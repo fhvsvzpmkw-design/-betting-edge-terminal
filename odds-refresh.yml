@@ -1,0 +1,244 @@
+name: Refresh Betting Edge odds
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Both PDT and PST UTC equivalents are listed.
+    # The Node step below checks America/Vancouver local time and only
+    # performs an API pull for the five Betting Edge refresh windows.
+    - cron: '45 12,13 * * *'  # 05:45 Vancouver
+    - cron: '45 14,15 * * *'  # 07:45 Vancouver
+    - cron: '15 16,17 * * *'  # 09:15 Vancouver
+    - cron: '0 22,23 * * *'   # 15:00 Vancouver
+    - cron: '0 1,2 * * *'     # 18:00 Vancouver
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Bet365 + Betway odds
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const API_BASE = 'https://api.odds-api.io/v3';
+          const API_KEY = process.env.ODDS_API_KEY;
+          const BOOKMAKERS = ['Bet365', 'Betway'];
+          const TARGET_SPORTS = [
+            'football',
+            'american-football',
+            'basketball',
+            'baseball',
+            'ice-hockey',
+            'tennis'
+          ];
+          const TARGET_LOCAL_MINUTES = [
+            5 * 60 + 45,
+            7 * 60 + 45,
+            9 * 60 + 15,
+            15 * 60,
+            18 * 60
+          ];
+
+          if (!API_KEY) {
+            console.error('Missing GitHub Actions secret ODDS_API_KEY.');
+            process.exit(2);
+          }
+
+          function vancouverClock(date = new Date()) {
+            const parts = new Intl.DateTimeFormat('en-CA', {
+              timeZone: 'America/Vancouver',
+              hour12: false,
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            }).formatToParts(date);
+            const obj = Object.fromEntries(parts.map(p => [p.type, p.value]));
+            const hour = Number(obj.hour === '24' ? '0' : obj.hour);
+            return {
+              date: `${obj.year}-${obj.month}-${obj.day}`,
+              hour,
+              minute: Number(obj.minute),
+              second: Number(obj.second),
+              label: `${obj.year}-${obj.month}-${obj.day} ${String(hour).padStart(2,'0')}:${obj.minute}:${obj.second} America/Vancouver`
+            };
+          }
+
+          function nearScheduledWindow(clock) {
+            if (process.env.EVENT_NAME === 'workflow_dispatch') return true;
+            const nowMin = clock.hour * 60 + clock.minute;
+            return TARGET_LOCAL_MINUTES.some(target => Math.abs(nowMin - target) <= 20);
+          }
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          async function fetchJson(url, attempts = 3) {
+            let last;
+            for (let i = 0; i < attempts; i++) {
+              try {
+                const res = await fetch(url, {
+                  headers: {
+                    accept: 'application/json',
+                    'user-agent': 'betting-edge-terminal/1.2'
+                  }
+                });
+                if (res.ok) return await res.json();
+                const body = await res.text();
+                const err = new Error(`${res.status} ${res.statusText}: ${body.slice(0, 400)}`);
+                if (res.status !== 429 && res.status < 500) throw err;
+                last = err;
+              } catch (err) {
+                last = err;
+              }
+              await sleep(1000 * (i + 1));
+            }
+            throw last;
+          }
+
+          function apiUrl(endpoint, params = {}, authenticated = true) {
+            const u = new URL(API_BASE + endpoint);
+            if (authenticated) u.searchParams.set('apiKey', API_KEY);
+            for (const [key, value] of Object.entries(params)) {
+              if (value !== undefined && value !== null && value !== '') {
+                u.searchParams.set(key, String(value));
+              }
+            }
+            return u.toString();
+          }
+
+          function norm(text) {
+            return String(text || '').toLowerCase().replace(/[_\s]+/g, '-');
+          }
+
+          function sportWanted(sport) {
+            const values = [sport?.slug, sport?.name].map(norm);
+            return TARGET_SPORTS.some(target =>
+              values.some(v => v === target || v.includes(target))
+            );
+          }
+
+          function chunks(arr, n) {
+            const out = [];
+            for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+            return out;
+          }
+
+          (async () => {
+            const clock = vancouverClock();
+
+            if (!nearScheduledWindow(clock)) {
+              console.log(`Skipping duplicate DST cron at ${clock.label}.`);
+              return;
+            }
+
+            const now = new Date();
+            const to = new Date(now.getTime() + 36 * 60 * 60 * 1000);
+
+            let sports = [];
+            try {
+              sports = await fetchJson(apiUrl('/sports', {}, false));
+            } catch {
+              // Some deployments accept the key here; retry authenticated.
+              sports = await fetchJson(apiUrl('/sports', {}, true));
+            }
+
+            const selectedSports = (Array.isArray(sports) ? sports : []).filter(sportWanted);
+
+            const snapshot = {
+              schema: 1,
+              generatedAt: now.toISOString(),
+              generatedAtVancouver: clock.label,
+              source: 'Odds-API.io v3',
+              bookmakers: BOOKMAKERS,
+              horizonHours: 36,
+              selectedSports: selectedSports.map(s => ({
+                name: s.name,
+                slug: s.slug
+              })),
+              events: [],
+              errors: []
+            };
+
+            for (const sport of selectedSports) {
+              try {
+                const events = await fetchJson(apiUrl('/events', {
+                  sport: sport.slug,
+                  status: 'pending',
+                  from: now.toISOString(),
+                  to: to.toISOString()
+                }));
+
+                const next = (Array.isArray(events) ? events : [])
+                  .filter(e => e?.id)
+                  .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))
+                  .slice(0, 20);
+
+                for (const batch of chunks(next, 10)) {
+                  const eventIds = batch.map(e => e.id).join(',');
+                  if (!eventIds) continue;
+                  const odds = await fetchJson(apiUrl('/odds/multi', {
+                    eventIds,
+                    bookmakers: BOOKMAKERS.join(',')
+                  }));
+                  if (Array.isArray(odds)) snapshot.events.push(...odds);
+                }
+              } catch (err) {
+                snapshot.errors.push({
+                  sport: sport.slug,
+                  message: String(err?.message || err)
+                });
+              }
+            }
+
+            snapshot.eventCount = snapshot.events.length;
+            snapshot.complete = snapshot.eventCount > 0 && snapshot.errors.length === 0;
+
+            fs.mkdirSync('data', { recursive: true });
+            fs.writeFileSync(
+              path.join('data', 'live-odds.json'),
+              JSON.stringify(snapshot, null, 2) + '\n',
+              'utf8'
+            );
+
+            console.log(`Saved ${snapshot.eventCount} events from ${BOOKMAKERS.join(' + ')}.`);
+            if (snapshot.errors.length) {
+              console.log(`Partial sport errors: ${snapshot.errors.length}`);
+            }
+          })().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Publish snapshot
+        run: |
+          if [ ! -f data/live-odds.json ]; then
+            echo "No refresh due in this DST cron window."
+            exit 0
+          fi
+
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/live-odds.json
+
+          if git diff --cached --quiet; then
+            echo "No odds changes to publish."
+            exit 0
+          fi
+
+          git commit -m "Refresh Betting Edge live odds"
+          git push
