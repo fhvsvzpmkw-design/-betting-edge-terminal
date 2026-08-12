@@ -1,0 +1,435 @@
+name: Refresh Betting Edge odds
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Both PDT and PST UTC equivalents are listed.
+    # The Node step below checks America/Vancouver local time and only
+    # performs an API pull for the five Betting Edge refresh windows.
+    - cron: '45 12,13 * * *'  # 05:45 Vancouver
+    - cron: '45 14,15 * * *'  # 07:45 Vancouver
+    - cron: '15 16,17 * * *'  # 09:15 Vancouver
+    - cron: '55 21,22 * * *'  # 14:55 Vancouver
+    - cron: '55 0,1 * * *'    # 17:55 Vancouver
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Bet365 + Betway odds
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const API_BASE = 'https://api.odds-api.io/v3';
+          const API_KEY = process.env.ODDS_API_KEY;
+          const BOOKMAKERS = ['Bet365', 'Betway'];
+          const TARGET_SPORTS = [
+            'football',
+            'american-football',
+            'basketball',
+            'baseball',
+            'ice-hockey',
+            'tennis'
+          ];
+          const TARGET_LOCAL_MINUTES = [
+            5 * 60 + 45,
+            7 * 60 + 45,
+            9 * 60 + 15,
+            14 * 60 + 55,
+            17 * 60 + 55
+          ];
+          const HORIZON_HOURS = 36;
+          const EVENTS_PAGE_SIZE = 200;
+          const MAX_EVENT_PAGES = 10;
+
+          if (!API_KEY) {
+            console.error('Missing GitHub Actions secret ODDS_API_KEY.');
+            process.exit(2);
+          }
+
+          function vancouverClock(date = new Date()) {
+            const parts = new Intl.DateTimeFormat('en-CA', {
+              timeZone: 'America/Vancouver',
+              hour12: false,
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            }).formatToParts(date);
+            const obj = Object.fromEntries(parts.map(p => [p.type, p.value]));
+            const hour = Number(obj.hour === '24' ? '0' : obj.hour);
+            return {
+              date: `${obj.year}-${obj.month}-${obj.day}`,
+              hour,
+              minute: Number(obj.minute),
+              second: Number(obj.second),
+              label: `${obj.year}-${obj.month}-${obj.day} ${String(hour).padStart(2,'0')}:${obj.minute}:${obj.second} America/Vancouver`
+            };
+          }
+
+          function nearScheduledWindow(clock) {
+            if (process.env.EVENT_NAME === 'workflow_dispatch') return true;
+            const nowMin = clock.hour * 60 + clock.minute;
+            return TARGET_LOCAL_MINUTES.some(target => Math.abs(nowMin - target) <= 20);
+          }
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          async function fetchJson(url, attempts = 3) {
+            let last;
+            for (let i = 0; i < attempts; i++) {
+              try {
+                const res = await fetch(url, {
+                  headers: {
+                    accept: 'application/json',
+                    'user-agent': 'betting-edge-terminal/1.2'
+                  }
+                });
+                if (res.ok) return await res.json();
+
+                const body = await res.text();
+                const err = new Error(`${res.status} ${res.statusText}: ${body.slice(0, 500)}`);
+
+                // Retry rate limits and server errors. Fail fast on other 4xx errors.
+                if (res.status !== 429 && res.status < 500) throw err;
+                last = err;
+              } catch (err) {
+                last = err;
+              }
+
+              await sleep(1000 * (i + 1));
+            }
+            throw last;
+          }
+
+          function apiUrl(endpoint, params = {}, authenticated = true) {
+            const u = new URL(API_BASE + endpoint);
+            if (authenticated) u.searchParams.set('apiKey', API_KEY);
+            for (const [key, value] of Object.entries(params)) {
+              if (value !== undefined && value !== null && value !== '') {
+                u.searchParams.set(key, String(value));
+              }
+            }
+            return u.toString();
+          }
+
+          function chunks(arr, n) {
+            const out = [];
+            for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+            return out;
+          }
+
+          function marketCount(event) {
+            const books = event?.bookmakers || {};
+            return Object.values(books).reduce((sum, markets) => {
+              return sum + (Array.isArray(markets) ? markets.length : 0);
+            }, 0);
+          }
+
+          function playerPropMarkets(event) {
+            const books = event?.bookmakers || {};
+            const out = {};
+
+            for (const [bookmaker, markets] of Object.entries(books)) {
+              if (!Array.isArray(markets)) continue;
+
+              const props = markets.filter(market => {
+                const name = String(market?.name || '').toLowerCase();
+                if (!name) return false;
+
+                // Keep explicit player/props markets and common MLB player-stat markets.
+                return (
+                  name.includes('player') ||
+                  name.includes('props') ||
+                  name.includes('strikeout') ||
+                  name.includes('home run') ||
+                  name.includes('total bases') ||
+                  name.includes('hits') ||
+                  name.includes('rbi')
+                );
+              });
+
+              if (props.length) out[bookmaker] = props;
+            }
+
+            return out;
+          }
+
+          async function getEventsForBookmaker(sport, bookmaker, now, to) {
+            const merged = new Map();
+
+            for (let page = 1; page <= MAX_EVENT_PAGES; page++) {
+              const events = await fetchJson(apiUrl('/events', {
+                sport,
+                status: 'pending',
+                from: now.toISOString(),
+                to: to.toISOString(),
+                bookmaker,
+                limit: EVENTS_PAGE_SIZE,
+                page
+              }));
+
+              const rows = Array.isArray(events) ? events : [];
+              let added = 0;
+
+              for (const event of rows) {
+                if (!event?.id) continue;
+                if (!merged.has(event.id)) {
+                  merged.set(event.id, event);
+                  added++;
+                }
+              }
+
+              // Normal end-of-pagination case.
+              if (rows.length < EVENTS_PAGE_SIZE) break;
+
+              // Safety for deployments that accept "limit" but ignore "page":
+              // don't keep requesting the same first page.
+              if (added === 0) break;
+            }
+
+            return [...merged.values()];
+          }
+
+          (async () => {
+            const clock = vancouverClock();
+
+            if (!nearScheduledWindow(clock)) {
+              console.log(`Skipping duplicate DST cron at ${clock.label}.`);
+              return;
+            }
+
+            const now = new Date();
+            const to = new Date(now.getTime() + HORIZON_HOURS * 60 * 60 * 1000);
+
+            // Verify the configured sports exist, using exact slugs only.
+            let sports = [];
+            try {
+              sports = await fetchJson(apiUrl('/sports', {}, false));
+            } catch {
+              sports = await fetchJson(apiUrl('/sports', {}, true));
+            }
+
+            const availableSlugs = new Set(
+              (Array.isArray(sports) ? sports : [])
+                .map(s => String(s?.slug || ''))
+                .filter(Boolean)
+            );
+            const selectedSports = TARGET_SPORTS.filter(slug => availableSlugs.has(slug));
+
+            const snapshot = {
+              schema: 2,
+              generatedAt: now.toISOString(),
+              generatedAtVancouver: clock.label,
+              source: 'Odds-API.io v3',
+              bookmakers: BOOKMAKERS,
+              horizonHours: HORIZON_HOURS,
+              selectedSports,
+              events: [],
+              baseballProps: [],
+              diagnostics: {
+                eventCandidatesBySport: {},
+                eventCandidatesTotal: 0,
+                mainOddsEvents: 0,
+                mainOddsMarkets: 0,
+                bet365Events: 0,
+                betwayEvents: 0,
+                baseballEventsCheckedForProps: 0,
+                baseballEventsWithProps: 0,
+                baseballPropMarkets: 0
+              },
+              errors: []
+            };
+
+            const candidateEvents = new Map();
+
+            // Discover every upcoming event that has Bet365 or Betway coverage.
+            for (const sport of selectedSports) {
+              const sportEvents = new Map();
+
+              for (const bookmaker of BOOKMAKERS) {
+                try {
+                  const events = await getEventsForBookmaker(sport, bookmaker, now, to);
+                  for (const event of events) {
+                    if (event?.id) sportEvents.set(event.id, event);
+                  }
+                } catch (err) {
+                  snapshot.errors.push({
+                    stage: 'events',
+                    sport,
+                    bookmaker,
+                    message: String(err?.message || err)
+                  });
+                }
+              }
+
+              const rows = [...sportEvents.values()]
+                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+
+              snapshot.diagnostics.eventCandidatesBySport[sport] = rows.length;
+              snapshot.diagnostics.eventCandidatesTotal += rows.length;
+
+              for (const event of rows) {
+                candidateEvents.set(event.id, event);
+              }
+            }
+
+            // Main event markets: batch up to 10 event IDs per request.
+            const candidates = [...candidateEvents.values()]
+              .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+
+            for (const batch of chunks(candidates, 10)) {
+              const eventIds = batch.map(e => e.id).join(',');
+              if (!eventIds) continue;
+
+              try {
+                const odds = await fetchJson(apiUrl('/odds/multi', {
+                  eventIds,
+                  bookmakers: BOOKMAKERS.join(',')
+                }));
+
+                if (Array.isArray(odds)) {
+                  snapshot.events.push(...odds);
+                }
+              } catch (err) {
+                snapshot.errors.push({
+                  stage: 'odds-multi',
+                  eventIds,
+                  message: String(err?.message || err)
+                });
+              }
+            }
+
+            // De-duplicate main odds in case upstream event discovery overlapped.
+            snapshot.events = [
+              ...new Map(
+                snapshot.events
+                  .filter(e => e?.id)
+                  .map(e => [e.id, e])
+              ).values()
+            ].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+
+            snapshot.diagnostics.mainOddsEvents = snapshot.events.length;
+            snapshot.diagnostics.mainOddsMarkets = snapshot.events.reduce(
+              (sum, event) => sum + marketCount(event), 0
+            );
+            snapshot.diagnostics.bet365Events = snapshot.events.filter(
+              e => Array.isArray(e?.bookmakers?.Bet365) && e.bookmakers.Bet365.length > 0
+            ).length;
+            snapshot.diagnostics.betwayEvents = snapshot.events.filter(
+              e => Array.isArray(e?.bookmakers?.Betway) && e.bookmakers.Betway.length > 0
+            ).length;
+
+            // MLB/baseball player props: single-event /odds calls expose the richer
+            // per-event market set, including strikeouts where the bookmaker/API carries it.
+            const baseballCandidates = candidates.filter(e => e?.sport?.slug === 'baseball');
+
+            for (const event of baseballCandidates) {
+              snapshot.diagnostics.baseballEventsCheckedForProps++;
+
+              try {
+                const fullOdds = await fetchJson(apiUrl('/odds', {
+                  eventId: event.id,
+                  bookmakers: BOOKMAKERS.join(',')
+                }));
+
+                if (!fullOdds || typeof fullOdds !== 'object') continue;
+
+                const props = playerPropMarkets(fullOdds);
+                const propMarketCount = Object.values(props).reduce(
+                  (sum, markets) => sum + markets.length, 0
+                );
+
+                if (propMarketCount > 0) {
+                  snapshot.baseballProps.push({
+                    id: fullOdds.id,
+                    home: fullOdds.home,
+                    away: fullOdds.away,
+                    date: fullOdds.date,
+                    sport: fullOdds.sport,
+                    league: fullOdds.league,
+                    urls: fullOdds.urls || {},
+                    bookmakerIds: fullOdds.bookmakerIds || {},
+                    bookmakers: props
+                  });
+
+                  snapshot.diagnostics.baseballEventsWithProps++;
+                  snapshot.diagnostics.baseballPropMarkets += propMarketCount;
+                }
+              } catch (err) {
+                snapshot.errors.push({
+                  stage: 'baseball-props',
+                  eventId: event.id,
+                  home: event.home,
+                  away: event.away,
+                  message: String(err?.message || err)
+                });
+              }
+            }
+
+            snapshot.eventCount = snapshot.events.length;
+            snapshot.baseballPropEventCount = snapshot.baseballProps.length;
+            snapshot.complete =
+              snapshot.eventCount > 0 &&
+              snapshot.errors.length === 0;
+
+            fs.mkdirSync('data', { recursive: true });
+            fs.writeFileSync(
+              path.join('data', 'live-odds.json'),
+              JSON.stringify(snapshot, null, 2) + '\n',
+              'utf8'
+            );
+
+            console.log(
+              `Saved ${snapshot.eventCount} main-odds events; ` +
+              `${snapshot.baseballPropEventCount} baseball events with player props.`
+            );
+            console.log(
+              `Candidates: ${snapshot.diagnostics.eventCandidatesTotal}; ` +
+              `Bet365 events: ${snapshot.diagnostics.bet365Events}; ` +
+              `Betway events: ${snapshot.diagnostics.betwayEvents}; ` +
+              `baseball checked: ${snapshot.diagnostics.baseballEventsCheckedForProps}; ` +
+              `prop markets: ${snapshot.diagnostics.baseballPropMarkets}.`
+            );
+
+            if (snapshot.errors.length) {
+              console.log(`Partial API errors: ${snapshot.errors.length}`);
+            }
+          })().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Publish snapshot
+        run: |
+          if [ ! -f data/live-odds.json ]; then
+            echo "No refresh due in this DST cron window."
+            exit 0
+          fi
+
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/live-odds.json
+
+          if git diff --cached --quiet; then
+            echo "No odds changes to publish."
+            exit 0
+          fi
+
+          git commit -m "Refresh Betting Edge live odds"
+          git push
