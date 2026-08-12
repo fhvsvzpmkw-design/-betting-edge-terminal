@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Betting Edge Terminal v1.2.2 Runner</title>
+<title>Betting Edge Terminal v1.2.3 Runner</title>
 <style>
 html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 #app{border:0;width:100%;height:100%;display:block;background:#01040a}
@@ -12,11 +12,15 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 </head>
 <body>
 <div id="err"></div>
-<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.2"></iframe>
+<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.3"></iframe>
 <script>
 const $=s=>document.querySelector(s);
-const HISTORY_KEY='bettingEdge.runnerHistory.v1.2.2';
+const HISTORY_KEY='bettingEdge.runnerHistory.v1.2.3';
+const LEGACY_HISTORY_KEYS=['bettingEdge.runnerHistory.v1.2.2'];
 const HISTORY_LIMIT=30;
+const FEED_URL='./data/live-odds.json';
+let activeRun=null;
+let refreshBusy=false;
 
 function b64u(v){
   try{
@@ -48,9 +52,13 @@ function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==
 
 function safeHistory(){
   try{
-    const raw=localStorage.getItem(HISTORY_KEY);
-    const parsed=raw?JSON.parse(raw):[];
-    return Array.isArray(parsed)?parsed:[];
+    const map=new Map();
+    [HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(key=>{
+      const raw=localStorage.getItem(key);
+      const parsed=raw?JSON.parse(raw):[];
+      if(Array.isArray(parsed))parsed.forEach(x=>map.set(runKey(x),x));
+    });
+    return [...map.values()];
   }catch(e){return []}
 }
 
@@ -69,6 +77,8 @@ function normalizeRun(run){
       pass:Number(c.pass)||0
     },
     summary:txt(run&&run.summary,''),
+    feedGeneratedAt:txt(run&&run.feedGeneratedAt,''),
+    repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),
     recs:Array.isArray(run&&run.recs)?run.recs:[]
   };
 }
@@ -116,12 +126,352 @@ function mergedPriorRuns(run){
   return [...map.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')));
 }
 
+
+function b64ue(v){
+  const bytes=new TextEncoder().encode(v);
+  let bin='';
+  bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+function updateRunnerHash(run){
+  try{
+    const encoded=b64ue(JSON.stringify(run));
+    history.replaceState(null,'',location.pathname+location.search+'#run='+encoded);
+  }catch(e){console.warn('Could not update runner URL',e)}
+}
+
+function normName(v){
+  return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function decimalOdds(v){
+  const n=Number(v);
+  return Number.isFinite(n)&&n>1.001?n:null;
+}
+
+function americanNumber(dec){
+  const d=Number(dec);
+  if(!Number.isFinite(d)||d<=1)return null;
+  return d>=2?Math.round((d-1)*100):Math.round(-100/(d-1));
+}
+
+function americanText(dec){
+  const n=americanNumber(dec);
+  return n===null?'UNAVAILABLE':(n>0?'+':'')+n;
+}
+
+function americanProb(a){
+  const n=Number(a);
+  if(!Number.isFinite(n)||n===0)return null;
+  return n>0?100/(n+100):(-n)/((-n)+100);
+}
+
+function inheritedFairProb(fair){
+  const text=String(fair||'');
+  if(/RECALC|UNVERIFIED|UNAVAILABLE|N\/A/i.test(text))return null;
+  const m=text.match(/([+-]\d{3,4})/);
+  return m?americanProb(Number(m[1])):null;
+}
+
+function vancouverIso(date=new Date()){
+  try{
+    const parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:'America/Vancouver',hour12:false,
+      year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',second:'2-digit',
+      timeZoneName:'longOffset'
+    }).formatToParts(date);
+    const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+    const hh=o.hour==='24'?'00':o.hour;
+    let off=String(o.timeZoneName||'GMT-07:00').replace('GMT','');
+    if(!/^[+-]\d{2}:\d{2}$/.test(off))off='-07:00';
+    return `${o.year}-${o.month}-${o.day}T${hh}:${o.minute}:${o.second}${off}`;
+  }catch(e){
+    return date.toISOString();
+  }
+}
+
+function vancouverClock(ts){
+  const d=new Date(ts);
+  if(!Number.isFinite(d.getTime()))return txt(ts,'');
+  return new Intl.DateTimeFormat('en-CA',{
+    timeZone:'America/Vancouver',hour:'numeric',minute:'2-digit',hour12:true,
+    month:'short',day:'numeric'
+  }).format(d);
+}
+
+function marketByName(event,book,name){
+  const arr=event?.bookmakers?.[book];
+  if(!Array.isArray(arr))return null;
+  const exact=arr.find(m=>normName(m?.name)===normName(name));
+  if(exact)return exact;
+  return arr.find(m=>normName(m?.name).includes(normName(name)))||null;
+}
+
+function quoteFromStructured(event,book,feedRef){
+  const market=marketByName(event,book,feedRef.market);
+  if(!market||!Array.isArray(market.odds))return null;
+  const side=String(feedRef.side||'').toLowerCase();
+  const label=normName(feedRef.label||'');
+  const hasHdp=feedRef.hdp!==undefined&&feedRef.hdp!==null&&feedRef.hdp!=='';
+  const hdp=hasHdp?Number(feedRef.hdp):null;
+
+  for(const row of market.odds){
+    if(label && normName(row?.label)!==label)continue;
+    if(hasHdp && Math.abs(Number(row?.hdp)-hdp)>0.001)continue;
+    const dec=decimalOdds(row?.[side]);
+    if(dec)return {book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row};
+  }
+  return null;
+}
+
+function teamEvent(feed,team){
+  const n=normName(team);
+  if(!n)return null;
+  const matches=(feed.events||[]).filter(e=>normName(e.home)===n||normName(e.away)===n);
+  return matches.length===1?matches[0]:null;
+}
+
+function playerEvent(feed,player,keyword){
+  const p=normName(player);
+  const k=normName(keyword);
+  const hits=[];
+  for(const e of feed.events||[]){
+    for(const book of ['Bet365','Betway']){
+      const markets=e?.bookmakers?.[book];
+      if(!Array.isArray(markets))continue;
+      for(const m of markets){
+        if(k && !normName(m?.name).includes(k))continue;
+        if((m.odds||[]).some(row=>normName(row?.label)===p)){hits.push(e);break}
+      }
+    }
+  }
+  const unique=[...new Map(hits.map(e=>[e.id,e])).values()];
+  return unique.length===1?unique[0]:null;
+}
+
+function bestQuoteForRec(rec,feed){
+  const books=['Bet365','Betway'];
+  const quotes=[];
+
+  if(rec?.feed?.eventId && rec?.feed?.market && rec?.feed?.side){
+    const event=(feed.events||[]).find(e=>String(e.id)===String(rec.feed.eventId));
+    if(event){
+      for(const book of books){
+        const q=quoteFromStructured(event,book,rec.feed);
+        if(q)quotes.push(q);
+      }
+      if(quotes.length)return quotes.sort((a,b)=>b.dec-a.dec)[0];
+    }
+  }
+
+  const title=String(rec?.title||'').trim();
+
+  const ml=title.match(/^(.*?)\s+ML$/i);
+  if(ml){
+    const team=ml[1].trim();
+    const event=teamEvent(feed,team);
+    if(event){
+      const side=normName(event.home)===normName(team)?'home':'away';
+      for(const book of books){
+        const market=marketByName(event,book,'ML');
+        const row=market?.odds?.[0];
+        const dec=decimalOdds(row?.[side]);
+        if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
+      }
+    }
+  }
+
+  if(!quotes.length){
+    const spread=title.match(/^(.*?)\s+([+-]\d+(?:\.\d+)?)$/);
+    if(spread){
+      const team=spread[1].trim();
+      const line=Number(spread[2]);
+      const event=teamEvent(feed,team);
+      if(event){
+        const side=normName(event.home)===normName(team)?'home':'away';
+        for(const book of books){
+          const market=marketByName(event,book,'Spread');
+          if(!market)continue;
+          let rows=(market.odds||[]).filter(row=>decimalOdds(row?.[side]) && Math.abs(Math.abs(Number(row?.hdp))-Math.abs(line))<0.001);
+          rows.sort((a,b)=>{
+            const ae=Math.abs(Number(a?.hdp)-line)<0.001?0:1;
+            const be=Math.abs(Number(b?.hdp)-line)<0.001?0:1;
+            return ae-be;
+          });
+          const row=rows[0];
+          const dec=decimalOdds(row?.[side]);
+          if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
+        }
+      }
+    }
+  }
+
+  if(!quotes.length){
+    const prop=title.match(/^(.*?)\s+([OU])(\d+(?:\.\d+)?)\s+(.+)$/i);
+    if(prop){
+      const player=prop[1].trim();
+      const side=prop[2].toUpperCase()==='O'?'over':'under';
+      const line=Number(prop[3]);
+      const keyword=prop[4].trim();
+      const event=playerEvent(feed,player,keyword);
+      if(event){
+        for(const book of books){
+          const markets=event?.bookmakers?.[book]||[];
+          for(const market of markets){
+            if(!normName(market?.name).includes(normName(keyword)))continue;
+            const row=(market.odds||[]).find(r=>
+              normName(r?.label)===normName(player) &&
+              Math.abs(Number(r?.hdp)-line)<0.001 &&
+              decimalOdds(r?.[side])
+            );
+            const dec=decimalOdds(row?.[side]);
+            if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
+          }
+        }
+      }
+    }
+  }
+
+  return quotes.length?quotes.sort((a,b)=>b.dec-a.dec)[0]:null;
+}
+
+function repriceStatus(originalStatus,ev){
+  const s=String(originalStatus||'WAIT').toUpperCase();
+  if(s==='WAIT')return 'WAIT';
+  if(!Number.isFinite(ev))return 'WAIT';
+  if(ev<=0)return 'PASS';
+  if(s==='BET')return ev>=2.5?'BET':ev>=0.5?'LEAN':'WAIT';
+  if(s==='LEAN')return ev>=1.0?'LEAN':'WAIT';
+  if(s==='PASS')return ev>=3.0?'LEAN':'WAIT';
+  return 'WAIT';
+}
+
+function repriceRec(rec,feed){
+  const out={...rec};
+  const q=bestQuoteForRec(rec,feed);
+  const oldPrice=txt(rec.price,'—');
+
+  if(!q){
+    out.status=String(rec.status||'WAIT').toUpperCase()==='PASS'?'PASS':'WAIT';
+    out.price='UNVERIFIED';
+    out.edge='NEEDS FULL RERUN';
+    out.move=`${oldPrice} → unverified`;
+    out.stake='$0';
+    out.source=`LATEST FEED // ${vancouverClock(feed.generatedAt)}`;
+    out.contrary='No exact current Bet365/Betway market match was found. Full scheduled rerun required.';
+    out.analysis=txt(rec.analysis,'')+
+      `\n\nREPRICE ONLY: latest published feed could not verify this exact market. Underlying analysis was not rebuilt.`;
+    return {rec:out,matched:false};
+  }
+
+  const fairProb=inheritedFairProb(rec.fair);
+  out.book=q.book;
+  out.price=americanText(q.dec);
+  out.move=`${oldPrice} → ${out.price}`;
+  out.source=`Odds-API.io → ${q.book} // ${vancouverClock(q.updatedAt||feed.generatedAt)}`;
+
+  if(fairProb===null){
+    out.status='WAIT';
+    out.edge='FAIR NEEDS FULL RERUN';
+    out.stake='$0';
+  }else{
+    const ev=(fairProb*q.dec-1)*100;
+    out.status=repriceStatus(rec.status,ev);
+    out.edge=`${ev>=0?'+':''}${ev.toFixed(1)}% EV vs inherited fair`;
+    if(out.status!=='BET')out.stake='$0';
+  }
+
+  out.analysis=txt(rec.analysis,'')+
+    `\n\nREPRICE ONLY: price updated from the latest published Bet365/Betway feed. The matchup handicap and fair value are inherited from the prior full Betting Edge run; the next scheduled run rebuilds them.`;
+  return {rec:out,matched:true};
+}
+
+function countCalls(recs){
+  const c={bet:0,lean:0,wait:0,pass:0};
+  for(const r of recs||[]){
+    const k=String(r.status||'WAIT').toLowerCase();
+    if(k in c)c[k]++;
+    else c.wait++;
+  }
+  return c;
+}
+
+function feedAgeMinutes(feed){
+  const t=Date.parse(feed?.generatedAt);
+  return Number.isFinite(t)?(Date.now()-t)/60000:Infinity;
+}
+
+async function refreshAndReprice(statusEl,button){
+  if(refreshBusy||!activeRun)return;
+  refreshBusy=true;
+  button.disabled=true;
+  button.textContent='UPDATING…';
+  statusEl.textContent='Fetching latest published Bet365/Betway snapshot…';
+
+  try{
+    const res=await fetch(FEED_URL+'?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('Feed HTTP '+res.status);
+    const feed=await res.json();
+    if(!feed||!Array.isArray(feed.events)||!feed.generatedAt)throw new Error('Malformed odds feed');
+
+    const age=feedAgeMinutes(feed);
+    if(age>75){
+      statusEl.textContent=`FEED STALE — latest snapshot ${vancouverClock(feed.generatedAt)} (${Math.round(age)}m old). No reprice applied.`;
+      return;
+    }
+
+    const feedMs=Date.parse(feed.generatedAt);
+    const currentFeedMs=Date.parse(activeRun.feedGeneratedAt||activeRun.ts||'');
+    if(Number.isFinite(feedMs)&&Number.isFinite(currentFeedMs)&&feedMs<=currentFeedMs){
+      statusEl.textContent=`NO NEW ODDS SNAPSHOT — latest published ${vancouverClock(feed.generatedAt)}.`;
+      return;
+    }
+
+    saveCurrentRun(activeRun);
+
+    let matched=0;
+    const recs=(activeRun.recs||[]).map(r=>{
+      const x=repriceRec(r,feed);
+      if(x.matched)matched++;
+      return x.rec;
+    });
+    const need=recs.length-matched;
+    const base=activeRun.repriceBaseLabel||activeRun.label||activeRun.slot||'BETTING EDGE';
+    const now=vancouverIso();
+
+    activeRun={
+      ...activeRun,
+      label:`${base} // REPRICE ${new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())}`,
+      repriceBaseLabel:base,
+      ts:now,
+      feedGeneratedAt:feed.generatedAt,
+      risk:0,
+      counts:countCalls(recs),
+      summary:`REPRICE ONLY using Bet365/Betway snapshot ${vancouverClock(feed.generatedAt)}. ${matched} exact market${matched===1?'':'s'} repriced; ${need} require${need===1?'s':''} full rerun. Underlying handicap/fair values are inherited from the last full Betting Edge run.`,
+      recs
+    };
+
+    saveCurrentRun(activeRun);
+    updateRunnerHash(activeRun);
+    apply(activeRun);
+  }catch(e){
+    statusEl.textContent='UPDATE FAILED — '+String(e?.message||e);
+  }finally{
+    refreshBusy=false;
+    button.disabled=false;
+    button.textContent='↻ UPDATE ODDS / REPRICE NOW';
+  }
+}
+
 function injectStyle(d){
-  const old=d.getElementById('runnerStyle122');
+  const old=d.getElementById('runnerStyle123');
   if(old)old.remove();
 
   const st=d.createElement('style');
-  st.id='runnerStyle122';
+  st.id='runnerStyle123';
   st.textContent=`
 #runnerLive{margin-top:10px;border:2px solid var(--green);background:#04130b;padding:11px}
 .runnerHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -148,6 +498,10 @@ function injectStyle(d){
 .runnerPriorActions{display:flex;gap:8px;align-items:center;margin-top:8px}
 .runnerClear{font:inherit;font-size:10px;padding:5px 7px;background:#090d13;color:var(--muted);border:1px solid var(--line);cursor:pointer}
 .runnerClear:hover{color:var(--cyan);border-color:var(--cyan)}
+.runnerRefresh{margin-top:9px;border:1px solid var(--cyan);padding:9px;background:#01131a}
+.runnerRefreshBtn{width:100%;font:inherit;font-weight:900;padding:9px;background:#05222b;color:var(--cyan);border:1px solid var(--cyan);cursor:pointer}
+.runnerRefreshBtn:disabled{opacity:.55;cursor:default}
+.runnerRefreshStatus{margin-top:6px;font-size:11px;color:var(--muted);line-height:1.4}
 @media(max-width:760px){.runnerCounts,.runnerFacts{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.runnerCounts,.runnerFacts{grid-template-columns:1fr}.runnerTop{display:block}}
 `;
@@ -260,7 +614,7 @@ function priorSection(d,run){
   const clear=el(d,'button','runnerClear','CLEAR SAVED HISTORY');
   clear.onclick=()=>{
     if(confirm('Clear Betting Edge saved runner history on this device?')){
-      localStorage.removeItem(HISTORY_KEY);
+      [HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));
       apply(run);
     }
   };
@@ -292,7 +646,7 @@ function apply(run){
   if(archive)archive.style.display='none';
 
   const build=d.querySelector('.top .small.muted');
-  if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.2';
+  if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.3';
 
   if(!run)return;
 
@@ -330,6 +684,17 @@ function apply(run){
     summary.style.marginTop='8px';
     summary.textContent=txt(run.summary,'No summary supplied.');
     box.appendChild(summary);
+
+    const refresh=el(d,'div','runnerRefresh');
+    const refreshBtn=el(d,'button','runnerRefreshBtn','↻ UPDATE ODDS / REPRICE NOW');
+    const refreshStatus=el(d,'div','runnerRefreshStatus',
+      run.feedGeneratedAt
+        ? 'Current price snapshot: '+vancouverClock(run.feedGeneratedAt)+'. Full handicap refresh remains scheduled.'
+        : 'Checks the latest published Bet365/Betway snapshot and reprices this existing analysis. Full handicap refresh remains scheduled.'
+    );
+    refreshBtn.onclick=()=>refreshAndReprice(refreshStatus,refreshBtn);
+    refresh.append(refreshBtn,refreshStatus);
+    box.appendChild(refresh);
 
     const counts=el(d,'div','runnerCounts');
     const cc=run.counts||{};
@@ -387,11 +752,11 @@ function apply(run){
   }
 }
 
-const run=payload();
-if(run && !run.__error)saveCurrentRun(run);
+activeRun=payload();
+if(activeRun && !activeRun.__error)saveCurrentRun(activeRun);
 
 $('#app').addEventListener('load',()=>{
-  try{apply(run)}
+  try{apply(activeRun)}
   catch(e){
     const x=$('#err');
     x.textContent='Betting Edge runner error: '+e.message;
