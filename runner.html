@@ -39,7 +39,15 @@ function runKey(run){return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].
 function safeHistory(){try{const map=new Map();[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(key=>{const raw=localStorage.getItem(key);const parsed=raw?JSON.parse(raw):[];if(Array.isArray(parsed))parsed.forEach(x=>map.set(runKey(x),x))});return [...map.values()]}catch(e){return []}}
 function saveCurrentRun(run){if(!run||run.__error||!run.ts)return;try{const current=normalizeRun(run),key=runKey(current);let h=safeHistory().filter(x=>runKey(x)!==key);h.push(current);h.sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));if(h.length>HISTORY_LIMIT)h=h.slice(-HISTORY_LIMIT);localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(e){console.warn('History save failed',e)}}
 function localDateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
-function mergedPriorRuns(run){const currentKey=runKey(run),day=localDateKey(run.ts);const embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];const map=new Map();[...embedded,...safeHistory()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;map.set(k,normalizeRun(x))});return [...map.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')))}
+function historyFamilyKey(run){const label=txt(run&&run.repriceBaseLabel||run&&run.label||run&&run.slot,'').replace(/\s*\/\/\s*REPRICE\s+\d{1,2}:\d{2}\s*$/i,'').trim();return [localDateKey(run&&run.ts),txt(run&&run.slot,''),label].join('|')}
+function mergedPriorRuns(run){
+  const currentKey=runKey(run),day=localDateKey(run.ts),embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];
+  const exact=new Map();
+  [...embedded,...safeHistory()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;exact.set(k,normalizeRun(x))});
+  const grouped=new Map();
+  [...exact.values()].forEach(x=>{const k=historyFamilyKey(x),prior=grouped.get(k);if(!prior){grouped.set(k,{...x,snapshotCount:1});return}const newer=String(x.ts||'')>String(prior.ts||'')?x:prior;grouped.set(k,{...newer,snapshotCount:(prior.snapshotCount||1)+1})});
+  return [...grouped.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')))
+}
 function updateRunnerHash(run){try{history.replaceState(null,'',location.pathname+location.search+'#run='+b64ue(JSON.stringify(run)))}catch(e){console.warn('Could not update runner URL',e)}}
 
 function normName(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim()}
@@ -153,7 +161,8 @@ function injectStyle(d){
   .runnerRefreshActions{display:grid;grid-template-columns:1fr auto;gap:7px}
   .runnerRefreshBtn,.runnerRestoreBtn{font:inherit;font-weight:950;padding:10px;cursor:pointer}
   .runnerRefreshBtn{background:#05222b;color:var(--cyan);border:1px solid var(--cyan)}
-  .runnerRestoreBtn{background:#090d13;color:var(--muted);border:1px solid var(--line)}
+  .runnerRestoreBtn{background:#171403;color:var(--yellow);border:1px solid var(--yellow)}
+  .runnerRestoreBtn:hover,.runnerRestoreBtn:focus{background:#251f03;color:#fff3a6}
   .runnerRefreshBtn:disabled{opacity:.55;cursor:default}
   .runnerRefreshStatus{margin-top:7px;font-size:11px;color:var(--muted);line-height:1.4}
   .deltaStrip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
@@ -290,7 +299,7 @@ function priorSection(d,run){
   const arr=mergedPriorRuns(run),sec=el(d,'div');sec.id='runnerPrior';
   const head=el(d,'div','runnerPriorHead'),left=el(d,'div');
   left.append(el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),el(d,'div','small muted','Earlier snapshots saved on this device for this betting day.'),el(d,'div','runnerPriorMeta','MASTER LEDGER // 1,622 WAGERS // 163 PAGES'));
-  head.append(left,el(d,'span','tag c',String(arr.length)+' SAVED'));sec.appendChild(head);
+  head.append(left,el(d,'span','tag c',String(arr.length)+' RUNS'));sec.appendChild(head);
   const list=el(d,'div','runnerPriorList');
   if(!arr.length){
     const q=el(d,'div','runnerPriorItem');q.append(el(d,'b','muted','NO EARLIER RUNS SAVED YET'),el(d,'div','runnerPriorMeta','Timed runner links opened on this device accumulate here automatically.'));list.appendChild(q)
@@ -298,7 +307,8 @@ function priorSection(d,run){
     arr.forEach(p=>{
       const item=el(d,'details','runnerPriorItem');
       item.appendChild(el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN')));
-      item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')),el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.')));
+      const grouped=p.snapshotCount>1?` // ${p.snapshotCount} SNAPSHOTS GROUPED`:'';
+      item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')+grouped),el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.')));
       const c=p.counts||{};
       item.appendChild(el(d,'div','runnerPriorMeta','BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)));
       list.appendChild(item)
@@ -319,6 +329,8 @@ function apply(run){
   const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
   const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='BETTING EDGE TERMINAL UI v1.3';
   const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
+  [...d.querySelectorAll('.sectiontitle')].forEach(x=>{if(/^SOURCE GOVERNANCE\s*\/\//i.test(x.textContent))x.textContent='SOURCE GOVERNANCE // v1.3'});
+  const footer=d.querySelector('.foot');if(footer)footer.textContent=footer.textContent.replace(/v1\.2/g,'v1.3');
   const qa=d.querySelector('.qa');if(qa)qa.style.display='none';
   if(!run){
     const board=d.getElementById('board');
