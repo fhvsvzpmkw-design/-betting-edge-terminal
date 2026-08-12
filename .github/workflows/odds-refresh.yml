@@ -1,11 +1,10 @@
-name: Refresh Betting Edge odds
+name:name: Refresh Betting Edge odds
 
 on:
   workflow_dispatch:
   schedule:
-    # Both PDT and PST UTC equivalents are listed.
-    # The Node step below checks America/Vancouver local time and only
-    # performs an API pull for the five Betting Edge refresh windows.
+    # PDT + PST UTC equivalents.
+    # Node checks America/Vancouver and only executes near the five local windows.
     - cron: '45 12,13 * * *'  # 05:45 Vancouver
     - cron: '45 14,15 * * *'  # 07:45 Vancouver
     - cron: '15 16,17 * * *'  # 09:15 Vancouver
@@ -18,30 +17,50 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull Bet365 + Betway odds
+      - name: Pull quota-aware Bet365 + Betway odds
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
+
         run: |
           node <<'NODE'
+
           const fs = require('fs');
           const path = require('path');
           const crypto = require('crypto');
 
           const API_BASE = 'https://api.odds-api.io/v3';
           const API_KEY = process.env.ODDS_API_KEY;
-          const BOOKMAKERS = ['Bet365', 'Betway'];
+
+          const BOOKMAKERS = [
+            'Bet365',
+            'Betway'
+          ];
+
+          /*
+           * Broad sport families.
+           *
+           * football          = soccer
+           * american-football = NFL / NCAA / CFL etc.
+           *
+           * Combat-sport aliases returned by /sports are also detected
+           * dynamically below.
+           */
           const TARGET_SPORTS = [
             'football',
             'american-football',
             'basketball',
             'baseball',
             'ice-hockey',
-            'tennis'
+            'tennis',
+            'boxing',
+            'mma'
           ];
+
           const TARGET_LOCAL_MINUTES = [
             5 * 60 + 45,
             7 * 60 + 45,
@@ -50,581 +69,2176 @@ jobs:
             17 * 60 + 55
           ];
 
-          const HORIZON_HOURS = 36;
-          const EVENTS_PAGE_SIZE = 200;
-          const MAX_EVENT_PAGES = 10;
+          /*
+           * QUOTA POLICY
+           *
+           * Free tier:
+           *   100 requests/hour
+           *   500 requests/day
+           *
+           * We deliberately stop well below the hourly maximum.
+           */
+          const REQUEST_BUDGET = 70;
+          const SAFETY_RESERVE = 5;
+          const OPTIONAL_STOP_AT =
+            REQUEST_BUDGET - SAFETY_RESERVE;
 
-          // Safety: a fresh snapshot must not carry an old individual market
-          // as if that market were current.
+          /*
+           * Main board:
+           * look ahead far enough to cover today's/overnight slate.
+           */
+          const HORIZON_HOURS = 30;
+
+          /*
+           * Deep markets / props:
+           * spend requests primarily on games/fights approaching start time.
+           */
+          const PROP_HORIZON_HOURS = 8;
+          const MAX_PROP_EVENTS = 24;
+
+          const EVENTS_PAGE_SIZE = 200;
+          const MAX_EVENT_PAGES = 4;
+
+          /*
+           * Never publish an individual market as "current"
+           * if its own update timestamp is too old.
+           */
           const MAX_MARKET_AGE_MINUTES = 90;
 
-          const OUTFILE = path.join('data', 'live-odds.json');
-          const TMPFILE = path.join('data', 'live-odds.next.json');
+          const OUTFILE =
+            path.join('data', 'live-odds.json');
+
+          const TMPFILE =
+            path.join('data', 'live-odds.next.json');
 
           if (!API_KEY) {
-            console.error('Missing GitHub Actions secret ODDS_API_KEY.');
+            console.error(
+              'Missing GitHub Actions secret ODDS_API_KEY.'
+            );
             process.exit(2);
           }
 
+          let requestsUsed = 0;
+
+          const requestLog = [];
+
           function vancouverClock(date = new Date()) {
-            const parts = new Intl.DateTimeFormat('en-CA', {
-              timeZone: 'America/Vancouver',
-              hour12: false,
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
-            }).formatToParts(date);
-            const obj = Object.fromEntries(parts.map(p => [p.type, p.value]));
-            const hour = Number(obj.hour === '24' ? '0' : obj.hour);
+
+            const parts =
+              new Intl.DateTimeFormat(
+                'en-CA',
+                {
+                  timeZone: 'America/Vancouver',
+                  hour12: false,
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                }
+              ).formatToParts(date);
+
+            const obj =
+              Object.fromEntries(
+                parts.map(p => [p.type, p.value])
+              );
+
+            const hour =
+              Number(
+                obj.hour === '24'
+                  ? '0'
+                  : obj.hour
+              );
+
             return {
-              date: `${obj.year}-${obj.month}-${obj.day}`,
+              date:
+                `${obj.year}-${obj.month}-${obj.day}`,
+
               hour,
-              minute: Number(obj.minute),
-              second: Number(obj.second),
-              label: `${obj.year}-${obj.month}-${obj.day} ${String(hour).padStart(2,'0')}:${obj.minute}:${obj.second} America/Vancouver`
+
+              minute:
+                Number(obj.minute),
+
+              second:
+                Number(obj.second),
+
+              label:
+                `${obj.year}-${obj.month}-${obj.day} ` +
+                `${String(hour).padStart(2, '0')}:` +
+                `${obj.minute}:${obj.second} ` +
+                `America/Vancouver`
             };
           }
 
           function nearScheduledWindow(clock) {
-            if (process.env.EVENT_NAME === 'workflow_dispatch') return true;
-            const nowMin = clock.hour * 60 + clock.minute;
-            return TARGET_LOCAL_MINUTES.some(target => Math.abs(nowMin - target) <= 20);
+
+            /*
+             * Manual workflow_dispatch is always allowed.
+             */
+            if (
+              process.env.EVENT_NAME ===
+              'workflow_dispatch'
+            ) {
+              return true;
+            }
+
+            const nowMinutes =
+              clock.hour * 60 +
+              clock.minute;
+
+            return TARGET_LOCAL_MINUTES.some(
+              target =>
+                Math.abs(
+                  nowMinutes - target
+                ) <= 20
+            );
           }
 
           function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+            return new Promise(
+              resolve =>
+                setTimeout(resolve, ms)
+            );
           }
 
-          async function fetchJson(url, attempts = 3) {
-            let last;
-            for (let i = 0; i < attempts; i++) {
+          function budgetRemaining() {
+            return Math.max(
+              0,
+              REQUEST_BUDGET -
+              requestsUsed
+            );
+          }
+
+          async function fetchJson(
+            url,
+            options = {}
+          ) {
+
+            const {
+              attempts = 2,
+              optional = false,
+              stage = 'api'
+            } = options;
+
+            let lastError;
+
+            for (
+              let attempt = 0;
+              attempt < attempts;
+              attempt++
+            ) {
+
+              const ceiling =
+                optional
+                  ? OPTIONAL_STOP_AT
+                  : REQUEST_BUDGET;
+
+              if (
+                requestsUsed >= ceiling
+              ) {
+
+                const error =
+                  new Error(
+                    `LOCAL_BUDGET_STOP ${stage}: ` +
+                    `${requestsUsed}/${REQUEST_BUDGET}`
+                  );
+
+                error.code =
+                  'LOCAL_BUDGET_STOP';
+
+                throw error;
+              }
+
+              requestsUsed++;
+
+              requestLog.push({
+                n: requestsUsed,
+                stage,
+                optional,
+                url:
+                  url.replace(
+                    API_KEY,
+                    'REDACTED'
+                  )
+              });
+
               try {
-                const res = await fetch(url, {
-                  headers: {
-                    accept: 'application/json',
-                    'user-agent': 'betting-edge-terminal/1.2'
-                  }
-                });
 
-                if (res.ok) return await res.json();
+                const response =
+                  await fetch(
+                    url,
+                    {
+                      headers: {
+                        accept:
+                          'application/json',
 
-                const body = await res.text();
-                const err = new Error(`${res.status} ${res.statusText}: ${body.slice(0, 500)}`);
+                        'user-agent':
+                          'betting-edge-terminal/1.3'
+                      }
+                    }
+                  );
 
-                if (res.status !== 429 && res.status < 500) throw err;
-                last = err;
-              } catch (err) {
-                last = err;
-              }
-
-              await sleep(1000 * (i + 1));
-            }
-            throw last;
-          }
-
-          function apiUrl(endpoint, params = {}, authenticated = true) {
-            const u = new URL(API_BASE + endpoint);
-            if (authenticated) u.searchParams.set('apiKey', API_KEY);
-
-            for (const [key, value] of Object.entries(params)) {
-              if (value !== undefined && value !== null && value !== '') {
-                u.searchParams.set(key, String(value));
-              }
-            }
-            return u.toString();
-          }
-
-          function chunks(arr, n) {
-            const out = [];
-            for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
-            return out;
-          }
-
-          function marketAgeMinutes(market, now) {
-            const stamp = market?.updatedAt;
-            if (!stamp) return Infinity;
-
-            const parsed = Date.parse(stamp);
-            if (!Number.isFinite(parsed)) return Infinity;
-
-            return Math.max(0, (now.getTime() - parsed) / 60000);
-          }
-
-          function marketIsFresh(market, now) {
-            return marketAgeMinutes(market, now) <= MAX_MARKET_AGE_MINUTES;
-          }
-
-          function filterFreshMarketsFromEvent(event, now, diagnostics) {
-            if (!event || typeof event !== 'object') return event;
-
-            const copy = { ...event, bookmakers: {} };
-            const books = event.bookmakers || {};
-
-            for (const [bookmaker, markets] of Object.entries(books)) {
-              if (!Array.isArray(markets)) continue;
-
-              const fresh = [];
-              for (const market of markets) {
-                if (marketIsFresh(market, now)) {
-                  fresh.push(market);
-                } else {
-                  diagnostics.staleMarketsRemoved++;
+                if (response.ok) {
+                  return await response.json();
                 }
+
+                const body =
+                  await response.text();
+
+                const error =
+                  new Error(
+                    `${response.status} ` +
+                    `${response.statusText}: ` +
+                    `${body.slice(0, 400)}`
+                  );
+
+                /*
+                 * Never waste additional quota
+                 * retrying a 429.
+                 */
+                if (
+                  response.status === 429
+                ) {
+                  error.code =
+                    'RATE_LIMIT';
+
+                  throw error;
+                }
+
+                /*
+                 * Don't retry ordinary 4xx errors.
+                 */
+                if (
+                  response.status < 500
+                ) {
+                  throw error;
+                }
+
+                lastError = error;
+
+              } catch (error) {
+
+                if (
+                  error?.code ===
+                  'RATE_LIMIT'
+                ) {
+                  throw error;
+                }
+
+                lastError = error;
               }
 
-              if (fresh.length) copy.bookmakers[bookmaker] = fresh;
+              if (
+                attempt <
+                attempts - 1
+              ) {
+                await sleep(
+                  800 *
+                  (attempt + 1)
+                );
+              }
+            }
+
+            throw lastError;
+          }
+
+          function apiUrl(
+            endpoint,
+            params = {},
+            authenticated = true
+          ) {
+
+            const url =
+              new URL(
+                API_BASE +
+                endpoint
+              );
+
+            if (authenticated) {
+              url.searchParams.set(
+                'apiKey',
+                API_KEY
+              );
+            }
+
+            for (
+              const [key, value]
+              of Object.entries(params)
+            ) {
+
+              if (
+                value !== undefined &&
+                value !== null &&
+                value !== ''
+              ) {
+                url.searchParams.set(
+                  key,
+                  String(value)
+                );
+              }
+            }
+
+            return url.toString();
+          }
+
+          function chunks(
+            array,
+            size
+          ) {
+
+            const output = [];
+
+            for (
+              let i = 0;
+              i < array.length;
+              i += size
+            ) {
+              output.push(
+                array.slice(
+                  i,
+                  i + size
+                )
+              );
+            }
+
+            return output;
+          }
+
+          function normalized(value) {
+
+            return String(
+              value || ''
+            )
+              .trim()
+              .toLowerCase()
+              .replace(
+                /\s+/g,
+                ' '
+              );
+          }
+
+          function leagueText(event) {
+
+            return normalized(
+              [
+                event?.league?.name,
+                event?.league?.slug,
+                event?.tournament?.name,
+                event?.sport?.name,
+                event?.sport?.slug
+              ]
+                .filter(Boolean)
+                .join(' ')
+            );
+          }
+
+          function eventHoursAway(
+            event,
+            now
+          ) {
+
+            const timestamp =
+              Date.parse(
+                event?.date
+              );
+
+            if (
+              !Number.isFinite(timestamp)
+            ) {
+              return Infinity;
+            }
+
+            return (
+              timestamp -
+              now.getTime()
+            ) / 3600000;
+          }
+
+          function marketAgeMinutes(
+            market,
+            now
+          ) {
+
+            const timestamp =
+              Date.parse(
+                market?.updatedAt
+              );
+
+            if (
+              !Number.isFinite(timestamp)
+            ) {
+              return Infinity;
+            }
+
+            return Math.max(
+              0,
+              (
+                now.getTime() -
+                timestamp
+              ) / 60000
+            );
+          }
+
+          function filterFreshMarketsFromEvent(
+            event,
+            now,
+            diagnostics
+          ) {
+
+            if (
+              !event ||
+              typeof event !==
+              'object'
+            ) {
+              return event;
+            }
+
+            const copy = {
+              ...event,
+              bookmakers: {}
+            };
+
+            for (
+              const [
+                bookmaker,
+                markets
+              ]
+              of Object.entries(
+                event.bookmakers || {}
+              )
+            ) {
+
+              if (
+                !Array.isArray(markets)
+              ) {
+                continue;
+              }
+
+              const fresh =
+                markets.filter(
+                  market => {
+
+                    const okay =
+                      marketAgeMinutes(
+                        market,
+                        now
+                      ) <=
+                      MAX_MARKET_AGE_MINUTES;
+
+                    if (!okay) {
+                      diagnostics
+                        .staleMarketsRemoved++;
+                    }
+
+                    return okay;
+                  }
+                );
+
+              if (fresh.length) {
+                copy.bookmakers[
+                  bookmaker
+                ] = fresh;
+              }
             }
 
             return copy;
           }
 
           function marketCount(event) {
-            const books = event?.bookmakers || {};
-            return Object.values(books).reduce((sum, markets) => {
-              return sum + (Array.isArray(markets) ? markets.length : 0);
-            }, 0);
+
+            return Object
+              .values(
+                event?.bookmakers ||
+                {}
+              )
+              .reduce(
+                (
+                  total,
+                  markets
+                ) =>
+                  total +
+                  (
+                    Array.isArray(markets)
+                      ? markets.length
+                      : 0
+                  ),
+                0
+              );
           }
 
-          function playerPropMarkets(event) {
-            const books = event?.bookmakers || {};
-            const out = {};
+          function sameEventIdentity(
+            candidate,
+            returned
+          ) {
 
-            for (const [bookmaker, markets] of Object.entries(books)) {
-              if (!Array.isArray(markets)) continue;
-
-              const props = markets.filter(market => {
-                const name = String(market?.name || '').toLowerCase();
-                if (!name) return false;
-
-                return (
-                  name.includes('player') ||
-                  name.includes('props') ||
-                  name.includes('strikeout') ||
-                  name.includes('home run') ||
-                  name.includes('total bases') ||
-                  name.includes('hits') ||
-                  name.includes('rbi')
-                );
-              });
-
-              if (props.length) out[bookmaker] = props;
+            if (
+              !candidate ||
+              !returned
+            ) {
+              return false;
             }
 
-            return out;
-          }
+            if (
+              String(candidate.id) !==
+              String(returned.id)
+            ) {
+              return false;
+            }
 
-          function normalizedTeam(value) {
-            return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
-          }
+            const candidateHome =
+              normalized(
+                candidate.home
+              );
 
-          function sameEventIdentity(candidate, returned) {
-            if (!candidate || !returned) return false;
+            const candidateAway =
+              normalized(
+                candidate.away
+              );
 
-            // Event ID is the primary identity check.
-            if (String(candidate.id) !== String(returned.id)) return false;
+            const returnedHome =
+              normalized(
+                returned.home
+              );
 
-            // Teams are a second safety check.
-            const candidateHome = normalizedTeam(candidate.home);
-            const candidateAway = normalizedTeam(candidate.away);
-            const returnedHome = normalizedTeam(returned.home);
-            const returnedAway = normalizedTeam(returned.away);
+            const returnedAway =
+              normalized(
+                returned.away
+              );
 
-            if (candidateHome && returnedHome && candidateHome !== returnedHome) return false;
-            if (candidateAway && returnedAway && candidateAway !== returnedAway) return false;
+            if (
+              candidateHome &&
+              returnedHome &&
+              candidateHome !==
+              returnedHome
+            ) {
+              return false;
+            }
+
+            if (
+              candidateAway &&
+              returnedAway &&
+              candidateAway !==
+              returnedAway
+            ) {
+              return false;
+            }
 
             return true;
           }
 
-          function propFingerprint(props) {
-            const normalized = [];
+          /*
+           * Determines which sports/leagues
+           * are eligible for expensive
+           * player/fighter/deep-market calls.
+           *
+           * Core odds are broader than this.
+           */
+          function isMajorPropLeague(
+            event
+          ) {
 
-            for (const bookmaker of Object.keys(props).sort()) {
-              const markets = props[bookmaker];
-              for (const market of Array.isArray(markets) ? markets : []) {
-                const entries = (Array.isArray(market?.odds) ? market.odds : [])
-                  .map(o => ({
-                    label: String(o?.label || ''),
-                    hdp: o?.hdp ?? null,
-                    over: o?.over ?? null,
-                    under: o?.under ?? null,
-                    odds: o?.odds ?? null
-                  }))
-                  .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+            const text =
+              leagueText(event);
 
-                normalized.push({
+            const sport =
+              normalized(
+                event?.sport?.slug
+              );
+
+            if (
+              sport === 'baseball'
+            ) {
+              return (
+                /\bmlb\b/.test(text) ||
+                /major league baseball/
+                  .test(text)
+              );
+            }
+
+            if (
+              sport ===
+              'ice-hockey'
+            ) {
+              return (
+                /\bnhl\b/.test(text) ||
+                /national hockey league/
+                  .test(text)
+              );
+            }
+
+            if (
+              sport ===
+              'basketball'
+            ) {
+              return (
+                /\bnba\b/.test(text) ||
+                /\bwnba\b/.test(text) ||
+                /\bncaa\b/.test(text) ||
+                /college/.test(text)
+              );
+            }
+
+            if (
+              sport ===
+              'american-football'
+            ) {
+              return (
+                /\bnfl\b/.test(text) ||
+                /\bncaa\b/.test(text) ||
+                /\bncaaf\b/.test(text) ||
+                /college/.test(text) ||
+                /\bcfl\b/.test(text) ||
+                /canadian football/
+                  .test(text)
+              );
+            }
+
+            /*
+             * Boxing and MMA cards can
+             * receive deep-market calls
+             * when the API/bookmakers
+             * actually expose them.
+             */
+            if (
+              sport === 'boxing' ||
+              sport === 'mma' ||
+              /boxing/.test(sport) ||
+              /mma/.test(sport) ||
+              /mixed-martial/.test(sport) ||
+              /ufc/.test(sport)
+            ) {
+              return true;
+            }
+
+            return false;
+          }
+
+          function priorityScore(
+            event,
+            now
+          ) {
+
+            const sport =
+              normalized(
+                event?.sport?.slug
+              );
+
+            const league =
+              leagueText(event);
+
+            const hours =
+              eventHoursAway(
+                event,
+                now
+              );
+
+            let score = 0;
+
+            /*
+             * Start-time priority.
+             */
+            if (
+              hours >= 0 &&
+              hours <= 2
+            ) {
+              score += 80;
+            } else if (
+              hours <= 4
+            ) {
+              score += 65;
+            } else if (
+              hours <= 6
+            ) {
+              score += 50;
+            } else if (
+              hours <=
+              PROP_HORIZON_HOURS
+            ) {
+              score += 35;
+            }
+
+            /*
+             * League priority.
+             */
+            if (
+              /\bnfl\b/.test(league) ||
+              /\bncaaf\b/.test(league) ||
+              /\bncaa football\b/
+                .test(league)
+            ) {
+              score += 30;
+            }
+
+            if (
+              /\bnhl\b/.test(league) ||
+              /\bnba\b/.test(league) ||
+              /\bmlb\b/.test(league) ||
+              /\bwnba\b/.test(league)
+            ) {
+              score += 25;
+            }
+
+            if (
+              /\bcfl\b/.test(league) ||
+              /canadian football/
+                .test(league)
+            ) {
+              score += 20;
+            }
+
+            if (
+              sport === 'boxing' ||
+              sport === 'mma' ||
+              /boxing/.test(sport) ||
+              /mma/.test(sport) ||
+              /ufc/.test(sport)
+            ) {
+              score += 25;
+            }
+
+            return score;
+          }
+
+          /*
+           * Extract deeper player/fighter
+           * markets from an event response.
+           *
+           * Main ML/spread/total markets
+           * are already covered by the
+           * batched core-board pass.
+           */
+          function deepMarkets(event) {
+
+            const output = {};
+
+            for (
+              const [
+                bookmaker,
+                markets
+              ]
+              of Object.entries(
+                event?.bookmakers ||
+                {}
+              )
+            ) {
+
+              if (
+                !Array.isArray(markets)
+              ) {
+                continue;
+              }
+
+              const selected =
+                markets.filter(
+                  market => {
+
+                    const name =
+                      normalized(
+                        market?.name
+                      );
+
+                    if (!name) {
+                      return false;
+                    }
+
+                    return (
+                      name.includes('player') ||
+                      name.includes('props') ||
+
+                      /*
+                       * Baseball
+                       */
+                      name.includes('strikeout') ||
+                      name.includes('home run') ||
+                      name.includes('total bases') ||
+                      name.includes('rbi') ||
+
+                      /*
+                       * Hockey
+                       */
+                      name.includes('shots') ||
+                      name.includes('saves') ||
+
+                      /*
+                       * Football
+                       */
+                      name.includes('passing') ||
+                      name.includes('receiving') ||
+                      name.includes('rushing') ||
+                      name.includes('touchdown') ||
+                      name.includes('receptions') ||
+
+                      /*
+                       * Basketball
+                       */
+                      name.includes('points') ||
+                      name.includes('rebounds') ||
+                      name.includes('assists') ||
+
+                      /*
+                       * Boxing / MMA
+                       */
+                      name.includes('method') ||
+                      name.includes('round') ||
+                      name.includes('decision') ||
+                      name.includes('knockout') ||
+                      name.includes('submission')
+                    );
+                  }
+                );
+
+              if (selected.length) {
+                output[
+                  bookmaker
+                ] = selected;
+              }
+            }
+
+            return output;
+          }
+
+          function fingerprint(
+            markets
+          ) {
+
+            const normalizedMarkets = [];
+
+            for (
+              const bookmaker
+              of Object
+                .keys(markets)
+                .sort()
+            ) {
+
+              for (
+                const market
+                of markets[
+                  bookmaker
+                ] || []
+              ) {
+
+                normalizedMarkets.push({
                   bookmaker,
-                  name: String(market?.name || ''),
-                  entries
+                  name:
+                    String(
+                      market?.name ||
+                      ''
+                    ),
+                  odds:
+                    Array.isArray(
+                      market?.odds
+                    )
+                      ? market.odds
+                      : []
                 });
               }
             }
 
-            if (!normalized.length) return null;
+            if (
+              !normalizedMarkets.length
+            ) {
+              return null;
+            }
 
             return crypto
               .createHash('sha256')
-              .update(JSON.stringify(normalized))
+              .update(
+                JSON.stringify(
+                  normalizedMarkets
+                )
+              )
               .digest('hex');
           }
 
-          async function getEventsForBookmaker(sport, bookmaker, now, to) {
-            const merged = new Map();
+          async function discoverSport(
+            sport,
+            now,
+            to,
+            diagnostics
+          ) {
 
-            for (let page = 1; page <= MAX_EVENT_PAGES; page++) {
-              const events = await fetchJson(apiUrl('/events', {
-                sport,
-                status: 'pending',
-                from: now.toISOString(),
-                to: to.toISOString(),
-                bookmaker,
-                limit: EVENTS_PAGE_SIZE,
-                page
-              }));
+            const merged =
+              new Map();
 
-              const rows = Array.isArray(events) ? events : [];
+            /*
+             * Event discovery happens
+             * ONCE per sport, not once
+             * per bookmaker.
+             */
+            for (
+              let page = 1;
+              page <=
+              MAX_EVENT_PAGES;
+              page++
+            ) {
+
+              const rows =
+                await fetchJson(
+                  apiUrl(
+                    '/events',
+                    {
+                      sport,
+                      status: 'pending',
+                      from:
+                        now.toISOString(),
+                      to:
+                        to.toISOString(),
+                      limit:
+                        EVENTS_PAGE_SIZE,
+                      page
+                    }
+                  ),
+                  {
+                    stage:
+                      `events:${sport}:p${page}`
+                  }
+                );
+
+              const list =
+                Array.isArray(rows)
+                  ? rows
+                  : [];
+
               let added = 0;
 
-              for (const event of rows) {
-                if (!event?.id) continue;
-                if (!merged.has(event.id)) {
-                  merged.set(event.id, event);
+              for (
+                const event
+                of list
+              ) {
+
+                if (!event?.id) {
+                  continue;
+                }
+
+                if (
+                  !merged.has(
+                    String(event.id)
+                  )
+                ) {
+                  merged.set(
+                    String(event.id),
+                    event
+                  );
+
                   added++;
                 }
               }
 
-              if (rows.length < EVENTS_PAGE_SIZE) break;
-              if (added === 0) break;
+              /*
+               * Stop pagination once
+               * the API has no more
+               * useful rows.
+               */
+              if (
+                list.length <
+                EVENTS_PAGE_SIZE ||
+                added === 0
+              ) {
+                break;
+              }
             }
 
-            return [...merged.values()];
+            diagnostics
+              .eventCandidatesBySport[
+                sport
+              ] = merged.size;
+
+            return [
+              ...merged.values()
+            ];
           }
 
           function readExistingSnapshot() {
+
             try {
-              if (!fs.existsSync(OUTFILE)) return null;
-              const parsed = JSON.parse(fs.readFileSync(OUTFILE, 'utf8'));
-              return parsed && typeof parsed === 'object' ? parsed : null;
+
+              if (
+                !fs.existsSync(
+                  OUTFILE
+                )
+              ) {
+                return null;
+              }
+
+              const parsed =
+                JSON.parse(
+                  fs.readFileSync(
+                    OUTFILE,
+                    'utf8'
+                  )
+                );
+
+              return (
+                parsed &&
+                typeof parsed ===
+                'object'
+              )
+                ? parsed
+                : null;
+
             } catch {
+
               return null;
             }
           }
 
           function logErrors(errors) {
-            if (!errors.length) return;
-            console.error(`API error detail (${errors.length}):`);
-            for (const err of errors.slice(0, 30)) {
-              console.error(JSON.stringify(err));
+
+            for (
+              const error
+              of errors.slice(0, 30)
+            ) {
+              console.error(
+                JSON.stringify(error)
+              );
             }
           }
 
           (async () => {
-            const clock = vancouverClock();
 
-            if (!nearScheduledWindow(clock)) {
-              console.log(`Skipping duplicate DST cron at ${clock.label}.`);
+            const clock =
+              vancouverClock();
+
+            /*
+             * Prevent duplicate PDT/PST
+             * cron entries from actually
+             * pulling odds.
+             */
+            if (
+              !nearScheduledWindow(
+                clock
+              )
+            ) {
+
+              console.log(
+                `Skipping duplicate DST cron at ${clock.label}.`
+              );
+
               return;
             }
 
-            const existing = readExistingSnapshot();
-            const existingCount = Number(existing?.eventCount || existing?.events?.length || 0);
+            const existing =
+              readExistingSnapshot();
 
-            const now = new Date();
-            const to = new Date(now.getTime() + HORIZON_HOURS * 60 * 60 * 1000);
+            const existingCount =
+              Number(
+                existing?.eventCount ||
+                existing?.events?.length ||
+                0
+              );
 
+            const now =
+              new Date();
+
+            const to =
+              new Date(
+                now.getTime() +
+                HORIZON_HOURS *
+                3600000
+              );
+
+            /*
+             * Discover the sport slugs
+             * actually available today.
+             */
             let sports = [];
+
             try {
-              sports = await fetchJson(apiUrl('/sports', {}, false));
+
+              sports =
+                await fetchJson(
+                  apiUrl(
+                    '/sports',
+                    {},
+                    false
+                  ),
+                  {
+                    attempts: 1,
+                    stage:
+                      'sports-public'
+                  }
+                );
+
             } catch {
-              sports = await fetchJson(apiUrl('/sports', {}, true));
+
+              sports =
+                await fetchJson(
+                  apiUrl(
+                    '/sports',
+                    {},
+                    true
+                  ),
+                  {
+                    attempts: 1,
+                    stage:
+                      'sports-auth'
+                  }
+                );
             }
 
-            const availableSlugs = new Set(
-              (Array.isArray(sports) ? sports : [])
-                .map(s => String(s?.slug || ''))
-                .filter(Boolean)
-            );
-            const selectedSports = TARGET_SPORTS.filter(slug => availableSlugs.has(slug));
+            const availableSlugs =
+              new Set(
+                (
+                  Array.isArray(sports)
+                    ? sports
+                    : []
+                )
+                  .map(
+                    sport =>
+                      String(
+                        sport?.slug ||
+                        ''
+                      )
+                  )
+                  .filter(Boolean)
+              );
+
+            /*
+             * Use configured sport families
+             * that the API actually exposes.
+             */
+            const selectedSports =
+              TARGET_SPORTS.filter(
+                sport =>
+                  availableSlugs.has(
+                    sport
+                  )
+              );
+
+            /*
+             * Also catch alternate
+             * combat-sport slug names.
+             */
+            for (
+              const sport
+              of availableSlugs
+            ) {
+
+              if (
+                /mma|mixed-martial|ufc|boxing/
+                  .test(sport) &&
+                !selectedSports
+                  .includes(sport)
+              ) {
+                selectedSports.push(
+                  sport
+                );
+              }
+            }
 
             const snapshot = {
-              schema: 3,
-              generatedAt: now.toISOString(),
-              generatedAtVancouver: clock.label,
-              source: 'Odds-API.io v3',
-              bookmakers: BOOKMAKERS,
-              horizonHours: HORIZON_HOURS,
-              maxMarketAgeMinutes: MAX_MARKET_AGE_MINUTES,
+
+              /*
+               * Schema 4 identifies the
+               * quota-aware feed.
+               */
+              schema: 4,
+
+              generatedAt:
+                now.toISOString(),
+
+              generatedAtVancouver:
+                clock.label,
+
+              source:
+                'Odds-API.io v3',
+
+              bookmakers:
+                BOOKMAKERS,
+
+              horizonHours:
+                HORIZON_HOURS,
+
+              maxMarketAgeMinutes:
+                MAX_MARKET_AGE_MINUTES,
+
+              requestBudget:
+                REQUEST_BUDGET,
+
+              requestsUsed: 0,
+
+              requestsRemaining:
+                REQUEST_BUDGET,
+
               selectedSports,
+
               events: [],
+
+              /*
+               * General deep-market array.
+               */
+              deepMarkets: [],
+
+              /*
+               * Backward compatibility
+               * with the existing runner.
+               */
               baseballProps: [],
+
               diagnostics: {
-                eventCandidatesBySport: {},
-                eventCandidatesTotal: 0,
-                mainOddsEvents: 0,
-                mainOddsMarkets: 0,
-                bet365Events: 0,
-                betwayEvents: 0,
-                staleMarketsRemoved: 0,
-                baseballEventsCheckedForProps: 0,
-                baseballEventsWithProps: 0,
-                baseballPropMarkets: 0,
-                baseballPropIdentityRejects: 0,
-                baseballDuplicatePropRejects: 0,
-                previousGoodEventCount: existingCount
+
+                eventCandidatesBySport:
+                  {},
+
+                eventCandidatesTotal:
+                  0,
+
+                mainOddsEvents:
+                  0,
+
+                mainOddsMarkets:
+                  0,
+
+                bet365Events:
+                  0,
+
+                betwayEvents:
+                  0,
+
+                staleMarketsRemoved:
+                  0,
+
+                deepCandidates:
+                  0,
+
+                deepEventsChecked:
+                  0,
+
+                deepEventsWithMarkets:
+                  0,
+
+                deepMarketsPublished:
+                  0,
+
+                deepEventsSkippedBudget:
+                  0,
+
+                deepEventsSkippedHorizon:
+                  0,
+
+                identityRejects:
+                  0,
+
+                duplicateDeepRejects:
+                  0,
+
+                previousGoodEventCount:
+                  existingCount
               },
+
               errors: []
             };
 
-            const candidateEvents = new Map();
+            const candidateMap =
+              new Map();
 
-            for (const sport of selectedSports) {
-              const sportEvents = new Map();
+            /*
+             * =========================
+             * PASS 1A
+             * BROAD EVENT DISCOVERY
+             * =========================
+             */
+            for (
+              const sport
+              of selectedSports
+            ) {
 
-              for (const bookmaker of BOOKMAKERS) {
-                try {
-                  const events = await getEventsForBookmaker(sport, bookmaker, now, to);
-                  for (const event of events) {
-                    if (event?.id) sportEvents.set(event.id, event);
-                  }
-                } catch (err) {
-                  snapshot.errors.push({
-                    stage: 'events',
+              if (
+                requestsUsed >=
+                OPTIONAL_STOP_AT
+              ) {
+                break;
+              }
+
+              try {
+
+                const rows =
+                  await discoverSport(
                     sport,
-                    bookmaker,
-                    message: String(err?.message || err)
-                  });
-                }
-              }
+                    now,
+                    to,
+                    snapshot.diagnostics
+                  );
 
-              const rows = [...sportEvents.values()]
-                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
-
-              snapshot.diagnostics.eventCandidatesBySport[sport] = rows.length;
-              snapshot.diagnostics.eventCandidatesTotal += rows.length;
-
-              for (const event of rows) {
-                candidateEvents.set(event.id, event);
-              }
-            }
-
-            const candidates = [...candidateEvents.values()]
-              .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
-
-            for (const batch of chunks(candidates, 10)) {
-              const eventIds = batch.map(e => e.id).join(',');
-              if (!eventIds) continue;
-
-              try {
-                const odds = await fetchJson(apiUrl('/odds/multi', {
-                  eventIds,
-                  bookmakers: BOOKMAKERS.join(',')
-                }));
-
-                if (Array.isArray(odds)) snapshot.events.push(...odds);
-              } catch (err) {
-                snapshot.errors.push({
-                  stage: 'odds-multi',
-                  eventIds,
-                  message: String(err?.message || err)
-                });
-              }
-            }
-
-            // Remove stale individual markets before publishing them as current.
-            snapshot.events = [
-              ...new Map(
-                snapshot.events
-                  .filter(e => e?.id)
-                  .map(e => [e.id, filterFreshMarketsFromEvent(e, now, snapshot.diagnostics)])
-              ).values()
-            ]
-              .filter(e => marketCount(e) > 0)
-              .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
-
-            snapshot.diagnostics.mainOddsEvents = snapshot.events.length;
-            snapshot.diagnostics.mainOddsMarkets = snapshot.events.reduce(
-              (sum, event) => sum + marketCount(event), 0
-            );
-            snapshot.diagnostics.bet365Events = snapshot.events.filter(
-              e => Array.isArray(e?.bookmakers?.Bet365) && e.bookmakers.Bet365.length > 0
-            ).length;
-            snapshot.diagnostics.betwayEvents = snapshot.events.filter(
-              e => Array.isArray(e?.bookmakers?.Betway) && e.bookmakers.Betway.length > 0
-            ).length;
-
-            const baseballCandidates = candidates.filter(e => e?.sport?.slug === 'baseball');
-            const propCandidates = [];
-
-            for (const event of baseballCandidates) {
-              snapshot.diagnostics.baseballEventsCheckedForProps++;
-
-              try {
-                const rawFullOdds = await fetchJson(apiUrl('/odds', {
-                  eventId: event.id,
-                  bookmakers: BOOKMAKERS.join(',')
-                }));
-
-                if (!rawFullOdds || typeof rawFullOdds !== 'object') continue;
-
-                // Critical fix #1: never attach a prop payload to a different event.
-                if (!sameEventIdentity(event, rawFullOdds)) {
-                  snapshot.diagnostics.baseballPropIdentityRejects++;
-                  snapshot.errors.push({
-                    stage: 'baseball-props-identity',
-                    requestedEventId: event.id,
-                    requestedHome: event.home,
-                    requestedAway: event.away,
-                    returnedEventId: rawFullOdds.id,
-                    returnedHome: rawFullOdds.home,
-                    returnedAway: rawFullOdds.away,
-                    message: 'Rejected prop response because returned event identity did not match request.'
-                  });
-                  continue;
+                for (
+                  const event
+                  of rows
+                ) {
+                  candidateMap.set(
+                    String(event.id),
+                    event
+                  );
                 }
 
-                const fullOdds = filterFreshMarketsFromEvent(
-                  rawFullOdds,
-                  now,
-                  snapshot.diagnostics
-                );
+              } catch (error) {
 
-                const props = playerPropMarkets(fullOdds);
-                const propMarketCount = Object.values(props).reduce(
-                  (sum, markets) => sum + markets.length, 0
-                );
-
-                if (propMarketCount <= 0) continue;
-
-                propCandidates.push({
-                  id: fullOdds.id,
-                  home: fullOdds.home,
-                  away: fullOdds.away,
-                  date: fullOdds.date,
-                  sport: fullOdds.sport,
-                  league: fullOdds.league,
-                  urls: fullOdds.urls || {},
-                  bookmakerIds: fullOdds.bookmakerIds || {},
-                  bookmakers: props,
-                  _fingerprint: propFingerprint(props),
-                  _propMarketCount: propMarketCount
-                });
-              } catch (err) {
                 snapshot.errors.push({
-                  stage: 'baseball-props',
-                  eventId: event.id,
-                  home: event.home,
-                  away: event.away,
-                  message: String(err?.message || err)
+                  stage:
+                    'events',
+                  sport,
+                  message:
+                    String(
+                      error?.message ||
+                      error
+                    )
                 });
+
+                if (
+                  error?.code ===
+                  'RATE_LIMIT'
+                ) {
+                  break;
+                }
               }
             }
 
-            // Critical fix #2: if the API repeats an identical full prop block across
-            // unrelated games, reject every copy rather than guessing which one is real.
-            const fingerprintEvents = new Map();
+            const candidates =
+              [
+                ...candidateMap
+                  .values()
+              ]
+                .filter(event => {
 
-            for (const item of propCandidates) {
-              if (!item._fingerprint) continue;
-              if (!fingerprintEvents.has(item._fingerprint)) {
-                fingerprintEvents.set(item._fingerprint, []);
-              }
-              fingerprintEvents.get(item._fingerprint).push(item.id);
-            }
+                  const hours =
+                    eventHoursAway(
+                      event,
+                      now
+                    );
 
-            const duplicateFingerprints = new Set(
-              [...fingerprintEvents.entries()]
-                .filter(([, ids]) => new Set(ids.map(String)).size > 1)
-                .map(([fingerprint]) => fingerprint)
-            );
+                  return (
+                    hours >= -0.25 &&
+                    hours <=
+                    HORIZON_HOURS
+                  );
+                })
+                .sort(
+                  (a, b) =>
+                    String(
+                      a.date || ''
+                    )
+                      .localeCompare(
+                        String(
+                          b.date ||
+                          ''
+                        )
+                      )
+                );
 
-            for (const item of propCandidates) {
-              if (item._fingerprint && duplicateFingerprints.has(item._fingerprint)) {
-                snapshot.diagnostics.baseballDuplicatePropRejects++;
+            snapshot
+              .diagnostics
+              .eventCandidatesTotal =
+                candidates.length;
+
+            /*
+             * =========================
+             * PASS 1B
+             * PROTECTED CORE BOARD
+             * =========================
+             *
+             * Up to 10 event IDs per
+             * /odds/multi request.
+             *
+             * Bet365 + Betway are requested
+             * together.
+             */
+            for (
+              const batch
+              of chunks(
+                candidates,
+                10
+              )
+            ) {
+
+              if (
+                requestsUsed >=
+                OPTIONAL_STOP_AT
+              ) {
+
                 snapshot.errors.push({
-                  stage: 'baseball-props-duplicate',
-                  eventId: item.id,
-                  home: item.home,
-                  away: item.away,
-                  message: 'Rejected duplicated player-prop block found on multiple unrelated events.'
+                  stage:
+                    'core-budget',
+                  message:
+                    `Core board stopped at local budget ` +
+                    `${requestsUsed}/${REQUEST_BUDGET}.`
                 });
+
+                break;
+              }
+
+              const eventIds =
+                batch
+                  .map(
+                    event =>
+                      event.id
+                  )
+                  .join(',');
+
+              if (!eventIds) {
                 continue;
               }
 
-              const { _fingerprint, _propMarketCount, ...published } = item;
-              snapshot.baseballProps.push(published);
-              snapshot.diagnostics.baseballEventsWithProps++;
-              snapshot.diagnostics.baseballPropMarkets += _propMarketCount;
+              try {
+
+                const odds =
+                  await fetchJson(
+                    apiUrl(
+                      '/odds/multi',
+                      {
+                        eventIds,
+                        bookmakers:
+                          BOOKMAKERS
+                            .join(',')
+                      }
+                    ),
+                    {
+                      stage:
+                        'odds-multi'
+                    }
+                  );
+
+                if (
+                  Array.isArray(odds)
+                ) {
+                  snapshot.events.push(
+                    ...odds
+                  );
+                }
+
+              } catch (error) {
+
+                snapshot.errors.push({
+                  stage:
+                    'odds-multi',
+                  eventIds,
+                  message:
+                    String(
+                      error?.message ||
+                      error
+                    )
+                });
+
+                if (
+                  error?.code ===
+                  'RATE_LIMIT'
+                ) {
+                  break;
+                }
+              }
             }
 
-            snapshot.eventCount = snapshot.events.length;
-            snapshot.baseballPropEventCount = snapshot.baseballProps.length;
+            /*
+             * Deduplicate events and
+             * remove stale individual
+             * markets.
+             */
+            snapshot.events =
+              [
+                ...new Map(
+                  snapshot.events
+                    .filter(
+                      event =>
+                        event?.id
+                    )
+                    .map(
+                      event => [
+                        String(
+                          event.id
+                        ),
 
-            // Data-quality rejects are intentionally recorded in errors, so "complete"
-            // means the pull had no API or validation problems at all.
+                        filterFreshMarketsFromEvent(
+                          event,
+                          now,
+                          snapshot.diagnostics
+                        )
+                      ]
+                    )
+                ).values()
+              ]
+                .filter(
+                  event =>
+                    marketCount(event) >
+                    0
+                )
+                .sort(
+                  (a, b) =>
+                    String(
+                      a.date || ''
+                    )
+                      .localeCompare(
+                        String(
+                          b.date ||
+                          ''
+                        )
+                      )
+                );
+
+            snapshot
+              .diagnostics
+              .mainOddsEvents =
+                snapshot.events.length;
+
+            snapshot
+              .diagnostics
+              .mainOddsMarkets =
+                snapshot.events.reduce(
+                  (
+                    total,
+                    event
+                  ) =>
+                    total +
+                    marketCount(event),
+                  0
+                );
+
+            snapshot
+              .diagnostics
+              .bet365Events =
+                snapshot.events
+                  .filter(
+                    event =>
+                      Array.isArray(
+                        event
+                          ?.bookmakers
+                          ?.Bet365
+                      ) &&
+                      event
+                        .bookmakers
+                        .Bet365
+                        .length
+                  )
+                  .length;
+
+            snapshot
+              .diagnostics
+              .betwayEvents =
+                snapshot.events
+                  .filter(
+                    event =>
+                      Array.isArray(
+                        event
+                          ?.bookmakers
+                          ?.Betway
+                      ) &&
+                      event
+                        .bookmakers
+                        .Betway
+                        .length
+                  )
+                  .length;
+
+            /*
+             * =========================
+             * PASS 2
+             * DYNAMIC DEEP MARKETS
+             * =========================
+             *
+             * These are the expensive
+             * individual-event calls.
+             *
+             * Priority:
+             *  - approaching start time
+             *  - MLB/NHL/NBA/NFL/NCAA/CFL
+             *  - boxing/MMA
+             *
+             * Once the optional quota
+             * ceiling is reached we stop.
+             */
+            const deepQueue =
+              candidates
+                .filter(event => {
+
+                  const hours =
+                    eventHoursAway(
+                      event,
+                      now
+                    );
+
+                  if (
+                    hours < 0 ||
+                    hours >
+                    PROP_HORIZON_HOURS
+                  ) {
+
+                    snapshot
+                      .diagnostics
+                      .deepEventsSkippedHorizon++;
+
+                    return false;
+                  }
+
+                  return (
+                    isMajorPropLeague(
+                      event
+                    )
+                  );
+                })
+                .map(
+                  event => ({
+                    event,
+                    score:
+                      priorityScore(
+                        event,
+                        now
+                      )
+                  })
+                )
+                .sort(
+                  (a, b) =>
+                    b.score -
+                    a.score ||
+                    String(
+                      a.event.date ||
+                      ''
+                    )
+                      .localeCompare(
+                        String(
+                          b.event.date ||
+                          ''
+                        )
+                      )
+                )
+                .slice(
+                  0,
+                  MAX_PROP_EVENTS
+                );
+
+            snapshot
+              .diagnostics
+              .deepCandidates =
+                deepQueue.length;
+
+            const deepCandidates =
+              [];
+
+            for (
+              let i = 0;
+              i < deepQueue.length;
+              i++
+            ) {
+
+              const {
+                event,
+                score
+              } = deepQueue[i];
+
+              if (
+                requestsUsed >=
+                OPTIONAL_STOP_AT
+              ) {
+
+                snapshot
+                  .diagnostics
+                  .deepEventsSkippedBudget +=
+                    deepQueue.length -
+                    i;
+
+                break;
+              }
+
+              snapshot
+                .diagnostics
+                .deepEventsChecked++;
+
+              try {
+
+                const raw =
+                  await fetchJson(
+                    apiUrl(
+                      '/odds',
+                      {
+                        eventId:
+                          event.id,
+
+                        bookmakers:
+                          BOOKMAKERS
+                            .join(',')
+                      }
+                    ),
+                    {
+                      optional: true,
+                      attempts: 1,
+                      stage:
+                        `deep:` +
+                        `${event.sport?.slug || 'sport'}`
+                    }
+                  );
+
+                if (
+                  !raw ||
+                  typeof raw !==
+                  'object'
+                ) {
+                  continue;
+                }
+
+                /*
+                 * Safety against a provider
+                 * returning the wrong event
+                 * for an ID.
+                 */
+                if (
+                  !sameEventIdentity(
+                    event,
+                    raw
+                  )
+                ) {
+
+                  snapshot
+                    .diagnostics
+                    .identityRejects++;
+
+                  snapshot.errors.push({
+                    stage:
+                      'deep-identity',
+
+                    requestedEventId:
+                      event.id,
+
+                    returnedEventId:
+                      raw.id,
+
+                    message:
+                      'Rejected deep-market response because event identity did not match.'
+                  });
+
+                  continue;
+                }
+
+                const fresh =
+                  filterFreshMarketsFromEvent(
+                    raw,
+                    now,
+                    snapshot.diagnostics
+                  );
+
+                const markets =
+                  deepMarkets(fresh);
+
+                const count =
+                  Object
+                    .values(markets)
+                    .reduce(
+                      (
+                        total,
+                        rows
+                      ) =>
+                        total +
+                        rows.length,
+                      0
+                    );
+
+                if (!count) {
+                  continue;
+                }
+
+                deepCandidates.push({
+
+                  id:
+                    fresh.id,
+
+                  home:
+                    fresh.home,
+
+                  away:
+                    fresh.away,
+
+                  date:
+                    fresh.date,
+
+                  sport:
+                    fresh.sport,
+
+                  league:
+                    fresh.league,
+
+                  urls:
+                    fresh.urls ||
+                    {},
+
+                  bookmakerIds:
+                    fresh.bookmakerIds ||
+                    {},
+
+                  bookmakers:
+                    markets,
+
+                  priorityScore:
+                    score,
+
+                  _fingerprint:
+                    fingerprint(
+                      markets
+                    ),
+
+                  _marketCount:
+                    count
+                });
+
+              } catch (error) {
+
+                if (
+                  error?.code ===
+                  'LOCAL_BUDGET_STOP'
+                ) {
+
+                  snapshot
+                    .diagnostics
+                    .deepEventsSkippedBudget +=
+                      deepQueue.length -
+                      i;
+
+                  break;
+                }
+
+                snapshot.errors.push({
+                  stage:
+                    'deep-markets',
+
+                  eventId:
+                    event.id,
+
+                  message:
+                    String(
+                      error?.message ||
+                      error
+                    )
+                });
+
+                if (
+                  error?.code ===
+                  'RATE_LIMIT'
+                ) {
+                  break;
+                }
+              }
+            }
+
+            /*
+             * Reject suspicious identical
+             * deep-market payloads repeated
+             * across unrelated event IDs.
+             */
+            const fingerprintMap =
+              new Map();
+
+            for (
+              const item
+              of deepCandidates
+            ) {
+
+              if (
+                !item._fingerprint
+              ) {
+                continue;
+              }
+
+              if (
+                !fingerprintMap.has(
+                  item._fingerprint
+                )
+              ) {
+                fingerprintMap.set(
+                  item._fingerprint,
+                  []
+                );
+              }
+
+              fingerprintMap
+                .get(
+                  item._fingerprint
+                )
+                .push(
+                  String(item.id)
+                );
+            }
+
+            const duplicates =
+              new Set(
+                [
+                  ...fingerprintMap
+                    .entries()
+                ]
+                  .filter(
+                    (
+                      [
+                        ,
+                        ids
+                      ]
+                    ) =>
+                      new Set(ids)
+                        .size > 1
+                  )
+                  .map(
+                    ([fp]) =>
+                      fp
+                  )
+              );
+
+            for (
+              const item
+              of deepCandidates
+            ) {
+
+              if (
+                item._fingerprint &&
+                duplicates.has(
+                  item._fingerprint
+                )
+              ) {
+
+                snapshot
+                  .diagnostics
+                  .duplicateDeepRejects++;
+
+                continue;
+              }
+
+              const {
+                _fingerprint,
+                _marketCount,
+                ...published
+              } = item;
+
+              snapshot
+                .deepMarkets
+                .push(
+                  published
+                );
+
+              snapshot
+                .diagnostics
+                .deepEventsWithMarkets++;
+
+              snapshot
+                .diagnostics
+                .deepMarketsPublished +=
+                  _marketCount;
+
+              /*
+               * Keep the legacy baseballProps
+               * field so runner v1.2.5 remains
+               * backward-compatible.
+               */
+              if (
+                normalized(
+                  item?.sport?.slug
+                ) === 'baseball'
+              ) {
+                snapshot
+                  .baseballProps
+                  .push(
+                    published
+                  );
+              }
+            }
+
+            snapshot.eventCount =
+              snapshot.events.length;
+
+            snapshot.deepMarketEventCount =
+              snapshot.deepMarkets.length;
+
+            snapshot.baseballPropEventCount =
+              snapshot.baseballProps.length;
+
+            snapshot.requestsUsed =
+              requestsUsed;
+
+            snapshot.requestsRemaining =
+              budgetRemaining();
+
+            snapshot.requestPolicy = {
+
+              hardBudget:
+                REQUEST_BUDGET,
+
+              optionalStopAt:
+                OPTIONAL_STOP_AT,
+
+              safetyReserve:
+                SAFETY_RESERVE,
+
+              propHorizonHours:
+                PROP_HORIZON_HOURS,
+
+              maxPropEvents:
+                MAX_PROP_EVENTS,
+
+              strategy:
+                'core-board-first; deep markets by league/start-time priority'
+            };
+
+            /*
+             * Budget skips are normal.
+             * 429s and identity failures
+             * are not.
+             */
             snapshot.complete =
               snapshot.eventCount > 0 &&
-              snapshot.errors.length === 0;
+              !snapshot.errors.some(
+                error =>
+                  /RATE_LIMIT|429|identity/i
+                    .test(
+                      String(
+                        error.message ||
+                        ''
+                      )
+                    )
+              );
 
             console.log(
-              `Candidate events: ${snapshot.diagnostics.eventCandidatesTotal}; ` +
-              `main odds: ${snapshot.eventCount}; ` +
-              `Bet365 events: ${snapshot.diagnostics.bet365Events}; ` +
-              `Betway events: ${snapshot.diagnostics.betwayEvents}; ` +
-              `stale markets removed: ${snapshot.diagnostics.staleMarketsRemoved}; ` +
-              `baseball checked: ${snapshot.diagnostics.baseballEventsCheckedForProps}; ` +
-              `prop markets: ${snapshot.diagnostics.baseballPropMarkets}; ` +
-              `prop identity rejects: ${snapshot.diagnostics.baseballPropIdentityRejects}; ` +
-              `duplicate prop rejects: ${snapshot.diagnostics.baseballDuplicatePropRejects}; ` +
-              `errors: ${snapshot.errors.length}.`
+
+              `Requests ` +
+              `${requestsUsed}/${REQUEST_BUDGET}; ` +
+
+              `candidates ` +
+              `${snapshot.diagnostics.eventCandidatesTotal}; ` +
+
+              `core events ` +
+              `${snapshot.eventCount}; ` +
+
+              `core markets ` +
+              `${snapshot.diagnostics.mainOddsMarkets}; ` +
+
+              `deep checked ` +
+              `${snapshot.diagnostics.deepEventsChecked}; ` +
+
+              `deep events ` +
+              `${snapshot.deepMarketEventCount}; ` +
+
+              `deep markets ` +
+              `${snapshot.diagnostics.deepMarketsPublished}; ` +
+
+              `deep skipped budget ` +
+              `${snapshot.diagnostics.deepEventsSkippedBudget}; ` +
+
+              `stale removed ` +
+              `${snapshot.diagnostics.staleMarketsRemoved}; ` +
+
+              `errors ` +
+              `${snapshot.errors.length}.`
             );
 
-            // HARD SAFETY GATE:
-            // Never overwrite the published feed with an empty/failed refresh.
-            if (snapshot.eventCount === 0) {
-              logErrors(snapshot.errors);
-              console.error(
-                `REFRESH REJECTED: API produced 0 usable fresh events. ` +
-                `Published live-odds.json was NOT changed. Existing feed had ${existingCount} event(s).`
+            /*
+             * HARD SAFETY GATE
+             *
+             * Never replace a working
+             * live-odds.json with an
+             * empty/failed core feed.
+             */
+            if (
+              snapshot.eventCount === 0
+            ) {
+
+              logErrors(
+                snapshot.errors
               );
+
+              console.error(
+
+                `REFRESH REJECTED: ` +
+                `0 usable core events. ` +
+                `Published feed unchanged; ` +
+                `previous feed had ` +
+                `${existingCount} event(s).`
+              );
+
               process.exit(1);
             }
 
-            fs.mkdirSync('data', { recursive: true });
-
-            // Write to a temporary file first, validate it, then atomically replace live-odds.json.
-            fs.writeFileSync(TMPFILE, JSON.stringify(snapshot, null, 2) + '\n', 'utf8');
-
-            const verify = JSON.parse(fs.readFileSync(TMPFILE, 'utf8'));
-            if (!Array.isArray(verify.events) || Number(verify.eventCount) <= 0) {
-              throw new Error('Safety validation failed: generated snapshot is not usable.');
-            }
-
-            fs.renameSync(TMPFILE, OUTFILE);
-
-            console.log(
-              `Saved ${snapshot.eventCount} main-odds events; ` +
-              `${snapshot.baseballPropEventCount} baseball events with validated player props.`
+            fs.mkdirSync(
+              'data',
+              {
+                recursive: true
+              }
             );
 
-            if (snapshot.errors.length) {
-              console.log(`Partial API/validation errors: ${snapshot.errors.length}`);
-              logErrors(snapshot.errors);
+            fs.writeFileSync(
+              TMPFILE,
+              JSON.stringify(
+                snapshot,
+                null,
+                2
+              ) + '\n',
+              'utf8'
+            );
+
+            /*
+             * Read it back before replacing
+             * the published snapshot.
+             */
+            const verify =
+              JSON.parse(
+                fs.readFileSync(
+                  TMPFILE,
+                  'utf8'
+                )
+              );
+
+            if (
+              !Array.isArray(
+                verify.events
+              ) ||
+              Number(
+                verify.eventCount
+              ) <= 0
+            ) {
+
+              throw new Error(
+                'Safety validation failed: generated snapshot is not usable.'
+              );
             }
-          })().catch(err => {
+
+            fs.renameSync(
+              TMPFILE,
+              OUTFILE
+            );
+
+            console.log(
+
+              `Published schema 4: ` +
+              `${snapshot.eventCount} core events, ` +
+              `${snapshot.deepMarketEventCount} deep-market events, ` +
+              `${requestsUsed}/${REQUEST_BUDGET} requests used.`
+            );
+
+            if (
+              snapshot.errors.length
+            ) {
+              logErrors(
+                snapshot.errors
+              );
+            }
+
+          })().catch(error => {
+
             try {
-              if (fs.existsSync(TMPFILE)) fs.unlinkSync(TMPFILE);
+
+              if (
+                fs.existsSync(
+                  TMPFILE
+                )
+              ) {
+                fs.unlinkSync(
+                  TMPFILE
+                );
+              }
+
             } catch {}
-            console.error(err);
+
+            console.error(error);
+
             process.exit(1);
           });
+
           NODE
 
       - name: Publish snapshot
         run: |
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
+
           git add data/live-odds.json
 
           if git diff --cached --quiet; then
