@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Betting Edge Terminal v1.2.1 Runner</title>
+<title>Betting Edge Terminal v1.2.2 Runner</title>
 <style>
 html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 #app{border:0;width:100%;height:100%;display:block;background:#01040a}
@@ -12,9 +12,11 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 </head>
 <body>
 <div id="err"></div>
-<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.1"></iframe>
+<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.2"></iframe>
 <script>
 const $=s=>document.querySelector(s);
+const HISTORY_KEY='bettingEdge.runnerHistory.v1.2.2';
+const HISTORY_LIMIT=30;
 
 function b64u(v){
   try{
@@ -44,9 +46,82 @@ function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
 function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
 
+function safeHistory(){
+  try{
+    const raw=localStorage.getItem(HISTORY_KEY);
+    const parsed=raw?JSON.parse(raw):[];
+    return Array.isArray(parsed)?parsed:[];
+  }catch(e){return []}
+}
+
+function normalizeRun(run){
+  const c=run&&run.counts||{};
+  return {
+    slot: txt(run&&run.slot,''),
+    label: txt(run&&run.label,''),
+    ts: txt(run&&run.ts,''),
+    bankroll: run&&run.bankroll,
+    risk: run&&run.risk,
+    counts:{
+      bet:Number(c.bet)||0,
+      lean:Number(c.lean)||0,
+      wait:Number(c.wait)||0,
+      pass:Number(c.pass)||0
+    },
+    summary:txt(run&&run.summary,''),
+    recs:Array.isArray(run&&run.recs)?run.recs:[]
+  };
+}
+
+function runKey(run){
+  return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].join('|');
+}
+
+function saveCurrentRun(run){
+  if(!run || run.__error || !run.ts)return;
+  try{
+    const current=normalizeRun(run);
+    const key=runKey(current);
+    let h=safeHistory().filter(x=>runKey(x)!==key);
+    h.push(current);
+    h.sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
+    if(h.length>HISTORY_LIMIT)h=h.slice(-HISTORY_LIMIT);
+    localStorage.setItem(HISTORY_KEY,JSON.stringify(h));
+  }catch(e){
+    console.warn('Betting Edge history save failed',e);
+  }
+}
+
+function localDateKey(ts){
+  const s=String(ts||'');
+  const m=s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m?m[1]:'';
+}
+
+function mergedPriorRuns(run){
+  const currentKey=runKey(run);
+  const day=localDateKey(run.ts);
+  const embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];
+  const local=safeHistory();
+
+  const map=new Map();
+  [...embedded,...local].forEach(x=>{
+    if(!x)return;
+    const k=runKey(x);
+    if(!k || k===currentKey)return;
+    if(day && localDateKey(x.ts)!==day)return;
+    map.set(k,normalizeRun(x));
+  });
+
+  return [...map.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')));
+}
+
 function injectStyle(d){
+  const old=d.getElementById('runnerStyle122');
+  if(old)old.remove();
+
   const st=d.createElement('style');
-  st.id='runnerStyle121';
+  st.id='runnerStyle122';
   st.textContent=`
 #runnerLive{margin-top:10px;border:2px solid var(--green);background:#04130b;padding:11px}
 .runnerHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -70,12 +145,12 @@ function injectStyle(d){
 .runnerPriorItem summary{cursor:pointer;font-weight:900;color:var(--cyan)}
 .runnerPriorMeta{margin-top:5px;font-size:11px;color:var(--muted)}
 .runnerPriorSummary{margin-top:6px;font-size:12px}
-.runnerHistoryNote{margin-top:7px;font-size:11px;color:var(--muted)}
+.runnerPriorActions{display:flex;gap:8px;align-items:center;margin-top:8px}
+.runnerClear{font:inherit;font-size:10px;padding:5px 7px;background:#090d13;color:var(--muted);border:1px solid var(--line);cursor:pointer}
+.runnerClear:hover{color:var(--cyan);border-color:var(--cyan)}
 @media(max-width:760px){.runnerCounts,.runnerFacts{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.runnerCounts,.runnerFacts{grid-template-columns:1fr}.runnerTop{display:block}}
 `;
-  const old=d.getElementById('runnerStyle121');
-  if(old)old.remove();
   d.head.appendChild(st);
 }
 
@@ -95,10 +170,11 @@ function card(d,r){
 
   const top=el(d,'div','runnerTop');
   const l=el(d,'div');
-  const tag=el(d,'span','tag '+cls(r.status),txt(r.status,'WAIT'));
-  const h=el(d,'h3','',txt(r.title,'Untitled market'));
-  const meta=el(d,'div','small muted',txt(r.meta,''));
-  l.append(tag,h,meta);
+  l.append(
+    el(d,'span','tag '+cls(r.status),txt(r.status,'WAIT')),
+    el(d,'h3','',txt(r.title,'Untitled market')),
+    el(d,'div','small muted',txt(r.meta,''))
+  );
 
   const rr=el(d,'div');
   rr.style.textAlign='right';
@@ -136,12 +212,8 @@ function card(d,r){
   return c;
 }
 
-function priorRuns(run){
-  const a=Array.isArray(run.prior_runs)?run.prior_runs.slice():[];
-  return a.sort((x,y)=>String(y.ts||'').localeCompare(String(x.ts||'')));
-}
-
 function priorSection(d,run){
+  const arr=mergedPriorRuns(run);
   const sec=el(d,'div');
   sec.id='runnerPrior';
 
@@ -149,26 +221,24 @@ function priorSection(d,run){
   const left=el(d,'div');
   left.append(
     el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),
-    el(d,'div','small muted','Older timed snapshots only. They are not current recommendations.')
+    el(d,'div','small muted','Earlier runner snapshots saved on this device for this betting day.')
   );
-  head.append(left,el(d,'span','tag c',String(priorRuns(run).length)+' SAVED'));
+  head.append(left,el(d,'span','tag c',String(arr.length)+' SAVED'));
   sec.appendChild(head);
 
   const list=el(d,'div','runnerPriorList');
-  const arr=priorRuns(run);
 
   if(!arr.length){
     const q=el(d,'div','runnerPriorItem');
     q.append(
-      el(d,'b','muted','NO PRIOR RUNS EMBEDDED'),
-      el(d,'div','runnerPriorMeta','This link contains only the current timed run.')
+      el(d,'b','muted','NO EARLIER RUNS SAVED YET'),
+      el(d,'div','runnerPriorMeta','Open future timed runner links on this device and they will accumulate here automatically.')
     );
     list.appendChild(q);
   }else{
     arr.forEach(p=>{
       const item=el(d,'details','runnerPriorItem');
-      const s=el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN'));
-      item.appendChild(s);
+      item.appendChild(el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN')));
       item.append(
         el(d,'div','runnerPriorMeta',txt(p.ts,'')),
         el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.'))
@@ -184,6 +254,19 @@ function priorSection(d,run){
   }
 
   sec.appendChild(list);
+
+  const actions=el(d,'div','runnerPriorActions');
+  actions.appendChild(el(d,'div','small muted','History is browser/device-local.'));
+  const clear=el(d,'button','runnerClear','CLEAR SAVED HISTORY');
+  clear.onclick=()=>{
+    if(confirm('Clear Betting Edge saved runner history on this device?')){
+      localStorage.removeItem(HISTORY_KEY);
+      apply(run);
+    }
+  };
+  actions.appendChild(clear);
+  sec.appendChild(actions);
+
   return sec;
 }
 
@@ -209,7 +292,7 @@ function apply(run){
   if(archive)archive.style.display='none';
 
   const build=d.querySelector('.top .small.muted');
-  if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.1';
+  if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.2';
 
   if(!run)return;
 
@@ -233,7 +316,6 @@ function apply(run){
 
     const box=el(d,'div');
     box.id='runnerLive';
-    box.className='runnerLive';
 
     const head=el(d,'div','runnerHead');
     const left=el(d,'div');
@@ -281,6 +363,7 @@ function apply(run){
     const wrap=el(d,'div','scroll');
     const table=el(d,'table','runnerMarketTable');
     const thead=el(d,'thead'),trh=el(d,'tr');
+
     ['CALL','MARKET','BOOK / PRICE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));
     thead.appendChild(trh);
 
@@ -305,6 +388,8 @@ function apply(run){
 }
 
 const run=payload();
+if(run && !run.__error)saveCurrentRun(run);
+
 $('#app').addEventListener('load',()=>{
   try{apply(run)}
   catch(e){
