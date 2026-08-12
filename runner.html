@@ -182,7 +182,7 @@ function injectStyle(d){
   .priceState{display:inline-block;margin-top:4px;padding:3px 6px;border:1px solid var(--line);font-size:9px;letter-spacing:.06em;color:var(--muted)}
   .priceState.updated{border-color:var(--green);color:var(--green)}
   .priceState.unresolved{border-color:var(--yellow);color:var(--yellow)}
-  .decisionLine{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:7px;margin-top:10px}
+  .decisionLine{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:7px;margin-top:10px}
   .decisionFact{border:1px solid var(--line);background:#020912;padding:9px}
   .decisionFact .value{font-size:14px;font-weight:900;margin-top:3px;line-height:1.25}
   .stakeFact .value{font-size:19px}
@@ -213,7 +213,6 @@ function injectStyle(d){
     .sessionStrip{grid-template-columns:repeat(5,1fr)}
     .runnerFacts{grid-template-columns:1fr}
     .decisionLine{grid-template-columns:1fr 1fr}
-    .stakeFact{grid-column:1/-1}
   }
   @media(max-width:520px){
     .stats{grid-template-columns:1fr!important}
@@ -279,7 +278,9 @@ function card(d,r){
   const fair=el(d,'div','decisionFact');fair.append(el(d,'div','key','FAIR / EDGE'),el(d,'div','value',[r.fair,r.edge].filter(Boolean).join(' / ')||'—'));
   const move=el(d,'div','decisionFact');move.append(el(d,'div','key','MOVE'),el(d,'div','value',txt(r.move,'—')));
   const stake=el(d,'div','decisionFact stakeFact');stake.append(el(d,'div','key','STAKE'),el(d,'div','value',txt(r.stake,'$0')));
-  decision.append(fair,move,stake);c.appendChild(decision);
+  const fallbackPlayTo=String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':(/STALE|UNVERIFIED/i.test(String(r.priceState||''))?'WAIT FOR FRESH PRICE':'NOT SET');
+  const playTo=el(d,'div','decisionFact');playTo.append(el(d,'div','key','BET AT / PLAY TO'),el(d,'div','value',txt(r.playTo||r.betAt,fallbackPlayTo)));
+  decision.append(fair,move,stake,playTo);c.appendChild(decision);
 
   const facts=el(d,'div','runnerFacts');
   [['HIST FIT',r.hist],['SUPPORT',r.support],['CONTRARY',r.contrary],['SOURCE',r.source]].forEach(([k,v])=>{
@@ -402,11 +403,12 @@ function apply(run){
     const m=el(d,'div','box');m.id='runnerMarket';
     m.append(el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // ')));
     const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
-    ['CALL','MARKET','BOOK / PRICE','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
+    ['CALL','MARKET','BOOK / PRICE','BET AT / PLAY TO','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
     const tb=el(d,'tbody');
     (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
       const tr=el(d,'tr');
-      [txt(r.status),txt(r.title),[r.book,r.price].filter(Boolean).join(' // '),txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
+      [txt(r.status),txt(r.title),[r.book,r.price].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
       tb.appendChild(tr)
     });
     table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m)
