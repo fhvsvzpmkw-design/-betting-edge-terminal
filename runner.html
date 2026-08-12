@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Betting Edge Terminal v1.2.3 Runner</title>
+<title>Betting Edge Terminal v1.2.4 Runner</title>
 <style>
 html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 #app{border:0;width:100%;height:100%;display:block;background:#01040a}
@@ -12,11 +12,14 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 </head>
 <body>
 <div id="err"></div>
-<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.3"></iframe>
+<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.4"></iframe>
 <script>
 const $=s=>document.querySelector(s);
-const HISTORY_KEY='bettingEdge.runnerHistory.v1.2.3';
-const LEGACY_HISTORY_KEYS=['bettingEdge.runnerHistory.v1.2.2'];
+const HISTORY_KEY='bettingEdge.runnerHistory.v1.2.4';
+const LEGACY_HISTORY_KEYS=[
+  'bettingEdge.runnerHistory.v1.2.3',
+  'bettingEdge.runnerHistory.v1.2.2'
+];
 const HISTORY_LIMIT=30;
 const FEED_URL='./data/live-odds.json';
 let activeRun=null;
@@ -31,7 +34,12 @@ function b64u(v){
     return new TextDecoder().decode(bytes);
   }catch(e){return null}
 }
-
+function b64ue(v){
+  const bytes=new TextEncoder().encode(v);
+  let bin='';
+  bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
 function payload(){
   const h=location.hash.slice(1);
   if(!h)return null;
@@ -43,13 +51,28 @@ function payload(){
   try{return JSON.parse(raw)}
   catch(e){return {__error:String(e)}}
 }
-
 function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
 function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
 function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN'?'y':s==='WAIT'?'c':'muted'}
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
 function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
 
+function normalizeRun(run){
+  const c=run&&run.counts||{};
+  return {
+    slot:txt(run&&run.slot,''),
+    label:txt(run&&run.label,''),
+    ts:txt(run&&run.ts,''),
+    bankroll:run&&run.bankroll,
+    risk:run&&run.risk,
+    counts:{bet:Number(c.bet)||0,lean:Number(c.lean)||0,wait:Number(c.wait)||0,pass:Number(c.pass)||0},
+    summary:txt(run&&run.summary,''),
+    feedGeneratedAt:txt(run&&run.feedGeneratedAt,''),
+    repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),
+    recs:Array.isArray(run&&run.recs)?run.recs:[]
+  };
+}
+function runKey(run){return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].join('|')}
 function safeHistory(){
   try{
     const map=new Map();
@@ -61,155 +84,135 @@ function safeHistory(){
     return [...map.values()];
   }catch(e){return []}
 }
-
-function normalizeRun(run){
-  const c=run&&run.counts||{};
-  return {
-    slot: txt(run&&run.slot,''),
-    label: txt(run&&run.label,''),
-    ts: txt(run&&run.ts,''),
-    bankroll: run&&run.bankroll,
-    risk: run&&run.risk,
-    counts:{
-      bet:Number(c.bet)||0,
-      lean:Number(c.lean)||0,
-      wait:Number(c.wait)||0,
-      pass:Number(c.pass)||0
-    },
-    summary:txt(run&&run.summary,''),
-    feedGeneratedAt:txt(run&&run.feedGeneratedAt,''),
-    repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),
-    recs:Array.isArray(run&&run.recs)?run.recs:[]
-  };
-}
-
-function runKey(run){
-  return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].join('|');
-}
-
 function saveCurrentRun(run){
-  if(!run || run.__error || !run.ts)return;
+  if(!run||run.__error||!run.ts)return;
   try{
-    const current=normalizeRun(run);
-    const key=runKey(current);
+    const current=normalizeRun(run),key=runKey(current);
     let h=safeHistory().filter(x=>runKey(x)!==key);
     h.push(current);
     h.sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
     if(h.length>HISTORY_LIMIT)h=h.slice(-HISTORY_LIMIT);
     localStorage.setItem(HISTORY_KEY,JSON.stringify(h));
-  }catch(e){
-    console.warn('Betting Edge history save failed',e);
-  }
+  }catch(e){console.warn('History save failed',e)}
 }
-
-function localDateKey(ts){
-  const s=String(ts||'');
-  const m=s.match(/^(\d{4}-\d{2}-\d{2})/);
-  return m?m[1]:'';
-}
-
+function localDateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
 function mergedPriorRuns(run){
-  const currentKey=runKey(run);
-  const day=localDateKey(run.ts);
+  const currentKey=runKey(run),day=localDateKey(run.ts);
   const embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];
-  const local=safeHistory();
-
   const map=new Map();
-  [...embedded,...local].forEach(x=>{
+  [...embedded,...safeHistory()].forEach(x=>{
     if(!x)return;
     const k=runKey(x);
-    if(!k || k===currentKey)return;
-    if(day && localDateKey(x.ts)!==day)return;
+    if(!k||k===currentKey)return;
+    if(day&&localDateKey(x.ts)!==day)return;
     map.set(k,normalizeRun(x));
   });
-
   return [...map.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')));
 }
-
-
-function b64ue(v){
-  const bytes=new TextEncoder().encode(v);
-  let bin='';
-  bytes.forEach(b=>bin+=String.fromCharCode(b));
-  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-
 function updateRunnerHash(run){
-  try{
-    const encoded=b64ue(JSON.stringify(run));
-    history.replaceState(null,'',location.pathname+location.search+'#run='+encoded);
-  }catch(e){console.warn('Could not update runner URL',e)}
+  try{history.replaceState(null,'',location.pathname+location.search+'#run='+b64ue(JSON.stringify(run)))}
+  catch(e){console.warn('Could not update runner URL',e)}
 }
 
 function normName(v){
   return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,' ').trim();
+    .replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim();
 }
-
-function decimalOdds(v){
-  const n=Number(v);
-  return Number.isFinite(n)&&n>1.001?n:null;
+function normMarket(v){
+  return normName(v)
+    .replace(/\bstrikeouts?\b/g,'strikeout')
+    .replace(/\bhome runs?\b/g,'home run')
+    .replace(/\brbis?\b/g,'rbi')
+    .replace(/\btotal bases?\b/g,'total base')
+    .replace(/\bhits?\b/g,'hit')
+    .replace(/\bpassing yards?\b/g,'passing yard')
+    .replace(/\breceiving yards?\b/g,'receiving yard')
+    .replace(/\brushing yards?\b/g,'rushing yard')
+    .replace(/\bgoals?\b/g,'goal')
+    .replace(/\bshots?\b/g,'shot')
+    .replace(/\bpoints?\b/g,'point')
+    .replace(/\brebounds?\b/g,'rebound')
+    .replace(/\bassists?\b/g,'assist');
 }
-
+function keywordMatch(a,b){
+  const x=normMarket(a),y=normMarket(b);
+  if(!x||!y)return false;
+  return x===y||x.includes(y)||y.includes(x);
+}
+function decimalOdds(v){const n=Number(v);return Number.isFinite(n)&&n>1.001?n:null}
 function americanNumber(dec){
   const d=Number(dec);
   if(!Number.isFinite(d)||d<=1)return null;
   return d>=2?Math.round((d-1)*100):Math.round(-100/(d-1));
 }
-
-function americanText(dec){
-  const n=americanNumber(dec);
-  return n===null?'UNAVAILABLE':(n>0?'+':'')+n;
-}
-
+function americanText(dec){const n=americanNumber(dec);return n===null?'UNAVAILABLE':(n>0?'+':'')+n}
 function americanProb(a){
-  const n=Number(a);
-  if(!Number.isFinite(n)||n===0)return null;
+  const n=Number(a);if(!Number.isFinite(n)||n===0)return null;
   return n>0?100/(n+100):(-n)/((-n)+100);
 }
-
 function inheritedFairProb(fair){
   const text=String(fair||'');
   if(/RECALC|UNVERIFIED|UNAVAILABLE|N\/A/i.test(text))return null;
   const m=text.match(/([+-]\d{3,4})/);
   return m?americanProb(Number(m[1])):null;
 }
-
 function vancouverIso(date=new Date()){
   try{
     const parts=new Intl.DateTimeFormat('en-CA',{
-      timeZone:'America/Vancouver',hour12:false,
-      year:'numeric',month:'2-digit',day:'2-digit',
-      hour:'2-digit',minute:'2-digit',second:'2-digit',
-      timeZoneName:'longOffset'
+      timeZone:'America/Vancouver',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'longOffset'
     }).formatToParts(date);
     const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));
     const hh=o.hour==='24'?'00':o.hour;
     let off=String(o.timeZoneName||'GMT-07:00').replace('GMT','');
     if(!/^[+-]\d{2}:\d{2}$/.test(off))off='-07:00';
     return `${o.year}-${o.month}-${o.day}T${hh}:${o.minute}:${o.second}${off}`;
-  }catch(e){
-    return date.toISOString();
-  }
+  }catch(e){return date.toISOString()}
 }
-
 function vancouverClock(ts){
-  const d=new Date(ts);
-  if(!Number.isFinite(d.getTime()))return txt(ts,'');
+  const d=new Date(ts);if(!Number.isFinite(d.getTime()))return txt(ts,'');
   return new Intl.DateTimeFormat('en-CA',{
-    timeZone:'America/Vancouver',hour:'numeric',minute:'2-digit',hour12:true,
-    month:'short',day:'numeric'
+    timeZone:'America/Vancouver',hour:'numeric',minute:'2-digit',hour12:true,month:'short',day:'numeric'
   }).format(d);
 }
 
+function mergeEvent(a,b){
+  const out={...(a||{}),...(b||{})};
+  out.bookmakers={...(a?.bookmakers||{})};
+  for(const [book,markets] of Object.entries(b?.bookmakers||{})){
+    const old=Array.isArray(out.bookmakers[book])?out.bookmakers[book]:[];
+    const add=Array.isArray(markets)?markets:[];
+    const key=m=>normMarket(m?.name)+'|'+String(m?.updatedAt||'');
+    out.bookmakers[book]=[...new Map([...old,...add].map(m=>[key(m),m])).values()];
+  }
+  out.urls={...(a?.urls||{}),...(b?.urls||{})};
+  out.bookmakerIds={...(a?.bookmakerIds||{}),...(b?.bookmakerIds||{})};
+  return out;
+}
+function allEvents(feed){
+  const map=new Map();
+  for(const e of [...(feed?.events||[]),...(feed?.baseballProps||[])]){
+    if(!e?.id)continue;
+    map.set(String(e.id),map.has(String(e.id))?mergeEvent(map.get(String(e.id)),e):e);
+  }
+  return [...map.values()];
+}
 function marketByName(event,book,name){
   const arr=event?.bookmakers?.[book];
   if(!Array.isArray(arr))return null;
-  const exact=arr.find(m=>normName(m?.name)===normName(name));
+  const exact=arr.find(m=>normMarket(m?.name)===normMarket(name));
   if(exact)return exact;
-  return arr.find(m=>normName(m?.name).includes(normName(name)))||null;
+  return arr.find(m=>keywordMatch(m?.name,name))||null;
 }
-
+function rowLabel(row){
+  return normName(row?.label||row?.player||row?.participant||row?.name||row?.selection||'');
+}
+function rowLine(row){
+  for(const k of ['hdp','line','total','points']){
+    const n=Number(row?.[k]);if(Number.isFinite(n))return n;
+  }
+  return null;
+}
 function quoteFromStructured(event,book,feedRef){
   const market=marketByName(event,book,feedRef.market);
   if(!market||!Array.isArray(market.odds))return null;
@@ -217,127 +220,179 @@ function quoteFromStructured(event,book,feedRef){
   const label=normName(feedRef.label||'');
   const hasHdp=feedRef.hdp!==undefined&&feedRef.hdp!==null&&feedRef.hdp!=='';
   const hdp=hasHdp?Number(feedRef.hdp):null;
-
   for(const row of market.odds){
-    if(label && normName(row?.label)!==label)continue;
-    if(hasHdp && Math.abs(Number(row?.hdp)-hdp)>0.001)continue;
+    if(label&&rowLabel(row)!==label)continue;
+    if(hasHdp){
+      const line=rowLine(row);
+      if(line===null||Math.abs(line-hdp)>0.001)continue;
+    }
     const dec=decimalOdds(row?.[side]);
     if(dec)return {book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row};
   }
   return null;
 }
-
-function teamEvent(feed,team){
-  const n=normName(team);
+function teamEvent(feed,team,opponent=''){
+  const n=normName(team),o=normName(opponent);
   if(!n)return null;
-  const matches=(feed.events||[]).filter(e=>normName(e.home)===n||normName(e.away)===n);
-  return matches.length===1?matches[0]:null;
+  let matches=allEvents(feed).filter(e=>normName(e.home)===n||normName(e.away)===n);
+  if(o)matches=matches.filter(e=>normName(e.home)===o||normName(e.away)===o);
+  if(!matches.length)return null;
+  matches.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+  return matches[0];
 }
-
-function playerEvent(feed,player,keyword){
-  const p=normName(player);
-  const k=normName(keyword);
-  const hits=[];
-  for(const e of feed.events||[]){
+function playerEvents(feed,player,keyword){
+  const p=normName(player),hits=[];
+  for(const e of allEvents(feed)){
     for(const book of ['Bet365','Betway']){
       const markets=e?.bookmakers?.[book];
       if(!Array.isArray(markets))continue;
       for(const m of markets){
-        if(k && !normName(m?.name).includes(k))continue;
-        if((m.odds||[]).some(row=>normName(row?.label)===p)){hits.push(e);break}
+        if(keyword&&!keywordMatch(m?.name,keyword))continue;
+        if((m.odds||[]).some(row=>rowLabel(row)===p)){hits.push(e);break}
       }
     }
   }
-  const unique=[...new Map(hits.map(e=>[e.id,e])).values()];
-  return unique.length===1?unique[0]:null;
+  return [...new Map(hits.map(e=>[String(e.id),e])).values()];
+}
+function bestBookQuote(quotes){return quotes.length?quotes.sort((a,b)=>b.dec-a.dec)[0]:null}
+
+function matchMoneyline(title,feed,books){
+  const m=title.match(/^(.*?)\s+(?:ML|moneyline)(?:\s+(?:vs\.?|v\.?|at)\s+(.+))?$/i);
+  if(!m)return null;
+  const team=m[1].trim(),opponent=(m[2]||'').trim();
+  const event=teamEvent(feed,team,opponent);
+  if(!event)return {quote:null,reason:'EVENT NOT FOUND'};
+  const side=normName(event.home)===normName(team)?'home':'away';
+  const quotes=[];
+  let marketSeen=false;
+  for(const book of books){
+    const market=marketByName(event,book,'ML')||marketByName(event,book,'Moneyline');
+    if(!market)continue;
+    marketSeen=true;
+    const row=market.odds?.[0];
+    const dec=decimalOdds(row?.[side]);
+    if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
+  }
+  const quote=bestBookQuote(quotes);
+  return quote?{quote,reason:''}:{quote:null,reason:marketSeen?'BOOK PRICE MISSING':'MARKET NOT FOUND'};
+}
+function matchSpread(title,feed,books){
+  const m=title.match(/^(.*?)\s+([+-]\d+(?:\.\d+)?)(?:\s+(?:vs\.?|v\.?|at)\s+(.+))?$/i);
+  if(!m)return null;
+  const team=m[1].trim(),line=Number(m[2]),opponent=(m[3]||'').trim();
+  const event=teamEvent(feed,team,opponent);
+  if(!event)return {quote:null,reason:'EVENT NOT FOUND'};
+  const side=normName(event.home)===normName(team)?'home':'away';
+  const quotes=[];
+  let marketSeen=false,lineSeen=false;
+  for(const book of books){
+    const market=marketByName(event,book,'Spread');
+    if(!market)continue;
+    marketSeen=true;
+    let rows=(market.odds||[]).filter(row=>{
+      const rl=rowLine(row);
+      if(rl===null)return false;
+      if(Math.abs(Math.abs(rl)-Math.abs(line))>0.001)return false;
+      lineSeen=true;
+      return decimalOdds(row?.[side]);
+    });
+    rows.sort((a,b)=>Math.abs((rowLine(a)??99)-line)-Math.abs((rowLine(b)??99)-line));
+    const row=rows[0],dec=decimalOdds(row?.[side]);
+    if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
+  }
+  const quote=bestBookQuote(quotes);
+  return quote?{quote,reason:''}:{quote:null,reason:!marketSeen?'MARKET NOT FOUND':!lineSeen?'LINE NOT FOUND':'BOOK PRICE MISSING'};
+}
+function parsePropTitle(title){
+  let m=title.match(/^(.*?)\s+([OU])\s*(\d+(?:\.\d+)?)\s+(.+)$/i);
+  if(m)return {player:m[1].trim(),side:m[2].toUpperCase()==='O'?'over':'under',line:Number(m[3]),keyword:m[4].trim()};
+  m=title.match(/^(.*?)\s+(over|under)\s+(\d+(?:\.\d+)?)\s+(.+)$/i);
+  if(m)return {player:m[1].trim(),side:m[2].toLowerCase(),line:Number(m[3]),keyword:m[4].trim()};
+  return null;
+}
+function matchProp(title,feed,books){
+  const p=parsePropTitle(title);
+  if(!p)return null;
+  const events=playerEvents(feed,p.player,p.keyword);
+  if(!events.length){
+    const playerAnywhere=playerEvents(feed,p.player,'');
+    return {quote:null,reason:playerAnywhere.length?'PROP NOT RETURNED':'PLAYER / EVENT NOT FOUND'};
+  }
+  const quotes=[];
+  let marketSeen=false,lineSeen=false;
+  for(const event of events){
+    for(const book of books){
+      const markets=event?.bookmakers?.[book]||[];
+      for(const market of markets){
+        if(!keywordMatch(market?.name,p.keyword))continue;
+        marketSeen=true;
+        for(const row of market.odds||[]){
+          if(rowLabel(row)!==normName(p.player))continue;
+          const rl=rowLine(row);
+          if(rl===null||Math.abs(rl-p.line)>0.001)continue;
+          lineSeen=true;
+          const dec=decimalOdds(row?.[p.side]);
+          if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side:p.side,row});
+        }
+      }
+    }
+  }
+  const quote=bestBookQuote(quotes);
+  return quote?{quote,reason:''}:{quote:null,reason:!marketSeen?'PROP NOT RETURNED':!lineSeen?'PROP LINE NOT RETURNED':'BOOK PRICE MISSING'};
+}
+function matchGameTotal(title,feed,books){
+  const m=title.match(/^(.*?)\s+(over|under|[OU])\s*(\d+(?:\.\d+)?)\s+(?:total|runs?|points?|goals?)$/i);
+  if(!m)return null;
+  const team=m[1].trim(),side=/^(over|o)$/i.test(m[2])?'over':'under',line=Number(m[3]);
+  const event=teamEvent(feed,team);
+  if(!event)return {quote:null,reason:'EVENT NOT FOUND'};
+  const quotes=[];let marketSeen=false,lineSeen=false;
+  for(const book of books){
+    const market=marketByName(event,book,'Total')||marketByName(event,book,'Totals');
+    if(!market)continue;
+    marketSeen=true;
+    for(const row of market.odds||[]){
+      const rl=rowLine(row);
+      if(rl===null||Math.abs(rl-line)>0.001)continue;
+      lineSeen=true;
+      const dec=decimalOdds(row?.[side]);
+      if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
+    }
+  }
+  const quote=bestBookQuote(quotes);
+  return quote?{quote,reason:''}:{quote:null,reason:!marketSeen?'MARKET NOT FOUND':!lineSeen?'LINE NOT FOUND':'BOOK PRICE MISSING'};
 }
 
 function bestQuoteForRec(rec,feed){
   const books=['Bet365','Betway'];
-  const quotes=[];
 
-  if(rec?.feed?.eventId && rec?.feed?.market && rec?.feed?.side){
-    const event=(feed.events||[]).find(e=>String(e.id)===String(rec.feed.eventId));
+  if(rec?.feed?.eventId&&rec?.feed?.market&&rec?.feed?.side){
+    const event=allEvents(feed).find(e=>String(e.id)===String(rec.feed.eventId));
     if(event){
+      const quotes=[];
       for(const book of books){
         const q=quoteFromStructured(event,book,rec.feed);
         if(q)quotes.push(q);
       }
-      if(quotes.length)return quotes.sort((a,b)=>b.dec-a.dec)[0];
+      if(quotes.length)return {quote:bestBookQuote(quotes),reason:'',method:'STRUCTURED'};
+      return {quote:null,reason:'STRUCTURED MARKET NOT FOUND',method:'STRUCTURED'};
     }
+    return {quote:null,reason:'STRUCTURED EVENT NOT FOUND',method:'STRUCTURED'};
   }
 
   const title=String(rec?.title||'').trim();
-
-  const ml=title.match(/^(.*?)\s+ML$/i);
-  if(ml){
-    const team=ml[1].trim();
-    const event=teamEvent(feed,team);
-    if(event){
-      const side=normName(event.home)===normName(team)?'home':'away';
-      for(const book of books){
-        const market=marketByName(event,book,'ML');
-        const row=market?.odds?.[0];
-        const dec=decimalOdds(row?.[side]);
-        if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
-      }
-    }
+  const attempts=[
+    ['MONEYLINE',()=>matchMoneyline(title,feed,books)],
+    ['SPREAD',()=>matchSpread(title,feed,books)],
+    ['PROP',()=>matchProp(title,feed,books)],
+    ['TOTAL',()=>matchGameTotal(title,feed,books)]
+  ];
+  for(const [method,fn] of attempts){
+    const r=fn();
+    if(r)return {...r,method};
   }
-
-  if(!quotes.length){
-    const spread=title.match(/^(.*?)\s+([+-]\d+(?:\.\d+)?)$/);
-    if(spread){
-      const team=spread[1].trim();
-      const line=Number(spread[2]);
-      const event=teamEvent(feed,team);
-      if(event){
-        const side=normName(event.home)===normName(team)?'home':'away';
-        for(const book of books){
-          const market=marketByName(event,book,'Spread');
-          if(!market)continue;
-          let rows=(market.odds||[]).filter(row=>decimalOdds(row?.[side]) && Math.abs(Math.abs(Number(row?.hdp))-Math.abs(line))<0.001);
-          rows.sort((a,b)=>{
-            const ae=Math.abs(Number(a?.hdp)-line)<0.001?0:1;
-            const be=Math.abs(Number(b?.hdp)-line)<0.001?0:1;
-            return ae-be;
-          });
-          const row=rows[0];
-          const dec=decimalOdds(row?.[side]);
-          if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
-        }
-      }
-    }
-  }
-
-  if(!quotes.length){
-    const prop=title.match(/^(.*?)\s+([OU])(\d+(?:\.\d+)?)\s+(.+)$/i);
-    if(prop){
-      const player=prop[1].trim();
-      const side=prop[2].toUpperCase()==='O'?'over':'under';
-      const line=Number(prop[3]);
-      const keyword=prop[4].trim();
-      const event=playerEvent(feed,player,keyword);
-      if(event){
-        for(const book of books){
-          const markets=event?.bookmakers?.[book]||[];
-          for(const market of markets){
-            if(!normName(market?.name).includes(normName(keyword)))continue;
-            const row=(market.odds||[]).find(r=>
-              normName(r?.label)===normName(player) &&
-              Math.abs(Number(r?.hdp)-line)<0.001 &&
-              decimalOdds(r?.[side])
-            );
-            const dec=decimalOdds(row?.[side]);
-            if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row});
-          }
-        }
-      }
-    }
-  }
-
-  return quotes.length?quotes.sort((a,b)=>b.dec-a.dec)[0]:null;
+  return {quote:null,reason:'TITLE FORMAT NOT RECOGNIZED',method:'NONE'};
 }
-
 function repriceStatus(originalStatus,ev){
   const s=String(originalStatus||'WAIT').toUpperCase();
   if(s==='WAIT')return 'WAIT';
@@ -348,30 +403,30 @@ function repriceStatus(originalStatus,ev){
   if(s==='PASS')return ev>=3.0?'LEAN':'WAIT';
   return 'WAIT';
 }
-
 function repriceRec(rec,feed){
   const out={...rec};
-  const q=bestQuoteForRec(rec,feed);
+  const result=bestQuoteForRec(rec,feed);
+  const q=result.quote;
   const oldPrice=txt(rec.price,'—');
 
   if(!q){
     out.status=String(rec.status||'WAIT').toUpperCase()==='PASS'?'PASS':'WAIT';
     out.price='UNVERIFIED';
     out.edge='NEEDS FULL RERUN';
-    out.move=`${oldPrice} → unverified`;
+    out.move=`${oldPrice} → ${result.reason}`;
     out.stake='$0';
-    out.source=`LATEST FEED // ${vancouverClock(feed.generatedAt)}`;
-    out.contrary='No exact current Bet365/Betway market match was found. Full scheduled rerun required.';
+    out.source=`LATEST FEED // ${vancouverClock(feed.generatedAt)} // ${result.method}`;
+    out.contrary=`Verification: ${result.reason}.`;
     out.analysis=txt(rec.analysis,'')+
-      `\n\nREPRICE ONLY: latest published feed could not verify this exact market. Underlying analysis was not rebuilt.`;
-    return {rec:out,matched:false};
+      `\n\nREPRICE ONLY: ${result.reason}. The latest published feed was searched using ${result.method.toLowerCase()} matching. Underlying analysis was not rebuilt.`;
+    return {rec:out,matched:false,reason:result.reason};
   }
 
   const fairProb=inheritedFairProb(rec.fair);
   out.book=q.book;
   out.price=americanText(q.dec);
   out.move=`${oldPrice} → ${out.price}`;
-  out.source=`Odds-API.io → ${q.book} // ${vancouverClock(q.updatedAt||feed.generatedAt)}`;
+  out.source=`Odds-API.io → ${q.book} // ${vancouverClock(q.updatedAt||feed.generatedAt)} // ${result.method}`;
 
   if(fairProb===null){
     out.status='WAIT';
@@ -383,32 +438,25 @@ function repriceRec(rec,feed){
     out.edge=`${ev>=0?'+':''}${ev.toFixed(1)}% EV vs inherited fair`;
     if(out.status!=='BET')out.stake='$0';
   }
-
   out.analysis=txt(rec.analysis,'')+
-    `\n\nREPRICE ONLY: price updated from the latest published Bet365/Betway feed. The matchup handicap and fair value are inherited from the prior full Betting Edge run; the next scheduled run rebuilds them.`;
-  return {rec:out,matched:true};
+    `\n\nREPRICE ONLY: exact market matched by ${result.method.toLowerCase()} against the latest published Bet365/Betway feed. The matchup handicap and fair value are inherited from the prior full Betting Edge run.`;
+  return {rec:out,matched:true,reason:''};
 }
-
 function countCalls(recs){
   const c={bet:0,lean:0,wait:0,pass:0};
   for(const r of recs||[]){
     const k=String(r.status||'WAIT').toLowerCase();
-    if(k in c)c[k]++;
-    else c.wait++;
+    if(k in c)c[k]++;else c.wait++;
   }
   return c;
 }
-
 function feedAgeMinutes(feed){
   const t=Date.parse(feed?.generatedAt);
   return Number.isFinite(t)?(Date.now()-t)/60000:Infinity;
 }
-
 async function refreshAndReprice(statusEl,button){
   if(refreshBusy||!activeRun)return;
-  refreshBusy=true;
-  button.disabled=true;
-  button.textContent='UPDATING…';
+  refreshBusy=true;button.disabled=true;button.textContent='UPDATING…';
   statusEl.textContent='Fetching latest published Bet365/Betway snapshot…';
 
   try{
@@ -423,24 +471,20 @@ async function refreshAndReprice(statusEl,button){
       return;
     }
 
-    const feedMs=Date.parse(feed.generatedAt);
-    const currentFeedMs=Date.parse(activeRun.feedGeneratedAt||activeRun.ts||'');
-    if(Number.isFinite(feedMs)&&Number.isFinite(currentFeedMs)&&feedMs<=currentFeedMs){
-      statusEl.textContent=`NO NEW ODDS SNAPSHOT — latest published ${vancouverClock(feed.generatedAt)}.`;
-      return;
-    }
-
     saveCurrentRun(activeRun);
 
     let matched=0;
+    const reasons={};
     const recs=(activeRun.recs||[]).map(r=>{
       const x=repriceRec(r,feed);
       if(x.matched)matched++;
+      else reasons[x.reason]=(reasons[x.reason]||0)+1;
       return x.rec;
     });
     const need=recs.length-matched;
     const base=activeRun.repriceBaseLabel||activeRun.label||activeRun.slot||'BETTING EDGE';
     const now=vancouverIso();
+    const reasonText=Object.entries(reasons).map(([k,v])=>`${v} ${k}`).join('; ');
 
     activeRun={
       ...activeRun,
@@ -450,7 +494,7 @@ async function refreshAndReprice(statusEl,button){
       feedGeneratedAt:feed.generatedAt,
       risk:0,
       counts:countCalls(recs),
-      summary:`REPRICE ONLY using Bet365/Betway snapshot ${vancouverClock(feed.generatedAt)}. ${matched} exact market${matched===1?'':'s'} repriced; ${need} require${need===1?'s':''} full rerun. Underlying handicap/fair values are inherited from the last full Betting Edge run.`,
+      summary:`REPRICE ONLY using schema ${feed.schema||1} Bet365/Betway snapshot ${vancouverClock(feed.generatedAt)}. ${matched} exact market${matched===1?'':'s'} repriced; ${need} unresolved${reasonText?' ('+reasonText+')':''}. Underlying handicap/fair values are inherited from the last full Betting Edge run.`,
       recs
     };
 
@@ -460,18 +504,13 @@ async function refreshAndReprice(statusEl,button){
   }catch(e){
     statusEl.textContent='UPDATE FAILED — '+String(e?.message||e);
   }finally{
-    refreshBusy=false;
-    button.disabled=false;
-    button.textContent='↻ UPDATE ODDS / REPRICE NOW';
+    refreshBusy=false;button.disabled=false;button.textContent='↻ UPDATE ODDS / REPRICE NOW';
   }
 }
 
 function injectStyle(d){
-  const old=d.getElementById('runnerStyle123');
-  if(old)old.remove();
-
-  const st=d.createElement('style');
-  st.id='runnerStyle123';
+  const old=d.getElementById('runnerStyle124');if(old)old.remove();
+  const st=d.createElement('style');st.id='runnerStyle124';
   st.textContent=`
 #runnerLive{margin-top:10px;border:2px solid var(--green);background:#04130b;padding:11px}
 .runnerHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -480,289 +519,107 @@ function injectStyle(d){
 .runnerCard{border:2px solid var(--cyan);padding:11px;background:var(--panel);margin-top:9px}
 .runnerTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .runnerFacts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.runnerFact{font-size:11px}
-.runnerBtn{width:100%;margin-top:8px;font:inherit;font-weight:900;padding:8px;background:#201a03;color:var(--yellow);border:1px solid var(--yellow);cursor:pointer}
-.runnerDetail{display:none;margin-top:8px;border:1px dotted var(--line);padding:9px;background:#01070d;white-space:pre-wrap;line-height:1.45}
-.runnerDetail.open{display:block}
-#runnerMarket{margin-bottom:9px}
-.runnerMarketTable{width:100%;border-collapse:collapse}
-.runnerMarketTable th,.runnerMarketTable td{padding:7px 8px;border-top:1px dotted var(--line);font-size:11px;text-align:left;vertical-align:top}
+.runnerFact{font-size:11px}.runnerBtn{width:100%;margin-top:8px;font:inherit;font-weight:900;padding:8px;background:#201a03;color:var(--yellow);border:1px solid var(--yellow);cursor:pointer}
+.runnerDetail{display:none;margin-top:8px;border:1px dotted var(--line);padding:9px;background:#01070d;white-space:pre-wrap;line-height:1.45}.runnerDetail.open{display:block}
+#runnerMarket{margin-bottom:9px}.runnerMarketTable{width:100%;border-collapse:collapse}.runnerMarketTable th,.runnerMarketTable td{padding:7px 8px;border-top:1px dotted var(--line);font-size:11px;text-align:left;vertical-align:top}
 .runnerMarketTable th{color:var(--cyan);font-size:9px;letter-spacing:.06em}
-#runnerPrior{margin-top:10px;border:2px solid var(--cyan);padding:11px;background:#03101b}
-.runnerPriorHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.runnerPriorList{display:grid;gap:7px;margin-top:8px}
-.runnerPriorItem{border:1px solid var(--line);padding:8px;background:#020912}
-.runnerPriorItem summary{cursor:pointer;font-weight:900;color:var(--cyan)}
-.runnerPriorMeta{margin-top:5px;font-size:11px;color:var(--muted)}
-.runnerPriorSummary{margin-top:6px;font-size:12px}
-.runnerPriorActions{display:flex;gap:8px;align-items:center;margin-top:8px}
+#runnerPrior{margin-top:10px;border:2px solid var(--cyan);padding:11px;background:#03101b}.runnerPriorHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.runnerPriorList{display:grid;gap:7px;margin-top:8px}.runnerPriorItem{border:1px solid var(--line);padding:8px;background:#020912}.runnerPriorItem summary{cursor:pointer;font-weight:900;color:var(--cyan)}
+.runnerPriorMeta{margin-top:5px;font-size:11px;color:var(--muted)}.runnerPriorSummary{margin-top:6px;font-size:12px}.runnerPriorActions{display:flex;gap:8px;align-items:center;margin-top:8px}
 .runnerClear{font:inherit;font-size:10px;padding:5px 7px;background:#090d13;color:var(--muted);border:1px solid var(--line);cursor:pointer}
-.runnerClear:hover{color:var(--cyan);border-color:var(--cyan)}
-.runnerRefresh{margin-top:9px;border:1px solid var(--cyan);padding:9px;background:#01131a}
-.runnerRefreshBtn{width:100%;font:inherit;font-weight:900;padding:9px;background:#05222b;color:var(--cyan);border:1px solid var(--cyan);cursor:pointer}
-.runnerRefreshBtn:disabled{opacity:.55;cursor:default}
-.runnerRefreshStatus{margin-top:6px;font-size:11px;color:var(--muted);line-height:1.4}
-@media(max-width:760px){.runnerCounts,.runnerFacts{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.runnerCounts,.runnerFacts{grid-template-columns:1fr}.runnerTop{display:block}}
-`;
+.runnerRefresh{margin-top:9px;border:1px solid var(--cyan);padding:9px;background:#01131a}.runnerRefreshBtn{width:100%;font:inherit;font-weight:900;padding:9px;background:#05222b;color:var(--cyan);border:1px solid var(--cyan);cursor:pointer}
+.runnerRefreshBtn:disabled{opacity:.55;cursor:default}.runnerRefreshStatus{margin-top:6px;font-size:11px;color:var(--muted);line-height:1.4}
+@media(max-width:760px){.runnerCounts,.runnerFacts{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.runnerCounts,.runnerFacts{grid-template-columns:1fr}.runnerTop{display:block}}`;
   d.head.appendChild(st);
 }
-
 function setStats(d,run){
-  const vals=[...d.querySelectorAll('.stats .stat b')];
-  const c=run.counts||{};
+  const vals=[...d.querySelectorAll('.stats .stat b')],c=run.counts||{};
   if(vals[0])vals[0].textContent=money(run.bankroll??455.47);
   if(vals[1])vals[1].textContent=money(run.risk??0);
   if(vals[4])vals[4].textContent=txt(c.bet,0);
   if(vals[5])vals[5].textContent=txt(c.lean,0);
   if(vals[6])vals[6].textContent=txt(c.wait,0)+' / '+txt(c.pass,0);
 }
-
 function card(d,r){
-  const c=el(d,'div','runnerCard');
-  c.style.borderColor=border(r.status);
-
-  const top=el(d,'div','runnerTop');
-  const l=el(d,'div');
-  l.append(
-    el(d,'span','tag '+cls(r.status),txt(r.status,'WAIT')),
-    el(d,'h3','',txt(r.title,'Untitled market')),
-    el(d,'div','small muted',txt(r.meta,''))
-  );
-
-  const rr=el(d,'div');
-  rr.style.textAlign='right';
-  rr.append(el(d,'div','key','EXECUTION'),el(d,'b','c',txt(r.price,'VERIFY PRICE')));
-  top.append(l,rr);
-  c.appendChild(top);
-
+  const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
+  const top=el(d,'div','runnerTop'),l=el(d,'div');
+  l.append(el(d,'span','tag '+cls(r.status),txt(r.status,'WAIT')),el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','small muted',txt(r.meta,'')));
+  const rr=el(d,'div');rr.style.textAlign='right';rr.append(el(d,'div','key','EXECUTION'),el(d,'b','c',txt(r.price,'VERIFY PRICE')));
+  top.append(l,rr);c.appendChild(top);
   const facts=el(d,'div','runnerFacts');
-  [
-    ['BOOK',r.book],
-    ['FAIR / EDGE',[r.fair,r.edge].filter(Boolean).join(' / ')],
-    ['MOVE',r.move],
-    ['HIST FIT',r.hist],
-    ['STAKE',r.stake],
-    ['SUPPORT',r.support],
-    ['CONTRARY',r.contrary],
-    ['SOURCE',r.source]
-  ].forEach(([k,v])=>{
-    if(v===undefined||v===null||v==='')return;
-    const f=el(d,'div','runnerFact');
-    f.append(el(d,'b','',k),d.createElement('br'),d.createTextNode(txt(v)));
-    facts.appendChild(f);
-  });
+  [['BOOK',r.book],['FAIR / EDGE',[r.fair,r.edge].filter(Boolean).join(' / ')],['MOVE',r.move],['HIST FIT',r.hist],['STAKE',r.stake],['SUPPORT',r.support],['CONTRARY',r.contrary],['SOURCE',r.source]]
+    .forEach(([k,v])=>{if(v===undefined||v===null||v==='')return;const f=el(d,'div','runnerFact');f.append(el(d,'b','',k),d.createElement('br'),d.createTextNode(txt(v)));facts.appendChild(f)});
   c.appendChild(facts);
-
   if(r.analysis){
-    const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS');
-    const det=el(d,'div','runnerDetail',r.analysis);
-    b.onclick=()=>{
-      det.classList.toggle('open');
-      b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS';
-    };
+    const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS'),det=el(d,'div','runnerDetail',r.analysis);
+    b.onclick=()=>{det.classList.toggle('open');b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS'};
     c.append(b,det);
   }
   return c;
 }
-
 function priorSection(d,run){
-  const arr=mergedPriorRuns(run);
-  const sec=el(d,'div');
-  sec.id='runnerPrior';
-
-  const head=el(d,'div','runnerPriorHead');
-  const left=el(d,'div');
-  left.append(
-    el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),
-    el(d,'div','small muted','Earlier runner snapshots saved on this device for this betting day.')
-  );
-  head.append(left,el(d,'span','tag c',String(arr.length)+' SAVED'));
-  sec.appendChild(head);
-
+  const arr=mergedPriorRuns(run),sec=el(d,'div');sec.id='runnerPrior';
+  const head=el(d,'div','runnerPriorHead'),left=el(d,'div');
+  left.append(el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),el(d,'div','small muted','Earlier runner snapshots saved on this device for this betting day.'));
+  head.append(left,el(d,'span','tag c',String(arr.length)+' SAVED'));sec.appendChild(head);
   const list=el(d,'div','runnerPriorList');
-
   if(!arr.length){
-    const q=el(d,'div','runnerPriorItem');
-    q.append(
-      el(d,'b','muted','NO EARLIER RUNS SAVED YET'),
-      el(d,'div','runnerPriorMeta','Open future timed runner links on this device and they will accumulate here automatically.')
-    );
-    list.appendChild(q);
+    const q=el(d,'div','runnerPriorItem');q.append(el(d,'b','muted','NO EARLIER RUNS SAVED YET'),el(d,'div','runnerPriorMeta','Open future timed runner links on this device and they will accumulate here automatically.'));list.appendChild(q);
   }else{
-    arr.forEach(p=>{
-      const item=el(d,'details','runnerPriorItem');
-      item.appendChild(el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN')));
-      item.append(
-        el(d,'div','runnerPriorMeta',txt(p.ts,'')),
-        el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.'))
-      );
-      const c=p.counts||{};
-      item.appendChild(
-        el(d,'div','runnerPriorMeta',
-          'BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)
-        )
-      );
-      list.appendChild(item);
-    });
+    arr.forEach(p=>{const item=el(d,'details','runnerPriorItem');item.appendChild(el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN')));item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')),el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.')));const c=p.counts||{};item.appendChild(el(d,'div','runnerPriorMeta','BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)));list.appendChild(item)});
   }
-
   sec.appendChild(list);
-
-  const actions=el(d,'div','runnerPriorActions');
-  actions.appendChild(el(d,'div','small muted','History is browser/device-local.'));
+  const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','History is browser/device-local.'));
   const clear=el(d,'button','runnerClear','CLEAR SAVED HISTORY');
-  clear.onclick=()=>{
-    if(confirm('Clear Betting Edge saved runner history on this device?')){
-      [HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));
-      apply(run);
-    }
-  };
-  actions.appendChild(clear);
-  sec.appendChild(actions);
-
-  return sec;
+  clear.onclick=()=>{if(confirm('Clear Betting Edge saved runner history on this device?')){[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));apply(run)}};
+  actions.appendChild(clear);sec.appendChild(actions);return sec;
 }
-
-function hideStaticBoard(board){
-  [...board.children].forEach(x=>{
-    if(x.id!=='runnerLive' && x.id!=='runnerPrior')x.style.display='none';
-  });
-}
-
-function hideStaticMarket(market){
-  [...market.children].forEach(x=>{
-    if(x.id!=='runnerMarket')x.style.display='none';
-  });
-}
-
+function hideStaticBoard(board){[...board.children].forEach(x=>{if(x.id!=='runnerLive'&&x.id!=='runnerPrior')x.style.display='none'})}
+function hideStaticMarket(market){[...market.children].forEach(x=>{if(x.id!=='runnerMarket')x.style.display='none'})}
 function apply(run){
-  const frame=$('#app'),d=frame.contentDocument;
-  if(!d)return;
-
+  const frame=$('#app'),d=frame.contentDocument;if(!d)return;
   injectStyle(d);
-
-  const archive=d.getElementById('runArchive');
-  if(archive)archive.style.display='none';
-
-  const build=d.querySelector('.top .small.muted');
-  if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.3';
-
+  const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
+  const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.4';
   if(!run)return;
-
-  if(run.__error){
-    const e=$('#err');
-    e.textContent='Betting Edge runner payload error: '+run.__error;
-    e.style.display='block';
-    return;
-  }
-
+  if(run.__error){const e=$('#err');e.textContent='Betting Edge runner payload error: '+run.__error;e.style.display='block';return}
   setStats(d,run);
-
   const board=d.getElementById('board');
   if(board){
-    ['runnerLive','runnerPrior','runnerBaseLabel'].forEach(id=>{
-      const x=d.getElementById(id);
-      if(x)x.remove();
-    });
-
+    ['runnerLive','runnerPrior','runnerBaseLabel'].forEach(id=>{const x=d.getElementById(id);if(x)x.remove()});
     hideStaticBoard(board);
-
-    const box=el(d,'div');
-    box.id='runnerLive';
-
-    const head=el(d,'div','runnerHead');
-    const left=el(d,'div');
-    left.append(
-      el(d,'div','sectiontitle','CURRENT RUN // '+txt(run.label||run.slot,'CURRENT')),
-      el(d,'div','small muted',txt(run.ts,''))
-    );
-    head.append(left,el(d,'span','tag g','CURRENT SNAPSHOT'));
-    box.appendChild(head);
-
-    const summary=el(d,'div','notice');
-    summary.style.marginTop='8px';
-    summary.textContent=txt(run.summary,'No summary supplied.');
-    box.appendChild(summary);
-
-    const refresh=el(d,'div','runnerRefresh');
-    const refreshBtn=el(d,'button','runnerRefreshBtn','↻ UPDATE ODDS / REPRICE NOW');
-    const refreshStatus=el(d,'div','runnerRefreshStatus',
-      run.feedGeneratedAt
-        ? 'Current price snapshot: '+vancouverClock(run.feedGeneratedAt)+'. Full handicap refresh remains scheduled.'
-        : 'Checks the latest published Bet365/Betway snapshot and reprices this existing analysis. Full handicap refresh remains scheduled.'
-    );
-    refreshBtn.onclick=()=>refreshAndReprice(refreshStatus,refreshBtn);
-    refresh.append(refreshBtn,refreshStatus);
-    box.appendChild(refresh);
-
-    const counts=el(d,'div','runnerCounts');
-    const cc=run.counts||{};
-    [['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{
-      const q=el(d,'div','runnerCount');
-      q.append(el(d,'div','key',k),el(d,'b',cls(k),txt(v,0)));
-      counts.appendChild(q);
-    });
+    const box=el(d,'div');box.id='runnerLive';
+    const head=el(d,'div','runnerHead'),left=el(d,'div');
+    left.append(el(d,'div','sectiontitle','CURRENT RUN // '+txt(run.label||run.slot,'CURRENT')),el(d,'div','small muted',txt(run.ts,'')));
+    head.append(left,el(d,'span','tag g','CURRENT SNAPSHOT'));box.appendChild(head);
+    const summary=el(d,'div','notice');summary.style.marginTop='8px';summary.textContent=txt(run.summary,'No summary supplied.');box.appendChild(summary);
+    const refresh=el(d,'div','runnerRefresh'),refreshBtn=el(d,'button','runnerRefreshBtn','↻ UPDATE ODDS / REPRICE NOW');
+    const refreshStatus=el(d,'div','runnerRefreshStatus',run.feedGeneratedAt?'Current price snapshot: '+vancouverClock(run.feedGeneratedAt)+'. Re-matching against the same snapshot is allowed after runner upgrades.':'Checks the latest published Bet365/Betway snapshot and reprices this existing analysis.');
+    refreshBtn.onclick=()=>refreshAndReprice(refreshStatus,refreshBtn);refresh.append(refreshBtn,refreshStatus);box.appendChild(refresh);
+    const counts=el(d,'div','runnerCounts'),cc=run.counts||{};
+    [['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{const q=el(d,'div','runnerCount');q.append(el(d,'div','key',k),el(d,'b',cls(k),txt(v,0)));counts.appendChild(q)});
     box.appendChild(counts);
-
     (Array.isArray(run.recs)?run.recs:[]).forEach(r=>box.appendChild(card(d,r)));
-
-    board.prepend(box);
-    box.after(priorSection(d,run));
+    board.prepend(box);box.after(priorSection(d,run));
   }
-
   const market=d.getElementById('market');
   if(market){
-    const old=d.getElementById('runnerMarket');
-    if(old)old.remove();
-
-    hideStaticMarket(market);
-
-    const m=el(d,'div','box');
-    m.id='runnerMarket';
-    m.append(
-      el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),
-      el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // '))
-    );
-
-    const wrap=el(d,'div','scroll');
-    const table=el(d,'table','runnerMarketTable');
-    const thead=el(d,'thead'),trh=el(d,'tr');
-
-    ['CALL','MARKET','BOOK / PRICE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));
-    thead.appendChild(trh);
-
+    const old=d.getElementById('runnerMarket');if(old)old.remove();hideStaticMarket(market);
+    const m=el(d,'div','box');m.id='runnerMarket';
+    m.append(el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // ')));
+    const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
+    ['CALL','MARKET','BOOK / PRICE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
     const tb=el(d,'tbody');
-    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
-      const tr=el(d,'tr');
-      [
-        txt(r.status),
-        txt(r.title),
-        [r.book,r.price].filter(Boolean).join(' // '),
-        [r.fair,r.edge].filter(Boolean).join(' // '),
-        txt(r.move)
-      ].forEach(v=>tr.appendChild(el(d,'td','',v)));
-      tb.appendChild(tr);
-    });
-
-    table.append(thead,tb);
-    wrap.appendChild(table);
-    m.appendChild(wrap);
-    market.prepend(m);
+    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{const tr=el(d,'tr');[txt(r.status),txt(r.title),[r.book,r.price].filter(Boolean).join(' // '),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));tb.appendChild(tr)});
+    table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m);
   }
 }
 
 activeRun=payload();
-if(activeRun && !activeRun.__error)saveCurrentRun(activeRun);
-
+if(activeRun&&!activeRun.__error)saveCurrentRun(activeRun);
 $('#app').addEventListener('load',()=>{
   try{apply(activeRun)}
-  catch(e){
-    const x=$('#err');
-    x.textContent='Betting Edge runner error: '+e.message;
-    x.style.display='block';
-    console.error(e);
-  }
+  catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}
 });
 </script>
 </body>
