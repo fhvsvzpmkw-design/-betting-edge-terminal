@@ -161,13 +161,13 @@ function injectStyle(d){
   .filterBtn{font:inherit;font-size:10px;font-weight:900;padding:7px 9px;border:1px solid var(--line);background:#020912;color:var(--muted);cursor:pointer}
   .filterBtn.active{border-color:var(--cyan);color:var(--cyan);background:#03151e}
   .runnerCard{border:2px solid var(--cyan);padding:13px;background:var(--panel);margin-top:10px}
-  .runnerTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start}
+  .runnerTop{display:grid;grid-template-columns:minmax(260px,1.45fr) minmax(240px,1fr);gap:14px;align-items:start}
   .callBadge{display:inline-block;font-size:clamp(25px,4vw,36px);font-weight:1000;line-height:1;letter-spacing:.08em;margin-bottom:8px}
   .runnerCard h3{font-size:clamp(16px,2.1vw,22px);line-height:1.2;margin:2px 0 5px}
   .runnerMeta{font-size:11px;color:var(--muted)}
-  .execution{text-align:right;min-width:120px}
+  .execution{text-align:right;min-width:0;max-width:460px;justify-self:end}
   .execution .book{font-size:11px;color:var(--muted);font-weight:900}
-  .bigExec{display:block;font-size:clamp(28px,5vw,43px);line-height:1;font-weight:1000;color:var(--cyan);margin:4px 0}
+  .bigExec{display:block;font-size:clamp(18px,2.8vw,28px);line-height:1.12;font-weight:1000;color:var(--cyan);margin:4px 0;overflow-wrap:anywhere}
   .priceState{display:inline-block;margin-top:4px;padding:3px 6px;border:1px solid var(--line);font-size:9px;letter-spacing:.06em;color:var(--muted)}
   .priceState.updated{border-color:var(--green);color:var(--green)}
   .priceState.unresolved{border-color:var(--yellow);color:var(--yellow)}
@@ -313,6 +313,7 @@ function apply(run){
   const frame=$('#app'),d=frame.contentDocument;if(!d)return;
   injectStyle(d);
   const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
+  const title=d.querySelector('.top .title');if(title)title.textContent='BETTING EDGE TERMINAL UI v1.3';
   const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
   const qa=d.querySelector('.qa');if(qa)qa.style.display='none';
   if(!run)return;
@@ -389,3 +390,4 @@ $('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('
 </script>
 </body>
 </html>
+
