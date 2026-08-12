@@ -317,9 +317,23 @@ function apply(run){
   const frame=$('#app'),d=frame.contentDocument;if(!d)return;
   injectStyle(d);
   const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
+  const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='BETTING EDGE TERMINAL UI v1.3';
   const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
   const qa=d.querySelector('.qa');if(qa)qa.style.display='none';
-  if(!run)return;
+  if(!run){
+    const board=d.getElementById('board');
+    if(board){
+      hideStaticBoard(board);
+      let empty=d.getElementById('runnerEmpty');
+      if(!empty){
+        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open the complete Betting Edge run link containing #run= to load the current selections and controls.');
+        empty.id='runnerEmpty';board.prepend(empty)
+      }
+    }
+    const market=d.getElementById('market');if(market)hideStaticMarket(market);
+    return
+  }
+  const empty=d.getElementById('runnerEmpty');if(empty)empty.remove();
   if(run.__error){const e=$('#err');e.textContent='Betting Edge runner payload error: '+run.__error;e.style.display='block';return}
   setStats(d,run);
 
