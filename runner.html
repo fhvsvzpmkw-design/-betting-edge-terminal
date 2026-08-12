@@ -3,34 +3,317 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Betting Edge Terminal v1.2 Runner</title>
+<title>Betting Edge Terminal v1.2.1 Runner</title>
 <style>
-html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}#app{border:0;width:100%;height:100%;display:block;background:#01040a}
+html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
+#app{border:0;width:100%;height:100%;display:block;background:#01040a}
 #err{position:fixed;z-index:10;left:10px;right:10px;top:10px;padding:10px;background:#25060d;color:#ff9cad;border:1px solid #ff6178;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;display:none}
 </style>
 </head>
 <body>
-<div id="err"></div><iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2"></iframe>
+<div id="err"></div>
+<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.2.1"></iframe>
 <script>
 const $=s=>document.querySelector(s);
-function b64u(v){try{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const bin=atob(v);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}catch(e){return null}}
-function payload(){const h=location.hash.slice(1);if(!h)return null;const p=new URLSearchParams(h);let raw=null;if(p.has('run'))raw=b64u(p.get('run'));else if(p.has('json'))raw=p.get('json');if(!raw)return null;try{return JSON.parse(raw)}catch(e){return {__error:String(e)}}}
+
+function b64u(v){
+  try{
+    v=v.replace(/-/g,'+').replace(/_/g,'/');
+    while(v.length%4)v+='=';
+    const bin=atob(v);
+    const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }catch(e){return null}
+}
+
+function payload(){
+  const h=location.hash.slice(1);
+  if(!h)return null;
+  const p=new URLSearchParams(h);
+  let raw=null;
+  if(p.has('run'))raw=b64u(p.get('run'));
+  else if(p.has('json'))raw=p.get('json');
+  if(!raw)return null;
+  try{return JSON.parse(raw)}
+  catch(e){return {__error:String(e)}}
+}
+
 function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
 function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
 function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN'?'y':s==='WAIT'?'c':'muted'}
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
 function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
-function injectStyle(d){const st=d.createElement('style');st.textContent=`
-#runnerLive{margin-top:10px;border:2px solid var(--green);background:#04130b;padding:11px}.runnerHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.runnerCounts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.runnerCount,.runnerFact{border:1px solid var(--line);padding:7px;background:#020912}.runnerCard{border:2px solid var(--cyan);padding:11px;background:var(--panel);margin-top:9px}.runnerTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.runnerFacts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.runnerFact{font-size:11px}.runnerBtn{width:100%;margin-top:8px;font:inherit;font-weight:900;padding:8px;background:#201a03;color:var(--yellow);border:1px solid var(--yellow);cursor:pointer}.runnerDetail{display:none;margin-top:8px;border:1px dotted var(--line);padding:9px;background:#01070d;white-space:pre-wrap;line-height:1.45}.runnerDetail.open{display:block}#runnerMarket{margin-bottom:9px}.runnerMarketTable{width:100%;border-collapse:collapse}.runnerMarketTable th,.runnerMarketTable td{padding:7px 8px;border-top:1px dotted var(--line);font-size:11px;text-align:left;vertical-align:top}.runnerMarketTable th{color:var(--cyan);font-size:9px;letter-spacing:.06em}
-#runnerPrior{margin-top:10px;border:2px solid var(--cyan);padding:11px;background:#03101b}.runnerPriorHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.runnerPriorList{display:grid;gap:7px;margin-top:8px}.runnerPriorItem{border:1px solid var(--line);padding:8px;background:#020912}.runnerPriorItem summary{cursor:pointer;font-weight:900;color:var(--cyan)}.runnerPriorMeta{margin-top:5px;font-size:11px;color:var(--muted)}.runnerPriorSummary{margin-top:6px;font-size:12px}.runnerBaseLabel{margin-top:10px;border:1px dashed var(--mag);padding:9px;background:#120516}.runnerBaseLabel b{color:var(--mag)}
-@media(max-width:760px){.runnerCounts,.runnerFacts{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.runnerCounts,.runnerFacts{grid-template-columns:1fr}.runnerTop{display:block}}
-`;d.head.appendChild(st)}
-function setStats(d,run){const vals=[...d.querySelectorAll('.stats .stat b')];const c=run.counts||{};if(vals[0])vals[0].textContent=money(run.bankroll??455.47);if(vals[1])vals[1].textContent=money(run.risk??0);if(vals[4])vals[4].textContent=txt(c.bet,0);if(vals[5])vals[5].textContent=txt(c.lean,0);if(vals[6])vals[6].textContent=txt(c.wait,0)+' / '+txt(c.pass,0)}
-function card(d,r){const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);const top=el(d,'div','runnerTop');const l=el(d,'div');const tag=el(d,'span','tag '+cls(r.status),txt(r.status,'WAIT'));const h=el(d,'h3','',txt(r.title,'Untitled market'));const meta=el(d,'div','small muted',txt(r.meta,''));l.append(tag,h,meta);const rr=el(d,'div');rr.style.textAlign='right';rr.append(el(d,'div','key','EXECUTION'),el(d,'b','c',txt(r.price,'VERIFY PRICE')));top.append(l,rr);c.appendChild(top);const facts=el(d,'div','runnerFacts');[['BOOK',r.book],['FAIR / EDGE',[r.fair,r.edge].filter(Boolean).join(' / ')],['MOVE',r.move],['HIST FIT',r.hist],['STAKE',r.stake],['SUPPORT',r.support],['CONTRARY',r.contrary],['SOURCE',r.source]].forEach(([k,v])=>{if(v===undefined||v===null||v==='')return;const f=el(d,'div','runnerFact');f.append(el(d,'b','',k),d.createElement('br'),d.createTextNode(txt(v)));facts.appendChild(f)});c.appendChild(facts);if(r.analysis){const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS');const det=el(d,'div','runnerDetail',r.analysis);b.onclick=()=>{det.classList.toggle('open');b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS'};c.append(b,det)}return c}
-function priorRuns(run){const a=Array.isArray(run.prior_runs)?run.prior_runs.slice():[];return a.sort((x,y)=>String(y.ts||'').localeCompare(String(x.ts||'')))}
-function priorSection(d,run){const sec=el(d,'div');sec.id='runnerPrior';const head=el(d,'div','runnerPriorHead');const left=el(d,'div');left.append(el(d,'div','sectiontitle','PRIOR RUNS // NEWEST → OLDEST'),el(d,'div','small muted','Earlier scheduled snapshots from this betting day.'));head.append(left,el(d,'span','tag c',String(priorRuns(run).length)+' SAVED'));sec.appendChild(head);const list=el(d,'div','runnerPriorList');const arr=priorRuns(run);if(!arr.length){const q=el(d,'div','runnerPriorItem');q.append(el(d,'b','y','NO PRIOR RUN PAYLOADS EMBEDDED'),el(d,'div','runnerPriorMeta','This current link contains only the live run. Future links can embed the earlier 06:00 / 08:00 / 09:30 / 15:15 snapshots here.'));list.appendChild(q)}else{arr.forEach(p=>{const item=el(d,'details','runnerPriorItem');const s=el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN'));item.appendChild(s);item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')),el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.')));const c=p.counts||{};item.appendChild(el(d,'div','runnerPriorMeta','BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)));list.appendChild(item)})}sec.appendChild(list);return sec}
-function apply(run){const frame=$('#app'),d=frame.contentDocument;if(!d)return;injectStyle(d);const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2';if(!run)return;if(run.__error){const e=$('#err');e.textContent='Betting Edge runner payload error: '+run.__error;e.style.display='block';return}setStats(d,run);const board=d.getElementById('board');if(board){['runnerLive','runnerPrior','runnerBaseLabel'].forEach(id=>{const x=d.getElementById(id);if(x)x.remove()});const box=el(d,'div');box.id='runnerLive';box.className='runnerLive';const head=el(d,'div','runnerHead');const left=el(d,'div');left.append(el(d,'div','sectiontitle','CURRENT RUN // '+txt(run.label||run.slot,'CURRENT')),el(d,'div','small muted',txt(run.ts,'')));head.append(left,el(d,'span','tag g','CURRENT SNAPSHOT'));box.appendChild(head);const summary=el(d,'div','notice');summary.style.marginTop='8px';summary.textContent=txt(run.summary,'No summary supplied.');box.appendChild(summary);const counts=el(d,'div','runnerCounts');const cc=run.counts||{};[['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{const q=el(d,'div','runnerCount');q.append(el(d,'div','key',k),el(d,'b',cls(k),txt(v,0)));counts.appendChild(q)});box.appendChild(counts);(Array.isArray(run.recs)?run.recs:[]).forEach(r=>box.appendChild(card(d,r)));const notice=board.querySelector('.notice');if(notice)notice.after(box);else board.prepend(box);box.after(priorSection(d,run));const base=el(d,'div','runnerBaseLabel');base.id='runnerBaseLabel';base.append(el(d,'b','','BASE BOARD / EARLIER RESEARCH'),d.createElement('br'),d.createTextNode('The cards below this marker are the terminal’s underlying research board. They are not newer than the CURRENT RUN and are not a chronological run history.'));d.getElementById('runnerPrior').after(base)}
-const market=d.getElementById('market');if(market){const old=d.getElementById('runnerMarket');if(old)old.remove();const m=el(d,'div','box');m.id='runnerMarket';m.append(el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // ')));const wrap=el(d,'div','scroll');const table=el(d,'table','runnerMarketTable');const thead=el(d,'thead'),trh=el(d,'tr');['CALL','MARKET','BOOK / PRICE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);const tb=el(d,'tbody');(Array.isArray(run.recs)?run.recs:[]).forEach(r=>{const tr=el(d,'tr');[txt(r.status),txt(r.title),[r.book,r.price].filter(Boolean).join(' // '),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));tb.appendChild(tr)});table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m)}}
-const run=payload();$('#app').addEventListener('load',()=>{try{apply(run)}catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}});
+
+function injectStyle(d){
+  const st=d.createElement('style');
+  st.id='runnerStyle121';
+  st.textContent=`
+#runnerLive{margin-top:10px;border:2px solid var(--green);background:#04130b;padding:11px}
+.runnerHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.runnerCounts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.runnerCount,.runnerFact{border:1px solid var(--line);padding:7px;background:#020912}
+.runnerCard{border:2px solid var(--cyan);padding:11px;background:var(--panel);margin-top:9px}
+.runnerTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.runnerFacts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.runnerFact{font-size:11px}
+.runnerBtn{width:100%;margin-top:8px;font:inherit;font-weight:900;padding:8px;background:#201a03;color:var(--yellow);border:1px solid var(--yellow);cursor:pointer}
+.runnerDetail{display:none;margin-top:8px;border:1px dotted var(--line);padding:9px;background:#01070d;white-space:pre-wrap;line-height:1.45}
+.runnerDetail.open{display:block}
+#runnerMarket{margin-bottom:9px}
+.runnerMarketTable{width:100%;border-collapse:collapse}
+.runnerMarketTable th,.runnerMarketTable td{padding:7px 8px;border-top:1px dotted var(--line);font-size:11px;text-align:left;vertical-align:top}
+.runnerMarketTable th{color:var(--cyan);font-size:9px;letter-spacing:.06em}
+#runnerPrior{margin-top:10px;border:2px solid var(--cyan);padding:11px;background:#03101b}
+.runnerPriorHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.runnerPriorList{display:grid;gap:7px;margin-top:8px}
+.runnerPriorItem{border:1px solid var(--line);padding:8px;background:#020912}
+.runnerPriorItem summary{cursor:pointer;font-weight:900;color:var(--cyan)}
+.runnerPriorMeta{margin-top:5px;font-size:11px;color:var(--muted)}
+.runnerPriorSummary{margin-top:6px;font-size:12px}
+.runnerHistoryNote{margin-top:7px;font-size:11px;color:var(--muted)}
+@media(max-width:760px){.runnerCounts,.runnerFacts{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.runnerCounts,.runnerFacts{grid-template-columns:1fr}.runnerTop{display:block}}
+`;
+  const old=d.getElementById('runnerStyle121');
+  if(old)old.remove();
+  d.head.appendChild(st);
+}
+
+function setStats(d,run){
+  const vals=[...d.querySelectorAll('.stats .stat b')];
+  const c=run.counts||{};
+  if(vals[0])vals[0].textContent=money(run.bankroll??455.47);
+  if(vals[1])vals[1].textContent=money(run.risk??0);
+  if(vals[4])vals[4].textContent=txt(c.bet,0);
+  if(vals[5])vals[5].textContent=txt(c.lean,0);
+  if(vals[6])vals[6].textContent=txt(c.wait,0)+' / '+txt(c.pass,0);
+}
+
+function card(d,r){
+  const c=el(d,'div','runnerCard');
+  c.style.borderColor=border(r.status);
+
+  const top=el(d,'div','runnerTop');
+  const l=el(d,'div');
+  const tag=el(d,'span','tag '+cls(r.status),txt(r.status,'WAIT'));
+  const h=el(d,'h3','',txt(r.title,'Untitled market'));
+  const meta=el(d,'div','small muted',txt(r.meta,''));
+  l.append(tag,h,meta);
+
+  const rr=el(d,'div');
+  rr.style.textAlign='right';
+  rr.append(el(d,'div','key','EXECUTION'),el(d,'b','c',txt(r.price,'VERIFY PRICE')));
+  top.append(l,rr);
+  c.appendChild(top);
+
+  const facts=el(d,'div','runnerFacts');
+  [
+    ['BOOK',r.book],
+    ['FAIR / EDGE',[r.fair,r.edge].filter(Boolean).join(' / ')],
+    ['MOVE',r.move],
+    ['HIST FIT',r.hist],
+    ['STAKE',r.stake],
+    ['SUPPORT',r.support],
+    ['CONTRARY',r.contrary],
+    ['SOURCE',r.source]
+  ].forEach(([k,v])=>{
+    if(v===undefined||v===null||v==='')return;
+    const f=el(d,'div','runnerFact');
+    f.append(el(d,'b','',k),d.createElement('br'),d.createTextNode(txt(v)));
+    facts.appendChild(f);
+  });
+  c.appendChild(facts);
+
+  if(r.analysis){
+    const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS');
+    const det=el(d,'div','runnerDetail',r.analysis);
+    b.onclick=()=>{
+      det.classList.toggle('open');
+      b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS';
+    };
+    c.append(b,det);
+  }
+  return c;
+}
+
+function priorRuns(run){
+  const a=Array.isArray(run.prior_runs)?run.prior_runs.slice():[];
+  return a.sort((x,y)=>String(y.ts||'').localeCompare(String(x.ts||'')));
+}
+
+function priorSection(d,run){
+  const sec=el(d,'div');
+  sec.id='runnerPrior';
+
+  const head=el(d,'div','runnerPriorHead');
+  const left=el(d,'div');
+  left.append(
+    el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),
+    el(d,'div','small muted','Older timed snapshots only. They are not current recommendations.')
+  );
+  head.append(left,el(d,'span','tag c',String(priorRuns(run).length)+' SAVED'));
+  sec.appendChild(head);
+
+  const list=el(d,'div','runnerPriorList');
+  const arr=priorRuns(run);
+
+  if(!arr.length){
+    const q=el(d,'div','runnerPriorItem');
+    q.append(
+      el(d,'b','muted','NO PRIOR RUNS EMBEDDED'),
+      el(d,'div','runnerPriorMeta','This link contains only the current timed run.')
+    );
+    list.appendChild(q);
+  }else{
+    arr.forEach(p=>{
+      const item=el(d,'details','runnerPriorItem');
+      const s=el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN'));
+      item.appendChild(s);
+      item.append(
+        el(d,'div','runnerPriorMeta',txt(p.ts,'')),
+        el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.'))
+      );
+      const c=p.counts||{};
+      item.appendChild(
+        el(d,'div','runnerPriorMeta',
+          'BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)
+        )
+      );
+      list.appendChild(item);
+    });
+  }
+
+  sec.appendChild(list);
+  return sec;
+}
+
+function hideStaticBoard(board){
+  [...board.children].forEach(x=>{
+    if(x.id!=='runnerLive' && x.id!=='runnerPrior')x.style.display='none';
+  });
+}
+
+function hideStaticMarket(market){
+  [...market.children].forEach(x=>{
+    if(x.id!=='runnerMarket')x.style.display='none';
+  });
+}
+
+function apply(run){
+  const frame=$('#app'),d=frame.contentDocument;
+  if(!d)return;
+
+  injectStyle(d);
+
+  const archive=d.getElementById('runArchive');
+  if(archive)archive.style.display='none';
+
+  const build=d.querySelector('.top .small.muted');
+  if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.2.1';
+
+  if(!run)return;
+
+  if(run.__error){
+    const e=$('#err');
+    e.textContent='Betting Edge runner payload error: '+run.__error;
+    e.style.display='block';
+    return;
+  }
+
+  setStats(d,run);
+
+  const board=d.getElementById('board');
+  if(board){
+    ['runnerLive','runnerPrior','runnerBaseLabel'].forEach(id=>{
+      const x=d.getElementById(id);
+      if(x)x.remove();
+    });
+
+    hideStaticBoard(board);
+
+    const box=el(d,'div');
+    box.id='runnerLive';
+    box.className='runnerLive';
+
+    const head=el(d,'div','runnerHead');
+    const left=el(d,'div');
+    left.append(
+      el(d,'div','sectiontitle','CURRENT RUN // '+txt(run.label||run.slot,'CURRENT')),
+      el(d,'div','small muted',txt(run.ts,''))
+    );
+    head.append(left,el(d,'span','tag g','CURRENT SNAPSHOT'));
+    box.appendChild(head);
+
+    const summary=el(d,'div','notice');
+    summary.style.marginTop='8px';
+    summary.textContent=txt(run.summary,'No summary supplied.');
+    box.appendChild(summary);
+
+    const counts=el(d,'div','runnerCounts');
+    const cc=run.counts||{};
+    [['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{
+      const q=el(d,'div','runnerCount');
+      q.append(el(d,'div','key',k),el(d,'b',cls(k),txt(v,0)));
+      counts.appendChild(q);
+    });
+    box.appendChild(counts);
+
+    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>box.appendChild(card(d,r)));
+
+    board.prepend(box);
+    box.after(priorSection(d,run));
+  }
+
+  const market=d.getElementById('market');
+  if(market){
+    const old=d.getElementById('runnerMarket');
+    if(old)old.remove();
+
+    hideStaticMarket(market);
+
+    const m=el(d,'div','box');
+    m.id='runnerMarket';
+    m.append(
+      el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),
+      el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // '))
+    );
+
+    const wrap=el(d,'div','scroll');
+    const table=el(d,'table','runnerMarketTable');
+    const thead=el(d,'thead'),trh=el(d,'tr');
+    ['CALL','MARKET','BOOK / PRICE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));
+    thead.appendChild(trh);
+
+    const tb=el(d,'tbody');
+    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
+      const tr=el(d,'tr');
+      [
+        txt(r.status),
+        txt(r.title),
+        [r.book,r.price].filter(Boolean).join(' // '),
+        [r.fair,r.edge].filter(Boolean).join(' // '),
+        txt(r.move)
+      ].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      tb.appendChild(tr);
+    });
+
+    table.append(thead,tb);
+    wrap.appendChild(table);
+    m.appendChild(wrap);
+    market.prepend(m);
+  }
+}
+
+const run=payload();
+$('#app').addEventListener('load',()=>{
+  try{apply(run)}
+  catch(e){
+    const x=$('#err');
+    x.textContent='Betting Edge runner error: '+e.message;
+    x.style.display='block';
+    console.error(e);
+  }
+});
 </script>
-</body></html>
+</body>
+</html>
