@@ -1,0 +1,24 @@
+name: Scheduler Canary v2
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Fresh workflow identity to test GitHub's UTC scheduler registration.
+    # Off-peak minutes reduce scheduler congestion.
+    - cron: '19,49 * * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Confirm scheduled dispatch
+        run: |
+          echo "event=${{ github.event_name }}"
+          echo "scheduled=${{ github.event.schedule || 'manual' }}"
+          echo "utc=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "Scheduler Canary v2 completed. No API requests or repository writes were made."
