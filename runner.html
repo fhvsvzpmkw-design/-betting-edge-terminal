@@ -30,6 +30,8 @@ function b64ue(v){const bytes=new TextEncoder().encode(v);let bin='';bytes.forEa
 function payload(){const h=location.hash.slice(1);if(!h)return null;const p=new URLSearchParams(h);let raw=null;if(p.has('run'))raw=b64u(p.get('run'));else if(p.has('json'))raw=p.get('json');if(!raw)return null;try{return JSON.parse(raw)}catch(e){return {__error:String(e)}}}
 function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
 function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
+function displayPrice(v){const raw=txt(v,'VERIFY PRICE').trim();const m=raw.match(/^([+−-]\d{2,4})(?=\s*(?:\||\/\/|$))/);return m?m[1]:raw}
+function displayPriceTime(v){const m=String(v||'').match(/\bupdated\s+(.+)$/i);return m?m[1].trim():''}
 function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN'?'y':s==='WAIT'?'c':'muted'}
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
 function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
@@ -298,9 +300,11 @@ function card(d,r){
   const badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
   l.append(badge,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
   const rr=el(d,'div','execution');
-  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',txt(r.price,'VERIFY PRICE')));
+  const snapshotTime=displayPriceTime(r.price);
+  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',displayPrice(r.price)));
   const state=txt(r.priceState,r.feedGeneratedAt?'UPDATED':'LAST VERIFIED');
-  rr.appendChild(el(d,'div','priceState '+(state==='UPDATED'?'updated':state==='REFRESH UNRESOLVED'?'unresolved':''),state));
+  const stateLabel=snapshotTime&&state==='LAST VERIFIED'?`${state} • ${snapshotTime}`:state;
+  rr.appendChild(el(d,'div','priceState '+(state==='UPDATED'?'updated':state==='REFRESH UNRESOLVED'?'unresolved':''),stateLabel));
   top.append(l,rr);c.appendChild(top);
 
   const decision=el(d,'div','decisionLine');
@@ -437,7 +441,7 @@ function apply(run){
     (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
       const tr=el(d,'tr');
       const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
-      [txt(r.status),txt(r.title),[r.book,r.price].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      [txt(r.status),txt(r.title),[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
       tb.appendChild(tr)
     });
     table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m)
