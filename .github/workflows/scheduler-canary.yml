@@ -3,8 +3,9 @@ name: Scheduler Canary
 on:
   workflow_dispatch:
   schedule:
-    # Diagnostic only: proves whether GitHub is dispatching schedule events.
-    - cron: '*/5 * * * *'
+    # Diagnostic only: off-peak minutes reduce GitHub scheduler congestion.
+    # GitHub Actions cron is UTC; minute-only cadence is timezone-independent.
+    - cron: '17,47 * * * *'
 
 permissions:
   contents: read
