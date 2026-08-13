@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Betting Edge Terminal v1.3 Runner</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
+#app{border:0;width:100%;height:100%;display:block;background:#01040a}
+#err{position:fixed;z-index:10;left:10px;right:10px;top:10px;padding:10px;background:#25060d;color:#ff9cad;border:1px solid #ff6178;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;display:none}
+</style>
+</head>
+<body>
+<div id="err"></div>
+<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.3"></iframe>
+<script>
+const $=s=>document.querySelector(s);
+const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';
+const LEGACY_HISTORY_KEYS=['bettingEdge.runnerHistory.v1.2.5','bettingEdge.runnerHistory.v1.2.4','bettingEdge.runnerHistory.v1.2.3','bettingEdge.runnerHistory.v1.2.2'];
+const HISTORY_LIMIT=30;
+const FEED_URL='./data/live-odds.json';
+let activeRun=null;
+let originalRun=null;
+let refreshBusy=false;
+let statusFilter='ALL';
+
+function deepClone(v){try{return JSON.parse(JSON.stringify(v))}catch(e){return v}}
+function b64u(v){try{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const bin=atob(v);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}catch(e){return null}}
+function b64ue(v){const bytes=new TextEncoder().encode(v);let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function payload(){const h=location.hash.slice(1);if(!h)return null;const p=new URLSearchParams(h);let raw=null;if(p.has('run'))raw=b64u(p.get('run'));else if(p.has('json'))raw=p.get('json');if(!raw)return null;try{return JSON.parse(raw)}catch(e){return {__error:String(e)}}}
+function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
+function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
+function displayPrice(v){const raw=txt(v,'VERIFY PRICE').trim();const m=raw.match(/^([+−-]\d{2,4})(?=\s*(?:\||\/\/|$))/);return m?m[1]:raw}
+function displayPriceTime(v){const m=String(v||'').match(/\bupdated\s+(.+)$/i);return m?m[1].trim():''}
+function americanFromText(v){const m=String(v||'').replace(/−/g,'-').match(/[+-]?\d{2,4}/);return m?Number(m[0]):null}
+function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN'?'y':s==='WAIT'?'c':'muted'}
+function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
+function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
+
+function normalizeRun(run){const c=run&&run.counts||{};return {slot:txt(run&&run.slot,''),label:txt(run&&run.label,''),ts:txt(run&&run.ts,''),bankroll:run&&run.bankroll,risk:run&&run.risk,counts:{bet:Number(c.bet)||0,lean:Number(c.lean)||0,wait:Number(c.wait)||0,pass:Number(c.pass)||0},summary:txt(run&&run.summary,''),feedGeneratedAt:txt(run&&run.feedGeneratedAt,''),repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),recs:Array.isArray(run&&run.recs)?run.recs:[]}}
+function runKey(run){return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].join('|')}
+function safeHistory(){try{const map=new Map();[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(key=>{const raw=localStorage.getItem(key);const parsed=raw?JSON.parse(raw):[];if(Array.isArray(parsed))parsed.forEach(x=>map.set(runKey(x),x))});return [...map.values()]}catch(e){return []}}
+function saveCurrentRun(run){if(!run||run.__error||!run.ts)return;try{const current=normalizeRun(run),key=runKey(current);let h=safeHistory().filter(x=>runKey(x)!==key);h.push(current);h.sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));if(h.length>HISTORY_LIMIT)h=h.slice(-HISTORY_LIMIT);localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(e){console.warn('History save failed',e)}}
+function localDateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
+function historyFamilyKey(run){const label=txt(run&&run.repriceBaseLabel||run&&run.label||run&&run.slot,'').replace(/\s*\/\/\s*REPRICE\s+\d{1,2}:\d{2}\s*$/i,'').trim();return [localDateKey(run&&run.ts),txt(run&&run.slot,''),label].join('|')}
+function mergedPriorRuns(run){
+  const currentKey=runKey(run),day=localDateKey(run.ts),embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];
+  const exact=new Map();
+  [...embedded,...safeHistory()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;exact.set(k,normalizeRun(x))});
+  const grouped=new Map();
+  [...exact.values()].forEach(x=>{const k=historyFamilyKey(x),prior=grouped.get(k);if(!prior){grouped.set(k,{...x,snapshotCount:1});return}const newer=String(x.ts||'')>String(prior.ts||'')?x:prior;grouped.set(k,{...newer,snapshotCount:(prior.snapshotCount||1)+1})});
+  return [...grouped.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')))
+}
+function updateRunnerHash(run){try{history.replaceState(null,'',location.pathname+location.search+'#run='+b64ue(JSON.stringify(run)))}catch(e){console.warn('Could not update runner URL',e)}}
+
+function normName(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim()}
+function normMarket(v){return normName(v).replace(/\bstrikeouts?\b/g,'strikeout').replace(/\bhome runs?\b/g,'home run').replace(/\brbis?\b/g,'rbi').replace(/\btotal bases?\b/g,'total base').replace(/\bhits?\b/g,'hit').replace(/\bpassing yards?\b/g,'passing yard').replace(/\breceiving yards?\b/g,'receiving yard').replace(/\brushing yards?\b/g,'rushing yard').replace(/\bgoals?\b/g,'goal').replace(/\bshots?\b/g,'shot').replace(/\bpoints?\b/g,'point').replace(/\brebounds?\b/g,'rebound').replace(/\bassists?\b/g,'assist')}
+function keywordMatch(a,b){const x=normMarket(a),y=normMarket(b);if(!x||!y)return false;return x===y||x.includes(y)||y.includes(x)}
+function decimalOdds(v){const n=Number(v);return Number.isFinite(n)&&n>1.001?n:null}
+function americanNumber(dec){const d=Number(dec);if(!Number.isFinite(d)||d<=1)return null;return d>=2?Math.round((d-1)*100):Math.round(-100/(d-1))}
+function americanText(dec){const n=americanNumber(dec);return n===null?'UNAVAILABLE':(n>0?'+':'')+n}
+function americanProb(a){const n=Number(a);if(!Number.isFinite(n)||n===0)return null;return n>0?100/(n+100):(-n)/((-n)+100)}
+function inheritedFairProb(fair){const text=String(fair||'');if(/RECALC|UNVERIFIED|UNAVAILABLE|N\/A/i.test(text))return null;const m=text.match(/([+-]\d{3,4})/);return m?americanProb(Number(m[1])):null}
+function vancouverIso(date=new Date()){try{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'longOffset'}).formatToParts(date);const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));const hh=o.hour==='24'?'00':o.hour;let off=String(o.timeZoneName||'GMT-07:00').replace('GMT','');if(!/^[+-]\d{2}:\d{2}$/.test(off))off='-07:00';return `${o.year}-${o.month}-${o.day}T${hh}:${o.minute}:${o.second}${off}`}catch(e){return date.toISOString()}}
+function vancouverClock(ts){const d=new Date(ts);if(!Number.isFinite(d.getTime()))return txt(ts,'');return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour:'numeric',minute:'2-digit',hour12:true,month:'short',day:'numeric'}).format(d)}
+function ageLabel(ts){const t=Date.parse(ts);if(!Number.isFinite(t))return 'PRICE TIME UNKNOWN';const m=Math.max(0,Math.round((Date.now()-t)/60000));return m<2?'JUST UPDATED':m<60?`${m}m OLD`:`${Math.floor(m/60)}h ${m%60}m OLD`}
+
+function mergeEvent(a,b){const out={...(a||{}),...(b||{})};out.bookmakers={...(a?.bookmakers||{})};for(const [book,markets] of Object.entries(b?.bookmakers||{})){const old=Array.isArray(out.bookmakers[book])?out.bookmakers[book]:[];const add=Array.isArray(markets)?markets:[];const key=m=>normMarket(m?.name)+'|'+String(m?.updatedAt||'');out.bookmakers[book]=[...new Map([...old,...add].map(m=>[key(m),m])).values()]}out.urls={...(a?.urls||{}),...(b?.urls||{})};out.bookmakerIds={...(a?.bookmakerIds||{}),...(b?.bookmakerIds||{})};return out}
+function allEvents(feed){const map=new Map();for(const e of [...(feed?.events||[]),...(feed?.deepMarkets||[]),...(feed?.baseballProps||[])]){if(!e?.id)continue;map.set(String(e.id),map.has(String(e.id))?mergeEvent(map.get(String(e.id)),e):e)}return [...map.values()]}
+function marketByName(event,book,name){const arr=event?.bookmakers?.[book];if(!Array.isArray(arr))return null;const exact=arr.find(m=>normMarket(m?.name)===normMarket(name));if(exact)return exact;return arr.find(m=>keywordMatch(m?.name,name))||null}
+function rowLabel(row){return normName(row?.label||row?.player||row?.participant||row?.name||row?.selection||'')}
+function rowLine(row){for(const k of ['hdp','line','total','points']){const n=Number(row?.[k]);if(Number.isFinite(n))return n}return null}
+function quoteFromStructured(event,book,feedRef){const market=marketByName(event,book,feedRef.market);if(!market||!Array.isArray(market.odds))return null;const side=String(feedRef.side||'').toLowerCase();const label=normName(feedRef.label||'');const hasHdp=feedRef.hdp!==undefined&&feedRef.hdp!==null&&feedRef.hdp!=='';const hdp=hasHdp?Number(feedRef.hdp):null;for(const row of market.odds){if(label&&rowLabel(row)!==label)continue;if(hasHdp){const line=rowLine(row);if(line===null||Math.abs(line-hdp)>0.001)continue}const dec=decimalOdds(row?.[side]);if(dec)return {book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row}}return null}
+function teamEvent(feed,team,opponent=''){const n=normName(team),o=normName(opponent);if(!n)return null;let matches=allEvents(feed).filter(e=>normName(e.home)===n||normName(e.away)===n);if(o)matches=matches.filter(e=>normName(e.home)===o||normName(e.away)===o);if(!matches.length)return null;matches.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));return matches[0]}
+function playerEvents(feed,player,keyword){const p=normName(player),hits=[];for(const e of allEvents(feed)){for(const book of ['Bet365','DraftKings']){const markets=e?.bookmakers?.[book];if(!Array.isArray(markets))continue;for(const m of markets){if(keyword&&!keywordMatch(m?.name,keyword))continue;if((m.odds||[]).some(row=>rowLabel(row)===p)){hits.push(e);break}}}}return [...new Map(hits.map(e=>[String(e.id),e])).values()]}
+function bestBookQuote(quotes){return quotes.length?quotes.sort((a,b)=>b.dec-a.dec)[0]:null}
+
+function matchMoneyline(title,feed,books){const m=title.match(/^(.*?)\s+(?:ML|moneyline)(?:\s+(?:vs\.?|v\.?|at)\s+(.+))?$/i);if(!m)return null;const team=m[1].trim(),opponent=(m[2]||'').trim();const event=teamEvent(feed,team,opponent);if(!event)return {quote:null,reason:'EVENT NOT FOUND'};const side=normName(event.home)===normName(team)?'home':'away';const quotes=[];let marketSeen=false;for(const book of books){const market=marketByName(event,book,'ML')||marketByName(event,book,'Moneyline');if(!market)continue;marketSeen=true;const row=market.odds?.[0];const dec=decimalOdds(row?.[side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row})}const quote=bestBookQuote(quotes);return quote?{quote,reason:''}:{quote:null,reason:marketSeen?'BOOK PRICE MISSING':'MARKET NOT FOUND'}}
+function matchSpread(title,feed,books){const m=title.match(/^(.*?)\s+([+-]\d+(?:\.\d+)?)(?:\s+(?:vs\.?|v\.?|at)\s+(.+))?$/i);if(!m)return null;const team=m[1].trim(),line=Number(m[2]),opponent=(m[3]||'').trim();const event=teamEvent(feed,team,opponent);if(!event)return {quote:null,reason:'EVENT NOT FOUND'};const side=normName(event.home)===normName(team)?'home':'away';const quotes=[];let marketSeen=false,lineSeen=false;for(const book of books){const market=marketByName(event,book,'Spread');if(!market)continue;marketSeen=true;let rows=(market.odds||[]).filter(row=>{const rl=rowLine(row);if(rl===null)return false;if(Math.abs(Math.abs(rl)-Math.abs(line))>0.001)return false;lineSeen=true;return decimalOdds(row?.[side])});rows.sort((a,b)=>Math.abs((rowLine(a)??99)-line)-Math.abs((rowLine(b)??99)-line));const row=rows[0],dec=decimalOdds(row?.[side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row})}const quote=bestBookQuote(quotes);return quote?{quote,reason:''}:{quote:null,reason:!marketSeen?'MARKET NOT FOUND':!lineSeen?'LINE NOT FOUND':'BOOK PRICE MISSING'}}
+function parsePropTitle(title){let m=title.match(/^(.*?)\s+([OU])\s*(\d+(?:\.\d+)?)\s+(.+)$/i);if(m)return {player:m[1].trim(),side:m[2].toUpperCase()==='O'?'over':'under',line:Number(m[3]),keyword:m[4].trim()};m=title.match(/^(.*?)\s+(over|under)\s+(\d+(?:\.\d+)?)\s+(.+)$/i);if(m)return {player:m[1].trim(),side:m[2].toLowerCase(),line:Number(m[3]),keyword:m[4].trim()};return null}
+function matchProp(title,feed,books){const p=parsePropTitle(title);if(!p)return null;const events=playerEvents(feed,p.player,p.keyword);if(!events.length){const playerAnywhere=playerEvents(feed,p.player,'');return {quote:null,reason:playerAnywhere.length?'PROP NOT RETURNED':'PLAYER / EVENT NOT FOUND'}}const quotes=[];let marketSeen=false,lineSeen=false;for(const event of events){for(const book of books){const markets=event?.bookmakers?.[book]||[];for(const market of markets){if(!keywordMatch(market?.name,p.keyword))continue;marketSeen=true;for(const row of market.odds||[]){if(rowLabel(row)!==normName(p.player))continue;const rl=rowLine(row);if(rl===null||Math.abs(rl-p.line)>0.001)continue;lineSeen=true;const dec=decimalOdds(row?.[p.side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side:p.side,row})}}}}const quote=bestBookQuote(quotes);return quote?{quote,reason:''}:{quote:null,reason:!marketSeen?'PROP NOT RETURNED':!lineSeen?'PROP LINE NOT RETURNED':'BOOK PRICE MISSING'}}
+function matchGameTotal(title,feed,books){const m=title.match(/^(.*?)\s+(over|under|[OU])\s*(\d+(?:\.\d+)?)\s+(?:total|runs?|points?|goals?)$/i);if(!m)return null;const team=m[1].trim(),side=/^(over|o)$/i.test(m[2])?'over':'under',line=Number(m[3]);const event=teamEvent(feed,team);if(!event)return {quote:null,reason:'EVENT NOT FOUND'};const quotes=[];let marketSeen=false,lineSeen=false;for(const book of books){const market=marketByName(event,book,'Total')||marketByName(event,book,'Totals');if(!market)continue;marketSeen=true;for(const row of market.odds||[]){const rl=rowLine(row);if(rl===null||Math.abs(rl-line)>0.001)continue;lineSeen=true;const dec=decimalOdds(row?.[side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,side,row})}}const quote=bestBookQuote(quotes);return quote?{quote,reason:''}:{quote:null,reason:!marketSeen?'MARKET NOT FOUND':!lineSeen?'LINE NOT FOUND':'BOOK PRICE MISSING'}}
+function matchTitle(v){return String(v||'').trim().replace(/^(?:(?:NEW\s+)?LEAN|NEW\s+BET|STILL\s+BET|DOWNGRADE|UPGRADE|PRICE\s+GONE|STILL\s+PASS|PASS\s*\/\s*NO\s+VALUE|PASS|WAIT|BET|CONFLICTING\s+SIGNALS|LINEUP\/INFORMATION\s+PENDING|EDGE\s+GONE|NO\s+VALUE|VALUE\s+CONFIRMED|VALUE\s+IMPROVED|VALUE\s+HOLDS|PRICE\s+MOVED|FAIR\s+VALUE\s+CHANGED|MARKET\s+UNAVAILABLE|PRICE\s+NOT\s+VERIFIED|FEED\s+STALE|POLICY\s+BLOCK|EVENT\s+STARTED\/CLOSED|DUPLICATE\s+EXPOSURE|IDENTITY\s+MISMATCH)\s*(?:[-–—:]|\/\/)\s*/i,'').trim()}
+function bestQuoteForRec(rec,feed){const books=['Bet365','DraftKings'];if(rec?.feed?.eventId&&rec?.feed?.market&&rec?.feed?.side){const event=allEvents(feed).find(e=>String(e.id)===String(rec.feed.eventId));if(event){const quotes=[];for(const book of books){const q=quoteFromStructured(event,book,rec.feed);if(q)quotes.push(q)}if(quotes.length)return {quote:bestBookQuote(quotes),reason:'',method:'STRUCTURED'};return {quote:null,reason:'STRUCTURED MARKET NOT FOUND',method:'STRUCTURED'}}return {quote:null,reason:'STRUCTURED EVENT NOT FOUND',method:'STRUCTURED'}}const title=matchTitle(rec?.title);const attempts=[['MONEYLINE',()=>matchMoneyline(title,feed,books)],['SPREAD',()=>matchSpread(title,feed,books)],['PROP',()=>matchProp(title,feed,books)],['TOTAL',()=>matchGameTotal(title,feed,books)]];for(const [method,fn] of attempts){const r=fn();if(r)return {...r,method}}return {quote:null,reason:'TITLE FORMAT NOT RECOGNIZED',method:'NONE'}}
+// A price check is an overlay only. The issued recommendation remains immutable.
+function compareRec(rec,feed){
+  const out=deepClone(rec),result=bestQuoteForRec(rec,feed),q=result.quote;
+  if(!q){out.priceComparison={state:'UNRESOLVED',movement:'UNRESOLVED',reason:result.reason,checkedAt:feed.generatedAt,method:result.method};return {rec:out,matched:false,reason:result.reason,retained:true,movement:'UNRESOLVED'}}
+  const issued=americanFromText(rec.price),current=americanNumber(q.dec);let movement='UNCHANGED';
+  const issuedP=americanProb(issued),currentP=americanProb(current);
+  if(issuedP!==null&&currentP!==null){if(currentP<issuedP-.0001)movement='IMPROVED';else if(currentP>issuedP+.0001)movement='WORSENED'}
+  out.priceComparison={state:'MATCHED',movement,book:q.book,price:americanText(q.dec),updatedAt:q.updatedAt||feed.generatedAt,checkedAt:feed.generatedAt,method:result.method};
+  return {rec:out,matched:true,reason:'',retained:false,movement}
+}
+function withoutComparison(run){const out=deepClone(run);if(!out)return out;delete out.comparison;delete out.refreshDelta;out.recs=(out.recs||[]).map(r=>{const x={...r};delete x.priceComparison;return x});return out}
+function feedAgeMinutes(feed){const t=Date.parse(feed?.generatedAt);return Number.isFinite(t)?(Date.now()-t)/60000:Infinity}
+function restoreOriginal(){if(!originalRun)return;activeRun=deepClone(originalRun);statusFilter='ALL';updateRunnerHash(activeRun);apply(activeRun)}
+
+async function refreshAndReprice(statusEl,button){
+  if(refreshBusy||!activeRun)return;
+  refreshBusy=true;button.disabled=true;button.textContent='UPDATING…';
+  statusEl.textContent='Fetching latest published Bet365/DraftKings snapshot…';
+  try{
+    const res=await fetch(FEED_URL+'?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('Feed HTTP '+res.status);
+    const feed=await res.json();
+    if(!feed||!Array.isArray(feed.events)||!feed.generatedAt)throw new Error('Malformed odds feed');
+    const age=feedAgeMinutes(feed);
+    if(age>75){statusEl.textContent=`FEED STALE — latest snapshot ${vancouverClock(feed.generatedAt)} (${Math.round(age)}m old). Existing verified prices were left untouched.`;return}
+    const issued=originalRun||withoutComparison(activeRun);
+    let matched=0,retained=0,improved=0,worsened=0,unchanged=0;
+    const reasons={};
+    const recs=(issued.recs||[]).map(r=>{
+      const x=compareRec(r,feed);
+      if(x.matched){
+        matched++;
+        if(x.movement==='IMPROVED')improved++;else if(x.movement==='WORSENED')worsened++;else unchanged++;
+      }else{
+        retained++;
+        reasons[x.reason]=(reasons[x.reason]||0)+1;
+      }
+      return x.rec
+    });
+    const now=vancouverIso();
+    const reasonText=Object.entries(reasons).map(([k,v])=>`${v} ${k}`).join('; ');
+    activeRun={...deepClone(issued),
+      comparison:{checkedAt:now,feedGeneratedAt:feed.generatedAt,schema:feed.schema||1,matched,retained,reasonText},
+      refreshDelta:{matched,retained,improved,worsened,unchanged},
+      recs
+    };
+    updateRunnerHash(activeRun);apply(activeRun)
+  }catch(e){
+    statusEl.textContent='UPDATE FAILED — existing verified prices retained. '+String(e?.message||e)
+  }finally{
+    refreshBusy=false;button.disabled=false;button.textContent='↻ UPDATE ODDS / REPRICE NOW'
+  }
+}
+
+function injectStyle(d){
+  const old=d.getElementById('runnerStyle130');if(old)old.remove();
+  const prior=d.getElementById('runnerStyle125');if(prior)prior.remove();
+  const st=d.createElement('style');st.id='runnerStyle130';
+  st.textContent=`
+  #runnerLive{margin-top:8px;border:2px solid var(--green);background:#031009;padding:12px}
+  .stats{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+  .stats .stat:nth-child(3),.stats .stat:nth-child(4){display:none!important}
+  .runnerHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .runnerTitle{font-size:clamp(18px,2.4vw,27px);font-weight:950;letter-spacing:.06em;color:var(--cyan)}
+  .runnerFresh{font-size:10px;border:1px solid var(--green);color:var(--green);padding:5px 7px;white-space:nowrap}
+  .sessionStrip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+  .sessionChip{font:inherit;border:1px solid var(--line);background:#020912;color:var(--cyan);padding:8px 5px;text-align:center;font-weight:900;font-size:11px;cursor:pointer}
+  .sessionChip.active{border:2px solid var(--green);color:var(--green);background:#04170b}
+  .sessionChip.unavailable{color:var(--muted);opacity:.45;cursor:default}
+  .runnerSummary{margin-top:9px;border-left:4px solid var(--cyan);background:#04111d;padding:10px;font-size:12px;line-height:1.45}
+  .runnerCounts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
+  .runnerCount{border:1px solid var(--line);padding:9px;background:#020912;text-align:center}
+  .runnerCount b{display:block;font-size:clamp(27px,4vw,39px);line-height:1;margin-top:4px}
+  .runnerCount .callName{font-size:12px;font-weight:950;letter-spacing:.12em}
+  .runnerRefresh{margin-top:9px;border:1px solid var(--cyan);padding:9px;background:#01131a}
+  .runnerRefreshActions{display:grid;grid-template-columns:1fr auto;gap:7px}
+  .runnerRefreshBtn,.runnerRestoreBtn{font:inherit;font-weight:950;padding:10px;cursor:pointer}
+  .runnerRefreshBtn{background:#05222b;color:var(--cyan);border:1px solid var(--cyan)}
+  .runnerRestoreBtn{background:#171403;color:var(--yellow);border:1px solid var(--yellow)}
+  .runnerRestoreBtn:hover,.runnerRestoreBtn:focus{background:#251f03;color:#fff3a6}
+  .runnerRestoreBtn:disabled{opacity:.4;cursor:default}
+  .runnerRefreshBtn:disabled{opacity:.55;cursor:default}
+  .runnerRefreshStatus{margin-top:7px;font-size:11px;color:var(--muted);line-height:1.4}
+  .deltaStrip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+  .deltaItem{border:1px solid var(--line);padding:7px;background:#020912;text-align:center;font-size:10px}
+  .deltaItem b{display:block;font-size:17px;margin-bottom:2px}
+  .runnerTools{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .filterBtn{font:inherit;font-size:10px;font-weight:900;padding:7px 9px;border:1px solid var(--line);background:#020912;color:var(--muted);cursor:pointer}
+  .filterBtn.active{border-color:var(--cyan);color:var(--cyan);background:#03151e}
+  .runnerCard{border:2px solid var(--cyan);padding:13px;background:var(--panel);margin-top:10px}
+  .runnerTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start}
+  .callBadge{display:inline-block;font-size:clamp(25px,4vw,36px);font-weight:1000;line-height:1;letter-spacing:.08em;margin-bottom:8px}
+  .runnerCard h3{font-size:clamp(16px,2.1vw,22px);line-height:1.2;margin:2px 0 5px}
+  .runnerMeta{font-size:11px;color:var(--muted)}
+  .execution{text-align:right;min-width:120px}
+  .execution .book{font-size:11px;color:var(--muted);font-weight:900}
+  .bigExec{display:block;font-size:clamp(28px,5vw,43px);line-height:1;font-weight:1000;color:var(--cyan);margin:4px 0}
+  .priceState{display:inline-block;margin-top:4px;padding:3px 6px;border:1px solid var(--line);font-size:9px;letter-spacing:.06em;color:var(--muted)}
+  .priceState.updated{border-color:var(--green);color:var(--green)}
+  .priceState.unresolved{border-color:var(--yellow);color:var(--yellow)}
+  .comparisonPanel{margin-top:10px;border:1px solid var(--cyan);background:#01131a;padding:9px}
+  .comparisonTitle{font-size:10px;font-weight:950;letter-spacing:.08em;color:var(--cyan);margin-bottom:7px}
+  .comparisonGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .comparisonFact{border:1px solid var(--line);background:#020912;padding:8px;font-size:10px}
+  .comparisonFact b{display:block;margin-top:3px;font-size:14px;color:var(--white)}
+  .decisionLine{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:7px;margin-top:10px}
+  .decisionFact{border:1px solid var(--line);background:#020912;padding:9px}
+  .decisionFact .value{font-size:14px;font-weight:900;margin-top:3px;line-height:1.25}
+  .stakeFact .value{font-size:19px}
+  .runnerFacts{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:7px}
+  .runnerFact{border:1px solid var(--line);padding:8px;background:#020912;font-size:11px;line-height:1.35}
+  .runnerFact b{color:var(--muted);font-size:9px;letter-spacing:.07em}
+  .runnerBtn{width:100%;margin-top:8px;font:inherit;font-weight:900;padding:9px;background:#201a03;color:var(--yellow);border:1px solid var(--yellow);cursor:pointer}
+  .runnerDetail{display:none;margin-top:8px;border:1px dotted var(--line);padding:10px;background:#01070d;white-space:pre-wrap;line-height:1.5;font-size:12px}
+  .runnerDetail.open{display:block}
+  #runnerPrior{margin-top:10px;border:1px solid var(--line);padding:10px;background:#020912}
+  .runnerPriorHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .runnerPriorList{display:grid;gap:6px;margin-top:8px}
+  .runnerPriorItem{border:1px solid var(--line);padding:8px;background:#01070d}
+  .runnerPriorItem summary{cursor:pointer;font-weight:900;color:var(--cyan)}
+  .runnerPriorMeta{margin-top:5px;font-size:10px;color:var(--muted)}
+  .runnerPriorSummary{margin-top:6px;font-size:11px}
+  .runnerPriorActions{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:8px}
+  .runnerClear{font:inherit;font-size:9px;padding:5px 7px;background:#090d13;color:var(--muted);border:1px solid var(--line);cursor:pointer}
+  #runnerMarket{margin-bottom:9px}
+  .runnerMarketTable{width:100%;border-collapse:collapse}
+  .runnerMarketTable th,.runnerMarketTable td{padding:8px;border-top:1px dotted var(--line);font-size:11px;text-align:left;vertical-align:top}
+  .runnerMarketTable th{color:var(--cyan);font-size:9px;letter-spacing:.06em}
+  .runnerMarketTable td:first-child{font-weight:1000;font-size:13px}
+  .runnerMarketTable td:nth-child(3){font-weight:950;font-size:13px;color:var(--cyan)}
+  @media(max-width:760px){
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    .runnerCounts{grid-template-columns:repeat(4,1fr)}
+    .sessionStrip{grid-template-columns:repeat(5,1fr)}
+    .runnerFacts{grid-template-columns:1fr}
+    .decisionLine{grid-template-columns:1fr 1fr}
+    .comparisonGrid{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:520px){
+    .stats{grid-template-columns:1fr!important}
+    .runnerHead{display:block}
+    .runnerFresh{display:inline-block;margin-top:6px}
+    .runnerTop{grid-template-columns:1fr}
+    .execution{text-align:left}
+    .runnerCounts{grid-template-columns:repeat(2,1fr)}
+    .sessionStrip{grid-template-columns:repeat(5,1fr);overflow-x:auto}
+    .sessionChip{font-size:9px;min-width:58px}
+    .runnerRefreshActions{grid-template-columns:1fr}
+    .deltaStrip{grid-template-columns:repeat(2,1fr)}
+  }`;
+  d.head.appendChild(st)
+}
+function setStats(d,run){
+  const vals=[...d.querySelectorAll('.stats .stat b')],c=run.counts||{};
+  if(vals[0])vals[0].textContent=money(run.bankroll??455.47);
+  if(vals[1])vals[1].textContent=money(run.risk??0);
+  if(vals[4])vals[4].textContent=txt(c.bet,0);
+  if(vals[5])vals[5].textContent=txt(c.lean,0);
+  if(vals[6])vals[6].textContent=txt(c.wait,0)+' / '+txt(c.pass,0)
+}
+function sessionKey(run){
+  const s=String(run?.slot||run?.label||'').toLowerCase();
+  if(s.includes('late')||s.includes('18')||s.includes('6:15'))return '18:15';
+  if(s.includes('evening')||s.includes('15')||s.includes('3:15'))return '15:15';
+  if(s.includes('final')||s.includes('09')||s.includes('9:30'))return '09:30';
+  if(s.includes('main')||s.includes('08')||s.includes('8:00'))return '08:00';
+  if(s.includes('open')||s.includes('06')||s.includes('6:00'))return '06:00';
+  return '';
+}
+function sessionRuns(run){
+  const day=localDateKey(run?.ts),map=new Map();
+  const embedded=Array.isArray(run?.prior_runs)?run.prior_runs:[];
+  [run,...embedded,...safeHistory()].forEach(x=>{
+    if(!x||x.__error||!sessionKey(x))return;
+    if(day&&localDateKey(x.ts)!==day)return;
+    map.set(runKey(x),normalizeRun(x))
+  });
+  return [...map.values()]
+}
+function newestSessionRun(run,key){
+  return sessionRuns(run)
+    .filter(x=>sessionKey(x)===key)
+    .sort((a,b)=>(Date.parse(b.ts)||0)-(Date.parse(a.ts)||0))[0]||null
+}
+function selectSession(run,key){
+  const selected=newestSessionRun(run,key);if(!selected)return;
+  saveCurrentRun(activeRun);
+  activeRun=deepClone(selected);
+  originalRun=deepClone(selected);
+  statusFilter='ALL';
+  updateRunnerHash(activeRun);
+  apply(activeRun)
+}
+function sessionStrip(d,run){
+  const strip=el(d,'div','sessionStrip');
+  const active=sessionKey(run);
+  ['06:00','08:00','09:30','15:15','18:15'].forEach(t=>{
+    const available=Boolean(newestSessionRun(run,t));
+    const q=el(d,'button','sessionChip'+(t===active?' active':'')+(!available?' unavailable':''),t);
+    q.type='button';q.disabled=!available;
+    q.title=available?`Load latest ${t} run`:`No ${t} run saved on this device yet`;
+    if(available)q.onclick=()=>selectSession(run,t);
+    strip.appendChild(q)
+  });
+  return strip
+}
+function filterTools(d,run,container){
+  const tools=el(d,'div','runnerTools');
+  ['ALL','BET','LEAN','WAIT','PASS'].forEach(k=>{
+    const b=el(d,'button','filterBtn'+(statusFilter===k?' active':''),k);
+    b.onclick=()=>{statusFilter=k;apply(run)};
+    tools.appendChild(b)
+  });
+  container.appendChild(tools)
+}
+function card(d,r){
+  const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
+  const top=el(d,'div','runnerTop'),l=el(d,'div');
+  const badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
+  l.append(badge,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  const rr=el(d,'div','execution');
+  const snapshotTime=displayPriceTime(r.price);
+  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',displayPrice(r.price)));
+  const state=txt(r.priceState,'ISSUED SNAPSHOT');
+  const stateLabel=snapshotTime&&state==='ISSUED SNAPSHOT'?`${state} • ${snapshotTime}`:state;
+  rr.appendChild(el(d,'div','priceState '+(state==='UPDATED'?'updated':state==='REFRESH UNRESOLVED'?'unresolved':''),stateLabel));
+  top.append(l,rr);c.appendChild(top);
+
+  if(r.priceComparison){
+    const pc=r.priceComparison,panel=el(d,'div','comparisonPanel');
+    panel.appendChild(el(d,'div','comparisonTitle','CURRENT PRICE COMPARISON // ISSUED REPORT UNCHANGED'));
+    const grid=el(d,'div','comparisonGrid');
+    const values=[
+      ['ISSUED',[txt(r.book,'—'),displayPrice(r.price)].join(' ')],
+      ['CURRENT',pc.state==='MATCHED'?[txt(pc.book,'—'),txt(pc.price,'—')].join(' '):'UNRESOLVED'],
+      ['MOVEMENT',txt(pc.movement,'—')],
+      [pc.state==='MATCHED'?'PRICE TIME':'REASON',pc.state==='MATCHED'?vancouverClock(pc.updatedAt):txt(pc.reason,'NOT RETURNED')]
+    ];
+    values.forEach(([k,v])=>{const f=el(d,'div','comparisonFact',k);f.appendChild(el(d,'b','',v));grid.appendChild(f)});
+    panel.appendChild(grid);c.appendChild(panel)
+  }
+
+  const decision=el(d,'div','decisionLine');
+  const fair=el(d,'div','decisionFact');fair.append(el(d,'div','key','FAIR / EDGE'),el(d,'div','value',[r.fair,r.edge].filter(Boolean).join(' / ')||'—'));
+  const move=el(d,'div','decisionFact');move.append(el(d,'div','key','MOVE'),el(d,'div','value',txt(r.move,'—')));
+  const stake=el(d,'div','decisionFact stakeFact');stake.append(el(d,'div','key','STAKE'),el(d,'div','value',txt(r.stake,'$0')));
+  const fallbackPlayTo=String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':(/STALE|UNVERIFIED/i.test(String(r.priceState||''))?'WAIT FOR FRESH PRICE':'NOT SET');
+  const playTo=el(d,'div','decisionFact');playTo.append(el(d,'div','key','BET AT / PLAY TO'),el(d,'div','value',txt(r.playTo||r.betAt,fallbackPlayTo)));
+  decision.append(fair,move,stake,playTo);c.appendChild(decision);
+
+  const facts=el(d,'div','runnerFacts');
+  [['HIST FIT',r.hist],['SUPPORT',r.support],['CONTRARY',r.contrary],['SOURCE',r.source]].forEach(([k,v])=>{
+    if(v===undefined||v===null||v==='')return;
+    const f=el(d,'div','runnerFact');f.append(el(d,'b','',k),d.createElement('br'),d.createTextNode(txt(v)));facts.appendChild(f)
+  });
+  if(facts.children.length)c.appendChild(facts);
+
+  if(r.analysis){
+    const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS'),det=el(d,'div','runnerDetail',r.analysis);
+    b.onclick=()=>{det.classList.toggle('open');b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS'};
+    c.append(b,det)
+  }
+  return c
+}
+function priorSection(d,run){
+  const arr=mergedPriorRuns(run),sec=el(d,'div');sec.id='runnerPrior';
+  const head=el(d,'div','runnerPriorHead'),left=el(d,'div');
+  left.append(el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),el(d,'div','small muted','Earlier snapshots saved on this device for this betting day.'),el(d,'div','runnerPriorMeta','MASTER LEDGER // 1,622 WAGERS // 163 PAGES'));
+  head.append(left,el(d,'span','tag c',String(arr.length)+' RUNS'));sec.appendChild(head);
+  const list=el(d,'div','runnerPriorList');
+  if(!arr.length){
+    const q=el(d,'div','runnerPriorItem');q.append(el(d,'b','muted','NO EARLIER RUNS SAVED YET'),el(d,'div','runnerPriorMeta','Timed runner links opened on this device accumulate here automatically.'));list.appendChild(q)
+  }else{
+    arr.forEach(p=>{
+      const item=el(d,'details','runnerPriorItem');
+      item.appendChild(el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN')));
+      const grouped=p.snapshotCount>1?` // ${p.snapshotCount} SNAPSHOTS GROUPED`:'';
+      item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')+grouped),el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.')));
+      const c=p.counts||{};
+      item.appendChild(el(d,'div','runnerPriorMeta','BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)));
+      list.appendChild(item)
+    })
+  }
+  sec.appendChild(list);
+  const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','History is browser/device-local.'));
+  const clear=el(d,'button','runnerClear','CLEAR SAVED HISTORY');
+  clear.onclick=()=>{if(confirm('Clear Betting Edge saved runner history on this device?')){[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));apply(run)}};
+  actions.appendChild(clear);sec.appendChild(actions);return sec
+}
+function hideStaticBoard(board){[...board.children].forEach(x=>{if(x.id!=='runnerLive'&&x.id!=='runnerPrior')x.style.display='none'})}
+function hideStaticMarket(market){[...market.children].forEach(x=>{if(x.id!=='runnerMarket')x.style.display='none'})}
+
+function apply(run){
+  const frame=$('#app'),d=frame.contentDocument;if(!d)return;
+  injectStyle(d);
+  const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
+  const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='BETTING EDGE TERMINAL UI v1.3';
+  const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
+  [...d.querySelectorAll('.sectiontitle')].forEach(x=>{if(/^SOURCE GOVERNANCE\s*\/\//i.test(x.textContent))x.textContent='SOURCE GOVERNANCE // v1.3'});
+  const footer=d.querySelector('.foot');if(footer)footer.textContent=footer.textContent.replace(/v1\.2/g,'v1.3');
+  const qa=d.querySelector('.qa');if(qa)qa.style.display='none';
+  if(!run){
+    const board=d.getElementById('board');
+    if(board){
+      hideStaticBoard(board);
+      let empty=d.getElementById('runnerEmpty');
+      if(!empty){
+        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open the complete Betting Edge run link containing #run= to load the current selections and controls.');
+        empty.id='runnerEmpty';board.prepend(empty)
+      }
+    }
+    const market=d.getElementById('market');if(market)hideStaticMarket(market);
+    return
+  }
+  const empty=d.getElementById('runnerEmpty');if(empty)empty.remove();
+  if(run.__error){const e=$('#err');e.textContent='Betting Edge runner payload error: '+run.__error;e.style.display='block';return}
+  setStats(d,run);
+
+  const board=d.getElementById('board');
+  if(board){
+    ['runnerLive','runnerPrior','runnerBaseLabel'].forEach(id=>{const x=d.getElementById(id);if(x)x.remove()});
+    hideStaticBoard(board);
+    const box=el(d,'div');box.id='runnerLive';
+
+    const head=el(d,'div','runnerHead'),left=el(d,'div');
+    left.append(el(d,'div','runnerTitle',txt(run.label||run.slot,'CURRENT RUN')),el(d,'div','small muted',txt(run.ts,'')));
+    const freshText=run.comparison?`COMPARED ${vancouverClock(run.comparison.feedGeneratedAt)} • ISSUED SNAPSHOT SAVED`:run.feedGeneratedAt?`ODDS ${vancouverClock(run.feedGeneratedAt)} • ${ageLabel(run.feedGeneratedAt)}`:'SNAPSHOT PRICE STATE';
+    head.append(left,el(d,'div','runnerFresh',freshText));box.appendChild(head);
+    box.appendChild(sessionStrip(d,run));
+
+    const counts=el(d,'div','runnerCounts'),cc=run.counts||{};
+    [['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{
+      const q=el(d,'div','runnerCount');q.append(el(d,'div','callName '+cls(k),k),el(d,'b',cls(k),txt(v,0)));counts.appendChild(q)
+    });
+    box.appendChild(counts);
+
+    const summary=el(d,'div','runnerSummary',txt(run.summary,'No summary supplied.'));box.appendChild(summary);
+
+    const refresh=el(d,'div','runnerRefresh'),actions=el(d,'div','runnerRefreshActions');
+    const refreshBtn=el(d,'button','runnerRefreshBtn','↻ UPDATE ODDS / REPRICE NOW');
+    const restoreBtn=el(d,'button','runnerRestoreBtn','CLEAR COMPARISON');restoreBtn.onclick=restoreOriginal;restoreBtn.disabled=!run.comparison;
+    actions.append(refreshBtn,restoreBtn);
+    const feedLabel=run.comparison?`Current prices checked ${vancouverClock(run.comparison.feedGeneratedAt)}. The issued report, grades, fair values, stakes, and reasoning are unchanged.`:'Checks the latest published Bet365/DraftKings snapshot as a comparison. The issued report remains unchanged.';
+    const refreshStatus=el(d,'div','runnerRefreshStatus',feedLabel);
+    refreshBtn.onclick=()=>refreshAndReprice(refreshStatus,refreshBtn);
+    refresh.append(actions,refreshStatus);
+
+    if(run.refreshDelta){
+      const delta=el(d,'div','deltaStrip');
+      [['MATCHED',run.refreshDelta.matched,'g'],['IMPROVED',run.refreshDelta.improved,'g'],['WORSENED',run.refreshDelta.worsened,'y'],['UNRESOLVED',run.refreshDelta.retained,'y']].forEach(([k,v,c])=>{
+        const q=el(d,'div','deltaItem');q.append(el(d,'b',c,txt(v,0)),d.createTextNode(k));delta.appendChild(q)
+      });
+      refresh.appendChild(delta)
+    }
+    box.appendChild(refresh);
+    filterTools(d,run,box);
+
+    const recs=(Array.isArray(run.recs)?run.recs:[]).filter(r=>statusFilter==='ALL'||String(r.status||'WAIT').toUpperCase()===statusFilter);
+    recs.forEach(r=>box.appendChild(card(d,r)));
+    if(!recs.length)box.appendChild(el(d,'div','runnerSummary','No selections match this filter.'));
+
+    board.prepend(box);box.after(priorSection(d,run))
+  }
+
+  const market=d.getElementById('market');
+  if(market){
+    const old=d.getElementById('runnerMarket');if(old)old.remove();
+    hideStaticMarket(market);
+    const m=el(d,'div','box');m.id='runnerMarket';
+    m.append(el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // ')));
+    const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
+    ['CALL','MARKET','BOOK / PRICE','BET AT / PLAY TO','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
+    const tb=el(d,'tbody');
+    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
+      const tr=el(d,'tr');
+      const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
+      [txt(r.status),txt(r.title),[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      tb.appendChild(tr)
+    });
+    table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m)
+  }
+}
+
+activeRun=payload();
+if(activeRun&&!activeRun.__error){
+  originalRun=withoutComparison(activeRun);
+  (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(saveCurrentRun);
+  saveCurrentRun(originalRun)
+}
+$('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}});
+</script>
+</body>
+</html>
