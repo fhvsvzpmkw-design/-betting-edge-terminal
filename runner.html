@@ -150,8 +150,9 @@ function injectStyle(d){
   .runnerTitle{font-size:clamp(18px,2.4vw,27px);font-weight:950;letter-spacing:.06em;color:var(--cyan)}
   .runnerFresh{font-size:10px;border:1px solid var(--green);color:var(--green);padding:5px 7px;white-space:nowrap}
   .sessionStrip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
-  .sessionChip{border:1px solid var(--line);background:#020912;color:var(--muted);padding:8px 5px;text-align:center;font-weight:900;font-size:11px}
+  .sessionChip{font:inherit;border:1px solid var(--line);background:#020912;color:var(--cyan);padding:8px 5px;text-align:center;font-weight:900;font-size:11px;cursor:pointer}
   .sessionChip.active{border:2px solid var(--green);color:var(--green);background:#04170b}
+  .sessionChip.unavailable{color:var(--muted);opacity:.45;cursor:default}
   .runnerSummary{margin-top:9px;border-left:4px solid var(--cyan);background:#04111d;padding:10px;font-size:12px;line-height:1.45}
   .runnerCounts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
   .runnerCount{border:1px solid var(--line);padding:9px;background:#020912;text-align:center}
@@ -238,18 +239,46 @@ function setStats(d,run){
 }
 function sessionKey(run){
   const s=String(run?.slot||run?.label||'').toLowerCase();
-  if(s.includes('open')||s.includes('06')||s.includes('6:'))return '06:00';
-  if(s.includes('main')||s.includes('08')||s.includes('8:'))return '08:00';
-  if(s.includes('final')||s.includes('09')||s.includes('9:30'))return '09:30';
-  if(s.includes('evening')||s.includes('15')||s.includes('3:15'))return '15:15';
   if(s.includes('late')||s.includes('18')||s.includes('6:15'))return '18:15';
+  if(s.includes('evening')||s.includes('15')||s.includes('3:15'))return '15:15';
+  if(s.includes('final')||s.includes('09')||s.includes('9:30'))return '09:30';
+  if(s.includes('main')||s.includes('08')||s.includes('8:00'))return '08:00';
+  if(s.includes('open')||s.includes('06')||s.includes('6:00'))return '06:00';
   return '';
+}
+function sessionRuns(run){
+  const day=localDateKey(run?.ts),map=new Map();
+  const embedded=Array.isArray(run?.prior_runs)?run.prior_runs:[];
+  [run,...embedded,...safeHistory()].forEach(x=>{
+    if(!x||x.__error||!sessionKey(x))return;
+    if(day&&localDateKey(x.ts)!==day)return;
+    map.set(runKey(x),normalizeRun(x))
+  });
+  return [...map.values()]
+}
+function newestSessionRun(run,key){
+  return sessionRuns(run)
+    .filter(x=>sessionKey(x)===key)
+    .sort((a,b)=>(Date.parse(b.ts)||0)-(Date.parse(a.ts)||0))[0]||null
+}
+function selectSession(run,key){
+  const selected=newestSessionRun(run,key);if(!selected)return;
+  saveCurrentRun(activeRun);
+  activeRun=deepClone(selected);
+  originalRun=deepClone(selected);
+  statusFilter='ALL';
+  updateRunnerHash(activeRun);
+  apply(activeRun)
 }
 function sessionStrip(d,run){
   const strip=el(d,'div','sessionStrip');
   const active=sessionKey(run);
   ['06:00','08:00','09:30','15:15','18:15'].forEach(t=>{
-    const q=el(d,'div','sessionChip'+(t===active?' active':''),t);
+    const available=Boolean(newestSessionRun(run,t));
+    const q=el(d,'button','sessionChip'+(t===active?' active':'')+(!available?' unavailable':''),t);
+    q.type='button';q.disabled=!available;
+    q.title=available?`Load latest ${t} run`:`No ${t} run saved on this device yet`;
+    if(available)q.onclick=()=>selectSession(run,t);
     strip.appendChild(q)
   });
   return strip
@@ -416,7 +445,11 @@ function apply(run){
 }
 
 activeRun=payload();
-if(activeRun&&!activeRun.__error){originalRun=deepClone(activeRun);saveCurrentRun(activeRun)}
+if(activeRun&&!activeRun.__error){
+  originalRun=deepClone(activeRun);
+  (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(saveCurrentRun);
+  saveCurrentRun(activeRun)
+}
 $('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}});
 </script>
 </body>
