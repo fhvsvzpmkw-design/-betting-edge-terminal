@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "libraryVersion": "1.7",
+  "generatedAtUtc": "2026-08-14T20:06:13Z",
+  "controlledValues": {
+    "itemType": [
+      "research_prior",
+      "question_resolution",
+      "gap_resolution"
+    ],
+    "retrievalRole": [
+      "primary_prior",
+      "synthesis",
+      "inference"
+    ],
+    "historyFitRole": [
+      "support",
+      "caution",
+      "mixed",
+      "methodology",
+      "gap"
+    ],
+    "evidenceTier": {
+      "A": "Peer-reviewed and replicated/consistent body of evidence. In this first canonicalization, A is retained only where the source package explicitly assigned A.",
+      "B": "Peer-reviewed single strong study or robust historical literature; also the conservative default for established legacy items without an explicit A/B tier.",
+      "C": "Credible working paper/preprint, promising single finding, model benchmark, or research candidate requiring replication/current validation.",
+      "D": "Practitioner, official/descriptive, market-risk, or microstructure evidence useful for architecture/context rather than direct research confidence.",
+      "GAP": "Explicit research gap/local-calibration need.",
+      "SYNTHESIS": "Resolution or explicit synthesis item summarizing other evidence; never counted as an independent study.",
+      "INFERENCE": "Architecture/market-structure inference rather than a direct empirical research result; usable as caution/design context only."
+    },
+    "sports": [
+      "Cross-Sport",
+      "MLB",
+      "NBA",
+      "NFL",
+      "NHL",
+      "Soccer",
+      "Tennis",
+      "MMA/UFC",
+      "Boxing",
+      "CFL",
+      "College Football/Basketball"
+    ],
+    "marketClasses": [
+      "general_research",
+      "moneyline",
+      "spread",
+      "totals",
+      "player_props",
+      "derivatives",
+      "live",
+      "line_movement",
+      "margin_devig",
+      "market_efficiency",
+      "injury_lineup",
+      "weather",
+      "market_structure",
+      "model_evaluation",
+      "home_advantage",
+      "integrity",
+      "expert_context",
+      "data_provenance"
+    ],
+    "timing": [
+      "all",
+      "pregame",
+      "live"
+    ]
+  },
+  "retrievalHierarchy": [
+    "Exact sport + exact market class + exact timing/mechanism",
+    "Exact sport + related market class/mechanism",
+    "Cross-sport methodological prior",
+    "Indirect analogy only when explicitly labeled",
+    "No reliable direct prior -> NR rather than forced analogy"
+  ],
+  "evidenceClusters": {
+    "favorite_longshot_sport_specificity": {
+      "title": "Favorite/longshot effects are sport-, book-, and market-dependent",
+      "members": [
+        "favorite_longshot_general",
+        "mlb_reverse_flb",
+        "nhl_reverse_flb",
+        "nhl_efficiency_reexamination_2004",
+        "nhl_reverse_flb_2011",
+        "tennis_flb",
+        "soccer_flb",
+        "college_moneyline_flb",
+        "mma_efficiency_2026",
+        "bookmaker_grid_structural_flb",
+        "favorite_longshot_mechanism_review_2026",
+        "woodland_woodland_mlb_update_2003"
+      ],
+      "relationship": "mixed_by_sport_and_market_structure",
+      "canonicalInterpretation": "Do not apply a universal favorite/longshot correction. Use the direct sport/market evidence first; older MLB/NHL reverse-FLB findings remain historical priors requiring modern validation."
+    },
+    "devig_margin_methods": {
+      "title": "De-vig and margin allocation",
+      "members": [
+        "method_no_vig_normalized_probabilities",
+        "margin_miscalculation",
+        "odds_only_calibration_methods",
+        "shin_insider_odds_1991",
+        "gr_devig_methodology",
+        "qr_boxing_odds_academic_evidence",
+        "gr_boxing_fight_winner",
+        "tennis_market_structure",
+        "levitt_bookmaker_behavior_2004"
+      ],
+      "relationship": "methodological_progression",
+      "canonicalInterpretation": "Use proportional no-vig as baseline. Where market structure warrants, compare Shin/power/book-aware alternatives. Research may flag method risk but does not silently change the current fair-value model at R3."
+    },
+    "movement_information_vs_overreaction": {
+      "title": "Line movement can contain information and also overreact",
+      "members": [
+        "closing_line_information",
+        "mlb_intraday_line_movement",
+        "mlb_intraday_inefficiency_2024",
+        "nba_point_spread_closing_efficiency",
+        "qr_modern_nhl_line_movement",
+        "qr_line_movement_overreaction",
+        "gr_modern_nhl_nfl_nba_line_movement",
+        "nfl_reverse_line_context"
+      ],
+      "relationship": "time_horizon_tension_not_binary_conflict",
+      "canonicalInterpretation": "Movement is informative but non-monotonic. Interpret path, reversal, timing and current price rather than treating all steam as truth or all reversals as fades."
+    },
+    "nba_totals_era_drift": {
+      "title": "NBA totals findings changed across eras",
+      "members": [
+        "nba_totals_high_total_anomaly",
+        "nba_early_season_totals",
+        "nba_totals_replication_shift",
+        "nba_early_season_learning"
+      ],
+      "relationship": "later_replication_qualifies_older_thresholds",
+      "canonicalInterpretation": "Older high-total and early-season findings are hypothesis/context only. Modern-era replication weakens transport of fixed historical thresholds; current-era calibration is required."
+    },
+    "nfl_efficiency_and_edge_decay": {
+      "title": "NFL efficiency, anomaly fragility, and edge decay",
+      "members": [
+        "nfl_point_spread_efficiency",
+        "nfl_recent_inefficiency_shank",
+        "nfl_inefficiency_decay_1997",
+        "nfl_objective_information_2006",
+        "nfl_home_dog_weak_evidence",
+        "zuber_gandar_bowers_1985",
+        "sauer_brajer_ferris_marr_1988",
+        "nfl_market_learning"
+      ],
+      "relationship": "historically_mixed_with_modern_efficiency_prior",
+      "canonicalInterpretation": "The default NFL prior is high market efficiency and anomaly decay. Older or sample-specific patterns may generate questions but require current price, replication and holdout support."
+    },
+    "nhl_reverse_flb_transportability": {
+      "title": "Historical NHL reverse-FLB versus modern transportability",
+      "members": [
+        "nhl_reverse_flb",
+        "nhl_efficiency_reexamination_2004",
+        "nhl_reverse_flb_2011",
+        "nhl_current_gap"
+      ],
+      "relationship": "historical_replication_with_modern_transportability_gap",
+      "canonicalInterpretation": "The old NHL anomaly appears historically real, but its modern multi-book transportability is not established. History Fit should preserve both facts."
+    },
+    "nhl_totals_efficiency": {
+      "title": "NHL totals efficiency",
+      "members": [
+        "nhl_totals_market_2018",
+        "qr_modern_nhl_totals"
+      ],
+      "relationship": "consistent_caution",
+      "canonicalInterpretation": "NHL totals show some forecastability in historical work but limited easy profitability; treat the market as generally efficient and avoid heuristic systems."
+    },
+    "boxing_research_boundary": {
+      "title": "Boxing has some odds-based research but remains locally calibrated",
+      "members": [
+        "boxing_sparse_literature",
+        "boxing_market_literature_gap_v2",
+        "qr_boxing_odds_academic_evidence",
+        "gr_boxing_fight_winner"
+      ],
+      "relationship": "later_resolution_qualifies_earlier_gap_language",
+      "canonicalInterpretation": "Later research resolves the strongest version of the gap: serious odds-based academic work exists, but broad boxing efficiency/calibration evidence remains too thin to replace local fight-winner calibration."
+    },
+    "boxing_derivatives_separation": {
+      "title": "Boxing derivative markets stay separate from fight winner",
+      "members": [
+        "boxing_derivatives_separate",
+        "gr_boxing_derivatives"
+      ],
+      "relationship": "consistent_gap",
+      "canonicalInterpretation": "Method, round and total-round derivatives must not inherit fight-winner calibration. Direct local evidence is required."
+    },
+    "cfl_pregame_live_split": {
+      "title": "CFL pregame evidence gap versus supported live methodology",
+      "members": [
+        "cfl_sparse_literature",
+        "cfl_ingame_win_probability_2015_2019",
+        "cfl_pregame_research_gap_v2",
+        "cfl_live_market_prior",
+        "qr_cfl_pregame_efficiency",
+        "qr_live_pregame_anchor",
+        "gr_cfl_pregame",
+        "gr_cfl_live"
+      ],
+      "relationship": "market_phase_split",
+      "canonicalInterpretation": "CFL live modeling has supported methodology using pregame market priors, while broad CFL pregame efficiency/calibration remains a local research gap. Do not merge the two."
+    },
+    "player_prop_evidence_boundary": {
+      "title": "Player-prop practitioner evidence versus peer-reviewed research gap",
+      "members": [
+        "player_props_nfl_four_books_2024",
+        "player_props_research_gap",
+        "qr_player_prop_calibration_evidence",
+        "gr_player_props",
+        "ufc_calibration_win_vs_props"
+      ],
+      "relationship": "architecture_support_without_production_prior",
+      "canonicalInterpretation": "Book-aware vig and market separation are useful design guidance, but broad production-grade peer-reviewed prop calibration remains thin. Props do not inherit game-market confidence."
+    },
+    "prop_integrity_risk": {
+      "title": "Player and micro-prop integrity sensitivity",
+      "members": [
+        "prop_integrity_risk",
+        "qr_micro_prop_integrity",
+        "gr_micro_props"
+      ],
+      "relationship": "consistent_risk_evidence",
+      "canonicalInterpretation": "Integrity-sensitive micro/player props deserve explicit caution and stronger verification. This is a risk modifier/context, not a predictive edge."
+    },
+    "live_information_and_execution": {
+      "title": "Live markets: state updates, surprise response and execution",
+      "members": [
+        "live_betting_information",
+        "inplay_surprise_news",
+        "market_price_time_to_expiry",
+        "live_liquidity_execution",
+        "qr_live_information_speed",
+        "qr_live_pregame_anchor"
+      ],
+      "relationship": "complementary_live_microstructure",
+      "canonicalInterpretation": "Live prices can update quickly yet still misreact to surprise; time since event, state, pregame prior and executable liquidity all matter. No static pregame calibration should be transplanted mechanically."
+    },
+    "calibration_over_accuracy": {
+      "title": "Probability calibration matters more than raw pick accuracy",
+      "members": [
+        "calibration_over_accuracy",
+        "crosssport_accuracy_vs_calibration",
+        "qr_calibration_vs_accuracy"
+      ],
+      "relationship": "consistent_methodological_support",
+      "canonicalInterpretation": "Evaluate wagering models by probability calibration, Brier/log loss, CLV and EV rather than pick percentage alone."
+    },
+    "home_advantage_context": {
+      "title": "Home advantage is contextual, not a universal betting boost",
+      "members": [
+        "home_field_cross_sport",
+        "home_field_not_universal",
+        "nfl_home_dog_weak_evidence"
+      ],
+      "relationship": "consistent_caution",
+      "canonicalInterpretation": "Home effects belong inside sport- and matchup-specific fair value; generic home or home-dog boosts are not justified."
+    },
+    "soccer_market_information": {
+      "title": "Soccer market information, dispersion and bookmaker behavior",
+      "members": [
+        "soccer_flb",
+        "soccer_exchange_vs_book",
+        "soccer_41_bookmaker_efficiency",
+        "soccer_multileague_efficiency",
+        "soccer_bookmaker_bias_mechanism_2023",
+        "forrest_goddard_simmons_2005",
+        "dixon_pope_2004",
+        "hvattum_arntzen_2010_elo"
+      ],
+      "relationship": "complementary_market_structure",
+      "canonicalInterpretation": "Soccer prices are highly informative but calibration varies by league, book and market structure. Best-price/consensus information and model-versus-market comparison are more useful than generic soccer trends."
+    }
+  },
+  "retrievalRoleRules": {
+    "primary_prior": "May be retrieved as direct research context. A/B/C items can contribute research evidence weight inside History Fit; they still do not count as live BET signals.",
+    "synthesis": "Summary/resolution only. Useful for interpretation and gap statements, never an additional evidence vote.",
+    "inference": "Design inference only. May frame caution/market separation, never treated as empirical study evidence."
+  }
+}
