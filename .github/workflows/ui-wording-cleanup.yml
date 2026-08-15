@@ -1,0 +1,97 @@
+name: One-time Betting Edge UI wording cleanup
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ui-wording-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact pre-change UI blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runner.html)" = "0336ab415c1ae8dfd1275ac87e231ab3fb828178"
+          test "$(git hash-object index.html)" = "6761da6de95532fac54825b13fb10651d72b6f1d"
+
+      - name: Apply wording-only cleanup
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_exact(path, replacements):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              for old, new, expected in replacements:
+                  count = text.count(old)
+                  if count != expected:
+                      raise SystemExit(f'{path}: expected {expected} occurrence(s), found {count}: {old[:120]!r}')
+                  text = text.replace(old, new)
+              p.write_text(text, encoding='utf-8')
+
+          replace_exact('runner.html', [
+              ("q.title=available?`Load latest ${t} run`:`No ${t} run saved on this device yet`;",
+               "q.title=available?`Load latest ${t} run`:`No ${t} run available for this betting day`;", 1),
+              ("left.append(el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),el(d,'div','small muted','Earlier snapshots saved on this device for this betting day.'),el(d,'div','runnerPriorMeta','MASTER LEDGER // 1,624 WAGERS // 163 PAGES'));",
+               "left.append(el(d,'div','sectiontitle','SAME-DAY RUNS // REPORT HISTORY'),el(d,'div','small muted','Earlier runs available for this betting day from the report archive or this browser.'),el(d,'div','runnerPriorMeta','SAME-DAY REPORT HISTORY // ARCHIVE + LOCAL'));", 1),
+              ("q.append(el(d,'b','muted','NO EARLIER RUNS SAVED YET'),el(d,'div','runnerPriorMeta','Timed runner links opened on this device accumulate here automatically.'));",
+               "q.append(el(d,'b','muted','NO EARLIER RUNS AVAILABLE YET'),el(d,'div','runnerPriorMeta','Archived same-day runs appear here when available; this browser may also retain opened runs.'));", 1),
+              ("const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','History is browser/device-local.'));",
+               "const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','Same-day history can come from the archive or this browser.'));", 1),
+              ("const clear=el(d,'button','runnerClear','CLEAR SAVED HISTORY');",
+               "const clear=el(d,'button','runnerClear','CLEAR LOCAL HISTORY');", 1),
+              ("empty=el(d,'div','runnerSummary','NO RUN LOADED // Open the complete Betting Edge run link containing #run= to load the current selections and controls.');",
+               "empty=el(d,'div','runnerSummary','NO RUN LOADED // Open a Betting Edge report link to load the current selections and controls.');", 1),
+          ])
+
+          old_source = '''<div class="box" style="margin-top:9px"><div class="sectiontitle">SOURCE GOVERNANCE // v1.3</div><div class="sourcegrid" style="margin-top:9px"><div class="sourcecard"><b class="c">theScore</b><div class="small">DATA BACKBONE</div></div><div class="sourcecard"><b class="y">VSiN</b><div class="small">BETTING INTELLIGENCE</div></div><div class="sourcecard"><b class="y">SportsGrid</b><div class="small">NEWS / PROJECTION INTEL</div></div><div class="sourcecard"><b class="m">Polymarket</b><div class="small">PREDICTION MARKET</div></div></div><p class="small">All four sources are additive. Official injury/lineup/schedule sources retain priority for causal facts. Customer sportsbook price remains the execution gate.</p></div><footer class="foot">BETTING EDGE TERMINAL UI v1.3 // RUN-ARCHIVE BUILD // MARKET PRICE FIRST // ZERO BETS IS A VALID OUTPUT</footer>'''
+          new_source = '''<div class="box" style="margin-top:9px"><div class="sectiontitle">EVIDENCE GOVERNANCE // v1.3</div><div class="sourcegrid" style="margin-top:9px"><div class="sourcecard"><b class="g">Bet365</b><div class="small">LIVE EXECUTION ODDS</div></div><div class="sourcecard"><b class="g">DraftKings</b><div class="small">LIVE EXECUTION ODDS</div></div><div class="sourcecard"><b class="c">Research Library</b><div class="small">READ-ONLY HISTORY FIT</div></div><div class="sourcecard"><b class="y">Official + Market Intel</b><div class="small">CONTEXT / CAUSAL FACTS</div></div></div><p class="small">Fresh supported sportsbook prices remain the execution gate. Research Fit is read-only and cannot create a BET or override identity, freshness, fair value, playTo, status, or stake.</p></div><footer class="foot">BETTING EDGE TERMINAL UI v1.3 // REPORT + ARCHIVE // MARKET PRICE FIRST // ZERO BETS IS A VALID OUTPUT</footer>'''
+
+          replace_exact('index.html', [
+              ('<header class="top"><div><div class="title">BETTING EDGE TERMINAL UI v1.3</div><div class="small muted">RUN-ARCHIVE BUILD // AUG 11 2026</div></div><div class="right small" style="text-align:right"><div class="g">ENGINE SPEC v1.0 // LOCKED</div><div class="y">ODDS LAYER: MARKET REFERENCE RESTORED</div></div></header>',
+               '<header class="top"><div><div class="title">BETTING EDGE TERMINAL UI v1.3</div><div class="small muted">LIVE REPORT + ARCHIVE</div></div><div class="right small" style="text-align:right"><div class="g">REPORT ENGINE // v1.3</div><div class="y">LIVE ODDS // BET365 + DRAFTKINGS</div></div></header>', 1),
+              ('>[F3] HISTORY</button>', '>[F3] BET HISTORY</button>', 1),
+              ('<span>Customer sportsbook price is the execution gate</span>', '<span>Fresh supported sportsbook price is the execution gate</span>', 1),
+              ('<span>VSiN/SportsGrid opinion creates a BET alone</span>', '<span>Research Library / external intel creates a BET alone</span>', 1),
+              ('<span>theScore reference line labeled executable</span>', '<span>Reference / comparison price labeled executable</span>', 1),
+              ('<span>Polymarket midpoint treated as an executable ask</span>', '<span>Comparison-market price treated as an executable sportsbook quote</span>', 1),
+              ('<div class="sectiontitle">LOCKED DECISION PIPELINE</div>', '<div class="sectiontitle">DECISION PIPELINE // v1.3</div>', 1),
+              ('MARKET PRICE<br><span class="small m">BOOKS + POLY</span>', 'MARKET PRICE<br><span class="small m">BET365 + DRAFTKINGS</span>', 1),
+              ('LEAGUE HISTORY<br><span class="small c">theScore CLOSES</span>', 'RESEARCH FIT<br><span class="small c">LIBRARY // READ-ONLY</span>', 1),
+              ('<b id="healthProps" class="y">PENDING FIX</b>', '<b id="healthProps" class="y">CHECKING</b>', 1),
+              (old_source, new_source, 1),
+          ])
+
+      - name: Validate wording-only diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git diff -- runner.html index.html
+          ! grep -Fq 'RUN-ARCHIVE BUILD // AUG 11 2026' index.html
+          ! grep -Fq 'ENGINE SPEC v1.0 // LOCKED' index.html
+          ! grep -Fq 'History is browser/device-local.' runner.html
+          ! grep -Fq 'No ${t} run saved on this device yet' runner.html
+          grep -Fq 'LIVE REPORT + ARCHIVE' index.html
+          grep -Fq '[F3] BET HISTORY' index.html
+          grep -Fq 'SAME-DAY RUNS // REPORT HISTORY' runner.html
+          grep -Fq 'CLEAR LOCAL HISTORY' runner.html
+
+      - name: Commit UI wording cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add runner.html index.html
+          git commit -m 'Clean up stale runner UI wording'
+          git push
