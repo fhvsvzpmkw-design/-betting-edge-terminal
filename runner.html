@@ -209,6 +209,10 @@ function restoreOriginal(){if(!originalRun)return;activeRun=withoutComparison(or
 
 async function refreshAndReprice(statusEl,button){
   if(refreshBusy||!activeRun)return;
+  if(!isLatestSessionRun(activeRun)){
+    statusEl.textContent='HISTORICAL REPORT — issued snapshot is frozen. Open the newest same-day report to reprice.';
+    return
+  }
   refreshBusy=true;button.disabled=true;button.textContent='UPDATING…';
   statusEl.textContent='Fetching latest published Bet365/DraftKings snapshot…';
   try{
@@ -219,6 +223,11 @@ async function refreshAndReprice(statusEl,button){
     const age=feedAgeMinutes(feed);
     if(age>75){statusEl.textContent=`FEED STALE — latest snapshot ${vancouverClock(feed.generatedAt)} (${Math.round(age)}m old). Existing verified prices were left untouched.`;return}
     const issued=originalRun||withoutComparison(activeRun);
+    const issuedFeedTime=Date.parse(issued&&issued.feedGeneratedAt),newFeedTime=Date.parse(feed.generatedAt);
+    if(Number.isFinite(issuedFeedTime)&&Number.isFinite(newFeedTime)&&newFeedTime<=issuedFeedTime){
+      statusEl.textContent=`NO NEWER ODDS SNAPSHOT — latest published odds ${vancouverClock(feed.generatedAt)} are not newer than this report. Run or await a new odds pull first.`;
+      return
+    }
     let matched=0,retained=0,improved=0,worsened=0,unchanged=0;
     const reasons={};
     const recs=(issued.recs||[]).map(r=>{
@@ -248,7 +257,7 @@ async function refreshAndReprice(statusEl,button){
   }catch(e){
     statusEl.textContent='UPDATE FAILED — existing verified prices retained. '+String(e?.message||e)
   }finally{
-    refreshBusy=false;button.disabled=false;button.textContent='↻ UPDATE ODDS / REPRICE NOW'
+    refreshBusy=false;button.disabled=false;button.textContent='↻ REPRICE NOW'
   }
 }
 
@@ -457,6 +466,14 @@ function newestSessionRun(run,key){
     .filter(x=>sessionKey(x)===key)
     .sort((a,b)=>(Date.parse(b.ts)||0)-(Date.parse(a.ts)||0))[0]||null
 }
+function isLatestSessionRun(run){
+  const current=withoutComparison(run),day=localDateKey(current&&current.ts);
+  const candidates=sessionRuns(current).filter(x=>!day||localDateKey(x&&x.ts)===day);
+  candidates.push(current);
+  candidates.sort((a,b)=>(Date.parse(b&&b.ts)||0)-(Date.parse(a&&a.ts)||0));
+  const latest=candidates[0]||current;
+  return String(current&&current.ts||'')===String(latest&&latest.ts||'')&&String(current&&current.slot||'')===String(latest&&latest.slot||'')
+}
 function selectSession(run,key){
   const selected=newestSessionRun(run,key);if(!selected)return;
   saveCurrentRun(activeRun);
@@ -599,10 +616,10 @@ function apply(run){
 
     const head=el(d,'div','runnerHead'),left=el(d,'div'),right=el(d,'div','runnerHeadRight');
     left.append(el(d,'div','runnerTitle',txt(run.label||run.slot,'CURRENT RUN')),el(d,'div','small muted',txt(run.ts,'')));
-    const state=marketState(run);
+    const issuedMeterRun=run.comparison?(originalRun||withoutComparison(run)):run,state=marketState(issuedMeterRun);
     const priceStateText=run.comparison?`COMPARED ${vancouverClock(run.comparison.feedGeneratedAt)} • ISSUED SNAPSHOT SAVED`:run.feedGeneratedAt?`ODDS ${vancouverClock(run.feedGeneratedAt)} • ${ageLabel(run.feedGeneratedAt)}`:'SNAPSHOT PRICE STATE';
     const freshText=`${priceStateText} · ${state.emoji} ${state.label}`;
-    right.append(instrumentCluster(d,run),el(d,'div','runnerFresh',freshText));head.append(left,right);box.appendChild(head);
+    right.append(instrumentCluster(d,issuedMeterRun),el(d,'div','runnerFresh',freshText));head.append(left,right);box.appendChild(head);
     box.appendChild(sessionStrip(d,run));
 
     const counts=el(d,'div','runnerCounts'),cc=run.counts||{};
@@ -613,14 +630,20 @@ function apply(run){
 
     const summary=el(d,'div','runnerSummary',txt(run.summary,'No summary supplied.'));box.appendChild(summary);
 
-    const refresh=el(d,'div','runnerRefresh'),actions=el(d,'div','runnerRefreshActions');
-    const refreshBtn=el(d,'button','runnerRefreshBtn','↻ UPDATE ODDS / REPRICE NOW');
-    const restoreBtn=el(d,'button','runnerRestoreBtn','CLEAR COMPARISON');restoreBtn.onclick=restoreOriginal;restoreBtn.disabled=!run.comparison;
-    actions.append(refreshBtn,restoreBtn);
-    const feedLabel=run.comparison?`Current prices checked ${vancouverClock(run.comparison.feedGeneratedAt)}. The issued report, grades, fair values, stakes, and reasoning are unchanged.`:'Checks the latest published Bet365/DraftKings snapshot as a comparison. The issued report remains unchanged.';
-    const refreshStatus=el(d,'div','runnerRefreshStatus',feedLabel);
-    refreshBtn.onclick=()=>refreshAndReprice(refreshStatus,refreshBtn);
-    refresh.append(actions,refreshStatus);
+    const refresh=el(d,'div','runnerRefresh'),latestReport=isLatestSessionRun(run);
+    let refreshStatus=null,refreshBtn=null;
+    if(latestReport){
+      const actions=el(d,'div','runnerRefreshActions');
+      refreshBtn=el(d,'button','runnerRefreshBtn','↻ REPRICE NOW');
+      actions.append(refreshBtn);
+      const feedLabel=run.comparison?`Current prices checked ${vancouverClock(run.comparison.feedGeneratedAt)}. The issued report, grades, fair values, stakes, reasoning, and report meters are unchanged.`:'Checks the latest published Bet365/DraftKings snapshot as a comparison. This does not run an odds pull; the issued report remains unchanged.';
+      refreshStatus=el(d,'div','runnerRefreshStatus',feedLabel);
+      refreshBtn.onclick=()=>refreshAndReprice(refreshStatus,refreshBtn);
+      refresh.append(actions,refreshStatus)
+    }else{
+      refreshStatus=el(d,'div','runnerRefreshStatus','HISTORICAL REPORT // ISSUED SNAPSHOT FROZEN // Reprice is available only on the newest same-day report.');
+      refresh.appendChild(refreshStatus)
+    }
 
     if(run.refreshDelta){
       const delta=el(d,'div','deltaStrip');
