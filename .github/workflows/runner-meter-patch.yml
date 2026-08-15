@@ -1,0 +1,117 @@
+name: One-time runner meter patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/runner-meter-patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply contained meter/header patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('runner.html')
+          s = path.read_text(encoding='utf-8')
+
+          def swap(old, new, label):
+              global s
+              if old not in s:
+                  raise SystemExit(f'Expected runner block not found: {label}')
+              s = s.replace(old, new, 1)
+
+          swap(
+              "  .runnerHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}",
+              "  .runnerHead{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch}",
+              'runner header layout'
+          )
+          swap(
+              "  .runnerTitle{font-size:clamp(18px,2.4vw,27px);font-weight:950;letter-spacing:.06em;color:var(--cyan)}",
+              "  .runnerTitle{font-size:clamp(18px,2.4vw,27px);font-weight:950;letter-spacing:.06em;line-height:1.1;color:var(--cyan);text-shadow:0 0 7px rgba(0,220,255,.16)}",
+              'runner title styling'
+          )
+          swap(
+              "  .runnerHeadRight{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:min(690px,62vw);flex:1}",
+              "  .runnerHeadRight{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:0;width:100%;flex:none}",
+              'meter width allocation'
+          )
+          swap(
+              "  .instrument{min-width:0;height:132px;border:1px solid #35553f;background:linear-gradient(180deg,#020d09 0%,#010806 100%);padding:7px 6px 6px;box-sizing:border-box;text-align:center;overflow:hidden;box-shadow:inset 0 0 18px rgba(0,255,135,.06)}",
+              "  .instrument{min-width:0;min-height:134px;height:auto;border:1px solid #456e50;background:repeating-linear-gradient(0deg,rgba(0,255,135,.018) 0,rgba(0,255,135,.018) 1px,transparent 1px,transparent 3px),linear-gradient(180deg,#020d09 0%,#010806 100%);padding:7px 6px 7px;box-sizing:border-box;text-align:center;overflow:hidden;box-shadow:inset 0 0 20px rgba(0,255,135,.075),inset 0 0 0 1px rgba(170,255,205,.025)}",
+              'instrument shell'
+          )
+          swap(
+              "  .instrumentLabel{font-size:10px;font-weight:950;letter-spacing:.07em;color:var(--green);white-space:nowrap;margin-bottom:1px}",
+              "  .instrumentLabel{font-size:10px;font-weight:950;letter-spacing:.07em;color:var(--green);white-space:nowrap;margin-bottom:1px;text-shadow:0 0 6px rgba(0,255,135,.18)}",
+              'instrument label'
+          )
+          swap(
+              "  .instrument svg{display:block;width:100%;height:72px;margin:-2px auto -5px;overflow:visible}",
+              "  .instrument svg{display:block;width:100%;height:72px;margin:-2px auto -5px;overflow:visible;filter:drop-shadow(0 0 2px rgba(0,255,135,.12))}",
+              'instrument svg'
+          )
+          swap(
+              "  .instrumentRead{font-size:10px;font-weight:950;line-height:1.05;color:var(--white);white-space:nowrap;margin-top:-1px}",
+              "  .instrumentRead{display:flex;justify-content:center;align-items:baseline;gap:5px;flex-wrap:wrap;min-height:18px;padding:0 3px;font-size:10px;font-weight:950;line-height:1.1;color:var(--white);white-space:normal;overflow-wrap:anywhere;margin-top:-1px}",
+              'instrument reading containment'
+          )
+          swap(
+              "  .instrumentRead b{font-size:17px;color:var(--cyan);margin-right:4px}",
+              "  .instrumentRead b{flex:0 0 auto;font-size:17px;color:var(--cyan);margin-right:0;text-shadow:0 0 6px rgba(0,220,255,.16)}",
+              'instrument reading value'
+          )
+          swap(
+              "  .instrumentBand span{height:4px;display:block;border-top:1px solid currentColor;font-size:5px;line-height:11px;white-space:nowrap;overflow:visible}",
+              "  .instrumentBand span{height:4px;display:block;border-top:1px solid currentColor;font-size:5px;line-height:11px;white-space:nowrap;overflow:hidden;text-overflow:clip}",
+              'instrument band containment'
+          )
+
+          swap("    .runnerHead{display:block}", "    .runnerHead{display:grid}", 'mobile runner header')
+          swap(
+              "    .runnerHeadRight{align-items:stretch;min-width:0;width:100%;margin-top:10px}",
+              "    .runnerHeadRight{align-items:stretch;min-width:0;width:100%;margin-top:0}",
+              'mobile meter spacing'
+          )
+          swap(
+              "    .instrumentCluster{grid-template-columns:repeat(3,minmax(0,1fr));width:100%;max-width:none;overflow:visible;gap:5px}",
+              "    .instrumentCluster{grid-template-columns:1fr;width:100%;max-width:none;overflow:visible;gap:8px}",
+              'mobile meter stacking'
+          )
+          swap("    .instrument{height:124px;padding:6px 3px 5px}", "    .instrument{min-height:128px;height:auto;padding:7px 7px 6px}", 'mobile instrument size')
+          swap("    .instrumentLabel{font-size:8px;letter-spacing:.035em}", "    .instrumentLabel{font-size:10px;letter-spacing:.06em}", 'mobile instrument label')
+          swap("    .instrument:last-child .instrumentLabel{font-size:7px}", "    .instrument:last-child .instrumentLabel{font-size:9px}", 'mobile agreement label')
+          swap("    .instrument svg{height:68px}", "    .instrument svg{height:72px}", 'mobile gauge size')
+          swap("    .instrumentRead{font-size:8px}", "    .instrumentRead{font-size:10px}", 'mobile reading text')
+          swap("    .instrumentRead b{font-size:15px}", "    .instrumentRead b{font-size:17px}", 'mobile reading value')
+          swap("    .instrumentBand span{font-size:4px}", "    .instrumentBand span{font-size:5px}", 'mobile band text')
+          swap("    .instrumentConf{font-size:5px}", "    .instrumentConf{font-size:6px}", 'mobile confidence text')
+
+          path.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Verify contained change
+        shell: bash
+        run: |
+          git diff --check
+          grep -F '.runnerHead{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch}' runner.html
+          grep -F '.instrumentCluster{grid-template-columns:1fr;width:100%;max-width:none;overflow:visible;gap:8px}' runner.html
+          grep -F 'ISSUED SNAPSHOT FROZEN' runner.html
+
+      - name: Commit runner meter patch
+        shell: bash
+        run: |
+          git config user.name 'Betting Edge Patch Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add runner.html
+          git commit -m 'Fix responsive runner meters'
+          git push
