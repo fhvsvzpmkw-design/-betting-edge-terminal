@@ -18,6 +18,7 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 <script>
 const INDEX_URL='./run-history.json';
 const SLOT_CODES={open:'o',main:'m',final_morning:'f',evening:'e',late:'l'};
+const SLOT_MINUTES={open:360,main:480,final_morning:570,evening:915,late:1095};
 const RETRY_MS=3000;
 const MAX_WAIT_MS=90000;
 const msg=document.getElementById('msg');
@@ -30,6 +31,20 @@ function shortId(entry){
   return m&&code?`${m[1].slice(2)}${m[2]}${m[3]}${code}${m[4]}${m[5]}${m[6]}`:'';
 }
 function dateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
+function vancouverNow(now=new Date()){
+  try{
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now);
+    const value=t=>parts.find(p=>p.type===t)?.value||'';
+    return {day:`${value('year')}-${value('month')}-${value('day')}`,minutes:Number(value('hour'))*60+Number(value('minute'))}
+  }catch(e){return {day:'',minutes:-1}}
+}
+function sessionApplicable(slot,day,now=new Date()){
+  const current=vancouverNow(now),minutes=SLOT_MINUTES[slot];
+  if(!day||!Number.isFinite(minutes)||!current.day)return false;
+  if(day<current.day)return true;
+  if(day>current.day)return false;
+  return current.minutes>=minutes;
+}
 function b64ue(v){
   const bytes=new TextEncoder().encode(v);let bin='';
   bytes.forEach(b=>bin+=String.fromCharCode(b));
@@ -71,14 +86,14 @@ async function resolveRun(id){
   }
   throw new Error(lastError+' — TRY THE LINK AGAIN IN A MOMENT');
 }
-async function sameDayPriorRuns(index,currentEntry){
+async function sameDayPriorRuns(index,currentEntry,now=new Date()){
   const day=dateKey(currentEntry&&currentEntry.ts);
   if(!day)return [];
   const runs=Array.isArray(index&&index.runs)?index.runs:[];
   const latestBySlot=new Map();
   runs.forEach(entry=>{
     const slot=String(entry&&entry.slot||'');
-    if(!SLOT_CODES[slot]||!entry.path||dateKey(entry.ts)!==day)return;
+    if(!SLOT_CODES[slot]||!entry.path||dateKey(entry.ts)!==day||!sessionApplicable(slot,day,now))return;
     if(String(entry.ts||'')===String(currentEntry.ts||'')&&slot===String(currentEntry.slot||''))return;
     const prior=latestBySlot.get(slot);
     if(!prior||String(entry.ts||'')>String(prior.ts||''))latestBySlot.set(slot,entry);
