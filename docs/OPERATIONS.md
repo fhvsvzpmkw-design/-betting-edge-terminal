@@ -167,6 +167,8 @@ The short resolver retrieves the authoritative archived active report. It may al
 
 The short and long delivery mechanisms must preserve the same active issued report content. Same-day `prior_runs` hydration is navigation context only and cannot change the active recommendation.
 
+UI terminology keeps report history distinct from betting-history analytics: **`SAME-DAY RUNS // REPORT HISTORY`** on the Board means issued report/session history for the active betting date, while **F3 `BET HISTORY`** means the personal betting ledger/performance views. **`CLEAR LOCAL HISTORY`** removes only browser-local runner history and must never delete repository-backed issued-report history.
+
 ### History/share failure
 
 If payload storage, required sidecar storage, or `run-history.json` indexing fails:

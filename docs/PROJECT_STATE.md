@@ -19,7 +19,9 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 - **Compact odds provenance index:** `data/history/odds-index.json`.
 - **Research/provenance sidecar schema:** `data/history/report-provenance-schema.json`.
 
-The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local history is stored separately from repository data. The runner payload format has not been enlarged for the new structured history work.
+The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. The runner payload format has not been enlarged for the new structured history work.
+
+Current UI terminology deliberately separates the two history concepts: the Board uses **`SAME-DAY RUNS // REPORT HISTORY`** for same-date issued report/session history, while F3 is labeled **`BET HISTORY`** for personal ledger/performance history. **`CLEAR LOCAL HISTORY`** clears only browser-local runner history; it does not delete repository-backed issued reports or `run-history.json`.
 
 ## Daily report sessions
 
