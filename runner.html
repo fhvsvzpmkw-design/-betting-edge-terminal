@@ -456,7 +456,7 @@ function sessionStrip(d,run){
     const available=Boolean(newestSessionRun(run,t));
     const q=el(d,'button','sessionChip'+(t===active?' active':'')+(!available?' unavailable':''),t);
     q.type='button';q.disabled=!available;
-    q.title=available?`Load latest ${t} run`:`No ${t} run saved on this device yet`;
+    q.title=available?`Load latest ${t} run`:`No ${t} run available for this betting day`;
     if(available)q.onclick=()=>selectSession(run,t);
     strip.appendChild(q)
   });
@@ -523,11 +523,11 @@ function card(d,r){
 function priorSection(d,run){
   const arr=mergedPriorRuns(run),sec=el(d,'div');sec.id='runnerPrior';
   const head=el(d,'div','runnerPriorHead'),left=el(d,'div');
-  left.append(el(d,'div','sectiontitle','PRIOR RUNS // HISTORICAL'),el(d,'div','small muted','Earlier snapshots saved on this device for this betting day.'),el(d,'div','runnerPriorMeta','MASTER LEDGER // 1,624 WAGERS // 163 PAGES'));
+  left.append(el(d,'div','sectiontitle','SAME-DAY RUNS // REPORT HISTORY'),el(d,'div','small muted','Earlier runs available for this betting day from the report archive or this browser.'),el(d,'div','runnerPriorMeta','SAME-DAY REPORT HISTORY // ARCHIVE + LOCAL'));
   head.append(left,el(d,'span','tag c',String(arr.length)+' RUNS'));sec.appendChild(head);
   const list=el(d,'div','runnerPriorList');
   if(!arr.length){
-    const q=el(d,'div','runnerPriorItem');q.append(el(d,'b','muted','NO EARLIER RUNS SAVED YET'),el(d,'div','runnerPriorMeta','Timed runner links opened on this device accumulate here automatically.'));list.appendChild(q)
+    const q=el(d,'div','runnerPriorItem');q.append(el(d,'b','muted','NO EARLIER RUNS AVAILABLE YET'),el(d,'div','runnerPriorMeta','Archived same-day runs appear here when available; this browser may also retain opened runs.'));list.appendChild(q)
   }else{
     arr.forEach(p=>{
       const item=el(d,'details','runnerPriorItem');
@@ -540,8 +540,8 @@ function priorSection(d,run){
     })
   }
   sec.appendChild(list);
-  const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','History is browser/device-local.'));
-  const clear=el(d,'button','runnerClear','CLEAR SAVED HISTORY');
+  const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','Same-day history can come from the archive or this browser.'));
+  const clear=el(d,'button','runnerClear','CLEAR LOCAL HISTORY');
   clear.onclick=()=>{if(confirm('Clear Betting Edge saved runner history on this device?')){[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));apply(run)}};
   actions.appendChild(clear);sec.appendChild(actions);return sec
 }
@@ -563,7 +563,7 @@ function apply(run){
       hideStaticBoard(board);
       let empty=d.getElementById('runnerEmpty');
       if(!empty){
-        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open the complete Betting Edge run link containing #run= to load the current selections and controls.');
+        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open a Betting Edge report link to load the current selections and controls.');
         empty.id='runnerEmpty';board.prepend(empty)
       }
     }
