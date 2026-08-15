@@ -29,6 +29,7 @@ function shortId(entry){
   const code=SLOT_CODES[slot];
   return m&&code?`${m[1].slice(2)}${m[2]}${m[3]}${code}${m[4]}${m[5]}${m[6]}`:'';
 }
+function dateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
 function b64ue(v){
   const bytes=new TextEncoder().encode(v);let bin='';
   bytes.forEach(b=>bin+=String.fromCharCode(b));
@@ -55,7 +56,7 @@ async function resolveRun(id){
         if(!entry.path)throw new Error('ARCHIVED RUN PATH MISSING');
         try{
           const run=await fetchJson('./'+String(entry.path).replace(/^\/+/,''));
-          return {entry,run};
+          return {entry,run,index};
         }catch(e){
           if(e&&e.httpStatus===404)lastError='ARCHIVED RUN IS STILL PUBLISHING';
           else throw e;
@@ -70,15 +71,42 @@ async function resolveRun(id){
   }
   throw new Error(lastError+' — TRY THE LINK AGAIN IN A MOMENT');
 }
+async function sameDayPriorRuns(index,currentEntry){
+  const day=dateKey(currentEntry&&currentEntry.ts);
+  if(!day)return [];
+  const runs=Array.isArray(index&&index.runs)?index.runs:[];
+  const latestBySlot=new Map();
+  runs.forEach(entry=>{
+    const slot=String(entry&&entry.slot||'');
+    if(!SLOT_CODES[slot]||!entry.path||dateKey(entry.ts)!==day)return;
+    if(String(entry.ts||'')===String(currentEntry.ts||'')&&slot===String(currentEntry.slot||''))return;
+    const prior=latestBySlot.get(slot);
+    if(!prior||String(entry.ts||'')>String(prior.ts||''))latestBySlot.set(slot,entry);
+  });
+  const loaded=[];
+  for(const entry of latestBySlot.values()){
+    try{
+      const run=await fetchJson('./'+String(entry.path).replace(/^\/+/,''));
+      if(String(run.ts||'')!==String(entry.ts||''))continue;
+      if(String(run.slot||'')!==String(entry.slot||''))continue;
+      if(dateKey(run.ts)!==day)continue;
+      if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))continue;
+      loaded.push(run);
+    }catch(e){console.warn('Same-day archived run unavailable',entry&&entry.path,e)}
+  }
+  return loaded;
+}
 async function load(){
   try{
     const id=String(new URLSearchParams(location.search).get('id')||'').trim().toLowerCase();
     if(!/^[0-9]{6}[omfel][0-9]{6}$/.test(id))throw new Error('INVALID OR MISSING SHORT RUN ID');
-    const {entry,run}=await resolveRun(id);
+    const {entry,run,index}=await resolveRun(id);
     if(String(run.ts||'')!==String(entry.ts||''))throw new Error('RUN TIMESTAMP VALIDATION FAILED');
     if(String(run.slot||'')!==String(entry.slot||''))throw new Error('RUN SLOT VALIDATION FAILED');
     if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))throw new Error('RUN FEED PROVENANCE VALIDATION FAILED');
-    frame.src='./runner.html#run='+b64ue(JSON.stringify(run));
+    const priorRuns=await sameDayPriorRuns(index,entry);
+    const hydrated={...run,prior_runs:priorRuns};
+    frame.src='./runner.html#run='+b64ue(JSON.stringify(hydrated));
     frame.addEventListener('load',()=>{msg.style.display='none'},{once:true});
   }catch(e){fail('BETTING EDGE SHORT LINK ERROR // '+String(e&&e.message||e))}
 }
