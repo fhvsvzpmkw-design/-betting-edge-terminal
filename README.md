@@ -5,11 +5,11 @@
 The repository includes four durable project references:
 
 - [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current production state, versions, runtime boundaries, active data/research/governance status, and known-good checkpoint.
-- [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — daily refresh/report timing, scheduler diagnostics, zombie protection, manual recovery, repricing checks, and deployment verification.
+- [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — daily refresh/report timing, scheduler diagnostics, zombie protection, manual recovery, repricing checks, history/share-link handling, and deployment verification.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable architectural and operating decisions, including the reasoning behind them.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — completed foundations, current priorities, planned History/Research/ledger work, and eventual contract activation.
 
-The governance specification remains separate in [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md). The draft is not operational merely because it exists in the repository.
+The newest governance specification is [`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9.md). It is a **DRAFT / NOT YET OPERATIONAL** delta that inherits [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md) except where v0.9 explicitly extends or overrides it. v0.8 therefore remains the preserved baseline/reference and should not be deleted while v0.9 depends on it.
 
 ## Repository change safety policy
 
@@ -24,6 +24,6 @@ Direct edits to this repository use the following default safety process:
 7. When relevant, verify GitHub Pages or GitHub Actions completes successfully after the commit.
 8. If validation fails or behavior regresses, restore the exact previous Git version rather than manually reconstructing the file.
 
-Git history is the authoritative rollback system for all repository files. Named `.old` files may be retained where they provide a useful quick backup (for example `runner.html.old`), but they do not replace Git history.
+Git history is the authoritative rollback system for all repository files. Named `.old` files may be retained where they provide a useful quick backup (for example `runner.html.old`), but they do not replace Git history. Obsolete duplicate workflow backups should not be retained merely for rollback when Git history already preserves the exact prior version.
 
 Higher-risk files — including the runner, odds-refresh workflows, scheduler logic, research governance, and production contract integration — receive stricter before/after comparison and validation before a change is treated as complete.
