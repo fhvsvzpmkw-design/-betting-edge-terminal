@@ -3,9 +3,9 @@ name: Scheduler Canary v2
 on:
   workflow_dispatch:
   schedule:
-    # Fresh workflow identity to test GitHub's UTC scheduler registration.
-    # Off-peak minutes reduce scheduler congestion.
-    - cron: '19,49 * * * *'
+    # Diagnostic contrast: sample the top and middle of each hour.
+    # GitHub Actions cron is UTC; minute-only cadence is timezone-independent.
+    - cron: '1,31 * * * *'
 
 permissions:
   contents: read
