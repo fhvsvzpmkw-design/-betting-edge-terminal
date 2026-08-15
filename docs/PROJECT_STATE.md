@@ -14,9 +14,12 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 - **Authoritative rollback system:** Git history. Named `.old` files are convenience backups only.
 - **Live odds feed:** `data/live-odds.json`.
 - **Betting ledger:** `data/betting-ledger.json`.
-- **Run history file:** `run-history.json`.
+- **Issued-run index:** `run-history.json`.
+- **Durable history documentation:** `data/history/README.md`.
+- **Compact odds provenance index:** `data/history/odds-index.json`.
+- **Research/provenance sidecar schema:** `data/history/report-provenance-schema.json`.
 
-The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local history is stored separately from repository data.
+The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local history is stored separately from repository data. The runner payload format has not been enlarged for the new structured history work.
 
 ## Daily report sessions
 
@@ -40,7 +43,7 @@ The GitHub workflow uses paired/backup cron attempts around those target slots r
 
 ## Odds pipeline
 
-The active workflow is `.github/workflows/odds-refresh.yml`.
+The active production refresh workflow is `.github/workflows/odds-refresh.yml`.
 
 Current core properties:
 
@@ -52,12 +55,34 @@ Current core properties:
 - Invalid refreshes are designed not to replace a previously good live-odds snapshot.
 - Structured event/market/selection identity is preferred over title parsing.
 
-The scheduler diagnostics are separate from the odds workflow:
+A separate post-refresh workflow now exists:
+
+- `.github/workflows/odds-history-index.yml` — **Index Betting Edge odds history**.
+
+It is intentionally isolated from the production refresh. After a successful odds-refresh workflow it builds/updates `data/history/odds-index.json` with compact provenance such as generation time, snapshot commit, exact Git blob SHA and SHA-256. The full 20+ MB odds snapshot remains in Git history and is not duplicated. A failure in this indexing workflow must not prevent the live odds snapshot from being published.
+
+The scheduler diagnostics remain separate from both workflows:
 
 - `.github/workflows/scheduler-canary.yml`
 - `.github/workflows/scheduler-canary-v2.yml`
 
 Both canaries are intentionally read-only and make no odds API requests.
+
+## Durable report history
+
+Validated issued report payloads are stored under:
+
+`data/history/runs/YYYY-MM-DD/<slot>-<timestamp>.json`
+
+`run-history.json` is the compact index. The stored issued payload is authoritative for what the report actually recommended.
+
+Structured research/provenance detail is deliberately separated from the runner payload and is designed to be stored under:
+
+`data/history/research-fit/YYYY-MM-DD/<slot>-<timestamp>.json`
+
+The sidecar uses the exact issued slot/timestamp to link back to the report. It can preserve the Research Library version and item IDs consulted, evidence clusters, History Fit grade, transportability/caveats, feed blob SHA, runner provenance and non-operational governance-draft provenance without increasing the share-link payload.
+
+The first live sidecar integration is a controlled **15:15 EVENING-only pilot**. The other four scheduled report lanes have not been changed yet.
 
 ## Runner repricing model
 
@@ -80,13 +105,16 @@ The current comparison vocabulary distinguishes matched movement from unresolved
 Current research state:
 
 - Library: **Betting Edge Research Library 1.7**.
-- Status: `R1_CANONICAL_READ_ONLY`.
-- Contract compatibility metadata: draft **0.8**.
-- Next stage: `R2_MANUAL_READ_TEST`.
-- Scheduled reports linked: **false**.
-- Runtime writes required: **false**.
+- Canonical library status: `R1_CANONICAL_READ_ONLY`.
+- Current tested contract-compatibility pointer: draft **0.8**.
+- R2 manual-read suite: **PASS** at `research/tests/R2_MANUAL_READ_TEST_2026-08-15.json`.
+- The test covered direct/mixed MLB movement evidence, NBA era-drift conflict handling, and an explicit boxing-derivative research gap that correctly returned NR.
+- Runtime research writes required: **false**.
+- Full scheduled-report linkage: **false**.
+- Active pilot: `15:15 EVENING`, read-only Research Fit with a durable sidecar.
+- Next stage: `VERIFY_15_15_LIVE_CHAIN`.
 
-Research is therefore available as a curated evidence library but is **not yet part of the live scheduled report path**. That separation is deliberate.
+`research/manifest.json` is the authoritative pointer for current tested compatibility. The internal `research-library.json` header preserves the contract version recorded when the canonical library was originally built; that historical header is not rewritten merely to advance compatibility metadata.
 
 ## Governance contract
 
@@ -94,13 +122,15 @@ Current draft: `BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`.
 
 Status: **DRAFT — governance/specification only; NOT YET OPERATIONAL.**
 
-The draft must not be treated as live merely because it exists in the repository. Production activation requires a separate, deliberate integration and validation step.
+The v0.8 draft is used only as a non-operational provenance reference in the 15:15 history pilot. It has not been activated as the production contract.
 
 The v0.8 draft preserves the existing historical-evidence architecture and adds three explicit areas over the prior baseline:
 
 1. authoritative repository/version preflight;
 2. deterministic equal-price sportsbook tie handling;
 3. report timestamp integrity.
+
+A v0.9 draft is intentionally deferred until the durable odds/report/research-provenance chain has been proven in a live run.
 
 ## Known-good checkpoint
 
@@ -115,7 +145,7 @@ When debugging future regressions, use Git history and this checkpoint to distin
 
 ## Repository-write capability
 
-As of 2026-08-15, the connected GitHub integration can create, update, commit, read back, and delete repository files directly on `main`. A harmless create/delete test was completed successfully.
+As of 2026-08-15, the connected GitHub integration can create, update, commit, read back, and delete repository files directly on `main`. A fresh create/edit/delete capability test was completed successfully.
 
 All direct changes follow the safety policy in the root `README.md`: fetch current state first, preserve rollback information, make narrow changes, compare before/after, validate, commit clearly, read back, and verify Pages/Actions when relevant.
 
@@ -123,8 +153,11 @@ All direct changes follow the safety policy in the root `README.md`: fetch curre
 
 The following boundaries are intentional and should not be crossed casually:
 
-- Do not couple Research Library writes to normal report runs.
+- Do not couple Research Library **writes** to normal report runs.
 - Do not activate the v0.8 contract simply by renaming or referencing the draft.
+- Do not place bulky structured research metadata into the runner payload while long hash links are still in use.
+- Do not let odds-history indexing interfere with the production odds-refresh workflow.
+- Do not roll the R2 sidecar integration to all five report lanes until the 15:15 pilot is verified.
 - Do not mix scheduler/odds-refresh changes with UI changes unless the change truly spans both systems.
 - Do not rewrite an issued report during repricing.
 - Do not consume API quota for clearly stale scheduled jobs.
