@@ -34,7 +34,7 @@ This roadmap separates completed foundations from active near-term work and late
 - Hard request budgeting and safety reserve exist.
 - Invalid refreshes are designed to preserve the prior good feed.
 - Scheduler Canary v1 and v2 provide independent diagnostic signals.
-- `data/history/odds-index.json` now exists as a compact snapshot-provenance index.
+- `data/history/odds-index.json` exists as a compact snapshot-provenance index.
 - `.github/workflows/odds-history-index.yml` is an isolated post-refresh indexing workflow; it does not modify the production odds-refresh workflow.
 - Full odds snapshots remain authoritative in Git history and are not duplicated into the history directory.
 
@@ -43,46 +43,52 @@ This roadmap separates completed foundations from active near-term work and late
 - Betting ledger is in repository data.
 - Durable issued-run storage and `run-history.json` schema 2 are established.
 - Research Library **1.7** is canonical and read-only.
-- Research metadata is aligned to contract draft **0.8** while preserving the library's original build-time header as historical provenance.
 - R2 manual Research Library read testing passed for direct/mixed evidence, era conflict and explicit research-gap handling.
-- `data/history/report-provenance-schema.json` defines a separate Research Fit/provenance sidecar so structured history does not enlarge the runner link.
-- Contract draft v0.8 exists and remains explicitly non-operational.
+- `data/history/report-provenance-schema.json` schema 2 defines a separate Research Fit/provenance sidecar so structured history does not enlarge the runner link.
+- All five scheduled report lanes are configured for exact issued-payload archive plus read-only Research Fit/provenance sidecars.
+- Research metadata is aligned to contract draft **0.9**, with R3 behavior staged and live verification pending.
+- Contract draft **v0.9** exists as a non-operational durable-history/provenance successor that inherits v0.8 in full except for explicit additions/overrides.
+- v0.8 remains untouched as the v0.9 baseline/reference.
 
-## Priority 0 — Preserve and prove operational reliability
+## Priority 0 — Verify the staged live chain
 
-These items come before broader architectural integration.
+These items come before broader UI or production-contract activation.
 
-### P0.1 — Verify the 15:15 durable-history pilot
-
-The 15:15 EVENING lane is the first controlled live integration of read-only Research Fit plus a durable sidecar.
+### P0.1 — Verify the 15:15 durable-history chain
 
 Observe the complete chain:
 
 1. scheduled odds refresh around the 14:55 target;
 2. resulting `data/live-odds.json` snapshot;
 3. post-refresh `odds-history-index.yml` run and compact odds-index entry;
-4. 15:15 Betting Edge report;
+4. 15:15 Betting Edge report using candidate-first, read-only Research Fit;
 5. exact issued payload saved under `data/history/runs/...`;
 6. matching structured sidecar saved under `data/history/research-fit/...`;
 7. `run-history.json` entry links both records;
 8. runner link loads normally with no payload-shape/URL regression.
 
-**Success condition:** the full chain completes without altering recommendation logic, runner payload shape, production odds refresh, or report delivery.
+**Success condition:** the full chain completes without altering recommendation logic, runner payload shape, production odds refresh, stake/risk invariants, or report delivery.
 
-### P0.2 — Observe the full 18:15 chain
+### P0.2 — Verify the 18:15 chain and same-day lineage
 
-After the 15:15 history pilot is verified, continue the previously planned late-session sequence:
+Repeat the full archive/provenance checks around the 17:55/18:15 window and additionally verify that later analysis can use the actual archived 15:15 record when the same candidate persists.
 
-1. scheduled odds refresh around the 17:55 target;
-2. resulting live feed;
-3. 18:15 Betting Edge report;
-4. runner load;
-5. reprice operation;
-6. comparison categorization.
+Check:
 
-**Success condition:** all layers complete without manual repair and the output states are explainable.
+- earlier status/price/`playTo`/History Fit comes from stored evidence where available;
+- current movement remains distinct from Research Fit;
+- same-day lineage is not counted as an extra historical-research vote;
+- runner reprice/comparison still behaves normally.
 
-### P0.3 — Trace any remaining `UNCATEGORIZED` output
+**Success condition:** 15:15 + 18:15 together satisfy the first preferred H3/R3 live-acceptance pair.
+
+### P0.3 — Verify the next morning lanes
+
+Because all five schedules are already staged, observe the next 06:00, 08:00 and 09:30 runs after the late-day acceptance pair.
+
+**Goal:** confirm the same bounded Research Fit/history behavior works across every lane without schedule, payload, pricing, or risk regression.
+
+### P0.4 — Trace any remaining `UNCATEGORIZED` output
 
 If an actual run still shows `UNCATEGORIZED`:
 
@@ -93,7 +99,7 @@ If an actual run still shows `UNCATEGORIZED`:
 
 Do not make a speculative runner change without reproducing the source.
 
-### P0.4 — Continue scheduler observation
+### P0.5 — Continue scheduler observation
 
 Use odds-refresh runs plus both canaries to determine whether GitHub scheduled dispatch remains reliable over multiple windows.
 
@@ -103,17 +109,18 @@ Use odds-refresh runs plus both canaries to determine whether GitHub scheduled d
 
 ### P1.1 — Develop the History box
 
-Expand the terminal's History area from basic prior-run storage into useful decision context without turning it into clutter.
+Expand the terminal's History area from basic prior-run storage into useful repository-backed decision context without turning it into clutter.
 
 Candidate outputs:
 
 - prior same-day report evolution;
 - recommendation status changes;
-- price movement history;
-- relevant historical-fit context;
-- compact links/summaries rather than dumping raw history.
+- prior issued price and `playTo`;
+- relevant Research Fit evolution;
+- later result/CLV context when available;
+- compact links/summaries rather than raw-history dumps.
 
-The UI should remain secondary to the live decision card.
+The UI should remain secondary to the live decision card. Treat this as a separate runner/UI change family after the current live history chain is verified.
 
 ### P1.2 — Research Library R2 manual-read testing — COMPLETE
 
@@ -126,11 +133,9 @@ Validated behaviors:
 - an explicit boxing-derivative evidence gap returned **NR** rather than a forced analogy;
 - research did not create a BET, provide an executable price, or directly change fair value, `playTo`, status or stake.
 
-### P1.3 — Verify structured History Fit sidecars
+### P1.3 — Structured History Fit sidecars — CONFIGURED, LIVE VERIFICATION PENDING
 
-Active pilot: **15:15 EVENING only**.
-
-For each displayed recommendation, preserve separately from the runner payload:
+All five scheduled lanes are configured to preserve separately from the runner payload:
 
 - Research Library version;
 - primary prior IDs and optional synthesis/inference ID;
@@ -139,17 +144,18 @@ For each displayed recommendation, preserve separately from the runner payload:
 - directness and transportability;
 - mechanism and strongest limitation;
 - exact History Fit display text used in the report;
-- feed/runner/research provenance blob SHAs where available.
+- feed/runner/research/governance-draft provenance blob SHAs where available.
 
 Hard rule: the issued report remains authoritative for the recommendation; the sidecar is an audit/context record and may not rewrite it.
 
-### P1.4 — Roll structured capture to all report lanes
+### P1.4 — Establish H3 and then observe a complete five-lane day
 
-Only after the 15:15 pilot is verified:
+After the 15:15/18:15 live pair passes:
 
-- apply the same read-only Research Fit/sidecar behavior to 06:00, 08:00, 09:30 and 18:15;
-- mark scheduled Research Library linkage in the manifest;
-- verify at least one complete five-lane day.
+- mark H3 only if payload + sidecar + odds index + run index + runner behavior are all verified;
+- observe 06:00, 08:00 and 09:30 under the same configuration;
+- reconcile any missing history entries without rewriting genuine issued reports;
+- update `research/manifest.json`, `docs/PROJECT_STATE.md` and this roadmap to the proven state.
 
 ### P1.5 — Add result / CLV observation history
 
@@ -192,20 +198,31 @@ Longer-term architecture should allow different users to supply their own ledger
 
 ## Priority 3 — Contract evolution and activation
 
-Contract draft v0.8 remains non-operational while the new history/provenance system is being proven.
+Contract draft v0.9 now exists but remains explicitly non-operational.
 
-### P3.1 — Draft v0.9 after the live history chain is proven
+### P3.1 — Draft v0.9 durable-history/provenance governance — COMPLETE
 
-Use the working implementation—not an untested design—to formalize:
+`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md` now formalizes:
 
 - issued-report immutability;
+- exact issued-payload authority;
 - compact odds-snapshot provenance;
-- Research Fit retrieval boundaries;
+- Research Fit retrieval/persistence boundaries;
 - structured Research Fit/provenance sidecars;
 - history-save failure behavior;
+- H-track activation states;
+- separation between durable issued history and Shadow History;
 - later CLV/result observations without hindsight rewriting.
 
-### P3.2 — Preflight current production state
+v0.9 inherits v0.8 in full except where its delta explicitly adds or overrides history/provenance rules.
+
+### P3.2 — Validate v0.9 assumptions with live H3/R3 evidence
+
+Use the 15:15 and 18:15 live chains to test the architecture documented in v0.9.
+
+Do not change v0.9 merely to make a failing implementation appear compliant. Diagnose whether a failure is in configuration, storage, index logic, Research Fit retrieval, or contract design.
+
+### P3.3 — Preflight current production state
 
 Before any production contract activation:
 
@@ -218,13 +235,13 @@ Before any production contract activation:
 - verify durable-history behavior;
 - verify rollback commit.
 
-### P3.3 — Connect contract deliberately
+### P3.4 — Connect contract deliberately
 
-Create a controlled integration step rather than simply renaming a draft.
+Create a controlled integration step rather than simply renaming a draft or treating sidecar provenance as authority.
 
-**Required:** a clear before/after diff, test run, and rollback procedure.
+**Required:** a clear before/after diff, test run, equivalence comparison and rollback procedure.
 
-### P3.4 — Promote only after validation
+### P3.5 — Promote only after validation
 
 Only after successful integration testing should a production contract filename/state be considered.
 
@@ -263,12 +280,13 @@ Automation should notify only on meaningful health changes rather than producing
 
 - No broad rewrite of Betting Edge's live decision process.
 - No automatic Research Library writes during normal reports.
-- No automatic production activation of contract v0.8.
+- No automatic production activation of contract v0.9.
 - No bulky structured research metadata inside long runner URLs.
-- No rollout of the sidecar pilot to all five lanes before live verification.
+- No claim that all-five-lane staging is already proven live integration.
 - No unnecessary paid data subscription.
 - No speculative fixes across multiple layers when one layer has not been proven faulty.
-- No replacement of the issued report during repricing.
+- No replacement of the issued report during repricing or later result/CLV enrichment.
+- No claim that individual browser reprice clicks are centrally archived.
 
 ## Working principle
 
