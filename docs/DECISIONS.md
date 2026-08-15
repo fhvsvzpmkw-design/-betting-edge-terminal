@@ -92,7 +92,7 @@ Structured event, market, and selection identity is the preferred basis for matc
 
 ## D-011 — Equal best-price ties are deterministic
 
-**Status:** Active in runner v1.3; specified in contract draft v0.8
+**Status:** Active in runner v1.3; specified in contract draft v0.8 and inherited by v0.9
 
 When multiple books share the best live price:
 
@@ -119,13 +119,13 @@ Identity mismatches, unavailable markets, unverified prices, and started/closed 
 
 **Reason:** Betting Edge should fail closed on price verification rather than manufacture confidence.
 
-## D-014 — Research Library remains read-only during initial integration
+## D-014 — Research Library remains read-only during staged scheduled integration
 
-**Status:** Active; R2 manual read passed, 15:15 pilot only
+**Status:** Active; R2 manual read passed, R3 staged across all five report lanes, live verification pending
 
-Research Library 1.7 remains canonical/read-only and requires no runtime research writes. The R2 manual-read suite passed on 2026-08-15. The 15:15 EVENING lane is the first controlled scheduled pilot that may read the library and preserve a separate Research Fit sidecar; the other four lanes remain unchanged until the pilot is verified.
+Research Library 1.7 remains canonical/read-only and requires no runtime research writes. The R2 manual-read suite passed on 2026-08-15. All five scheduled report lanes are now staged to read the library after the provisional current handicap is formed, render concise History Fit in the existing `hist` field, and preserve structured Research Fit/provenance in a separate history sidecar.
 
-**Reason:** Historical evidence should prove useful and safe as independent read-only context before broad scheduled integration. One-lane rollout preserves a narrow rollback surface.
+**Reason:** The library has passed controlled retrieval tests. Staging the same bounded read-only behavior across all upcoming lanes avoids configuration drift while keeping the actual live-acceptance gate explicit. Research still cannot create a BET or directly change fair value, `playTo`, status, stake, identity, or price freshness.
 
 ## D-015 — User betting history is a separate secondary context
 
@@ -135,13 +135,15 @@ The user's personal ledger/history may eventually interact with the historical r
 
 **Reason:** Population-level historical evidence and one user's betting performance answer different questions. Combining them too early risks circular reasoning and overfitting.
 
-## D-016 — Contract draft v0.8 is not operational by existence alone
+## D-016 — Contract draft v0.9 is not operational by existence alone
 
-**Status:** Active
+**Status:** Active; supersedes the v0.8-only draft reference
 
-`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` is governance/specification only. It is not currently connected to the scheduler, runner, or odds-refresh workflow as an operational production contract. The 15:15 history pilot may record its blob SHA only as explicitly non-operational provenance.
+`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md` is governance/specification only and explicitly inherits v0.8 except for its history/provenance additions and overrides. It is not the authoritative production contract merely because it exists or because scheduled sidecars record its blob SHA. Scheduled provenance must record `governanceDraftOperational=false` until a separate contract cutover is deliberately approved and tested.
 
-**Reason:** Governance changes can materially alter decision behavior and therefore require deliberate preflight, integration, and testing.
+`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` remains untouched as the immutable v0.9 baseline/reference draft.
+
+**Reason:** Governance changes can materially alter decision behavior and therefore require deliberate preflight, integration, equivalence testing, and rollback even when related mechanisms are already staged independently in scheduled prompts.
 
 ## D-017 — Preserve adaptive handicapping inside hard guardrails
 
@@ -197,13 +199,25 @@ The issued payload remains authoritative for the recommendation. The sidecar rec
 
 **Reason:** This captures richer audit data without making already-long `#run=` links larger or risking runner compatibility.
 
-## D-023 — Prove one live lane before rolling history integration to all five
+## D-023 — All five upcoming lanes are pre-staged; live acceptance is still incremental
 
-**Status:** Active rollout rule
+**Status:** Supersedes the earlier 15:15-only rollout rule on 2026-08-15
 
-The 15:15 EVENING lane is the live R2 sidecar pilot. Do not apply the same scheduled Research Library/sidecar integration to 06:00, 08:00, 09:30 or 18:15 until the 15:15 chain has been verified end to end.
+The initial plan was to change only the 15:15 lane and wait before configuring the other four. The project owner deliberately chose to configure all five upcoming scheduled report lanes now so the Research Fit/history behavior would not be forgotten or drift between lanes.
 
-**Reason:** A narrow live pilot limits blast radius and gives a clean before/after comparison before broad rollout.
+This does **not** declare the integration proven. The 15:15 and 18:15 live chains remain the first acceptance pair, followed by observation of the morning lanes.
+
+**Reason:** Configuration consistency and live acceptance are different questions. Pre-staging all lanes reduces administrative drift while preserving a clear evidence gate before calling R3/H3 verified.
+
+## D-024 — v0.9 adds an H-track separate from Shadow History
+
+**Status:** Active architecture; H2 configured, H3 pending live verification
+
+Contract draft v0.9 introduces a dedicated **H-track** for durable issued-report and market provenance. It covers exact issued report archives, Research Fit/provenance sidecars, `run-history.json`, and compact Git-backed odds-snapshot indexing.
+
+H-track history records what Betting Edge actually issued. It is intentionally separate from the S-track / Shadow History concept, which remains inactive and would concern broader prospective candidate-level calibration if later justified.
+
+**Reason:** Durable auditability of real issued reports is useful now and can be implemented safely without activating a more complex candidate-level Shadow History collector.
 
 ---
 
