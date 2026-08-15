@@ -1,27 +1,35 @@
 {
-  "schema": 1,
-  "purpose": "Additive historical provenance fields for issued Betting Edge report payloads. These fields document how a report was produced and must not alter recommendation logic.",
-  "rootProvenance": {
-    "field": "provenance",
+  "schema": 2,
+  "purpose": "Durable research/provenance sidecar for an issued Betting Edge report. The sidecar enriches history without enlarging or mutating the runner payload.",
+  "sidecarPath": "data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json",
+  "reportReference": {
     "fields": {
-      "reportSchemaVersion": "string",
-      "contractDraftVersion": "string",
-      "contractBlobSha": "git blob SHA or null if unavailable",
+      "slot": "issued report slot",
+      "label": "issued report label",
+      "ts": "exact issued run.ts",
+      "reportPath": "exact data/history/runs path of the stored issued payload",
+      "feedGeneratedAt": "exact feedGeneratedAt recorded in the issued payload"
+    },
+    "rule": "slot and ts must exactly match the issued payload; the sidecar never replaces the issued payload as authority."
+  },
+  "provenance": {
+    "fields": {
+      "governanceDraftVersion": "string",
+      "governanceDraftOperational": "boolean",
+      "contractBlobSha": "git blob SHA or null if only a non-operational draft reference",
       "runnerVersion": "string",
       "runnerBlobSha": "git blob SHA or null if unavailable",
-      "feedGeneratedAt": "exact data/live-odds.json generatedAt used for issuance",
       "feedBlobSha": "git blob SHA of data/live-odds.json used for issuance or null if unavailable",
       "researchLibraryVersion": "string",
       "researchLibraryBlobSha": "git blob SHA of canonical research-library.json",
       "historyFitPolicyBlobSha": "git blob SHA of history-fit-policy.json",
-      "researchManifestBlobSha": "git blob SHA of research/manifest.json"
+      "researchManifestBlobSha": "git blob SHA of research/manifest.json",
+      "r2ValidationBlobSha": "git blob SHA of the active R2 manual read test"
     }
   },
-  "recommendationResearchFit": {
-    "field": "researchFit",
-    "requiredWhenResearchLibraryAvailable": true,
-    "fields": {
-      "libraryVersion": "string",
+  "recommendations": {
+    "shape": "array aligned to the issued recs by stable title/identity and ordinal",
+    "researchFitFields": {
       "grade": "A|B|C|D|NR with optional +/- only for communication",
       "priorIds": "array; normally 0-4 primary prior IDs",
       "synthesisIds": "array; normally 0-1 synthesis/inference ID",
@@ -30,10 +38,11 @@
       "transportability": "high|medium|low|not_applicable",
       "mechanism": "concise historical mechanism",
       "limitation": "strongest caveat, conflict, era issue or research gap",
-      "text": "concise display History Fit wording derived from this structured record"
+      "displayText": "the concise History Fit wording placed in the issued report's existing hist field"
     }
   },
   "boundaries": {
+    "issuedRunnerPayloadChangedForSidecar": false,
     "researchMayCreateBet": false,
     "researchMaySupplyExecutablePrice": false,
     "researchMayOverrideIdentityOrFreshness": false,
@@ -41,11 +50,12 @@
     "researchMayDirectlyChangePlayTo": false,
     "researchMayDirectlyChangeStatus": false,
     "researchMayDirectlyChangeStake": false,
-    "normalReportResearchWrites": false,
-    "issuedPayloadImmutableAfterDelivery": true
+    "normalReportMayWriteResearchLibrary": false,
+    "issuedPayloadImmutableAfterDelivery": true,
+    "sidecarAppendOnlyHistoricalEvidence": true
   },
   "failureBehavior": {
-    "researchUnavailable": "Use HISTORY LIBRARY UNAVAILABLE/NR-style disclosure as appropriate; do not fabricate retrieved prior IDs.",
-    "historySaveFailure": "Deliver the already-validated report and surface HISTORY SAVE FAILED; do not rebuild or mutate the report solely for storage."
+    "researchUnavailable": "Use HISTORY LIBRARY UNAVAILABLE in the issued hist field as appropriate and do not fabricate prior IDs.",
+    "sidecarSaveFailure": "Deliver the already-validated issued report and surface HISTORY SAVE FAILED; do not rebuild or mutate the report solely for sidecar storage."
   }
 }
