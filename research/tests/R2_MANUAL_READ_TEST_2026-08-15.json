@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "testId": "R2_MANUAL_READ_TEST_2026-08-15",
+  "status": "PASS",
+  "purpose": "Verify that the canonical Research Library can retrieve concise relevant historical evidence, handle conflict and explicit gaps, and remain independent from the live Betting Edge recommendation layer.",
+  "provenance": {
+    "libraryVersion": "1.7",
+    "contractDraftVersion": "0.8",
+    "researchLibraryBlobSha": "ade09ebcc4760cc4dfc06cba7dc73ba3c514980e",
+    "historyFitPolicyBlobSha": "f112d3c117d6fea7e037f6fad036f28a724194be",
+    "taxonomyBlobSha": "e86e5e64089e2ab7f31f38972066de4110f5fb3d",
+    "manifestBlobSha": "407d45fa23ed4a299eeb0d7a228fb5990e241ab9"
+  },
+  "rulesChecked": [
+    "candidate first",
+    "smallest relevant retrieval set",
+    "cluster deduplication",
+    "direct evidence before analogy",
+    "era and transportability caveats",
+    "explicit research gap produces NR",
+    "research does not create or change a BET",
+    "research does not supply an executable price",
+    "research does not change playTo, status or stake"
+  ],
+  "cases": [
+    {
+      "caseId": "R2-MLB-MOVEMENT-001",
+      "caseType": "historical_real_candidate_audit",
+      "candidate": {
+        "sport": "MLB",
+        "marketClass": "moneyline",
+        "timing": "pregame",
+        "selection": "Texas moneyline",
+        "issuedPrice": "-133",
+        "laterObservedPrices": ["-127", "-140"],
+        "note": "Used only to test the independent Research Library lens; no recommendation is recreated or changed."
+      },
+      "retrieved": [
+        {
+          "priorId": "mlb_reverse_flb",
+          "tier": "B",
+          "role": "support",
+          "use": "Historical MLB moneyline calibration prior; not a mechanical favorite/underdog rule."
+        },
+        {
+          "priorId": "mlb_intraday_line_movement",
+          "tier": "C",
+          "role": "mixed",
+          "use": "Direct MLB movement evidence; movement can contain information while intraday reversals/overreaction can occur."
+        },
+        {
+          "priorId": "closing_line_information",
+          "tier": "B",
+          "role": "support",
+          "use": "Cross-sport methodological prior that later prices can incorporate information and CLV should be tracked."
+        }
+      ],
+      "clusterIds": ["favorite_longshot_sport_specificity", "movement_information_vs_overreaction"],
+      "historyFit": {
+        "grade": "C",
+        "verdict": "Direct MLB evidence exists, but it does not validate a one-direction interpretation of the move. Historical moneyline calibration is useful as a guardrail, while modern intraday evidence makes the -133 to -127 to -140 path explicitly non-monotonic.",
+        "mainLimitation": "Historical reverse favorite-longshot evidence is old and not sufficient for mechanical profitability; one observed price path is not a validated movement strategy."
+      },
+      "boundaryResult": "PASS"
+    },
+    {
+      "caseId": "R2-NBA-ERA-002",
+      "caseType": "representative_conflict_test",
+      "candidate": {
+        "sport": "NBA",
+        "marketClass": "totals",
+        "timing": "pregame",
+        "mechanism": "historical high-total threshold"
+      },
+      "retrieved": [
+        {
+          "priorId": "nba_totals_high_total_anomaly",
+          "tier": "B",
+          "role": "caution",
+          "use": "Older high-total under findings are explicitly weakened by later-era replication."
+        }
+      ],
+      "clusterIds": ["nba_totals_era_drift"],
+      "historyFit": {
+        "grade": "C",
+        "verdict": "The historical mechanism is real enough to study, but fixed old thresholds do not transport cleanly into the modern scoring environment.",
+        "mainLimitation": "Era drift and later replication prevent the old threshold from becoming a current betting rule without fresh calibration."
+      },
+      "boundaryResult": "PASS"
+    },
+    {
+      "caseId": "R2-BOXING-GAP-003",
+      "caseType": "representative_gap_test",
+      "candidate": {
+        "sport": "Boxing",
+        "marketClass": "derivatives",
+        "timing": "pregame",
+        "mechanism": "method-of-victory / round / total-round calibration"
+      },
+      "retrieved": [
+        {
+          "priorId": "gr_boxing_derivatives",
+          "tier": "SYNTHESIS",
+          "role": "gap",
+          "use": "Explicit local-calibration gap; derivative markets must not inherit fight-winner calibration."
+        }
+      ],
+      "clusterIds": ["boxing_derivatives_separation"],
+      "historyFit": {
+        "grade": "NR",
+        "verdict": "No reliable direct production-grade historical calibration prior is available for these boxing derivative markets.",
+        "mainLimitation": "The library contains an explicit research gap, so the correct output is NR rather than a forced cross-market analogy."
+      },
+      "boundaryResult": "PASS"
+    }
+  ],
+  "assertions": {
+    "allCasesUsedSmallRetrievalSets": true,
+    "conflictsAndEraDriftWerePreserved": true,
+    "gapProducedNR": true,
+    "noResearchItemWasDoubleCountedAsAnIndependentVote": true,
+    "noLiveRecommendationWasChanged": true,
+    "noExecutablePriceWasSuppliedByResearch": true,
+    "noFairValuePlayToStatusOrStakeWasChanged": true
+  },
+  "result": "R2 manual read behavior validated for direct/mixed evidence, era conflict and explicit research-gap handling. Scheduled reports remain unlinked and read-only."
+}
