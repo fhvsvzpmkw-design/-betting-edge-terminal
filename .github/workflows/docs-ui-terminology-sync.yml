@@ -1,0 +1,65 @@
+name: One-time Betting Edge UI terminology docs sync
+
+on:
+  push:
+    paths:
+      - '.github/workflows/docs-ui-terminology-sync.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact documentation blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object docs/PROJECT_STATE.md)" = "0e7fceea52b301e16f69ca348f224f7569280058"
+          test "$(git hash-object docs/OPERATIONS.md)" = "1f4fb3f40147f1d33106a88aa59c243b08950da2"
+
+      - name: Sync UI terminology documentation
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one target, found {count}')
+              p.write_text(text.replace(old, new), encoding='utf-8')
+
+          old_state = "The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local history is stored separately from repository data. The runner payload format has not been enlarged for the new structured history work."
+          new_state = "The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. The runner payload format has not been enlarged for the new structured history work.\n\nCurrent UI terminology deliberately separates the two history concepts: the Board uses **`SAME-DAY RUNS // REPORT HISTORY`** for same-date issued report/session history, while F3 is labeled **`BET HISTORY`** for personal ledger/performance history. **`CLEAR LOCAL HISTORY`** clears only browser-local runner history; it does not delete repository-backed issued reports or `run-history.json`."
+          replace_once('docs/PROJECT_STATE.md', old_state, new_state)
+
+          old_ops = "The short and long delivery mechanisms must preserve the same active issued report content. Same-day `prior_runs` hydration is navigation context only and cannot change the active recommendation."
+          new_ops = "The short and long delivery mechanisms must preserve the same active issued report content. Same-day `prior_runs` hydration is navigation context only and cannot change the active recommendation.\n\nUI terminology keeps report history distinct from betting-history analytics: **`SAME-DAY RUNS // REPORT HISTORY`** on the Board means issued report/session history for the active betting date, while **F3 `BET HISTORY`** means the personal betting ledger/performance views. **`CLEAR LOCAL HISTORY`** removes only browser-local runner history and must never delete repository-backed issued-report history."
+          replace_once('docs/OPERATIONS.md', old_ops, new_ops)
+
+      - name: Validate docs diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          grep -Fq 'SAME-DAY RUNS // REPORT HISTORY' docs/PROJECT_STATE.md
+          grep -Fq 'F3 is labeled **`BET HISTORY`**' docs/PROJECT_STATE.md
+          grep -Fq 'CLEAR LOCAL HISTORY' docs/OPERATIONS.md
+          git diff -- docs/PROJECT_STATE.md docs/OPERATIONS.md
+
+      - name: Commit docs sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/PROJECT_STATE.md docs/OPERATIONS.md
+          git commit -m 'Document runner history terminology'
+          git push
