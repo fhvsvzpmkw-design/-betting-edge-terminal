@@ -1,7 +1,7 @@
 # Betting Edge Research Library — Canonical v1.7
 
-**Status:** R1 canonicalization complete — read-only — not yet linked to scheduled Betting Edge reports  
-**Contract compatibility:** Betting Edge Contract draft v0.8  
+**Status:** R2 manual read validation passed — read-only — R3 staged across all five scheduled report lanes; live verification pending  
+**Contract compatibility:** Betting Edge Contract draft v0.9  
 **Built:** 2026-08-14T20:06:13Z
 
 ## Purpose
@@ -18,10 +18,10 @@ The 18 resolution records are retained as synthesis/audit items. In addition, th
 
 ## Active files
 
-- `manifest.json` — authoritative current version/compatibility pointer for later read-before-run integration.
+- `manifest.json` — authoritative current version/compatibility pointer for read-before-run integration.
 - `research-library.json` — all 96 normalized logical items and their runtime boundaries.
 - `source-registry.json` — deduplicated source/provenance registry.
-- `history-fit-policy.json` — R1/R2 retrieval, grading, conflict and failure rules.
+- `history-fit-policy.json` — R2/R3 retrieval, grading, conflict and failure rules.
 - `taxonomy.json` — controlled values and evidence/conflict clusters.
 - `source-package-manifest.json` — exact source-package counts and SHA-256 hashes.
 - `CANONICALIZATION_REPORT.md` — build/audit summary.
@@ -30,11 +30,11 @@ The 18 resolution records are retained as synthesis/audit items. In addition, th
 
 `research-library.json` preserves the contract version recorded when the canonical v1.7 library was originally built. That build-time header is historical provenance and is not rewritten solely to advance contract compatibility.
 
-`manifest.json` is the authoritative pointer for the library's **current tested contract compatibility**. The active manifest records compatibility with Betting Edge Contract draft v0.8 and the latest R2 validation result.
+`manifest.json` is the authoritative pointer for the library's **current tested contract compatibility**. The active manifest records compatibility with Betting Edge Contract draft v0.9, the passed R2 manual-read test, and the current staged live-validation state.
 
 ## Runtime boundary
 
-At the first read-only integration stage, the Research Library is an **independent historical interpretation layer**.
+The Research Library is an **independent historical interpretation layer**.
 
 It does not:
 
@@ -48,6 +48,8 @@ It does not:
 - require runtime write access.
 
 The current handicap is formed first from current evidence. Research is then applied as the History Fit lens.
+
+Structured Research Fit/provenance may be written to `data/history/research-fit/` by the report-history layer. That is a history write, not a Research Library write: normal reports remain prohibited from mutating `research/*`.
 
 ## Conflict handling
 
@@ -68,7 +70,7 @@ This canonicalization is deliberately conservative. Where the original package e
 
 ## Updating the library
 
-Normal Betting Edge reports remain read-only.
+Normal Betting Edge reports remain read-only with respect to `research/*`.
 
 When worthwhile new research is found:
 
@@ -88,4 +90,6 @@ When worthwhile new research is found:
 
 The R2 manual read suite is stored at `research/tests/R2_MANUAL_READ_TEST_2026-08-15.json` and validates direct/mixed evidence, era-conflict handling and explicit research-gap behavior without changing live recommendation fields.
 
-The next stage is **R2 structured report capture**: preserve the Research Library version, exact retrieved prior IDs/clusters, History Fit grade, mechanism, limitation and transportability with the issued report while keeping scheduled research use read-only.
+All five scheduled report lanes are now staged to perform the same read-only Research Fit process and preserve structured Research Fit/provenance in separate history sidecars while keeping the runner payload compact.
+
+The next acceptance step is to verify the **15:15 and 18:15 live chains**: authoritative Research Library read, correct `hist` rendering, exact issued-payload archive, matching Research Fit sidecar, correct `run-history.json` linkage, and no regression in price/stake/risk/runner behavior.
