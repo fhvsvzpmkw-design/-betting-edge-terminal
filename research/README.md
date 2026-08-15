@@ -1,7 +1,7 @@
 # Betting Edge Research Library — Canonical v1.7
 
 **Status:** R1 canonicalization complete — read-only — not yet linked to scheduled Betting Edge reports  
-**Contract compatibility:** Betting Edge Contract draft v0.7  
+**Contract compatibility:** Betting Edge Contract draft v0.8  
 **Built:** 2026-08-14T20:06:13Z
 
 ## Purpose
@@ -70,8 +70,8 @@ When worthwhile new research is found:
 2. determine whether it adds, replicates, contradicts, supersedes or narrows an existing prior;
 3. update the canonical library and source registry;
 4. increment the Research Library version independently from the Betting Edge contract version;
-5. manually upload the approved files;
-6. verify the uploaded hashes/content;
+5. commit the approved files through the verified repository write path;
+6. verify the committed hashes/content;
 7. only then allow later reports to use the new approved version.
 
 ## Source-package audit
