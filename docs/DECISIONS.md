@@ -26,7 +26,7 @@ Required safeguards are documented in the root `README.md`: fetch current state 
 
 **Status:** Active
 
-The odds refresh, runner UI/repricing, research library, and governance contract should remain separable components unless a deliberate integration is approved.
+The odds refresh, runner UI/repricing, research library, history/provenance layer, and governance contract should remain separable components unless a deliberate integration is approved.
 
 **Reason:** A failure in one layer should not force changes in unrelated layers. Modularity makes diagnosis and rollback safer.
 
@@ -121,11 +121,11 @@ Identity mismatches, unavailable markets, unverified prices, and started/closed 
 
 ## D-014 — Research Library remains read-only during initial integration
 
-**Status:** Active
+**Status:** Active; R2 manual read passed, 15:15 pilot only
 
-Research Library 1.7 is currently `R1_CANONICAL_READ_ONLY`, with no scheduled-report link and no runtime write requirement. The next planned stage is `R2_MANUAL_READ_TEST`.
+Research Library 1.7 remains canonical/read-only and requires no runtime research writes. The R2 manual-read suite passed on 2026-08-15. The 15:15 EVENING lane is the first controlled scheduled pilot that may read the library and preserve a separate Research Fit sidecar; the other four lanes remain unchanged until the pilot is verified.
 
-**Reason:** Historical evidence should first prove useful and safe as read-only context before it can influence automated runtime behavior.
+**Reason:** Historical evidence should prove useful and safe as independent read-only context before broad scheduled integration. One-lane rollout preserves a narrow rollback surface.
 
 ## D-015 — User betting history is a separate secondary context
 
@@ -139,7 +139,7 @@ The user's personal ledger/history may eventually interact with the historical r
 
 **Status:** Active
 
-`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` is governance/specification only. It is not currently connected to the scheduler, report task, runner, or odds-refresh workflow.
+`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` is governance/specification only. It is not currently connected to the scheduler, runner, or odds-refresh workflow as an operational production contract. The 15:15 history pilot may record its blob SHA only as explicitly non-operational provenance.
 
 **Reason:** Governance changes can materially alter decision behavior and therefore require deliberate preflight, integration, and testing.
 
@@ -176,6 +176,34 @@ A malformed or unusable refresh should not replace the existing valid `data/live
 The current runner comparison vocabulary and upstream odds category logic do not intentionally rely on a literal `UNCATEGORIZED` result. If it appears in an actual report, inspect the specific run/report payload and trace its origin before changing runner or workflow code.
 
 **Reason:** Fixing the wrong layer can hide the symptom while damaging a component that was already behaving correctly.
+
+## D-021 — Full odds snapshots stay in Git; use a compact provenance index
+
+**Status:** Active
+
+Do not duplicate the large `data/live-odds.json` file into the history directory for every refresh. Git history is the full-fidelity snapshot archive. `data/history/odds-index.json` provides compact lookup/provenance using generation time, commit/blob identity, hashes and summary metadata.
+
+The index is maintained by a separate `.github/workflows/odds-history-index.yml` workflow rather than by modifying the production odds-refresh workflow.
+
+**Reason:** This preserves exact historical data without multiplying repository storage or adding failure risk to the production refresh path.
+
+## D-022 — Structured Research Fit belongs in a sidecar, not the long runner payload
+
+**Status:** Active architecture
+
+The issued runner payload keeps its existing compact shape. Structured Research Fit/provenance is stored separately under `data/history/research-fit/...` and linked by exact slot/run timestamp.
+
+The issued payload remains authoritative for the recommendation. The sidecar records the research/provenance context and must not rewrite issued status, price, fair value, `playTo`, stake or analysis.
+
+**Reason:** This captures richer audit data without making already-long `#run=` links larger or risking runner compatibility.
+
+## D-023 — Prove one live lane before rolling history integration to all five
+
+**Status:** Active rollout rule
+
+The 15:15 EVENING lane is the live R2 sidecar pilot. Do not apply the same scheduled Research Library/sidecar integration to 06:00, 08:00, 09:30 or 18:15 until the 15:15 chain has been verified end to end.
+
+**Reason:** A narrow live pilot limits blast radius and gives a clean before/after comparison before broad rollout.
 
 ---
 
