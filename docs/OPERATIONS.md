@@ -14,7 +14,7 @@ This document describes how the current Betting Edge system is operated and chec
 | 15:15 | 14:55 | 14:53 and 15:03 Vancouver |
 | 18:15 | 17:55 | 17:53 and 18:03 Vancouver |
 
-The two-trigger pattern exists because GitHub scheduled workflows can arrive late or occasionally fail to dispatch. The backup trigger is intended to provide a second opportunity without blindly spending quota when a valid same-slot refresh already exists.
+The paired-trigger pattern exists because GitHub scheduled workflows can arrive late or occasionally fail to dispatch. The backup trigger provides another opportunity without blindly spending quota when a valid same-slot refresh already exists.
 
 ## Active odds workflow
 
@@ -39,6 +39,8 @@ Key controls:
 
 A stale scheduled trigger should exit before making Odds-API requests. This is the "zombie killer" behavior.
 
+Git history is the rollback authority for this workflow. The obsolete `.github/workflows/odds-refresh.yml.old` duplicate has been removed; restore an earlier workflow from Git history if rollback is required.
+
 ## Post-refresh odds-history index
 
 File: `.github/workflows/odds-history-index.yml`  
@@ -57,7 +59,7 @@ Its job is provenance/navigation only. It records compact information such as:
 
 The large full feed is **not copied** into the history directory. Git history remains the full-fidelity snapshot archive.
 
-Operational rule: a failure in `odds-history-index.yml` must never be treated as failure of the already-published live odds snapshot. Repair the index independently; do not rerun the odds API solely because indexing failed.
+Operational rule: failure of `odds-history-index.yml` must never be treated as failure of the already-published live odds snapshot. Repair the index independently; do not rerun the odds API solely because indexing failed.
 
 ## Scheduler diagnostics
 
@@ -95,7 +97,8 @@ When checking whether a report window is on track, use this order:
 3. **Check `data/live-odds.json`.** Confirm the latest valid snapshot reflects the intended refresh period.
 4. **Check the odds-history index.** After a successful published refresh, confirm the separate indexing workflow eventually records the snapshot. Index lag does not invalidate the live feed.
 5. **Check API-use evidence when needed.** A zombie-killed run should make zero odds API requests. A successful live refresh should show actual request activity.
-6. **Open the runner/report.** Reprice only after a valid live feed exists.
+6. **Open the issued report.** Prefer the compact short link when durable history/indexing succeeded; use the long fallback when history saving failed.
+7. **Reprice only after a valid live feed exists.**
 
 Do not infer success solely from the existence of a workflow run. A run can finish successfully because a stale trigger was intentionally rejected or because no publishable odds changes were produced.
 
@@ -110,27 +113,83 @@ Use manual recovery when an important scheduled refresh did not produce a usable
 5. Confirm `data/live-odds.json` was actually updated or that the workflow explicitly reported there were no valid changes to publish.
 6. Confirm API activity is consistent with the action taken.
 7. Allow/check the separate odds-history index run; repair it independently if necessary.
-8. Reprice/open the Betting Edge runner using the new feed.
+8. Open/reprice the Betting Edge report using the new feed.
 
 A manual odds refresh should not require changing runner code.
 
 ## Durable issued-report history
 
-The exact validated payload used for a runner link is stored under:
+The exact validated issued payload is stored under:
 
 `data/history/runs/YYYY-MM-DD/<slot>-HHMMSS.json`
 
-`run-history.json` is the compact index. The stored payload is authoritative for what Betting Edge actually issued.
+`run-history.json` is the compact discovery/index layer. The stored issued payload is authoritative for what Betting Edge actually issued.
 
-History-save failure must not cause a different report to be generated solely for storage. If the already-validated live report can be delivered but its archive cannot be written, deliver it with the existing `HISTORY SAVE FAILED` warning and repair the archive later.
+Structured Research Fit/provenance is stored separately under:
 
-Issued payloads are historical evidence. Do not silently overwrite or delete them during ordinary operations.
+`data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json`
 
-## 15:15 R2 Research Fit pilot
+The sidecar must refer to the same slot, exact `run.ts`, report path and `feedGeneratedAt`. It is supplementary evidence and cannot rewrite the recommendation.
 
-The 15:15 EVENING lane is currently the only scheduled lane using the read-only R2 Research Fit pilot. The 06:00, 08:00, 09:30 and 18:15 lanes remain unchanged until this pilot is verified.
+Issued payloads and sidecars are historical evidence. Do not silently overwrite or delete genuine issued records during ordinary operations.
 
-For each displayed 15:15 recommendation, the report process forms its current handicap first and then reads the canonical Research Library as an independent History Fit lens. Research must not:
+## Report link delivery
+
+Every scheduled report lane follows the same delivery hierarchy.
+
+### Long fallback — built first
+
+The validated report payload is serialized, round-trip checked, Base64URL encoded and used to build:
+
+`runner.html#run=<validated payload>`
+
+This long link is retained as the self-contained emergency fallback. It must be capable of opening the active issued card without depending on repository history.
+
+### Short link — normal primary delivery after history success
+
+After the exact issued payload, required Research Fit/provenance sidecar and matching `run-history.json` entry have been stored successfully, the report derives the deterministic compact ID and delivers:
+
+`r.html?id=<shortId>`
+
+Current short ID format:
+
+`YYMMDD + slot code + HHMMSS`
+
+Slot codes:
+
+- `open = o`;
+- `main = m`;
+- `final_morning = f`;
+- `evening = e`;
+- `late = l`.
+
+The short resolver retrieves the authoritative archived active report. It may also hydrate the newest valid archived run for the other session lanes on the **same active report date** into the existing five session buttons. It must not pull a different date into that strip.
+
+The short and long delivery mechanisms must preserve the same active issued report content. Same-day `prior_runs` hydration is navigation context only and cannot change the active recommendation.
+
+### History/share failure
+
+If payload storage, required sidecar storage, or `run-history.json` indexing fails:
+
+- do not rebuild or re-handicap the report merely for history;
+- do not send a known-unresolvable short link as the sole report path;
+- deliver the already-validated long fallback;
+- surface `HISTORY SAVE FAILED`;
+- repair the history/index problem separately.
+
+Publication lag in GitHub Pages may be retried by the compact resolver for a bounded period, but the resolver must never substitute a different report.
+
+## Research Fit — all five lanes staged
+
+Read-only Research Fit/history-sidecar behavior is configured across all five report lanes:
+
+- 06:00 OPEN / OVERNIGHT;
+- 08:00 MAIN;
+- 09:30 FINAL MORNING;
+- 15:15 EVENING;
+- 18:15 LATE / WEST COAST.
+
+The canonical Research Library is read **after** the provisional current handicap is formed. Research must not:
 
 - create a BET;
 - supply an executable sportsbook price;
@@ -140,32 +199,43 @@ For each displayed 15:15 recommendation, the report process forms its current ha
 - directly rewrite status or stake;
 - write to `research/*` during a normal report.
 
-The concise History Fit conclusion remains in the existing `hist` field of the issued runner payload. Structured detail is stored separately so the runner URL does not grow.
+The concise History Fit conclusion remains in the existing `hist` field of the issued runner payload. Structured detail belongs in the sidecar so the issued payload shape does not grow.
 
-Expected sidecar path:
+This configuration is staged, not yet proof of live acceptance. R2 manual Research Library validation has passed; R3/H3 live-chain acceptance still requires successful scheduled evidence.
 
-`data/history/research-fit/YYYY-MM-DD/evening-HHMMSS.json`
+## Preferred live acceptance sequence
 
-The sidecar must match the issued payload's exact `slot`, `run.ts`, report path and `feedGeneratedAt`. It may contain prior IDs, evidence clusters, grade, directness, transportability, mechanism/limitation and feed/runner/research provenance. It is not authoritative for the recommendation itself and may not rewrite the issued payload.
+The preferred first acceptance pair is 15:15 followed by 18:15.
 
-### 15:15 live-pilot verification
+### 15:15 acceptance
 
-For the first successful live pilot, verify the chain in this order:
+Verify:
 
-1. 14:53/15:03 odds-refresh attempt produces a valid 14:55-window feed.
-2. `data/live-odds.json` has the expected fresh `generatedAt`.
-3. `Index Betting Edge odds history` runs after the successful refresh and adds the snapshot to `data/history/odds-index.json`.
-4. The 15:15 report is generated with the normal runner payload shape and validates normally.
-5. The exact issued payload is created under `data/history/runs/YYYY-MM-DD/evening-HHMMSS.json`.
-6. A matching `data/history/research-fit/YYYY-MM-DD/evening-HHMMSS.json` sidecar is created.
-7. `run-history.json` contains the run plus `researchFitPath`, feed blob SHA when available, and Research Library version.
-8. The runner link opens normally and the report presentation/repricing behavior is unchanged.
+1. the 14:53/15:03 refresh window produces a valid fresh feed;
+2. the odds-history index records the corresponding snapshot;
+3. the 15:15 report passes the normal feed/price/stake/timestamp gates;
+4. the exact issued payload is archived;
+5. the matching Research Fit/provenance sidecar is archived;
+6. `run-history.json` contains the matching entry;
+7. the compact `r.html?id=` link resolves the exact archived report;
+8. the retained long fallback opens the same active issued report content;
+9. same-date session hydration does not leak another betting date;
+10. non-BET stakes remain zero and total risk reconciles.
 
-If all eight checks pass, the pilot may be considered proven for later rollout planning. Do not automatically change the other four report lanes merely because the files exist.
+### 18:15 acceptance
 
-### Sidecar recovery
+Repeat the same checks and additionally verify:
 
-If the issued payload exists but the Research Fit sidecar fails:
+- the valid 15:15 archived lane can appear in the 18:15 same-day session navigation;
+- no prior-date report appears in the current day's strip;
+- same-day lineage comes from actual archived evidence where available;
+- prior lane evidence is not double-counted as Research Library evidence.
+
+Only after live evidence passes should H3/R3 behavior be described as proven rather than merely staged.
+
+## Sidecar recovery
+
+If the issued payload exists but a Research Fit sidecar fails:
 
 - do not modify or regenerate the issued recommendation;
 - inspect the Research Library read/provenance failure separately;
@@ -195,7 +265,7 @@ If an unexpected label such as `UNCATEGORIZED` appears, capture the actual run p
 
 ## Invalid refresh behavior
 
-The odds workflow is designed to protect the last good feed. Examples of conditions that should not overwrite it include malformed output or a refresh that fails core validation.
+The odds workflow is designed to protect the last good feed. Conditions such as malformed output or a refresh that fails core validation should not overwrite it.
 
 When investigating a suspicious refresh:
 
@@ -205,9 +275,9 @@ When investigating a suspicious refresh:
 
 ## GitHub Pages verification
 
-Changes to the root web files and documentation can trigger GitHub Pages deployment.
+Changes to root web files and documentation can trigger GitHub Pages deployment.
 
-For any functional runner/index change:
+For functional runner/resolver/index changes:
 
 1. commit the narrow change;
 2. read the committed file back from GitHub;
@@ -219,7 +289,7 @@ Documentation-only Pages deployments should still be checked when convenient, bu
 
 ## Direct repository changes
 
-The root `README.md` contains the authoritative repository-change safety policy. Operationally:
+The root `README.md` contains the repository-change safety policy. Operationally:
 
 - fetch the current file immediately before editing;
 - retain its blob/commit as rollback information;
@@ -238,8 +308,10 @@ For higher-risk changes to the runner, odds-refresh workflow, scheduler logic, r
 - Do not spend API quota repeatedly without first checking whether a valid feed already exists.
 - Do not modify the production odds-refresh workflow merely to repair a failed odds-history index.
 - Do not write to the canonical Research Library during a normal report.
-- Do not roll the R2 sidecar pilot to all five lanes before the 15:15 chain has passed.
+- Do not declare all-lane R3/H3 behavior proven merely because all five scheduled definitions are configured; verify the live chain first.
 - Do not activate a governance draft while debugging scheduler/history reliability.
-- Do not delete working backup files or rewrite Git history to make the repo look cleaner.
+- Do not delete `runner.html.old` while it remains the designated quick runner backup.
+- Do not delete `BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` while v0.9 explicitly inherits it.
+- Do not rewrite Git history merely to make the repository look cleaner.
 
 The preferred recovery strategy is narrow diagnosis, narrow repair, validation, then resume normal operation.
