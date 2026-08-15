@@ -5,12 +5,16 @@ on:
     branches: [main]
     paths:
       - r.html
+      - runner.html
       - tests/runner-history-session-applicability.test.js
+      - tests/runner-session-strip-applicability.test.js
       - .github/workflows/runner-history-regression.yml
   pull_request:
     paths:
       - r.html
+      - runner.html
       - tests/runner-history-session-applicability.test.js
+      - tests/runner-session-strip-applicability.test.js
       - .github/workflows/runner-history-regression.yml
   workflow_dispatch:
 
@@ -28,5 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run runner history regression
+      - name: Run short-link history regression
         run: node tests/runner-history-session-applicability.test.js
+      - name: Run runner session strip regression
+        run: node tests/runner-session-strip-applicability.test.js
