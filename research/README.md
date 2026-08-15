@@ -18,13 +18,19 @@ The 18 resolution records are retained as synthesis/audit items. In addition, th
 
 ## Active files
 
-- `manifest.json` — stable version/pointer file for later read-before-run integration.
+- `manifest.json` — authoritative current version/compatibility pointer for later read-before-run integration.
 - `research-library.json` — all 96 normalized logical items and their runtime boundaries.
 - `source-registry.json` — deduplicated source/provenance registry.
 - `history-fit-policy.json` — R1/R2 retrieval, grading, conflict and failure rules.
 - `taxonomy.json` — controlled values and evidence/conflict clusters.
 - `source-package-manifest.json` — exact source-package counts and SHA-256 hashes.
 - `CANONICALIZATION_REPORT.md` — build/audit summary.
+
+## Compatibility authority
+
+`research-library.json` preserves the contract version recorded when the canonical v1.7 library was originally built. That build-time header is historical provenance and is not rewritten solely to advance contract compatibility.
+
+`manifest.json` is the authoritative pointer for the library's **current tested contract compatibility**. The active manifest records compatibility with Betting Edge Contract draft v0.8 and the latest R2 validation result.
 
 ## Runtime boundary
 
@@ -78,6 +84,8 @@ When worthwhile new research is found:
 
 `source-package-manifest.json` records the original seven package names, counts, sizes and SHA-256 hashes. A separate full-audit bundle can retain the extracted legacy packages; they are not required for the normal repo upload or runtime read path.
 
-## Next step
+## Validation and next step
 
-This package is intended for **R2 manual read testing**. Uploading it alone must not change the scheduled 06:00/08:00/09:30/15:15/18:15 Betting Edge reports.
+The R2 manual read suite is stored at `research/tests/R2_MANUAL_READ_TEST_2026-08-15.json` and validates direct/mixed evidence, era-conflict handling and explicit research-gap behavior without changing live recommendation fields.
+
+The next stage is **R2 structured report capture**: preserve the Research Library version, exact retrieved prior IDs/clusters, History Fit grade, mechanism, limitation and transportability with the issued report while keeping scheduled research use read-only.
