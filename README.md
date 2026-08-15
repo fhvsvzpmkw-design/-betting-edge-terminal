@@ -1,5 +1,16 @@
 # Betting Edge Terminal
 
+## Project documentation
+
+The repository includes four durable project references:
+
+- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current production state, versions, runtime boundaries, active data/research/governance status, and known-good checkpoint.
+- [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — daily refresh/report timing, scheduler diagnostics, zombie protection, manual recovery, repricing checks, and deployment verification.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable architectural and operating decisions, including the reasoning behind them.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — completed foundations, current priorities, planned History/Research/ledger work, and eventual contract activation.
+
+The governance specification remains separate in [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md). The draft is not operational merely because it exists in the repository.
+
 ## Repository change safety policy
 
 Direct edits to this repository use the following default safety process:
