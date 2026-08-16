@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-15
+**Last updated:** 2026-08-15 — v0.9 production promotion
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -70,7 +70,7 @@ A scheduled odds-refresh job arriving more than 25 minutes after its target slot
 
 **Status:** Active
 
-Scheduler Canary and Scheduler Canary v2 are read-only diagnostic workflows with no odds API calls and no repository writes.
+Scheduler canary workflows are diagnostic, read-only with respect to betting data, and make no odds API calls.
 
 **Reason:** This creates a clean signal for distinguishing GitHub scheduler behavior from errors inside the odds workflow.
 
@@ -92,7 +92,7 @@ Structured event, market, and selection identity is the preferred basis for matc
 
 ## D-011 — Equal best-price ties are deterministic
 
-**Status:** Active in runner v1.3; specified in contract draft v0.8 and inherited by v0.9
+**Status:** Active in runner v1.3 and production contract v0.9
 
 When multiple books share the best live price:
 
@@ -105,7 +105,7 @@ When multiple books share the best live price:
 
 **Status:** Active
 
-The runner applies freshness limits to feeds/quotes rather than treating any available number as valid. Current repricing quote age is capped at 30 minutes.
+The runner applies freshness limits to feeds/quotes rather than treating any available number as valid. Current repricing quote age is capped at 30 minutes. The production report contract retains the 75-minute feed freshness limit and 30-minute exact-quote limit.
 
 The odds workflow also rejects stale scheduled execution and limits acceptable market age.
 
@@ -119,13 +119,15 @@ Identity mismatches, unavailable markets, unverified prices, and started/closed 
 
 **Reason:** Betting Edge should fail closed on price verification rather than manufacture confidence.
 
-## D-014 — Research Library remains read-only during staged scheduled integration
+## D-014 — Research Library remains read-only in production R3
 
-**Status:** Active; R2 manual read passed, R3 staged across all five report lanes, live verification pending
+**Status:** Active; R2 passed and R3 live acceptance passed on 2026-08-15
 
-Research Library 1.7 remains canonical/read-only and requires no runtime research writes. The R2 manual-read suite passed on 2026-08-15. All five scheduled report lanes are now staged to read the library after the provisional current handicap is formed, render concise History Fit in the existing `hist` field, and preserve structured Research Fit/provenance in a separate history sidecar.
+Research Library 1.7 remains canonical/read-only and requires no runtime research writes. The R2 manual-read suite passed on 2026-08-15. All five scheduled report lanes read the library after the provisional current handicap is formed, render concise History Fit in the existing `hist` field, and preserve structured Research Fit/provenance in a separate history sidecar.
 
-**Reason:** The library has passed controlled retrieval tests. Staging the same bounded read-only behavior across all upcoming lanes avoids configuration drift while keeping the actual live-acceptance gate explicit. Research still cannot create a BET or directly change fair value, `playTo`, status, stake, identity, or price freshness.
+The 15:15 + 18:15 live sequence passed the first R3/H3 acceptance pair. Post-cutover sidecars use schema 3 and record the exact operational v0.9 production-contract blob used at issuance.
+
+**Reason:** Research can enrich auditability and calibration without becoming betting authority. It still cannot create a BET or directly change fair value, `playTo`, status, stake, identity, or price freshness.
 
 ## D-015 — User betting history is a separate secondary context
 
@@ -135,19 +137,19 @@ The user's personal ledger/history may eventually interact with the historical r
 
 **Reason:** Population-level historical evidence and one user's betting performance answer different questions. Combining them too early risks circular reasoning and overfitting.
 
-## D-016 — Contract draft v0.9 is not operational by existence alone
+## D-016 — Draft existence is not production authority; explicit contract promotion is required
 
-**Status:** Active; supersedes the v0.8-only draft reference
+**Status:** Historical safeguard satisfied; remains a standing change-control rule
 
-`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md` is governance/specification only and explicitly inherits v0.8 except for its history/provenance additions and overrides. It is not the authoritative production contract merely because it exists or because scheduled sidecars record its blob SHA. Scheduled provenance must record `governanceDraftOperational=false` until a separate contract cutover is deliberately approved and tested.
+The presence of `BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`, `BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`, or any future draft does not make that draft operational. On 2026-08-15 the v0.9 draft assumptions were live-tested, an explicit acceptance record was created, and `BETTING_EDGE_CONTRACT.md` was deliberately created as the operational v0.9 production authority.
 
-`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` remains untouched as the immutable v0.9 baseline/reference draft.
+The draft files remain historical design artifacts incorporated by fixed blob identity; scheduled reports now resolve `BETTING_EDGE_CONTRACT.md` rather than treating draft provenance as authority.
 
-**Reason:** Governance changes can materially alter decision behavior and therefore require deliberate preflight, integration, equivalence testing, and rollback even when related mechanisms are already staged independently in scheduled prompts.
+**Reason:** Governance changes can materially alter decision behavior and require deliberate preflight, equivalence/regression testing, explicit promotion and rollback information.
 
 ## D-017 — Preserve adaptive handicapping inside hard guardrails
 
-**Status:** Design principle
+**Status:** Active production principle
 
 The contract principle is: **hard-code the guardrails; keep the handicapper adaptive.**
 
@@ -159,7 +161,7 @@ Hard gates such as feed freshness, exact market identity, valid stake/status rel
 
 **Status:** Active operating preference
 
-The 2026-08-11 known-good checkpoint established that manual odds pulling and terminal propagation were working, and UI/layout work was intentionally paused while reliability issues were investigated.
+The 2026-08-11 known-good checkpoint established that manual odds pulling and terminal propagation were working, and UI/layout work was intentionally paused while reliability issues were investigated. The later meter-only v1.3 UI patch was deliberately isolated and passed the 18:15 live regression.
 
 **Reason:** Changing presentation and data flow simultaneously makes regressions harder to isolate.
 
@@ -193,31 +195,55 @@ The index is maintained by a separate `.github/workflows/odds-history-index.yml`
 
 **Status:** Active architecture
 
-The issued runner payload keeps its existing compact shape. Structured Research Fit/provenance is stored separately under `data/history/research-fit/...` and linked by exact slot/run timestamp.
+The issued runner payload remains compact. Structured Research Fit/provenance is stored separately under `data/history/research-fit/...` and linked by exact slot/run timestamp.
 
-The issued payload remains authoritative for the recommendation. The sidecar records the research/provenance context and must not rewrite issued status, price, fair value, `playTo`, stake or analysis.
+Player-specific recommendations may additionally carry the narrow runner-supported `rec.feed` identity object required by production v0.9. That identity object is execution provenance, not bulky Research Fit metadata.
 
-**Reason:** This captures richer audit data without making already-long `#run=` links larger or risking runner compatibility.
+The issued payload remains authoritative for the recommendation. The sidecar records research/provenance context and must not rewrite issued status, price, fair value, `playTo`, stake or analysis.
 
-## D-023 — All five upcoming lanes are pre-staged; live acceptance is still incremental
+**Reason:** This captures richer audit data without making already-long `#run=` links unnecessarily larger or risking runner compatibility.
 
-**Status:** Supersedes the earlier 15:15-only rollout rule on 2026-08-15
+## D-023 — Configure all five lanes consistently; accept behavior incrementally
 
-The initial plan was to change only the 15:15 lane and wait before configuring the other four. The project owner deliberately chose to configure all five upcoming scheduled report lanes now so the Research Fit/history behavior would not be forgotten or drift between lanes.
+**Status:** Active; configuration complete and first live acceptance pair passed
 
-This does **not** declare the integration proven. The 15:15 and 18:15 live chains remain the first acceptance pair, followed by observation of the morning lanes.
+The project owner deliberately chose to configure all five scheduled report lanes consistently so Research Fit/history behavior would not be forgotten or drift between lanes. The 15:15 and 18:15 live chains were then used as the first acceptance pair and passed on 2026-08-15.
 
-**Reason:** Configuration consistency and live acceptance are different questions. Pre-staging all lanes reduces administrative drift while preserving a clear evidence gate before calling R3/H3 verified.
+The next step is observation of the first full post-cutover five-lane day, not another broad configuration change.
 
-## D-024 — v0.9 adds an H-track separate from Shadow History
+**Reason:** Configuration consistency and live acceptance are different questions. Preconfiguring all lanes reduces administrative drift while live evidence verifies the actual path.
 
-**Status:** Active architecture; H2 configured, H3 pending live verification
+## D-024 — v0.9 H-track is separate from Shadow History
 
-Contract draft v0.9 introduces a dedicated **H-track** for durable issued-report and market provenance. It covers exact issued report archives, Research Fit/provenance sidecars, `run-history.json`, and compact Git-backed odds-snapshot indexing.
+**Status:** Active; H3 live after 2026-08-15 acceptance, S-track remains S0
+
+Production v0.9 has a dedicated **H-track** for durable issued-report and market provenance. It covers exact issued report archives, Research Fit/provenance sidecars, `run-history.json`, compact Git-backed odds-snapshot indexing, source-backed same-day lineage and archive-backed session navigation.
 
 H-track history records what Betting Edge actually issued. It is intentionally separate from the S-track / Shadow History concept, which remains inactive and would concern broader prospective candidate-level calibration if later justified.
 
 **Reason:** Durable auditability of real issued reports is useful now and can be implemented safely without activating a more complex candidate-level Shadow History collector.
+
+## D-025 — v0.9 is the operational production contract
+
+**Status:** Active as of 2026-08-15
+
+`BETTING_EDGE_CONTRACT.md` is the authoritative production governance file and declares version 0.9 operational. It incorporates the exact v0.8 baseline, v0.9 durable-history/provenance delta and player-prop delta by fixed Git blob identity.
+
+All five scheduled report lanes must resolve this production contract and the current approved runner before handicapping. If either cannot be resolved or the contract does not identify itself as operational v0.9, the lane stops with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
+
+New post-cutover sidecars record the exact production contract blob SHA used by the report.
+
+**Reason:** Production authority should be explicit, auditable and fail closed rather than depend on conversational memory or an implicitly promoted draft.
+
+## D-026 — Exact player-prop identity is a hard production invariant
+
+**Status:** Active under v0.9 Invariant 23
+
+Every displayed player-specific prop must validate exact event, player, market, side, line and approved-book quote. When feed context is insufficient, current player/team/game participation is validated with an authoritative current roster, lineup, injury, transaction or official game-status source.
+
+Every displayed player prop preserves exact machine-readable `rec.feed` identity in the issued payload. Ambiguous identity forces zero stake, and a later different prop line is treated as a different selection rather than an exact reprice.
+
+**Reason:** Player props are especially vulnerable to fuzzy identity and line-substitution errors. Exact structured identity allows safe issuance, durable auditability and exact repricing without requiring a separate roster database as the primary execution authority.
 
 ---
 
