@@ -707,13 +707,23 @@ function apply(run){
   }
 }
 
+function normalizeNearTopScroll(){
+  const frame=$('#app'),win=frame&&frame.contentWindow;if(!win)return;
+  const y=Number(win.scrollY||win.pageYOffset||0);
+  if(y<96)win.scrollTo(0,0)
+}
+function normalizeAfterViewportChange(){
+  [0,80,240].forEach(delay=>setTimeout(normalizeNearTopScroll,delay))
+}
+window.addEventListener('orientationchange',normalizeAfterViewportChange,{passive:true});
+
 activeRun=payload();
 if(activeRun&&!activeRun.__error){
   originalRun=withoutComparison(activeRun);
   (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(saveCurrentRun);
   saveCurrentRun(originalRun)
 }
-$('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}});
+$('#app').addEventListener('load',()=>{try{apply(activeRun);normalizeAfterViewportChange()}catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}});
 </script>
 </body>
 </html>
