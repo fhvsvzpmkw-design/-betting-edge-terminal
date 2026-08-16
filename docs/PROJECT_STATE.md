@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-15  
+**Last updated:** 2026-08-15 — v0.9 production promotion  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -8,6 +8,9 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 
 ## Current production surface
 
+- **Production governance:** `BETTING_EDGE_CONTRACT.md`, Betting Edge contract **v0.9 OPERATIONAL**.
+- **Production contract blob at activation:** `27e485c3974fb6ef78e3fbf8036d81281c440a0b`.
+- **Live acceptance record:** `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
 - **Runner:** `runner.html`, Betting Edge Terminal **v1.3**.
 - **Static shell:** `index.html`, aligned to UI **v1.3**.
 - **Quick runner backup:** `runner.html.old`.
@@ -17,9 +20,9 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 - **Issued-run index:** `run-history.json`.
 - **Durable history documentation:** `data/history/README.md`.
 - **Compact odds provenance index:** `data/history/odds-index.json`.
-- **Research/provenance sidecar schema:** `data/history/report-provenance-schema.json`.
+- **Research/provenance sidecar schema:** `data/history/report-provenance-schema.json`, production schema **3** for post-cutover runs; historical schema-2 sidecars remain valid.
 
-The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. The runner payload format has not been enlarged for the new structured history work.
+The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. Player props may additionally carry the runner-supported `rec.feed` structured identity required by v0.9; otherwise the visible payload remains compact.
 
 Current UI terminology deliberately separates the two history concepts: the Board uses **`SAME-DAY RUNS // REPORT HISTORY`** for same-date issued report/session history, while F3 is labeled **`BET HISTORY`** for personal ledger/performance history. **`CLEAR LOCAL HISTORY`** clears only browser-local runner history; it does not delete repository-backed issued reports or `run-history.json`.
 
@@ -43,6 +46,8 @@ The corresponding target odds-refresh slots are approximately:
 
 The GitHub workflow uses paired/backup cron attempts around those target slots rather than trusting a single scheduled dispatch.
 
+All five report tasks are being cut over to a mandatory production-contract preflight: resolve `BETTING_EDGE_CONTRACT.md` v0.9 operational and the current runner before handicapping; otherwise stop with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
+
 ## Odds pipeline
 
 The active production refresh workflow is `.github/workflows/odds-refresh.yml`.
@@ -61,36 +66,37 @@ A separate post-refresh workflow exists:
 
 - `.github/workflows/odds-history-index.yml` — **Index Betting Edge odds history**.
 
-It is intentionally isolated from the production refresh. After a successful odds-refresh workflow it builds/updates `data/history/odds-index.json` with compact provenance such as generation time, snapshot commit, exact Git blob SHA and SHA-256. The full 20+ MB odds snapshot remains in Git history and is not duplicated. A failure in this indexing workflow must not prevent the live odds snapshot from being published.
+It is intentionally isolated from the production refresh. After a successful odds-refresh workflow it builds/updates `data/history/odds-index.json` with compact provenance such as generation time, snapshot commit, exact Git blob SHA and SHA-256. The full odds snapshot remains in Git history and is not duplicated. A failure in this indexing workflow must not prevent the live odds snapshot from being published.
 
-The scheduler diagnostics remain separate from both workflows:
+Scheduler diagnostics remain separate from both workflows:
 
 - `.github/workflows/scheduler-canary.yml`
 - `.github/workflows/scheduler-canary-v2.yml`
+- `.github/workflows/scheduler-canary-v3.yml`
 
-Both canaries are intentionally read-only and make no odds API requests.
+The canaries are diagnostics and make no odds API requests.
 
 ## Durable report history
 
-Validated issued report payloads are configured to be stored under:
+Validated issued report payloads are stored under:
 
 `data/history/runs/YYYY-MM-DD/<slot>-<timestamp>.json`
 
 `run-history.json` is the compact index. The stored issued payload is authoritative for what the report actually recommended.
 
-Structured research/provenance detail is deliberately separated from the runner payload and is configured to be stored under:
+Structured research/provenance detail is stored separately under:
 
 `data/history/research-fit/YYYY-MM-DD/<slot>-<timestamp>.json`
 
-The sidecar uses the exact issued slot/timestamp to link back to the report. It can preserve the Research Library version and item IDs consulted, evidence clusters, History Fit grade, transportability/caveats, feed blob SHA, runner provenance and non-operational governance-draft provenance without increasing the share-link payload.
+The sidecar uses the exact issued slot/timestamp to link back to the report. Post-cutover schema-3 sidecars record the authoritative production contract version/path/blob SHA along with runner, feed and Research Library provenance. Historical schema-2 sidecars from before the cutover remain immutable valid evidence.
 
-All five scheduled report lanes — 06:00, 08:00, 09:30, 15:15 and 18:15 — are now staged with the same exact-issued-payload archive and Research Fit/provenance sidecar behavior. This is an **H2/R3-staged configuration**, not yet a declaration of successful live acceptance.
+The 2026-08-15 15:15 + 18:15 live acceptance pair passed exact payload archive, matching sidecar, correct `run-history.json` linkage, normal runner delivery, source-backed same-day lineage/navigation, and reprice-overlay regression checks. The acceptance is recorded in `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
 
-The first preferred live acceptance pair is 15:15 and 18:15. Successful completion should verify exact payload archive, matching sidecar, correct `run-history.json` linkage, normal runner delivery and same-day lineage behavior where applicable.
+All five scheduled report lanes — 06:00, 08:00, 09:30, 15:15 and 18:15 — now share the production durable-history behavior. The next operational observation is the first full post-cutover day, particularly that a fresh device arriving later can hydrate all earlier successfully archived same-day lanes.
 
 ## Runner repricing model
 
-The issued report is treated as immutable. Repricing is an **overlay/comparison**, not a rewrite of the original recommendation.
+The issued report is immutable. Repricing is an **overlay/comparison**, not a rewrite of the original recommendation.
 
 Current runner principles include:
 
@@ -100,11 +106,12 @@ Current runner principles include:
 - if equal best prices are tied and the issued book is one of the tied books, retain the issued book;
 - otherwise use the configured book priority;
 - structured identity first, title parsing only as fallback;
+- exact player-prop line/selection identity when `rec.feed` is present;
 - unresolved comparisons remain explicit rather than being forced into a false match.
 
 The current comparison vocabulary distinguishes matched movement from unresolved states. If the literal word `UNCATEGORIZED` appears in a future report, investigate the run/report payload layer as well as the runner rather than assuming the current repricing UI generated it.
 
-Runner-side `UPDATE ODDS / REPRICE NOW` remains client-side comparison state. Individual browser reprice clicks are not yet represented as centrally archived repository history.
+Runner-side `UPDATE ODDS / REPRICE NOW` remains client-side comparison state. Individual browser reprice clicks are not represented as centrally archived repository history. The accepted 18:15 regression correctly returned `NO NEWER ODDS SNAPSHOT` without mutating the report.
 
 ## Research Library
 
@@ -112,60 +119,71 @@ Current research state:
 
 - Library: **Betting Edge Research Library 1.7**.
 - Canonical library status: `R1_CANONICAL_READ_ONLY`.
-- Current tested/staged contract-compatibility pointer: draft **0.9**.
+- Production contract compatibility: **v0.9 operational**.
 - R2 manual-read suite: **PASS** at `research/tests/R2_MANUAL_READ_TEST_2026-08-15.json`.
 - The test covered direct/mixed MLB movement evidence, NBA era-drift conflict handling, and an explicit boxing-derivative research gap that correctly returned NR.
 - Runtime Research Library writes required: **false**.
-- Scheduled-report linkage: **true, staged across all five lanes**.
-- Current mode: `R3_STAGED_READ_ONLY_HISTORY_FIT_WITH_HISTORY_SIDECAR`.
-- Next stage: `VERIFY_15_15_AND_18_15_LIVE_CHAIN`.
+- Scheduled-report linkage: **true across all five lanes**.
+- Current mode: `R3_LIVE_READ_ONLY_HISTORY_FIT_WITH_HISTORY_SIDECAR`.
+- Next stage: `VERIFY_FIRST_POST_CUTOVER_LANE`.
 
-`research/manifest.json` is the authoritative pointer for current tested compatibility. The internal `research-library.json` header preserves the contract version recorded when the canonical library was originally built; that historical header is not rewritten merely to advance compatibility metadata.
+`research/manifest.json` is the authoritative pointer for current tested compatibility. The internal `research-library.json` header preserves historical metadata from when the canonical library was built; that historical header is not rewritten merely to advance production compatibility metadata.
 
-The Research Library itself remains read-only. Scheduled history writes go to `data/history/...`, not `research/*`.
+The Research Library remains read-only. Scheduled history writes go to `data/history/...`, not `research/*`.
 
 ## Governance contract
 
-Current newest draft: `BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`.
+Authoritative production contract:
 
-Status: **DRAFT — governance/specification only; NOT YET OPERATIONAL.**
+`BETTING_EDGE_CONTRACT.md` — **v0.9 OPERATIONAL**.
 
-v0.9 explicitly inherits the full v0.8 baseline except where it adds or overrides durable-history/provenance governance. `BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` remains untouched as the v0.9 baseline/reference.
+The production file incorporates the exact v0.8 baseline, v0.9 durable-history/provenance delta, and player-prop identity delta by fixed Git blob identity and defines conflict precedence. The draft files remain historical design artifacts and are not independently operational.
 
-The principal v0.9 additions are:
+The principal v0.9 production additions are:
 
-1. exact issued-report immutability and archive authority;
-2. Research Fit/provenance sidecars linked to the exact issued report;
-3. compact Git-backed odds-snapshot indexing without full-feed duplication;
-4. history-save failure isolation from live report delivery;
-5. a dedicated **H-track** for durable issued-report/market provenance;
-6. explicit separation of H-track history from future S-track / Shadow History;
-7. source-backed same-day lineage;
-8. later result/CLV enrichment as a separate future observation layer.
-
-Current contract track remains **C0**: the existence of v0.9 and its use as non-operational sidecar provenance do not make it the authoritative production contract.
+1. mandatory production-contract/runner preflight before handicapping;
+2. exact issued-report immutability and archive authority;
+3. Research Fit/provenance sidecars linked to the exact issued report;
+4. production-contract blob provenance in new sidecars;
+5. compact Git-backed odds-snapshot indexing without full-feed duplication;
+6. history-save failure isolation from live report delivery;
+7. a dedicated **H-track** for durable issued-report/market provenance;
+8. explicit separation of H-track history from future S-track / Shadow History;
+9. source-backed same-day lineage and archive-backed session navigation;
+10. compact deterministic share links with validated long-link fallback;
+11. exact executable player-prop identity preserved in `rec.feed` and durable history;
+12. later result/CLV enrichment remains a separate future observation layer.
 
 ## Activation state summary
 
-- **C-track:** C0 — v0.9 documentation only; no production contract cutover.
-- **R-track:** R2 passed; R3 behavior staged across all five scheduled lanes; live acceptance pending.
-- **H-track:** H2 — issued-report/sidecar/odds-index configuration established; H3 live-chain verification pending.
+- **C-track:** C1 — v0.9 production contract operational.
+- **R-track:** R3 — live read-only History Fit with durable sidecar provenance; Evening/Late live acceptance passed.
+- **H-track:** H3 — live issued-report/provenance history; Evening/Late archive/index/lineage acceptance passed; full five-lane day remains to be observed post-cutover.
 - **S-track:** S0 — Shadow History remains inactive.
 
-## Known-good checkpoint
+## Known-good checkpoints
 
-A key rollback checkpoint from **2026-08-11** is preserved as project history:
+A key rollback checkpoint from **2026-08-11** remains preserved as project history:
 
 - a manual odds pull completed successfully;
 - the newly pulled odds propagated through the pipeline;
 - the terminal displayed the updated odds correctly;
 - UI/layout experimentation was intentionally paused at that point.
 
-When debugging future regressions, use Git history and this checkpoint to distinguish a new issue from a previously working pipeline.
+A second checkpoint is the **2026-08-15 v0.9 acceptance pair**:
+
+- 15:15 exact report archive + sidecar + index succeeded;
+- 18:15 exact report archive + sidecar + index succeeded;
+- 18:15 used the stored 15:15 run for same-day history/lineage;
+- the runner rendered the meter-only UI change normally;
+- Reprice Now remained a non-mutating comparison overlay;
+- v0.9 was then explicitly promoted to production.
+
+Use Git history and these checkpoints to distinguish future regressions from previously working pipelines.
 
 ## Repository-write capability
 
-As of 2026-08-15, the connected GitHub integration can create, update, commit, read back, and delete repository files directly on `main`. A fresh create/edit/delete capability test was completed successfully.
+As of 2026-08-15, the connected GitHub integration can create, update, commit, read back, and delete repository files directly on `main`. A fresh create/read/delete capability check was completed immediately before v0.9 promotion, and temporary probe files were removed.
 
 All direct changes follow the safety policy in the root `README.md`: fetch current state first, preserve rollback information, make narrow changes, compare before/after, validate, commit clearly, read back, and verify Pages/Actions when relevant.
 
@@ -174,14 +192,15 @@ All direct changes follow the safety policy in the root `README.md`: fetch curre
 The following boundaries are intentional and should not be crossed casually:
 
 - Do not couple Research Library **writes** to normal report runs.
-- Do not activate the v0.9 contract simply by renaming, referencing or recording the draft in provenance.
-- Do not place bulky structured research metadata into the runner payload while long hash links are still in use.
+- Do not treat the v0.8/v0.9 draft files as production authority; `BETTING_EDGE_CONTRACT.md` is authoritative.
+- Do not place bulky structured research metadata into the runner payload; player-prop `rec.feed` identity is the narrow approved structured addition.
 - Do not let odds-history indexing interfere with the production odds-refresh workflow.
-- Do not interpret all-five-lane staging as proof of live R3/H3 acceptance; verify the 15:15/18:15 chain first.
+- Do not interpret the v0.9 cutover as activation of Shadow History.
 - Do not mix scheduler/odds-refresh changes with UI changes unless the change truly spans both systems.
 - Do not rewrite an issued report during repricing or later history enrichment.
 - Do not claim browser-side reprice clicks are centrally archived until a safe authenticated persistence path exists.
 - Do not consume API quota for clearly stale scheduled jobs.
 - Do not replace a good feed with an invalid refresh.
+- Do not treat tomorrow's full five-lane archive observation as permission to silently weaken the production contract if one lane fails; diagnose the specific delivery/history path instead.
 
 For daily procedures see `docs/OPERATIONS.md`. For architectural choices see `docs/DECISIONS.md`. For planned work see `docs/ROADMAP.md`.
