@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-15 — v0.9 production promotion
+**Last updated:** 2026-08-16 — structured game-market identity hardening
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -244,6 +244,18 @@ Every displayed player-specific prop must validate exact event, player, market, 
 Every displayed player prop preserves exact machine-readable `rec.feed` identity in the issued payload. Ambiguous identity forces zero stake, and a later different prop line is treated as a different selection rather than an exact reprice.
 
 **Reason:** Player props are especially vulnerable to fuzzy identity and line-substitution errors. Exact structured identity allows safe issuance, durable auditability and exact repricing without requiring a separate roster database as the primary execution authority.
+
+## D-027 — Preserve structured identity for every displayed game market
+
+**Status:** Active as of 2026-08-16
+
+All five scheduled report lanes preserve exact machine-readable `rec.feed` identity for every displayed moneyline, spread and game total, regardless of BET / LEAN / WAIT / PASS status. The identity is copied from the exact live-odds event, market and selection used for issuance and is not reconstructed from display text.
+
+New cards therefore use structured repricing first. Existing immutable reports without `rec.feed` remain valid and use fail-closed fallback matching. The fallback accepts `a.m.` / `p.m.` and existing 24-hour PT time formats, but still returns `IDENTITY MISMATCH` when a single event cannot be established safely.
+
+This is an implementation hardening of the operational v0.9 requirement that event / market / selection identity precede executable price. It does not rewrite Contract 0.9, alter report status or stake semantics, activate recovery analysis, or change the five history slots.
+
+**Reason:** Exact structured identity prevents ordinary game cards from depending on lossy title parsing, while the improved fallback preserves compatibility with archived reports without weakening fail-closed behavior.
 
 ---
 
