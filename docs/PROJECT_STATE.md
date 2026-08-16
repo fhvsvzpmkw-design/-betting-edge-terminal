@@ -107,6 +107,8 @@ Current runner principles include:
 - otherwise use the configured book priority;
 - structured identity first, title parsing only as fallback;
 - exact player-prop line/selection identity when `rec.feed` is present;
+- all five scheduled report lanes preserve exact `rec.feed` identity for every displayed moneyline, spread and game total issued after the 2026-08-16 identity hardening;
+- archived game cards without `rec.feed` remain compatible through fail-closed fallback matching, whose event-time parser accepts `a.m.` / `p.m.` and existing 24-hour PT forms;
 - unresolved comparisons remain explicit rather than being forced into a false match.
 
 The current comparison vocabulary distinguishes matched movement from unresolved states. If the literal word `UNCATEGORIZED` appears in a future report, investigate the run/report payload layer as well as the runner rather than assuming the current repricing UI generated it.
