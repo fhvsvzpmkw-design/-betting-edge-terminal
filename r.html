@@ -221,7 +221,7 @@ const RETRY_MS=3000;
 const MAX_WAIT_MS=90000;
 const SPLASH_MIN_MS=1600;
 const SPLASH_FADE_MS=300;
-const splashStarted=performance.now();
+const splashStarted=Date.now();
 const splash=document.getElementById('splash');
 const msg=document.getElementById('msg');
 const frame=document.getElementById('app');
@@ -255,7 +255,7 @@ function b64ue(v){
 function fail(text){msg.textContent=text;msg.classList.add('error')}
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 function revealTerminal(){
-  const elapsed=performance.now()-splashStarted;
+  const elapsed=Date.now()-splashStarted;
   const remaining=Math.max(0,SPLASH_MIN_MS-elapsed);
   setTimeout(()=>{
     frame.classList.add('ready');
