@@ -647,7 +647,7 @@ If the underdog is getting 6.5 and you like the underdog, it’s best to wait to
 
 *The values in the table above are rounded for presentation purposes. Numbers above a half or more are rounded up; half or less is rounded down. For example, the percentage 3.5 gets rounded to 4; 3.4 would be rounded down to 3.*
 
-<!-- Page 265 -->
+## Book page 265 — VERIFIED
 
 price—and that’s a big percentage advantage for you (6 = 5 percent, while 7 is 6 percent). If the line goes the other way, say from 6.5 to 6, it’s not as big of a disadvantage, so the risk-reward remains in your favor. And if you’re betting the dog and the number is 7.5, grab it as fast as you can—you don’t want the line to drop to 7. If it goes to 8, it’s not all that significant (8 is worth 3 percent, compared to 6 percent for 7).
 
@@ -661,7 +661,7 @@ Here’s how it works: Most bookmakers will sell half points for an additional t
 
 Remember, one of the most important issues in buying points is to shop around—see who is offering the best price. If the price is not right—and this chart outlines the values—do not buy the half point. Stick with the original number. And choose the bet that provides the best value.
 
-<!-- Page 266 -->
+## Book page 266 — VERIFIED
 
 ### The Value of Points*
 
@@ -690,7 +690,7 @@ Remember, one of the most important issues in buying points is to shop around—
 
 *The values in the table above are rounded for presentation purposes. Numbers above a half or more are rounded up; half or less is rounded down. For example, the percentage 3.5 gets rounded to 4; 3.4 would be rounded down to 3.*
 
-<!-- Page 267 -->
+## Book page 267 — VERIFIED
 
 ### Deciding Strength/Size of Bet
 
@@ -704,7 +704,7 @@ Our minimum for making a bet is a 5.5 percent advantage. If the actual spread is
 
 Here’s the table that shows our star system.
 
-<!-- Page 268 -->
+## Book page 268 — VERIFIED
 
 ### Strength of Play Guidelines
 
@@ -729,7 +729,7 @@ It’s not unusual, however, for bookmakers to charge less than $1.10/100 when t
 
 In general terms, in the price is above par ($1.10/$1), you reduce the strength of your bet. If it is below par, you increase the strength.
 
-<!-- Page 269 -->
+## Book page 269 — VERIFIED
 
 ### How changes in bet price affect implicit spread
 
@@ -760,7 +760,7 @@ This chart shows the implicit odds when the bookmaker charges a price other than
 | 7.5 | −105 | 7.375 |
 | 7 | −120 | 7.375 |
 
-<!-- Page 270 -->
+## Book page 270 — VERIFIED
 
 ### Moneyline vs. the Spread
 
@@ -784,7 +784,7 @@ If I like the underdog and I’m getting 2 points, that’s the moneyline equiva
 | 4.5 | 222 | 184 |
 | 5 | 237 | 196 |
 
-<!-- Page 271 -->
+## Book page 271 — VERIFIED
 
 | Point Spread | Favorite | Dog |
 |---:|---:|---:|
@@ -819,7 +819,7 @@ If I like the underdog and I’m getting 2 points, that’s the moneyline equiva
 | 19.5 | 2182 | 1805 |
 | 20 | 2390 | 1977 |
 
-<!-- Page 272 -->
+## Book page 272 — VERIFIED
 
 Here’s another example: Let’s say you like the favorite and the number is 3. If you can get anything better than −170 on the moneyline, you’re better off than laying 3 points at $110/$100. If you like the dog and can get anything better than +140, you’re better off than taking 3 points at $110/$100.
 
@@ -839,7 +839,7 @@ In a three-team parlay, one tie reverts the bet to a two-team parlay, while two 
 | Two-Team Parlays | .25 | 260 | 100 | −9.8 |
 | Three-Team Parlays | .125 | 600 | 100 | −12.4 |
 
-<!-- Page 273 -->
+## Book page 273 — VERIFIED
 
 Teasers allow you to move the point spread in your favor. There are many varieties of teasers, but the most common are two- and three-team teasers in which the spread is moved 6, 6.5, or 7 points.
 
@@ -853,7 +853,7 @@ To compare a teaser with a straight bet, you can convert the teaser price to an 
 
 In the table below, I list examples of recent prices for teasers from a variety of betting locations. Note that there are no situations
 
-<!-- Page 274 -->
+## Book page 274 — VERIFIED
 
 in which the bettor can lay $110/$100 for a two-team teaser, regardless of the points involved. In fact, every one of these bets has a significant negative expected value for the bettor.
 
