@@ -149,9 +149,14 @@ def normalize_overlay_item(item):
 
 
 def mlb_metric(holdout, market):
-    for row in holdout["primaryHoldoutResults"]:
-        if row["market"] == market:
-            return row
+    for row in holdout["fits"]:
+        if row.get("cohort") == "primary" and row.get("market") == market:
+            out = dict(row["holdout"])
+            out["recalibrationGeneralized"] = (
+                out.get("brierImprovement", 0) > 0
+                and out.get("logLossImprovement", 0) > 0
+            )
+            return out
     raise KeyError(market)
 
 
