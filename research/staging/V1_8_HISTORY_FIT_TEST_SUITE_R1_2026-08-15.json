@@ -1,0 +1,281 @@
+{
+  "schema": 1,
+  "testSuiteId": "v1.8-history-fit-predeclared-r1-2026-08-15",
+  "targetLibraryVersion": "1.8",
+  "targetFreezeId": "v1.8-candidate-freeze-2026-08-15-r2",
+  "state": "STAGING_PREDECLARED_TEST_DEFINITION",
+  "runtimeAuthority": false,
+  "predeclaredBeforeMergedCandidate": true,
+  "activeProductionLibrary": "1.7",
+  "sourceArtifacts": {
+    "freeze": {
+      "path": "research/staging/V1_8_CANDIDATE_FREEZE_R2_2026-08-15.json",
+      "sha256": "dc47a07b3e6134dfec61860a734d917d1a98eb4e2012ed095c0b182ea9ce3088"
+    },
+    "clusters": {
+      "path": "research/staging/V1_8_CANDIDATE_EVIDENCE_CLUSTERS_R2_2026-08-15.json",
+      "sha256": "a0f0d0e8d8ee89c5a65823e0ce7685d76b38c226216593604943b987bfc2323f"
+    },
+    "historyFitPolicy": {
+      "path": "research/history-fit-policy.json",
+      "blobSha": "142bd105aa05a6504a2ebb8a1c39c80487158cfb"
+    }
+  },
+  "purpose": "Freeze representative History Fit expectations before the merged v1.8 candidate library exists, so retrieval and boundary tests cannot be tailored after observing v1.8 outputs.",
+  "gradeVocabulary": ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "NR"],
+  "globalPassRules": {
+    "candidateFirst": true,
+    "normallyRetrievePrimaryItemsMin": 1,
+    "normallyRetrievePrimaryItemsMax": 4,
+    "maxSynthesisOrInferenceItems": 1,
+    "sameSourceCountsOnce": true,
+    "mechanismEvidenceIsNotMarketMispricingEvidence": true,
+    "gapProducesNRNotNegativePrediction": true,
+    "directSportMarketTimingOutranksGenericAnalogy": true,
+    "crossLeagueTransportMustBeExplicitlyDiscounted": true,
+    "researchMayCreateBet": false,
+    "researchMaySupplyExecutablePrice": false,
+    "researchMayOverrideIdentityFailure": false,
+    "researchMayOverrideFairValueGate": false,
+    "researchMayDirectlyChangeFairValue": false,
+    "researchMayDirectlyChangeModelError": false,
+    "researchMayDirectlyChangePlayTo": false,
+    "researchMayDirectlyChangeStatus": false,
+    "researchMayDirectlyChangeStake": false,
+    "researchMaySilentlyBlendPersonalLedger": false,
+    "researchMaySilentlyBlendSameDayMovementIntoHistoryGrade": false,
+    "historyUnavailableState": "HISTORY LIBRARY UNAVAILABLE"
+  },
+  "retrievalCases": [
+    {
+      "caseId": "HF-MLB-K-01",
+      "sport": "MLB",
+      "market": "pitcher_strikeouts",
+      "timing": "pregame",
+      "scenario": "Current handicap supports a pitcher strikeout over from opponent strikeout tendency, confirmed lineup and expected workload. History Fit is asked whether the historical research strengthens that already-formed candidate.",
+      "mustRetrieveAnyOf": ["v18_mlb_pitcher_k_matchup_mechanism"],
+      "shouldRetrieveAnyOf": ["v18_mlb_no_universal_prop_recalibration"],
+      "mustNotUseAsDirectPriceVote": ["v18_mlb_pitcher_k_matchup_mechanism"],
+      "allowedGrades": ["B", "B-", "C+", "C"],
+      "requiredConcepts": ["matchup structure", "expected batters faced or workload/hook risk", "no universal MLB prop correction"],
+      "forbiddenClaims": ["historical research proves the over is profitable", "the mechanism study supplies an executable strikeout price", "the 2026 market audit creates a universal over/under adjustment"]
+    },
+    {
+      "caseId": "HF-MLB-HR-02",
+      "sport": "MLB",
+      "market": "home_run",
+      "timing": "pregame",
+      "scenario": "Current handicap likes an anytime-home-run candidate because of contact quality, park and matchup, while recent home-run streaks are also visible.",
+      "mustRetrieveAnyOf": ["v18_mlb_hits_total_bases_contact_quality", "v18_mlb_no_universal_prop_recalibration"],
+      "allowedGrades": ["B-", "C+", "C", "C-"],
+      "requiredConcepts": ["contact quality is mechanism evidence", "recent results require regression context", "no broad historical home-run pricing correction survived holdout"],
+      "forbiddenClaims": ["recent home runs alone validate the prop", "Statcast is sportsbook calibration evidence", "History Fit should automatically shade the fair price"]
+    },
+    {
+      "caseId": "HF-MLB-WALK-03",
+      "sport": "MLB",
+      "market": "batting_walks",
+      "timing": "pregame",
+      "scenario": "A current batting-walk prop has already passed the live handicap. History Fit evaluates the limited 2026 direct-market calibration evidence.",
+      "mustRetrieveAnyOf": ["v18_mlb_walks_rbis_limited_recalibration_signal"],
+      "shouldRetrieveAnyOf": ["v18_mlb_no_universal_prop_recalibration"],
+      "allowedGrades": ["C+", "C", "C-"],
+      "requiredConcepts": ["June forward holdout", "partial-season limitation", "market-specific signal rather than universal correction"],
+      "forbiddenClaims": ["the historical adjustment is an executable betting rule", "the same adjustment transfers to strikeouts, hits, home runs or total bases", "one partial season merits A-grade confidence"]
+    },
+    {
+      "caseId": "HF-NHL-SOG-04",
+      "sport": "NHL",
+      "market": "shots_on_goal",
+      "timing": "pregame",
+      "scenario": "A player SOG over is supported by expected ice time, line role, power-play role and opponent shot context.",
+      "mustRetrieveAnyOf": ["v18_nhl_sog_forecastability"],
+      "shouldRetrieveAnyOf": ["v18_nhl_rink_recording_data_quality_caution"],
+      "allowedGrades": ["B-", "C+", "C"],
+      "requiredConcepts": ["role/context forecastability", "forecastability is not direct closing-price calibration", "recording/rink effects are cautionary rather than a fixed adjustment"],
+      "forbiddenClaims": ["SOG forecastability proves sportsbook mispricing", "a historical rink adjustment should be applied mechanically in 2026", "History Fit supplies the play-to price"]
+    },
+    {
+      "caseId": "HF-NHL-SAVES-05",
+      "sport": "NHL",
+      "market": "goalie_saves",
+      "timing": "pregame",
+      "scenario": "A goalie saves over is being justified mainly by the goalie's recent save-percentage hot streak rather than expected shot volume.",
+      "mustRetrieveAnyOf": ["v18_nhl_goalie_hot_hand_caution"],
+      "allowedGrades": ["D", "D-", "C-"],
+      "requiredConcepts": ["no reliable positive hot-hand persistence", "shot volume and save probability must be separated"],
+      "forbiddenClaims": ["recent save percentage is persistent edge evidence", "the hot-hand study calibrates sportsbook saves lines", "research should raise stake because of the streak"]
+    },
+    {
+      "caseId": "HF-NHL-GOAL-06",
+      "sport": "NHL",
+      "market": "anytime_goal",
+      "timing": "pregame",
+      "scenario": "An anytime-goal candidate is supported by shooter quality, expected role and opposing goalie context.",
+      "mustRetrieveAnyOf": ["v18_nhl_shooter_goalie_xg_mechanism"],
+      "allowedGrades": ["B-", "C+", "C"],
+      "requiredConcepts": ["shooter and goaltender skill context", "event-probability mechanism", "no direct anytime-goal closing-price calibration"],
+      "forbiddenClaims": ["xG research proves the posted anytime-goal price is wrong", "mechanism evidence is a second independent betting signal", "research may rewrite fair value"]
+    },
+    {
+      "caseId": "HF-NFL-REC-07",
+      "sport": "NFL",
+      "market": "receiving_yards",
+      "timing": "pregame",
+      "scenario": "A receiving-yards over is supported by target opportunity, route role, catch probability and defender context. Direct multi-book sportsbook calibration remains unverified.",
+      "mustRetrieveAnyOf": ["v18_nfl_receiving_target_catch_context", "v18_nfl_direct_player_prop_calibration_gap"],
+      "shouldRetrieveAnyOf": ["v18_nfl_injury_participation_role_caution"],
+      "allowedGrades": ["C+", "C", "C-", "NR"],
+      "requiredConcepts": ["target opportunity separated from catch probability", "defender/yardage distribution context", "direct regulated prop calibration gap"],
+      "forbiddenClaims": ["tracking research proves sportsbook mispricing", "the gap is negative predictive evidence", "NFL mechanism evidence deserves A-grade direct-market confidence"]
+    },
+    {
+      "caseId": "HF-NFL-KEY-08",
+      "sport": "NFL",
+      "market": "spread_line_movement",
+      "timing": "pregame",
+      "scenario": "A spread moves across 3 and the proposed explanation is that the move must represent informed or sharp money.",
+      "mustRetrieveAnyOf": ["v18_football_key_numbers_demand_not_information"],
+      "shouldRetrieveAnyOf": ["v18_online_bookmaker_orderflow_price_adjustment"],
+      "allowedGrades": ["D", "C-", "C"],
+      "requiredConcepts": ["key-number demand discontinuity", "movement can reflect demand/order flow rather than private information"],
+      "forbiddenClaims": ["crossing 3 proves sharp information", "all steam is informative", "the research dictates a side to bet"]
+    },
+    {
+      "caseId": "HF-NFL-ANCHOR-09",
+      "sport": "NFL",
+      "market": "game_market",
+      "timing": "pregame",
+      "scenario": "A mid-to-late-season NFL candidate leans heavily on preseason expectations despite substantial current-season evidence.",
+      "mustRetrieveAnyOf": ["v18_nfl_anchoring_preseason_closing_prices"],
+      "allowedGrades": ["D", "C-", "C"],
+      "requiredConcepts": ["preseason anchors can persist in bettor behavior and closing prices", "preseason expectations are context rather than independent current-value evidence"],
+      "forbiddenClaims": ["preseason rating persistence proves value", "historical anchoring automatically identifies the correct side"]
+    },
+    {
+      "caseId": "HF-NBA-AST-10",
+      "sport": "NBA",
+      "market": "assists",
+      "timing": "pregame",
+      "scenario": "An assists prop is supported by minutes, role and usage assumptions. History Fit evaluates NBA stat-specific forecastability and available closing-prop context.",
+      "mustRetrieveAnyOf": ["v18_nba_stat_specific_forecastability"],
+      "shouldRetrieveAnyOf": ["v18_nba_player_prop_closing_context", "v18_nba_individualized_forecast_methodology"],
+      "allowedGrades": ["B", "B-", "C+", "C"],
+      "requiredConcepts": ["stat-specific error structure", "single-book direct-market evidence does not show a universal directional bias", "player-specific models are mechanism rather than sportsbook price evidence"],
+      "forbiddenClaims": ["NBA props have a universal over or under bias", "DFS forecasting success proves sportsbook value", "single-book thesis evidence merits A-grade market confidence"]
+    },
+    {
+      "caseId": "HF-NBA-PROJ-11",
+      "sport": "NBA",
+      "market": "player_props",
+      "timing": "pregame",
+      "scenario": "A candidate is being supported primarily because a commercial or third-party projection provider agrees with it.",
+      "mustRetrieveAnyOf": ["v18_nba_external_projection_caution"],
+      "shouldRetrieveAnyOf": ["v18_nba_stat_specific_forecastability"],
+      "allowedGrades": ["D", "C-", "C"],
+      "requiredConcepts": ["professional projections can improve on naive forecasts only modestly", "third-party projection is an input rather than an independent sharp signal"],
+      "forbiddenClaims": ["commercial projection agreement is an extra betting vote", "projection-provider consensus can override current fair value"]
+    },
+    {
+      "caseId": "HF-WNBA-PROP-12",
+      "sport": "WNBA",
+      "market": "player_props",
+      "timing": "pregame",
+      "scenario": "A WNBA points or assists prop has a current handicap, but direct WNBA closing-price calibration evidence is requested.",
+      "mustRetrieveAnyOf": ["v18_wnba_direct_prop_calibration_gap"],
+      "mayRetrieveOnlyAsIndirectAnalogy": ["v18_nba_stat_specific_forecastability", "v18_nba_player_prop_closing_context"],
+      "allowedGrades": ["NR"],
+      "requiredConcepts": ["direct WNBA calibration gap", "NBA evidence must not be inherited automatically"],
+      "forbiddenClaims": ["NBA closing-prop evidence directly validates WNBA prices", "the WNBA gap predicts the candidate will lose", "an indirect NBA analogy upgrades direct WNBA confidence above NR"]
+    },
+    {
+      "caseId": "HF-SOCCER-STRUCT-13",
+      "sport": "Soccer",
+      "market": "1x2_asian_handicap",
+      "timing": "pregame",
+      "scenario": "A soccer candidate compares 1X2 pricing with Asian-handicap market behavior for the same match.",
+      "mustRetrieveAnyOf": ["v18_soccer_market_structure_1x2_vs_asian_handicap"],
+      "allowedGrades": ["B", "B-", "C+", "C"],
+      "requiredConcepts": ["market structure changes calibration behavior", "1X2 and Asian handicap should not be treated as interchangeable price surfaces"],
+      "forbiddenClaims": ["the numerical effect transfers automatically to North American sports", "one market structure is universally sharper"]
+    },
+    {
+      "caseId": "HF-PARLAY-14",
+      "sport": "NFL",
+      "market": "parlay_or_sgp",
+      "timing": "pregame",
+      "scenario": "A multi-leg NFL wager has passed its current leg-level handicap and History Fit is asked what historical market structure says about the product.",
+      "mustRetrieveAnyOf": ["v18_parlay_contract_choice_margin"],
+      "shouldRetrieveAnyOf": ["v18_retail_betting_market_regime"],
+      "allowedGrades": ["D", "C-", "C"],
+      "requiredConcepts": ["structural margin caution", "correlation/dependence must be priced explicitly", "large historical hold does not define a specific wager's fair price"],
+      "forbiddenClaims": ["apply a fixed historical haircut to all parlays", "historical sportsbook hold supplies the fair price", "research should create or size the parlay"]
+    },
+    {
+      "caseId": "HF-MOVE-15",
+      "sport": "Cross-Sport",
+      "market": "line_movement",
+      "timing": "pregame",
+      "scenario": "A current candidate is being upgraded simply because the market moved in the same direction as the selection.",
+      "mustRetrieveAnyOf": ["v18_online_bookmaker_orderflow_price_adjustment"],
+      "allowedGrades": ["C+", "C", "C-", "D"],
+      "requiredConcepts": ["order flow and demand can move prices", "movement is informative but not a pure informed-money signal", "current path/timing/price still matter"],
+      "forbiddenClaims": ["steam equals sharp truth", "all reversals should be faded", "History Fit may silently blend today's move into the historical grade"]
+    }
+  ],
+  "boundaryCases": [
+    {
+      "caseId": "HB-DEDUP-01",
+      "condition": "The same DOI/source is reachable through multiple logical items or clusters.",
+      "expected": "Count the source once; synthesis/cluster membership must not create an additional evidence vote."
+    },
+    {
+      "caseId": "HB-MECHANISM-02",
+      "condition": "A player-performance mechanism study is presented as proof that the sportsbook price is wrong.",
+      "expected": "Reject the market-mispricing inference; mechanism may support/caution History Fit but cannot become direct market-calibration evidence."
+    },
+    {
+      "caseId": "HB-WNBA-TRANSPORT-03",
+      "condition": "NBA direct player-prop evidence is offered as direct WNBA calibration evidence.",
+      "expected": "Do not inherit direct-market confidence; WNBA direct calibration remains NR unless direct WNBA evidence exists."
+    },
+    {
+      "caseId": "HB-GAP-04",
+      "condition": "An explicit research gap is treated as evidence against a candidate.",
+      "expected": "Return NR/insufficient evidence rather than a negative predictive conclusion."
+    },
+    {
+      "caseId": "HB-EXECUTION-05",
+      "condition": "History Fit attempts to change bet status, fair value, model error, play-to price or stake.",
+      "expected": "Hard-boundary failure. Preserve the already-formed current handicap and reject the research-side mutation."
+    },
+    {
+      "caseId": "HB-PRICE-06",
+      "condition": "Research attempts to supply an executable sportsbook price or create a wager that did not already exist.",
+      "expected": "Hard-boundary failure. Research cannot create a bet or executable price."
+    },
+    {
+      "caseId": "HB-UNAVAILABLE-07",
+      "condition": "The research library or retrieval layer is unavailable.",
+      "expected": "Render HISTORY LIBRARY UNAVAILABLE; core analysis may proceed if all non-research gates pass."
+    },
+    {
+      "caseId": "HB-WRONG-MARKET-08",
+      "condition": "A superficially similar but wrong-sport or wrong-market prior ranks above an exact available prior.",
+      "expected": "Fail retrieval ordering. Exact sport + exact market + timing/mechanism must outrank generic analogy."
+    },
+    {
+      "caseId": "HB-SAME-DAY-09",
+      "condition": "Today's line movement or personal ledger performance is silently blended into the History Fit grade.",
+      "expected": "Hard-boundary failure. Same-day movement and personal ledger data may not be silently incorporated into the historical research grade."
+    }
+  ],
+  "acceptance": {
+    "minimumRetrievalCases": 15,
+    "minimumBoundaryCases": 9,
+    "allReferencedR2ItemsMustExist": true,
+    "allCasesMustHaveForbiddenClaimsOrExpectedBoundaryBehavior": true,
+    "noTestMayRequireProductionMutation": true,
+    "mergedCandidateMayNotBeMaterializedBeforeThisSuiteIsFrozen": true
+  }
+}
