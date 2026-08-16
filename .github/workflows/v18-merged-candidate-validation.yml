@@ -1,0 +1,56 @@
+name: V1.8 Merged Candidate Validation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'research/staging/build_v18_merged_candidate.py'
+      - 'research/staging/run_v18_merged_candidate_structural_tests.py'
+      - '.github/workflows/v18-merged-candidate-validation.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build staging-only merged candidate
+        run: python research/staging/build_v18_merged_candidate.py
+
+      - name: Run frozen structural tests
+        run: python research/staging/run_v18_merged_candidate_structural_tests.py
+
+      - name: Verify production research files untouched
+        run: |
+          git diff --exit-code -- research/manifest.json research/research-library.json research/source-registry.json research/taxonomy.json research/history-fit-policy.json
+
+      - name: Commit candidate and validation artifacts
+        run: |
+          git config user.name "betting-edge-research-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            research/staging/V1_8_MERGED_CANDIDATE_LIBRARY_R1_2026-08-15.json \
+            research/staging/V1_8_MERGED_CANDIDATE_SOURCE_REGISTRY_R1_2026-08-15.json \
+            research/staging/V1_8_MERGED_CANDIDATE_TAXONOMY_R1_2026-08-15.json \
+            research/staging/V1_8_MERGED_CANDIDATE_MANIFEST_R1_2026-08-15.json \
+            research/staging/V1_8_MERGED_CANDIDATE_CHECKSUMS_R1_2026-08-15.json \
+            research/staging/V1_8_MERGED_CANDIDATE_R1_2026-08-15.md \
+            research/staging/V1_8_MERGED_CANDIDATE_STRUCTURAL_TEST_RESULTS_R1_2026-08-15.json \
+            research/staging/V1_8_MERGED_CANDIDATE_STRUCTURAL_TEST_RESULTS_R1_2026-08-15.md
+          if git diff --cached --quiet; then
+            echo "Candidate artifacts unchanged."
+          else
+            git commit -m "Record v1.8 merged candidate R1 validation"
+            git push
+          fi
