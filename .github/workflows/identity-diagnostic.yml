@@ -1,0 +1,91 @@
+name: Diagnose Betting Edge event identity
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inspect archived 08:06 snapshot
+        shell: bash
+        run: |
+          git show 4a0d0b0db2a2c5d7ca83da053f408321baca2290:data/live-odds.json > "${RUNNER_TEMP}/live-odds-0806.json"
+          node <<'NODE'
+          const fs = require('fs');
+          const path = process.env.RUNNER_TEMP + '/live-odds-0806.json';
+          const feed = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const norm = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+          const fixtures = [
+            {key:'WHITE_SOX', away:'Chicago White Sox', home:'Detroit Tigers', expected:'2026-08-16T10:40:00-07:00'},
+            {key:'FEVER', away:'Indiana Fever', home:'Atlanta Dream', expected:'2026-08-16T14:00:00-07:00'},
+            {key:'RAYS', away:'Baltimore Orioles', home:'Tampa Bay Rays', expected:'2026-08-16T09:15:00-07:00'},
+            {key:'RED_SOX', away:'Boston Red Sox', home:'Pittsburgh Pirates', expected:'2026-08-16T10:35:00-07:00'}
+          ];
+          const collections = [
+            ['events', feed.events || []],
+            ['deepMarkets', feed.deepMarkets || []],
+            ['baseballProps', feed.baseballProps || []]
+          ];
+          const sameFixture = (event, fixture) => {
+            const sides = [norm(event.home), norm(event.away)];
+            return sides.includes(norm(fixture.home)) && sides.includes(norm(fixture.away));
+          };
+          const eventId = event => String(event.eventId || event.identity?.eventId || event.id || '');
+          const eventKey = event => String(event.eventKey || event.identity?.eventKey || '');
+          const sportKey = event => String(event.identity?.sportKey || event.sport?.slug || event.sport?.name || event.sport || '');
+          const league = event => String(event.league?.slug || event.league?.name || event.league || '');
+          const books = event => Object.keys(event.bookmakers || {}).sort();
+          console.log('DIAGNOSTIC_META ' + JSON.stringify({
+            generatedAt: feed.generatedAt,
+            generatedAtVancouver: feed.generatedAtVancouver,
+            declaredEventCount: feed.eventCount,
+            collectionCounts: Object.fromEntries(collections.map(([name, rows]) => [name, rows.length]))
+          }));
+          for (const fixture of fixtures) {
+            const raw = [];
+            for (const [collection, rows] of collections) {
+              for (const event of rows) {
+                if (!sameFixture(event, fixture)) continue;
+                const time = Date.parse(event.date);
+                raw.push({
+                  collection,
+                  id: String(event.id || ''),
+                  eventId: eventId(event),
+                  eventKey: eventKey(event),
+                  home: event.home,
+                  away: event.away,
+                  date: event.date,
+                  deltaMinutes: Number.isFinite(time) ? Math.round((time - Date.parse(fixture.expected)) / 60000) : null,
+                  sportKey: sportKey(event),
+                  league: league(event),
+                  books: books(event)
+                });
+              }
+            }
+            const byRunnerId = new Map();
+            for (const row of raw) {
+              if (!row.id) continue;
+              const current = byRunnerId.get(row.id);
+              if (!current) byRunnerId.set(row.id, {...row, collections:[row.collection]});
+              else {
+                current.collections = [...new Set([...current.collections, row.collection])];
+                current.books = [...new Set([...current.books, ...row.books])].sort();
+              }
+            }
+            console.log('FIXTURE_DIAGNOSTIC ' + JSON.stringify({
+              key: fixture.key,
+              expected: fixture.expected,
+              rawCandidateCount: raw.length,
+              runnerMergedCandidateCount: byRunnerId.size,
+              rawCandidates: raw,
+              runnerMergedCandidates: [...byRunnerId.values()]
+            }));
+          }
+          NODE
