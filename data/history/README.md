@@ -37,7 +37,8 @@ It preserves, where available:
 - feed generation timestamp used by the analysis;
 - bankroll and total new risk;
 - BET / LEAN / WAIT / PASS counts;
-- recommendation title and structured identity when available;
+- recommendation title;
+- exact `rec.feed` machine identity for every displayed moneyline, spread, game total and player prop issued after the 2026-08-16 identity hardening;
 - sportsbook and issued price;
 - `playTo` threshold;
 - fair price / edge;
@@ -46,7 +47,9 @@ It preserves, where available:
 - stake;
 - support / contrary evidence;
 - source and analysis text;
-- exact player-prop `rec.feed` machine identity when the issued recommendation is player-specific.
+- exact player label and line identity when the issued recommendation is player-specific.
+
+Older immutable game-market reports issued without `rec.feed` remain valid historical evidence and use the runner's fail-closed fallback matching when repriced. They are not rewritten merely to adopt structured identity.
 
 `/run-history.json` is the compact repository index for these payload files. The full stored issued payload is authoritative if an index summary and payload ever disagree.
 
@@ -114,6 +117,8 @@ Player-prop `rec.feed` identity is part of the issued historical payload and rem
 ## Repricing
 
 Runner-side `UPDATE ODDS / REPRICE NOW` remains a comparison overlay and does not mutate the issued report. Browser/device-local reprice history is not a durable repository write. Durable reprice-event capture is a future extension and must be implemented without exposing repository credentials to the client.
+
+Newly issued game-market and player-prop cards use exact structured `rec.feed` identity first. Older cards without that object may use title/team/time fallback; ambiguous fallback results remain unresolved rather than being forced into a match.
 
 For player props, a later different line is a different selection and must not be treated as an exact reprice of the issued line.
 
