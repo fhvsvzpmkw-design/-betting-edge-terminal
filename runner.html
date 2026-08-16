@@ -407,7 +407,7 @@ function instrumentGauge(d,title,type,reading){
   const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+clamp(reading.value)*1.44}deg)`;
   const line=d.createElementNS(ns,'line');line.setAttribute('x1','80');line.setAttribute('y1','72');line.setAttribute('x2','80');line.setAttribute('y2','27');line.setAttribute('stroke','#f4fff9');line.setAttribute('stroke-width','2.2');
   const hub=d.createElementNS(ns,'circle');hub.setAttribute('cx','80');hub.setAttribute('cy','72');hub.setAttribute('r','4');hub.setAttribute('fill','#f4fff9');needle.append(line,hub);svg.appendChild(needle);wrap.appendChild(svg);
-  const read=el(d,'div','instrumentRead');read.append(el(d,'b','',`${reading.value} / 100`),d.createTextNode(reading.label));wrap.appendChild(read);
+  const read=el(d,'div','instrumentRead');read.append(el(d,'b','',`${reading.value}`),d.createTextNode(reading.label));wrap.appendChild(read);
   const defs=type==='heat'?[['DORM','g'],['QUIET','g'],['FORM','y'],['ACTIVE','y'],['PRESS','y'],['HOT','r'],['EXTREME','r']]:type==='pressure'?[['AGAINST','r'],['NEUTRAL','y'],['FAVOR','g']]:[['FRAG','r'],['MIXED','y'],['STRONG','g'],['CONSENSUS','g']];
   const band=el(d,'div',`instrumentBand ${type}`);defs.forEach(([label,c])=>band.appendChild(el(d,'span',c,label)));wrap.appendChild(band);
   wrap.appendChild(el(d,'div','instrumentConf',`CONF ${reading.confidence}%${reading.pairs?` • ${reading.pairs} PAIRS`:''}`));
