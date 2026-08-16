@@ -271,9 +271,10 @@ function injectStyle(d){
   .stats .stat:nth-child(3),.stats .stat:nth-child(4){display:none!important}
   .runnerHead{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch}
   .runnerTitle{font-size:clamp(18px,2.4vw,27px);font-weight:950;letter-spacing:.06em;line-height:1.1;color:var(--cyan);text-shadow:0 0 7px rgba(0,220,255,.16)}
-  .runnerFresh{font-size:10px;border:1px solid var(--green);color:var(--green);padding:5px 7px;white-space:nowrap}
-  .marketStateLabel{white-space:nowrap}
-  .marketStateLabel:before{content:' · '}
+  .runnerFresh{font-size:10px;border:1px solid var(--green);color:var(--green);padding:5px 7px;display:grid;grid-template-columns:1fr;gap:3px;text-align:center;line-height:1.35}
+  .feedMeta,.marketStateLabel{display:block}
+  .marketStateLabel{order:1;white-space:nowrap}
+  .feedMeta{order:2}
   .runnerHeadRight{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:0;width:100%;flex:none}
   .instrumentCluster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%;align-items:stretch}
   .instrument{min-width:0;min-height:134px;height:auto;border:1px solid #456e50;background:repeating-linear-gradient(0deg,rgba(0,255,135,.018) 0,rgba(0,255,135,.018) 1px,transparent 1px,transparent 3px),linear-gradient(180deg,#020d09 0%,#010806 100%);padding:7px 6px 7px;box-sizing:border-box;text-align:center;overflow:hidden;box-shadow:inset 0 0 20px rgba(0,255,135,.075),inset 0 0 0 1px rgba(170,255,205,.025)}
@@ -379,11 +380,7 @@ function injectStyle(d){
     .instrumentRead b{font-size:17px}
     .instrumentBand span{font-size:5px}
     .instrumentConf{font-size:6px}
-    .runnerFresh{display:grid;grid-template-columns:1fr;gap:3px;margin-top:1px;white-space:normal;overflow-wrap:anywhere;line-height:1.35;text-align:center}
-    .feedMeta,.marketStateLabel{display:block}
-    .marketStateLabel{order:1}
-    .feedMeta{order:2}
-    .marketStateLabel:before{content:''}
+    .runnerFresh{margin-top:1px;white-space:normal;overflow-wrap:anywhere}
     .runnerTop{grid-template-columns:1fr}
     .execution{text-align:left}
     .runnerCounts{grid-template-columns:repeat(2,1fr)}
