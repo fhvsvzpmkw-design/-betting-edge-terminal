@@ -49,7 +49,7 @@ Automated agreement is an audit aid, not final certification. Every page was ini
 | 273 | 376 | 394 | 88.3% | 9.3% | 93.1 | 13 | VISUAL CHECK | VERIFIED |
 | 274 | 260 | 11 | 6.6% | 0.0% | 91.9 | 1 | VISUAL CHECK | VERIFIED |
 
-## Pages requiring visual reconciliation
+## Pages initially requiring visual reconciliation
 
 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274
 
@@ -58,7 +58,7 @@ Automated agreement is an audit aid, not final certification. Every page was ini
 | Pages | Prose | Numeric data | Tables | Result |
 |:---|:---|:---|:---|:---|
 | 232–244 | Compared directly with photographed pages; OCR omissions and substitutions corrected | Independently enumerated and checked against page images | No tables in this range | VERIFIED |
-| 245 | Compared directly; previously cropped final line supplied in a clear replacement photograph | “a tenth of a point” checked directly against replacement image | No table | VISUAL CHECK | VERIFIED |
+| 245 | Compared directly; previously cropped final line supplied in a clear replacement photograph | “a tenth of a point” checked directly against replacement image | No table | VERIFIED |
 | 246–254 | Compared directly with photographed pages; diagram labels and prose reconciled | Signs, decimals, percentages, arithmetic, player values, and historical ranges checked against page images | Power-rating flowchart transcribed as labeled steps and a separately marked diagram note | VERIFIED |
 | 255–264 | Compared directly with photographed pages; prose and category labels reconciled | Every factor value, formula, sign, decimal, example, and point-value bar checked against page images | S/W-factor tables, Updating Power Ratings table, and Relative Value chart transcribed cell by cell | VERIFIED |
 | 265–274 | Compared directly with photographed pages; line-break continuations and apparent source typos preserved | Every sign, price, percentage, decimal, equivalent spread, point value, and expected-loss figure checked against page images | Value of Points, Strength of Play, implicit-spread, moneyline, parlay, and teaser tables transcribed cell by cell | VERIFIED |
