@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "buildId": "v1.8-merged-candidate-r1-2026-08-15",
+  "testSuiteId": "v1.8-history-fit-predeclared-r1-2026-08-15",
+  "reviewType": "assistant_narrative_and_boundary_review",
+  "state": "PASS",
+  "runtimeAuthority": false,
+  "activeProductionLibrary": "1.7",
+  "testDefinitionsModified": false,
+  "summary": {
+    "retrievalCases": 15,
+    "retrievalCasesPassed": 15,
+    "boundaryCases": 9,
+    "boundaryCasesPassed": 9,
+    "gradeBandFailures": 0,
+    "requiredConceptFailures": 0,
+    "forbiddenClaimFailures": 0,
+    "promotionDecision": "NOT_YET_PROMOTED"
+  },
+  "retrievalCases": [
+    {
+      "caseId": "HF-MLB-K-01",
+      "result": "PASS",
+      "grade": "B-",
+      "retrievalSet": ["v18_mlb_pitcher_k_matchup_mechanism", "v18_mlb_no_universal_prop_recalibration"],
+      "historyFit": "B- — Matchup-level strikeout research supports using opponent K tendency, lineup and expected batters faced/workload. The 2026 holdout argues against any universal MLB prop adjustment, so the mechanism strengthens context without proving the over is profitable or supplying an executable price.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-MLB-HR-02",
+      "result": "PASS",
+      "grade": "C+",
+      "retrievalSet": ["v18_mlb_hits_total_bases_contact_quality", "v18_mlb_no_universal_prop_recalibration"],
+      "historyFit": "C+ — Contact quality is useful mechanism/regression context for an HR candidate, especially versus recent-results chasing. It is not sportsbook calibration evidence, and the 2026 holdout did not support a broad historical home-run pricing correction or an automatic fair-price shade.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-MLB-WALK-03",
+      "result": "PASS",
+      "grade": "C",
+      "retrievalSet": ["v18_mlb_walks_rbis_limited_recalibration_signal", "v18_mlb_no_universal_prop_recalibration"],
+      "deduplicationNote": "Both logical items derive from the same SmartStake dataset and count as one underlying direct-market source.",
+      "historyFit": "C — Batting walks retained a modest calibration improvement in the untouched June holdout, but this is one partial 2026 season from one underlying dataset. Treat it as a market-specific caution/support signal, not a reusable betting adjustment and not transferable to other prop families.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NHL-SOG-04",
+      "result": "PASS",
+      "grade": "C+",
+      "retrievalSet": ["v18_nhl_sog_forecastability", "v18_nhl_rink_recording_data_quality_caution"],
+      "historyFit": "C+ — Modern SOG research supports a dedicated role/context layer built around ice time, line and power-play usage. That forecastability is not direct closing-price calibration; rink-recording effects are a data-quality caution and should not become a fixed 2026 adjustment.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NHL-SAVES-05",
+      "result": "PASS",
+      "grade": "D",
+      "retrievalSet": ["v18_nhl_goalie_hot_hand_caution"],
+      "historyFit": "D — Historical goalie evidence does not support treating a recent save-percentage hot streak as persistent save-probability edge. Expected shot volume and save efficiency must be separated, and this study does not calibrate sportsbook saves lines or justify a larger stake.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NHL-GOAL-06",
+      "result": "PASS",
+      "grade": "C+",
+      "retrievalSet": ["v18_nhl_shooter_goalie_xg_mechanism"],
+      "historyFit": "C+ — Shooter- and goaltender-adjusted xG supports the event-probability mechanism behind an anytime-goal handicap. It improves context around shooter/goalie skill but is not direct anytime-goal price calibration and cannot act as a second betting signal or rewrite fair value.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NFL-REC-07",
+      "result": "PASS",
+      "grade": "C",
+      "retrievalSet": ["v18_nfl_receiving_target_catch_context", "v18_nfl_injury_participation_role_caution", "v18_nfl_direct_player_prop_calibration_gap"],
+      "historyFit": "C — Receiving research supports separating target opportunity, catch probability, defender context and yardage distribution, with injury/participation affecting volume. Direct regulated multi-book prop calibration remains a gap, so mechanism fit is useful but direct pricing confidence stays NR/caveated.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NFL-KEY-08",
+      "result": "PASS",
+      "grade": "D",
+      "retrievalSet": ["v18_football_key_numbers_demand_not_information", "v18_online_bookmaker_orderflow_price_adjustment"],
+      "historyFit": "D — Crossing 3 can produce a large demand discontinuity without corresponding return predictability. Bookmaker movement can reflect order flow and demand as well as information, so the move does not prove sharp money and the research does not dictate a side.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NFL-ANCHOR-09",
+      "result": "PASS",
+      "grade": "D",
+      "retrievalSet": ["v18_nfl_anchoring_preseason_closing_prices"],
+      "historyFit": "D — Preseason expectations can persist in bettor behavior and closing prices, which makes them an anchoring context rather than independent current-value evidence. A current handicap that leans heavily on preseason ratings despite substantial in-season information should therefore be treated cautiously.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NBA-AST-10",
+      "result": "PASS",
+      "grade": "B-",
+      "retrievalSet": ["v18_nba_stat_specific_forecastability", "v18_nba_player_prop_closing_context", "v18_nba_individualized_forecast_methodology"],
+      "deduplicationNote": "The two Papageorgiou forecasting papers remain overlap-clustered and do not count as two independent market votes.",
+      "historyFit": "B- — NBA research supports stat-specific error structures for assists and player-specific modeling, while direct single-book closing-prop evidence does not show a universal over/under bias. Forecasting studies are mechanism evidence, not proof that the posted sportsbook price is wrong.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-NBA-PROJ-11",
+      "result": "PASS",
+      "grade": "D",
+      "retrievalSet": ["v18_nba_external_projection_caution", "v18_nba_stat_specific_forecastability"],
+      "historyFit": "D — Professional projection providers can improve on naive forecasts, but the verified improvement is modest enough that agreement from a commercial projection should remain an input rather than an independent sharp signal. It cannot override current fair value.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-WNBA-PROP-12",
+      "result": "PASS",
+      "grade": "NR",
+      "retrievalSet": ["v18_wnba_direct_prop_calibration_gap"],
+      "historyFit": "NR — Direct WNBA closing player-prop calibration remains an explicit evidence gap. NBA mechanism or closing-prop research may be discussed only as discounted analogy; it cannot be inherited as direct WNBA price evidence, and the gap itself is not a negative prediction.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-SOCCER-STRUCT-13",
+      "result": "PASS",
+      "grade": "B",
+      "retrievalSet": ["v18_soccer_market_structure_1x2_vs_asian_handicap"],
+      "historyFit": "B — Direct soccer evidence shows that 1X2 and Asian-handicap markets for the same matches can have materially different calibration behavior. That strongly supports treating the price surfaces separately, while the numerical effects remain soccer-specific rather than universal market-sharpness rankings.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-PARLAY-14",
+      "result": "PASS",
+      "grade": "D",
+      "retrievalSet": ["v18_parlay_contract_choice_margin", "v18_retail_betting_market_regime"],
+      "historyFit": "D — Modern transaction evidence supports explicit margin caution for parlays and other multi-leg products, with dependence/correlation priced separately. Historical sportsbook hold does not determine the fair price of this wager and cannot be converted into a fixed haircut, stake or newly created bet.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    },
+    {
+      "caseId": "HF-MOVE-15",
+      "result": "PASS",
+      "grade": "C-",
+      "retrievalSet": ["v18_online_bookmaker_orderflow_price_adjustment", "closing_line_information"],
+      "historyFit": "C- — Movement can contain information, but bookmaker prices also respond to demand and order flow, so same-direction steam is not pure sharp-money evidence. Path, timing and current price still matter, and today's move remains separate from the historical History Fit grade.",
+      "requiredConceptsPass": true,
+      "forbiddenClaimsPass": true
+    }
+  ],
+  "boundaryCases": [
+    {"caseId": "HB-DEDUP-01", "result": "PASS", "finding": "Same source counts once; overlap/cluster membership does not create another evidence vote."},
+    {"caseId": "HB-MECHANISM-02", "result": "PASS", "finding": "Mechanism evidence is explicitly separated from direct market-calibration evidence."},
+    {"caseId": "HB-WNBA-TRANSPORT-03", "result": "PASS", "finding": "NBA evidence is not promoted into direct WNBA calibration; WNBA remains NR for direct price evidence."},
+    {"caseId": "HB-GAP-04", "result": "PASS", "finding": "Explicit gaps produce NR/insufficient evidence rather than negative prediction."},
+    {"caseId": "HB-EXECUTION-05", "result": "PASS", "finding": "History Fit cannot change status, fair value, model error, play-to or stake."},
+    {"caseId": "HB-PRICE-06", "result": "PASS", "finding": "Research cannot create a wager or supply an executable sportsbook price."},
+    {"caseId": "HB-UNAVAILABLE-07", "result": "PASS", "finding": "Failure state remains HISTORY LIBRARY UNAVAILABLE while core analysis may continue if other gates pass."},
+    {"caseId": "HB-WRONG-MARKET-08", "result": "PASS", "finding": "Exact sport/market evidence is selected before generic analogy; an exact gap blocks forced analogy when no exact primary exists."},
+    {"caseId": "HB-SAME-DAY-09", "result": "PASS", "finding": "Same-day movement and personal-ledger performance remain outside the historical research grade unless explicitly handled elsewhere."}
+  ],
+  "diagnosticObservation": {
+    "severity": "NON_BLOCKING",
+    "finding": "The generic structural-test scorer can surface additional low-value fallback candidates after the exact required evidence. Those diagnostic extras are not the runtime retrieval set and were excluded from the narrative review under the existing smallest-relevant-set policy.",
+    "runtimeEffect": "none",
+    "promotionRequirement": "Do not wire the diagnostic scorer into production retrieval; production History Fit remains governed by the candidate-first, exact-sport/market, smallest-relevant-set policy."
+  },
+  "decision": "Merged candidate R1 passes the frozen 15 narrative retrieval cases and 9 hard-boundary cases. It is eligible for final candidate integrity/checksum review, but production promotion still requires an explicit separate approval."
+}
