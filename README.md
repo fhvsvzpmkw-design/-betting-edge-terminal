@@ -4,12 +4,24 @@
 
 The repository includes four durable project references:
 
-- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current production state, versions, runtime boundaries, active data/research/governance status, and known-good checkpoint.
+- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current production state, versions, runtime boundaries, active data/research/governance status, and known-good checkpoints.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — daily refresh/report timing, scheduler diagnostics, zombie protection, manual recovery, repricing checks, history/share-link handling, and deployment verification.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable architectural and operating decisions, including the reasoning behind them.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — completed foundations, current priorities, planned History/Research/ledger work, and eventual contract activation.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — completed foundations, current priorities, planned History/Research/ledger work, and future contract evolution.
 
-The newest governance specification is [`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9.md). It is a **DRAFT / NOT YET OPERATIONAL** delta that inherits [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md) except where v0.9 explicitly extends or overrides it. v0.8 therefore remains the preserved baseline/reference and should not be deleted while v0.9 depends on it.
+## Production governance
+
+The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v0.9 OPERATIONAL**.
+
+The production contract incorporates by fixed Git blob identity:
+
+- [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md) as the inherited execution/pricing/risk baseline;
+- [`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9.md) as the durable-history/provenance design delta;
+- [`BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md) as the player-prop identity delta.
+
+Those draft files are retained as historical design artifacts and are **not independently operational**. The live promotion/acceptance record is [`BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`](BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md).
+
+Every scheduled production report must resolve the production contract and current approved runner before handicapping. If authority cannot be resolved, the report must stop before analysis rather than silently falling back to a draft.
 
 ## Repository change safety policy
 
