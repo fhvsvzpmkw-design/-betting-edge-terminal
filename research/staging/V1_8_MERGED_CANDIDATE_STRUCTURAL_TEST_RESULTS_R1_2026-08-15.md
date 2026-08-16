@@ -15,4 +15,6 @@
 - Frozen boundary cases checked against policy: **9**
 - Errors: **0**
 
+Retrieval filtering requires actual market relevance, exact sport evidence is selected before cross-sport analogy, and an exact sport/market gap blocks forced generic analogy when no exact primary exists.
+
 Automated PASS is not the final promotion gate. The 15 frozen narrative cases still require an assistant review for allowed grade bands, required concepts and forbidden claims.
