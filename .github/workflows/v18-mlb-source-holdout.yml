@@ -1,0 +1,46 @@
+name: V1.8 MLB Source Holdout
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/staging/V1_8_MLB_SOURCE_CLASSIFICATION.json'
+      - 'research/staging/run_v18_mlb_source_holdout.py'
+      - '.github/workflows/v18-mlb-source-holdout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check duckdb huggingface_hub
+
+      - name: Execute source classification and forward holdout
+        run: python research/staging/run_v18_mlb_source_holdout.py
+
+      - name: Commit validation results
+        run: |
+          git config user.name 'betting-edge-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/staging/V1_8_MLB_SOURCE_HOLDOUT_RESULTS.json research/staging/V1_8_MLB_SOURCE_HOLDOUT_RESULTS.md
+          if git diff --cached --quiet; then
+            echo 'No result changes to commit.'
+          else
+            git commit -m 'Record v1.8 MLB source classification and holdout results'
+            git push
+          fi
