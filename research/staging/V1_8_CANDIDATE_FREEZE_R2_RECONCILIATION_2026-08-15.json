@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "freezeId": "v1.8-candidate-freeze-2026-08-15-r2",
+  "r1FreezeId": "v1.8-candidate-freeze-2026-08-15-r1",
+  "state": "STAGING_R1_TO_R2_RECONCILIATION",
+  "runtimeAuthority": false,
+  "summary": {
+    "r1Admitted": 19,
+    "r2Admitted": 24,
+    "addedLogicalItems": [
+      "v18_nba_individualized_forecast_methodology",
+      "v18_nba_external_projection_caution",
+      "v18_nhl_rink_recording_data_quality_caution",
+      "v18_nhl_shooter_goalie_xg_mechanism",
+      "v18_nfl_injury_participation_role_caution"
+    ],
+    "sportLabelsNormalized": [
+      "NFL/NCAAF -> NFL + College Football/Basketball",
+      "Cross-market -> Cross-Sport"
+    ],
+    "phase2LedgerItems": 23,
+    "phase2LedgerItemsExplicitlyReconciled": 23,
+    "silentDisappearances": 0
+  },
+  "ledgerReconciliation": [
+    {
+      "candidateId": "V18-METHOD-CALIBRATION-001",
+      "phase2Status": "HOLD_CORRIGENDUM_RECONCILIATION",
+      "r2Disposition": "HOLD",
+      "representedBy": [
+        "v18_walsh_joshi_calibration_corrigendum_hold"
+      ],
+      "reason": "Corrigendum remains unresolved; exact quantitative claims stay out of the freeze."
+    },
+    {
+      "candidateId": "V18-NBA-DIRECT-001",
+      "phase2Status": "KEEP_WITH_CAUTION",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nba_player_prop_closing_context"
+      ],
+      "reason": "Direct single-book closing context retained with C-tier caution."
+    },
+    {
+      "candidateId": "V18-NBA-MECH-001",
+      "phase2Status": "KEEP",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nba_stat_specific_forecastability"
+      ],
+      "reason": "Peer-reviewed stat-specific mechanism retained; not market-calibration evidence."
+    },
+    {
+      "candidateId": "V18-NBA-MECH-002",
+      "phase2Status": "KEEP_OVERLAP_CLUSTER",
+      "r2Disposition": "INCLUDED_CLUSTERED",
+      "representedBy": [
+        "v18_nba_individualized_forecast_methodology"
+      ],
+      "reason": "Distinct paper retained, but overlap lineage prevents an extra independent-weight vote."
+    },
+    {
+      "candidateId": "V18-NBA-CAUTION-001",
+      "phase2Status": "KEEP",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nba_external_projection_caution"
+      ],
+      "reason": "Projection-provider quality caution restored after being omitted from R1."
+    },
+    {
+      "candidateId": "V18-WNBA-DATA-001",
+      "phase2Status": "INFRASTRUCTURE",
+      "r2Disposition": "INFRASTRUCTURE_ONLY",
+      "representedBy": [],
+      "reason": "Acquisition path only; not predictive or calibration evidence."
+    },
+    {
+      "candidateId": "V18-WNBA-GAP-001",
+      "phase2Status": "GAP",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_wnba_direct_prop_calibration_gap"
+      ],
+      "reason": "Explicit direct-closing calibration gap retained; supports NR."
+    },
+    {
+      "candidateId": "V18-NHL-SOG-001",
+      "phase2Status": "KEEP_WITH_CAUTION",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nhl_sog_forecastability"
+      ],
+      "reason": "Exact-stat SOG mechanism retained with thesis/no-price caveat."
+    },
+    {
+      "candidateId": "V18-NHL-SOG-002",
+      "phase2Status": "DATA_AUDIT_REQUIRED",
+      "r2Disposition": "DEFERRED_DATA_AUDIT",
+      "representedBy": [],
+      "reason": "Public odds project remains outside canonical evidence until book/timestamp/grading provenance is audited."
+    },
+    {
+      "candidateId": "V18-NHL-DATA-QUALITY-001",
+      "phase2Status": "KEEP_ERA_CAVEAT",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nhl_rink_recording_data_quality_caution"
+      ],
+      "reason": "Historical rink-recording caution restored after being omitted from R1."
+    },
+    {
+      "candidateId": "V18-NHL-SAVES-001",
+      "phase2Status": "KEEP",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nhl_goalie_hot_hand_caution"
+      ],
+      "reason": "Goalie hot-hand caution retained; no saves-price claim."
+    },
+    {
+      "candidateId": "V18-NHL-GOAL-001",
+      "phase2Status": "KEEP_WITH_CAUTION",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nhl_shooter_goalie_xg_mechanism"
+      ],
+      "reason": "Shooter/goalie skill mechanism restored after being omitted from R1."
+    },
+    {
+      "candidateId": "V18-NHL-DATA-001",
+      "phase2Status": "INFRASTRUCTURE",
+      "r2Disposition": "INFRASTRUCTURE_ONLY",
+      "representedBy": [],
+      "reason": "Current/opening prop data path only; no complete historical closing stream."
+    },
+    {
+      "candidateId": "V18-NFL-REC-001",
+      "phase2Status": "KEEP",
+      "r2Disposition": "INCLUDED_CLUSTERED",
+      "representedBy": [
+        "v18_nfl_receiving_target_catch_context"
+      ],
+      "reason": "Catch-probability mechanism represented in one combined receiving logical item."
+    },
+    {
+      "candidateId": "V18-NFL-REC-002",
+      "phase2Status": "KEEP",
+      "r2Disposition": "INCLUDED_CLUSTERED",
+      "representedBy": [
+        "v18_nfl_receiving_target_catch_context"
+      ],
+      "reason": "Defender/yardage distribution mechanism represented in the same combined receiving logical item."
+    },
+    {
+      "candidateId": "V18-NFL-INJURY-001",
+      "phase2Status": "KEEP_CAUTION_ONLY",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nfl_injury_participation_role_caution"
+      ],
+      "reason": "Participation/role caution restored after being omitted from R1."
+    },
+    {
+      "candidateId": "V18-NFL-DATA-001",
+      "phase2Status": "INFRASTRUCTURE",
+      "r2Disposition": "INFRASTRUCTURE_ONLY",
+      "representedBy": [],
+      "reason": "Current/opening prop data path only; not a direct calibration finding."
+    },
+    {
+      "candidateId": "V18-NFL-DIRECT-GAP-001",
+      "phase2Status": "GAP",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_nfl_direct_player_prop_calibration_gap"
+      ],
+      "reason": "Explicit direct sportsbook calibration gap retained; supports NR/caveated mechanism fit."
+    },
+    {
+      "candidateId": "V18-MLB-K-001",
+      "phase2Status": "KEEP",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_mlb_pitcher_k_matchup_mechanism"
+      ],
+      "reason": "Strikeout matchup mechanism retained separately from audited price evidence."
+    },
+    {
+      "candidateId": "V18-MLB-HIT-001",
+      "phase2Status": "KEEP_MECHANISM",
+      "r2Disposition": "INCLUDED",
+      "representedBy": [
+        "v18_mlb_hits_total_bases_contact_quality"
+      ],
+      "reason": "Official contact-quality mechanism retained as non-independent market evidence."
+    },
+    {
+      "candidateId": "V18-MLB-MARKET-001",
+      "phase2Status": "DATA_AUDIT_REQUIRED_HIGH_PRIORITY",
+      "r2Disposition": "INCLUDED_AS_AUDITED_DERIVED_FINDINGS",
+      "representedBy": [
+        "v18_mlb_no_universal_prop_recalibration",
+        "v18_mlb_walks_rbis_limited_recalibration_signal"
+      ],
+      "reason": "Raw infrastructure candidate was replaced by the completed full audit and June forward-holdout findings."
+    },
+    {
+      "candidateId": "V18-MLB-MARKET-002",
+      "phase2Status": "DATA_AUDIT_REQUIRED",
+      "r2Disposition": "DEFERRED_DATA_AUDIT",
+      "representedBy": [],
+      "reason": "Lineup-reaction dataset is adjacent infrastructure from the same collection family; not required for v1.8 freeze."
+    },
+    {
+      "candidateId": "V18-SHANK-CITATION-CORRECTION",
+      "phase2Status": "REGISTRY_METADATA_CORRECTION_FOR_V1_8",
+      "r2Disposition": "REGISTRY_CORRECTION",
+      "representedBy": [],
+      "reason": "Correct DOI is carried into the v1.8 registry delta with provenance; v1.7 remains immutable."
+    }
+  ],
+  "evidenceSemantics": {
+    "independentResearchSourceEligible": "May count as a distinct research source under History Fit dedup rules.",
+    "directMarketCalibrationEvidenceEligible": "May support a direct historical market-calibration statement when scope/timing match; does not create a bet or executable price.",
+    "mechanismRule": "Mechanism/forecastability evidence can support or caution a candidate but is not a market-mispricing vote."
+  }
+}
