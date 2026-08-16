@@ -118,6 +118,24 @@ Use manual recovery when an important scheduled refresh did not produce a usable
 
 A manual odds refresh should not require changing runner code or the production contract.
 
+## Structured identity verification
+
+For production reports issued after the 2026-08-16 identity hardening, verify every displayed recommendation preserves exact machine-readable `rec.feed` identity copied from the live-odds row used for issuance.
+
+For moneylines, spreads and game totals, confirm at minimum:
+
+- exact `eventId`;
+- `eventKey` when present;
+- `sportKey`;
+- exact `market` / `marketKey`;
+- exact `side` and `selectionKey`;
+- `eventDate` when present;
+- exact `hdp` / line or label when applicable.
+
+Player props retain the stricter v0.9 Invariant 23 requirements, including player label and exact line identity. Do not synthesize missing identifiers from display text.
+
+On a newer valid feed, `REPRICE NOW` should use the structured path for newly issued cards. Older immutable reports without `rec.feed` remain valid and may use the fail-closed title/team/time fallback. The fallback recognizes both `a.m.` / `p.m.` metadata and existing 24-hour PT forms. A genuinely ambiguous event remains `IDENTITY MISMATCH`; never force a match merely to eliminate an unresolved count.
+
 ## Durable issued-report history
 
 The exact validated issued payload is stored under:
