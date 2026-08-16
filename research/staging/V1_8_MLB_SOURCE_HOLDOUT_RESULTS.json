@@ -1,0 +1,3291 @@
+{
+  "schema": 1,
+  "targetLibraryVersion": "1.8",
+  "state": "STAGING_MLB_SOURCE_CLASSIFIED_FORWARD_HOLDOUT_EXECUTED",
+  "runtimeAuthority": false,
+  "activeProductionLibrary": "1.7",
+  "dataset": "SmartStake/mlb-player-props",
+  "datasetRevision": "049dd4caeb562010a5806207c413e9f9bc012825",
+  "executedAtUtc": "2026-08-16T03:30:19.762519+00:00",
+  "trainWindow": {
+    "start": "dataset_start",
+    "endExclusive": "2026-06-01T00:00:00"
+  },
+  "holdoutWindow": {
+    "startInclusive": "2026-06-01T00:00:00",
+    "endExclusive": "2026-07-01T00:00:00"
+  },
+  "closeCutoffMinutes": 5,
+  "sourceClassification": {
+    "datasetSourceCount": 75,
+    "classifiedSourceCount": 75,
+    "missing": [],
+    "extra": [],
+    "primaryHighConfidenceSportsbooks": [
+      "888sport",
+      "bally_bet",
+      "bet365",
+      "bet99",
+      "bet99_ca",
+      "bet_jack",
+      "betano",
+      "betcris",
+      "betmgm",
+      "betonline",
+      "betrivers",
+      "betsafe",
+      "betvictor",
+      "betway",
+      "bodog",
+      "bookmaker",
+      "bovada",
+      "bwin",
+      "caesars",
+      "circa",
+      "coolbet",
+      "desert_diamond",
+      "draftkings",
+      "fanatics",
+      "fanduel",
+      "firekeepers",
+      "hard_rock",
+      "hardrock_fl",
+      "leovegas",
+      "miseojeu",
+      "mybookie",
+      "northstar_bets",
+      "pinnacle",
+      "playnow",
+      "pointsbet_ca",
+      "prime_sports",
+      "proline",
+      "ps3838",
+      "sports_interaction",
+      "stake",
+      "thescore",
+      "tonybet",
+      "xbet"
+    ],
+    "primaryCount": 43,
+    "sensitivityAllEligibleSportsbooks": [
+      "888sport",
+      "bally_bet",
+      "bet105",
+      "bet365",
+      "bet99",
+      "bet99_ca",
+      "bet_jack",
+      "betano",
+      "betcris",
+      "betmgm",
+      "betonline",
+      "betphoenix",
+      "betrivers",
+      "betsafe",
+      "betvictor",
+      "betway",
+      "bodog",
+      "bookmaker",
+      "bovada",
+      "bwin",
+      "caesars",
+      "circa",
+      "coolbet",
+      "desert_diamond",
+      "draftkings",
+      "fanatics",
+      "fanduel",
+      "firekeepers",
+      "hard_rock",
+      "hardrock_fl",
+      "leovegas",
+      "miseojeu",
+      "mybookie",
+      "northstar_bets",
+      "pinnacle",
+      "playnow",
+      "pointsbet_ca",
+      "powerplay",
+      "prime_sports",
+      "proline",
+      "ps3838",
+      "sports_interaction",
+      "stake",
+      "thescore",
+      "tonybet",
+      "tooniebet",
+      "xbet"
+    ],
+    "sensitivityCount": 47,
+    "classCounts": {
+      "derived_aggregator": 9,
+      "dfs_pickem_sweepstakes": 10,
+      "exchange_prediction_market": 7,
+      "other_excluded": 2,
+      "sportsbook": 47
+    },
+    "classificationComplete": true,
+    "conservativeRule": "Ambiguous/nontraditional/composite labels are excluded from sportsbook holdout rather than guessed into the primary cohort."
+  },
+  "design": {
+    "mainLineSelection": "Within each source/player/game/market choose exact over/under line whose proportional no-vig over probability is closest to 0.50; tie-break lower absolute overround then line.",
+    "calibrator": "Per-market logistic recalibration q=sigmoid(a+b*logit(p)); a,b fit on March-May only, then frozen for June holdout.",
+    "primaryCohort": "High-confidence traditional sportsbook labels only.",
+    "sensitivityCohort": "High- and medium-confidence labels classified as traditional sportsbooks.",
+    "interpretation": "Holdout calibration is evidence about probability calibration, not a claim of executable betting profit or book sharpness."
+  },
+  "coverageByCohortPeriodMarket": [
+    {
+      "cohort": "primary",
+      "period": "holdout",
+      "market": "player bases",
+      "n": 82917,
+      "books": 31,
+      "games": 218,
+      "players": 412
+    },
+    {
+      "cohort": "primary",
+      "period": "train",
+      "market": "player bases",
+      "n": 238086,
+      "books": 27,
+      "games": 767,
+      "players": 486
+    },
+    {
+      "cohort": "primary",
+      "period": "holdout",
+      "market": "player batting walks",
+      "n": 29961,
+      "books": 10,
+      "games": 218,
+      "players": 407
+    },
+    {
+      "cohort": "primary",
+      "period": "train",
+      "market": "player batting walks",
+      "n": 94705,
+      "books": 11,
+      "games": 766,
+      "players": 484
+    },
+    {
+      "cohort": "primary",
+      "period": "holdout",
+      "market": "player hits",
+      "n": 72897,
+      "books": 27,
+      "games": 217,
+      "players": 412
+    },
+    {
+      "cohort": "primary",
+      "period": "train",
+      "market": "player hits",
+      "n": 233196,
+      "books": 24,
+      "games": 767,
+      "players": 486
+    },
+    {
+      "cohort": "primary",
+      "period": "holdout",
+      "market": "player home runs",
+      "n": 37950,
+      "books": 16,
+      "games": 218,
+      "players": 409
+    },
+    {
+      "cohort": "primary",
+      "period": "train",
+      "market": "player home runs",
+      "n": 124626,
+      "books": 19,
+      "games": 767,
+      "players": 485
+    },
+    {
+      "cohort": "primary",
+      "period": "holdout",
+      "market": "player rbis",
+      "n": 59054,
+      "books": 20,
+      "games": 217,
+      "players": 411
+    },
+    {
+      "cohort": "primary",
+      "period": "train",
+      "market": "player rbis",
+      "n": 169909,
+      "books": 19,
+      "games": 767,
+      "players": 486
+    },
+    {
+      "cohort": "primary",
+      "period": "holdout",
+      "market": "player strikeouts",
+      "n": 9267,
+      "books": 35,
+      "games": 170,
+      "players": 158
+    },
+    {
+      "cohort": "primary",
+      "period": "train",
+      "market": "player strikeouts",
+      "n": 38378,
+      "books": 33,
+      "games": 753,
+      "players": 245
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "holdout",
+      "market": "player bases",
+      "n": 85840,
+      "books": 33,
+      "games": 220,
+      "players": 412
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "train",
+      "market": "player bases",
+      "n": 250148,
+      "books": 29,
+      "games": 767,
+      "players": 486
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "holdout",
+      "market": "player batting walks",
+      "n": 29961,
+      "books": 10,
+      "games": 218,
+      "players": 407
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "train",
+      "market": "player batting walks",
+      "n": 94705,
+      "books": 11,
+      "games": 766,
+      "players": 484
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "holdout",
+      "market": "player hits",
+      "n": 72897,
+      "books": 27,
+      "games": 217,
+      "players": 412
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "train",
+      "market": "player hits",
+      "n": 233196,
+      "books": 24,
+      "games": 767,
+      "players": 486
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "holdout",
+      "market": "player home runs",
+      "n": 39138,
+      "books": 17,
+      "games": 218,
+      "players": 409
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "train",
+      "market": "player home runs",
+      "n": 127964,
+      "books": 20,
+      "games": 767,
+      "players": 485
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "holdout",
+      "market": "player rbis",
+      "n": 59054,
+      "books": 20,
+      "games": 217,
+      "players": 411
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "train",
+      "market": "player rbis",
+      "n": 169909,
+      "books": 19,
+      "games": 767,
+      "players": 486
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "holdout",
+      "market": "player strikeouts",
+      "n": 9856,
+      "books": 38,
+      "games": 170,
+      "players": 158
+    },
+    {
+      "cohort": "sensitivity",
+      "period": "train",
+      "market": "player strikeouts",
+      "n": 39525,
+      "books": 35,
+      "games": 754,
+      "players": 245
+    }
+  ],
+  "fits": [
+    {
+      "cohort": "primary",
+      "market": "player bases",
+      "fit": {
+        "status": "fit",
+        "n": 238086,
+        "intercept": -0.10358718061675025,
+        "slope": 1.080125724376556,
+        "iterations": 15
+      },
+      "train": {
+        "n": 238086,
+        "raw_mean_probability": 0.4680819126966835,
+        "recal_mean_probability": 0.44103811227877243,
+        "realized_over_rate": 0.4410381122787564,
+        "raw_brier": 0.23804333925419638,
+        "recal_brier": 0.23727851475701692,
+        "raw_log_loss": 0.6687499123718256,
+        "recal_log_loss": 0.6671267213690137,
+        "avg_overround": 0.07295244505801873
+      },
+      "holdout": {
+        "n": 82917,
+        "raw_mean_probability": 0.4668540317983098,
+        "recal_mean_probability": 0.4396569150579376,
+        "realized_over_rate": 0.45546751570847954,
+        "raw_brier": 0.23947538715635422,
+        "recal_brier": 0.23954673426657214,
+        "raw_log_loss": 0.6717906315411337,
+        "recal_log_loss": 0.6719763564028692,
+        "avg_overround": 0.0742245580835326,
+        "brierImprovement": -7.134711021791751e-05,
+        "logLossImprovement": -0.0001857248617355145,
+        "rawCalibrationGap": -0.011386516089830268,
+        "recalCalibrationGap": 0.01581060065054196
+      }
+    },
+    {
+      "cohort": "primary",
+      "market": "player batting walks",
+      "fit": {
+        "status": "fit",
+        "n": 94705,
+        "intercept": 0.009867803691057563,
+        "slope": 1.1453727367709308,
+        "iterations": 15
+      },
+      "train": {
+        "n": 94705,
+        "raw_mean_probability": 0.3313108781143784,
+        "recal_mean_probability": 0.3124439047568774,
+        "realized_over_rate": 0.3124439047568766,
+        "raw_brier": 0.2081028792975563,
+        "recal_brier": 0.20767512157335516,
+        "raw_log_loss": 0.605654276606849,
+        "recal_log_loss": 0.6045628270913398,
+        "avg_overround": 0.0730960617948595
+      },
+      "holdout": {
+        "n": 29961,
+        "raw_mean_probability": 0.3237605739135611,
+        "recal_mean_probability": 0.3040709109972121,
+        "realized_over_rate": 0.29581789659891194,
+        "raw_brier": 0.20148759887349046,
+        "recal_brier": 0.20060943361857583,
+        "raw_log_loss": 0.5913577847617518,
+        "recal_log_loss": 0.58904392810666,
+        "avg_overround": 0.07447094839564158,
+        "brierImprovement": 0.0008781652549146313,
+        "logLossImprovement": 0.0023138566550918727,
+        "rawCalibrationGap": -0.027942677314649167,
+        "recalCalibrationGap": -0.008253014398300174
+      }
+    },
+    {
+      "cohort": "primary",
+      "market": "player hits",
+      "fit": {
+        "status": "fit",
+        "n": 233196,
+        "intercept": -0.1042512881558041,
+        "slope": 1.134358472246663,
+        "iterations": 15
+      },
+      "train": {
+        "n": 233196,
+        "raw_mean_probability": 0.5711256706697334,
+        "recal_mean_probability": 0.5555584143810205,
+        "realized_over_rate": 0.5555584143810357,
+        "raw_brier": 0.23856421208043435,
+        "recal_brier": 0.2382249025907511,
+        "raw_log_loss": 0.6699202151014276,
+        "recal_log_loss": 0.6691776271814208,
+        "avg_overround": 0.0716550035583368
+      },
+      "holdout": {
+        "n": 72897,
+        "raw_mean_probability": 0.5704951162579802,
+        "recal_mean_probability": 0.5550555686738792,
+        "realized_over_rate": 0.5722320534452721,
+        "raw_brier": 0.23469481868134504,
+        "recal_brier": 0.23497284417518458,
+        "raw_log_loss": 0.6620527047634176,
+        "recal_log_loss": 0.6626256702788689,
+        "avg_overround": 0.07192096006292348,
+        "brierImprovement": -0.0002780254938395399,
+        "logLossImprovement": -0.0005729655154512736,
+        "rawCalibrationGap": 0.0017369371872918427,
+        "recalCalibrationGap": 0.017176484771392886
+      }
+    },
+    {
+      "cohort": "primary",
+      "market": "player home runs",
+      "fit": {
+        "status": "fit",
+        "n": 124626,
+        "intercept": -0.09829313965548403,
+        "slope": 1.1181035986313514,
+        "iterations": 15
+      },
+      "train": {
+        "n": 124626,
+        "raw_mean_probability": 0.14310376765422844,
+        "recal_mean_probability": 0.11053070787797308,
+        "realized_over_rate": 0.11053070787797088,
+        "raw_brier": 0.09743778778545392,
+        "recal_brier": 0.09635556571156842,
+        "raw_log_loss": 0.34270337403768614,
+        "recal_log_loss": 0.3378724991210703,
+        "avg_overround": 0.06710127765276432
+      },
+      "holdout": {
+        "n": 37950,
+        "raw_mean_probability": 0.14886266764832679,
+        "recal_mean_probability": 0.11582451219509757,
+        "realized_over_rate": 0.14342555994729908,
+        "raw_brier": 0.12029761390683331,
+        "recal_brier": 0.12108744002239338,
+        "raw_log_loss": 0.3999597448271727,
+        "recal_log_loss": 0.4034691765986678,
+        "avg_overround": 0.0682832898741933,
+        "brierImprovement": -0.0007898261155600689,
+        "logLossImprovement": -0.0035094317714950973,
+        "rawCalibrationGap": -0.005437107701027705,
+        "recalCalibrationGap": 0.027601047752201513
+      }
+    },
+    {
+      "cohort": "primary",
+      "market": "player rbis",
+      "fit": {
+        "status": "fit",
+        "n": 169909,
+        "intercept": -0.09045691882186029,
+        "slope": 1.0749045143103588,
+        "iterations": 15
+      },
+      "train": {
+        "n": 169909,
+        "raw_mean_probability": 0.3144170737146539,
+        "recal_mean_probability": 0.2838519442760418,
+        "realized_over_rate": 0.28385194427605365,
+        "raw_brier": 0.20144148633550035,
+        "recal_brier": 0.20052078359087702,
+        "raw_log_loss": 0.5918997880143422,
+        "recal_log_loss": 0.5896311704536827,
+        "avg_overround": 0.07662702853910099
+      },
+      "holdout": {
+        "n": 59054,
+        "raw_mean_probability": 0.32259965621136194,
+        "recal_mean_probability": 0.2922044795114902,
+        "realized_over_rate": 0.30334947675009316,
+        "raw_brier": 0.20905800977055244,
+        "recal_brier": 0.20883745335752132,
+        "raw_log_loss": 0.6080966096464565,
+        "recal_log_loss": 0.6075924385071259,
+        "avg_overround": 0.07656655466291,
+        "brierImprovement": 0.00022055641303111995,
+        "logLossImprovement": 0.0005041711393306558,
+        "rawCalibrationGap": -0.01925017946126878,
+        "recalCalibrationGap": 0.01114499723860296
+      }
+    },
+    {
+      "cohort": "primary",
+      "market": "player strikeouts",
+      "fit": {
+        "status": "fit",
+        "n": 38378,
+        "intercept": -0.04172050293128213,
+        "slope": 1.18286355143223,
+        "iterations": 15
+      },
+      "train": {
+        "n": 38378,
+        "raw_mean_probability": 0.49721296723275094,
+        "recal_mean_probability": 0.48645057063942654,
+        "realized_over_rate": 0.4864505706394288,
+        "raw_brier": 0.2460975937133129,
+        "recal_brier": 0.24589206336712227,
+        "raw_log_loss": 0.6852976278155196,
+        "recal_log_loss": 0.6848769278353734,
+        "avg_overround": 0.07100177363692413
+      },
+      "holdout": {
+        "n": 9267,
+        "raw_mean_probability": 0.49471170595924974,
+        "recal_mean_probability": 0.48352841100573624,
+        "realized_over_rate": 0.4957375633970001,
+        "raw_brier": 0.24565468567077434,
+        "recal_brier": 0.24565881249491123,
+        "raw_log_loss": 0.6844335722838276,
+        "recal_log_loss": 0.6844703558389855,
+        "avg_overround": 0.07152574256113199,
+        "brierImprovement": -4.126824136890805e-06,
+        "logLossImprovement": -3.6783555157904324e-05,
+        "rawCalibrationGap": 0.0010258574377503549,
+        "recalCalibrationGap": 0.012209152391263856
+      }
+    },
+    {
+      "cohort": "sensitivity",
+      "market": "player bases",
+      "fit": {
+        "status": "fit",
+        "n": 250148,
+        "intercept": -0.10406744388011616,
+        "slope": 1.0765920012714512,
+        "iterations": 15
+      },
+      "train": {
+        "n": 250148,
+        "raw_mean_probability": 0.4695270266116321,
+        "recal_mean_probability": 0.4425460127604304,
+        "realized_over_rate": 0.4425460127604458,
+        "raw_brier": 0.23831850674266994,
+        "recal_brier": 0.23756052870888092,
+        "raw_log_loss": 0.6693199932786725,
+        "recal_log_loss": 0.6677140818063322,
+        "avg_overround": 0.07283668004982131
+      },
+      "holdout": {
+        "n": 85840,
+        "raw_mean_probability": 0.4657117534796285,
+        "recal_mean_probability": 0.438404264686323,
+        "realized_over_rate": 0.4540540540540541,
+        "raw_brier": 0.23956155388520706,
+        "recal_brier": 0.23962407154004292,
+        "raw_log_loss": 0.6719685158198565,
+        "recal_log_loss": 0.6721333850367254,
+        "avg_overround": 0.0741233007935393,
+        "brierImprovement": -6.251765483586413e-05,
+        "logLossImprovement": -0.00016486921686886813,
+        "rawCalibrationGap": -0.01165769942557443,
+        "recalCalibrationGap": 0.015649789367731093
+      }
+    },
+    {
+      "cohort": "sensitivity",
+      "market": "player batting walks",
+      "fit": {
+        "status": "fit",
+        "n": 94705,
+        "intercept": 0.009867803691057879,
+        "slope": 1.1453727367709312,
+        "iterations": 15
+      },
+      "train": {
+        "n": 94705,
+        "raw_mean_probability": 0.3313108781143797,
+        "recal_mean_probability": 0.31244390475687794,
+        "realized_over_rate": 0.3124439047568766,
+        "raw_brier": 0.20810287929755647,
+        "recal_brier": 0.20767512157335452,
+        "raw_log_loss": 0.6056542766068479,
+        "recal_log_loss": 0.6045628270913385,
+        "avg_overround": 0.07309606179485935
+      },
+      "holdout": {
+        "n": 29961,
+        "raw_mean_probability": 0.3237605739135607,
+        "recal_mean_probability": 0.30407091099721206,
+        "realized_over_rate": 0.29581789659891194,
+        "raw_brier": 0.2014875988734905,
+        "recal_brier": 0.2006094336185762,
+        "raw_log_loss": 0.591357784761751,
+        "recal_log_loss": 0.5890439281066601,
+        "avg_overround": 0.07447094839564167,
+        "brierImprovement": 0.0008781652549142982,
+        "logLossImprovement": 0.0023138566550909845,
+        "rawCalibrationGap": -0.02794267731464878,
+        "recalCalibrationGap": -0.008253014398300118
+      }
+    },
+    {
+      "cohort": "sensitivity",
+      "market": "player hits",
+      "fit": {
+        "status": "fit",
+        "n": 233196,
+        "intercept": -0.10425128815580334,
+        "slope": 1.134358472246662,
+        "iterations": 15
+      },
+      "train": {
+        "n": 233196,
+        "raw_mean_probability": 0.5711256706697324,
+        "recal_mean_probability": 0.5555584143810249,
+        "realized_over_rate": 0.5555584143810357,
+        "raw_brier": 0.2385642120804345,
+        "recal_brier": 0.23822490259075174,
+        "raw_log_loss": 0.6699202151014315,
+        "recal_log_loss": 0.6691776271814165,
+        "avg_overround": 0.07165500355833669
+      },
+      "holdout": {
+        "n": 72897,
+        "raw_mean_probability": 0.5704951162579794,
+        "recal_mean_probability": 0.555055568673878,
+        "realized_over_rate": 0.5722320534452721,
+        "raw_brier": 0.2346948186813441,
+        "recal_brier": 0.23497284417518566,
+        "raw_log_loss": 0.6620527047634156,
+        "recal_log_loss": 0.662625670278867,
+        "avg_overround": 0.07192096006292331,
+        "brierImprovement": -0.00027802549384156605,
+        "logLossImprovement": -0.0005729655154513846,
+        "rawCalibrationGap": 0.0017369371872926198,
+        "recalCalibrationGap": 0.017176484771394107
+      }
+    },
+    {
+      "cohort": "sensitivity",
+      "market": "player home runs",
+      "fit": {
+        "status": "fit",
+        "n": 127964,
+        "intercept": -0.09315837513976793,
+        "slope": 1.1201333751296179,
+        "iterations": 15
+      },
+      "train": {
+        "n": 127964,
+        "raw_mean_probability": 0.14405228190186645,
+        "recal_mean_probability": 0.11153918289518946,
+        "realized_over_rate": 0.11153918289518927,
+        "raw_brier": 0.09819116754497521,
+        "recal_brier": 0.09711479401260023,
+        "raw_log_loss": 0.3446858734946263,
+        "recal_log_loss": 0.33989764696713715,
+        "avg_overround": 0.06717054774782096
+      },
+      "holdout": {
+        "n": 39138,
+        "raw_mean_probability": 0.15003921806189865,
+        "recal_mean_probability": 0.11705949512440472,
+        "realized_over_rate": 0.14492309264653278,
+        "raw_brier": 0.12136404426731813,
+        "recal_brier": 0.12217045257699401,
+        "raw_log_loss": 0.40268702923830596,
+        "recal_log_loss": 0.40626322833585554,
+        "avg_overround": 0.06832822341672587,
+        "brierImprovement": -0.0008064083096758767,
+        "logLossImprovement": -0.0035761990975495817,
+        "rawCalibrationGap": -0.00511612541536588,
+        "recalCalibrationGap": 0.027863597522128053
+      }
+    },
+    {
+      "cohort": "sensitivity",
+      "market": "player rbis",
+      "fit": {
+        "status": "fit",
+        "n": 169909,
+        "intercept": -0.09045691882186205,
+        "slope": 1.0749045143103566,
+        "iterations": 15
+      },
+      "train": {
+        "n": 169909,
+        "raw_mean_probability": 0.3144170737146547,
+        "recal_mean_probability": 0.2838519442760426,
+        "realized_over_rate": 0.28385194427605365,
+        "raw_brier": 0.20144148633550094,
+        "recal_brier": 0.20052078359087544,
+        "raw_log_loss": 0.5918997880143435,
+        "recal_log_loss": 0.5896311704536804,
+        "avg_overround": 0.07662702853910051
+      },
+      "holdout": {
+        "n": 59054,
+        "raw_mean_probability": 0.322599656211363,
+        "recal_mean_probability": 0.2922044795114909,
+        "realized_over_rate": 0.30334947675009316,
+        "raw_brier": 0.2090580097705518,
+        "recal_brier": 0.20883745335752146,
+        "raw_log_loss": 0.6080966096464576,
+        "recal_log_loss": 0.6075924385071264,
+        "avg_overround": 0.07656655466290987,
+        "brierImprovement": 0.0002205564130303428,
+        "logLossImprovement": 0.0005041711393312109,
+        "rawCalibrationGap": -0.019250179461269834,
+        "recalCalibrationGap": 0.011144997238602239
+      }
+    },
+    {
+      "cohort": "sensitivity",
+      "market": "player strikeouts",
+      "fit": {
+        "status": "fit",
+        "n": 39525,
+        "intercept": -0.03979251672621334,
+        "slope": 1.1846601844636806,
+        "iterations": 15
+      },
+      "train": {
+        "n": 39525,
+        "raw_mean_probability": 0.49720079364284586,
+        "recal_mean_probability": 0.48690702087285986,
+        "realized_over_rate": 0.48690702087286525,
+        "raw_brier": 0.24607098113925638,
+        "recal_brier": 0.24587325776561883,
+        "raw_log_loss": 0.685243315307354,
+        "recal_log_loss": 0.6848379588636576,
+        "avg_overround": 0.07106623693970879
+      },
+      "holdout": {
+        "n": 9856,
+        "raw_mean_probability": 0.49492013452459943,
+        "recal_mean_probability": 0.48423848721738516,
+        "realized_over_rate": 0.49573863636363635,
+        "raw_brier": 0.24566330232953815,
+        "recal_brier": 0.24565121733619585,
+        "raw_log_loss": 0.684451047356063,
+        "recal_log_loss": 0.6844545497603647,
+        "avg_overround": 0.07142497652979675,
+        "brierImprovement": 1.2084993342292849e-05,
+        "logLossImprovement": -3.502404301691797e-06,
+        "rawCalibrationGap": 0.0008185018390369225,
+        "recalCalibrationGap": 0.011500149146251193
+      }
+    }
+  ],
+  "holdoutBookDiagnostics": [
+    {
+      "cohort": "primary",
+      "book": "hardrock_fl",
+      "market": "player bases",
+      "n": 2372,
+      "brier": 0.2281359308534492,
+      "calibration_gap": -0.020460847815395422,
+      "avg_overround": 0.07185968827022866
+    },
+    {
+      "cohort": "primary",
+      "book": "hard_rock",
+      "market": "player bases",
+      "n": 3732,
+      "brier": 0.22840840376200733,
+      "calibration_gap": -0.014741176869619788,
+      "avg_overround": 0.07196604668234616
+    },
+    {
+      "cohort": "primary",
+      "book": "coolbet",
+      "market": "player bases",
+      "n": 1511,
+      "brier": 0.2295239287108557,
+      "calibration_gap": -0.0028452174833048516,
+      "avg_overround": 0.07105827492076298
+    },
+    {
+      "cohort": "primary",
+      "book": "northstar_bets",
+      "market": "player bases",
+      "n": 2951,
+      "brier": 0.22964734220442398,
+      "calibration_gap": -0.017006521134032282,
+      "avg_overround": 0.08249850991839272
+    },
+    {
+      "cohort": "primary",
+      "book": "bet365",
+      "market": "player bases",
+      "n": 3208,
+      "brier": 0.2298898158982475,
+      "calibration_gap": -0.007551992898195636,
+      "avg_overround": 0.06936220942852438
+    },
+    {
+      "cohort": "primary",
+      "book": "bet_jack",
+      "market": "player bases",
+      "n": 3597,
+      "brier": 0.22996692176760553,
+      "calibration_gap": -0.014376913222409082,
+      "avg_overround": 0.08105388310567356
+    },
+    {
+      "cohort": "primary",
+      "book": "circa",
+      "market": "player bases",
+      "n": 104,
+      "brier": 0.23050367409970926,
+      "calibration_gap": 0.007069503316714576,
+      "avg_overround": 0.05458931696758265
+    },
+    {
+      "cohort": "primary",
+      "book": "proline",
+      "market": "player bases",
+      "n": 696,
+      "brier": 0.2362073525191358,
+      "calibration_gap": 0.008020252732379052,
+      "avg_overround": 0.08092403788915373
+    },
+    {
+      "cohort": "primary",
+      "book": "draftkings",
+      "market": "player bases",
+      "n": 2075,
+      "brier": 0.23909358818487128,
+      "calibration_gap": -0.02295874508405854,
+      "avg_overround": 0.06692071244602527
+    },
+    {
+      "cohort": "primary",
+      "book": "bodog",
+      "market": "player bases",
+      "n": 2044,
+      "brier": 0.23957118340428268,
+      "calibration_gap": -0.02362063105126566,
+      "avg_overround": 0.06650835295682345
+    },
+    {
+      "cohort": "primary",
+      "book": "bovada",
+      "market": "player bases",
+      "n": 2044,
+      "brier": 0.23957118340428277,
+      "calibration_gap": -0.023620631051265828,
+      "avg_overround": 0.0665083529568235
+    },
+    {
+      "cohort": "primary",
+      "book": "prime_sports",
+      "market": "player bases",
+      "n": 2948,
+      "brier": 0.24043236582532784,
+      "calibration_gap": -0.00803022431570416,
+      "avg_overround": 0.05852615040316473
+    },
+    {
+      "cohort": "primary",
+      "book": "bookmaker",
+      "market": "player bases",
+      "n": 2948,
+      "brier": 0.24043236582532784,
+      "calibration_gap": -0.008030224315704493,
+      "avg_overround": 0.0585261504031647
+    },
+    {
+      "cohort": "primary",
+      "book": "888sport",
+      "market": "player bases",
+      "n": 3087,
+      "brier": 0.24179674840938173,
+      "calibration_gap": -0.015045351574790644,
+      "avg_overround": 0.10052278395491304
+    },
+    {
+      "cohort": "primary",
+      "book": "betcris",
+      "market": "player bases",
+      "n": 1207,
+      "brier": 0.24190190714388257,
+      "calibration_gap": -0.010806171837732303,
+      "avg_overround": 0.05859366703092662
+    },
+    {
+      "cohort": "primary",
+      "book": "pinnacle",
+      "market": "player bases",
+      "n": 3707,
+      "brier": 0.24196463154697223,
+      "calibration_gap": -0.01100427712624552,
+      "avg_overround": 0.06973632811799504
+    },
+    {
+      "cohort": "primary",
+      "book": "stake",
+      "market": "player bases",
+      "n": 2157,
+      "brier": 0.24208884575782957,
+      "calibration_gap": -0.007945285883809217,
+      "avg_overround": 0.09000000000000105
+    },
+    {
+      "cohort": "primary",
+      "book": "ps3838",
+      "market": "player bases",
+      "n": 3696,
+      "brier": 0.24218962806779235,
+      "calibration_gap": -0.01138172315752517,
+      "avg_overround": 0.06974469703182312
+    },
+    {
+      "cohort": "primary",
+      "book": "caesars",
+      "market": "player bases",
+      "n": 3631,
+      "brier": 0.24241918840070034,
+      "calibration_gap": -0.011199177103092706,
+      "avg_overround": 0.07138428212594644
+    },
+    {
+      "cohort": "primary",
+      "book": "firekeepers",
+      "market": "player bases",
+      "n": 3742,
+      "brier": 0.24260272006470804,
+      "calibration_gap": -0.013227898246957637,
+      "avg_overround": 0.07528978577172828
+    },
+    {
+      "cohort": "primary",
+      "book": "betano",
+      "market": "player bases",
+      "n": 3719,
+      "brier": 0.2426177050359439,
+      "calibration_gap": -0.011172676319933461,
+      "avg_overround": 0.07000966776302713
+    },
+    {
+      "cohort": "primary",
+      "book": "betsafe",
+      "market": "player bases",
+      "n": 3706,
+      "brier": 0.24275583816672477,
+      "calibration_gap": -0.012131954852780735,
+      "avg_overround": 0.10629750867998736
+    },
+    {
+      "cohort": "primary",
+      "book": "bet99",
+      "market": "player bases",
+      "n": 3753,
+      "brier": 0.2428575748810652,
+      "calibration_gap": -0.013295245391467647,
+      "avg_overround": 0.07005785496040555
+    },
+    {
+      "cohort": "primary",
+      "book": "betvictor",
+      "market": "player bases",
+      "n": 3734,
+      "brier": 0.24310768804023736,
+      "calibration_gap": -0.01243361163025497,
+      "avg_overround": 0.08009259031977767
+    },
+    {
+      "cohort": "primary",
+      "book": "betway",
+      "market": "player bases",
+      "n": 3743,
+      "brier": 0.24315348644257886,
+      "calibration_gap": -0.013416618095962785,
+      "avg_overround": 0.06876962857277018
+    },
+    {
+      "cohort": "primary",
+      "book": "bwin",
+      "market": "player bases",
+      "n": 3660,
+      "brier": 0.24358591864786958,
+      "calibration_gap": -0.0025009269318292393,
+      "avg_overround": 0.07320326889425242
+    },
+    {
+      "cohort": "primary",
+      "book": "betmgm",
+      "market": "player bases",
+      "n": 3669,
+      "brier": 0.24363377149061397,
+      "calibration_gap": -0.002954200771217441,
+      "avg_overround": 0.07317089649178472
+    },
+    {
+      "cohort": "primary",
+      "book": "sports_interaction",
+      "market": "player bases",
+      "n": 3650,
+      "brier": 0.24367192505001556,
+      "calibration_gap": -0.002502200858974124,
+      "avg_overround": 0.0731730913226902
+    },
+    {
+      "cohort": "primary",
+      "book": "fanatics",
+      "market": "player bases",
+      "n": 1804,
+      "brier": 0.2442120234960018,
+      "calibration_gap": -0.007439601396661222,
+      "avg_overround": 0.06750624087524185
+    },
+    {
+      "cohort": "primary",
+      "book": "draftkings",
+      "market": "player batting walks",
+      "n": 3639,
+      "brier": 0.19823063419132445,
+      "calibration_gap": -0.03960792665143453,
+      "avg_overround": 0.07374332219918642
+    },
+    {
+      "cohort": "primary",
+      "book": "hardrock_fl",
+      "market": "player batting walks",
+      "n": 2306,
+      "brier": 0.19858893235289246,
+      "calibration_gap": -0.03823350301230205,
+      "avg_overround": 0.07339748025668201
+    },
+    {
+      "cohort": "primary",
+      "book": "hard_rock",
+      "market": "player batting walks",
+      "n": 3628,
+      "brier": 0.19875775413258417,
+      "calibration_gap": -0.0368795743522039,
+      "avg_overround": 0.07311382698614574
+    },
+    {
+      "cohort": "primary",
+      "book": "bet365",
+      "market": "player batting walks",
+      "n": 3004,
+      "brier": 0.20130319056081594,
+      "calibration_gap": -0.020135470471288774,
+      "avg_overround": 0.06817051575728357
+    },
+    {
+      "cohort": "primary",
+      "book": "betsafe",
+      "market": "player batting walks",
+      "n": 3482,
+      "brier": 0.2019257322737274,
+      "calibration_gap": -0.014269001577678964,
+      "avg_overround": 0.08065435246579569
+    },
+    {
+      "cohort": "primary",
+      "book": "bet99",
+      "market": "player batting walks",
+      "n": 3531,
+      "brier": 0.20225115154820522,
+      "calibration_gap": -0.023254960407248393,
+      "avg_overround": 0.07012559200674279
+    },
+    {
+      "cohort": "primary",
+      "book": "betano",
+      "market": "player batting walks",
+      "n": 3507,
+      "brier": 0.2025145714164091,
+      "calibration_gap": -0.029621762044758082,
+      "avg_overround": 0.07009929128929165
+    },
+    {
+      "cohort": "primary",
+      "book": "stake",
+      "market": "player batting walks",
+      "n": 2020,
+      "brier": 0.20302535547229492,
+      "calibration_gap": -0.02910750295213005,
+      "avg_overround": 0.09000000000000091
+    },
+    {
+      "cohort": "primary",
+      "book": "fanatics",
+      "market": "player batting walks",
+      "n": 1694,
+      "brier": 0.20367942540927025,
+      "calibration_gap": -0.020451855358898596,
+      "avg_overround": 0.08110984866778248
+    },
+    {
+      "cohort": "primary",
+      "book": "caesars",
+      "market": "player batting walks",
+      "n": 3150,
+      "brier": 0.20604371270933752,
+      "calibration_gap": -0.02586690661080243,
+      "avg_overround": 0.07304321696190341
+    },
+    {
+      "cohort": "primary",
+      "book": "circa",
+      "market": "player hits",
+      "n": 106,
+      "brier": 0.2100255675908019,
+      "calibration_gap": 0.1471494158214729,
+      "avg_overround": 0.04949031726981143
+    },
+    {
+      "cohort": "primary",
+      "book": "coolbet",
+      "market": "player hits",
+      "n": 1513,
+      "brier": 0.22980081976695663,
+      "calibration_gap": 0.010551802109128983,
+      "avg_overround": 0.07074706519284556
+    },
+    {
+      "cohort": "primary",
+      "book": "prime_sports",
+      "market": "player hits",
+      "n": 2940,
+      "brier": 0.23185501715725734,
+      "calibration_gap": 0.010905268381089406,
+      "avg_overround": 0.05651206116984897
+    },
+    {
+      "cohort": "primary",
+      "book": "bookmaker",
+      "market": "player hits",
+      "n": 2940,
+      "brier": 0.23185501715725737,
+      "calibration_gap": 0.010905268381089406,
+      "avg_overround": 0.05651206116984898
+    },
+    {
+      "cohort": "primary",
+      "book": "stake",
+      "market": "player hits",
+      "n": 2157,
+      "brier": 0.23232386449194048,
+      "calibration_gap": 0.0007516385737921238,
+      "avg_overround": 0.09000000000000105
+    },
+    {
+      "cohort": "primary",
+      "book": "888sport",
+      "market": "player hits",
+      "n": 3087,
+      "brier": 0.23247566773280073,
+      "calibration_gap": -0.0022331077032575752,
+      "avg_overround": 0.10146742511646296
+    },
+    {
+      "cohort": "primary",
+      "book": "betcris",
+      "market": "player hits",
+      "n": 1235,
+      "brier": 0.23276037819709766,
+      "calibration_gap": 0.00016164045541267047,
+      "avg_overround": 0.056318783147292495
+    },
+    {
+      "cohort": "primary",
+      "book": "proline",
+      "market": "player hits",
+      "n": 699,
+      "brier": 0.23400663664452528,
+      "calibration_gap": 0.0001909610636818826,
+      "avg_overround": 0.06391425293129835
+    },
+    {
+      "cohort": "primary",
+      "book": "betsafe",
+      "market": "player hits",
+      "n": 3705,
+      "brier": 0.23452798056731616,
+      "calibration_gap": -0.008282101339253889,
+      "avg_overround": 0.08136994688087107
+    },
+    {
+      "cohort": "primary",
+      "book": "betway",
+      "market": "player hits",
+      "n": 3742,
+      "brier": 0.23462949282683193,
+      "calibration_gap": -0.003283472225622419,
+      "avg_overround": 0.06836711154333759
+    },
+    {
+      "cohort": "primary",
+      "book": "fanatics",
+      "market": "player hits",
+      "n": 1804,
+      "brier": 0.23468324072253638,
+      "calibration_gap": 0.00047724385219471976,
+      "avg_overround": 0.06646300293545965
+    },
+    {
+      "cohort": "primary",
+      "book": "bwin",
+      "market": "player hits",
+      "n": 3660,
+      "brier": 0.23474755176233847,
+      "calibration_gap": 0.010045247761508835,
+      "avg_overround": 0.07211157884854563
+    },
+    {
+      "cohort": "primary",
+      "book": "sports_interaction",
+      "market": "player hits",
+      "n": 3650,
+      "brier": 0.23474849814481216,
+      "calibration_gap": 0.009682218362092043,
+      "avg_overround": 0.07212047358209973
+    },
+    {
+      "cohort": "primary",
+      "book": "betmgm",
+      "market": "player hits",
+      "n": 3669,
+      "brier": 0.2348038682244343,
+      "calibration_gap": 0.009624777885079094,
+      "avg_overround": 0.07216860831660336
+    },
+    {
+      "cohort": "primary",
+      "book": "betvictor",
+      "market": "player hits",
+      "n": 3733,
+      "brier": 0.23482250389745218,
+      "calibration_gap": -0.0013431334133098272,
+      "avg_overround": 0.0797316138671675
+    },
+    {
+      "cohort": "primary",
+      "book": "betano",
+      "market": "player hits",
+      "n": 3718,
+      "brier": 0.23484534079248837,
+      "calibration_gap": -0.0013167698271190353,
+      "avg_overround": 0.0700589158541822
+    },
+    {
+      "cohort": "primary",
+      "book": "bet99",
+      "market": "player hits",
+      "n": 3752,
+      "brier": 0.23495496793408574,
+      "calibration_gap": -0.004664667443784687,
+      "avg_overround": 0.07007241025830437
+    },
+    {
+      "cohort": "primary",
+      "book": "bet365",
+      "market": "player hits",
+      "n": 3200,
+      "brier": 0.23516348356452518,
+      "calibration_gap": 0.005370848059628841,
+      "avg_overround": 0.07478364156408744
+    },
+    {
+      "cohort": "primary",
+      "book": "bet_jack",
+      "market": "player hits",
+      "n": 3608,
+      "brier": 0.23555504773387104,
+      "calibration_gap": -0.004309484519594675,
+      "avg_overround": 0.06389002053425437
+    },
+    {
+      "cohort": "primary",
+      "book": "pointsbet_ca",
+      "market": "player hits",
+      "n": 3434,
+      "brier": 0.23573757962470662,
+      "calibration_gap": 0.010545698399723968,
+      "avg_overround": 0.0762876296939266
+    },
+    {
+      "cohort": "primary",
+      "book": "draftkings",
+      "market": "player hits",
+      "n": 3736,
+      "brier": 0.23578905998878424,
+      "calibration_gap": -0.0023942797011413663,
+      "avg_overround": 0.06855331108938541
+    },
+    {
+      "cohort": "primary",
+      "book": "caesars",
+      "market": "player hits",
+      "n": 3711,
+      "brier": 0.23594376028940484,
+      "calibration_gap": 0.0009335780161265905,
+      "avg_overround": 0.07200076290701114
+    },
+    {
+      "cohort": "primary",
+      "book": "hard_rock",
+      "market": "player hits",
+      "n": 3731,
+      "brier": 0.23628342128218632,
+      "calibration_gap": -8.139683998420466e-05,
+      "avg_overround": 0.07128233645479287
+    },
+    {
+      "cohort": "primary",
+      "book": "northstar_bets",
+      "market": "player hits",
+      "n": 2960,
+      "brier": 0.23654220760490707,
+      "calibration_gap": -0.009017769092451444,
+      "avg_overround": 0.06544181713414275
+    },
+    {
+      "cohort": "primary",
+      "book": "hardrock_fl",
+      "market": "player hits",
+      "n": 2373,
+      "brier": 0.23860814518053453,
+      "calibration_gap": -0.004742626371185166,
+      "avg_overround": 0.07144219562246061
+    },
+    {
+      "cohort": "primary",
+      "book": "betsafe",
+      "market": "player home runs",
+      "n": 3706,
+      "brier": 0.1107018476177385,
+      "calibration_gap": -0.011725822082553461,
+      "avg_overround": 0.10561675894986035
+    },
+    {
+      "cohort": "primary",
+      "book": "firekeepers",
+      "market": "player home runs",
+      "n": 3185,
+      "brier": 0.11186029723101891,
+      "calibration_gap": 0.00948694135366708,
+      "avg_overround": 0.06987304345051407
+    },
+    {
+      "cohort": "primary",
+      "book": "hard_rock",
+      "market": "player home runs",
+      "n": 3735,
+      "brier": 0.11197130937568024,
+      "calibration_gap": -0.006505947372730664,
+      "avg_overround": 0.05267041091075788
+    },
+    {
+      "cohort": "primary",
+      "book": "hardrock_fl",
+      "market": "player home runs",
+      "n": 2373,
+      "brier": 0.11319866192882526,
+      "calibration_gap": -0.004982417109492404,
+      "avg_overround": 0.05267713822284971
+    },
+    {
+      "cohort": "primary",
+      "book": "bet365",
+      "market": "player home runs",
+      "n": 3202,
+      "brier": 0.11343842102506338,
+      "calibration_gap": -0.00308050859975198,
+      "avg_overround": 0.041096905281288135
+    },
+    {
+      "cohort": "primary",
+      "book": "bet_jack",
+      "market": "player home runs",
+      "n": 3579,
+      "brier": 0.11489786666259717,
+      "calibration_gap": -0.014897898952537653,
+      "avg_overround": 0.07586937781797001
+    },
+    {
+      "cohort": "primary",
+      "book": "stake",
+      "market": "player home runs",
+      "n": 2029,
+      "brier": 0.11890057130118453,
+      "calibration_gap": -0.018928382490583845,
+      "avg_overround": 0.09000000000000093
+    },
+    {
+      "cohort": "primary",
+      "book": "888sport",
+      "market": "player home runs",
+      "n": 3048,
+      "brier": 0.12054542778822569,
+      "calibration_gap": -0.02087179738831252,
+      "avg_overround": 0.09728475252103048
+    },
+    {
+      "cohort": "primary",
+      "book": "bookmaker",
+      "market": "player home runs",
+      "n": 2829,
+      "brier": 0.1206338044547438,
+      "calibration_gap": -0.002571856000486733,
+      "avg_overround": 0.05501217270055593
+    },
+    {
+      "cohort": "primary",
+      "book": "prime_sports",
+      "market": "player home runs",
+      "n": 2829,
+      "brier": 0.12063380445474389,
+      "calibration_gap": -0.0025718560004866775,
+      "avg_overround": 0.05501217270055595
+    },
+    {
+      "cohort": "primary",
+      "book": "coolbet",
+      "market": "player home runs",
+      "n": 1401,
+      "brier": 0.12284652348541633,
+      "calibration_gap": 5.5697733593540466e-05,
+      "avg_overround": 0.08783913291509057
+    },
+    {
+      "cohort": "primary",
+      "book": "betcris",
+      "market": "player home runs",
+      "n": 1179,
+      "brier": 0.126411336011841,
+      "calibration_gap": -0.000461367987267286,
+      "avg_overround": 0.05500852186048731
+    },
+    {
+      "cohort": "primary",
+      "book": "circa",
+      "market": "player home runs",
+      "n": 1942,
+      "brier": 0.1431203753934185,
+      "calibration_gap": 0.004678094408848754,
+      "avg_overround": 0.0364693493335906
+    },
+    {
+      "cohort": "primary",
+      "book": "pinnacle",
+      "market": "player home runs",
+      "n": 1447,
+      "brier": 0.1529179657480038,
+      "calibration_gap": 0.005459187198771198,
+      "avg_overround": 0.06981819526903907
+    },
+    {
+      "cohort": "primary",
+      "book": "ps3838",
+      "market": "player home runs",
+      "n": 1441,
+      "brier": 0.15343415803710495,
+      "calibration_gap": 0.006164085395804181,
+      "avg_overround": 0.06981865638998791
+    },
+    {
+      "cohort": "primary",
+      "book": "hardrock_fl",
+      "market": "player rbis",
+      "n": 2369,
+      "brier": 0.20735351673148236,
+      "calibration_gap": -0.02123181149358455,
+      "avg_overround": 0.07462742008932496
+    },
+    {
+      "cohort": "primary",
+      "book": "betsafe",
+      "market": "player rbis",
+      "n": 3705,
+      "brier": 0.2073594724846307,
+      "calibration_gap": -0.01522652268615099,
+      "avg_overround": 0.08047928250147328
+    },
+    {
+      "cohort": "primary",
+      "book": "firekeepers",
+      "market": "player rbis",
+      "n": 3741,
+      "brier": 0.20741299661949317,
+      "calibration_gap": -0.010438312453372955,
+      "avg_overround": 0.07531805644092505
+    },
+    {
+      "cohort": "primary",
+      "book": "bet99",
+      "market": "player rbis",
+      "n": 3752,
+      "brier": 0.2076828833579176,
+      "calibration_gap": -0.023984416121093033,
+      "avg_overround": 0.07007243322385213
+    },
+    {
+      "cohort": "primary",
+      "book": "betway",
+      "market": "player rbis",
+      "n": 3742,
+      "brier": 0.20783952864973812,
+      "calibration_gap": -0.027154946917944844,
+      "avg_overround": 0.06841432756679479
+    },
+    {
+      "cohort": "primary",
+      "book": "draftkings",
+      "market": "player rbis",
+      "n": 3724,
+      "brier": 0.2079587379942151,
+      "calibration_gap": -0.01007331481398449,
+      "avg_overround": 0.0733073220054402
+    },
+    {
+      "cohort": "primary",
+      "book": "betmgm",
+      "market": "player rbis",
+      "n": 3665,
+      "brier": 0.2080133308834512,
+      "calibration_gap": -0.02353241031106479,
+      "avg_overround": 0.06969291990899235
+    },
+    {
+      "cohort": "primary",
+      "book": "sports_interaction",
+      "market": "player rbis",
+      "n": 3646,
+      "brier": 0.20832065290445498,
+      "calibration_gap": -0.02282072852843453,
+      "avg_overround": 0.06972107138364184
+    },
+    {
+      "cohort": "primary",
+      "book": "stake",
+      "market": "player rbis",
+      "n": 2880,
+      "brier": 0.2083627644920928,
+      "calibration_gap": -0.02537824923547427,
+      "avg_overround": 0.09000000000000165
+    },
+    {
+      "cohort": "primary",
+      "book": "bwin",
+      "market": "player rbis",
+      "n": 3656,
+      "brier": 0.20836677796130318,
+      "calibration_gap": -0.022963013487069417,
+      "avg_overround": 0.06969156161077772
+    },
+    {
+      "cohort": "primary",
+      "book": "coolbet",
+      "market": "player rbis",
+      "n": 1490,
+      "brier": 0.20841367581420747,
+      "calibration_gap": -0.009592539711704873,
+      "avg_overround": 0.07376441942245467
+    },
+    {
+      "cohort": "primary",
+      "book": "betano",
+      "market": "player rbis",
+      "n": 3719,
+      "brier": 0.20851336243220392,
+      "calibration_gap": -0.0281561945921176,
+      "avg_overround": 0.07001736161650271
+    },
+    {
+      "cohort": "primary",
+      "book": "hard_rock",
+      "market": "player rbis",
+      "n": 3725,
+      "brier": 0.20882665796381542,
+      "calibration_gap": -0.016029895372346448,
+      "avg_overround": 0.07457552146253899
+    },
+    {
+      "cohort": "primary",
+      "book": "pointsbet_ca",
+      "market": "player rbis",
+      "n": 3428,
+      "brier": 0.20937750746663394,
+      "calibration_gap": -0.020170724223869507,
+      "avg_overround": 0.10642008385040441
+    },
+    {
+      "cohort": "primary",
+      "book": "northstar_bets",
+      "market": "player rbis",
+      "n": 2939,
+      "brier": 0.2107195513247998,
+      "calibration_gap": -0.01762139882124758,
+      "avg_overround": 0.07074155866255208
+    },
+    {
+      "cohort": "primary",
+      "book": "proline",
+      "market": "player rbis",
+      "n": 690,
+      "brier": 0.21133671186241382,
+      "calibration_gap": -0.014176636238953377,
+      "avg_overround": 0.06956722507709515
+    },
+    {
+      "cohort": "primary",
+      "book": "bet365",
+      "market": "player rbis",
+      "n": 3208,
+      "brier": 0.21189530818274446,
+      "calibration_gap": -0.009044016029010615,
+      "avg_overround": 0.06810317850384262
+    },
+    {
+      "cohort": "primary",
+      "book": "fanatics",
+      "market": "player rbis",
+      "n": 1804,
+      "brier": 0.21312448077883134,
+      "calibration_gap": -0.0187892447851703,
+      "avg_overround": 0.0817208246701348
+    },
+    {
+      "cohort": "primary",
+      "book": "888sport",
+      "market": "player rbis",
+      "n": 3071,
+      "brier": 0.2147385977844195,
+      "calibration_gap": -0.021749138715299043,
+      "avg_overround": 0.10086844643134431
+    },
+    {
+      "cohort": "primary",
+      "book": "circa",
+      "market": "player rbis",
+      "n": 100,
+      "brier": 0.24663660286913638,
+      "calibration_gap": 0.0370536800357259,
+      "avg_overround": 0.04811185492321132
+    },
+    {
+      "cohort": "primary",
+      "book": "fanduel",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.2411130812762175,
+      "calibration_gap": -0.002833549135443314,
+      "avg_overround": 0.0602488239131803
+    },
+    {
+      "cohort": "primary",
+      "book": "fanatics",
+      "market": "player strikeouts",
+      "n": 130,
+      "brier": 0.24140950879834014,
+      "calibration_gap": -0.020470404356050798,
+      "avg_overround": 0.07132644033878022
+    },
+    {
+      "cohort": "primary",
+      "book": "bodog",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.2432293549843194,
+      "calibration_gap": -0.002033921952127815,
+      "avg_overround": 0.06669308003631332
+    },
+    {
+      "cohort": "primary",
+      "book": "bet_jack",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.2435290115566792,
+      "calibration_gap": -0.007378634834393494,
+      "avg_overround": 0.06948378183557008
+    },
+    {
+      "cohort": "primary",
+      "book": "desert_diamond",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.24358750338469026,
+      "calibration_gap": -0.005245071439182403,
+      "avg_overround": 0.06964147092454497
+    },
+    {
+      "cohort": "primary",
+      "book": "betrivers",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.24360191860046745,
+      "calibration_gap": -0.005261764799551094,
+      "avg_overround": 0.0696507036591495
+    },
+    {
+      "cohort": "primary",
+      "book": "leovegas",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.24360191860046745,
+      "calibration_gap": -0.005261764799551094,
+      "avg_overround": 0.0696507036591495
+    },
+    {
+      "cohort": "primary",
+      "book": "northstar_bets",
+      "market": "player strikeouts",
+      "n": 248,
+      "brier": 0.24361934564312376,
+      "calibration_gap": -0.024905608348554598,
+      "avg_overround": 0.07089458688936985
+    },
+    {
+      "cohort": "primary",
+      "book": "bovada",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.243749469024667,
+      "calibration_gap": -0.002562186074058004,
+      "avg_overround": 0.06714909327776124
+    },
+    {
+      "cohort": "primary",
+      "book": "firekeepers",
+      "market": "player strikeouts",
+      "n": 328,
+      "brier": 0.2441452267443455,
+      "calibration_gap": -0.005395226681241538,
+      "avg_overround": 0.07506721187023796
+    },
+    {
+      "cohort": "primary",
+      "book": "circa",
+      "market": "player strikeouts",
+      "n": 290,
+      "brier": 0.24461069859864706,
+      "calibration_gap": 0.016728334008730472,
+      "avg_overround": 0.03981207569471706
+    },
+    {
+      "cohort": "primary",
+      "book": "coolbet",
+      "market": "player strikeouts",
+      "n": 111,
+      "brier": 0.2446914805105446,
+      "calibration_gap": 0.029789086873423243,
+      "avg_overround": 0.0698320592247716
+    },
+    {
+      "cohort": "primary",
+      "book": "stake",
+      "market": "player strikeouts",
+      "n": 198,
+      "brier": 0.24475958469468698,
+      "calibration_gap": -0.0027731442869056155,
+      "avg_overround": 0.08999999999999991
+    },
+    {
+      "cohort": "primary",
+      "book": "draftkings",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.24486688186631642,
+      "calibration_gap": -0.011829877436687786,
+      "avg_overround": 0.06091769521217768
+    },
+    {
+      "cohort": "primary",
+      "book": "sports_interaction",
+      "market": "player strikeouts",
+      "n": 286,
+      "brier": 0.24494453528297416,
+      "calibration_gap": -0.00816747629803416,
+      "avg_overround": 0.07616504126923904
+    },
+    {
+      "cohort": "primary",
+      "book": "betway",
+      "market": "player strikeouts",
+      "n": 320,
+      "brier": 0.24505638039258218,
+      "calibration_gap": 0.0014941047206386004,
+      "avg_overround": 0.06925251296912308
+    },
+    {
+      "cohort": "primary",
+      "book": "bwin",
+      "market": "player strikeouts",
+      "n": 291,
+      "brier": 0.24508574314557882,
+      "calibration_gap": -0.012928991233889686,
+      "avg_overround": 0.07602585733544981
+    },
+    {
+      "cohort": "primary",
+      "book": "betmgm",
+      "market": "player strikeouts",
+      "n": 291,
+      "brier": 0.24513664082381625,
+      "calibration_gap": -0.012841766103240337,
+      "avg_overround": 0.07585477169512736
+    },
+    {
+      "cohort": "primary",
+      "book": "hard_rock",
+      "market": "player strikeouts",
+      "n": 297,
+      "brier": 0.24550157938933787,
+      "calibration_gap": -0.0019563196739667554,
+      "avg_overround": 0.06814200522765478
+    },
+    {
+      "cohort": "primary",
+      "book": "888sport",
+      "market": "player strikeouts",
+      "n": 313,
+      "brier": 0.24552908738064358,
+      "calibration_gap": 0.00490162320059595,
+      "avg_overround": 0.10047104564476393
+    },
+    {
+      "cohort": "primary",
+      "book": "hardrock_fl",
+      "market": "player strikeouts",
+      "n": 185,
+      "brier": 0.24576206593026922,
+      "calibration_gap": 0.07060956434991422,
+      "avg_overround": 0.06774535718716582
+    },
+    {
+      "cohort": "primary",
+      "book": "betsafe",
+      "market": "player strikeouts",
+      "n": 325,
+      "brier": 0.24603618194584786,
+      "calibration_gap": 0.00616162571251927,
+      "avg_overround": 0.10712894600915757
+    },
+    {
+      "cohort": "primary",
+      "book": "bet99",
+      "market": "player strikeouts",
+      "n": 327,
+      "brier": 0.24603709116272288,
+      "calibration_gap": 0.00026373528334178165,
+      "avg_overround": 0.07023762089857484
+    },
+    {
+      "cohort": "primary",
+      "book": "caesars",
+      "market": "player strikeouts",
+      "n": 298,
+      "brier": 0.24664461728423143,
+      "calibration_gap": -0.004066115663974856,
+      "avg_overround": 0.06865745612106762
+    },
+    {
+      "cohort": "primary",
+      "book": "betano",
+      "market": "player strikeouts",
+      "n": 325,
+      "brier": 0.24672367623665695,
+      "calibration_gap": -0.004318173148021909,
+      "avg_overround": 0.07025233177798355
+    },
+    {
+      "cohort": "primary",
+      "book": "ps3838",
+      "market": "player strikeouts",
+      "n": 313,
+      "brier": 0.24686606602061179,
+      "calibration_gap": 0.007104832757983237,
+      "avg_overround": 0.06982466550601417
+    },
+    {
+      "cohort": "primary",
+      "book": "pinnacle",
+      "market": "player strikeouts",
+      "n": 314,
+      "brier": 0.24772294385844706,
+      "calibration_gap": 0.009857369364538793,
+      "avg_overround": 0.06978826580577159
+    },
+    {
+      "cohort": "primary",
+      "book": "betvictor",
+      "market": "player strikeouts",
+      "n": 317,
+      "brier": 0.2479096143339586,
+      "calibration_gap": 0.002814307565734031,
+      "avg_overround": 0.07997540401340786
+    },
+    {
+      "cohort": "primary",
+      "book": "bet365",
+      "market": "player strikeouts",
+      "n": 277,
+      "brier": 0.248643239512511,
+      "calibration_gap": 0.01984744963186763,
+      "avg_overround": 0.07079320157398786
+    },
+    {
+      "cohort": "primary",
+      "book": "pointsbet_ca",
+      "market": "player strikeouts",
+      "n": 281,
+      "brier": 0.2488721631493486,
+      "calibration_gap": 0.0007622757232522703,
+      "avg_overround": 0.07343006564513924
+    },
+    {
+      "cohort": "primary",
+      "book": "bookmaker",
+      "market": "player strikeouts",
+      "n": 290,
+      "brier": 0.25084508010366985,
+      "calibration_gap": 0.001161423216025581,
+      "avg_overround": 0.06149896606025015
+    },
+    {
+      "cohort": "primary",
+      "book": "prime_sports",
+      "market": "player strikeouts",
+      "n": 290,
+      "brier": 0.25084508010366985,
+      "calibration_gap": 0.001161423216025581,
+      "avg_overround": 0.06149896606025015
+    },
+    {
+      "cohort": "primary",
+      "book": "betcris",
+      "market": "player strikeouts",
+      "n": 121,
+      "brier": 0.25333837991699126,
+      "calibration_gap": 0.03316661287541822,
+      "avg_overround": 0.061320175209004055
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hardrock_fl",
+      "market": "player bases",
+      "n": 2372,
+      "brier": 0.2281359308534492,
+      "calibration_gap": -0.02046084781539559,
+      "avg_overround": 0.07185968827022868
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hard_rock",
+      "market": "player bases",
+      "n": 3732,
+      "brier": 0.22840840376200736,
+      "calibration_gap": -0.014741176869619788,
+      "avg_overround": 0.07196604668234619
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "coolbet",
+      "market": "player bases",
+      "n": 1511,
+      "brier": 0.22952392871085556,
+      "calibration_gap": -0.002845217483304907,
+      "avg_overround": 0.07105827492076298
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "northstar_bets",
+      "market": "player bases",
+      "n": 2951,
+      "brier": 0.22964734220442393,
+      "calibration_gap": -0.017006521134032004,
+      "avg_overround": 0.08249850991839267
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet365",
+      "market": "player bases",
+      "n": 3208,
+      "brier": 0.22988981589824714,
+      "calibration_gap": -0.007551992898195692,
+      "avg_overround": 0.06936220942852443
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet_jack",
+      "market": "player bases",
+      "n": 3597,
+      "brier": 0.22996692176760547,
+      "calibration_gap": -0.014376913222409027,
+      "avg_overround": 0.0810538831056736
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "circa",
+      "market": "player bases",
+      "n": 104,
+      "brier": 0.23050367409970932,
+      "calibration_gap": 0.007069503316714465,
+      "avg_overround": 0.05458931696758265
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "proline",
+      "market": "player bases",
+      "n": 696,
+      "brier": 0.23620735251913572,
+      "calibration_gap": 0.008020252732379163,
+      "avg_overround": 0.08092403788915373
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "draftkings",
+      "market": "player bases",
+      "n": 2075,
+      "brier": 0.2390935881848714,
+      "calibration_gap": -0.02295874508405854,
+      "avg_overround": 0.06692071244602527
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bovada",
+      "market": "player bases",
+      "n": 2044,
+      "brier": 0.2395711834042827,
+      "calibration_gap": -0.023620631051265994,
+      "avg_overround": 0.06650835295682349
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bodog",
+      "market": "player bases",
+      "n": 2044,
+      "brier": 0.23957118340428277,
+      "calibration_gap": -0.02362063105126605,
+      "avg_overround": 0.06650835295682343
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "powerplay",
+      "market": "player bases",
+      "n": 1947,
+      "brier": 0.2401142085081014,
+      "calibration_gap": -0.021208730472398185,
+      "avg_overround": 0.0686542067735032
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "prime_sports",
+      "market": "player bases",
+      "n": 2948,
+      "brier": 0.24043236582532793,
+      "calibration_gap": -0.008030224315704326,
+      "avg_overround": 0.05852615040316478
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bookmaker",
+      "market": "player bases",
+      "n": 2948,
+      "brier": 0.24043236582532798,
+      "calibration_gap": -0.008030224315704326,
+      "avg_overround": 0.05852615040316473
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "888sport",
+      "market": "player bases",
+      "n": 3087,
+      "brier": 0.24179674840938192,
+      "calibration_gap": -0.015045351574790533,
+      "avg_overround": 0.100522783954913
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betcris",
+      "market": "player bases",
+      "n": 1207,
+      "brier": 0.24190190714388263,
+      "calibration_gap": -0.01080617183773247,
+      "avg_overround": 0.058593667030926604
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "pinnacle",
+      "market": "player bases",
+      "n": 3707,
+      "brier": 0.24196463154697226,
+      "calibration_gap": -0.01100427712624552,
+      "avg_overround": 0.06973632811799509
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "stake",
+      "market": "player bases",
+      "n": 2157,
+      "brier": 0.24208884575782946,
+      "calibration_gap": -0.007945285883809106,
+      "avg_overround": 0.09000000000000108
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "ps3838",
+      "market": "player bases",
+      "n": 3696,
+      "brier": 0.24218962806779226,
+      "calibration_gap": -0.01138172315752528,
+      "avg_overround": 0.0697446970318231
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "caesars",
+      "market": "player bases",
+      "n": 3631,
+      "brier": 0.24241918840070018,
+      "calibration_gap": -0.011199177103092983,
+      "avg_overround": 0.07138428212594643
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "firekeepers",
+      "market": "player bases",
+      "n": 3742,
+      "brier": 0.242602720064708,
+      "calibration_gap": -0.01322789824695747,
+      "avg_overround": 0.07528978577172828
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betano",
+      "market": "player bases",
+      "n": 3719,
+      "brier": 0.24261770503594374,
+      "calibration_gap": -0.011172676319933461,
+      "avg_overround": 0.07000966776302713
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betsafe",
+      "market": "player bases",
+      "n": 3706,
+      "brier": 0.24275583816672477,
+      "calibration_gap": -0.012131954852781068,
+      "avg_overround": 0.10629750867998736
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet99",
+      "market": "player bases",
+      "n": 3753,
+      "brier": 0.24285757488106546,
+      "calibration_gap": -0.013295245391467814,
+      "avg_overround": 0.07005785496040555
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betvictor",
+      "market": "player bases",
+      "n": 3734,
+      "brier": 0.2431076880402372,
+      "calibration_gap": -0.01243361163025547,
+      "avg_overround": 0.08009259031977764
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betway",
+      "market": "player bases",
+      "n": 3743,
+      "brier": 0.24315348644257856,
+      "calibration_gap": -0.013416618095962785,
+      "avg_overround": 0.06876962857277022
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bwin",
+      "market": "player bases",
+      "n": 3660,
+      "brier": 0.2435859186478696,
+      "calibration_gap": -0.0025009269318292393,
+      "avg_overround": 0.07320326889425241
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betmgm",
+      "market": "player bases",
+      "n": 3669,
+      "brier": 0.2436337714906139,
+      "calibration_gap": -0.00295420077121733,
+      "avg_overround": 0.07317089649178471
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "sports_interaction",
+      "market": "player bases",
+      "n": 3650,
+      "brier": 0.2436719250500154,
+      "calibration_gap": -0.002502200858974013,
+      "avg_overround": 0.07317309132269023
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "fanatics",
+      "market": "player bases",
+      "n": 1804,
+      "brier": 0.24421202349600177,
+      "calibration_gap": -0.007439601396661,
+      "avg_overround": 0.06750624087524186
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betphoenix",
+      "market": "player bases",
+      "n": 976,
+      "brier": 0.2457794515342386,
+      "calibration_gap": -0.01564320270614772,
+      "avg_overround": 0.07643106241507501
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "draftkings",
+      "market": "player batting walks",
+      "n": 3639,
+      "brier": 0.1982306341913243,
+      "calibration_gap": -0.03960792665143448,
+      "avg_overround": 0.07374332219918642
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hardrock_fl",
+      "market": "player batting walks",
+      "n": 2306,
+      "brier": 0.19858893235289254,
+      "calibration_gap": -0.038233503012301884,
+      "avg_overround": 0.07339748025668204
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hard_rock",
+      "market": "player batting walks",
+      "n": 3628,
+      "brier": 0.1987577541325842,
+      "calibration_gap": -0.0368795743522039,
+      "avg_overround": 0.07311382698614571
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet365",
+      "market": "player batting walks",
+      "n": 3004,
+      "brier": 0.20130319056081597,
+      "calibration_gap": -0.020135470471288885,
+      "avg_overround": 0.06817051575728364
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betsafe",
+      "market": "player batting walks",
+      "n": 3482,
+      "brier": 0.20192573227372745,
+      "calibration_gap": -0.014269001577679075,
+      "avg_overround": 0.08065435246579569
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet99",
+      "market": "player batting walks",
+      "n": 3531,
+      "brier": 0.20225115154820542,
+      "calibration_gap": -0.02325496040724845,
+      "avg_overround": 0.07012559200674273
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betano",
+      "market": "player batting walks",
+      "n": 3507,
+      "brier": 0.20251457141640905,
+      "calibration_gap": -0.029621762044758027,
+      "avg_overround": 0.07009929128929163
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "stake",
+      "market": "player batting walks",
+      "n": 2020,
+      "brier": 0.20302535547229494,
+      "calibration_gap": -0.029107502952129993,
+      "avg_overround": 0.09000000000000091
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "fanatics",
+      "market": "player batting walks",
+      "n": 1694,
+      "brier": 0.20367942540927025,
+      "calibration_gap": -0.020451855358898485,
+      "avg_overround": 0.08110984866778252
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "caesars",
+      "market": "player batting walks",
+      "n": 3150,
+      "brier": 0.20604371270933752,
+      "calibration_gap": -0.02586690661080243,
+      "avg_overround": 0.07304321696190336
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "circa",
+      "market": "player hits",
+      "n": 106,
+      "brier": 0.2100255675908019,
+      "calibration_gap": 0.147149415821473,
+      "avg_overround": 0.04949031726981143
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "coolbet",
+      "market": "player hits",
+      "n": 1513,
+      "brier": 0.22980081976695665,
+      "calibration_gap": 0.010551802109128983,
+      "avg_overround": 0.07074706519284558
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bookmaker",
+      "market": "player hits",
+      "n": 2940,
+      "brier": 0.23185501715725726,
+      "calibration_gap": 0.010905268381089295,
+      "avg_overround": 0.056512061169849
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "prime_sports",
+      "market": "player hits",
+      "n": 2940,
+      "brier": 0.23185501715725756,
+      "calibration_gap": 0.010905268381089184,
+      "avg_overround": 0.05651206116984903
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "stake",
+      "market": "player hits",
+      "n": 2157,
+      "brier": 0.2323238644919405,
+      "calibration_gap": 0.0007516385737923459,
+      "avg_overround": 0.09000000000000105
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "888sport",
+      "market": "player hits",
+      "n": 3087,
+      "brier": 0.23247566773280057,
+      "calibration_gap": -0.0022331077032575752,
+      "avg_overround": 0.10146742511646305
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betcris",
+      "market": "player hits",
+      "n": 1235,
+      "brier": 0.23276037819709766,
+      "calibration_gap": 0.00016164045541244842,
+      "avg_overround": 0.056318783147292495
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "proline",
+      "market": "player hits",
+      "n": 699,
+      "brier": 0.23400663664452526,
+      "calibration_gap": 0.00019096106368177157,
+      "avg_overround": 0.06391425293129836
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betsafe",
+      "market": "player hits",
+      "n": 3705,
+      "brier": 0.2345279805673163,
+      "calibration_gap": -0.008282101339254111,
+      "avg_overround": 0.081369946880871
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betway",
+      "market": "player hits",
+      "n": 3742,
+      "brier": 0.23462949282683185,
+      "calibration_gap": -0.003283472225622419,
+      "avg_overround": 0.06836711154333758
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "fanatics",
+      "market": "player hits",
+      "n": 1804,
+      "brier": 0.23468324072253646,
+      "calibration_gap": 0.00047724385219516385,
+      "avg_overround": 0.06646300293545966
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bwin",
+      "market": "player hits",
+      "n": 3660,
+      "brier": 0.23474755176233825,
+      "calibration_gap": 0.010045247761508946,
+      "avg_overround": 0.07211157884854566
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "sports_interaction",
+      "market": "player hits",
+      "n": 3650,
+      "brier": 0.23474849814481238,
+      "calibration_gap": 0.009682218362092154,
+      "avg_overround": 0.07212047358209968
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betmgm",
+      "market": "player hits",
+      "n": 3669,
+      "brier": 0.23480386822443447,
+      "calibration_gap": 0.009624777885078983,
+      "avg_overround": 0.07216860831660336
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betvictor",
+      "market": "player hits",
+      "n": 3733,
+      "brier": 0.23482250389745216,
+      "calibration_gap": -0.0013431334133102713,
+      "avg_overround": 0.07973161386716751
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betano",
+      "market": "player hits",
+      "n": 3718,
+      "brier": 0.23484534079248845,
+      "calibration_gap": -0.0013167698271189243,
+      "avg_overround": 0.07005891585418221
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet99",
+      "market": "player hits",
+      "n": 3752,
+      "brier": 0.23495496793408557,
+      "calibration_gap": -0.004664667443784798,
+      "avg_overround": 0.07007241025830432
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet365",
+      "market": "player hits",
+      "n": 3200,
+      "brier": 0.2351634835645251,
+      "calibration_gap": 0.005370848059628952,
+      "avg_overround": 0.07478364156408746
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet_jack",
+      "market": "player hits",
+      "n": 3608,
+      "brier": 0.23555504773387093,
+      "calibration_gap": -0.004309484519594342,
+      "avg_overround": 0.06389002053425433
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "pointsbet_ca",
+      "market": "player hits",
+      "n": 3434,
+      "brier": 0.23573757962470673,
+      "calibration_gap": 0.010545698399723746,
+      "avg_overround": 0.07628762969392666
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "draftkings",
+      "market": "player hits",
+      "n": 3736,
+      "brier": 0.23578905998878424,
+      "calibration_gap": -0.0023942797011416994,
+      "avg_overround": 0.06855331108938538
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "caesars",
+      "market": "player hits",
+      "n": 3711,
+      "brier": 0.23594376028940492,
+      "calibration_gap": 0.0009335780161262575,
+      "avg_overround": 0.07200076290701113
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hard_rock",
+      "market": "player hits",
+      "n": 3731,
+      "brier": 0.23628342128218632,
+      "calibration_gap": -8.13968399838716e-05,
+      "avg_overround": 0.07128233645479283
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "northstar_bets",
+      "market": "player hits",
+      "n": 2960,
+      "brier": 0.23654220760490727,
+      "calibration_gap": -0.009017769092451444,
+      "avg_overround": 0.06544181713414274
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hardrock_fl",
+      "market": "player hits",
+      "n": 2373,
+      "brier": 0.23860814518053433,
+      "calibration_gap": -0.004742626371185055,
+      "avg_overround": 0.07144219562246064
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betsafe",
+      "market": "player home runs",
+      "n": 3706,
+      "brier": 0.11070184761773842,
+      "calibration_gap": -0.011725822082553489,
+      "avg_overround": 0.10561675894986026
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "firekeepers",
+      "market": "player home runs",
+      "n": 3185,
+      "brier": 0.11186029723101888,
+      "calibration_gap": 0.009486941353667122,
+      "avg_overround": 0.06987304345051408
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hard_rock",
+      "market": "player home runs",
+      "n": 3735,
+      "brier": 0.11197130937568023,
+      "calibration_gap": -0.006505947372730608,
+      "avg_overround": 0.0526704109107579
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hardrock_fl",
+      "market": "player home runs",
+      "n": 2373,
+      "brier": 0.11319866192882529,
+      "calibration_gap": -0.004982417109492432,
+      "avg_overround": 0.05267713822284971
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet365",
+      "market": "player home runs",
+      "n": 3202,
+      "brier": 0.11343842102506341,
+      "calibration_gap": -0.003080508599751869,
+      "avg_overround": 0.04109690528128811
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet_jack",
+      "market": "player home runs",
+      "n": 3579,
+      "brier": 0.1148978666625972,
+      "calibration_gap": -0.014897898952537764,
+      "avg_overround": 0.07586937781797001
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "stake",
+      "market": "player home runs",
+      "n": 2029,
+      "brier": 0.11890057130118456,
+      "calibration_gap": -0.01892838249058376,
+      "avg_overround": 0.09000000000000091
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "888sport",
+      "market": "player home runs",
+      "n": 3048,
+      "brier": 0.12054542778822575,
+      "calibration_gap": -0.02087179738831252,
+      "avg_overround": 0.09728475252103046
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "prime_sports",
+      "market": "player home runs",
+      "n": 2829,
+      "brier": 0.1206338044547438,
+      "calibration_gap": -0.0025718560004867053,
+      "avg_overround": 0.05501217270055593
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bookmaker",
+      "market": "player home runs",
+      "n": 2829,
+      "brier": 0.12063380445474384,
+      "calibration_gap": -0.0025718560004866775,
+      "avg_overround": 0.05501217270055596
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "coolbet",
+      "market": "player home runs",
+      "n": 1401,
+      "brier": 0.12284652348541635,
+      "calibration_gap": 5.569773359356822e-05,
+      "avg_overround": 0.08783913291509055
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betcris",
+      "market": "player home runs",
+      "n": 1179,
+      "brier": 0.12641133601184096,
+      "calibration_gap": -0.000461367987267286,
+      "avg_overround": 0.055008521860487325
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "circa",
+      "market": "player home runs",
+      "n": 1942,
+      "brier": 0.14312037539341857,
+      "calibration_gap": 0.004678094408848782,
+      "avg_overround": 0.036469349333590605
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "pinnacle",
+      "market": "player home runs",
+      "n": 1447,
+      "brier": 0.15291796574800384,
+      "calibration_gap": 0.00545918719877117,
+      "avg_overround": 0.06981819526903905
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "ps3838",
+      "market": "player home runs",
+      "n": 1441,
+      "brier": 0.15343415803710492,
+      "calibration_gap": 0.0061640853958040975,
+      "avg_overround": 0.06981865638998791
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet105",
+      "market": "player home runs",
+      "n": 1188,
+      "brier": 0.15543056967169436,
+      "calibration_gap": 0.005137475376614742,
+      "avg_overround": 0.06976360046984416
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hardrock_fl",
+      "market": "player rbis",
+      "n": 2369,
+      "brier": 0.20735351673148228,
+      "calibration_gap": -0.021231811493584496,
+      "avg_overround": 0.07462742008932502
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betsafe",
+      "market": "player rbis",
+      "n": 3705,
+      "brier": 0.20735947248463077,
+      "calibration_gap": -0.015226522686150823,
+      "avg_overround": 0.0804792825014733
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "firekeepers",
+      "market": "player rbis",
+      "n": 3741,
+      "brier": 0.2074129966194933,
+      "calibration_gap": -0.010438312453372789,
+      "avg_overround": 0.0753180564409251
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet99",
+      "market": "player rbis",
+      "n": 3752,
+      "brier": 0.20768288335791746,
+      "calibration_gap": -0.02398441612109309,
+      "avg_overround": 0.07007243322385212
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betway",
+      "market": "player rbis",
+      "n": 3742,
+      "brier": 0.20783952864973812,
+      "calibration_gap": -0.02715494691794501,
+      "avg_overround": 0.06841432756679483
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "draftkings",
+      "market": "player rbis",
+      "n": 3724,
+      "brier": 0.20795873799421516,
+      "calibration_gap": -0.010073314813984269,
+      "avg_overround": 0.07330732200544023
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betmgm",
+      "market": "player rbis",
+      "n": 3665,
+      "brier": 0.20801333088345103,
+      "calibration_gap": -0.02353241031106501,
+      "avg_overround": 0.06969291990899242
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "sports_interaction",
+      "market": "player rbis",
+      "n": 3646,
+      "brier": 0.208320652904455,
+      "calibration_gap": -0.02282072852843464,
+      "avg_overround": 0.06972107138364188
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "stake",
+      "market": "player rbis",
+      "n": 2880,
+      "brier": 0.20836276449209284,
+      "calibration_gap": -0.02537824923547416,
+      "avg_overround": 0.09000000000000165
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bwin",
+      "market": "player rbis",
+      "n": 3656,
+      "brier": 0.2083667779613033,
+      "calibration_gap": -0.022963013487069417,
+      "avg_overround": 0.0696915616107778
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "coolbet",
+      "market": "player rbis",
+      "n": 1490,
+      "brier": 0.2084136758142074,
+      "calibration_gap": -0.009592539711704984,
+      "avg_overround": 0.0737644194224547
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betano",
+      "market": "player rbis",
+      "n": 3719,
+      "brier": 0.2085133624322039,
+      "calibration_gap": -0.028156194592117767,
+      "avg_overround": 0.07001736161650263
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hard_rock",
+      "market": "player rbis",
+      "n": 3725,
+      "brier": 0.20882665796381544,
+      "calibration_gap": -0.016029895372346503,
+      "avg_overround": 0.07457552146253896
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "pointsbet_ca",
+      "market": "player rbis",
+      "n": 3428,
+      "brier": 0.20937750746663397,
+      "calibration_gap": -0.020170724223869396,
+      "avg_overround": 0.10642008385040448
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "northstar_bets",
+      "market": "player rbis",
+      "n": 2939,
+      "brier": 0.21071955132479983,
+      "calibration_gap": -0.01762139882124758,
+      "avg_overround": 0.07074155866255209
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "proline",
+      "market": "player rbis",
+      "n": 690,
+      "brier": 0.2113367118624139,
+      "calibration_gap": -0.014176636238953377,
+      "avg_overround": 0.06956722507709515
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet365",
+      "market": "player rbis",
+      "n": 3208,
+      "brier": 0.21189530818274463,
+      "calibration_gap": -0.009044016029010393,
+      "avg_overround": 0.06810317850384262
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "fanatics",
+      "market": "player rbis",
+      "n": 1804,
+      "brier": 0.21312448077883123,
+      "calibration_gap": -0.018789244785170134,
+      "avg_overround": 0.08172082467013479
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "888sport",
+      "market": "player rbis",
+      "n": 3071,
+      "brier": 0.21473859778441948,
+      "calibration_gap": -0.02174913871529921,
+      "avg_overround": 0.10086844643134428
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "circa",
+      "market": "player rbis",
+      "n": 100,
+      "brier": 0.24663660286913638,
+      "calibration_gap": 0.037053680035725844,
+      "avg_overround": 0.04811185492321133
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "fanduel",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.24111308127621756,
+      "calibration_gap": -0.002833549135443425,
+      "avg_overround": 0.0602488239131803
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "fanatics",
+      "market": "player strikeouts",
+      "n": 130,
+      "brier": 0.24140950879834014,
+      "calibration_gap": -0.020470404356050798,
+      "avg_overround": 0.07132644033878022
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bodog",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.2432293549843195,
+      "calibration_gap": -0.002033921952127815,
+      "avg_overround": 0.0666930800363133
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet_jack",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.2435290115566792,
+      "calibration_gap": -0.007378634834393383,
+      "avg_overround": 0.0694837818355701
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "desert_diamond",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.24358750338469026,
+      "calibration_gap": -0.005245071439182403,
+      "avg_overround": 0.06964147092454497
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "leovegas",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.24360191860046745,
+      "calibration_gap": -0.005261764799551094,
+      "avg_overround": 0.0696507036591495
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betrivers",
+      "market": "player strikeouts",
+      "n": 293,
+      "brier": 0.24360191860046748,
+      "calibration_gap": -0.005261764799551205,
+      "avg_overround": 0.0696507036591495
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "northstar_bets",
+      "market": "player strikeouts",
+      "n": 248,
+      "brier": 0.24361934564312374,
+      "calibration_gap": -0.024905608348554542,
+      "avg_overround": 0.07089458688936986
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bovada",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.24374946902466696,
+      "calibration_gap": -0.002562186074058226,
+      "avg_overround": 0.06714909327776122
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "firekeepers",
+      "market": "player strikeouts",
+      "n": 328,
+      "brier": 0.24414522674434558,
+      "calibration_gap": -0.005395226681241816,
+      "avg_overround": 0.07506721187023795
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "circa",
+      "market": "player strikeouts",
+      "n": 290,
+      "brier": 0.24461069859864695,
+      "calibration_gap": 0.016728334008730472,
+      "avg_overround": 0.039812075694717064
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "coolbet",
+      "market": "player strikeouts",
+      "n": 111,
+      "brier": 0.2446914805105446,
+      "calibration_gap": 0.029789086873423243,
+      "avg_overround": 0.0698320592247716
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "stake",
+      "market": "player strikeouts",
+      "n": 198,
+      "brier": 0.24475958469468692,
+      "calibration_gap": -0.0027731442869058376,
+      "avg_overround": 0.0899999999999999
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "draftkings",
+      "market": "player strikeouts",
+      "n": 295,
+      "brier": 0.24486688186631636,
+      "calibration_gap": -0.011829877436687897,
+      "avg_overround": 0.06091769521217769
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "sports_interaction",
+      "market": "player strikeouts",
+      "n": 286,
+      "brier": 0.24494453528297416,
+      "calibration_gap": -0.008167476298034326,
+      "avg_overround": 0.07616504126923904
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betway",
+      "market": "player strikeouts",
+      "n": 320,
+      "brier": 0.24505638039258226,
+      "calibration_gap": 0.0014941047206386004,
+      "avg_overround": 0.06925251296912309
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bwin",
+      "market": "player strikeouts",
+      "n": 291,
+      "brier": 0.24508574314557877,
+      "calibration_gap": -0.012928991233889797,
+      "avg_overround": 0.07602585733544981
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betmgm",
+      "market": "player strikeouts",
+      "n": 291,
+      "brier": 0.24513664082381625,
+      "calibration_gap": -0.012841766103240115,
+      "avg_overround": 0.07585477169512737
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hard_rock",
+      "market": "player strikeouts",
+      "n": 297,
+      "brier": 0.2455015793893379,
+      "calibration_gap": -0.0019563196739667554,
+      "avg_overround": 0.06814200522765476
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "888sport",
+      "market": "player strikeouts",
+      "n": 313,
+      "brier": 0.24552908738064358,
+      "calibration_gap": 0.004901623200595839,
+      "avg_overround": 0.10047104564476393
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "powerplay",
+      "market": "player strikeouts",
+      "n": 268,
+      "brier": 0.24561997235093644,
+      "calibration_gap": -0.008907674998020865,
+      "avg_overround": 0.06799145634660937
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "hardrock_fl",
+      "market": "player strikeouts",
+      "n": 185,
+      "brier": 0.2457620659302693,
+      "calibration_gap": 0.07060956434991422,
+      "avg_overround": 0.06774535718716582
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betsafe",
+      "market": "player strikeouts",
+      "n": 325,
+      "brier": 0.24603618194584784,
+      "calibration_gap": 0.006161625712519159,
+      "avg_overround": 0.1071289460091576
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet99",
+      "market": "player strikeouts",
+      "n": 327,
+      "brier": 0.24603709116272288,
+      "calibration_gap": 0.0002637352833416706,
+      "avg_overround": 0.07023762089857487
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "caesars",
+      "market": "player strikeouts",
+      "n": 298,
+      "brier": 0.24664461728423137,
+      "calibration_gap": -0.004066115663974856,
+      "avg_overround": 0.06865745612106762
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betano",
+      "market": "player strikeouts",
+      "n": 325,
+      "brier": 0.24672367623665697,
+      "calibration_gap": -0.004318173148022186,
+      "avg_overround": 0.07025233177798355
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "ps3838",
+      "market": "player strikeouts",
+      "n": 313,
+      "brier": 0.24686606602061187,
+      "calibration_gap": 0.007104832757983237,
+      "avg_overround": 0.06982466550601417
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet105",
+      "market": "player strikeouts",
+      "n": 269,
+      "brier": 0.24761705101835219,
+      "calibration_gap": 0.007685241220866057,
+      "avg_overround": 0.06970160591266963
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "pinnacle",
+      "market": "player strikeouts",
+      "n": 314,
+      "brier": 0.2477229438584471,
+      "calibration_gap": 0.009857369364538793,
+      "avg_overround": 0.06978826580577158
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betvictor",
+      "market": "player strikeouts",
+      "n": 317,
+      "brier": 0.2479096143339586,
+      "calibration_gap": 0.002814307565734031,
+      "avg_overround": 0.07997540401340786
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bet365",
+      "market": "player strikeouts",
+      "n": 277,
+      "brier": 0.248643239512511,
+      "calibration_gap": 0.01984744963186763,
+      "avg_overround": 0.07079320157398784
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "pointsbet_ca",
+      "market": "player strikeouts",
+      "n": 281,
+      "brier": 0.24887216314934857,
+      "calibration_gap": 0.0007622757232521593,
+      "avg_overround": 0.07343006564513926
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "prime_sports",
+      "market": "player strikeouts",
+      "n": 290,
+      "brier": 0.2508450801036698,
+      "calibration_gap": 0.00116142321602547,
+      "avg_overround": 0.06149896606025016
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "bookmaker",
+      "market": "player strikeouts",
+      "n": 290,
+      "brier": 0.2508450801036698,
+      "calibration_gap": 0.001161423216025581,
+      "avg_overround": 0.06149896606025016
+    },
+    {
+      "cohort": "sensitivity",
+      "book": "betcris",
+      "market": "player strikeouts",
+      "n": 121,
+      "brier": 0.25333837991699126,
+      "calibration_gap": 0.03316661287541822,
+      "avg_overround": 0.061320175209004055
+    }
+  ],
+  "primaryHoldoutStability": [
+    {
+      "market": "player bases",
+      "holdoutN": 82917,
+      "rawCalibrationGap": -0.011386516089830268,
+      "recalCalibrationGap": 0.01581060065054196,
+      "brierImprovement": -7.134711021791751e-05,
+      "logLossImprovement": -0.0001857248617355145,
+      "recalibrationGeneralized": false
+    },
+    {
+      "market": "player batting walks",
+      "holdoutN": 29961,
+      "rawCalibrationGap": -0.027942677314649167,
+      "recalCalibrationGap": -0.008253014398300174,
+      "brierImprovement": 0.0008781652549146313,
+      "logLossImprovement": 0.0023138566550918727,
+      "recalibrationGeneralized": true
+    },
+    {
+      "market": "player hits",
+      "holdoutN": 72897,
+      "rawCalibrationGap": 0.0017369371872918427,
+      "recalCalibrationGap": 0.017176484771392886,
+      "brierImprovement": -0.0002780254938395399,
+      "logLossImprovement": -0.0005729655154512736,
+      "recalibrationGeneralized": false
+    },
+    {
+      "market": "player home runs",
+      "holdoutN": 37950,
+      "rawCalibrationGap": -0.005437107701027705,
+      "recalCalibrationGap": 0.027601047752201513,
+      "brierImprovement": -0.0007898261155600689,
+      "logLossImprovement": -0.0035094317714950973,
+      "recalibrationGeneralized": false
+    },
+    {
+      "market": "player rbis",
+      "holdoutN": 59054,
+      "rawCalibrationGap": -0.01925017946126878,
+      "recalCalibrationGap": 0.01114499723860296,
+      "brierImprovement": 0.00022055641303111995,
+      "logLossImprovement": 0.0005041711393306558,
+      "recalibrationGeneralized": true
+    },
+    {
+      "market": "player strikeouts",
+      "holdoutN": 9267,
+      "rawCalibrationGap": 0.0010258574377503549,
+      "recalCalibrationGap": 0.012209152391263856,
+      "brierImprovement": -4.126824136890805e-06,
+      "logLossImprovement": -3.6783555157904324e-05,
+      "recalibrationGeneralized": false
+    }
+  ],
+  "admissionChecks": {
+    "all75SourcesOperationallyClassified": true,
+    "nonSportsbookSourcesExcludedFromPrimary": true,
+    "forwardHoldoutPerformed": true,
+    "trainAndHoldoutSeparatedByTime": true,
+    "fiveMinutePregameCutoffUsed": true,
+    "directProfitabilityClaimAllowed": false,
+    "bookSharpnessRankingAllowed": false,
+    "mlbDirectMarketAuditPhaseComplete": true,
+    "productionPromotionPerformed": false
+  }
+}
