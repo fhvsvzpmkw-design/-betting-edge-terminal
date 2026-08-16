@@ -424,7 +424,7 @@ async function load(){
     const priorRuns=await sameDayPriorRuns(index,entry);
     const hydrated={...run,prior_runs:priorRuns};
     frame.addEventListener('load',revealTerminal,{once:true});
-    frame.src='./runner.html#run='+b64ue(JSON.stringify(hydrated));
+    frame.src='./runner.html?build='+Date.now()+'#run='+b64ue(JSON.stringify(hydrated));
   }catch(e){fail('BETTING EDGE SHORT LINK ERROR // '+String(e&&e.message||e))}
 }
 load();
