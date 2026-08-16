@@ -1,0 +1,42 @@
+name: Patch meter display
+
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-meter-display.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove redundant meter denominator
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('runner.html')
+          s = p.read_text()
+          old = "read.append(el(d,'b','',`${reading.value} / 100`),d.createTextNode(reading.label))"
+          new = "read.append(el(d,'b','',`${reading.value}`),d.createTextNode(reading.label))"
+          assert s.count(old) == 1, f'expected one meter readout match, found {s.count(old)}'
+          s = s.replace(old, new)
+          assert 'Betting Edge Terminal v1.3 Runner' in s
+          assert "`${reading.value} / 100`" not in s
+          p.write_text(s)
+          PY
+      - name: Commit runner-only patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add runner.html
+          git diff --cached --check
+          git diff --cached --exit-code -- .github/workflows/patch-meter-display.yml || true
+          git commit -m 'ui: simplify meter value readout'
+          git push
