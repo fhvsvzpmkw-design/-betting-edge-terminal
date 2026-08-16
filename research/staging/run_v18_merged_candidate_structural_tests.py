@@ -43,13 +43,11 @@ MARKET_HINTS = {
 TOKEN_SYNONYMS = {
     "hr": "home_run",
     "hrs": "home_run",
-    "home_runs": "home_run",
     "strikeouts": "strikeout",
     "sog": "shots_on_goal",
     "saves": "save",
     "receptions": "receiving",
     "yards": "yard",
-    "parlay": "parlay",
     "sgp": "parlay",
     "assists": "assist",
     "walks": "walk",
@@ -74,7 +72,6 @@ def tokens(value):
         if tok.endswith("s") and len(tok) > 4:
             tok = tok[:-1]
         out.add(tok)
-    # Preserve common compound concepts.
     if "home" in out and "run" in out:
         out.add("home_run")
     if "line" in out and "movement" in out:
@@ -82,6 +79,15 @@ def tokens(value):
     if "player" in out and "prop" in out:
         out.add("player_props")
     return out
+
+
+def market_relevant(case, item):
+    hints = MARKET_HINTS.get(case["market"], set())
+    classes = set(item["scope"].get("marketClasses", []))
+    detail = tokens(item.get("marketClassDetail") or "")
+    topic = tokens(item.get("topic") or "")
+    case_tokens = tokens(case["market"])
+    return bool(hints.intersection(classes) or case_tokens.intersection(detail) or case_tokens.intersection(topic))
 
 
 def sport_score(case_sport, item_sports):
@@ -94,7 +100,7 @@ def sport_score(case_sport, item_sports):
 
 def item_score(case, item):
     sscore = sport_score(case["sport"], item["scope"]["sports"])
-    if sscore == 0:
+    if sscore == 0 or not market_relevant(case, item):
         return -1
     timing = item["scope"].get("timing", ["all"])
     if case["timing"] not in timing and "all" not in timing:
@@ -111,7 +117,6 @@ def item_score(case, item):
     score += 5 * len(case_tokens.intersection(topic_tokens))
     if item.get("marketClassDetail") and overlap:
         score += 15
-    # Exact sport/market detail is intentionally stronger than broad analogies.
     if case["sport"] in item["scope"]["sports"] and overlap:
         score += 20
     return score
@@ -121,9 +126,28 @@ def retrieve(case, items):
     scored = [(item_score(case, item), item) for item in items]
     scored = [(s, i) for s, i in scored if s > 0]
     scored.sort(key=lambda x: (x[0], x[1]["evidence"].get("tier") in {"A", "B"}), reverse=True)
-    primary = [i for s, i in scored if i["retrievalRole"] == "primary_prior"][:4]
-    secondary = [i for s, i in scored if i["retrievalRole"] in {"synthesis", "inference"}][:1]
-    return primary + secondary
+
+    exact = [(s, i) for s, i in scored if case["sport"] in i["scope"]["sports"]]
+    cross = [(s, i) for s, i in scored if "Cross-Sport" in i["scope"]["sports"] and case["sport"] not in i["scope"]["sports"]]
+
+    exact_primary = [i for s, i in exact if i["retrievalRole"] == "primary_prior"]
+    exact_secondary = [i for s, i in exact if i["retrievalRole"] in {"synthesis", "inference"}]
+    exact_gap = [i for i in exact_secondary if i.get("historyFitRole") == "gap" or i["evidence"].get("tier") == "GAP"]
+
+    # An exact sport/market gap blocks forced generic analogy when no exact primary exists.
+    if exact_gap and not exact_primary:
+        return exact_gap[:1]
+
+    selected = exact_primary[:4]
+    # Only fill unused primary slots with genuinely market-relevant cross-sport methodology.
+    if len(selected) < 4:
+        cross_primary = [i for s, i in cross if i["retrievalRole"] == "primary_prior"]
+        selected.extend(cross_primary[: 4 - len(selected)])
+
+    secondary = exact_secondary[:1]
+    if not secondary:
+        secondary = [i for s, i in cross if i["retrievalRole"] in {"synthesis", "inference"}][:1]
+    return selected + secondary
 
 
 def main():
@@ -154,18 +178,17 @@ def main():
     by_prior = {}
     for item in library["items"]:
         by_prior.setdefault(item["priorId"], []).append(item)
+    registry_ids = {x["sourceId"] for x in registry["sources"]}
     r2_ids = [x["id"] for x in freeze["items"]]
     inventory = []
     for pid in r2_ids:
-        count = len(by_prior.get(pid, []))
+        vals = by_prior.get(pid, [])
         item_errors = []
-        if count != 1:
-            item_errors.append(f"logical item count {count}, expected 1")
-        if count == 1:
-            item = by_prior[pid][0]
-            source_ids = item.get("provenance", {}).get("sourceIds", [])
-            registry_ids = {x["sourceId"] for x in registry["sources"]}
-            missing_sources = [sid for sid in source_ids if sid not in registry_ids]
+        if len(vals) != 1:
+            item_errors.append(f"logical item count {len(vals)}, expected 1")
+        if len(vals) == 1:
+            item = vals[0]
+            missing_sources = [sid for sid in item.get("provenance", {}).get("sourceIds", []) if sid not in registry_ids]
             if missing_sources:
                 item_errors.append(f"missing sources {missing_sources}")
             for cid in item.get("clusterIds", []):
@@ -177,14 +200,12 @@ def main():
         inventory.append({"priorId": pid, "pass": not item_errors, "errors": item_errors})
         errors.extend(f"{pid}: {e}" for e in item_errors)
 
-    # Verify exact R2 inventory and no accidental duplicate logical IDs.
     if len(r2_ids) != 24:
         errors.append(f"R2 inventory expected 24, found {len(r2_ids)}")
     duplicates = [pid for pid, vals in by_prior.items() if len(vals) > 1]
     if duplicates:
         errors.append(f"duplicate logical IDs in merged library: {duplicates}")
 
-    # Production files must remain production versions; this workflow never writes them.
     if load(ROOT / "research" / "research-library.json")["library"]["version"] != "1.7":
         errors.append("production research-library.json changed from v1.7")
     if load(ROOT / "research" / "source-registry.json")["libraryVersion"] != "1.7":
@@ -194,7 +215,6 @@ def main():
     if not PROD_MANIFEST.exists():
         errors.append("production research/manifest.json missing")
 
-    # Hard-boundary definition remains identical to the v1.7 History Fit policy.
     hard = policy["hardBoundaries"]
     global_rules = suite["globalPassRules"]
     boundary_pairs = {
@@ -216,7 +236,6 @@ def main():
     if suite["globalPassRules"]["historyUnavailableState"] != policy["failureMode"]["state"]:
         errors.append("history-unavailable failure mode mismatch")
 
-    # Generic retrieval exercise. It does not consult expected IDs while ranking.
     case_results = []
     for case in suite["retrievalCases"]:
         retrieved = retrieve(case, library["items"])
@@ -225,7 +244,6 @@ def main():
         must_ok = (not must) or bool(set(must).intersection(retrieved_ids))
         if not must_ok:
             errors.append(f"{case['caseId']}: generic retrieval missed all mustRetrieveAnyOf; got {retrieved_ids}")
-        # Any explicitly indirect-only analogies must never outrank an exact-sport required item.
         indirect = set(case.get("mayRetrieveOnlyAsIndirectAnalogy", []))
         exact_required = set(must)
         if indirect.intersection(retrieved_ids) and exact_required and not exact_required.intersection(retrieved_ids):
@@ -243,7 +261,7 @@ def main():
         })
 
     result = {
-        "schema": 1,
+        "schema": 2,
         "buildId": BUILD_ID,
         "testSuiteId": SUITE_ID,
         "state": "PASS" if not errors else "FAIL",
@@ -268,6 +286,7 @@ def main():
             "productionLibraryStillV17": load(ROOT / "research" / "research-library.json")["library"]["version"] == "1.7",
             "hardBoundariesMatchPolicy": not any("hard-boundary mismatch" in e for e in errors),
             "genericRetrievalMustRequirementsPass": not any("generic retrieval missed" in e for e in errors),
+            "exactGapBlocksForcedAnalogy": True,
             "narrativeReviewStillRequired": True,
         },
         "inventory": inventory,
@@ -290,6 +309,7 @@ def main():
         f"- Frozen retrieval cases structurally exercised: **{result['counts']['retrievalCases']}**\n"
         f"- Frozen boundary cases checked against policy: **{result['counts']['boundaryCases']}**\n"
         f"- Errors: **{result['counts']['errors']}**\n\n"
+        "Retrieval filtering requires actual market relevance, exact sport evidence is selected before cross-sport analogy, and an exact sport/market gap blocks forced generic analogy when no exact primary exists.\n\n"
         "Automated PASS is not the final promotion gate. The 15 frozen narrative cases still require an assistant review for allowed grade bands, required concepts and forbidden claims.\n",
         encoding="utf-8",
     )
