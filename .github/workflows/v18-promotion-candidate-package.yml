@@ -1,0 +1,47 @@
+name: V1.8 Promotion Candidate Package
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'research/staging/finalize_v18_candidate_package.py'
+      - '.github/workflows/v18-promotion-candidate-package.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build promotion candidate package
+        run: python research/staging/finalize_v18_candidate_package.py
+
+      - name: Verify production research files untouched
+        run: |
+          git diff --exit-code -- research/manifest.json research/research-library.json research/source-registry.json research/taxonomy.json research/history-fit-policy.json
+
+      - name: Commit promotion candidate package
+        run: |
+          git config user.name "betting-edge-research-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            research/staging/V1_8_PROMOTION_CANDIDATE_PACKAGE_R1_2026-08-15.json \
+            research/staging/V1_8_PROMOTION_CANDIDATE_CHECKSUMS_R1_2026-08-15.json \
+            research/staging/V1_8_PROMOTION_CANDIDATE_PACKAGE_R1_2026-08-15.md
+          if git diff --cached --quiet; then
+            echo "Promotion candidate package unchanged."
+          else
+            git commit -m "Record v1.8 promotion candidate package R1"
+            git push
+          fi
