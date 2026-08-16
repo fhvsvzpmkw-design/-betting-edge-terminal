@@ -1,6 +1,6 @@
 # Betting Edge — Roadmap
 
-**Last updated:** 2026-08-15 — after v0.9 production promotion
+**Last updated:** 2026-08-15 — v1.8 candidate frozen; v1.7 production soak active
 
 This roadmap separates completed foundations from active near-term work and later integration. Preserve the working pipeline, prove each new layer independently, and keep unrelated change families separate.
 
@@ -45,6 +45,8 @@ This roadmap separates completed foundations from active near-term work and late
 - Betting ledger is in repository data.
 - Durable issued-run storage and `run-history.json` are established.
 - Research Library **1.7** is canonical and read-only.
+- Research Library **1.8** promotion candidate is fully built/tested in staging only: 120 logical items, 100 source records, 26 evidence clusters; Candidate Freeze R2 24/24, narrative tests 15/15, hard-boundary tests 9/9.
+- v1.8 promotion is explicitly **ON HOLD** while production v1.7 completes an operational soak and shadow comparison period.
 - R2 manual Research Library read testing passed for direct/mixed evidence, era conflict and explicit research-gap handling.
 - `data/history/report-provenance-schema.json` is now **schema 3** for post-cutover production sidecars; schema-2 historical sidecars remain valid.
 - All five scheduled report lanes are configured for exact issued-payload archive plus read-only Research Fit/provenance sidecars.
@@ -101,6 +103,20 @@ If an actual run still shows `UNCATEGORIZED`:
 - compare the result against the known-good runner/workflow state.
 
 Do not make a speculative runner change without reproducing the source.
+
+### P0.7 — Complete v1.7 History Fit soak before any v1.8 promotion
+
+Production Research Library **v1.7** remains the runtime authority. The completed v1.8 candidate stays frozen in staging.
+
+Minimum gate before reopening promotion:
+
+1. observe at least one complete five-lane production day on v1.7;
+2. review real History Fit retrieval relevance, grade reasonableness, explanation quality, NR handling and deduplication;
+3. shadow-compare v1.8 against the same real candidates without changing issued reports;
+4. confirm no R3 hard-boundary regression;
+5. require explicit promotion approval.
+
+The frozen v1.8 candidate may be used for shadow evaluation only. It must not alter fair value, play-to, status, model error, stake, executable price, runner output, production manifest or scheduled-report authority.
 
 ## Priority 1 — History and learning evidence
 

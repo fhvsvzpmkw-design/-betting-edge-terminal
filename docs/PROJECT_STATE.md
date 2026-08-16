@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-15 — v0.9 production promotion  
+**Last updated:** 2026-08-15 — v1.8 candidate ready; promotion held for v1.7 soak  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -118,6 +118,11 @@ Runner-side `UPDATE ODDS / REPRICE NOW` remains client-side comparison state. In
 Current research state:
 
 - Library: **Betting Edge Research Library 1.7**.
+- **Production runtime authority remains v1.7** during the soak period.
+- A complete **v1.8 promotion candidate exists in staging only**: 120 logical items, 100 source records and 26 evidence clusters.
+- Candidate Freeze R2 structural inventory passed **24/24**; frozen History Fit narrative tests passed **15/15**; hard-boundary tests passed **9/9**.
+- v1.8 promotion is explicitly **ON HOLD** pending v1.7 operational soak, same-candidate shadow comparisons and later explicit approval.
+- v1.8 shadow output may be compared with live v1.7 History Fit but may not modify any issued report, fair value, play-to, status, model error, stake or executable price.
 - Canonical library status: `R1_CANONICAL_READ_ONLY`.
 - Production contract compatibility: **v0.9 operational**.
 - R2 manual-read suite: **PASS** at `research/tests/R2_MANUAL_READ_TEST_2026-08-15.json`.
@@ -125,7 +130,7 @@ Current research state:
 - Runtime Research Library writes required: **false**.
 - Scheduled-report linkage: **true across all five lanes**.
 - Current mode: `R3_LIVE_READ_ONLY_HISTORY_FIT_WITH_HISTORY_SIDECAR`.
-- Next stage: `VERIFY_FIRST_POST_CUTOVER_LANE`.
+- Next stage: `V1_7_PRODUCTION_SOAK_WITH_V1_8_SHADOW_COMPARISON`.
 
 `research/manifest.json` is the authoritative pointer for current tested compatibility. The internal `research-library.json` header preserves historical metadata from when the canonical library was built; that historical header is not rewritten merely to advance production compatibility metadata.
 
@@ -157,7 +162,7 @@ The principal v0.9 production additions are:
 ## Activation state summary
 
 - **C-track:** C1 — v0.9 production contract operational.
-- **R-track:** R3 — live read-only History Fit with durable sidecar provenance; Evening/Late live acceptance passed.
+- **R-track:** R3 — live read-only History Fit on production v1.7 with durable sidecar provenance; v1.8 is frozen staging-only pending soak/shadow comparison and explicit promotion approval.
 - **H-track:** H3 — live issued-report/provenance history; Evening/Late archive/index/lineage acceptance passed; full five-lane day remains to be observed post-cutover.
 - **S-track:** S0 — Shadow History remains inactive.
 
@@ -192,6 +197,7 @@ All direct changes follow the safety policy in the root `README.md`: fetch curre
 The following boundaries are intentional and should not be crossed casually:
 
 - Do not couple Research Library **writes** to normal report runs.
+- Do not promote Research Library v1.8 merely because the staging validation package is green; complete the v1.7 soak/shadow gate and obtain explicit promotion approval first.
 - Do not treat the v0.8/v0.9 draft files as production authority; `BETTING_EDGE_CONTRACT.md` is authoritative.
 - Do not place bulky structured research metadata into the runner payload; player-prop `rec.feed` identity is the narrow approved structured addition.
 - Do not let odds-history indexing interfere with the production odds-refresh workflow.
