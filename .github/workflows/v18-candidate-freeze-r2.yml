@@ -1,0 +1,46 @@
+name: V1.8 Candidate Freeze R2
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'research/staging/build_v18_candidate_freeze_r2.py'
+      - '.github/workflows/v18-candidate-freeze-r2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-r2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build candidate freeze R2
+        run: python research/staging/build_v18_candidate_freeze_r2.py
+
+      - name: Commit R2 artifacts
+        run: |
+          git config user.name "betting-edge-research-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            research/staging/V1_8_CANDIDATE_FREEZE_R2_2026-08-15.json \
+            research/staging/V1_8_CANDIDATE_SOURCE_REGISTRY_DELTA_R2_2026-08-15.json \
+            research/staging/V1_8_CANDIDATE_EVIDENCE_CLUSTERS_R2_2026-08-15.json \
+            research/staging/V1_8_CANDIDATE_FREEZE_R2_RECONCILIATION_2026-08-15.json \
+            research/staging/V1_8_CANDIDATE_FREEZE_CHECKSUMS_R2_2026-08-15.json \
+            research/staging/V1_8_CANDIDATE_FREEZE_R2_2026-08-15.md
+          if git diff --cached --quiet; then
+            echo "R2 artifacts unchanged."
+          else
+            git commit -m "Record v1.8 candidate freeze R2"
+            git push
+          fi
