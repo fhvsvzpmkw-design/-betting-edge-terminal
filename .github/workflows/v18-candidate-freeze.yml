@@ -24,6 +24,34 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Repair holdout accessor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('research/staging/build_v18_candidate_freeze.py')
+          s = p.read_text()
+          old = '''def mlb_metric(holdout, market):
+              for row in holdout["primaryHoldoutResults"]:
+                  if row["market"] == market:
+                      return row
+              raise KeyError(market)
+          '''
+          new = '''def mlb_metric(holdout, market):
+              for row in holdout["fits"]:
+                  if row.get("cohort") == "primary" and row.get("market") == market:
+                      out = dict(row["holdout"])
+                      out["recalibrationGeneralized"] = (
+                          out.get("brierImprovement", 0) > 0
+                          and out.get("logLossImprovement", 0) > 0
+                      )
+                      return out
+              raise KeyError(market)
+          '''
+          if old not in s:
+              raise SystemExit('Expected mlb_metric block not found')
+          p.write_text(s.replace(old, new))
+          PY
+
       - name: Build candidate freeze
         run: python research/staging/build_v18_candidate_freeze.py
 
@@ -32,6 +60,7 @@ jobs:
           git config user.name "betting-edge-research-bot"
           git config user.email "actions@users.noreply.github.com"
           git add \
+            research/staging/build_v18_candidate_freeze.py \
             research/staging/V1_8_CANDIDATE_FREEZE_R1_2026-08-15.json \
             research/staging/V1_8_CANDIDATE_SOURCE_REGISTRY_DELTA_R1_2026-08-15.json \
             research/staging/V1_8_CANDIDATE_EVIDENCE_CLUSTERS_R1_2026-08-15.json \
