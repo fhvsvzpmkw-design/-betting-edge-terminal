@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """Execute the staged v1.8 SmartStake MLB player-prop reproducibility audit.
 
-This script is research QA only. It downloads the dataset at an immutable revision,
-scans all parquet files with DuckDB, constructs exact-selection closing quotes at
-multiple safety cutoffs, pairs over/under sides, selects one market-information-only
-main line per book/player/game/market, and writes compact audit results.
-
-It does NOT alter the production Research Library and does NOT generate betting picks.
+Research QA only. This downloads an immutable dataset revision, scans every parquet
+file, constructs exact-selection closes at multiple pregame cutoffs, pairs over/under
+prices, selects one market-information-only main line per book/player/game/market,
+and writes compact audit results. It never changes the production Research Library.
 """
 
 from __future__ import annotations
@@ -14,8 +12,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
 
 import duckdb
 from huggingface_hub import snapshot_download
@@ -45,9 +43,15 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def parquet_list_sql(files):
+    return "[" + ",".join("'" + str(p).replace("'", "''") + "'" for p in files) + "]"
+
+
 def main():
-    root = Path(os.environ.get("RUNNER_TEMP", ".audit_tmp")) / "smartstake_mlb"
+    runner_temp = Path(os.environ.get("RUNNER_TEMP", ".audit_tmp"))
+    root = runner_temp / "smartstake_mlb"
     root.mkdir(parents=True, exist_ok=True)
+
     print(f"Downloading {DATASET}@{REVISION} ...", flush=True)
     snap = Path(snapshot_download(
         repo_id=DATASET,
@@ -68,20 +72,23 @@ def main():
             "bytes": p.stat().st_size,
             "sha256": sha256_file(p),
         })
-    print(f"Source bytes: {sum(x['bytes'] for x in source_manifest):,}", flush=True)
+    source_bytes = sum(x["bytes"] for x in source_manifest)
+    print(f"Source bytes: {source_bytes:,}", flush=True)
 
-    db_path = Path(os.environ.get("RUNNER_TEMP", ".audit_tmp")) / "v18_smartstake_audit.duckdb"
-    temp_dir = Path(os.environ.get("RUNNER_TEMP", ".audit_tmp")) / "duckdb_spill"
+    db_path = runner_temp / "v18_smartstake_audit.duckdb"
+    temp_dir = runner_temp / "duckdb_spill"
     temp_dir.mkdir(parents=True, exist_ok=True)
+    temp_sql = str(temp_dir).replace("'", "''")
+
     con = duckdb.connect(str(db_path))
     con.execute("SET threads=4")
     con.execute("SET memory_limit='5GB'")
-    con.execute(f"SET temp_directory='{str(temp_dir).replace("'", "''")}'")
+    con.execute(f"SET temp_directory='{temp_sql}'")
     con.execute("SET preserve_insertion_order=false")
     con.execute("PRAGMA enable_progress_bar")
 
-    file_sql = "[" + ",".join("'" + str(p).replace("'", "''") + "'" for p in files) + "]"
-    con.execute(f"CREATE OR REPLACE VIEW src AS SELECT * FROM read_parquet({file_sql}, union_by_name=true)")
+    all_files = parquet_list_sql(files)
+    con.execute(f"CREATE OR REPLACE VIEW src AS SELECT * FROM read_parquet({all_files}, union_by_name=true)")
 
     results = {
         "schema": 1,
@@ -92,11 +99,12 @@ def main():
         "dataset": DATASET,
         "datasetRevision": REVISION,
         "executedAtUtc": datetime.now(timezone.utc).isoformat(),
+        "sourceBytes": source_bytes,
         "sourceFiles": source_manifest,
         "notes": [
-            "This is research QA, not a betting signal.",
-            "Calibration results are descriptive until sportsbook/exchange/prediction-market source types are classified and uncertainty/holdout rules are applied.",
-            "The public source crosswalk used for game-key de-drift is documented by the publisher but is not exposed in the released table, so provenance reconstruction remains limited.",
+            "Research QA only; not a betting signal.",
+            "Calibration outputs remain descriptive until source types are classified and forward-holdout/uncertainty rules are applied.",
+            "Publisher-documented game-key de-drift cannot be independently reconstructed because the source crosswalk is not in the released table.",
         ],
     }
 
@@ -116,14 +124,14 @@ def main():
         FROM src
     """))[0]
     results["marketRows"] = rows(con.execute("""
-        SELECT market, count(*) AS rows, count(DISTINCT game_id) AS games,
+        SELECT market, count(*) AS quote_rows, count(DISTINCT game_id) AS games,
                count(DISTINCT player) AS players, count(DISTINCT book) AS books
-        FROM src GROUP BY market ORDER BY rows DESC
+        FROM src GROUP BY market ORDER BY quote_rows DESC
     """))
     results["bookRows"] = rows(con.execute("""
-        SELECT book, count(*) AS rows, count(DISTINCT game_id) AS games,
+        SELECT book, count(*) AS quote_rows, count(DISTINCT game_id) AS games,
                count(DISTINCT market) AS markets
-        FROM src GROUP BY book ORDER BY rows DESC
+        FROM src GROUP BY book ORDER BY quote_rows DESC
     """))
 
     print("B: grade/timing consistency", flush=True)
@@ -143,9 +151,6 @@ def main():
         FROM src
     """))[0]
 
-    # Exact duplicate checking over 621M minute identities can require a huge hash table.
-    # We execute it file-by-file exactly, then separately detect overlaps between file
-    # key ranges. The publisher says files are a partitioned export of the dedrifted table.
     print("C: exact within-file minute-key duplicate checks", flush=True)
     dup_files = []
     for i, p in enumerate(files, 1):
@@ -157,44 +162,48 @@ def main():
               GROUP BY ALL
               HAVING count(*) > 1
             )
-            SELECT '{p.name}' AS file, count(*) AS duplicated_keys,
+            SELECT count(*) AS duplicated_keys,
                    coalesce(sum(n-1),0) AS duplicate_rows,
                    coalesce(max(n),1) AS max_rows_per_key
             FROM g
         """))[0]
+        rec["file"] = p.name
         rec["partition"] = p.parent.name
         dup_files.append(rec)
-        print(f"  {i}/{len(files)} {p.parent.name}/{p.name}: {rec['duplicate_rows']} dup rows", flush=True)
+        print(f"  {i}/{len(files)} {p.parent.name}/{p.name}: {rec['duplicate_rows']} duplicate rows", flush=True)
     results["withinFileExactDuplicateAudit"] = dup_files
     results["duplicateAuditScope"] = {
         "mode": "exact_within_each_parquet_file",
         "globalCrossFileDuplicateGuarantee": False,
-        "reason": "A single 621M-row exact global GROUP BY on the full minute identity is disproportionate for the hosted runner. Exact within-file checks were executed; closing-selection construction below globally regroups all files and therefore removes any cross-file duplication for the calibration surface.",
+        "reason": "A single exact 621M-row minute-key hash aggregation is disproportionate on the hosted runner. The calibration surface below globally regroups all files by exact selection before pairing, so cross-file repetition cannot multiply a closing selection.",
     }
 
-    print("D: repeated same-price minute prevalence by month (upper-bound measure)", flush=True)
+    print("D: repeated same-price prevalence by month", flush=True)
     repeated_months = []
     for month_dir in sorted({p.parent for p in files}):
         month_files = sorted(month_dir.glob("*.parquet"))
-        month_sql = "[" + ",".join("'" + str(p).replace("'", "''") + "'" for p in month_files) + "]"
+        month_sql = parquet_list_sql(month_files)
         rec = rows(con.execute(f"""
             WITH g AS (
               SELECT game_id, player, market, line, side, book, odds, count(*) AS n
               FROM read_parquet({month_sql}, union_by_name=true)
               GROUP BY ALL
             )
-            SELECT '{month_dir.name}' AS partition,
-                   sum(n) AS quote_rows,
+            SELECT sum(n) AS quote_rows,
                    sum(CASE WHEN n>1 THEN n-1 ELSE 0 END) AS repeated_same_price_excess_rows,
                    count(*) AS distinct_selection_price_states
             FROM g
         """))[0]
+        rec["partition"] = month_dir.name
         repeated_months.append(rec)
         print(f"  {month_dir.name}: {rec['repeated_same_price_excess_rows']:,} same-price excess", flush=True)
     results["repeatedSamePriceByMonth"] = repeated_months
-    results["repeatedSamePriceMetricNote"] = "This is a conservative prevalence/upper-bound style metric: it counts repeated uses of the same price for a selection within a month, including possible returns to an earlier price. It proves raw quote rows are not independent price changes; it is not an adjacent-run count."
+    results["repeatedSamePriceMetricNote"] = (
+        "Counts repeated uses of the same price for an exact selection within a month, including possible returns to an earlier price. "
+        "It proves raw minute rows are not independent price changes; it is not an adjacent-run count."
+    )
 
-    print("E: build global exact-selection cutoff closes", flush=True)
+    print("E: build global exact-selection closes at 0/5/15/60m", flush=True)
     con.execute("DROP TABLE IF EXISTS closing_cutoffs")
     con.execute("""
         CREATE TABLE closing_cutoffs AS
@@ -229,11 +238,11 @@ def main():
         FROM closing_cutoffs
     """))[0]
 
-    print("F: pair over/under and build main lines", flush=True)
+    print("F: pair exact over/under lines", flush=True)
     con.execute("DROP TABLE IF EXISTS paired_cutoffs")
     con.execute("""
         CREATE TABLE paired_cutoffs AS
-        WITH pairs AS (
+        WITH base_pairs AS (
           SELECT
             o.game_id, o.start_time, o.player, o.market, o.line, o.book,
             o.result_min AS result,
@@ -248,23 +257,21 @@ def main():
             AND o.result_values=1 AND u.result_values=1
             AND o.result_min=u.result_min
             AND o.any_won IS NOT NULL
+        ), u AS (
+          SELECT 0 AS cutoff_min, game_id,start_time,player,market,line,book,result,over_won,over_0m AS over_odds,under_0m AS under_odds FROM base_pairs
+          UNION ALL
+          SELECT 5, game_id,start_time,player,market,line,book,result,over_won,over_5m,under_5m FROM base_pairs
+          UNION ALL
+          SELECT 15, game_id,start_time,player,market,line,book,result,over_won,over_15m,under_15m FROM base_pairs
+          UNION ALL
+          SELECT 60, game_id,start_time,player,market,line,book,result,over_won,over_60m,under_60m FROM base_pairs
         )
-        SELECT * FROM (
-          SELECT 0 AS cutoff_min, game_id,start_time,player,market,line,book,result,over_won,
-                 over_0m AS over_odds, under_0m AS under_odds FROM pairs
-          UNION ALL
-          SELECT 5, game_id,start_time,player,market,line,book,result,over_won,over_5m,under_5m FROM pairs
-          UNION ALL
-          SELECT 15, game_id,start_time,player,market,line,book,result,over_won,over_15m,under_15m FROM pairs
-          UNION ALL
-          SELECT 60, game_id,start_time,player,market,line,book,result,over_won,over_60m,under_60m FROM pairs
-        ) q
+        SELECT *,
+               (1.0/over_odds)/((1.0/over_odds)+(1.0/under_odds)) AS p_over,
+               (1.0/over_odds + 1.0/under_odds - 1.0) AS overround
+        FROM u
         WHERE over_odds > 1 AND under_odds > 1
     """)
-    con.execute("ALTER TABLE paired_cutoffs ADD COLUMN p_over DOUBLE")
-    con.execute("ALTER TABLE paired_cutoffs ADD COLUMN overround DOUBLE")
-    con.execute("UPDATE paired_cutoffs SET p_over=(1.0/over_odds)/((1.0/over_odds)+(1.0/under_odds)), overround=(1.0/over_odds+1.0/under_odds-1.0)")
-
     results["pairedLineSummary"] = rows(con.execute("""
         SELECT cutoff_min, market, count(*) AS paired_exact_lines,
                count(DISTINCT book) AS books,
@@ -277,6 +284,7 @@ def main():
         ORDER BY market, cutoff_min
     """))
 
+    print("G: market-information-only main-line selection", flush=True)
     con.execute("DROP TABLE IF EXISTS mainlines")
     con.execute("""
         CREATE TABLE mainlines AS
@@ -289,7 +297,7 @@ def main():
         ) q WHERE rn=1
     """)
 
-    print("G: descriptive calibration / cutoff sensitivity", flush=True)
+    print("H: descriptive calibration and cutoff sensitivity", flush=True)
     results["mainlineCalibrationByMarketCutoff"] = rows(con.execute("""
         SELECT cutoff_min, market, count(*) AS n,
                avg((p_over-CAST(over_won AS INTEGER))*(p_over-CAST(over_won AS INTEGER))) AS brier,
@@ -302,7 +310,6 @@ def main():
         GROUP BY cutoff_min, market
         ORDER BY market, cutoff_min
     """))
-
     results["mainlineCalibrationByBookMarket5m"] = rows(con.execute("""
         SELECT book, market, count(*) AS n,
                avg((p_over-CAST(over_won AS INTEGER))*(p_over-CAST(over_won AS INTEGER))) AS brier,
@@ -315,15 +322,12 @@ def main():
         HAVING count(*) >= 200
         ORDER BY market, brier
     """))
-
     results["calibrationBins5m"] = rows(con.execute("""
         WITH b AS (
           SELECT market,
-                 CASE
-                   WHEN p_over >= 1 THEN 10
-                   WHEN p_over <= 0 THEN 1
-                   ELSE least(10, greatest(1, CAST(floor(p_over*10)+1 AS INTEGER)))
-                 END AS bin,
+                 CASE WHEN p_over >= 1 THEN 10
+                      WHEN p_over <= 0 THEN 1
+                      ELSE least(10, greatest(1, CAST(floor(p_over*10)+1 AS INTEGER))) END AS bin,
                  p_over, over_won
           FROM mainlines WHERE cutoff_min=5
         )
@@ -333,16 +337,14 @@ def main():
                avg(CAST(over_won AS INTEGER))-avg(p_over) AS calibration_gap
         FROM b GROUP BY market, bin ORDER BY market, bin
     """))
-
     results["books"] = [r[0] for r in con.execute("SELECT DISTINCT book FROM src ORDER BY book").fetchall()]
 
-    # Simple admission checks. These are deliberately conservative.
     c = results["consistency"]
     o = results["selectionOutcomeConsistency"]
     results["admissionChecks"] = {
-        "gradeLogicClean": (c["over_grade_mismatches"] == 0 and c["under_grade_mismatches"] == 0 and c["graded_pushes"] == 0),
-        "validSidesAndOdds": (c["unexpected_side_rows"] == 0 and c["invalid_decimal_odds_rows"] == 0),
-        "selectionOutcomeConsistency": (o["selections_with_multiple_results"] == 0 and o["selections_with_multiple_nonnull_grades"] == 0),
+        "gradeLogicClean": c["over_grade_mismatches"] == 0 and c["under_grade_mismatches"] == 0 and c["graded_pushes"] == 0,
+        "validSidesAndOdds": c["unexpected_side_rows"] == 0 and c["invalid_decimal_odds_rows"] == 0,
+        "selectionOutcomeConsistency": o["selections_with_multiple_results"] == 0 and o["selections_with_multiple_nonnull_grades"] == 0,
         "postStartRowsExist": c["at_or_after_start_rows"] > 0,
         "mustUsePregameCutoff": True,
         "sourceTypeClassificationComplete": False,
@@ -355,6 +357,7 @@ def main():
     OUT_JSON.write_text(json.dumps(results, indent=2, default=json_default) + "\n", encoding="utf-8")
 
     cov = results["coverage"]
+    duplicate_rows = sum(int(x["duplicate_rows"]) for x in dup_files)
     lines = [
         "# Betting Edge Research Library v1.8 — SmartStake MLB Full Audit Results",
         "",
@@ -380,15 +383,15 @@ def main():
         f"- Graded pushes: **{c['graded_pushes']:,}**",
         f"- Invalid decimal-odds rows: **{c['invalid_decimal_odds_rows']:,}**",
         f"- At/after scheduled-start rows: **{c['at_or_after_start_rows']:,}**",
-        f"- Exact within-file duplicate rows: **{sum(int(x['duplicate_rows']) for x in dup_files):,}**",
+        f"- Exact within-file duplicate rows: **{duplicate_rows:,}**",
         "",
-        "The exact duplicate audit is exhaustive inside every parquet file. A single global 621M-row minute-key hash aggregation was intentionally not used on the hosted runner; global calibration construction regroups exact selections across all files before pairing.",
+        "Exact duplicate checking was exhaustive inside every parquet file. The calibration surface globally regroups every file by exact selection before pairing, but a single global 621M-row minute-key hash aggregation was not required on the hosted runner.",
         "",
         "## Market calibration surface",
         "",
-        "The generated JSON contains exact-line pairing, market-information-only main-line selection, proportional no-vig probabilities, Brier/log loss, reliability bins, and cutoff sensitivity at 0/5/15/60 minutes before first pitch.",
+        "The JSON result contains exact-line pairing, market-information-only main-line selection, proportional no-vig probabilities, Brier/log loss, reliability bins, and cutoff sensitivity at 0/5/15/60 minutes before first pitch.",
         "",
-        "These results remain **descriptive research QA**, not a bookmaker ranking or betting edge. Source-type classification, forward holdout testing, and remaining provenance limitations must be resolved before any direct-market finding can enter canonical v1.8.",
+        "These remain **descriptive research-QA results**, not a bookmaker ranking or betting edge. Source-type classification, forward holdout testing, and provenance limitations must be resolved before a direct-market finding enters canonical v1.8.",
         "",
         "## Promotion status",
         "",
