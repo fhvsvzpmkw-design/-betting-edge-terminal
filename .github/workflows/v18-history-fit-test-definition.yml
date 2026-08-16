@@ -1,0 +1,43 @@
+name: V1.8 History Fit Test Definition
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'research/staging/V1_8_HISTORY_FIT_TEST_SUITE_R1_2026-08-15.json'
+      - 'research/staging/validate_v18_history_fit_test_suite.py'
+      - '.github/workflows/v18-history-fit-test-definition.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-test-definition:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate predeclared History Fit suite
+        run: python research/staging/validate_v18_history_fit_test_suite.py
+
+      - name: Commit validation artifacts
+        run: |
+          git config user.name "betting-edge-research-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            research/staging/V1_8_HISTORY_FIT_TEST_SUITE_R1_VALIDATION_2026-08-15.json \
+            research/staging/V1_8_HISTORY_FIT_TEST_SUITE_R1_CHECKSUMS_2026-08-15.json
+          if git diff --cached --quiet; then
+            echo "History Fit test-definition validation artifacts unchanged."
+          else
+            git commit -m "Record v1.8 History Fit test-definition validation"
+            git push
+          fi
