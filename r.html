@@ -4,16 +4,214 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Betting Edge Terminal</title>
+<title>Better Edge Market Intelligence</title>
 <style>
-html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
-#app{border:0;width:100%;height:100%;display:block;background:#01040a}
-#msg{position:fixed;z-index:10;left:12px;right:12px;top:12px;padding:12px;background:#07131b;color:#a9fff0;border:1px solid #1fd6c3;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
-#msg.error{background:#25060d;color:#ff9cad;border-color:#ff6178}
+:root{
+  --bg:#01040a;
+  --green:#76ff75;
+  --green-soft:#52e96d;
+  --yellow:#ffd739;
+  --red:#ff5d57;
+  --cyan:#8dfff0;
+  --fade-ms:300ms;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);overflow:hidden}
+body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+#app{
+  border:0;
+  width:100%;
+  height:100%;
+  display:block;
+  background:var(--bg);
+  opacity:0;
+  transition:opacity var(--fade-ms) ease;
+}
+#app.ready{opacity:1}
+#splash{
+  position:fixed;
+  z-index:20;
+  inset:0;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  color:var(--green);
+  background:
+    radial-gradient(circle at 50% 42%,rgba(53,166,89,.10),transparent 42%),
+    linear-gradient(180deg,#020712 0%,#01040a 48%,#010308 100%);
+  opacity:1;
+  transition:opacity var(--fade-ms) ease;
+}
+#splash.fade{opacity:0;pointer-events:none}
+#splash:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 4px);
+  opacity:.65;
+}
+#splash:after{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.42) 76%,rgba(0,0,0,.82) 100%);
+}
+.splash-inner{
+  position:relative;
+  z-index:1;
+  width:min(94vw,1040px);
+  height:min(88dvh,760px);
+  min-height:520px;
+  display:grid;
+  grid-template-rows:auto auto 1fr auto;
+  align-items:start;
+  text-align:center;
+  padding:max(22px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+}
+.brand{
+  padding-top:clamp(4px,2vh,18px);
+  text-shadow:0 0 7px rgba(118,255,117,.66),0 0 18px rgba(82,233,109,.22);
+}
+.brand-name{
+  margin:0;
+  color:var(--green);
+  font-size:clamp(28px,5.6vw,62px);
+  line-height:.98;
+  font-weight:900;
+  letter-spacing:clamp(.16em,1.2vw,.30em);
+  white-space:nowrap;
+}
+.brand-sub{
+  margin-top:clamp(12px,2vh,21px);
+  font-size:clamp(16px,2.8vw,29px);
+  line-height:1.1;
+  font-weight:900;
+  letter-spacing:.035em;
+}
+.brand-power{
+  margin-top:clamp(12px,1.8vh,18px);
+  color:var(--green-soft);
+  font-size:clamp(10px,1.7vw,16px);
+  line-height:1.25;
+  font-weight:800;
+  letter-spacing:.015em;
+}
+.brand-version{
+  margin-top:6px;
+  color:var(--green-soft);
+  font-size:clamp(9px,1.45vw,14px);
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+.personality{
+  align-self:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  padding-top:clamp(28px,6vh,62px);
+  padding-bottom:clamp(18px,4vh,38px);
+  text-shadow:0 0 7px rgba(118,255,117,.58),0 0 18px rgba(82,233,109,.18);
+}
+.legit{
+  color:var(--green);
+  font-size:clamp(17px,3.2vw,31px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.035em;
+  white-space:nowrap;
+}
+.bolt{color:var(--yellow);text-shadow:0 0 8px rgba(255,215,57,.55)}
+.specials{
+  margin-top:clamp(24px,4.2vh,40px);
+  color:var(--green);
+  font-size:clamp(10px,2.05vw,19px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.015em;
+  white-space:nowrap;
+}
+.pizza,.lock{color:var(--yellow);text-shadow:0 0 7px rgba(255,215,57,.38)}
+.meats{
+  margin-top:clamp(23px,4vh,38px);
+  color:var(--green);
+  font-size:clamp(12px,2.15vw,20px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.meat{color:var(--red);text-shadow:0 0 7px rgba(255,93,87,.38)}
+.ready{
+  align-self:end;
+  color:var(--green-soft);
+  font-size:clamp(11px,1.8vw,16px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.03em;
+  text-shadow:0 0 6px rgba(118,255,117,.45);
+  padding-bottom:clamp(3px,1.2vh,12px);
+}
+.cursor{display:inline-block;margin-left:2px;animation:blink .72s steps(1,end) infinite}
+@keyframes blink{50%{opacity:.12}}
+#msg{
+  display:none;
+  position:fixed;
+  z-index:30;
+  left:12px;
+  right:12px;
+  top:max(12px,env(safe-area-inset-top));
+  padding:12px;
+  background:#07131b;
+  color:#a9fff0;
+  border:1px solid #1fd6c3;
+  font:12px ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+#msg.error{display:block;background:#25060d;color:#ff9cad;border-color:#ff6178}
+@media(max-width:560px){
+  .splash-inner{width:96vw;height:92dvh;min-height:430px}
+  .brand-name{letter-spacing:.12em}
+  .specials{letter-spacing:0}
+}
+@media(max-height:620px){
+  .splash-inner{height:96dvh;min-height:0}
+  .brand{padding-top:0}
+  .personality{padding-top:14px;padding-bottom:12px}
+  .specials{margin-top:16px}
+  .meats{margin-top:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  #app,#splash{transition:none}
+  .cursor{animation:none}
+}
 </style>
 </head>
 <body>
-<div id="msg">LOADING BETTING EDGE RUN…</div>
+<div id="splash" aria-label="Better Edge Market Intelligence">
+  <div class="splash-inner">
+    <div class="brand">
+      <h1 class="brand-name">B E T T E R&nbsp;&nbsp; E D G E</h1>
+      <div class="brand-sub">MARKET INTELLIGENCE</div>
+      <div class="brand-power">POWERED BY BETTING EDGE PRODUCTION</div>
+      <div class="brand-version">PRODUCTION // v0.9</div>
+    </div>
+
+    <div></div>
+
+    <div class="personality">
+      <div class="legit"><span class="bolt">⚡</span>&nbsp; 2 LEGIT 2 QUIT &nbsp;<span class="bolt">⚡</span></div>
+      <div class="specials"><span class="pizza">🍕</span>&nbsp; PIZZA PLAYS &nbsp;&nbsp;&nbsp; <span class="lock">🔒</span>&nbsp; CRYPTO SPECIALS</div>
+      <div class="meats"><span class="meat">🥩</span>&nbsp; WE GOT THE MEATS</div>
+    </div>
+
+    <div class="ready">TERMINAL READY <span class="cursor">▌</span></div>
+  </div>
+</div>
+<div id="msg"></div>
 <iframe id="app" title="Betting Edge Terminal v1.3"></iframe>
 <script>
 const INDEX_URL='./run-history.json';
@@ -21,6 +219,10 @@ const SLOT_CODES={open:'o',main:'m',final_morning:'f',evening:'e',late:'l'};
 const SLOT_MINUTES={open:360,main:480,final_morning:570,evening:915,late:1095};
 const RETRY_MS=3000;
 const MAX_WAIT_MS=90000;
+const SPLASH_MIN_MS=1600;
+const SPLASH_FADE_MS=300;
+const splashStarted=performance.now();
+const splash=document.getElementById('splash');
 const msg=document.getElementById('msg');
 const frame=document.getElementById('app');
 function shortId(entry){
@@ -52,6 +254,15 @@ function b64ue(v){
 }
 function fail(text){msg.textContent=text;msg.classList.add('error')}
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function revealTerminal(){
+  const elapsed=performance.now()-splashStarted;
+  const remaining=Math.max(0,SPLASH_MIN_MS-elapsed);
+  setTimeout(()=>{
+    frame.classList.add('ready');
+    splash.classList.add('fade');
+    setTimeout(()=>splash.remove(),SPLASH_FADE_MS+60);
+  },remaining);
+}
 async function fetchJson(url){
   const res=await fetch(url+(url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});
   if(!res.ok){const e=new Error('HTTP '+res.status);e.httpStatus=res.status;throw e}
@@ -81,7 +292,6 @@ async function resolveRun(id){
       if(/NOT UNIQUE|PATH MISSING/.test(String(e&&e.message||e)))throw e;
       lastError='RUN HISTORY IS STILL PUBLISHING';
     }
-    msg.textContent='BETTING EDGE // '+lastError+'…';
     await wait(RETRY_MS);
   }
   throw new Error(lastError+' — TRY THE LINK AGAIN IN A MOMENT');
@@ -121,8 +331,8 @@ async function load(){
     if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))throw new Error('RUN FEED PROVENANCE VALIDATION FAILED');
     const priorRuns=await sameDayPriorRuns(index,entry);
     const hydrated={...run,prior_runs:priorRuns};
+    frame.addEventListener('load',revealTerminal,{once:true});
     frame.src='./runner.html#run='+b64ue(JSON.stringify(hydrated));
-    frame.addEventListener('load',()=>{msg.style.display='none'},{once:true});
   }catch(e){fail('BETTING EDGE SHORT LINK ERROR // '+String(e&&e.message||e))}
 }
 load();
