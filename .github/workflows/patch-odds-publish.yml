@@ -1,0 +1,109 @@
+name: One-time odds publish hardening
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - PATCH_ODDS_PUBLISH_TRIGGER
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: contains(github.event.head_commit.message, '[run-patch]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch publish step without re-pulling odds
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/odds-refresh.yml')
+          text = path.read_text()
+
+          old = '''      - name: Publish snapshot
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add data/live-odds.json
+
+          if git diff --cached --quiet; then
+            echo "No validated odds changes to publish."
+            exit 0
+          fi
+
+          git commit -m "Refresh Betting Edge live odds"
+          git push
+'''
+
+          new = '''      - name: Publish snapshot
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          # Preserve the exact snapshot that already passed validation. A push
+          # collision must never cause another Odds-API pull or silently lose it.
+          candidate="$(mktemp)"
+          cp data/live-odds.json "$candidate"
+
+          candidate_epoch="$(node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); const t=Date.parse(d.generatedAt||''); if(!Number.isFinite(t)) process.exit(2); process.stdout.write(String(t));" "$candidate")"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+
+            remote_epoch="$(git show origin/main:data/live-odds.json 2>/dev/null | node -e "let s=''; process.stdin.on('data',d=>s+=d); process.stdin.on('end',()=>{try{const j=JSON.parse(s); const t=Date.parse(j.generatedAt||''); process.stdout.write(Number.isFinite(t)?String(t):'0')}catch{process.stdout.write('0')}})")"
+
+            # Never overwrite a snapshot that is already as new or newer.
+            if [ "${remote_epoch:-0}" -ge "$candidate_epoch" ]; then
+              echo "Remote live odds are already equal/newer; no publish needed."
+              exit 0
+            fi
+
+            # Rebase safely by rebuilding only the live-odds change on the
+            # newest main. Other concurrent repository updates remain intact.
+            git reset --hard origin/main
+            cp "$candidate" data/live-odds.json
+            git add data/live-odds.json
+
+            if git diff --cached --quiet; then
+              echo "No validated odds changes to publish."
+              exit 0
+            fi
+
+            git commit -m "Refresh Betting Edge live odds"
+
+            if git push origin HEAD:main; then
+              echo "Validated odds snapshot published on attempt $attempt."
+              exit 0
+            fi
+
+            echo "Publish collision on attempt $attempt; syncing main and retrying the same validated snapshot."
+          done
+
+          echo "Validated odds snapshot could not be published after 4 attempts."
+          exit 1
+'''
+
+          if old not in text:
+              raise SystemExit('Expected Publish snapshot block not found; refusing to patch.')
+
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+      - name: Commit hardening and remove one-time patch files
+        run: |
+          rm -f PATCH_ODDS_PUBLISH_TRIGGER
+          rm -f .github/workflows/patch-odds-publish.yml
+
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add .github/workflows/odds-refresh.yml PATCH_ODDS_PUBLISH_TRIGGER .github/workflows/patch-odds-publish.yml
+          git commit -m "Harden odds snapshot publish retry"
+          git push origin HEAD:main
