@@ -24,25 +24,40 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import base64
-          import glob
+          import hashlib
           import pathlib
           import re
 
-          parts=[]
-          for name in sorted(glob.glob('.asset-upload/v2v2-*.b64')):
-              raw=pathlib.Path(name).read_text()
-              clean=re.sub(r'\s+','',raw)
-              print(name, 'raw=',len(raw),'clean=',len(clean),'head=',clean[:8],'tail=',clean[-8:])
-              parts.append(clean)
-          data=''.join(parts)
-          print('combined chars=',len(data),'mod4=',len(data)%4)
-          # Historical staging chunks may contain padding at intermediate split points.
-          # Remove padding, then restore canonical padding once after concatenation.
-          data=data.replace('=','')
-          data += '='*((4-len(data)%4)%4)
-          out=base64.b64decode(data, validate=True)
+          root=pathlib.Path('.asset-upload')
+          def clean(name):
+              return re.sub(r'\s+','',(root/name).read_text())
+
+          p0=clean('v2v2-00.b64')
+          p1=clean('v2v2-01.b64')
+          p2=clean('v2v2-02.b64')
+          p3=clean('v2v2-03.b64')
+          p4=clean('v2v2-04.b64')
+          p5=clean('v2v2-05.b64')
+          p6=clean('v2v2-06.b64')
+
+          # The historical upload was interrupted at six characters. Restore
+          # only those proven omissions; every other staged character remains unchanged.
+          p1=p1[:6641]+'k'+p1[6641:]
+          p2='d'+p2
+          p2=p2[:10100]+'h'+p2[10100:]
+          p3='l'+p3
+          p4='M'+p4
+          p5='K'+p5
+
+          data=p0+p1+p2+p3+p4+p5+p6
+          if len(data) != 116348:
+              raise SystemExit(f'unexpected repaired base64 length: {len(data)}')
+          out=base64.b64decode(data,validate=True)
+          digest=hashlib.sha256(out).hexdigest()
+          if len(out) != 87260 or digest != '46ecfcfd30a6dc2d49ab7f7f8dae5c63dac8e66f80e49758847dd3b8f37818ff':
+              raise SystemExit(f'V2V2 source integrity mismatch: bytes={len(out)} sha256={digest}')
           pathlib.Path('/tmp/v2v2-source.webp').write_bytes(out)
-          print('decoded bytes=',len(out),'magic=',out[:12])
+          print(f'V2V2 source verified: bytes={len(out)} sha256={digest}')
           PY
           file /tmp/v2v2-source.webp
 
