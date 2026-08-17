@@ -1,6 +1,6 @@
 # Betting Edge — Operations
 
-**Last updated:** 2026-08-16 — report-lane recovery runbook
+**Last updated:** 2026-08-17 — runner UI v1.3.1 preflight
 
 This document describes how the current Betting Edge system is operated and checked. It is practical runbook material, not a substitute for the governance contract. The authoritative production contract is `BETTING_EDGE_CONTRACT.md` v0.9.
 
@@ -11,7 +11,7 @@ Every scheduled Betting Edge report now begins with production authority resolut
 1. Read `BETTING_EDGE_CONTRACT.md` from `fhvsvzpmkw-design/-betting-edge-terminal` branch `main`.
 2. Verify `Contract version: 0.9` and operational status.
 3. Capture the exact contract Git blob SHA for report provenance.
-4. Resolve current `runner.html` from the same repository context and verify Betting Edge Terminal v1.3.
+4. Resolve current `runner.html` from the same repository context, verify presentation/UI version **v1.3.1**, and confirm the underlying report engine/core in `runner-core.html` and `index.html` remains **v1.3**.
 5. Only after those checks pass, read the live odds feed and begin analysis.
 
 If contract or runner authority cannot be resolved, or the production contract does not identify itself as operational v0.9, stop before analysis and surface:
@@ -19,6 +19,26 @@ If contract or runner authority cannot be resolved, or the production contract d
 `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`
 
 The v0.8/v0.9 draft files remain historical design artifacts. They are not scheduler authority after the production cutover.
+
+## Runner UI version boundary
+
+The production version boundary is intentional:
+
+- `runner.html` owns presentation/UI version **v1.3.1**;
+- `runner-core.html` and `index.html` retain report engine/UI-core version **v1.3**;
+- `BETTING_EDGE_CONTRACT.md` remains production contract **v0.9 OPERATIONAL**.
+
+For a runner presentation check, confirm:
+
+1. the visible title reads `VIGSCOPE TERMINAL UI v1.3.1`;
+2. the build line reads `CHATGPT LIVE-RUNNER // v1.3.1 UI`;
+3. `REPORT ENGINE // v1.3` remains unchanged;
+4. F1–F4 appear directly beneath the terminal header;
+5. the duplicated upper Bankroll/New Risk/Bet/Lean/Wait-Pass strip is absent;
+6. bankroll appears as a compact header readout and New Risk appears inside the BET counter;
+7. full-width iPad layouts retain four navigation/outcome columns, while narrow iPad and iPhone widths use 2 × 2 grids without horizontal clipping.
+
+UI v1.3.1 is presentation-only. It does not require a report rerun or migrate issued payloads, browser history keys, durable archive schemas, odds/repricing logic, recommendation status, stake semantics, or report-generation rules.
 
 ## Standard daily sequence
 
@@ -91,7 +111,7 @@ The canaries are diagnostic only, do not consume odds API quota, and are kept se
 
 When checking whether a report window is on track, use this order:
 
-1. **Check production authority.** Confirm `BETTING_EDGE_CONTRACT.md` is present, operational v0.9, and the current runner remains v1.3.
+1. **Check production authority.** Confirm `BETTING_EDGE_CONTRACT.md` is present and operational v0.9; verify runner presentation/UI v1.3.1 and report engine/core v1.3.
 2. **Check the scheduled odds workflow run.** Confirm whether an expected trigger appeared and whether it completed, is delayed, or was killed as stale.
 3. **Check canaries.** If canaries have recent scheduled successes while the odds workflow does not, focus on the odds workflow rather than assuming all GitHub scheduling is down.
 4. **Check `data/live-odds.json`.** Confirm the latest valid snapshot reflects the intended refresh period.
