@@ -9,6 +9,10 @@ The repository includes four durable project references:
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable architectural and operating decisions, including the reasoning behind them.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — completed foundations, current priorities, planned History/Research/ledger work, and future contract evolution.
 
+## Splash branding
+
+Current splash identity is centralized in `r.html` under `BRAND_CONFIG`. For a splash rename, update `appName` and/or `companyName`, then verify the GitHub Pages deployment and the splash-to-report transition. Terminal branding remains separate and should be changed independently when a broader product rename is intended.
+
 ## Production governance
 
 The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v0.9 OPERATIONAL**.
