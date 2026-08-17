@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>VigScope Terminal UI v1.3 Runner</title>
 <style>
-:root{--bg:#01040a;--fade-ms:320ms}
+:root{--bg:#01040a;--fade-ms:320ms;--green:#58ff88;--cyan:#45d7ff}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
 #core{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;transition:opacity var(--fade-ms) ease}
@@ -13,24 +13,66 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
 #splash2{position:fixed;z-index:10;inset:0;display:grid;place-items:center;background:#01040a;opacity:0;visibility:hidden;transition:opacity var(--fade-ms) ease;overflow:hidden}
 #splash2.show{opacity:1;visibility:visible}
 #splash2.fade{opacity:0;pointer-events:none}
-#splash2 img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#01040a}
+#splash2art{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#01040a}
 #splash2:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 4px)}
-#fallback{display:none;position:absolute;z-index:2;color:#58ff88;font:900 clamp(18px,3vw,36px) ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-align:center;text-shadow:0 0 10px rgba(88,255,136,.45)}
-#splash2.asset-error img{display:none}
+#fallback{display:none;position:absolute;inset:0;z-index:2;padding:3vh 3vw;color:var(--cyan);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#01040a;text-shadow:0 0 8px rgba(69,215,255,.35)}
+#splash2.asset-error #splash2art{display:none}
 #splash2.asset-error #fallback{display:block}
+.f-shell{height:100%;border:1px solid #0bbbbb;border-radius:18px;padding:2.5vh 2.5vw;display:grid;grid-template-rows:auto 1fr auto;position:relative;overflow:hidden}
+.f-top{display:grid;grid-template-columns:1.2fr .95fr;gap:2vw;font-size:clamp(9px,1.25vw,18px);line-height:1.45}
+.f-left,.f-right{white-space:pre-line}
+.f-right{border:1px dashed #22d366;padding:1.1em;color:#44dcff}
+.f-main{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:0}
+.f-title{font-weight:900;font-size:clamp(34px,7vw,98px);letter-spacing:.05em;color:#45cfff;text-shadow:0 0 14px rgba(69,207,255,.35)}
+.f-sub{margin-top:.3em;font-weight:800;font-size:clamp(14px,2.2vw,32px);letter-spacing:.18em;color:#38df63}
+.f-art{margin-top:2vh;font-size:clamp(36px,7vw,100px);letter-spacing:.08em;filter:saturate(.9)}
+.f-loading{text-align:center;border-top:1px solid #0bbbbb;padding-top:1.3vh;font-size:clamp(10px,1.4vw,18px);color:#44dcff}
+.f-bar{color:#35df64;letter-spacing:.08em}
+@media(max-width:700px){.f-top{grid-template-columns:1fr 1fr;gap:1.5vw}.f-shell{border-radius:12px;padding:2vh 2vw}.f-right{padding:.8em}.f-art{font-size:clamp(32px,9vw,70px)}}
 @media(prefers-reduced-motion:reduce){#core,#splash2{transition:none}}
 </style>
 </head>
 <body>
 <iframe id="core" title="VigScope Terminal UI v1.3"></iframe>
 <div id="splash2" aria-label="VigWire Labs boot screen">
-  <img id="splash2art" src="./assets/splash-02-vigwire-labs-v2.webp" alt="VigWire Labs Market Intelligence terminal boot screen with syndicate loading messages, vinegar bottle, terminal, and pickle illustration">
-  <div id="fallback">VIGWIRE LABS<br><span style="font-size:.52em;letter-spacing:.12em">MARKET INTELLIGENCE // BOOT 02</span></div>
+  <img id="splash2art" src="https://raw.githubusercontent.com/fhvsvzpmkw-design/-betting-edge-terminal/0ec8c45f0e938bb365a0432547dd1d2d5cb6c764/assets/splash-02-vigwire-labs-v2.webp" alt="VigWire Labs Market Intelligence terminal boot screen with syndicate loading messages, vinegar bottle, terminal, and pickle illustration" referrerpolicy="no-referrer">
+  <div id="fallback">
+    <div class="f-shell">
+      <div class="f-top">
+        <div class="f-left">vigwire@lab:~$
+&gt; INITIALIZING VIGWIRE LABS ... OK
+&gt; LOADING CORE SYNDICATES ... OK
+&gt; MAIN FEED ONLINE .......... OK
+&gt; MEATS DESK SYNC ........... OK
+&gt; CRYPTO SPECIALS LINK ...... OK
+&gt; PIZZA PLAYS READY ......... OK
+&gt; READY.</div>
+        <div class="f-right">🥒  In a world of noise,
+    we pickle what matters.
+
+⚡  Too legit to quit.
+
+🥩  We got the meats.
+
+₿   Crypto specials.
+    No weak hands.
+
+🍕  Pizza plays.
+    Fresh out of the oven.</div>
+      </div>
+      <div class="f-main">
+        <div class="f-title">VIGWIRE LABS</div>
+        <div class="f-sub">MARKET INTELLIGENCE</div>
+        <div class="f-art">🖥️&nbsp;&nbsp; 🧴💦 &nbsp;&nbsp;🥒</div>
+      </div>
+      <div class="f-loading">LOADING VIGSCOPE...<br><span class="f-bar">[██████████████████████░░░░░] 78%</span></div>
+    </div>
+  </div>
 </div>
 <script>
 // BOOT SCREEN 2 — locked VigWire Labs V2 splash.
-// Safari paint gate: Screen 2 cannot advance until the asset is decoded, the wrapper is visible,
-// and the browser has completed two paint frames. The preserved v1.3 runner core preloads behind it.
+// Exact artwork is loaded from its immutable GitHub commit so Pages caching cannot replace it.
+// If Safari cannot render that bitmap, the fallback is the full V2 composition rather than a placeholder.
 const SCREEN2_MIN_MS=3000;
 const FADE_MS=320;
 const core=document.getElementById('core');
@@ -53,10 +95,7 @@ function paintThenStart(){
   screen2Started=true;
   splash2.classList.add('show');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    setTimeout(()=>{
-      screen2Elapsed=true;
-      maybeRevealCore();
-    },FADE_MS+SCREEN2_MIN_MS);
+    setTimeout(()=>{screen2Elapsed=true;maybeRevealCore()},SCREEN2_MIN_MS);
   }));
 }
 function markArtReady(failed=false){
@@ -86,10 +125,7 @@ function waitUntilActuallyVisible(){
 }
 art.addEventListener('load',confirmArtReady,{once:true});
 art.addEventListener('error',()=>markArtReady(true),{once:true});
-if(art.complete){
-  if(art.naturalWidth)confirmArtReady();
-  else markArtReady(true);
-}
+if(art.complete){if(art.naturalWidth)confirmArtReady();else markArtReady(true)}
 core.addEventListener('load',()=>{coreLoaded=true;maybeRevealCore()},{once:true});
 core.src='./runner-core.html'+location.search+location.hash;
 if(document.readyState==='complete')waitUntilActuallyVisible();
