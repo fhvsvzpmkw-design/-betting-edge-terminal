@@ -17,21 +17,45 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: asset-v2v2-upload
+          fetch-depth: 0
 
-      - name: Convert locked Screen 2 artwork to PNG
+      - name: Assemble approved V2V2 source and render PNG
         run: |
+          set -euo pipefail
+          cat .asset-upload/v2v2-*.b64 | tr -d '\r\n' | base64 -d > /tmp/v2v2-source.webp
+          file /tmp/v2v2-source.webp
+
           if ! command -v convert >/dev/null 2>&1; then
             sudo apt-get update
             sudo apt-get install -y imagemagick
           fi
+
           mkdir -p assets
-          convert assets/splash-02-vigwire-labs-v2.webp assets/vigwire-labs-v2v2.png
-          file assets/vigwire-labs-v2v2.png
+          convert /tmp/v2v2-source.webp -resize 1280x720\! assets/splash-02-vigwire-labs-v2v2.png
+
+          python - <<'PY'
+          import hashlib
+          import pathlib
+          import struct
+
+          p = pathlib.Path('assets/splash-02-vigwire-labs-v2v2.png')
+          b = p.read_bytes()
+          if b[:8] != b'\x89PNG\r\n\x1a\n':
+              raise SystemExit('generated asset is not PNG')
+          width, height = struct.unpack('>II', b[16:24])
+          if (width, height) != (1280, 720):
+              raise SystemExit(f'unexpected PNG dimensions: {width}x{height}')
+          print(f'PNG {width}x{height} bytes={len(b)} sha256={hashlib.sha256(b).hexdigest()}')
+          PY
 
       - name: Commit generated PNG
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/vigwire-labs-v2v2.png
-          git commit -m "build canonical VigWire Labs V2 V2 splash PNG"
+          git add assets/splash-02-vigwire-labs-v2v2.png
+          if git diff --cached --quiet; then
+            echo "V2V2 PNG is already current."
+            exit 0
+          fi
+          git commit -m "build approved VigWire Labs V2V2 PNG"
           git push origin HEAD:asset-v2v2-upload
