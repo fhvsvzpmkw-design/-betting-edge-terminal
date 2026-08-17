@@ -5,60 +5,59 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>VigScope Terminal UI v1.3 Runner</title>
 <style>
-:root{--bg:#01040a;--fade-ms:320ms;--green:#58ff88}
+:root{--bg:#01040a;--fade-ms:320ms;--green:#58ff88;--cyan:#45d7ff}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
 #core{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;transition:opacity var(--fade-ms) ease}
 #core.ready{opacity:1}
-#splash2{position:fixed;z-index:10;inset:0;display:grid;place-items:center;background:var(--bg);opacity:1;transition:opacity var(--fade-ms) ease;overflow:hidden}
+#splash2{position:fixed;z-index:10;inset:0;display:grid;place-items:center;background:var(--bg);opacity:1;transition:opacity var(--fade-ms) ease;overflow:hidden;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
 #splash2.fade{opacity:0;pointer-events:none}
-#splash2art{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:var(--bg)}
-#fallback{display:none;color:var(--green);font:700 clamp(14px,2.2vw,24px) ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;letter-spacing:.08em;text-align:center}
-#splash2.asset-error #splash2art{display:none}
-#splash2.asset-error #fallback{display:block}
+.boot{width:min(1180px,96vw);height:min(760px,94vh);display:grid;grid-template-rows:auto auto 1fr auto auto;gap:clamp(8px,1.4vh,16px);align-items:center;color:var(--green)}
+.brand{text-align:center}.brand h1{margin:0;color:var(--cyan);font-size:clamp(34px,7vw,88px);letter-spacing:.06em;line-height:.95}.brand div{margin-top:.45em;font-size:clamp(12px,1.8vw,24px);letter-spacing:.16em}
+.art{width:100%;max-height:30vh;object-fit:contain;display:block;margin:auto}
+.status{width:min(760px,92vw);margin:auto;color:var(--cyan);font-size:clamp(11px,1.55vw,20px);line-height:1.45;white-space:pre-wrap}
+.status b{color:var(--green);font-weight:700}
+.sayings{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;font-size:clamp(8px,1.05vw,13px);line-height:1.35;text-align:center}.sayings span{border:1px dashed rgba(88,255,136,.34);padding:8px 6px}
+.loading{text-align:center;color:var(--cyan);font-size:clamp(11px,1.5vw,19px);letter-spacing:.08em}.bar{margin:.45em auto 0;width:min(760px,88vw);height:16px;border:1px solid rgba(88,255,136,.5);position:relative}.bar:before{content:"";position:absolute;inset:2px auto 2px 2px;width:78%;background:repeating-linear-gradient(90deg,var(--green) 0 12px,transparent 12px 15px)}
+#fallback{display:none;color:var(--green);font-weight:700;text-align:center}
+#splash2.asset-error .art{display:none}#splash2.asset-error #fallback{display:block}
+@media (orientation:portrait){.boot{height:min(920px,94vh);grid-template-rows:auto auto auto 1fr auto}.brand h1{font-size:clamp(36px,10vw,72px)}.art{max-height:24vh}.status{font-size:clamp(10px,2.35vw,17px)}.sayings{grid-template-columns:1fr;font-size:clamp(9px,2.1vw,14px);gap:4px}.sayings span{padding:5px 8px}.loading{font-size:clamp(10px,2.4vw,16px)}}
+@media (max-width:700px) and (orientation:portrait){#splash2{padding:10px}.boot{width:96vw;height:96vh;gap:6px}.brand h1{font-size:clamp(34px,11vw,58px)}.brand div{font-size:clamp(10px,3vw,15px)}.art{max-height:20vh}.status{font-size:clamp(9px,2.7vw,13px);line-height:1.35}.sayings{font-size:clamp(8px,2.4vw,11px)}.loading{font-size:clamp(9px,2.7vw,13px)}.bar{height:13px}}
+@media (max-height:520px) and (orientation:landscape){#splash2{padding:8px}.boot{width:98vw;height:96vh;grid-template-columns:.9fr 1.1fr;grid-template-rows:auto 1fr auto;gap:6px 14px}.brand{grid-column:1}.brand h1{font-size:clamp(28px,5vw,50px)}.brand div{font-size:clamp(9px,1.4vw,13px)}.art{grid-column:2;grid-row:1 / span 2;max-height:48vh}.status{grid-column:1;grid-row:2;width:100%;font-size:clamp(8px,1.35vw,12px)}.sayings{grid-column:1 / span 2;grid-row:3;grid-template-columns:repeat(5,1fr);font-size:clamp(7px,1vw,10px)}.loading{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:65%;font-size:9px}.bar{height:10px;margin-top:3px}}
 @media(prefers-reduced-motion:reduce){#core,#splash2{transition:none}}
 </style>
 </head>
 <body>
 <iframe id="core" title="VigScope Terminal UI v1.3"></iframe>
 <div id="splash2" aria-label="VigWire Labs boot screen">
-  <img id="splash2art" src="./assets/splash-02-vigwire-labs-v2v2.png" alt="VigWire Labs Market Intelligence boot screen">
-  <div id="fallback">VIGWIRE LABS // LOADING VIGSCOPE</div>
+  <div class="boot">
+    <div class="brand"><h1>VIGWIRE LABS</h1><div>MARKET INTELLIGENCE</div></div>
+    <img class="art" src="./assets/vigwire-characters-v2v2.webp" alt="VigWire terminal, vinegar bottle and pickle">
+    <div class="status">&gt; INITIALIZING VIGWIRE LABS........ <b>OK</b>
+&gt; LOADING CORE SYNDICATES.......... <b>OK</b>
+&gt; MAIN FEED ONLINE................. <b>OK</b>
+&gt; PIZZA PLAYS READY................ <b>OK</b>
+&gt; CRYPTO SPECIALS LINK............. <b>OK</b>
+&gt; MEAT DESK SYNC................... <b>OK</b>
+&gt; READY............................ <b>OK</b></div>
+    <div class="sayings"><span>🥒 In a world of noise, we pickle what matters.</span><span>🛡 Too legit to quit.</span><span>🥩 We got the meats.</span><span>🔒 Crypto specials. No weak hands.</span><span>🍕 Pizza plays. Fresh out of the oven.</span></div>
+    <div class="loading">LOADING VIGSCOPE...<div class="bar"></div></div>
+    <div id="fallback">VIGWIRE LABS // LOADING VIGSCOPE</div>
+  </div>
 </div>
 <script>
-// Screen 2 stays deliberately simple: local V2V2 image, short hold, then unchanged runner core.
+// Screen 2 stays deliberately simple: responsive presentation only, short hold, then unchanged runner core.
 const SCREEN2_MS=3000;
 const FADE_MS=320;
 const core=document.getElementById('core');
 const splash=document.getElementById('splash2');
-const art=document.getElementById('splash2art');
+const art=document.querySelector('.art');
 let coreLoaded=false;
 let timerDone=false;
 let started=false;
-
-function reveal(){
-  if(!coreLoaded||!timerDone)return;
-  core.classList.add('ready');
-  splash.classList.add('fade');
-  setTimeout(()=>splash.remove(),FADE_MS+80);
-}
-
-function startWhenVisible(){
-  if(started)return;
-  try{
-    const host=window.frameElement;
-    if(host){
-      const style=getComputedStyle(host);
-      if(Number.parseFloat(style.opacity||'1')<=.01||style.visibility==='hidden'){
-        requestAnimationFrame(startWhenVisible);
-        return;
-      }
-    }
-  }catch(e){}
-  started=true;
-  setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS);
-}
-
+function reveal(){if(!coreLoaded||!timerDone)return;core.classList.add('ready');splash.classList.add('fade');setTimeout(()=>splash.remove(),FADE_MS+80)}
+function startWhenVisible(){if(started)return;try{const host=window.frameElement;if(host){const style=getComputedStyle(host);if(Number.parseFloat(style.opacity||'1')<=.01||style.visibility==='hidden'){requestAnimationFrame(startWhenVisible);return}}}catch(e){}started=true;setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS)}
 art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});
 core.addEventListener('load',()=>{coreLoaded=true;reveal()},{once:true});
 core.src='./runner-core.html'+location.search+location.hash;
