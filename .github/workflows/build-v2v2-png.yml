@@ -22,7 +22,28 @@ jobs:
       - name: Assemble approved V2V2 source and render PNG
         run: |
           set -euo pipefail
-          cat .asset-upload/v2v2-*.b64 | tr -d '\r\n' | base64 -d > /tmp/v2v2-source.webp
+          python - <<'PY'
+          import base64
+          import glob
+          import pathlib
+          import re
+
+          parts=[]
+          for name in sorted(glob.glob('.asset-upload/v2v2-*.b64')):
+              raw=pathlib.Path(name).read_text()
+              clean=re.sub(r'\s+','',raw)
+              print(name, 'raw=',len(raw),'clean=',len(clean),'head=',clean[:8],'tail=',clean[-8:])
+              parts.append(clean)
+          data=''.join(parts)
+          print('combined chars=',len(data),'mod4=',len(data)%4)
+          # Historical staging chunks may contain padding at intermediate split points.
+          # Remove padding, then restore canonical padding once after concatenation.
+          data=data.replace('=','')
+          data += '='*((4-len(data)%4)%4)
+          out=base64.b64decode(data, validate=True)
+          pathlib.Path('/tmp/v2v2-source.webp').write_bytes(out)
+          print('decoded bytes=',len(out),'magic=',out[:12])
+          PY
           file /tmp/v2v2-source.webp
 
           if ! command -v convert >/dev/null 2>&1; then
@@ -37,14 +58,11 @@ jobs:
           import hashlib
           import pathlib
           import struct
-
-          p = pathlib.Path('assets/splash-02-vigwire-labs-v2v2.png')
-          b = p.read_bytes()
-          if b[:8] != b'\x89PNG\r\n\x1a\n':
-              raise SystemExit('generated asset is not PNG')
-          width, height = struct.unpack('>II', b[16:24])
-          if (width, height) != (1280, 720):
-              raise SystemExit(f'unexpected PNG dimensions: {width}x{height}')
+          p=pathlib.Path('assets/splash-02-vigwire-labs-v2v2.png')
+          b=p.read_bytes()
+          if b[:8] != b'\x89PNG\r\n\x1a\n': raise SystemExit('generated asset is not PNG')
+          width,height=struct.unpack('>II',b[16:24])
+          if (width,height)!=(1280,720): raise SystemExit(f'unexpected PNG dimensions: {width}x{height}')
           print(f'PNG {width}x{height} bytes={len(b)} sha256={hashlib.sha256(b).hexdigest()}')
           PY
 
