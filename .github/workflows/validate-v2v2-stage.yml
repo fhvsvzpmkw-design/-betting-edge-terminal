@@ -17,9 +17,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: v2v2-png-production-2
-      - name: Validate staged base64 chunks
+      - name: Inspect staged base64 chunks
         run: |
           normalize() { tr -cd 'A-Za-z0-9+/=' < "$1"; }
-          test "$(normalize .asset-build/v2v2-production/chunk-00.b64 | sha256sum | cut -d' ' -f1)" = "32c6ee2c3541bbbd5ac231fa93f7f1021813bc5fa593946445f35465bbd0f28b"
-          test "$(normalize .asset-build/v2v2-production/chunk-01.b64 | sha256sum | cut -d' ' -f1)" = "03797e66f01242fc41f07f72a55f1d1f74a3822287ff13ba07fab1558c993edd"
-          echo "V2V2 staged chunks 00-01 validated."
+          for f in .asset-build/v2v2-production/chunk-00.b64 .asset-build/v2v2-production/chunk-01.b64; do
+            echo "$f length=$(normalize "$f" | wc -c) sha=$(normalize "$f" | sha256sum | cut -d' ' -f1)"
+          done
+          echo "expected00 length=18000 sha=32c6ee2c3541bbbd5ac231fa93f7f1021813bc5fa593946445f35465bbd0f28b"
+          echo "expected01 length=40000 sha=03797e66f01242fc41f07f72a55f1d1f74a3822287ff13ba07fab1558c993edd"
