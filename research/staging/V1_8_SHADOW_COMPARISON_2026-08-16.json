@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "comparisonId": "v1.8-shadow-comparison-2026-08-16-r1",
+  "date": "2026-08-16",
+  "state": "SHADOW_ONLY_NOT_RUNTIME_AUTHORITY",
+  "purpose": "Compare frozen v1.8 History Fit behavior against the exact real candidates evaluated by production v1.7 on 2026-08-16 without changing any issued report or production authority.",
+  "production": {
+    "libraryVersion": "1.7",
+    "libraryBlobSha": "ade09ebcc4760cc4dfc06cba7dc73ba3c514980e",
+    "historyFitPolicyBlobSha": "142bd105aa05a6504a2ebb8a1c39c80487158cfb",
+    "authority": true
+  },
+  "shadow": {
+    "libraryVersion": "1.8-candidate-r1",
+    "candidateBuildId": "v1.8-merged-candidate-r1-2026-08-15",
+    "candidateFreezeId": "v1.8-candidate-freeze-2026-08-15-r2",
+    "promotionPackageId": "v1.8-promotion-candidate-r1-2026-08-15",
+    "mergedCandidateLibrarySha256": "d8910609c4ef77da51716958227812479bdcff1e79c46f6cdf432c7e94ad59fc",
+    "runtimeAuthority": false
+  },
+  "sourceRuns": [
+    "data/history/runs/2026-08-16/open-060831.json",
+    "data/history/runs/2026-08-16/main-080114.json",
+    "data/history/runs/2026-08-16/final_morning-093240.json",
+    "data/history/runs/2026-08-16/evening-154530.json",
+    "data/history/runs/2026-08-16/late-190810.json"
+  ],
+  "method": {
+    "candidateFirst": true,
+    "deduplicateRepeatedSameDayCardsByExactMarketCandidate": true,
+    "uniqueCandidates": 6,
+    "issuedCardObservations": 14,
+    "sameDayMovementExcludedFromHistoricalGrade": true,
+    "smallestRelevantSet": true,
+    "directSportMarketEvidenceOutranksAnalogy": true,
+    "gradeModifiersAreCommunicationNotPseudoPrecision": true
+  },
+  "comparisons": [
+    {
+      "candidate": "White Sox ML",
+      "sport": "MLB",
+      "market": "moneyline",
+      "productionGrade": "B",
+      "shadowGrade": "B-",
+      "gradeChange": "SOFTEN_WITHIN_B_BAND",
+      "productionPriorIds": [
+        "method_no_vig_normalized_probabilities",
+        "consensus_beats_individual_book",
+        "mlb_intraday_line_movement",
+        "woodland_woodland_mlb_update_2003"
+      ],
+      "shadowAddedContext": [
+        "v18_online_bookmaker_orderflow_price_adjustment"
+      ],
+      "shadowHistoryFit": "B- — Direct MLB no-vig and moneyline/movement evidence remains applicable, but v1.8 adds that bookmaker moves can reflect demand and order flow as well as information. The Chicago move is therefore useful context, not proof of sharp money or profitability at the posted price.",
+      "productionDecisionImpact": "NONE"
+    },
+    {
+      "candidate": "Fever ML",
+      "sport": "WNBA",
+      "market": "moneyline",
+      "productionGrade": "NR",
+      "shadowGrade": "NR",
+      "gradeChange": "UNCHANGED",
+      "productionPriorIds": [],
+      "shadowExcludedWrongMarketItems": [
+        "v18_wnba_direct_prop_calibration_gap"
+      ],
+      "shadowHistoryFit": "NR — v1.8 adds an explicit WNBA player-prop calibration gap, but that is the wrong market for a game moneyline and cannot be forced into this candidate. Direct WNBA moneyline price-band calibration remains unavailable; cross-sport analogy is insufficient.",
+      "productionDecisionImpact": "NONE"
+    },
+    {
+      "candidate": "Rays ML",
+      "sport": "MLB",
+      "market": "moneyline",
+      "productionGrade": "B",
+      "shadowGrade": "B",
+      "gradeChange": "UNCHANGED",
+      "productionPriorIds": [
+        "method_no_vig_normalized_probabilities",
+        "consensus_beats_individual_book",
+        "mlb_reverse_flb",
+        "closing_line_information"
+      ],
+      "shadowAddedContext": [
+        "v18_online_bookmaker_orderflow_price_adjustment"
+      ],
+      "shadowHistoryFit": "B — Direct MLB moneyline calibration remains the strongest fit and still supports price discipline rather than a mechanical favorite rule. v1.8's order-flow research adds a useful caution around interpreting the steam, but it does not displace the direct MLB prior or create value at the current favorite price.",
+      "productionDecisionImpact": "NONE"
+    },
+    {
+      "candidate": "Red Sox ML",
+      "sport": "MLB",
+      "market": "moneyline",
+      "productionGrade": "B",
+      "shadowGrade": "B-",
+      "gradeChange": "SOFTEN_WITHIN_B_BAND",
+      "productionPriorIds": [
+        "method_no_vig_normalized_probabilities",
+        "consensus_beats_individual_book",
+        "mlb_intraday_line_movement",
+        "woodland_woodland_mlb_update_2003"
+      ],
+      "shadowAddedContext": [
+        "v18_online_bookmaker_orderflow_price_adjustment"
+      ],
+      "shadowHistoryFit": "B- — MLB movement and no-vig evidence still fit the Boston favorite-flip context, but v1.8 more explicitly separates movement from informed-money proof because bookmaker prices also react to demand/order flow. The historical fit supports disciplined repricing, not chasing the flip.",
+      "productionDecisionImpact": "NONE"
+    },
+    {
+      "candidate": "Portland Fire ML",
+      "sport": "WNBA",
+      "market": "moneyline",
+      "productionGrade": "NR",
+      "shadowGrade": "NR",
+      "gradeChange": "UNCHANGED",
+      "productionPriorIds": [],
+      "shadowExcludedWrongMarketItems": [
+        "v18_wnba_direct_prop_calibration_gap"
+      ],
+      "shadowHistoryFit": "NR — v1.8 does not add direct WNBA game-moneyline calibration. Its WNBA addition is player-prop-specific and is deliberately excluded here under the exact-market rule. The Portland price improvement remains current-market evidence, not historical calibration evidence.",
+      "productionDecisionImpact": "NONE"
+    },
+    {
+      "candidate": "Vancouver Whitecaps FC ML",
+      "sport": "MLS / Soccer",
+      "market": "three-way moneyline / 1X2",
+      "productionGrade": "NR",
+      "shadowGrade": "NR",
+      "gradeChange": "UNCHANGED_WITH_BETTER_LIMITATION_CONTEXT",
+      "productionPriorIds": [],
+      "shadowAuxiliaryContext": [
+        "v18_soccer_market_structure_1x2_vs_asian_handicap",
+        "v18_retail_betting_market_regime"
+      ],
+      "shadowHistoryFit": "NR — v1.8 adds useful direct soccer evidence that 1X2 and Asian-handicap price surfaces should be treated separately, but the verified evidence is European-soccer-specific and explicitly should not transfer numerical effects to North American markets. It improves the structural explanation without supplying direct MLS three-way price-band calibration.",
+      "productionDecisionImpact": "NONE"
+    }
+  ],
+  "summary": {
+    "uniqueCandidatesCompared": 6,
+    "upgrades": 0,
+    "downgradesAcrossLetterBands": 0,
+    "softenedWithinBand": 2,
+    "unchanged": 4,
+    "productionRecommendationChanges": 0,
+    "productionStatusChanges": 0,
+    "productionStakeChanges": 0,
+    "productionFairValueChanges": 0,
+    "productionPlayToChanges": 0,
+    "keyFinding": "v1.8 improved caution and market-structure explanation without manufacturing new direct evidence. It softened two movement-heavy MLB narratives within the existing B band, preserved the Rays B direct-moneyline fit, and correctly left WNBA and MLS direct price-band gaps at NR.",
+    "promotionSignal": "POSITIVE_BUT_INSUFFICIENT_ALONE",
+    "nextEvidenceNeeded": "Continue same-candidate shadow comparisons on future real production slates, especially player props and NFL/other markets where v1.8 contains direct new evidence. Do not promote from this single shadow observation."
+  },
+  "boundaries": {
+    "issuedReportsModified": false,
+    "runHistoryModified": false,
+    "productionManifestModified": false,
+    "productionResearchLibraryModified": false,
+    "runnerModified": false,
+    "contractModified": false,
+    "schedulerModified": false,
+    "oddsWorkflowModified": false,
+    "shadowMayCreateBet": false,
+    "shadowMayChangeExecutablePrice": false,
+    "shadowMayChangeFairValue": false,
+    "shadowMayChangePlayTo": false,
+    "shadowMayChangeStatus": false,
+    "shadowMayChangeStake": false
+  }
+}
