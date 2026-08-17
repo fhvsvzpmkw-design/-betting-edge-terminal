@@ -35,6 +35,8 @@ const art=document.getElementById('splash2art');
 let coreLoaded=false;
 let timerDone=false;
 let started=false;
+let hierarchyObserver=null;
+let hierarchyFrame=null;
 
 function reveal(){
   if(!coreLoaded||!timerDone)return;
@@ -59,8 +61,122 @@ function startWhenVisible(){
   setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS);
 }
 
+function innerAppFrame(){
+  try{return core.contentDocument&&core.contentDocument.getElementById('app')}catch(e){return null}
+}
+
+function scheduleHierarchyPatch(){
+  if(hierarchyFrame)return;
+  hierarchyFrame=requestAnimationFrame(()=>{
+    hierarchyFrame=null;
+    applyHierarchyPatch();
+  });
+}
+
+function applyHierarchyPatch(){
+  const app=innerAppFrame();
+  let d=null;
+  try{d=app&&app.contentDocument}catch(e){return false}
+  if(!d||!d.head||!d.body)return false;
+
+  let style=d.getElementById('runnerHierarchyPatch130');
+  if(!style){
+    style=d.createElement('style');
+    style.id='runnerHierarchyPatch130';
+    style.textContent=`
+      .stats{display:none!important}
+      .runnerNavPad{padding-top:10px!important;padding-bottom:8px!important}
+      #runnerBankrollCompact{display:inline-flex;align-items:baseline;gap:8px;margin-top:7px;padding:4px 8px;border:1px solid var(--line);background:#020912;line-height:1;white-space:nowrap}
+      #runnerBankrollCompact .runnerBankrollKey{color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.09em}
+      #runnerBankrollCompact .runnerBankrollValue{color:var(--green);font-size:14px;font-weight:950}
+      .runnerRiskMini{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-top:7px;padding-top:6px;border-top:1px dotted var(--line);color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.08em;line-height:1}
+      .runnerRiskMini .runnerRiskValue{display:inline!important;margin:0!important;color:var(--text)!important;font-size:10px!important;line-height:1!important}
+      @media(min-width:721px){
+        .runnerNavPad .tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+        .runnerCounts{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+      }
+      @media(max-width:720px){
+        .runnerNavPad .tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+        .runnerNavPad .btn{min-height:50px;padding:9px 6px}
+        .runnerCounts{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+      }
+      @media(max-width:560px){
+        #runnerBankrollCompact{margin-top:6px}
+      }
+    `;
+    d.head.appendChild(style);
+  }
+
+  const top=d.querySelector('.top');
+  const tabs=d.querySelector('.tabs');
+  const navPad=tabs&&tabs.parentElement;
+  if(top&&navPad){
+    navPad.classList.add('runnerNavPad');
+    if(top.nextElementSibling!==navPad)top.insertAdjacentElement('afterend',navPad);
+  }
+
+  const stats=d.querySelector('.stats');
+  const statValues=stats?[...stats.querySelectorAll('.stat b')]:[];
+  if(stats)stats.setAttribute('aria-hidden','true');
+
+  const titleGroup=top&&top.firstElementChild;
+  let bankroll=d.getElementById('runnerBankrollCompact');
+  if(titleGroup&&!bankroll){
+    bankroll=d.createElement('div');
+    bankroll.id='runnerBankrollCompact';
+    bankroll.setAttribute('aria-label','Current bankroll');
+    const key=d.createElement('span');
+    key.className='runnerBankrollKey';
+    key.textContent='BANKROLL';
+    const value=d.createElement('b');
+    value.className='runnerBankrollValue';
+    bankroll.append(key,value);
+    titleGroup.appendChild(bankroll);
+  }
+  const bankrollValue=bankroll&&bankroll.querySelector('.runnerBankrollValue');
+  const nextBankroll=statValues[0]&&statValues[0].textContent||'$0.00';
+  if(bankrollValue&&bankrollValue.textContent!==nextBankroll)bankrollValue.textContent=nextBankroll;
+
+  const betCount=d.querySelector('.runnerCounts .runnerCount');
+  let riskMini=betCount&&betCount.querySelector('.runnerRiskMini');
+  if(betCount&&!riskMini){
+    riskMini=d.createElement('div');
+    riskMini.className='runnerRiskMini';
+    const key=d.createElement('span');
+    key.textContent='NEW RISK';
+    const value=d.createElement('b');
+    value.className='runnerRiskValue';
+    riskMini.append(key,value);
+    betCount.appendChild(riskMini);
+  }
+  const riskValue=riskMini&&riskMini.querySelector('.runnerRiskValue');
+  const nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';
+  if(riskValue&&riskValue.textContent!==nextRisk)riskValue.textContent=nextRisk;
+  return true;
+}
+
+function watchHierarchy(){
+  const app=innerAppFrame();
+  if(!app){setTimeout(watchHierarchy,50);return}
+  const attach=()=>{
+    let d=null;
+    try{d=app.contentDocument}catch(e){return}
+    if(!d||!d.body){setTimeout(attach,30);return}
+    if(hierarchyObserver)hierarchyObserver.disconnect();
+    applyHierarchyPatch();
+    hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);
+    hierarchyObserver.observe(d.body,{subtree:true,childList:true,characterData:true});
+  };
+  app.addEventListener('load',attach);
+  if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0);
+}
+
 art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});
-core.addEventListener('load',()=>{coreLoaded=true;reveal()},{once:true});
+core.addEventListener('load',()=>{
+  coreLoaded=true;
+  watchHierarchy();
+  reveal();
+},{once:true});
 core.src='./runner-core.html'+location.search+location.hash;
 startWhenVisible();
 </script>
