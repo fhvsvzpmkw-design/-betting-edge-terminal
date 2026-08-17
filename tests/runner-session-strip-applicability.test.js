@@ -3,13 +3,13 @@ const vm = require('vm');
 const assert = require('assert');
 const path = require('path');
 
-const html = fs.readFileSync(path.join(__dirname, '..', 'runner.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, '..', 'runner-core.html'), 'utf8');
 const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
-assert(scriptMatch, 'runner.html script block not found');
+assert(scriptMatch, 'runner-core.html script block not found');
 const script = scriptMatch[1];
 const start = script.indexOf('function sessionKey(');
 const end = script.indexOf('function selectSession(', start);
-assert(start >= 0 && end > start, 'runner session block not found');
+assert(start >= 0 && end > start, 'runner core session block not found');
 const sessionSource = script.slice(start, end) + '\nglobalThis.__runnerSessionTest={sessionKey,sessionWindowApplicable,sessionRuns,newestSessionRun,SESSION_MINUTES};\n';
 
 const FIXED_NOW = '2026-08-15T21:32:00Z'; // 14:32 America/Vancouver
@@ -42,7 +42,7 @@ const context = {
 };
 context.globalThis = context;
 vm.createContext(context);
-vm.runInContext(sessionSource, context, { filename: 'runner.html' });
+vm.runInContext(sessionSource, context, { filename: 'runner-core.html' });
 const { sessionWindowApplicable, sessionRuns, newestSessionRun } = context.__runnerSessionTest;
 
 function assertSlots(nowIso, day, expected) {
