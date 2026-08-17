@@ -3,16 +3,16 @@
 **Status:** ACCEPTED — PRESENTATION-ONLY RUNNER WRAPPER  
 **Production contract:** `BETTING_EDGE_CONTRACT.md` v0.9 OPERATIONAL  
 **Terminal/UI family:** v1.3  
-**Current production wrapper blob:** `b2b328c12cc70f887667ca90eef11d453e188287`
+**Current production wrapper blob:** `857eab62c138926c77407cc022ab1ac3c0505738`
 
 ## Scope
 
-This acceptance records the approved VigWire Labs V2 second splash screen and its Safari visibility hardening in the existing short-link boot sequence.
+This acceptance records the approved VigWire Labs V2 second splash screen and its Safari delivery hardening in the existing short-link boot sequence.
 
 Boot order on every short-link refresh:
 
 1. existing `r.html` VigScope splash;
-2. `runner.html` presentation wrapper displaying `assets/splash-02-vigwire-labs-v2.webp`;
+2. `runner.html` presentation wrapper displaying the locked VigWire Labs V2 artwork;
 3. preserved v1.3 runner logic in `runner-core.html`;
 4. VigScope Terminal UI v1.3.
 
@@ -30,26 +30,35 @@ Therefore the runner application logic used before the presentation deployment r
 
 The current `runner.html` is a thin presentation wrapper only. Its production blob is:
 
-`b2b328c12cc70f887667ca90eef11d453e188287`
+`857eab62c138926c77407cc022ab1ac3c0505738`
 
-The locked Screen 2 asset remains:
+The locked Screen 2 artwork remains the immutable repository asset introduced at deployment commit:
 
-`assets/splash-02-vigwire-labs-v2.webp`  
-Git blob: `515341e1e288bd6c25895cc37226c683891f8239`
+`0ec8c45f0e938bb365a0432547dd1d2d5cb6c764`
 
-## Safari paint-gate revision
+Asset path:
 
-A live Safari refresh showed that the first wrapper implementation could reach the terminal without visibly presenting Screen 2. The presentation wrapper was therefore hardened without changing runner-core behavior.
+`assets/splash-02-vigwire-labs-v2.webp`
 
-Screen 2 now cannot advance until:
+Git blob:
 
-1. the Screen 2 image has loaded and, where supported, decoded;
+`515341e1e288bd6c25895cc37226c683891f8239`
+
+The production wrapper now requests that exact asset from the immutable GitHub commit/raw path rather than depending on the GitHub Pages asset path. This prevents a stale or missing Pages asset from silently replacing the approved artwork.
+
+If Safari cannot render the exact bitmap, the emergency fallback is now a full VigWire Labs V2 terminal composition containing the syndicate loading messages, brand title, Market Intelligence label, pickle/vinegar motif and the separate `Too legit to quit`, `We got the meats`, Crypto Specials and Pizza Plays lines. The old two-line placeholder fallback is removed.
+
+## Display gate
+
+Screen 2 cannot advance until:
+
+1. the exact artwork has loaded and, where supported, decoded, or the full V2 emergency composition is activated;
 2. the wrapper iframe is actually visible after Screen 1;
 3. two browser paint frames have completed;
 4. the full Screen 2 display window has elapsed; and
 5. the preserved runner core has loaded.
 
-The Screen 2 minimum display window is **3000 ms**, beginning only after the paint gate. If the artwork asset fails, the wrapper shows an explicit VigWire Labs fallback instead of silently bypassing Screen 2.
+The Screen 2 minimum display window remains **3000 ms** after the paint gate.
 
 ## Contract boundary check
 
@@ -66,7 +75,7 @@ This revision does not modify:
 - browser history/storage keys;
 - repricing logic contained in the preserved v1.3 runner core.
 
-The revision changes only the user-facing timing/paint gate before the preserved v1.3 runner core is revealed.
+The revision changes only the user-facing Screen 2 asset-delivery/presentation layer before the preserved v1.3 runner core is revealed.
 
 ## Preflight interpretation
 
