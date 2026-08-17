@@ -5,131 +5,64 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>VigScope Terminal UI v1.3 Runner</title>
 <style>
-:root{--bg:#01040a;--fade-ms:320ms;--green:#58ff88;--cyan:#45d7ff}
+:root{--bg:#01040a;--fade-ms:320ms;--green:#58ff88}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
 #core{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;transition:opacity var(--fade-ms) ease}
 #core.ready{opacity:1}
-#splash2{position:fixed;z-index:10;inset:0;display:grid;place-items:center;background:#01040a;opacity:0;visibility:hidden;transition:opacity var(--fade-ms) ease;overflow:hidden}
-#splash2.show{opacity:1;visibility:visible}
+#splash2{position:fixed;z-index:10;inset:0;display:grid;place-items:center;background:var(--bg);opacity:1;transition:opacity var(--fade-ms) ease;overflow:hidden}
 #splash2.fade{opacity:0;pointer-events:none}
-#splash2art{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#01040a}
-#splash2:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 4px)}
-#fallback{display:none;position:absolute;inset:0;z-index:2;padding:3vh 3vw;color:var(--cyan);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#01040a;text-shadow:0 0 8px rgba(69,215,255,.35)}
+#splash2art{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:var(--bg)}
+#fallback{display:none;color:var(--green);font:700 clamp(14px,2.2vw,24px) ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;letter-spacing:.08em;text-align:center}
 #splash2.asset-error #splash2art{display:none}
 #splash2.asset-error #fallback{display:block}
-.f-shell{height:100%;border:1px solid #0bbbbb;border-radius:18px;padding:2.5vh 2.5vw;display:grid;grid-template-rows:auto 1fr auto;position:relative;overflow:hidden}
-.f-top{display:grid;grid-template-columns:1.2fr .95fr;gap:2vw;font-size:clamp(9px,1.25vw,18px);line-height:1.45}
-.f-left,.f-right{white-space:pre-line}
-.f-right{border:1px dashed #22d366;padding:1.1em;color:#44dcff}
-.f-main{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:0}
-.f-title{font-weight:900;font-size:clamp(34px,7vw,98px);letter-spacing:.05em;color:#45cfff;text-shadow:0 0 14px rgba(69,207,255,.35)}
-.f-sub{margin-top:.3em;font-weight:800;font-size:clamp(14px,2.2vw,32px);letter-spacing:.18em;color:#38df63}
-.f-art{margin-top:2vh;font-size:clamp(36px,7vw,100px);letter-spacing:.08em;filter:saturate(.9)}
-.f-loading{text-align:center;border-top:1px solid #0bbbbb;padding-top:1.3vh;font-size:clamp(10px,1.4vw,18px);color:#44dcff}
-.f-bar{color:#35df64;letter-spacing:.08em}
-@media(max-width:700px){.f-top{grid-template-columns:1fr 1fr;gap:1.5vw}.f-shell{border-radius:12px;padding:2vh 2vw}.f-right{padding:.8em}.f-art{font-size:clamp(32px,9vw,70px)}}
 @media(prefers-reduced-motion:reduce){#core,#splash2{transition:none}}
 </style>
 </head>
 <body>
 <iframe id="core" title="VigScope Terminal UI v1.3"></iframe>
 <div id="splash2" aria-label="VigWire Labs boot screen">
-  <img id="splash2art" src="./assets/splash-02-vigwire-labs-v2v2.png" alt="VigWire Labs Market Intelligence terminal boot screen with syndicate loading messages, vinegar bottle, terminal, and pickle illustration">
-  <div id="fallback">
-    <div class="f-shell">
-      <div class="f-top">
-        <div class="f-left">vigwire@lab:~$
-&gt; INITIALIZING VIGWIRE LABS ... OK
-&gt; LOADING CORE SYNDICATES ... OK
-&gt; MAIN FEED ONLINE .......... OK
-&gt; MEATS DESK SYNC ........... OK
-&gt; CRYPTO SPECIALS LINK ...... OK
-&gt; PIZZA PLAYS READY ......... OK
-&gt; READY.</div>
-        <div class="f-right">🥒  In a world of noise,
-    we pickle what matters.
-
-⚡  Too legit to quit.
-
-🥩  We got the meats.
-
-₿   Crypto specials.
-    No weak hands.
-
-🍕  Pizza plays.
-    Fresh out of the oven.</div>
-      </div>
-      <div class="f-main">
-        <div class="f-title">VIGWIRE LABS</div>
-        <div class="f-sub">MARKET INTELLIGENCE</div>
-        <div class="f-art">🖥️&nbsp;&nbsp; 🧴💦 &nbsp;&nbsp;🥒</div>
-      </div>
-      <div class="f-loading">LOADING VIGSCOPE...<br><span class="f-bar">[██████████████████████░░░░░] 78%</span></div>
-    </div>
-  </div>
+  <img id="splash2art" src="./assets/splash-02-vigwire-labs-v2v2.png" alt="VigWire Labs Market Intelligence boot screen">
+  <div id="fallback">VIGWIRE LABS // LOADING VIGSCOPE</div>
 </div>
 <script>
-// BOOT SCREEN 2 — locked VigWire Labs V2V2 PNG splash.
-// Same-origin PNG avoids Safari/raw-GitHub bitmap delivery failures.
-// The HTML fallback remains emergency-only if the local asset cannot load.
-const SCREEN2_MIN_MS=3000;
+// Screen 2 stays deliberately simple: local V2V2 image, short hold, then unchanged runner core.
+const SCREEN2_MS=3000;
 const FADE_MS=320;
 const core=document.getElementById('core');
-const splash2=document.getElementById('splash2');
+const splash=document.getElementById('splash2');
 const art=document.getElementById('splash2art');
 let coreLoaded=false;
-let hostVisible=false;
-let artReady=false;
-let screen2Started=false;
-let screen2Elapsed=false;
+let timerDone=false;
+let started=false;
 
-function maybeRevealCore(){
-  if(!coreLoaded||!screen2Elapsed)return;
+function reveal(){
+  if(!coreLoaded||!timerDone)return;
   core.classList.add('ready');
-  splash2.classList.add('fade');
-  setTimeout(()=>splash2.remove(),FADE_MS+100);
+  splash.classList.add('fade');
+  setTimeout(()=>splash.remove(),FADE_MS+80);
 }
-function paintThenStart(){
-  if(screen2Started||!hostVisible||!artReady)return;
-  screen2Started=true;
-  splash2.classList.add('show');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    setTimeout(()=>{screen2Elapsed=true;maybeRevealCore()},SCREEN2_MIN_MS);
-  }));
-}
-function markArtReady(failed=false){
-  if(artReady)return;
-  if(failed)splash2.classList.add('asset-error');
-  artReady=true;
-  paintThenStart();
-}
-async function confirmArtReady(){
-  if(!art.complete||!art.naturalWidth)return;
-  try{if(typeof art.decode==='function')await art.decode()}catch(e){}
-  markArtReady(false);
-}
-function waitUntilActuallyVisible(){
+
+function startWhenVisible(){
+  if(started)return;
   try{
     const host=window.frameElement;
-    if(!host){hostVisible=true;paintThenStart();return}
-    const style=getComputedStyle(host);
-    const opacity=Number.parseFloat(style.opacity||'1');
-    if(opacity>.01&&style.visibility!=='hidden'){
-      hostVisible=true;
-      paintThenStart();
-      return;
+    if(host){
+      const style=getComputedStyle(host);
+      if(Number.parseFloat(style.opacity||'1')<=.01||style.visibility==='hidden'){
+        requestAnimationFrame(startWhenVisible);
+        return;
+      }
     }
-  }catch(e){hostVisible=true;paintThenStart();return}
-  requestAnimationFrame(waitUntilActuallyVisible);
+  }catch(e){}
+  started=true;
+  setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS);
 }
-art.addEventListener('load',confirmArtReady,{once:true});
-art.addEventListener('error',()=>markArtReady(true),{once:true});
-if(art.complete){if(art.naturalWidth)confirmArtReady();else markArtReady(true)}
-core.addEventListener('load',()=>{coreLoaded=true;maybeRevealCore()},{once:true});
+
+art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});
+core.addEventListener('load',()=>{coreLoaded=true;reveal()},{once:true});
 core.src='./runner-core.html'+location.search+location.hash;
-if(document.readyState==='complete')waitUntilActuallyVisible();
-else window.addEventListener('load',waitUntilActuallyVisible,{once:true});
+startWhenVisible();
 </script>
 </body>
 </html>

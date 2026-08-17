@@ -3,88 +3,57 @@
 **Status:** ACCEPTED — PRESENTATION-ONLY RUNNER WRAPPER  
 **Production contract:** `BETTING_EDGE_CONTRACT.md` v0.9 OPERATIONAL  
 **Terminal/UI family:** v1.3  
-**Current production wrapper blob:** `857eab62c138926c77407cc022ab1ac3c0505738`
 
 ## Scope
 
-This acceptance records the approved VigWire Labs V2 second splash screen and its Safari delivery hardening in the existing short-link boot sequence.
-
-Boot order on every short-link refresh:
+The short-link boot sequence is intentionally simple and presentation-only:
 
 1. existing `r.html` VigScope splash;
-2. `runner.html` presentation wrapper displaying the locked VigWire Labs V2 artwork;
-3. preserved v1.3 runner logic in `runner-core.html`;
-4. VigScope Terminal UI v1.3.
+2. `runner.html` displays the repository-local VigWire Labs V2V2 PNG for about three seconds;
+3. unchanged v1.3 application logic runs from `runner-core.html`;
+4. VigScope Terminal UI v1.3 is revealed.
+
+Screen 1, report resolution, report payloads and Betting Edge analysis are outside this presentation wrapper.
 
 ## Runner continuity
 
-The pre-presentation production `runner.html` blob was:
+The pre-presentation runner application remains preserved in `runner-core.html`. `runner.html` is only a thin display wrapper and must not contain Betting Edge recommendation, pricing, history or repricing logic.
 
-`bdb023355bacf89fc0fcf8006f8a50cf4b1f5f2a`
+Approved Screen 2 asset:
 
-The deployed `runner-core.html` blob remains exactly:
+`assets/splash-02-vigwire-labs-v2v2.png`
 
-`bdb023355bacf89fc0fcf8006f8a50cf4b1f5f2a`
+The asset is loaded from the same repository/site as the runner. No remote image host, immutable raw-GitHub asset URL or separate splash delivery service is required.
 
-Therefore the runner application logic used before the presentation deployment remains preserved byte-for-byte under `runner-core.html`.
+## Display behavior
 
-The current `runner.html` is a thin presentation wrapper only. Its production blob is:
+Screen 2 has only three responsibilities:
 
-`857eab62c138926c77407cc022ab1ac3c0505738`
+- show the local V2V2 PNG after Screen 1;
+- remain visible for approximately 3000 ms;
+- reveal `runner-core.html` when the hold has elapsed and the core is ready.
 
-The locked Screen 2 artwork remains the immutable repository asset introduced at deployment commit:
-
-`0ec8c45f0e938bb365a0432547dd1d2d5cb6c764`
-
-Asset path:
-
-`assets/splash-02-vigwire-labs-v2.webp`
-
-Git blob:
-
-`515341e1e288bd6c25895cc37226c683891f8239`
-
-The production wrapper now requests that exact asset from the immutable GitHub commit/raw path rather than depending on the GitHub Pages asset path. This prevents a stale or missing Pages asset from silently replacing the approved artwork.
-
-If Safari cannot render the exact bitmap, the emergency fallback is now a full VigWire Labs V2 terminal composition containing the syndicate loading messages, brand title, Market Intelligence label, pickle/vinegar motif and the separate `Too legit to quit`, `We got the meats`, Crypto Specials and Pizza Plays lines. The old two-line placeholder fallback is removed.
-
-## Display gate
-
-Screen 2 cannot advance until:
-
-1. the exact artwork has loaded and, where supported, decoded, or the full V2 emergency composition is activated;
-2. the wrapper iframe is actually visible after Screen 1;
-3. two browser paint frames have completed;
-4. the full Screen 2 display window has elapsed; and
-5. the preserved runner core has loaded.
-
-The Screen 2 minimum display window remains **3000 ms** after the paint gate.
+If the PNG fails to render, a minimal loading fallback is shown so the presentation layer cannot trap the user. No duplicate terminal composition is maintained as a second artwork implementation.
 
 ## Contract boundary check
 
-This revision does not modify:
+This presentation layer does not modify:
 
 - `BETTING_EDGE_CONTRACT.md` or Contract 0.9 rules;
-- report-generation logic;
-- recommendation status, fair value, `playTo`, stake, or risk rules;
+- report-generation or recommendation logic;
+- fair value, `playTo`, stake or risk rules;
 - executable-price freshness or identity gates;
-- `data/live-odds.json` or the odds-refresh workflow;
+- `data/live-odds.json` or odds-refresh workflows;
 - scheduler/canary workflows;
-- issued report payloads, `run-history.json`, or durable-history semantics;
-- Research Library production/staging behavior;
-- browser history/storage keys;
-- repricing logic contained in the preserved v1.3 runner core.
+- issued report payloads, `run-history.json` or durable-history semantics;
+- Research Library behavior;
+- browser history/storage keys; or
+- repricing logic contained in `runner-core.html`.
 
-The revision changes only the user-facing Screen 2 asset-delivery/presentation layer before the preserved v1.3 runner core is revealed.
-
-## Preflight interpretation
-
-For Contract 0.9 section 3, `runner.html` remains the production runner entry point and is approved as the v1.3 presentation wrapper. The expected v1.3 runner behavior is supplied by the byte-identical preserved `runner-core.html` noted above.
-
-A production preflight resolving the current `runner.html` may treat this wrapper + preserved core pair as the approved v1.3 runner surface.
+Splash presentation must remain subordinate to valid report delivery and should not grow into an independent subsystem.
 
 ## Result
 
-**PASS — APPROVED FOR PRODUCTION PRESENTATION USE UNDER CONTRACT 0.9.**
+**PASS — APPROVED SIMPLE TWO-STAGE PRESENTATION UNDER CONTRACT 0.9.**
 
 This acceptance does not promote a new terminal version and does not amend Contract 0.9. Terminal/UI version remains **v1.3**.
