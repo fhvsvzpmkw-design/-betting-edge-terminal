@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-15 — v1.8 candidate ready; promotion held for v1.7 soak  
+**Last updated:** 2026-08-16 — same-lane report recovery documented  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -21,6 +21,7 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 - **Durable history documentation:** `data/history/README.md`.
 - **Compact odds provenance index:** `data/history/odds-index.json`.
 - **Research/provenance sidecar schema:** `data/history/report-provenance-schema.json`, production schema **3** for post-cutover runs; historical schema-2 sidecars remain valid.
+- **Manual report-lane recovery:** active operating capability under `docs/OPERATIONS.md` and Decision D-028; recovery remains inside the original five-lane model.
 
 The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. Player props may additionally carry the runner-supported `rec.feed` structured identity required by v0.9; otherwise the visible payload remains compact.
 
@@ -46,7 +47,9 @@ The corresponding target odds-refresh slots are approximately:
 
 The GitHub workflow uses paired/backup cron attempts around those target slots rather than trusting a single scheduled dispatch.
 
-All five report tasks are being cut over to a mandatory production-contract preflight: resolve `BETTING_EDGE_CONTRACT.md` v0.9 operational and the current runner before handicapping; otherwise stop with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
+All five report tasks use the mandatory production-contract preflight: resolve `BETTING_EDGE_CONTRACT.md` v0.9 operational and the current runner before handicapping; otherwise stop with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
+
+If a standard report lane does not produce a usable issued report while its betting window still has practical value, a manual **same-lane recovery** may be issued. The recovery keeps the original slot, appends `— RECOVERY`, uses the actual recovery timestamp, obeys all normal v0.9 freshness/identity/value/risk gates, and is archived as a separate immutable issuance. Recovery is not a sixth report session and does not itself require another odds API pull when a valid feed already exists.
 
 ## Odds pipeline
 
@@ -92,7 +95,7 @@ The sidecar uses the exact issued slot/timestamp to link back to the report. Pos
 
 The 2026-08-15 15:15 + 18:15 live acceptance pair passed exact payload archive, matching sidecar, correct `run-history.json` linkage, normal runner delivery, source-backed same-day lineage/navigation, and reprice-overlay regression checks. The acceptance is recorded in `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
 
-All five scheduled report lanes — 06:00, 08:00, 09:30, 15:15 and 18:15 — now share the production durable-history behavior. The next operational observation is the first full post-cutover day, particularly that a fresh device arriving later can hydrate all earlier successfully archived same-day lanes.
+All five scheduled report lanes — 06:00, 08:00, 09:30, 15:15 and 18:15 — share the production durable-history behavior. On 2026-08-16 the 15:15 Evening and 18:15 Late / West Coast lanes were both successfully recovered manually using the same immutable payload + schema-3 sidecar + `run-history.json` path. Both recoveries preserved zero risk when candidates failed ordinary value and/or executable-price gates. The next observation is continued normal five-lane operation plus additional recovery evidence if future misses occur; no recovery automation or contract promotion is implied yet.
 
 ## Runner repricing model
 
@@ -161,11 +164,13 @@ The principal v0.9 production additions are:
 11. exact executable player-prop identity preserved in `rec.feed` and durable history;
 12. later result/CLV enrichment remains a separate future observation layer.
 
+Manual same-lane report recovery is currently an **operating procedure and durable project decision**, not an amendment to the v0.9 contract. It may be considered for future contract promotion only after additional live evidence and/or a decision to automate or guarantee recovery behavior.
+
 ## Activation state summary
 
 - **C-track:** C1 — v0.9 production contract operational.
 - **R-track:** R3 — live read-only History Fit on production v1.7 with durable sidecar provenance; v1.8 is frozen staging-only pending soak/shadow comparison and explicit promotion approval.
-- **H-track:** H3 — live issued-report/provenance history; Evening/Late archive/index/lineage acceptance passed; full five-lane day remains to be observed post-cutover.
+- **H-track:** H3 — live issued-report/provenance history; scheduled-lane history is operational and the 2026-08-16 Evening/Late same-lane recovery pair also passed archive/sidecar/index handling.
 - **S-track:** S0 — Shadow History remains inactive.
 
 ## Known-good checkpoints
@@ -185,6 +190,14 @@ A second checkpoint is the **2026-08-15 v0.9 acceptance pair**:
 - the runner rendered the meter-only UI change normally;
 - Reprice Now remained a non-mutating comparison overlay;
 - v0.9 was then explicitly promoted to production.
+
+A third checkpoint is the **2026-08-16 same-lane recovery pair**:
+
+- the missed 15:15 Evening lane was recovered as `15:15 EVENING — RECOVERY` with its actual recovery timestamp;
+- the missed 18:15 Late / West Coast lane was recovered as `18:15 LATE / WEST COAST — RECOVERY` with its actual recovery timestamp;
+- both recoveries used the existing lane codes and normal immutable history/sidecar/index path rather than creating a sixth lane;
+- both preserved the ordinary v0.9 freshness, identity, fair-value and zero-risk safeguards;
+- the observed pair established the manual recovery runbook now documented in `docs/OPERATIONS.md` and Decision D-028 without changing the production contract, runner, scheduler or odds workflow.
 
 Use Git history and these checkpoints to distinguish future regressions from previously working pipelines.
 
@@ -209,6 +222,7 @@ The following boundaries are intentional and should not be crossed casually:
 - Do not claim browser-side reprice clicks are centrally archived until a safe authenticated persistence path exists.
 - Do not consume API quota for clearly stale scheduled jobs.
 - Do not replace a good feed with an invalid refresh.
-- Do not treat tomorrow's full five-lane archive observation as permission to silently weaken the production contract if one lane fails; diagnose the specific delivery/history path instead.
+- Do not create a separate recovery lane or relax production gates merely because a scheduled report was missed; recovery remains a same-lane manual issuance under the existing five-lane model.
+- Do not treat additional recovery evidence as automatic permission to amend the production contract; promotion remains a separate explicit decision.
 
 For daily procedures see `docs/OPERATIONS.md`. For architectural choices see `docs/DECISIONS.md`. For planned work see `docs/ROADMAP.md`.
