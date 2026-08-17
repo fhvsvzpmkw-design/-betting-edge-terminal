@@ -1,6 +1,6 @@
 # Betting Edge — Operations
 
-**Last updated:** 2026-08-15 — v0.9 production cutover
+**Last updated:** 2026-08-16 — report-lane recovery runbook
 
 This document describes how the current Betting Edge system is operated and checked. It is practical runbook material, not a substitute for the governance contract. The authoritative production contract is `BETTING_EDGE_CONTRACT.md` v0.9.
 
@@ -117,6 +117,41 @@ Use manual recovery when an important scheduled refresh did not produce a usable
 8. Open/reprice the Betting Edge report using the new feed.
 
 A manual odds refresh should not require changing runner code or the production contract.
+
+## Manual report-lane recovery
+
+Use report-lane recovery when a standard Betting Edge report lane did not produce a usable issued report, but the lane can still be meaningfully recovered before its relevant betting window has passed. This is separate from the manual odds-refresh procedure above: a recovery may use an already-valid feed, and a fresh API pull is required only when the current feed or executable quotes do not satisfy the normal production gates.
+
+A recovery **restores report coverage, not confidence**. It must never manufacture a recommendation merely because the scheduled issuance was missed.
+
+Operational rules:
+
+- recovery remains in the original canonical lane (`open`, `main`, `final_morning`, `evening`, or `late`); it is not a sixth report lane;
+- retain the normal lane label and append `— RECOVERY`, for example `15:15 EVENING — RECOVERY` or `18:15 LATE / WEST COAST — RECOVERY`;
+- generate a fresh `run.ts` at the actual recovery issuance time in `America/Vancouver`; never backdate the recovery to the scheduled report time;
+- perform the normal v0.9 production-contract/runner preflight before handicapping;
+- apply the same feed validity, exact event/market/selection identity, 30-minute executable-quote freshness, fair-value, status/stake/risk, Research Fit and payload-validation rules as a normal scheduled report;
+- use the newest valid available feed. Run a manual odds refresh only when a fresh pull is actually required; recovery by itself is not a reason to spend API quota;
+- if an otherwise relevant candidate has stale or unverifiable executable pricing, fail closed with the appropriate zero-risk state rather than relaxing the gate;
+- archive the recovery as a new immutable issued payload under the normal lane using its actual recovery timestamp, create the matching schema-3 Research Fit/provenance sidecar, and append the matching `run-history.json` entry;
+- do not overwrite, delete or retroactively fill the missed scheduled issuance. If an earlier genuine issuance exists for the same lane, preserve it as separate historical evidence;
+- the compact ID is derived normally from the actual recovery timestamp and the original lane code. Same-day navigation may therefore resolve the newest valid recovery as the current representative of that lane without changing the five-lane model;
+- zero BETs is a valid recovery result. Discovery of a new late candidate does not imply qualification.
+
+Recovery procedure:
+
+1. Confirm which standard lane failed to issue a usable report and that recovery still has practical pregame value.
+2. Check production authority and runner authority exactly as for a normal scheduled report.
+3. Inspect the newest valid live feed and determine whether its feed age and exact executable quotes satisfy production limits.
+4. If they do not and a new pull is still useful, use the manual odds-refresh procedure above; otherwise do not pull odds merely because recovery is being performed.
+5. Handicap the remaining relevant window under the normal production framework, including exact structured identity and fair-value work.
+6. Preserve the original lane/slot and append `— RECOVERY` to the display label; set `run.ts` to the actual recovery issuance time.
+7. Validate counts, status/stake/risk, timestamps, identities, serialization and Base64URL round trip exactly as for a normal report.
+8. Build the long fallback first, then store the immutable issued payload, matching schema-3 sidecar and `run-history.json` entry.
+9. Derive and verify the normal deterministic short link from the recovery timestamp.
+10. Open the issued recovery and, when a genuinely newer valid feed later exists, use `REPRICE NOW` only as the non-mutating comparison overlay.
+
+The first observed same-day pair using this procedure was 2026-08-16: the 15:15 Evening recovery and the 18:15 Late / West Coast recovery. Both remained zero-risk when the available candidates failed normal value and/or executable-price gates. This observation documents the procedure; it does not change the v0.9 production contract, scheduler, runner or odds workflow.
 
 ## Structured identity verification
 
