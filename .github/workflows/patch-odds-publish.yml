@@ -22,79 +22,19 @@ jobs:
       - name: Patch publish step without re-pulling odds
         run: |
           python <<'PY'
+          import base64
           from pathlib import Path
 
           path = Path('.github/workflows/odds-refresh.yml')
           text = path.read_text()
+          marker = '      - name: Publish snapshot\n'
+          if text.count(marker) != 1:
+              raise SystemExit('Expected one Publish snapshot block; refusing to patch.')
 
-          old = '''      - name: Publish snapshot
-        run: |
-          git config user.name "betting-edge-bot"
-          git config user.email "actions@users.noreply.github.com"
-
-          git add data/live-odds.json
-
-          if git diff --cached --quiet; then
-            echo "No validated odds changes to publish."
-            exit 0
-          fi
-
-          git commit -m "Refresh Betting Edge live odds"
-          git push
-'''
-
-          new = '''      - name: Publish snapshot
-        run: |
-          git config user.name "betting-edge-bot"
-          git config user.email "actions@users.noreply.github.com"
-
-          # Preserve the exact snapshot that already passed validation. A push
-          # collision must never cause another Odds-API pull or silently lose it.
-          candidate="$(mktemp)"
-          cp data/live-odds.json "$candidate"
-
-          candidate_epoch="$(node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); const t=Date.parse(d.generatedAt||''); if(!Number.isFinite(t)) process.exit(2); process.stdout.write(String(t));" "$candidate")"
-
-          for attempt in 1 2 3 4; do
-            git fetch origin main
-
-            remote_epoch="$(git show origin/main:data/live-odds.json 2>/dev/null | node -e "let s=''; process.stdin.on('data',d=>s+=d); process.stdin.on('end',()=>{try{const j=JSON.parse(s); const t=Date.parse(j.generatedAt||''); process.stdout.write(Number.isFinite(t)?String(t):'0')}catch{process.stdout.write('0')}})")"
-
-            # Never overwrite a snapshot that is already as new or newer.
-            if [ "${remote_epoch:-0}" -ge "$candidate_epoch" ]; then
-              echo "Remote live odds are already equal/newer; no publish needed."
-              exit 0
-            fi
-
-            # Rebase safely by rebuilding only the live-odds change on the
-            # newest main. Other concurrent repository updates remain intact.
-            git reset --hard origin/main
-            cp "$candidate" data/live-odds.json
-            git add data/live-odds.json
-
-            if git diff --cached --quiet; then
-              echo "No validated odds changes to publish."
-              exit 0
-            fi
-
-            git commit -m "Refresh Betting Edge live odds"
-
-            if git push origin HEAD:main; then
-              echo "Validated odds snapshot published on attempt $attempt."
-              exit 0
-            fi
-
-            echo "Publish collision on attempt $attempt; syncing main and retrying the same validated snapshot."
-          done
-
-          echo "Validated odds snapshot could not be published after 4 attempts."
-          exit 1
-'''
-
-          if old not in text:
-              raise SystemExit('Expected Publish snapshot block not found; refusing to patch.')
-
-          path.write_text(text.replace(old, new, 1))
+          encoded = 'ICAgICAgLSBuYW1lOiBQdWJsaXNoIHNuYXBzaG90CiAgICAgICAgcnVuOiB8CiAgICAgICAgICBnaXQgY29uZmlnIHVzZXIubmFtZSAiYmV0dGluZy1lZGdlLWJvdCIKICAgICAgICAgIGdpdCBjb25maWcgdXNlci5lbWFpbCAiYWN0aW9uc0B1c2Vycy5ub3JlcGx5LmdpdGh1Yi5jb20iCgogICAgICAgICAgIyBQcmVzZXJ2ZSB0aGUgZXhhY3Qgc25hcHNob3QgdGhhdCBhbHJlYWR5IHBhc3NlZCB2YWxpZGF0aW9uLiBBIHB1c2gKICAgICAgICAgICMgY29sbGlzaW9uIG11c3QgbmV2ZXIgY2F1c2UgYW5vdGhlciBPZGRzLUFQSSBwdWxsIG9yIHNpbGVudGx5IGxvc2UgaXQuCiAgICAgICAgICBjYW5kaWRhdGU9IiQobWt0ZW1wKSIKICAgICAgICAgIGNwIGRhdGEvbGl2ZS1vZGRzLmpzb24gIiRjYW5kaWRhdGUiCgogICAgICAgICAgY2FuZGlkYXRlX2Vwb2NoPSIkKG5vZGUgLWUgJ2NvbnN0IGZzPXJlcXVpcmUoImZzIik7IGNvbnN0IGQ9SlNPTi5wYXJzZShmcy5yZWFkRmlsZVN5bmMocHJvY2Vzcy5hcmd2WzFdLCJ1dGY4IikpOyBjb25zdCB0PURhdGUucGFyc2UoZC5nZW5lcmF0ZWRBdHx8IiIpOyBpZighTnVtYmVyLmlzRmluaXRlKHQpKSBwcm9jZXNzLmV4aXQoMik7IHByb2Nlc3Muc3Rkb3V0LndyaXRlKFN0cmluZyh0KSk7JyAiJGNhbmRpZGF0ZSIpIgoKICAgICAgICAgIGZvciBhdHRlbXB0IGluIDEgMiAzIDQ7IGRvCiAgICAgICAgICAgIGdpdCBmZXRjaCBvcmlnaW4gbWFpbgoKICAgICAgICAgICAgcmVtb3RlX2Vwb2NoPSIkKGdpdCBzaG93IG9yaWdpbi9tYWluOmRhdGEvbGl2ZS1vZGRzLmpzb24gMj4vZGV2L251bGwgfCBub2RlIC1lICdsZXQgcz0iIjsgcHJvY2Vzcy5zdGRpbi5vbigiZGF0YSIsZD0+cys9ZCk7IHByb2Nlc3Muc3RkaW4ub24oImVuZCIsKCk9Pnt0cnl7Y29uc3Qgaj1KU09OLnBhcnNlKHMpOyBjb25zdCB0PURhdGUucGFyc2Uoai5nZW5lcmF0ZWRBdHx8IiIpOyBwcm9jZXNzLnN0ZG91dC53cml0ZShOdW1iZXIuaXNGaW5pdGUodCk/U3RyaW5nKHQpOiIwIil9Y2F0Y2h7cHJvY2Vzcy5zdGRvdXQud3JpdGUoIjAiKX19KScpIgoKICAgICAgICAgICAgIyBOZXZlciBvdmVyd3JpdGUgYSBzbmFwc2hvdCB0aGF0IGlzIGFscmVhZHkgYXMgbmV3IG9yIG5ld2VyLgogICAgICAgICAgICBpZiBbICIke3JlbW90ZV9lcG9jaDotMH0iIC1nZSAiJGNhbmRpZGF0ZV9lcG9jaCIgXTsgdGhlbgogICAgICAgICAgICAgIGVjaG8gIlJlbW90ZSBsaXZlIG9kZHMgYXJlIGFscmVhZHkgZXF1YWwvbmV3ZXI7IG5vIHB1Ymxpc2ggbmVlZGVkLiIKICAgICAgICAgICAgICBleGl0IDAKICAgICAgICAgICAgZmkKCiAgICAgICAgICAgICMgUmVidWlsZCBvbmx5IHRoZSB2YWxpZGF0ZWQgbGl2ZS1vZGRzIGNoYW5nZSBvbiB0aGUgbmV3ZXN0IG1haW4uCiAgICAgICAgICAgICMgT3RoZXIgY29uY3VycmVudCByZXBvc2l0b3J5IHVwZGF0ZXMgcmVtYWluIGludGFjdC4KICAgICAgICAgICAgZ2l0IHJlc2V0IC0taGFyZCBvcmlnaW4vbWFpbgogICAgICAgICAgICBjcCAiJGNhbmRpZGF0ZSIgZGF0YS9saXZlLW9kZHMuanNvbgogICAgICAgICAgICBnaXQgYWRkIGRhdGEvbGl2ZS1vZGRzLmpzb24KCiAgICAgICAgICAgIGlmIGdpdCBkaWZmIC0tY2FjaGVkIC0tcXVpZXQ7IHRoZW4KICAgICAgICAgICAgICBlY2hvICJObyB2YWxpZGF0ZWQgb2RkcyBjaGFuZ2VzIHRvIHB1Ymxpc2guIgogICAgICAgICAgICAgIGV4aXQgMAogICAgICAgICAgICBmaQoKICAgICAgICAgICAgZ2l0IGNvbW1pdCAtbSAiUmVmcmVzaCBCZXR0aW5nIEVkZ2UgbGl2ZSBvZGRzIgoKICAgICAgICAgICAgaWYgZ2l0IHB1c2ggb3JpZ2luIEhFQUQ6bWFpbjsgdGhlbgogICAgICAgICAgICAgIGVjaG8gIlZhbGlkYXRlZCBvZGRzIHNuYXBzaG90IHB1Ymxpc2hlZCBvbiBhdHRlbXB0ICRhdHRlbXB0LiIKICAgICAgICAgICAgICBleGl0IDAKICAgICAgICAgICAgZmkKCiAgICAgICAgICAgIGVjaG8gIlB1Ymxpc2ggY29sbGlzaW9uIG9uIGF0dGVtcHQgJGF0dGVtcHQ7IHN5bmNpbmcgbWFpbiBhbmQgcmV0cnlpbmcgdGhlIHNhbWUgdmFsaWRhdGVkIHNuYXBzaG90LiIKICAgICAgICAgIGRvbmUKCiAgICAgICAgICBlY2hvICJWYWxpZGF0ZWQgb2RkcyBzbmFwc2hvdCBjb3VsZCBub3QgYmUgcHVibGlzaGVkIGFmdGVyIDQgYXR0ZW1wdHMuIgogICAgICAgICAgZXhpdCAxCg=='
+          new_block = base64.b64decode(encoded).decode('utf-8')
+          prefix = text.split(marker, 1)[0]
+          path.write_text(prefix + new_block)
           PY
 
       - name: Commit hardening and remove one-time patch files
