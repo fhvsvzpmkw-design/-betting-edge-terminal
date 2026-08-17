@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-16 — same-lane report recovery
+**Last updated:** 2026-08-17 — runner UI v1.3.1 hierarchy
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -274,6 +274,18 @@ The first observed pair was the 2026-08-16 15:15 Evening recovery and 18:15 Late
 **Reason:** Recovery should restore report coverage without relaxing confidence, pricing or identity requirements. Treating recovery as same-lane issuance preserves schedule semantics, immutable history, provenance and the existing five-lane UI while avoiding a parallel recovery architecture.
 
 This decision documents proven operating behavior only. It does not amend `BETTING_EDGE_CONTRACT.md` v0.9, automate recovery, alter the runner, or change the odds-refresh scheduler/workflow.
+
+## D-029 — Runner UI patch versions may advance independently
+
+**Status:** Active as of 2026-08-17
+
+`runner.html` now declares presentation/UI version **v1.3.1**, while the underlying report engine in `runner-core.html` and `index.html` remains **v1.3** and the production governance contract remains **v0.9**.
+
+The accepted v1.3.1 hierarchy places F1–F4 directly below the terminal header, removes the duplicated upper status strip, keeps bankroll as a compact header readout, moves New Risk into the BET counter, and uses four-column layouts when space permits with 2 × 2 navigation and outcome grids at narrower iPad and iPhone widths.
+
+A presentation-only patch version must not be treated as an engine or contract promotion. UI v1.3.1 does not migrate issued payloads, browser history keys, durable archive schemas, odds/repricing logic, recommendation status, stake semantics, or report-generation rules.
+
+**Reason:** Versioning the presentation layer independently preserves an accurate audit trail without implying analytical or governance changes that did not occur.
 
 ---
 
