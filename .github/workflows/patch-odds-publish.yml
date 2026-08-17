@@ -19,14 +19,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Patch publish step without re-pulling odds
+      - name: Build patched workflow without re-pulling odds
         run: |
           python <<'PY'
           import base64
           from pathlib import Path
 
-          path = Path('.github/workflows/odds-refresh.yml')
-          text = path.read_text()
+          source = Path('.github/workflows/odds-refresh.yml')
+          text = source.read_text()
           marker = '      - name: Publish snapshot\n'
           if text.count(marker) != 1:
               raise SystemExit('Expected one Publish snapshot block; refusing to patch.')
@@ -34,16 +34,15 @@ jobs:
           encoded = 'ICAgICAgLSBuYW1lOiBQdWJsaXNoIHNuYXBzaG90CiAgICAgICAgcnVuOiB8CiAgICAgICAgICBnaXQgY29uZmlnIHVzZXIubmFtZSAiYmV0dGluZy1lZGdlLWJvdCIKICAgICAgICAgIGdpdCBjb25maWcgdXNlci5lbWFpbCAiYWN0aW9uc0B1c2Vycy5ub3JlcGx5LmdpdGh1Yi5jb20iCgogICAgICAgICAgIyBQcmVzZXJ2ZSB0aGUgZXhhY3Qgc25hcHNob3QgdGhhdCBhbHJlYWR5IHBhc3NlZCB2YWxpZGF0aW9uLiBBIHB1c2gKICAgICAgICAgICMgY29sbGlzaW9uIG11c3QgbmV2ZXIgY2F1c2UgYW5vdGhlciBPZGRzLUFQSSBwdWxsIG9yIHNpbGVudGx5IGxvc2UgaXQuCiAgICAgICAgICBjYW5kaWRhdGU9IiQobWt0ZW1wKSIKICAgICAgICAgIGNwIGRhdGEvbGl2ZS1vZGRzLmpzb24gIiRjYW5kaWRhdGUiCgogICAgICAgICAgY2FuZGlkYXRlX2Vwb2NoPSIkKG5vZGUgLWUgJ2NvbnN0IGZzPXJlcXVpcmUoImZzIik7IGNvbnN0IGQ9SlNPTi5wYXJzZShmcy5yZWFkRmlsZVN5bmMocHJvY2Vzcy5hcmd2WzFdLCJ1dGY4IikpOyBjb25zdCB0PURhdGUucGFyc2UoZC5nZW5lcmF0ZWRBdHx8IiIpOyBpZighTnVtYmVyLmlzRmluaXRlKHQpKSBwcm9jZXNzLmV4aXQoMik7IHByb2Nlc3Muc3Rkb3V0LndyaXRlKFN0cmluZyh0KSk7JyAiJGNhbmRpZGF0ZSIpIgoKICAgICAgICAgIGZvciBhdHRlbXB0IGluIDEgMiAzIDQ7IGRvCiAgICAgICAgICAgIGdpdCBmZXRjaCBvcmlnaW4gbWFpbgoKICAgICAgICAgICAgcmVtb3RlX2Vwb2NoPSIkKGdpdCBzaG93IG9yaWdpbi9tYWluOmRhdGEvbGl2ZS1vZGRzLmpzb24gMj4vZGV2L251bGwgfCBub2RlIC1lICdsZXQgcz0iIjsgcHJvY2Vzcy5zdGRpbi5vbigiZGF0YSIsZD0+cys9ZCk7IHByb2Nlc3Muc3RkaW4ub24oImVuZCIsKCk9Pnt0cnl7Y29uc3Qgaj1KU09OLnBhcnNlKHMpOyBjb25zdCB0PURhdGUucGFyc2Uoai5nZW5lcmF0ZWRBdHx8IiIpOyBwcm9jZXNzLnN0ZG91dC53cml0ZShOdW1iZXIuaXNGaW5pdGUodCk/U3RyaW5nKHQpOiIwIil9Y2F0Y2h7cHJvY2Vzcy5zdGRvdXQud3JpdGUoIjAiKX19KScpIgoKICAgICAgICAgICAgIyBOZXZlciBvdmVyd3JpdGUgYSBzbmFwc2hvdCB0aGF0IGlzIGFscmVhZHkgYXMgbmV3IG9yIG5ld2VyLgogICAgICAgICAgICBpZiBbICIke3JlbW90ZV9lcG9jaDotMH0iIC1nZSAiJGNhbmRpZGF0ZV9lcG9jaCIgXTsgdGhlbgogICAgICAgICAgICAgIGVjaG8gIlJlbW90ZSBsaXZlIG9kZHMgYXJlIGFscmVhZHkgZXF1YWwvbmV3ZXI7IG5vIHB1Ymxpc2ggbmVlZGVkLiIKICAgICAgICAgICAgICBleGl0IDAKICAgICAgICAgICAgZmkKCiAgICAgICAgICAgICMgUmVidWlsZCBvbmx5IHRoZSB2YWxpZGF0ZWQgbGl2ZS1vZGRzIGNoYW5nZSBvbiB0aGUgbmV3ZXN0IG1haW4uCiAgICAgICAgICAgICMgT3RoZXIgY29uY3VycmVudCByZXBvc2l0b3J5IHVwZGF0ZXMgcmVtYWluIGludGFjdC4KICAgICAgICAgICAgZ2l0IHJlc2V0IC0taGFyZCBvcmlnaW4vbWFpbgogICAgICAgICAgICBjcCAiJGNhbmRpZGF0ZSIgZGF0YS9saXZlLW9kZHMuanNvbgogICAgICAgICAgICBnaXQgYWRkIGRhdGEvbGl2ZS1vZGRzLmpzb24KCiAgICAgICAgICAgIGlmIGdpdCBkaWZmIC0tY2FjaGVkIC0tcXVpZXQ7IHRoZW4KICAgICAgICAgICAgICBlY2hvICJObyB2YWxpZGF0ZWQgb2RkcyBjaGFuZ2VzIHRvIHB1Ymxpc2guIgogICAgICAgICAgICAgIGV4aXQgMAogICAgICAgICAgICBmaQoKICAgICAgICAgICAgZ2l0IGNvbW1pdCAtbSAiUmVmcmVzaCBCZXR0aW5nIEVkZ2UgbGl2ZSBvZGRzIgoKICAgICAgICAgICAgaWYgZ2l0IHB1c2ggb3JpZ2luIEhFQUQ6bWFpbjsgdGhlbgogICAgICAgICAgICAgIGVjaG8gIlZhbGlkYXRlZCBvZGRzIHNuYXBzaG90IHB1Ymxpc2hlZCBvbiBhdHRlbXB0ICRhdHRlbXB0LiIKICAgICAgICAgICAgICBleGl0IDAKICAgICAgICAgICAgZmkKCiAgICAgICAgICAgIGVjaG8gIlB1Ymxpc2ggY29sbGlzaW9uIG9uIGF0dGVtcHQgJGF0dGVtcHQ7IHN5bmNpbmcgbWFpbiBhbmQgcmV0cnlpbmcgdGhlIHNhbWUgdmFsaWRhdGVkIHNuYXBzaG90LiIKICAgICAgICAgIGRvbmUKCiAgICAgICAgICBlY2hvICJWYWxpZGF0ZWQgb2RkcyBzbmFwc2hvdCBjb3VsZCBub3QgYmUgcHVibGlzaGVkIGFmdGVyIDQgYXR0ZW1wdHMuIgogICAgICAgICAgZXhpdCAxCg=='
           new_block = base64.b64decode(encoded).decode('utf-8')
           prefix = text.split(marker, 1)[0]
-          path.write_text(prefix + new_block)
+          staged = Path('tmp/odds-refresh.patched.yml')
+          staged.parent.mkdir(parents=True, exist_ok=True)
+          staged.write_text(prefix + new_block)
           PY
 
-      - name: Commit hardening and remove one-time patch files
+      - name: Publish staged blob only
         run: |
-          rm -f PATCH_ODDS_PUBLISH_TRIGGER
-          rm -f .github/workflows/patch-odds-publish.yml
-
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add .github/workflows/odds-refresh.yml PATCH_ODDS_PUBLISH_TRIGGER .github/workflows/patch-odds-publish.yml
-          git commit -m "Harden odds snapshot publish retry"
+          git add tmp/odds-refresh.patched.yml
+          git commit -m "Stage hardened odds refresh workflow"
           git push origin HEAD:main
