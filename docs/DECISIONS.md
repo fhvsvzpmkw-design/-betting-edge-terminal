@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-16 — structured game-market identity hardening
+**Last updated:** 2026-08-16 — same-lane report recovery
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -256,6 +256,24 @@ New cards therefore use structured repricing first. Existing immutable reports w
 This is an implementation hardening of the operational v0.9 requirement that event / market / selection identity precede executable price. It does not rewrite Contract 0.9, alter report status or stake semantics, activate recovery analysis, or change the five history slots.
 
 **Reason:** Exact structured identity prevents ordinary game cards from depending on lossy title parsing, while the improved fallback preserves compatibility with archived reports without weakening fail-closed behavior.
+
+## D-028 — Report recovery stays in the original lane
+
+**Status:** Active operating decision as of 2026-08-16
+
+When a standard Betting Edge report lane fails to produce a usable issued report but the relevant betting window can still be meaningfully recovered, the recovery is a new issuance in the **same canonical lane**. It is not a sixth report lane and does not change the five-slot production model.
+
+The recovery keeps the original slot (`open`, `main`, `final_morning`, `evening`, or `late`), appends `— RECOVERY` to the normal display label, and uses a fresh actual `run.ts` rather than backdating to the scheduled issuance time. It must pass the same v0.9 preflight, feed/quote freshness, identity, fair-value, Research Fit, status/stake/risk and payload-validation rules as a normal report.
+
+Recovery does not automatically require another odds API pull. Use the newest valid feed when it satisfies normal gates; request a fresh pull only when it is actually needed and still operationally useful. A stale or unverifiable exact price remains a zero-risk failure state. Zero BETs is a valid recovery outcome.
+
+Every recovery is archived as a separate immutable issued payload with its matching schema-3 Research Fit/provenance sidecar and `run-history.json` entry. It must never overwrite a missed scheduled slot or an earlier genuine issuance. The normal deterministic short-link scheme continues to use the original lane code plus the actual recovery timestamp, allowing the newest valid same-day recovery to represent that lane in navigation without changing the lane model.
+
+The first observed pair was the 2026-08-16 15:15 Evening recovery and 18:15 Late / West Coast recovery. Both preserved zero risk when the available candidates failed ordinary value and/or executable-price gates.
+
+**Reason:** Recovery should restore report coverage without relaxing confidence, pricing or identity requirements. Treating recovery as same-lane issuance preserves schedule semantics, immutable history, provenance and the existing five-lane UI while avoiding a parallel recovery architecture.
+
+This decision documents proven operating behavior only. It does not amend `BETTING_EDGE_CONTRACT.md` v0.9, automate recovery, alter the runner, or change the odds-refresh scheduler/workflow.
 
 ---
 
