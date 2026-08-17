@@ -1,6 +1,6 @@
 # Betting Edge — Roadmap
 
-**Last updated:** 2026-08-15 — v1.8 candidate frozen; v1.7 production soak active
+**Last updated:** 2026-08-16 — first real v1.8 shadow comparison complete; promotion still on hold
 
 This roadmap separates completed foundations from active near-term work and later integration. Preserve the working pipeline, prove each new layer independently, and keep unrelated change families separate.
 
@@ -46,23 +46,27 @@ This roadmap separates completed foundations from active near-term work and late
 - Durable issued-run storage and `run-history.json` are established.
 - Research Library **1.7** is canonical and read-only.
 - Research Library **1.8** promotion candidate is fully built/tested in staging only: 120 logical items, 100 source records, 26 evidence clusters; Candidate Freeze R2 24/24, narrative tests 15/15, hard-boundary tests 9/9.
-- v1.8 promotion is explicitly **ON HOLD** while production v1.7 completes an operational soak and shadow comparison period.
+- The first real v1.7/v1.8 same-candidate shadow comparison is recorded at `research/staging/V1_8_SHADOW_COMPARISON_2026-08-16.json`: five real report runs, 14 issued-card observations, six unique candidates, 0 upgrades, 0 cross-letter-band downgrades, 2 within-B-band softenings and 4 unchanged grades.
+- The first comparison produced no production recommendation/status/stake/fair-value/play-to changes and exposed one useful soak calibration: movement should not be rendered as synonymous with sharp/informed action because bookmaker movement can also reflect demand/order flow.
+- The first comparison also correctly preserved WNBA game-moneyline and MLS three-way calibration gaps rather than forcing wrong-market or cross-league analogies.
+- v1.8 promotion is explicitly **ON HOLD** while production v1.7 continues its operational soak and broader shadow comparison period.
 - R2 manual Research Library read testing passed for direct/mixed evidence, era conflict and explicit research-gap handling.
 - `data/history/report-provenance-schema.json` is now **schema 3** for post-cutover production sidecars; schema-2 historical sidecars remain valid.
 - All five scheduled report lanes are configured for exact issued-payload archive plus read-only Research Fit/provenance sidecars.
 - 15:15 + 18:15 live archive/index/lineage acceptance passed on 2026-08-15.
+- Same-lane manual recovery was proven on the 2026-08-16 Evening and Late / West Coast lanes and is documented in `docs/OPERATIONS.md`, `docs/DECISIONS.md` and `docs/PROJECT_STATE.md`.
 - `BETTING_EDGE_CONTRACT.md` **v0.9 is OPERATIONAL**.
 - All five scheduled report lanes now perform production-contract/runner preflight before handicapping.
 - Player-prop executable identity tightening is operational as v0.9 Invariant 23.
 - v0.8/v0.9 draft files remain preserved historical design artifacts.
 
-## Priority 0 — Verify the first post-cutover full day
+## Priority 0 — Continue post-cutover observation and v1.8 soak
 
-v0.9 is active. The next goal is operational observation, not another contract change.
+v0.9 is active. The near-term goal remains operational observation and evidence collection, not another contract change or speculative production rewrite.
 
 ### P0.1 — Verify 06:00 production preflight and archive
 
-On the first post-cutover 06:00 run verify:
+On post-cutover 06:00 runs verify:
 
 1. `BETTING_EDGE_CONTRACT.md` resolves as operational v0.9 before analysis;
 2. current runner v1.3 resolves;
@@ -79,7 +83,7 @@ Confirm later morning lanes can hydrate/use the actual archived earlier morning 
 
 ### P0.3 — Verify 15:15 and 18:15 under production contract
 
-Repeat the already-accepted history/share behavior with schema-3 production-contract provenance.
+Continue observing the accepted history/share behavior with schema-3 production-contract provenance. If a standard lane is missed while its betting window remains useful, use the documented same-lane recovery procedure rather than creating a new report lane.
 
 ### P0.4 — Fresh-device / late-arrival history test
 
@@ -91,7 +95,7 @@ After multiple same-day lanes have archived, open Betting Edge on a browser/devi
 
 Use odds-refresh runs plus scheduler canaries to determine whether scheduled dispatch remains reliable over multiple windows.
 
-Goal: reduce unnecessary manual refreshes while retaining a clear manual recovery path.
+Goal: reduce unnecessary manual refreshes while retaining the documented manual odds-refresh and report-lane recovery paths.
 
 ### P0.6 — Trace any remaining `UNCATEGORIZED` output
 
@@ -110,13 +114,30 @@ Production Research Library **v1.7** remains the runtime authority. The complete
 
 Minimum gate before reopening promotion:
 
-1. observe at least one complete five-lane production day on v1.7;
-2. review real History Fit retrieval relevance, grade reasonableness, explanation quality, NR handling and deduplication;
+1. continue observing real production candidates on v1.7;
+2. review History Fit retrieval relevance, grade reasonableness, explanation quality, NR handling and deduplication;
 3. shadow-compare v1.8 against the same real candidates without changing issued reports;
 4. confirm no R3 hard-boundary regression;
 5. require explicit promotion approval.
 
+**Progress as of 2026-08-16:** the first real same-candidate comparison is complete and positive-but-insufficient-alone. It covered six unique game-moneyline candidates. v1.8 made no unsupported upgrades, softened two movement-heavy MLB narratives within the B band, preserved a direct MLB B fit on the Rays, and correctly left WNBA/MLS direct-calibration gaps at NR.
+
+**Next high-value evidence:** prioritize real **NFL** and **player-prop** candidates because v1.8 contains substantially more genuinely new direct evidence in those areas than today's game-moneyline slate exposed. Continue using exact sport/market matching and do not force v1.8 evidence into an unrelated market merely to avoid NR.
+
 The frozen v1.8 candidate may be used for shadow evaluation only. It must not alter fair value, play-to, status, model error, stake, executable price, runner output, production manifest or scheduled-report authority.
+
+### P0.8 — Calibrate movement language during the soak
+
+The first real v1.8 comparison exposed a wording/calibration issue rather than a production betting defect.
+
+Working rule:
+
+- **movement is observed market evidence; it is not proof of sharp/informed action**;
+- bookmaker movement may reflect new information, informed trading, ordinary demand, inventory/risk management or other order-flow effects;
+- same-direction steam/favorite flips can remain relevant context, but their cause should not be asserted without supporting evidence;
+- current executable value and no-vig/fair comparison remain separate from the interpretation of why a line moved.
+
+For now this is a **soak finding**, not a reason to rewrite Contract 0.9, production v1.7, the runner or the History Fit policy. Continue watching real v1.7/v1.8 comparisons to determine whether the wording issue is systematic enough to justify a future narrow policy/prompt refinement.
 
 ## Priority 1 — History and learning evidence
 
@@ -150,7 +171,7 @@ Do not rewrite the original issued report when adding later observations.
 
 Shadow History remains **S0 / inactive**. Before activation it needs explicit design for candidate-level prospective calibration, storage growth, evaluation cadence and separation from actual issued-report history.
 
-Durable H-track report history is not Shadow History.
+Durable H-track report history is not Shadow History. The v1.8 Research Library staging comparisons are promotion-evaluation evidence and do not activate S-track Shadow History.
 
 ## Priority 2 — Player-prop identity and learning
 
@@ -163,6 +184,8 @@ The first live player-specific recommendation after cutover should be checked fo
 - correct zero-stake failure behavior on ambiguity;
 - unchanged identity in the archived issued payload;
 - exact-line repricing rather than silent line substitution.
+
+When a suitable real player-prop candidate occurs, also run the same-candidate v1.7/v1.8 shadow comparison. This is one of the highest-value next tests because much of v1.8's new direct evidence is prop-specific.
 
 ### P2.2 — Grow player/team association evidence from existing odds history
 
@@ -210,7 +233,7 @@ Potential future contract work must follow explicit versioned change control and
 - any future authenticated central persistence of browser-side repricing;
 - major changes to supported books, freshness gates, staking methodology or report payload architecture.
 
-Do not edit v0.9 merely to make a failing implementation appear compliant. Diagnose the failing layer first.
+Do not edit v0.9 merely to make a failing implementation appear compliant. Diagnose the failing layer first. Do not promote a research-soak wording observation into contract language without enough repeated real evidence to justify it.
 
 ## Priority 5 — Broader refinement
 
@@ -218,6 +241,7 @@ Do not edit v0.9 merely to make a failing implementation appear compliant. Diagn
 
 - Evaluate whether additional free books/sources provide enough incremental value to justify added request complexity.
 - Improve DraftKings coverage diagnostics where markets are absent.
+- Treat direct WNBA game-moneyline calibration and direct MLS/North-American soccer three-way calibration as genuine research gaps; do not fill them by transporting player-prop or European numerical findings across the wrong market/league.
 - Preserve the no-paid-subscription constraint unless the project owner deliberately changes it.
 
 ### Terminal clarity
@@ -247,6 +271,9 @@ Automation should notify only on meaningful health changes rather than producing
 
 - No broad rewrite of Betting Edge's live decision process.
 - No automatic Research Library writes during normal reports.
+- No v1.8 production promotion from a single positive shadow comparison.
+- No automatic inference that steam/movement means sharp action.
+- No wrong-market evidence transport merely to avoid an NR grade.
 - No Shadow History activation without separate approval.
 - No bulky structured research metadata inside long runner URLs.
 - No unnecessary paid data subscription.
@@ -259,4 +286,4 @@ Automation should notify only on meaningful health changes rather than producing
 
 **Stabilize → observe → validate → document → integrate.**
 
-v0.9 has completed the integration step. The immediate cycle now returns to **observe → validate** on the first full post-cutover day.
+The 2026-08-16 cycle produced both recovery evidence and the first real v1.8 shadow evidence. The next move is continued **observe → validate** on more varied real candidates, especially NFL and player props, rather than further production tinkering tonight.
