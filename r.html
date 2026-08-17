@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Better Edge Market Intelligence</title>
+<title>Market Intelligence</title>
 <style>
 :root{
   --bg:#01040a;
@@ -238,12 +238,12 @@ body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation M
 </style>
 </head>
 <body>
-<div id="splash" aria-label="Better Edge Market Intelligence">
+<div id="splash" aria-label="Market Intelligence">
   <div class="splash-inner">
     <div class="brand">
-      <h1 class="brand-name">B E T T E R&nbsp;&nbsp; E D G E</h1>
-      <div class="brand-sub">MARKET INTELLIGENCE</div>
-      <div class="brand-power">POWERED BY BETTING EDGE PRODUCTION</div>
+      <h1 class="brand-name"></h1>
+      <div class="brand-sub"></div>
+      <div class="brand-power"></div>
       <div class="brand-version">CONTRACT // v0.9</div>
     </div>
 
@@ -259,17 +259,31 @@ body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation M
   </div>
 </div>
 <div id="msg"></div>
-<iframe id="app" title="Betting Edge Terminal v1.3"></iframe>
+<iframe id="app" title="Market Intelligence Terminal"></iframe>
 <script>
-// SPLASH SETTINGS — future copy/timing changes should happen in this block only.
+// BRAND SETTINGS — company/app naming changes should happen here first.
+const BRAND_CONFIG={
+  appName:'Better Edge',
+  companyName:'Betting Edge Production',
+  descriptor:'Market Intelligence',
+  terminalName:'Betting Edge Terminal'
+};
+
+function spacedBrandText(name){
+  return String(name||'').trim().split(/\s+/).map(word=>Array.from(word.toUpperCase()).join(' ')).join('\u00a0\u00a0');
+}
+
+// SPLASH SETTINGS — non-brand copy/timing changes should happen in this block only.
 const SPLASH_CONFIG={
   minimumDisplayMs:1600,
   fadeMs:300,
   copy:{
-    browserTitle:'Better Edge Market Intelligence',
-    titleHtml:'B E T T E R&nbsp;&nbsp; E D G E',
-    subtitle:'MARKET INTELLIGENCE',
-    poweredBy:'POWERED BY BETTING EDGE PRODUCTION',
+    browserTitle:`${BRAND_CONFIG.appName} ${BRAND_CONFIG.descriptor}`,
+    ariaLabel:`${BRAND_CONFIG.appName} ${BRAND_CONFIG.descriptor}`,
+    terminalTitle:`${BRAND_CONFIG.terminalName} v1.3`,
+    titleText:spacedBrandText(BRAND_CONFIG.appName),
+    subtitle:BRAND_CONFIG.descriptor.toUpperCase(),
+    poweredBy:`POWERED BY ${BRAND_CONFIG.companyName.toUpperCase()}`,
     version:'CONTRACT // v0.9',
     legit:'2 LEGIT 2 QUIT',
     pizza:'PIZZA PLAYS',
@@ -295,6 +309,8 @@ function applySplashConfig(){
     document.documentElement.style.setProperty('--fade-ms',SPLASH_FADE_MS+'ms');
   }
   if(!document.querySelector)return;
+  const splashNode=document.getElementById('splash');
+  const frameNode=document.getElementById('app');
   const title=document.querySelector('.brand-name');
   const subtitle=document.querySelector('.brand-sub');
   const powered=document.querySelector('.brand-power');
@@ -303,7 +319,9 @@ function applySplashConfig(){
   const specials=document.querySelector('.specials');
   const meats=document.querySelector('.meats');
   const ready=document.querySelector('.ready');
-  if(title)title.innerHTML=c.titleHtml;
+  if(splashNode)splashNode.setAttribute('aria-label',c.ariaLabel);
+  if(frameNode)frameNode.setAttribute('title',c.terminalTitle);
+  if(title)title.textContent=c.titleText;
   if(subtitle)subtitle.textContent=c.subtitle;
   if(powered)powered.textContent=c.poweredBy;
   if(version)version.textContent=c.version;
