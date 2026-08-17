@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Betting Edge Terminal v1.3 Runner</title>
+<title>VigScope Terminal UI v1.3 Runner</title>
 <style>
 html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 #app{border:0;width:100%;height:100%;display:block;background:#01040a}
@@ -12,7 +12,7 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 </head>
 <body>
 <div id="err"></div>
-<iframe id="app" src="./index.html" title="Betting Edge Terminal v1.3"></iframe>
+<iframe id="app" src="./index.html" title="VigScope Terminal UI v1.3"></iframe>
 <script>
 const $=s=>document.querySelector(s);
 const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';
@@ -180,7 +180,7 @@ function matchMoneyline(title,feed,books,ctx={},issuedBook=''){const m=title.mat
 function matchSpread(title,feed,books,ctx={},issuedBook=''){const m=title.match(/^(.*?)\s+([+-]\d+(?:\.\d+)?)(?:\s+(?:vs\.?|v\.?|at)\s+(.+))?$/i);if(!m)return null;const team=m[1].trim(),line=Number(m[2]),opponent=(m[3]||'').trim(),resolved=resolveTeamEvent(feed,team,opponent,ctx),event=resolved.event;if(!event)return {quote:null,reason:resolved.reason};const side=teamExact(event.home,team)||(!teamExact(event.away,team)&&teamLoose(event.home,team))?'home':'away';const quotes=[];let marketSeen=false,lineSeen=false;for(const book of books){const market=marketByName(event,book,'Spread');if(!market)continue;marketSeen=true;let rows=(market.odds||[]).filter(row=>{const rl=rowLine(row);if(rl===null)return false;if(Math.abs(Math.abs(rl)-Math.abs(line))>0.001)return false;lineSeen=true;return decimalOdds(row?.[side])});rows.sort((a,b)=>Math.abs((rowLine(a)??99)-line)-Math.abs((rowLine(b)??99)-line));const row=rows[0],dec=decimalOdds(row?.[side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,marketObj:market,side,row})}const quote=bestBookQuote(quotes,feed,issuedBook);return quote?{quote,reason:''}:{quote:null,reason:quotes.length?'PRICE NOT VERIFIED — QUOTE STALE':!marketSeen?'MARKET UNAVAILABLE — SPREAD NOT RETURNED':!lineSeen?'PRICE NOT VERIFIED — LINE NOT RETURNED':'PRICE NOT VERIFIED — BOOK PRICE MISSING'}}
 function parsePropTitle(title){let m=title.match(/^(.*?)\s+([OU])\s*(\d+(?:\.\d+)?)\s+(.+)$/i);if(m)return {player:m[1].trim(),side:m[2].toUpperCase()==='O'?'over':'under',line:Number(m[3]),keyword:m[4].trim()};m=title.match(/^(.*?)\s+(over|under)\s+(\d+(?:\.\d+)?)\s+(.+)$/i);if(m)return {player:m[1].trim(),side:m[2].toLowerCase(),line:Number(m[3]),keyword:m[4].trim()};return null}
 function matchProp(title,feed,books,issuedBook=''){const p=parsePropTitle(title);if(!p)return null;const events=playerEvents(feed,p.player,p.keyword);if(!events.length){const playerAnywhere=playerEvents(feed,p.player,'');return {quote:null,reason:playerAnywhere.length?'PROP NOT RETURNED':'PLAYER / EVENT NOT FOUND'}}const quotes=[];let marketSeen=false,lineSeen=false;for(const event of events){for(const book of books){const markets=event?.bookmakers?.[book]||[];for(const market of markets){if(!keywordMatch(market?.name,p.keyword))continue;marketSeen=true;for(const row of market.odds||[]){if(rowLabel(row)!==normName(p.player))continue;const rl=rowLine(row);if(rl===null||Math.abs(rl-p.line)>0.001)continue;lineSeen=true;const dec=decimalOdds(row?.[p.side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,marketObj:market,side:p.side,row})}}}}const quote=bestBookQuote(quotes,feed,issuedBook);return quote?{quote,reason:''}:{quote:null,reason:quotes.length?'PRICE NOT VERIFIED — QUOTE STALE':!marketSeen?'PROP NOT RETURNED':!lineSeen?'PROP LINE NOT RETURNED':'BOOK PRICE MISSING'}}
-function matchGameTotal(title,feed,books,ctx={},issuedBook=''){const m=title.match(/^(.*?)\s+(over|under|[OU])\s*(\d+(?:\.\d+)?)\s+(?:total|runs?|points?|goals?)$/i);if(!m)return null;const team=m[1].trim(),side=/^(over|o)$/i.test(m[2])?'over':'under',line=Number(m[3]),resolved=resolveTeamEvent(feed,team,'',ctx),event=resolved.event;if(!event)return {quote:null,reason:resolved.reason};const quotes=[];let marketSeen=false,lineSeen=false;for(const book of books){const market=marketByName(event,book,'Total')||marketByName(event,book,'Totals');if(!market)continue;marketSeen=true;for(const row of market.odds||[]){const rl=rowLine(row);if(rl===null||Math.abs(rl-line)>0.001)continue;lineSeen=true;const dec=decimalOdds(row?.[side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,marketObj:market,side,row})}}const quote=bestBookQuote(quotes,feed,issuedBook);return quote?{quote,reason:''}:{quote:null,reason:quotes.length?'PRICE NOT VERIFIED — QUOTE STALE':!marketSeen?'MARKET UNAVAILABLE — TOTAL NOT RETURNED':!lineSeen?'PRICE NOT VERIFIED — LINE NOT RETURNED':'PRICE NOT VERIFIED — BOOK PRICE MISSING'}}
+function matchGameTotal(title,feed,books,ctx={},issuedBook=''){const m=title.match(/^(.*?)\s+(over|under|[OU])\s*(\d+(?:\.\d+)?)\s+(?:total|runs?|points?|goals?)$/i);if(!m)return null;const team=m[1].trim(),side=/^(over|o)$/i.test(m[2])?'over':'under',line=Number(m[3]),resolved=resolveTeamEvent(feed,team,'',ctx),event=resolved.event;if(!event)return {quote:null,reason:resolved.reason};const quotes=[];let marketSeen=false,lineSeen=false;for(const book of books){const market=marketByName(event,book,'Total')||marketByName(event,book,'Totals');if(!market)continue;marketSeen=true;for(const row of market.odds||[]){const rl=rowLine(row);if(rl===null||Math.abs(rl-line)>0.001)continue;lineSeen=true;const dec=decimalOdds(row?.[side]);if(dec)quotes.push({book,dec,updatedAt:market.updatedAt,event,market:market.name,marketObj:market,side,row})}const quote=bestBookQuote(quotes,feed,issuedBook);return quote?{quote,reason:''}:{quote:null,reason:quotes.length?'PRICE NOT VERIFIED — QUOTE STALE':!marketSeen?'MARKET UNAVAILABLE — TOTAL NOT RETURNED':!lineSeen?'PRICE NOT VERIFIED — LINE NOT RETURNED':'PRICE NOT VERIFIED — BOOK PRICE MISSING'}}
 function matchTitle(v){return String(v||'').trim().replace(/^(?:(?:NEW\s+)?LEAN|NEW\s+BET|STILL\s+BET|DOWNGRADE|UPGRADE|PRICE\s+GONE|STILL\s+PASS|PASS\s*\/\s*NO\s+VALUE|PASS|WAIT|BET|CONFLICTING\s+SIGNALS|LINEUP\/INFORMATION\s+PENDING|EDGE\s+GONE|NO\s+VALUE|VALUE\s+CONFIRMED|VALUE\s+IMPROVED|VALUE\s+HOLDS|PRICE\s+MOVED|FAIR\s+VALUE\s+CHANGED|MARKET\s+UNAVAILABLE|PRICE\s+NOT\s+VERIFIED|FEED\s+STALE|POLICY\s+BLOCK|EVENT\s+STARTED\/CLOSED|DUPLICATE\s+EXPOSURE|IDENTITY\s+MISMATCH)\s*(?:[-–—:]|\/\/)\s*/i,'').trim()}
 function bestQuoteForRec(rec,feed,run){const books=['Bet365','DraftKings'],issuedBook=String(rec?.book||'');if(rec?.feed?.eventId&&(rec?.feed?.market||rec?.feed?.marketKey)&&rec?.feed?.side){const event=allEvents(feed).find(e=>eventIdentity(e)===String(rec.feed.eventId));if(event){const quotes=[];for(const book of books){const q=quoteFromStructured(event,book,rec.feed);if(q)quotes.push(q)}if(quotes.length){const quote=bestBookQuote(quotes,feed,issuedBook);return quote?{quote,reason:'',method:'STRUCTURED'}:{quote:null,reason:'PRICE NOT VERIFIED — QUOTE STALE',method:'STRUCTURED'}}const arr=Object.values(event?.bookmakers||{}).flat();const marketExists=arr.some(m=>rec.feed.marketKey?marketIdentity(m)===String(rec.feed.marketKey):keywordMatch(m?.name,rec.feed.market));return {quote:null,reason:marketExists?'PRICE NOT VERIFIED — SELECTION NOT RETURNED':'MARKET UNAVAILABLE — STRUCTURED MARKET NOT RETURNED',method:'STRUCTURED'}}return {quote:null,reason:'IDENTITY MISMATCH — STRUCTURED EVENT NOT FOUND',method:'STRUCTURED'}}const title=matchTitle(rec?.title),ctx=matchContext(rec,run);const attempts=[['MONEYLINE',()=>matchMoneyline(title,feed,books,ctx,issuedBook)],['SPREAD',()=>matchSpread(title,feed,books,ctx,issuedBook)],['PROP',()=>matchProp(title,feed,books,issuedBook)],['TOTAL',()=>matchGameTotal(title,feed,books,ctx,issuedBook)]];for(const [method,fn] of attempts){const r=fn();if(r)return {...r,method}}return {quote:null,reason:'PRICE NOT VERIFIED — TITLE FORMAT NOT RECOGNIZED',method:'NONE'}}
 // A price check is an overlay only. The issued recommendation remains immutable.
@@ -608,7 +608,7 @@ function priorSection(d,run){
   sec.appendChild(list);
   const actions=el(d,'div','runnerPriorActions');actions.appendChild(el(d,'div','small muted','Same-day history can come from the archive or this browser.'));
   const clear=el(d,'button','runnerClear','CLEAR LOCAL HISTORY');
-  clear.onclick=()=>{if(confirm('Clear Betting Edge saved runner history on this device?')){[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));apply(run)}};
+  clear.onclick=()=>{if(confirm('Clear VigScope saved runner history on this device?')){[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(k=>localStorage.removeItem(k));apply(run)}};
   actions.appendChild(clear);sec.appendChild(actions);return sec
 }
 function hideStaticBoard(board){[...board.children].forEach(x=>{if(x.id!=='runnerLive'&&x.id!=='runnerPrior')x.style.display='none'})}
@@ -618,7 +618,7 @@ function apply(run){
   const frame=$('#app'),d=frame.contentDocument;if(!d)return;
   injectStyle(d);
   const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
-  const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='BETTING EDGE TERMINAL UI v1.3';
+  const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='VIGSCOPE TERMINAL UI v1.3';
   const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
   [...d.querySelectorAll('.sectiontitle')].forEach(x=>{if(/^SOURCE GOVERNANCE\s*\/\//i.test(x.textContent))x.textContent='SOURCE GOVERNANCE // v1.3'});
   const footer=d.querySelector('.foot');if(footer)footer.textContent=footer.textContent.replace(/v1\.2/g,'v1.3');
@@ -629,7 +629,7 @@ function apply(run){
       hideStaticBoard(board);
       let empty=d.getElementById('runnerEmpty');
       if(!empty){
-        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open a Betting Edge report link to load the current selections and controls.');
+        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open a VigScope report link to load the current selections and controls.');
         empty.id='runnerEmpty';board.prepend(empty)
       }
     }
@@ -637,7 +637,7 @@ function apply(run){
     return
   }
   const empty=d.getElementById('runnerEmpty');if(empty)empty.remove();
-  if(run.__error){const e=$('#err');e.textContent='Betting Edge runner payload error: '+run.__error;e.style.display='block';return}
+  if(run.__error){const e=$('#err');e.textContent='VigScope runner payload error: '+run.__error;e.style.display='block';return}
   setStats(d,run);
 
   const board=d.getElementById('board');
@@ -720,7 +720,7 @@ if(activeRun&&!activeRun.__error){
   (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(saveCurrentRun);
   saveCurrentRun(originalRun)
 }
-$('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='Betting Edge runner error: '+e.message;x.style.display='block';console.error(e)}});
+$('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='VigScope runner error: '+e.message;x.style.display='block';console.error(e)}});
 </script>
 </body>
 </html>
