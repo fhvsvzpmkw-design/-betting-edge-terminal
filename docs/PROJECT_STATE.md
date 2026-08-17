@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-16 — recovery + first v1.8 shadow comparison documented  
+**Last updated:** 2026-08-17 — runner UI v1.3.1 hierarchy accepted  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -11,8 +11,8 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 - **Production governance:** `BETTING_EDGE_CONTRACT.md`, Betting Edge contract **v0.9 OPERATIONAL**.
 - **Production contract blob at activation:** `27e485c3974fb6ef78e3fbf8036d81281c440a0b`.
 - **Live acceptance record:** `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
-- **Runner:** `runner.html`, Betting Edge Terminal **v1.3**.
-- **Static shell:** `index.html`, aligned to UI **v1.3**.
+- **Runner presentation:** `runner.html`, VigScope Terminal UI **v1.3.1**.
+- **Report engine/core:** `runner-core.html` and `index.html`, report engine/UI core **v1.3**.
 - **Quick runner backup:** `runner.html.old`.
 - **Authoritative rollback system:** Git history. Named `.old` files are convenience backups only.
 - **Live odds feed:** `data/live-odds.json`.
@@ -25,7 +25,11 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 
 The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. Player props may additionally carry the runner-supported `rec.feed` structured identity required by v0.9; otherwise the visible payload remains compact.
 
+The active version boundary is deliberate: `runner.html` owns presentation/UI version **v1.3.1**, the report engine/core remains **v1.3**, and the production governance contract remains **v0.9**. A UI patch version does not imply an engine or contract promotion.
+
 Current UI terminology deliberately separates the two history concepts: the Board uses **`SAME-DAY RUNS // REPORT HISTORY`** for same-date issued report/session history, while F3 is labeled **`BET HISTORY`** for personal ledger/performance history. **`CLEAR LOCAL HISTORY`** clears only browser-local runner history; it does not delete repository-backed issued reports or `run-history.json`.
+
+UI v1.3.1 establishes the accepted responsive hierarchy: F1–F4 sit directly beneath the terminal header; the duplicated upper Bankroll/New Risk/Bet/Lean/Wait-Pass strip is removed; bankroll remains as a compact header readout; New Risk is nested inside the BET counter; and navigation/outcome grids use four columns when space permits and 2 × 2 layouts at narrower iPad and iPhone widths. The change is presentation-only and does not alter issued payloads, browser history keys, durable archive schemas, odds/repricing logic, status/stake semantics, or report-generation rules.
 
 ## Daily report sessions
 
@@ -170,7 +174,7 @@ The principal v0.9 production additions are:
 
 Manual same-lane report recovery is currently an **operating procedure and durable project decision**, not an amendment to the v0.9 contract. It may be considered for future contract promotion only after additional live evidence and/or a decision to automate or guarantee recovery behavior.
 
-The first v1.8 shadow comparison is likewise an **evaluation observation**, not a production-library promotion. Contract 0.9, the production v1.7 manifest/library, runner, scheduler and odds workflow remain unchanged.
+The first v1.8 shadow comparison is likewise an **evaluation observation**, not a production-library promotion. That evaluation itself did not change Contract 0.9, the production v1.7 manifest/library, the report engine, scheduler or odds workflow; the later UI v1.3.1 patch is presentation-only.
 
 ## Activation state summary
 
@@ -212,6 +216,14 @@ A fourth checkpoint is the **2026-08-16 first real v1.7 vs v1.8 shadow compariso
 - v1.8 produced no upgrades and no cross-letter-band downgrades; White Sox and Red Sox movement-heavy History Fit softened from B to B-, while Rays stayed B and the WNBA/MLS direct-calibration gaps stayed NR;
 - the shadow result improved caution/transportability language without creating a bet or changing price, fair value, play-to, status or stake;
 - the comparison is preserved at `research/staging/V1_8_SHADOW_COMPARISON_2026-08-16.json` and is positive evidence for continued soak, not sufficient evidence for promotion.
+
+A fifth checkpoint is the **2026-08-17 runner UI v1.3.1 hierarchy acceptance**:
+
+- F1–F4 were moved directly beneath the terminal header;
+- the duplicated upper status strip was removed, bankroll was reduced to a compact header readout, and New Risk was moved into the BET counter;
+- full-width iPad landscape, narrower iPad layouts and iPhone portrait behavior were visually verified;
+- four-column layouts remain active when space permits, with 2 × 2 navigation and outcome grids at narrower widths;
+- the report engine remains v1.3 and Contract 0.9, issued payloads, history keys, archive schemas, odds logic and decision/stake behavior remain unchanged.
 
 Use Git history and these checkpoints to distinguish future regressions from previously working pipelines.
 
