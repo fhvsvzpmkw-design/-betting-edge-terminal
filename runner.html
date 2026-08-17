@@ -1,1 +1,99 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VigScope Terminal UI v1.3 Runner</title>
+<style>
+:root{--bg:#01040a;--fade-ms:320ms}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+#core{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;transition:opacity var(--fade-ms) ease}
+#core.ready{opacity:1}
+#splash2{position:fixed;z-index:10;inset:0;display:grid;place-items:center;background:#01040a;opacity:0;visibility:hidden;transition:opacity var(--fade-ms) ease;overflow:hidden}
+#splash2.show{opacity:1;visibility:visible}
+#splash2.fade{opacity:0;pointer-events:none}
+#splash2 img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#01040a}
+#splash2:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 4px)}
+#fallback{display:none;position:absolute;z-index:2;color:#58ff88;font:900 clamp(18px,3vw,36px) ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-align:center;text-shadow:0 0 10px rgba(88,255,136,.45)}
+#splash2.asset-error img{display:none}
+#splash2.asset-error #fallback{display:block}
+@media(prefers-reduced-motion:reduce){#core,#splash2{transition:none}}
+</style>
+</head>
+<body>
+<iframe id="core" title="VigScope Terminal UI v1.3"></iframe>
+<div id="splash2" aria-label="VigWire Labs boot screen">
+  <img id="splash2art" src="./assets/splash-02-vigwire-labs-v2.webp" alt="VigWire Labs Market Intelligence terminal boot screen with syndicate loading messages, vinegar bottle, terminal, and pickle illustration">
+  <div id="fallback">VIGWIRE LABS<br><span style="font-size:.52em;letter-spacing:.12em">MARKET INTELLIGENCE // BOOT 02</span></div>
+</div>
+<script>
+// BOOT SCREEN 2 — locked VigWire Labs V2 splash.
+// Safari paint gate: Screen 2 cannot advance until the asset is decoded, the wrapper is visible,
+// and the browser has completed two paint frames. The preserved v1.3 runner core preloads behind it.
+const SCREEN2_MIN_MS=3000;
+const FADE_MS=320;
+const core=document.getElementById('core');
+const splash2=document.getElementById('splash2');
+const art=document.getElementById('splash2art');
+let coreLoaded=false;
+let hostVisible=false;
+let artReady=false;
+let screen2Started=false;
+let screen2Elapsed=false;
+
+function maybeRevealCore(){
+  if(!coreLoaded||!screen2Elapsed)return;
+  core.classList.add('ready');
+  splash2.classList.add('fade');
+  setTimeout(()=>splash2.remove(),FADE_MS+100);
+}
+function paintThenStart(){
+  if(screen2Started||!hostVisible||!artReady)return;
+  screen2Started=true;
+  splash2.classList.add('show');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      screen2Elapsed=true;
+      maybeRevealCore();
+    },FADE_MS+SCREEN2_MIN_MS);
+  }));
+}
+function markArtReady(failed=false){
+  if(artReady)return;
+  if(failed)splash2.classList.add('asset-error');
+  artReady=true;
+  paintThenStart();
+}
+async function confirmArtReady(){
+  if(!art.complete||!art.naturalWidth)return;
+  try{if(typeof art.decode==='function')await art.decode()}catch(e){}
+  markArtReady(false);
+}
+function waitUntilActuallyVisible(){
+  try{
+    const host=window.frameElement;
+    if(!host){hostVisible=true;paintThenStart();return}
+    const style=getComputedStyle(host);
+    const opacity=Number.parseFloat(style.opacity||'1');
+    if(opacity>.01&&style.visibility!=='hidden'){
+      hostVisible=true;
+      paintThenStart();
+      return;
+    }
+  }catch(e){hostVisible=true;paintThenStart();return}
+  requestAnimationFrame(waitUntilActuallyVisible);
+}
+art.addEventListener('load',confirmArtReady,{once:true});
+art.addEventListener('error',()=>markArtReady(true),{once:true});
+if(art.complete){
+  if(art.naturalWidth)confirmArtReady();
+  else markArtReady(true);
+}
+core.addEventListener('load',()=>{coreLoaded=true;maybeRevealCore()},{once:true});
+core.src='./runner-core.html'+location.search+location.hash;
+if(document.readyState==='complete')waitUntilActuallyVisible();
+else window.addEventListener('load',waitUntilActuallyVisible,{once:true});
+</script>
+</body>
+</html>
