@@ -1,0 +1,149 @@
+name: Report history publication
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Verify current history or publish one complete report bundle
+        required: true
+        type: choice
+        options:
+          - verify
+          - publish
+        default: verify
+      report_json_b64:
+        description: Base64 or Base64URL encoded validated issued report JSON (publish mode)
+        required: false
+        type: string
+      sidecar_json_b64:
+        description: Base64 or Base64URL encoded matching schema-3 Research Fit sidecar JSON (publish mode)
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - data/history/runs/**
+      - data/history/research-fit/**
+      - run-history.json
+      - tools/report-publication.mjs
+      - .github/workflows/report-history.yml
+  pull_request:
+    paths:
+      - data/history/runs/**
+      - data/history/research-fit/**
+      - run-history.json
+      - tools/report-publication.mjs
+      - .github/workflows/report-history.yml
+
+concurrency:
+  group: betting-edge-report-history
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.mode == 'verify' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise publisher path
+        run: node tools/report-publication.mjs self-test
+      - name: Verify durable report history
+        run: node tools/report-publication.mjs verify
+
+  publish:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'publish' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Decode bundle inputs
+        env:
+          REPORT_JSON_B64: ${{ inputs.report_json_b64 }}
+          SIDECAR_JSON_B64: ${{ inputs.sidecar_json_b64 }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          function decode(name, target) {
+            let value = String(process.env[name] || '').trim();
+            if (!value) throw new Error(`${name} is required in publish mode`);
+            value = value.replace(/-/g, '+').replace(/_/g, '/');
+            while (value.length % 4) value += '=';
+            const bytes = Buffer.from(value, 'base64');
+            if (!bytes.length) throw new Error(`${name} decoded to an empty value`);
+            fs.writeFileSync(target, bytes);
+          }
+          decode('REPORT_JSON_B64', '/tmp/report.json');
+          decode('SIDECAR_JSON_B64', '/tmp/sidecar.json');
+          NODE
+      - name: Validate bundle and derive paths
+        id: bundle
+        run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Commit payload, sidecar and index together
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          published=0
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+            git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
+            if git diff --cached --quiet; then
+              echo "Bundle already exists unchanged."
+              published=1
+              break
+            fi
+            git commit -m "history: publish ${REPORT_TS} report bundle"
+            if git push origin HEAD:main; then
+              published=1
+              break
+            fi
+            echo "Push raced another repository update; retrying from current main."
+          done
+          test "$published" -eq 1
+      - name: Remote read-back gate
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          node tools/report-publication.mjs verify --ts "$REPORT_TS"
+      - name: Publication summary
+        env:
+          SHORT_ID: ${{ steps.bundle.outputs.short_id }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          {
+            echo "## Betting Edge report history published"
+            echo
+            echo "- Short ID: \`$SHORT_ID\`"
+            echo "- Report: \`$REPORT_PATH\`"
+            echo "- Sidecar: \`$SIDECAR_PATH\`"
+            echo "- Index: \`run-history.json\`"
+            echo "- Read-back: passed"
+            echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
+          } >> "$GITHUB_STEP_SUMMARY"
