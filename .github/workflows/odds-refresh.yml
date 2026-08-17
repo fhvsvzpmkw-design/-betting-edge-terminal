@@ -1359,12 +1359,44 @@ jobs:
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add data/live-odds.json
+          # Preserve the exact snapshot that already passed validation. A push
+          # collision must never cause another Odds-API pull or silently lose it.
+          candidate="$(mktemp)"
+          cp data/live-odds.json "$candidate"
 
-          if git diff --cached --quiet; then
-            echo "No validated odds changes to publish."
-            exit 0
-          fi
+          candidate_epoch="$(node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); const t=Date.parse(d.generatedAt||""); if(!Number.isFinite(t)) process.exit(2); process.stdout.write(String(t));' "$candidate")"
 
-          git commit -m "Refresh Betting Edge live odds"
-          git push
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+
+            remote_epoch="$(git show origin/main:data/live-odds.json 2>/dev/null | node -e 'let s=""; process.stdin.on("data",d=>s+=d); process.stdin.on("end",()=>{try{const j=JSON.parse(s); const t=Date.parse(j.generatedAt||""); process.stdout.write(Number.isFinite(t)?String(t):"0")}catch{process.stdout.write("0")}})')"
+
+            # Never overwrite a snapshot that is already as new or newer.
+            if [ "${remote_epoch:-0}" -ge "$candidate_epoch" ]; then
+              echo "Remote live odds are already equal/newer; no publish needed."
+              exit 0
+            fi
+
+            # Rebuild only the validated live-odds change on the newest main.
+            # Other concurrent repository updates remain intact.
+            git reset --hard origin/main
+            cp "$candidate" data/live-odds.json
+            git add data/live-odds.json
+
+            if git diff --cached --quiet; then
+              echo "No validated odds changes to publish."
+              exit 0
+            fi
+
+            git commit -m "Refresh Betting Edge live odds"
+
+            if git push origin HEAD:main; then
+              echo "Validated odds snapshot published on attempt $attempt."
+              exit 0
+            fi
+
+            echo "Publish collision on attempt $attempt; syncing main and retrying the same validated snapshot."
+          done
+
+          echo "Validated odds snapshot could not be published after 4 attempts."
+          exit 1
