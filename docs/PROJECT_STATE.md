@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-16 — same-lane report recovery documented  
+**Last updated:** 2026-08-16 — recovery + first v1.8 shadow comparison documented  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -126,7 +126,11 @@ Current research state:
 - **Production runtime authority remains v1.7** during the soak period.
 - A complete **v1.8 promotion candidate exists in staging only**: 120 logical items, 100 source records and 26 evidence clusters.
 - Candidate Freeze R2 structural inventory passed **24/24**; frozen History Fit narrative tests passed **15/15**; hard-boundary tests passed **9/9**.
-- v1.8 promotion is explicitly **ON HOLD** pending v1.7 operational soak, same-candidate shadow comparisons and later explicit approval.
+- The first real same-candidate v1.7/v1.8 shadow comparison is recorded at `research/staging/V1_8_SHADOW_COMPARISON_2026-08-16.json`: five real 2026-08-16 report runs, 14 issued-card observations and six unique candidates.
+- That first shadow comparison produced **0 upgrades, 0 cross-letter-band downgrades, 2 within-B-band softenings and 4 unchanged grades**, with no production recommendation, status, stake, fair-value or play-to changes.
+- The primary soak finding is interpretive: **observed line movement is not synonymous with sharp/informed action**. v1.8 adds bookmaker order-flow/demand evidence that should temper movement-heavy History Fit language without discarding direct sport/market evidence.
+- v1.8 also correctly refused wrong-market transport: its new WNBA player-prop evidence did not fill the WNBA game-moneyline gap, and European soccer market-structure evidence did not become direct MLS three-way price-band calibration.
+- v1.8 promotion remains explicitly **ON HOLD** pending additional real same-candidate shadow comparisons and later explicit approval.
 - v1.8 shadow output may be compared with live v1.7 History Fit but may not modify any issued report, fair value, play-to, status, model error, stake or executable price.
 - Canonical library status: `R1_CANONICAL_READ_ONLY`.
 - Production contract compatibility: **v0.9 operational**.
@@ -135,7 +139,7 @@ Current research state:
 - Runtime Research Library writes required: **false**.
 - Scheduled-report linkage: **true across all five lanes**.
 - Current mode: `R3_LIVE_READ_ONLY_HISTORY_FIT_WITH_HISTORY_SIDECAR`.
-- Next stage: `V1_7_PRODUCTION_SOAK_WITH_V1_8_SHADOW_COMPARISON`.
+- Next stage: `CONTINUE_V1_7_SOAK_WITH_VARIED_V1_8_SHADOW_COMPARISONS`, prioritizing real NFL and player-prop candidates where v1.8 contains more genuinely new direct evidence.
 
 `research/manifest.json` is the authoritative pointer for current tested compatibility. The internal `research-library.json` header preserves historical metadata from when the canonical library was built; that historical header is not rewritten merely to advance production compatibility metadata.
 
@@ -166,12 +170,14 @@ The principal v0.9 production additions are:
 
 Manual same-lane report recovery is currently an **operating procedure and durable project decision**, not an amendment to the v0.9 contract. It may be considered for future contract promotion only after additional live evidence and/or a decision to automate or guarantee recovery behavior.
 
+The first v1.8 shadow comparison is likewise an **evaluation observation**, not a production-library promotion. Contract 0.9, the production v1.7 manifest/library, runner, scheduler and odds workflow remain unchanged.
+
 ## Activation state summary
 
 - **C-track:** C1 — v0.9 production contract operational.
-- **R-track:** R3 — live read-only History Fit on production v1.7 with durable sidecar provenance; v1.8 is frozen staging-only pending soak/shadow comparison and explicit promotion approval.
+- **R-track:** R3 — live read-only History Fit on production v1.7 with durable sidecar provenance; first real v1.8 same-candidate shadow comparison completed positively but promotion remains on hold pending broader real-slate evidence and explicit approval.
 - **H-track:** H3 — live issued-report/provenance history; scheduled-lane history is operational and the 2026-08-16 Evening/Late same-lane recovery pair also passed archive/sidecar/index handling.
-- **S-track:** S0 — Shadow History remains inactive.
+- **S-track:** S0 — Shadow History remains inactive. The v1.8 Research Library shadow comparison is a staging evaluation and does not activate S-track Shadow History.
 
 ## Known-good checkpoints
 
@@ -199,6 +205,14 @@ A third checkpoint is the **2026-08-16 same-lane recovery pair**:
 - both preserved the ordinary v0.9 freshness, identity, fair-value and zero-risk safeguards;
 - the observed pair established the manual recovery runbook now documented in `docs/OPERATIONS.md` and Decision D-028 without changing the production contract, runner, scheduler or odds workflow.
 
+A fourth checkpoint is the **2026-08-16 first real v1.7 vs v1.8 shadow comparison**:
+
+- the same real candidates from all five issued/recovered report lanes were compared without modifying issued reports;
+- six unique candidates were evaluated across 14 issued-card observations;
+- v1.8 produced no upgrades and no cross-letter-band downgrades; White Sox and Red Sox movement-heavy History Fit softened from B to B-, while Rays stayed B and the WNBA/MLS direct-calibration gaps stayed NR;
+- the shadow result improved caution/transportability language without creating a bet or changing price, fair value, play-to, status or stake;
+- the comparison is preserved at `research/staging/V1_8_SHADOW_COMPARISON_2026-08-16.json` and is positive evidence for continued soak, not sufficient evidence for promotion.
+
 Use Git history and these checkpoints to distinguish future regressions from previously working pipelines.
 
 ## Repository-write capability
@@ -212,7 +226,9 @@ All direct changes follow the safety policy in the root `README.md`: fetch curre
 The following boundaries are intentional and should not be crossed casually:
 
 - Do not couple Research Library **writes** to normal report runs.
-- Do not promote Research Library v1.8 merely because the staging validation package is green; complete the v1.7 soak/shadow gate and obtain explicit promotion approval first.
+- Do not promote Research Library v1.8 merely because the staging validation package is green or because one real shadow comparison is positive; continue the v1.7 soak/shadow gate and require explicit promotion approval.
+- Do not equate observed market movement, steam or a favorite flip with confirmed sharp/informed action; distinguish movement from its cause and from current executable value.
+- Do not use evidence from the wrong market to fill a direct research gap: WNBA player-prop evidence is not WNBA game-moneyline calibration, and European soccer calibration is not direct MLS numerical calibration.
 - Do not treat the v0.8/v0.9 draft files as production authority; `BETTING_EDGE_CONTRACT.md` is authoritative.
 - Do not place bulky structured research metadata into the runner payload; player-prop `rec.feed` identity is the narrow approved structured addition.
 - Do not let odds-history indexing interfere with the production odds-refresh workflow.
