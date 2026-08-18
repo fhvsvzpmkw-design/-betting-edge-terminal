@@ -9,10 +9,13 @@ This factory creates additional saved Syndicate characters without increasing th
 - a generated display name, nickname and publication name that may all be changed later;
 - a generic `👤` card/avatar placeholder;
 - `headshot: null` until a permanent JPEG is supplied;
+- the shared Syndicate-card accent `#c9a43b` so every character selection uses the same gold outline;
 - a dedicated blank Hotline file showing `NO REPORT LOADED`;
 - an enabled roster entry in `data/syndicates.json` so the character appears in the LOAD selector;
 - no automatic assignment to F1–F4;
 - `continuity.lastReportSeen: null` until the character is deliberately updated to an issued report.
+
+The shared card accent is presentation-only. Individual Hotline pages may still use their own independent color palettes and visual themes.
 
 ## Create
 
