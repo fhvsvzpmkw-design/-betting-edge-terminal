@@ -1,0 +1,39 @@
+name: Materialize VIG Scope JPEGs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/vig-scope/vig-scope-assets.zip'
+      - '.github/workflows/materialize-vig-scope.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack VIG Scope meter states
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/vig-scope
+          unzip -o assets/vig-scope/vig-scope-assets.zip -d assets/vig-scope
+          count=$(find assets/vig-scope -maxdepth 1 -type f -name 'vig-*.jpg' | wc -l)
+          test "$count" -eq 18
+      - name: Commit individual JPEGs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/vig-scope/*.jpg
+          if git diff --cached --quiet; then
+            echo 'VIG Scope JPEGs already materialized.'
+          else
+            git commit -m 'Add VIG Scope meter-state JPEGs'
+            git push
+          fi
