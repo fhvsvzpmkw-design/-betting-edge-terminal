@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="vigscope-ui-version" content="1.3.1">
-<title>VigScope Terminal UI v1.3.1 Runner</title>
+<meta name="vigscope-ui-version" content="1.3.2">
+<title>VigScope Terminal UI v1.3.2 Runner</title>
 <style>
 :root{--bg:#01040a;--fade-ms:320ms;--green:#58ff88}
 *{box-sizing:border-box}
@@ -21,13 +21,13 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
 </style>
 </head>
 <body>
-<iframe id="core" title="VigScope Terminal UI v1.3.1"></iframe>
+<iframe id="core" title="VigScope Terminal UI v1.3.2"></iframe>
 <div id="splash2" aria-label="VigWire Labs boot screen">
   <img id="splash2art" src="./assets/splash-02-vigwire-labs-v2v2.png" alt="VigWire Labs Market Intelligence boot screen">
   <div id="fallback">VIGWIRE LABS // LOADING VIGSCOPE</div>
 </div>
 <script>
-const UI_VERSION='1.3.1';
+const UI_VERSION='1.3.2';
 const UI_TITLE=`VIGSCOPE TERMINAL UI v${UI_VERSION}`;
 const UI_BUILD=`CHATGPT LIVE-RUNNER // v${UI_VERSION} UI`;
 const SCREEN2_MS=3000,FADE_MS=320;
@@ -47,8 +47,15 @@ async function buildSyndicateWorkspace(d,navPad){
   let box=d.getElementById('runnerSyndicateWorkspace');
   if(!box){box=d.createElement('section');box.id='runnerSyndicateWorkspace';box.setAttribute('aria-label','Loaded syndicate workspace');const tabs=d.createElement('div');tabs.className='syndicateTabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Syndicate profiles');const pane=d.createElement('div');pane.className='syndicatePane';box.append(tabs,pane);navPad.insertAdjacentElement('afterend',box)}
   const tabs=box.querySelector('.syndicateTabs'),pane=box.querySelector('.syndicatePane');tabs.innerHTML='';pane.innerHTML='<div class="blankSyndicate"><b>LOADING SYNDICATES</b><span>READING EXTERNAL MANIFEST</span></div>';
-  try{const slots=await loadSyndicateManifest();slots.forEach((slot,i)=>tabs.appendChild(buildSyndicateTab(d,slot,i)));tabs.onclick=e=>{const b=e.target.closest('[data-syndicate-tab]');if(!b)return;const idx=Number(b.dataset.syndicateTab);tabs.querySelectorAll('.syndicateTab').forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-selected',String(active))});renderSyndicateSlot(d,pane,slots[idx],idx)};renderSyndicateSlot(d,pane,slots[0],0)}catch(err){pane.innerHTML=`<div class="blankSyndicate"><b>SYNDICATE LOAD FAILED</b><span>${String(err.message||err)}</span></div>`}
+  try{const slots=await loadSyndicateManifest();slots.forEach((slot,i)=>tabs.appendChild(buildSyndicateTab(d,slot,i)));tabs.onclick=e=>{const b=e.target.closest('[data-syndicate-tab]');if(!b)return;const idx=Number(b.dataset.syndicateTab);tabs.querySelectorAll('.syndicateTab').forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-selected',String(active))});renderSyndicateSlot(d,pane,slots[idx],idx)};renderSyndicateSlot(d,pane,slots[0],0)}catch(err){pane.innerHTML=`<div class="blankSyndicate"><b>SYNDICATE LOAD FAILED</b><span>${String(err.message||err)}</span></div>`;throw err}
   return box;
+}
+function setF5State(f5,state){
+  f5.dataset.state=state;
+  if(state==='connecting'){f5.classList.add('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 CONNECTING SYNDICATE 💵</span><span class="f5Message">CONNECTING TO SYNDICATE&nbsp;&nbsp; // &nbsp;&nbsp;PLEASE STANDBY</span>';return}
+  if(state==='connected'){f5.classList.add('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 SYNDICATE LOADED 💵</span><span class="f5Message">CONNECTED TO SYNDICATE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO DISCONNECT</span>';return}
+  if(state==='error'){f5.classList.remove('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 LOAD SYNDICATE 💵</span><span class="f5Message f5Error">CONNECTION FAILED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO RETRY</span>';return}
+  f5.classList.remove('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 LOAD SYNDICATE 💵</span><span class="f5Message">DISCONNECTED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO LOAD SYNDICATE</span>';
 }
 function applyHierarchyPatch(){
   const app=innerAppFrame();let d=null;try{d=app&&app.contentDocument}catch(e){return false}if(!d||!d.head||!d.body)return false;
@@ -58,10 +65,15 @@ function applyHierarchyPatch(){
     #runnerBankrollCompact{display:inline-flex;align-items:baseline;gap:8px;margin-top:7px;padding:4px 8px;border:1px solid var(--line);background:#020912;line-height:1;white-space:nowrap}
     #runnerBankrollCompact .runnerBankrollKey{color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.09em}#runnerBankrollCompact .runnerBankrollValue{color:var(--green);font-size:14px;font-weight:950}
     .runnerRiskMini{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-top:7px;padding-top:6px;border-top:1px dotted var(--line);color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.08em;line-height:1}.runnerRiskMini .runnerRiskValue{display:inline!important;margin:0!important;color:var(--text)!important;font-size:10px!important;line-height:1!important}
-    #runnerSyndicateF5{grid-column:1/-1!important;border-color:#c9a43b!important;color:#ffe17b!important;background:#070903!important;box-shadow:inset 0 0 0 1px rgba(255,220,100,.06),0 0 10px rgba(216,173,56,.10)!important;text-shadow:0 0 6px rgba(255,216,106,.25)!important}
+    #runnerSyndicateF5{grid-column:1/-1!important;border-color:#c9a43b!important;color:#ffe17b!important;background:#070903!important;box-shadow:inset 0 0 0 1px rgba(255,220,100,.06),0 0 10px rgba(216,173,56,.10)!important;text-shadow:0 0 6px rgba(255,216,106,.25)!important;display:grid!important;place-items:center;gap:7px;padding-top:10px!important;padding-bottom:10px!important}
+    #runnerSyndicateF5 .f5Main{display:block;font-size:inherit}.f5Message{display:block;color:#d8c56f;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}.f5Error{color:#ff6666}
     #runnerSyndicateF5:hover,#runnerSyndicateF5.loaded{border-color:#ffe27a!important;color:#fff1ad!important;background:#111004!important;box-shadow:inset 0 0 0 1px rgba(255,235,150,.12),0 0 15px rgba(255,210,80,.18)!important}
     #runnerSyndicateWorkspace{display:none;margin:0 12px 12px;padding:10px;border:1px solid var(--line);background:#02070b;box-shadow:inset 0 0 22px rgba(88,255,136,.025);color:var(--text)}
-    body.runnerSyndicateLoaded #runnerSyndicateWorkspace{display:block}body.runnerSyndicateLoaded #runnerSyndicateWorkspace~*{display:none!important}
+    body.runnerSyndicateLoaded .top{display:none!important}
+    body.runnerSyndicateLoaded .runnerNavPad{padding-top:8px!important;margin-top:0!important}
+    body.runnerSyndicateLoaded .runnerNavPad .tabs>.btn:not(#runnerSyndicateF5){display:none!important}
+    body.runnerSyndicateLoaded #runnerSyndicateWorkspace{display:block}
+    body.runnerSyndicateLoaded #runnerSyndicateWorkspace~*{display:none!important}
     .syndicateTabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
     .syndicateTab{--syndicate-accent:#c9a43b;position:relative;min-width:0;min-height:112px;border:1px solid var(--line);background:linear-gradient(135deg,#020912,#01060b);color:var(--muted);font:950 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.025em;display:grid;grid-template-columns:80px minmax(0,1fr);align-items:center;gap:12px;padding:10px 12px;text-align:left;overflow:hidden;cursor:pointer;transition:border-color 140ms ease,background 140ms ease,box-shadow 140ms ease}
     .syndicateTab:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--syndicate-accent);opacity:.28}
@@ -77,7 +89,7 @@ function applyHierarchyPatch(){
     .syndicateSubtitle{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#7894a2;font-size:8.5px;font-weight:850;letter-spacing:.07em;line-height:1.15}
     .syndicateStatus{display:inline-flex;align-items:center;flex:0 0 auto;padding:3px 5px;border:1px solid var(--syndicate-accent);color:var(--syndicate-accent);font-size:7.5px;font-weight:950;letter-spacing:.09em;line-height:1}
     .syndicatePane{border:1px solid var(--line);background:#01040a;min-height:280px;padding:0;overflow:hidden;overscroll-behavior:contain}.syndicateFrame{display:block;width:100%;height:min(78vh,820px);min-height:320px;border:0;background:#020503;overflow:auto;-webkit-overflow-scrolling:touch}.blankSyndicate{min-height:280px;display:grid;place-items:center;align-content:center;gap:10px;color:var(--muted);text-align:center}.blankSyndicate b{color:#b79a45;font-size:14px}.blankSyndicate span{font-size:9px;letter-spacing:.1em}
-    @media(min-width:721px) and (orientation:portrait){.runnerNavPad .tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}.runnerCounts{grid-template-columns:repeat(4,minmax(0,1fr))!important}.syndicateTab{grid-template-columns:68px minmax(0,1fr);min-height:98px;gap:10px;padding:9px 10px}.syndicateAvatar{width:68px;height:78px;min-width:68px}.syndicateName{font-size:14px}.syndicateIdentity{gap:6px}.syndicateMeta{gap:4px}.syndicateSubtitle{font-size:7.5px}.syndicateFrame{height:min(78vh,820px)}}
+    @media(min-width:721px) and (orientation:portrait){.runnerNavPad .tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}.runnerCounts{grid-template-columns:repeat(4,minmax(0,1fr))!important}.syndicateTab{grid-template-columns:68px minmax(0,1fr);min-height:104px;gap:10px;padding:9px 10px}.syndicateAvatar{width:68px;height:78px;min-width:68px}.syndicateName{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;text-overflow:clip;overflow:hidden;font-size:14px;line-height:1.08;max-height:2.16em}.syndicateIdentity{gap:6px}.syndicateMeta{gap:4px}.syndicateSubtitle{font-size:7.5px}.syndicateFrame{height:min(78vh,820px)}}
     @media(min-width:721px) and (orientation:landscape){.runnerNavPad .tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}.runnerCounts{grid-template-columns:repeat(4,minmax(0,1fr))!important}.syndicateFrame{height:min(80vh,860px)}}
     @media(max-width:720px) and (orientation:portrait){.runnerNavPad .tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}.runnerNavPad .btn{min-height:50px;padding:9px 6px}.runnerCounts{grid-template-columns:repeat(2,minmax(0,1fr))!important}.syndicateTabs{grid-template-columns:repeat(4,235px);scroll-snap-type:x mandatory;padding-bottom:3px}.syndicateTab{grid-template-columns:64px minmax(0,1fr);min-height:94px;gap:10px;padding:8px 9px;scroll-snap-align:start}.syndicateAvatar{width:64px;height:76px;min-width:64px;border-radius:6px;font-size:16px}.syndicateName{font-size:14px}.syndicateIdentity{gap:6px}.syndicateMeta{gap:4px}.syndicateSubtitle{font-size:7.5px}.syndicateFrame{height:72vh;min-height:340px}}
     @media(max-width:720px) and (orientation:landscape){.runnerNavPad .tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}.runnerNavPad .btn{min-height:44px;padding:7px 6px}.runnerCounts{grid-template-columns:repeat(2,minmax(0,1fr))!important}.syndicateTabs{grid-template-columns:repeat(4,220px);scroll-snap-type:x mandatory;padding-bottom:3px}.syndicateTab{grid-template-columns:58px minmax(0,1fr);min-height:86px;gap:9px;padding:7px 8px;scroll-snap-align:start}.syndicateAvatar{width:58px;height:68px;min-width:58px;border-radius:6px;font-size:15px}.syndicateName{font-size:13px}.syndicateIdentity{gap:5px}.syndicateMeta{gap:3px}.syndicateSubtitle{font-size:7px}.syndicateStatus{padding:2px 4px;font-size:7px}.syndicateFrame{height:64vh;min-height:260px}}
@@ -85,7 +97,7 @@ function applyHierarchyPatch(){
   `;d.head.appendChild(style)}
   const top=d.querySelector('.top'),terminalTitle=top&&top.querySelector('.title');if(terminalTitle&&terminalTitle.textContent!==UI_TITLE)terminalTitle.textContent=UI_TITLE;const build=top&&top.querySelector('.small.muted');if(build&&build.textContent!==UI_BUILD)build.textContent=UI_BUILD;const footer=d.querySelector('.foot');if(footer){const nextFooter=footer.textContent.replace(/VIGSCOPE TERMINAL UI v\d+(?:\.\d+)+/i,UI_TITLE);if(nextFooter!==footer.textContent)footer.textContent=nextFooter}
   const tabs=d.querySelector('.tabs'),navPad=tabs&&tabs.parentElement;if(top&&navPad){navPad.classList.add('runnerNavPad');if(top.nextElementSibling!==navPad)top.insertAdjacentElement('afterend',navPad)}
-  if(tabs&&!d.getElementById('runnerSyndicateF5')){const f5=d.createElement('button');f5.type='button';f5.id='runnerSyndicateF5';f5.className='btn';f5.innerHTML='<b>[F5]</b>&nbsp; 💵 LOAD SYNDICATE 💵';f5.setAttribute('aria-pressed','false');f5.addEventListener('click',async()=>{const loaded=!d.body.classList.contains('runnerSyndicateLoaded');if(loaded)await buildSyndicateWorkspace(d,navPad);d.body.classList.toggle('runnerSyndicateLoaded',loaded);f5.classList.toggle('loaded',loaded);f5.setAttribute('aria-pressed',String(loaded));f5.innerHTML=loaded?'<b>[F5]</b>&nbsp; 💵 SYNDICATE LOADED 💵':'<b>[F5]</b>&nbsp; 💵 LOAD SYNDICATE 💵'});tabs.appendChild(f5)}
+  if(tabs&&!d.getElementById('runnerSyndicateF5')){const f5=d.createElement('button');f5.type='button';f5.id='runnerSyndicateF5';f5.className='btn';f5.setAttribute('aria-pressed','false');setF5State(f5,'disconnected');f5.addEventListener('click',async()=>{const isLoaded=d.body.classList.contains('runnerSyndicateLoaded');if(isLoaded){d.body.classList.remove('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','false');setF5State(f5,'disconnected');return}setF5State(f5,'connecting');f5.disabled=true;try{await buildSyndicateWorkspace(d,navPad);d.body.classList.add('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','true');setF5State(f5,'connected')}catch(err){d.body.classList.remove('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','false');setF5State(f5,'error')}finally{f5.disabled=false}});tabs.appendChild(f5)}
   const stats=d.querySelector('.stats'),statValues=stats?[...stats.querySelectorAll('.stat b')]:[];if(stats)stats.setAttribute('aria-hidden','true');const titleGroup=top&&top.firstElementChild;let bankroll=d.getElementById('runnerBankrollCompact');if(titleGroup&&!bankroll){bankroll=d.createElement('div');bankroll.id='runnerBankrollCompact';bankroll.setAttribute('aria-label','Current bankroll');const key=d.createElement('span');key.className='runnerBankrollKey';key.textContent='BANKROLL';const value=d.createElement('b');value.className='runnerBankrollValue';bankroll.append(key,value);titleGroup.appendChild(bankroll)}const bankrollValue=bankroll&&bankroll.querySelector('.runnerBankrollValue'),nextBankroll=statValues[0]&&statValues[0].textContent||'$0.00';if(bankrollValue&&bankrollValue.textContent!==nextBankroll)bankrollValue.textContent=nextBankroll;
   const betCount=d.querySelector('.runnerCounts .runnerCount');let riskMini=betCount&&betCount.querySelector('.runnerRiskMini');if(betCount&&!riskMini){riskMini=d.createElement('div');riskMini.className='runnerRiskMini';const key=d.createElement('span');key.textContent='NEW RISK';const value=d.createElement('b');value.className='runnerRiskValue';riskMini.append(key,value);betCount.appendChild(riskMini)}const riskValue=riskMini&&riskMini.querySelector('.runnerRiskValue'),nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';if(riskValue&&riskValue.textContent!==nextRisk)riskValue.textContent=nextRisk;return true
 }
