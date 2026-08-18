@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LARRY'S LOCK LINE!!! — 08:00 UPDATE</title>
+  <style>
+    :root{--night:#12001f;--plum:#2b0644;--wine:#5a0f4f;--pink:#ff4fa3;--pink2:#ff8fc8;--aqua:#27f2dc;--teal:#00a9a5;--gold:#ffd166;--cream:#fff0c7;--blue:#3857ff;--silver:#d7d7dc}
+    *{box-sizing:border-box}
+    body{margin:0;background-color:#09000f;background-image:linear-gradient(45deg,rgba(255,79,163,.11) 25%,transparent 25%,transparent 75%,rgba(39,242,220,.08) 75%),linear-gradient(-45deg,rgba(255,209,102,.08) 25%,transparent 25%,transparent 75%,rgba(56,87,255,.09) 75%),radial-gradient(circle at 20% 10%,#3c0754 0,#140021 42%,#060009 100%);background-size:38px 38px,38px 38px,100% 100%;color:var(--cream);font:14px "Comic Sans MS","Trebuchet MS",Arial,sans-serif}
+    .page{max-width:900px;margin:auto;padding:8px;background:rgba(30,3,48,.94);border-left:5px ridge var(--aqua);border-right:5px ridge var(--pink);box-shadow:0 0 28px rgba(255,79,163,.22)}
+    .rainbow{height:8px;background:linear-gradient(90deg,var(--pink),var(--gold),var(--aqua),var(--blue),var(--pink2),var(--pink));box-shadow:0 0 12px rgba(39,242,220,.4)}
+    .hero{text-align:center;padding:12px;border:6px ridge var(--gold);background:linear-gradient(180deg,#3a0755 0,#18002d 55%,#070014 100%);position:relative;overflow:hidden}
+    .hero h1{margin:4px 0;color:var(--gold);font-size:clamp(28px,7vw,52px);text-shadow:3px 3px #a8005f,-2px -2px #003c72,0 0 14px rgba(255,79,163,.7)}
+    .blink{color:var(--aqua);font-weight:bold;animation:blink 1s steps(2,end) infinite}
+    .tag{color:var(--pink2);font-size:16px;font-weight:bold}
+    .cheek{font-size:24px;letter-spacing:6px;margin:5px 0}
+    .marquee{overflow:hidden;white-space:nowrap;border:4px outset var(--silver);background:#07000d;color:var(--aqua);padding:6px;margin:7px 0;font-family:"Courier New",monospace;font-weight:bold}
+    .marquee span{display:inline-block;animation:scroll 16s linear infinite}
+    .nav{text-align:center;background:linear-gradient(#f3ead5,#bbb8c2);border:4px outset #fff;padding:5px;color:#170023}
+    .nav a{color:#4b00c7;text-decoration:underline;font-weight:bold;margin:0 8px}
+    .layout{display:grid;grid-template-columns:230px 1fr;gap:8px;margin-top:8px}
+    .sidebox{margin-bottom:8px;border:4px ridge var(--aqua);background:#0d0018;padding:7px}
+    .sidebox h3{margin:-3px -3px 6px;padding:4px;text-align:center;background:linear-gradient(90deg,#7d0f69,#3f0a60);color:var(--gold);font-size:14px}
+    .counter{font-family:"Courier New",monospace;background:#020205;color:var(--aqua);border:3px inset #999;padding:5px;text-align:center;font-size:18px;letter-spacing:3px}
+    .button{display:block;margin:5px auto;padding:5px;background:linear-gradient(#efe8d8,#beb9c8);color:#3d00ba;border:3px outset #fff;text-align:center;font:bold 11px Arial}
+    .under{text-align:center;color:var(--gold);font-weight:bold}
+    .under .cone{font-size:30px}
+    .hotlist{padding-left:18px}
+    .hotlist li{margin:4px 0}
+    .hotlist a{color:var(--aqua);text-decoration:underline}
+    .update-list{padding-left:18px;margin:4px 0}
+    .update-list li{margin:5px 0;line-height:1.3}
+    .update-list b{color:var(--gold)}
+    .main{min-width:0}
+    .status{border:5px ridge var(--gold);background:linear-gradient(135deg,#4b0d58,#200128);padding:9px;text-align:center;color:#fff}
+    .status b{color:var(--aqua);font-size:17px}
+    .status em{color:var(--gold)}
+    .chron{text-align:center;margin:7px 0;color:var(--aqua);font-family:"Courier New",monospace;font-weight:bold}
+    .post{margin:9px 0;border:5px ridge #c7bfd0;background:linear-gradient(180deg,#12001e,#08000e)}
+    .post.latest{border-color:var(--gold);box-shadow:0 0 15px rgba(255,209,102,.2)}
+    .post.wait{border-color:var(--gold)}
+    .posthead{display:flex;justify-content:space-between;gap:8px;padding:5px;background:linear-gradient(90deg,#2f1fb5,#6d146c);color:var(--gold);font:bold 12px "Courier New",monospace}
+    .latest .posthead,.wait .posthead{background:linear-gradient(90deg,#8d175d,#4f092f)}
+    .postbody{padding:9px;line-height:1.5}
+    .postbody h2{margin:0 0 6px;color:var(--aqua);font-size:18px;text-shadow:2px 2px #6b0b63}
+    .larry{margin:8px 0;padding:7px;border:3px dashed var(--pink);background:linear-gradient(90deg,#4b063a,#210027);color:#ffd4eb;font:bold 15px "Comic Sans MS",sans-serif}
+    .numbers{display:flex;gap:5px;flex-wrap:wrap}
+    .num{padding:3px 6px;border:3px outset #e8dfc8;background:linear-gradient(#fff3c9,#cfc6b6);color:#160018;font:bold 10px Arial}
+    .sig{margin-top:7px;color:var(--gold);text-align:center;font-weight:bold}
+    .divider{text-align:center;color:var(--pink);letter-spacing:5px;margin:6px 0;font-size:19px}
+    .guest{border:4px ridge var(--pink);background:linear-gradient(180deg,#320429,#130015);padding:8px;text-align:center}
+    .guest b{color:var(--aqua)}
+    .footer{text-align:center;margin-top:9px;border-top:3px solid var(--aqua);padding:9px;color:#d8cfe0;font-size:10px}
+    .netscape{color:var(--gold);font-weight:bold}
+    .email{color:var(--aqua);text-decoration:underline}
+    @keyframes blink{50%{visibility:hidden}}
+    @keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+    @media(max-width:680px){.layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sidebox{margin:0}.posthead{font-size:10px}.hero h1{font-size:30px}}
+    @media(max-width:430px){.sidebar{grid-template-columns:1fr}.nav a{display:inline-block;margin:3px 6px}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="rainbow"></div>
+    <header class="hero">
+      <div class="blink">💖 ★ 08:00 HOTLINE UPDATE IS LIVE!!! ★ 💖</div>
+      <h1>LARRY'S LOCK LINE!!!</h1>
+      <div class="tag">HOT NUMBERS • BAD DECISIONS • GOOD COLOGNE</div>
+      <div class="cheek">💋 ❤️‍🔥 🦵 💕 🦵 ❤️‍🔥 💋</div>
+      <div>Official Home Page of <b>Larry “Luck” Lombardo</b></div>
+    </header>
+
+    <div class="marquee"><span>💘 ★★★ 08:00 MAIN BOARD UPDATED!!! ★★★ ONE WAIT, FOUR PASSES, ZERO BETS!!! ★★★ WHITE SOX +157 IS NEW!!! ★★★ TORONTO NEEDS A FRESH PRICE!!! ★★★ LARRY STILL HAS CAB FARE!!! ★★★ 💋</span></div>
+
+    <nav class="nav"><a>HOME</a><a>HOT PICKS</a><a>ABOUT ME</a><a>MY LINKS</a><a>GUESTBOOK</a><a>EMAIL LARRY</a></nav>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <section class="sidebox">
+          <h3>💘 ABOUT THE WEBMASTER 💘</h3>
+          <div style="text-align:center;font-size:34px">😎💋</div>
+          <p><b>Name:</b> Larry Lombardo<br><b>Status:</b> Available ❤️<br><b>Location:</b> Near the lounge<br><b>Occupation:</b> Number enthusiast<br><b>Current mood:</b> Waiting on Toronto 💕</p>
+        </section>
+
+        <section class="sidebox">
+          <h3>08:00 CHANGES SINCE 06:00</h3>
+          <ul class="update-list">
+            <li><b>NEW:</b> White Sox +157 — PASS</li>
+            <li><b>TORONTO:</b> PASS → WAIT</li>
+            <li><b>MIAMI:</b> +212 → +210</li>
+            <li><b>LA SPARKS:</b> −125 unchanged</li>
+            <li><b>MILWAUKEE:</b> −152 → −156</li>
+          </ul>
+        </section>
+
+        <section class="sidebox">
+          <h3>YOU ARE VISITOR #</h3>
+          <div class="counter">001339</div>
+          <p style="text-align:center">since Larry figured out HTML</p>
+        </section>
+
+        <section class="sidebox">
+          <h3>💕 LARRY'S COOL LINKS 💕</h3>
+          <ul class="hotlist"><li><a>Underdogs With Nice Numbers</a></li><li><a>White Suits Online</a></li><li><a>Shrimp Cocktail WebRing</a></li><li><a>Legs Appreciation Page 🦵</a></li><li><a>Women Who Haven't Blocked Me</a></li><li><a>Betting Edge</a></li></ul>
+        </section>
+
+        <section class="sidebox">
+          <h3>💋 WEBRING 💋</h3>
+          <div class="button">← PREVIOUS HEARTBREAKER</div>
+          <div class="button">💘 RANDOM GAMBLER 💘</div>
+          <div class="button">NEXT LOUNGE LIZARD →</div>
+        </section>
+
+        <section class="sidebox under">
+          <h3>UNDER CONSTRUCTION</h3>
+          <div class="cone">🚧💖🚧</div>FOREVER!!!<br><small>please excuse Larry's HTML</small>
+        </section>
+      </aside>
+
+      <section class="main">
+        <div class="status"><b>💋 LARRY IS CURRENTLY: 💋</b><br><em>ONLINE • UNBET • WATCHING ONE STALE NUMBER ❤️‍🔥</em><br><small>Fresh feed 07:56 PT • Report issued 08:10 PT</small></div>
+        <div class="chron">TODAY'S HOT UPDATES // 08:00 MAIN OVER 06:00 OPEN</div>
+
+        <article class="post latest">
+          <div class="posthead"><span>08:00 💘★★ NEW ARRIVAL!!!</span><span>PASS</span></div>
+          <div class="postbody">
+            <h2>WHITE SOX +157 // SIX CENTS BETTER, TWO CENTS SHORT 💔</h2>
+            <p>DraftKings beat Bet365 by six cents and posted the best new price on the board. The problem: +157 still sat below the conservative no-vig fair near +159 before lineup, pitcher and model-error adjustments. Better shopping, no positive expectation.</p>
+            <div class="larry">💋 “Six cents better than the other guy! Then the fair number tells me I’m still two cents short. Even my best introductions end like this.”</div>
+            <div class="numbers"><span class="num">DK +157</span><span class="num">FAIR +159</span><span class="num">−0.9% EV</span><span class="num">PASS</span></div>
+            <div class="sig">💕 Larry found the best counter. The counter still did not pay enough. 💕</div>
+          </div>
+        </article>
+
+        <div class="divider">💋 ♥ 🦵 ♥ 💋 ♥ 🦵 ♥ 💋</div>
+
+        <article class="post wait">
+          <div class="posthead"><span>08:00 ❤️‍🔥 STATUS CHANGE!!!</span><span>PASS → WAIT</span></div>
+          <div class="postbody">
+            <h2>TORONTO +10½ // STILL ATTRACTIVE, CURRENTLY UNAVAILABLE</h2>
+            <p>The exact +10½ quotes aged outside the 30-minute execution window. Bet365 last showed −105 at 06:27 PT and DraftKings −116 at 07:17 PT. The matchup is confirmed, but the earlier PASS cannot become value without a fresh executable price.</p>
+            <div class="larry">❤️ “Ten and a half still looks terrific. Unfortunately, both phone numbers she gave me are expired.”</div>
+            <div class="numbers"><span class="num">LAST B365 −105</span><span class="num">LAST DK −116</span><span class="num">PRICE STALE</span><span class="num">WAIT</span></div>
+            <div class="sig">💖 Larry is not chasing the old quote. He is waiting by the phone. 💖</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="posthead"><span>08:00 💔 MIAMI RECHECK</span><span>PASS</span></div>
+          <div class="postbody">
+            <h2>MIAMI +210 // TWO CENTS LESS CHARMING</h2>
+            <p>Miami slipped from the archived +212 to a fresh Bet365 +210 while the no-vig fair estimate moved near +220. DraftKings was not fresh enough to validate a stronger market view. The plus-money dog remains interesting, but the transaction remains negative.</p>
+            <div class="larry">💔 “She was +212 at breakfast and +210 by lunch. Meanwhile my number says +220. I know when I’m being underappreciated.”</div>
+            <div class="numbers"><span class="num">06:00 +212</span><span class="num">08:00 +210</span><span class="num">FAIR +220</span><span class="num">PASS</span></div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="posthead"><span>08:00 💕 SAME FAVORITE, SAME BILL</span><span>PASS</span></div>
+          <div class="postbody">
+            <h2>LA SPARKS −125 // NOTHING CHANGED BUT LARRY'S PATIENCE</h2>
+            <p>Los Angeles remained −125, unchanged from 06:00, against paired-market fair near −114. The required 55.6% break-even still exceeded the estimated fair probability near 53.2%. The side may be right; the price remains wrong.</p>
+            <div class="larry">💘 “Same favorite, same eleven-cent surcharge, same answer. At least she’s consistent.”</div>
+            <div class="numbers"><span class="num">−125</span><span class="num">FAIR −114</span><span class="num">−4.2% EV</span><span class="num">PASS</span></div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="posthead"><span>08:00 💸 FAVORITE GOT EXPENSIVE</span><span>PASS</span></div>
+          <div class="postbody">
+            <h2>MILWAUKEE −156 // FOUR CENTS FARTHER FROM LOVE</h2>
+            <p>Milwaukee worsened from −152 to −156 while the no-vig fair estimate sat near −146. The buyer now needs roughly 61.0% break-even versus about 59.4% fair, and a second fresh approved-book quote is still absent. The favorite stayed coherent; the ticket got worse.</p>
+            <div class="larry">💋 “Four cents more expensive and still only one fresh opinion? I make bad decisions, sweetheart, but I like them properly sourced.”</div>
+            <div class="numbers"><span class="num">06:00 −152</span><span class="num">08:00 −156</span><span class="num">FAIR −146</span><span class="num">PASS</span></div>
+            <div class="sig">💋 Five introductions by 8:00. Larry kept every dollar and only one phone number. Progress! 💋</div>
+          </div>
+        </article>
+
+        <section class="guest">
+          <b>💋💖 SIGN LARRY'S GUESTBOOK!!! 💖💋</b>
+          <p>Tell Larry what you think of his picks, his website, or his shirt.</p>
+          <span class="button">💘 SIGN GUESTBOOK 💘</span><span class="button">VIEW 3 GUESTBOOK ENTRIES</span>
+        </section>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <div class="netscape">💖 BEST VIEWED AT 800×600 WITH NETSCAPE NAVIGATOR 4.0 💖</div>
+      <div>Page last updated: 08:10 PT • © 1998 Larry Lombardo Enterprises</div>
+      <div class="email">💌 EMAIL THE WEBMASTER 💌</div>
+      <div>This GeoCities-style page is fictional Syndicate satire. The underlying 08:00 Betting Edge report issued 0 BETs, 0 LEANs, 1 WAIT and 4 PASSES; its prices, movement and outcomes remain unchanged.</div>
+    </footer>
+    <div class="rainbow"></div>
+  </main>
+</body>
+</html>
