@@ -3,6 +3,16 @@ const vm = require('vm');
 const assert = require('assert');
 
 const html = fs.readFileSync(require('path').join(__dirname, '..', 'r.html'), 'utf8');
+const contract = fs.readFileSync(require('path').join(__dirname, '..', 'BETTING_EDGE_CONTRACT.md'), 'utf8');
+
+assert(contract.includes('## 6.1 Spread-lineage reconciliation when a tracked spread disappears'), 'spread-lineage reconciliation rule missing');
+assert(contract.includes('same event and same side'), 'spread-lineage same-event/same-side identity rule missing');
+assert(contract.includes('must **not** trigger an additional Odds-API request'), 'spread-lineage no-extra-API guard missing');
+assert(contract.includes('`+10.5 -> +11.5`'), 'spread-lineage favorable-move example missing');
+assert(contract.includes('`+10.5 -> +9.5`'), 'spread-lineage adverse-move example missing');
+assert(contract.includes('Preserve the tracked spread recommendation on the current pregame report instead of silently dropping it.'), 'spread-lineage card-continuity rule missing');
+assert(contract.includes('The current line must independently satisfy all ordinary identity, freshness, fair-value and staking gates before action'), 'spread-lineage independent-requalification rule missing');
+
 const match = html.match(/<script>([\s\S]*?)<\/script>/);
 assert(match, 'r.html script block not found');
 const source = match[1].replace(/\nload\(\);\s*$/, '\nglobalThis.__runnerHistoryTest={sessionApplicable,sameDayPriorRuns,SLOT_MINUTES};\n');
@@ -85,7 +95,7 @@ for (const entry of entries) {
     JSON.stringify(['evening', 'late', 'main', 'open'])
   );
 
-  console.log('runner history applicability regression: PASS');
+  console.log('runner history + spread-lineage contract regression: PASS');
 })().catch(error => {
   console.error(error);
   process.exit(1);
