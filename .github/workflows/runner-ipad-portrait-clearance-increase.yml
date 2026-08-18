@@ -1,0 +1,44 @@
+name: One-time runner iPad portrait clearance increase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/runner-ipad-portrait-clearance-increase.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Increase portrait loaded top clearance
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('runner.html')
+          s=p.read_text(encoding='utf-8')
+          old='body.runnerSyndicateLoaded .runnerNavPad{padding-top:20px!important}'
+          new='body.runnerSyndicateLoaded .runnerNavPad{padding-top:56px!important}'
+          if s.count(old)!=1:
+              raise SystemExit(f'Expected one portrait clearance target, found {s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+      - name: Validate
+        shell: bash
+        run: |
+          grep -q 'body.runnerSyndicateLoaded .runnerNavPad{padding-top:56px!important}' runner.html
+      - name: Commit
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runner.html
+          git commit -m "Increase iPad portrait syndicate top clearance"
+          git push
