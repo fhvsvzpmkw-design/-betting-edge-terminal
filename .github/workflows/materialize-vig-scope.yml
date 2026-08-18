@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'assets/vig-scope/vig-scope-assets.zip'
       - '.github/workflows/materialize-vig-scope.yml'
   workflow_dispatch:
 
@@ -16,21 +15,169 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unpack VIG Scope meter states
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install --quiet pillow
+      - name: Generate all 18 VIG Scope meter states
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p assets/vig-scope
-          unzip -o assets/vig-scope/vig-scope-assets.zip -d assets/vig-scope
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw, ImageFont
+
+          OUT = Path('assets/vig-scope')
+          W, H = 768, 654
+          BG = '#020702'
+          PANEL = '#071208'
+          GREEN = '#8eff35'
+          DIM = '#4b7b35'
+          WHITE = '#d8f6c8'
+          BLUE = '#43c8ff'
+          YELLOW = '#ffd633'
+          RED = '#ff5b42'
+          AMBER = '#e1a63a'
+          DARK = '#061007'
+
+          font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'
+          bold_path = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf'
+          def F(size, bold=False):
+              return ImageFont.truetype(bold_path if bold else font_path, size)
+
+          heat_colors = {'low': BLUE, 'medium': YELLOW, 'high': RED}
+          pressure_colors = {'adverse': RED, 'neutral': YELLOW, 'favorable': GREEN}
+          labels = {
+              ('adverse','low'): ('VIG WARNING', 'MARKET DIVIDED'),
+              ('adverse','high'): ('VIG AGAINST US', 'STRONG WARNING'),
+              ('neutral','low'): ('VIG UNCERTAIN', 'WAITING'),
+              ('neutral','high'): ('VIG MEH', 'NO EDGE'),
+              ('favorable','low'): ('VIG OPPORTUNITY', 'WATCHING'),
+              ('favorable','high'): ('FULL VIG', 'STRONG CONFIRMATION'),
+          }
+
+          def center(draw, xy, text, font, fill):
+              box = draw.textbbox((0,0), text, font=font)
+              x = xy[0] - (box[2]-box[0])/2
+              draw.text((x, xy[1]), text, font=font, fill=fill)
+
+          def monitor(draw, x, y, symbol, color):
+              draw.rounded_rectangle((x,y,x+92,y+58), radius=4, fill='#020a04', outline=DIM, width=2)
+              draw.line((x+8,y+47,x+84,y+47), fill='#1f4322', width=1)
+              center(draw, (x+46,y+9), symbol, F(30, True), color)
+
+          def bottle(draw, heat, pressure):
+              x,y=80,250
+              col = '#c6b46a' if heat=='low' else '#d3a43a' if heat=='medium' else '#c86b2e'
+              draw.rectangle((x+25,y-70,x+75,y-32), fill=col, outline=GREEN, width=2)
+              draw.rectangle((x+35,y-94,x+65,y-70), fill=col, outline=GREEN, width=2)
+              draw.rectangle((x+33,y-103,x+67,y-94), fill='#6a5827', outline=GREEN, width=2)
+              draw.rounded_rectangle((x,y-32,x+100,y+120), radius=18, fill=col, outline=GREEN, width=2)
+              draw.rectangle((x+14,y+32,x+86,y+77), fill='#171e10', outline='#c6b46a', width=1)
+              center(draw,(x+50,y+44),'VINEGAR',F(15,True),WHITE)
+              eye_y=y-6
+              draw.ellipse((x+25,eye_y,x+37,eye_y+12), fill='#071007')
+              draw.ellipse((x+63,eye_y,x+75,eye_y+12), fill='#071007')
+              if pressure=='adverse':
+                  draw.arc((x+34,y+9,x+68,y+33), 200, 340, fill='#260806', width=4)
+              elif pressure=='favorable':
+                  draw.arc((x+34,y+3,x+68,y+34), 20, 160, fill='#260806', width=4)
+              else:
+                  draw.line((x+35,y+22,x+67,y+22), fill='#260806', width=3)
+
+          def pickle(draw, heat, pressure):
+              x,y=505,280
+              pcol = '#467d23' if heat=='low' else '#5d9b28' if heat=='medium' else '#77b92d'
+              draw.ellipse((x,y-40,x+150,y+150), fill=pcol, outline=GREEN, width=3)
+              for dx,dy in [(22,0),(120,20),(45,90),(105,110),(72,-10)]:
+                  draw.ellipse((x+dx,y+dy,x+dx+8,y+dy+8), fill='#294b16')
+              # sunglasses
+              draw.rectangle((x+28,y+22,x+70,y+47), fill='#050505', outline=WHITE, width=2)
+              draw.rectangle((x+82,y+22,x+124,y+47), fill='#050505', outline=WHITE, width=2)
+              draw.line((x+70,y+34,x+82,y+34), fill=WHITE, width=2)
+              if pressure=='adverse':
+                  draw.arc((x+48,y+58,x+108,y+104), 205, 335, fill='#240807', width=5)
+              elif pressure=='favorable':
+                  draw.arc((x+45,y+52,x+112,y+110), 15, 165, fill='#240807', width=6)
+              else:
+                  draw.line((x+53,y+82,x+105,y+82), fill='#240807', width=4)
+
+          def spray(draw, heat, pressure):
+              if pressure != 'favorable': return
+              count = {'low':5,'medium':9,'high':14}[heat]
+              for i in range(count):
+                  sx,sy = 180, 285 + (i%3)*8
+                  ex = 485 + (i%4)*10
+                  ey = 270 + ((i*17)%120)
+                  draw.line((sx,sy,ex,ey), fill=GREEN if heat!='high' else YELLOW, width=2)
+                  draw.ellipse((ex-3,ey-3,ex+3,ey+3), fill=WHITE)
+
+          def draw_state(heat, pressure, agreement):
+              im=Image.new('RGB',(W,H),BG)
+              d=ImageDraw.Draw(im)
+              d.rounded_rectangle((8,8,W-8,H-8), radius=10, outline=GREEN, width=3)
+              d.text((28,22),'VIG SCOPE',font=F(34,True),fill=GREEN)
+              d.text((28,64),'MARKET REACTION TERMINAL',font=F(15,True),fill=WHITE)
+
+              # state readout
+              cards=[('HEAT',heat.upper(),heat_colors[heat]),('PRESSURE',pressure.upper(),pressure_colors[pressure]),('AGREEMENT',agreement.upper(),GREEN if agreement=='high' else YELLOW)]
+              x=28
+              for title,val,col in cards:
+                  d.rectangle((x,100,x+225,158),fill=PANEL,outline=DIM,width=2)
+                  d.text((x+12,109),title,font=F(12,True),fill=WHITE)
+                  d.text((x+12,128),val,font=F(20,True),fill=col)
+                  x+=238
+
+              # terminal monitors
+              symbols=[]
+              if pressure=='adverse': base='↓'
+              elif pressure=='favorable': base='↑'
+              else: base='→'
+              if agreement=='high': symbols=[base]*4
+              else:
+                  alt='?' if pressure!='neutral' else '↔'
+                  symbols=[base,alt,'?' if base!='?' else '↔',base]
+              for i,sym in enumerate(symbols):
+                  monitor(d,210+i*100,190,sym,pressure_colors[pressure] if sym==base else BLUE)
+
+              bottle(d,heat,pressure)
+              pickle(d,heat,pressure)
+              spray(d,heat,pressure)
+
+              # heat activity lights
+              n={'low':4,'medium':9,'high':16}[heat]
+              for i in range(n):
+                  xx=28+(i*43)%700; yy=470+(i%2)*20
+                  d.ellipse((xx,yy,xx+5,yy+5),fill=heat_colors[heat])
+
+              top,bottom=labels[(pressure,agreement)]
+              center(d,(W/2,510),top,F(27,True),pressure_colors[pressure])
+              center(d,(W/2,548),bottom,F(17,True),WHITE)
+              center(d,(W/2,592),f'{heat.upper()} HEAT  //  {pressure.upper()} PRESSURE  //  {agreement.upper()} AGREEMENT',F(15,True),DIM)
+              center(d,(W/2,620),'METERS EXPLAIN THE MARKET.  VIG SCOPE SHOWS THE REACTION.',F(11,True),GREEN)
+              return im
+
+          count=0
+          for heat in ('low','medium','high'):
+              for pressure in ('adverse','neutral','favorable'):
+                  for agreement in ('low','high'):
+                      p=OUT/f'vig-{heat}-{pressure}-{agreement}.jpg'
+                      draw_state(heat,pressure,agreement).save(p,'JPEG',quality=88,optimize=True)
+                      count+=1
+          assert count==18
+          PY
           count=$(find assets/vig-scope -maxdepth 1 -type f -name 'vig-*.jpg' | wc -l)
           test "$count" -eq 18
+          rm -f assets/vig-scope/vig-scope-assets.zip
       - name: Commit individual JPEGs
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/vig-scope/*.jpg
+          git add assets/vig-scope .github/workflows/materialize-vig-scope.yml
           if git diff --cached --quiet; then
             echo 'VIG Scope JPEGs already materialized.'
           else
