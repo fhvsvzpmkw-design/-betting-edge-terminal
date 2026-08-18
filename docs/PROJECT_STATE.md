@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-17 — runner UI v1.4 Syndicates release  
+**Last updated:** 2026-08-18 — morning production audit / Syndicate slot defaults  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -22,7 +22,7 @@ This document is the practical snapshot of what Betting Edge is *right now*. It 
 - **Compact odds provenance index:** `data/history/odds-index.json`.
 - **Research/provenance sidecar schema:** `data/history/report-provenance-schema.json`, production schema **3** for post-cutover runs; historical schema-2 sidecars remain valid.
 - **Manual report-lane recovery:** active operating capability under `docs/OPERATIONS.md` and Decision D-028; recovery remains inside the original five-lane model.
-- **F5 Syndicates:** active presentation capability driven by external `data/syndicates.json`; four independently editable Syndicate feed pages load inside the runner workspace.
+- **F5 Syndicates:** active presentation capability driven by external `data/syndicates.json`; four persistent, locally selectable slots load inside the runner workspace. Current defaults are F1 Eddie Numbers, F2 Bill Weston, F3 Larry Lombardo and F4 empty; Jesse Bains remains an available selectable profile.
 
 The runner loads `index.html`, consumes an encoded run payload from the URL hash, and uses `data/live-odds.json` for repricing. Browser/device-local runner history remains a separate fallback/cache alongside repository-backed same-day history. Player props may additionally carry the runner-supported `rec.feed` structured identity required by v0.9; otherwise the visible payload remains compact.
 
@@ -30,7 +30,7 @@ The active version boundary is deliberate: `runner.html` owns presentation/UI ve
 
 Current UI terminology deliberately separates the two history concepts: the Board uses **`SAME-DAY RUNS // REPORT HISTORY`** for same-date issued report/session history, while F3 is labeled **`BET HISTORY`** for personal ledger/performance history. **`CLEAR LOCAL HISTORY`** clears only browser-local runner history; it does not delete repository-backed issued reports or `run-history.json`.
 
-UI v1.3.1 established the accepted responsive hierarchy: F1–F4 sit directly beneath the terminal header; the duplicated upper Bankroll/New Risk/Bet/Lean/Wait-Pass strip is removed; bankroll remains as a compact header readout; New Risk is nested inside the BET counter; and navigation/outcome grids use four columns when space permits and 2 × 2 layouts at narrower iPad and iPhone widths. UI v1.4 preserves that hierarchy and adds the F5 Syndicate workspace, external manifest-driven nameplates/avatars, and independent feed pages. The current four presentation identities are Muddy’s Number, Larry Lombardo, Bill Weston and Jesse Bains / The Delphoria Sheet. Bill Weston is the Syndicate personality reserved for Walters-intelligence presentation. These changes do not alter issued payloads, browser history keys, durable archive schemas, odds/repricing logic, status/stake semantics or report-generation rules.
+UI v1.3.1 established the accepted responsive hierarchy: F1–F4 sit directly beneath the terminal header; the duplicated upper Bankroll/New Risk/Bet/Lean/Wait-Pass strip is removed; bankroll remains as a compact header readout; New Risk is nested inside the BET counter; and navigation/outcome grids use four columns when space permits and 2 × 2 layouts at narrower iPad and iPhone widths. UI v1.4 preserves that hierarchy and adds the F5 Syndicate workspace, external manifest-driven nameplates/avatars, independent feed pages, and four persistent selectable slot assignments. Available profiles are Eddie Numbers, Larry Lombardo, Bill Weston and Jesse Bains; the default load is Eddie / Bill / Larry / empty, leaving Jesse deliberately available for selection into an open slot. Bill Weston is the Syndicate personality reserved for Walters-intelligence presentation. These changes do not alter issued payloads, browser history keys, durable archive schemas, odds/repricing logic, status/stake semantics or report-generation rules.
 
 ## Daily report sessions
 
@@ -76,13 +76,11 @@ A separate post-refresh workflow exists:
 
 It is intentionally isolated from the production refresh. After a successful odds-refresh workflow it builds/updates `data/history/odds-index.json` with compact provenance such as generation time, snapshot commit, exact Git blob SHA and SHA-256. The full odds snapshot remains in Git history and is not duplicated. A failure in this indexing workflow must not prevent the live odds snapshot from being published.
 
-Scheduler diagnostics remain separate from both workflows:
+Scheduler diagnostics remain separate from both workflows. The active diagnostic is:
 
-- `.github/workflows/scheduler-canary.yml`
-- `.github/workflows/scheduler-canary-v2.yml`
 - `.github/workflows/scheduler-canary-v3.yml`
 
-The canaries are diagnostics and make no odds API requests.
+Scheduler Canary v1 and v2 were retired from the live workflow directory and remain available only through Git history. The active canary is diagnostic and makes no odds API requests.
 
 ## Durable report history
 
