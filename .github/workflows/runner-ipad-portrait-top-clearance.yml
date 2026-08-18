@@ -1,0 +1,53 @@
+name: One-time runner iPad portrait top clearance
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/runner-ipad-portrait-top-clearance.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add portrait-only loaded F5 clearance
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('runner.html')
+          s = p.read_text(encoding='utf-8')
+          old = "@media(min-width:721px) and (orientation:portrait){.runnerNavPad .tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}"
+          new = "@media(min-width:721px) and (orientation:portrait){body.runnerSyndicateLoaded .runnerNavPad{padding-top:20px!important}.runnerNavPad .tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}"
+          if s.count(old) != 1:
+              raise SystemExit(f'Expected one portrait media target, found {s.count(old)}')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Validate focused change
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('runner.html').read_text(encoding='utf-8')
+          assert "@media(min-width:721px) and (orientation:portrait){body.runnerSyndicateLoaded .runnerNavPad{padding-top:20px!important}" in s
+          assert "@media(min-width:721px) and (orientation:landscape)" in s
+          assert "body.runnerSyndicateLoaded .top{display:none!important}" in s
+          PY
+
+      - name: Commit runner fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runner.html
+          git commit -m "Fix loaded F5 clearance on iPad portrait"
+          git push
