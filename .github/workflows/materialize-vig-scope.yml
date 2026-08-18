@@ -93,7 +93,6 @@ jobs:
               draw.ellipse((x,y-40,x+150,y+150), fill=pcol, outline=GREEN, width=3)
               for dx,dy in [(22,0),(120,20),(45,90),(105,110),(72,-10)]:
                   draw.ellipse((x+dx,y+dy,x+dx+8,y+dy+8), fill='#294b16')
-              # sunglasses
               draw.rectangle((x+28,y+22,x+70,y+47), fill='#050505', outline=WHITE, width=2)
               draw.rectangle((x+82,y+22,x+124,y+47), fill='#050505', outline=WHITE, width=2)
               draw.line((x+70,y+34,x+82,y+34), fill=WHITE, width=2)
@@ -120,8 +119,6 @@ jobs:
               d.rounded_rectangle((8,8,W-8,H-8), radius=10, outline=GREEN, width=3)
               d.text((28,22),'VIG SCOPE',font=F(34,True),fill=GREEN)
               d.text((28,64),'MARKET REACTION TERMINAL',font=F(15,True),fill=WHITE)
-
-              # state readout
               cards=[('HEAT',heat.upper(),heat_colors[heat]),('PRESSURE',pressure.upper(),pressure_colors[pressure]),('AGREEMENT',agreement.upper(),GREEN if agreement=='high' else YELLOW)]
               x=28
               for title,val,col in cards:
@@ -129,8 +126,6 @@ jobs:
                   d.text((x+12,109),title,font=F(12,True),fill=WHITE)
                   d.text((x+12,128),val,font=F(20,True),fill=col)
                   x+=238
-
-              # terminal monitors
               symbols=[]
               if pressure=='adverse': base='↓'
               elif pressure=='favorable': base='↑'
@@ -141,17 +136,13 @@ jobs:
                   symbols=[base,alt,'?' if base!='?' else '↔',base]
               for i,sym in enumerate(symbols):
                   monitor(d,210+i*100,190,sym,pressure_colors[pressure] if sym==base else BLUE)
-
               bottle(d,heat,pressure)
               pickle(d,heat,pressure)
               spray(d,heat,pressure)
-
-              # heat activity lights
               n={'low':4,'medium':9,'high':16}[heat]
               for i in range(n):
                   xx=28+(i*43)%700; yy=470+(i%2)*20
                   d.ellipse((xx,yy,xx+5,yy+5),fill=heat_colors[heat])
-
               top,bottom=labels[(pressure,agreement)]
               center(d,(W/2,510),top,F(27,True),pressure_colors[pressure])
               center(d,(W/2,548),bottom,F(17,True),WHITE)
@@ -184,3 +175,4 @@ jobs:
             git commit -m 'Add VIG Scope meter-state JPEGs'
             git push
           fi
+# retrigger: 2026-08-18
