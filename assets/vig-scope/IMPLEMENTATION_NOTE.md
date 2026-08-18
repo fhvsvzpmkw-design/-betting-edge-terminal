@@ -1,0 +1,1 @@
+VIG Scope is the canonical name for the three-meter visual system: Market Heat × Price Pressure × Market Agreement. The visual-state layer therefore has exactly 18 deterministic combinations. The state art is intended to be looked up by the three meter labels; it does not alter handicapping, pricing, fair value, playTo, recommendation status, or staking logic.
