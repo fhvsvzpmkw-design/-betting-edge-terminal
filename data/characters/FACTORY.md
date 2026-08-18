@@ -55,7 +55,15 @@ Natural-language commands remain the preferred editing interface. Examples:
 - `Make underdogs his primary obsession.`
 - `Reset his current storyline without changing his stable personality.`
 
-These requests should be translated into edits to the character JSON. Keep the stable `id` and `profileId` unless the character is intentionally being replaced rather than renamed.
+These requests should be translated into edits to the character JSON.
+
+### Rename rule
+
+A visible rename is not a replacement character. Keep the character JSON `id`, `profileId`, roster `characterId`, character file path, and existing live Hotline URL/folder stable. Change only the visible identity fields that should actually change, such as `displayName`, nickname, roster `name`, title/publication text, avatar, or style.
+
+Previously archived Hotline issues are frozen under the same stable identity and retain the name that appeared when each issue was published. Future issues use the new visible name. This produces one continuous Hotline history across a rename without moving folders or rewriting old editions.
+
+Only change the stable IDs when the user intentionally replaces the character with a different character.
 
 ## Add a permanent avatar
 
@@ -66,12 +74,23 @@ A newly created profile uses:
 
 When a JPEG is uploaded, save it under the repository assets and change only that character's `headshot`/`headshotAlt`/position as needed. Do not recreate the character or Hotline.
 
-## First Hotline update
+## First and later Hotline updates
 
 When the character receives a report, build the edition from:
 
 1. the authoritative issued Betting Edge report;
 2. the character profile;
-3. the current blank/previous Hotline.
+3. the current blank/previous Hotline;
+4. the most recent archived Hotline when prior-session continuity is relevant.
 
-Then update the Hotline and the character's `continuity.lastReportSeen`, `currentMood`, and `ongoingThreads`. The Betting Edge recommendation remains authoritative.
+Then update the live Hotline and the character's `continuity.lastReportSeen`, `currentMood`, and `ongoingThreads`. The Betting Edge recommendation remains authoritative.
+
+Once the issued Hotline is finalized, freeze the same edition into the character's archive:
+
+```sh
+node tools/archive-syndicate-hotline.mjs --character <stable-character-id>
+```
+
+The archive lives beside the character's existing live Hotline and uses `archive/YYYY-MM-DD/HHMM.html` plus `archive/index.json`. The helper keys the archive to the stable character ID, records the visible name at issue time, and refuses to overwrite a different issue at the same date/session.
+
+The live Hotline remains the current edition. Archiving does not change F1–F4, the slot host, or the Betting Edge runner.
