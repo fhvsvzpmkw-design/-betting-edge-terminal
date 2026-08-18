@@ -13,6 +13,14 @@ The repository includes four durable project references:
 
 Current splash identity is centralized in `r.html` under `BRAND_CONFIG`. For a splash rename, update `appName` and/or `companyName`, then verify the GitHub Pages deployment and the splash-to-report transition. Terminal branding remains separate and should be changed independently when a broader product rename is intended.
 
+## Current UI release boundary
+
+The current presentation release is **VigScope Terminal UI v1.4** in `runner.html`. The headline v1.4 feature is **F5 Syndicates**: a four-slot, externally configured Syndicate workspace driven by `data/syndicates.json`, with independent profile/nameplate/avatar presentation and independently editable feed pages.
+
+The v1.4 UI promotion does **not** promote the underlying report engine or governance contract. `runner-core.html` / `index.html` remain report engine/core **v1.3**, and `BETTING_EDGE_CONTRACT.md` remains **v0.9 OPERATIONAL**. Odds refresh, scheduler behavior, durable history schemas, Research Library authority, status/stake semantics and report-generation rules are unchanged by this UI release.
+
+The current Syndicate presentation includes the modern `Muddy’s Number` feed, Larry Lombardo’s retro personal-site feed, Bill Weston’s private-sheet/fax presentation, and Jesse Bains’ Hotel Delphoria underground sporting sheet. Bill Weston is the Syndicate personality reserved for Walters-intelligence presentation; that presentation boundary does not change the underlying Betting Edge engine authority.
+
 ## Production governance
 
 The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v0.9 OPERATIONAL**.
