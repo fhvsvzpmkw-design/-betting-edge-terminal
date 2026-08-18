@@ -136,9 +136,11 @@ Production vocabulary includes:
 - `VALUE HOLDS` — changed current price remains inside `playTo`;
 - `EDGE GONE` — only when the same validated market/selection previously had a documented qualifying BET or LEAN edge and now no longer qualifies;
 - `PASS / NO VALUE` — current price exists but the selection did not previously qualify or does not qualify now without a documented lost edge;
-- `PRICE MOVED` — verified current sportsbook odds moved beyond `playTo`;
+- `PRICE MOVED` — verified current sportsbook odds moved beyond `playTo`, or the same spread remains but its juice changes materially;
+- `LINE MOVED IN FAVOR` — a tracked same-side spread has moved to a numerically greater handicap for the bettor;
+- `LINE MOVED AGAINST` — a tracked same-side spread has moved to a numerically smaller handicap for the bettor;
 - `FAIR VALUE CHANGED` — updated analysis/fair value, not sportsbook movement, removed a prior qualifying edge;
-- `MARKET UNAVAILABLE` — exact market confirmed absent;
+- `MARKET UNAVAILABLE` — exact market confirmed absent after any required spread-lineage reconciliation;
 - `PRICE NOT VERIFIED` — exact feed quote cannot be confidently retrieved/matched;
 - `LINEUP/INFORMATION PENDING` — material input unresolved;
 - `CONFLICTING SIGNALS` — evidence materially disagrees;
@@ -149,6 +151,22 @@ Production vocabulary includes:
 - `IDENTITY MISMATCH` — event/player/market/selection identity cannot be validated.
 
 `EDGE GONE` is not a generic PASS label. `UNRESOLVED` is a technical state, not an analytical verdict.
+
+## 6.1 Spread-lineage reconciliation when a tracked spread disappears
+
+When a later scheduled lane has a same-day tracked spread from an archived Betting Edge lane and the exact prior spread/handicap no longer appears as a fresh executable row, the report must reconcile the current line before using `MARKET UNAVAILABLE` or removing that recommendation from the board.
+
+1. Resolve the archived prior recommendation under the source-backed same-day lineage rule. Preserve its exact event identity, side/team, prior handicap, `selectionKey`, sportsbook price, status, fair value and `playTo` as historical reference.
+2. Using only the already-fetched `data/live-odds.json`, inspect the current primary spread for the **same event and same side** at Bet365 and DraftKings, subject to the normal 75-minute feed and 30-minute executable-quote freshness gates. This reconciliation must **not** trigger an additional Odds-API request or refresh solely because the old handicap disappeared.
+3. If a fresh current spread exists for that same side, compare its numeric handicap with the archived handicap:
+   - `LINE MOVED IN FAVOR` when the current same-side handicap is numerically greater. Examples: `+10.5 -> +11.5` and `-3.5 -> -2.5`.
+   - `LINE MOVED AGAINST` when the current same-side handicap is numerically smaller. Examples: `+10.5 -> +9.5` and `-3.5 -> -4.5`.
+   - `PRICE MOVED` when the handicap is unchanged but the executable price/juice changed.
+4. If fresh supported books show different current primary spreads, preserve the book-specific lines/prices and use `CONFLICTING SIGNALS` or cautious `PRICE NOT VERIFIED` as appropriate. Do not invent a consensus line.
+5. Use `MARKET UNAVAILABLE` only when no fresh current spread for the same event and same side can be found after this reconciliation. Use `PRICE NOT VERIFIED` when candidate rows exist but identity or freshness cannot be validated.
+6. Preserve the tracked spread recommendation on the current pregame report instead of silently dropping it. Its movement text should show the archived line and the reconciled current line, or state why the current line is unavailable/unverified.
+7. A changed handicap is a **new current selection**, not an exact reprice of the archived selection. Prior fair value, `playTo`, BET/LEAN status or stake does not automatically transfer. The current line must independently satisfy all ordinary identity, freshness, fair-value and staking gates before action; otherwise stake remains zero.
+8. This reconciliation is a report-generation continuity check only. It does not redesign the runner, change staking methodology, add books, or increase the production odds-refresh/API budget.
 
 ---
 
