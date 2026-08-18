@@ -1,229 +1,30 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Muddy Numbers — 09:30 Final Morning Hotline</title>
-  <style>
-    :root{
-      --bg:#020407;--ink:#f7fbff;--muted:#8fa5b8;--line:#22384b;
-      --navy:#07131f;--navy2:#0a1d2d;--blue:#18a7ff;--cyan:#7ee4ff;
-      --gold:#f1c45d;--gold2:#fff0ae;--red:#ff6158;--green:#5ce5a0;
-      --shadow:0 18px 50px rgba(0,0,0,.42);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;background:var(--bg)}
-    body{
-      color:var(--ink);
-      font:13px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      background:
-        radial-gradient(circle at 50% -14%,rgba(34,115,170,.55) 0,rgba(10,31,49,.88) 28%,rgba(3,9,15,.98) 58%,#010203 100%);
-    }
-    .wrap{max-width:1180px;margin:auto;padding:12px}
-
-    .mast{
-      position:relative;overflow:hidden;border:1px solid #31536d;border-radius:17px;
-      background:linear-gradient(135deg,rgba(10,31,49,.99),rgba(4,11,18,.99));
-      box-shadow:var(--shadow),inset 0 1px rgba(255,255,255,.08);
-    }
-    .mast:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.09),transparent 25%,rgba(255,255,255,.025) 42%,transparent 66%)}
-    .mast:after{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--cyan) 32%,var(--gold) 66%,var(--red))}
-
-    .networkbar{
-      position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:8px 14px;border-bottom:1px solid rgba(126,228,255,.18);
-      background:linear-gradient(90deg,rgba(8,74,114,.72),rgba(10,33,52,.5),rgba(42,31,10,.42));
-      color:#d8f4ff;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;
-    }
-    .networkbar .desk{color:var(--gold2)}
-    .networkbar .live{display:inline-flex;align-items:center;gap:6px;color:var(--green)}
-    .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(92,229,160,.75)}
-
-    .hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end;padding:16px 18px 13px}
-    .eyebrow{color:var(--cyan);font-size:9px;font-weight:950;letter-spacing:.18em;text-transform:uppercase}
-    .brand{margin-top:3px;display:flex;align-items:flex-end;gap:11px;flex-wrap:wrap}
-    .brand h1{margin:0;font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;font-size:clamp(42px,8vw,70px);line-height:.86;letter-spacing:.005em;text-transform:uppercase;font-style:italic;text-shadow:0 5px 26px rgba(0,0,0,.42)}
-    .brand h1 span{color:var(--gold);text-shadow:0 2px 0 rgba(255,255,255,.15),0 0 22px rgba(241,196,93,.18)}
-    .tag{margin:7px 0 0;color:#d0dce5;font:650 13px/1.45 ui-rounded,"Avenir Next",system-ui,sans-serif;max-width:760px}
-
-    .issue{
-      min-width:235px;border:1px solid #486177;border-radius:12px;padding:10px 12px;
-      background:linear-gradient(180deg,rgba(24,72,106,.70),rgba(7,20,32,.94));
-      box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 26px rgba(0,0,0,.24);
-    }
-    .issue small{display:block;color:#b9d9eb;font-size:8px;font-weight:950;letter-spacing:.13em;text-transform:uppercase}
-    .issue strong{display:block;margin-top:1px;font-size:30px;line-height:1;color:#fff;letter-spacing:-.06em}
-    .issue b{display:block;margin-top:4px;color:var(--gold2);font-size:10px;letter-spacing:.08em}
-
-    .scorestrip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,1fr);gap:1px;border-top:1px solid rgba(255,255,255,.06);background:#203244}
-    .score{padding:9px 11px;background:linear-gradient(180deg,rgba(8,20,31,.98),rgba(4,10,16,.99));min-width:0}
-    .score small{display:block;color:#768ea1;font-size:7px;font-weight:950;letter-spacing:.11em;text-transform:uppercase}
-    .score strong{display:block;margin-top:2px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .score.gold strong{color:var(--gold)}.score.green strong{color:var(--green)}
-
-    .boardbar{
-      display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
-      margin:11px 0 8px;padding:9px 12px;border:1px solid #265d82;border-radius:9px;
-      background:linear-gradient(90deg,#0b5687,#123853 58%,#152514);
-      box-shadow:0 9px 24px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.06);
-      font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
-    }
-    .boardbar b{color:white}.boardbar span{color:#d4efff}.boardbar em{color:var(--gold2);font-style:normal}
-
-    .feed{display:grid;gap:9px}
-    .post{
-      position:relative;overflow:hidden;border:1px solid var(--line);border-radius:13px;
-      background:linear-gradient(135deg,rgba(12,24,35,.98),rgba(5,11,17,.99));
-      padding:13px 14px;box-shadow:0 12px 30px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.03);
-    }
-    .post:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#36546a}
-    .post:after{content:"";position:absolute;left:0;right:0;top:0;height:42px;background:linear-gradient(180deg,rgba(255,255,255,.045),transparent);pointer-events:none}
-    .post.latest{border-color:#786632;box-shadow:0 0 0 1px rgba(241,196,93,.10),0 14px 34px rgba(0,0,0,.28)}
-    .post.latest:before,.post.wait:before{background:var(--gold)}
-    .post.wait{border-color:#6f5d2e}
-
-    .top{position:relative;z-index:1;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
-    .time{color:var(--cyan);font-size:9px;font-weight:950;letter-spacing:.10em;text-transform:uppercase}
-    .badge{border:1px solid #3e5a70;border-radius:999px;padding:3px 8px;color:#a9bdcb;background:rgba(4,10,16,.58);font-size:8px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}
-    .latest .badge,.wait .badge{color:var(--gold2);border-color:#7d6935;background:rgba(76,54,10,.19)}
-
-    .market{position:relative;z-index:1;display:grid;grid-template-columns:minmax(170px,1.4fr) repeat(4,minmax(82px,.62fr));gap:6px;align-items:stretch;margin-top:8px}
-    .team,.cell{border:1px solid #223544;border-radius:9px;background:linear-gradient(180deg,#081119,#060c12);padding:9px}
-    .team small,.cell small{display:block;color:#7f94a5;font-size:7px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}
-    .team strong{display:block;margin-top:3px;font-size:clamp(18px,3.4vw,28px);letter-spacing:-.035em}
-    .cell strong{display:block;margin-top:3px;font-size:14px;line-height:1.08}
-    .price strong{color:var(--cyan)}.fair strong{color:#e2ebf1}.edge strong{color:#ffbbb6}.decision strong{color:var(--red)}.waitcell strong{color:var(--gold2)}
-
-    .analysis{position:relative;z-index:1;margin:9px 0 0;color:#d1dce4;line-height:1.55}
-    .analysis b{color:#fff}
-    .quote{position:relative;z-index:1;margin-top:9px;padding:8px 10px;border-left:3px solid var(--red);border-radius:0 7px 7px 0;background:linear-gradient(90deg,rgba(104,24,19,.22),rgba(22,8,8,.08));color:#ffd8d3;font:700 14px/1.42 ui-rounded,"Avenir Next",system-ui,sans-serif}
-    .wisdom{position:relative;z-index:1;margin-top:8px;padding:9px 10px 9px 43px;border:1px solid #68572e;border-radius:8px;background:linear-gradient(90deg,rgba(241,196,93,.12),rgba(8,24,21,.06));color:#ffedbb;font:italic 600 13px/1.45 ui-rounded,"Avenir Next",system-ui,sans-serif}
-    .wisdom:before{content:"★";position:absolute;left:10px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:22px;height:22px;border:1px solid var(--gold);border-radius:50%;color:var(--gold);font-style:normal}
-
-    .walk{margin-top:11px;padding:14px;border:1px solid #2a5946;border-radius:12px;background:linear-gradient(135deg,#0a211a,#07120f);box-shadow:0 13px 30px rgba(0,0,0,.18)}
-    .walk h3{margin:0 0 5px;color:#aceac8;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
-    .walk p{margin:5px 0;color:#cbdcd3;line-height:1.53}
-    .footer{margin:12px 2px 24px;color:#65798a;font-size:9px;line-height:1.5}
-
-    @media(max-width:850px){.hero{grid-template-columns:1fr}.scorestrip{grid-template-columns:repeat(2,1fr)}.score:last-child{grid-column:1/-1}.market{grid-template-columns:1fr 1fr}.team{grid-column:1/-1}}
-    @media(max-width:500px){.wrap{padding:7px}.hero{padding:14px}.networkbar{align-items:flex-start;flex-direction:column}.brand h1{font-size:46px}.issue{min-width:0;width:100%}.scorestrip{grid-template-columns:1fr 1fr}.market{grid-template-columns:1fr 1fr}.cell strong{font-size:13px}.quote{font-size:14px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Muddy Numbers — 15:15 Evening Hotline</title>
+<style>
+:root{--bg:#020407;--ink:#f7fbff;--muted:#8fa5b8;--line:#22384b;--navy:#07131f;--blue:#18a7ff;--cyan:#7ee4ff;--gold:#f1c45d;--gold2:#fff0ae;--red:#ff6158;--green:#5ce5a0;--shadow:0 18px 50px rgba(0,0,0,.42)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg)}body{color:var(--ink);font:13px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:radial-gradient(circle at 50% -14%,rgba(34,115,170,.55) 0,rgba(10,31,49,.88) 28%,rgba(3,9,15,.98) 58%,#010203 100%)}.wrap{max-width:1180px;margin:auto;padding:12px}
+.mast{position:relative;overflow:hidden;border:1px solid #31536d;border-radius:17px;background:linear-gradient(135deg,rgba(10,31,49,.99),rgba(4,11,18,.99));box-shadow:var(--shadow),inset 0 1px rgba(255,255,255,.08)}.mast:after{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--cyan) 32%,var(--gold) 66%,var(--red))}.networkbar{position:relative;z-index:1;display:flex;justify-content:space-between;gap:10px;padding:8px 14px;border-bottom:1px solid rgba(126,228,255,.18);background:linear-gradient(90deg,rgba(8,74,114,.72),rgba(10,33,52,.5),rgba(42,31,10,.42));font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.desk{color:var(--gold2)}.live{color:var(--green)}
+.hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end;padding:16px 18px 13px}.eyebrow{color:var(--cyan);font-size:9px;font-weight:950;letter-spacing:.18em;text-transform:uppercase}.brand h1{margin:4px 0 0;font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;font-size:clamp(42px,8vw,70px);line-height:.86;font-style:italic}.brand h1 span{color:var(--gold)}.tag{margin:8px 0 0;color:#d0dce5;font:650 13px/1.45 ui-rounded,"Avenir Next",system-ui,sans-serif;max-width:760px}.issue{min-width:235px;border:1px solid #486177;border-radius:12px;padding:10px 12px;background:linear-gradient(180deg,rgba(24,72,106,.70),rgba(7,20,32,.94))}.issue small{display:block;color:#b9d9eb;font-size:8px;font-weight:950;letter-spacing:.13em;text-transform:uppercase}.issue strong{display:block;font-size:30px}.issue b{color:var(--gold2);font-size:10px}
+.scorestrip{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#203244}.score{padding:9px 11px;background:#07101a}.score small{display:block;color:#768ea1;font-size:7px;font-weight:950;text-transform:uppercase}.score strong{display:block;margin-top:2px;font-size:13px}.gold strong{color:var(--gold)}.green strong{color:var(--green)}
+.boardbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:11px 0 8px;padding:9px 12px;border:1px solid #265d82;border-radius:9px;background:linear-gradient(90deg,#0b5687,#123853 58%,#152514);font-size:9px;font-weight:900;text-transform:uppercase}.boardbar em{color:var(--gold2);font-style:normal}.feed{display:grid;gap:9px}.post{position:relative;border:1px solid var(--line);border-radius:13px;background:linear-gradient(135deg,rgba(12,24,35,.98),rgba(5,11,17,.99));padding:13px 14px;box-shadow:0 12px 30px rgba(0,0,0,.20)}.post:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#36546a}.post.latest{border-color:#786632}.post.latest:before{background:var(--gold)}.top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.time{color:var(--cyan);font-size:9px;font-weight:950;text-transform:uppercase}.badge{border:1px solid #3e5a70;border-radius:999px;padding:3px 8px;color:#a9bdcb;font-size:8px;font-weight:950;text-transform:uppercase}.market{display:grid;grid-template-columns:minmax(170px,1.4fr) repeat(4,minmax(82px,.62fr));gap:6px;margin-top:8px}.team,.cell{border:1px solid #223544;border-radius:9px;background:#081119;padding:9px}.team small,.cell small{display:block;color:#7f94a5;font-size:7px;font-weight:950;text-transform:uppercase}.team strong{display:block;margin-top:3px;font-size:clamp(18px,3.4vw,28px)}.cell strong{display:block;margin-top:3px;font-size:14px}.price strong{color:var(--cyan)}.decision strong{color:var(--red)}.analysis{margin:9px 0 0;color:#d1dce4;line-height:1.55}.quote{margin-top:9px;padding:8px 10px;border-left:3px solid var(--red);background:rgba(104,24,19,.18);color:#ffd8d3;font:700 14px/1.42 ui-rounded,"Avenir Next",system-ui,sans-serif}.wisdom{margin-top:8px;padding:9px 10px;border:1px solid #68572e;border-radius:8px;background:rgba(241,196,93,.10);color:#ffedbb;font:italic 600 13px/1.45 ui-rounded,"Avenir Next",system-ui,sans-serif}.walk{margin-top:11px;padding:14px;border:1px solid #2a5946;border-radius:12px;background:#0a211a}.walk h3{margin:0;color:#aceac8;font-size:10px;text-transform:uppercase}.walk p{line-height:1.53}.footer{margin:12px 2px 24px;color:#65798a;font-size:9px;line-height:1.5}
+@media(max-width:850px){.hero{grid-template-columns:1fr}.scorestrip{grid-template-columns:repeat(2,1fr)}.score:last-child{grid-column:1/-1}.market{grid-template-columns:1fr 1fr}.team{grid-column:1/-1}}@media(max-width:500px){.wrap{padding:7px}.issue{min-width:0}.brand h1{font-size:46px}}
+</style>
 </head>
-<body>
-<main class="wrap">
-  <header class="mast">
-    <div class="networkbar">
-      <span class="desk">EDDIE NUMBERS HOTLINE // CASINO SPORTS DESK</span>
-      <span class="live"><i class="dot"></i> LIVE BOARD // 09:30 PT</span>
-    </div>
-
-    <div class="hero">
-      <div>
-        <div class="eyebrow">FINAL MORNING MARKET INTELLIGENCE // AUGUST 18</div>
-        <div class="brand"><h1><span>MUDDY</span> NUMBERS</h1></div>
-        <p class="tag">Eddie “Muddy” Numbers with the glossy cage-side read of the issued Betting Edge board — fresh prices first, casino noise second, money in the pocket until the number earns the ticket.</p>
-      </div>
-      <div class="issue">
-        <small>Final Morning Issue</small>
-        <strong>09:30</strong>
-        <b>FEED 09:25 PT // ISSUED 09:36 PT</b>
-      </div>
-    </div>
-
-    <div class="scorestrip">
-      <div class="score gold"><small>Issued Bets</small><strong>0</strong></div>
-      <div class="score"><small>New Risk</small><strong>$0</strong></div>
-      <div class="score"><small>Open File</small><strong>1 WAIT / 4 PASS</strong></div>
-      <div class="score"><small>Best Fresh Look</small><strong>YANKEES −112</strong></div>
-      <div class="score green"><small>Desk Status</small><strong>MONEY IN POCKET</strong></div>
-    </div>
-  </header>
-
-  <div class="boardbar">
-    <b>09:30 FINAL MORNING // MARKET CALLS</b>
-    <span>FRESH FEED <em>09:25 PT</em> // FIVE REVIEWS // ZERO FORCED ACTION</span>
-  </div>
-
-  <section class="feed">
-    <article class="post latest">
-      <div class="top"><div class="time">MLB // FEATURED PRICE CHECK</div><div class="badge">BEST NEW PRICE // PASS</div></div>
-      <div class="market">
-        <div class="team"><small>New Review</small><strong>NEW YORK YANKEES ML</strong></div>
-        <div class="cell price"><small>DraftKings</small><strong>−112</strong></div>
-        <div class="cell"><small>Bet365</small><strong>−116</strong></div>
-        <div class="cell fair"><small>Fair</small><strong>≈ −109</strong></div>
-        <div class="cell decision"><small>Decision</small><strong>PASS</strong></div>
-      </div>
-      <p class="analysis">DraftKings supplied the best fresh two-book price and beat Bet365 by four cents, but <b>−112 still sits below the no-vig fair near −109</b>. Before pitcher, bullpen and model-error uncertainty, the best ticket on the board still does not clear positive expectation.</p>
-      <div class="quote">EDDIE: “Best number in the room isn’t automatically a number worth buying.”</div>
-      <div class="wisdom">Line shopping finds the cleanest receipt. Fair value decides whether you walk to the cage.</div>
-    </article>
-
-    <article class="post">
-      <div class="top"><div class="time">MLB // ROAD DOG CHECK</div><div class="badge">PRICE LOST // PASS</div></div>
-      <div class="market">
-        <div class="team"><small>Chicago at Cubs</small><strong>WHITE SOX ML</strong></div>
-        <div class="cell price"><small>Bet365</small><strong>+154</strong></div>
-        <div class="cell"><small>08:00</small><strong>+157</strong></div>
-        <div class="cell fair"><small>Fair</small><strong>≈ +160</strong></div>
-        <div class="cell decision"><small>Decision</small><strong>PASS</strong></div>
-      </div>
-      <p class="analysis">The plus-money profile remains interesting, but the fresh quote worsened from the archived +157 to <b>+154 against fair near +160</b>. The matchup can stay on the board while the transaction stays below value.</p>
-      <div class="quote">EDDIE: “If your dog loses three cents before he ever had an edge, don’t call it a bargain.”</div>
-      <div class="wisdom">A watch-list team and a bettable price are two different things.</div>
-    </article>
-
-    <article class="post wait">
-      <div class="top"><div class="time">WNBA // SPREAD DESK</div><div class="badge">WAIT // PRICE NOT VERIFIED</div></div>
-      <div class="market">
-        <div class="team"><small>Indiana at Toronto</small><strong>TORONTO +10½</strong></div>
-        <div class="cell price"><small>Bet365 Last</small><strong>−105</strong></div>
-        <div class="cell"><small>DraftKings Last</small><strong>−119</strong></div>
-        <div class="cell fair"><small>Threshold</small><strong>UNAVAILABLE</strong></div>
-        <div class="cell waitcell"><small>Decision</small><strong>WAIT</strong></div>
-      </div>
-      <p class="analysis">The event and exact +10.5 spread remain identified, but the last quotes were Bet365 −105 at 08:40 PT and DraftKings −119 at 08:50 PT. <b>Both are outside the 30-minute execution window.</b> No fresh ticket, no fair-value action.</p>
-      <div class="quote">EDDIE: “A stale line is yesterday’s cocktail napkin. Show me the live ticket.”</div>
-      <div class="wisdom">Freshness is part of the price, not a note beneath it.</div>
-    </article>
-
-    <article class="post">
-      <div class="top"><div class="time">MLB // UNDERDOG WINDOW</div><div class="badge">PRICE SLIPPED // PASS</div></div>
-      <div class="market">
-        <div class="team"><small>Miami at Philadelphia</small><strong>MARLINS ML</strong></div>
-        <div class="cell price"><small>Bet365</small><strong>+195</strong></div>
-        <div class="cell"><small>08:00 / 06:00</small><strong>+210 / +212</strong></div>
-        <div class="cell fair"><small>Fair</small><strong>≈ +202</strong></div>
-        <div class="cell decision"><small>Decision</small><strong>PASS</strong></div>
-      </div>
-      <p class="analysis">Miami’s dog profile is still worth monitoring, but the executable offer fell hard from the stronger morning windows. At <b>+195 versus fair near +202</b>, the current price no longer carries the cushion needed to buy the underdog.</p>
-      <div class="quote">EDDIE: “The plus sign stayed. The value left the building.”</div>
-      <div class="wisdom">Don’t fall in love with an underdog after the market has already taken your price.</div>
-    </article>
-
-    <article class="post">
-      <div class="top"><div class="time">MLB // HOME FAVORITE CHECK</div><div class="badge">NO IMPROVEMENT // PASS</div></div>
-      <div class="market">
-        <div class="team"><small>Seattle at Milwaukee</small><strong>BREWERS ML</strong></div>
-        <div class="cell price"><small>Bet365</small><strong>−156</strong></div>
-        <div class="cell"><small>06:00</small><strong>−152</strong></div>
-        <div class="cell fair"><small>Fair</small><strong>≈ −146</strong></div>
-        <div class="cell decision"><small>Decision</small><strong>PASS</strong></div>
-      </div>
-      <p class="analysis">Milwaukee remains a coherent favorite, but the exact price is unchanged from 08:00 and worse than the 06:00 window. <b>−156 requires about 61.0% versus roughly 59.4% no-vig fair</b>, and a second fresh confirming quote is absent.</p>
-      <div class="quote">EDDIE: “You can like the favorite and hate the receipt. That’s the whole business.”</div>
-      <div class="wisdom">A good team at the wrong price is still the wrong purchase.</div>
-    </article>
-  </section>
-
-  <section class="walk">
-    <h3>THE WALK TO THE CAGE // EDDIE'S FINAL WORD</h3>
-    <p>The 09:30 final-morning report came off a fresh 09:25 PT feed. Yankees −112 was the best new shopping opportunity but remained below fair. Toronto +10½ stays WAIT because the exact price is no longer executable. White Sox +154, Miami +195 and Milwaukee −156 remain PASS.</p>
-    <p><b>Five reviews. Zero bets. Zero new risk.</b> The board got sharper; the wallet stayed closed.</p>
-    <div class="wisdom">The casino wants action. The desk wants a number. Those are not the same job.</div>
-  </section>
-
-  <footer class="footer">MUDDY NUMBERS is Eddie Numbers' casino-sports presentation of the issued 09:30 Betting Edge report. The underlying report issued 0 BETs, 0 LEANs, 1 WAIT and 4 PASS decisions. Prices, fair values, freshness states and outcomes are grounded in that issued report; Eddie's voice and presentation are entertainment/presentation only.</footer>
-</main>
-</body>
-</html>
+<body><main class="wrap">
+<header class="mast"><div class="networkbar"><span class="desk">EDDIE NUMBERS HOTLINE // CASINO SPORTS DESK</span><span class="live">● LIVE BOARD // 15:15 PT</span></div><div class="hero"><div><div class="eyebrow">EVENING MARKET INTELLIGENCE // AUGUST 18</div><div class="brand"><h1><span>MUDDY</span> NUMBERS</h1></div><p class="tag">Eddie “Muddy” Numbers with the clean cage-side read of the issued Betting Edge board: movement matters, but only a number that clears fair value earns a ticket.</p></div><div class="issue"><small>Evening Issue</small><strong>15:15</strong><b>FEED 15:05 PT // ISSUED 15:18 PT</b></div></div><div class="scorestrip"><div class="score gold"><small>Issued Bets</small><strong>0</strong></div><div class="score"><small>New Risk</small><strong>$0</strong></div><div class="score"><small>Board</small><strong>5 PASS</strong></div><div class="score"><small>Closest Price</small><strong>WHITE SOX +158</strong></div><div class="score green"><small>Desk Status</small><strong>MONEY IN POCKET</strong></div></div></header>
+<div class="boardbar"><b>15:15 EVENING // MARKET CALLS</b><span>FRESH FEED <em>15:05 PT</em> // FIVE CURRENT REVIEWS // ZERO FORCED ACTION</span></div>
+<section class="feed">
+<article class="post latest"><div class="top"><div class="time">MLB // BEST VALUE DEFICIT</div><div class="badge">PRICE IMPROVED // PASS</div></div><div class="market"><div class="team"><small>White Sox at Cubs</small><strong>WHITE SOX ML</strong></div><div class="cell price"><small>DraftKings</small><strong>+158</strong></div><div class="cell"><small>09:30</small><strong>+154</strong></div><div class="cell"><small>Fair</small><strong>≈ +162</strong></div><div class="cell decision"><small>Decision</small><strong>PASS</strong></div></div><p class="analysis">The shop improved four cents from the final-morning board, but the conservative fair number also sits longer at about +162. Better receipt, still no cushion.</p><div class="quote">EDDIE: “Improved is not the same word as cheap.”</div><div class="wisdom">Line shopping can rescue a price. It cannot manufacture an edge.</div></article>
+<article class="post"><div class="top"><div class="time">MLB // FAVORITE REPRICE</div><div class="badge">PRICE IMPROVED // PASS</div></div><div class="market"><div class="team"><small>Yankees at Orioles</small><strong>YANKEES ML</strong></div><div class="cell price"><small>Bet365</small><strong>−109</strong></div><div class="cell"><small>09:30</small><strong>−112</strong></div><div class="cell"><small>Fair</small><strong>≈ −103</strong></div><div class="cell decision"><small>Decision</small><strong>PASS</strong></div></div><p class="analysis">The offered price improved toward even money, but fair moved farther toward −103. The ticket looks prettier while the estimated value remains negative.</p><div class="quote">EDDIE: “A cheaper favorite can still be overpriced.”</div></article>
+<article class="post"><div class="top"><div class="time">WNBA // LINEAGE FILE</div><div class="badge">EXACT MARKET UNAVAILABLE</div></div><div class="market"><div class="team"><small>Prior tracked file</small><strong>TORONTO +10½</strong></div><div class="cell price"><small>09:30</small><strong>WAIT</strong></div><div class="cell"><small>15:15</small><strong>NO EXACT MARKET</strong></div><div class="cell"><small>Current detail</small><strong>NOT LISTED</strong></div><div class="cell decision"><small>Action</small><strong>NONE</strong></div></div><p class="analysis">The 15:15 report summary confirms the exact +10½ market is unavailable. Toronto is therefore a continuity note from the prior WAIT, not one of the five current recommendation cards.</p><div class="quote">EDDIE: “If the ticket is gone, keep the history. Don’t pretend it’s still on the board.”</div></article>
+<article class="post"><div class="top"><div class="time">MLB // DOG PRICE SLIPPED</div><div class="badge">PRICE LOST // PASS</div></div><div class="market"><div class="team"><small>Marlins at Phillies</small><strong>MARLINS ML</strong></div><div class="cell price"><small>Bet365</small><strong>+190</strong></div><div class="cell"><small>09:30</small><strong>+195</strong></div><div class="cell"><small>Fair</small><strong>≈ +197</strong></div><div class="cell decision"><small>Decision</small><strong>PASS</strong></div></div><p class="analysis">Miami has shortened all day: +212 → +210 → +195 → +190. The dog profile may remain interesting, but the current transaction is now seven cents short of fair.</p><div class="quote">EDDIE: “The plus sign stayed. The cushion didn’t.”</div></article>
+<article class="post"><div class="top"><div class="time">MLB // MARKET PRESSURE</div><div class="badge">STRONGER MARKET // WORSE BUY</div></div><div class="market"><div class="team"><small>Mariners at Brewers</small><strong>BREWERS ML</strong></div><div class="cell price"><small>Bet365</small><strong>−172</strong></div><div class="cell"><small>09:30</small><strong>−156</strong></div><div class="cell"><small>Fair</small><strong>≈ −161</strong></div><div class="cell decision"><small>Decision</small><strong>PASS</strong></div></div><p class="analysis">Milwaukee drew the strongest market pressure on the board, moving from −152 early to −156 and now −172. The market likes the favorite more; the buyer is being asked to pay too much.</p><div class="quote">EDDIE: “Respect the move. Don’t pay any price for it.”</div></article>
+<article class="post"><div class="top"><div class="time">WNBA // FRESH RECEIPT RETURNS</div><div class="badge">PRICE WORSENED // PASS</div></div><div class="market"><div class="team"><small>Sparks at Sun // TD Garden</small><strong>LA SPARKS ML</strong></div><div class="cell price"><small>Bet365</small><strong>−135</strong></div><div class="cell"><small>08:00</small><strong>−125</strong></div><div class="cell"><small>Fair</small><strong>≈ −124</strong></div><div class="cell decision"><small>Decision</small><strong>PASS</strong></div></div><p class="analysis">Los Angeles is back in the detailed receipts with a fresh −135, ten cents worse than the earlier −125. The neutral-site setting adds uncertainty and the eleven-cent pricing gap is too large.</p><div class="quote">EDDIE: “Fresh receipt, bad receipt. Easy file.”</div></article>
+</section>
+<section class="walk"><h3>THE WALK TO THE CAGE // EDDIE'S EVENING WORD</h3><p>Two prices improved and still failed. Three prices deteriorated. Toronto’s exact tracked spread is unavailable. Milwaukee drew the strongest market pressure, while White Sox +158 is the smallest current value deficit.</p><p><b>Five current recommendations. Five PASS. Zero bets. Zero new risk.</b></p><div class="wisdom">The board moved. The threshold did not.</div></section>
+<footer class="footer">MUDDY NUMBERS is Eddie Numbers' presentation of the issued 15:15 EVENING Betting Edge report. The underlying report issued 0 BETS, 0 LEANS, 0 WAITS and 5 PASSES. Toronto +10½ is referenced only as prior-session continuity because the 15:15 summary confirms the exact market unavailable and the current detailed recommendation list does not include it. Eddie's voice is presentation only.</footer>
+</main></body></html>
