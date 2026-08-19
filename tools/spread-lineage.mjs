@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 const BOOKS = ['Bet365', 'DraftKings'];
 const FEED_MAX_AGE_MINUTES = 75;
 const QUOTE_MAX_AGE_MINUTES = 30;
+const PRIMARY_SCORE_EPSILON = 1e-8;
 
 function die(message) { throw new Error(message); }
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
@@ -22,10 +23,12 @@ function decimalOdds(value) { const n = Number(value); return Number.isFinite(n)
 function americanOdds(value) { const d = decimalOdds(value); if (!d) return null; const n = d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); return n > 0 ? `+${n}` : String(n); }
 function implied(value) { const d = decimalOdds(value); return d ? 1 / d : null; }
 function ageMinutes(older, newer) { const a = parseMs(older), b = parseMs(newer); if (a === null || b === null) return Infinity; return Math.max(0, (b - a) / 60000); }
-function fresh(value, reportTs, limit) { return ageMinutes(value, reportTs) <= limit; }
+function feedFresh(feedGeneratedAt, reportTs) { return ageMinutes(feedGeneratedAt, reportTs) <= FEED_MAX_AGE_MINUTES; }
+function quoteFresh(marketUpdatedAt, feedGeneratedAt) { return ageMinutes(marketUpdatedAt, feedGeneratedAt) <= QUOTE_MAX_AGE_MINUTES; }
 function recKey(rec) { return `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`; }
 function combinedText(rec) { return [rec?.title, rec?.move, rec?.analysis, rec?.price, rec?.source].filter(Boolean).join(' // ').toUpperCase(); }
 function unavailableText(text) { return /(MARKET UNAVAILABLE|PRICE NOT VERIFIED|FEED STALE|IDENTITY MISMATCH)/.test(text); }
+function explicitPrimaryRow(row) { return row?.primary === true || row?.isPrimary === true || row?.main === true || row?.isMain === true || row?.mainLine === true || row?.isMainLine === true; }
 
 function parseArgs(argv) {
   const [command, ...rest] = argv;
@@ -83,40 +86,75 @@ function allEvents(feed) {
   return map;
 }
 
-function primarySpread(event, book, side, reportTs) {
+function latestCanonicalSpreadMarket(event, book) {
   const markets = event?.bookmakers?.[book];
   if (!Array.isArray(markets)) return null;
-  const market = markets.find((item) => marketKey(item) === 'spread');
-  if (!market || !fresh(market.updatedAt, reportTs, QUOTE_MAX_AGE_MINUTES)) return null;
+  return markets
+    .filter((item) => marketKey(item) === 'spread')
+    .sort((a, b) => (parseMs(b?.updatedAt) ?? -Infinity) - (parseMs(a?.updatedAt) ?? -Infinity))[0] || null;
+}
+
+function primarySpread(event, book, side, feedGeneratedAt) {
+  const market = latestCanonicalSpreadMarket(event, book);
+  if (!market) return { state: 'MISSING', book };
+  if (!quoteFresh(market.updatedAt, feedGeneratedAt)) return { state: 'STALE', book, updatedAt: market.updatedAt || null };
+
   const rows = (market.odds || []).map((row) => {
     const home = decimalOdds(row?.home), away = decimalOdds(row?.away), raw = Number(row?.hdp);
     if (!home || !away || !Number.isFinite(raw)) return null;
     const ph = implied(home), pa = implied(away);
-    return { row, raw, home, away, balance: Math.abs(ph - pa), overroundDistance: Math.abs((ph + pa) - 1.05) };
-  }).filter(Boolean).sort((a, b) => a.balance - b.balance || a.overroundDistance - b.overroundDistance || Math.abs(a.raw) - Math.abs(b.raw));
-  if (!rows.length) return null;
-  const picked = rows[0];
-  const dec = decimalOdds(picked.row?.[side]);
-  if (!dec) return null;
+    return { row, raw, home, away, balance: Math.abs(ph - pa) };
+  }).filter(Boolean);
+  if (!rows.length) return { state: 'MISSING', book, updatedAt: market.updatedAt || null };
+
+  const marked = rows.filter((item) => explicitPrimaryRow(item.row));
+  let candidates;
+  let method;
+  if (marked.length) {
+    candidates = marked;
+    method = 'PROVIDER_PRIMARY';
+  } else {
+    const minBalance = Math.min(...rows.map((item) => item.balance));
+    candidates = rows.filter((item) => Math.abs(item.balance - minBalance) <= PRIMARY_SCORE_EPSILON);
+    method = 'MARKET_CENTER';
+  }
+
+  const distinctLines = [...new Set(candidates.map((item) => item.raw))];
+  if (distinctLines.length !== 1) {
+    return {
+      state: 'AMBIGUOUS',
+      book,
+      method,
+      updatedAt: market.updatedAt || null,
+      candidateRawHdps: distinctLines.sort((a, b) => a - b)
+    };
+  }
+
+  const raw = distinctLines[0];
+  const sameLine = candidates.filter((item) => Math.abs(item.raw - raw) <= 0.001);
+  const picked = sameLine.sort((a, b) => (decimalOdds(b.row?.[side]) || 0) - (decimalOdds(a.row?.[side]) || 0))[0];
+  const dec = decimalOdds(picked?.row?.[side]);
+  if (!dec) return { state: 'MISSING', book, updatedAt: market.updatedAt || null };
+
   return {
+    state: 'OK',
     book,
-    rawHdp: picked.raw,
-    displayLine: lineFromRaw(picked.raw, side),
+    method,
+    rawHdp: raw,
+    displayLine: lineFromRaw(raw, side),
     priceAmerican: americanOdds(dec),
     updatedAt: market.updatedAt
   };
 }
 
-function exactFreshQuotes(event, priorRec, reportTs) {
+function exactFreshQuotes(event, priorRec, feedGeneratedAt) {
   const out = [];
   const side = String(priorRec.feed.side).toLowerCase();
   const selectionKey = String(priorRec.feed.selectionKey || '');
   const rawHdp = Number(priorRec.feed.hdp);
   for (const book of BOOKS) {
-    const markets = event?.bookmakers?.[book];
-    if (!Array.isArray(markets)) continue;
-    const market = markets.find((item) => marketKey(item) === 'spread');
-    if (!market || !fresh(market.updatedAt, reportTs, QUOTE_MAX_AGE_MINUTES)) continue;
+    const market = latestCanonicalSpreadMarket(event, book);
+    if (!market || !quoteFresh(market.updatedAt, feedGeneratedAt)) continue;
     for (const row of market.odds || []) {
       const raw = Number(row?.hdp);
       if (!Number.isFinite(raw) || Math.abs(raw - rawHdp) > 0.001) continue;
@@ -163,7 +201,7 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
   if (String(feed?.generatedAt || '') !== String(report?.feedGeneratedAt || '')) {
     die(`Resolved feed generatedAt ${feed?.generatedAt || 'unknown'} does not match report feedGeneratedAt ${report?.feedGeneratedAt || 'unknown'}`);
   }
-  if (!fresh(feed.generatedAt, report.ts, FEED_MAX_AGE_MINUTES)) die(`Report feed is older than ${FEED_MAX_AGE_MINUTES} minutes at issuance`);
+  if (!feedFresh(feed.generatedAt, report.ts)) die(`Report feed is older than ${FEED_MAX_AGE_MINUTES} minutes at issuance`);
 
   const events = allEvents(feed);
   const currentSpreads = new Map();
@@ -188,10 +226,12 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
       continue;
     }
 
-    const exact = exactFreshQuotes(event, prior, report.ts);
+    const exact = exactFreshQuotes(event, prior, feed.generatedAt);
     if (exact.length) continue;
 
-    const primaries = BOOKS.map((book) => primarySpread(event, book, String(prior.feed.side).toLowerCase(), report.ts)).filter(Boolean);
+    const primaryResults = BOOKS.map((book) => primarySpread(event, book, String(prior.feed.side).toLowerCase(), feed.generatedAt));
+    const primaries = primaryResults.filter((item) => item.state === 'OK');
+    const ambiguous = primaryResults.filter((item) => item.state === 'AMBIGUOUS');
     const diagnostic = {
       eventId: String(prior.feed.eventId),
       side: String(prior.feed.side).toLowerCase(),
@@ -199,17 +239,27 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
       priorLineText: lineText(oldLine),
       sourceTs: tracked.sourceTs,
       sourcePath: tracked.sourcePath,
-      primary: primaries
+      primary: primaries,
+      primaryStates: primaryResults
     };
 
     if (!currentRec) {
-      diagnostic.state = primaries.length ? 'RECONCILIATION_REQUIRED' : 'UNAVAILABLE_RECONCILIATION_REQUIRED';
+      diagnostic.state = ambiguous.length ? 'PRIMARY_AMBIGUOUS' : primaries.length ? 'RECONCILIATION_REQUIRED' : 'UNAVAILABLE_RECONCILIATION_REQUIRED';
       diagnostics.push(diagnostic);
       violations.push(`${prior.title}: tracked ${lineText(oldLine)} spread disappeared from the draft; preserve the same event/side and reconcile it before publication`);
       continue;
     }
 
     const text = combinedText(currentRec);
+    if (ambiguous.length) {
+      diagnostic.state = 'PRIMARY_AMBIGUOUS';
+      diagnostics.push(diagnostic);
+      if (!/(PRICE NOT VERIFIED|CONFLICTING SIGNALS)/.test(text)) {
+        violations.push(`${prior.title}: current primary spread is ambiguous at ${ambiguous.map((x) => x.book).join(', ')}; draft must fail closed as PRICE NOT VERIFIED or CONFLICTING SIGNALS`);
+      }
+      continue;
+    }
+
     if (!primaries.length) {
       diagnostic.state = 'NO_FRESH_PRIMARY';
       diagnostics.push(diagnostic);
@@ -259,18 +309,39 @@ function fixtureRoot() {
   return root;
 }
 
+function spreadRow(raw, home, away, extra = {}) {
+  return {
+    hdp: raw,
+    home: String(home),
+    away: String(away),
+    selectionKeys: { home: `68096572|spread|home||${raw}`, away: `68096572|spread|away||${raw}` },
+    ...extra
+  };
+}
+
+function spreadFeed(rows, { updatedAt = '2026-08-19T16:14:00Z', generatedAt = '2026-08-19T16:15:00Z', draftKings = null, extraMarkets = [] } = {}) {
+  const bookmakers = { Bet365: [{ name: 'Spread', marketKey: 'spread', updatedAt, odds: rows }, ...extraMarkets] };
+  if (draftKings) bookmakers.DraftKings = draftKings;
+  return { generatedAt, events: [{ id: 68096572, home: 'Washington Mystics', away: 'Toronto Tempo', bookmakers }] };
+}
+
+function movedRec(raw, titleLine, move) {
+  return {
+    status: 'WAIT', title: `Toronto Tempo ${titleLine}`, move, stake: '$0',
+    feed: { eventId: '68096572', marketKey: 'spread', market: 'Spread', side: 'away', hdp: raw, selectionKey: `68096572|spread|away||${raw}`, eventDate: '2026-08-19T23:30:00Z' }
+  };
+}
+
 function selfTest() {
   const root = fixtureRoot();
   try {
-    const feed = {
-      generatedAt: '2026-08-19T16:15:00Z',
-      events: [{ id: 68096572, home: 'Washington Mystics', away: 'Toronto Tempo', bookmakers: {
-        Bet365: [{ name: 'Spread', marketKey: 'spread', updatedAt: '2026-08-19T16:14:00Z', odds: [
-          { hdp: -10.5, home: '1.80', away: '1.95', selectionKeys: { home: '68096572|spread|home||-10.5', away: '68096572|spread|away||-10.5' } },
-          { hdp: -11, home: '1.91', away: '1.91', selectionKeys: { home: '68096572|spread|home||-11', away: '68096572|spread|away||-11' } }
-        ] }]
-      }}]
-    };
+    assert.equal(lineFromRaw(-11.5, 'home'), -11.5);
+    assert.equal(lineFromRaw(-11.5, 'away'), 11.5);
+
+    const feed = spreadFeed([
+      spreadRow(-10.5, 1.80, 1.95),
+      spreadRow(-11, 1.91, 1.91)
+    ]);
     const base = { slot: 'final_morning', label: '09:30 FINAL MORNING', ts: '2026-08-19T09:16:00-07:00', feedGeneratedAt: feed.generatedAt, recs: [] };
 
     const missing = auditLineage({ root, report: base, feed });
@@ -278,30 +349,88 @@ function selfTest() {
     assert.match(missing.violations.join(' '), /preserve the same event\/side/i);
 
     const corrected = structuredClone(base);
-    corrected.recs = [{
-      status: 'WAIT', title: 'Toronto Tempo +11', move: 'LINE MOVED AGAINST — Toronto +11.5 -> +11; current line requires independent requalification', stake: '$0',
-      feed: { eventId: '68096572', marketKey: 'spread', market: 'Spread', side: 'away', hdp: -11, selectionKey: '68096572|spread|away||-11', eventDate: '2026-08-19T23:30:00Z' }
-    }];
+    corrected.recs = [movedRec(-11, '+11', 'LINE MOVED AGAINST — Toronto +11.5 -> +11; current line requires independent requalification')];
     const passed = auditLineage({ root, report: corrected, feed });
     assert.equal(passed.ok, true, passed.violations.join('; '));
     assert.equal(passed.diagnostics[0].state, 'LINE MOVED AGAINST');
     assert.equal(passed.diagnostics[0].currentLine, 11);
+    assert.equal(passed.diagnostics[0].primary[0].method, 'MARKET_CENTER');
+
+    const favorableFeed = spreadFeed([
+      spreadRow(-11, 1.78, 2.00),
+      spreadRow(-12, 1.91, 1.91)
+    ]);
+    const favorableDraft = { ...base, feedGeneratedAt: favorableFeed.generatedAt, recs: [movedRec(-12, '+12', 'LINE MOVED IN FAVOR — Toronto +11.5 -> +12; current line requires independent requalification')] };
+    const favorable = auditLineage({ root, report: favorableDraft, feed: favorableFeed });
+    assert.equal(favorable.ok, true, favorable.violations.join('; '));
+    assert.equal(favorable.diagnostics[0].state, 'LINE MOVED IN FAVOR');
+    assert.equal(favorable.diagnostics[0].currentLine, 12);
 
     const conflictFeed = structuredClone(feed);
-    conflictFeed.events[0].bookmakers.DraftKings = [{ name: 'Spread', marketKey: 'spread', updatedAt: '2026-08-19T16:14:30Z', odds: [
-      { hdp: -10.5, home: '1.91', away: '1.91', selectionKeys: { home: '68096572|spread|home||-10.5', away: '68096572|spread|away||-10.5' } }
-    ] }];
+    conflictFeed.events[0].bookmakers.DraftKings = [{ name: 'Spread', marketKey: 'spread', updatedAt: '2026-08-19T16:14:30Z', odds: [spreadRow(-10.5, 1.91, 1.91)] }];
     const conflictDraft = structuredClone(base);
-    conflictDraft.recs = [{ status: 'WAIT', title: 'Toronto Tempo spread', move: 'CONFLICTING SIGNALS — Bet365 +11 / DraftKings +10.5', feed: { eventId: '68096572', marketKey: 'spread', market: 'Spread', side: 'away', hdp: -11, selectionKey: '68096572|spread|away||-11', eventDate: '2026-08-19T23:30:00Z' } }];
+    conflictDraft.recs = [movedRec(-11, '+11', 'CONFLICTING SIGNALS — Bet365 +11 / DraftKings +10.5')];
     const conflict = auditLineage({ root, report: conflictDraft, feed: conflictFeed });
     assert.equal(conflict.ok, true, conflict.violations.join('; '));
     assert.equal(conflict.diagnostics[0].state, 'BOOK_CONFLICT');
 
-    const exactFeed = structuredClone(feed);
-    exactFeed.events[0].bookmakers.Bet365[0].odds.push({ hdp: -11.5, home: '2.05', away: '1.74', selectionKeys: { home: '68096572|spread|home||-11.5', away: '68096572|spread|away||-11.5' } });
-    const exactStillThere = auditLineage({ root, report: base, feed: exactFeed });
-    assert.equal(exactStillThere.ok, true, exactStillThere.violations.join('; '));
-    assert.equal(exactStillThere.diagnostics.length, 0);
+    const freshnessFeed = spreadFeed([
+      spreadRow(-11, 1.91, 1.91),
+      spreadRow(-11.5, 2.05, 1.74)
+    ], { updatedAt: '2026-08-19T15:50:00Z' });
+    const laterReport = { ...base, ts: '2026-08-19T09:31:00-07:00', feedGeneratedAt: freshnessFeed.generatedAt, recs: [] };
+    assert.equal(ageMinutes('2026-08-19T15:50:00Z', laterReport.ts), 41);
+    assert.equal(ageMinutes('2026-08-19T15:50:00Z', freshnessFeed.generatedAt), 25);
+    const exactStillFresh = auditLineage({ root, report: laterReport, feed: freshnessFeed });
+    assert.equal(exactStillFresh.ok, true, exactStillFresh.violations.join('; '));
+    assert.equal(exactStillFresh.diagnostics.length, 0, 'quote freshness must be measured at feed time, not report time');
+
+    const staleFeed = spreadFeed([spreadRow(-11, 1.91, 1.91)], { updatedAt: '2026-08-19T15:44:00Z' });
+    const staleDraft = { ...base, feedGeneratedAt: staleFeed.generatedAt, recs: [movedRec(-11, '+11', 'PRICE NOT VERIFIED — no fresh current primary spread')] };
+    const stale = auditLineage({ root, report: staleDraft, feed: staleFeed });
+    assert.equal(stale.ok, true, stale.violations.join('; '));
+    assert.equal(stale.diagnostics[0].state, 'NO_FRESH_PRIMARY');
+
+    const ambiguousFeed = spreadFeed([
+      spreadRow(-11, 1.91, 1.91),
+      spreadRow(-12, 1.91, 1.91)
+    ]);
+    const ambiguousDraft = { ...base, feedGeneratedAt: ambiguousFeed.generatedAt, recs: [movedRec(-11, '+11', 'PRICE NOT VERIFIED — current primary spread is ambiguous')] };
+    const ambiguous = auditLineage({ root, report: ambiguousDraft, feed: ambiguousFeed });
+    assert.equal(ambiguous.ok, true, ambiguous.violations.join('; '));
+    assert.equal(ambiguous.diagnostics[0].state, 'PRIMARY_AMBIGUOUS');
+
+    const providerMarkedFeed = spreadFeed([
+      spreadRow(-11, 1.91, 1.91),
+      spreadRow(-12, 1.80, 2.00, { isMain: true })
+    ]);
+    const providerMarkedDraft = { ...base, feedGeneratedAt: providerMarkedFeed.generatedAt, recs: [movedRec(-12, '+12', 'LINE MOVED IN FAVOR — Toronto +11.5 -> +12; provider primary row')] };
+    const providerMarked = auditLineage({ root, report: providerMarkedDraft, feed: providerMarkedFeed });
+    assert.equal(providerMarked.ok, true, providerMarked.violations.join('; '));
+    assert.equal(providerMarked.diagnostics[0].primary[0].method, 'PROVIDER_PRIMARY');
+    assert.equal(providerMarked.diagnostics[0].currentLine, 12);
+
+    const duplicateFeed = spreadFeed([
+      spreadRow(-10.5, 1.91, 1.91)
+    ], { updatedAt: '2026-08-19T16:00:00Z' });
+    duplicateFeed.events[0].bookmakers.Bet365.push({ name: 'Spread', marketKey: 'spread', updatedAt: '2026-08-19T16:14:00Z', odds: [spreadRow(-11, 1.91, 1.91)] });
+    duplicateFeed.events[0].bookmakers.Bet365.push({ name: 'Alternative Spread', marketKey: 'alternative-spread', updatedAt: '2026-08-19T16:14:30Z', odds: [spreadRow(-12, 1.91, 1.91)] });
+    const duplicateDraft = { ...base, feedGeneratedAt: duplicateFeed.generatedAt, recs: [movedRec(-11, '+11', 'LINE MOVED AGAINST — Toronto +11.5 -> +11; newest canonical spread only')] };
+    const duplicate = auditLineage({ root, report: duplicateDraft, feed: duplicateFeed });
+    assert.equal(duplicate.ok, true, duplicate.violations.join('; '));
+    assert.equal(duplicate.diagnostics[0].currentLine, 11);
+
+    const noMarketFeed = { generatedAt: feed.generatedAt, events: [{ id: 68096572, home: 'Washington Mystics', away: 'Toronto Tempo', bookmakers: {} }] };
+    const unavailableDraft = { ...base, feedGeneratedAt: noMarketFeed.generatedAt, recs: [movedRec(-11, '+11', 'MARKET UNAVAILABLE — no fresh canonical spread returned')] };
+    const unavailable = auditLineage({ root, report: unavailableDraft, feed: noMarketFeed });
+    assert.equal(unavailable.ok, true, unavailable.violations.join('; '));
+    assert.equal(unavailable.diagnostics[0].state, 'NO_FRESH_PRIMARY');
+
+    const eventMissingFeed = { generatedAt: feed.generatedAt, events: [] };
+    const eventMissingDraft = { ...base, feedGeneratedAt: eventMissingFeed.generatedAt, recs: [movedRec(-11.5, '+11.5', 'PRICE NOT VERIFIED — tracked event not returned in exact report snapshot')] };
+    const eventMissing = auditLineage({ root, report: eventMissingDraft, feed: eventMissingFeed });
+    assert.equal(eventMissing.ok, true, eventMissing.violations.join('; '));
+    assert.equal(eventMissing.diagnostics[0].state, 'EVENT_NOT_IN_FEED');
 
     console.log('SPREAD LINEAGE SELF-TEST OK');
   } finally {
