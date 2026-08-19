@@ -109,6 +109,20 @@ The full incorporated v0.8 baseline remains operational. The following high-valu
 
 Equal-price deterministic sportsbook behavior and all inherited `playTo`, risk and fair-value rules remain unchanged.
 
+## 4.1 Fair-value benchmark confidence and labeling
+
+Fair value must distinguish the source and strength of the estimate rather than presenting every de-vigged number as an equally strong independent handicap.
+
+1. A price derived primarily by removing sportsbook margin is a **market-derived no-vig fair benchmark**. It is not, by itself, an independently modeled true price.
+2. An **independent fair value** requires material matchup/model work that is meaningfully separate from the quoted sportsbook pair or consensus being evaluated.
+3. When the available benchmark is single-book, two-book, thin-market, lower-liquidity, stale-near-boundary, or materially book-disagreed, analytical confidence must be reduced and the uncertainty/model-error margin widened rather than treating a small apparent edge as precise.
+4. Large disagreement between supported books is evidence of uncertainty or price-quality risk unless additional independent evidence resolves the conflict. A one-book outlier may not be promoted to BET merely because its de-vigged comparison appears positive.
+5. Three-way markets must account for the draw and total market margin before describing an underdog price as value. The resulting de-vigged price remains a market benchmark unless independent fair-value work also exists.
+6. A single-book paired-market no-vig estimate may support PASS/WAIT analysis, but it is weaker than a multi-book/sharp benchmark and must not be described as equally robust.
+7. Recommendation text should use wording such as `market-derived fair`, `no-vig benchmark`, or `independent fair` when the distinction is material. Do not imply model precision that the evidence does not support.
+8. On thin or weakly calibrated competitions, a small positive market-derived edge is not a near-BET by default. It must still clear uncertainty, model-error, identity, freshness and multiple-independent-signal requirements.
+9. These rules clarify confidence and presentation only. They do not loosen existing BET thresholds, freshness requirements, `playTo`, staking, or risk controls.
+
 ---
 
 # 5. Report lanes and live-feed schedule boundary
