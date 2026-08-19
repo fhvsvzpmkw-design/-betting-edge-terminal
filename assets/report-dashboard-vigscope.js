@@ -11,9 +11,9 @@
     try{
       const own=new URLSearchParams(location.search);
       const topParams=window.top&&window.top!==window?new URLSearchParams(window.top.location.search):null;
-      const raw=(topParams&&topParams.get('meters'))||own.get('meters')||'';
-      return String(raw).toLowerCase()==='blocks'?'blocks':'rails';
-    }catch(e){return 'rails'}
+      const raw=String((topParams&&topParams.get('meters'))||own.get('meters')||'').toLowerCase();
+      return raw==='rails'?'rails':'blocks';
+    }catch(e){return 'blocks'}
   }
 
   function schedulePatch(d){
@@ -52,8 +52,9 @@
       #runnerVigPicks .runnerCount{min-height:88px!important;margin:0!important;padding:8px 7px!important;border:0!important;border-left:1px solid #24475b!important;border-top:1px solid #24475b!important;background:linear-gradient(180deg,#020b14,#010811)!important;display:grid!important;align-content:center!important;text-align:center!important}
       #runnerVigPicks .runnerCount:nth-child(odd){border-left:0!important}
       #runnerVigPicks .runnerCount:nth-child(-n+2){border-top:0!important}
-      #runnerVigPicks .runnerCount b{font-size:clamp(34px,4vw,48px)!important;margin-top:4px!important;line-height:.95!important}
-      #runnerVigPicks .runnerCount .callName{font-size:11px!important;letter-spacing:.13em!important}
+      #runnerVigPicks .runnerCount b{display:inline-block!important;justify-self:center!important;min-width:1.18em;padding:1px 9px 5px!important;margin-top:4px!important;border-bottom:2px solid currentColor;font-size:clamp(39px,4.45vw,54px)!important;font-weight:1000!important;font-variant-numeric:tabular-nums;letter-spacing:-.08em!important;line-height:.9!important;background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(0,0,0,.15));text-shadow:0 0 3px currentColor,0 0 10px currentColor;filter:saturate(1.05)}
+      #runnerVigPicks .runnerCount .callName{font-size:11px!important;letter-spacing:.13em!important;text-shadow:0 0 5px currentColor}
+      #runnerVigPicks .runnerCount .callName:before{content:'◆';display:inline-block;margin-right:5px;font-size:5px;vertical-align:middle;opacity:.7}
       #runnerVigPicks .runnerRiskMini{margin-top:5px!important;padding-top:4px!important;border-top:1px dotted #204555!important;font-size:6.5px!important;gap:5px!important}
       #runnerVigPicks .runnerRiskMini .runnerRiskValue{font-size:8.5px!important}
 
@@ -110,7 +111,7 @@
         .runnerVigScopeRow{grid-template-columns:minmax(220px,.86fr) minmax(245px,1fr) minmax(275px,1.08fr);gap:8px;min-height:218px}
         .runnerVigSection{padding:7px}
         #runnerVigPicks .runnerCount{min-height:82px!important;padding:6px!important}
-        #runnerVigPicks .runnerCount b{font-size:clamp(31px,3.8vw,42px)!important}
+        #runnerVigPicks .runnerCount b{font-size:clamp(36px,4.05vw,47px)!important;padding:1px 7px 4px!important}
         #runnerVigContributors .instrument{min-height:60px!important;padding:7px 8px 6px!important}
         #runnerVigContributors .instrumentRead b{font-size:24px!important}
       }
@@ -122,7 +123,7 @@
         .runnerVigScopeRow{grid-template-columns:minmax(205px,.84fr) minmax(225px,1fr) minmax(250px,1.06fr);gap:7px;min-height:210px}
         .runnerVigSectionTitle{font-size:6.5px;margin-bottom:6px}
         #runnerVigPicks .runnerCount{min-height:77px!important}
-        #runnerVigPicks .runnerCount b{font-size:32px!important}
+        #runnerVigPicks .runnerCount b{font-size:35px!important;padding:1px 6px 4px!important}
         #runnerVigContributors .instrumentRead b{font-size:22px!important}
         #runnerVigContributors .instrumentLabel{font-size:8px!important}
         .runnerVigScopeKey{font-size:7px}
@@ -136,7 +137,7 @@
         #runnerVigPicks .runnerCounts{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:1fr!important}
         #runnerVigPicks .runnerCount{min-height:74px!important;border-top:0!important;border-left:1px solid #24475b!important}
         #runnerVigPicks .runnerCount:first-child{border-left:0!important}
-        #runnerVigPicks .runnerCount b{font-size:32px!important}
+        #runnerVigPicks .runnerCount b{font-size:34px!important;padding:1px 5px 4px!important}
         #runnerVigContributors .instrumentCluster{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:1fr!important}
         #runnerVigContributors .instrument{min-height:70px!important;grid-template-columns:1fr!important;grid-template-areas:'label' 'read' 'rail' 'conf'!important;gap:2px!important;border-top:0!important;border-left:1px solid #23482f!important;text-align:center!important}
         #runnerVigContributors .instrument:first-child{border-left:0!important}
