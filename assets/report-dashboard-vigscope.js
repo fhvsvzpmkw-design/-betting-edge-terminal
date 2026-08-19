@@ -2,13 +2,15 @@
   'use strict';
 
   // Keep the full known-good VigScope implementation in the adjacent rollback
-  // file, then apply this tiny presentation-only override on top of it.
+  // file, then apply these small presentation/intelligence overlays on top.
   const legacy=document.createElement('script');
   legacy.src='./assets/report-dashboard-vigscope.js.old';
   legacy.async=false;
   document.head.appendChild(legacy);
 
   const STYLE_ID='vigScopeCompactPresentationFix';
+  const INTEL_SCRIPT_ID='vigScopeGameWindowIntelligenceLoader';
+
   function applyFix(){
     let d=null;
     try{
@@ -34,10 +36,32 @@
     return true;
   }
 
+  function injectGameWindowIntelligence(){
+    try{
+      const core=document.getElementById('core');
+      const d=core?.contentDocument||null;
+      if(!d?.head||d.readyState!=='complete')return false;
+      if(d.getElementById(INTEL_SCRIPT_ID))return true;
+      const script=d.createElement('script');
+      script.id=INTEL_SCRIPT_ID;
+      script.src='./assets/game-window-intelligence.js?v=1';
+      script.async=false;
+      d.head.appendChild(script);
+      return true
+    }catch(e){return false}
+  }
+
   let tries=0;
   const timer=setInterval(()=>{
     tries++;
-    if(applyFix()||tries>150)clearInterval(timer);
+    const fixed=applyFix();
+    const intel=injectGameWindowIntelligence();
+    if((fixed&&intel)||tries>150)clearInterval(timer);
   },80);
-  legacy.addEventListener('load',()=>{applyFix();setTimeout(applyFix,100);setTimeout(applyFix,350)});
+  legacy.addEventListener('load',()=>{
+    applyFix();
+    injectGameWindowIntelligence();
+    setTimeout(()=>{applyFix();injectGameWindowIntelligence()},100);
+    setTimeout(()=>{applyFix();injectGameWindowIntelligence()},350)
+  });
 })();
