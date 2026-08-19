@@ -28,10 +28,11 @@
   }
 
   function referenceFor(run){
-    let runDay='';
+    let runDay='',latest=true;
     try{if(typeof localDateKey==='function')runDay=localDateKey(run?.ts)}catch(e){}
+    try{if(typeof isLatestSessionRun==='function')latest=isLatestSessionRun(run)}catch(e){}
     const currentDay=currentVancouverDay();
-    if(runDay&&currentDay&&runDay!==currentDay){
+    if(!latest||(runDay&&currentDay&&runDay!==currentDay)){
       const issued=Date.parse(run?.ts||'');
       if(Number.isFinite(issued))return {time:issued,mode:'ISSUE'}
     }
@@ -91,8 +92,8 @@
     if(clockEl){
       const prefix=mode==='ISSUE'?'AT ISSUE • ':'';
       let relative='';
-      if(delta>0)relative=`${durationLabel(delta)} TO START`;
-      else if(delta>=-15)relative=`${durationLabel(delta)} PAST SCHEDULED`;
+      if(Math.abs(delta)<0.75)relative='SCHEDULED NOW';
+      else if(delta>0)relative=`${durationLabel(delta)} TO START`;
       else relative=`${durationLabel(delta)} PAST SCHEDULED`;
       clockEl.textContent=`${prefix}${startClock(eventTime)} • ${relative}`
     }
