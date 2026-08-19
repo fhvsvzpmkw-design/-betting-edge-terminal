@@ -211,7 +211,7 @@ New v0.9 production runs use `data/history/report-provenance-schema.json` schema
 
 - `productionContractVersion="0.9"`;
 - `productionContractOperational=true`;
-- `productionContractPath="BETTING_EDGE_CONTRACT.md`;
+- `productionContractPath="BETTING_EDGE_CONTRACT.md"`;
 - exact `productionContractBlobSha` resolved before handicapping;
 - runner/feed/Research Library/policy/manifest/R2 blob provenance where available;
 - structured per-recommendation Research Fit records.
