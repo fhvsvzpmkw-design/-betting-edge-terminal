@@ -53,28 +53,52 @@ Derived voice rule: Jesse can be socially smooth, decisive and almost courteous 
 
 This is still a sheet coming out of the hotel. It should not become a police evidence dossier titled DEATH ANGEL.
 
-The surface presentation can look semi-respectable: a late-1980s hotel sports sheet with lines, scores, telephone notes, poker/gambling flavor and little hotel notices.
+The key visual correction is that the **Hotel Delphoria is not a classy old hotel publication environment**. Treat the Sports Desk as a low-rent counter and telephone operation inside a rough gambling joint: cheap paper, bad copies, grease pencil, carbon slips, coffee rings, smoke, lounge noise and a back room close enough that everybody knows where the real business happens.
 
-The underlying truth is that Jesse Bains is the dangerous man behind the desk/world. The reader should feel that everyone at the Delphoria knows who he is.
+The sheet is public-facing only in the narrowest sense: somebody can walk up, ask what is on the board and get handed a page. It is not a polished lobby newspaper, guest-services bulletin, elegant house organ or refined sportsbook publication.
 
-### Front-of-house layer
+### Counter layer
 
-- Hotel Delphoria masthead.
-- Sports Desk issue time.
-- Current card / late board.
-- Telephone messages.
-- Short game briefs.
-- Poker-room or lounge references where natural.
+- blunt **SPORTS DESK // HOTEL DELPHORIA** heading;
+- current card / late board pinned or typed onto cheap paper;
+- telephone slips and handwritten messages;
+- crooked stamps, crossed-out numbers and rough notes;
+- cocktail-lounge and back-room traffic nearby;
+- desk-clerk / runner language rather than concierge or formal hotel-service language;
+- stained, worn, copied, folded or otherwise low-rent presentation.
 
 ### Back-room layer
 
-- Jesse's quotes.
-- A runner bringing him the current Betting Edge sheet.
-- Associates or callers waiting for his answer.
-- Quiet room changes when Jesse becomes interested or irritated.
-- Non-graphic implication of his reputation and control.
+- Jesse's quotes;
+- a runner bringing him the current Betting Edge sheet;
+- associates or callers waiting for his answer;
+- a room changing when Jesse becomes interested or irritated;
+- poker / gambling operation atmosphere;
+- non-graphic implication of his reputation and control.
 
-The two layers should coexist on the same sheet.
+The two layers should coexist on the same sheet: a shabby counter operation in front, Jesse's criminal power behind it.
+
+## Visual guardrail
+
+Avoid visual cues that make the Delphoria feel too respectable:
+
+- elegant newspaper mastheads;
+- polished parchment or boutique-hotel stationery;
+- symmetrical grand-hotel layout;
+- “Sports & Information” guest-services language;
+- “Lobby Copy” presentation that reads like a luxury hotel bulletin;
+- refined gold rules, formal editorial columns or upscale vintage-newspaper treatment.
+
+Prefer:
+
+- dirty ivory / yellowed paper;
+- blocky typewriter or condensed display type;
+- black, faded red and dirty green ink;
+- off-register printing and crooked rubber-stamp effects;
+- carbon-copy phone slips;
+- rough board grids;
+- clipped notes, grease-pencil marks and cheap counter signage;
+- coffee/smoke/grime texture used as atmosphere, not as betting evidence.
 
 ## Jesse and Betting Edge
 
@@ -158,13 +182,13 @@ Do not use graphic violence as decorative filler, and never use fictional violen
 Preferred world terms, grounded in the game setting or closely derived from it:
 
 - Hotel Delphoria
-- lobby
+- Sports Desk / counter
 - cocktail lounge / lounge
 - back room
 - poker game / card game
 - penthouse / suite
 - desk clerk
-- telephone / message
+- telephone / message / carbon slip
 - elevator
 - room / room number
 - cash / cards / game
@@ -172,6 +196,7 @@ Preferred world terms, grounded in the game setting or closely derived from it:
 - associate
 - caller
 - front man
+- cheap coffee / old smoke / worn counter as fictional texture
 - marked money (only when referring to the original undercover context, not invented modern betting evidence)
 
 ## Era rule
