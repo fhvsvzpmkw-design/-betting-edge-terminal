@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-17 — runner UI v1.3.1 hierarchy
+**Last updated:** 2026-08-18 — odds-refresh scheduler simplification
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -48,15 +48,17 @@ Betting Edge is being developed around sources that do not require adding a recu
 
 **Reason:** Cost discipline and proof-of-concept reliability come before expanding data-provider spend.
 
-## D-006 — Use redundant scheduled attempts rather than a single cron trigger
+## D-006 — Use one scheduled odds refresh per window with manual fallback
 
-**Status:** Active
+**Status:** Active as of 2026-08-18; supersedes the earlier paired-trigger form of this decision
 
-Important odds windows use paired or backup scheduled attempts around the intended refresh slot.
+Each important odds window now uses **one scheduled cron trigger at the intended refresh slot**: 05:45, 07:45, 09:15, 14:55 and 17:55 Vancouver. Paired/backup scheduled attempts are no longer the production design.
 
-**Reason:** GitHub Actions scheduling can be delayed or occasionally miss a dispatch. A second trigger improves reliability.
+Manual `workflow_dispatch` is the explicit fallback when the scheduled trigger is missed, materially delayed, fails, or does not leave a usable snapshot while a new pull still has practical value. The 25-minute stale-job cutoff remains active so delayed scheduled jobs fail before spending quota.
 
-The backup design must be paired with quota protection so redundancy does not automatically double API use.
+The current workflow control profile uses a hard request budget of **90**, a safety reserve of **5**, optional work stopping at **85**, a core request planning target of **34**, and a deep request planning target of **6**.
+
+**Reason:** A single production trigger keeps each window simple and predictable, avoids duplicate scheduled attempts and unnecessary quota pressure, and makes recovery an explicit operational action rather than another automatic cron. Manual fallback plus zombie protection preserves a recovery path without creating overlapping scheduled work.
 
 ## D-007 — Kill stale scheduled jobs before they spend quota
 
