@@ -23,21 +23,27 @@ on:
   push:
     branches: [main]
     paths:
+      - BETTING_EDGE_CONTRACT.md
       - data/history/runs/**
       - data/history/research-fit/**
       - run-history.json
       - tools/report-publication.mjs
       - tools/spread-lineage.mjs
       - tests/spread-lineage-reconciliation.test.js
+      - tests/spread-lineage-primary-line-fixtures.test.js
+      - tests/fixtures/spread-lineage-primary-lines.json
       - .github/workflows/report-history.yml
   pull_request:
     paths:
+      - BETTING_EDGE_CONTRACT.md
       - data/history/runs/**
       - data/history/research-fit/**
       - run-history.json
       - tools/report-publication.mjs
       - tools/spread-lineage.mjs
       - tests/spread-lineage-reconciliation.test.js
+      - tests/spread-lineage-primary-line-fixtures.test.js
+      - tests/fixtures/spread-lineage-primary-lines.json
       - .github/workflows/report-history.yml
 
 concurrency:
@@ -62,6 +68,8 @@ jobs:
         run: node tools/report-publication.mjs self-test
       - name: Exercise spread-lineage path
         run: node tests/spread-lineage-reconciliation.test.js
+      - name: Exercise spread primary-line fixtures
+        run: node tests/spread-lineage-primary-line-fixtures.test.js
       - name: Verify durable report history
         run: node tools/report-publication.mjs verify
 
