@@ -65,15 +65,15 @@
     const style=d.createElement('style');
     style.id=STYLE_ID;
     style.textContent=`
-      .gameWindowIntel{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;width:100%;margin:10px 0 0;padding:6px 8px;border:1px solid var(--line);background:#020912;font-size:9px;font-weight:900;letter-spacing:.055em;line-height:1.25;text-align:center}
-      .gameWindowState{display:inline-flex;align-items:center;padding:3px 7px;border:1px solid var(--line);background:#020912;color:var(--muted);white-space:nowrap}
-      .gameWindowClock{color:#93aeba;letter-spacing:.025em}
+      .gameWindowIntel{display:grid;grid-template-columns:1fr;justify-items:center;align-items:center;gap:5px;width:100%;margin:11px 0 13px;padding:9px 10px;border:1px solid var(--line);background:#020912;font-size:9px;font-weight:900;letter-spacing:.055em;line-height:1.3;text-align:center}
+      .gameWindowState{display:inline-flex;align-items:center;justify-content:center;padding:4px 9px;border:1px solid var(--line);background:#020912;color:var(--muted);white-space:nowrap;font-size:9px;letter-spacing:.07em}
+      .gameWindowClock{display:block;width:100%;color:#93aeba;letter-spacing:.025em;font-size:9px;font-weight:850}
       .gameWindowIntel[data-window="upcoming"]{border-color:#315469;background:#020b12}.gameWindowIntel[data-window="upcoming"] .gameWindowState{border-color:#315469;color:#8fb8c8}
       .gameWindowIntel[data-window="approaching"]{border-color:#257a91;background:#021016}.gameWindowIntel[data-window="approaching"] .gameWindowState{border-color:var(--cyan);color:var(--cyan)}
       .gameWindowIntel[data-window="closing"]{border-color:#8a7828;background:#100e03}.gameWindowIntel[data-window="closing"] .gameWindowState{border-color:var(--yellow);color:var(--yellow);background:#171403}
       .gameWindowIntel[data-window="start"]{border-color:#b86928;background:#130902}.gameWindowIntel[data-window="start"] .gameWindowState{border-color:#ff9d45;color:#ffb56f;background:#1a0d03}
       .gameWindowIntel[data-window="passed"]{border-color:#8f3040;background:#120509}.gameWindowIntel[data-window="passed"] .gameWindowState{border-color:var(--red);color:var(--red);background:#19070b}
-      @media(max-width:520px){.gameWindowIntel{gap:5px;margin-top:8px;padding:6px;font-size:8px}.gameWindowState{padding:3px 5px}.gameWindowClock{flex-basis:100%;text-align:center}}
+      @media(max-width:520px){.gameWindowIntel{gap:4px;margin:9px 0 11px;padding:8px 7px}.gameWindowState{padding:4px 7px;font-size:8px}.gameWindowClock{font-size:8px}}
     `;
     d.head.appendChild(style)
   }
