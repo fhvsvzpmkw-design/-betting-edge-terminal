@@ -28,6 +28,7 @@ Rules:
 - Prefer exact event identity from `rec.feed.eventId` and `rec.feed.selectionKey`.
 - Web verification should use an authoritative or otherwise reliable final-score/result source for the exact event and date.
 - Final-score grading for moneyline, spread and game-total cards is deterministic from the exact issued side/line.
+- **Spread sign convention:** Odds-API.io spread-row `hdp` is the HOME-side handicap and is also the raw line stored at the end of both home/away selection keys for that row. A home selection uses raw `hdp`; an away selection uses the opposite sign. Example: home Washington / away Toronto with raw `hdp: -11.5` means Washington -11.5 and Toronto +11.5.
 - Player props, regulation-only markets, shortened/suspended games and other special settlement cases remain unresolved unless the exact issued selection can be verified safely.
 - A verified BET is an **official** result. LEAN / WAIT / PASS results are **hypothetical** and never alter the official betting ledger.
 - Missing price/CLV observation does not prevent a result from becoming COMPLETE.
@@ -42,15 +43,17 @@ Deterministic grading helper:
 
 The verification JSON supplies already-verified final event evidence. The helper grades standard score-based markets and updates/creates the matching observation sidecar. Unsupported markets fail closed as unresolved unless an exact selection outcome is supplied.
 
-## Morning backlog rule
+## 05:00 result-closure backlog rule
 
-The 06:00 Open process may perform one lightweight closure pass before handicapping:
+A separate daily 05:00 America/Vancouver result-closure task performs one lightweight closure pass before the morning odds/report sequence:
 
-1. inspect only previously issued cards that are not COMPLETE;
+1. inspect the previous Vancouver day's issued cards plus older cards explicitly still UNRESOLVED;
 2. group unresolved cards by exact event so one verified final can close multiple cards;
 3. perform targeted result verification only for events expected to be finished;
-4. save verified completion records in this observation layer;
-5. leave ambiguous or unsupported cards UNRESOLVED;
-6. continue the 06:00 report even if result verification fails.
+4. grade score markets with the spread sign convention above;
+5. save verified completion records in this observation layer;
+6. leave ambiguous or unsupported cards UNRESOLVED.
+
+The 05:00 audit is independent of the 05:45 odds refresh and 06:00 Betting Edge Open report. Its failure must not modify live odds or block the report.
 
 This layer is deliberately small: no second odds engine, no full-board result harvesting, no duplicate odds archive and no automatic re-handicapping from outcomes.
