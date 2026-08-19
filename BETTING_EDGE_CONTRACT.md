@@ -3,10 +3,11 @@
 **Document status:** OPERATIONAL — AUTHORITATIVE PRODUCTION CONTRACT  
 **Contract version:** 0.9  
 **Activated:** 2026-08-15  
+**Clarified:** 2026-08-19 — spread-lineage, quote-clock and runner-family wording only; no change to contract version, staking or risk methodology  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Authoritative branch:** `main`  
 **Production filename:** `BETTING_EDGE_CONTRACT.md`  
-**Validated runner family:** Betting Edge Terminal v1.3  
+**Validated runner family:** VigScope outer runner v1.4 / Betting Edge core runner v1.3  
 **Live acceptance:** `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`
 
 > **THIS FILE IS OPERATIONAL.**
@@ -91,10 +92,12 @@ A preflight failure must not be converted into a betting opinion.
 The full incorporated v0.8 baseline remains operational. The following high-value gates are reiterated because they are production critical:
 
 - Live odds source: `data/live-odds.json` from the authoritative repository path, with an approved fallback route only when the primary read fails.
-- Feed freshness: maximum **75 minutes**.
-- Exact executable sportsbook quote freshness: maximum **30 minutes**.
+- Feed freshness: maximum **75 minutes**, measured as `run.ts - feed.generatedAt`.
+- Exact executable sportsbook quote freshness: maximum **30 minutes**, measured as `feed.generatedAt - market.updatedAt`. Do **not** substitute report issuance time (`run.ts`) for `feed.generatedAt` when evaluating the 30-minute quote-age gate.
+- A report-generation or lineage check must use the exact odds snapshot bound to that report. Prefer the report provenance `feedBlobSha` when available; `data/live-odds.json` is valid for the check only when its `generatedAt` exactly matches the report's `feedGeneratedAt`.
 - Primary supported user pricing books: **Bet365** and **DraftKings**.
-- Exact event, market and selection identity precedes price use.
+- Exact event, market and selection identity precedes price use. When an archived recommendation carries `selectionKey`, a current row is the same exact selection only when the same event, market, side and `selectionKey` all match; a matching numeric handicap without the archived `selectionKey` is not sufficient to bypass lineage reconciliation.
+- For the current Odds-API.io spread schema, row `hdp` is the **home-side handicap**. The bettor-facing home line equals `hdp`; the bettor-facing away line is the opposite sign. Example: raw `hdp: -11.5` means home `-11.5` and away `+11.5`.
 - Fair-value work must exist before a BET can be issued.
 - Every recommendation includes `playTo` or an explicit non-action threshold state.
 - `BET`, `LEAN`, `WAIT`, and `PASS` semantics remain distinct.
@@ -171,16 +174,17 @@ Production vocabulary includes:
 When a later scheduled lane has a same-day tracked spread from an archived Betting Edge lane and the exact prior spread/handicap no longer appears as a fresh executable row, the report must reconcile the current line before using `MARKET UNAVAILABLE` or removing that recommendation from the board.
 
 1. Resolve the archived prior recommendation under the source-backed same-day lineage rule. Preserve its exact event identity, side/team, prior handicap, `selectionKey`, sportsbook price, status, fair value and `playTo` as historical reference.
-2. Using only the already-fetched `data/live-odds.json`, inspect the current primary spread for the **same event and same side** at Bet365 and DraftKings, subject to the normal 75-minute feed and 30-minute executable-quote freshness gates. This reconciliation must **not** trigger an additional Odds-API request or refresh solely because the old handicap disappeared.
-3. If a fresh current spread exists for that same side, compare its numeric handicap with the archived handicap:
+2. Using only the exact already-fetched odds snapshot bound to the current report, inspect the current primary spread for the **same event and same side** at Bet365 and DraftKings. Resolve that snapshot by report `feedBlobSha` when available; use `data/live-odds.json` only when its `generatedAt` exactly matches the report's `feedGeneratedAt`. Apply the normal 75-minute feed gate and the 30-minute executable-quote gate defined in Section 4. This reconciliation must **not** trigger an additional Odds-API request or refresh solely because the old handicap disappeared.
+3. For spread-lineage purposes, inspect only the newest fresh canonical market with `marketKey: spread` for each supported book. Do not use `alternative-spread` or other alternate-spread markets to establish the current primary line. If the provider supplies a unique explicit primary/main marker on a canonical spread row, use it. Otherwise define the market-center row as the canonical spread row whose home/away prices have the smallest absolute difference in implied probability. If more than one distinct handicap ties for that best market-center score, do not break the tie heuristically; fail closed as `PRICE NOT VERIFIED` or `CONFLICTING SIGNALS`.
+4. If a fresh current spread exists for that same side, compare its bettor-facing numeric handicap with the archived bettor-facing handicap. Apply the home/away `hdp` orientation rule in Section 4 before comparing:
    - `LINE MOVED IN FAVOR` when the current same-side handicap is numerically greater. Examples: `+10.5 -> +11.5` and `-3.5 -> -2.5`.
    - `LINE MOVED AGAINST` when the current same-side handicap is numerically smaller. Examples: `+10.5 -> +9.5` and `-3.5 -> -4.5`.
    - `PRICE MOVED` when the handicap is unchanged but the executable price/juice changed.
-4. If fresh supported books show different current primary spreads, preserve the book-specific lines/prices and use `CONFLICTING SIGNALS` or cautious `PRICE NOT VERIFIED` as appropriate. Do not invent a consensus line.
-5. Use `MARKET UNAVAILABLE` only when no fresh current spread for the same event and same side can be found after this reconciliation. Use `PRICE NOT VERIFIED` when candidate rows exist but identity or freshness cannot be validated.
-6. Preserve the tracked spread recommendation on the current pregame report instead of silently dropping it. Its movement text should show the archived line and the reconciled current line, or state why the current line is unavailable/unverified.
-7. A changed handicap is a **new current selection**, not an exact reprice of the archived selection. Prior fair value, `playTo`, BET/LEAN status or stake does not automatically transfer. The current line must independently satisfy all ordinary identity, freshness, fair-value and staking gates before action; otherwise stake remains zero.
-8. This reconciliation is a report-generation continuity check only. It does not redesign the runner, change staking methodology, add books, or increase the production odds-refresh/API budget.
+5. If fresh supported books show different current primary spreads, preserve the book-specific lines/prices and use `CONFLICTING SIGNALS` or cautious `PRICE NOT VERIFIED` as appropriate. Do not invent a consensus line.
+6. Use `MARKET UNAVAILABLE` only when no fresh current spread for the same event and same side can be found after this reconciliation. Use `PRICE NOT VERIFIED` when candidate rows exist but identity, primary-line resolution or freshness cannot be validated.
+7. Preserve the tracked spread recommendation on the current pregame report instead of silently dropping it. Its movement text should show the archived line and the reconciled current line, or state why the current line is unavailable/unverified.
+8. A changed handicap is a **new current selection**, not an exact reprice of the archived selection. Prior fair value, `playTo`, BET/LEAN status or stake does not automatically transfer. The current line must independently satisfy all ordinary identity, freshness, fair-value and staking gates before action; otherwise stake remains zero.
+9. This reconciliation is a report-generation continuity check only. It does not redesign the runner, change staking methodology, add books, or increase the production odds-refresh/API budget.
 
 ---
 
