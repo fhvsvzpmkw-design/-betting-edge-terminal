@@ -27,6 +27,8 @@ on:
       - data/history/research-fit/**
       - run-history.json
       - tools/report-publication.mjs
+      - tools/spread-lineage.mjs
+      - tests/spread-lineage-reconciliation.test.js
       - .github/workflows/report-history.yml
   pull_request:
     paths:
@@ -34,6 +36,8 @@ on:
       - data/history/research-fit/**
       - run-history.json
       - tools/report-publication.mjs
+      - tools/spread-lineage.mjs
+      - tests/spread-lineage-reconciliation.test.js
       - .github/workflows/report-history.yml
 
 concurrency:
@@ -56,6 +60,8 @@ jobs:
           node-version: '22'
       - name: Exercise publisher path
         run: node tools/report-publication.mjs self-test
+      - name: Exercise spread-lineage path
+        run: node tests/spread-lineage-reconciliation.test.js
       - name: Verify durable report history
         run: node tools/report-publication.mjs verify
 
@@ -94,6 +100,8 @@ jobs:
           decode('REPORT_JSON_B64', '/tmp/report.json');
           decode('SIDECAR_JSON_B64', '/tmp/sidecar.json');
           NODE
+      - name: Reconcile tracked spread lineage
+        run: node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Validate bundle and derive paths
         id: bundle
         run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
