@@ -7,6 +7,15 @@
   let observedDocument=null;
   let frameHandle=0;
 
+  function selectedMeterVariant(){
+    try{
+      const own=new URLSearchParams(location.search);
+      const topParams=window.top&&window.top!==window?new URLSearchParams(window.top.location.search):null;
+      const raw=(topParams&&topParams.get('meters'))||own.get('meters')||'';
+      return String(raw).toLowerCase()==='blocks'?'blocks':'rails';
+    }catch(e){return 'rails'}
+  }
+
   function schedulePatch(d){
     if(frameHandle)return;
     frameHandle=requestAnimationFrame(()=>{
@@ -53,7 +62,7 @@
       #runnerVigScope.assetError .runnerVigScopeFallback{display:block}
       .runnerVigScopeKey{margin-top:5px;color:#a9cfb5;font-size:7px;font-weight:900;letter-spacing:.105em;text-align:center;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-      /* Inputs are one compact terminal bank, not three miniature gauges. */
+      /* Default input style: continuous terminal rails. */
       .runnerContributors{min-width:0;border-left:1px dotted #3a6647;background:transparent;padding:0 0 0 10px;display:grid;grid-template-rows:auto minmax(0,1fr)}
       .runnerContributorTitle{color:#86ad91;font-size:6.5px;font-weight:950;letter-spacing:.14em;text-align:left;margin:1px 0 6px;text-transform:uppercase}
       .runnerContributors .instrumentCluster{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:0!important;width:100%!important;align-items:stretch!important;border:1px solid #31583b!important;background:#010604!important;overflow:hidden}
@@ -70,6 +79,26 @@
       .instrument[data-meter-kind='pressure'] .runnerMiniRailTrack,.instrument[data-meter-kind='agreement'] .runnerMiniRailTrack{background:linear-gradient(90deg,#ff334f 0%,#ff7a2f 27%,#ffd43b 50%,#a9d92e 72%,#00ff78 100%)}
       .runnerMiniRailMarker{position:absolute;top:-3px;left:calc(var(--meter-value,50) * 1%);width:2px;height:11px;background:#effff3;box-shadow:0 0 5px rgba(235,255,240,.65);transform:translateX(-1px)}
       .runnerContributors .instrumentConf{grid-area:conf!important;font-size:5.5px!important;margin:0!important;text-align:right!important;color:#789487!important}
+      .runnerLedBlocks{display:none}
+
+      /* Comparison style B: segmented LED rack meters. */
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors{padding-left:12px}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributorTitle:after{content:' // SEGMENTED';color:#5f8269}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrument{min-height:58px!important;grid-template-columns:minmax(84px,.65fr) minmax(92px,1fr) auto!important;grid-template-areas:'label blocks read' 'conf conf conf'!important;gap:5px 9px!important;padding:8px 9px 7px!important}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerMiniRail{display:none!important}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks{grid-area:blocks;display:grid;grid-template-columns:repeat(10,minmax(3px,1fr));gap:3px;height:13px;align-self:center}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks span{display:block;border:1px solid #24442f;background:#071109;box-shadow:inset 0 0 5px rgba(0,0,0,.65)}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks span.on{box-shadow:0 0 5px currentColor,inset 0 0 4px rgba(255,255,255,.12)}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='heat'] .runnerLedBlocks span.on:nth-child(-n+3){background:#00d96d;color:#00d96d}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='heat'] .runnerLedBlocks span.on:nth-child(n+4):nth-child(-n+6){background:#d6c934;color:#d6c934}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='heat'] .runnerLedBlocks span.on:nth-child(n+7):nth-child(-n+8){background:#e6782f;color:#e6782f}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='heat'] .runnerLedBlocks span.on:nth-child(n+9){background:#e83b50;color:#e83b50}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='pressure'] .runnerLedBlocks span.on:nth-child(-n+3),#runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='agreement'] .runnerLedBlocks span.on:nth-child(-n+3){background:#e83b50;color:#e83b50}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='pressure'] .runnerLedBlocks span.on:nth-child(n+4):nth-child(-n+5),#runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='agreement'] .runnerLedBlocks span.on:nth-child(n+4):nth-child(-n+5){background:#e6782f;color:#e6782f}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='pressure'] .runnerLedBlocks span.on:nth-child(n+6):nth-child(-n+7),#runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='agreement'] .runnerLedBlocks span.on:nth-child(n+6):nth-child(-n+7){background:#d6c934;color:#d6c934}
+      #runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='pressure'] .runnerLedBlocks span.on:nth-child(n+8),#runnerMarketIntel[data-meter-variant='blocks'] .instrument[data-meter-kind='agreement'] .runnerLedBlocks span.on:nth-child(n+8){background:#00d96d;color:#00d96d}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrumentRead b{font-size:20px!important}
+      #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrumentConf{text-align:left!important;padding-left:1px}
 
       /* Edge readout is the footer of the same VIG SCOPE instrument. */
       #runnerMarketIntel>.runnerSummary.edgeReadout{margin:9px 0 0!important;border:0!important;border-top:1px solid #2a6240!important;border-left:3px solid var(--cyan)!important;background:#03101b!important;padding:8px 10px!important;font-size:11px!important;line-height:1.42!important}
@@ -93,6 +122,12 @@
         .runnerContributors .instrumentRead b{font-size:17px!important}
         .runnerContributors .instrumentConf{text-align:center!important;font-size:5px!important}
         .runnerMiniRail{height:6px;margin-top:1px}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors{padding:9px 0 0}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributorTitle{text-align:center}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrument{min-height:74px!important;grid-template-columns:1fr!important;grid-template-areas:'label' 'read' 'blocks' 'conf'!important;gap:3px!important;padding:6px!important}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrumentRead{justify-content:center!important}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrumentConf{text-align:center!important;padding-left:0}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks{height:10px;gap:2px;width:90%;margin:0 auto}
       }
 
       @media(max-width:900px) and (orientation:landscape){
@@ -101,6 +136,9 @@
         .runnerVigScopeAsset{max-height:214px}
         .runnerContributors .instrument{min-height:57px!important;padding:6px 7px 5px!important}
         .runnerContributors .instrumentRead b{font-size:16px!important}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrument{grid-template-columns:minmax(72px,.6fr) minmax(82px,1fr) auto!important;gap:4px 7px!important}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks{gap:2px;height:11px}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrumentRead b{font-size:17px!important}
       }
 
       @media(max-width:720px){
@@ -118,12 +156,14 @@
         .runnerContributors .instrument:first-child{border-top:0!important}
         .runnerVigScopeFrame{min-height:188px}
         .runnerVigScopeAsset{max-height:202px}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrument{grid-template-columns:minmax(82px,.6fr) minmax(94px,1fr) auto!important;grid-template-areas:'label blocks read' 'conf conf conf'!important;min-height:58px!important}
       }
 
       @media(max-width:520px){
         #runnerLive .runnerFresh{display:grid!important;grid-template-columns:1fr!important}
         .runnerVigScopeFrame{min-height:174px}
         .runnerVigScopeAsset{max-height:188px}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerContributors .instrument{grid-template-columns:1fr auto!important;grid-template-areas:'label read' 'blocks blocks' 'conf conf'!important}
       }
     `;
     d.head.appendChild(style);
@@ -169,6 +209,17 @@
         const conf=instrument.querySelector('.instrumentConf');
         if(conf)instrument.insertBefore(rail,conf);else instrument.appendChild(rail);
       }
+      let blocks=instrument.querySelector('.runnerLedBlocks');
+      if(!blocks){
+        blocks=d.createElement('div');
+        blocks.className='runnerLedBlocks';
+        blocks.setAttribute('aria-hidden','true');
+        for(let i=0;i<10;i++)blocks.appendChild(d.createElement('span'));
+        const conf=instrument.querySelector('.instrumentConf');
+        if(conf)instrument.insertBefore(blocks,conf);else instrument.appendChild(blocks);
+      }
+      const lit=Math.max(1,Math.ceil(value/10));
+      [...blocks.children].forEach((seg,i)=>seg.classList.toggle('on',i<lit));
     });
   }
 
@@ -246,7 +297,8 @@
     const summary=live.querySelector('.runnerSummary.edgeReadout')||live.querySelector(':scope > .runnerSummary');
     if(!head||!cluster||!counts)return;
 
-    cluster.dataset.meterStyle='terminal-rail';
+    const meterVariant=selectedMeterVariant();
+    cluster.dataset.meterStyle=meterVariant==='blocks'?'segmented-led':'terminal-rail';
     if(summary)summary.classList.add('edgeReadout');
 
     let intel=d.getElementById('runnerMarketIntel');
@@ -261,6 +313,7 @@
       grid.className='runnerMarketIntelGrid';
       intel.append(title,grid);
     }
+    intel.dataset.meterVariant=meterVariant;
 
     const title=intel.querySelector('.runnerMarketIntelTitle');
     if(title&&title.textContent!=='VIG SCOPE')title.textContent='VIG SCOPE';
