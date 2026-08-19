@@ -25,6 +25,7 @@ function ageMinutes(older, newer) { const a = parseMs(older), b = parseMs(newer)
 function fresh(value, reportTs, limit) { return ageMinutes(value, reportTs) <= limit; }
 function recKey(rec) { return `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`; }
 function combinedText(rec) { return [rec?.title, rec?.move, rec?.analysis, rec?.price, rec?.source].filter(Boolean).join(' // ').toUpperCase(); }
+function unavailableText(text) { return /(MARKET UNAVAILABLE|PRICE NOT VERIFIED|FEED STALE|IDENTITY MISMATCH)/.test(text); }
 
 function parseArgs(argv) {
   const [command, ...rest] = argv;
@@ -174,18 +175,23 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
     const prior = tracked.rec;
     const commenceMs = parseMs(prior?.feed?.eventDate);
     if (commenceMs !== null && commenceMs <= reportMs) continue;
+    const oldLine = lineFromRaw(prior.feed.hdp, prior.feed.side);
+    const currentRec = currentSpreads.get(recKey(prior));
     const event = events.get(String(prior.feed.eventId));
     if (!event) {
-      diagnostics.push({ eventId: String(prior.feed.eventId), side: prior.feed.side, priorLine: lineFromRaw(prior.feed.hdp, prior.feed.side), state: 'EVENT_NOT_IN_FEED' });
+      diagnostics.push({ eventId: String(prior.feed.eventId), side: prior.feed.side, priorLine: oldLine, priorLineText: lineText(oldLine), sourceTs: tracked.sourceTs, sourcePath: tracked.sourcePath, state: 'EVENT_NOT_IN_FEED', primary: [] });
+      if (!currentRec) {
+        violations.push(`${prior.title}: tracked ${lineText(oldLine)} event is absent from the feed but still pregame; preserve the card and mark it unavailable/unverified`);
+      } else if (!unavailableText(combinedText(currentRec))) {
+        violations.push(`${prior.title}: event is absent from the feed; draft must state unavailable/unverified`);
+      }
       continue;
     }
 
     const exact = exactFreshQuotes(event, prior, report.ts);
     if (exact.length) continue;
 
-    const oldLine = lineFromRaw(prior.feed.hdp, prior.feed.side);
     const primaries = BOOKS.map((book) => primarySpread(event, book, String(prior.feed.side).toLowerCase(), report.ts)).filter(Boolean);
-    const currentRec = currentSpreads.get(recKey(prior));
     const diagnostic = {
       eventId: String(prior.feed.eventId),
       side: String(prior.feed.side).toLowerCase(),
@@ -207,7 +213,7 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
     if (!primaries.length) {
       diagnostic.state = 'NO_FRESH_PRIMARY';
       diagnostics.push(diagnostic);
-      if (!/(MARKET UNAVAILABLE|PRICE NOT VERIFIED|FEED STALE|IDENTITY MISMATCH)/.test(text)) {
+      if (!unavailableText(text)) {
         violations.push(`${prior.title}: exact ${lineText(oldLine)} is not fresh and no fresh primary spread exists; draft must state unavailable/unverified`);
       }
       continue;
@@ -290,6 +296,12 @@ function selfTest() {
     const conflict = auditLineage({ root, report: conflictDraft, feed: conflictFeed });
     assert.equal(conflict.ok, true, conflict.violations.join('; '));
     assert.equal(conflict.diagnostics[0].state, 'BOOK_CONFLICT');
+
+    const exactFeed = structuredClone(feed);
+    exactFeed.events[0].bookmakers.Bet365[0].odds.push({ hdp: -11.5, home: '2.05', away: '1.74', selectionKeys: { home: '68096572|spread|home||-11.5', away: '68096572|spread|away||-11.5' } });
+    const exactStillThere = auditLineage({ root, report: base, feed: exactFeed });
+    assert.equal(exactStillThere.ok, true, exactStillThere.violations.join('; '));
+    assert.equal(exactStillThere.diagnostics.length, 0);
 
     console.log('SPREAD LINEAGE SELF-TEST OK');
   } finally {
