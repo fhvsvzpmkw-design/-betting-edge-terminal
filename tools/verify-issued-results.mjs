@@ -59,6 +59,19 @@ function parseLine(rec) {
   return Number.isFinite(Number(tail)) && tail !== '' ? Number(tail) : null;
 }
 
+function selectedSpreadLine(rec) {
+  const rawLine = parseLine(rec);
+  if (!Number.isFinite(rawLine)) return null;
+  const side = String(rec?.feed?.side || '').trim().toLowerCase();
+
+  // Odds-API.io spread rows express hdp from the HOME side's perspective.
+  // The same raw hdp identifies both home and away prices in the market row.
+  // Therefore an away selection carries the opposite signed handicap.
+  if (side === 'away') return -rawLine;
+  if (side === 'home') return rawLine;
+  return null;
+}
+
 function gradeFromScore(rec, event) {
   const home = Number(event?.homeScore);
   const away = Number(event?.awayScore);
@@ -79,7 +92,7 @@ function gradeFromScore(rec, event) {
 
   if (market === 'spread') {
     if (!['home', 'away'].includes(side)) return { grade: null, reason: 'unsupported_spread_side' };
-    const line = parseLine(rec);
+    const line = selectedSpreadLine(rec);
     if (!Number.isFinite(line)) return { grade: null, reason: 'spread_line_missing' };
     const selected = side === 'home' ? home : away;
     const opponent = side === 'home' ? away : home;
@@ -126,6 +139,7 @@ function skeleton(issued, sourcePath) {
     resultMethod: {
       lifecycle: 'ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE',
       scoreMarkets: ['ml', 'spread', 'totals'],
+      spreadHdpSemantics: 'raw hdp is the home-side handicap; away selected handicap is the opposite sign',
       unsupportedMarkets: 'remain unresolved unless exact selection verification is supplied',
       officialOnlyWhenStatus: 'BET',
       issuedReportMutable: false
@@ -157,7 +171,10 @@ const verification = readJson(verificationPath);
 const outputPath = args.output ? path.resolve(ROOT, args.output) : defaultOutput(sourcePath);
 let result = fs.existsSync(outputPath) ? readJson(outputPath) : skeleton(issued, sourcePath);
 result.kind = 'issued-card-observations';
-result.resultMethod = result.resultMethod || skeleton(issued, sourcePath).resultMethod;
+result.resultMethod = {
+  ...(result.resultMethod || skeleton(issued, sourcePath).resultMethod),
+  spreadHdpSemantics: 'raw hdp is the home-side handicap; away selected handicap is the opposite sign'
+};
 
 const verifiedAt = verification.verifiedAt || new Date().toISOString();
 const globalSource = verification.source || null;
