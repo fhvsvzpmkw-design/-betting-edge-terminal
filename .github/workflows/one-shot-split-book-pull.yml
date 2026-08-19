@@ -1,9 +1,9 @@
 name: One-shot split bookmaker pull migration
 
 on:
-  push:
-    paths:
-      - '.github/workflows/one-shot-split-book-pull.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
@@ -254,7 +254,7 @@ jobs:
         run: |
           grep -q "const REQUEST_BUDGET = 90;" .github/workflows/odds-refresh.yml
           grep -q "bookmakers: bookmaker" .github/workflows/odds-refresh.yml
-          grep -q "odds-multi:\${bookmaker}" .github/workflows/odds-refresh.yml
+          grep -q 'stage: `odds-multi:${bookmaker}`' .github/workflows/odds-refresh.yml
           grep -q "mergeCoreEvent" .github/workflows/odds-refresh.yml
           grep -q "DEEP_REQUEST_TARGET = 6" .github/workflows/odds-refresh.yml
 
