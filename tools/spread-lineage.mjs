@@ -261,8 +261,7 @@ function selfTest() {
       events: [{ id: 68096572, home: 'Washington Mystics', away: 'Toronto Tempo', bookmakers: {
         Bet365: [{ name: 'Spread', marketKey: 'spread', updatedAt: '2026-08-19T16:14:00Z', odds: [
           { hdp: -10.5, home: '1.80', away: '1.95', selectionKeys: { home: '68096572|spread|home||-10.5', away: '68096572|spread|away||-10.5' } },
-          { hdp: -11, home: '1.91', away: '1.91', selectionKeys: { home: '68096572|spread|home||-11', away: '68096572|spread|away||-11' } },
-          { hdp: -11.5, home: '2.05', away: '1.74', selectionKeys: { home: '68096572|spread|home||-11.5', away: '68096572|spread|away||-11.5' } }
+          { hdp: -11, home: '1.91', away: '1.91', selectionKeys: { home: '68096572|spread|home||-11', away: '68096572|spread|away||-11' } }
         ] }]
       }}]
     };
