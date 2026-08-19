@@ -159,7 +159,7 @@ function exactFreshQuotes(event, priorRec, feedGeneratedAt) {
       const raw = Number(row?.hdp);
       if (!Number.isFinite(raw) || Math.abs(raw - rawHdp) > 0.001) continue;
       const keys = row?.selectionKeys || row?.identity?.selectionKeys || {};
-      if (selectionKey && keys?.[side] && String(keys[side]) !== selectionKey) continue;
+      if (selectionKey && String(keys?.[side] || '') !== selectionKey) continue;
       const dec = decimalOdds(row?.[side]);
       if (!dec) continue;
       out.push({ book, rawHdp: raw, displayLine: lineFromRaw(raw, side), priceAmerican: americanOdds(dec), updatedAt: market.updatedAt });
