@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "description": "Primary spread resolution fixtures. Canonical spread only; alternate spreads must not influence market-center selection.",
+  "cases": [
+    {
+      "name": "toronto-0800-no-provider-marker",
+      "eventId": 68096572,
+      "home": "Washington Mystics",
+      "away": "Toronto Tempo",
+      "book": "Bet365",
+      "side": "away",
+      "generatedAt": "2026-08-19T14:56:27.576Z",
+      "marketUpdatedAt": "2026-08-19T14:55:00.000Z",
+      "rows": [
+        { "hdp": -10.5, "home": "1.80", "away": "1.83" },
+        { "hdp": -11, "home": "1.86", "away": "1.86" },
+        { "hdp": -11.5, "home": "2.00", "away": "1.83" },
+        { "hdp": -12, "home": "2.05", "away": "1.68" }
+      ],
+      "extraMarkets": [
+        {
+          "name": "Alternative Spread",
+          "marketKey": "alternative-spread",
+          "updatedAt": "2026-08-19T14:55:30.000Z",
+          "odds": [
+            { "hdp": -12, "home": "1.90", "away": "1.90" }
+          ]
+        }
+      ],
+      "expected": {
+        "state": "OK",
+        "method": "MARKET_CENTER",
+        "rawHdp": -11,
+        "displayLine": 11
+      }
+    },
+    {
+      "name": "no-marker-equal-center-is-ambiguous",
+      "eventId": 68096572,
+      "book": "Bet365",
+      "side": "away",
+      "generatedAt": "2026-08-19T16:15:00.000Z",
+      "marketUpdatedAt": "2026-08-19T16:14:00.000Z",
+      "rows": [
+        { "hdp": -11, "home": "1.91", "away": "1.91" },
+        { "hdp": -12, "home": "1.91", "away": "1.91" }
+      ],
+      "expected": {
+        "state": "AMBIGUOUS",
+        "method": "MARKET_CENTER",
+        "candidateRawHdps": [-12, -11]
+      }
+    }
+  ]
+}
