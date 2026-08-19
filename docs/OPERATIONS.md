@@ -1,6 +1,6 @@
 # Betting Edge — Operations
 
-**Last updated:** 2026-08-18 — runner UI v1.4 / scheduler diagnostics sync
+**Last updated:** 2026-08-18 — evening scheduler / odds-workflow record sync
 
 This document describes how the current Betting Edge system is operated and checked. It is practical runbook material, not a substitute for the governance contract. The authoritative production contract is `BETTING_EDGE_CONTRACT.md` v0.9.
 
@@ -42,15 +42,15 @@ UI v1.4 is presentation-only. It does not require a report rerun or migrate issu
 
 ## Standard daily sequence
 
-| Report session | Target odds slot | Scheduled attempts |
-|---|---:|---|
-| 06:00 | 05:45 | 05:43 and 05:53 Vancouver |
-| 08:00 | 07:45 | 07:43 and 07:53 Vancouver |
-| 09:30 | 09:15 | 09:13 and 09:23 Vancouver |
-| 15:15 | 14:55 | 14:53 and 15:03 Vancouver |
-| 18:15 | 17:55 | 17:53 and 18:03 Vancouver |
+| Report session | Target odds slot | Production scheduled trigger |
+|---|---:|---:|
+| 06:00 | 05:45 | 05:45 Vancouver |
+| 08:00 | 07:45 | 07:45 Vancouver |
+| 09:30 | 09:15 | 09:15 Vancouver |
+| 15:15 | 14:55 | 14:55 Vancouver |
+| 18:15 | 17:55 | 17:55 Vancouver |
 
-The paired-trigger pattern exists because GitHub scheduled workflows can arrive late or occasionally fail to dispatch. The backup trigger provides another opportunity without blindly spending quota when a valid same-slot refresh already exists.
+Production now uses **one scheduled odds-refresh trigger per report window**. Manual `workflow_dispatch` is the explicit fallback when the scheduled trigger is missed, materially delayed, fails, or does not leave a usable snapshot while a fresh pull is still operationally useful. The 25-minute zombie cutoff remains in place so a stale scheduled dispatch cannot spend API quota merely because it finally arrived.
 
 ## Active odds workflow
 
@@ -58,24 +58,25 @@ File: `.github/workflows/odds-refresh.yml`
 
 Key controls:
 
-- manual `workflow_dispatch` remains available;
+- one scheduled cron trigger per report window;
+- manual `workflow_dispatch` remains available as fallback;
 - concurrency group: `betting-edge-odds-refresh`;
 - `cancel-in-progress: false`;
 - output: `data/live-odds.json`;
 - books: Bet365 and DraftKings;
 - stale scheduled-job cutoff: 25 minutes after the intended slot;
-- hard request budget: 70;
+- hard request budget: 90;
 - safety reserve: 5;
-- optional stop point: 65;
+- optional stop point: 85;
 - core request planning target: 34;
-- deep request planning target: 20;
+- deep request planning target: 6;
 - event horizon: 30 hours;
 - prop horizon: 8 hours;
 - maximum market age in the refresh workflow: 90 minutes.
 
 A stale scheduled trigger should exit before making Odds-API requests. This is the "zombie killer" behavior.
 
-Git history is the rollback authority for this workflow. The obsolete `.github/workflows/odds-refresh.yml.old` duplicate has been removed; restore an earlier workflow from Git history if rollback is required.
+Git history is the rollback authority for this workflow. `.github/workflows/odds-refresh.yml.old` currently remains only as an inactive convenience/historical file; it is not a scheduled production workflow and must not be treated as current scheduler authority.
 
 ## Post-refresh odds-history index
 
@@ -110,14 +111,15 @@ Scheduler Canary v1 and v2 were removed from the live workflow directory after v
 When checking whether a report window is on track, use this order:
 
 1. **Check production authority.** Confirm `BETTING_EDGE_CONTRACT.md` is present and operational v0.9; verify runner presentation/UI v1.4 and report engine/core v1.3.
-2. **Check the scheduled odds workflow run.** Confirm whether an expected trigger appeared and whether it completed, is delayed, or was killed as stale.
+2. **Check the scheduled odds workflow run.** Confirm whether the single expected trigger appeared and whether it completed, is delayed, failed, or was killed as stale.
 3. **Check canaries.** If canaries have recent scheduled successes while the odds workflow does not, focus on the odds workflow rather than assuming all GitHub scheduling is down.
 4. **Check `data/live-odds.json`.** Confirm the latest valid snapshot reflects the intended refresh period.
 5. **Check the odds-history index.** After a successful published refresh, confirm the separate indexing workflow eventually records the snapshot. Index lag does not invalidate the live feed.
 6. **Check API-use evidence when needed.** A zombie-killed run should make zero odds API requests. A successful live refresh should show actual request activity.
-7. **Open the issued report.** Prefer the compact short link when durable history/indexing succeeded; use the long fallback when history saving failed.
-8. **Check durable report history.** For post-cutover reports, confirm exact issued payload + schema-3 sidecar + `run-history.json` linkage.
-9. **Reprice only after a valid newer live feed exists.**
+7. **Use manual refresh only if needed.** If the scheduled trigger missed or failed and a fresh pull still has practical value, use `workflow_dispatch`; do not create ad hoc extra scheduled attempts.
+8. **Open the issued report.** Prefer the compact short link when durable history/indexing succeeded; use the long fallback when history saving failed.
+9. **Check durable report history.** For post-cutover reports, confirm exact issued payload + schema-3 sidecar + `run-history.json` linkage.
+10. **Reprice only after a valid newer live feed exists.**
 
 Do not infer success solely from the existence of a workflow run. A run can finish successfully because a stale trigger was intentionally rejected or because no publishable odds changes were produced.
 
@@ -209,7 +211,7 @@ New v0.9 production runs use `data/history/report-provenance-schema.json` schema
 
 - `productionContractVersion="0.9"`;
 - `productionContractOperational=true`;
-- `productionContractPath="BETTING_EDGE_CONTRACT.md"`;
+- `productionContractPath="BETTING_EDGE_CONTRACT.md`;
 - exact `productionContractBlobSha` resolved before handicapping;
 - runner/feed/Research Library/policy/manifest/R2 blob provenance where available;
 - structured per-recommendation Research Fit records.
