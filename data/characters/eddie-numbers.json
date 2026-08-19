@@ -6,7 +6,7 @@
   "nickname": "Muddy",
   "publication": "MUDDY NUMBERS",
   "editable": true,
-  "updatedAt": "2026-08-18T21:54:00-07:00",
+  "updatedAt": "2026-08-18T21:57:00-07:00",
   "identity": {
     "role": "Modern Vegas sportsbook desk personality",
     "corePromise": "Give the straight Betting Edge read with premium sportsbook presentation and no forced action."
@@ -22,29 +22,24 @@
   "hotlineStyle": {
     "visualTheme": "Glossy modern sports-broadcast and casino insert",
     "era": "modern",
-    "layoutStyle": "Premium network masthead, seven-day ledger tape, compact performance graph, market cards and clean sportsbook information blocks",
+    "layoutStyle": "Premium network masthead, one last-ten-bets running graph with matching stats, market cards and clean sportsbook information blocks",
     "headlineStyle": "Large italic sports headline with gold/cyan broadcast accents",
     "informationDensity": "medium-high",
-    "signatureSections": ["network masthead", "MUDDY LEDGER // EDDIE $100-UNIT SCALE", "market cards", "EDDIE quote", "THE WALK TO THE CAGE"],
+    "signatureSections": ["network masthead", "MUDDY LEDGER // LAST 10 BETS", "market cards", "EDDIE quote", "THE WALK TO THE CAGE"],
     "ledgerTape": {
       "source": "data/betting-ledger.json",
-      "purpose": "Replace generic issued-bets/new-risk/past-current score boxes with useful recent performance context from the actual betting ledger.",
-      "windowRule": "Use the last seven complete America/Vancouver local wagering dates supported by the ledger snapshot. Do not fill dates beyond ledger coverage as if they were complete.",
+      "purpose": "Give one compact performance view based on Eddie's most recent ten settled wagers instead of generic report counters or a seven-day dashboard.",
+      "selectionRule": "Use the ten most recent settled wagers in chronological order from the source ledger. Do not substitute calendar-day buckets for the last-ten sequence.",
       "displayScale": {
-        "name": "EDDIE $100-UNIT SCALE",
         "multiplier": 10,
-        "reason": "Eddie is presented as roughly a $100 player, about ten times the staking scale of the source betting ledger.",
-        "applyTo": ["risk dollars", "profit/loss dollars", "daily P/L dollars", "cumulative P/L graph dollars"],
-        "preserveUnscaled": ["wager count", "win-loss record", "ROI percentage", "dates", "result status"],
-        "bankrollRule": "If Eddie's bankroll is displayed, use approximately 10× the source-ledger bankroll and label it clearly as Eddie-scale or fictional presentation bankroll, never as the source bankroll.",
-        "sourceIntegrity": "Never modify data/betting-ledger.json. Scaling is presentation-only."
+        "unitProfile": "$100 player",
+        "rule": "Multiply source-ledger dollar risk and profit/loss by 10 for Eddie's fictional presentation. Do not scale wager count, record, odds or ROI.",
+        "bankrollRule": "If Eddie's bankroll is displayed, present it at approximately 10× the source bankroll for character consistency; never rewrite the source ledger bankroll."
       },
-      "requiredSummary": ["settled wager count", "record", "Eddie-scale net profit/loss", "Eddie-scale amount risked", "ROI"],
-      "dailyGrid": "Show each of the seven local dates with wager count, W-L record and daily net P/L at Eddie's 10× display scale.",
-      "graph": "Show one compact cumulative seven-day P/L trend graph at Eddie's 10× display scale.",
-      "freshnessRule": "Always display the ledger generated timestamp/window note when the ledger snapshot does not cover the current report date.",
-      "roundingRule": "Daily cells may be rounded to cents after scaling; aggregate P/L and risk must be calculated from the source totals first and then multiplied by 10 so rounding does not change the headline total.",
-      "never": "Do not invent missing ledger days, infer deposits, alter source-ledger values, or substitute current Betting Edge recommendation counts for ledger performance."
+      "requiredStats": ["10 wager count", "record", "amount risked", "net profit/loss", "ROI"],
+      "graph": "Show exactly one running cumulative P/L graph across bets 1 through 10. Each point represents one settled wager in sequence on Eddie's 10× scale.",
+      "betLabels": "Under the graph, concise wager labels may identify bets 1 through 10 and their individual scaled P/L so the sequence is readable.",
+      "never": "Do not show a second graph, seven-day daily grid, generic issued-bets/new-risk score strip, or additional performance dashboard. Do not modify the source ledger."
     }
   },
   "editorial": {
