@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-18 — morning production audit / Syndicate slot defaults  
+**Last updated:** 2026-08-18 — evening scheduler / odds-workflow record sync  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -50,7 +50,7 @@ The corresponding target odds-refresh slots are approximately:
 - 14:55
 - 17:55
 
-The GitHub workflow uses paired/backup cron attempts around those target slots rather than trusting a single scheduled dispatch.
+The GitHub odds-refresh workflow uses **one scheduled cron trigger at each target slot**. Manual `workflow_dispatch` is the explicit fallback when a scheduled refresh is missed, delayed beyond practical use, or does not produce a usable snapshot. The 25-minute zombie cutoff still prevents stale scheduled jobs from spending quota.
 
 All five report tasks use the mandatory production-contract preflight: resolve `BETTING_EDGE_CONTRACT.md` v0.9 operational and the current runner before handicapping; otherwise stop with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
 
@@ -66,7 +66,9 @@ Current core properties:
 - Primary books: **Bet365** and **DraftKings**.
 - Covered sport families include soccer/football, American football, basketball, baseball, ice hockey, tennis, boxing, and MMA.
 - Scheduled jobs more than **25 minutes late** for their intended slot are treated as zombies and exit before spending API quota.
-- The workflow has a hard request ceiling of **70**, with a safety reserve and early-stop controls.
+- The workflow has a hard request ceiling of **90**, with a **5-request safety reserve** and optional work stopping at **85**.
+- Core request planning target is **34**; deep-request planning target is **6**.
+- Manual `workflow_dispatch` remains available as the operational fallback for missed or unusable scheduled refreshes.
 - Invalid refreshes are designed not to replace a previously good live-odds snapshot.
 - Structured event/market/selection identity is preferred over title parsing.
 
