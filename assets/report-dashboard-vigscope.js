@@ -37,6 +37,7 @@
       #runnerLive .runnerFresh .marketStateLabel{order:2!important;color:#9cc8aa!important;font-size:8px!important;opacity:.72}
       #runnerLive .sessionStrip{margin-top:10px!important;gap:7px!important}
       #runnerLive .sessionChip{min-height:44px!important;padding:8px 6px!important;font-size:11px!important}
+      #runnerBankrollCompact .runnerNewRiskValue{color:#f4fff9!important}
 
       /* VIG SCOPE = PICKS + INPUTS + VIG METER */
       #runnerMarketIntel{margin-top:10px;border:2px solid #36a35c;background:linear-gradient(180deg,#010b07 0%,#010604 100%);padding:10px;box-shadow:inset 0 0 26px rgba(0,255,120,.04),0 0 8px rgba(0,255,120,.035)}
@@ -52,11 +53,10 @@
       #runnerVigPicks .runnerCount{min-height:88px!important;margin:0!important;padding:8px 7px!important;border:0!important;border-left:1px solid #24475b!important;border-top:1px solid #24475b!important;background:linear-gradient(180deg,#020b14,#010811)!important;display:grid!important;align-content:center!important;text-align:center!important}
       #runnerVigPicks .runnerCount:nth-child(odd){border-left:0!important}
       #runnerVigPicks .runnerCount:nth-child(-n+2){border-top:0!important}
-      #runnerVigPicks .runnerCount b{display:inline-block!important;justify-self:center!important;min-width:1.18em;padding:1px 9px 5px!important;margin-top:4px!important;border-bottom:2px solid currentColor;font-size:clamp(39px,4.45vw,54px)!important;font-weight:1000!important;font-variant-numeric:tabular-nums;letter-spacing:-.08em!important;line-height:.9!important;background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(0,0,0,.15));text-shadow:0 0 3px currentColor,0 0 10px currentColor;filter:saturate(1.05)}
-      #runnerVigPicks .runnerCount .callName{font-size:11px!important;letter-spacing:.13em!important;text-shadow:0 0 5px currentColor}
-      #runnerVigPicks .runnerCount .callName:before{content:'◆';display:inline-block;margin-right:5px;font-size:5px;vertical-align:middle;opacity:.7}
-      #runnerVigPicks .runnerRiskMini{margin-top:5px!important;padding-top:4px!important;border-top:1px dotted #204555!important;font-size:6.5px!important;gap:5px!important}
-      #runnerVigPicks .runnerRiskMini .runnerRiskValue{font-size:8.5px!important}
+      #runnerVigPicks .runnerCount b{display:inline-block!important;justify-self:center!important;min-width:1.18em;padding:1px 9px 5px!important;margin-top:4px!important;border-bottom:1px solid currentColor;font-size:clamp(39px,4.45vw,54px)!important;font-weight:1000!important;font-variant-numeric:tabular-nums;letter-spacing:-.08em!important;line-height:.9!important;background:transparent!important;text-shadow:none!important;filter:none!important}
+      #runnerVigPicks .runnerCount .callName{font-size:11px!important;letter-spacing:.13em!important;text-shadow:none!important}
+      #runnerVigPicks .runnerCount .callName:before{content:'•';display:inline-block;margin-right:5px;font-size:7px;vertical-align:middle;opacity:.65}
+      #runnerVigPicks .runnerRiskMini{display:none!important}
 
       /* SECTION 2 — INPUT METERS */
       #runnerVigContributors{padding:8px;display:grid;grid-template-rows:auto minmax(0,1fr)}
@@ -87,7 +87,7 @@
       #runnerVigScope.assetError .runnerVigScopeFallback{display:block}
       .runnerVigScopeKey{margin-top:6px;color:#b1d8bc;font-size:8px;font-weight:900;letter-spacing:.11em;text-align:center;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-      /* Optional comparison style: segmented LEDs. */
+      /* Default segmented LEDs. */
       #runnerMarketIntel[data-meter-variant='blocks'] #runnerVigContributors .instrument{grid-template-columns:minmax(86px,.7fr) minmax(110px,1fr) auto!important;grid-template-areas:'label blocks read' 'conf conf conf'!important;gap:5px 9px!important}
       #runnerMarketIntel[data-meter-variant='blocks'] .runnerMiniRail{display:none!important}
       #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks{grid-area:blocks;display:grid;grid-template-columns:repeat(10,minmax(4px,1fr));gap:3px;height:14px;align-self:center}
@@ -106,21 +106,23 @@
       #runnerMarketIntel>.runnerSummary.edgeReadout{margin:10px 0 0!important;border:0!important;border-top:1px solid #2a6240!important;border-left:3px solid var(--cyan)!important;background:#03101b!important;padding:9px 11px!important;font-size:11px!important;line-height:1.42!important}
       #runnerMarketIntel>.runnerSummary.edgeReadout:before{content:'EDGE READOUT';display:block;margin-bottom:5px;color:var(--green);font-size:8px;font-weight:950;letter-spacing:.11em}
 
-      /* iPad portrait still keeps all three VigScope sections on one row. */
+      /* iPad portrait: keep all three sections on one row, but give inputs more room. */
       @media(max-width:1100px){
-        .runnerVigScopeRow{grid-template-columns:minmax(220px,.86fr) minmax(245px,1fr) minmax(275px,1.08fr);gap:8px;min-height:218px}
+        .runnerVigScopeRow{grid-template-columns:minmax(205px,.76fr) minmax(310px,1.22fr) minmax(260px,1fr);gap:9px;min-height:218px}
         .runnerVigSection{padding:7px}
         #runnerVigPicks .runnerCount{min-height:82px!important;padding:6px!important}
         #runnerVigPicks .runnerCount b{font-size:clamp(36px,4.05vw,47px)!important;padding:1px 7px 4px!important}
         #runnerVigContributors .instrument{min-height:60px!important;padding:7px 8px 6px!important}
         #runnerVigContributors .instrumentRead b{font-size:24px!important}
+        #runnerMarketIntel[data-meter-variant='blocks'] #runnerVigContributors .instrument{grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:'label read' 'blocks blocks' 'conf conf'!important;gap:3px 8px!important}
+        #runnerMarketIntel[data-meter-variant='blocks'] .runnerLedBlocks{width:100%;height:12px;gap:3px}
       }
 
       @media(max-width:900px){
         #runnerLive .runnerHead{grid-template-columns:1fr!important}
         #runnerLive .runnerHeadRight{min-width:0!important;max-width:none!important;width:100%!important}
         #runnerLive .runnerFresh{justify-content:flex-start!important;text-align:left!important}
-        .runnerVigScopeRow{grid-template-columns:minmax(205px,.84fr) minmax(225px,1fr) minmax(250px,1.06fr);gap:7px;min-height:210px}
+        .runnerVigScopeRow{grid-template-columns:minmax(185px,.72fr) minmax(285px,1.24fr) minmax(235px,1fr);gap:7px;min-height:210px}
         .runnerVigSectionTitle{font-size:6.5px;margin-bottom:6px}
         #runnerVigPicks .runnerCount{min-height:77px!important}
         #runnerVigPicks .runnerCount b{font-size:35px!important;padding:1px 6px 4px!important}
