@@ -1,118 +1,24 @@
 (()=>{
-  'use strict';
-
-  const CONFIG_URL='./data/schedule-profiles.json';
-  const STATE_URL='./data/schedule-state.json';
-  const HISTORY_URL='./run-history.json';
-  const ACTION_URL='https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/workflows/set-schedule-profile.yml';
-  const STYLE_ID='runnerScheduleProfileUiStyle';
-  const PANEL_ID='runnerSchedulePreferences';
-  const BUTTON_ID='runnerPreferencesF6';
-  let config=null,state=null,history=null,observer=null,lastDoc=null;
-
-  function appDocument(){
-    try{
-      const core=document.getElementById('core');
-      const app=core?.contentDocument?.getElementById('app');
-      return app?.contentDocument||null;
-    }catch(e){return null}
-  }
-  function vancouverParts(date=new Date()){
-    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(date);
-    const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));
-    const hour=Number(o.hour==='24'?'0':o.hour),minute=Number(o.minute);
-    return {date:`${o.year}-${o.month}-${o.day}`,hour,minute,minutes:hour*60+minute,time:`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`};
-  }
-  function addDays(dateText,days){const d=new Date(`${dateText}T12:00:00Z`);d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10)}
-  function resolveProfile(dateText){
-    if(!config||!state)return null;
-    let id=state.defaultProfileId||config.legacyProfileId;
-    const selections=(state.selections||[]).slice().sort((a,b)=>String(a.effectiveOperatingDate).localeCompare(String(b.effectiveOperatingDate))||String(a.selectedAt||'').localeCompare(String(b.selectedAt||'')));
-    selections.forEach(s=>{if(s?.effectiveOperatingDate<=dateText&&config.profiles[s.profileId])id=s.profileId});
-    return config.profiles[id]||config.profiles[config.legacyProfileId];
-  }
-  function profileSlot(profile,slot){return profile?.slots?.find(x=>x.slot===slot)||null}
-  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-  function b64u(v){try{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const bin=atob(v);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}catch(e){return null}}
-  function currentRun(){
-    try{
-      const core=document.getElementById('core');
-      const hash=core?.contentWindow?.location?.hash?.slice(1)||'';
-      const p=new URLSearchParams(hash);const raw=p.has('run')?b64u(p.get('run')):null;
-      return raw?JSON.parse(raw):null;
-    }catch(e){return null}
-  }
-  async function loadData(){
-    const bust=`v=${Date.now()}`;
-    const [c,s,h]=await Promise.all([
-      fetch(`${CONFIG_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`profiles ${r.status}`);return r.json()}),
-      fetch(`${STATE_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`state ${r.status}`);return r.json()}),
-      fetch(`${HISTORY_URL}?${bust}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
-    ]);
-    config=c;state=s;history=h;
-  }
-  function ensureStyle(d){
-    if(d.getElementById(STYLE_ID))return;
-    const style=d.createElement('style');style.id=STYLE_ID;style.textContent=`
-      #${BUTTON_ID}{border-color:#4d6b7d!important;color:#b9dfff!important;background:#020a10!important}
-      #${BUTTON_ID}:hover,#${BUTTON_ID}.active{border-color:#64d7ff!important;color:#e7f8ff!important;background:#04131d!important;box-shadow:inset 0 0 12px rgba(80,205,255,.06),0 0 8px rgba(80,205,255,.08)!important}
-      #${PANEL_ID}{display:none;margin:0 12px 14px;padding:12px;border:1px solid #31566d;background:linear-gradient(180deg,#020b12,#01060a);color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;box-shadow:inset 0 0 24px rgba(67,200,255,.025)}
-      body.runnerPreferencesLoaded #${PANEL_ID}{display:block}
-      body.runnerPreferencesLoaded #runnerLive,body.runnerPreferencesLoaded .view,body.runnerPreferencesLoaded #runnerSyndicateWorkspace{display:none!important}
-      .schedulePrefHead{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap;border-bottom:1px solid #23465a;padding-bottom:10px}
-      .schedulePrefHead h2{margin:0;color:#7fe4ff;font-size:16px;letter-spacing:.12em}.schedulePrefHead p{margin:4px 0 0;color:#819aa8;font-size:9px;line-height:1.5}
-      .scheduleLock{border:1px solid #466d55;background:#04110a;color:#8effaa;padding:6px 9px;font-size:9px;font-weight:900;letter-spacing:.08em}
-      .scheduleStatusGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.scheduleStatus{border:1px solid #29495b;background:#020a0f;padding:9px}.scheduleStatus small{display:block;color:#6f8b9a;font-size:7px;letter-spacing:.11em}.scheduleStatus b{display:block;margin-top:4px;color:#d9f6ff;font-size:15px}.scheduleStatus span{display:block;margin-top:3px;color:#7e98a7;font-size:8px}
-      .scheduleProfiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.scheduleProfileCard{border:1px solid #29495b;background:#02090e;padding:9px;min-width:0}.scheduleProfileCard.current{border-color:#58ff88;box-shadow:inset 0 0 14px rgba(88,255,136,.035)}.scheduleProfileCard.queued{border-color:#ffd65b}.scheduleProfileName{display:flex;justify-content:space-between;gap:6px;align-items:center}.scheduleProfileName b{color:#f3fbff;font-size:12px}.scheduleProfileName em{color:#6f8c9d;font-style:normal;font-size:7px}.scheduleFocus{margin:5px 0 7px;color:#7d98a7;font-size:8px;min-height:24px}.scheduleRows{display:grid;gap:3px}.scheduleRow{display:grid;grid-template-columns:28px 46px 12px 46px minmax(0,1fr);gap:4px;align-items:center;padding:4px 5px;border-top:1px solid #172f3b;font-size:7px;color:#8da6b5}.scheduleRow:first-child{border-top:0}.scheduleRow .vigStar{color:#ffd65b;font-size:9px}.scheduleRow strong{color:#c9efff}.scheduleAction{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #23465a}.scheduleAction a{display:inline-block;border:1px solid #4a7f96;padding:7px 10px;color:#bceeff;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.08em}.scheduleAction a:hover{background:#06202c}.scheduleAction span{color:#78909d;font-size:8px;max-width:670px;line-height:1.45}
-      #runnerScheduleTranslation{margin:7px 0 0;padding:5px 8px;border-left:3px solid #43c8ff;background:#031019;color:#87a9ba;font-size:7px;font-weight:800;letter-spacing:.06em}
-      .runbtn.scheduleFeatured{border-color:#8d7629!important;box-shadow:inset 0 0 8px rgba(255,214,91,.04)}.runbtn .scheduleStar{color:#ffd65b;margin-left:3px}
-      .runnerVigScopeScheduleBadge{margin-top:4px;color:#ffd65b;font-size:7px;font-weight:950;letter-spacing:.09em;text-align:center;text-transform:uppercase}
-      @media(max-width:760px){.scheduleStatusGrid,.scheduleProfiles{grid-template-columns:1fr}.scheduleFocus{min-height:0}.scheduleRow{grid-template-columns:28px 43px 10px 43px minmax(0,1fr)}}
-    `;d.head.appendChild(style);
-  }
-  function profileHtml(profile,currentId,nextId){
-    const current=profile.id===currentId,queued=profile.id===nextId&&nextId!==currentId;
-    const rows=profile.slots.map(s=>`<div class="scheduleRow"><strong>S${s.canonicalSlot}</strong><span>${esc(s.pulseTime)}</span><span>→</span><span>${esc(s.reportTime)}</span><span>${s.featuredVigScope?'<b class="vigStar">★</b> ':''}${esc(s.label)}</span></div>`).join('');
-    return `<section class="scheduleProfileCard ${current?'current':''} ${queued?'queued':''}"><div class="scheduleProfileName"><b>${esc(profile.name)}</b><em>${current?'CURRENT':queued?'QUEUED':'AVAILABLE'}</em></div><div class="scheduleFocus">${esc(profile.focus)}</div><div class="scheduleRows">${rows}</div></section>`;
-  }
-  function renderPanel(d){
-    if(!config||!state)return;
-    let panel=d.getElementById(PANEL_ID);if(!panel){panel=d.createElement('section');panel.id=PANEL_ID;panel.setAttribute('aria-label','Schedule preferences');const nav=d.querySelector('.runnerNavPad');if(nav)nav.insertAdjacentElement('afterend',panel);else d.body.prepend(panel)}
-    const now=vancouverParts(),today=now.date,tomorrow=addDays(today,1),current=resolveProfile(today),next=resolveProfile(tomorrow);
-    const locked=now.minutes>=360;
-    panel.innerHTML=`<div class="schedulePrefHead"><div><h2>PREFERENCES / OPERATIONS</h2><p>ONE VANCOUVER OPERATING DAY = ONE SCHEDULE PROFILE // FIVE PRIMARY ODDS PULSES // THREE FEATURED VIG SCOPE CHECKPOINTS</p></div><div class="scheduleLock">${locked?'TODAY LOCKED':'NEXT 06:00 PROFILE'}</div></div><div class="scheduleStatusGrid"><div class="scheduleStatus"><small>CURRENT OPERATING PROFILE // ${today}</small><b>${esc(current.name)}</b><span>Five-pull schedule remains fixed for this operating day.</span></div><div class="scheduleStatus"><small>NEXT 06:00 // ${tomorrow}</small><b>${esc(next.name)}</b><span>${next.id===current.id?'NO CHANGE QUEUED':'PROFILE CHANGE QUEUED'}</span></div></div><div class="scheduleProfiles">${Object.values(config.profiles).map(p=>profileHtml(p,current.id,next.id)).join('')}</div><div class="scheduleAction"><span>Profile changes are repository-controlled so a static terminal cannot silently spend quota or rewrite the day. One change per local day; after the 05:30 cutoff it takes effect on the next operating day.</span><a href="${ACTION_URL}" target="_blank" rel="noopener">QUEUE NEXT PROFILE ↗</a></div>`;
-  }
-  function ensureButton(d){
-    const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');if(!tabs)return false;
-    let b=d.getElementById(BUTTON_ID);if(!b){b=d.createElement('button');b.type='button';b.className='btn';b.id=BUTTON_ID;b.innerHTML='<b>[F6]</b>&nbsp; ⚙ PREFERENCES';tabs.appendChild(b);b.addEventListener('click',()=>{const opening=!d.body.classList.contains('runnerPreferencesLoaded');d.body.classList.remove('runnerSyndicateLoaded');d.body.classList.toggle('runnerPreferencesLoaded',opening);b.classList.toggle('active',opening);if(opening)renderPanel(d)});tabs.addEventListener('click',e=>{const target=e.target.closest('.btn');if(target&&target!==b&&!target.matches('#runnerSyndicateF5')){d.body.classList.remove('runnerPreferencesLoaded');b.classList.remove('active')}})}
-    return true;
-  }
-  function historyDate(d){const sel=d.getElementById('runDateSelect');if(sel&&sel.value&&sel.value!=='latest')return sel.value;const run=currentRun();return String(run?.ts||'').slice(0,10)||vancouverParts().date}
-  function patchHistory(d){
-    if(!config||!state)return;
-    const date=historyDate(d),profile=resolveProfile(date);if(!profile)return;
-    d.querySelectorAll('[data-run-slot]').forEach(btn=>{
-      const slot=profileSlot(profile,btn.dataset.runSlot);if(!slot)return;
-      const rt=btn.querySelector('.rt'),rl=btn.querySelector('.rl');if(rt&&rt.textContent!==slot.reportTime)rt.textContent=slot.reportTime;if(rl){const label=slot.label;if(rl.textContent!==label)rl.textContent=label}
-      btn.classList.toggle('scheduleFeatured',slot.featuredVigScope===true);btn.dataset.canonicalSlot=String(slot.canonicalSlot);btn.title=`${profile.name} // CANONICAL SLOT ${slot.canonicalSlot} // PULSE ${slot.pulseTime} // REPORT ${slot.reportTime}${slot.featuredVigScope?' // FEATURED VIG SCOPE':''}`;
-      let star=btn.querySelector('.scheduleStar');if(slot.featuredVigScope&&!star){star=d.createElement('span');star.className='scheduleStar';star.textContent='★';btn.appendChild(star)}else if(!slot.featuredVigScope&&star)star.remove();
-    });
-    const bar=d.querySelector('.runArchiveBar');if(bar){let note=d.getElementById('runnerScheduleTranslation');if(!note){note=d.createElement('div');note.id='runnerScheduleTranslation';bar.insertAdjacentElement('afterend',note)}note.textContent=`SCHEDULE TRANSLATION // ${date} // ${profile.name} // HISTORY NAVIGATES CANONICAL SLOTS 1–5; ACTUAL ISSUE TIMESTAMPS REMAIN IMMUTABLE`;}
-    const meta=d.getElementById('runArchiveMeta');if(meta&&meta.textContent){const active=d.querySelector('[data-run-slot].active');const slot=active?profileSlot(profile,active.dataset.runSlot):null;if(slot){const marker='// GENERATED';const i=meta.textContent.indexOf(marker);const suffix=i>=0?' '+meta.textContent.slice(i):'';const desired=`${date} // ${slot.reportTime} ${slot.label} // ${profile.shortName} // S${slot.canonicalSlot}${suffix}`;if(meta.textContent!==desired)meta.textContent=desired;}}
-  }
-  function patchVigScope(d){
-    if(!config||!state)return;
-    const run=currentRun();if(!run?.slot||!run?.ts)return;
-    const date=String(run.ts).slice(0,10),profile=resolveProfile(date),slot=profileSlot(profile,run.slot);if(!slot)return;
-    const scope=d.getElementById('runnerVigScope');if(!scope)return;
-    let badge=scope.querySelector('.runnerVigScopeScheduleBadge');if(!badge){badge=d.createElement('div');badge.className='runnerVigScopeScheduleBadge';scope.appendChild(badge)}
-    badge.textContent=`${slot.featuredVigScope?'★ FEATURED VIG SCOPE CHECKPOINT':'STANDARD VIG SCOPE SNAPSHOT'} // ${profile.shortName} S${slot.canonicalSlot} // PLANNED ${slot.reportTime}`;
-  }
-  function patch(d){if(!d?.body)return;ensureStyle(d);ensureButton(d);renderPanel(d);patchHistory(d);patchVigScope(d)}
-  function attach(){
-    const d=appDocument();if(!d?.body)return false;if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();observer=new MutationObserver(()=>requestAnimationFrame(()=>patch(d)));observer.observe(d.body,{subtree:true,childList:true,characterData:true});d.addEventListener('change',e=>{if(e.target?.id==='runDateSelect')setTimeout(()=>patchHistory(d),0)});}
-    patch(d);return true;
-  }
-  async function start(){try{await loadData()}catch(e){console.warn('Schedule profile UI data unavailable',e);return}let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);setInterval(()=>{const d=appDocument();if(d)patch(d)},1500)}
-  start();
+'use strict';
+const CFG='./data/schedule-profiles.json',STATE='./data/schedule-state.json',ACTION='https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/workflows/set-schedule-profile.yml';
+let cfg=null,state=null,lastDoc=null,observer=null;
+const ID='runnerSchedulePreferences',BTN='runnerPreferencesF6',STYLE='runnerScheduleProfileUiStyle';
+function appDoc(){try{const c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
+function vc(d=new Date()){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(d),o=Object.fromEntries(p.map(x=>[x.type,x.value])),h=+(o.hour==='24'?'0':o.hour),m=+o.minute;return{date:`${o.year}-${o.month}-${o.day}`,minutes:h*60+m}}
+function plusDay(s,n=1){const d=new Date(`${s}T12:00:00Z`);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function resolve(date){let id=state?.defaultProfileId||cfg?.legacyProfileId;[...(state?.selections||[])].sort((a,b)=>String(a.effectiveOperatingDate).localeCompare(String(b.effectiveOperatingDate))||String(a.selectedAt||'').localeCompare(String(b.selectedAt||''))).forEach(s=>{if(s?.effectiveOperatingDate<=date&&cfg.profiles[s.profileId])id=s.profileId});return cfg?.profiles?.[id]||null}
+function slot(profile,key){return profile?.slots?.find(x=>x.slot===key)||null}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function currentRun(){try{const c=document.getElementById('core'),h=c?.contentWindow?.location?.hash?.slice(1)||'',p=new URLSearchParams(h),v=p.get('run');if(!v)return null;let b=v.replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b),x=>x.charCodeAt(0))))}catch{return null}}
+async function load(){const q=`v=${Date.now()}`;[cfg,state]=await Promise.all([fetch(`${CFG}?${q}`,{cache:'no-store'}).then(r=>r.json()),fetch(`${STATE}?${q}`,{cache:'no-store'}).then(r=>r.json())])}
+function style(d){if(d.getElementById(STYLE))return;const s=d.createElement('style');s.id=STYLE;s.textContent=`#${BTN}{grid-column:1/-1!important;border-color:#4d6b7d!important;color:#b9dfff!important;background:#020a10!important}#${BTN}.active,#${BTN}:hover{border-color:#64d7ff!important;color:#e7f8ff!important;background:#04131d!important}#${ID}{display:none;margin:0 12px 14px;padding:12px;border:1px solid #31566d;background:linear-gradient(180deg,#020b12,#01060a);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}body.runnerPreferencesLoaded #${ID}{display:block}body.runnerPreferencesLoaded #runnerLive,body.runnerPreferencesLoaded .view,body.runnerPreferencesLoaded #runnerSyndicateWorkspace{display:none!important}.sp-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid #23465a;padding-bottom:9px}.sp-head h2{margin:0;color:#7fe4ff;font-size:16px;letter-spacing:.11em}.sp-head p{margin:4px 0 0;color:#819aa8;font-size:8px}.sp-lock{border:1px solid #466d55;color:#8effaa;background:#04110a;padding:6px 8px;font-size:8px;font-weight:900}.sp-status{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}.sp-stat,.sp-card{border:1px solid #29495b;background:#02090e;padding:9px}.sp-stat small{display:block;color:#718c9a;font-size:7px}.sp-stat b{display:block;color:#dff7ff;font-size:14px;margin-top:3px}.sp-stat span{display:block;color:#78909d;font-size:8px;margin-top:3px}.sp-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sp-card.current{border-color:#58ff88}.sp-card.queued{border-color:#ffd65b}.sp-title{display:flex;justify-content:space-between;gap:5px}.sp-title b{color:#f3fbff;font-size:11px}.sp-title em{font-style:normal;color:#77919e;font-size:7px}.sp-focus{color:#78909d;font-size:8px;margin:5px 0}.sp-row{display:grid;grid-template-columns:24px 42px 10px 42px minmax(0,1fr);gap:3px;padding:4px 2px;border-top:1px solid #172f3b;color:#8ca5b4;font-size:7px}.sp-row strong{color:#c8efff}.sp-star{color:#ffd65b}.sp-action{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:9px;border-top:1px solid #23465a}.sp-action span{max-width:690px;color:#78909d;font-size:8px}.sp-action a{border:1px solid #4a7f96;padding:7px 9px;color:#bceeff;text-decoration:none;font-size:8px;font-weight:900}.runbtn.scheduleFeatured{border-color:#8d7629!important}.scheduleStar{color:#ffd65b;margin-left:3px}#runnerScheduleTranslation{margin:6px 0;padding:5px 8px;border-left:3px solid #43c8ff;background:#031019;color:#87a9ba;font-size:7px;font-weight:800}.runnerVigScopeScheduleBadge{margin-top:4px;color:#ffd65b;font-size:7px;font-weight:950;letter-spacing:.08em;text-align:center;text-transform:uppercase}@media(max-width:760px){.sp-status,.sp-cards{grid-template-columns:1fr}}`;d.head.appendChild(s)}
+function card(p,current,next){const c=p.id===current,q=p.id===next&&next!==current;return`<section class="sp-card ${c?'current':''} ${q?'queued':''}"><div class="sp-title"><b>${esc(p.name)}</b><em>${c?'CURRENT':q?'QUEUED':'AVAILABLE'}</em></div><div class="sp-focus">${esc(p.focus)}</div>${p.slots.map(x=>`<div class="sp-row"><strong>S${x.canonicalSlot}</strong><span>${x.pulseTime}</span><span>→</span><span>${x.reportTime}</span><span>${x.featuredVigScope?'<b class="sp-star">★</b> ':''}${esc(x.label)}</span></div>`).join('')}</section>`}
+function panel(d){let p=d.getElementById(ID);if(!p){p=d.createElement('section');p.id=ID;const n=d.querySelector('.runnerNavPad');n?n.insertAdjacentElement('afterend',p):d.body.prepend(p)}const n=vc(),tom=plusDay(n.date),cur=resolve(n.date),next=resolve(tom),key=[n.date,cur?.id,next?.id,state?.updatedAt||''].join('|');if(p.dataset.key===key&&p.innerHTML)return;p.dataset.key=key;p.innerHTML=`<div class="sp-head"><div><h2>PREFERENCES / OPERATIONS</h2><p>ONE VANCOUVER OPERATING DAY = ONE PROFILE // FIVE PRIMARY ODDS PULSES // THREE FEATURED VIG SCOPE CHECKPOINTS</p></div><div class="sp-lock">${n.minutes>=360?'TODAY LOCKED':'NEXT 06:00 PROFILE'}</div></div><div class="sp-status"><div class="sp-stat"><small>CURRENT // ${n.date}</small><b>${esc(cur.name)}</b><span>Today's five-pull schedule remains fixed.</span></div><div class="sp-stat"><small>NEXT 06:00 // ${tom}</small><b>${esc(next.name)}</b><span>${next.id===cur.id?'NO CHANGE QUEUED':'PROFILE CHANGE QUEUED'}</span></div></div><div class="sp-cards">${Object.values(cfg.profiles).map(x=>card(x,cur.id,next.id)).join('')}</div><div class="sp-action"><span>Changes are repository-controlled: one change per Vancouver day, effective next eligible 06:00 operating day. Existing history and actual timestamps are never rewritten.</span><a href="${ACTION}" target="_blank" rel="noopener">QUEUE NEXT PROFILE ↗</a></div>`}
+function button(d){const t=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');if(!t)return;let b=d.getElementById(BTN);if(b)return;b=d.createElement('button');b.type='button';b.className='btn';b.id=BTN;b.innerHTML='<b>[F6]</b>&nbsp; ⚙ PREFERENCES';t.appendChild(b);b.onclick=()=>{const open=!d.body.classList.contains('runnerPreferencesLoaded');d.body.classList.remove('runnerSyndicateLoaded');d.body.classList.toggle('runnerPreferencesLoaded',open);b.classList.toggle('active',open);if(open)panel(d)};t.addEventListener('click',e=>{const x=e.target.closest('.btn');if(x&&x!==b&&!x.matches('#runnerSyndicateF5')){d.body.classList.remove('runnerPreferencesLoaded');b.classList.remove('active')}})}
+function histDate(d){const s=d.getElementById('runDateSelect');if(s?.value&&s.value!=='latest')return s.value;return String(currentRun()?.ts||'').slice(0,10)||vc().date}
+function historyPatch(d){const date=histDate(d),p=resolve(date);if(!p)return;d.querySelectorAll('[data-run-slot]').forEach(b=>{const s=slot(p,b.dataset.runSlot);if(!s)return;const rt=b.querySelector('.rt'),rl=b.querySelector('.rl');if(rt)rt.textContent=s.reportTime;if(rl)rl.textContent=s.label;b.dataset.canonicalSlot=String(s.canonicalSlot);b.classList.toggle('scheduleFeatured',!!s.featuredVigScope);b.title=`${p.name} // S${s.canonicalSlot} // PULSE ${s.pulseTime} // REPORT ${s.reportTime}`;let star=b.querySelector('.scheduleStar');if(s.featuredVigScope&&!star){star=d.createElement('span');star.className='scheduleStar';star.textContent='★';b.appendChild(star)}if(!s.featuredVigScope&&star)star.remove()});const bar=d.querySelector('.runArchiveBar');if(bar){let n=d.getElementById('runnerScheduleTranslation');if(!n){n=d.createElement('div');n.id='runnerScheduleTranslation';bar.insertAdjacentElement('afterend',n)}n.textContent=`SCHEDULE TRANSLATION // ${date} // ${p.name} // CANONICAL SLOTS 1–5 // ACTUAL ISSUE TIMESTAMPS REMAIN IMMUTABLE`}}
+function vigPatch(d){const r=currentRun();if(!r?.slot||!r?.ts)return;const p=resolve(String(r.ts).slice(0,10)),s=slot(p,r.slot),scope=d.getElementById('runnerVigScope');if(!s||!scope)return;let b=scope.querySelector('.runnerVigScopeScheduleBadge');if(!b){b=d.createElement('div');b.className='runnerVigScopeScheduleBadge';scope.appendChild(b)}b.textContent=`${s.featuredVigScope?'★ FEATURED VIG SCOPE CHECKPOINT':'STANDARD VIG SCOPE SNAPSHOT'} // ${p.shortName} S${s.canonicalSlot} // PLANNED ${s.reportTime}`}
+function patch(d){if(!d?.body||!cfg||!state)return;style(d);button(d);panel(d);historyPatch(d);vigPatch(d)}
+function attach(){const d=appDoc();if(!d?.body)return false;if(d!==lastDoc){lastDoc=d;observer?.disconnect();observer=new MutationObserver(()=>requestAnimationFrame(()=>patch(d)));observer.observe(d.body,{subtree:true,childList:true,characterData:true});d.addEventListener('change',e=>{if(e.target?.id==='runDateSelect')setTimeout(()=>historyPatch(d),0)})}patch(d);return true}
+load().then(()=>{let n=0;const t=setInterval(()=>{if(attach()||++n>180)clearInterval(t)},100);setInterval(()=>{const d=appDoc();if(d)patch(d)},1500)}).catch(e=>console.warn('Schedule profile UI unavailable',e));
 })();
