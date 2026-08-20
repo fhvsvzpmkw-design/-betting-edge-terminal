@@ -1,10 +1,9 @@
 name: Apply PRICE WATCH guardrails
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/apply-price-watch-guardrails.yml'
 
@@ -16,8 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Apply contract and runner changes
         shell: bash
@@ -162,7 +159,7 @@ console.log('PRICE WATCH guardrails: PASS');
           node tests/spread-lineage-reconciliation.test.js
           node tests/spread-lineage-primary-line-fixtures.test.js
 
-      - name: Commit guarded implementation to PR branch
+      - name: Commit guarded implementation
         shell: bash
         run: |
           set -euo pipefail
@@ -172,4 +169,4 @@ console.log('PRICE WATCH guardrails: PASS');
           git add -- BETTING_EDGE_CONTRACT.md runner-core.html tests/price-watch-guardrails.test.js .github/workflows/apply-price-watch-guardrails.yml
           git diff --cached --check
           git commit -m 'Add guarded PRICE WATCH metadata'
-          git push origin HEAD:${{ github.head_ref }}
+          git push
