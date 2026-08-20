@@ -1,0 +1,37 @@
+/* VigScope Betting Edge card view: VIG SCOPE
+   Per-card market-instrument presentation. Same card geometry/data as Normal.
+   The master VigScope panel above the cards is not themed by this file. */
+.runnerCard{
+  transition:background 160ms ease,box-shadow 160ms ease,outline-color 160ms ease;
+}
+.runnerCard .callBadge,
+.runnerCard .bigExec,
+.runnerCard .decisionFact,
+.runnerCard .runnerFact,
+.runnerCard .analysisBtn,
+.runnerCard .gameWindowState{
+  transition:color 160ms ease,background 160ms ease,border-color 160ms ease,box-shadow 160ms ease,text-shadow 160ms ease;
+}
+.runnerCard[data-card-view="vigscope"]{
+  --cyan:#78ffc0;--green:#78ffc0;--yellow:#f3e875;--mag:#6de8ff;--muted:#82aa9a;--line:#245a48;
+  background-color:#020b09;
+  background-image:
+    linear-gradient(rgba(120,255,192,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(120,255,192,.035) 1px,transparent 1px),
+    radial-gradient(circle at 50% 0%,rgba(54,255,169,.065),transparent 48%);
+  background-size:18px 18px,18px 18px,100% 100%;
+  outline:1px solid rgba(120,255,192,.24);outline-offset:-5px;
+  box-shadow:0 0 16px rgba(120,255,192,.12),inset 0 0 30px rgba(41,255,160,.035);
+}
+.runnerCard[data-card-view="vigscope"] .callBadge{letter-spacing:.11em;text-shadow:0 0 8px currentColor}
+.runnerCard[data-card-view="vigscope"] .bigExec{color:#8affca;text-shadow:0 0 8px rgba(120,255,192,.52)}
+.runnerCard[data-card-view="vigscope"] .decisionFact,
+.runnerCard[data-card-view="vigscope"] .runnerFact{border-color:#245a48;background:rgba(1,12,9,.86);box-shadow:inset 0 0 12px rgba(120,255,192,.025)}
+.runnerCard[data-card-view="vigscope"] .decisionFact .key,
+.runnerCard[data-card-view="vigscope"] .runnerFact .key{color:#8deec0}
+.runnerCard[data-card-view="vigscope"] .analysisBtn{border-color:#91d8b4;color:#b7ffd9;background:#07150f;box-shadow:inset 0 0 12px rgba(120,255,192,.04)}
+.runnerCard[data-card-view="vigscope"] .priceState{border-color:#356b57;color:#91bbaa;background:#03100c}
+.runnerCard[data-card-view="vigscope"] .gameWindowState{box-shadow:0 0 7px rgba(120,255,192,.12)}
+@media(max-width:520px){
+  .runnerCard[data-card-view="vigscope"]{outline-offset:-3px}
+}
