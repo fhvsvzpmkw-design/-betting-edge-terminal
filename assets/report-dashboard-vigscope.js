@@ -39,10 +39,10 @@
   document.head.appendChild(preferences);
 
   // Card appearance is a separate terminal-only presentation preference.
-  // Normal remains the product default; all variants reuse this same hook.
+  // Each card view is loaded from its own isolated stylesheet.
   const cardView=document.createElement('script');
   cardView.id='cardViewPreferenceLoader';
-  cardView.src='./assets/card-view-preference.js?v=2';
+  cardView.src='./assets/card-view-preference.js?v=3';
   cardView.async=false;
   document.head.appendChild(cardView);
 
