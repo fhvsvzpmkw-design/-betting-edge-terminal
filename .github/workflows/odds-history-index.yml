@@ -86,6 +86,9 @@ jobs:
                   'indexedAtUtc': dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00', 'Z')
               }
 
+              if feed.get('scheduleMeta'):
+                  entry['scheduleMeta'] = feed['scheduleMeta']
+
               for key in ('selectedSports', 'requestUsage', 'requestCounts', 'requestCount', 'requestsUsed'):
                   if key in feed:
                       entry[key] = feed[key]
