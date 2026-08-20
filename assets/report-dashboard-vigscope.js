@@ -1,6 +1,21 @@
 (()=>{
   'use strict';
 
+  // Apply the saved meter-presentation preference before the known-good
+  // VigScope renderer boots so its existing query-parameter switch remains
+  // the single rendering path.
+  try{
+    const saved=localStorage.getItem('bettingEdge.preferences.meterPresentation');
+    const meter=saved==='rails'?'rails':saved==='blocks'?'blocks':null;
+    if(meter){
+      const url=new URL(location.href);
+      if(url.searchParams.get('meters')!==meter){
+        url.searchParams.set('meters',meter);
+        history.replaceState(null,'',url.pathname+url.search+url.hash);
+      }
+    }
+  }catch(e){}
+
   // Keep the full known-good VigScope implementation in the adjacent rollback
   // file, then apply these small presentation/intelligence overlays on top.
   const legacy=document.createElement('script');
@@ -15,11 +30,11 @@
   schedule.async=false;
   document.head.appendChild(schedule);
 
-  // The framework adds the permanent F6 module registry above the detailed
-  // schedule module so future preferences do not require another pane rebuild.
+  // The framework adds the permanent F6 module registry and safe local UI
+  // controls above the detailed schedule module.
   const preferences=document.createElement('script');
   preferences.id='preferencesFrameworkLoader';
-  preferences.src='./assets/preferences-framework.js?v=1';
+  preferences.src='./assets/preferences-framework.js?v=2';
   preferences.async=false;
   document.head.appendChild(preferences);
 
