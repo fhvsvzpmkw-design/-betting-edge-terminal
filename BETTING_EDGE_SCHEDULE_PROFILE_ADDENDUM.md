@@ -15,9 +15,11 @@ The fixed lane times listed in Section 5 of `BETTING_EDGE_CONTRACT.md` are the l
 
 ## Daily operating rule
 
-One Vancouver operating day uses one profile. A profile change may be queued once per Vancouver local day and becomes effective at the next eligible 06:00 operating boundary. The selection cutoff is 05:30 so the opening 05:45 odds pulse and 06:00 report cannot be split across profiles.
+One Vancouver operating day uses one profile. Once that operating day begins, its selected profile is authoritative for the entire day: **the run is the run**. No terminal interaction may change the active day's profile, pulse times or report times.
 
 The active profile supplies exactly five primary odds pulses and five report windows. The Odds-API spending target remains five primary pulls per operating day. Extra GitHub cron wake-ups used for DST/profile coverage must exit before the Odds API is called unless they match the active Vancouver-local profile slot.
+
+Profile configuration may be prepared outside the live terminal for a future operating day. The current F6 Preferences / Operations pane is deliberately **display-only**. It shows the active profile, the five pulse/report pairs, all three seasonal reference profiles, featured Vig Scope checkpoints and History translation, but it does not queue or switch profiles.
 
 ## Canonical History translation
 
