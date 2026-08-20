@@ -13,7 +13,7 @@
   // avoids changing the runner hierarchy solely to expose Preferences.
   const schedule=document.createElement('script');
   schedule.id='scheduleProfileUiLoader';
-  schedule.src='./assets/schedule-profile-ui.js?v=2';
+  schedule.src='./assets/schedule-profile-ui.js?v=3';
   schedule.async=false;
   document.head.appendChild(schedule);
 
