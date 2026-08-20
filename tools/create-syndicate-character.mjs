@@ -8,7 +8,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const POOLS_PATH = path.join(ROOT, 'data/characters/trait-pools.json');
 const TEMPLATE_PATH = path.join(ROOT, 'syndicates/_templates/blank-hotline.html');
+const SHELL_TEMPLATE_PATH = path.join(ROOT, 'syndicates/_templates/blank-shell.html');
 const MANIFEST_PATH = path.join(ROOT, 'data/syndicates.json');
+const SHELL_MANIFEST_PATH = path.join(ROOT, 'data/hotline-shells.json');
 
 function args(argv) {
   const out = { dryRun: false, seed: null, name: null };
@@ -42,9 +44,7 @@ function pick(list, rnd) {
 function pickDistinct(list, count, rnd) {
   const copy = [...list];
   const out = [];
-  while (copy.length && out.length < count) {
-    out.push(copy.splice(Math.floor(rnd() * copy.length), 1)[0]);
-  }
+  while (copy.length && out.length < count) out.push(copy.splice(Math.floor(rnd() * copy.length), 1)[0]);
   return out;
 }
 
@@ -75,7 +75,7 @@ function publicationName(displayName, theme, rnd) {
   return pick(options, rnd);
 }
 
-function buildProfile({ id, displayName, nickname, publication, pools, rnd, now }) {
+function buildProfile({ id, displayName, nickname, publication, pools, rnd, now, shellId, shellRel }) {
   const primary = pickDistinct(pools.primaryFocus, 3, rnd);
   const secondary = pickDistinct(pools.secondaryFocus, 2, rnd);
   const tone = pick(pools.voiceToneSets, rnd);
@@ -108,7 +108,14 @@ function buildProfile({ id, displayName, nickname, publication, pools, rnd, now 
       layoutStyle: pick(pools.layoutStyles, rnd),
       headlineStyle: pick(pools.headlineStyles, rnd),
       informationDensity: pick(pools.informationDensity, rnd),
-      signatureSections: pick(pools.signatureSectionSets, rnd)
+      signatureSections: pick(pools.signatureSectionSets, rnd),
+      shell: {
+        id: shellId,
+        version: 1,
+        status: 'editable',
+        path: shellRel,
+        portable: true
+      }
     },
     editorial: {
       primaryFocus: primary,
@@ -137,23 +144,38 @@ function buildProfile({ id, displayName, nickname, publication, pools, rnd, now 
   };
 }
 
+function replaceTokens(template, replacements) {
+  return Object.entries(replacements).reduce((html, [token, value]) => html.split(token).join(String(value)), template);
+}
+
 function renderHotline(template, profile, accent) {
-  const replacements = {
+  return replaceTokens(template, {
     '{{DISPLAY_NAME}}': profile.displayName,
     '{{PUBLICATION}}': profile.publication,
     '{{ACCENT}}': accent,
     '{{VOICE}}': `${profile.voice.tone.join(', ')}; ${profile.voice.humor}`,
     '{{THEME}}': `${profile.hotlineStyle.visualTheme}; ${profile.hotlineStyle.era}`,
     '{{FOCUS}}': profile.editorial.primaryFocus.join(' / ')
-  };
-  return Object.entries(replacements).reduce((html, [token, value]) => html.split(token).join(String(value)), template);
+  });
+}
+
+function renderShell(template, profile, accent, shellId) {
+  return replaceTokens(template, {
+    '{{SHELL_ID}}': shellId,
+    '{{DISPLAY_NAME}}': profile.displayName,
+    '{{PUBLICATION}}': profile.publication,
+    '{{ACCENT}}': accent,
+    '{{THEME}}': `${profile.hotlineStyle.visualTheme}; ${profile.hotlineStyle.era}`
+  });
 }
 
 const opt = args(process.argv.slice(2));
 const rnd = rngFromSeed(opt.seed);
 const pools = JSON.parse(fs.readFileSync(POOLS_PATH, 'utf8'));
 const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+const shellManifest = JSON.parse(fs.readFileSync(SHELL_MANIFEST_PATH, 'utf8'));
 const template = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+const shellTemplate = fs.readFileSync(SHELL_TEMPLATE_PATH, 'utf8');
 
 const generatedName = `${pick(pools.firstNames, rnd)} ${pick(pools.lastNames, rnd)}`;
 const displayName = opt.name || generatedName;
@@ -162,11 +184,14 @@ const nickname = pick(pools.nicknames, rnd);
 const now = new Date().toISOString();
 const visualPreview = pick(pools.visualThemes, rnd);
 const publication = publicationName(displayName, visualPreview, rnd);
-const profile = buildProfile({ id, displayName, nickname, publication, pools, rnd, now });
-profile.hotlineStyle.visualTheme = visualPreview;
 const accent = pick(pools.accentColors, rnd);
 const hotlineRel = `./syndicates/generated/${id}/hotline.html`;
+const shellRel = `./syndicates/generated/${id}/shell.html`;
 const profileRel = `./data/characters/${id}.json`;
+const shellId = `${id}-default`;
+const profile = buildProfile({ id, displayName, nickname, publication, pools, rnd, now, shellId, shellRel });
+profile.hotlineStyle.visualTheme = visualPreview;
+
 const rosterEntry = {
   id,
   name: profile.displayName,
@@ -182,8 +207,31 @@ const rosterEntry = {
   characterFile: profileRel,
   url: hotlineRel
 };
+
+const shellEntry = {
+  id: shellId,
+  version: 1,
+  name: `${profile.publication} DEFAULT`,
+  description: `Generated editable v1 Hotline shell for ${profile.displayName}.`,
+  characterId: id,
+  defaultForCharacter: true,
+  path: shellRel,
+  liveUrl: hotlineRel,
+  preview: null,
+  status: 'editable',
+  portable: true,
+  installable: true,
+  author: { type: 'generated', name: 'Syndicate Character Factory' },
+  compatibility: {
+    characterProfileSchema: 1,
+    contentZoneSchema: 1,
+    requiredZones: ['masthead', 'issue-meta', 'report-summary', 'recommendations', 'character-voice', 'footer']
+  }
+};
+
 const hotline = renderHotline(template, profile, accent);
-const result = { id, profile, rosterEntry, hotlinePath: hotlineRel, profilePath: profileRel };
+const shell = renderShell(shellTemplate, profile, accent, shellId);
+const result = { id, profile, rosterEntry, shellEntry, hotlinePath: hotlineRel, shellPath: shellRel, profilePath: profileRel };
 
 if (opt.dryRun) {
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -192,17 +240,26 @@ if (opt.dryRun) {
 
 const profileAbs = path.join(ROOT, profileRel.replace(/^\.\//, ''));
 const hotlineAbs = path.join(ROOT, hotlineRel.replace(/^\.\//, ''));
+const shellAbs = path.join(ROOT, shellRel.replace(/^\.\//, ''));
 fs.mkdirSync(path.dirname(profileAbs), { recursive: true });
 fs.mkdirSync(path.dirname(hotlineAbs), { recursive: true });
 fs.writeFileSync(profileAbs, `${JSON.stringify(profile, null, 2)}\n`);
 fs.writeFileSync(hotlineAbs, hotline);
+fs.writeFileSync(shellAbs, shell);
+
 manifest.profiles = Array.isArray(manifest.profiles) ? manifest.profiles : [];
 manifest.profiles.push(rosterEntry);
 manifest.updatedAt = now;
 fs.writeFileSync(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
 
+shellManifest.shells = Array.isArray(shellManifest.shells) ? shellManifest.shells : [];
+shellManifest.shells.push(shellEntry);
+shellManifest.updatedAt = now;
+fs.writeFileSync(SHELL_MANIFEST_PATH, `${JSON.stringify(shellManifest, null, 2)}\n`);
+
 process.stdout.write(`Created ${profile.displayName} (${id})\n`);
 process.stdout.write(`Profile: ${profileRel}\n`);
 process.stdout.write(`Hotline: ${hotlineRel}\n`);
+process.stdout.write(`Shell: ${shellRel} (${shellId} v1 EDITABLE)\n`);
 process.stdout.write('Avatar: 👤 placeholder; headshot null\n');
 process.stdout.write('Default F1-F4 slot assignments were not changed.\n');
