@@ -8,6 +8,15 @@
   legacy.async=false;
   document.head.appendChild(legacy);
 
+  // Schedule Preferences is deliberately bootstrapped here because this file
+  // is already loaded by the live runner shell. That keeps F6 additive and
+  // avoids changing the runner hierarchy solely to expose Preferences.
+  const schedule=document.createElement('script');
+  schedule.id='scheduleProfileUiLoader';
+  schedule.src='./assets/schedule-profile-ui.js?v=2';
+  schedule.async=false;
+  document.head.appendChild(schedule);
+
   const STYLE_ID='vigScopeCompactPresentationFix';
   const INTEL_SCRIPT_ID='vigScopeGameWindowIntelligenceLoader';
 
