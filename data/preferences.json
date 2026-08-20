@@ -1,16 +1,131 @@
 {
   "schema": 1,
   "title": "PREFERENCES / OPERATIONS",
-  "description": "Terminal preference modules. A module may be operational, display-only, or reserved without requiring a new F6 layout.",
+  "description": "Terminal preference modules. Active UI preferences are stored locally in the browser; operating rules and issued history remain repository-controlled.",
   "states": {
-    "active": {"label": "ACTIVE", "meaning": "The module is operational in the terminal now."},
-    "display_only": {"label": "DISPLAY ONLY", "meaning": "The module is fully presented in F6 but is intentionally not changeable from the terminal."},
-    "reserved": {"label": "RESERVED", "meaning": "The module has a permanent home in F6 but its controls are not activated yet."}
+    "active": {
+      "label": "ACTIVE",
+      "meaning": "The module is operational in the terminal now."
+    },
+    "display_only": {
+      "label": "DISPLAY ONLY",
+      "meaning": "The module is fully presented in F6 but is intentionally not changeable from the terminal."
+    },
+    "reserved": {
+      "label": "RESERVED",
+      "meaning": "The module has a permanent home in F6 but its controls are not activated yet."
+    }
   },
   "modules": [
-    {"id":"schedule_profile","title":"SCHEDULE PROFILE","state":"display_only","kind":"schedule","summary":"Seasonal odds-pulse, report-window and Vig Scope checkpoint schedule for the current Vancouver operating day.","source":"data/schedule-profiles.json","controlPolicy":"The run is the run: once the operating day is assigned a schedule profile, F6 observes it and does not change it."},
-    {"id":"history_translation","title":"HISTORY TRANSLATION","state":"active","kind":"history","summary":"Canonical S1-S5 translation keeps previous-day comparisons meaningful across seasonal schedule profiles.","source":"run-history.json","controlPolicy":"Actual issue times, feed timestamps and archived payloads remain immutable."},
-    {"id":"meter_presentation","title":"METER PRESENTATION","state":"reserved","kind":"reserved","summary":"Future home for terminal meter styling and presentation choices, including Vig Scope/input-meter presentation.","controlPolicy":"No F6 meter control is activated yet. Existing meter behavior remains unchanged."},
-    {"id":"terminal_interface","title":"TERMINAL INTERFACE","state":"reserved","kind":"reserved","summary":"Future home for terminal-level display and interface preferences that should not be scattered through the runner.","controlPolicy":"Reserved structure only; no existing runner behavior is changed."}
+    {
+      "id": "schedule_profile",
+      "title": "SCHEDULE PROFILE",
+      "state": "display_only",
+      "kind": "schedule",
+      "summary": "Seasonal odds-pulse, report-window and Vig Scope checkpoint schedule for the current Vancouver operating day.",
+      "source": "data/schedule-profiles.json",
+      "controlPolicy": "The run is the run: once the operating day is assigned a schedule profile, F6 observes it and does not change it."
+    },
+    {
+      "id": "history_translation",
+      "title": "HISTORY TRANSLATION",
+      "state": "active",
+      "kind": "system",
+      "editable": false,
+      "summary": "Canonical S1-S5 translation keeps previous-day comparisons meaningful across seasonal schedule profiles.",
+      "source": "run-history.json",
+      "controlPolicy": "Operational automatically. Actual issue times, feed timestamps and archived payloads remain immutable."
+    },
+    {
+      "id": "meter_presentation",
+      "title": "METER PRESENTATION",
+      "state": "active",
+      "kind": "choice",
+      "editable": true,
+      "summary": "Choose the existing Vig Scope input-meter renderer.",
+      "storageKey": "bettingEdge.preferences.meterPresentation",
+      "default": "blocks",
+      "options": [
+        {"value": "blocks", "label": "SEGMENTED LED"},
+        {"value": "rails", "label": "TERMINAL RAIL"}
+      ],
+      "controlPolicy": "Presentation only. Changing meter style does not alter Market Heat, Price Pressure, Market Agreement or Vig Scope state."
+    },
+    {
+      "id": "syndicate_load",
+      "title": "SYNDICATE LOAD",
+      "state": "active",
+      "kind": "syndicate",
+      "editable": true,
+      "summary": "Set the saved F1-F4 Hotline Unit assignments used when the Syndicate workspace loads.",
+      "storageKey": "bettingEdge.syndicateSlots.v4",
+      "source": "data/syndicates.json",
+      "controlPolicy": "Local UI preference. Character content and archived hotlines are unchanged."
+    },
+    {
+      "id": "startup_screen",
+      "title": "STARTUP SCREEN",
+      "state": "active",
+      "kind": "choice",
+      "editable": true,
+      "summary": "Choose which existing terminal view opens when the runner loads.",
+      "storageKey": "bettingEdge.preferences.startupScreen",
+      "default": "board",
+      "options": [
+        {"value": "board", "label": "BOARD"},
+        {"value": "market", "label": "MARKET"},
+        {"value": "history", "label": "BET HISTORY"},
+        {"value": "engine", "label": "ENGINE"},
+        {"value": "last_used", "label": "LAST USED"}
+      ],
+      "controlPolicy": "Applies on the next runner load. It does not change report generation."
+    },
+    {
+      "id": "history_landing",
+      "title": "HISTORY LANDING VIEW",
+      "state": "active",
+      "kind": "choice",
+      "editable": true,
+      "summary": "Choose the first Bet History subpage shown when F3 opens.",
+      "storageKey": "bettingEdge.preferences.historyLanding",
+      "default": "summary",
+      "options": [
+        {"value": "summary", "label": "SUMMARY"},
+        {"value": "sports", "label": "SPORTS"},
+        {"value": "types", "label": "BET TYPES"},
+        {"value": "timing", "label": "TIMING"},
+        {"value": "prices", "label": "PRICES"},
+        {"value": "books", "label": "BOOKS"},
+        {"value": "time", "label": "TIME"},
+        {"value": "clv", "label": "CLV"},
+        {"value": "ledger", "label": "FULL LEDGER"},
+        {"value": "last_used", "label": "LAST USED"}
+      ],
+      "controlPolicy": "Navigation preference only. History data, grading and archived records are unchanged."
+    },
+    {
+      "id": "recommendation_detail",
+      "title": "RECOMMENDATION DETAIL",
+      "state": "active",
+      "kind": "choice",
+      "editable": true,
+      "summary": "Choose the default state of expandable recommendation analysis panels.",
+      "storageKey": "bettingEdge.preferences.recommendationDetail",
+      "default": "collapsed",
+      "options": [
+        {"value": "collapsed", "label": "COLLAPSED"},
+        {"value": "expanded", "label": "EXPANDED"},
+        {"value": "remember", "label": "REMEMBER LAST"}
+      ],
+      "controlPolicy": "Presentation only. Expanding or collapsing analysis never changes a recommendation."
+    },
+    {
+      "id": "terminal_interface",
+      "title": "TERMINAL INTERFACE",
+      "state": "reserved",
+      "kind": "reserved",
+      "summary": "Future home for additional terminal-level display preferences that should not be scattered through the runner.",
+      "controlPolicy": "Reserved structure only; no existing runner behavior is changed."
+    }
   ]
 }
