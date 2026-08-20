@@ -38,6 +38,14 @@
   preferences.async=false;
   document.head.appendChild(preferences);
 
+  // Card appearance is a separate terminal-only presentation preference.
+  // Normal is the product default; future variants reuse this same hook.
+  const cardView=document.createElement('script');
+  cardView.id='cardViewPreferenceLoader';
+  cardView.src='./assets/card-view-preference.js?v=1';
+  cardView.async=false;
+  document.head.appendChild(cardView);
+
   const STYLE_ID='vigScopeCompactPresentationFix';
   const INTEL_SCRIPT_ID='vigScopeGameWindowIntelligenceLoader';
 
