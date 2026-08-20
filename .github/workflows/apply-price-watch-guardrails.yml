@@ -1,0 +1,172 @@
+name: Apply PRICE WATCH guardrails
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/apply-price-watch-guardrails.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply contract and runner changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          contract_path = Path('BETTING_EDGE_CONTRACT.md')
+          contract = contract_path.read_text()
+          heading = '## 6.2 PRICE WATCH — informational PASS metadata'
+          marker = '\n---\n\n# 7. Research Library — production R3 behavior'
+          section = r'''
+
+## 6.2 PRICE WATCH — informational PASS metadata
+
+`PRICE WATCH` is **not a fifth recommendation status**. It is optional, lane-specific informational metadata that may be attached only to an otherwise valid `PASS` recommendation when price is the primary remaining blocker.
+
+A qualifying recommendation may carry:
+
+```json
+"priceWatch": {
+  "active": true,
+  "target": "+160 OR BETTER",
+  "reason": "PRICE IS PRIMARY BLOCKER"
+}
+```
+
+A report may emit `priceWatch` only when **all** of the following are true:
+
+1. `status` remains exactly `PASS` and `stake` remains zero.
+2. The current event/market/selection identity and executable-price freshness gates pass, and defensible fair-value work exists.
+3. The non-price analytical case is acceptable enough to revisit if the price improves; price is the primary remaining blocker. Do not use PRICE WATCH to mask `FEED STALE`, `PRICE NOT VERIFIED`, `MARKET UNAVAILABLE`, `IDENTITY MISMATCH`, `POLICY BLOCK`, material `LINEUP/INFORMATION PENDING`, or material `CONFLICTING SIGNALS`.
+4. `priceWatch.target` is a defensible **re-evaluation threshold** that ordinary market movement could plausibly reach. It is not a guaranteed LEAN threshold, BET threshold, or substitute for fresh handicapping.
+5. `priceWatch.reason` states why price, rather than another unresolved factor, is the primary blocker.
+
+Guardrails are mandatory:
+
+- PRICE WATCH does **not** alter recommendation status, risk, stake, status counts, runner filters, VigScope meter inputs/weights, history weighting, carry-forward priority, or promotion criteria.
+- A PRICE WATCH recommendation counts only as `PASS`; it never increments `LEAN`, `WAIT`, or `BET`.
+- For a PRICE WATCH PASS, `playTo` remains the normal non-action state such as `NO BET`. `priceWatch.target` is separate from `playTo` and means **re-evaluate here**, not **bet here**.
+- Update Odds / Reprice may compare the issued recommendation with a newer validated price, but crossing the watch target is informational only. Repricing must not silently promote the recommendation, rewrite fair value, rewrite `playTo`, assign stake, or re-handicap the issued card.
+- Each scheduled report lane independently determines whether PRICE WATCH applies from that lane's current snapshot and analysis. The tag is **not automatically carried forward** from 06:00 to 08:00, 09:30, 15:15, 18:15, or any other card.
+- If the next lane no longer independently satisfies these conditions, omit `priceWatch`. If the recommendation becomes `LEAN`, `WAIT`, or `BET`, omit `priceWatch` and use the normal status semantics.
+- An archived issued report may retain its historical `priceWatch` metadata exactly as issued. That historical tag has no authority over a later report.
+- A malformed payload that combines `priceWatch` with a non-`PASS` status must not cause the runner to display a PRICE WATCH badge or influence calculations.
+
+PRICE WATCH therefore distinguishes a **price-sensitive PASS** from an ordinary PASS without weakening the existing four-status decision system.
+'''
+          if heading not in contract:
+              if marker not in contract:
+                  raise SystemExit('Contract insertion marker not found')
+              contract = contract.replace(marker, section + marker, 1)
+              contract_path.write_text(contract)
+
+          runner_path = Path('runner-core.html')
+          runner = runner_path.read_text()
+
+          style_old = "  .callBadge{display:inline-block;font-size:clamp(25px,4vw,36px);font-weight:1000;line-height:1;letter-spacing:.08em;margin-bottom:8px}\n  .runnerCard h3{font-size:clamp(16px,2.1vw,22px);line-height:1.2;margin:2px 0 5px}"
+          style_new = "  .callBadge{display:inline-block;font-size:clamp(25px,4vw,36px);font-weight:1000;line-height:1;letter-spacing:.08em;margin-bottom:8px}\n  .runnerBadgeRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}\n  .runnerBadgeRow .callBadge{margin-bottom:0}\n  .priceWatchBadge{display:inline-block;padding:4px 7px;border:1px solid var(--yellow);background:#171403;color:var(--yellow);font-size:10px;font-weight:950;letter-spacing:.08em;line-height:1.2}\n  .priceWatchTarget{margin-top:4px;color:var(--yellow);font-weight:900;letter-spacing:.03em}\n  .runnerCard h3{font-size:clamp(16px,2.1vw,22px);line-height:1.2;margin:2px 0 5px}"
+          if '.priceWatchBadge{' not in runner:
+              if style_old not in runner:
+                  raise SystemExit('Runner style marker not found')
+              runner = runner.replace(style_old, style_new, 1)
+
+          card_old = """function card(d,r){
+  const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
+  const top=el(d,'div','runnerTop'),l=el(d,'div');
+  const badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
+  l.append(badge,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  const rr=el(d,'div','execution');
+"""
+          card_new = """function priceWatchMeta(r){
+  if(String(r?.status||'PASS').toUpperCase()!=='PASS')return null;
+  const w=r?.priceWatch;if(!w||w.active===false)return null;
+  const target=txt(w.target,'').trim();if(!target)return null;
+  return {target,reason:txt(w.reason,'').trim()}
+}
+function card(d,r){
+  const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
+  const top=el(d,'div','runnerTop'),l=el(d,'div');
+  const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
+  const badges=el(d,'div','runnerBadgeRow');badges.appendChild(badge);
+  if(watch)badges.appendChild(el(d,'span','priceWatchBadge','PRICE WATCH'));
+  l.append(badges,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  if(watch)l.appendChild(el(d,'div','runnerMeta priceWatchTarget',`WATCH TARGET: ${watch.target}${watch.reason?` // ${watch.reason}`:''}`));
+  const rr=el(d,'div','execution');
+"""
+          if 'function priceWatchMeta(r)' not in runner:
+              if card_old not in runner:
+                  raise SystemExit('Runner card marker not found')
+              runner = runner.replace(card_old, card_new, 1)
+
+          runner_path.write_text(runner)
+
+          test = r'''const assert = require('assert');
+const fs = require('fs');
+
+const runner = fs.readFileSync('runner-core.html', 'utf8');
+const contract = fs.readFileSync('BETTING_EDGE_CONTRACT.md', 'utf8');
+
+assert(runner.includes("['ALL','BET','LEAN','WAIT','PASS'].forEach"), 'status filters must remain the original four statuses');
+assert(!runner.includes('PASS · PRICE WATCH'), 'PRICE WATCH must never be encoded into status text');
+
+const helperStart = runner.indexOf('function priceWatchMeta(r)');
+const helperEnd = runner.indexOf('function card(d,r)', helperStart);
+assert(helperStart >= 0 && helperEnd > helperStart, 'priceWatchMeta helper must exist');
+const helper = runner.slice(helperStart, helperEnd);
+assert(helper.includes("String(r?.status||'PASS').toUpperCase()!=='PASS'"), 'runner must refuse PRICE WATCH rendering for non-PASS statuses');
+assert(helper.includes("w.active===false"), 'inactive PRICE WATCH metadata must not render');
+assert(helper.includes("if(!target)return null"), 'PRICE WATCH must have an explicit target');
+
+const weightStart = runner.indexOf('function recWeight(rec)');
+const weightEnd = runner.indexOf('function moveSignal(rec)', weightStart);
+assert(weightStart >= 0 && weightEnd > weightStart, 'recWeight block must exist');
+assert(!/priceWatch|PRICE WATCH/i.test(runner.slice(weightStart, weightEnd)), 'VigScope status weighting must remain blind to PRICE WATCH');
+
+const normalizeStart = runner.indexOf('function normalizeRun(run)');
+const normalizeEnd = runner.indexOf('function runKey(run)', normalizeStart);
+assert(normalizeStart >= 0 && normalizeEnd > normalizeStart, 'normalizeRun block must exist');
+const normalize = runner.slice(normalizeStart, normalizeEnd);
+assert(normalize.includes('counts:{bet:Number(c.bet)||0,lean:Number(c.lean)||0,wait:Number(c.wait)||0,pass:Number(c.pass)||0}'), 'runner counts must remain BET/LEAN/WAIT/PASS only');
+
+assert(contract.includes('`PRICE WATCH` is **not a fifth recommendation status**'), 'contract must define PRICE WATCH as metadata, not status');
+assert(contract.includes('does **not** alter recommendation status, risk, stake, status counts, runner filters, VigScope meter inputs/weights'), 'contract must protect downstream logic');
+assert(contract.includes('`priceWatch.target` is separate from `playTo`'), 'watch target must not become an automatic bet threshold');
+assert(contract.includes('not automatically carried forward'), 'later cards must independently qualify PRICE WATCH');
+assert(contract.includes('crossing the watch target is informational only'), 'repricing must not auto-promote PRICE WATCH');
+
+console.log('PRICE WATCH guardrails: PASS');
+'''
+          Path('tests/price-watch-guardrails.test.js').write_text(test)
+          PY
+
+      - name: Run guardrail regression checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/price-watch-guardrails.test.js
+          node tests/runner-history-session-applicability.test.js
+          node tests/runner-session-strip-applicability.test.js
+          node tests/spread-lineage-reconciliation.test.js
+          node tests/spread-lineage-primary-line-fixtures.test.js
+
+      - name: Commit guarded implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/apply-price-watch-guardrails.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- BETTING_EDGE_CONTRACT.md runner-core.html tests/price-watch-guardrails.test.js .github/workflows/apply-price-watch-guardrails.yml
+          git diff --cached --check
+          git commit -m 'Add guarded PRICE WATCH metadata'
+          git push
