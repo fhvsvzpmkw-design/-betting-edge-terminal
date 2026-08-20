@@ -318,6 +318,10 @@ function injectStyle(d){
   .runnerCard{border:2px solid var(--cyan);padding:13px;background:var(--panel);margin-top:10px}
   .runnerTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start}
   .callBadge{display:inline-block;font-size:clamp(25px,4vw,36px);font-weight:1000;line-height:1;letter-spacing:.08em;margin-bottom:8px}
+  .runnerBadgeRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .runnerBadgeRow .callBadge{margin-bottom:0}
+  .priceWatchBadge{display:inline-block;padding:4px 7px;border:1px solid var(--yellow);background:#171403;color:var(--yellow);font-size:10px;font-weight:950;letter-spacing:.08em;line-height:1.2}
+  .priceWatchTarget{margin-top:4px;color:var(--yellow);font-weight:900;letter-spacing:.03em}
   .runnerCard h3{font-size:clamp(16px,2.1vw,22px);line-height:1.2;margin:2px 0 5px}
   .runnerMeta{font-size:11px;color:var(--muted)}
   .execution{text-align:right;min-width:120px}
@@ -540,11 +544,20 @@ function filterTools(d,run,container){
   });
   container.appendChild(tools)
 }
+function priceWatchMeta(r){
+  if(String(r?.status||'PASS').toUpperCase()!=='PASS')return null;
+  const w=r?.priceWatch;if(!w||w.active===false)return null;
+  const target=txt(w.target,'').trim();if(!target)return null;
+  return {target,reason:txt(w.reason,'').trim()}
+}
 function card(d,r){
   const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
   const top=el(d,'div','runnerTop'),l=el(d,'div');
-  const badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
-  l.append(badge,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
+  const badges=el(d,'div','runnerBadgeRow');badges.appendChild(badge);
+  if(watch)badges.appendChild(el(d,'span','priceWatchBadge','PRICE WATCH'));
+  l.append(badges,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  if(watch)l.appendChild(el(d,'div','runnerMeta priceWatchTarget',`WATCH TARGET: ${watch.target}${watch.reason?` // ${watch.reason}`:''}`));
   const rr=el(d,'div','execution');
   const snapshotTime=displayPriceTime(r.price);
   rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',displayPrice(r.price)));

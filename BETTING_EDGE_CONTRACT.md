@@ -186,6 +186,41 @@ When a later scheduled lane has a same-day tracked spread from an archived Betti
 8. A changed handicap is a **new current selection**, not an exact reprice of the archived selection. Prior fair value, `playTo`, BET/LEAN status or stake does not automatically transfer. The current line must independently satisfy all ordinary identity, freshness, fair-value and staking gates before action; otherwise stake remains zero.
 9. This reconciliation is a report-generation continuity check only. It does not redesign the runner, change staking methodology, add books, or increase the production odds-refresh/API budget.
 
+## 6.2 PRICE WATCH — informational PASS metadata
+
+`PRICE WATCH` is **not a fifth recommendation status**. It is optional, lane-specific informational metadata that may be attached only to an otherwise valid `PASS` recommendation when price is the primary remaining blocker.
+
+A qualifying recommendation may carry:
+
+```json
+"priceWatch": {
+  "active": true,
+  "target": "+160 OR BETTER",
+  "reason": "PRICE IS PRIMARY BLOCKER"
+}
+```
+
+A report may emit `priceWatch` only when **all** of the following are true:
+
+1. `status` remains exactly `PASS` and `stake` remains zero.
+2. The current event/market/selection identity and executable-price freshness gates pass, and defensible fair-value work exists.
+3. The non-price analytical case is acceptable enough to revisit if the price improves; price is the primary remaining blocker. Do not use PRICE WATCH to mask `FEED STALE`, `PRICE NOT VERIFIED`, `MARKET UNAVAILABLE`, `IDENTITY MISMATCH`, `POLICY BLOCK`, material `LINEUP/INFORMATION PENDING`, or material `CONFLICTING SIGNALS`.
+4. `priceWatch.target` is a defensible **re-evaluation threshold** that ordinary market movement could plausibly reach. It is not a guaranteed LEAN threshold, BET threshold, or substitute for fresh handicapping.
+5. `priceWatch.reason` states why price, rather than another unresolved factor, is the primary blocker.
+
+Guardrails are mandatory:
+
+- PRICE WATCH does **not** alter recommendation status, risk, stake, status counts, runner filters, VigScope meter inputs/weights, history weighting, carry-forward priority, or promotion criteria.
+- A PRICE WATCH recommendation counts only as `PASS`; it never increments `LEAN`, `WAIT`, or `BET`.
+- For a PRICE WATCH PASS, `playTo` remains the normal non-action state such as `NO BET`. `priceWatch.target` is separate from `playTo` and means **re-evaluate here**, not **bet here**.
+- Update Odds / Reprice may compare the issued recommendation with a newer validated price, but crossing the watch target is informational only. Repricing must not silently promote the recommendation, rewrite fair value, rewrite `playTo`, assign stake, or re-handicap the issued card.
+- Each scheduled report lane independently determines whether PRICE WATCH applies from that lane's current snapshot and analysis. The tag is **not automatically carried forward** from 06:00 to 08:00, 09:30, 15:15, 18:15, or any other card.
+- If the next lane no longer independently satisfies these conditions, omit `priceWatch`. If the recommendation becomes `LEAN`, `WAIT`, or `BET`, omit `priceWatch` and use the normal status semantics.
+- An archived issued report may retain its historical `priceWatch` metadata exactly as issued. That historical tag has no authority over a later report.
+- A malformed payload that combines `priceWatch` with a non-`PASS` status must not cause the runner to display a PRICE WATCH badge or influence calculations.
+
+PRICE WATCH therefore distinguishes a **price-sensitive PASS** from an ordinary PASS without weakening the existing four-status decision system.
+
 ---
 
 # 7. Research Library — production R3 behavior
