@@ -34,6 +34,9 @@ const prefs=json('data/preferences.json');
 const shellPrefs=prefs.modules.find(x=>x.id==='hotline_shells');
 assert(shellPrefs?.state==='display_only','F6 HOTLINE SHELLS must be display-only');
 assert(shellPrefs?.source==='data/hotline-shells.json','F6 HOTLINE SHELLS must use shell manifest');
+const prefFramework=read('assets/preferences-framework.js');
+assert(prefFramework.includes("HOTLINE_SHELLS_URL='./data/hotline-shells.json'"),'F6 framework must load shell manifest');
+assert(prefFramework.includes('prefShellGrid'),'F6 framework must render the shell list');
 
 const slotHost=read('syndicates/slot-host.html');
 assert(slotHost.includes('BUILD YOUR SYNDICATE'),'Load Syndicate title bar missing');
@@ -42,7 +45,7 @@ assert(slotHost.includes("const FALLBACK_DEFAULTS=['eddie-numbers','lou-vega',nu
 assert(slotHost.includes('CHOOSE CHARACTER'),'Empty-slot choose action missing');
 
 const factory=read('tools/create-syndicate-character.mjs');
-assert(factory.includes("SHELL_MANIFEST_PATH"),'Character factory does not update shell manifest');
+assert(factory.includes('SHELL_MANIFEST_PATH'),'Character factory does not update shell manifest');
 assert(factory.includes("shellRel = `./syndicates/generated/${id}/shell.html`"),'Character factory does not create shell path');
 assert(factory.includes("status: 'editable'"),'Generated character shell must start editable');
 assert(factory.includes("process.stdout.write('Default F1-F4 slot assignments were not changed."),'Factory must preserve F1-F4 defaults');

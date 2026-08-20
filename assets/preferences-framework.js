@@ -3,6 +3,7 @@
 
 const DATA_URL='./data/preferences.json';
 const SYNDICATES_URL='./data/syndicates.json';
+const HOTLINE_SHELLS_URL='./data/hotline-shells.json';
 const OVERVIEW_ID='runnerPreferenceModuleOverview';
 const STYLE_ID='runnerPreferenceFrameworkStyle';
 
@@ -11,7 +12,7 @@ const LAST_HISTORY_KEY='bettingEdge.preferences.lastHistoryView';
 const DETAIL_LAST_KEY='bettingEdge.preferences.recommendationDetailLastState';
 const SYNDICATE_FALLBACK=['eddie-numbers','lou-vega',null,null];
 
-let prefs=null,syndicates=null,lastDoc=null,observer=null;
+let prefs=null,syndicates=null,hotlineShells=null,lastDoc=null,observer=null;
 
 function appDoc(){
   try{
@@ -54,6 +55,10 @@ function enabledSyndicateProfiles(){
     .filter(p=>p&&p.enabled!==false&&p.url)
     .map(p=>({id:String(p.id),label:String(p.name||p.label||p.id)}));
 }
+function syndicateCharacterLabel(id){
+  const p=(Array.isArray(syndicates?.profiles)?syndicates.profiles:[]).find(x=>String(x?.characterId||x?.id||'')===String(id||''));
+  return String(p?.name||p?.label||id||'UNKNOWN CHARACTER');
+}
 function readSyndicateAssignments(){
   const module=moduleById('syndicate_load');
   const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
@@ -87,7 +92,20 @@ function syndicateControl(){
     return `<label class="prefControlLabel prefSlotControl"><span>F${index+1}</span><select class="prefSelect" data-pref-syndicate-slot="${index}">${opts}</select></label>`;
   }).join('')}</div>`;
 }
+function hotlineShellDisplay(){
+  const shells=Array.isArray(hotlineShells?.shells)?hotlineShells.shells:[];
+  if(!shells.length)return '<div class="prefShellEmpty">SHELL REGISTRY UNAVAILABLE</div>';
+  return `<div class="prefShellGrid">${shells.map(shell=>{
+    const character=syndicateCharacterLabel(shell.characterId);
+    const state=String(shell.status||'unknown').toUpperCase();
+    return `<div class="prefShellRow">
+      <div><b class="prefShellCharacter">${esc(character)}</b><span class="prefShellName">${esc(shell.name||shell.id)}</span></div>
+      <div class="prefShellMeta"><span>v${esc(shell.version??'—')}</span><span class="prefShellState shell-${esc(String(shell.status||'unknown').toLowerCase())}">${esc(state)}</span></div>
+    </div>`;
+  }).join('')}</div>`;
+}
 function moduleControl(module){
+  if(module.kind==='manifest'&&module.id==='hotline_shells')return hotlineShellDisplay();
   if(module.state!=='active'||module.editable===false)return '';
   if(module.kind==='choice')return choiceControl(module);
   if(module.kind==='syndicate')return syndicateControl();
@@ -121,6 +139,7 @@ function ensureStyle(d){
     .prefControlLabel{display:grid;grid-template-columns:80px minmax(0,1fr);gap:7px;align-items:center;color:#738d99;font-size:7px;font-weight:900;letter-spacing:.07em}
     .prefSelect{width:100%;min-width:0;border:1px solid #3a6475;background:#04111a;color:#d9f6ff;padding:6px 7px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace}
     .prefSyndicateGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.prefSlotControl{grid-template-columns:24px minmax(0,1fr)}
+    .prefShellGrid{display:grid;gap:5px}.prefShellRow{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #403b22;background:#070903;padding:6px 7px}.prefShellCharacter{display:block;color:#f4e4a2;font-size:7.5px;letter-spacing:.06em}.prefShellName{display:block;margin-top:2px;color:#8198a4;font-size:6.8px}.prefShellMeta{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#9aacb4;font-size:6.5px;font-weight:900}.prefShellState{border:1px solid #71622f;padding:2px 4px;color:#f4d66f;letter-spacing:.07em}.prefShellState.shell-editable{border-color:#2f7486;color:#78dff3}.prefShellEmpty{color:#8ba2af;font-size:7px;letter-spacing:.08em}
     .prefFrameworkRule{margin-top:8px;padding:7px 8px;border-left:3px solid #43c8ff;background:#031019;color:#7f9dab;font-size:7.5px;line-height:1.45}.prefFrameworkRule b{color:#bceeff}
     @media(max-width:760px){.prefModuleGrid,.prefStateCounts{grid-template-columns:1fr}.prefFrameworkHead span{text-align:left}.prefSyndicateGrid{grid-template-columns:1fr}}
   `;
@@ -264,7 +283,7 @@ function render(d,force=false){
     head?head.insertAdjacentElement('afterend',box):panel.prepend(box);
   }
   const c=counts();
-  const settings=(prefs.modules||[]).map(m=>m.kind==='choice'?[m.id,readChoice(m)]:m.kind==='syndicate'?[m.id,readSyndicateAssignments()]:[m.id,m.state]);
+  const settings=(prefs.modules||[]).map(m=>m.kind==='choice'?[m.id,readChoice(m)]:m.kind==='syndicate'?[m.id,readSyndicateAssignments()]:m.kind==='manifest'?[m.id,hotlineShells?.updatedAt||'',hotlineShells?.shells?.length||0]:[m.id,m.state]);
   const key=JSON.stringify([prefs.schema,prefs.modules,c,settings]);
   if(!force&&box.dataset.key===key&&box.innerHTML){bindControls(d);return true}
   box.dataset.key=key;
@@ -302,10 +321,12 @@ function attach(){
 
 Promise.all([
   fetch(`${DATA_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`preferences ${r.status}`);return r.json()}),
-  fetch(`${SYNDICATES_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
-]).then(([data,syndicateData])=>{
+  fetch(`${SYNDICATES_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+  fetch(`${HOTLINE_SHELLS_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
+]).then(([data,syndicateData,shellData])=>{
   prefs=data;
   syndicates=syndicateData;
+  hotlineShells=shellData;
   let tries=0;
   const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);
   setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500);
