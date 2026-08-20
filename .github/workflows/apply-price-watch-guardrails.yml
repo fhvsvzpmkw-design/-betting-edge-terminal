@@ -1,17 +1,15 @@
 name: Apply PRICE WATCH guardrails
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/apply-price-watch-guardrails.yml'
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   apply:
+    if: github.event.issue.title == 'APPLY PRICE WATCH GUARDRAILS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -170,5 +168,3 @@ console.log('PRICE WATCH guardrails: PASS');
           git diff --cached --check
           git commit -m 'Add guarded PRICE WATCH metadata'
           git push
-
-# retrigger: 2026-08-20 07:07 PT
