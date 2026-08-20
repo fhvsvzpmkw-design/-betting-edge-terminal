@@ -8,14 +8,20 @@
   legacy.async=false;
   document.head.appendChild(legacy);
 
-  // Schedule Preferences is deliberately bootstrapped here because this file
-  // is already loaded by the live runner shell. That keeps F6 additive and
-  // avoids changing the runner hierarchy solely to expose Preferences.
+  // The schedule module owns the detailed schedule/history/VigScope display.
   const schedule=document.createElement('script');
   schedule.id='scheduleProfileUiLoader';
   schedule.src='./assets/schedule-profile-ui.js?v=3';
   schedule.async=false;
   document.head.appendChild(schedule);
+
+  // The framework adds the permanent F6 module registry above the detailed
+  // schedule module so future preferences do not require another pane rebuild.
+  const preferences=document.createElement('script');
+  preferences.id='preferencesFrameworkLoader';
+  preferences.src='./assets/preferences-framework.js?v=1';
+  preferences.async=false;
+  document.head.appendChild(preferences);
 
   const STYLE_ID='vigScopeCompactPresentationFix';
   const INTEL_SCRIPT_ID='vigScopeGameWindowIntelligenceLoader';
