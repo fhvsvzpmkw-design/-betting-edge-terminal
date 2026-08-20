@@ -50,6 +50,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Syntax-check F6 preference runtime
+        run: |
+          node --check assets/preferences-framework.js
+          node --check assets/report-dashboard-vigscope.js
       - name: Run short-link history regression
         run: node tests/runner-history-session-applicability.test.js
       - name: Run runner session strip regression

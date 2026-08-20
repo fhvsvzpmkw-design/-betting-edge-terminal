@@ -2,9 +2,16 @@
 'use strict';
 
 const DATA_URL='./data/preferences.json';
+const SYNDICATES_URL='./data/syndicates.json';
 const OVERVIEW_ID='runnerPreferenceModuleOverview';
 const STYLE_ID='runnerPreferenceFrameworkStyle';
-let prefs=null,lastDoc=null,observer=null;
+
+const LAST_VIEW_KEY='bettingEdge.preferences.lastView';
+const LAST_HISTORY_KEY='bettingEdge.preferences.lastHistoryView';
+const DETAIL_LAST_KEY='bettingEdge.preferences.recommendationDetailLastState';
+const SYNDICATE_FALLBACK=['eddie-numbers','lou-vega',null,null];
+
+let prefs=null,syndicates=null,lastDoc=null,observer=null;
 
 function appDoc(){
   try{
@@ -17,18 +24,84 @@ function esc(v){
   return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function stateDef(id){return prefs?.states?.[id]||{label:String(id||'').toUpperCase(),meaning:''}}
-function moduleCard(module){
-  const state=stateDef(module.state);
-  return `<article class="prefModuleCard state-${esc(module.state)}" data-preference-module="${esc(module.id)}">
-    <div class="prefModuleHead"><b>${esc(module.title)}</b><span class="prefStateBadge">${esc(state.label)}</span></div>
-    <p>${esc(module.summary)}</p>
-    <div class="prefModulePolicy">${esc(module.controlPolicy||state.meaning)}</div>
-  </article>`;
+function moduleById(id){return (prefs?.modules||[]).find(m=>m.id===id)||null}
+function safeGet(key,fallback=''){
+  try{const v=localStorage.getItem(key);return v===null?fallback:v}catch{return fallback}
+}
+function safeSet(key,value){
+  try{localStorage.setItem(key,String(value));return true}catch{return false}
+}
+function validChoice(module,value){return Array.isArray(module?.options)&&module.options.some(o=>o.value===value)}
+function readChoice(module){
+  const raw=safeGet(module.storageKey,module.default||'');
+  return validChoice(module,raw)?raw:(module.default||module.options?.[0]?.value||'');
+}
+function writeChoice(module,value){
+  if(!validChoice(module,value))return false;
+  return safeSet(module.storageKey,value);
 }
 function counts(){
   const out={active:0,display_only:0,reserved:0};
-  for(const module of prefs?.modules||[]){if(Object.hasOwn(out,module.state))out[module.state]++;}
+  for(const module of prefs?.modules||[]){if(Object.hasOwn(out,module.state))out[module.state]++}
   return out;
+}
+function defaultSyndicateAssignments(){
+  const source=Array.isArray(syndicates?.defaults)&&syndicates.defaults.length===4?syndicates.defaults:SYNDICATE_FALLBACK;
+  return source.map(v=>v==null?null:String(v));
+}
+function enabledSyndicateProfiles(){
+  return (Array.isArray(syndicates?.profiles)?syndicates.profiles:[])
+    .filter(p=>p&&p.enabled!==false&&p.url)
+    .map(p=>({id:String(p.id),label:String(p.name||p.label||p.id)}));
+}
+function readSyndicateAssignments(){
+  const module=moduleById('syndicate_load');
+  const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
+  try{
+    const raw=JSON.parse(localStorage.getItem(key)||'null');
+    if(Array.isArray(raw)&&raw.length===4)return raw.map(v=>v==null?null:String(v));
+  }catch{}
+  return defaultSyndicateAssignments();
+}
+function writeSyndicateAssignments(assignments){
+  const module=moduleById('syndicate_load');
+  const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
+  try{localStorage.setItem(key,JSON.stringify(assignments));return true}catch{return false}
+}
+function choiceControl(module){
+  const value=readChoice(module);
+  const options=(module.options||[]).map(o=>`<option value="${esc(o.value)}"${o.value===value?' selected':''}>${esc(o.label)}</option>`).join('');
+  return `<label class="prefControlLabel"><span>CURRENT</span><select class="prefSelect" data-pref-choice="${esc(module.id)}">${options}</select></label>`;
+}
+function syndicateControl(){
+  const profiles=enabledSyndicateProfiles();
+  const assignments=readSyndicateAssignments();
+  return `<div class="prefSyndicateGrid">${assignments.map((current,index)=>{
+    const opts=[
+      `<option value=""${current==null?' selected':''}>EMPTY</option>`,
+      ...profiles.map(p=>{
+        const used=assignments.some((id,i)=>i!==index&&id===p.id);
+        return `<option value="${esc(p.id)}"${p.id===current?' selected':''}${used?' disabled':''}>${esc(p.label)}</option>`;
+      })
+    ].join('');
+    return `<label class="prefControlLabel prefSlotControl"><span>F${index+1}</span><select class="prefSelect" data-pref-syndicate-slot="${index}">${opts}</select></label>`;
+  }).join('')}</div>`;
+}
+function moduleControl(module){
+  if(module.state!=='active'||module.editable===false)return '';
+  if(module.kind==='choice')return choiceControl(module);
+  if(module.kind==='syndicate')return syndicateControl();
+  return '';
+}
+function moduleCard(module){
+  const state=stateDef(module.state);
+  const control=moduleControl(module);
+  return `<article class="prefModuleCard state-${esc(module.state)}" data-preference-module="${esc(module.id)}">
+    <div class="prefModuleHead"><b>${esc(module.title)}</b><span class="prefStateBadge">${esc(state.label)}</span></div>
+    <p>${esc(module.summary)}</p>
+    ${control?`<div class="prefModuleControl">${control}</div>`:''}
+    <div class="prefModulePolicy">${esc(module.controlPolicy||state.meaning)}</div>
+  </article>`;
 }
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
@@ -44,12 +117,141 @@ function ensureStyle(d){
     .prefModuleCard{min-width:0;border:1px solid #284552;background:#02080c;padding:8px}.prefModuleCard.state-active{border-color:#347b4a}.prefModuleCard.state-display_only{border-color:#75652e}.prefModuleCard.state-reserved{border-color:#394b54;opacity:.82}
     .prefModuleHead{display:flex;justify-content:space-between;gap:8px;align-items:center}.prefModuleHead b{color:#dff6ff;font-size:9px;letter-spacing:.08em}.prefStateBadge{flex:0 0 auto;border:1px solid #475b65;padding:3px 5px;color:#91a8b4;background:#04090c;font-size:6.5px;font-weight:950;letter-spacing:.08em}.state-active .prefStateBadge{border-color:#438858;color:#8effaa}.state-display_only .prefStateBadge{border-color:#8b7631;color:#ffe07a}.state-reserved .prefStateBadge{color:#82949e}
     .prefModuleCard p{margin:6px 0 5px;color:#8ba2af;font-size:7.5px;line-height:1.45}.prefModulePolicy{border-top:1px solid #1b313b;padding-top:5px;color:#617985;font-size:7px;line-height:1.4}
+    .prefModuleControl{margin:7px 0;padding:7px;border:1px solid #1f3d48;background:#010609}
+    .prefControlLabel{display:grid;grid-template-columns:80px minmax(0,1fr);gap:7px;align-items:center;color:#738d99;font-size:7px;font-weight:900;letter-spacing:.07em}
+    .prefSelect{width:100%;min-width:0;border:1px solid #3a6475;background:#04111a;color:#d9f6ff;padding:6px 7px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .prefSyndicateGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.prefSlotControl{grid-template-columns:24px minmax(0,1fr)}
     .prefFrameworkRule{margin-top:8px;padding:7px 8px;border-left:3px solid #43c8ff;background:#031019;color:#7f9dab;font-size:7.5px;line-height:1.45}.prefFrameworkRule b{color:#bceeff}
-    @media(max-width:760px){.prefModuleGrid,.prefStateCounts{grid-template-columns:1fr}.prefFrameworkHead span{text-align:left}}
+    @media(max-width:760px){.prefModuleGrid,.prefStateCounts{grid-template-columns:1fr}.prefFrameworkHead span{text-align:left}.prefSyndicateGrid{grid-template-columns:1fr}}
   `;
   d.head.appendChild(s);
 }
-function render(d){
+
+function setMeterPresentation(d,value){
+  const normalized=value==='rails'?'rails':'blocks';
+  const module=moduleById('meter_presentation');
+  if(module)writeChoice(module,normalized);
+  try{
+    const url=new URL(location.href);
+    if(url.searchParams.get('meters')!==normalized){
+      url.searchParams.set('meters',normalized);
+      history.replaceState(null,'',url.pathname+url.search+url.hash);
+    }
+  }catch{}
+  const intel=d?.getElementById('runnerMarketIntel');
+  if(intel)intel.dataset.meterVariant=normalized;
+  const cluster=d?.querySelector('#runnerVigContributors .instrumentCluster,.instrumentCluster');
+  if(cluster)cluster.dataset.meterStyle=normalized==='blocks'?'segmented-led':'terminal-rail';
+}
+function reloadSyndicateFrames(d){
+  d?.querySelectorAll('iframe[src*="slot-host.html?slot="]').forEach(frame=>{
+    try{frame.contentWindow.location.reload()}catch{}
+  });
+}
+function saveSyndicateFromControls(d){
+  const selects=[...d.querySelectorAll('[data-pref-syndicate-slot]')].sort((a,b)=>Number(a.dataset.prefSyndicateSlot)-Number(b.dataset.prefSyndicateSlot));
+  if(selects.length!==4)return;
+  const assignments=selects.map(s=>s.value||null);
+  const nonempty=assignments.filter(Boolean);
+  if(new Set(nonempty).size!==nonempty.length){render(d,true);return}
+  writeSyndicateAssignments(assignments);
+  render(d,true);
+  reloadSyndicateFrames(d);
+}
+function resolveStartupValue(){
+  const module=moduleById('startup_screen');
+  if(!module)return 'board';
+  const value=readChoice(module);
+  if(value!=='last_used')return value;
+  const last=safeGet(LAST_VIEW_KEY,'board');
+  return ['board','market','history','engine'].includes(last)?last:'board';
+}
+function resolveHistoryValue(){
+  const module=moduleById('history_landing');
+  if(!module)return 'summary';
+  const value=readChoice(module);
+  if(value!=='last_used')return value;
+  const last=safeGet(LAST_HISTORY_KEY,'summary');
+  const allowed=(module.options||[]).map(x=>x.value).filter(x=>x!=='last_used');
+  return allowed.includes(last)?last:'summary';
+}
+function applyHistoryLanding(d){
+  const value=resolveHistoryValue();
+  const button=d.querySelector(`.subbtn[data-h="${CSS.escape(value)}"]`);
+  if(button&&!button.classList.contains('active'))button.click();
+}
+function detailDesiredState(){
+  const module=moduleById('recommendation_detail');
+  if(!module)return false;
+  const value=readChoice(module);
+  if(value==='expanded')return true;
+  if(value==='remember')return safeGet(DETAIL_LAST_KEY,'collapsed')==='expanded';
+  return false;
+}
+function applyDetailDefaults(d,force=false){
+  const open=detailDesiredState();
+  d.querySelectorAll('.detail').forEach(detail=>{
+    if(!force&&detail.dataset.prefDetailInit==='1')return;
+    detail.dataset.prefDetailInit='1';
+    detail.classList.toggle('open',open);
+  });
+}
+function applyStartup(d){
+  if(d.documentElement.dataset.prefStartupApplied==='1')return;
+  d.documentElement.dataset.prefStartupApplied='1';
+  const value=resolveStartupValue();
+  const button=d.querySelector(`.btn[data-view="${CSS.escape(value)}"]`);
+  if(button&&!button.classList.contains('active'))button.click();
+  if(value==='history')setTimeout(()=>applyHistoryLanding(d),0);
+}
+function bindRuntime(d){
+  if(d.documentElement.dataset.prefRuntimeBound==='1')return;
+  d.documentElement.dataset.prefRuntimeBound='1';
+  d.addEventListener('click',event=>{
+    const view=event.target.closest?.('.btn[data-view]');
+    if(view){
+      const value=String(view.dataset.view||'');
+      if(['board','market','history','engine'].includes(value))safeSet(LAST_VIEW_KEY,value);
+      if(value==='history')setTimeout(()=>applyHistoryLanding(d),0);
+    }
+    const historyButton=event.target.closest?.('.subbtn[data-h]');
+    if(historyButton)safeSet(LAST_HISTORY_KEY,String(historyButton.dataset.h||'summary'));
+    const analysisButton=event.target.closest?.('.analysisBtn');
+    if(analysisButton){
+      setTimeout(()=>{
+        const id=analysisButton.dataset.detail;
+        const detail=id?d.getElementById(id):analysisButton.nextElementSibling;
+        const isOpen=Boolean(detail?.classList?.contains('open'));
+        safeSet(DETAIL_LAST_KEY,isOpen?'expanded':'collapsed');
+      },0);
+    }
+  });
+  applyStartup(d);
+  applyDetailDefaults(d);
+  const meter=moduleById('meter_presentation');
+  if(meter)setMeterPresentation(d,readChoice(meter));
+}
+
+function bindControls(d){
+  const box=d.getElementById(OVERVIEW_ID);
+  if(!box||box.dataset.bound==='1')return;
+  box.dataset.bound='1';
+  box.addEventListener('change',event=>{
+    const choice=event.target.closest?.('[data-pref-choice]');
+    if(choice){
+      const module=moduleById(choice.dataset.prefChoice);
+      if(!module||module.state!=='active'||module.editable===false)return;
+      const value=choice.value;
+      if(!writeChoice(module,value))return;
+      if(module.id==='meter_presentation')setMeterPresentation(d,value);
+      if(module.id==='recommendation_detail')applyDetailDefaults(d,true);
+      return;
+    }
+    const slot=event.target.closest?.('[data-pref-syndicate-slot]');
+    if(slot)saveSyndicateFromControls(d);
+  });
+}
+function render(d,force=false){
   if(!prefs||!d?.body)return false;
   const panel=d.getElementById('runnerSchedulePreferences');
   if(!panel)return false;
@@ -62,19 +264,22 @@ function render(d){
     head?head.insertAdjacentElement('afterend',box):panel.prepend(box);
   }
   const c=counts();
-  const key=JSON.stringify([prefs.schema,prefs.modules,c]);
-  if(box.dataset.key===key&&box.innerHTML)return true;
+  const settings=(prefs.modules||[]).map(m=>m.kind==='choice'?[m.id,readChoice(m)]:m.kind==='syndicate'?[m.id,readSyndicateAssignments()]:[m.id,m.state]);
+  const key=JSON.stringify([prefs.schema,prefs.modules,c,settings]);
+  if(!force&&box.dataset.key===key&&box.innerHTML){bindControls(d);return true}
   box.dataset.key=key;
+  box.dataset.bound='0';
   box.innerHTML=`
-    <div class="prefFrameworkHead"><b>PREFERENCE MODULES</b><span>ONE PERMANENT F6 PANE // EACH MODULE CAN BE OPERATIONAL, DISPLAY-ONLY OR RESERVED INDEPENDENTLY</span></div>
+    <div class="prefFrameworkHead"><b>PREFERENCE MODULES</b><span>ACTIVE UI PREFERENCES ARE SAVED LOCALLY // OPERATING RULES AND ISSUED HISTORY REMAIN REPOSITORY-CONTROLLED</span></div>
     <div class="prefStateCounts">
       <div class="prefStateCount active"><small>ACTIVE</small><b>${c.active}</b></div>
       <div class="prefStateCount display"><small>DISPLAY ONLY</small><b>${c.display_only}</b></div>
       <div class="prefStateCount reserved"><small>RESERVED</small><b>${c.reserved}</b></div>
     </div>
     <div class="prefModuleGrid">${(prefs.modules||[]).map(moduleCard).join('')}</div>
-    <div class="prefFrameworkRule"><b>F6 ARCHITECTURE RULE:</b> adding another terminal preference should add or promote a module in this registry; it should not require rebuilding the Preferences pane or scattering controls through the runner.</div>
+    <div class="prefFrameworkRule"><b>F6 ARCHITECTURE RULE:</b> UI preferences may change presentation or landing behavior only. Pricing, identity, freshness, staking, the five-pull budget and the active daily schedule are not preference controls.</div>
   `;
+  bindControls(d);
   return true;
 }
 function attach(){
@@ -83,13 +288,26 @@ function attach(){
   if(d!==lastDoc){
     lastDoc=d;
     if(observer)observer.disconnect();
-    observer=new MutationObserver(()=>requestAnimationFrame(()=>render(d)));
+    bindRuntime(d);
+    observer=new MutationObserver(()=>requestAnimationFrame(()=>{
+      render(d);
+      applyDetailDefaults(d);
+    }));
     observer.observe(d.body,{subtree:true,childList:true});
   }
-  return render(d);
+  render(d);
+  applyDetailDefaults(d);
+  return true;
 }
-fetch(`${DATA_URL}?v=${Date.now()}`,{cache:'no-store'})
-  .then(r=>{if(!r.ok)throw new Error(`preferences ${r.status}`);return r.json()})
-  .then(data=>{prefs=data;let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);setInterval(()=>{const d=appDoc();if(d)render(d)},1500)})
-  .catch(e=>console.warn('Preferences framework unavailable',e));
+
+Promise.all([
+  fetch(`${DATA_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`preferences ${r.status}`);return r.json()}),
+  fetch(`${SYNDICATES_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
+]).then(([data,syndicateData])=>{
+  prefs=data;
+  syndicates=syndicateData;
+  let tries=0;
+  const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);
+  setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500);
+}).catch(e=>console.warn('Preferences framework unavailable',e));
 })();
