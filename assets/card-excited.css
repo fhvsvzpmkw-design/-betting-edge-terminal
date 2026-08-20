@@ -1,0 +1,28 @@
+/* VigScope Betting Edge card view: EXCITED
+   Same card geometry and data as Normal; presentation only. */
+.runnerCard{
+  transition:background 160ms ease,box-shadow 160ms ease,outline-color 160ms ease;
+}
+.runnerCard .callBadge,
+.runnerCard .bigExec,
+.runnerCard .decisionFact,
+.runnerCard .runnerFact,
+.runnerCard .analysisBtn,
+.runnerCard .gameWindowState{
+  transition:color 160ms ease,background 160ms ease,border-color 160ms ease,box-shadow 160ms ease,text-shadow 160ms ease;
+}
+.runnerCard[data-card-view="excited"]{
+  --cyan:#54efff;--yellow:#fff07a;--mag:#ff61dd;
+  background:linear-gradient(180deg,#081a2d 0%,#061421 52%,#05101a 100%);
+  box-shadow:0 0 0 1px rgba(84,239,255,.18),0 0 18px rgba(47,132,255,.22),inset 0 0 24px rgba(84,239,255,.035);
+}
+.runnerCard[data-card-view="excited"] .callBadge{text-shadow:0 0 8px currentColor,0 0 18px rgba(84,239,255,.34)}
+.runnerCard[data-card-view="excited"] .bigExec{text-shadow:0 0 9px rgba(84,239,255,.72);transform:scale(1.035);transform-origin:right center}
+.runnerCard[data-card-view="excited"] .decisionFact,
+.runnerCard[data-card-view="excited"] .runnerFact{background:linear-gradient(180deg,#031421,#020b12);box-shadow:inset 0 0 12px rgba(84,239,255,.035)}
+.runnerCard[data-card-view="excited"] .stakeFact .value{text-shadow:0 0 8px rgba(84,239,255,.45)}
+.runnerCard[data-card-view="excited"] .analysisBtn{box-shadow:0 0 10px rgba(255,233,107,.18),inset 0 0 12px rgba(255,233,107,.045)}
+.runnerCard[data-card-view="excited"] .gameWindowState{box-shadow:0 0 8px rgba(255,97,120,.12)}
+@media(max-width:520px){
+  .runnerCard[data-card-view="excited"] .bigExec{transform:none}
+}
