@@ -39,12 +39,6 @@
     return {time:Date.now(),mode:'LIVE'}
   }
 
-  function startClock(ts){
-    try{
-      return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour:'numeric',minute:'2-digit',hour12:true,timeZoneName:'short'}).format(new Date(ts))
-    }catch(e){return 'START TIME'}
-  }
-
   function durationLabel(minutes){
     const m=Math.max(0,Math.round(Math.abs(minutes)));
     if(m<60)return `${m}m`;
@@ -53,11 +47,18 @@
   }
 
   function classify(deltaMinutes){
-    if(deltaMinutes>180)return {key:'upcoming',label:'UPCOMING'};
-    if(deltaMinutes>60)return {key:'approaching',label:'APPROACHING'};
-    if(deltaMinutes>15)return {key:'closing',label:'CLOSING WINDOW'};
-    if(deltaMinutes>=-15)return {key:'start',label:'START WINDOW'};
-    return {key:'passed',label:'SCHEDULED START PASSED'}
+    if(deltaMinutes>180)return {key:'upcoming'};
+    if(deltaMinutes>60)return {key:'approaching'};
+    if(deltaMinutes>15)return {key:'closing'};
+    if(deltaMinutes>=-15)return {key:'start'};
+    return {key:'passed'}
+  }
+
+  function statusLabel(deltaMinutes,mode){
+    const prefix=mode==='ISSUE'?'AT ISSUE • ':'';
+    if(Math.abs(deltaMinutes)<0.75)return `${prefix}STARTING NOW`;
+    if(deltaMinutes>0)return `${prefix}STARTS IN ${durationLabel(deltaMinutes)}`;
+    return `${prefix}STARTED ${durationLabel(deltaMinutes)} AGO`
   }
 
   function ensureStyle(d){
@@ -65,15 +66,14 @@
     const style=d.createElement('style');
     style.id=STYLE_ID;
     style.textContent=`
-      .gameWindowIntel{display:grid;grid-template-columns:1fr;justify-items:center;align-items:center;gap:5px;width:100%;margin:11px 0 13px;padding:9px 10px;border:1px solid var(--line);background:#020912;font-size:9px;font-weight:900;letter-spacing:.055em;line-height:1.3;text-align:center}
-      .gameWindowState{display:inline-flex;align-items:center;justify-content:center;padding:4px 9px;border:1px solid var(--line);background:#020912;color:var(--muted);white-space:nowrap;font-size:9px;letter-spacing:.07em}
-      .gameWindowClock{display:block;width:100%;color:#93aeba;letter-spacing:.025em;font-size:9px;font-weight:850}
-      .gameWindowIntel[data-window="upcoming"]{border-color:#315469;background:#020b12}.gameWindowIntel[data-window="upcoming"] .gameWindowState{border-color:#315469;color:#8fb8c8}
-      .gameWindowIntel[data-window="approaching"]{border-color:#257a91;background:#021016}.gameWindowIntel[data-window="approaching"] .gameWindowState{border-color:var(--cyan);color:var(--cyan)}
-      .gameWindowIntel[data-window="closing"]{border-color:#8a7828;background:#100e03}.gameWindowIntel[data-window="closing"] .gameWindowState{border-color:var(--yellow);color:var(--yellow);background:#171403}
-      .gameWindowIntel[data-window="start"]{border-color:#b86928;background:#130902}.gameWindowIntel[data-window="start"] .gameWindowState{border-color:#ff9d45;color:#ffb56f;background:#1a0d03}
-      .gameWindowIntel[data-window="passed"]{border-color:#8f3040;background:#120509}.gameWindowIntel[data-window="passed"] .gameWindowState{border-color:var(--red);color:var(--red);background:#19070b}
-      @media(max-width:520px){.gameWindowIntel{gap:4px;margin:9px 0 11px;padding:8px 7px}.gameWindowState{padding:4px 7px;font-size:8px}.gameWindowClock{font-size:8px}}
+      .gameWindowIntel{display:inline-flex;align-items:center;max-width:100%;margin:6px 0 0;padding:0;border:0;background:transparent;font-size:9px;font-weight:900;letter-spacing:.055em;line-height:1.25}
+      .gameWindowState{display:inline-flex;align-items:center;justify-content:center;max-width:100%;padding:4px 8px;border:1px solid var(--line);background:#020912;color:var(--muted);white-space:nowrap;font-size:9px;font-weight:950;letter-spacing:.065em}
+      .gameWindowIntel[data-window="upcoming"] .gameWindowState{border-color:#315469;color:#8fb8c8;background:#020b12}
+      .gameWindowIntel[data-window="approaching"] .gameWindowState{border-color:var(--cyan);color:var(--cyan);background:#021016}
+      .gameWindowIntel[data-window="closing"] .gameWindowState{border-color:var(--yellow);color:var(--yellow);background:#171403}
+      .gameWindowIntel[data-window="start"] .gameWindowState{border-color:#ff9d45;color:#ffb56f;background:#1a0d03}
+      .gameWindowIntel[data-window="passed"] .gameWindowState{border-color:var(--red);color:var(--red);background:#19070b}
+      @media(max-width:520px){.gameWindowIntel{margin-top:5px}.gameWindowState{padding:3px 6px;font-size:8px;letter-spacing:.055em}}
     `;
     d.head.appendChild(style)
   }
@@ -87,16 +87,8 @@
     const delta=(eventTime-reference)/60000;
     const state=classify(delta);
     chip.dataset.window=state.key;
-    const stateEl=chip.querySelector('.gameWindowState'),clockEl=chip.querySelector('.gameWindowClock');
-    if(stateEl)stateEl.textContent=state.label;
-    if(clockEl){
-      const prefix=mode==='ISSUE'?'AT ISSUE • ':'';
-      let relative='';
-      if(Math.abs(delta)<0.75)relative='SCHEDULED NOW';
-      else if(delta>0)relative=`${durationLabel(delta)} TO START`;
-      else relative=`${durationLabel(delta)} PAST SCHEDULED`;
-      clockEl.textContent=`${prefix}${startClock(eventTime)} • ${relative}`
-    }
+    const stateEl=chip.querySelector('.gameWindowState');
+    if(stateEl)stateEl.textContent=statusLabel(delta,mode)
   }
 
   function enhanceCard(d,r,run,baseCard){
@@ -107,6 +99,8 @@
       ensureStyle(d);
       const top=cardEl.querySelector('.runnerTop');
       if(!top)return cardEl;
+      const left=top.firstElementChild;
+      if(!left)return cardEl;
       const ref=referenceFor(run);
       const chip=d.createElement('div');
       chip.className='gameWindowIntel';
@@ -114,9 +108,9 @@
       chip.dataset.referenceMode=ref.mode;
       chip.dataset.referenceTime=String(ref.time);
       const state=d.createElement('span');state.className='gameWindowState';
-      const clock=d.createElement('span');clock.className='gameWindowClock';
-      chip.append(state,clock);
-      top.insertAdjacentElement('afterend',chip);
+      chip.appendChild(state);
+      const meta=[...left.querySelectorAll('.runnerMeta')].find(x=>!x.classList.contains('priceWatchTarget'));
+      if(meta)meta.insertAdjacentElement('afterend',chip);else left.appendChild(chip);
       updateChip(chip,ref.time)
     }catch(e){console.warn('VigScope game-window intelligence card error',e)}
     return cardEl
