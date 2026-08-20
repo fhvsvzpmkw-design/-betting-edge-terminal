@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "title": "PREFERENCES / OPERATIONS",
+  "description": "Terminal preference modules. A module may be operational, display-only, or reserved without requiring a new F6 layout.",
+  "states": {
+    "active": {"label": "ACTIVE", "meaning": "The module is operational in the terminal now."},
+    "display_only": {"label": "DISPLAY ONLY", "meaning": "The module is fully presented in F6 but is intentionally not changeable from the terminal."},
+    "reserved": {"label": "RESERVED", "meaning": "The module has a permanent home in F6 but its controls are not activated yet."}
+  },
+  "modules": [
+    {"id":"schedule_profile","title":"SCHEDULE PROFILE","state":"display_only","kind":"schedule","summary":"Seasonal odds-pulse, report-window and Vig Scope checkpoint schedule for the current Vancouver operating day.","source":"data/schedule-profiles.json","controlPolicy":"The run is the run: once the operating day is assigned a schedule profile, F6 observes it and does not change it."},
+    {"id":"history_translation","title":"HISTORY TRANSLATION","state":"active","kind":"history","summary":"Canonical S1-S5 translation keeps previous-day comparisons meaningful across seasonal schedule profiles.","source":"run-history.json","controlPolicy":"Actual issue times, feed timestamps and archived payloads remain immutable."},
+    {"id":"meter_presentation","title":"METER PRESENTATION","state":"reserved","kind":"reserved","summary":"Future home for terminal meter styling and presentation choices, including Vig Scope/input-meter presentation.","controlPolicy":"No F6 meter control is activated yet. Existing meter behavior remains unchanged."},
+    {"id":"terminal_interface","title":"TERMINAL INTERFACE","state":"reserved","kind":"reserved","summary":"Future home for terminal-level display and interface preferences that should not be scattered through the runner.","controlPolicy":"Reserved structure only; no existing runner behavior is changed."}
+  ]
+}
