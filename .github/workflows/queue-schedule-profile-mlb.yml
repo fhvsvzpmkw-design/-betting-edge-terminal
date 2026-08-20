@@ -1,0 +1,54 @@
+name: Queue MLB / Summer schedule
+run-name: Queue MLB / Summer for next eligible 06:00
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-schedule-profile-control
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate profile definitions
+        run: node tools/schedule-profile.mjs validate
+
+      - name: Queue MLB profile
+        id: queue
+        run: node tools/schedule-profile.mjs queue --profile mlb | tee -a "$GITHUB_OUTPUT"
+
+      - name: Publish profile state
+        if: steps.queue.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/schedule-state.json
+          git commit -m "Queue Betting Edge schedule profile: mlb"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
+
+      - name: Summary
+        run: |
+          {
+            echo "## Betting Edge schedule profile"
+            echo
+            echo "- Profile: \`MLB / SUMMER\`"
+            echo "- Activation boundary: \`06:00 America/Vancouver\`"
+            echo "- Five-pull daily cap: unchanged"
+          } >> "$GITHUB_STEP_SUMMARY"
