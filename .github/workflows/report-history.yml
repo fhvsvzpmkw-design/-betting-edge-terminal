@@ -29,6 +29,8 @@ on:
       - run-history.json
       - tools/report-publication.mjs
       - tools/spread-lineage.mjs
+      - tools/selection-availability.mjs
+      - tests/selection-availability.test.mjs
       - tests/spread-lineage-reconciliation.test.js
       - tests/spread-lineage-primary-line-fixtures.test.js
       - tests/fixtures/spread-lineage-primary-lines.json
@@ -41,6 +43,8 @@ on:
       - run-history.json
       - tools/report-publication.mjs
       - tools/spread-lineage.mjs
+      - tools/selection-availability.mjs
+      - tests/selection-availability.test.mjs
       - tests/spread-lineage-reconciliation.test.js
       - tests/spread-lineage-primary-line-fixtures.test.js
       - tests/fixtures/spread-lineage-primary-lines.json
@@ -66,6 +70,8 @@ jobs:
           node-version: '22'
       - name: Exercise publisher path
         run: node tools/report-publication.mjs self-test
+      - name: Exercise tracked selection availability
+        run: node tests/selection-availability.test.mjs
       - name: Exercise spread-lineage path
         run: node tests/spread-lineage-reconciliation.test.js
       - name: Exercise spread primary-line fixtures
@@ -173,6 +179,8 @@ jobs:
           }
           console.log(`SELECTION CONTINUITY OK: ${prior.path}`);
           NODE
+      - name: Verify tracked non-spread book availability
+        run: node tools/selection-availability.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Reconcile tracked spread lineage
         run: node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Validate bundle and derive paths
