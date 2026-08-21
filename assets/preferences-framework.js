@@ -126,22 +126,22 @@ function ensureStyle(d){
   const s=d.createElement('style');
   s.id=STYLE_ID;
   s.textContent=`
-    #${OVERVIEW_ID}{margin:10px 0;border:1px solid #2d566b;background:linear-gradient(180deg,#020b12,#01070b);padding:9px}
-    .prefFrameworkHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-    .prefFrameworkHead b{color:#9feaff;font-size:10px;letter-spacing:.1em}.prefFrameworkHead span{color:#718c9a;font-size:7px;line-height:1.45;max-width:620px;text-align:right}
-    .prefStateCounts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
-    .prefStateCount{border:1px solid #203b49;background:#02070b;padding:6px 7px}.prefStateCount small{display:block;color:#6e8997;font-size:6.5px;letter-spacing:.1em}.prefStateCount b{display:block;margin-top:2px;font-size:14px;color:#d9f5ff}.prefStateCount.active b{color:#8effaa}.prefStateCount.display b{color:#f5dd83}.prefStateCount.reserved b{color:#8ca2ae}
-    .prefModuleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-    .prefModuleCard{min-width:0;border:1px solid #284552;background:#02080c;padding:8px}.prefModuleCard.state-active{border-color:#347b4a}.prefModuleCard.state-display_only{border-color:#75652e}.prefModuleCard.state-reserved{border-color:#394b54;opacity:.82}
-    .prefModuleHead{display:flex;justify-content:space-between;gap:8px;align-items:center}.prefModuleHead b{color:#dff6ff;font-size:9px;letter-spacing:.08em}.prefStateBadge{flex:0 0 auto;border:1px solid #475b65;padding:3px 5px;color:#91a8b4;background:#04090c;font-size:6.5px;font-weight:950;letter-spacing:.08em}.state-active .prefStateBadge{border-color:#438858;color:#8effaa}.state-display_only .prefStateBadge{border-color:#8b7631;color:#ffe07a}.state-reserved .prefStateBadge{color:#82949e}
-    .prefModuleCard p{margin:6px 0 5px;color:#8ba2af;font-size:7.5px;line-height:1.45}.prefModulePolicy{border-top:1px solid #1b313b;padding-top:5px;color:#617985;font-size:7px;line-height:1.4}
-    .prefModuleControl{margin:7px 0;padding:7px;border:1px solid #1f3d48;background:#010609}
-    .prefControlLabel{display:grid;grid-template-columns:80px minmax(0,1fr);gap:7px;align-items:center;color:#738d99;font-size:7px;font-weight:900;letter-spacing:.07em}
-    .prefSelect{width:100%;min-width:0;border:1px solid #3a6475;background:#04111a;color:#d9f6ff;padding:6px 7px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace}
-    .prefSyndicateGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.prefSlotControl{grid-template-columns:24px minmax(0,1fr)}
-    .prefShellGrid{display:grid;gap:5px}.prefShellRow{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #403b22;background:#070903;padding:6px 7px}.prefShellCharacter{display:block;color:#f4e4a2;font-size:7.5px;letter-spacing:.06em}.prefShellName{display:block;margin-top:2px;color:#8198a4;font-size:6.8px}.prefShellMeta{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#9aacb4;font-size:6.5px;font-weight:900}.prefShellState{border:1px solid #71622f;padding:2px 4px;color:#f4d66f;letter-spacing:.07em}.prefShellState.shell-editable{border-color:#2f7486;color:#78dff3}.prefShellEmpty{color:#8ba2af;font-size:7px;letter-spacing:.08em}
-    .prefFrameworkRule{margin-top:8px;padding:7px 8px;border-left:3px solid #43c8ff;background:#031019;color:#7f9dab;font-size:7.5px;line-height:1.45}.prefFrameworkRule b{color:#bceeff}
-    @media(max-width:760px){.prefModuleGrid,.prefStateCounts{grid-template-columns:1fr}.prefFrameworkHead span{text-align:left}.prefSyndicateGrid{grid-template-columns:1fr}}
+    #${OVERVIEW_ID}{margin:12px 0;border:1px solid #2d566b;background:linear-gradient(180deg,#020b12,#01070b);padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .prefFrameworkHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:11px}
+    .prefFrameworkHead b{color:#9feaff;font-size:14px;font-weight:900;letter-spacing:.08em}.prefFrameworkHead span{color:#8ba5b1;font-size:10.5px;line-height:1.5;max-width:680px;text-align:right}
+    .prefStateCounts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:11px}
+    .prefStateCount{border:1px solid #203b49;background:#02070b;padding:9px 10px}.prefStateCount small{display:block;color:#7f99a5;font-size:9.5px;font-weight:900;letter-spacing:.09em}.prefStateCount b{display:block;margin-top:3px;font-size:18px;color:#d9f5ff}.prefStateCount.active b{color:#8effaa}.prefStateCount.display b{color:#f5dd83}.prefStateCount.reserved b{color:#8ca2ae}
+    .prefModuleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .prefModuleCard{min-width:0;border:1px solid #284552;background:#02080c;padding:11px}.prefModuleCard.state-active{border-color:#347b4a}.prefModuleCard.state-display_only{border-color:#75652e}.prefModuleCard.state-reserved{border-color:#394b54;opacity:.86}
+    .prefModuleHead{display:flex;justify-content:space-between;gap:9px;align-items:center}.prefModuleHead b{color:#dff6ff;font-size:12.5px;font-weight:900;letter-spacing:.06em}.prefStateBadge{flex:0 0 auto;border:1px solid #475b65;padding:4px 6px;color:#a1b6c0;background:#04090c;font-size:9px;font-weight:950;letter-spacing:.07em}.state-active .prefStateBadge{border-color:#438858;color:#8effaa}.state-display_only .prefStateBadge{border-color:#8b7631;color:#ffe07a}.state-reserved .prefStateBadge{color:#91a2aa}
+    .prefModuleCard p{margin:8px 0 7px;color:#a1b6c0;font-size:11px;line-height:1.55}.prefModulePolicy{border-top:1px solid #1b313b;padding-top:7px;color:#78909b;font-size:10px;line-height:1.5}
+    .prefModuleControl{margin:9px 0;padding:9px;border:1px solid #1f3d48;background:#010609}
+    .prefControlLabel{display:grid;grid-template-columns:92px minmax(0,1fr);gap:9px;align-items:center;color:#8da4ae;font-size:10px;font-weight:900;letter-spacing:.06em}
+    .prefSelect{width:100%;min-width:0;min-height:36px;border:1px solid #3a6475;background:#04111a;color:#d9f6ff;padding:8px 9px;font:900 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .prefSyndicateGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prefSlotControl{grid-template-columns:28px minmax(0,1fr)}
+    .prefShellGrid{display:grid;gap:7px}.prefShellRow{display:flex;align-items:center;justify-content:space-between;gap:9px;border:1px solid #403b22;background:#070903;padding:8px 9px}.prefShellCharacter{display:block;color:#f4e4a2;font-size:11px;letter-spacing:.05em}.prefShellName{display:block;margin-top:3px;color:#95aab4;font-size:9.5px}.prefShellMeta{display:flex;align-items:center;gap:6px;flex:0 0 auto;color:#aebdc4;font-size:9px;font-weight:900}.prefShellState{border:1px solid #71622f;padding:3px 5px;color:#f4d66f;letter-spacing:.06em}.prefShellState.shell-editable{border-color:#2f7486;color:#78dff3}.prefShellEmpty{color:#9eb1ba;font-size:10px;letter-spacing:.07em}
+    .prefFrameworkRule{margin-top:11px;padding:9px 10px;border-left:3px solid #43c8ff;background:#031019;color:#93abb5;font-size:10.5px;line-height:1.5}.prefFrameworkRule b{color:#bceeff}
+    @media(max-width:760px){.prefModuleGrid,.prefStateCounts{grid-template-columns:1fr}.prefFrameworkHead span{text-align:left}.prefSyndicateGrid{grid-template-columns:1fr}.prefControlLabel{grid-template-columns:78px minmax(0,1fr)}}
   `;
   d.head.appendChild(s);
 }
