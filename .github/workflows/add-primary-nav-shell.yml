@@ -1,0 +1,55 @@
+name: Add primary navigation full-page shells
+
+on:
+  push:
+    branches: [ui/primary-nav-full-shell]
+    paths:
+      - '.github/workflows/add-primary-nav-shell.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui/primary-nav-full-shell
+      - name: Load F2-F4 full-page shell and bust cache
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          dash=Path('assets/report-dashboard-vigscope.js')
+          s=dash.read_text()
+          anchor="""  // Install the permanent F6/F7/F8 desk navigation before Meat Desk binds its\n"""
+          block="""  // F2/F3/F4 retain their normal top-row positions, but open into the same\n  // isolated full-page banner treatment used by Load Syndicate.\n  const primaryNav=document.createElement('script');\n  primaryNav.id='primaryNavShellLoader';\n  primaryNav.src='./assets/primary-nav-shell.js?v=1';\n  primaryNav.async=false;\n  document.head.appendChild(primaryNav);\n\n"""
+          if 'primaryNavShellLoader' not in s:
+              if anchor not in s:
+                  raise SystemExit('dashboard loader anchor not found')
+              s=s.replace(anchor,block+anchor)
+              dash.write_text(s)
+
+          runner=Path('runner.html')
+          r=runner.read_text()
+          old='report-dashboard-vigscope.js?v=20260821-1643'
+          new='report-dashboard-vigscope.js?v=20260821-1651'
+          if old in r:
+              runner.write_text(r.replace(old,new))
+          elif new not in r:
+              raise SystemExit('runner dashboard asset tag not found')
+          PY
+      - name: Commit UI patch
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/report-dashboard-vigscope.js runner.html; then
+            echo 'Already patched'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/report-dashboard-vigscope.js runner.html
+          git commit -m 'Open F2-F4 as full-page navigation shells'
+          git push origin ui/primary-nav-full-shell
