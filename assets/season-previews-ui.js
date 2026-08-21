@@ -209,7 +209,7 @@ function ensureUi(d){
   const pref=d.getElementById(PREF_BUTTON_ID);if(!pref)return false;
   let b=d.getElementById(BUTTON_ID);if(!b){b=d.createElement('button');b.type='button';b.id=BUTTON_ID;b.className='btn';b.setAttribute('aria-pressed','false');tabs.appendChild(b)}
   setButtonCopy(b);setPreferenceCopy(pref);
-  const f5=d.getElementById('runnerSyndicateF5');if(f5&&f5.nextElementSibling!==b)f5.insertAdjacentElement('afterend',b);if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
+  if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
   if(!d.getElementById(PANEL_ID))renderPanel(d,'library');patchLegacyPreferenceCopy(d);bindPanel(d);bindNav(d,b,pref,tabs);return true;
 }
 async function loadManifest(){
