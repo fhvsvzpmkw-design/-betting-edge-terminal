@@ -53,6 +53,6 @@ for(const token of [
 ]) assert(framework.includes(token),`preferences runtime missing ${token}`);
 
 assert(bootstrap.includes('bettingEdge.preferences.meterPresentation'),'VigScope bootstrap must honor saved meter preference before renderer load');
-assert(bootstrap.includes('preferences-framework.js?v=2'),'preferences framework cache version must be v2');
+assert(bootstrap.includes('preferences-framework.js?v=3'),'preferences framework cache version must be v3');
 
 console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL');
