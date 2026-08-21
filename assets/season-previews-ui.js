@@ -62,6 +62,9 @@ function renderPanel(d){
   let p=d.getElementById(PANEL_ID);
   if(!p){p=d.createElement('section');p.id=PANEL_ID;p.setAttribute('aria-label','Season preview source library');nav.insertAdjacentElement('afterend',p)}
   const sources=Array.isArray(manifest?.sources)?manifest.sources:[];
+  const renderKey=JSON.stringify([manifest?.updatedAt||'',sources]);
+  if(p.dataset.renderKey===renderKey&&p.innerHTML)return;
+  p.dataset.renderKey=renderKey;
   const cards=sources.map(item=>{
     const title=esc(item.title||item.name||item.file||'UNTITLED SOURCE');
     const meta=[item.kind,item.season,item.status].filter(Boolean).map(esc).join(' // ');
@@ -103,7 +106,7 @@ function patchLegacyPreferenceCopy(d){
     }
   });
 }
-function closeSeasonPreview(d,b){d.body.classList.remove('runnerSeasonPreviewsLoaded');b?.classList.remove('active')}
+function closeSeasonPreview(d,b){d.body.classList.remove('runnerSeasonPreviewsLoaded');if(b){b.classList.remove('active');b.setAttribute('aria-pressed','false')}}
 function bind(d,b,pref,tabs){
   if(b.dataset.bound!=='1'){
     b.dataset.bound='1';
@@ -113,6 +116,7 @@ function bind(d,b,pref,tabs){
       pref?.classList.remove('active');
       d.body.classList.toggle('runnerSeasonPreviewsLoaded',open);
       b.classList.toggle('active',open);
+      b.setAttribute('aria-pressed',String(open));
       if(open)renderPanel(d);
       try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
     });
