@@ -1,0 +1,42 @@
+name: Fix special desk Meat copy
+
+on:
+  push:
+    branches: [ui/f6-f8-desks]
+    paths:
+      - '.github/workflows/fix-special-desk-meat-copy.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-special-desks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui/f6-f8-desks
+      - name: Preserve Meat Desk native source count copy
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/special-desks-ui.js')
+          s=p.read_text()
+          old="""  const count=(window.__meatDeskSourceCount??null);\n  meat.innerHTML=`<span class=\"f6Main\"><b>[F8]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class=\"f6Message\">${count==null?'SOURCE DESK':`${count} SOURCES ON DESK`}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN</span>`;\n"""
+          if old in s:
+              s=s.replace(old,'')
+              p.write_text(s)
+          PY
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/special-desks-ui.js; then
+            echo 'No cleanup needed'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/special-desks-ui.js
+          git commit -m 'Preserve Meat Desk source-count copy'
+          git push origin ui/f6-f8-desks
