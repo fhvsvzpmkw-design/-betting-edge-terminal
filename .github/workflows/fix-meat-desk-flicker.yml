@@ -1,0 +1,55 @@
+name: Fix Meat Desk navigation flicker
+
+on:
+  push:
+    branches: [fix/meat-desk-flicker]
+    paths:
+      - '.github/workflows/fix-meat-desk-flicker.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/meat-desk-flicker
+      - name: Stop competing nav reordering and bust caches
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          meat = Path('assets/season-previews-ui.js')
+          s = meat.read_text()
+          old = "const f5=d.getElementById('runnerSyndicateF5');if(f5&&f5.nextElementSibling!==b)f5.insertAdjacentElement('afterend',b);if(tabs.lastElementChild!==pref)tabs.appendChild(pref);"
+          new = "if(tabs.lastElementChild!==pref)tabs.appendChild(pref);"
+          if old in s:
+              meat.write_text(s.replace(old, new))
+          elif new not in s:
+              raise SystemExit('Meat Desk nav ordering line not found')
+
+          dash = Path('assets/report-dashboard-vigscope.js')
+          d = dash.read_text()
+          d = d.replace("seasonPreviews.src='./assets/season-previews-ui.js?v=3';", "seasonPreviews.src='./assets/season-previews-ui.js?v=4';")
+          dash.write_text(d)
+
+          runner = Path('runner.html')
+          r = runner.read_text()
+          r = r.replace('report-dashboard-vigscope.js?v=20260821-1631', 'report-dashboard-vigscope.js?v=20260821-1643')
+          runner.write_text(r)
+          PY
+      - name: Commit flicker fix
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/season-previews-ui.js assets/report-dashboard-vigscope.js runner.html; then
+            echo 'Already fixed'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/season-previews-ui.js assets/report-dashboard-vigscope.js runner.html
+          git commit -m 'Fix Meat Desk navigation flicker'
+          git push origin fix/meat-desk-flicker
