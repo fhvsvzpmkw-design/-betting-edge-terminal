@@ -108,6 +108,39 @@ jobs:
           decode('REPORT_JSON_B64', '/tmp/report.json');
           decode('SIDECAR_JSON_B64', '/tmp/sidecar.json');
           NODE
+      - name: Guard tracked selection continuity
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('/tmp/report.json', 'utf8'));
+          const index = JSON.parse(fs.readFileSync('run-history.json', 'utf8'));
+          const reportMs = Date.parse(report.ts);
+          const day = String(report.ts || '').slice(0, 10);
+          const prior = (index.runs || [])
+            .filter(entry => String(entry.ts || '').slice(0, 10) === day && Date.parse(entry.ts) < reportMs && entry.path)
+            .sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0];
+          if (!prior) {
+            console.log('SELECTION CONTINUITY OK: no prior same-day report');
+            process.exit(0);
+          }
+          const previous = JSON.parse(fs.readFileSync(prior.path, 'utf8'));
+          const currentKeys = new Set((report.recs || []).map(rec => String(rec?.feed?.selectionKey || '')).filter(Boolean));
+          const active = new Set(['BET', 'LEAN', 'WAIT']);
+          const missing = [];
+          for (const rec of previous.recs || []) {
+            if (!active.has(String(rec?.status || '').toUpperCase())) continue;
+            const key = String(rec?.feed?.selectionKey || '').trim();
+            if (!key || currentKeys.has(key)) continue;
+            const eventDate = String(rec?.feed?.eventDate || '').trim();
+            const eventMs = Date.parse(eventDate);
+            if (Number.isFinite(eventMs) && reportMs >= eventMs) continue;
+            missing.push(`${rec.status} ${rec.title} [${key}] event=${eventDate || 'UNKNOWN'}`);
+          }
+          if (missing.length) {
+            throw new Error(`SELECTION CONTINUITY VIOLATION: a tracked BET/LEAN/WAIT vanished before event start. Carry it forward as BET/LEAN/WAIT/PASS with an explicit resolution. A sportsbook dropping the market does not authorize silent omission. Prior=${prior.path}. Missing: ${missing.join('; ')}`);
+          }
+          console.log(`SELECTION CONTINUITY OK: ${prior.path}`);
+          NODE
       - name: Reconcile tracked spread lineage
         run: node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Validate bundle and derive paths
