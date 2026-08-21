@@ -34,7 +34,7 @@
   // controls above the detailed schedule module.
   const preferences=document.createElement('script');
   preferences.id='preferencesFrameworkLoader';
-  preferences.src='./assets/preferences-framework.js?v=2';
+  preferences.src='./assets/preferences-framework.js?v=3';
   preferences.async=false;
   document.head.appendChild(preferences);
 
