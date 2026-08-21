@@ -30,8 +30,8 @@
   schedule.async=false;
   document.head.appendChild(schedule);
 
-  // The framework adds the permanent F6 module registry and safe local UI
-  // controls above the detailed schedule module.
+  // The framework adds the permanent Preferences module registry and safe local
+  // UI controls above the detailed schedule module.
   const preferences=document.createElement('script');
   preferences.id='preferencesFrameworkLoader';
   preferences.src='./assets/preferences-framework.js?v=3';
@@ -45,6 +45,14 @@
   cardView.src='./assets/card-view-preference.js?v=3';
   cardView.async=false;
   document.head.appendChild(cardView);
+
+  // F6 is the season-preview source library. Preferences is re-keyed to TAB
+  // and kept as the permanent lowest navigation selection.
+  const seasonPreviews=document.createElement('script');
+  seasonPreviews.id='seasonPreviewsUiLoader';
+  seasonPreviews.src='./assets/season-previews-ui.js?v=1';
+  seasonPreviews.async=false;
+  document.head.appendChild(seasonPreviews);
 
   const STYLE_ID='vigScopeCompactPresentationFix';
   const INTEL_SCRIPT_ID='vigScopeGameWindowIntelligenceLoader';
@@ -92,7 +100,7 @@
       @media(max-width:1100px){.runnerNavPad{padding-bottom:3px!important}}
       @media(max-width:720px){.runnerNavPad{padding-bottom:2px!important}}
 
-      /* F6 Preferences uses the same isolated full-page shell as Load Syndicate. */
+      /* Preferences uses the same isolated full-page shell as Load Syndicate. */
       body.runnerPreferencesLoaded .top{display:none!important}
       body.runnerPreferencesLoaded .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
       body.runnerPreferencesLoaded .runnerNavPad .tabs>.btn:not(#runnerPreferencesF6){display:none!important}
