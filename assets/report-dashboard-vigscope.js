@@ -50,7 +50,7 @@
   // and kept as the permanent lowest navigation selection.
   const seasonPreviews=document.createElement('script');
   seasonPreviews.id='seasonPreviewsUiLoader';
-  seasonPreviews.src='./assets/season-previews-ui.js?v=2';
+  seasonPreviews.src='./assets/season-previews-ui.js?v=3';
   seasonPreviews.async=false;
   document.head.appendChild(seasonPreviews);
 
