@@ -1,0 +1,42 @@
+name: Rekey Meat Desk to F8
+
+on:
+  push:
+    branches: [ui/f6-f8-desks]
+    paths:
+      - '.github/workflows/rekey-meat-desk-f8.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-meat-desk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui/f6-f8-desks
+      - name: Rekey Meat Desk navigation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/season-previews-ui.js')
+          s=p.read_text()
+          s=s.replace('PRESS [F6] TO OPEN','PRESS [F8] TO OPEN')
+          s=s.replace('<b>[F6]</b>&nbsp; 🥩 MEAT DESK 🥩','<b>[F8]</b>&nbsp; 🥩 MEAT DESK 🥩')
+          s=s.replace("if(e.key==='F6'){","if(e.key==='F8'){")
+          p.write_text(s)
+          PY
+      - name: Commit Meat Desk rekey
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/season-previews-ui.js; then
+            echo 'Meat Desk already keyed to F8'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/season-previews-ui.js
+          git commit -m 'Rekey Meat Desk navigation to F8'
+          git push origin ui/f6-f8-desks
