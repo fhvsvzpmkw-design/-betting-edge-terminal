@@ -82,8 +82,6 @@ function ensureButtons(d){
   ensureStyle(d);
   let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.innerHTML=buttonHtml('F6','🍕 PIZZA PLAYS 🍕','LONG SHOTS + PREMIUM&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN','pizza');p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
   let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.innerHTML=buttonHtml('F7','🔒 CRYPTO SPECIALS 🔒','PREMIUM LINKS + ANALYSIS&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN','crypto');c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
-  const count=(window.__meatDeskSourceCount??null);
-  meat.innerHTML=`<span class="f6Main"><b>[F8]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="f6Message">${count==null?'SOURCE DESK':`${count} SOURCES ON DESK`}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN</span>`;
   meat.setAttribute('aria-label','Meat Desk');
   if(f5){if(f5.nextElementSibling!==p)f5.insertAdjacentElement('afterend',p);if(p.nextElementSibling!==c)p.insertAdjacentElement('afterend',c);if(c.nextElementSibling!==meat)c.insertAdjacentElement('afterend',meat)}else{tabs.append(p,c,meat)}
   if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
