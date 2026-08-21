@@ -5,6 +5,7 @@ function assert(condition,message){if(!condition)throw new Error(message)}
 const prefs=JSON.parse(fs.readFileSync('data/preferences.json','utf8'));
 const framework=fs.readFileSync('assets/preferences-framework.js','utf8');
 const bootstrap=fs.readFileSync('assets/report-dashboard-vigscope.js','utf8');
+const contract=fs.readFileSync('BETTING_EDGE_CONTRACT.md','utf8');
 
 assert(prefs.schema===1,'preferences schema must be 1');
 assert(prefs.states&&typeof prefs.states==='object','preferences states are required');
@@ -36,9 +37,13 @@ for(const id of ['meter_presentation','syndicate_load','startup_screen','history
   assert(byId[id]?.editable===true,`${id} must be editable`);
 }
 assert(byId.report_card_target?.state==='display_only','report card target must remain display-only for now');
-assert(byId.report_card_target?.current===7,'report card target current status must be 7');
+assert(byId.report_card_target?.current===9,'report card target current status must be 9');
 assert(byId.report_card_target?.profiles?.join(',')==='7,9,12','report card target profiles must be 7/9/12');
 assert(byId.report_card_target?.overflowProtection===true,'report card target overflow protection must remain on');
+assert(contract.includes('data/preferences.json'),'production contract must resolve repository preferences for report card target');
+assert(contract.includes('id: "report_card_target"'),'production contract must bind the report_card_target module');
+assert(contract.includes('current repository setting is **9 cards**'),'production contract must state the current 9-card operational profile');
+assert(contract.includes('Fewer than the target is valid'),'production contract must keep the card target soft rather than a quota');
 assert(byId.terminal_interface?.state==='reserved','terminal interface must remain reserved');
 
 assert(byId.meter_presentation.options.map(x=>x.value).join(',')==='blocks,rails','meter presentation options drifted');
@@ -59,4 +64,4 @@ for(const token of [
 assert(bootstrap.includes('bettingEdge.preferences.meterPresentation'),'VigScope bootstrap must honor saved meter preference before renderer load');
 assert(bootstrap.includes('preferences-framework.js?v=3'),'preferences framework cache version must be v3');
 
-console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + REPORT CARD TARGET STATUS');
+console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + REPORT CARD TARGET 9');
