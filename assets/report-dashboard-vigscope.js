@@ -46,11 +46,11 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
-  // F6 is the season-preview source library. Preferences is re-keyed to TAB
+  // F6 owns the Meat Desk source library. Preferences is re-keyed to TAB
   // and kept as the permanent lowest navigation selection.
   const seasonPreviews=document.createElement('script');
   seasonPreviews.id='seasonPreviewsUiLoader';
-  seasonPreviews.src='./assets/season-previews-ui.js?v=1';
+  seasonPreviews.src='./assets/season-previews-ui.js?v=2';
   seasonPreviews.async=false;
   document.head.appendChild(seasonPreviews);
 
