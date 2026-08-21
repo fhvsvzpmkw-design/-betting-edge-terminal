@@ -17,7 +17,7 @@ on:
         required: false
         type: string
       sidecar_json_b64:
-        description: Base64 or Base64URL encoded matching schema-3 Research Fit sidecar JSON (publish mode)
+        description: Base64 or Base64URL decoded matching schema-3 Research Fit sidecar JSON (publish mode)
         required: false
         type: string
   push:
@@ -125,6 +125,9 @@ jobs:
           }
           const previous = JSON.parse(fs.readFileSync(prior.path, 'utf8'));
           const currentByKey = new Map((report.recs || []).map(rec => [String(rec?.feed?.selectionKey || '').trim(), rec]).filter(([key]) => key));
+          const currentSpreadByEventSide = new Map((report.recs || [])
+            .filter(rec => String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() === 'spread' && rec?.feed?.eventId && rec?.feed?.side)
+            .map(rec => [`${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`, rec]));
           const active = new Set(['BET', 'LEAN', 'WAIT']);
           const resolved = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
           const missing = [];
@@ -154,6 +157,15 @@ jobs:
             const eventDate = String(rec?.feed?.eventDate || '').trim();
             const eventMs = Date.parse(eventDate);
             if (Number.isFinite(eventMs) && reportMs >= eventMs) continue;
+            const marketKey = String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase();
+            if (marketKey === 'spread' && rec?.feed?.eventId && rec?.feed?.side) {
+              const lineageKey = `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`;
+              const movedSpread = currentSpreadByEventSide.get(lineageKey);
+              if (movedSpread) {
+                console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${key} -> ${String(movedSpread?.feed?.selectionKey || 'NEW LINE')}`);
+                continue;
+              }
+            }
             missing.push(`${rec.status} ${rec.title} [${key}] event=${eventDate || 'UNKNOWN'}`);
           }
           if (missing.length) {
