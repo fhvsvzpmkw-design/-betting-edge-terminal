@@ -49,6 +49,27 @@
   const STYLE_ID='vigScopeCompactPresentationFix';
   const INTEL_SCRIPT_ID='vigScopeGameWindowIntelligenceLoader';
 
+  function pinInnerTop(d){
+    try{
+      if(d.documentElement)d.documentElement.scrollTop=0;
+      if(d.body)d.body.scrollTop=0;
+      if(d.scrollingElement)d.scrollingElement.scrollTop=0;
+      d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'});
+    }catch(e){}
+  }
+
+  function bindPreferencesPage(d){
+    if(d.documentElement.dataset.vigScopePreferencesPageBound==='1')return;
+    d.documentElement.dataset.vigScopePreferencesPageBound='1';
+    d.addEventListener('click',event=>{
+      const button=event.target.closest?.('#runnerPreferencesF6');
+      if(!button)return;
+      requestAnimationFrame(()=>pinInnerTop(d));
+      setTimeout(()=>pinInnerTop(d),80);
+      setTimeout(()=>pinInnerTop(d),220);
+    });
+  }
+
   function applyFix(){
     let d=null;
     try{
@@ -57,6 +78,7 @@
       d=app?.contentDocument||null;
     }catch(e){return false}
     if(!d?.head)return false;
+    bindPreferencesPage(d);
     if(d.getElementById(STYLE_ID))return true;
     const style=d.createElement('style');
     style.id=STYLE_ID;
@@ -69,6 +91,14 @@
       .runnerNavPad+.runnerLive,#runnerLive{margin-top:0!important}
       @media(max-width:1100px){.runnerNavPad{padding-bottom:3px!important}}
       @media(max-width:720px){.runnerNavPad{padding-bottom:2px!important}}
+
+      /* F6 Preferences uses the same isolated full-page shell as Load Syndicate. */
+      body.runnerPreferencesLoaded .top{display:none!important}
+      body.runnerPreferencesLoaded .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
+      body.runnerPreferencesLoaded .runnerNavPad .tabs>.btn:not(#runnerPreferencesF6){display:none!important}
+      body.runnerPreferencesLoaded #runnerPreferencesF6{grid-column:1/-1!important;display:grid!important;place-items:center!important}
+      body.runnerPreferencesLoaded #runnerSchedulePreferences{display:block!important;margin-top:0!important}
+      body.runnerPreferencesLoaded #runnerSchedulePreferences~*{display:none!important}
     `;
     d.head.appendChild(style);
     return true;
