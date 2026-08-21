@@ -46,6 +46,14 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
+  // F2/F3/F4 retain their normal top-row positions, but open into the same
+  // isolated full-page banner treatment used by Load Syndicate.
+  const primaryNav=document.createElement('script');
+  primaryNav.id='primaryNavShellLoader';
+  primaryNav.src='./assets/primary-nav-shell.js?v=1';
+  primaryNav.async=false;
+  document.head.appendChild(primaryNav);
+
   // Install the permanent F6/F7/F8 desk navigation before Meat Desk binds its
   // legacy F6 shortcut. The desk overlay owns F6 Pizza, F7 Crypto and F8 Meat.
   const specialDesks=document.createElement('script');
