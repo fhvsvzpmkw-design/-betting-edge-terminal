@@ -3,7 +3,7 @@
 **Document status:** OPERATIONAL — AUTHORITATIVE PRODUCTION CONTRACT  
 **Contract version:** 0.9  
 **Activated:** 2026-08-15  
-**Clarified:** 2026-08-19 — spread-lineage, quote-clock and runner-family wording only; no change to contract version, staking or risk methodology  
+**Clarified:** 2026-08-21 — report-card target profile; no change to contract version, staking, risk, freshness or execution gates  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Authoritative branch:** `main`  
 **Production filename:** `BETTING_EDGE_CONTRACT.md`  
@@ -139,6 +139,21 @@ Standard production report lanes remain:
 - `18:15 LATE / WEST COAST` — slot `late`.
 
 The report schedule itself is unchanged by v0.9. The odds-refresh workflow remains operationally separate from this contract promotion. v0.9 does not increase Odds-API request volume or alter the production refresh budget merely because history and player-prop identity are now governed here.
+
+## 5.1 Repository-controlled recommendation-card target
+
+Before final recommendation selection for each scheduled lane, resolve `data/preferences.json` from the same authoritative `main` branch and locate the module with `id: "report_card_target"`.
+
+The module's `current` value is the production **soft target** for the number of recommendation cards in that report. Allowed profiles are `7`, `9`, and `12`. The current repository setting is **9 cards**.
+
+The target governs report breadth only:
+
+1. Do **not** pad the report with weak, redundant or unqualified recommendations merely to reach the target. Fewer than the target is valid when the board does not support more useful cards.
+2. `overflowProtection` must remain `true`. A tracked or actionable `BET`, `LEAN`, or `WAIT` may not be dropped merely to enforce the target. A current qualifying `BET` may never be suppressed by the card target. The report may therefore exceed the target.
+3. All ordinary identity, freshness, fair-value, information, uncertainty, status and staking gates remain unchanged. Raising the target does not lower recommendation quality or BET standards.
+4. The target does not increase odds-refresh/API usage and does not require additional feed pulls.
+5. F6 may display this repository-controlled value while remaining non-editable until user-selectable report-card profiles are deliberately activated.
+6. If `data/preferences.json` or the module is temporarily unreadable or invalid, use **9** as the fallback soft target for this contract version and continue the report; this presentation/breadth setting is not a betting-safety preflight blocker.
 
 ---
 
