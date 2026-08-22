@@ -86,8 +86,8 @@ function ensureStyle(d){
 
 function setButtonCopy(b){
   const count=Array.isArray(manifest?.sources)?manifest.sources.length:null,mode=analysisModeLabel();
-  const msg=count===null?`ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`:`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`;
-  const html=`<span class="f6Main"><b>[F8]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="f6Message">${msg}</span>`;
+  const msg=count===null?`ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`:`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
+  const html=`<span class="f6Main"><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="f6Message">${msg}</span>`;
   if(b.innerHTML!==html)b.innerHTML=html;
 }
 function setPreferenceCopy(pref){
@@ -204,7 +204,7 @@ function bindNav(d,b,pref,tabs){
   if(pref&&pref.dataset.meatDeskBound!=='1'){pref.dataset.meatDeskBound='1';pref.addEventListener('click',()=>closeDesk(d,b))}
   if(tabs.dataset.meatDeskBound!=='1'){tabs.dataset.meatDeskBound='1';tabs.addEventListener('click',e=>{const x=e.target.closest('.btn');if(x&&x!==b)closeDesk(d,b)})}
   if(d.documentElement.dataset.meatDeskKeysBound!=='1'&&pref){d.documentElement.dataset.meatDeskKeysBound='1';d.addEventListener('keydown',e=>{
-    if(e.key==='F8'){e.preventDefault();b.click();return}
+    if(e.key==='F7'){e.preventDefault();b.click();return}
     if(e.key==='Tab'&&!d.body.classList.contains('runnerPreferencesLoaded')){const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;e.preventDefault();pref.click();return}
     if(reader?.id&&e.key==='ArrowLeft'){e.preventDefault();turnPage(d,-1)}
     if(reader?.id&&e.key==='ArrowRight'){e.preventDefault();turnPage(d,1)}
