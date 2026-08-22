@@ -1,0 +1,109 @@
+name: Live resolver fix one-time
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-resolver-fix-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Separate live homepage from permalinks
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+
+          const workerPath='cloudflare-worker/src/index.js';
+          let worker=fs.readFileSync(workerPath,'utf8');
+          const oldWorker=`      try {
+        const { id } = await loadLatestRun();
+        return redirectToReport(url, id);
+      } catch {
+        return errorResponse("VigWire Labs report link is temporarily unavailable.");
+      }`;
+          const newWorker=`      // Bare vigwirelabs.com stays in LIVE mode. r.html resolves the newest issued run.
+      try {
+        return await proxyGitHubPages(request, "/r.html");
+      } catch {
+        return errorResponse("VigWire Labs report link is temporarily unavailable.");
+      }`;
+          if(!worker.includes(oldWorker))throw new Error('Worker live-root marker not found');
+          worker=worker.replace(oldWorker,newWorker);
+          fs.writeFileSync(workerPath,worker);
+
+          const rPath='r.html';
+          let html=fs.readFileSync(rPath,'utf8');
+          const insertMarker='async function sameDayPriorRuns(index,currentEntry,now=new Date()){';
+          const resolver=`async function resolveLatestRun(){
+  const started=Date.now();
+  let lastError='RUN ARCHIVE IS STILL PUBLISHING';
+  while(Date.now()-started<=MAX_WAIT_MS){
+    try{
+      const index=await fetchJson(INDEX_URL);
+      const runs=Array.isArray(index&&index.runs)?index.runs:[];
+      const entry=[...runs].filter(x=>shortId(x)&&x&&x.path).sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||''))).at(-1);
+      if(entry){
+        try{
+          const run=await fetchJson('./'+String(entry.path).replace(/^\\/+/,''));
+          return {entry,run,index};
+        }catch(e){
+          if(e&&e.httpStatus===404)lastError='LATEST ARCHIVED RUN IS STILL PUBLISHING';
+          else throw e;
+        }
+      }else lastError='RUN ARCHIVE IS STILL PUBLISHING';
+    }catch(e){
+      lastError='RUN HISTORY IS STILL PUBLISHING';
+    }
+    await wait(RETRY_MS);
+  }
+  throw new Error(lastError+' — TRY THE LINK AGAIN IN A MOMENT');
+}
+`;
+          if(!html.includes(insertMarker))throw new Error('r.html resolver insertion marker not found');
+          html=html.replace(insertMarker,resolver+insertMarker);
+
+          const oldLoad=`    const id=String(new URLSearchParams(location.search).get('id')||'').trim().toLowerCase();
+    if(!/^[0-9]{6}[omfel][0-9]{6}$/.test(id))throw new Error('INVALID OR MISSING SHORT RUN ID');
+    const {entry,run,index}=await resolveRun(id);`;
+          const newLoad=`    const id=String(new URLSearchParams(location.search).get('id')||'').trim().toLowerCase();
+    if(id&&!/^[0-9]{6}[omfel][0-9]{6}$/.test(id))throw new Error('INVALID SHORT RUN ID');
+    const {entry,run,index}=id?await resolveRun(id):await resolveLatestRun();`;
+          if(!html.includes(oldLoad))throw new Error('r.html load marker not found');
+          html=html.replace(oldLoad,newLoad);
+          fs.writeFileSync(rPath,html);
+          NODE
+      - name: Validate resolver syntax and invariants
+        shell: bash
+        run: |
+          git diff --check
+          node --check cloudflare-worker/src/index.js
+          node <<'NODE'
+          const fs=require('node:fs');
+          const html=fs.readFileSync('r.html','utf8');
+          const m=html.match(/<script>([\s\S]*?)<\/script>/);
+          if(!m)throw new Error('r.html inline script not found');
+          fs.writeFileSync('/tmp/r-inline.js',m[1]);
+          for(const marker of ['async function resolveLatestRun()','id?await resolveRun(id):await resolveLatestRun()','frame.src=\'./runner.html?build=\'+Date.now()'])if(!html.includes(marker))throw new Error('Missing r.html marker: '+marker);
+          const worker=fs.readFileSync('cloudflare-worker/src/index.js','utf8');
+          if(!worker.includes('Bare vigwirelabs.com stays in LIVE mode'))throw new Error('Worker LIVE marker missing');
+          if(worker.includes('const { id } = await loadLatestRun();\n        return redirectToReport(url, id);'))throw new Error('Old root pinning behavior survived');
+          NODE
+          node --check /tmp/r-inline.js
+      - name: Commit live resolver fix
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add cloudflare-worker/src/index.js r.html
+          git commit -m 'Keep homepage live while preserving report permalinks'
+          git push origin HEAD:main
