@@ -17,15 +17,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Validate upgrade script
-        run: node --check tools/upgrade-f3-live-stats.mjs
-      - name: Convert F3 to live public statistics
-        run: node tools/upgrade-f3-live-stats.mjs
-      - name: Validate generated F3
+      - name: Run and capture F3 upgrade
         shell: bash
         run: |
-          git diff --check
-          node <<'NODE'
+          mkdir -p tmp
+          set +e
+          node --check tools/upgrade-f3-live-stats.mjs > tmp/f3-upgrade-result.txt 2>&1
+          CHECK=$?
+          if [ "$CHECK" -eq 0 ]; then
+            node tools/upgrade-f3-live-stats.mjs >> tmp/f3-upgrade-result.txt 2>&1
+            PATCH=$?
+          else
+            PATCH=99
+          fi
+          echo "script_check=$CHECK patch=$PATCH" >> tmp/f3-upgrade-result.txt
+          if [ "$CHECK" -eq 0 ] && [ "$PATCH" -eq 0 ]; then
+            git diff --check >> tmp/f3-upgrade-result.txt 2>&1
+            node <<'NODE' >> tmp/f3-upgrade-result.txt 2>&1
           const fs=require('node:fs');
           const html=fs.readFileSync('index.html','utf8');
           const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
@@ -36,11 +44,14 @@ jobs:
           if(html.includes('x.bookid'))throw new Error('Public F3 still searches sportsbook reference IDs');
           console.log('F3 live public stats validation: PASS');
           NODE
-      - name: Commit F3 upgrade
-        shell: bash
-        run: |
+            VALID=$?
+          else
+            VALID=98
+          fi
+          echo "validation=$VALID" >> tmp/f3-upgrade-result.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html
-          git commit -m 'Make F3 bet history live public stats'
+          git add tmp/f3-upgrade-result.txt
+          if [ "$CHECK" -eq 0 ] && [ "$PATCH" -eq 0 ] && [ "$VALID" -eq 0 ]; then git add index.html; fi
+          git commit -m 'Capture F3 public stats upgrade result' || exit 0
           git push origin HEAD:main
