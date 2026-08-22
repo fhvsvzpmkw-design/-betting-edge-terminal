@@ -96,11 +96,17 @@ function setLedgerText(){
   const ok=v.status==='PASS'&&count===Number(v.uniqueWagers)&&pages===Number(v.pagesAt10Rows);
   $('qaCount').textContent='LEDGER: '+(ok?'PASS':'FAIL')+' '+count.toLocaleString()+'/'+Number(v.uniqueWagers||0).toLocaleString()+' // '+pages+' PAGES';$('qaCount').className='tag '+(ok?'g':'r');
   $('invRows').textContent=(ok?'PASS // ':'FAIL // ')+count.toLocaleString();$('invRows').className=ok?'g':'r';$('invPages').textContent=(ok?'PASS // ':'FAIL // ')+pages;$('invPages').className=ok?'g':'r';
-  $('ledgerStatus').textContent='READY // '+count.toLocaleString()+' UNIQUE WAGERS // '+pages+' PAGES // SYNC '+new Date(LEDGER_META.generatedAt).toLocaleString('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' // PUBLIC F3 DATASET';
+  $('ledgerStatus').textContent='READY // '+count.toLocaleString()+' UNIQUE WAGERS // '+pages+' PAGES // SYNC '+new Date(LEDGER_META.generatedAt).toLocaleString('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' // '+(LEDGER_META.deliverySource||'PUBLIC F3 DATASET');
 }
 async function loadLedger(){
-  const res=await fetch('./data/bet-history-public.json?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Ledger HTTP '+res.status);const payload=await res.json();
-  if(!payload||!Array.isArray(payload.wagers)||!payload.validation)throw new Error('Invalid ledger schema');LEDGER_META=payload;MASTER=payload.wagers;DATA=MASTER.map(rec);
+  let payload=null,lastError=null;
+  for(const path of ['./api/bet-history','./data/bet-history-public.json']){
+    try{
+      const res=await fetch(path+'?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Ledger HTTP '+res.status+' @ '+path);const candidate=await res.json();
+      if(!candidate||!Array.isArray(candidate.wagers)||!candidate.validation)throw new Error('Invalid ledger schema @ '+path);payload=candidate;payload.deliverySource=path.includes('/api/')?'PRIVATE MASTER // CLOUDFLARE':'STATIC PUBLIC FALLBACK';break;
+    }catch(error){lastError=error}
+  }
+  if(!payload)throw lastError||new Error('Ledger unavailable');LEDGER_META=payload;MASTER=payload.wagers;DATA=MASTER.map(rec);
 }
 function init(){[...new Set(DATA.map(x=>x.sport).filter(Boolean))].sort().forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;$('sport').appendChild(o)});[...new Set(DATA.map(x=>x.book).filter(Boolean))].sort().forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;$('book').appendChild(o)});setLedgerText();render()}
 function healthSet(id,label,state,meta=''){const x=$(id);if(x){x.textContent=label;x.className=state==='pass'?'g':state==='fail'?'r':'y'}const m=$(id+'Meta');if(m&&meta)m.textContent=meta}

@@ -1,6 +1,7 @@
 const HISTORY_URL = "https://raw.githubusercontent.com/fhvsvzpmkw-design/-betting-edge-terminal/main/run-history.json";
 const GITHUB_PAGES_ORIGIN = "https://fhvsvzpmkw-design.github.io/-betting-edge-terminal";
 const CANONICAL_HOST = "vigwirelabs.com";
+const PRIVATE_LEDGER_API = "https://api.github.com/repos/fhvsvzpmkw-design/betting-edge-private/contents/data/betting-ledger.json?ref=main";
 
 const SLOT_CODES = {
   open: "o",
@@ -51,6 +52,79 @@ async function loadLatestRun() {
   }
 
   return { latest, id, updatedAt: history?.updated_at || null };
+}
+
+async function loadPrivateLedger(env) {
+  const token = String(env?.GITHUB_PRIVATE_TOKEN || "").trim();
+  if (!token) throw new Error("private ledger token unavailable");
+
+  const response = await fetch(PRIVATE_LEDGER_API, {
+    headers: {
+      Accept: "application/vnd.github.raw+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "VigWire-Labs-Worker",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`private ledger fetch failed: ${response.status}`);
+  }
+
+  const raw = await response.json();
+  if (!raw || !Array.isArray(raw.wagers) || !raw.validation) {
+    throw new Error("invalid private ledger schema");
+  }
+  return raw;
+}
+
+function buildPublicBetHistory(raw) {
+  const wagers = raw.wagers.map((r, index) => [
+    index + 1,
+    r[1] || "",
+    null,
+    r[3] || null,
+    r[4] || null,
+    r[5] || "",
+    r[6] || "",
+    r[7] || "",
+    r[8] ?? 0,
+    r[9] ?? 0,
+    r[10] || "",
+    r[11] ?? 0,
+    r[12] || "UNKNOWN",
+    r[13] ?? null,
+    Boolean(r[14]),
+    Array.isArray(r[15]) ? r[15] : [],
+    Array.isArray(r[16]) ? r[16] : [],
+    r[17] || "",
+  ]);
+
+  return {
+    schema: 2,
+    publicProjection: true,
+    generatedAt: raw.generatedAt || new Date().toISOString(),
+    timezone: raw.timezone || "America/Vancouver",
+    bankrollCad: Number(raw.bankrollCad || 0),
+    validation: {
+      uniqueWagers: wagers.length,
+      pagesAt10Rows: Math.ceil(wagers.length / 10),
+      status: raw.validation.status === "PASS" ? "PASS" : "CHECK",
+    },
+    summary: raw.summary || {},
+    wagers,
+  };
+}
+
+function privateBetHistoryResponse(request, raw) {
+  const body = JSON.stringify(buildPublicBetHistory(raw));
+  const headers = {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "X-VigWire-Source": "private-ledger",
+  };
+  return new Response(request.method === "HEAD" ? null : body, { status: 200, headers });
 }
 
 function redirectToCanonical(requestUrl) {
@@ -149,7 +223,7 @@ function errorResponse(message, status = 503) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
     const hostname = url.hostname.toLowerCase();
 
@@ -163,6 +237,16 @@ export default {
         status: 405,
         headers: { Allow: "GET, HEAD" },
       });
+    }
+
+    if (url.pathname === "/api/bet-history") {
+      try {
+        const raw = await loadPrivateLedger(env);
+        return privateBetHistoryResponse(request, raw);
+      } catch (error) {
+        console.error("Private ledger API failed", error);
+        return errorResponse("Bet history is temporarily unavailable.");
+      }
     }
 
     if (url.pathname === "/health") {
