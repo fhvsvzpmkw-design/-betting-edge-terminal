@@ -1,0 +1,55 @@
+name: Default open to F1 VigScope
+
+on:
+  push:
+    branches: [ui/default-f1-vigscope]
+    paths:
+      - '.github/workflows/default-f1-vigscope.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui/default-f1-vigscope
+      - name: Open VigScope after boot and bust caches
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          nav=Path('assets/primary-nav-shell.js')
+          s=nav.read_text()
+          old="""  ensureStyle(d);\n  restoreAllCompact(d);\n  enterMenu(d);\n\n  d.addEventListener('click',e=>{\n"""
+          new="""  ensureStyle(d);\n  restoreAllCompact(d);\n  openShell(d,'board');\n\n  d.addEventListener('click',e=>{\n"""
+          if old in s:
+              nav.write_text(s.replace(old,new))
+          elif new not in s:
+              raise SystemExit('primary nav boot block not found')
+
+          dash=Path('assets/report-dashboard-vigscope.js')
+          d=dash.read_text()
+          d=d.replace("primaryNav.src='./assets/primary-nav-shell.js?v=3';", "primaryNav.src='./assets/primary-nav-shell.js?v=4';")
+          dash.write_text(d)
+
+          runner=Path('runner.html')
+          r=runner.read_text()
+          r=r.replace('report-dashboard-vigscope.js?v=20260821-1720','report-dashboard-vigscope.js?v=20260821-1728')
+          runner.write_text(r)
+          PY
+      - name: Commit default F1 change
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/primary-nav-shell.js assets/report-dashboard-vigscope.js runner.html; then
+            echo 'Already patched'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/primary-nav-shell.js assets/report-dashboard-vigscope.js runner.html
+          git commit -m 'Default boot to F1 VigScope'
+          git push origin ui/default-f1-vigscope
