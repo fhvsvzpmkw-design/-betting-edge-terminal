@@ -1,0 +1,43 @@
+name: F3 ledger diagnostics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/f3-ledger-diagnostics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect public projection semantics
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+          const j=JSON.parse(fs.readFileSync('data/bet-history-public.json','utf8'));
+          const rows=j.wagers;
+          const sum=(a,f)=>a.reduce((t,x)=>t+Number(f(x)||0),0);
+          const stat=(name,a)=>console.log(name, JSON.stringify({count:a.length,risk:+sum(a,x=>x[9]).toFixed(4),profit:+sum(a,x=>x[11]).toFixed(4)}));
+          const single=x=>Array.isArray(x[16])&&x[16].length===1;
+          const pre=x=>x[12]==='PREGAME';
+          const boosted=x=>!!x[14];
+          const zeroLost=x=>x[10]==='Lost'&&Number(x[11])===0;
+          console.log('SUMMARY',JSON.stringify(j.summary));
+          stat('ALL',rows);
+          stat('BOOSTED_TRUE',rows.filter(boosted));
+          stat('BOOSTED_FALSE',rows.filter(x=>!boosted(x)));
+          stat('ZERO_PL_LOST',rows.filter(zeroLost));
+          stat('NON_ZERO_LOST_FILTER',rows.filter(x=>!zeroLost(x)));
+          stat('PREGAME_SINGLE_ALL',rows.filter(x=>pre(x)&&single(x)));
+          stat('PREGAME_SINGLE_NOT_BOOSTED',rows.filter(x=>pre(x)&&single(x)&&!boosted(x)));
+          stat('PREGAME_SINGLE_NOT_ZERO_LOST',rows.filter(x=>pre(x)&&single(x)&&!zeroLost(x)));
+          stat('PREGAME_SINGLE_NOT_BOOSTED_NOT_ZERO_LOST',rows.filter(x=>pre(x)&&single(x)&&!boosted(x)&&!zeroLost(x)));
+          const results={};for(const r of rows)results[r[10]]=(results[r[10]]||0)+1;console.log('RESULTS',JSON.stringify(results));
+          const combo={};for(const r of rows){const k=`${r[10]}|boost=${!!r[14]}|pl0=${Number(r[11])===0}`;combo[k]=(combo[k]||0)+1}console.log('COMBOS',JSON.stringify(combo,null,2));
+          NODE
