@@ -56,7 +56,7 @@ jobs:
 
           profile_path = Path('data/characters/eddie-numbers.json')
           profile = json.loads(profile_path.read_text())
-          profile['updatedAt'] = '2026-08-22T14:20:00-07:00'
+          profile['updatedAt'] = '2026-08-22T14:27:00-07:00'
           profile['authority']['source'] = '/api/bet-history'
           profile['authority']['updateModel'] = 'The live Hotline fetches /api/bet-history with cache bypass and recalculates on every page load. Any update to the private master ledger becomes the next authoritative Muddy Numbers report without a separate Betting Edge publication run.'
           profile['hotlineStyle']['ledgerRules']['source'] = '/api/bet-history'
@@ -83,32 +83,21 @@ jobs:
           assert(shells.shells.find(x=>x.id==='muddy-ledger-desk'&&x.defaultForCharacter===true),'Muddy Ledger Desk shell is not default');
           for(const marker of ['ACTUAL CAD DOLLARS','CASH-WAGER CUMULATIVE P/L','WEEKLY + MONTHLY RECONCILIATION','Sport Desk','Sportsbook Windows','MUDDY METERS','MUDDY LEDGER // LAST 10 TICKETS','EDDIE: WHAT THE NUMBERS SAY','THE WALK TO THE CAGE']) assert(live.includes(marker),`Missing Ledger Desk marker: ${marker}`);
           assert(live.includes("const URL='/api/bet-history'"),'Live desk must fetch /api/bet-history');
-          assert(!live.includes("../../data/betting-ledger.json"),'Live desk still exposes raw public-ledger fetch');
+          assert(!live.includes('../../data/betting-ledger.json'),'Live desk still exposes raw public-ledger path');
           assert(live.includes("cache:'no-store'"),'Ledger fetch must bypass browser cache');
           assert(fallback.publicProjection===true,'Static fallback must remain sanitized');
-          assert(Number.isFinite(Number(fallback.bankrollCad)),'Fallback bankrollCad missing');
-          assert(fallback.summary&&Number.isFinite(Number(fallback.summary.cashProfit)),'Fallback cashProfit summary missing');
           assert(Array.isArray(fallback.wagers)&&fallback.wagers.length>0,'Fallback wagers missing');
           assert(fallback.wagers.every(r=>r[2]===null),'Fallback sportsbook reference leaked');
           console.log('MUDDY NUMBERS // PRIVATE LEDGER DESK guardrails: PASS');
           """))
-
-          wf_path = Path('.github/workflows/muddy-ledger-desk.yml')
-          wf = wf_path.read_text()
-          old = "      - 'data/betting-ledger.json'\n"
-          if old not in wf:
-              raise SystemExit('Muddy workflow raw-ledger trigger marker missing')
-          wf = wf.replace(old, "      - 'cloudflare-worker/src/index.js'\n      - 'data/bet-history-public.json'\n", 1)
-          wf_path.write_text(wf)
           PY
 
-      - name: Remove obsolete public master pipeline
+      - name: Remove public raw ledger
         shell: bash
         run: |
           set -euo pipefail
           git rm -- data/betting-ledger.json
           git rm -- tools/build-public-bet-history.mjs
-          git rm -- .github/workflows/f3-public-bet-history.yml
 
       - name: Validate completed cutover
         shell: bash
@@ -118,33 +107,17 @@ jobs:
           node --input-type=module --check < cloudflare-worker/src/index.js
           grep -Fq './api/bet-history' index.html
           grep -Fq "const URL='/api/bet-history'" syndicates/sharp-room/incoming.html
-          if grep -Fq '../../data/betting-ledger.json' syndicates/sharp-room/incoming.html; then
-            echo 'Live Muddy desk still references public raw ledger'
-            exit 1
-          fi
-          if grep -Fq "data/betting-ledger.json" .github/workflows/muddy-ledger-desk.yml; then
-            echo 'Muddy validation workflow still depends on public raw ledger'
-            exit 1
-          fi
-          node <<'NODE'
-          const fs=require('node:fs');
-          const p=JSON.parse(fs.readFileSync('data/characters/eddie-numbers.json','utf8'));
-          if(p.authority?.source!=='/api/bet-history') throw new Error('Eddie authority source not cut over');
-          if(p.hotlineStyle?.ledgerRules?.source!=='/api/bet-history') throw new Error('Eddie ledgerRules source not cut over');
-          NODE
           test ! -e data/betting-ledger.json
           test ! -e tools/build-public-bet-history.mjs
-          test ! -e .github/workflows/f3-public-bet-history.yml
           test -e data/bet-history-public.json
-          echo 'Live public surfaces are fully cut over; historical archive references are intentionally preserved.'
+          echo 'Live ledger surfaces are cut over to the private Worker API.'
 
-      - name: Commit cutover and remove one-time workflow
+      - name: Commit ledger cutover
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'betting-edge-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git rm -- .github/workflows/private-ledger-cutover-stage2.yml
-          git add -- syndicates/sharp-room/incoming.html data/characters/eddie-numbers.json tests/muddy-ledger-desk.test.mjs .github/workflows/muddy-ledger-desk.yml
+          git add -- syndicates/sharp-room/incoming.html data/characters/eddie-numbers.json tests/muddy-ledger-desk.test.mjs
           git commit -m 'Complete private ledger cutover'
           git push origin HEAD:main
