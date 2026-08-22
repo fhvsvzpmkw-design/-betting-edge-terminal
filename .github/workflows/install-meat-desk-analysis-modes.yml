@@ -1,0 +1,93 @@
+name: Install Meat Desk analysis modes
+
+on:
+  push:
+    branches: [feature/meat-desk-analysis-modes]
+    paths:
+      - '.github/workflows/install-meat-desk-analysis-modes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/meat-desk-analysis-modes
+      - name: Add Meat Desk analysis preference and display
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          prefs_path=Path('data/preferences.json')
+          prefs=json.loads(prefs_path.read_text())
+          prefs['schema']=max(int(prefs.get('schema',1)),2)
+          modules=prefs.get('modules',[])
+          if not any(m.get('id')=='meat_desk_analysis' for m in modules):
+              module={
+                  'id':'meat_desk_analysis',
+                  'title':'MEAT DESK ANALYSIS',
+                  'state':'active',
+                  'kind':'choice',
+                  'editable':True,
+                  'summary':'Choose the review depth used when a pending Meat Desk source is manually analyzed.',
+                  'storageKey':'bettingEdge.preferences.meatDeskAnalysisMode',
+                  'default':'god_mode',
+                  'options':[
+                      {'value':'basic_readthrough','label':'BASIC READ-THROUGH'},
+                      {'value':'in_depth_report','label':'IN-DEPTH REPORT'},
+                      {'value':'god_mode','label':'GOD MODE'}
+                  ],
+                  'controlPolicy':'Applies only when a Meat Desk review is manually triggered. BASIC captures the core read-through and usable notes; IN-DEPTH publishes a detailed report with structured source intelligence; GOD MODE performs the full-source, page-referenced review and deepest publication pass. No mode auto-starts analysis or changes Betting Edge recommendation logic.'
+              }
+              idx=next((i+1 for i,m in enumerate(modules) if m.get('id')=='card_view'),len(modules))
+              modules.insert(idx,module)
+          prefs_path.write_text(json.dumps(prefs,indent=2,ensure_ascii=False)+'\n')
+
+          ui_path=Path('assets/season-previews-ui.js')
+          s=ui_path.read_text()
+          if "const ANALYSIS_MODE_KEY='bettingEdge.preferences.meatDeskAnalysisMode';" not in s:
+              s=s.replace("const STYLE_ID='runnerSeasonPreviewsUiStyle';", "const STYLE_ID='runnerSeasonPreviewsUiStyle';\nconst ANALYSIS_MODE_KEY='bettingEdge.preferences.meatDeskAnalysisMode';")
+          marker="function itemById(id){return (manifest?.sources||[]).find(x=>String(x.id)===String(id))||null}\n"
+          func="""function analysisModeLabel(){\n  let value='god_mode';\n  try{value=localStorage.getItem(ANALYSIS_MODE_KEY)||'god_mode'}catch{}\n  return ({basic_readthrough:'BASIC READ-THROUGH',in_depth_report:'IN-DEPTH REPORT',god_mode:'GOD MODE'})[value]||'GOD MODE';\n}\n"""
+          if 'function analysisModeLabel()' not in s:
+              if marker not in s: raise SystemExit('itemById marker not found')
+              s=s.replace(marker,marker+func)
+          old="""  const count=Array.isArray(manifest?.sources)?manifest.sources.length:null;\n  const msg=count===null?'SOURCE DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN':`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`;\n"""
+          new="""  const count=Array.isArray(manifest?.sources)?manifest.sources.length:null,mode=analysisModeLabel();\n  const msg=count===null?`ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`:`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`;\n"""
+          if old in s: s=s.replace(old,new)
+          elif new not in s: raise SystemExit('button copy block not found')
+          old_badge='<div class="meatDeskBadge">${sources.length} DESK COP${sources.length===1?\'Y\':\'IES\'} // SOURCE-ONLY</div>'
+          new_badge='<div class="meatDeskBadge">${sources.length} DESK COP${sources.length===1?\'Y\':\'IES\'} // ANALYSIS: ${esc(analysisModeLabel())}</div>'
+          if old_badge in s: s=s.replace(old_badge,new_badge)
+          elif new_badge not in s: raise SystemExit('desk badge not found')
+          old_detail="""        <div class=\"meatInfoBlock\"><small>REVIEW STATE</small><p>${esc(item.status||'INDEXED')}</p></div>\n        <div class=\"meatInfoBlock\"><small>NOTES</small><p>${esc(item.notes||'No notes yet.')}</p></div>\n"""
+          new_detail="""        <div class=\"meatInfoBlock\"><small>REVIEW STATE</small><p>${esc(item.status||'INDEXED')}</p></div>\n        <div class=\"meatInfoBlock\"><small>NEXT ANALYSIS MODE</small><p>${esc(analysisModeLabel())} // MANUAL TRIGGER ONLY</p></div>\n        <div class=\"meatInfoBlock\"><small>NOTES</small><p>${esc(item.notes||'No notes yet.')}</p></div>\n"""
+          if old_detail in s: s=s.replace(old_detail,new_detail)
+          elif new_detail not in s: raise SystemExit('detail review block not found')
+          ui_path.write_text(s)
+
+          dash=Path('assets/report-dashboard-vigscope.js')
+          d=dash.read_text().replace("seasonPreviews.src='./assets/season-previews-ui.js?v=4';","seasonPreviews.src='./assets/season-previews-ui.js?v=5';")
+          dash.write_text(d)
+
+          runner=Path('runner.html')
+          r=runner.read_text().replace('report-dashboard-vigscope.js?v=20260821-1728','report-dashboard-vigscope.js?v=20260821-1800')
+          runner.write_text(r)
+          PY
+      - name: Commit analysis mode preference
+        shell: bash
+        run: |
+          if git diff --quiet -- data/preferences.json assets/season-previews-ui.js assets/report-dashboard-vigscope.js runner.html; then
+            echo 'Already installed'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- data/preferences.json assets/season-previews-ui.js assets/report-dashboard-vigscope.js runner.html
+          git commit -m 'Add Meat Desk analysis depth preference'
+          git push origin feature/meat-desk-analysis-modes
