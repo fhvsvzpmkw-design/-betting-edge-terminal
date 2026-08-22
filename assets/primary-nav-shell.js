@@ -8,7 +8,7 @@ const VIEWS={
   board:{key:'F1',label:'📺 VIG SCOPE 📺',sub:'FULL VIG SCOPE + PICK CARDS'},
   market:{key:'F2',label:'📈 MARKET 📉',sub:'MARKET VIEW'},
   history:{key:'F3',label:'🎟️ BET HISTORY 🎟️',sub:'BET HISTORY'},
-  engine:{key:'F4',label:'⚙️ ENGINE ⚙️',sub:'ENGINE STATUS'}
+  engine:{key:'F8',label:'⚙️ ENGINE ⚙️',sub:'ENGINE STATUS'}
 };
 let lastDoc=null;
 
@@ -113,8 +113,8 @@ function syncMenu(d){
   enterMenu(d);
 }
 function bind(d){
-  if(d.documentElement.dataset.primaryNavShellBound==='4')return;
-  d.documentElement.dataset.primaryNavShellBound='4';
+  if(d.documentElement.dataset.primaryNavShellBound==='5')return;
+  d.documentElement.dataset.primaryNavShellBound='5';
   ensureStyle(d);
   restoreAllMenuButtons(d);
   openShell(d,'board');
@@ -132,8 +132,9 @@ function bind(d){
       return;
     }
 
-    // F5/F6/F7/F8/Preferences own their page logic. Remove the menu/shell
-    // before their handlers run, then return to the menu whenever they close.
+    // Syndicate, Pizza, Crypto, Meat and Preferences own their page logic.
+    // Remove the menu/shell before their handlers run, then return to the menu
+    // whenever they close.
     leaveMenu(d);closeShell(d);
     setTimeout(()=>syncMenu(d),0);
     setTimeout(()=>syncMenu(d),180);
@@ -141,7 +142,10 @@ function bind(d){
 
   d.addEventListener('keydown',e=>{
     const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;
-    const map={F1:'board',F2:'market',F3:'history',F4:'engine'},view=map[e.key];if(!view)return;
+    if(e.key==='F4'){
+      e.preventDefault();e.stopImmediatePropagation();d.getElementById('runnerSyndicateF5')?.click();return;
+    }
+    const map={F1:'board',F2:'market',F3:'history',F8:'engine'},view=map[e.key];if(!view)return;
     e.preventDefault();e.stopImmediatePropagation();btn(d,view)?.click();
   },true);
 }

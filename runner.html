@@ -54,10 +54,10 @@ async function buildSyndicateWorkspace(d,navPad){
 }
 function setF5State(f5,state){
   f5.dataset.state=state;
-  if(state==='connecting'){f5.classList.add('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 CONNECTING SYNDICATE 💵</span><span class="f5Message">CONNECTING TO SYNDICATE&nbsp;&nbsp; // &nbsp;&nbsp;PLEASE STANDBY</span>';return}
-  if(state==='connected'){f5.classList.add('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 SYNDICATE LOADED 💵</span><span class="f5Message">CONNECTED TO SYNDICATE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO DISCONNECT</span>';return}
-  if(state==='error'){f5.classList.remove('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 LOAD SYNDICATE 💵</span><span class="f5Message f5Error">CONNECTION FAILED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO RETRY</span>';return}
-  f5.classList.remove('loaded');f5.innerHTML='<span class="f5Main"><b>[F5]</b>&nbsp; 💵 LOAD SYNDICATE 💵</span><span class="f5Message">DISCONNECTED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO LOAD SYNDICATE</span>';
+  if(state==='connecting'){f5.classList.add('loaded');f5.innerHTML='<span class="f5Main"><b>[F4]</b>&nbsp; 💵 CONNECTING SYNDICATE 💵</span><span class="f5Message">CONNECTING TO SYNDICATE&nbsp;&nbsp; // &nbsp;&nbsp;PLEASE STANDBY</span>';return}
+  if(state==='connected'){f5.classList.add('loaded');f5.innerHTML='<span class="f5Main"><b>[F4]</b>&nbsp; 💵 SYNDICATE LOADED 💵</span><span class="f5Message">CONNECTED TO SYNDICATE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F4] TO DISCONNECT</span>';return}
+  if(state==='error'){f5.classList.remove('loaded');f5.innerHTML='<span class="f5Main"><b>[F4]</b>&nbsp; 💵 LOAD SYNDICATE 💵</span><span class="f5Message f5Error">CONNECTION FAILED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F4] TO RETRY</span>';return}
+  f5.classList.remove('loaded');f5.innerHTML='<span class="f5Main"><b>[F4]</b>&nbsp; 💵 LOAD SYNDICATE 💵</span><span class="f5Message">DISCONNECTED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F4] TO LOAD SYNDICATE</span>';
 }
 function applyHierarchyPatch(){
   const app=innerAppFrame();let d=null;try{d=app&&app.contentDocument}catch(e){return false}if(!d||!d.head||!d.body)return false;
@@ -112,6 +112,6 @@ function applyHierarchyPatch(){
 function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true,characterData:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
 art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});core.src='./runner-core.html'+location.search+location.hash;startWhenVisible();
 </script>
-<script src="./assets/report-dashboard-vigscope.js?v=20260821-2028"></script>
+<script src="./assets/report-dashboard-vigscope.js?v=20260821-2039"></script>
 </body>
 </html>

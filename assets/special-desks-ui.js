@@ -28,7 +28,7 @@ function cryptoAnalysisModeLabel(){
 }
 function cryptoButtonMessage(){
   const count=Array.isArray(crypto?.items)?crypto.items.length:0;
-  return `${count} WEB SOURCE${count===1?'':'S'} // ANALYSIS: ${cryptoAnalysisModeLabel()}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
+  return `${count} WEB SOURCE${count===1?'':'S'} // ANALYSIS: ${cryptoAnalysisModeLabel()}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN`;
 }
 function closeSpecial(d){
   d.body.classList.remove('runnerPizzaLoaded','runnerCryptoLoaded');
@@ -91,14 +91,15 @@ function ensurePanel(d,id,kind,data){
 function buttonHtml(key,title,msg,kind){return `<span class="specialMain"><b>[${key}]</b>&nbsp; ${title}</span><span class="specialMessage ${kind}Message">${msg}</span>`}
 function ensureButtons(d){
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');if(!tabs)return false;
-  const meat=d.getElementById(MEAT_ID),pref=d.getElementById(PREF_ID),f5=d.getElementById('runnerSyndicateF5');if(!meat||!pref)return false;
+  const meat=d.getElementById(MEAT_ID),pref=d.getElementById(PREF_ID),f5=d.getElementById('runnerSyndicateF5');if(!meat||!pref||!f5)return false;
+  const board=tabs.querySelector('.btn[data-view="board"]'),market=tabs.querySelector('.btn[data-view="market"]'),history=tabs.querySelector('.btn[data-view="history"]'),engine=tabs.querySelector('.btn[data-view="engine"]');
   ensureStyle(d);
-  let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.innerHTML=buttonHtml('F6','🍕 PIZZA PLAYS 🍕','LONG SHOTS + PREMIUM&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN','pizza');p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
+  let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.innerHTML=buttonHtml('F5','🍕 PIZZA PLAYS 🍕','LONG SHOTS + PREMIUM&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN','pizza');p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
   let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
-  const cryptoHtml=buttonHtml('F7','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
+  const cryptoHtml=buttonHtml('F6','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
   meat.setAttribute('aria-label','Meat Desk');
-  if(f5){if(f5.nextElementSibling!==p)f5.insertAdjacentElement('afterend',p);if(p.nextElementSibling!==c)p.insertAdjacentElement('afterend',c);if(c.nextElementSibling!==meat)c.insertAdjacentElement('afterend',meat)}else{tabs.append(p,c,meat)}
-  if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
+  const ordered=[board,market,history,f5,p,c,meat,engine,pref].filter(Boolean),current=[...tabs.children].filter(node=>ordered.includes(node));
+  if(current.length!==ordered.length||ordered.some((node,index)=>current[index]!==node))ordered.forEach(node=>tabs.appendChild(node));
   if(meat.dataset.specialDeskBound!=='1'){meat.dataset.specialDeskBound='1';meat.addEventListener('click',()=>closeSpecial(d))}
   if(pref.dataset.specialDeskBound!=='1'){pref.dataset.specialDeskBound='1';pref.addEventListener('click',()=>closeSpecial(d))}
   if(tabs.dataset.specialDeskCloseBound!=='1'){tabs.dataset.specialDeskCloseBound='1';tabs.addEventListener('click',e=>{const b=e.target.closest?.('.btn');if(b&&!['runnerPizzaF6','runnerCryptoF7','runnerSeasonPreviewF6'].includes(b.id))closeSpecial(d)})}
@@ -108,12 +109,11 @@ function ensureButtons(d){
 function bindKeys(d){
   const w=d.defaultView;if(!w||w.__specialDeskKeysBound)return;w.__specialDeskKeysBound=true;
   w.addEventListener('keydown',e=>{
-    if(!['F6','F7','F8'].includes(e.key))return;
+    if(!['F5','F6'].includes(e.key))return;
     const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;
     e.preventDefault();e.stopImmediatePropagation();
-    if(e.key==='F6')d.getElementById(PIZZA_ID)?.click();
-    if(e.key==='F7')d.getElementById(CRYPTO_ID)?.click();
-    if(e.key==='F8')d.getElementById(MEAT_ID)?.click();
+    if(e.key==='F5')d.getElementById(PIZZA_ID)?.click();
+    if(e.key==='F6')d.getElementById(CRYPTO_ID)?.click();
   },true);
 }
 function attach(){

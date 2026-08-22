@@ -58,19 +58,19 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
-  // F1-F4 share the menu-first/full-page navigation shell. In menu view they
-  // use the same full-width, two-line bar geometry as the other desk buttons.
+  // VigScope, Market, Bet History and Engine share the menu-first/full-page
+  // navigation shell. Engine is intentionally F8; F4-F7 belong to the desks.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=7';
+  primaryNav.src='./assets/primary-nav-shell.js?v=8';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
-  // Install the permanent F6/F7/F8 desk navigation before Meat Desk binds its
-  // legacy F6 shortcut. The desk overlay owns F6 Pizza, F7 Crypto and F8 Meat.
+  // Install Pizza and Crypto navigation before Meat Desk binds F7. The final
+  // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Engine.
   const specialDesks=document.createElement('script');
   specialDesks.id='specialDesksUiLoader';
-  specialDesks.src='./assets/special-desks-ui.js?v=3';
+  specialDesks.src='./assets/special-desks-ui.js?v=4';
   specialDesks.async=false;
   document.head.appendChild(specialDesks);
 
@@ -78,7 +78,7 @@
   // the permanent lowest navigation selection.
   const seasonPreviews=document.createElement('script');
   seasonPreviews.id='seasonPreviewsUiLoader';
-  seasonPreviews.src='./assets/season-previews-ui.js?v=5';
+  seasonPreviews.src='./assets/season-previews-ui.js?v=6';
   seasonPreviews.async=false;
   document.head.appendChild(seasonPreviews);
 
@@ -122,7 +122,7 @@
       /* Presentation-only: remove decorative status bullet. */
       #runnerVigPicks .runnerCount .callName:before{content:none!important;display:none!important}
 
-      /* Presentation-only: reduce the F5/navigation-to-report gap. */
+      /* Presentation-only: reduce the navigation-to-report gap. */
       .runnerNavPad{padding-bottom:4px!important}
       .runnerNavPad+.runnerLive,#runnerLive{margin-top:0!important}
       @media(max-width:1100px){.runnerNavPad{padding-bottom:3px!important}}
