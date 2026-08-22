@@ -15,35 +15,83 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Decode brand assets
+
+      - name: Install image tools
+        run: python -m pip install --quiet pillow
+
+      - name: Build VigWire brand assets
         shell: python
         run: |
           from pathlib import Path
           import base64, hashlib
+          from PIL import Image, ImageDraw, ImageFont
 
           src = Path('brand-upload')
           dst = Path('assets/brand')
           dst.mkdir(parents=True, exist_ok=True)
 
-          expected = {
-              'vigwire-icon.png': ('c4ae9ecf07eafd4cb51ea721d034e3301678c032789a63383d570b73b30788e7', 15937),
-              'apple-touch-icon.png': ('59a0b86105ca1f82f4e01333c688d6f50b9dd1e321612a275fe60953e3526d4d', 7587),
-              'favicon.ico': ('5ee307ca57ae231cbca5353356c30ac8ce71ffc16795b33caed8c63800c79169', 5636),
-              'vigwire-share-card.png': ('642208c632cee9a002b394b6aa804f547505da7fa68bdc396b18fb7a813f77da', 30567),
-          }
+          # Decode the approved VW master icon from small text chunks.
+          parts = sorted(src.glob('vigwire-icon.png.b64.*'))
+          if not parts:
+              raise SystemExit('Missing VigWire master icon chunks')
+          encoded = ''.join(p.read_text().strip() for p in parts)
+          data = base64.b64decode(encoded, validate=True)
+          if len(data) != 15937:
+              raise SystemExit(f'Icon size mismatch: {len(data)} != 15937')
+          digest = hashlib.sha256(data).hexdigest()
+          expected = 'c4ae9ecf07eafd4cb51ea721d034e3301678c032789a63383d570b73b30788e7'
+          if digest != expected:
+              raise SystemExit(f'Icon SHA256 mismatch: {digest} != {expected}')
+          icon_path = dst / 'vigwire-icon.png'
+          icon_path.write_bytes(data)
 
-          for name, (sha256, size) in expected.items():
-              parts = sorted(src.glob(f'{name}.b64.*'))
-              if not parts:
-                  raise SystemExit(f'Missing chunks for {name}')
-              encoded = ''.join(p.read_text().strip() for p in parts)
-              data = base64.b64decode(encoded, validate=True)
-              if len(data) != size:
-                  raise SystemExit(f'Size mismatch for {name}: {len(data)} != {size}')
-              digest = hashlib.sha256(data).hexdigest()
-              if digest != sha256:
-                  raise SystemExit(f'SHA256 mismatch for {name}: {digest} != {sha256}')
-              (dst / name).write_bytes(data)
+          icon = Image.open(icon_path).convert('RGB')
+
+          # Apple touch icon: same approved VW mark, fixed 180x180 filename.
+          apple = icon.resize((180, 180), Image.Resampling.LANCZOS)
+          apple.save(dst / 'apple-touch-icon.png', format='PNG', optimize=True)
+
+          # Browser favicon with standard embedded sizes.
+          icon.save(dst / 'favicon.ico', format='ICO', sizes=[(16,16), (32,32), (48,48)])
+
+          # Social/share card: same logo, terminal presentation, fixed 1200x630 filename.
+          W, H = 1200, 630
+          card = Image.new('RGB', (W, H), '#01060a')
+          draw = ImageDraw.Draw(card)
+          for y in range(2, H, 4):
+              draw.line((0, y, W, y), fill='#03100e', width=1)
+          draw.rounded_rectangle((24, 24, W-24, H-24), radius=28, outline='#0b594d', width=2)
+          draw.line((52, 505, W-52, 505), fill='#0b594d', width=2)
+
+          logo = icon.resize((470, 470), Image.Resampling.LANCZOS)
+          card.paste(logo, (62, 80))
+
+          bold = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf'
+          regular = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'
+          font_title = ImageFont.truetype(bold, 64)
+          font_sub = ImageFont.truetype(regular, 31)
+          font_small = ImageFont.truetype(regular, 23)
+
+          x = 570
+          draw.text((x, 178), 'VIGWIRE LABS', font=font_title, fill='#63ff74')
+          draw.line((x, 263, 1138, 263), fill='#20c86b', width=3)
+          draw.text((x, 300), 'VigScope // Market Intelligence', font=font_sub, fill='#73f8ef')
+          draw.text((x, 366), 'Betting Edge // Live Runner', font=font_small, fill='#4fa98d')
+          draw.text((x, 526), 'vigwirelabs.com', font=font_small, fill='#63ff74')
+          card.save(dst / 'vigwire-share-card.png', format='PNG', optimize=True)
+
+          # Fail closed if any fixed deliverable is missing or malformed.
+          checks = {
+              'vigwire-icon.png': (256, 256),
+              'apple-touch-icon.png': (180, 180),
+              'vigwire-share-card.png': (1200, 630),
+          }
+          for name, expected_size in checks.items():
+              with Image.open(dst / name) as im:
+                  if im.size != expected_size:
+                      raise SystemExit(f'{name} dimensions {im.size} != {expected_size}')
+          if not (dst / 'favicon.ico').exists() or (dst / 'favicon.ico').stat().st_size < 1000:
+              raise SystemExit('favicon.ico was not created correctly')
 
       - name: Commit brand assets and remove upload scaffolding
         run: |
