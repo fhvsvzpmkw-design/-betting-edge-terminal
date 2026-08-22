@@ -35,8 +35,9 @@ jobs:
           out.results={};for(const r of rows)out.results[r[10]]=(out.results[r[10]]||0)+1;
           out.combos={};for(const r of rows){const k=`${r[10]}|boost=${!!r[14]}|pl0=${Number(r[11])===0}`;out.combos[k]=(out.combos[k]||0)+1}
           out.tagCounts={};for(const r of rows){const k=String(r[17]??'');out.tagCounts[k]=(out.tagCounts[k]||0)+1}
-          out.nonEmptyTagRows=rows.filter(r=>String(r[17]??'')!=='[]'&&String(r[17]??'').trim()!=='').slice(0,100).map(r=>({id:r[0],desc:r[7],risk:r[9],result:r[10],pl:r[11],boosted:r[14],tags:r[17]}));
-          out.keywordRows=rows.filter(r=>/free|bonus|credit|promo/i.test([r[7],r[17]].join(' '))).slice(0,100).map(r=>({id:r[0],desc:r[7],risk:r[9],result:r[10],pl:r[11],boosted:r[14],tags:r[17]}));
+          const clv=rows.map(r=>r[13]).filter(v=>v!==null&&v!==''&&Number.isFinite(Number(v))).map(Number).sort((a,b)=>a-b);const med=clv.length?(clv.length%2?clv[(clv.length-1)/2]:(clv[clv.length/2-1]+clv[clv.length/2])/2):null;out.clv={count:clv.length,mean:clv.length?sum(clv,x=>x)/clv.length:null,median:med,min:clv[0]??null,max:clv.at(-1)??null,sample:clv.slice(0,10).concat(clv.slice(-10))};
+          const classify=r=>{const t=[r[7],...(Array.isArray(r[16])?r[16]:[])].join(' ').toLowerCase();if(/goalscorer|touchdown|rush yds|receiv|passing|shots|rebounds|assists|strikeouts|total bases|hits, runs|player|offsides|saves|aces|double faults/.test(t))return 'Props';if(/spread|point spread|run line|puck line|handicap/.test(t))return 'Spread';if(/money line|moneyline|to advance|match winner|draw no bet| to win\b/.test(t))return 'Moneyline';if(/total|over |under |o\/u|team points|team total/.test(t))return 'Totals';return 'Props'};
+          out.typeCounts={};for(const r of rows.filter(x=>pre(x)&&single(x))){const k=classify(r);out.typeCounts[k]=(out.typeCounts[k]||0)+1}
           fs.writeFileSync('tmp/f3-ledger-diagnostics.json',JSON.stringify(out,null,2)+'\n');
           NODE
       - name: Publish diagnostic snapshot
