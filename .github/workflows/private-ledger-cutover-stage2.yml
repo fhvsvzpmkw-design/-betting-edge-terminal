@@ -1,0 +1,137 @@
+name: Complete private ledger cutover
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/private-ledger-cutover-stage2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cutover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Confirm live private ledger API
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:data/betting-ledger.json)" = "b483b4a970841aeeffb41fd41816abb27ee803c4"
+          curl -fsS 'https://vigwirelabs.com/api/bet-history?cutover=stage2' -o /tmp/private-ledger.json
+          node <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync('/tmp/private-ledger.json','utf8'));
+          if(p.schema!==2 || p.publicProjection!==true) throw new Error('private API projection marker missing');
+          if(!Array.isArray(p.wagers) || p.wagers.length!==1624) throw new Error('private API wager count mismatch');
+          if(p.validation?.status!=='PASS') throw new Error('private API validation failed');
+          if(p.wagers.some(r=>r[2]!==null)) throw new Error('private bet/reference id leaked');
+          console.log('Live private ledger API verified.');
+          NODE
+
+      - name: Rewire Muddy Numbers to private API
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+          import json
+
+          page_path = Path('syndicates/sharp-room/incoming.html')
+          page = page_path.read_text()
+          replacements = {
+              'Authority: data/betting-ledger.json.': 'Authority: private ledger via Cloudflare Worker.',
+              "const URL='../../data/betting-ledger.json'": "const URL='/api/bet-history'",
+              "set('file',j.validation?.sourceFile||'betting-ledger.json');": "set('file',j.publicProjection?'PRIVATE MASTER // CLOUDFLARE':(j.validation?.sourceFile||'LEDGER'));",
+          }
+          for old, new in replacements.items():
+              if old not in page:
+                  raise SystemExit(f'Muddy page marker missing: {old}')
+              page = page.replace(old, new, 1)
+          page_path.write_text(page)
+
+          profile_path = Path('data/characters/eddie-numbers.json')
+          profile = json.loads(profile_path.read_text())
+          profile['updatedAt'] = '2026-08-22T14:04:00-07:00'
+          profile['authority']['source'] = '/api/bet-history'
+          profile['authority']['updateModel'] = 'The live Hotline fetches /api/bet-history with cache bypass and recalculates on every page load. Any update to the private master ledger becomes the next authoritative Muddy Numbers report without a separate Betting Edge publication run.'
+          profile['hotlineStyle']['ledgerRules']['source'] = '/api/bet-history'
+          profile['guardrails']['ledgerAuthority'] = 'The private master ledger delivered through /api/bet-history is authoritative for every accounting figure on Muddy Numbers.'
+          profile_path.write_text(json.dumps(profile, indent=2, ensure_ascii=False) + '\n')
+
+          test_path = Path('tests/muddy-ledger-desk.test.mjs')
+          test_path.write_text(r'''#!/usr/bin/env node
+          import fs from 'node:fs';
+          const read=p=>fs.readFileSync(p,'utf8'),json=p=>JSON.parse(read(p)),assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
+          const profile=json('data/characters/eddie-numbers.json'),roster=json('data/syndicates.json'),shells=json('data/hotline-shells.json'),live=read('syndicates/sharp-room/incoming.html'),fallback=json('data/bet-history-public.json');
+          assert(profile.authority?.mode==='ledger-authoritative','Eddie must be ledger-authoritative');assert(profile.authority?.source==='/api/bet-history','Eddie authority source must be /api/bet-history');assert(profile.authority?.actualDollars===true,'Eddie must use actual CAD dollars');assert(profile.authority?.fictionalScaling===false,'Eddie fictional scaling must be disabled');assert(!JSON.stringify(profile).includes('"multiplier": 10'),'Legacy Eddie 10x scaling survived');
+          assert(roster.profiles.find(x=>x.characterId==='eddie-numbers')?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie roster title not converted');assert(roster.slots[0]?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie slot title not converted');assert(shells.shells.find(x=>x.id==='muddy-ledger-desk'&&x.defaultForCharacter===true),'Muddy Ledger Desk shell is not default');
+          for(const marker of ['ACTUAL CAD DOLLARS','CASH-WAGER CUMULATIVE P/L','WEEKLY + MONTHLY RECONCILIATION','Sport Desk','Sportsbook Windows','MUDDY METERS','MUDDY LEDGER // LAST 10 TICKETS','EDDIE: WHAT THE NUMBERS SAY','THE WALK TO THE CAGE'])assert(live.includes(marker),`Missing Ledger Desk marker: ${marker}`);
+          assert(live.includes("const URL='/api/bet-history'"),'Live desk must fetch /api/bet-history');assert(!live.includes('data/betting-ledger.json'),'Live desk still exposes raw public-ledger path');assert(live.includes("cache:'no-store'"),'Ledger fetch must bypass browser cache');
+          assert(fallback.publicProjection===true,'Static fallback must remain sanitized');assert(Number.isFinite(Number(fallback.bankrollCad)),'Fallback bankrollCad missing');assert(fallback.summary&&Number.isFinite(Number(fallback.summary.cashProfit)),'Fallback cashProfit summary missing');assert(Array.isArray(fallback.wagers)&&fallback.wagers.length>0,'Fallback wagers missing');assert(fallback.wagers.every(r=>r[2]===null),'Fallback sportsbook reference leaked');console.log('MUDDY NUMBERS // PRIVATE LEDGER DESK guardrails: PASS');
+          ''').replace(/^          /gm,'')
+
+          wf_path = Path('.github/workflows/muddy-ledger-desk.yml')
+          wf = wf_path.read_text()
+          old = "      - 'data/betting-ledger.json'\n"
+          if old not in wf:
+              raise SystemExit('Muddy workflow raw-ledger trigger marker missing')
+          wf = wf.replace(old, "      - 'cloudflare-worker/src/index.js'\n      - 'data/bet-history-public.json'\n", 1)
+          wf_path.write_text(wf)
+          PY
+
+      - name: Remove obsolete public master pipeline
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -- data/betting-ledger.json
+          git rm -- tools/build-public-bet-history.mjs
+          git rm -- .github/workflows/f3-public-bet-history.yml
+
+      - name: Validate completed cutover
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/muddy-ledger-desk.test.mjs
+          node --input-type=module --check < cloudflare-worker/src/index.js
+          grep -Fq './api/bet-history' index.html
+          grep -Fq "const URL='/api/bet-history'" syndicates/sharp-room/incoming.html
+          test ! -e data/betting-ledger.json
+          test -e data/bet-history-public.json
+          python <<'PY'
+          from pathlib import Path
+          bad=[]
+          excluded={'.github/workflows/private-ledger-cutover-stage2.yml'}
+          for p in Path('.').rglob('*'):
+              if not p.is_file() or '.git' in p.parts:
+                  continue
+              rel=p.as_posix().lstrip('./')
+              if rel in excluded:
+                  continue
+              try:
+                  text=p.read_text(errors='ignore')
+              except Exception:
+                  continue
+              if 'data/betting-ledger.json' in text or '../../data/betting-ledger.json' in text:
+                  bad.append(rel)
+          if bad:
+              raise SystemExit('Raw public ledger references remain: ' + ', '.join(sorted(set(bad))))
+          print('No current-branch raw ledger references remain.')
+          PY
+
+      - name: Commit cutover and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'betting-edge-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git rm -- .github/workflows/private-ledger-cutover-stage2.yml
+          git add -- syndicates/sharp-room/incoming.html data/characters/eddie-numbers.json tests/muddy-ledger-desk.test.mjs .github/workflows/muddy-ledger-desk.yml
+          git commit -m 'Complete private ledger cutover'
+          git push origin HEAD:main
