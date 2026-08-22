@@ -1,0 +1,35 @@
+name: Muddy Numbers Ledger Desk
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/betting-ledger.json'
+      - 'data/characters/eddie-numbers.json'
+      - 'data/syndicates.json'
+      - 'data/hotline-shells.json'
+      - 'syndicates/sharp-room/incoming.html'
+      - 'tests/muddy-ledger-desk.test.mjs'
+      - 'tests/syndicate-hotline-completeness.test.mjs'
+      - 'tests/hotline-shells.test.js'
+      - '.github/workflows/muddy-ledger-desk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: muddy-ledger-desk
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate authoritative ledger desk
+        run: node tests/muddy-ledger-desk.test.mjs
+      - name: Validate Syndicate hotline contracts
+        run: node tests/syndicate-hotline-completeness.test.mjs
+      - name: Validate Hotline shell registry
+        run: node tests/hotline-shells.test.js
