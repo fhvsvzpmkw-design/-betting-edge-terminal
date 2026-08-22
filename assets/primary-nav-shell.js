@@ -3,7 +3,9 @@
 
 const STYLE_ID='runnerPrimaryNavShellStyle';
 const SHELL_CLASS='runnerPrimaryViewLoaded';
+const MENU_CLASS='runnerMenuHome';
 const VIEWS={
+  board:{key:'F1',label:'VIGSCOPE',sub:'FULL VIGSCOPE + PICK CARDS'},
   market:{key:'F2',label:'MARKET',sub:'MARKET VIEW'},
   history:{key:'F3',label:'BET HISTORY',sub:'BET HISTORY'},
   engine:{key:'F4',label:'ENGINE',sub:'ENGINE STATUS'}
@@ -22,6 +24,12 @@ function ensureStyle(d){
   const s=d.createElement('style');
   s.id=STYLE_ID;
   s.textContent=`
+    body.${MENU_CLASS} .top{display:none!important}
+    body.${MENU_CLASS} .runnerNavPad{padding-top:14px!important;padding-bottom:10px!important;margin-top:0!important}
+    body.${MENU_CLASS} .runnerNavPad~*{display:none!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{display:block!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:#03101b!important;color:var(--cyan)!important}
+
     body.${SHELL_CLASS} .top{display:none!important}
     body.${SHELL_CLASS} .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
     body.${SHELL_CLASS} .runnerNavPad .tabs>.btn{display:none!important}
@@ -32,42 +40,73 @@ function ensureStyle(d){
   d.head.appendChild(s);
 }
 function btn(d,view){return d.querySelector(`.runnerNavPad .tabs>.btn[data-view="${view}"]`)||d.querySelector(`.tabs>.btn[data-view="${view}"]`)}
-function saveCompact(b){if(b&&!b.dataset.primaryCompact)b.dataset.primaryCompact=b.innerHTML}
-function restoreCompact(b){if(!b)return;b.classList.remove('primaryShellActive');if(b.dataset.primaryCompact&&b.innerHTML!==b.dataset.primaryCompact)b.innerHTML=b.dataset.primaryCompact}
+function compactHtml(view){const m=VIEWS[view];return m?`[${m.key}] ${m.label}`:''}
+function restoreCompact(d,view){
+  const b=btn(d,view);if(!b)return;
+  b.classList.remove('primaryShellActive');
+  const html=compactHtml(view);if(html&&b.innerHTML!==html)b.innerHTML=html;
+}
+function restoreAllCompact(d){Object.keys(VIEWS).forEach(v=>restoreCompact(d,v))}
+function clearPrimaryActive(d){d.querySelectorAll('.tabs>.btn[data-view].active').forEach(x=>x.classList.remove('active'))}
+function workspaceOpen(d){
+  const body=d.body;
+  if(body.classList.contains('runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'))return true;
+  const f5=d.getElementById('runnerSyndicateF5');
+  return f5?.dataset?.state==='connecting';
+}
+function leaveMenu(d){d.body.classList.remove(MENU_CLASS)}
+function enterMenu(d){
+  d.body.classList.remove(SHELL_CLASS);
+  delete d.body.dataset.primaryView;
+  restoreAllCompact(d);
+  clearPrimaryActive(d);
+  d.body.classList.add(MENU_CLASS);
+  try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
+}
 function closeShell(d){
   d.body.classList.remove(SHELL_CLASS);
   delete d.body.dataset.primaryView;
-  Object.keys(VIEWS).forEach(v=>restoreCompact(btn(d,v)));
+  restoreAllCompact(d);
 }
 function openShell(d,view){
   const meta=VIEWS[view],b=btn(d,view);if(!meta||!b)return;
-  Object.keys(VIEWS).forEach(v=>restoreCompact(btn(d,v)));
-  saveCompact(b);
+  leaveMenu(d);closeShell(d);
   d.body.classList.remove('runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded');
   d.body.classList.add(SHELL_CLASS);
   d.body.dataset.primaryView=view;
   b.classList.add('primaryShellActive');
-  b.innerHTML=`<span class="primaryShellMain"><b>[${meta.key}]</b>&nbsp; ${meta.label}</span><span class="primaryShellMessage">${meta.sub}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [${meta.key}] TO RETURN TO BOARD</span>`;
+  b.innerHTML=`<span class="primaryShellMain"><b>[${meta.key}]</b>&nbsp; ${meta.label}</span><span class="primaryShellMessage">${meta.sub}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [${meta.key}] TO RETURN TO MENU</span>`;
   try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
 }
+function syncMenu(d){
+  if(d.body.classList.contains(MENU_CLASS)||d.body.classList.contains(SHELL_CLASS)||workspaceOpen(d))return;
+  enterMenu(d);
+}
 function bind(d){
-  if(d.documentElement.dataset.primaryNavShellBound==='1')return;
-  d.documentElement.dataset.primaryNavShellBound='1';
+  if(d.documentElement.dataset.primaryNavShellBound==='2')return;
+  d.documentElement.dataset.primaryNavShellBound='2';
   ensureStyle(d);
-  Object.keys(VIEWS).forEach(v=>saveCompact(btn(d,v)));
+  restoreAllCompact(d);
+  enterMenu(d);
 
   d.addEventListener('click',e=>{
-    const b=e.target.closest?.('.tabs>.btn[data-view]');if(!b)return;
-    const view=b.dataset.view;
-    if(VIEWS[view]){
+    const navButton=e.target.closest?.('.runnerNavPad .tabs>.btn,.tabs>.btn');if(!navButton)return;
+    const view=navButton.dataset?.view;
+
+    if(view&&VIEWS[view]){
       if(d.body.classList.contains(SHELL_CLASS)&&d.body.dataset.primaryView===view){
-        e.preventDefault();e.stopImmediatePropagation();closeShell(d);btn(d,'board')?.click();return;
+        e.preventDefault();e.stopImmediatePropagation();enterMenu(d);return;
       }
-      closeShell(d);
-      requestAnimationFrame(()=>openShell(d,view));
+      leaveMenu(d);closeShell(d);
+      queueMicrotask(()=>openShell(d,view));
       return;
     }
-    if(view==='board')closeShell(d);
+
+    // F5/F6/F7/F8/Preferences own their page logic. Remove the menu/shell
+    // before their handlers run, then return to the menu whenever they close.
+    leaveMenu(d);closeShell(d);
+    setTimeout(()=>syncMenu(d),0);
+    setTimeout(()=>syncMenu(d),180);
   },true);
 
   d.addEventListener('keydown',e=>{
@@ -79,8 +118,10 @@ function bind(d){
 function attach(){
   const d=appDoc();if(!d?.body)return false;
   if(d!==lastDoc){lastDoc=d;bind(d)}
-  ensureStyle(d);return true;
+  ensureStyle(d);
+  if(!d.body.classList.contains(MENU_CLASS)&&!d.body.classList.contains(SHELL_CLASS)&&!workspaceOpen(d))syncMenu(d);
+  return true;
 }
 let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
-setInterval(attach,900);
+setInterval(attach,650);
 })();
