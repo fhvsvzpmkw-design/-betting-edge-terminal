@@ -1,5 +1,5 @@
 name: F3 public stats upgrade
-# syntax locator revision
+# literal-dollar replacement fix
 
 on:
   push:
@@ -24,21 +24,24 @@ jobs:
           mkdir -p tmp
           : > tmp/f3-upgrade-result.txt
           set +e
+          sed -i "s/html=html.replace(summaryMarker,summaryReplacement);/html=html.replace(summaryMarker,()=>summaryReplacement);/" tools/upgrade-f3-live-stats.mjs
+          grep -Fq "html=html.replace(summaryMarker,()=>summaryReplacement);" tools/upgrade-f3-live-stats.mjs
+          PREP=$?
           node --check tools/upgrade-f3-live-stats.mjs >> tmp/f3-upgrade-result.txt 2>&1
           CHECK=$?
           PATCH=99
           FIX=99
           SCRIPT=97
           VALID=98
-          if [ "$CHECK" -eq 0 ]; then
+          if [ "$PREP" -eq 0 ] && [ "$CHECK" -eq 0 ]; then
             node tools/upgrade-f3-live-stats.mjs >> tmp/f3-upgrade-result.txt 2>&1
             PATCH=$?
           fi
-          if [ "$CHECK" -eq 0 ] && [ "$PATCH" -eq 0 ]; then
+          if [ "$PATCH" -eq 0 ]; then
             node tools/fix-f3-generated-regex.mjs >> tmp/f3-upgrade-result.txt 2>&1
             FIX=$?
           fi
-          if [ "$CHECK" -eq 0 ] && [ "$PATCH" -eq 0 ] && [ "$FIX" -eq 0 ]; then
+          if [ "$PATCH" -eq 0 ] && [ "$FIX" -eq 0 ]; then
             node <<'NODE'
           const fs=require('node:fs');
           const html=fs.readFileSync('index.html','utf8');
@@ -49,7 +52,7 @@ jobs:
             node --check tmp/f3-script1.js >> tmp/f3-upgrade-result.txt 2>&1
             SCRIPT=$?
           fi
-          echo "script_check=$CHECK patch=$PATCH regex_fix=$FIX generated_script=$SCRIPT" >> tmp/f3-upgrade-result.txt
+          echo "prep=$PREP script_check=$CHECK patch=$PATCH regex_fix=$FIX generated_script=$SCRIPT" >> tmp/f3-upgrade-result.txt
           if [ "$SCRIPT" -eq 0 ]; then
             git diff --check >> tmp/f3-upgrade-result.txt 2>&1
             DIFF=$?
@@ -69,6 +72,6 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add tmp/f3-upgrade-result.txt
-          if [ "$CHECK" -eq 0 ] && [ "$PATCH" -eq 0 ] && [ "$FIX" -eq 0 ] && [ "$SCRIPT" -eq 0 ] && [ "$VALID" -eq 0 ]; then git add index.html; fi
+          if [ "$PREP" -eq 0 ] && [ "$CHECK" -eq 0 ] && [ "$PATCH" -eq 0 ] && [ "$FIX" -eq 0 ] && [ "$SCRIPT" -eq 0 ] && [ "$VALID" -eq 0 ]; then git add index.html; fi
           git commit -m 'Capture F3 public stats upgrade result' || exit 0
           git push origin HEAD:main
