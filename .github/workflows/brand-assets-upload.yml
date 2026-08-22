@@ -31,7 +31,7 @@ jobs:
           dst.mkdir(parents=True, exist_ok=True)
 
           # Decode the approved VW master icon from small text chunks.
-          parts = sorted(src.glob('vigwire-icon.png.b64.*'))
+          parts = sorted(src.glob('master.b64.*'))
           if not parts:
               raise SystemExit('Missing VigWire master icon chunks')
           encoded = ''.join(p.read_text().strip() for p in parts)
