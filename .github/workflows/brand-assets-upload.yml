@@ -1,0 +1,56 @@
+name: Assemble brand assets
+
+on:
+  push:
+    paths:
+      - 'brand-upload/READY'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Decode brand assets
+        shell: python
+        run: |
+          from pathlib import Path
+          import base64, hashlib
+
+          src = Path('brand-upload')
+          dst = Path('assets/brand')
+          dst.mkdir(parents=True, exist_ok=True)
+
+          expected = {
+              'vigwire-icon.png': ('c4ae9ecf07eafd4cb51ea721d034e3301678c032789a63383d570b73b30788e7', 15937),
+              'apple-touch-icon.png': ('59a0b86105ca1f82f4e01333c688d6f50b9dd1e321612a275fe60953e3526d4d', 7587),
+              'favicon.ico': ('5ee307ca57ae231cbca5353356c30ac8ce71ffc16795b33caed8c63800c79169', 5636),
+              'vigwire-share-card.png': ('642208c632cee9a002b394b6aa804f547505da7fa68bdc396b18fb7a813f77da', 30567),
+          }
+
+          for name, (sha256, size) in expected.items():
+              parts = sorted(src.glob(f'{name}.b64.*'))
+              if not parts:
+                  raise SystemExit(f'Missing chunks for {name}')
+              encoded = ''.join(p.read_text().strip() for p in parts)
+              data = base64.b64decode(encoded, validate=True)
+              if len(data) != size:
+                  raise SystemExit(f'Size mismatch for {name}: {len(data)} != {size}')
+              digest = hashlib.sha256(data).hexdigest()
+              if digest != sha256:
+                  raise SystemExit(f'SHA256 mismatch for {name}: {digest} != {sha256}')
+              (dst / name).write_bytes(data)
+
+      - name: Commit brand assets and remove upload scaffolding
+        run: |
+          rm -rf brand-upload
+          rm -f .github/workflows/brand-assets-upload.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets/brand brand-upload .github/workflows/brand-assets-upload.yml
+          git commit -m "Add VigWire brand assets"
+          git push
