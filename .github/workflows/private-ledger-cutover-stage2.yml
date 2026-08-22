@@ -2,10 +2,6 @@ name: Complete private ledger cutover
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/private-ledger-cutover-stage2.yml'
 
 permissions:
   contents: write
@@ -42,6 +38,7 @@ jobs:
           set -euo pipefail
           python <<'PY'
           from pathlib import Path
+          from textwrap import dedent
           import json
 
           page_path = Path('syndicates/sharp-room/incoming.html')
@@ -59,7 +56,7 @@ jobs:
 
           profile_path = Path('data/characters/eddie-numbers.json')
           profile = json.loads(profile_path.read_text())
-          profile['updatedAt'] = '2026-08-22T14:04:00-07:00'
+          profile['updatedAt'] = '2026-08-22T14:15:00-07:00'
           profile['authority']['source'] = '/api/bet-history'
           profile['authority']['updateModel'] = 'The live Hotline fetches /api/bet-history with cache bypass and recalculates on every page load. Any update to the private master ledger becomes the next authoritative Muddy Numbers report without a separate Betting Edge publication run.'
           profile['hotlineStyle']['ledgerRules']['source'] = '/api/bet-history'
@@ -67,16 +64,34 @@ jobs:
           profile_path.write_text(json.dumps(profile, indent=2, ensure_ascii=False) + '\n')
 
           test_path = Path('tests/muddy-ledger-desk.test.mjs')
-          test_path.write_text(r'''#!/usr/bin/env node
+          test_path.write_text(dedent("""\
           import fs from 'node:fs';
-          const read=p=>fs.readFileSync(p,'utf8'),json=p=>JSON.parse(read(p)),assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
-          const profile=json('data/characters/eddie-numbers.json'),roster=json('data/syndicates.json'),shells=json('data/hotline-shells.json'),live=read('syndicates/sharp-room/incoming.html'),fallback=json('data/bet-history-public.json');
-          assert(profile.authority?.mode==='ledger-authoritative','Eddie must be ledger-authoritative');assert(profile.authority?.source==='/api/bet-history','Eddie authority source must be /api/bet-history');assert(profile.authority?.actualDollars===true,'Eddie must use actual CAD dollars');assert(profile.authority?.fictionalScaling===false,'Eddie fictional scaling must be disabled');assert(!JSON.stringify(profile).includes('"multiplier": 10'),'Legacy Eddie 10x scaling survived');
-          assert(roster.profiles.find(x=>x.characterId==='eddie-numbers')?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie roster title not converted');assert(roster.slots[0]?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie slot title not converted');assert(shells.shells.find(x=>x.id==='muddy-ledger-desk'&&x.defaultForCharacter===true),'Muddy Ledger Desk shell is not default');
-          for(const marker of ['ACTUAL CAD DOLLARS','CASH-WAGER CUMULATIVE P/L','WEEKLY + MONTHLY RECONCILIATION','Sport Desk','Sportsbook Windows','MUDDY METERS','MUDDY LEDGER // LAST 10 TICKETS','EDDIE: WHAT THE NUMBERS SAY','THE WALK TO THE CAGE'])assert(live.includes(marker),`Missing Ledger Desk marker: ${marker}`);
-          assert(live.includes("const URL='/api/bet-history'"),'Live desk must fetch /api/bet-history');assert(!live.includes('data/betting-ledger.json'),'Live desk still exposes raw public-ledger path');assert(live.includes("cache:'no-store'"),'Ledger fetch must bypass browser cache');
-          assert(fallback.publicProjection===true,'Static fallback must remain sanitized');assert(Number.isFinite(Number(fallback.bankrollCad)),'Fallback bankrollCad missing');assert(fallback.summary&&Number.isFinite(Number(fallback.summary.cashProfit)),'Fallback cashProfit summary missing');assert(Array.isArray(fallback.wagers)&&fallback.wagers.length>0,'Fallback wagers missing');assert(fallback.wagers.every(r=>r[2]===null),'Fallback sportsbook reference leaked');console.log('MUDDY NUMBERS // PRIVATE LEDGER DESK guardrails: PASS');
-          ''').replace(/^          /gm,'')
+          const read=p=>fs.readFileSync(p,'utf8');
+          const json=p=>JSON.parse(read(p));
+          const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
+          const profile=json('data/characters/eddie-numbers.json');
+          const roster=json('data/syndicates.json');
+          const shells=json('data/hotline-shells.json');
+          const live=read('syndicates/sharp-room/incoming.html');
+          const fallback=json('data/bet-history-public.json');
+          assert(profile.authority?.mode==='ledger-authoritative','Eddie must be ledger-authoritative');
+          assert(profile.authority?.source==='/api/bet-history','Eddie authority source must be /api/bet-history');
+          assert(profile.authority?.actualDollars===true,'Eddie must use actual CAD dollars');
+          assert(profile.authority?.fictionalScaling===false,'Eddie fictional scaling must be disabled');
+          assert(roster.profiles.find(x=>x.characterId==='eddie-numbers')?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie roster title not converted');
+          assert(roster.slots[0]?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie slot title not converted');
+          assert(shells.shells.find(x=>x.id==='muddy-ledger-desk'&&x.defaultForCharacter===true),'Muddy Ledger Desk shell is not default');
+          for(const marker of ['ACTUAL CAD DOLLARS','CASH-WAGER CUMULATIVE P/L','WEEKLY + MONTHLY RECONCILIATION','Sport Desk','Sportsbook Windows','MUDDY METERS','MUDDY LEDGER // LAST 10 TICKETS','EDDIE: WHAT THE NUMBERS SAY','THE WALK TO THE CAGE']) assert(live.includes(marker),`Missing Ledger Desk marker: ${marker}`);
+          assert(live.includes("const URL='/api/bet-history'"),'Live desk must fetch /api/bet-history');
+          assert(!live.includes('data/betting-ledger.json'),'Live desk still exposes raw public-ledger path');
+          assert(live.includes("cache:'no-store'"),'Ledger fetch must bypass browser cache');
+          assert(fallback.publicProjection===true,'Static fallback must remain sanitized');
+          assert(Number.isFinite(Number(fallback.bankrollCad)),'Fallback bankrollCad missing');
+          assert(fallback.summary&&Number.isFinite(Number(fallback.summary.cashProfit)),'Fallback cashProfit summary missing');
+          assert(Array.isArray(fallback.wagers)&&fallback.wagers.length>0,'Fallback wagers missing');
+          assert(fallback.wagers.every(r=>r[2]===null),'Fallback sportsbook reference leaked');
+          console.log('MUDDY NUMBERS // PRIVATE LEDGER DESK guardrails: PASS');
+          """))
 
           wf_path = Path('.github/workflows/muddy-ledger-desk.yml')
           wf = wf_path.read_text()
