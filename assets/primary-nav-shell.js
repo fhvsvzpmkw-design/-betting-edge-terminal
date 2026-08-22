@@ -50,7 +50,8 @@ function restoreAllCompact(d){Object.keys(VIEWS).forEach(v=>restoreCompact(d,v))
 function clearPrimaryActive(d){d.querySelectorAll('.tabs>.btn[data-view].active').forEach(x=>x.classList.remove('active'))}
 function workspaceOpen(d){
   const body=d.body;
-  if(body.classList.contains('runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'))return true;
+  const pageClasses=['runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
+  if(pageClasses.some(c=>body.classList.contains(c)))return true;
   const f5=d.getElementById('runnerSyndicateF5');
   return f5?.dataset?.state==='connecting';
 }
