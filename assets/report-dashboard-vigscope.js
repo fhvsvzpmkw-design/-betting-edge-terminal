@@ -58,11 +58,11 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
-  // F1-F4 now share the menu-first/full-page navigation shell. F1 is VigScope;
-  // the boot sequence lands on the menu instead of opening the report directly.
+  // F1-F4 share the menu-first/full-page navigation shell. In menu view they
+  // now use the same full-width, two-line bar geometry as the other desk buttons.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=4';
+  primaryNav.src='./assets/primary-nav-shell.js?v=5';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
