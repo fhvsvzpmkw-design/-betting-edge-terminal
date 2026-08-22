@@ -24,18 +24,30 @@ function ensureStyle(d){
   const s=d.createElement('style');
   s.id=STYLE_ID;
   s.textContent=`
-    body.${MENU_CLASS} .top{display:none!important}
+    /* The terminal identity/header is permanent console chrome. */
+    body.${MENU_CLASS} main.term>header.top,
+    body.${SHELL_CLASS} main.term>header.top,
+    body.runnerSyndicateLoaded main.term>header.top,
+    body.runnerPizzaLoaded main.term>header.top,
+    body.runnerCryptoLoaded main.term>header.top,
+    body.runnerSeasonPreviewsLoaded main.term>header.top,
+    body.runnerPreferencesLoaded main.term>header.top{display:flex!important;position:sticky!important;top:0!important;z-index:120!important;background:#030811!important;box-shadow:0 8px 18px rgba(0,0,0,.42)!important}
+
     body.${MENU_CLASS} .runnerNavPad{padding-top:14px!important;padding-bottom:10px!important;margin-top:0!important}
     body.${MENU_CLASS} .runnerNavPad~*{display:none!important}
     body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{display:block!important}
     body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:#03101b!important;color:var(--cyan)!important}
 
-    body.${SHELL_CLASS} .top{display:none!important}
     body.${SHELL_CLASS} .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
     body.${SHELL_CLASS} .runnerNavPad .tabs>.btn{display:none!important}
+    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerSyndicateF5,
+    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerPizzaF6,
+    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerCryptoF7,
+    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerSeasonPreviewF6,
+    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerPreferencesF6{display:none!important}
     body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;border-color:var(--cyan)!important;background:#03101b!important;color:var(--cyan)!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.05),0 0 10px rgba(57,231,255,.08)!important;text-shadow:0 0 6px rgba(57,231,255,.16)!important}
     .primaryShellMain{display:block;font-size:inherit;font-weight:900}.primaryShellMessage{display:block;color:#83a6b7;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}
-    @media(max-width:560px){body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{min-height:58px!important}.primaryShellMessage{font-size:7.5px}}
+    @media(max-width:560px){body.${MENU_CLASS} main.term>header.top,body.${SHELL_CLASS} main.term>header.top,body.runnerSyndicateLoaded main.term>header.top,body.runnerPizzaLoaded main.term>header.top,body.runnerCryptoLoaded main.term>header.top,body.runnerSeasonPreviewsLoaded main.term>header.top,body.runnerPreferencesLoaded main.term>header.top{display:block!important}body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{min-height:58px!important}.primaryShellMessage{font-size:7.5px}}
   `;
   d.head.appendChild(s);
 }
