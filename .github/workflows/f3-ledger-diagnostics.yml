@@ -8,36 +8,39 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Inspect public projection semantics
         shell: bash
         run: |
+          mkdir -p tmp
           node <<'NODE'
           const fs=require('node:fs');
           const j=JSON.parse(fs.readFileSync('data/bet-history-public.json','utf8'));
           const rows=j.wagers;
           const sum=(a,f)=>a.reduce((t,x)=>t+Number(f(x)||0),0);
-          const stat=(name,a)=>console.log(name, JSON.stringify({count:a.length,risk:+sum(a,x=>x[9]).toFixed(4),profit:+sum(a,x=>x[11]).toFixed(4)}));
+          const stat=a=>({count:a.length,risk:+sum(a,x=>x[9]).toFixed(4),profit:+sum(a,x=>x[11]).toFixed(4)});
           const single=x=>Array.isArray(x[16])&&x[16].length===1;
           const pre=x=>x[12]==='PREGAME';
           const boosted=x=>!!x[14];
           const zeroLost=x=>x[10]==='Lost'&&Number(x[11])===0;
-          console.log('SUMMARY',JSON.stringify(j.summary));
-          stat('ALL',rows);
-          stat('BOOSTED_TRUE',rows.filter(boosted));
-          stat('BOOSTED_FALSE',rows.filter(x=>!boosted(x)));
-          stat('ZERO_PL_LOST',rows.filter(zeroLost));
-          stat('NON_ZERO_LOST_FILTER',rows.filter(x=>!zeroLost(x)));
-          stat('PREGAME_SINGLE_ALL',rows.filter(x=>pre(x)&&single(x)));
-          stat('PREGAME_SINGLE_NOT_BOOSTED',rows.filter(x=>pre(x)&&single(x)&&!boosted(x)));
-          stat('PREGAME_SINGLE_NOT_ZERO_LOST',rows.filter(x=>pre(x)&&single(x)&&!zeroLost(x)));
-          stat('PREGAME_SINGLE_NOT_BOOSTED_NOT_ZERO_LOST',rows.filter(x=>pre(x)&&single(x)&&!boosted(x)&&!zeroLost(x)));
-          const results={};for(const r of rows)results[r[10]]=(results[r[10]]||0)+1;console.log('RESULTS',JSON.stringify(results));
-          const combo={};for(const r of rows){const k=`${r[10]}|boost=${!!r[14]}|pl0=${Number(r[11])===0}`;combo[k]=(combo[k]||0)+1}console.log('COMBOS',JSON.stringify(combo,null,2));
+          const out={summary:j.summary,all:stat(rows),boostedTrue:stat(rows.filter(boosted)),boostedFalse:stat(rows.filter(x=>!boosted(x))),zeroPlLost:stat(rows.filter(zeroLost)),notZeroLost:stat(rows.filter(x=>!zeroLost(x))),pregameSingleAll:stat(rows.filter(x=>pre(x)&&single(x))),pregameSingleNotBoosted:stat(rows.filter(x=>pre(x)&&single(x)&&!boosted(x))),pregameSingleNotZeroLost:stat(rows.filter(x=>pre(x)&&single(x)&&!zeroLost(x))),pregameSingleNotBoostedNotZeroLost:stat(rows.filter(x=>pre(x)&&single(x)&&!boosted(x)&&!zeroLost(x)))};
+          out.results={};for(const r of rows)out.results[r[10]]=(out.results[r[10]]||0)+1;
+          out.combos={};for(const r of rows){const k=`${r[10]}|boost=${!!r[14]}|pl0=${Number(r[11])===0}`;out.combos[k]=(out.combos[k]||0)+1}
+          fs.writeFileSync('tmp/f3-ledger-diagnostics.json',JSON.stringify(out,null,2)+'\n');
           NODE
+      - name: Publish diagnostic snapshot
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tmp/f3-ledger-diagnostics.json
+          git commit -m 'Capture F3 ledger diagnostic snapshot' || exit 0
+          git push origin HEAD:main
