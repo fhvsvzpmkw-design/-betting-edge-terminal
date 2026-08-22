@@ -5,10 +5,10 @@ const STYLE_ID='runnerPrimaryNavShellStyle';
 const SHELL_CLASS='runnerPrimaryViewLoaded';
 const MENU_CLASS='runnerMenuHome';
 const VIEWS={
-  board:{key:'F1',label:'📺 VIG SCOPE 📺',sub:'FULL VIGSCOPE + PICK CARDS'},
-  market:{key:'F2',label:'MARKET',sub:'MARKET VIEW'},
-  history:{key:'F3',label:'BET HISTORY',sub:'BET HISTORY'},
-  engine:{key:'F4',label:'ENGINE',sub:'ENGINE STATUS'}
+  board:{key:'F1',label:'📺 VIG SCOPE 📺',sub:'FULL VIG SCOPE + PICK CARDS'},
+  market:{key:'F2',label:'📈 MARKET 📉',sub:'MARKET VIEW'},
+  history:{key:'F3',label:'🎟️ BET HISTORY 🎟️',sub:'BET HISTORY'},
+  engine:{key:'F4',label:'⚙️ ENGINE ⚙️',sub:'ENGINE STATUS'}
 };
 let lastDoc=null;
 
@@ -36,11 +36,17 @@ function ensureStyle(d){
     body.${MENU_CLASS} .runnerNavPad{padding-top:14px!important;padding-bottom:10px!important;margin-top:0!important}
     body.${MENU_CLASS} .runnerNavPad~*{display:none!important}
     body.${MENU_CLASS} .runnerNavPad .tabs{grid-template-columns:1fr!important;gap:9px!important}
-    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;border-color:var(--cyan)!important;background:#03101b!important;color:var(--cyan)!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.04),0 0 8px rgba(57,231,255,.05)!important;text-shadow:0 0 6px rgba(57,231,255,.14)!important}
-    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:#03101b!important;color:var(--cyan)!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;background:#03101b!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.04),0 0 8px rgba(57,231,255,.05)!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:inherit!important}
     body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="board"]{border-color:var(--green)!important;color:var(--green)!important;background:#03140b!important;box-shadow:inset 0 0 0 1px rgba(88,255,136,.06),0 0 10px rgba(88,255,136,.09)!important;text-shadow:0 0 6px rgba(88,255,136,.18)!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="market"]{border-color:var(--cyan)!important;color:var(--cyan)!important;background:#03101b!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.05),0 0 9px rgba(57,231,255,.07)!important;text-shadow:0 0 6px rgba(57,231,255,.16)!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="history"]{border-color:var(--blue)!important;color:var(--blue)!important;background:#061126!important;box-shadow:inset 0 0 0 1px rgba(47,132,255,.07),0 0 9px rgba(47,132,255,.09)!important;text-shadow:0 0 6px rgba(47,132,255,.18)!important}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="engine"]{border-color:var(--mag)!important;color:var(--mag)!important;background:#16091a!important;box-shadow:inset 0 0 0 1px rgba(255,79,216,.07),0 0 9px rgba(255,79,216,.09)!important;text-shadow:0 0 6px rgba(255,79,216,.18)!important}
     .primaryMenuMain{display:block;font-size:inherit;font-weight:900}.primaryMenuMessage{display:block;color:#83a6b7;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}
     body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="board"] .primaryMenuMessage{color:#8fc7a2}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="market"] .primaryMenuMessage{color:#83c8d8}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="history"] .primaryMenuMessage{color:#83a9ea}
+    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view="engine"] .primaryMenuMessage{color:#d993c9}
 
     body.${SHELL_CLASS} .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
     body.${SHELL_CLASS} .runnerNavPad .tabs>.btn{display:none!important}
@@ -51,8 +57,13 @@ function ensureStyle(d){
     body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerPreferencesF6{display:none!important}
     body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;border-color:var(--cyan)!important;background:#03101b!important;color:var(--cyan)!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.05),0 0 10px rgba(57,231,255,.08)!important;text-shadow:0 0 6px rgba(57,231,255,.16)!important}
     body.${SHELL_CLASS}[data-primary-view="board"] .runnerNavPad .tabs>.btn.primaryShellActive{border-color:var(--green)!important;color:var(--green)!important;background:#03140b!important;box-shadow:inset 0 0 0 1px rgba(88,255,136,.06),0 0 10px rgba(88,255,136,.09)!important;text-shadow:0 0 6px rgba(88,255,136,.18)!important}
+    body.${SHELL_CLASS}[data-primary-view="history"] .runnerNavPad .tabs>.btn.primaryShellActive{border-color:var(--blue)!important;color:var(--blue)!important;background:#061126!important;box-shadow:inset 0 0 0 1px rgba(47,132,255,.07),0 0 10px rgba(47,132,255,.10)!important;text-shadow:0 0 6px rgba(47,132,255,.18)!important}
+    body.${SHELL_CLASS}[data-primary-view="engine"] .runnerNavPad .tabs>.btn.primaryShellActive{border-color:var(--mag)!important;color:var(--mag)!important;background:#16091a!important;box-shadow:inset 0 0 0 1px rgba(255,79,216,.07),0 0 10px rgba(255,79,216,.10)!important;text-shadow:0 0 6px rgba(255,79,216,.18)!important}
     .primaryShellMain{display:block;font-size:inherit;font-weight:900}.primaryShellMessage{display:block;color:#83a6b7;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}
     body.${SHELL_CLASS}[data-primary-view="board"] .primaryShellMessage{color:#8fc7a2}
+    body.${SHELL_CLASS}[data-primary-view="market"] .primaryShellMessage{color:#83c8d8}
+    body.${SHELL_CLASS}[data-primary-view="history"] .primaryShellMessage{color:#83a9ea}
+    body.${SHELL_CLASS}[data-primary-view="engine"] .primaryShellMessage{color:#d993c9}
     @media(max-width:560px){body.${MENU_CLASS} main.term>header.top,body.${SHELL_CLASS} main.term>header.top,body.runnerSyndicateLoaded main.term>header.top,body.runnerPizzaLoaded main.term>header.top,body.runnerCryptoLoaded main.term>header.top,body.runnerSeasonPreviewsLoaded main.term>header.top,body.runnerPreferencesLoaded main.term>header.top{display:block!important}body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view],body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{min-height:58px!important}.primaryMenuMessage,.primaryShellMessage{font-size:7.5px}}
   `;
   d.head.appendChild(s);
@@ -102,8 +113,8 @@ function syncMenu(d){
   enterMenu(d);
 }
 function bind(d){
-  if(d.documentElement.dataset.primaryNavShellBound==='3')return;
-  d.documentElement.dataset.primaryNavShellBound='3';
+  if(d.documentElement.dataset.primaryNavShellBound==='4')return;
+  d.documentElement.dataset.primaryNavShellBound='4';
   ensureStyle(d);
   restoreAllMenuButtons(d);
   openShell(d,'board');
