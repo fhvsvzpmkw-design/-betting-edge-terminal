@@ -35,6 +35,8 @@ function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
   const s=d.createElement('style');s.id=STYLE_ID;s.textContent=`
     #${PIZZA_ID},#${CRYPTO_ID},#${MEAT_ID}{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;padding:10px 8px!important}
+    #runnerSyndicateF5{box-shadow:inset 0 0 0 1px rgba(255,232,145,.10),0 0 12px rgba(216,173,56,.18),0 0 26px rgba(216,173,56,.08)!important;text-shadow:0 0 7px rgba(255,216,106,.34),0 0 14px rgba(255,216,106,.14)!important}
+    #runnerSyndicateF5:hover,#runnerSyndicateF5.loaded{box-shadow:inset 0 0 0 1px rgba(255,240,170,.16),0 0 16px rgba(255,210,80,.26),0 0 30px rgba(255,210,80,.12)!important;text-shadow:0 0 8px rgba(255,225,125,.42),0 0 16px rgba(255,216,106,.18)!important}
     #${PIZZA_ID}{border-color:#c97035!important;color:#ffd7a3!important;background:#100704!important;box-shadow:inset 0 0 0 1px rgba(255,166,80,.05),0 0 10px rgba(220,105,35,.08)!important}
     #${PIZZA_ID}:hover,#${PIZZA_ID}.active{border-color:#ff9a49!important;color:#fff0c9!important;background:#1a0a04!important}
     #${CRYPTO_ID}{border-color:#6552a8!important;color:#cfc4ff!important;background:#070611!important;box-shadow:inset 0 0 0 1px rgba(156,130,255,.05),0 0 10px rgba(93,70,180,.08)!important}
