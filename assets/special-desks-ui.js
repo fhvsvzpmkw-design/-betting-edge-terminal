@@ -86,7 +86,7 @@ function panelHtml(kind,data){
 function ensurePanel(d,id,kind,data){
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');const nav=tabs?.parentElement;if(!nav)return null;
   let p=d.getElementById(id);if(!p){p=d.createElement('section');p.id=id;p.setAttribute('aria-label',kind==='pizza'?'Pizza Plays':'Crypto Specials');nav.insertAdjacentElement('afterend',p)}
-  const key=JSON.stringify(data||{});if(p.dataset.key!==key){p.dataset.key=key;p.innerHTML=panelHtml(kind,data)}return p;
+  const key=JSON.stringify([data||{},kind==='crypto'?cryptoAnalysisModeLabel():'']);if(p.dataset.key!==key){p.dataset.key=key;p.innerHTML=panelHtml(kind,data)}return p;
 }
 function buttonHtml(key,title,msg,kind){return `<span class="specialMain"><b>[${key}]</b>&nbsp; ${title}</span><span class="specialMessage ${kind}Message">${msg}</span>`}
 function ensureButtons(d){
