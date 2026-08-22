@@ -10,6 +10,7 @@ const PREF_ID='runnerPreferencesF6';
 const PIZZA_PANEL='runnerPizzaWorkspace';
 const CRYPTO_PANEL='runnerCryptoWorkspace';
 const STYLE_ID='runnerSpecialDesksStyle';
+const CRYPTO_ANALYSIS_MODE_KEY='bettingEdge.preferences.cryptoSpecialsAnalysisMode';
 let pizza=null,crypto=null,lastDoc=null,observer=null;
 
 function appDoc(){
@@ -20,6 +21,15 @@ function appDoc(){
   }catch{return null}
 }
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function cryptoAnalysisModeLabel(){
+  let value='god_mode';
+  try{value=localStorage.getItem(CRYPTO_ANALYSIS_MODE_KEY)||'god_mode'}catch{}
+  return ({basic_readthrough:'BASIC READ-THROUGH',in_depth_report:'IN-DEPTH REPORT',god_mode:'GOD MODE'})[value]||'GOD MODE';
+}
+function cryptoButtonMessage(){
+  const count=Array.isArray(crypto?.items)?crypto.items.length:0;
+  return `${count} WEB SOURCE${count===1?'':'S'} // ANALYSIS: ${cryptoAnalysisModeLabel()}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
+}
 function closeSpecial(d){
   d.body.classList.remove('runnerPizzaLoaded','runnerCryptoLoaded');
   d.getElementById(PIZZA_ID)?.classList.remove('active');
@@ -61,15 +71,16 @@ function itemCard(item,kind){
   const title=esc(item?.title||item?.name||'UNTITLED');
   const meta=esc(item?.summary||item?.description||item?.type||'');
   const url=String(item?.url||'').trim();
-  return `<article class="specialCard"><div class="specialIcon">${icon}</div><b>${title}</b>${meta?`<span>${meta}</span>`:''}${url?`<a href="${esc(url)}" target="_blank" rel="noopener" style="color:#8edfff;font-size:9px;font-weight:900;text-decoration:none">OPEN LINK</a>`:''}</article>`;
+  const review=kind==='crypto'?`<span>REVIEW: ${esc(item?.status||'PENDING ANALYSIS')} // NEXT: ${esc(cryptoAnalysisModeLabel())}</span>`:'';
+  return `<article class="specialCard"><div class="specialIcon">${icon}</div><b>${title}</b>${meta?`<span>${meta}</span>`:''}${review}${url?`<a href="${esc(url)}" target="_blank" rel="noopener" style="color:#8edfff;font-size:9px;font-weight:900;text-decoration:none">OPEN SOURCE PAGE</a>`:''}</article>`;
 }
 function panelHtml(kind,data){
   const isPizza=kind==='pizza';const items=Array.isArray(data?.items)?data.items:[];
   const title=isPizza?'PIZZA PLAYS':'CRYPTO SPECIALS';
   const desc=isPizza?'LONG SHOTS // PREMIUM PLAYS // SPECIAL COLLECTION':'PREMIUM WEB LINKS // CRYPTO ANALYSIS // SPECIAL COLLECTION';
-  const badge=isPizza?'COLLECTION RESERVED':'PREMIUM / LOCKED';
+  const badge=isPizza?'COLLECTION RESERVED':`${items.length} WEB SOURCE${items.length===1?'':'S'} // ${cryptoAnalysisModeLabel()}`;
   const emptyTitle=isPizza?'THE OVEN IS EMPTY':'THE VAULT IS EMPTY';
-  const emptyText=isPizza?'Long-shot and premium Pizza Plays will live here when the collection is defined.':'Premium crypto links and analysis will live here when the collection is defined.';
+  const emptyText=isPizza?'Long-shot and premium Pizza Plays will live here when the collection is defined.':'Add curated crypto web-page URLs here. New sources remain PENDING ANALYSIS until a manual review is triggered.';
   return `<div class="specialHead ${isPizza?'pizzaHead':'cryptoHead'}"><div><h2>${title}</h2><p>${desc}</p></div><div class="specialBadge ${isPizza?'pizzaBadge':'cryptoBadge'}">${badge}</div></div>${items.length?`<div class="specialShelf">${items.map(x=>itemCard(x,kind)).join('')}</div>`:`<div class="specialEmpty"><strong>${emptyTitle}</strong><span>${emptyText}</span></div>`}`;
 }
 function ensurePanel(d,id,kind,data){
@@ -83,7 +94,8 @@ function ensureButtons(d){
   const meat=d.getElementById(MEAT_ID),pref=d.getElementById(PREF_ID),f5=d.getElementById('runnerSyndicateF5');if(!meat||!pref)return false;
   ensureStyle(d);
   let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.innerHTML=buttonHtml('F6','🍕 PIZZA PLAYS 🍕','LONG SHOTS + PREMIUM&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN','pizza');p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
-  let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.innerHTML=buttonHtml('F7','🔒 CRYPTO SPECIALS 🔒','PREMIUM LINKS + ANALYSIS&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN','crypto');c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
+  let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
+  const cryptoHtml=buttonHtml('F7','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
   meat.setAttribute('aria-label','Meat Desk');
   if(f5){if(f5.nextElementSibling!==p)f5.insertAdjacentElement('afterend',p);if(p.nextElementSibling!==c)p.insertAdjacentElement('afterend',c);if(c.nextElementSibling!==meat)c.insertAdjacentElement('afterend',meat)}else{tabs.append(p,c,meat)}
   if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
