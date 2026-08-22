@@ -100,7 +100,7 @@ function bind(d){
   d.documentElement.dataset.primaryNavShellBound='2';
   ensureStyle(d);
   restoreAllCompact(d);
-  enterMenu(d);
+  openShell(d,'board');
 
   d.addEventListener('click',e=>{
     const navButton=e.target.closest?.('.runnerNavPad .tabs>.btn,.tabs>.btn');if(!navButton)return;
