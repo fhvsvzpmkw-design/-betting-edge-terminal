@@ -1,0 +1,32 @@
+name: F3 cleanup runner one-time
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/f3-public-cleanup-once.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply and validate F3 cleanup
+        run: node tools/f3-public-cleanup-once.mjs
+      - name: Commit F3 cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git commit -m 'Simplify F3 public bet history'
+          git push origin HEAD:main
