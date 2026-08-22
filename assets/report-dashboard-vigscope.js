@@ -50,7 +50,7 @@
   // the boot sequence lands on the menu instead of opening the report directly.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=2';
+  primaryNav.src='./assets/primary-nav-shell.js?v=3';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
