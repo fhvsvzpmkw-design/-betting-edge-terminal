@@ -1,0 +1,96 @@
+name: Install Crypto Specials source reviews
+
+on:
+  push:
+    branches: [feature/crypto-specials-source-reviews]
+    paths:
+      - '.github/workflows/install-crypto-specials-source-reviews.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/crypto-specials-source-reviews
+      - name: Add Crypto Specials analysis preference and source display
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          prefs_path=Path('data/preferences.json')
+          prefs=json.loads(prefs_path.read_text())
+          prefs['schema']=max(int(prefs.get('schema',1)),2)
+          modules=prefs.get('modules',[])
+          if not any(m.get('id')=='crypto_specials_analysis' for m in modules):
+              module={
+                  'id':'crypto_specials_analysis',
+                  'title':'CRYPTO SPECIALS ANALYSIS',
+                  'state':'active',
+                  'kind':'choice',
+                  'editable':True,
+                  'summary':'Choose the review depth used when a pending Crypto Specials web page is manually analyzed.',
+                  'storageKey':'bettingEdge.preferences.cryptoSpecialsAnalysisMode',
+                  'default':'god_mode',
+                  'options':[
+                      {'value':'basic_readthrough','label':'BASIC READ-THROUGH'},
+                      {'value':'in_depth_report','label':'IN-DEPTH REPORT'},
+                      {'value':'god_mode','label':'GOD MODE'}
+                  ],
+                  'controlPolicy':'Applies only when a Crypto Specials web-source review is manually triggered. BASIC captures the core page and usable notes; IN-DEPTH publishes a detailed report with structured source intelligence; GOD MODE performs the deepest page/context review and publication pass. No mode auto-starts analysis or changes Betting Edge recommendation logic.'
+              }
+              idx=next((i+1 for i,m in enumerate(modules) if m.get('id')=='meat_desk_analysis'),len(modules))
+              modules.insert(idx,module)
+          prefs_path.write_text(json.dumps(prefs,indent=2,ensure_ascii=False)+'\n')
+
+          ui_path=Path('assets/special-desks-ui.js')
+          s=ui_path.read_text()
+          if "const CRYPTO_ANALYSIS_MODE_KEY='bettingEdge.preferences.cryptoSpecialsAnalysisMode';" not in s:
+              s=s.replace("const STYLE_ID='runnerSpecialDesksStyle';", "const STYLE_ID='runnerSpecialDesksStyle';\nconst CRYPTO_ANALYSIS_MODE_KEY='bettingEdge.preferences.cryptoSpecialsAnalysisMode';")
+          esc_marker="function esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c]))}\n"
+          helper="""function cryptoAnalysisModeLabel(){\n  let value='god_mode';\n  try{value=localStorage.getItem(CRYPTO_ANALYSIS_MODE_KEY)||'god_mode'}catch{}\n  return ({basic_readthrough:'BASIC READ-THROUGH',in_depth_report:'IN-DEPTH REPORT',god_mode:'GOD MODE'})[value]||'GOD MODE';\n}\nfunction cryptoButtonMessage(){\n  const count=Array.isArray(crypto?.items)?crypto.items.length:0;\n  return `${count} WEB SOURCE${count===1?'':'S'} // ANALYSIS: ${cryptoAnalysisModeLabel()}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;\n}\n"""
+          if 'function cryptoAnalysisModeLabel()' not in s:
+              if esc_marker not in s: raise SystemExit('esc marker not found')
+              s=s.replace(esc_marker,esc_marker+helper)
+
+          old_item="""function itemCard(item,kind){\n  const icon=kind==='pizza'?'🍕':'🔒';\n  const title=esc(item?.title||item?.name||'UNTITLED');\n  const meta=esc(item?.summary||item?.description||item?.type||'');\n  const url=String(item?.url||'').trim();\n  return `<article class=\"specialCard\"><div class=\"specialIcon\">${icon}</div><b>${title}</b>${meta?`<span>${meta}</span>`:''}${url?`<a href=\"${esc(url)}\" target=\"_blank\" rel=\"noopener\" style=\"color:#8edfff;font-size:9px;font-weight:900;text-decoration:none\">OPEN LINK</a>`:''}</article>`;\n}\n"""
+          new_item="""function itemCard(item,kind){\n  const icon=kind==='pizza'?'🍕':'🔒';\n  const title=esc(item?.title||item?.name||'UNTITLED');\n  const meta=esc(item?.summary||item?.description||item?.type||'');\n  const url=String(item?.url||'').trim();\n  const review=kind==='crypto'?`<span>REVIEW: ${esc(item?.status||'PENDING ANALYSIS')} // NEXT: ${esc(cryptoAnalysisModeLabel())}</span>`:'';\n  return `<article class=\"specialCard\"><div class=\"specialIcon\">${icon}</div><b>${title}</b>${meta?`<span>${meta}</span>`:''}${review}${url?`<a href=\"${esc(url)}\" target=\"_blank\" rel=\"noopener\" style=\"color:#8edfff;font-size:9px;font-weight:900;text-decoration:none\">OPEN SOURCE PAGE</a>`:''}</article>`;\n}\n"""
+          if old_item in s: s=s.replace(old_item,new_item)
+          elif new_item not in s: raise SystemExit('itemCard block not found')
+
+          old_panel="""  const badge=isPizza?'COLLECTION RESERVED':'PREMIUM / LOCKED';\n  const emptyTitle=isPizza?'THE OVEN IS EMPTY':'THE VAULT IS EMPTY';\n  const emptyText=isPizza?'Long-shot and premium Pizza Plays will live here when the collection is defined.':'Premium crypto links and analysis will live here when the collection is defined.';\n"""
+          new_panel="""  const badge=isPizza?'COLLECTION RESERVED':`${items.length} WEB SOURCE${items.length===1?'':'S'} // ${cryptoAnalysisModeLabel()}`;\n  const emptyTitle=isPizza?'THE OVEN IS EMPTY':'THE VAULT IS EMPTY';\n  const emptyText=isPizza?'Long-shot and premium Pizza Plays will live here when the collection is defined.':'Add curated crypto web-page URLs here. New sources remain PENDING ANALYSIS until a manual review is triggered.';\n"""
+          if old_panel in s: s=s.replace(old_panel,new_panel)
+          elif new_panel not in s: raise SystemExit('panel copy block not found')
+
+          old_create="""  let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.innerHTML=buttonHtml('F7','🔒 CRYPTO SPECIALS 🔒','PREMIUM LINKS + ANALYSIS&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN','crypto');c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}\n"""
+          new_create="""  let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}\n  const cryptoHtml=buttonHtml('F7','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;\n"""
+          if old_create in s: s=s.replace(old_create,new_create)
+          elif new_create not in s: raise SystemExit('crypto button block not found')
+          ui_path.write_text(s)
+
+          dash=Path('assets/report-dashboard-vigscope.js')
+          d=dash.read_text().replace("specialDesks.src='./assets/special-desks-ui.js?v=2';","specialDesks.src='./assets/special-desks-ui.js?v=3';")
+          dash.write_text(d)
+
+          runner=Path('runner.html')
+          r=runner.read_text().replace('report-dashboard-vigscope.js?v=20260821-1800','report-dashboard-vigscope.js?v=20260821-1810')
+          runner.write_text(r)
+          PY
+      - name: Commit Crypto Specials review model
+        shell: bash
+        run: |
+          if git diff --quiet -- data/preferences.json assets/special-desks-ui.js assets/report-dashboard-vigscope.js runner.html; then
+            echo 'Already installed'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- data/preferences.json assets/special-desks-ui.js assets/report-dashboard-vigscope.js runner.html
+          git commit -m 'Mirror Meat Desk review modes for Crypto Specials'
+          git push origin feature/crypto-specials-source-reviews
