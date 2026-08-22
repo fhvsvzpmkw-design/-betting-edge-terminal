@@ -58,7 +58,7 @@
   // legacy F6 shortcut. The desk overlay owns F6 Pizza, F7 Crypto and F8 Meat.
   const specialDesks=document.createElement('script');
   specialDesks.id='specialDesksUiLoader';
-  specialDesks.src='./assets/special-desks-ui.js?v=1';
+  specialDesks.src='./assets/special-desks-ui.js?v=2';
   specialDesks.async=false;
   document.head.appendChild(specialDesks);
 
