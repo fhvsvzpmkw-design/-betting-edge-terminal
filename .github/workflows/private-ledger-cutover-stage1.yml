@@ -1,0 +1,207 @@
+name: Stage private ledger cutover
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/private-ledger-cutover-stage1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Confirm expected rollback points
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:cloudflare-worker/src/index.js)" = "74408cc856bc302b70c4490457ddfa53c8326e76"
+          test "$(git rev-parse HEAD:index.html)" = "6b68064f1fb2bd28317457016cf7ccad1009e8a6"
+
+      - name: Patch Worker and F3 ledger loader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+
+          worker_path = Path('cloudflare-worker/src/index.js')
+          worker = worker_path.read_text()
+
+          constant_needle = 'const CANONICAL_HOST = "vigwirelabs.com";\n'
+          if worker.count(constant_needle) != 1:
+              raise SystemExit('Worker canonical-host marker mismatch')
+          worker = worker.replace(
+              constant_needle,
+              constant_needle + 'const PRIVATE_LEDGER_API = "https://api.github.com/repos/fhvsvzpmkw-design/betting-edge-private/contents/data/betting-ledger.json?ref=main";\n',
+              1,
+          )
+
+          function_marker = 'function redirectToCanonical(requestUrl) {'
+          if worker.count(function_marker) != 1:
+              raise SystemExit('Worker function insertion marker mismatch')
+
+          private_functions = r'''async function loadPrivateLedger(env) {
+            const token = String(env?.GITHUB_PRIVATE_TOKEN || "").trim();
+            if (!token) throw new Error("private ledger token unavailable");
+
+            const response = await fetch(PRIVATE_LEDGER_API, {
+              headers: {
+                Accept: "application/vnd.github.raw+json",
+                Authorization: `Bearer ${token}`,
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "VigWire-Labs-Worker",
+              },
+              cache: "no-store",
+            });
+
+            if (!response.ok) {
+              throw new Error(`private ledger fetch failed: ${response.status}`);
+            }
+
+            const raw = await response.json();
+            if (!raw || !Array.isArray(raw.wagers) || !raw.validation) {
+              throw new Error("invalid private ledger schema");
+            }
+            return raw;
+          }
+
+          function buildPublicBetHistory(raw) {
+            const wagers = raw.wagers.map((r, index) => [
+              index + 1,
+              r[1] || "",
+              null,
+              r[3] || null,
+              r[4] || null,
+              r[5] || "",
+              r[6] || "",
+              r[7] || "",
+              r[8] ?? 0,
+              r[9] ?? 0,
+              r[10] || "",
+              r[11] ?? 0,
+              r[12] || "UNKNOWN",
+              r[13] ?? null,
+              Boolean(r[14]),
+              Array.isArray(r[15]) ? r[15] : [],
+              Array.isArray(r[16]) ? r[16] : [],
+              r[17] || "",
+            ]);
+
+            return {
+              schema: 2,
+              publicProjection: true,
+              generatedAt: raw.generatedAt || new Date().toISOString(),
+              timezone: raw.timezone || "America/Vancouver",
+              bankrollCad: Number(raw.bankrollCad || 0),
+              validation: {
+                uniqueWagers: wagers.length,
+                pagesAt10Rows: Math.ceil(wagers.length / 10),
+                status: raw.validation.status === "PASS" ? "PASS" : "CHECK",
+              },
+              summary: raw.summary || {},
+              wagers,
+            };
+          }
+
+          function privateBetHistoryResponse(request, raw) {
+            const body = JSON.stringify(buildPublicBetHistory(raw));
+            const headers = {
+              "Content-Type": "application/json; charset=utf-8",
+              "Cache-Control": "no-store",
+              "X-VigWire-Source": "private-ledger",
+            };
+            return new Response(request.method === "HEAD" ? null : body, { status: 200, headers });
+          }
+
+          '''
+          worker = worker.replace(function_marker, private_functions + function_marker, 1)
+
+          fetch_needle = '  async fetch(request) {'
+          if worker.count(fetch_needle) != 1:
+              raise SystemExit('Worker fetch signature marker mismatch')
+          worker = worker.replace(fetch_needle, '  async fetch(request, env) {', 1)
+
+          method_block = '''    if (request.method !== "GET" && request.method !== "HEAD") {
+                return new Response(`Method ${request.method} not allowed.`, {
+                  status: 405,
+                  headers: { Allow: "GET, HEAD" },
+                });
+              }
+
+          '''
+          if method_block not in worker:
+              raise SystemExit('Worker method block marker mismatch')
+
+          api_route = '''    if (url.pathname === "/api/bet-history") {
+                try {
+                  const raw = await loadPrivateLedger(env);
+                  return privateBetHistoryResponse(request, raw);
+                } catch (error) {
+                  console.error("Private ledger API failed", error);
+                  return errorResponse("Bet history is temporarily unavailable.");
+                }
+              }
+
+          '''
+          worker = worker.replace(method_block, method_block + api_route, 1)
+          worker_path.write_text(worker)
+
+          index_path = Path('index.html')
+          index = index_path.read_text()
+          old_loader = '''async function loadLedger(){
+            const res=await fetch('./data/bet-history-public.json?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Ledger HTTP '+res.status);const payload=await res.json();
+            if(!payload||!Array.isArray(payload.wagers)||!payload.validation)throw new Error('Invalid ledger schema');LEDGER_META=payload;MASTER=payload.wagers;DATA=MASTER.map(rec);
+          }'''
+          new_loader = '''async function loadLedger(){
+            let payload=null,lastError=null;
+            for(const path of ['./api/bet-history','./data/bet-history-public.json']){
+              try{
+                const res=await fetch(path+'?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Ledger HTTP '+res.status+' @ '+path);const candidate=await res.json();
+                if(!candidate||!Array.isArray(candidate.wagers)||!candidate.validation)throw new Error('Invalid ledger schema @ '+path);payload=candidate;payload.deliverySource=path.includes('/api/')?'PRIVATE MASTER // CLOUDFLARE':'STATIC PUBLIC FALLBACK';break;
+              }catch(error){lastError=error}
+            }
+            if(!payload)throw lastError||new Error('Ledger unavailable');LEDGER_META=payload;MASTER=payload.wagers;DATA=MASTER.map(rec);
+          }'''
+          if index.count(old_loader) != 1:
+              raise SystemExit('Index ledger loader marker mismatch')
+          index = index.replace(old_loader, new_loader, 1)
+
+          status_old = "+' // PUBLIC F3 DATASET';"
+          status_new = "+' // '+(LEDGER_META.deliverySource||'PUBLIC F3 DATASET');"
+          if index.count(status_old) != 1:
+              raise SystemExit('Index ledger status marker mismatch')
+          index = index.replace(status_old, status_new, 1)
+          index_path.write_text(index)
+          PY
+
+      - name: Validate staged cutover
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module --check < cloudflare-worker/src/index.js
+          grep -Fq 'GITHUB_PRIVATE_TOKEN' cloudflare-worker/src/index.js
+          grep -Fq '/api/bet-history' index.html
+          if grep -Fq './data/betting-ledger.json' index.html; then
+            echo 'Raw private ledger reference leaked into index.html'
+            exit 1
+          fi
+
+      - name: Commit staged cutover and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'betting-edge-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git rm -- .github/workflows/private-ledger-cutover-stage1.yml
+          git add -- cloudflare-worker/src/index.js index.html
+          git commit -m 'Stage private ledger delivery through Worker'
+          git push origin HEAD:main
