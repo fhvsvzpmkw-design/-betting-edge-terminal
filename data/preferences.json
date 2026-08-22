@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "title": "PREFERENCES / OPERATIONS",
   "description": "Terminal preference modules. Active UI preferences are stored locally in the browser; operating rules and issued history remain repository-controlled.",
   "states": {
@@ -46,8 +46,14 @@
       "storageKey": "bettingEdge.preferences.meterPresentation",
       "default": "blocks",
       "options": [
-        {"value": "blocks", "label": "SEGMENTED LED"},
-        {"value": "rails", "label": "TERMINAL RAIL"}
+        {
+          "value": "blocks",
+          "label": "SEGMENTED LED"
+        },
+        {
+          "value": "rails",
+          "label": "TERMINAL RAIL"
+        }
       ],
       "controlPolicy": "Presentation only. Changing meter style does not alter Market Heat, Price Pressure, Market Agreement or Vig Scope state."
     },
@@ -61,12 +67,49 @@
       "storageKey": "bettingEdge.preferences.cardView",
       "default": "normal",
       "options": [
-        {"value": "normal", "label": "NORMAL / STANDARD"},
-        {"value": "excited", "label": "EXCITED"},
-        {"value": "neon", "label": "NEON"},
-        {"value": "vigscope", "label": "VIG SCOPE"}
+        {
+          "value": "normal",
+          "label": "NORMAL / STANDARD"
+        },
+        {
+          "value": "excited",
+          "label": "EXCITED"
+        },
+        {
+          "value": "neon",
+          "label": "NEON"
+        },
+        {
+          "value": "vigscope",
+          "label": "VIG SCOPE"
+        }
       ],
       "controlPolicy": "Presentation only. Normal remains the product default. All four card views use the same recommendation data, geometry and game-status placement and do not change the master Vig Scope panel."
+    },
+    {
+      "id": "meat_desk_analysis",
+      "title": "MEAT DESK ANALYSIS",
+      "state": "active",
+      "kind": "choice",
+      "editable": true,
+      "summary": "Choose the review depth used when a pending Meat Desk source is manually analyzed.",
+      "storageKey": "bettingEdge.preferences.meatDeskAnalysisMode",
+      "default": "god_mode",
+      "options": [
+        {
+          "value": "basic_readthrough",
+          "label": "BASIC READ-THROUGH"
+        },
+        {
+          "value": "in_depth_report",
+          "label": "IN-DEPTH REPORT"
+        },
+        {
+          "value": "god_mode",
+          "label": "GOD MODE"
+        }
+      ],
+      "controlPolicy": "Applies only when a Meat Desk review is manually triggered. BASIC captures the core read-through and usable notes; IN-DEPTH publishes a detailed report with structured source intelligence; GOD MODE performs the full-source, page-referenced review and deepest publication pass. No mode auto-starts analysis or changes Betting Edge recommendation logic."
     },
     {
       "id": "syndicate_load",
@@ -99,11 +142,26 @@
       "storageKey": "bettingEdge.preferences.startupScreen",
       "default": "board",
       "options": [
-        {"value": "board", "label": "BOARD"},
-        {"value": "market", "label": "MARKET"},
-        {"value": "history", "label": "BET HISTORY"},
-        {"value": "engine", "label": "ENGINE"},
-        {"value": "last_used", "label": "LAST USED"}
+        {
+          "value": "board",
+          "label": "BOARD"
+        },
+        {
+          "value": "market",
+          "label": "MARKET"
+        },
+        {
+          "value": "history",
+          "label": "BET HISTORY"
+        },
+        {
+          "value": "engine",
+          "label": "ENGINE"
+        },
+        {
+          "value": "last_used",
+          "label": "LAST USED"
+        }
       ],
       "controlPolicy": "Applies on the next runner load. It does not change report generation."
     },
@@ -117,16 +175,46 @@
       "storageKey": "bettingEdge.preferences.historyLanding",
       "default": "summary",
       "options": [
-        {"value": "summary", "label": "SUMMARY"},
-        {"value": "sports", "label": "SPORTS"},
-        {"value": "types", "label": "BET TYPES"},
-        {"value": "timing", "label": "TIMING"},
-        {"value": "prices", "label": "PRICES"},
-        {"value": "books", "label": "BOOKS"},
-        {"value": "time", "label": "TIME"},
-        {"value": "clv", "label": "CLV"},
-        {"value": "ledger", "label": "FULL LEDGER"},
-        {"value": "last_used", "label": "LAST USED"}
+        {
+          "value": "summary",
+          "label": "SUMMARY"
+        },
+        {
+          "value": "sports",
+          "label": "SPORTS"
+        },
+        {
+          "value": "types",
+          "label": "BET TYPES"
+        },
+        {
+          "value": "timing",
+          "label": "TIMING"
+        },
+        {
+          "value": "prices",
+          "label": "PRICES"
+        },
+        {
+          "value": "books",
+          "label": "BOOKS"
+        },
+        {
+          "value": "time",
+          "label": "TIME"
+        },
+        {
+          "value": "clv",
+          "label": "CLV"
+        },
+        {
+          "value": "ledger",
+          "label": "FULL LEDGER"
+        },
+        {
+          "value": "last_used",
+          "label": "LAST USED"
+        }
       ],
       "controlPolicy": "Navigation preference only. History data, grading and archived records are unchanged."
     },
@@ -140,9 +228,18 @@
       "storageKey": "bettingEdge.preferences.recommendationDetail",
       "default": "collapsed",
       "options": [
-        {"value": "collapsed", "label": "COLLAPSED"},
-        {"value": "expanded", "label": "EXPANDED"},
-        {"value": "remember", "label": "REMEMBER LAST"}
+        {
+          "value": "collapsed",
+          "label": "COLLAPSED"
+        },
+        {
+          "value": "expanded",
+          "label": "EXPANDED"
+        },
+        {
+          "value": "remember",
+          "label": "REMEMBER LAST"
+        }
       ],
       "controlPolicy": "Presentation only. Expanding or collapsing analysis never changes a recommendation."
     },
@@ -153,7 +250,11 @@
       "kind": "status",
       "editable": false,
       "current": 9,
-      "profiles": [7, 9, 12],
+      "profiles": [
+        7,
+        9,
+        12
+      ],
       "overflowProtection": true,
       "summary": "CURRENT: 9 CARDS · STATUS PROFILES: 7 / 9 / 12 · OVERFLOW PROTECTION: ON",
       "controlPolicy": "Repository-controlled operational target while F6 remains display-only. The card count is a soft target, never a quota or hard ceiling: fewer cards are valid when the board is thin, and tracked or actionable BET / LEAN / WAIT recommendations may overflow the selected target rather than being dropped."

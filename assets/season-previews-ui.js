@@ -7,6 +7,7 @@ const BUTTON_ID='runnerSeasonPreviewF6';
 const PREF_BUTTON_ID='runnerPreferencesF6';
 const PANEL_ID='runnerSeasonPreviewsWorkspace';
 const STYLE_ID='runnerSeasonPreviewsUiStyle';
+const ANALYSIS_MODE_KEY='bettingEdge.preferences.meatDeskAnalysisMode';
 
 let manifest=null,lastDoc=null,observer=null,manifestRequested=false;
 let selectedId=null,reader=null;
@@ -45,6 +46,11 @@ function sizeText(bytes){
   return n>1048576?`${(n/1048576).toFixed(1)} MB`:`${Math.round(n/1024)} KB`;
 }
 function itemById(id){return (manifest?.sources||[]).find(x=>String(x.id)===String(id))||null}
+function analysisModeLabel(){
+  let value='god_mode';
+  try{value=localStorage.getItem(ANALYSIS_MODE_KEY)||'god_mode'}catch{}
+  return ({basic_readthrough:'BASIC READ-THROUGH',in_depth_report:'IN-DEPTH REPORT',god_mode:'GOD MODE'})[value]||'GOD MODE';
+}
 
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
@@ -79,8 +85,8 @@ function ensureStyle(d){
 }
 
 function setButtonCopy(b){
-  const count=Array.isArray(manifest?.sources)?manifest.sources.length:null;
-  const msg=count===null?'SOURCE DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN':`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`;
+  const count=Array.isArray(manifest?.sources)?manifest.sources.length:null,mode=analysisModeLabel();
+  const msg=count===null?`ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`:`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN`;
   const html=`<span class="f6Main"><b>[F8]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="f6Message">${msg}</span>`;
   if(b.innerHTML!==html)b.innerHTML=html;
 }
@@ -114,7 +120,7 @@ function bookHtml(item){
 }
 function libraryHtml(){
   const sources=Array.isArray(manifest?.sources)?manifest.sources:[];
-  return `<div class="meatDeskHead"><div><h2>🥩 MEAT DESK</h2><p>PRESEASON MAGAZINES // BETTING GUIDES // BOOKS // REFERENCE COPIES</p></div><div class="meatDeskBadge">${sources.length} DESK COP${sources.length===1?'Y':'IES'} // SOURCE-ONLY</div></div>
+  return `<div class="meatDeskHead"><div><h2>🥩 MEAT DESK</h2><p>PRESEASON MAGAZINES // BETTING GUIDES // BOOKS // REFERENCE COPIES</p></div><div class="meatDeskBadge">${sources.length} DESK COP${sources.length===1?'Y':'IES'} // ANALYSIS: ${esc(analysisModeLabel())}</div></div>
     <div class="meatShelfTools"><input class="meatSearch" type="search" placeholder="SEARCH THE DESK…" aria-label="Search Meat Desk">${filtersHtml()}</div>
     ${sources.length?`<div class="meatShelf">${sources.map(bookHtml).join('')}</div>`:`<div class="meatEmpty">NO DESK COPIES INDEXED.</div>`}`;
 }
@@ -129,6 +135,7 @@ function detailHtml(item){
       <div class="meatInfo"><h3>${title}</h3><div class="meatInfoMeta">${chips}</div>
         <div class="meatInfoBlock"><small>WHY IT'S ON THE DESK</small><p>${esc(item.use||item.notes||'Reference copy.')}</p></div>
         <div class="meatInfoBlock"><small>REVIEW STATE</small><p>${esc(item.status||'INDEXED')}</p></div>
+        <div class="meatInfoBlock"><small>NEXT ANALYSIS MODE</small><p>${esc(analysisModeLabel())} // MANUAL TRIGGER ONLY</p></div>
         <div class="meatInfoBlock"><small>NOTES</small><p>${esc(item.notes||'No notes yet.')}</p></div>
         <div class="meatInfoActions"><button type="button" class="meatAction primary" data-meat-read="${esc(item.id)}">READ DESK COPY</button><a class="meatAction" href="${esc(path)}" target="_blank" rel="noopener">OPEN FULLSCREEN PDF</a></div>
       </div>
