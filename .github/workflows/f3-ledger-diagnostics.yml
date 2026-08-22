@@ -1,4 +1,4 @@
-name: F3 ledger diagnostics
+name: F3 public stats upgrade
 
 on:
   push:
@@ -11,40 +11,36 @@ permissions:
   contents: write
 
 jobs:
-  diagnose:
+  upgrade:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect public projection semantics
+      - name: Validate upgrade script
+        run: node --check tools/upgrade-f3-live-stats.mjs
+      - name: Convert F3 to live public statistics
+        run: node tools/upgrade-f3-live-stats.mjs
+      - name: Validate generated F3
         shell: bash
         run: |
-          mkdir -p tmp
+          git diff --check
           node <<'NODE'
           const fs=require('node:fs');
-          const j=JSON.parse(fs.readFileSync('data/bet-history-public.json','utf8'));
-          const rows=j.wagers;
-          const sum=(a,f)=>a.reduce((t,x)=>t+Number(f(x)||0),0);
-          const stat=a=>({count:a.length,risk:+sum(a,x=>x[9]).toFixed(4),profit:+sum(a,x=>x[11]).toFixed(4)});
-          const single=x=>Array.isArray(x[16])&&x[16].length===1;
-          const pre=x=>x[12]==='PREGAME';
-          const boosted=x=>!!x[14];
-          const zeroLost=x=>x[10]==='Lost'&&Number(x[11])===0;
-          const out={summary:j.summary,all:stat(rows),boostedTrue:stat(rows.filter(boosted)),boostedFalse:stat(rows.filter(x=>!boosted(x))),zeroPlLost:stat(rows.filter(zeroLost)),notZeroLost:stat(rows.filter(x=>!zeroLost(x))),pregameSingleAll:stat(rows.filter(x=>pre(x)&&single(x))),pregameSingleNotBoosted:stat(rows.filter(x=>pre(x)&&single(x)&&!boosted(x))),pregameSingleNotZeroLost:stat(rows.filter(x=>pre(x)&&single(x)&&!zeroLost(x))),pregameSingleNotBoostedNotZeroLost:stat(rows.filter(x=>pre(x)&&single(x)&&!boosted(x)&&!zeroLost(x)))};
-          out.results={};for(const r of rows)out.results[r[10]]=(out.results[r[10]]||0)+1;
-          out.combos={};for(const r of rows){const k=`${r[10]}|boost=${!!r[14]}|pl0=${Number(r[11])===0}`;out.combos[k]=(out.combos[k]||0)+1}
-          out.tagCounts={};for(const r of rows){const k=String(r[17]??'');out.tagCounts[k]=(out.tagCounts[k]||0)+1}
-          const clv=rows.map(r=>r[13]).filter(v=>v!==null&&v!==''&&Number.isFinite(Number(v))).map(Number).sort((a,b)=>a-b);const med=clv.length?(clv.length%2?clv[(clv.length-1)/2]:(clv[clv.length/2-1]+clv[clv.length/2])/2):null;out.clv={count:clv.length,mean:clv.length?sum(clv,x=>x)/clv.length:null,median:med,min:clv[0]??null,max:clv.at(-1)??null,sample:clv.slice(0,10).concat(clv.slice(-10))};
-          const classify=r=>{const t=[r[7],...(Array.isArray(r[16])?r[16]:[])].join(' ').toLowerCase();if(/goalscorer|touchdown|rush yds|receiv|passing|shots|rebounds|assists|strikeouts|total bases|hits, runs|player|offsides|saves|aces|double faults/.test(t))return 'Props';if(/spread|point spread|run line|puck line|handicap/.test(t))return 'Spread';if(/money line|moneyline|to advance|match winner|draw no bet| to win\b/.test(t))return 'Moneyline';if(/total|over |under |o\/u|team points|team total/.test(t))return 'Totals';return 'Props'};
-          out.typeCounts={};for(const r of rows.filter(x=>pre(x)&&single(x))){const k=classify(r);out.typeCounts[k]=(out.typeCounts[k]||0)+1}
-          fs.writeFileSync('tmp/f3-ledger-diagnostics.json',JSON.stringify(out,null,2)+'\n');
+          const html=fs.readFileSync('index.html','utf8');
+          const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
+          if(!scripts.length)throw new Error('No scripts found');
+          scripts.forEach((s,i)=>{try{new Function(s)}catch(e){throw new Error(`Script ${i+1} syntax: ${e.message}`)}});
+          for(const marker of ['id="sportsBody"','id="typesBody"','id="timingBody"','id="pricesBody"','id="booksBody"','id="timeBody"','id="clvCount"','function renderHistoryStats()','./api/bet-history','PRIVATE MASTER // CLOUDFLARE'])if(!html.includes(marker))throw new Error('Missing marker: '+marker);
+          for(const stale of ['+9.32% ROI','752 bets // +$388.66','<b>180</b>'])if(html.includes(stale))throw new Error('Static F3 value survived: '+stale);
+          if(html.includes('x.bookid'))throw new Error('Public F3 still searches sportsbook reference IDs');
+          console.log('F3 live public stats validation: PASS');
           NODE
-      - name: Publish diagnostic snapshot
+      - name: Commit F3 upgrade
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tmp/f3-ledger-diagnostics.json
-          git commit -m 'Update F3 ledger diagnostic snapshot' || exit 0
+          git add index.html
+          git commit -m 'Make F3 bet history live public stats'
           git push origin HEAD:main
