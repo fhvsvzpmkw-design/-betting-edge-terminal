@@ -34,6 +34,9 @@ jobs:
           const out={summary:j.summary,all:stat(rows),boostedTrue:stat(rows.filter(boosted)),boostedFalse:stat(rows.filter(x=>!boosted(x))),zeroPlLost:stat(rows.filter(zeroLost)),notZeroLost:stat(rows.filter(x=>!zeroLost(x))),pregameSingleAll:stat(rows.filter(x=>pre(x)&&single(x))),pregameSingleNotBoosted:stat(rows.filter(x=>pre(x)&&single(x)&&!boosted(x))),pregameSingleNotZeroLost:stat(rows.filter(x=>pre(x)&&single(x)&&!zeroLost(x))),pregameSingleNotBoostedNotZeroLost:stat(rows.filter(x=>pre(x)&&single(x)&&!boosted(x)&&!zeroLost(x)))};
           out.results={};for(const r of rows)out.results[r[10]]=(out.results[r[10]]||0)+1;
           out.combos={};for(const r of rows){const k=`${r[10]}|boost=${!!r[14]}|pl0=${Number(r[11])===0}`;out.combos[k]=(out.combos[k]||0)+1}
+          out.tagCounts={};for(const r of rows){const k=String(r[17]??'');out.tagCounts[k]=(out.tagCounts[k]||0)+1}
+          out.nonEmptyTagRows=rows.filter(r=>String(r[17]??'')!=='[]'&&String(r[17]??'').trim()!=='').slice(0,100).map(r=>({id:r[0],desc:r[7],risk:r[9],result:r[10],pl:r[11],boosted:r[14],tags:r[17]}));
+          out.keywordRows=rows.filter(r=>/free|bonus|credit|promo/i.test([r[7],r[17]].join(' '))).slice(0,100).map(r=>({id:r[0],desc:r[7],risk:r[9],result:r[10],pl:r[11],boosted:r[14],tags:r[17]}));
           fs.writeFileSync('tmp/f3-ledger-diagnostics.json',JSON.stringify(out,null,2)+'\n');
           NODE
       - name: Publish diagnostic snapshot
@@ -42,5 +45,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add tmp/f3-ledger-diagnostics.json
-          git commit -m 'Capture F3 ledger diagnostic snapshot' || exit 0
+          git commit -m 'Update F3 ledger diagnostic snapshot' || exit 0
           git push origin HEAD:main
