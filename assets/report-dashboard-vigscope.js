@@ -62,7 +62,7 @@
   // use the same full-width, two-line bar geometry as the other desk buttons.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=6';
+  primaryNav.src='./assets/primary-nav-shell.js?v=7';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
