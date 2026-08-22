@@ -16,6 +16,18 @@
     }
   }catch(e){}
 
+  // New Meat Desk and Crypto Specials sources start with a lightweight review
+  // unless the user has explicitly selected a deeper mode in Preferences.
+  try{
+    const defaults=[
+      'bettingEdge.preferences.meatDeskAnalysisMode',
+      'bettingEdge.preferences.cryptoSpecialsAnalysisMode'
+    ];
+    defaults.forEach(key=>{
+      if(localStorage.getItem(key)===null)localStorage.setItem(key,'basic_readthrough');
+    });
+  }catch(e){}
+
   // Keep the full known-good VigScope implementation in the adjacent rollback
   // file, then apply these small presentation/intelligence overlays on top.
   const legacy=document.createElement('script');
