@@ -222,6 +222,34 @@ function errorResponse(message, status = 503) {
   });
 }
 
+async function liveRootResponse(request, id) {
+  const upstream = await proxyGitHubPages(request, "/r.html");
+  if (request.method === "HEAD" || !upstream.ok) return upstream;
+
+  const html = await upstream.text();
+  const marker = "const id=String(new URLSearchParams(location.search).get('id')||'').trim().toLowerCase();";
+  if (!html.includes(marker)) {
+    return errorResponse("VigWire Labs live resolver is temporarily unavailable.");
+  }
+
+  const bound = html.replace(
+    marker,
+    `const id=String(new URLSearchParams(location.search).get('id')||'${id}').trim().toLowerCase();`,
+  );
+  const headers = new Headers(upstream.headers);
+  headers.set("Cache-Control", "no-store, max-age=0");
+  headers.delete("Content-Length");
+  headers.delete("Content-Encoding");
+  headers.delete("ETag");
+  headers.delete("Last-Modified");
+
+  return new Response(bound, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -277,7 +305,7 @@ export default {
       return redirectToReport(url, pathId);
     }
 
-    // The public root is the report resolver. With an ID present, internally serve r.html.
+    // Explicit IDs are permanent report links. Bare vigwirelabs.com stays in LIVE mode.
     if (url.pathname === "/") {
       const suppliedId = String(url.searchParams.get("id") || "").trim().toLowerCase();
 
@@ -295,7 +323,7 @@ export default {
 
       try {
         const { id } = await loadLatestRun();
-        return redirectToReport(url, id);
+        return await liveRootResponse(request, id);
       } catch {
         return errorResponse("VigWire Labs report link is temporarily unavailable.");
       }
