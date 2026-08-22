@@ -46,11 +46,11 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
-  // F2/F3/F4 retain their normal top-row positions, but open into the same
-  // isolated full-page banner treatment used by Load Syndicate.
+  // F1-F4 now share the menu-first/full-page navigation shell. F1 is VigScope;
+  // the boot sequence lands on the menu instead of opening the report directly.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=1';
+  primaryNav.src='./assets/primary-nav-shell.js?v=2';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
