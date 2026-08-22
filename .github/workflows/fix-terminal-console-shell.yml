@@ -1,0 +1,54 @@
+name: Fix terminal console shell
+
+on:
+  push:
+    branches: [fix/terminal-console-shell]
+    paths:
+      - '.github/workflows/fix-terminal-console-shell.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/terminal-console-shell
+      - name: Keep console header and isolate F1-F4 views
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('assets/primary-nav-shell.js')
+          s=p.read_text()
+          old="""    body.${MENU_CLASS} .top{display:none!important}\n    body.${MENU_CLASS} .runnerNavPad{padding-top:14px!important;padding-bottom:10px!important;margin-top:0!important}\n    body.${MENU_CLASS} .runnerNavPad~*{display:none!important}\n    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{display:block!important}\n    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:#03101b!important;color:var(--cyan)!important}\n\n    body.${SHELL_CLASS} .top{display:none!important}\n    body.${SHELL_CLASS} .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}\n    body.${SHELL_CLASS} .runnerNavPad .tabs>.btn{display:none!important}\n    body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;border-color:var(--cyan)!important;background:#03101b!important;color:var(--cyan)!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.05),0 0 10px rgba(57,231,255,.08)!important;text-shadow:0 0 6px rgba(57,231,255,.16)!important}\n"""
+          new="""    /* The terminal identity/header is permanent console chrome. */\n    body.${MENU_CLASS} main.term>header.top,\n    body.${SHELL_CLASS} main.term>header.top,\n    body.runnerSyndicateLoaded main.term>header.top,\n    body.runnerPizzaLoaded main.term>header.top,\n    body.runnerCryptoLoaded main.term>header.top,\n    body.runnerSeasonPreviewsLoaded main.term>header.top,\n    body.runnerPreferencesLoaded main.term>header.top{display:flex!important;position:sticky!important;top:0!important;z-index:120!important;background:#030811!important;box-shadow:0 8px 18px rgba(0,0,0,.42)!important}\n\n    body.${MENU_CLASS} .runnerNavPad{padding-top:14px!important;padding-bottom:10px!important;margin-top:0!important}\n    body.${MENU_CLASS} .runnerNavPad~*{display:none!important}\n    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{display:block!important}\n    body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:#03101b!important;color:var(--cyan)!important}\n\n    body.${SHELL_CLASS} .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}\n    body.${SHELL_CLASS} .runnerNavPad .tabs>.btn{display:none!important}\n    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerSyndicateF5,\n    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerPizzaF6,\n    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerCryptoF7,\n    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerSeasonPreviewF6,\n    body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerPreferencesF6{display:none!important}\n    body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;border-color:var(--cyan)!important;background:#03101b!important;color:var(--cyan)!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.05),0 0 10px rgba(57,231,255,.08)!important;text-shadow:0 0 6px rgba(57,231,255,.16)!important}\n"""
+          if old not in s:
+              raise SystemExit('primary nav style block not found')
+          s=s.replace(old,new)
+          s=s.replace("@media(max-width:560px){body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{min-height:58px!important}.primaryShellMessage{font-size:7.5px}}", "@media(max-width:560px){body.${MENU_CLASS} main.term>header.top,body.${SHELL_CLASS} main.term>header.top,body.runnerSyndicateLoaded main.term>header.top,body.runnerPizzaLoaded main.term>header.top,body.runnerCryptoLoaded main.term>header.top,body.runnerSeasonPreviewsLoaded main.term>header.top,body.runnerPreferencesLoaded main.term>header.top{display:block!important}body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{min-height:58px!important}.primaryShellMessage{font-size:7.5px}}")
+          p.write_text(s)
+
+          dash=Path('assets/report-dashboard-vigscope.js')
+          d=dash.read_text().replace("primaryNav.src='./assets/primary-nav-shell.js?v=2';", "primaryNav.src='./assets/primary-nav-shell.js?v=3';")
+          dash.write_text(d)
+
+          runner=Path('runner.html')
+          r=runner.read_text().replace('report-dashboard-vigscope.js?v=20260821-1712','report-dashboard-vigscope.js?v=20260821-1720')
+          runner.write_text(r)
+          PY
+      - name: Commit terminal shell fix
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/primary-nav-shell.js assets/report-dashboard-vigscope.js runner.html; then
+            echo 'Already patched'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/primary-nav-shell.js assets/report-dashboard-vigscope.js runner.html
+          git commit -m 'Keep terminal console chrome and isolate primary views'
+          git push origin fix/terminal-console-shell
