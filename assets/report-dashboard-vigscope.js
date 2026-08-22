@@ -59,10 +59,10 @@
   document.head.appendChild(cardView);
 
   // F1-F4 share the menu-first/full-page navigation shell. In menu view they
-  // now use the same full-width, two-line bar geometry as the other desk buttons.
+  // use the same full-width, two-line bar geometry as the other desk buttons.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=5';
+  primaryNav.src='./assets/primary-nav-shell.js?v=6';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
