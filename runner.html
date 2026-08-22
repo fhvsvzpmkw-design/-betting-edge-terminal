@@ -112,6 +112,6 @@ function applyHierarchyPatch(){
 function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true,characterData:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
 art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});core.src='./runner-core.html'+location.search+location.hash;startWhenVisible();
 </script>
-<script src="./assets/report-dashboard-vigscope.js?v=20260821-1704"></script>
+<script src="./assets/report-dashboard-vigscope.js?v=20260821-1712"></script>
 </body>
 </html>
