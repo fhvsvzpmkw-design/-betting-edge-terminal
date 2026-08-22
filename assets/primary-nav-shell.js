@@ -5,7 +5,7 @@ const STYLE_ID='runnerPrimaryNavShellStyle';
 const SHELL_CLASS='runnerPrimaryViewLoaded';
 const MENU_CLASS='runnerMenuHome';
 const VIEWS={
-  board:{key:'F1',label:'VIGSCOPE',sub:'FULL VIGSCOPE + PICK CARDS'},
+  board:{key:'F1',label:'📺 VIG SCOPE 📺',sub:'FULL VIGSCOPE + PICK CARDS'},
   market:{key:'F2',label:'MARKET',sub:'MARKET VIEW'},
   history:{key:'F3',label:'BET HISTORY',sub:'BET HISTORY'},
   engine:{key:'F4',label:'ENGINE',sub:'ENGINE STATUS'}
@@ -50,7 +50,9 @@ function ensureStyle(d){
     body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerSeasonPreviewF6,
     body.${SHELL_CLASS} .runnerNavPad .tabs>#runnerPreferencesF6{display:none!important}
     body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;border-color:var(--cyan)!important;background:#03101b!important;color:var(--cyan)!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.05),0 0 10px rgba(57,231,255,.08)!important;text-shadow:0 0 6px rgba(57,231,255,.16)!important}
+    body.${SHELL_CLASS}[data-primary-view="board"] .runnerNavPad .tabs>.btn.primaryShellActive{border-color:var(--green)!important;color:var(--green)!important;background:#03140b!important;box-shadow:inset 0 0 0 1px rgba(88,255,136,.06),0 0 10px rgba(88,255,136,.09)!important;text-shadow:0 0 6px rgba(88,255,136,.18)!important}
     .primaryShellMain{display:block;font-size:inherit;font-weight:900}.primaryShellMessage{display:block;color:#83a6b7;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}
+    body.${SHELL_CLASS}[data-primary-view="board"] .primaryShellMessage{color:#8fc7a2}
     @media(max-width:560px){body.${MENU_CLASS} main.term>header.top,body.${SHELL_CLASS} main.term>header.top,body.runnerSyndicateLoaded main.term>header.top,body.runnerPizzaLoaded main.term>header.top,body.runnerCryptoLoaded main.term>header.top,body.runnerSeasonPreviewsLoaded main.term>header.top,body.runnerPreferencesLoaded main.term>header.top{display:block!important}body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view],body.${SHELL_CLASS} .runnerNavPad .tabs>.btn.primaryShellActive{min-height:58px!important}.primaryMenuMessage,.primaryShellMessage{font-size:7.5px}}
   `;
   d.head.appendChild(s);
