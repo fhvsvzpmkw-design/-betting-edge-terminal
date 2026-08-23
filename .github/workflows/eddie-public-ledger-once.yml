@@ -1,0 +1,30 @@
+name: Eddie Public Ledger Once
+
+on:
+  push:
+    paths:
+      - 'tools/eddie-public-ledger-once.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Re-anchor Eddie to public Bet History
+        run: node tools/eddie-public-ledger-once.mjs
+      - name: Validate Eddie public ledger desk
+        run: node tests/muddy-ledger-desk.test.mjs
+      - name: Commit Eddie update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/characters/eddie-numbers.json data/hotline-shells.json syndicates/sharp-room/incoming.html tests/muddy-ledger-desk.test.mjs
+          if git diff --cached --quiet; then
+            echo "No Eddie changes to commit"
+          else
+            git commit -m "Re-anchor Eddie Numbers to public Bet History"
+            git push
+          fi
