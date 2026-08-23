@@ -25,6 +25,7 @@ assert(!live.includes('PRIVATE MASTER // CLOUDFLARE'),'Private-master label leak
 assert(!live.includes('Authority: private ledger'),'Private-ledger authority leaked into Eddie Hotline');
 assert(!live.includes('../../data/betting-ledger.json'),'Live desk still exposes raw ledger path');
 assert(live.includes("cache:'no-store'"),'Ledger fetch must bypass browser cache');
+assert(live.includes("html('tickets',last.map"),'Recent ticket tape must render ticket cards as HTML');
 assert(fallback.publicProjection===true,'Static fallback must remain sanitized');
 assert(Array.isArray(fallback.wagers)&&fallback.wagers.length>0,'Fallback wagers missing');
 assert(fallback.wagers.every(r=>r[2]===null),'Fallback sportsbook reference leaked');
