@@ -1,13 +1,28 @@
 # The Crown & Lance — Production Reference
 
-Purpose: define the **presentation mechanics** for Alex Daventry's Hotline. This file is not King’s Quest canon and is not betting evidence.
+Purpose: define the **presentation mechanics** for Alex Daventry's Hotline. This file is not King's Quest canon and is not betting evidence.
 
 ## Public product
 
 - Character: **ALEX DAVENTRY**
 - Publication / setting: **THE CROWN & LANCE**
-- Format: a continuing Daventry royal-feast and tournament show inside the VigScope / Betting Edge world.
-- Primary story source: King’s Quest III, with King’s Quest I, II and IV supporting the early Daventry family/world.
+- Format: an actual continuing live Vegas-style medieval dinner show inside the VigScope / Betting Edge world.
+- Current job: Alex is the on-floor host / personality of the show, wearing the project-owned green-and-blue Crown & Lance costume seen in his avatar.
+- Primary character biography source: King's Quest III, with King's Quest I, II and IV supporting early Daventry family/world history.
+
+## Core interpretation
+
+The Crown & Lance is **not** a metaphorical medieval skin placed over a Betting Edge report. It is the real present-day venue where Alex works.
+
+Alex's KQ3 material is his biography and behavioral logic:
+
+- he once lived as Gwydion under Manannan;
+- he learned clocks, chores, secrecy and preparation;
+- he learned to keep strange objects until their use becomes clear;
+- he escaped Llewdor, survived travel and a pirate voyage, discovered his identity and returned to Daventry;
+- he now brings those instincts into a tacky, noisy live casino dinner show.
+
+The comedy comes from someone with genuine adventure-game history using those instincts to solve ordinary live-show disasters.
 
 ## Las Vegas production research
 
@@ -15,15 +30,15 @@ Use these as real-world staging research only:
 
 1. Excalibur / MGM Resorts — Tournament of Kings official show page
    - https://excalibur.mgmresorts.com/en/entertainment/tournament-of-kings.html
-   - Production ideas to study: theater-in-the-round, central arena, mounted knight spectacle, feast service, special effects, visible tournament structure and audience proximity to the action.
+   - Production ideas to study: theater-in-the-round, central arena, mounted-knight spectacle, feast service, special effects, visible tournament structure and audience proximity to the action.
 
 2. MGM Resorts Newsroom — Tournament of Kings feature / production description
    - https://newsroom.mgmresorts.com/2024-08-06-Excaliburs-Tournament-Of-Kings-Dinner-Show-Takes-Audience-To-King-Arthurs-Court
-   - Production ideas to study: large cast, horses, cheering/singing audience participation, tournament costumes, live score, theatrical entrances and pyrotechnic spectacle.
+   - Production ideas to study: large cast, horses, cheering/singing audience participation, tournament costumes, theatrical entrances and pyrotechnic spectacle.
 
 3. MGM Resorts Newsroom — 35th anniversary feature
    - https://newsroom.mgmresorts.com/press-releases?item=122641
-   - Production ideas to study: long-running dinner-show rhythm, jousting, feast, rowdy chanting, coronation/show-finale energy and repeatable nightly spectacle.
+   - Production ideas to study: repeatable dinner-show rhythm, jousting, feast, rowdy chanting, coronation/show-finale energy and nightly spectacle.
 
 ## Hard separation rule
 
@@ -38,65 +53,79 @@ The Vegas sources contribute only generic production lessons:
 - banners, shields, trumpets and court announcements;
 - horses / jousting as background spectacle where appropriate;
 - audience chants and participation;
-- a finale that feels like the end of a show rather than the end of an analytics report.
+- a finale that feels like the end of a live show rather than the end of an analytics report.
+
+## Food & drink anchors
+
+The Crown & Lance identity should repeatedly feel tangible through its table service.
+
+Recurring anchors:
+
+- **chicken dinner** as the signature meal;
+- potatoes / bread or similar simple supporting plate elements when useful;
+- **wine service in goblets** as a recurring visual and story beat;
+- servers moving through the cheering sections while the tournament continues;
+- kitchen timing, missing trays, wrong tables, spilled or delayed service as legitimate story problems.
+
+Chicken and wine should recur naturally across issues, but not as the exact same joke every time.
 
 ## Crown & Lance story engine
 
 Each Hotline edition should feel like a new performance at the same establishment.
 
-Suggested sequence:
+Recommended sequence:
 
-1. **THE DOORS OPEN** — establish what is happening in the hall today.
-2. **ALEX'S TABLE** — short first-person or close-third-person KQ3-rooted incident.
-3. **TODAY'S LISTS** — the Betting Edge selections, kept brief and unmistakable.
-4. **BETWEEN BOUTS** — continue the feast/show story; use one or two KQ I-IV world callbacks.
-5. **THE ROYAL BOX** — one family/world beat involving Graham, Valanice or Rosella when useful.
+1. **THE DOORS OPEN** — Alex on the real show floor; when useful, reveal a piece of his KQ3 biography and how it shaped him.
+2. **CHICKEN & FIRST POUR** — establish table service, audience energy and the episode's live-show problem.
+3. **TODAY'S LISTS** — the Betting Edge selections in one compact factual wire.
+4. **BETWEEN BOUTS** — return immediately to the show; let Alex solve the problem using KQ3 timing/preparation/inventory logic.
+5. **THE SECOND POUR** — continue the floor story and use one focused Daventry biography/family callback only when useful.
 6. **FINAL FANFARE** — close the performance and state whether any real betting action exists.
 
 ## Entertainment-first ratio
 
-Target approximately **80% story / character / world and 20% betting information**.
+Target approximately **80% story / character / live-show world and 20% betting information**.
 
-The Sierra branch is entertainment-first. Do not turn Alex into Bill Weston in a tunic.
+The Sierra branch is entertainment-first. Do not turn Alex into Bill Weston in a costume.
 
 ### Betting copy rules
 
-For each current recommendation, normally show only:
+The Betting Edge section should normally be one compact block. For each recommendation, show only:
 
-- the Betting Edge status;
+- BET / LEAN / WAIT / PASS;
 - selection;
 - current/best issued price;
-- exact play-to/watch requirement when WAIT or LEAN;
-- stake/risk when BET;
-- one short plain-language reason when necessary.
+- exact play-to/watch condition when needed;
+- stake/risk when BET.
 
-Do not reproduce long fair-value, EV, model or no-vig explanations unless a future user explicitly asks Alex for more analysis. Alex does not make an independent model.
+Do not create a separate medieval-themed handicap paragraph for every candidate. The show story should continue independently of the betting board.
 
 ## Character-specific story mechanics
 
-KQ3 gives Alex natural ways to talk about WAIT without becoming an analyst:
+KQ3 gives Alex natural ways to solve live-show problems:
 
-- he learned to watch a clock;
-- he learned not to move while the dangerous person in the house was still awake;
-- he learned that having almost all the ingredients is the same as not having the spell;
-- he learned that a route can be open but still be the wrong time to take it;
-- he learned to keep useful objects until their purpose becomes clear.
+- watch the clock before moving;
+- wait until the dangerous or obstructing condition changes;
+- finish preparation before taking the route;
+- keep keys, cords, notes and apparently useless props because they may matter later;
+- distrust "almost ready";
+- check the kitchen, backstage, stairs, storage and route instead of charging ahead;
+- treat absurd complications as familiar rather than heroic.
 
-Translate these into story and humor, never into evidence for a wager.
+These are character/story traits only. They are never independent betting evidence.
 
 ## Visual direction
 
-The page should look like a purpose-built medieval dinner-show program rather than an old manuscript archive:
+The page should look like a purpose-built casino dinner-show program rather than an old manuscript archive:
 
 - warm parchment / feast-menu surface;
 - deep royal banners;
 - brass/gold rules and seals;
-- tournament cards that resemble entries in the lists;
-- a visible central-arena motif;
-- ticket/program typography rather than tiny faux-calligraphy;
-- responsive mobile layout with short betting blocks and larger story sections.
-
-No copyrighted King’s Quest art or Tournament of Kings promotional assets are required. Prefer original CSS ornament, simple heraldic geometry and future project-owned artwork.
+- live Crown & Lance hero photography / project-owned artwork;
+- Alex's consistent photorealistic casino-show avatar;
+- chicken-and-wine program elements;
+- a compact VigScope wire;
+- responsive portrait handling that never stretches Alex's image to match neighboring text height.
 
 ## Betting authority
 
