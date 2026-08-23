@@ -75,11 +75,11 @@
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
-  // Player-value overlay keeps the flat-card calibration intact but makes the
-  // headline cash view stake-aware and standardized to a single $100 full unit.
+  // Player/decision/model value overlay. The $100 player view is actual BET
+  // performance only; non-BET decisions and flat-card calibration stay separate.
   const resultsPlayerScale=document.createElement('script');
   resultsPlayerScale.id='resultsPlayerScaleLoader';
-  resultsPlayerScale.src='./assets/results-player-scale.js?v=2';
+  resultsPlayerScale.src='./assets/results-player-scale.js?v=3';
   resultsPlayerScale.async=false;
   document.head.appendChild(resultsPlayerScale);
 
