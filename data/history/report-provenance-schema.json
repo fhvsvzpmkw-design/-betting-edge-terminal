@@ -4,7 +4,7 @@
   "sidecarPath": "data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json",
   "compatibility": {
     "historicalSchema2Valid": true,
-    "rule": "Schema-2 sidecars issued before the v0.9 production cutover remain valid immutable historical evidence and are not rewritten merely to adopt schema 3."
+    "rule": "Schema-2 sidecars issued before the v0.9 production cutover remain valid immutable historical evidence. Schema-3 sidecars issued under contract v0.9 also remain valid immutable evidence and are not rewritten merely because the current production contract is v1.0."
   },
   "reportReference": {
     "fields": {
@@ -18,7 +18,7 @@
   },
   "provenance": {
     "fields": {
-      "productionContractVersion": "string; required post-cutover and currently 0.9",
+      "productionContractVersion": "string; required post-cutover and currently 1.0",
       "productionContractOperational": "boolean; required post-cutover and must be true",
       "productionContractPath": "string; required post-cutover and currently BETTING_EDGE_CONTRACT.md",
       "productionContractBlobSha": "exact Git blob SHA of the authoritative production contract read before handicapping",
@@ -34,7 +34,7 @@
       "governanceDraftOperational": "optional historical design provenance only; must not imply draft authority after production cutover",
       "governanceDraftBlobSha": "optional exact Git blob SHA of historical design draft"
     },
-    "productionRule": "Post-cutover sidecars must record productionContractVersion=0.9, productionContractOperational=true, productionContractPath=BETTING_EDGE_CONTRACT.md, and the exact productionContractBlobSha resolved before handicapping. Draft provenance is optional and non-authoritative."
+    "productionRule": "New sidecars must record productionContractVersion=1.0, productionContractOperational=true, productionContractPath=BETTING_EDGE_CONTRACT.md, and the exact productionContractBlobSha resolved before handicapping. Historical v0.9 sidecars remain valid and immutable. Draft provenance is optional and non-authoritative."
   },
   "recommendations": {
     "shape": "array aligned to the issued recs by stable title/identity and ordinal",

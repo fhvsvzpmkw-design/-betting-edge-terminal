@@ -13,27 +13,49 @@ The repository includes four durable project references:
 
 Current splash identity is centralized in `r.html` under `BRAND_CONFIG`. For a splash rename, update `appName` and/or `companyName`, then verify the GitHub Pages deployment and the splash-to-report transition. Terminal branding remains separate and should be changed independently when a broader product rename is intended.
 
-## Current UI release boundary
+## Current production version boundary
 
-The current presentation release is **VigScope Terminal UI v1.4** in `runner.html`. The headline v1.4 feature is **F5 Syndicates**: a four-slot, externally configured Syndicate workspace driven by `data/syndicates.json`, with independent profile/nameplate/avatar presentation and independently editable feed pages.
+The current presentation release is **VigScope Terminal UI v1.5** in `runner.html`.
 
-The v1.4 UI promotion does **not** promote the underlying report engine or governance contract. `runner-core.html` / `index.html` remain report engine/core **v1.3**, and `BETTING_EDGE_CONTRACT.md` remains **v0.9 OPERATIONAL**. Odds refresh, scheduler behavior, durable history schemas, Research Library authority, status/stake semantics and report-generation rules are unchanged by this UI release.
+v1.5 is a consolidation boundary for the accumulated production presentation work now operating together, including the manifest-driven Syndicate workspace and independent hotline shells, the rebuilt F3 Bet History/public performance surface, the current Preferences/report-card presentation, and the private-ledger public-projection architecture. It does not imply a betting-engine rewrite.
 
-The current Syndicate presentation includes the modern `Muddy’s Number` feed, Larry Lombardo’s retro personal-site feed, Bill Weston’s private-sheet/fax presentation, and Jesse Bains’ Hotel Delphoria underground sporting sheet. Bill Weston is the Syndicate personality reserved for Walters-intelligence presentation; that presentation boundary does not change the underlying Betting Edge engine authority.
+The underlying `runner-core.html` / `index.html` report engine/core remains **v1.3**. The authoritative governance contract is **Betting Edge Contract v1.0 OPERATIONAL**. The production Research Library remains **v1.7 read-only**.
+
+These versions are intentionally independent:
+
+- **Terminal / product UI:** v1.5
+- **Report engine/core:** v1.3
+- **Governance contract:** v1.0
+- **Research Library:** v1.7
+- **Hotline shells:** independently versioned per character/publication
+
+## F3 Bet History and ledger boundary
+
+The public terminal does not use the raw private betting ledger as a browser-facing data source. The authoritative master ledger is held in the private repository and a Cloudflare Worker exposes the sanitized public `/api/bet-history` projection used by F3 and other approved public-facing views. A sanitized repository fallback may be used when necessary; private ticket/reference identifiers remain excluded.
+
+F3 is the public performance/history surface. Exact cash-accounting summary totals come from the sanctioned public projection summary, while public wager rows remain sanitized and must not be heuristically treated as an exact cash/free-bet classifier.
+
+## Syndicate presentation
+
+Syndicate slots are externally configured by `data/syndicates.json`. Character profiles, nameplates, avatars, hotline shells, live editions and archives remain independently maintainable. Shell versions are independent from the terminal UI version; promoting the terminal or governance contract does not renumber a character shell.
+
+Betting Edge report data remains authoritative wherever a character hotline presents current recommendations. Fictional character voice, setting, visuals and editorial framing are presentation only and may not alter issued status, price, fair value, play-to or risk.
 
 ## Production governance
 
-The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v0.9 OPERATIONAL**.
+The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v1.0 OPERATIONAL**.
 
-The production contract incorporates by fixed Git blob identity:
+Contract v1.0 is a controlled consolidation of the final operational v0.9 rule set. It preserves the inherited execution/pricing/risk baseline and the already-operational durable-history, exact-identity, fair-value-confidence, spread-lineage, PRICE WATCH and repository-controlled report-card rules. It does not introduce a new staking model, add books, increase the odds-refresh budget, alter the five report lanes or promote Research Library v1.8.
+
+The production contract continues to incorporate by fixed Git blob identity:
 
 - [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md) as the inherited execution/pricing/risk baseline;
 - [`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9.md) as the durable-history/provenance design delta;
 - [`BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md) as the player-prop identity delta.
 
-Those draft files are retained as historical design artifacts and are **not independently operational**. The live promotion/acceptance record is [`BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`](BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md).
+Those draft files remain historical design artifacts and are **not independently operational**. The v0.9 production acceptance record remains immutable historical evidence at [`BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`](BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md). The current promotion record is [`BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`](BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md).
 
-Every scheduled production report must resolve the production contract and current approved runner before handicapping. If authority cannot be resolved, the report must stop before analysis rather than silently falling back to a draft.
+Every scheduled production report must resolve the production contract and current approved runner before handicapping. If authority cannot be resolved, the report must stop before analysis rather than silently falling back to a draft or an older production version.
 
 ## Repository change safety policy
 
@@ -48,6 +70,6 @@ Direct edits to this repository use the following default safety process:
 7. When relevant, verify GitHub Pages or GitHub Actions completes successfully after the commit.
 8. If validation fails or behavior regresses, restore the exact previous Git version rather than manually reconstructing the file.
 
-Git history is the authoritative rollback system for all repository files. Named `.old` files may be retained where they provide a useful quick backup (for example `runner.html.old`), but they do not replace Git history. Obsolete duplicate workflow backups should not be retained merely for rollback when Git history already preserves the exact prior version.
+Git history is the authoritative rollback system for all repository files. Named `.old` files may be retained where they provide a useful quick backup, but they do not replace Git history. Obsolete duplicate workflow backups should not be retained merely for rollback when Git history already preserves the exact prior version.
 
-Higher-risk files — including the runner, odds-refresh workflows, scheduler logic, research governance, and production contract integration — receive stricter before/after comparison and validation before a change is treated as complete.
+Higher-risk files — including the runner, odds-refresh workflows, scheduler logic, research governance, production contract integration and private/public ledger boundary — receive stricter before/after comparison and validation before a change is treated as complete.

@@ -1,26 +1,27 @@
-# Betting Edge Governance & Report-Generation Contract — v0.9
+# Betting Edge Governance & Report-Generation Contract — v1.0
 
 **Document status:** OPERATIONAL — AUTHORITATIVE PRODUCTION CONTRACT  
-**Contract version:** 0.9  
-**Activated:** 2026-08-15  
-**Clarified:** 2026-08-21 — report-card target profile; no change to contract version, staking, risk, freshness or execution gates  
+**Contract version:** 1.0  
+**Activated:** 2026-08-22  
+**Promotion basis:** consolidation of the final operational v0.9 rule set; no new staking, risk, freshness, execution-book or odds-budget gate is introduced by this promotion  
+**Supersedes production contract:** v0.9 final blob `59d8dda8d8e491255d5792329a9446eb01960a34`  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Authoritative branch:** `main`  
 **Production filename:** `BETTING_EDGE_CONTRACT.md`  
-**Validated runner family:** VigScope outer runner v1.4 / Betting Edge core runner v1.3  
-**Live acceptance:** `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`
+**Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.3  
+**Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`
 
 > **THIS FILE IS OPERATIONAL.**
 >
-> Every production Betting Edge scheduled report must resolve this file from the authoritative repository/branch before handicapping, verify that it declares version `0.9` and `OPERATIONAL`, resolve the current approved runner, and obey this contract as governing authority. If production-contract or runner authority cannot be resolved, stop before analysis and surface `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
+> Every production Betting Edge scheduled report must resolve this file from the authoritative repository/branch before handicapping, verify that it declares version `1.0` and `OPERATIONAL`, resolve the current approved runner, and obey this contract as governing authority. If production-contract or runner authority cannot be resolved, stop before analysis and surface `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
 
 ---
 
 # 1. Contract composition and precedence
 
-v0.9 is the production composition of the validated v0.8 execution baseline, the v0.9 durable-history/provenance delta, and the v0.9 player-prop identity delta.
+v1.0 is the deliberate production consolidation of the final operational v0.9 contract. It preserves the validated v0.8 execution baseline, the v0.9 durable-history/provenance delta, the v0.9 player-prop identity delta, and the production clarifications already operating before this promotion, including fair-value benchmark confidence labeling, spread-lineage reconciliation, PRICE WATCH informational metadata and the repository-controlled report-card target.
 
-The following exact historical design artifacts are incorporated into this production contract by reference:
+The following exact historical design artifacts remain incorporated into this production contract by reference:
 
 1. `BETTING_EDGE_CONTRACT_DRAFT_v0.8.md` — Git blob `7c4780aba635a6f8d1ccc38e45e8a780b94ae1e4` — inherited execution, pricing, risk, payload, Research Library and report-generation baseline.
 2. `BETTING_EDGE_CONTRACT_DRAFT_v0.9.md` — Git blob `0e2eacb9e8209c9d99113381a5e11258f20f664e` — durable issued-report history, provenance, short-link delivery, H-track and same-day lineage delta.
@@ -37,11 +38,11 @@ Conflict precedence is:
 
 Draft-status language such as `DRAFT`, `NOT YET OPERATIONAL`, proposed/future activation wording, or activation holds in the incorporated artifacts is superseded by this file and is not imported as an operational restriction.
 
-The v0.9 draft statement that runner payload shape is wholly unchanged is clarified as follows:
+The v0.9 draft statement that runner payload shape is wholly unchanged remains clarified as follows:
 
 > Core visible recommendation fields and runner behavior remain compatible; player-specific props may additionally carry the existing runner-supported `rec.feed` structured identity object required for exact issuance, durable-history integrity and exact repricing.
 
-No other inherited v0.8 rule is weakened by activation.
+No inherited v0.8 or final-v0.9 execution safeguard is weakened by the v1.0 promotion.
 
 ---
 
@@ -74,7 +75,7 @@ When evidence or layers conflict, inherited precedence remains:
 Every scheduled lane must perform this sequence before analysis:
 
 1. resolve `BETTING_EDGE_CONTRACT.md` from `fhvsvzpmkw-design/-betting-edge-terminal` branch `main`;
-2. verify `Document status` is operational and `Contract version` is `0.9`;
+2. verify `Document status` is operational and `Contract version` is `1.0`;
 3. retain the exact production-contract Git blob SHA for durable provenance;
 4. resolve the current approved `runner.html` in the same repository context and verify the expected production runner family/version;
 5. only then read and validate the live odds feed and begin handicapping.
@@ -138,7 +139,7 @@ Standard production report lanes remain:
 - `15:15 EVENING` — slot `evening`;
 - `18:15 LATE / WEST COAST` — slot `late`.
 
-The report schedule itself is unchanged by v0.9. The odds-refresh workflow remains operationally separate from this contract promotion. v0.9 does not increase Odds-API request volume or alter the production refresh budget merely because history and player-prop identity are now governed here.
+The report schedule itself is unchanged by v1.0. The odds-refresh workflow remains operationally separate from this contract promotion. v1.0 does not increase Odds-API request volume or alter the production refresh budget.
 
 ## 5.1 Repository-controlled recommendation-card target
 
@@ -265,7 +266,7 @@ Visible `rec.hist` remains concise. Structured research/provenance belongs in th
 
 # 8. Invariants 9-22 — durable history and delivery are operational
 
-The v0.9 durable-history/provenance invariants are now production requirements.
+The durable-history/provenance invariants promoted under v0.9 remain production requirements under v1.0.
 
 ## 8.1 Issued report immutability
 
@@ -390,7 +391,7 @@ Post-cutover sidecars use the current `data/history/report-provenance-schema.jso
 
 Required production-contract provenance includes:
 
-- `productionContractVersion: "0.9"`;
+- `productionContractVersion: "1.0"`;
 - `productionContractOperational: true`;
 - `productionContractPath: "BETTING_EDGE_CONTRACT.md"`;
 - exact `productionContractBlobSha` fetched for that report;
@@ -401,7 +402,7 @@ Required production-contract provenance includes:
 - Research manifest blob SHA;
 - active R2 validation blob SHA.
 
-Historical schema-2 sidecars issued before cutover remain valid historical evidence and must not be rewritten merely to adopt schema 3.
+Historical schema-2 sidecars issued before the v0.9 cutover remain valid historical evidence and must not be rewritten merely to adopt schema 3. Schema-3 sidecars issued under contract v0.9 likewise remain immutable valid historical evidence; new sidecars after this promotion record contract v1.0.
 
 Draft files may still be recorded as historical design provenance, but they are not production authority after this cutover.
 
@@ -429,14 +430,14 @@ History/share work may not create, change or suppress a betting decision that ha
 
 # 12. Activation tracks
 
-At production activation:
+At v1.0 production activation:
 
-- **C-track: C1 — v0.9 OPERATIONAL.** `BETTING_EDGE_CONTRACT.md` is authoritative production governance.
-- **R-track: R3 — LIVE READ-ONLY HISTORY FIT.** The Evening/Late acceptance pair validated live sidecar behavior; all five scheduled lanes are cut over to production authority.
-- **H-track: H3 — LIVE ISSUED-REPORT / PROVENANCE HISTORY.** The Evening/Late pair validated archive + sidecar + index + same-day lineage/navigation behavior. Full five-lane day coverage remains an operational observation to verify, not a prerequisite to v0.9 authority.
-- **S-track: S0 — INACTIVE.** Shadow History remains separate and is not activated by v0.9.
+- **C-track: C2 — v1.0 OPERATIONAL.** `BETTING_EDGE_CONTRACT.md` is authoritative production governance. C2 represents a controlled consolidation of the final v0.9 operating rule set, not a new betting methodology.
+- **R-track: R3 — LIVE READ-ONLY HISTORY FIT.** Production Research Library remains v1.7 and read-only; this contract promotion does not promote the staged v1.8 candidate.
+- **H-track: H3 — LIVE ISSUED-REPORT / PROVENANCE HISTORY.** Existing archive + sidecar + index + same-day lineage/navigation behavior remains operational.
+- **S-track: S0 — INACTIVE.** Shadow History remains separate and is not activated by v1.0.
 
-The first post-cutover scheduled lane must be checked for production-contract preflight plus normal report/history/share behavior. That check is post-activation verification, not permission to silently change the contract.
+The first post-v1.0 scheduled lane must be checked for production-contract preflight plus normal report/history/share behavior. That check is post-activation verification, not permission to silently change the contract. The 2026-08-22 18:15 issuance remains immutable v0.9 historical evidence and is not relabeled by this promotion.
 
 ---
 
@@ -450,9 +451,11 @@ The following artifacts remain historical and must not be deleted as part of pro
 - `BETTING_EDGE_V0.9_PREFLIGHT_2026-08-15.md`;
 - `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
 
+The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`, including the exact rollback boundary and equivalence statement.
+
 Git history is the authoritative rollback system. Existing issued reports and sidecars are append-only historical evidence.
 
-Do not bundle unrelated UI development, richer lower History-box work, Shadow History activation, new staking methodology, new books, or odds-refresh budget changes into this contract activation.
+Do not bundle unrelated UI feature development, Shadow History activation, new staking methodology, new books, Research Library promotion, or odds-refresh budget changes into this contract activation. The associated v1.5 runner change is a version-boundary declaration for already-deployed presentation work; it does not change the v1.3 report engine/core.
 
 Any future contract version requires explicit change control, regression/equivalence review and deliberate production promotion.
 
@@ -460,6 +463,6 @@ Any future contract version requires explicit change control, regression/equival
 
 # 14. Production declaration
 
-Betting Edge governance version **0.9 is operational** on the authoritative `main` branch.
+Betting Edge governance version **1.0 is operational** on the authoritative `main` branch.
 
-The production system now treats durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, production provenance, and exact player-prop identity as first-class governed behavior while preserving the inherited v0.8 pricing, freshness, fair-value, staking, risk and payload safeguards.
+This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH and the repository-controlled report-card target remain governed behavior.
