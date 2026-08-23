@@ -184,7 +184,7 @@
       if(d.getElementById(INTEL_SCRIPT_ID))return true;
       const script=d.createElement('script');
       script.id=INTEL_SCRIPT_ID;
-      script.src='./assets/game-window-intelligence.js?v=4';
+      script.src='./assets/game-window-intelligence.js?v=5';
       script.async=false;
       d.head.appendChild(script);
       return true
