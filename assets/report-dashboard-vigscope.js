@@ -33,14 +33,14 @@
   // Keep the full known-good VigScope implementation in the adjacent rollback
   // file, then apply these small presentation/intelligence overlays on top.
   const legacy=document.createElement('script');
-  legacy.src='./assets/report-dashboard-vigscope.js.old';
+  legacy.src=`./assets/report-dashboard-vigscope.js.old?b=${UI_CACHE_BUST}`;
   legacy.async=false;
   document.head.appendChild(legacy);
 
   // The schedule module owns the detailed schedule/history/VigScope display.
   const schedule=document.createElement('script');
   schedule.id='scheduleProfileUiLoader';
-  schedule.src='./assets/schedule-profile-ui.js?v=3';
+  schedule.src=`./assets/schedule-profile-ui.js?v=3&b=${UI_CACHE_BUST}`;
   schedule.async=false;
   document.head.appendChild(schedule);
 
@@ -48,7 +48,7 @@
   // UI controls above the detailed schedule module.
   const preferences=document.createElement('script');
   preferences.id='preferencesFrameworkLoader';
-  preferences.src='./assets/preferences-framework.js?v=3';
+  preferences.src=`./assets/preferences-framework.js?v=3&b=${UI_CACHE_BUST}`;
   preferences.async=false;
   document.head.appendChild(preferences);
 
@@ -56,7 +56,7 @@
   // Each card view is loaded from its own isolated stylesheet.
   const cardView=document.createElement('script');
   cardView.id='cardViewPreferenceLoader';
-  cardView.src='./assets/card-view-preference.js?v=3';
+  cardView.src=`./assets/card-view-preference.js?v=3&b=${UI_CACHE_BUST}`;
   cardView.async=false;
   document.head.appendChild(cardView);
 
@@ -106,7 +106,7 @@
   // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Results.
   const specialDesks=document.createElement('script');
   specialDesks.id='specialDesksUiLoader';
-  specialDesks.src='./assets/special-desks-ui.js?v=4';
+  specialDesks.src=`./assets/special-desks-ui.js?v=4&b=${UI_CACHE_BUST}`;
   specialDesks.async=false;
   document.head.appendChild(specialDesks);
 
@@ -114,7 +114,7 @@
   // the permanent lowest navigation selection.
   const seasonPreviews=document.createElement('script');
   seasonPreviews.id='seasonPreviewsUiLoader';
-  seasonPreviews.src='./assets/season-previews-ui.js?v=6';
+  seasonPreviews.src=`./assets/season-previews-ui.js?v=6&b=${UI_CACHE_BUST}`;
   seasonPreviews.async=false;
   document.head.appendChild(seasonPreviews);
 
@@ -184,7 +184,7 @@
       if(d.getElementById(INTEL_SCRIPT_ID))return true;
       const script=d.createElement('script');
       script.id=INTEL_SCRIPT_ID;
-      script.src='./assets/game-window-intelligence.js?v=5';
+      script.src=`./assets/game-window-intelligence.js?v=5&b=${UI_CACHE_BUST}`;
       script.async=false;
       d.head.appendChild(script);
       return true

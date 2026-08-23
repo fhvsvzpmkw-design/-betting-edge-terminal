@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="vigscope-ui-version" content="1.5">
 <title>VigScope Terminal UI v1.5 Runner</title>
 <style>
@@ -110,8 +113,10 @@ function applyHierarchyPatch(){
   const headerRiskValue=bankroll&&bankroll.querySelector('.runnerNewRiskValue'),nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';if(headerRiskValue&&headerRiskValue.textContent!==nextRisk)headerRiskValue.textContent=nextRisk;d.querySelectorAll('.runnerRiskMini').forEach(x=>x.remove());return true
 }
 function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true,characterData:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
-art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});core.src='./runner-core.html'+location.search+location.hash;startWhenVisible();
+art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});const coreUrl=new URL('./runner-core.html',location.href);for(const [k,v] of new URLSearchParams(location.search))coreUrl.searchParams.set(k,v);coreUrl.searchParams.set('build',String(Date.now()));coreUrl.hash=location.hash;core.src=coreUrl.pathname+coreUrl.search+coreUrl.hash;startWhenVisible();
 </script>
-<script src="./assets/report-dashboard-vigscope.js?v=20260823-1130"></script>
+<script>
+(()=>{const s=document.createElement('script');s.src=`./assets/report-dashboard-vigscope.js?build=${Date.now()}`;s.async=false;document.head.appendChild(s)})();
+</script>
 </body>
 </html>
