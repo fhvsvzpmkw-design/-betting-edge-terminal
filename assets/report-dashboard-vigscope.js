@@ -58,16 +58,25 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
-  // VigScope, Market, Bet History and Engine share the menu-first/full-page
-  // navigation shell. Engine is intentionally F8; F4-F7 belong to the desks.
+  // VigScope, Market, Bet History and Results share the menu-first/full-page
+  // navigation shell. Results reuses the internal engine route at F8 so the
+  // public navigation contract does not need a disruptive route migration.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
   primaryNav.src='./assets/primary-nav-shell.js?v=8';
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
+  // F8 Results replaces the old visible Engine panel while keeping the route
+  // hook stable. It is read-only and consumes the rebuildable results index.
+  const resultsDesk=document.createElement('script');
+  resultsDesk.id='resultsDeskUiLoader';
+  resultsDesk.src='./assets/results-desk-ui.js?v=1';
+  resultsDesk.async=false;
+  document.head.appendChild(resultsDesk);
+
   // Install Pizza and Crypto navigation before Meat Desk binds F7. The final
-  // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Engine.
+  // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Results.
   const specialDesks=document.createElement('script');
   specialDesks.id='specialDesksUiLoader';
   specialDesks.src='./assets/special-desks-ui.js?v=4';
