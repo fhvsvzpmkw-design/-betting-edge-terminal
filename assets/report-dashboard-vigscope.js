@@ -1,6 +1,8 @@
 (()=>{
   'use strict';
 
+  const UI_CACHE_BUST=Date.now();
+
   // Apply the saved meter-presentation preference before the known-good
   // VigScope renderer boots so its existing query-parameter switch remains
   // the single rendering path.
@@ -63,7 +65,7 @@
   // public navigation contract does not need a disruptive route migration.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src='./assets/primary-nav-shell.js?v=8';
+  primaryNav.src=`./assets/primary-nav-shell.js?v=8&b=${UI_CACHE_BUST}`;
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
@@ -71,7 +73,7 @@
   // hook stable. It is read-only and consumes the rebuildable results index.
   const resultsDesk=document.createElement('script');
   resultsDesk.id='resultsDeskUiLoader';
-  resultsDesk.src='./assets/results-desk-ui.js?v=2';
+  resultsDesk.src=`./assets/results-desk-ui.js?v=2&b=${UI_CACHE_BUST}`;
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
@@ -79,7 +81,7 @@
   // performance only; non-BET decisions and flat-card calibration stay separate.
   const resultsPlayerScale=document.createElement('script');
   resultsPlayerScale.id='resultsPlayerScaleLoader';
-  resultsPlayerScale.src='./assets/results-player-scale.js?v=3';
+  resultsPlayerScale.src=`./assets/results-player-scale.js?v=3&b=${UI_CACHE_BUST}`;
   resultsPlayerScale.async=false;
   document.head.appendChild(resultsPlayerScale);
 
