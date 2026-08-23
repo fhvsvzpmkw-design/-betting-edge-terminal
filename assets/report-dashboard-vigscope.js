@@ -75,6 +75,14 @@
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
+  // Player-value overlay keeps the flat-card calibration intact but makes the
+  // headline cash view stake-aware and standardized to a full-unit player scale.
+  const resultsPlayerScale=document.createElement('script');
+  resultsPlayerScale.id='resultsPlayerScaleLoader';
+  resultsPlayerScale.src='./assets/results-player-scale.js?v=1';
+  resultsPlayerScale.async=false;
+  document.head.appendChild(resultsPlayerScale);
+
   // The legacy inner page can finish its one-time Engine health request after
   // Results has already replaced that panel. Keep two invisible anchors alive
   // for a few seconds so the old callback cannot throw on missing nodes.
