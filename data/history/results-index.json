@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "betting-edge-results-index",
-  "generatedAt": "2026-08-23T17:20:58.411Z",
+  "generatedAt": "2026-08-23T17:52:48.205Z",
   "authority": {
     "runs": "data/history/runs/**",
     "observations": "data/history/observations/**",
@@ -11925,32 +11925,94 @@
     }
   ],
   "playerValueAnalytics": {
-    "methodology": "issued BET stake preserved; standardized full-unit scale uses 3% of report bankroll as the reference 1.00u amount, then replays each completed exact-priced BET at its issued stake fraction",
-    "unitBasePct": 3,
+    "methodology": "actual issued BET stake is divided by 3% of that report bankroll to preserve the issued stake fraction, then replayed with a standardized $100 full unit",
+    "referenceUnitBasePct": 3,
+    "standardizedFullUnitCad": 100,
     "issuedBets": 0,
     "settledBets": 0,
     "pricedBets": 0,
     "riskUnits": 0,
     "netUnits": 0,
     "roiPct": null,
-    "playerScale": [
+    "riskCad": 0,
+    "cashValueCad": 0,
+    "note": "$100 defines the standardized full-unit reference only. Each actual BET keeps its issued Betting Edge stake fraction; non-BET statuses never contribute to realized player P/L."
+  },
+  "decisionValueAnalytics": {
+    "methodology": "one final issued non-BET decision per unique selectionKey; repeated report-lane appearances are deduplicated. Counterfactual shadow review uses a flat $100 full-unit risk at the final exact issued price. It is not actual betting P/L.",
+    "standardizedFullUnitCad": 100,
+    "uniqueFinalDecisions": 83,
+    "pricedFinalDecisions": 70,
+    "shadowNetUnits": 1.353,
+    "shadowRoiPct": 1.93,
+    "lossAvoidedUnits": 34,
+    "opportunityMissedUnits": 35.353,
+    "netDecisionUnits": -1.353,
+    "lossAvoidedCad": 3400,
+    "opportunityMissedCad": 3535.3,
+    "netDecisionCad": -135.3,
+    "byStatus": [
       {
-        "fullUnitCad": 100,
-        "cashValueCad": null
+        "status": "LEAN",
+        "decisions": 0,
+        "priced": 0,
+        "grades": {
+          "WIN": 0,
+          "LOSS": 0,
+          "PUSH": 0,
+          "VOID": 0,
+          "HALF_WIN": 0,
+          "HALF_LOSS": 0
+        },
+        "shadowNetUnits": 0,
+        "shadowRoiPct": null,
+        "lossAvoidedUnits": 0,
+        "opportunityMissedUnits": 0,
+        "decisionValueUnits": 0,
+        "shadowCashCad": null,
+        "decisionValueCad": null
       },
       {
-        "fullUnitCad": 250,
-        "cashValueCad": null
+        "status": "WAIT",
+        "decisions": 14,
+        "priced": 12,
+        "grades": {
+          "WIN": 5,
+          "LOSS": 7,
+          "PUSH": 0,
+          "VOID": 0,
+          "HALF_WIN": 0,
+          "HALF_LOSS": 0
+        },
+        "shadowNetUnits": -2.37,
+        "shadowRoiPct": -19.75,
+        "lossAvoidedUnits": 6,
+        "opportunityMissedUnits": 3.63,
+        "decisionValueUnits": 2.37,
+        "shadowCashCad": -237,
+        "decisionValueCad": 237
       },
       {
-        "fullUnitCad": 500,
-        "cashValueCad": null
-      },
-      {
-        "fullUnitCad": 1000,
-        "cashValueCad": null
+        "status": "PASS",
+        "decisions": 69,
+        "priced": 58,
+        "grades": {
+          "WIN": 29,
+          "LOSS": 29,
+          "PUSH": 0,
+          "VOID": 0,
+          "HALF_WIN": 0,
+          "HALF_LOSS": 0
+        },
+        "shadowNetUnits": 3.723,
+        "shadowRoiPct": 6.42,
+        "lossAvoidedUnits": 28,
+        "opportunityMissedUnits": 31.723,
+        "decisionValueUnits": -3.723,
+        "shadowCashCad": 372.3,
+        "decisionValueCad": -372.3
       }
     ],
-    "note": "$100 player means 1.00u = $100. VigScope fractional/full stake sizing is preserved; it does not make every wager $100. Flat-card calibration remains separate in priceAnalytics."
+    "note": "Positive decision value means losses avoided exceeded profitable opportunities passed up. Negative decision value means the final non-BET filters left more profitable shadow value on the table than they protected."
   }
 }
