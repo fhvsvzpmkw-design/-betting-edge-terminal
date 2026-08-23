@@ -1,0 +1,30 @@
+name: Restore Larry Original GIF Layer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/restore-larry-original-gifs.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore original Lizard Line animated layer
+        run: node tools/restore-larry-original-gifs.mjs
+      - name: Validate Larry animated layer
+        run: node tests/larry-animated-layer.test.mjs
+      - name: Commit Hotline repair and clean runner
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f tools/restore-larry-original-gifs.mjs .github/workflows/restore-larry-original-gifs.yml
+          git add -A
+          git commit -m "Restore Larry original animated GIF layer"
+          git push
