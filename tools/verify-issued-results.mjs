@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const GRADES = new Set(['WIN', 'LOSS', 'PUSH', 'VOID']);
+const GRADES = new Set(['WIN', 'LOSS', 'PUSH', 'VOID', 'HALF_WIN', 'HALF_LOSS']);
+const EPSILON = 1e-9;
 
 function fail(message) {
   console.error(`verify-issued-results: ${message}`);
@@ -51,6 +52,10 @@ function normalizeMarket(value) {
   return String(value || '').trim().toLowerCase();
 }
 
+function normalizeSide(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 function parseLine(rec) {
   const direct = rec?.feed?.hdp ?? rec?.feed?.line;
   if (Number.isFinite(Number(direct))) return Number(direct);
@@ -62,13 +67,74 @@ function parseLine(rec) {
 function selectedSpreadLine(rec) {
   const rawLine = parseLine(rec);
   if (!Number.isFinite(rawLine)) return null;
-  const side = String(rec?.feed?.side || '').trim().toLowerCase();
+  const side = normalizeSide(rec?.feed?.side);
 
   // Odds-API.io spread rows express hdp from the HOME side's perspective.
   // The same raw hdp identifies both home and away prices in the market row.
   // Therefore an away selection carries the opposite signed handicap.
   if (side === 'away') return -rawLine;
   if (side === 'home') return rawLine;
+  return null;
+}
+
+function selectedLineForAnalytics(rec) {
+  const market = normalizeMarket(rec?.feed?.marketKey || rec?.feed?.market);
+  if (market === 'ml' || market === 'moneyline') return null;
+  if (market === 'spread') return selectedSpreadLine(rec);
+  return parseLine(rec);
+}
+
+function normalizedIssued(rec, issued) {
+  return {
+    priceAmerican: rec?.price || null,
+    priceDecimal: null,
+    feedGeneratedAt: issued?.feedGeneratedAt || null,
+    analysisPriceState: 'unavailable',
+    analysisPriceReason: 'exact_issued_snapshot_not_resolved',
+    analysisPriceAmerican: null,
+    analysisPriceDecimal: null,
+    analysisBook: null,
+    analysisBookKey: null,
+    analysisQuoteUpdatedAt: null,
+    analysisSnapshotBlobSha: null,
+    marketKey: normalizeMarket(rec?.feed?.marketKey || rec?.feed?.market) || null,
+    side: normalizeSide(rec?.feed?.side) || null,
+    selectedLine: selectedLineForAnalytics(rec)
+  };
+}
+
+function isQuarterLine(line) {
+  if (!Number.isFinite(line)) return false;
+  const quarterUnits = line * 4;
+  if (Math.abs(quarterUnits - Math.round(quarterUnits)) > EPSILON) return false;
+  return Math.abs(Math.round(quarterUnits)) % 2 === 1;
+}
+
+function splitQuarterLine(line) {
+  const lower = Math.floor((line * 2) + EPSILON) / 2;
+  return [lower, lower + 0.5];
+}
+
+function aggregateSplitGrades(components) {
+  const grades = components.map((component) => component.grade);
+  if (grades.every((grade) => grade === 'WIN')) return 'WIN';
+  if (grades.every((grade) => grade === 'LOSS')) return 'LOSS';
+  if (grades.every((grade) => grade === 'PUSH')) return 'PUSH';
+  if (grades.includes('WIN') && grades.includes('PUSH') && !grades.includes('LOSS')) return 'HALF_WIN';
+  if (grades.includes('LOSS') && grades.includes('PUSH') && !grades.includes('WIN')) return 'HALF_LOSS';
+  return null;
+}
+
+function gradeSpreadComponent(selected, opponent, line) {
+  const margin = selected + line - opponent;
+  if (Math.abs(margin) < EPSILON) return 'PUSH';
+  return margin > 0 ? 'WIN' : 'LOSS';
+}
+
+function gradeTotalComponent(total, side, line) {
+  if (Math.abs(total - line) < EPSILON) return 'PUSH';
+  if (side === 'over') return total > line ? 'WIN' : 'LOSS';
+  if (side === 'under') return total < line ? 'WIN' : 'LOSS';
   return null;
 }
 
@@ -80,7 +146,7 @@ function gradeFromScore(rec, event) {
   }
 
   const market = normalizeMarket(rec?.feed?.marketKey || rec?.feed?.market);
-  const side = String(rec?.feed?.side || '').trim().toLowerCase();
+  const side = normalizeSide(rec?.feed?.side);
 
   if (market === 'ml' || market === 'moneyline') {
     if (!['home', 'away', 'draw'].includes(side)) return { grade: null, reason: 'unsupported_moneyline_side' };
@@ -96,9 +162,20 @@ function gradeFromScore(rec, event) {
     if (!Number.isFinite(line)) return { grade: null, reason: 'spread_line_missing' };
     const selected = side === 'home' ? home : away;
     const opponent = side === 'home' ? away : home;
-    const margin = selected + line - opponent;
-    if (Math.abs(margin) < 1e-9) return { grade: 'PUSH', method: 'final_score', line };
-    return { grade: margin > 0 ? 'WIN' : 'LOSS', method: 'final_score', line };
+
+    if (isQuarterLine(line)) {
+      const components = splitQuarterLine(line).map((componentLine) => ({
+        line: componentLine,
+        stakeFraction: 0.5,
+        grade: gradeSpreadComponent(selected, opponent, componentLine)
+      }));
+      const grade = aggregateSplitGrades(components);
+      if (!grade) return { grade: null, reason: 'quarter_line_components_conflict' };
+      return { grade, method: 'final_score_asian_handicap', line, components };
+    }
+
+    const grade = gradeSpreadComponent(selected, opponent, line);
+    return { grade, method: 'final_score', line };
   }
 
   if (market === 'totals' || market === 'total') {
@@ -106,9 +183,20 @@ function gradeFromScore(rec, event) {
     const line = parseLine(rec);
     if (!Number.isFinite(line)) return { grade: null, reason: 'total_line_missing' };
     const total = home + away;
-    if (Math.abs(total - line) < 1e-9) return { grade: 'PUSH', method: 'final_score', line };
-    if (side === 'over') return { grade: total > line ? 'WIN' : 'LOSS', method: 'final_score', line };
-    return { grade: total < line ? 'WIN' : 'LOSS', method: 'final_score', line };
+
+    if (isQuarterLine(line)) {
+      const components = splitQuarterLine(line).map((componentLine) => ({
+        line: componentLine,
+        stakeFraction: 0.5,
+        grade: gradeTotalComponent(total, side, componentLine)
+      }));
+      const grade = aggregateSplitGrades(components);
+      if (!grade) return { grade: null, reason: 'quarter_line_components_conflict' };
+      return { grade, method: 'final_score_asian_total', line, components, observedValue: total };
+    }
+
+    const grade = gradeTotalComponent(total, side, line);
+    return { grade, method: 'final_score', line, observedValue: total };
   }
 
   return { grade: null, reason: 'market_requires_exact_selection_verification' };
@@ -125,7 +213,8 @@ function exactSelectionGrade(rec, event) {
     grade,
     method: 'exact_selection_verification',
     basis: match.basis || null,
-    observedValue: match.observedValue ?? null
+    observedValue: match.observedValue ?? null,
+    components: Array.isArray(match.components) ? match.components : null
   };
 }
 
@@ -179,7 +268,9 @@ function skeleton(issued, sourcePath) {
     resultMethod: {
       lifecycle: 'ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE',
       scoreMarkets: ['ml', 'spread', 'totals'],
+      grades: ['WIN', 'LOSS', 'PUSH', 'VOID', 'HALF_WIN', 'HALF_LOSS'],
       spreadHdpSemantics: 'raw hdp is the home-side handicap; away selected handicap is the opposite sign',
+      quarterLineSemantics: 'quarter lines split into two equal half-stakes on the adjacent half-goal/half-point lines',
       unsupportedMarkets: 'remain unresolved unless exact selection verification is supplied',
       officialOnlyWhenStatus: 'BET',
       issuedReportMutable: false
@@ -190,10 +281,7 @@ function skeleton(issued, sourcePath) {
       book: rec.book || null,
       selectionKey: rec?.feed?.selectionKey || null,
       commenceTime: rec?.feed?.eventDate || null,
-      issued: {
-        priceAmerican: rec.price || null,
-        feedGeneratedAt: issued.feedGeneratedAt || null
-      },
+      issued: normalizedIssued(rec, issued),
       observation: { state: 'unavailable', reason: 'price_not_backfilled' },
       completion: { state: 'unresolved' }
     }))
@@ -213,7 +301,9 @@ let result = fs.existsSync(outputPath) ? readJson(outputPath) : skeleton(issued,
 result.kind = 'issued-card-observations';
 result.resultMethod = {
   ...(result.resultMethod || skeleton(issued, sourcePath).resultMethod),
-  spreadHdpSemantics: 'raw hdp is the home-side handicap; away selected handicap is the opposite sign'
+  grades: ['WIN', 'LOSS', 'PUSH', 'VOID', 'HALF_WIN', 'HALF_LOSS'],
+  spreadHdpSemantics: 'raw hdp is the home-side handicap; away selected handicap is the opposite sign',
+  quarterLineSemantics: 'quarter lines split into two equal half-stakes on the adjacent half-goal/half-point lines'
 };
 
 const verifiedAt = verification.verifiedAt || new Date().toISOString();
@@ -226,10 +316,20 @@ let completed = 0;
 let unresolved = 0;
 
 result.recommendations = (issued.recs || []).map((rec, index) => {
-  const existing = result.recommendations?.[index] || skeleton(issued, sourcePath).recommendations[index];
-  if (existing?.completion?.state === 'complete') {
+  const baseSkeleton = skeleton(issued, sourcePath).recommendations[index];
+  const existing = result.recommendations?.[index] || baseSkeleton;
+  const mergedExisting = {
+    ...baseSkeleton,
+    ...existing,
+    issued: {
+      ...baseSkeleton.issued,
+      ...(existing?.issued || {})
+    }
+  };
+
+  if (mergedExisting?.completion?.state === 'complete') {
     completed += 1;
-    return existing;
+    return mergedExisting;
   }
 
   const eventId = String(rec?.feed?.eventId || '');
@@ -238,16 +338,16 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
     unresolved += 1;
     if (deferredEventIds.has(eventId)) {
       return {
-        ...existing,
-        completion: unresolvedCompletion(existing?.completion, 'verification_deferred_event_cap', verifiedAt, false)
+        ...mergedExisting,
+        completion: unresolvedCompletion(mergedExisting?.completion, 'verification_deferred_event_cap', verifiedAt, false)
       };
     }
     if (hasAttemptedEventList && !attemptedEventIds.has(eventId)) {
-      return existing;
+      return mergedExisting;
     }
     return {
-      ...existing,
-      completion: unresolvedCompletion(existing?.completion, 'result_not_verified', verifiedAt, true)
+      ...mergedExisting,
+      completion: unresolvedCompletion(mergedExisting?.completion, 'result_not_verified', verifiedAt, true)
     };
   }
 
@@ -256,16 +356,16 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
   if (explicitReason && ['unresolved', 'ambiguous', 'conflict', 'unknown'].includes(status)) {
     unresolved += 1;
     return {
-      ...existing,
-      completion: unresolvedCompletion(existing?.completion, explicitReason, verifiedAt, true)
+      ...mergedExisting,
+      completion: unresolvedCompletion(mergedExisting?.completion, explicitReason, verifiedAt, true)
     };
   }
 
   if (!['final', 'settled', 'complete', 'completed'].includes(status)) {
     unresolved += 1;
     return {
-      ...existing,
-      completion: unresolvedCompletion(existing?.completion, explicitReason || 'event_not_final', verifiedAt, true)
+      ...mergedExisting,
+      completion: unresolvedCompletion(mergedExisting?.completion, explicitReason || 'event_not_final', verifiedAt, true)
     };
   }
 
@@ -274,17 +374,17 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
   if (!graded.grade) {
     unresolved += 1;
     return {
-      ...existing,
-      completion: unresolvedCompletion(existing?.completion, graded.reason, verifiedAt, true)
+      ...mergedExisting,
+      completion: unresolvedCompletion(mergedExisting?.completion, graded.reason, verifiedAt, true)
     };
   }
 
   const official = String(rec.status || '').toUpperCase() === 'BET';
   const source = event.source || globalSource;
-  const audit = completedAudit(existing?.completion, verifiedAt);
+  const audit = completedAudit(mergedExisting?.completion, verifiedAt);
   completed += 1;
   return {
-    ...existing,
+    ...mergedExisting,
     completion: {
       state: 'complete',
       verificationState: 'verified',
@@ -303,6 +403,7 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
       line: graded.line ?? null,
       basis: graded.basis ?? null,
       observedValue: graded.observedValue ?? null,
+      settlementComponents: graded.components ?? null,
       source: source ? {
         name: source.name || null,
         url: source.url || null
