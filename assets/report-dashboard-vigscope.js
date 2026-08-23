@@ -71,7 +71,7 @@
   // hook stable. It is read-only and consumes the rebuildable results index.
   const resultsDesk=document.createElement('script');
   resultsDesk.id='resultsDeskUiLoader';
-  resultsDesk.src='./assets/results-desk-ui.js?v=1';
+  resultsDesk.src='./assets/results-desk-ui.js?v=2';
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
