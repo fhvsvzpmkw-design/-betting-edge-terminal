@@ -17,6 +17,7 @@ function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function signed(v,d=2){const n=Number(v);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(d)}`:'—'}
 function pct(v){const n=Number(v);return Number.isFinite(n)?`${n>0?'+':''}${n.toFixed(2)}%`:'—'}
 function cash(v){const n=Number(v);if(!Number.isFinite(n))return '—';const sign=n>0?'+':n<0?'-':'';return `${sign}$${Math.abs(n).toFixed(2)}`}
+function dollars(v){const n=Number(v);return Number.isFinite(n)?`$${n.toFixed(2)}`:'—'}
 function valueClass(v){const n=Number(v);return !Number.isFinite(n)?'neutral':n>0?'positive':n<0?'negative':'neutral'}
 
 function ensureStyle(d){
@@ -38,11 +39,12 @@ function ensureStyle(d){
     #engine.resultsDesk .playerMetric.cyan b{color:var(--results-accent)}
     #engine.resultsDesk .playerScaleBox,#engine.resultsDesk .calibrationBox{border:1px solid var(--rline);background:var(--rpanel);padding:11px;margin-top:9px}
     #engine.resultsDesk .playerScaleGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}
-    #engine.resultsDesk .playerScaleCard{border:1px solid #315268;background:#030a11;padding:12px;min-height:92px}
+    #engine.resultsDesk .playerScaleCard{border:1px solid #315268;background:#030a11;padding:12px;min-height:104px}
     #engine.resultsDesk .playerScaleCard.anchor{border-color:#4b8b3d;background:linear-gradient(180deg,#08170a,#030a07);box-shadow:inset 0 0 14px rgba(88,255,136,.035)}
     #engine.resultsDesk .playerScaleCard .key{color:#a7bcc7;font-size:8px}
     #engine.resultsDesk .playerScaleCard b{display:block;font-size:clamp(22px,3vw,34px);margin-top:8px;line-height:1}
     #engine.resultsDesk .playerScaleCard span{display:block;color:#98abb5;font-size:8px;margin-top:6px;line-height:1.35}
+    #engine.resultsDesk .playerScaleCard .stakeExample{color:#c1d0d7;margin-top:7px}
     #engine.resultsDesk .playerScaleExplainer{color:#a9bdc8;font-size:9px;line-height:1.45;margin-top:8px}
     #engine.resultsDesk .calibrationGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
     #engine.resultsDesk .calibrationMetric{border:1px solid #28465a;background:#030a11;padding:10px}
@@ -58,9 +60,12 @@ function ensureStyle(d){
 function scaleValue(analytics,unitCad){
   const rows=Array.isArray(analytics?.playerScale)?analytics.playerScale:[];
   const row=rows.find(x=>Number(x.fullUnitCad)===unitCad);
-  if(row&&Number.isFinite(Number(row.cashValueCad)))return Number(row.cashValueCad);
+  if(row&&row.cashValueCad!==null&&row.cashValueCad!==undefined&&Number.isFinite(Number(row.cashValueCad)))return Number(row.cashValueCad);
   const net=Number(analytics?.netUnits);
   return Number(analytics?.pricedBets)>0&&Number.isFinite(net)?net*unitCad:null;
+}
+function stakeExample(unit){
+  return `¼u ${dollars(unit*.25)} · ½u ${dollars(unit*.5)} · 1u ${dollars(unit)}`;
 }
 
 function apply(d,index){
@@ -78,7 +83,7 @@ function apply(d,index){
   const pa=index?.priceAnalytics||{};
   const priced=Number(a.pricedBets||0);
   const net=Number(a.netUnits);
-  const roi=Number(a.roiPct);
+  const roi=a.roiPct===null||a.roiPct===undefined?null:Number(a.roiPct);
   const hundred=scaleValue(a,100);
   const hasSample=priced>0&&Number.isFinite(hundred);
 
@@ -108,7 +113,7 @@ function apply(d,index){
   scale.innerHTML=`
     <div class="resultsSection">PLAYER SCALE // SAME VIGSCOPE SIZING, BIGGER FULL UNIT</div>
     <div class="playerScaleGrid">
-      ${[100,250,500,1000].map((unit,i)=>{const v=scaleValue(a,unit);return `<div class="playerScaleCard ${i===0?'anchor':''}"><div class="key">$${unit.toLocaleString('en-CA')} FULL UNIT</div><b class="${valueClass(v)}">${priced?esc(cash(v)):'—'}</b><span>1.00u = $${unit.toLocaleString('en-CA')} // FRACTIONAL STAKES SCALE WITH IT</span></div>`}).join('')}
+      ${[100,250,500,1000].map((unit,i)=>{const v=scaleValue(a,unit);return `<div class="playerScaleCard ${i===0?'anchor':''}"><div class="key">$${unit.toLocaleString('en-CA')} FULL UNIT</div><b class="${valueClass(v)}">${priced?esc(cash(v)):'—'}</b><span>RESULT VALUE AT THIS FULL-UNIT SIZE</span><span class="stakeExample">${esc(stakeExample(unit))}</span></div>`}).join('')}
     </div>
     <div class="playerScaleExplainer">A $250-unit player is 2.5× the $100-unit player, a $500-unit player is 5×, and a $1,000-unit player is 10×. The underlying VigScope stake fractions stay identical.</div>
   `;
@@ -139,10 +144,21 @@ async function loadIndex(){
   }catch(e){}
   loading=false;
 }
-
+function ensureObserver(d){
+  if(d.documentElement.dataset.resultsPlayerScaleObserver==='1')return;
+  d.documentElement.dataset.resultsPlayerScaleObserver='1';
+  let queued=false;
+  const obs=new MutationObserver(()=>{
+    if(!cached||queued)return;
+    queued=true;
+    requestAnimationFrame(()=>{queued=false;apply(d,cached)});
+  });
+  obs.observe(d.body,{childList:true,subtree:true});
+}
 function patch(){
   const d=appDoc();
   if(!d)return false;
+  ensureObserver(d);
   if(cached)apply(d,cached);
   return true;
 }
