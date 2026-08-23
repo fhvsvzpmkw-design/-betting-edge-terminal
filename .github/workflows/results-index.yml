@@ -8,6 +8,7 @@ on:
     paths:
       - "data/history/observations/**"
       - "tools/build-results-index.mjs"
+      - "tools/add-results-player-value.mjs"
       - ".github/workflows/results-index.yml"
 
 permissions:
@@ -33,6 +34,9 @@ jobs:
 
       - name: Build results index
         run: node tools/build-results-index.mjs
+
+      - name: Add stake-aware player value
+        run: node tools/add-results-player-value.mjs
 
       - name: Publish results index
         run: |
