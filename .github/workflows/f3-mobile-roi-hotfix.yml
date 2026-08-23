@@ -1,0 +1,45 @@
+name: F3 mobile ROI hotfix
+
+on:
+  push:
+    paths:
+      - ".github/workflows/f3-mobile-roi-hotfix.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Keep Cash Profit ROI inside iPhone card
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          text = path.read_text()
+          anchor = "#history .cashRoiInline b{color:var(--green);font-size:14px}\n"
+          patch = (
+              anchor
+              + "@media(max-width:560px){#history .cashProfitLine{display:block}"
+              + "#history .cashRoiInline{display:block;margin-top:4px;font-size:9px}"
+              + "#history .cashRoiInline b{font-size:12px}}\n"
+          )
+          if anchor not in text:
+              raise SystemExit("F3 Cash Profit ROI CSS anchor not found")
+          if "#history .cashRoiInline{display:block;margin-top:4px;font-size:9px}" in text:
+              raise SystemExit("F3 mobile ROI hotfix already present")
+          path.write_text(text.replace(anchor, patch, 1))
+          PY
+
+      - name: Commit hotfix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fix F3 cash ROI overflow on iPhone"
+          git push
