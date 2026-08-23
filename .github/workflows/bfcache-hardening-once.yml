@@ -1,0 +1,50 @@
+name: Safari bfcache hardening once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bfcache-hardening-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add Safari back-forward cache guard
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          guard = """window.addEventListener('pageshow',event=>{if(!event.persisted)return;const fresh=new URL(location.href);fresh.searchParams.set('_fresh',String(Date.now()));location.replace(fresh.pathname+fresh.search+fresh.hash)});"""
+
+          def insert_after(path, marker, label):
+              p=Path(path)
+              text=p.read_text()
+              if guard in text:
+                  print(f'{label}: already applied')
+                  return
+              if marker not in text:
+                  raise SystemExit(f'{label}: marker not found in {path}')
+              p.write_text(text.replace(marker, marker+'\n'+guard, 1))
+              print(f'{label}: applied')
+
+          insert_after('r.html', 'const splashStarted=Date.now();', 'live resolver bfcache guard')
+          insert_after('runner.html', 'let coreLoaded=false,timerDone=false,started=false,hierarchyObserver=null,hierarchyFrame=null;', 'runner bfcache guard')
+          PY
+      - name: Commit Safari bfcache hardening
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add r.html runner.html
+          if git diff --cached --quiet; then
+            echo "No bfcache changes needed."
+          else
+            git commit -m "Prevent stale VigScope Safari bfcache restores"
+            git push
+          fi
