@@ -1,0 +1,30 @@
+name: Lou Vega V2 Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/lou-vega-v2-once.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Vegas by the Slice v2
+        run: node tools/lou-vega-v2-once.mjs
+      - name: Validate Lou v2
+        run: |
+          node tests/lou-vega-v2.test.mjs
+          node tests/hotline-shells.test.js
+      - name: Commit Lou v2 and remove one-time runner
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f tools/lou-vega-v2-once.mjs .github/workflows/lou-vega-v2-once.yml
+          git add -A
+          git commit -m "Launch Lou Vega Vegas by the Slice v2"
+          git push
