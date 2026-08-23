@@ -75,6 +75,23 @@
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
+  // The legacy inner page can finish its one-time Engine health request after
+  // Results has already replaced that panel. Keep two invisible anchors alive
+  // for a few seconds so the old callback cannot throw on missing nodes.
+  const healthCompat=setInterval(()=>{
+    try{
+      const core=document.getElementById('core');
+      const app=core?.contentDocument?.getElementById('app');
+      const d=app?.contentDocument||null;
+      if(!d?.body)return;
+      let holder=d.getElementById('runnerLegacyHealthCompat');
+      if(!holder){holder=d.createElement('div');holder.id='runnerLegacyHealthCompat';holder.hidden=true;d.body.appendChild(holder)}
+      if(!d.getElementById('healthOverall')){const x=d.createElement('span');x.id='healthOverall';holder.appendChild(x)}
+      if(!d.getElementById('healthChecked')){const x=d.createElement('span');x.id='healthChecked';holder.appendChild(x)}
+    }catch(e){}
+  },50);
+  setTimeout(()=>clearInterval(healthCompat),6000);
+
   // Install Pizza and Crypto navigation before Meat Desk binds F7. The final
   // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Results.
   const specialDesks=document.createElement('script');
