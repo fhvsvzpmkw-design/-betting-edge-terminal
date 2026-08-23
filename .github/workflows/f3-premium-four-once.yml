@@ -1,0 +1,26 @@
+name: F3 Premium Four Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/f3-premium-four-once.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unify F3 premium performance block
+        run: node tools/f3-premium-four-once.mjs
+      - name: Commit F3 premium block and clean runner
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f tools/f3-premium-four-once.mjs .github/workflows/f3-premium-four-once.yml
+          git add -A
+          git commit -m "Unify F3 all-in premium performance block"
+          git push
