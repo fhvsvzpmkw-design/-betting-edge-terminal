@@ -140,12 +140,13 @@
   }
 
   function manualWatchMeta(rec,run,eventTime,ref){
+    if(ref?.mode!=='LIVE')return null;
     if(String(rec?.status||'').toUpperCase()!=='WAIT')return null;
     if(!Number.isFinite(eventTime)||!Number.isFinite(ref?.time)||eventTime<=ref.time)return null;
     const next=nextPullFor(run);
     if(!next||eventTime>next.time)return null;
     const terms=watchTerms(rec);
-    return {...next,...terms,current:currentPrice(rec)}
+    return {...next,...terms,current:currentPrice(rec),eventTime}
   }
 
   function ensureStyle(d){
@@ -190,7 +191,7 @@
     if(badges&&!badges.querySelector('.watchMarketBadge')){
       const badge=d.createElement('span');badge.className='watchMarketBadge';badge.textContent='WATCH THIS MARKET';badges.appendChild(badge)
     }
-    const panel=d.createElement('div');panel.className='watchMarketIntel';
+    const panel=d.createElement('div');panel.className='watchMarketIntel';panel.dataset.eventTime=String(watch.eventTime);
     const title=d.createElement('div');title.className='watchMarketTitle';title.textContent='WAIT — WATCH THIS MARKET';
     const why=d.createElement('div');why.className='watchMarketWhy';why.textContent=`STARTS BEFORE NEXT VIGSCOPE ODDS PULL • NEXT PULL ${watch.pulseTime} PT • MONITOR MANUALLY`;
     const facts=d.createElement('div');facts.className='watchMarketFacts';
@@ -234,7 +235,15 @@
       const d=app?.contentDocument;
       if(!d)return;
       const now=Date.now();
-      d.querySelectorAll('.gameWindowIntel[data-reference-mode="LIVE"]').forEach(chip=>updateChip(chip,now))
+      d.querySelectorAll('.gameWindowIntel[data-reference-mode="LIVE"]').forEach(chip=>{
+        updateChip(chip,now);
+        const eventTime=Number(chip.dataset.eventTime);
+        if(Number.isFinite(eventTime)&&eventTime<=now){
+          const left=chip.parentElement;
+          left?.querySelector('.watchMarketIntel')?.remove();
+          left?.querySelector('.watchMarketBadge')?.remove()
+        }
+      })
     }catch(e){}
   }
 
