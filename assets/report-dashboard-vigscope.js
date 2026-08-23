@@ -76,10 +76,10 @@
   document.head.appendChild(resultsDesk);
 
   // Player-value overlay keeps the flat-card calibration intact but makes the
-  // headline cash view stake-aware and standardized to a full-unit player scale.
+  // headline cash view stake-aware and standardized to a single $100 full unit.
   const resultsPlayerScale=document.createElement('script');
   resultsPlayerScale.id='resultsPlayerScaleLoader';
-  resultsPlayerScale.src='./assets/results-player-scale.js?v=1';
+  resultsPlayerScale.src='./assets/results-player-scale.js?v=2';
   resultsPlayerScale.async=false;
   document.head.appendChild(resultsPlayerScale);
 
