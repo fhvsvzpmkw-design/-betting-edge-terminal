@@ -22,6 +22,7 @@ function parseStakeCad(v){
   return Number.isFinite(n)?Math.max(0,n):0;
 }
 function round(v,d=4){
+  if(v===null||v===undefined||v==='')return null;
   const n=Number(v);
   if(!Number.isFinite(n))return null;
   const p=10**d;
