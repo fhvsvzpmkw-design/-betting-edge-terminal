@@ -43,16 +43,46 @@ Deterministic grading helper:
 
 The verification JSON supplies already-verified final event evidence. The helper grades standard score-based markets and updates/creates the matching observation sidecar. Unsupported markets fail closed as unresolved unless an exact selection outcome is supplied.
 
+## Unresolved reason and retry metadata
+
+Unresolved cards should carry a specific reason rather than a generic open state whenever the cause is known. Standard reasons include:
+
+- `verification_deferred_event_cap` — eligible event was not attempted because its quota was exhausted;
+- `result_not_verified` — an attempt was made but no reliable exact result was established;
+- `event_not_final` — the exact event was found but was not yet final/settled;
+- `identity_conflict` — event/player/market identity could not be reconciled safely;
+- `source_conflict` — reliable sources materially disagree;
+- `settlement_ambiguity` — final event evidence exists but exact market settlement cannot be established safely;
+- `exact_stat_not_verified` — a player/stat-specific outcome was not safely verified;
+- `market_requires_exact_selection_verification` — final score alone is insufficient for settlement.
+
+When an unresolved event is actually attempted, its completion record may retain lightweight retry metadata:
+
+- `firstUnresolvedAt` — first known unresolved timestamp;
+- `lastVerificationAttemptAt` — most recent targeted result-verification attempt;
+- `verificationAttempts` — count of targeted attempts;
+- `nextRetryTier` — advisory tier such as `24h`, `72h`, `7d`, or `exception`.
+
+These fields are audit metadata only. They do not alter report generation, handicapping, status, stake, bankroll, ledger behavior or grading rules.
+
 ## 05:00 result-closure backlog rule
 
 A separate daily 05:00 America/Vancouver result-closure task performs one lightweight closure pass before the morning odds/report sequence:
 
-1. inspect the previous Vancouver day's issued cards plus older cards explicitly still UNRESOLVED;
-2. group unresolved cards by exact event so one verified final can close multiple cards;
-3. perform targeted result verification only for events expected to be finished;
-4. grade score markets with the spread sign convention above;
-5. save verified completion records in this observation layer;
-6. leave ambiguous or unsupported cards UNRESOLVED.
+1. inspect the previous Vancouver calendar day's issued cards whose event start has passed, plus older cards explicitly still UNRESOLVED;
+2. group unresolved cards by exact `rec.feed.eventId` so one verified final can close multiple cards;
+3. use two independent verification quotas per run:
+   - up to **20 unique previous-day events**;
+   - plus up to **10 unique older-backlog events**;
+4. do not let older backlog consume the previous-day quota, and do not let previous-day volume eliminate the backlog quota;
+5. if the same exact event qualifies in both buckets, count it once under the previous-day bucket and do not spend a backlog slot on it;
+6. process the older backlog oldest-first by event start/date, but within the same age priority process `verification_deferred_event_cap` before genuine verification failures or ambiguity cases;
+7. perform targeted result verification only for events expected to be finished;
+8. grade score markets with the spread sign convention above;
+9. save verified completion records in this observation layer, preserving any existing price-observation fields and retry metadata;
+10. leave ambiguous or unsupported cards UNRESOLVED with a specific reason;
+11. for attempted unresolved items, update `lastVerificationAttemptAt` and increment `verificationAttempts`; retain `firstUnresolvedAt` once set;
+12. use retry tiers as guidance rather than as a blocker: ordinary unresolved items should receive another targeted attempt around 24 hours, 72 hours and 7 days after first becoming unresolved, while cap-deferred items should be attempted at the next available backlog pass; after the 7-day tier, retain only genuine exception cases for periodic cleanup rather than repeatedly forcing a grade.
 
 The 05:00 audit is independent of the 05:45 odds refresh and 06:00 Betting Edge Open report. Its failure must not modify live odds or block the report.
 
