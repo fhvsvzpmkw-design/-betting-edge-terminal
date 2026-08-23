@@ -56,9 +56,9 @@ function ensureStyle(d){
 
     #engine.resultsDesk .actualPlayerState{font-size:clamp(28px,4.7vw,54px);font-weight:950;line-height:1.02;letter-spacing:.015em;color:var(--value-silver);margin-top:15px}
     #engine.resultsDesk .actualPlayerCash{font-size:clamp(48px,7.5vw,84px);font-weight:950;line-height:.95;letter-spacing:-.04em;margin-top:13px;text-shadow:0 0 16px currentColor}
-    #engine.resultsDesk .actualPlayerCash.positive,#engine.resultsDesk .decisionBig.positive,#engine.resultsDesk .decisionMetric b.positive{color:var(--green)}
-    #engine.resultsDesk .actualPlayerCash.negative,#engine.resultsDesk .decisionBig.negative,#engine.resultsDesk .decisionMetric b.negative{color:var(--red)}
-    #engine.resultsDesk .actualPlayerCash.neutral,#engine.resultsDesk .decisionBig.neutral,#engine.resultsDesk .decisionMetric b.neutral{color:var(--value-silver)}
+    #engine.resultsDesk .actualPlayerCash.positive,#engine.resultsDesk .decisionBig.positive,#engine.resultsDesk .decisionMetric b.positive,#engine.resultsDesk .decisionStatusCash.positive{color:var(--green)}
+    #engine.resultsDesk .actualPlayerCash.negative,#engine.resultsDesk .decisionBig.negative,#engine.resultsDesk .decisionMetric b.negative,#engine.resultsDesk .decisionStatusCash.negative{color:var(--red)}
+    #engine.resultsDesk .actualPlayerCash.neutral,#engine.resultsDesk .decisionBig.neutral,#engine.resultsDesk .decisionMetric b.neutral,#engine.resultsDesk .decisionStatusCash.neutral{color:var(--value-silver)}
     #engine.resultsDesk .actualPlayerLabel{color:var(--value-silver);font-size:clamp(12px,1.7vw,19px);font-weight:950;letter-spacing:.07em;margin-top:7px}
     #engine.resultsDesk .actualPlayerRule{color:#aebbc5;font-size:9px;line-height:1.5;margin-top:10px;font-weight:800}
     #engine.resultsDesk .actualPlayerNote{color:var(--value-muted);font-size:9px;line-height:1.45;margin-top:5px}
