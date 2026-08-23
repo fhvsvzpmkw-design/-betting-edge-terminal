@@ -1,0 +1,48 @@
+name: Build Betting Edge results index
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "data/history/observations/**"
+      - "data/history/runs/**"
+      - "tools/build-results-index.mjs"
+      - ".github/workflows/results-index.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-results-index
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout main with history
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Refresh branch
+        run: git pull --ff-only origin main
+
+      - name: Build results index
+        run: node tools/build-results-index.mjs
+
+      - name: Publish results index
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history/results-index.json
+          if git diff --cached --quiet; then
+            echo "No results index changes to publish."
+            exit 0
+          fi
+          git commit -m "Rebuild Betting Edge results index"
+          git pull --rebase origin main
+          git push
