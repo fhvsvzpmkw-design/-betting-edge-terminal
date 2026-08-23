@@ -1,7 +1,7 @@
 # Betting Edge Research Library — Canonical v1.7
 
-**Status:** R2 manual read validation passed — read-only — R3 staged across all five scheduled report lanes; live verification pending  
-**Contract compatibility:** Betting Edge Contract draft v0.9  
+**Status:** R2 manual read validation passed — R3 live read-only across all scheduled report lanes  
+**Contract compatibility:** Betting Edge Contract v1.0 OPERATIONAL  
 **Built:** 2026-08-14T20:06:13Z
 
 ## Purpose
@@ -30,7 +30,7 @@ The 18 resolution records are retained as synthesis/audit items. In addition, th
 
 `research-library.json` preserves the contract version recorded when the canonical v1.7 library was originally built. That build-time header is historical provenance and is not rewritten solely to advance contract compatibility.
 
-`manifest.json` is the authoritative pointer for the library's **current tested contract compatibility**. The active manifest records compatibility with Betting Edge Contract draft v0.9, the passed R2 manual-read test, and the current staged live-validation state.
+`manifest.json` is the authoritative pointer for the library's **current tested contract compatibility**. The active manifest records compatibility with Betting Edge Contract v1.0, the passed R2 manual-read test, and the current R3 live read-only runtime state.
 
 ## Runtime boundary
 
@@ -86,10 +86,10 @@ When worthwhile new research is found:
 
 `source-package-manifest.json` records the original seven package names, counts, sizes and SHA-256 hashes. A separate full-audit bundle can retain the extracted legacy packages; they are not required for the normal repo upload or runtime read path.
 
-## Validation and next step
+## Validation and current state
 
 The R2 manual read suite is stored at `research/tests/R2_MANUAL_READ_TEST_2026-08-15.json` and validates direct/mixed evidence, era-conflict handling and explicit research-gap behavior without changing live recommendation fields.
 
-All five scheduled report lanes are now staged to perform the same read-only Research Fit process and preserve structured Research Fit/provenance in separate history sidecars while keeping the runner payload compact.
+All scheduled report lanes use the same R3 read-only Research Fit process and preserve structured Research Fit/provenance in separate history sidecars while keeping the runner payload compact.
 
-The next acceptance step is to verify the **15:15 and 18:15 live chains**: authoritative Research Library read, correct `hist` rendering, exact issued-payload archive, matching Research Fit sidecar, correct `run-history.json` linkage, and no regression in price/stake/risk/runner behavior.
+Research Library v1.7 remains unchanged by the Contract v1.0 promotion. The next production observation is simply the first v1.0-issued report confirming that the existing Research Fit layer continues to read normally and records the new contract authority in provenance without changing price, status, stake or risk behavior.
