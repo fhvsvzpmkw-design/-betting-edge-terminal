@@ -319,6 +319,7 @@ const MAX_WAIT_MS=90000;
 const SPLASH_MIN_MS=Math.max(0,Number(SPLASH_CONFIG.minimumDisplayMs)||0);
 const SPLASH_FADE_MS=Math.max(0,Number(SPLASH_CONFIG.fadeMs)||0);
 const splashStarted=Date.now();
+window.addEventListener('pageshow',event=>{if(!event.persisted)return;const fresh=new URL(location.href);fresh.searchParams.set('_fresh',String(Date.now()));location.replace(fresh.pathname+fresh.search+fresh.hash)});
 
 function applySplashConfig(){
   const c=SPLASH_CONFIG.copy;

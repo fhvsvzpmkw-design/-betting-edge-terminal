@@ -37,6 +37,7 @@ const SCREEN2_MS=3000,FADE_MS=320;
 const SYNDICATE_MANIFEST='./data/syndicates.json';
 const core=document.getElementById('core'),splash=document.getElementById('splash2'),art=document.getElementById('splash2art');
 let coreLoaded=false,timerDone=false,started=false,hierarchyObserver=null,hierarchyFrame=null;
+window.addEventListener('pageshow',event=>{if(!event.persisted)return;const fresh=new URL(location.href);fresh.searchParams.set('_fresh',String(Date.now()));location.replace(fresh.pathname+fresh.search+fresh.hash)});
 function reveal(){if(!coreLoaded||!timerDone)return;core.classList.add('ready');splash.classList.add('fade');setTimeout(()=>splash.remove(),FADE_MS+80)}
 function startWhenVisible(){if(started)return;try{const host=window.frameElement;if(host){const style=getComputedStyle(host);if(Number.parseFloat(style.opacity||'1')<=.01||style.visibility==='hidden'){requestAnimationFrame(startWhenVisible);return}}}catch(e){}started=true;setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS)}
 function innerAppFrame(){try{return core.contentDocument&&core.contentDocument.getElementById('app')}catch(e){return null}}
