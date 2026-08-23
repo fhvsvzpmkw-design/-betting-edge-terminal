@@ -11,6 +11,27 @@ This directory stores small retrospective observations for already-issued Bettin
 - If no eligible snapshot or exact quote exists, the price observation remains explicitly unavailable. Do not infer or fuzzy-match a price.
 - An observed price is a **last observed pre-start price**, not a verified closing line or formal CLV unless separately established.
 - Full odds snapshots are not duplicated here; observation records reference their immutable Git blob SHA.
+- Running the price-observation helper against an existing sidecar must preserve completion/result fields already stored there.
+
+### Normalized issued-price analytics
+
+Human-facing issued price text remains immutable display evidence. Analytics must not depend on parsing that presentation string.
+
+When the exact immutable odds snapshot whose `generatedAt` matches the issued run's `feedGeneratedAt` is available, resolve the exact `rec.feed.selectionKey` across the sportsbook or sportsbooks named on the issued card. Only quotes no more than 30 minutes old at that snapshot are eligible. If more than one named book has a fresh exact quote, use the best bettor-facing decimal price; ties remain deterministic by the card's named-book order.
+
+Store additive normalized fields under the recommendation's `issued` object when safely resolvable:
+
+- `analysisPriceState` — `verified_exact_issued_snapshot` or `unavailable`;
+- `analysisPriceReason` — explicit failure reason when unavailable;
+- `analysisPriceAmerican` — numeric American odds, not display text;
+- `analysisPriceDecimal` — numeric decimal odds;
+- `analysisBook` and `analysisBookKey` — exact sportsbook selected for analytics;
+- `analysisQuoteUpdatedAt` — exact quote timestamp;
+- `analysisSnapshotBlobSha` — immutable issued-snapshot blob;
+- `marketKey` and `side` — normalized exact market identity;
+- `selectedLine` — bettor-facing selected line, including away-spread sign inversion.
+
+`issued.priceAmerican` remains the original human-readable report string. Existing sidecars without normalized fields remain valid historical evidence. Do not rewrite already-complete historical cards merely to backfill analytics fields; populate them when the sidecar is next legitimately processed or when a deliberate analytics backfill is run.
 
 Manual validation command:
 
@@ -29,7 +50,9 @@ Rules:
 - Web verification should use an authoritative or otherwise reliable final-score/result source for the exact event and date.
 - Final-score grading for moneyline, spread and game-total cards is deterministic from the exact issued side/line.
 - **Spread sign convention:** Odds-API.io spread-row `hdp` is the HOME-side handicap and is also the raw line stored at the end of both home/away selection keys for that row. A home selection uses raw `hdp`; an away selection uses the opposite sign. Example: home Washington / away Toronto with raw `hdp: -11.5` means Washington -11.5 and Toronto +11.5.
-- Player props, regulation-only markets, shortened/suspended games and other special settlement cases remain unresolved unless the exact issued selection can be verified safely.
+- **Quarter-line settlement:** spread or standard game-total lines ending in `.25` or `.75` split into two equal half-stakes on the adjacent whole/half lines. Example: `-0.75` is half on `-0.5` and half on `-1.0`; Over `2.25` is half on Over `2.0` and half on Over `2.5`. Valid aggregate grades therefore include `HALF_WIN` and `HALF_LOSS` in addition to `WIN`, `LOSS`, `PUSH`, and `VOID`.
+- Quarter-line completion records should retain `settlementComponents` showing each component line, its `0.5` stake fraction and component grade so later ROI analysis can reproduce the settlement exactly.
+- Player props, regulation-only markets, shortened/suspended games and other special settlement cases remain unresolved unless the exact issued selection can be verified safely. Supported quarter-line spread/standard-total settlement is not considered unsupported solely because it is fractional.
 - A verified BET is an **official** result. LEAN / WAIT / PASS results are **hypothetical** and never alter the official betting ledger.
 - Missing price/CLV observation does not prevent a result from becoming COMPLETE.
 - Once a card is COMPLETE, routine backlog checks do not recheck it.
@@ -41,7 +64,7 @@ Deterministic grading helper:
 
 `node tools/verify-issued-results.mjs <issued-run.json> <verification.json>`
 
-The verification JSON supplies already-verified final event evidence. The helper grades standard score-based markets and updates/creates the matching observation sidecar. Unsupported markets fail closed as unresolved unless an exact selection outcome is supplied.
+The verification JSON supplies already-verified final event evidence. The helper grades standard score-based markets, including supported Asian quarter-line spread/standard-total settlement, and updates/creates the matching observation sidecar. Unsupported markets fail closed as unresolved unless an exact selection outcome is supplied.
 
 ## Unresolved reason and retry metadata
 
@@ -78,8 +101,8 @@ A separate daily 05:00 America/Vancouver result-closure task performs one lightw
 5. if the same exact event qualifies in both buckets, count it once under the previous-day bucket and do not spend a backlog slot on it;
 6. process the older backlog oldest-first by event start/date, but within the same age priority process `verification_deferred_event_cap` before genuine verification failures or ambiguity cases;
 7. perform targeted result verification only for events expected to be finished;
-8. grade score markets with the spread sign convention above;
-9. save verified completion records in this observation layer, preserving any existing price-observation fields and retry metadata;
+8. grade score markets with the spread sign convention and quarter-line settlement rules above;
+9. save verified completion records in this observation layer, preserving any existing price-observation fields, normalized analytics fields and retry metadata;
 10. leave ambiguous or unsupported cards UNRESOLVED with a specific reason;
 11. for attempted unresolved items, update `lastVerificationAttemptAt` and increment `verificationAttempts`; retain `firstUnresolvedAt` once set;
 12. use retry tiers as guidance rather than as a blocker: ordinary unresolved items should receive another targeted attempt around 24 hours, 72 hours and 7 days after first becoming unresolved, while cap-deferred items should be attempted at the next available backlog pass; after the 7-day tier, retain only genuine exception cases for periodic cleanup rather than repeatedly forcing a grade.
