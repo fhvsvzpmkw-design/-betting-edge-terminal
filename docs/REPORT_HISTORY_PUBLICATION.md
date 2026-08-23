@@ -1,8 +1,9 @@
 # Betting Edge Report-History Publication
 
-**Status:** Operational beginning with the next production lane after the 2026-08-17 09:30 report  
+**Status:** Operational  
 **Workflow:** `.github/workflows/report-history.yml`  
-**Publisher/validator:** `tools/report-publication.mjs`
+**Publisher/validator:** `tools/report-publication.mjs`  
+**Current production contract:** Betting Edge Contract v1.0
 
 ## Purpose
 
@@ -37,6 +38,17 @@ The workflow:
 
 Existing immutable files may be submitted again only when their JSON content is identical. Conflicting rewrites fail closed.
 
+## Contract v1.0 provenance
+
+For new production reports, the schema-3 sidecar must identify:
+
+- `productionContractVersion: "1.0"`;
+- `productionContractOperational: true`;
+- `productionContractPath: "BETTING_EDGE_CONTRACT.md"`;
+- the exact Contract v1.0 blob SHA resolved before handicapping.
+
+Historical reports and sidecars remain governed by the contract version they recorded at issuance. Contract v0.9 schema-3 sidecars and earlier schema-2 evidence must not be rewritten merely because current production is v1.0.
+
 ## Continuous integrity check
 
 The same workflow runs in verification mode whenever report payloads, sidecars, `run-history.json`, the publisher, or the workflow itself changes.
@@ -48,14 +60,14 @@ The verifier checks that:
 - deterministic short IDs are unique;
 - counts and recommendation totals agree;
 - every linked sidecar resolves and matches its report reference;
-- every production run at or after `2026-08-17T15:15:00-07:00` has a matching schema-3 sidecar and index linkage;
+- every production run at or after the established complete-bundle enforcement boundary has a matching required sidecar and index linkage;
 - `run-history.json.updated_at` matches the newest indexed report.
 
 ## Historical boundary
 
 The August 17 08:00 and 09:30 reports remain valid issued reports. Their missing sidecars are not reconstructed after the fact. The 09:30 index omission was repaired separately without changing its issued payload.
 
-Strict complete-bundle enforcement begins with the next standard lane, `2026-08-17T15:15:00-07:00` and later.
+Strict complete-bundle enforcement began with `2026-08-17T15:15:00-07:00` and continues under Contract v1.0.
 
 ## Failure behavior
 
@@ -67,10 +79,10 @@ Do not pull odds again, re-handicap, mutate recommendations, or alter the runner
 
 ## Scope boundary
 
-This implementation does not modify:
+This publication layer does not modify betting methodology. In particular, it does not change:
 
-- `BETTING_EDGE_CONTRACT.md` or Contract 0.9 betting rules;
+- Contract v1.0 pricing, freshness, identity, fair-value, status, staking or risk rules;
 - the odds-refresh workflow or request budget;
-- report analysis, fair value, status, staking or risk logic;
-- `r.html`, `runner.html`, `runner-core.html`, splash screens or repricing;
+- report analysis or recommendation qualification;
+- `r.html`, `runner.html`, `runner-core.html`, splash screens or repricing behavior;
 - previously issued report payloads or sidecars.
