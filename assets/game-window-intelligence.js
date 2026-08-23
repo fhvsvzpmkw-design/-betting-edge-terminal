@@ -6,6 +6,36 @@
 
   const STYLE_ID='vigScopeGameWindowIntelligenceStyle';
   const LIVE_TIMER_MS=30000;
+  const CFG_URL='./data/schedule-profiles.json';
+  const STATE_URL='./data/schedule-state.json';
+  const FALLBACK_CFG={
+    legacyProfileId:'mlb',
+    profiles:{
+      mlb:{id:'mlb',slots:[
+        {slot:'open',pulseTime:'05:45'},
+        {slot:'main',pulseTime:'07:45'},
+        {slot:'final_morning',pulseTime:'09:15'},
+        {slot:'evening',pulseTime:'14:55'},
+        {slot:'late',pulseTime:'17:55'}
+      ]},
+      nfl:{id:'nfl',slots:[
+        {slot:'open',pulseTime:'05:45'},
+        {slot:'main',pulseTime:'07:45'},
+        {slot:'final_morning',pulseTime:'08:45'},
+        {slot:'evening',pulseTime:'12:00'},
+        {slot:'late',pulseTime:'16:45'}
+      ]},
+      nba_nhl:{id:'nba_nhl',slots:[
+        {slot:'open',pulseTime:'05:45'},
+        {slot:'main',pulseTime:'10:45'},
+        {slot:'final_morning',pulseTime:'13:45'},
+        {slot:'evening',pulseTime:'15:45'},
+        {slot:'late',pulseTime:'17:45'}
+      ]}
+    }
+  };
+  let scheduleCfg=FALLBACK_CFG;
+  let scheduleState={defaultProfileId:'mlb',selections:[]};
 
   function currentVancouverDay(now=new Date()){
     try{
@@ -13,6 +43,11 @@
       const get=t=>parts.find(p=>p.type===t)?.value||'';
       return `${get('year')}-${get('month')}-${get('day')}`
     }catch(e){return ''}
+  }
+
+  function runDay(run){
+    try{if(typeof localDateKey==='function'){const day=localDateKey(run?.ts);if(day)return day}}catch(e){}
+    return String(run?.ts||'').slice(0,10)
   }
 
   function eventTimeFor(rec,run){
@@ -28,11 +63,11 @@
   }
 
   function referenceFor(run){
-    let runDay='',latest=true;
-    try{if(typeof localDateKey==='function')runDay=localDateKey(run?.ts)}catch(e){}
+    let runDayKey='',latest=true;
+    try{if(typeof localDateKey==='function')runDayKey=localDateKey(run?.ts)}catch(e){}
     try{if(typeof isLatestSessionRun==='function')latest=isLatestSessionRun(run)}catch(e){}
     const currentDay=currentVancouverDay();
-    if(!latest||(runDay&&currentDay&&runDay!==currentDay)){
+    if(!latest||(runDayKey&&currentDay&&runDayKey!==currentDay)){
       const issued=Date.parse(run?.ts||'');
       if(Number.isFinite(issued))return {time:issued,mode:'ISSUE'}
     }
@@ -61,6 +96,58 @@
     return `${prefix}STARTED ${durationLabel(deltaMinutes)} AGO`
   }
 
+  function resolveProfile(run){
+    const day=runDay(run);
+    let id=String(run?.scheduleProfileId||scheduleState?.defaultProfileId||scheduleCfg?.legacyProfileId||'mlb');
+    const selections=[...(scheduleState?.selections||[])].sort((a,b)=>
+      String(a?.effectiveOperatingDate||'').localeCompare(String(b?.effectiveOperatingDate||''))||
+      String(a?.selectedAt||'').localeCompare(String(b?.selectedAt||''))
+    );
+    selections.forEach(s=>{
+      if(day&&s?.effectiveOperatingDate<=day&&scheduleCfg?.profiles?.[s.profileId])id=s.profileId
+    });
+    return scheduleCfg?.profiles?.[id]||FALLBACK_CFG.profiles.mlb
+  }
+
+  function nextPullFor(run){
+    const profile=resolveProfile(run),slots=Array.isArray(profile?.slots)?profile.slots:[];
+    const currentSlot=String(run?.slot||'');
+    const i=slots.findIndex(x=>String(x?.slot||'')===currentSlot);
+    if(i<0||i>=slots.length-1)return null;
+    const next=slots[i+1],day=runDay(run),pulse=String(next?.pulseTime||'');
+    if(!day||!/^[0-2]\d:[0-5]\d$/.test(pulse))return null;
+    const offset=String(run?.ts||'').match(/([+-]\d{2}:\d{2}|Z)$/)?.[1]||'-07:00';
+    const time=Date.parse(`${day}T${pulse}:00${offset}`);
+    if(!Number.isFinite(time))return null;
+    return {time,pulseTime:pulse,slot:String(next?.slot||''),profileId:String(profile?.id||'')}
+  }
+
+  function watchTerms(rec){
+    const raw=String(rec?.playTo||rec?.betAt||'').trim();
+    if(!raw)return {target:'SEE BET AT / PLAY TO',conditions:''};
+    const match=raw.match(/^(.+?\bOR BETTER)(?:\s+(?:AFTER|WITH)\s+(.+))?$/i);
+    if(!match)return {target:raw,conditions:''};
+    return {
+      target:match[1].trim(),
+      conditions:String(match[2]||'').trim().replace(/\s+AND\s+/gi,' + ')
+    }
+  }
+
+  function currentPrice(rec){
+    try{if(typeof displayPrice==='function')return displayPrice(rec?.price)}catch(e){}
+    const m=String(rec?.price||'').replace(/−/g,'-').match(/([+-]\d{2,4})/);
+    return m?m[1]:'—'
+  }
+
+  function manualWatchMeta(rec,run,eventTime,ref){
+    if(String(rec?.status||'').toUpperCase()!=='WAIT')return null;
+    if(!Number.isFinite(eventTime)||!Number.isFinite(ref?.time)||eventTime<=ref.time)return null;
+    const next=nextPullFor(run);
+    if(!next||eventTime>next.time)return null;
+    const terms=watchTerms(rec);
+    return {...next,...terms,current:currentPrice(rec)}
+  }
+
   function ensureStyle(d){
     if(!d?.head||d.getElementById(STYLE_ID))return;
     const style=d.createElement('style');
@@ -73,7 +160,14 @@
       .gameWindowIntel[data-window="closing"] .gameWindowState{border-color:var(--yellow);color:var(--yellow);background:#171403}
       .gameWindowIntel[data-window="start"] .gameWindowState{border-color:#ff9d45;color:#ffb56f;background:#1a0d03}
       .gameWindowIntel[data-window="passed"] .gameWindowState{border-color:var(--red);color:var(--red);background:#19070b}
-      @media(max-width:520px){.gameWindowIntel{margin-top:5px}.gameWindowState{padding:3px 6px;font-size:8px;letter-spacing:.055em}}
+      .watchMarketBadge{display:inline-block;padding:4px 7px;border:1px solid var(--yellow);background:#171403;color:var(--yellow);font-size:10px;font-weight:950;letter-spacing:.08em;line-height:1.2}
+      .watchMarketIntel{margin-top:8px;border:1px solid var(--yellow);border-left:4px solid var(--yellow);background:#100e04;padding:8px 9px;color:#d8ca85;font-size:10px;line-height:1.4}
+      .watchMarketTitle{color:#ffe570;font-size:11px;font-weight:1000;letter-spacing:.075em}
+      .watchMarketWhy{margin-top:3px;color:#b8a966;font-size:9px;font-weight:850;letter-spacing:.035em}
+      .watchMarketFacts{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+      .watchMarketFact{color:#d6c983;font-size:9px}.watchMarketFact b{color:#fff0a2;font-size:10px}
+      .watchMarketConditions{margin-top:5px;color:#d6c983;font-size:9px}.watchMarketConditions b{color:#fff0a2}
+      @media(max-width:520px){.gameWindowIntel{margin-top:5px}.gameWindowState{padding:3px 6px;font-size:8px;letter-spacing:.055em}.watchMarketIntel{padding:7px 8px}.watchMarketFacts{gap:7px}.watchMarketTitle{font-size:10px}.watchMarketBadge{font-size:9px}}
     `;
     d.head.appendChild(style)
   }
@@ -89,6 +183,22 @@
     chip.dataset.window=state.key;
     const stateEl=chip.querySelector('.gameWindowState');
     if(stateEl)stateEl.textContent=statusLabel(delta,mode)
+  }
+
+  function addWatchPanel(d,left,rec,watch){
+    const badges=left.querySelector('.runnerBadgeRow');
+    if(badges&&!badges.querySelector('.watchMarketBadge')){
+      const badge=d.createElement('span');badge.className='watchMarketBadge';badge.textContent='WATCH THIS MARKET';badges.appendChild(badge)
+    }
+    const panel=d.createElement('div');panel.className='watchMarketIntel';
+    const title=d.createElement('div');title.className='watchMarketTitle';title.textContent='WAIT — WATCH THIS MARKET';
+    const why=d.createElement('div');why.className='watchMarketWhy';why.textContent=`STARTS BEFORE NEXT VIGSCOPE ODDS PULL • NEXT PULL ${watch.pulseTime} PT • MONITOR MANUALLY`;
+    const facts=d.createElement('div');facts.className='watchMarketFacts';
+    const target=d.createElement('span');target.className='watchMarketFact';target.innerHTML=`TARGET <b>${watch.target}</b>`;
+    const current=d.createElement('span');current.className='watchMarketFact';current.innerHTML=`CURRENT <b>${watch.current}</b>`;
+    facts.append(target,current);panel.append(title,why,facts);
+    if(watch.conditions){const conditions=d.createElement('div');conditions.className='watchMarketConditions';conditions.innerHTML=`ALSO REQUIRE <b>${watch.conditions}</b>`;panel.appendChild(conditions)}
+    left.appendChild(panel)
   }
 
   function enhanceCard(d,r,run,baseCard){
@@ -111,7 +221,9 @@
       chip.appendChild(state);
       const meta=[...left.querySelectorAll('.runnerMeta')].find(x=>!x.classList.contains('priceWatchTarget'));
       if(meta)meta.insertAdjacentElement('afterend',chip);else left.appendChild(chip);
-      updateChip(chip,ref.time)
+      updateChip(chip,ref.time);
+      const watch=manualWatchMeta(r,run,eventTime,ref);
+      if(watch)addWatchPanel(d,left,r,watch)
     }catch(e){console.warn('VigScope game-window intelligence card error',e)}
     return cardEl
   }
@@ -124,6 +236,27 @@
       const now=Date.now();
       d.querySelectorAll('.gameWindowIntel[data-reference-mode="LIVE"]').forEach(chip=>updateChip(chip,now))
     }catch(e){}
+  }
+
+  function rerender(){
+    try{
+      let run=null;
+      try{run=typeof activeRun!=='undefined'?activeRun:null}catch(e){}
+      if(run&&typeof apply==='function')apply(run)
+    }catch(e){}
+  }
+
+  async function loadScheduleAuthority(){
+    try{
+      const bust=`v=${Date.now()}`;
+      const [cfg,state]=await Promise.all([
+        fetch(`${CFG_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`profiles ${r.status}`);return r.json()}),
+        fetch(`${STATE_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`state ${r.status}`);return r.json()})
+      ]);
+      if(cfg?.profiles)scheduleCfg=cfg;
+      if(state?.defaultProfileId)scheduleState=state;
+      rerender()
+    }catch(e){console.warn('VigScope watch-market schedule authority fallback active',e)}
   }
 
   function install(){
@@ -139,6 +272,7 @@
       try{run=typeof activeRun!=='undefined'?activeRun:null}catch(e){}
       if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run)}catch(e){}},0);
       setInterval(refreshLiveChips,LIVE_TIMER_MS);
+      loadScheduleAuthority();
       return true
     }catch(e){console.warn('VigScope game-window intelligence install error',e);return false}
   }
