@@ -19,6 +19,19 @@ Every supplied page received manual visual reconciliation. End-of-line typesetti
 
 The verification report separates the initial automated disposition from the final manual result and records the scope of numerical and tabular checking.
 
+## Lou “Two Slice” Vega reference pack
+
+- [Lou Vega canon and language guide](lou-vega-canon-language-guide.md)
+- [Lou Vega Vegas route scene bank](lou-vega-scene-bank.md)
+
+Lou is an original VigWire Labs character rather than an adaptation of an outside fictional property. His character profile, first-party language guide, scene bank, approved **Vegas by the Slice v2** shell and issued archive form the durable asset pack for future Hotline editions.
+
+The pack separates four things deliberately: Lou's permanent Vegas-local voice, rotating sportsbook/casino/food route scenes, the locked visual shell and the current issued Betting Edge report. The first three control presentation only. Betting Edge remains authoritative for sports recommendations, prices, buying thresholds, stakes and risk.
+
+The user-supplied *Gambler* chapters may support general professional sports-betting culture such as respecting the number, line shopping and disciplined non-action. They are not Lou biography, do not independently set Betting Edge policy and must not be used to manufacture a recommendation.
+
+Real casino progressives, paytables, machine inventories, promotions, comps, restaurant details and property conditions require current evidence if they are presented as real. Without such evidence, Lou's casino-floor and food route stays fictional/generic rather than manufacturing a current claim about a real business.
+
 ## Police Quest / Jesse Bains reference pack
 
 - [Police Quest series reference index](police-quest-series-reference-index.md)
