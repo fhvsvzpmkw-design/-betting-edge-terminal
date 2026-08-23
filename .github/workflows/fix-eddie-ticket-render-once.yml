@@ -1,0 +1,30 @@
+name: Fix Eddie Ticket Render Once
+
+on:
+  push:
+    paths:
+      - 'tools/fix-eddie-ticket-render-once.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix Eddie Recent Tape rendering
+        run: node tools/fix-eddie-ticket-render-once.mjs
+      - name: Validate Eddie ledger desk
+        run: node tests/muddy-ledger-desk.test.mjs
+      - name: Commit Eddie Recent Tape fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/sharp-room/incoming.html tests/muddy-ledger-desk.test.mjs
+          if git diff --cached --quiet; then
+            echo "No Eddie changes to commit"
+          else
+            git commit -m "Fix Eddie Recent Tape card rendering"
+            git push
+          fi
