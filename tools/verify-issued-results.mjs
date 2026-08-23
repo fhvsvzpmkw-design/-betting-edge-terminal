@@ -129,6 +129,46 @@ function exactSelectionGrade(rec, event) {
   };
 }
 
+function nextRetryTier(firstUnresolvedAt, nowIso) {
+  const first = Date.parse(firstUnresolvedAt || '');
+  const now = Date.parse(nowIso || '');
+  if (!Number.isFinite(first) || !Number.isFinite(now)) return '24h';
+  const ageHours = Math.max(0, (now - first) / 3600000);
+  if (ageHours < 24) return '24h';
+  if (ageHours < 72) return '72h';
+  if (ageHours < 168) return '7d';
+  return 'exception';
+}
+
+function unresolvedCompletion(existingCompletion, reason, verifiedAt, attempted = true) {
+  const existing = existingCompletion || {};
+  const firstUnresolvedAt = existing.firstUnresolvedAt || verifiedAt;
+  const priorAttempts = Number.isFinite(Number(existing.verificationAttempts)) ? Number(existing.verificationAttempts) : 0;
+  const verificationAttempts = priorAttempts + (attempted ? 1 : 0);
+  return {
+    ...existing,
+    state: 'unresolved',
+    reason,
+    firstUnresolvedAt,
+    lastVerificationAttemptAt: attempted ? verifiedAt : (existing.lastVerificationAttemptAt || null),
+    verificationAttempts,
+    nextRetryTier: reason === 'verification_deferred_event_cap'
+      ? 'next_backlog_pass'
+      : nextRetryTier(firstUnresolvedAt, verifiedAt)
+  };
+}
+
+function completedAudit(existingCompletion, verifiedAt) {
+  const existing = existingCompletion || {};
+  const priorAttempts = Number.isFinite(Number(existing.verificationAttempts)) ? Number(existing.verificationAttempts) : 0;
+  return {
+    firstUnresolvedAt: existing.firstUnresolvedAt || null,
+    lastVerificationAttemptAt: verifiedAt,
+    verificationAttempts: priorAttempts + 1,
+    nextRetryTier: null
+  };
+}
+
 function skeleton(issued, sourcePath) {
   return {
     schemaVersion: 1,
@@ -179,6 +219,9 @@ result.resultMethod = {
 const verifiedAt = verification.verifiedAt || new Date().toISOString();
 const globalSource = verification.source || null;
 const events = Array.isArray(verification.events) ? verification.events : [];
+const hasAttemptedEventList = Array.isArray(verification.attemptedEventIds);
+const attemptedEventIds = new Set((verification.attemptedEventIds || []).map((value) => String(value)));
+const deferredEventIds = new Set((verification.deferredEventIds || []).map((value) => String(value)));
 let completed = 0;
 let unresolved = 0;
 
@@ -193,24 +236,52 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
   const event = events.find((row) => String(row?.eventId || '') === eventId);
   if (!event) {
     unresolved += 1;
-    return { ...existing, completion: { state: 'unresolved', reason: 'result_not_verified' } };
+    if (deferredEventIds.has(eventId)) {
+      return {
+        ...existing,
+        completion: unresolvedCompletion(existing?.completion, 'verification_deferred_event_cap', verifiedAt, false)
+      };
+    }
+    if (hasAttemptedEventList && !attemptedEventIds.has(eventId)) {
+      return existing;
+    }
+    return {
+      ...existing,
+      completion: unresolvedCompletion(existing?.completion, 'result_not_verified', verifiedAt, true)
+    };
   }
 
   const status = String(event.status || '').toLowerCase();
+  const explicitReason = String(event.unresolvedReason || event.reason || '').trim();
+  if (explicitReason && ['unresolved', 'ambiguous', 'conflict', 'unknown'].includes(status)) {
+    unresolved += 1;
+    return {
+      ...existing,
+      completion: unresolvedCompletion(existing?.completion, explicitReason, verifiedAt, true)
+    };
+  }
+
   if (!['final', 'settled', 'complete', 'completed'].includes(status)) {
     unresolved += 1;
-    return { ...existing, completion: { state: 'unresolved', reason: 'event_not_final' } };
+    return {
+      ...existing,
+      completion: unresolvedCompletion(existing?.completion, explicitReason || 'event_not_final', verifiedAt, true)
+    };
   }
 
   const exact = exactSelectionGrade(rec, event);
   const graded = exact || gradeFromScore(rec, event);
   if (!graded.grade) {
     unresolved += 1;
-    return { ...existing, completion: { state: 'unresolved', reason: graded.reason } };
+    return {
+      ...existing,
+      completion: unresolvedCompletion(existing?.completion, graded.reason, verifiedAt, true)
+    };
   }
 
   const official = String(rec.status || '').toUpperCase() === 'BET';
   const source = event.source || globalSource;
+  const audit = completedAudit(existing?.completion, verifiedAt);
   completed += 1;
   return {
     ...existing,
@@ -235,7 +306,8 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
       source: source ? {
         name: source.name || null,
         url: source.url || null
-      } : null
+      } : null,
+      ...audit
     }
   };
 });
