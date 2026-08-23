@@ -1,6 +1,6 @@
 # Betting Edge Durable History
 
-This directory is the repository-backed history layer for Betting Edge under the operational `BETTING_EDGE_CONTRACT.md` v0.9.
+This directory is the repository-backed history layer for Betting Edge under the operational `BETTING_EDGE_CONTRACT.md` v1.0.
 
 ## Goals
 
@@ -63,7 +63,7 @@ The format is governed by `data/history/report-provenance-schema.json`.
 
 ### Production schema 3
 
-Post-v0.9-cutover sidecars use schema 3 and are keyed to the exact issued `slot` and `run.ts`. They preserve:
+Schema 3 remains the production sidecar format under Contract v1.0 and is keyed to the exact issued `slot` and `run.ts`. It preserves:
 
 - production contract version/path and exact contract blob SHA resolved before handicapping;
 - runner version/blob SHA;
@@ -79,13 +79,13 @@ Post-v0.9-cutover sidecars use schema 3 and are keyed to the exact issued `slot`
 
 The issued payload remains authoritative for what Betting Edge actually recommended. The sidecar is authoritative only for the structured research/provenance record associated with that issuance.
 
-Historical schema-2 sidecars issued before the production cutover remain valid immutable evidence. Do not rewrite them merely to adopt schema 3.
+Historical schema-2 sidecars issued before the original v0.9 production cutover remain valid immutable evidence. Existing schema-3 sidecars issued under v0.9 also remain immutable historical evidence and are not rewritten merely because Contract v1.0 is now operational.
 
 ## Live integration state
 
-The 15:15 EVENING + 18:15 LATE / WEST COAST live acceptance pair passed on 2026-08-15 and is recorded in `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
+The original 15:15 EVENING + 18:15 LATE / WEST COAST durable-history acceptance pair passed on 2026-08-15 and remains recorded as historical evidence in `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
 
-All five scheduled report lanes are now configured for the same production durable-history behavior:
+Contract v1.0 is now the current production authority. All five scheduled report lanes remain configured for the same durable-history behavior:
 
 - `open` — 06:00;
 - `main` — 08:00;
@@ -93,7 +93,7 @@ All five scheduled report lanes are now configured for the same production durab
 - `evening` — 15:15;
 - `late` — 18:15.
 
-The immediate operational observation is the first full post-cutover day, including whether a browser/device with no local runner history can load all successfully archived earlier same-day lanes through repository-backed history.
+The next production observation is the first report issued under Contract v1.0, confirming that its sidecar records the exact v1.0 contract authority while preserving the existing immutable history/share behavior.
 
 ## Same-day session history
 
