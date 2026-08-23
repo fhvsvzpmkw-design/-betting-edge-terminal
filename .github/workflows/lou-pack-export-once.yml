@@ -16,38 +16,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Build Lou Vega asset pack
+      - name: Build downloadable chunks
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf lou-vega-asset-pack lou-vega-hotline-asset-pack.zip
-          mkdir -p lou-vega-asset-pack/data/characters
-          mkdir -p lou-vega-asset-pack/docs/source-material
-          mkdir -p lou-vega-asset-pack/tests
-          cp data/characters/lou-vega.json lou-vega-asset-pack/data/characters/
-          cp docs/source-material/lou-vega-canon-language-guide.md lou-vega-asset-pack/docs/source-material/
-          cp docs/source-material/lou-vega-scene-bank.md lou-vega-asset-pack/docs/source-material/
-          cp tests/lou-vega-v2.test.mjs lou-vega-asset-pack/tests/
-          cat > lou-vega-asset-pack/README-UPLOAD.txt <<'TXT'
-          LOU VEGA HOTLINE ASSET PACK
-
-          Unzip this file, then upload/replace the files at these exact repository paths:
-
-          data/characters/lou-vega.json
-          docs/source-material/lou-vega-canon-language-guide.md
-          docs/source-material/lou-vega-scene-bank.md
-          tests/lou-vega-v2.test.mjs
-
-          The locked Vegas by the Slice v2 shell and Lou avatar were not changed by this update.
-          TXT
-          zip -qr lou-vega-hotline-asset-pack.zip lou-vega-asset-pack
-      - name: Commit export zip
+          test -f lou-vega-hotline-asset-pack.zip
+          rm -rf lou-pack-chunks
+          mkdir lou-pack-chunks
+          base64 -w 0 lou-vega-hotline-asset-pack.zip | split -b 6000 -d -a 2 - lou-pack-chunks/part-
+          printf '%s\n' "$(wc -c < lou-vega-hotline-asset-pack.zip)" > lou-pack-chunks/ZIP-BYTES.txt
+      - name: Commit download chunks
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lou-vega-hotline-asset-pack.zip
-          git commit -m "Export Lou Vega hotline asset pack"
+          git add lou-pack-chunks
+          git commit -m "Prepare Lou pack download chunks"
           git pull --rebase origin main
           git push origin HEAD:main
