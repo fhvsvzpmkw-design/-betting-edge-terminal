@@ -1,0 +1,49 @@
+name: Lou pack export once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lou-pack-export-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Lou Vega asset pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf lou-vega-asset-pack lou-vega-hotline-asset-pack.zip
+          mkdir -p lou-vega-asset-pack/data/characters
+          mkdir -p lou-vega-asset-pack/docs/source-material
+          mkdir -p lou-vega-asset-pack/tests
+          cp data/characters/lou-vega.json lou-vega-asset-pack/data/characters/
+          cp docs/source-material/lou-vega-canon-language-guide.md lou-vega-asset-pack/docs/source-material/
+          cp docs/source-material/lou-vega-scene-bank.md lou-vega-asset-pack/docs/source-material/
+          cp tests/lou-vega-v2.test.mjs lou-vega-asset-pack/tests/
+          cat > lou-vega-asset-pack/README-UPLOAD.txt <<'TXT'
+          LOU VEGA HOTLINE ASSET PACK
+
+          Unzip this file, then upload/replace the files at these exact repository paths:
+
+          data/characters/lou-vega.json
+          docs/source-material/lou-vega-canon-language-guide.md
+          docs/source-material/lou-vega-scene-bank.md
+          tests/lou-vega-v2.test.mjs
+
+          The locked Vegas by the Slice v2 shell and Lou avatar were not changed by this update.
+          TXT
+          zip -qr lou-vega-hotline-asset-pack.zip lou-vega-asset-pack
+      - name: Commit export zip
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lou-vega-hotline-asset-pack.zip
+          git commit -m "Export Lou Vega hotline asset pack"
+          git push
