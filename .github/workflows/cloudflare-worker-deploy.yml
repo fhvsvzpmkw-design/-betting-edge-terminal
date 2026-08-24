@@ -23,12 +23,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Deploy Worker
+      - name: Validate Worker syntax
+        run: node --check cloudflare-worker/src/index.js
+
+      - name: Deploy Worker and minute scheduler
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy cloudflare-worker/src/index.js --name betting-edge-terminal --compatibility-date 2026-08-22
+          command: deploy cloudflare-worker/src/index.js --name betting-edge-terminal --compatibility-date 2026-08-22 --triggers "* * * * *"
 
       - name: Verify live mutable-file cache policy
         shell: bash
