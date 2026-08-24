@@ -16,31 +16,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Build Lou Vega asset pack
+      - name: Verify staged Lou Vega zip
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf lou-vega-asset-pack lou-vega-hotline-asset-pack.zip
-          mkdir -p lou-vega-asset-pack/data/characters
-          mkdir -p lou-vega-asset-pack/docs/source-material
-          mkdir -p lou-vega-asset-pack/tests
-          cp data/characters/lou-vega.json lou-vega-asset-pack/data/characters/
-          cp docs/source-material/lou-vega-canon-language-guide.md lou-vega-asset-pack/docs/source-material/
-          cp docs/source-material/lou-vega-scene-bank.md lou-vega-asset-pack/docs/source-material/
-          cp tests/lou-vega-v2.test.mjs lou-vega-asset-pack/tests/
-          cat > lou-vega-asset-pack/README-UPLOAD.txt <<'TXT'
-          LOU VEGA HOTLINE ASSET PACK
-
-          Unzip this file, then upload/replace the files at these exact repository paths:
-
-          data/characters/lou-vega.json
-          docs/source-material/lou-vega-canon-language-guide.md
-          docs/source-material/lou-vega-scene-bank.md
-          tests/lou-vega-v2.test.mjs
-
-          The locked Vegas by the Slice v2 shell and Lou avatar were not changed by this update.
-          TXT
-          zip -qr lou-vega-hotline-asset-pack.zip lou-vega-asset-pack
+          test -f lou-vega-hotline-asset-pack.zip
+          unzip -t lou-vega-hotline-asset-pack.zip >/dev/null
       - name: Upload Lou pack artifact
         uses: actions/upload-artifact@v4
         with:
