@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+const read=p=>fs.readFileSync(p,'utf8'),json=p=>JSON.parse(read(p)),assert=(x,m)=>{if(!x)throw new Error(m)};
+const profile=json('data/characters/lou-vega.json');
+const shells=json('data/hotline-shells.json');
+const idx=json('syndicates/generated/lou-vega/archive/index.json');
+const live=read('syndicates/generated/lou-vega/hotline.html');
+const shell=read('syndicates/generated/lou-vega/shell-v3.html');
+const ts=profile.continuity?.lastReportSeen?.timestamp;
+const issue=idx.issues.find(x=>x.issuedAt===ts);
+assert(profile.hotlineStyle?.shell?.version===3,'Lou current profile must use v3');
+assert(profile.sourceMaterial?.visualShell==='./syndicates/generated/lou-vega/shell-v3.html','Lou source visual shell must point to v3');
+const reg=shells.shells.find(x=>x.id==='vegas-by-the-slice'&&x.characterId==='lou-vega');
+assert(reg?.version===3&&reg?.defaultForCharacter===true,'Lou v3 must be registry default');
+assert(reg?.path==='./syndicates/generated/lou-vega/shell-v3.html','Lou registry must point to v3 shell');
+assert(issue?.shellVersion===3,'Lou current archived issue must retain shell v3 metadata');
+const archive=read(`syndicates/generated/lou-vega/archive/${issue.path}`);
+assert(live===archive,'Lou live must equal current archived edition');
+for(const p of ['assets/syndicates/01_lou_vega_main_hero.png','assets/syndicates/02_lou_vega_portrait_cutout.png','assets/syndicates/03_vegas_by_the_slice_logo.png','assets/syndicates/04_lou_vega_header_banner.png'])assert(fs.existsSync(p),`Lou image missing ${p}`);
+for(const m of ['data-shell-version="3"','04_lou_vega_header_banner.png','03_vegas_by_the_slice_logo.png','02_lou_vega_portrait_cutout.png','01_lou_vega_main_hero.png','SHAKIRA AUSTIN UNDER 2.5 ASSISTS','0 BET · 0 LEAN · 1 WAIT · 6 PASS · $0'])assert(live.includes(m),`Lou v3 live missing ${m}`);
+for(const m of ['{{RECOMMENDATION_ITEMS}}','04_lou_vega_header_banner.png','03_vegas_by_the_slice_logo.png','02_lou_vega_portrait_cutout.png','01_lou_vega_main_hero.png','{{LAST_STOP}}'])assert(shell.includes(m),`Lou v3 shell missing ${m}`);
+console.log(`LOU VEGA // VEGAS BY THE SLICE v3: PASS // ${issue.label}`);
