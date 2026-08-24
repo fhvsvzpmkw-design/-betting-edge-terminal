@@ -2,7 +2,6 @@
 'use strict';
 
 const MANIFEST_URL='./research/season-previews/manifest.json';
-const SOURCE_FOLDER='research/season-previews/source-pdfs/';
 const BUTTON_ID='runnerSeasonPreviewF6';
 const PREF_BUTTON_ID='runnerPreferencesF6';
 const PANEL_ID='runnerSeasonPreviewsWorkspace';
@@ -10,7 +9,6 @@ const STYLE_ID='runnerSeasonPreviewsUiStyle';
 const ANALYSIS_MODE_KEY='bettingEdge.preferences.meatDeskAnalysisMode';
 
 let manifest=null,lastDoc=null,observer=null,manifestRequested=false;
-let selectedId=null,reader=null;
 
 function appDoc(){
   try{
@@ -25,31 +23,60 @@ function cardStyle(){
   try{v=localStorage.getItem('bettingEdge.preferences.cardView')||'normal'}catch{}
   return ({normal:'NORMAL',excited:'EXCITED',neon:'NEON',vigscope:'VIG SCOPE'})[v]||String(v).toUpperCase();
 }
-function sourcePath(item){
-  const path=String(item?.path||item?.file||'').trim();
-  if(!path)return '';
-  if(path.startsWith('http://')||path.startsWith('https://')||path.startsWith('./')||path.startsWith('../'))return path;
-  if(path.startsWith('research/'))return './'+path;
-  return './'+SOURCE_FOLDER+path;
-}
-function iconFor(item){
-  const desk=String(item?.desk||item?.kind||'').toUpperCase();
-  if(desk.includes('RACING')||desk.includes('HORSE'))return '🐎';
-  if(desk.includes('FANTASY'))return '🏈';
-  if(desk.includes('CFB')||desk.includes('COLLEGE'))return '🏟️';
-  if(desk.includes('NFL'))return '🏈';
-  return '📖';
-}
-function shortDesk(item){return String(item?.desk||item?.season||item?.kind||'SOURCE').toUpperCase()}
-function sizeText(bytes){
-  const n=Number(bytes);if(!Number.isFinite(n)||n<=0)return '';
-  return n>1048576?`${(n/1048576).toFixed(1)} MB`:`${Math.round(n/1024)} KB`;
-}
-function itemById(id){return (manifest?.sources||[]).find(x=>String(x.id)===String(id))||null}
 function analysisModeLabel(){
   let value='god_mode';
   try{value=localStorage.getItem(ANALYSIS_MODE_KEY)||'god_mode'}catch{}
   return ({basic_readthrough:'BASIC READ-THROUGH',in_depth_report:'IN-DEPTH REPORT',god_mode:'GOD MODE'})[value]||'GOD MODE';
+}
+function shortDesk(item){return String(item?.desk||item?.season||item?.kind||'GENERAL').toUpperCase()}
+function sizeText(bytes){
+  const n=Number(bytes);if(!Number.isFinite(n)||n<=0)return '';
+  return n>1048576?`${(n/1048576).toFixed(1)} MB`:`${Math.round(n/1024)} KB`;
+}
+function iconFor(item){
+  const desk=shortDesk(item),kind=String(item?.kind||'').toUpperCase();
+  if(desk.includes('NHL')||kind.includes('HOCKEY'))return '🏒';
+  if(desk.includes('NBA')||desk.includes('CBB')||desk.includes('NCAAB')||kind.includes('BASKETBALL'))return '🏀';
+  if(desk.includes('RACING')||kind.includes('HORSE'))return '🐎';
+  if(desk.includes('CFB')||kind.includes('COLLEGE FOOTBALL'))return '🏟️';
+  if(desk.includes('NFL')||desk.includes('FANTASY'))return '🏈';
+  return '📚';
+}
+function statusLabel(item){
+  const raw=String(item?.status||'').trim().toUpperCase();
+  if(item?.reviewedAt||raw.includes('ANALYZED')||raw.includes('REVIEWED'))return 'ANALYZED // PRESEASON RESEARCH';
+  if(raw.includes('SUPERSEDED'))return 'SUPERSEDED';
+  if(raw.includes('VERIFIED'))return 'CURRENTLY VERIFIED';
+  return 'SOURCE AVAILABLE // NOT ANALYZED';
+}
+function statusClass(item){
+  const label=statusLabel(item);
+  if(label.startsWith('ANALYZED'))return 'analyzed';
+  if(label==='CURRENTLY VERIFIED')return 'verified';
+  if(label==='SUPERSEDED')return 'superseded';
+  return 'available';
+}
+function sourceCount(){return Array.isArray(manifest?.sources)?manifest.sources.length:0}
+function sportKeys(){
+  const seen=[];
+  (manifest?.sources||[]).forEach(item=>{const key=shortDesk(item);if(key&&!seen.includes(key))seen.push(key)});
+  return seen.sort((a,b)=>a.localeCompare(b));
+}
+function sortSources(items){
+  return items.slice().sort((a,b)=>{
+    const sa=String(a.season||''),sb=String(b.season||'');
+    if(sa!==sb)return sb.localeCompare(sa,undefined,{numeric:true});
+    return String(a.title||a.file||'').localeCompare(String(b.title||b.file||''));
+  });
+}
+function groupSources(items){
+  const groups=new Map();
+  sortSources(items).forEach(item=>{
+    const key=`${shortDesk(item)}|||${String(item.season||'CURRENT').toUpperCase()}`;
+    if(!groups.has(key))groups.set(key,{desk:shortDesk(item),season:String(item.season||'CURRENT').toUpperCase(),items:[]});
+    groups.get(key).items.push(item);
+  });
+  return Array.from(groups.values()).sort((a,b)=>a.desk.localeCompare(b.desk)||b.season.localeCompare(a.season,undefined,{numeric:true}));
 }
 
 function ensureStyle(d){
@@ -70,23 +97,18 @@ function ensureStyle(d){
     body.runnerSeasonPreviewsLoaded #${PANEL_ID}{display:block!important;margin-top:0!important}
     body.runnerSeasonPreviewsLoaded #${PANEL_ID}~*{display:none!important}
 
-    .meatDeskHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #4a302b;padding-bottom:10px;flex-wrap:wrap}.meatDeskHead h2{margin:0;color:#ffd0bb;font-size:18px;letter-spacing:.12em}.meatDeskHead p{margin:5px 0 0;color:#9c827b;font-size:8px;line-height:1.5;letter-spacing:.05em}.meatDeskBadge{border:1px solid #81584d;color:#f0b5a4;background:#100705;padding:6px 9px;font-size:8px;font-weight:950;letter-spacing:.09em}
-    .meatShelfTools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:11px 0 6px}.meatSearch{flex:1 1 220px;min-height:36px;border:1px solid #4a302b;background:#080404;color:#e9d8d1;padding:8px 10px;font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}.meatFilter{border:1px solid #594039;background:#080404;color:#a98f87;padding:7px 9px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer}.meatFilter.active{border-color:#d88672;color:#ffd5c6;background:#190908}
-    .meatShelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:16px 13px;padding:10px 2px 16px;align-items:start}.meatBookWrap{min-width:0;display:grid;justify-items:center;gap:7px}.meatBook{position:relative;width:min(100%,170px);aspect-ratio:.72;border:0;background:transparent;padding:0;cursor:pointer;perspective:900px}.meatBookCover{position:absolute;inset:0;border:1px solid #68443a;border-left:7px solid #3b211b;border-radius:3px 7px 7px 3px;background:linear-gradient(150deg,#1d0a07 0%,#5a1e15 45%,#140706 100%);box-shadow:0 12px 22px rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,220,205,.06);display:grid;grid-template-rows:auto 1fr auto;padding:10px 9px;overflow:hidden;transform-origin:left center;transition:transform 160ms ease,box-shadow 160ms ease,border-color 160ms ease}.meatBookCover:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(105deg,rgba(255,255,255,.025) 0 1px,transparent 1px 7px);pointer-events:none}.meatBook:hover .meatBookCover,.meatBook:focus-visible .meatBookCover{transform:rotateY(-7deg) translateY(-2px);box-shadow:7px 14px 24px rgba(0,0,0,.50);border-color:#d88672}.meatBookKicker{position:relative;z-index:1;color:#e1a694;font-size:7px;font-weight:950;letter-spacing:.11em;text-align:left}.meatBookIcon{position:relative;z-index:1;display:grid;place-items:center;font-size:48px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}.meatBookTitle{position:relative;z-index:1;text-align:left}.meatBookTitle b{display:block;color:#fff0e8;font-size:11px;line-height:1.12;letter-spacing:.035em;text-shadow:0 1px 5px #000}.meatBookTitle span{display:block;margin-top:5px;color:#e5ac9b;font-size:7px;font-weight:900;letter-spacing:.08em}.meatBookCaption{width:min(100%,170px);color:#bea69d;font-size:8px;line-height:1.35;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meatBookCaption b{color:#f0c3b5}.meatBookStatus{font-size:7px;color:#866e67}
-    .meatEmpty{margin-top:14px;border:1px dashed #81584d;padding:18px;text-align:center;color:#c99c8e;font-size:10px}
-
-    .meatDetail{margin-top:11px;border:1px solid #52362e;background:#050303;padding:11px}.meatDetailTop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.meatDetailTop b{color:#ffd0bb;font-size:12px;letter-spacing:.08em}.meatClose,.meatAction,.meatReaderBtn{border:1px solid #6b493f;background:#0b0504;color:#e9baa9;padding:8px 10px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer;text-decoration:none}.meatAction.primary,.meatReaderBtn.primary{border-color:#d88672;background:#1a0907;color:#ffe0d4}.meatDetailGrid{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(260px,1.2fr);gap:13px}.meatCoverPreview{position:relative;min-height:420px;border:1px solid #5d4037;background:#100806;overflow:hidden;display:grid;place-items:center}.meatCoverPreview iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#111}.meatCoverHint{position:absolute;left:8px;right:8px;bottom:8px;z-index:2;background:rgba(5,3,3,.86);border:1px solid #60423a;padding:6px;color:#c6a69b;font-size:7px;text-align:center;pointer-events:none}.meatInfo{display:grid;align-content:start;gap:9px}.meatInfo h3{margin:0;color:#fff0e8;font-size:17px;line-height:1.2}.meatInfoMeta{display:flex;gap:6px;flex-wrap:wrap}.meatChip{border:1px solid #5b4038;background:#0b0605;color:#caa89b;padding:4px 6px;font-size:7px;font-weight:900;letter-spacing:.07em}.meatInfoBlock{border-top:1px solid #34231f;padding-top:8px}.meatInfoBlock small{display:block;color:#8f7770;font-size:7px;font-weight:900;letter-spacing:.10em}.meatInfoBlock p{margin:4px 0 0;color:#cbb6ae;font-size:10px;line-height:1.55}.meatInfoActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-
-    .meatReader{margin-top:10px}.meatReaderBar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.meatReaderTitle{flex:1 1 220px;color:#f5d1c3;font-size:10px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meatPageBox{display:flex;align-items:center;gap:6px;border:1px solid #51362f;background:#080404;padding:5px 7px;color:#a78c83;font-size:8px}.meatPageBox input{width:54px;border:0;background:#120806;color:#ffe1d6;font:900 10px ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center;outline:none}.meatReaderStage{position:relative;border:1px solid #5f4039;background:radial-gradient(circle at 50% 15%,#39211b,#0a0605 58%,#030303);min-height:620px;padding:12px;overflow:hidden;perspective:1200px}.meatPaper{position:relative;width:100%;height:min(74vh,880px);min-height:580px;background:#111;border:1px solid #6a5149;box-shadow:0 20px 44px rgba(0,0,0,.55);transform-origin:left center;transition:transform 160ms ease,opacity 160ms ease}.meatPaper.turning{transform:rotateY(-10deg) translateX(8px);opacity:.72}.meatPaper iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#161616}.meatReaderHelp{margin-top:7px;color:#8e7770;font-size:7px;line-height:1.45;text-align:center}
-    @media(max-width:760px){#${PANEL_ID}{margin-left:7px;margin-right:7px;padding:9px}.meatShelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}.meatBook{width:min(100%,160px)}.meatDetailGrid{grid-template-columns:1fr}.meatCoverPreview{min-height:430px}.meatReaderStage{min-height:520px;padding:7px}.meatPaper{height:68vh;min-height:500px}}
-    @media(max-width:430px){.meatShelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}.meatBookIcon{font-size:40px}.meatBookTitle b{font-size:9.5px}.meatBookCover{padding:8px 7px}.meatBookCaption{font-size:7.5px}.meatCoverPreview{min-height:360px}.meatPaper{min-height:460px}}
+    .meatDeskHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #4a302b;padding-bottom:10px;flex-wrap:wrap}.meatDeskHead h2{margin:0;color:#ffd0bb;font-size:18px;letter-spacing:.12em}.meatDeskHead p{margin:5px 0 0;color:#9c827b;font-size:8px;line-height:1.55;letter-spacing:.05em}.meatDeskBadge{border:1px solid #81584d;color:#f0b5a4;background:#100705;padding:6px 9px;font-size:8px;font-weight:950;letter-spacing:.09em;line-height:1.45}.meatDeskPrivacy{margin:10px 0 0;border:1px solid #49342f;background:#070403;padding:8px 10px;color:#b9968b;font-size:8px;font-weight:850;line-height:1.5;letter-spacing:.06em}.meatDeskPrivacy b{color:#f0b5a4}
+    .meatShelfTools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:11px 0 8px}.meatSearch{flex:1 1 220px;min-height:36px;border:1px solid #4a302b;background:#080404;color:#e9d8d1;padding:8px 10px;font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}.meatFilter{border:1px solid #594039;background:#080404;color:#a98f87;padding:7px 9px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer}.meatFilter.active{border-color:#d88672;color:#ffd5c6;background:#190908}
+    .meatGroup{margin-top:14px}.meatGroup[hidden]{display:none!important}.meatGroupHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px solid #34231f;color:#d8a99b;font-size:9px;font-weight:950;letter-spacing:.11em}.meatGroupCount{color:#755f58;font-size:7px}
+    .meatShelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:11px;padding:10px 0 5px}.meatSource{min-width:0;border:1px solid #51362f;border-left:4px solid #784b3f;background:linear-gradient(145deg,#100706,#050303);padding:10px;display:grid;grid-template-columns:38px minmax(0,1fr);gap:9px;align-items:start;box-shadow:inset 0 0 0 1px rgba(255,220,205,.025)}.meatSourceIcon{width:38px;height:45px;border:1px solid #553930;background:#0b0504;display:grid;place-items:center;font-size:22px}.meatSourceMain{min-width:0}.meatSourceKicker{color:#a47b70;font-size:7px;font-weight:950;letter-spacing:.09em}.meatSourceTitle{margin-top:4px;color:#f2d8cf;font-size:10px;font-weight:950;line-height:1.3}.meatSourceMeta{margin-top:5px;color:#866f68;font-size:7px;line-height:1.45}.meatSourceStatus{grid-column:1/-1;margin-top:2px;border:1px solid #523b34;background:#090504;padding:6px 7px;font-size:7px;font-weight:950;letter-spacing:.08em}.meatSourceStatus.available{color:#efb39f;border-color:#775044}.meatSourceStatus.analyzed{color:#b9e6c5;border-color:#44634c}.meatSourceStatus.verified{color:#cfe8ff;border-color:#466477}.meatSourceStatus.superseded{color:#9b8f8a;border-color:#514845}.meatSourceFoot{grid-column:1/-1;color:#6f5b55;font-size:6.5px;line-height:1.4;letter-spacing:.06em}.meatEmpty{margin-top:14px;border:1px dashed #81584d;padding:18px;text-align:center;color:#c99c8e;font-size:10px}
+    @media(max-width:760px){#${PANEL_ID}{margin-left:7px;margin-right:7px;padding:9px}.meatShelf{grid-template-columns:1fr}.meatDeskBadge{width:100%}}
   `;
   d.head.appendChild(s);
 }
 
 function setButtonCopy(b){
   const count=Array.isArray(manifest?.sources)?manifest.sources.length:null,mode=analysisModeLabel();
-  const msg=count===null?`ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`:`${count} SOURCE${count===1?'':'S'} ON DESK&nbsp;&nbsp; // &nbsp;&nbsp;ANALYSIS: ${mode}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
+  const msg=count===null?`PRIVATE RESEARCH DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`:`${count} SOURCE${count===1?'':'S'} REGISTERED&nbsp;&nbsp; // &nbsp;&nbsp;${esc(mode)} MANUAL REVIEW&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
   const html=`<span class="f6Main"><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="f6Message">${msg}</span>`;
   if(b.innerHTML!==html)b.innerHTML=html;
 }
@@ -106,56 +128,35 @@ function patchLegacyPreferenceCopy(d){
     }
   });
 }
-function filtersHtml(){return ['ALL','NFL','CFB','FANTASY','RACING'].map(x=>`<button type="button" class="meatFilter${x==='ALL'?' active':''}" data-meat-filter="${x}">${x}</button>`).join('')}
-function bookHtml(item){
+function filtersHtml(){
+  return ['ALL',...sportKeys()].map(x=>`<button type="button" class="meatFilter${x==='ALL'?' active':''}" data-meat-filter="${esc(x)}">${esc(x)}</button>`).join('');
+}
+function sourceHtml(item){
   const title=esc(item.title||item.file||'UNTITLED SOURCE');
-  const tags=(item.tags||[]).slice(0,2).map(esc).join(' · ');
-  return `<div class="meatBookWrap" data-meat-item="${esc(item.id)}" data-search="${esc([item.title,item.kind,item.season,item.desk,item.publisher,(item.tags||[]).join(' ')].filter(Boolean).join(' ').toUpperCase())}" data-desk="${esc(shortDesk(item))}">
-    <button type="button" class="meatBook" data-meat-open="${esc(item.id)}" aria-label="Open ${title}">
-      <span class="meatBookCover"><span class="meatBookKicker">${esc(shortDesk(item))} // ${esc(item.season||'')}</span><span class="meatBookIcon">${iconFor(item)}</span><span class="meatBookTitle"><b>${title}</b><span>${tags||esc(item.format||item.kind||'SOURCE')}</span></span></span>
-    </button>
-    <div class="meatBookCaption"><b>${esc(item.publisher||item.format||'DESK COPY')}</b> · ${esc(sizeText(item.bytes))}</div>
-    <div class="meatBookStatus">${esc(item.status||'INDEXED')}</div>
-  </div>`;
+  const desk=shortDesk(item),season=String(item.season||'CURRENT').toUpperCase();
+  const publisher=esc(item.publisher||item.format||'DESK SOURCE');
+  const size=esc(sizeText(item.bytes));
+  const status=statusLabel(item),klass=statusClass(item);
+  const search=esc([item.title,item.kind,item.season,item.desk,item.publisher,(item.tags||[]).join(' '),status].filter(Boolean).join(' ').toUpperCase());
+  return `<article class="meatSource" data-meat-item data-desk="${esc(desk)}" data-search="${search}">
+    <div class="meatSourceIcon" aria-hidden="true">${iconFor(item)}</div>
+    <div class="meatSourceMain"><div class="meatSourceKicker">${esc(desk)} // ${esc(season)}</div><div class="meatSourceTitle">${title}</div><div class="meatSourceMeta">${publisher}${size?` // ${size}`:''}</div></div>
+    <div class="meatSourceStatus ${klass}">${esc(status)}</div>
+    <div class="meatSourceFoot">PRIVATE RESEARCH SOURCE // DOCUMENT ACCESS DISABLED // ANALYSIS RUNS MANUALLY</div>
+  </article>`;
 }
 function libraryHtml(){
   const sources=Array.isArray(manifest?.sources)?manifest.sources:[];
-  return `<div class="meatDeskHead"><div><h2>🥩 MEAT DESK</h2><p>PRESEASON MAGAZINES // BETTING GUIDES // BOOKS // REFERENCE COPIES</p></div><div class="meatDeskBadge">${sources.length} DESK COP${sources.length===1?'Y':'IES'} // ANALYSIS: ${esc(analysisModeLabel())}</div></div>
-    <div class="meatShelfTools"><input class="meatSearch" type="search" placeholder="SEARCH THE DESK…" aria-label="Search Meat Desk">${filtersHtml()}</div>
-    ${sources.length?`<div class="meatShelf">${sources.map(bookHtml).join('')}</div>`:`<div class="meatEmpty">NO DESK COPIES INDEXED.</div>`}`;
+  const groups=groupSources(sources);
+  const analyzed=sources.filter(x=>statusLabel(x).startsWith('ANALYZED')).length;
+  return `<div class="meatDeskHead"><div><h2>🥩 MEAT DESK</h2><p>PRIVATE PRESEASON RESEARCH REGISTRY // SPORT → SEASON → SOURCE</p></div><div class="meatDeskBadge">${sources.length} SOURCE${sources.length===1?'':'S'} // ${analyzed} ANALYZED<br>REVIEW MODE: ${esc(analysisModeLabel())} // MANUAL ONLY</div></div>
+    <div class="meatDeskPrivacy"><b>DESK POLICY:</b> SOURCE PRESENCE AND REVIEW STATUS ONLY. ORIGINAL DOCUMENTS AND PRIVATE RESEARCH ARE NOT OPENED OR EXPOSED FROM THIS SCREEN.</div>
+    <div class="meatShelfTools"><input class="meatSearch" type="search" placeholder="SEARCH SOURCES…" aria-label="Search Meat Desk sources">${filtersHtml()}</div>
+    ${groups.length?groups.map(group=>`<section class="meatGroup" data-meat-group="${esc(group.desk)}"><div class="meatGroupHead"><span>${esc(group.desk)} // ${esc(group.season)}</span><span class="meatGroupCount">${group.items.length} SOURCE${group.items.length===1?'':'S'}</span></div><div class="meatShelf">${group.items.map(sourceHtml).join('')}</div></section>`).join(''):`<div class="meatEmpty">NO RESEARCH SOURCES REGISTERED.</div>`}`;
 }
-function detailHtml(item){
-  const path=sourcePath(item),title=esc(item.title||item.file||'SOURCE');
-  const chips=[item.desk,item.season,item.publisher,item.format,sizeText(item.bytes)].filter(Boolean).map(x=>`<span class="meatChip">${esc(x)}</span>`).join('');
-  const previewSrc=`${path}#page=1&view=FitH&toolbar=0&navpanes=0`;
-  return `<div class="meatDetail" data-meat-detail="${esc(item.id)}">
-    <div class="meatDetailTop"><b>DESK COPY // COVER PREVIEW</b><button type="button" class="meatClose" data-meat-back>BACK TO SHELF</button></div>
-    <div class="meatDetailGrid">
-      <div class="meatCoverPreview"><iframe src="${esc(previewSrc)}" title="${title} cover preview" loading="eager"></iframe><div class="meatCoverHint">LIVE PDF COVER PREVIEW // IF THE EMBED IS BLANK, USE OPEN FULLSCREEN PDF</div></div>
-      <div class="meatInfo"><h3>${title}</h3><div class="meatInfoMeta">${chips}</div>
-        <div class="meatInfoBlock"><small>WHY IT'S ON THE DESK</small><p>${esc(item.use||item.notes||'Reference copy.')}</p></div>
-        <div class="meatInfoBlock"><small>REVIEW STATE</small><p>${esc(item.status||'INDEXED')}</p></div>
-        <div class="meatInfoBlock"><small>NEXT ANALYSIS MODE</small><p>${esc(analysisModeLabel())} // MANUAL TRIGGER ONLY</p></div>
-        <div class="meatInfoBlock"><small>NOTES</small><p>${esc(item.notes||'No notes yet.')}</p></div>
-        <div class="meatInfoActions"><button type="button" class="meatAction primary" data-meat-read="${esc(item.id)}">READ DESK COPY</button><a class="meatAction" href="${esc(path)}" target="_blank" rel="noopener">OPEN FULLSCREEN PDF</a></div>
-      </div>
-    </div>
-  </div>`;
-}
-function readerSrc(item,page){return `${sourcePath(item)}#page=${Math.max(1,page)}&zoom=page-width&view=FitH`}
-function readerHtml(item,page=1){
-  const title=esc(item.title||item.file||'SOURCE'),path=sourcePath(item);
-  return `<div class="meatReader" data-meat-reader="${esc(item.id)}">
-    <div class="meatReaderBar"><button type="button" class="meatReaderBtn" data-meat-reader-back>← SHELF</button><div class="meatReaderTitle">${title}</div><button type="button" class="meatReaderBtn" data-meat-prev>◀ PREV</button><div class="meatPageBox">PAGE <input type="number" min="1" value="${page}" data-meat-page></div><button type="button" class="meatReaderBtn primary" data-meat-next>NEXT ▶</button><a class="meatReaderBtn" href="${esc(path)}" target="_blank" rel="noopener">FULLSCREEN PDF</a></div>
-    <div class="meatReaderStage"><div class="meatPaper"><iframe src="${esc(readerSrc(item,page))}" title="${title} reader" loading="eager"></iframe></div></div>
-    <div class="meatReaderHelp">NATIVE PDF READER // SWIPE LEFT OR RIGHT OR USE PREV / NEXT // THE FULLSCREEN PDF LINK IS ALWAYS AVAILABLE AS A FALLBACK</div>
-  </div>`;
-}
-function renderPanel(d,mode='library'){
+function renderPanel(d){
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),nav=tabs?.parentElement;if(!nav)return;
-  let p=d.getElementById(PANEL_ID);if(!p){p=d.createElement('section');p.id=PANEL_ID;p.setAttribute('aria-label','Meat Desk source library');nav.insertAdjacentElement('afterend',p)}
-  if(mode==='detail'&&selectedId){const item=itemById(selectedId);p.innerHTML=libraryHtml()+(item?detailHtml(item):'');return}
-  if(mode==='reader'&&reader?.id){const item=itemById(reader.id);p.innerHTML=item?readerHtml(item,reader.page||1):libraryHtml();return}
+  let p=d.getElementById(PANEL_ID);if(!p){p=d.createElement('section');p.id=PANEL_ID;p.setAttribute('aria-label','Meat Desk private source registry');nav.insertAdjacentElement('afterend',p)}
   p.innerHTML=libraryHtml();
 }
 function applyShelfFilter(d){
@@ -164,51 +165,42 @@ function applyShelfFilter(d){
   const active=p.querySelector('.meatFilter.active')?.dataset.meatFilter||'ALL';
   p.querySelectorAll('[data-meat-item]').forEach(card=>{
     const search=String(card.dataset.search||''),desk=String(card.dataset.desk||'');
-    const filterOk=active==='ALL'||desk.includes(active),searchOk=!q||search.includes(q);
-    card.style.display=filterOk&&searchOk?'grid':'none';
+    const show=(active==='ALL'||desk===active)&&(!q||search.includes(q));
+    card.style.display=show?'grid':'none';
   });
-}
-function turnPage(d,deltaOrPage){
-  if(!reader?.id)return;const item=itemById(reader.id);if(!item)return;
-  const page=typeof deltaOrPage==='number'&&Math.abs(deltaOrPage)<2?Math.max(1,(reader.page||1)+deltaOrPage):Math.max(1,Number(deltaOrPage)||1);
-  if(page===reader.page)return;
-  const p=d.getElementById(PANEL_ID),paper=p?.querySelector('.meatPaper');if(paper)paper.classList.add('turning');
-  setTimeout(()=>{reader.page=page;renderPanel(d,'reader')},150);
+  p.querySelectorAll('[data-meat-group]').forEach(group=>{group.hidden=!Array.from(group.querySelectorAll('[data-meat-item]')).some(card=>card.style.display!=='none')});
 }
 function bindPanel(d){
   if(d.documentElement.dataset.meatDeskPanelBound==='1')return;
   d.documentElement.dataset.meatDeskPanelBound='1';
   d.addEventListener('click',e=>{
     const p=e.target.closest?.(`#${PANEL_ID}`);if(!p)return;
-    const filter=e.target.closest('[data-meat-filter]');if(filter){p.querySelectorAll('.meatFilter').forEach(x=>x.classList.toggle('active',x===filter));applyShelfFilter(d);return}
-    const open=e.target.closest('[data-meat-open]');if(open){selectedId=open.dataset.meatOpen;reader=null;renderPanel(d,'detail');return}
-    if(e.target.closest('[data-meat-back]')){selectedId=null;reader=null;renderPanel(d,'library');return}
-    const read=e.target.closest('[data-meat-read]');if(read){reader={id:read.dataset.meatRead,page:1};selectedId=null;renderPanel(d,'reader');return}
-    if(e.target.closest('[data-meat-reader-back]')){reader=null;selectedId=null;renderPanel(d,'library');return}
-    if(e.target.closest('[data-meat-prev]')){turnPage(d,-1);return}
-    if(e.target.closest('[data-meat-next]')){turnPage(d,1);return}
+    const filter=e.target.closest('[data-meat-filter]');if(!filter)return;
+    p.querySelectorAll('.meatFilter').forEach(x=>x.classList.toggle('active',x===filter));
+    applyShelfFilter(d);
   });
   d.addEventListener('input',e=>{if(e.target.matches?.('.meatSearch'))applyShelfFilter(d)});
-  d.addEventListener('change',e=>{if(e.target.matches?.('[data-meat-page]'))turnPage(d,Number(e.target.value)||1);setTimeout(()=>{const pref=d.getElementById(PREF_BUTTON_ID);if(pref)setPreferenceCopy(pref)},0)});
-  let touchX=null;
-  d.addEventListener('touchstart',e=>{if(e.target.closest?.('.meatReaderStage'))touchX=e.touches?.[0]?.clientX??null},{passive:true});
-  d.addEventListener('touchend',e=>{if(touchX===null||!e.target.closest?.('.meatReaderStage'))return;const x=e.changedTouches?.[0]?.clientX??touchX,dx=x-touchX;touchX=null;if(Math.abs(dx)>55)turnPage(d,dx<0?1:-1)},{passive:true});
+  d.addEventListener('change',()=>setTimeout(()=>{const pref=d.getElementById(PREF_BUTTON_ID);if(pref)setPreferenceCopy(pref)},0));
 }
-function closeDesk(d,b){d.body.classList.remove('runnerSeasonPreviewsLoaded');if(b){b.classList.remove('active');b.setAttribute('aria-pressed','false')}selectedId=null;reader=null}
+function closeDesk(d,b){d.body.classList.remove('runnerSeasonPreviewsLoaded');if(b){b.classList.remove('active');b.setAttribute('aria-pressed','false')}}
 function bindNav(d,b,pref,tabs){
   if(b.dataset.bound!=='1'){
     b.dataset.bound='1';b.addEventListener('click',()=>{
-      const open=!d.body.classList.contains('runnerSeasonPreviewsLoaded');d.body.classList.remove('runnerSyndicateLoaded','runnerPreferencesLoaded');pref?.classList.remove('active');d.body.classList.toggle('runnerSeasonPreviewsLoaded',open);b.classList.toggle('active',open);b.setAttribute('aria-pressed',String(open));if(open)renderPanel(d,'library');try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
+      const open=!d.body.classList.contains('runnerSeasonPreviewsLoaded');
+      d.body.classList.remove('runnerSyndicateLoaded','runnerPreferencesLoaded');pref?.classList.remove('active');
+      d.body.classList.toggle('runnerSeasonPreviewsLoaded',open);b.classList.toggle('active',open);b.setAttribute('aria-pressed',String(open));
+      if(open)renderPanel(d);
+      try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
     });
   }
   if(pref&&pref.dataset.meatDeskBound!=='1'){pref.dataset.meatDeskBound='1';pref.addEventListener('click',()=>closeDesk(d,b))}
   if(tabs.dataset.meatDeskBound!=='1'){tabs.dataset.meatDeskBound='1';tabs.addEventListener('click',e=>{const x=e.target.closest('.btn');if(x&&x!==b)closeDesk(d,b)})}
-  if(d.documentElement.dataset.meatDeskKeysBound!=='1'&&pref){d.documentElement.dataset.meatDeskKeysBound='1';d.addEventListener('keydown',e=>{
-    if(e.key==='F7'){e.preventDefault();b.click();return}
-    if(e.key==='Tab'&&!d.body.classList.contains('runnerPreferencesLoaded')){const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;e.preventDefault();pref.click();return}
-    if(reader?.id&&e.key==='ArrowLeft'){e.preventDefault();turnPage(d,-1)}
-    if(reader?.id&&e.key==='ArrowRight'){e.preventDefault();turnPage(d,1)}
-  },true)}
+  if(d.documentElement.dataset.meatDeskKeysBound!=='1'&&pref){
+    d.documentElement.dataset.meatDeskKeysBound='1';d.addEventListener('keydown',e=>{
+      if(e.key==='F7'){e.preventDefault();b.click();return}
+      if(e.key==='Tab'&&!d.body.classList.contains('runnerPreferencesLoaded')){const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;e.preventDefault();pref.click()}
+    },true);
+  }
 }
 function ensureUi(d){
   if(!d?.body)return false;ensureStyle(d);
@@ -217,12 +209,13 @@ function ensureUi(d){
   let b=d.getElementById(BUTTON_ID);if(!b){b=d.createElement('button');b.type='button';b.id=BUTTON_ID;b.className='btn';b.setAttribute('aria-pressed','false');tabs.appendChild(b)}
   setButtonCopy(b);setPreferenceCopy(pref);
   if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
-  if(!d.getElementById(PANEL_ID))renderPanel(d,'library');patchLegacyPreferenceCopy(d);bindPanel(d);bindNav(d,b,pref,tabs);return true;
+  if(!d.getElementById(PANEL_ID))renderPanel(d);
+  patchLegacyPreferenceCopy(d);bindPanel(d);bindNav(d,b,pref,tabs);return true;
 }
 async function loadManifest(){
   if(manifestRequested)return;manifestRequested=true;
   try{const r=await fetch(`${MANIFEST_URL}?v=${Date.now()}`,{cache:'no-store'});if(r.ok)manifest=await r.json()}catch{}
-  const d=appDoc();if(d){ensureUi(d);if(d.body.classList.contains('runnerSeasonPreviewsLoaded'))renderPanel(d,'library')}
+  const d=appDoc();if(d){ensureUi(d);setButtonCopy(d.getElementById(BUTTON_ID));if(d.body.classList.contains('runnerSeasonPreviewsLoaded'))renderPanel(d)}
 }
 function attach(){
   const d=appDoc();if(!d?.body)return false;
