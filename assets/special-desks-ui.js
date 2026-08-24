@@ -77,14 +77,14 @@ function ensureStyle(d){
     .cryptoBoard{display:grid;grid-template-columns:1fr;gap:11px;margin-top:11px}
     .cryptoPick{--status:#9c87ff;position:relative;width:100%;border:2px solid #50456e;border-left:4px solid var(--status);background:#060812;padding:14px;box-shadow:inset 0 0 0 1px rgba(191,176,255,.025),0 0 12px rgba(0,0,0,.26);font-size:16px}
     .cryptoPick[data-status="PLAY"]{--status:#58ff88}.cryptoPick[data-status="WAIT"]{--status:#5edcff}.cryptoPick[data-status="WATCH"]{--status:#ffd36b}.cryptoPick[data-status="PASS"]{--status:#ff738a}
-    .cryptoPickHead{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.cryptoPickIdentity{min-width:0}.cryptoStatusTag{display:inline-block;border:1px solid var(--status);color:var(--status);background:#03060b;padding:4px 8px;font-size:11px;font-weight:950;letter-spacing:.10em;box-shadow:0 0 9px color-mix(in srgb,var(--status) 18%,transparent)}
-    .cryptoPick h3{margin:9px 0 0;color:#f3f1fb;font-size:19px;line-height:1.2;letter-spacing:.055em;text-transform:uppercase}.cryptoMarket{margin-top:5px;color:#9187ad;font-size:12px;font-weight:900;letter-spacing:.08em}.cryptoPickState{text-align:right;min-width:170px}.cryptoPickState small{display:block;color:#827899;font-size:10px;font-weight:950;letter-spacing:.11em;margin-bottom:4px}.cryptoPickState strong{display:block;color:var(--status);font-size:16px;font-weight:950;letter-spacing:.07em;line-height:1.35}.cryptoDecisionTag{display:inline-block;margin-top:6px;border:1px solid var(--status);color:var(--status);padding:3px 7px;font-size:11px;font-weight:950;letter-spacing:.07em}
+    .cryptoPickHead{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.cryptoPickIdentity{min-width:0}.cryptoStatusTag{display:inline-block;border:2px solid var(--status);color:var(--status);background:color-mix(in srgb,var(--status) 8%,#03060b);padding:5px 10px;font-size:14px;font-weight:950;letter-spacing:.10em;box-shadow:0 0 11px color-mix(in srgb,var(--status) 20%,transparent)}
+    .cryptoPick h3{margin:9px 0 0;color:#f3f1fb;font-size:19px;line-height:1.2;letter-spacing:.055em;text-transform:uppercase}.cryptoMarket{margin-top:5px;color:#9187ad;font-size:12px;font-weight:900;letter-spacing:.08em}.cryptoEventMeta{display:flex;flex-wrap:wrap;gap:7px 16px;margin-top:9px;padding:8px 10px;border:1px solid #342a4d;background:#05060d;color:#aaa1bf;font-size:12px;font-weight:800;line-height:1.4;letter-spacing:.035em}.cryptoEventMeta span{white-space:normal}.cryptoEventMeta b{color:#cbbfff;font-size:10px;letter-spacing:.09em}.cryptoEventMeta .eventStart{color:#ece7ff}.cryptoEventMeta .eventStart b{color:var(--status)}.cryptoPickState{text-align:right;min-width:170px}.cryptoPickState small{display:block;color:#827899;font-size:10px;font-weight:950;letter-spacing:.11em;margin-bottom:4px}.cryptoPickState strong{display:block;color:var(--status);font-size:16px;font-weight:950;letter-spacing:.07em;line-height:1.35}.cryptoDecisionTag{display:inline-block;margin-top:7px;border:2px solid var(--status);color:var(--status);background:color-mix(in srgb,var(--status) 7%,#03060b);padding:4px 8px;font-size:13px;font-weight:950;letter-spacing:.07em}
     .cryptoMarketStrip{margin-top:12px;background:#040710;border:1px solid #654f94;padding:11px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.cryptoMarketCell{min-width:0}.cryptoMarketCell small{display:block;color:#807696;font-size:10px;font-weight:950;letter-spacing:.10em;margin-bottom:5px}.cryptoMarketCell strong{display:block;color:#e9e5f6;font-size:20px;font-weight:950;line-height:1.25;overflow-wrap:anywhere}.cryptoMarketCell.marketMove strong{color:#c4b8e8;font-size:16px;line-height:1.4}.cryptoMarketCell.marketDecision strong{color:var(--status);font-size:16px}
     .cryptoSourceNote{margin-top:8px;color:#807790;font-size:11px;line-height:1.45;letter-spacing:.035em}.cryptoSourceNote b{color:#b8aecb}.cryptoWhy{margin-top:10px;border-left:4px solid var(--status);padding:9px 11px;background:#0b0912;color:#b9b3c5;font-size:16px;line-height:1.5}.cryptoWhy b{color:var(--status);letter-spacing:.06em}.cryptoAnalysisBtn{width:100%;margin-top:10px;font:inherit;font-weight:950;padding:9px;background:#100b1c;color:#d7ccff;border:1px solid #725bb0;cursor:pointer;letter-spacing:.06em}.cryptoAnalysisBtn:hover{border-color:#a68cff;color:#fff}.cryptoDetail{margin-top:8px;border:1px dotted #574774;background:#03050a;padding:10px;display:none;color:#9d95ad;font-size:14px;line-height:1.55}.cryptoDetail.open{display:block}.cryptoDetailGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.cryptoDetailCell{border:1px solid #302942;background:#070711;padding:8px}.cryptoDetailCell small{display:block;color:#746b83;font-size:10px;font-weight:950;letter-spacing:.10em;margin-bottom:4px}.cryptoDetailCell strong{display:block;color:#c8bfd8;font-size:13px;line-height:1.4}
     .cryptoPasses{margin-top:12px;border:1px solid rgba(94,76,143,.30);background:rgba(8,6,18,.60)}.cryptoPasses summary{cursor:pointer;list-style:none;padding:9px 11px;color:#9a90b3;font-size:11px;font-weight:950;letter-spacing:.11em}.cryptoPasses summary::-webkit-details-marker{display:none}.cryptoPasses[open] summary{border-bottom:1px solid rgba(94,76,143,.24)}.cryptoPassList{display:grid;gap:7px;padding:9px}.cryptoPass{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;border-left:3px solid #ff738a;background:#07070d;padding:9px}.cryptoPass strong{color:#bbb4c7;font-size:13px;letter-spacing:.05em}.cryptoPass span{display:block;margin-top:3px;color:#817a8d;font-size:11px;line-height:1.4}.cryptoPass b{color:#ff8295;font-size:11px;letter-spacing:.08em}.cryptoTimestamp{margin-top:10px;text-align:right;color:#6e667e;font-size:10px;font-weight:900;letter-spacing:.08em}
     @media(max-width:900px){.cryptoMarketStrip{grid-template-columns:repeat(2,minmax(0,1fr))}.cryptoDetailGrid{grid-template-columns:1fr}}
     @media(max-width:720px){#${PIZZA_PANEL},#${CRYPTO_PANEL}{margin-left:7px;margin-right:7px;padding:10px}.specialShelf{grid-template-columns:1fr}.cryptoSourceBar{grid-template-columns:1fr 1fr}.cryptoSourceBar .cryptoSourceCell:first-child{grid-column:1/-1}}
-    @media(max-width:560px){.cryptoSourceBar{grid-template-columns:1fr}.cryptoSourceBar .cryptoSourceCell:first-child{grid-column:auto}.cryptoPickHead{display:block}.cryptoPickState{text-align:left;min-width:0;margin-top:10px}.cryptoMarketStrip{grid-template-columns:1fr}.cryptoPick h3{font-size:18px}.cryptoWhy{font-size:14px}}
+    @media(max-width:560px){.cryptoSourceBar{grid-template-columns:1fr}.cryptoSourceBar .cryptoSourceCell:first-child{grid-column:auto}.cryptoPickHead{display:block}.cryptoPickState{text-align:left;min-width:0;margin-top:10px}.cryptoMarketStrip{grid-template-columns:1fr}.cryptoPick h3{font-size:18px}.cryptoWhy{font-size:14px}.cryptoStatusTag{font-size:13px}.cryptoDecisionTag{font-size:12px}.cryptoEventMeta{font-size:11px}}
   `;d.head.appendChild(s)
 }
 function itemCard(item,kind){
@@ -101,6 +101,26 @@ function displayDate(value){
   const d=new Date(`${text}T12:00:00`);return d.toLocaleDateString('en-CA',{month:'short',day:'numeric',timeZone:'America/Vancouver'}).toUpperCase();
 }
 function priceText(v){return String(v??'').trim()||'—'}
+function fallbackEvent(card){
+  const key=[card?.selection,card?.market].filter(Boolean).join(' ').toUpperCase();
+  if(key.includes('CAMERON'))return {event:'MVPW-06 · UK VS USA',eventDate:'AUG 29, 2026',eventStartPt:'11:00 AM PT',venue:'BP PULSE LIVE · BIRMINGHAM'};
+  if(key.includes('HRGOVIC')||key.includes('BERINCHYK')||key.includes('NOAKES'))return {event:'ITAUMA vs HRGOVIC',eventDate:'AUG 29, 2026',eventStartPt:'11:00 AM PT',venue:'THE O2 · LONDON'};
+  if(key.includes('MARTINEZ')||key.includes('PLANTIC'))return {event:'PROBOXTV · MARTINEZ vs PLANTIC',eventDate:'AUG 29, 2026',eventStartPt:'2:30 PM PT',venue:'GALEN CENTER · LOS ANGELES'};
+  return {};
+}
+function eventMetaHtml(card){
+  const fallback=fallbackEvent(card);
+  const event=card?.event||fallback.event||'';
+  const date=card?.eventDate||fallback.eventDate||'';
+  const start=card?.eventStartPt||fallback.eventStartPt||'';
+  const venue=card?.venue||fallback.venue||'';
+  const cells=[];
+  if(event)cells.push(`<span><b>EVENT //</b> ${esc(event)}</span>`);
+  if(date)cells.push(`<span><b>DATE //</b> ${esc(date)}</span>`);
+  if(start)cells.push(`<span class="eventStart"><b>EVENT START //</b> ${esc(start)}</span>`);
+  if(venue)cells.push(`<span><b>VENUE //</b> ${esc(venue)}</span>`);
+  return cells.length?`<div class="cryptoEventMeta">${cells.join('')}</div>`:'';
+}
 function cryptoCardHtml(card,index){
   const status=String(card?.status||'WATCH').toUpperCase();
   const rank=String(card?.rank||'').toUpperCase();
@@ -108,7 +128,7 @@ function cryptoCardHtml(card,index){
   const detailId=`cryptoDetail${String(card?.id||index).replace(/[^a-zA-Z0-9_-]/g,'')}`;
   return `<article class="cryptoPick" data-status="${esc(status)}">
     <div class="cryptoPickHead">
-      <div class="cryptoPickIdentity"><span class="cryptoStatusTag">${esc(label)}</span><h3>${esc(card?.selection||card?.title||'UNTITLED')}</h3><div class="cryptoMarket">${esc(card?.market||'MARKET')}</div></div>
+      <div class="cryptoPickIdentity"><span class="cryptoStatusTag">${esc(label)}</span><h3>${esc(card?.selection||card?.title||'UNTITLED')}</h3><div class="cryptoMarket">${esc(card?.market||'MARKET')}</div>${eventMetaHtml(card)}</div>
       <div class="cryptoPickState"><small>PRICE STATUS</small><strong>${esc(card?.actionLabel||status)}</strong><span class="cryptoDecisionTag">${esc(card?.decision||status)}</span></div>
     </div>
     <div class="cryptoMarketStrip">
