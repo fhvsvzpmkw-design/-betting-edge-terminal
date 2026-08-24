@@ -1,0 +1,63 @@
+name: Pizza Plays publication
+
+on:
+  workflow_run:
+    workflows: ["Report history publication"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - run-history.json
+      - data/history/runs/**
+      - tools/build-pizza-plays.mjs
+  workflow_dispatch:
+
+concurrency:
+  group: betting-edge-pizza-plays
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Pizza Plays builder
+        run: node tools/build-pizza-plays.mjs --self-test
+      - name: Build and publish Pizza Plays
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          published=0
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/build-pizza-plays.mjs
+            node tools/build-pizza-plays.mjs --check
+            git add -- data/pizza-plays.json
+            if git diff --cached --quiet; then
+              echo "Pizza Plays already matches the latest Betting Edge report."
+              published=1
+              break
+            fi
+            report_label=$(node -e "const p=require('./data/pizza-plays.json'); process.stdout.write(String(p.source?.reportLabel||p.source?.slot||'latest report'))")
+            git commit -m "Publish Pizza Plays from ${report_label}"
+            if git push origin HEAD:main; then
+              published=1
+              break
+            fi
+            echo "Push raced another repository update; rebuilding from current main."
+          done
+          test "$published" -eq 1
