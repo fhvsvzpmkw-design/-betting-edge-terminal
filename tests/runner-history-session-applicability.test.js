@@ -26,6 +26,7 @@ const dummyElement = () => ({
   src: ''
 });
 const context = {
+  window: { addEventListener() {} },
   document: { getElementById: dummyElement },
   location: { search: '' },
   URLSearchParams,
