@@ -1,0 +1,44 @@
+name: F3 public ledger cutover once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/f3-public-ledger-cutover-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cutover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make public ledger authoritative for F3
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          old_paths = "for(const path of ['./api/bet-history','./data/bet-history-public.json']){"
+          new_paths = "for(const path of ['./data/bet-history-public.json']){"
+          old_source = "payload.deliverySource=path.includes('/api/')?'PRIVATE MASTER // CLOUDFLARE':'STATIC PUBLIC FALLBACK';"
+          new_source = "payload.deliverySource='PUBLIC LEDGER // STATIC PUBLIC PROJECTION';"
+          if old_paths not in s:
+              raise SystemExit('Expected F3 ledger source list not found')
+          if old_source not in s:
+              raise SystemExit('Expected F3 delivery source marker not found')
+          s = s.replace(old_paths, new_paths, 1).replace(old_source, new_source, 1)
+          p.write_text(s)
+          PY
+      - name: Verify F3 source lineage
+        run: |
+          grep -F "for(const path of ['./data/bet-history-public.json']){" index.html
+          grep -F "PUBLIC LEDGER // STATIC PUBLIC PROJECTION" index.html
+      - name: Commit cutover
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Use public ledger for F3 bet history"
+          git push
