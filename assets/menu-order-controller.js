@@ -108,7 +108,7 @@ function applyVisual(d,order=middle){
   return normalized;
 }
 function ensureStyle(d){
-  let old=d.getElementById(STYLE_ID);if(old)old.remove();
+  if(d.getElementById(STYLE_ID))return;
   const s=d.createElement('style');s.id=STYLE_ID;s.textContent=`
     body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
     body.runnerMenuHome.runnerMenuReordering .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grabbing}
