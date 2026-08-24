@@ -1,0 +1,94 @@
+name: Lou Vega v3 promote once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lou-v3-promote-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Promote image-rich Lou v3
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp syndicates/generated/lou-vega/archive/2026-08-23/1515.html syndicates/generated/lou-vega/hotline.html
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          profile_path=Path('data/characters/lou-vega.json')
+          profile=json.loads(profile_path.read_text())
+          profile['updatedAt']='2026-08-23T17:20:00-07:00'
+          hs=profile['hotlineStyle']
+          hs['visualTheme']='Image-rich Vegas sportsbook and pizza-joint marquee built around the canonical Lou Two Slice Vega portrait, neon Vegas by the Slice branding, menu-board pricing, coupon slips, route notes and casino-floor flavor'
+          hs['layoutStyle']='Vegas by the Slice v3: wide illustrated hero banner, standalone neon brand mark, authoritative sportsbook menu, perforated coupon book, cropped Lou route portrait, floor-walk notes, route cards and image-backed Last Stop close'
+          hs['headlineStyle']='The uploaded VEGAS BY THE SLICE neon mark leads the page while Lou remains the recognizable visual host; decorative illustrated odds and slips are explicitly non-live and the text report remains authoritative'
+          hs['shell']={'id':'vegas-by-the-slice','version':3,'portable':True,'status':'locked'}
+          hs['imageAssets']={
+            'mainHero':'./assets/syndicates/01_lou_vega_main_hero.png',
+            'portraitCutout':'./assets/syndicates/02_lou_vega_portrait_cutout.png',
+            'brandLogo':'./assets/syndicates/03_vegas_by_the_slice_logo.png',
+            'headerBanner':'./assets/syndicates/04_lou_vega_header_banner.png',
+            'rule':'Artwork is decorative presentation. Illustrated slips, odds boards and props inside the art are never live prices or issued plays.'
+          }
+          cont=profile['continuity']
+          cont['currentMood']='The Aug. 23 15:15 route is deliberately quiet: the rate-limited 15:10 feed covers 17 events and produces 0 BET, 0 LEAN, 1 WAIT and 6 PASS with $0 new risk. Shakira Austin under 2.5 assists is the only live coupon at Bet365 +125, but it requires +140 or better after active-status confirmation. The other six prices are discarded. Lou treats the thin board as a reason to keep the coupon visible, finish lunch, walk the floor and keep his wallet closed.'
+          threads=cont.get('ongoingThreads',[])
+          threads=[t for t in threads if 'Vegas by the Slice v2 preserves' not in t and 'current 09:30 report carries' not in t]
+          additions=[
+            'Vegas by the Slice v3 is Lou’s current locked image-rich shell. V2 and all historical issues remain preserved.',
+            'The four uploaded Lou visual assets now form the standing v3 image pack: hero, cropped portrait, neon logo and wide header banner. Illustrated betting slips/boards inside the art are decoration only, never live prices.',
+            'The current 15:15 report leaves one WAIT coupon: Shakira Austin under 2.5 assists at +125 requires +140 or better after active-status confirmation. Six other candidates are PASS and new risk remains zero.'
+          ]
+          for x in additions:
+            if x not in threads: threads.append(x)
+          cont['ongoingThreads']=threads
+          cont['lastReportSeen']={'slot':'evening','label':'15:15 EVENING','timestamp':'2026-08-23T15:27:43.870-07:00'}
+          profile_path.write_text(json.dumps(profile,ensure_ascii=False,indent=2)+'\n')
+
+          shells_path=Path('data/hotline-shells.json')
+          shells=json.loads(shells_path.read_text())
+          shells['updatedAt']='2026-08-23T17:20:00-07:00'
+          reg=next(x for x in shells['shells'] if x.get('id')=='vegas-by-the-slice' and x.get('characterId')=='lou-vega')
+          reg.update({
+            'version':3,
+            'name':'VEGAS BY THE SLICE',
+            'description':'Image-rich Vegas sportsbook and pizza-joint Hotline using the canonical Lou Two Slice Vega artwork: wide hero banner, neon brand mark, authoritative menu board, coupon book, Lou route portrait and image-backed Last Stop.',
+            'defaultForCharacter':True,
+            'path':'./syndicates/generated/lou-vega/shell-v3.html',
+            'liveUrl':'./syndicates/generated/lou-vega/hotline.html',
+            'status':'locked',
+            'portable':True,
+            'installable':True
+          })
+          reg['compatibility']={'characterProfileSchema':1,'contentZoneSchema':1,'requiredZones':['hero','masthead','issue-meta','menu-board','recommendations','coupon-book','floor-walk','last-stop','footer']}
+          shells_path.write_text(json.dumps(shells,ensure_ascii=False,indent=2)+'\n')
+
+          idx_path=Path('syndicates/generated/lou-vega/archive/index.json')
+          idx=json.loads(idx_path.read_text())
+          issue={
+            'id':'2026-08-23T1515|lou-vega','characterId':'lou-vega','profileId':'lou-vega','displayName':'LOU VEGA','publication':'VEGAS BY THE SLICE','date':'2026-08-23','session':'1515','label':'15:15 EVENING','issuedAt':'2026-08-23T15:27:43.870-07:00','sourceReport':'data/history/runs/2026-08-23/evening-152743.json','path':'2026-08-23/1515.html','shellId':'vegas-by-the-slice','shellVersion':3
+          }
+          if not any(x.get('id')==issue['id'] for x in idx['issues']): idx['issues'].append(issue)
+          idx['updatedAt']=issue['issuedAt']
+          idx_path.write_text(json.dumps(idx,ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Commit Lou v3
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/generated/lou-vega/hotline.html data/characters/lou-vega.json data/hotline-shells.json syndicates/generated/lou-vega/archive/index.json
+          git commit -m "Promote Lou Vega to image-rich Vegas by the Slice v3"
+          git pull --rebase origin main
+          git push origin HEAD:main
