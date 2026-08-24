@@ -5,8 +5,10 @@ const STORAGE_KEY='bettingEdge.preferences.mainMenuOrder.v1';
 const STYLE_ID='runnerMenuOrderControllerStyle';
 const HINT_ID='runnerMenuOrderHint';
 const PREF_BOX_ID='runnerMenuOrderPreference';
-const HOLD_MS=430;
-const MOVE_CANCEL_PX=12;
+const HOLD_MS=300;
+const MOVE_CANCEL_PX=10;
+const FLIP_MS=165;
+const DROP_MS=180;
 const DEFAULT_MIDDLE=['market','history','syndicate','pizza','crypto','meat','engine'];
 const DEFINITIONS={
   board:{label:'VIGSCOPE',selector:'.btn[data-view="board"]'},
@@ -92,9 +94,10 @@ function applyVisual(d,order=middle){
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
   const s=d.createElement('style');s.id=STYLE_ID;s.textContent=`
-    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;will-change:transform}
     body.runnerMenuHome.runnerMenuReordering .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grabbing}
-    body.runnerMenuHome .runnerNavPad .tabs>.btn.menuOrderDragging{position:relative;z-index:5;opacity:.82;transform:scale(.985);outline:2px solid #ffe96b;outline-offset:2px;box-shadow:0 0 18px rgba(255,233,107,.20)!important}
+    body.runnerMenuHome .runnerNavPad .tabs>.btn.menuOrderDragging{position:relative;z-index:12;opacity:.94;outline:2px solid #ffe96b;outline-offset:2px;box-shadow:0 12px 26px rgba(0,0,0,.42),0 0 20px rgba(255,233,107,.24)!important;transition:none!important}
+    body.runnerMenuHome.runnerMenuReordering .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]:not(.menuOrderDragging){pointer-events:none}
     #${HINT_ID}{display:none;margin-top:8px;padding:7px 9px;border:1px dashed #31566d;background:#020a10;color:#7f9aa8;text-align:center;font-size:8px;font-weight:900;letter-spacing:.09em;line-height:1.45}
     body.runnerMenuHome #${HINT_ID}{display:block}
     #${PREF_BOX_ID}{margin:11px 0;border:1px solid #31566d;background:linear-gradient(180deg,#020b12,#01070b);padding:11px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -154,15 +157,36 @@ function schedule(d){
 function clearHold(){if(drag?.timer){clearTimeout(drag.timer);drag.timer=null}}
 function cleanupDrag(d){
   clearHold();
-  if(drag?.button){drag.button.classList.remove('menuOrderDragging');try{drag.button.releasePointerCapture?.(drag.pointerId)}catch{}}
+  if(drag?.button){
+    drag.button.classList.remove('menuOrderDragging');
+    drag.button.style.transform='';
+    drag.button.style.transition='';
+    try{drag.button.releasePointerCapture?.(drag.pointerId)}catch{}
+  }
   d.body.classList.remove('runnerMenuReordering');
   drag=null;
 }
+function baseRect(b){
+  const transform=b.style.transform,transition=b.style.transition;
+  b.style.transition='none';b.style.transform='none';
+  const r=b.getBoundingClientRect();
+  b.style.transform=transform;b.style.transition=transition;
+  return r;
+}
+function positionDragged(y){
+  if(!drag?.dragging||!drag.button)return;
+  const r=baseRect(drag.button);
+  const dy=y-drag.pointerOffsetY-r.top;
+  drag.translateY=dy;
+  drag.button.style.transform=`translate3d(0,${dy.toFixed(2)}px,0) scale(1.012)`;
+}
 function beginDrag(d){
   if(!drag||drag.dragging||!d.body.classList.contains('runnerMenuHome'))return;
-  drag.dragging=true;drag.draft=[...middle];
+  const r=drag.button.getBoundingClientRect();
+  drag.dragging=true;drag.draft=[...middle];drag.pointerOffsetY=drag.currentY-r.top;drag.translateY=0;
   drag.button.classList.add('menuOrderDragging');d.body.classList.add('runnerMenuReordering');
   try{drag.button.setPointerCapture?.(drag.pointerId)}catch{}
+  positionDragged(drag.currentY);
 }
 function draftForY(d,id,y,current){
   const others=current.filter(x=>x!==id);
@@ -174,29 +198,84 @@ function draftForY(d,id,y,current){
   }
   const next=[...others];next.splice(at,0,id);return normalizeMiddle(next)
 }
+function animateOrderChange(d,next){
+  const first=new Map();
+  DEFAULT_MIDDLE.forEach(id=>{
+    if(id===drag?.id)return;
+    const b=button(d,id);if(b)first.set(id,b.getBoundingClientRect().top);
+  });
+  applyVisual(d,next);
+  DEFAULT_MIDDLE.forEach(id=>{
+    if(id===drag?.id)return;
+    const b=button(d,id),top=first.get(id);if(!b||top===undefined)return;
+    const dy=top-b.getBoundingClientRect().top;if(Math.abs(dy)<.5)return;
+    try{b.__menuOrderFlip?.cancel?.()}catch{}
+    if(typeof b.animate!=='function')return;
+    const animation=b.animate([
+      {transform:`translate3d(0,${dy.toFixed(2)}px,0)`},
+      {transform:'translate3d(0,0,0)'}
+    ],{duration:FLIP_MS,easing:'cubic-bezier(.22,.8,.25,1)'});
+    b.__menuOrderFlip=animation;
+    const clear=()=>{if(b.__menuOrderFlip===animation)b.__menuOrderFlip=null};
+    animation.onfinish=clear;animation.oncancel=clear;
+  });
+}
+function autoScroll(d,y){
+  const w=d.defaultView;if(!w)return;
+  const h=w.innerHeight||0;if(!h)return;
+  const edge=Math.min(90,h*.16);let delta=0;
+  if(y<edge)delta=-Math.min(14,Math.max(2,(edge-y)/5));
+  else if(y>h-edge)delta=Math.min(14,Math.max(2,(y-(h-edge))/5));
+  if(delta){try{w.scrollBy({top:delta,left:0,behavior:'auto'})}catch{try{w.scrollBy(0,delta)}catch{}}}
+}
+function animateDrop(source,visualTop){
+  if(!source||!Number.isFinite(visualTop)||typeof source.animate!=='function')return;
+  const targetTop=source.getBoundingClientRect().top,dy=visualTop-targetTop;
+  source.animate([
+    {transform:`translate3d(0,${dy.toFixed(2)}px,0) scale(1.012)`},
+    {transform:'translate3d(0,0,0) scale(1)'}
+  ],{duration:DROP_MS,easing:'cubic-bezier(.22,.8,.25,1)'});
+}
 function bindPointer(d){
-  if(d.documentElement.dataset.menuOrderPointerBound==='1')return;
-  d.documentElement.dataset.menuOrderPointerBound='1';
+  if(d.documentElement.dataset.menuOrderPointerBound==='2')return;
+  d.documentElement.dataset.menuOrderPointerBound='2';
+  d.addEventListener('contextmenu',e=>{
+    const b=e.target.closest?.('.runnerNavPad .tabs>.btn[data-menu-id]');
+    if(b&&DEFAULT_MIDDLE.includes(b.dataset.menuId))e.preventDefault();
+  },true);
   d.addEventListener('pointerdown',e=>{
     if(!d.body.classList.contains('runnerMenuHome'))return;
+    if(e.isPrimary===false)return;
     if(e.pointerType==='mouse'&&e.button!==0)return;
     const b=e.target.closest?.('.runnerNavPad .tabs>.btn[data-menu-id]');
     const id=b?.dataset?.menuId;if(!b||!DEFAULT_MIDDLE.includes(id))return;
-    clearHold();drag={id,button:b,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,dragging:false,draft:[...middle],timer:null};
+    clearHold();
+    drag={id,button:b,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,currentX:e.clientX,currentY:e.clientY,dragging:false,draft:[...middle],pointerOffsetY:0,translateY:0,timer:null};
     drag.timer=setTimeout(()=>beginDrag(d),HOLD_MS);
   },true);
   d.addEventListener('pointermove',e=>{
     if(!drag||e.pointerId!==drag.pointerId)return;
-    if(!drag.dragging){if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>MOVE_CANCEL_PX)cleanupDrag(d);return}
+    drag.currentX=e.clientX;drag.currentY=e.clientY;
+    if(!drag.dragging){
+      if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>MOVE_CANCEL_PX)cleanupDrag(d);
+      return;
+    }
     e.preventDefault();
+    autoScroll(d,e.clientY);
     const next=draftForY(d,drag.id,e.clientY,drag.draft);
-    if(JSON.stringify(next)!==JSON.stringify(drag.draft)){drag.draft=next;applyVisual(d,next);renderPreferenceBox(d)}
+    if(JSON.stringify(next)!==JSON.stringify(drag.draft)){
+      drag.draft=next;
+      animateOrderChange(d,next);
+    }
+    positionDragged(e.clientY);
   },{capture:true,passive:false});
   const finish=e=>{
     if(!drag||e.pointerId!==drag.pointerId)return;
     const wasDragging=drag.dragging,source=drag.button,next=drag.draft;
+    const visualTop=wasDragging?source.getBoundingClientRect().top:NaN;
     if(wasDragging){e.preventDefault();saveMiddle(next);suppressButton=source;suppressClickUntil=Date.now()+550}
     cleanupDrag(d);apply(d,true);
+    if(wasDragging)animateDrop(source,visualTop);
   };
   d.addEventListener('pointerup',finish,true);
   d.addEventListener('pointercancel',finish,true);
