@@ -5,6 +5,7 @@ import path from 'node:path';
 
 const ROOT=process.cwd();
 const INDEX_PATH=path.join(ROOT,'data/history/results-index.json');
+const PIZZA_ROOT=path.join(ROOT,'data/history/pizza-plays');
 const UNIT_BASE_PCT=0.03;
 const PLAYER_UNIT_CAD=100;
 const NON_BET_STATUSES=new Set(['LEAN','WAIT','PASS']);
@@ -12,6 +13,16 @@ const NON_BET_STATUSES=new Set(['LEAN','WAIT','PASS']);
 function readJson(file){
   try{return JSON.parse(fs.readFileSync(file,'utf8'))}
   catch{return null}
+}
+function walkJson(dir){
+  if(!fs.existsSync(dir))return [];
+  const out=[];
+  for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+    const full=path.join(dir,entry.name);
+    if(entry.isDirectory())out.push(...walkJson(full));
+    else if(entry.isFile()&&entry.name.endsWith('.json'))out.push(full);
+  }
+  return out.sort();
 }
 function cleanText(v){return String(v??'').trim()}
 function parseStakeCad(v){
@@ -79,6 +90,26 @@ function decisionStatusRow(rows,status){
     decisionValueUnits:round(lossAvoidedUnits-opportunityMissedUnits,4),
     shadowCashCad:priced.length?round(shadowNetUnits*PLAYER_UNIT_CAD,2):null,
     decisionValueCad:priced.length?round((lossAvoidedUnits-opportunityMissedUnits)*PLAYER_UNIT_CAD,2):null
+  };
+}
+function pizzaStatusRow(rows,status){
+  const list=rows.filter(row=>cleanText(row?.vigScopeStatus).toUpperCase()===status);
+  const settled=list.filter(row=>row.completionState==='complete');
+  const priced=settled.filter(row=>Number.isFinite(Number(row.unitResult))&&Number.isFinite(Number(row.profitLossCad)));
+  const netUnits=priced.reduce((n,row)=>n+Number(row.unitResult),0);
+  const riskCad=priced.reduce((n,row)=>n+Number(row.trackingUnitCad||0),0);
+  const profitLossCad=priced.reduce((n,row)=>n+Number(row.profitLossCad||0),0);
+  return {
+    status,
+    plays:list.length,
+    settled:settled.length,
+    pending:list.length-settled.length,
+    priced:priced.length,
+    grades:gradeCounts(settled),
+    netUnits:round(netUnits,4),
+    riskCad:round(riskCad,2),
+    profitLossCad:round(profitLossCad,2),
+    roiPct:riskCad>0?round(profitLossCad/riskCad*100,2):null
   };
 }
 
@@ -153,5 +184,66 @@ index.decisionValueAnalytics={
   note:'Positive decision value means losses avoided exceeded profitable opportunities passed up. Negative decision value means the final non-BET filters left more profitable shadow value on the table than they protected.'
 };
 
+const cardMap=new Map(index.cards.map(card=>[cleanText(card.cardId),card]));
+const pizzaArchives=walkJson(PIZZA_ROOT).map(file=>({file,data:readJson(file)})).filter(x=>x.data?.title==='Pizza Plays');
+const pizzaRows=[];
+for(const {file,data} of pizzaArchives){
+  if(cleanText(data?.status).toUpperCase()!=='PLAY'||!data?.play)continue;
+  const sourceRun=cleanText(data?.source?.reportPath);
+  const ordinal=Number(data?.play?.sourceOrdinal);
+  const cardId=sourceRun&&Number.isInteger(ordinal)&&ordinal>0?`${sourceRun}#${ordinal-1}`:'';
+  const card=cardMap.get(cardId)||null;
+  const trackingUnitCad=Number(data?.tracking?.unitCad);
+  const validUnit=Number.isFinite(trackingUnitCad)&&trackingUnitCad>0;
+  const complete=card?.completionState==='complete';
+  const flatUnits=complete&&Number.isFinite(Number(card?.units))?Number(card.units):null;
+  const profitLossCad=validUnit&&flatUnits!==null?trackingUnitCad*flatUnits:null;
+  pizzaRows.push({
+    archivePath:path.relative(ROOT,file).split(path.sep).join('/'),
+    sourceRun,
+    cardId:cardId||null,
+    publishedAt:data?.generatedAt||data?.source?.reportTs||null,
+    title:data?.play?.title||card?.title||null,
+    selectionKey:data?.play?.feed?.selectionKey||card?.selectionKey||null,
+    vigScopeStatus:cleanText(data?.play?.vigScopeStatus).toUpperCase()||null,
+    bankrollCad:round(data?.tracking?.bankrollCad,2),
+    trackingUnitCad:round(trackingUnitCad,4),
+    completionState:complete?'complete':'unresolved',
+    grade:complete?(card?.grade||null):null,
+    unitResult:round(flatUnits,4),
+    profitLossCad:round(profitLossCad,2),
+    analysisPrice:card?.analysisPrice||null
+  });
+}
+pizzaRows.sort((a,b)=>String(a.publishedAt||'').localeCompare(String(b.publishedAt||'')));
+const pizzaSettled=pizzaRows.filter(row=>row.completionState==='complete');
+const pizzaPriced=pizzaSettled.filter(row=>Number.isFinite(Number(row.unitResult))&&Number.isFinite(Number(row.profitLossCad))&&Number(row.trackingUnitCad)>0);
+const pizzaRiskCad=pizzaPriced.reduce((n,row)=>n+Number(row.trackingUnitCad),0);
+const pizzaProfitLossCad=pizzaPriced.reduce((n,row)=>n+Number(row.profitLossCad),0);
+const pizzaNetUnits=pizzaPriced.reduce((n,row)=>n+Number(row.unitResult),0);
+const latestPizzaArchive=pizzaArchives
+  .map(x=>x.data)
+  .sort((a,b)=>String(a?.generatedAt||'').localeCompare(String(b?.generatedAt||'')))
+  .at(-1)||null;
+
+index.pizzaPlayAnalytics={
+  methodology:'each published Pizza Play is tracked as one unit equal to 3% of the bankroll frozen in its source Betting Edge report; settlement uses the exact issued-price flat-unit result already resolved by the Betting Edge Results index',
+  referenceUnitBasePct:3,
+  plays:pizzaRows.length,
+  settled:pizzaSettled.length,
+  pending:pizzaRows.length-pizzaSettled.length,
+  pricedSettled:pizzaPriced.length,
+  unpricedSettled:pizzaSettled.length-pizzaPriced.length,
+  currentTrackingUnitCad:round(latestPizzaArchive?.tracking?.unitCad,2),
+  riskCad:round(pizzaRiskCad,2),
+  profitLossCad:round(pizzaProfitLossCad,2),
+  netUnits:round(pizzaNetUnits,4),
+  roiPct:pizzaRiskCad>0?round(pizzaProfitLossCad/pizzaRiskCad*100,2):null,
+  grades:gradeCounts(pizzaSettled),
+  bySourceStatus:['BET','LEAN','WAIT'].map(status=>pizzaStatusRow(pizzaRows,status)),
+  latest:pizzaRows.at(-1)||null,
+  note:'Pizza tracking is performance accounting only. The Pizza Plays card remains stake-neutral; the frozen 3% unit is used only for VigScope Value plus/minus calculations.'
+};
+
 fs.writeFileSync(INDEX_PATH,`${JSON.stringify(index,null,2)}\n`,'utf8');
-console.log(`${path.relative(ROOT,INDEX_PATH)}: $100 player (${pricedBets.length} priced settled BETs) + decision value (${pricedFinalDecisions.length} priced unique final non-BET decisions)`);
+console.log(`${path.relative(ROOT,INDEX_PATH)}: $100 player (${pricedBets.length} priced settled BETs) + decision value (${pricedFinalDecisions.length} priced unique final non-BET decisions) + Pizza Plays (${pizzaPriced.length} priced settled / ${pizzaRows.length} tracked)`);
