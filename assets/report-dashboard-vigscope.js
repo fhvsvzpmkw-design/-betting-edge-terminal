@@ -85,6 +85,14 @@
   resultsPlayerScale.async=false;
   document.head.appendChild(resultsPlayerScale);
 
+  // Keep the issued-card and unique-selection logs compact as history grows.
+  // Filters apply first; the user then chooses 10 / 25 / 50 / 100 / ALL rows.
+  const resultsCardLogPagination=document.createElement('script');
+  resultsCardLogPagination.id='resultsCardLogPaginationLoader';
+  resultsCardLogPagination.src=`./assets/results-card-log-pagination.js?v=1&b=${UI_CACHE_BUST}`;
+  resultsCardLogPagination.async=false;
+  document.head.appendChild(resultsCardLogPagination);
+
   // The legacy inner page can finish its one-time Engine health request after
   // Results has already replaced that panel. Keep two invisible anchors alive
   // for a few seconds so the old callback cannot throw on missing nodes.
