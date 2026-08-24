@@ -36,7 +36,7 @@ jobs:
           node-version: '22'
       - name: Verify Pizza Plays builder
         run: node tools/build-pizza-plays.mjs --self-test
-      - name: Build and publish Pizza Plays
+      - name: Build and publish Pizza Plays with VigScope Value
         run: |
           set -euo pipefail
           git config user.name github-actions[bot]
@@ -45,11 +45,19 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
+
             node tools/build-pizza-plays.mjs
             node tools/build-pizza-plays.mjs --check
-            git add -- data/pizza-plays.json data/history/pizza-plays
+
+            # A workflow-authored Pizza commit cannot trigger another push workflow
+            # with GITHUB_TOKEN. Rebuild the downstream Value index here so the
+            # immutable Pizza archive and its performance accounting publish atomically.
+            node tools/build-results-index.mjs
+            node tools/add-results-player-value.mjs
+
+            git add -- data/pizza-plays.json data/history/pizza-plays data/history/results-index.json
             if git diff --cached --quiet; then
-              echo "Pizza Plays and immutable archive already match the latest Betting Edge report."
+              echo "Pizza Plays, immutable archive and VigScope Value already match the latest report."
               published=1
               break
             fi
@@ -59,6 +67,6 @@ jobs:
               published=1
               break
             fi
-            echo "Push raced another repository update; rebuilding from current main."
+            echo "Push raced another repository update; rebuilding Pizza and Value from current main."
           done
           test "$published" -eq 1
