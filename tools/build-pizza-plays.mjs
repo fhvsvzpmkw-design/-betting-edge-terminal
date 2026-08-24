@@ -1,86 +1,142 @@
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 
-const ODDS_PATH='data/live-odds.json';
-const HISTORY_PATH='run-history.json';
-const OUT_PATH='data/pizza-plays.json';
-const TIMEZONE='America/Vancouver';
-const MIN_START_LEAD_MINUTES=20;
-const MIN_DECIMAL=1.18;
-const MAX_DECIMAL=2.80;
-const MIN_LEG_EV=0.0125;
-const MAX_FAIR_DISPERSION=0.07;
-const MIN_TWO_EV=0.025;
-const MIN_THREE_EV=0.04;
-const STAKE_UNITS=0.25;
-const ACCEPTED_MARKETS=new Set(['ml','moneyline','money-line','match-winner','h2h','spread','run-line','puck-line','handicap','point-spread']);
+const SOURCE_PATH = 'data/live-odds.json';
+const OUTPUT_PATH = 'data/pizza-plays.json';
+const HISTORY_PATH = 'run-history.json';
+const STAKE_UNITS = 0.25;
+const BOOKS = ['Bet365', 'DraftKings'];
+const MIN_BOOKS = 2;
+const MAX_FEED_AGE_MINUTES = 75;
+const MAX_QUOTE_AGE_MINUTES = 75;
+const MIN_START_LEAD_MINUTES = 20;
+const MIN_DECIMAL = 1.20;
+const MAX_DECIMAL = 3.50;
+const MIN_LEG_EV = 0.03;
+const MAX_LEG_EV = 0.18;
+const MAX_FAIR_DISAGREEMENT = 0.075;
+const MIN_TWO_EV = 0.06;
+const MIN_THREE_EV = 0.09;
 
-const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const num=v=>Number.isFinite(Number(v))?Number(v):null;
-const mean=a=>{const x=a.filter(Number.isFinite);return x.length?x.reduce((s,v)=>s+v,0)/x.length:null};
-const round=(v,d=4)=>Number.isFinite(v)?Number(v.toFixed(d)):null;
-function americanFromDecimal(d){d=Number(d);if(!Number.isFinite(d)||d<=1)return null;return d>=2?Math.round((d-1)*100):Math.round(-100/(d-1))}
-function americanText(d){const n=americanFromDecimal(d);return n==null?'—':`${n>0?'+':''}${n}`}
-function ptStamp(v){const d=new Date(v);if(!Number.isFinite(d.getTime()))return null;return new Intl.DateTimeFormat('en-CA',{timeZone:TIMEZONE,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(d).replace(',','')+' PT'}
-function rowLine(row){for(const k of ['hdp','line','points']){const n=num(row?.[k]);if(n!=null)return n}return null}
-function rowSides(row){const out=[];for(const side of ['home','away','draw']){const d=num(row?.[side]);if(d!=null&&d>1.001)out.push({side,decimal:d})}return out}
-function noVig(row){const sides=rowSides(row);if(sides.length<2)return null;const raw=sides.map(x=>({...x,p:1/x.decimal}));const sum=raw.reduce((s,x)=>s+x.p,0);if(!(sum>0))return null;return Object.fromEntries(raw.map(x=>[x.side,x.p/sum]))}
-function marketKey(m){return String(m?.marketKey||m?.name||'').trim().toLowerCase().replace(/\s+/g,'-')}
-function marketAllowed(k){return ACCEPTED_MARKETS.has(k)||/(^|-)spread$/.test(k)||/(^|-)handicap$/.test(k)||/run-line|puck-line/.test(k)}
-function selectionKey(row,side,eventId,k,line){return String(row?.selectionKeys?.[side]||row?.identity?.selectionKeys?.[side]||`${eventId}|${k}|${side}||${line==null?'':line}`)}
-function selectionLabel(event,side,k,line){const name=side==='home'?event.home:side==='away'?event.away:'Draw';if(k==='ml'||/money|match-winner|h2h/.test(k))return `${name} ML`;if(line==null)return `${name} ${k.toUpperCase()}`;const x=side==='away'?-line:line;const suffix=/run-line/.test(k)?'RL':/puck-line/.test(k)?'PL':'SPREAD';return `${name} ${x>0?'+':''}${x} ${suffix}`}
-function latestReportMeta(odds,history){const runs=Array.isArray(history?.runs)?history.runs.filter(r=>r?.path):[];const exact=runs.filter(r=>r.feedGeneratedAt===odds.generatedAt).sort((a,b)=>Date.parse(b.ts||0)-Date.parse(a.ts||0));return exact[0]||runs.sort((a,b)=>Date.parse(b.ts||0)-Date.parse(a.ts||0))[0]||null}
-function reportMap(report){const m=new Map();for(const r of Array.isArray(report?.recs)?report.recs:[]){if(r?.feed?.selectionKey)m.set(String(r.feed.selectionKey),r)}return m}
-function bettingEdgeGate(rec){if(!rec)return{allowed:true,status:'NOT TRACKED',note:'Not present on the issued Betting Edge shortlist.'};const s=String(rec.status||'').toUpperCase();if(['PASS','WAIT'].includes(s))return{allowed:false,status:s,note:rec.analysis||rec.contrary||`${s} in Betting Edge`};return{allowed:true,status:s||'TRACKED',note:rec.analysis||rec.support||'Tracked by Betting Edge'}}
+function num(value) { const x = Number(value); return Number.isFinite(x) ? x : null; }
+function round(value, digits = 3) { if (!Number.isFinite(value)) return null; const m = 10 ** digits; return Math.round(value * m) / m; }
+function decimalToAmerican(decimal) { const d = num(decimal); if (!d || d <= 1) return null; return d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); }
+function implied(decimal) { const d = num(decimal); return d && d > 1 ? 1 / d : null; }
+function mean(values) { const a = values.filter(Number.isFinite); return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
+function minutesBetween(a, b) { return (a - b) / 60_000; }
+function lineValue(row) { for (const key of ['hdp', 'line', 'points', 'total']) { const x = num(row?.[key]); if (x !== null) return x; } return null; }
+function isHalfLine(line) { if (!Number.isFinite(line)) return false; return Math.abs(line * 2 - Math.round(line * 2)) < 1e-7 && Math.abs(line - Math.round(line)) > 1e-7; }
+function marketKind(market) {
+  const key = String(market?.marketKey || market?.identity?.marketKey || '').toLowerCase();
+  const name = String(market?.name || '').toLowerCase();
+  if (key === 'ml' || name === 'ml' || /money\s*line|moneyline|match winner/.test(name)) return 'ml';
+  if (key === 'spread' || /spread|run[- ]line|puck[- ]line|handicap/.test(`${key} ${name}`)) return 'spread';
+  if (key === 'totals' || name === 'totals') return 'totals';
+  return null;
+}
+function outcomesFor(kind, row) {
+  const sides = kind === 'totals' ? ['over', 'under'] : ['home', 'away', ...(kind === 'ml' && num(row?.draw) ? ['draw'] : [])];
+  const values = {};
+  for (const side of sides) { const d = num(row?.[side]); if (!d || d <= 1) return null; values[side] = d; }
+  return values;
+}
+function noVig(values) {
+  const entries = Object.entries(values || {}); if (entries.length < 2) return null;
+  const raw = entries.map(([side, decimal]) => [side, implied(decimal)]); if (raw.some(([, p]) => !p)) return null;
+  const sum = raw.reduce((t, [, p]) => t + p, 0); return Object.fromEntries(raw.map(([side, p]) => [side, p / sum]));
+}
+function rowIdentity(kind, row) { if (kind === 'ml') return 'ml'; const line = lineValue(row); if (line === null || !isHalfLine(line)) return null; return `${kind}|${line}`; }
+function selectionName(event, side) { if (side === 'home') return event.home; if (side === 'away') return event.away; if (side === 'draw') return 'Draw'; if (side === 'over') return 'Over'; if (side === 'under') return 'Under'; return side; }
+function displayMarket(event, kind) { if (kind === 'ml') return 'Moneyline'; if (kind === 'totals') return 'Total'; const sport = String(event?.sport?.slug || '').toLowerCase(); if (sport === 'baseball') return 'Run Line'; if (sport === 'ice-hockey') return 'Puck Line'; return 'Spread'; }
+function displayLine(kind, side, homeLine) { if (kind === 'ml') return null; if (kind === 'totals') return homeLine; return side === 'away' ? -homeLine : homeLine; }
+function selectionKey(eventId, market, row, side, kind, homeLine) { const explicit = row?.selectionKeys?.[side] || row?.identity?.selectionKeys?.[side]; if (explicit) return String(explicit); const key = market?.marketKey || market?.identity?.marketKey || kind; const line = kind === 'ml' ? '' : String(homeLine); return `${eventId}|${key}|${side}||${line}`; }
+function formatSelection(event, kind, side, homeLine) { const name = selectionName(event, side); if (kind === 'ml') return name; if (kind === 'totals') return `${name} ${homeLine}`; const line = displayLine(kind, side, homeLine); return `${name} ${line > 0 ? '+' : ''}${line}`; }
 
-function extractCandidates(odds,report,clock=Date.now()){
-  const rmap=reportMap(report), groups=new Map();
-  const diagnostics={eventsScanned:0,marketRowsScanned:0,priceQuotesScanned:0,excludedStartedSoon:0,excludedUnsupportedMarket:0,excludedOneBook:0,excludedPriceBand:0,excludedWeakEv:0,excludedDisagreement:0,excludedBettingEdge:0};
-  for(const event of odds.events||[]){
-    diagnostics.eventsScanned++;
-    const start=Date.parse(event?.date||'');
-    if(!Number.isFinite(start)||start<=clock+MIN_START_LEAD_MINUTES*60000){diagnostics.excludedStartedSoon++;continue}
-    if(event?.status&&!['pending','scheduled','not_started'].includes(String(event.status).toLowerCase()))continue;
-    const eventId=String(event?.eventId||event?.id||'');if(!eventId)continue;
-    for(const [book,markets] of Object.entries(event?.bookmakers||{})){
-      if(!Array.isArray(markets))continue;
-      for(const market of markets){
-        const k=marketKey(market);if(!marketAllowed(k)){diagnostics.excludedUnsupportedMarket++;continue}
-        for(const row of Array.isArray(market?.odds)?market.odds:[]){
-          diagnostics.marketRowsScanned++;const fair=noVig(row);if(!fair)continue;const line=rowLine(row);
-          for(const {side,decimal} of rowSides(row)){
-            diagnostics.priceQuotesScanned++;const sk=selectionKey(row,side,eventId,k,line);
-            if(!groups.has(sk))groups.set(sk,{selectionKey:sk,eventId,eventKey:event.eventKey||`odds-api-io:${eventId}`,event,marketKey:k,marketName:market?.name||k,line,side,quotes:[],fairByBook:[]});
-            const g=groups.get(sk);g.quotes.push({book,decimal,updatedAt:market?.updatedAt||null});if(Number.isFinite(fair[side]))g.fairByBook.push({book,probability:fair[side]});
-          }
+function loadBettingEdgeGate(source) {
+  const empty = { report: null, statuses: new Map(), blocked: new Set() };
+  if (!fs.existsSync(HISTORY_PATH)) return empty;
+  try {
+    const history = JSON.parse(fs.readFileSync(HISTORY_PATH, 'utf8'));
+    const runs = (Array.isArray(history.runs) ? history.runs : []).filter(r => r?.path && r.feedGeneratedAt === source.generatedAt).sort((a, b) => Date.parse(b.ts || '') - Date.parse(a.ts || ''));
+    const run = runs[0]; if (!run || !fs.existsSync(run.path)) return empty;
+    const report = JSON.parse(fs.readFileSync(run.path, 'utf8')); const statuses = new Map(); const blocked = new Set();
+    for (const rec of Array.isArray(report.recs) ? report.recs : []) { const key = rec?.feed?.selectionKey; if (!key) continue; const status = String(rec.status || '').toUpperCase(); statuses.set(String(key), status); if (status === 'WAIT' || status === 'PASS') blocked.add(String(key)); }
+    return { report: { path: run.path, ts: report.ts || run.ts || null, label: report.label || run.label || null }, statuses, blocked };
+  } catch (error) { return { ...empty, warning: `Betting Edge gate unavailable: ${error.message}` }; }
+}
+
+function marketRows(event, book) {
+  const markets = event?.bookmakers?.[book]; if (!Array.isArray(markets)) return []; const out = [];
+  for (const market of markets) { const kind = marketKind(market); if (!kind || !Array.isArray(market.odds)) continue; for (const row of market.odds) { if (!row || typeof row !== 'object') continue; const identity = rowIdentity(kind, row); if (!identity) continue; const values = outcomesFor(kind, row); const fair = noVig(values); if (!values || !fair) continue; out.push({ market, kind, row, identity, values, fair, homeLine: lineValue(row) }); } }
+  return out;
+}
+
+function extractCandidates(source, gate, nowMs = Date.now()) {
+  const sourceTime = Date.parse(source.generatedAt || ''); if (!Number.isFinite(sourceTime)) throw new Error('live-odds.json is missing a valid generatedAt');
+  const availableBooks = BOOKS.filter(book => Array.isArray(source.bookmakers) && source.bookmakers.includes(book)); if (availableBooks.length < MIN_BOOKS) throw new Error(`Pizza requires ${MIN_BOOKS} supported books`);
+  const candidates = []; let blockedCount = 0;
+  for (const event of Array.isArray(source.events) ? source.events : []) {
+    if (String(event?.status || '').toLowerCase() !== 'pending') continue;
+    const start = Date.parse(event?.date || ''); if (!Number.isFinite(start) || minutesBetween(start, nowMs) < MIN_START_LEAD_MINUTES) continue;
+    const eventId = String(event.eventId ?? event.id ?? ''); if (!eventId) continue;
+    const byBook = new Map();
+    for (const book of availableBooks) { const rows = new Map(); for (const item of marketRows(event, book)) rows.set(item.identity, item); byBook.set(book, rows); }
+    const identities = new Set(); for (const rows of byBook.values()) for (const id of rows.keys()) identities.add(id);
+    for (const identity of identities) {
+      const matched = availableBooks.map(book => ({ book, item: byBook.get(book)?.get(identity) })).filter(x => x.item); if (matched.length < MIN_BOOKS) continue;
+      const kind = matched[0].item.kind; const sides = Object.keys(matched[0].item.values);
+      for (const offer of matched) {
+        const quoteTime = Date.parse(offer.item.market.updatedAt || ''); if (!Number.isFinite(quoteTime) || minutesBetween(sourceTime, quoteTime) > MAX_QUOTE_AGE_MINUTES) continue;
+        for (const side of sides) {
+          const decimal = offer.item.values[side]; if (decimal < MIN_DECIMAL || decimal > MAX_DECIMAL) continue;
+          const key = selectionKey(eventId, offer.item.market, offer.item.row, side, kind, offer.item.homeLine); if (gate.blocked.has(key)) { blockedCount++; continue; }
+          const comparisons = matched.filter(x => x.book !== offer.book && Number.isFinite(x.item.values?.[side])); if (!comparisons.length) continue;
+          const comparisonQuoteTimes = comparisons.map(x => Date.parse(x.item.market.updatedAt || '')).filter(Number.isFinite); if (comparisonQuoteTimes.length !== comparisons.length || comparisonQuoteTimes.some(t => minutesBetween(sourceTime, t) > MAX_QUOTE_AGE_MINUTES)) continue;
+          const bestOtherPrice = Math.max(...comparisons.map(x => x.item.values[side])); if (decimal + 0.005 < bestOtherPrice) continue;
+          const otherFair = mean(comparisons.map(x => x.item.fair[side])); const ownFair = offer.item.fair[side]; if (!Number.isFinite(otherFair) || !Number.isFinite(ownFair)) continue;
+          const fairDisagreement = Math.abs(otherFair - ownFair); if (fairDisagreement > MAX_FAIR_DISAGREEMENT) continue;
+          const ev = otherFair * decimal - 1; if (ev < MIN_LEG_EV || ev > MAX_LEG_EV) continue;
+          const homeLine = offer.item.homeLine; const latestStatus = gate.statuses.get(key) || 'UNTRACKED';
+          candidates.push({ eventId, eventKey: event.eventKey || event?.identity?.eventKey || null, event: `${event.away} @ ${event.home}`, startTime: event.date, sport: event?.sport?.name || event?.sport?.slug || 'Unknown', sportKey: event?.sport?.slug || null, league: event?.league?.name || null, market: displayMarket(event, kind), marketKey: offer.item.market?.marketKey || offer.item.market?.identity?.marketKey || kind, selection: formatSelection(event, kind, side, homeLine), selectionKey: key, side, line: displayLine(kind, side, homeLine), book: offer.book, decimal: round(decimal, 3), american: decimalToAmerican(decimal), fairMethod: 'OTHER-BOOK NO-VIG', fairProbability: round(otherFair, 5), fairDecimal: round(1 / otherFair, 3), fairAmerican: decimalToAmerican(1 / otherFair), evPct: round(ev * 100, 2), fairDisagreementPct: round(fairDisagreement * 100, 2), bettingEdgeStatus: latestStatus, url: event?.urls?.[offer.book] || null, books: matched.map(x => ({ book: x.book, decimal: round(x.item.values[side], 3), american: decimalToAmerican(x.item.values[side]), noVigProbability: round(x.item.fair[side], 5), updatedAt: x.item.market.updatedAt || null })) });
         }
       }
     }
   }
-  const rows=[];
-  for(const g of groups.values()){
-    const books=[...new Set(g.fairByBook.map(x=>x.book))];if(books.length<2){diagnostics.excludedOneBook++;continue}
-    const best=g.quotes.slice().sort((a,b)=>b.decimal-a.decimal)[0];if(!best||best.decimal<MIN_DECIMAL||best.decimal>MAX_DECIMAL){diagnostics.excludedPriceBand++;continue}
-    const fairs=books.map(b=>mean(g.fairByBook.filter(x=>x.book===b).map(x=>x.probability))).filter(Number.isFinite);const fairProb=mean(fairs);if(!Number.isFinite(fairProb)||fairProb<=0||fairProb>=1)continue;
-    const dispersion=Math.max(...fairs)-Math.min(...fairs);if(dispersion>MAX_FAIR_DISPERSION){diagnostics.excludedDisagreement++;continue}
-    const ev=fairProb*best.decimal-1;if(ev<MIN_LEG_EV){diagnostics.excludedWeakEv++;continue}
-    const gate=bettingEdgeGate(rmap.get(g.selectionKey));if(!gate.allowed){diagnostics.excludedBettingEdge++;continue}
-    const fairDecimal=1/fairProb, sport=g.event?.sport?.name||g.event?.sport?.slug||'Unknown';
-    const score=ev*100-dispersion*35+(gate.status==='BET'?1:gate.status==='LEAN'?.5:0);
-    rows.push({eventId:g.eventId,eventKey:g.eventKey,selectionKey:g.selectionKey,sport,league:g.event?.league?.name||'',event:`${g.event?.away||'Away'} @ ${g.event?.home||'Home'}`,eventStart:g.event?.date||null,selection:selectionLabel(g.event,g.side,g.marketKey,g.line),market:g.marketName,marketKey:g.marketKey,side:g.side,line:g.line,book:best.book,decimal:round(best.decimal),american:americanText(best.decimal),fairProbability:round(fairProb,6),fairDecimal:round(fairDecimal),fairAmerican:americanText(fairDecimal),ev:round(ev,6),evPercent:round(ev*100,2),bookFairDispersion:round(dispersion,6),updatedAt:best.updatedAt,bettingEdgeStatus:gate.status,bettingEdgeNote:gate.note,score:round(score,6)});
-  }
-  const bestByEvent=new Map();for(const c of rows.sort((a,b)=>b.score-a.score)){if(!bestByEvent.has(c.eventId))bestByEvent.set(c.eventId,c)}
-  return{pool:[...bestByEvent.values()].sort((a,b)=>b.score-a.score).slice(0,30),diagnostics};
+  const deduped = new Map(); for (const c of candidates) { const key = `${c.book}|${c.selectionKey}`; const prior = deduped.get(key); if (!prior || c.evPct > prior.evPct) deduped.set(key, c); }
+  return { candidates: [...deduped.values()].sort((a, b) => b.evPct - a.evPct || b.decimal - a.decimal), blockedCount };
 }
-function combinations(rows,n){const out=[];function go(start,pick){if(pick.length===n){out.push(pick.slice());return}for(let i=start;i<rows.length;i++)go(i+1,[...pick,rows[i]])}go(0,[]);return out}
-function parlayFromLegs(legs,kind){const combinedDecimal=legs.reduce((p,l)=>p*l.decimal,1),fairProbability=legs.reduce((p,l)=>p*l.fairProbability,1),fairDecimal=1/fairProbability,ev=fairProbability*combinedDecimal-1;return{kind,status:'PLAY',priceType:'ESTIMATED FROM INDEPENDENT LEG PRICES',legs,combinedDecimal:round(combinedDecimal),combinedAmerican:americanText(combinedDecimal),fairProbability:round(fairProbability,6),fairDecimal:round(fairDecimal),fairAmerican:americanText(fairDecimal),ev:round(ev,6),evPercent:round(ev*100,2),stakeUnits:STAKE_UNITS,potentialProfitUnits:round(STAKE_UNITS*(combinedDecimal-1),3),expectedValueUnits:round(STAKE_UNITS*ev,3),distinctSports:new Set(legs.map(l=>l.sport)).size,independenceAssumption:'Different-event legs treated as independent for fair-price math.'}}
-function bestParlay(pool,n){const min=n===2?MIN_TWO_EV:MIN_THREE_EV;let best=null,bestScore=-Infinity;for(const legs of combinations(pool,n)){if(new Set(legs.map(l=>l.eventId)).size!==n)continue;const p=parlayFromLegs(legs,n===2?'TWO-TOPPING':'THREE-TOPPING');if(p.ev<min)continue;const s=legs.reduce((x,l)=>x+l.score,0)+(p.distinctSports-1)*.2+p.ev*10;if(s>bestScore){best=p;bestScore=s}}return best}
-function noPlay(kind,n,min){return{kind,status:'NO PLAY',legs:[],reason:`No ${n}-leg independent combination cleared the Pizza price, two-book no-vig, disagreement, Betting Edge veto and ${(min*100).toFixed(1)}% parlay-EV gates.`,stakeUnits:0}}
-function build(odds,history,report,clock=Date.now()){
-  if(!Array.isArray(odds?.events))throw new Error('live-odds.json does not contain events[]');if(!Number.isFinite(Date.parse(odds.generatedAt||'')))throw new Error('live-odds.json generatedAt is invalid');
-  const reportMeta=latestReportMeta(odds,history);const {pool,diagnostics}=extractCandidates(odds,report,clock);const two=bestParlay(pool,2)||noPlay('TWO-TOPPING',2,MIN_TWO_EV),three=bestParlay(pool,3)||noPlay('THREE-TOPPING',3,MIN_THREE_EV);
-  return{schema:1,title:'Pizza Plays',description:'Manual cross-sport Two-Topping and Three-Topping value parlays.',mode:'MANUAL',timezone:TIMEZONE,generatedAt:new Date(clock).toISOString(),generatedAtVancouver:ptStamp(clock),sourceOdds:{path:ODDS_PATH,generatedAt:odds.generatedAt||null,generatedAtVancouver:odds.generatedAtVancouver||ptStamp(odds.generatedAt),schema:odds.schema||null,bookmakers:Array.isArray(odds.bookmakers)?odds.bookmakers:[]},sourceBettingEdge:reportMeta?{path:reportMeta.path||null,slot:reportMeta.slot||null,label:reportMeta.label||null,ts:reportMeta.ts||null,feedGeneratedAt:reportMeta.feedGeneratedAt||null}:null,policy:{trigger:'WORKFLOW_DISPATCH ONLY',oddsApiRequests:0,eligibleMarkets:['Moneyline','Spread','Run Line','Puck Line','Side/Handicap'],minimumStartLeadMinutes:MIN_START_LEAD_MINUTES,decimalPriceBand:[MIN_DECIMAL,MAX_DECIMAL],minimumStandaloneEvPercent:round(MIN_LEG_EV*100,2),maxTwoBookFairDispersionPoints:round(MAX_FAIR_DISPERSION*100,1),minimumTwoToppingEvPercent:round(MIN_TWO_EV*100,1),minimumThreeToppingEvPercent:round(MIN_THREE_EV*100,1),defaultStakeUnits:STAKE_UNITS,bettingEdgeVeto:['PASS','WAIT'],noPlayIsValid:true},candidateCount:pool.length,diagnostics,twoTopping:two,threeTopping:three};
-}
-function loadCurrent(){const odds=readJson(ODDS_PATH),history=fs.existsSync(HISTORY_PATH)?readJson(HISTORY_PATH):{runs:[]},meta=latestReportMeta(odds,history),report=meta?.path&&fs.existsSync(meta.path)?readJson(meta.path):null;return{odds,history,report}}
-function selfTest(){const now=Date.parse('2026-08-24T16:00:00Z');const mk=(id,sport,home,away,a,b)=>({id,eventId:String(id),eventKey:`test:${id}`,home,away,date:'2026-08-24T22:00:00Z',status:'pending',sport:{name:sport,slug:sport.toLowerCase().replace(/ /g,'-')},league:{name:'Test'},bookmakers:{Bet365:[{name:'ML',marketKey:'ml',updatedAt:'2026-08-24T15:59:00Z',odds:[{home:String(a),away:String(b),selectionKeys:{home:`${id}|ml|home||`,away:`${id}|ml|away||`}}]}],DraftKings:[{name:'ML',marketKey:'ml',updatedAt:'2026-08-24T15:59:00Z',odds:[{home:String(a+.08),away:String(Math.max(1.05,b-.04)),selectionKeys:{home:`${id}|ml|home||`,away:`${id}|ml|away||`}}]}]}});const odds={schema:5,generatedAt:new Date(now).toISOString(),bookmakers:['Bet365','DraftKings'],events:[mk(1,'Baseball','A','B',1.7,2.25),mk(2,'Football','C','D',1.72,2.2),mk(3,'Ice Hockey','E','F',1.75,2.15)]};const out=build(odds,{runs:[]},null,now);if(!['PLAY','NO PLAY'].includes(out.twoTopping.status)||!['PLAY','NO PLAY'].includes(out.threeTopping.status))throw new Error('Pizza self-test failed');console.log('Pizza self-test OK')}
 
-if(process.argv.includes('--self-test'))selfTest();else{const {odds,history,report}=loadCurrent();const out=build(odds,history,report);fs.writeFileSync(OUT_PATH,JSON.stringify(out,null,2)+'\n');JSON.parse(fs.readFileSync(OUT_PATH,'utf8'));console.log(`Pizza Plays: ${out.twoTopping.status} / ${out.threeTopping.status} // ${out.candidateCount} candidates // source ${out.sourceOdds.generatedAt}`)}
+function combinations(items, size) { const out = []; function walk(start, chosen) { if (chosen.length === size) { out.push([...chosen]); return; } for (let i = start; i <= items.length - (size - chosen.length); i++) { chosen.push(items[i]); walk(i + 1, chosen); chosen.pop(); } } walk(0, []); return out; }
+function noPlay(label, size, reason) { return { status: 'NO_PLAY', label, legCount: size, reason }; }
+function buildParlay(label, candidates, size, minParlayEv) {
+  let best = null;
+  for (const book of BOOKS) {
+    const pool = candidates.filter(c => c.book === book).slice(0, 18); if (pool.length < size) continue;
+    for (const legs of combinations(pool, size)) {
+      if (new Set(legs.map(x => x.eventId)).size !== size) continue;
+      const sports = new Set(legs.map(x => x.sportKey || x.sport)); if (sports.size < 2) continue;
+      const offeredDecimal = legs.reduce((p, x) => p * x.decimal, 1); const fairProbability = legs.reduce((p, x) => p * x.fairProbability, 1); const fairDecimal = 1 / fairProbability; const ev = fairProbability * offeredDecimal - 1; if (ev < minParlayEv) continue;
+      const marketDiversity = new Set(legs.map(x => x.market)).size; const trackedBonus = legs.filter(x => x.bettingEdgeStatus === 'BET' || x.bettingEdgeStatus === 'LEAN').length; const score = ev + sports.size * 0.004 + marketDiversity * 0.001 + trackedBonus * 0.002;
+      if (!best || score > best.score) best = { book, legs, offeredDecimal, fairProbability, fairDecimal, ev, score };
+    }
+  }
+  if (!best) return noPlay(label, size, `No same-book cross-sport ${size}-leg combination cleared the Pizza value and Betting Edge gates.`);
+  return { status: 'PLAY', label, legCount: size, book: best.book, legs: best.legs, combined: { priceType: 'ESTIMATED', label: 'ESTIMATED COMBINED PRICE', decimal: round(best.offeredDecimal, 3), american: decimalToAmerican(best.offeredDecimal), fairProbability: round(best.fairProbability, 5), fairDecimal: round(best.fairDecimal, 3), fairAmerican: decimalToAmerican(best.fairDecimal), evPct: round(best.ev * 100, 2), breakEvenProbability: round(1 / best.offeredDecimal, 5) }, stakeUnits: STAKE_UNITS, potentialProfitUnits: round(STAKE_UNITS * (best.offeredDecimal - 1), 3), expectedValueUnits: round(STAKE_UNITS * best.ev, 3), note: 'Estimated from independent leg prices at one sportsbook. Confirm the actual parlay quote before wagering.' };
+}
+function sourceHash(raw) { return crypto.createHash('sha256').update(raw).digest('hex'); }
+
+function build(source, { rawSource = JSON.stringify(source), nowMs = Date.now(), gate = null } = {}) {
+  const sourceTime = Date.parse(source.generatedAt || ''); if (!Number.isFinite(sourceTime)) throw new Error('live-odds.json is missing a valid generatedAt');
+  const feedAgeMinutes = minutesBetween(nowMs, sourceTime); const effectiveGate = gate || loadBettingEdgeGate(source);
+  const base = { schema: 2, title: 'Pizza Plays', description: 'Cross-sport Two-Topping and Three-Topping value parlays built from the latest stored Betting Edge odds snapshot.', access: 'mixed', timezone: 'America/Vancouver', mode: 'MANUAL_ONLY', generatedAt: new Date(nowMs).toISOString(), source: { file: SOURCE_PATH, generatedAt: source.generatedAt || null, generatedAtVancouver: source.generatedAtVancouver || null, provider: source.source || null, eventCount: Array.isArray(source.events) ? source.events.length : null, bookmakers: source.bookmakers || [], sha256: sourceHash(rawSource) }, bettingEdgeGate: { applied: Boolean(effectiveGate.report), report: effectiveGate.report || null, rule: 'Exact selections marked WAIT or PASS by the matching Betting Edge report are ineligible for Pizza.', warning: effectiveGate.warning || null }, methodology: { engine: 'PIZZA MARKET VALUE PASS v2', eligibleMarkets: ['Moneyline', 'Spread', 'Run Line', 'Puck Line', 'Full-Game Total'], pricing: 'ONE SPORTSBOOK PER PARLAY', fairMethod: 'OTHER-BOOK NO-VIG', crossSportRequired: true, sameEventBlocked: true, minBooks: MIN_BOOKS, feedFreshnessMinutes: MAX_FEED_AGE_MINUTES, quoteFreshnessMinutes: MAX_QUOTE_AGE_MINUTES, minLegEvPct: MIN_LEG_EV * 100, maxLegEvPct: MAX_LEG_EV * 100, maxFairDisagreementPct: MAX_FAIR_DISAGREEMENT * 100, legDecimalRange: [MIN_DECIMAL, MAX_DECIMAL], minStartLeadMinutes: MIN_START_LEAD_MINUTES, twoToppingMinEvPct: MIN_TWO_EV * 100, threeToppingMinEvPct: MIN_THREE_EV * 100, stakeUnits: STAKE_UNITS, combinedPriceType: 'ESTIMATED' } };
+  if (feedAgeMinutes < -2 || feedAgeMinutes > MAX_FEED_AGE_MINUTES) { const stale = { ...base, status: 'STALE_FEED', message: `Latest odds snapshot is ${round(feedAgeMinutes, 1)} minutes old; Pizza requires ${MAX_FEED_AGE_MINUTES} minutes or fresher.`, candidateCount: 0, blockedByBettingEdgeCount: 0, twoTopping: noPlay('TWO-TOPPING', 2, 'Fresh odds required.'), threeTopping: noPlay('THREE-TOPPING', 3, 'Fresh odds required.') }; stale.items = []; return stale; }
+  const { candidates, blockedCount } = extractCandidates(source, effectiveGate, nowMs); const twoTopping = buildParlay('TWO-TOPPING', candidates, 2, MIN_TWO_EV); const threeTopping = buildParlay('THREE-TOPPING', candidates, 3, MIN_THREE_EV); const status = twoTopping.status === 'PLAY' || threeTopping.status === 'PLAY' ? 'READY' : 'NO_QUALIFIED_PIZZA';
+  const output = { ...base, status, message: status === 'READY' ? 'Pizza is served from the latest stored odds snapshot.' : 'No qualifying Pizza parlay cleared every gate.', candidateCount: candidates.length, blockedByBettingEdgeCount: blockedCount, twoTopping, threeTopping }; output.items = [twoTopping, threeTopping].filter(x => x.status === 'PLAY'); return output;
+}
+function validateParlay(parlay, size, minEv) { if (!parlay || !['PLAY', 'NO_PLAY'].includes(parlay.status)) throw new Error(`invalid ${size}-leg parlay state`); if (parlay.status === 'NO_PLAY') return; if (parlay.legCount !== size || !Array.isArray(parlay.legs) || parlay.legs.length !== size) throw new Error(`invalid ${size}-leg count`); if (!parlay.book || new Set(parlay.legs.map(x => x.book)).size !== 1 || parlay.legs[0].book !== parlay.book) throw new Error(`${size}-leg parlay must use one sportsbook`); if (new Set(parlay.legs.map(x => x.eventId)).size !== size) throw new Error(`${size}-leg parlay repeats an event`); if (new Set(parlay.legs.map(x => x.sportKey || x.sport)).size < 2) throw new Error(`${size}-leg parlay is not cross-sport`); if (parlay.combined?.priceType !== 'ESTIMATED') throw new Error(`${size}-leg combined price must be labeled estimated`); if (!(Number(parlay.combined?.evPct) >= minEv * 100)) throw new Error(`${size}-leg EV below threshold`); }
+function validateOutput(output) { if (output?.schema !== 2) throw new Error('pizza output schema must be 2'); validateParlay(output.twoTopping, 2, MIN_TWO_EV); validateParlay(output.threeTopping, 3, MIN_THREE_EV); return true; }
+function selfTest() {
+  const nowMs = Date.parse('2026-08-24T16:00:00Z'); const fixture = { schema: 5, generatedAt: '2026-08-24T15:59:00Z', generatedAtVancouver: '2026-08-24 08:59:00 America/Vancouver', source: 'TEST', bookmakers: ['Bet365', 'DraftKings'], events: [['1', 'Baseball', 'baseball', '18:00:00Z'], ['2', 'Football', 'football', '19:00:00Z'], ['3', 'Ice Hockey', 'ice-hockey', '20:00:00Z']].map(([id, name, slug, time]) => ({ id: Number(id), eventId: id, eventKey: `test:${id}`, home: `Home ${id}`, away: `Away ${id}`, date: `2026-08-24T${time}`, status: 'pending', sport: { name, slug }, league: { name: 'Test League' }, urls: {}, bookmakers: { Bet365: [{ name: 'ML', marketKey: 'ml', updatedAt: '2026-08-24T15:58:00Z', odds: [{ home: '2.05', away: '1.75', selectionKeys: { home: `${id}|ml|home||`, away: `${id}|ml|away||` } }] }], DraftKings: [{ name: 'ML', marketKey: 'ml', updatedAt: '2026-08-24T15:58:00Z', odds: [{ home: '1.80', away: '2.00', selectionKeys: { home: `${id}|ml|home||`, away: `${id}|ml|away||` } }] }] } })) };
+  const gate = { report: { path: 'fixture', ts: 'fixture', label: 'fixture' }, statuses: new Map(), blocked: new Set() }; const output = build(fixture, { rawSource: JSON.stringify(fixture), nowMs, gate }); validateOutput(output); if (output.twoTopping.status !== 'PLAY' || output.threeTopping.status !== 'PLAY') throw new Error('self-test failed to build both toppings'); if (output.twoTopping.book !== 'Bet365' || output.threeTopping.book !== 'Bet365') throw new Error('self-test failed single-book pricing'); console.log('Pizza self-test OK');
+}
+if (process.argv.includes('--self-test')) { selfTest(); } else if (process.argv.includes('--check')) { validateOutput(JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'))); console.log('Pizza output validation OK'); } else { const rawSource = fs.readFileSync(SOURCE_PATH, 'utf8'); const source = JSON.parse(rawSource); const output = build(source, { rawSource }); fs.writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2) + '\n'); validateOutput(output); console.log(`Pizza Plays built from ${source.generatedAt}: ${output.twoTopping.status} / ${output.threeTopping.status}`); }
