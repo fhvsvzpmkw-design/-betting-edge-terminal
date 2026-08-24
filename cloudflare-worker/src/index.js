@@ -164,6 +164,10 @@ function copyRequestHeaders(request) {
   return headers;
 }
 
+function isMutableAppFile(pathname) {
+  return pathname === "/" || /\.(?:html|js|json|css)$/i.test(pathname);
+}
+
 function rewriteUpstreamLocation(location, requestUrl) {
   if (!location) return location;
 
@@ -189,11 +193,21 @@ async function proxyGitHubPages(request, pathOverride = null) {
   const publicUrl = new URL(request.url);
   const upstreamPath = pathOverride ?? publicUrl.pathname;
   const upstreamUrl = new URL(`${GITHUB_PAGES_ORIGIN}${upstreamPath}${publicUrl.search}`);
+  const mutable = isMutableAppFile(upstreamPath);
+  const requestHeaders = copyRequestHeaders(request);
+
+  // Mutable terminal files must come back as a full fresh body. Do not allow
+  // Safari or another browser to validate against an older local copy via 304.
+  if (mutable) {
+    requestHeaders.delete("if-none-match");
+    requestHeaders.delete("if-modified-since");
+  }
 
   const upstream = await fetch(upstreamUrl.toString(), {
     method: request.method,
-    headers: copyRequestHeaders(request),
+    headers: requestHeaders,
     redirect: "manual",
+    cache: "no-store",
   });
 
   const headers = new Headers(upstream.headers);
@@ -203,6 +217,16 @@ async function proxyGitHubPages(request, pathOverride = null) {
   }
 
   headers.set("X-VigWire-Origin", "github-pages");
+
+  if (mutable) {
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    headers.set("Cloudflare-CDN-Cache-Control", "no-store");
+    headers.set("CDN-Cache-Control", "no-store");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
+    headers.delete("ETag");
+    headers.delete("Last-Modified");
+  }
 
   return new Response(request.method === "HEAD" ? null : upstream.body, {
     status: upstream.status,
