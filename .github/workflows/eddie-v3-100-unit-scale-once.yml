@@ -1,0 +1,103 @@
+name: Eddie V3 $100 unit scale once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/eddie-v3-100-unit-scale-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply current-bankroll $100 unit normalization
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          p = Path('syndicates/generated/eddie-numbers/hotline.html')
+          s = p.read_text()
+
+          replacements = [
+            ('PUBLIC LEDGER // ACTUAL CAD // LAS VEGAS MAIN SHEET', 'PUBLIC LEDGER // $100 UNIT SCALE // LAS VEGAS MAIN SHEET'),
+            ('Eddie “Muddy” Numbers works the public ledger from the Las Vegas main sheet: exact all-time cash totals from the authoritative public summary, with week, month, sport, book, behaviour and recent-ticket analysis calculated from settled public wager rows.', 'Eddie “Muddy” Numbers works the public ledger from the Las Vegas main sheet. The source bankroll stays unscaled; every wager and performance dollar is normalized so the current 3% bankroll unit displays as $100, while ROI, counts and percentages remain unchanged.'),
+            ('FICTIONAL CHARACTER // LIVE NUMBERS FROM THE PUBLIC LEDGER', 'BANKROLL UNSCALED // PERFORMANCE DOLLARS NORMALIZED TO A $100 UNIT'),
+            ('<div class="sourceMetric"><small>Source file</small><b id="file">—</b></div>', '<div class="sourceMetric"><small>$100 Unit Scale</small><b id="scale">—</b></div>'),
+            ('<div class="sub">actual CAD</div></div><div class="stat"><small>All-Time Cash P/L</small>', '<div class="sub">source bankroll // unscaled</div></div><div class="stat"><small>All-Time Cash P/L</small>'),
+            ('<b id="profit">—</b><div class="sub">public summary</div>', '<b id="profit">—</b><div class="sub">$100-unit normalized</div>'),
+            ('<b id="risk">—</b><div class="sub">actual dollars</div>', '<b id="risk">—</b><div class="sub">$100-unit normalized</div>'),
+            ('Latest 120 settled public wagers from Bet History.', 'Latest 120 settled public wagers · $100-unit normalized.'),
+            ('PUBLIC LEDGER // WEEKLY + MONTHLY RECONCILIATION', 'PUBLIC LEDGER // $100-UNIT WEEKLY + MONTHLY RECONCILIATION'),
+            ('Settled public-row risk, P/L and ROI by sport.', '$100-unit normalized risk and P/L by sport; ROI unchanged.'),
+            ('Settled public-row results by recorded book.', '$100-unit normalized risk and P/L by recorded book; ROI unchanged.'),
+            ('Ten most recent settled public wagers, recorded stake and P/L.', 'Ten most recent settled public wagers, $100-unit normalized stake and P/L.'),
+            ('MUDDY NUMBERS // LEDGER DESK V3. Authority: public Bet History via /data/bet-history-public.json. Exact cash totals come from the authoritative public summary; row-derived trends use public wager rows. The Eddie character, Hall of Fame framing and broadcast world are fictional presentation. Betting Edge remains authoritative for current market recommendations.', 'MUDDY NUMBERS // LEDGER DESK V3. Authority: public Bet History via /data/bet-history-public.json. Source bankroll remains unscaled. Every displayed wager/performance dollar is normalized by 100 ÷ (current bankroll × 3%), making the current 3% unit equal $100. Counts, ROI, win rates and percentage ratios remain unchanged. Betting Edge remains authoritative for current market recommendations.'),
+          ]
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'Missing expected text: {old[:90]}')
+              s = s.replace(old, new, 1)
+
+          old = "const URL='/data/bet-history-public.json',TZ='America/Vancouver',$=id=>document.getElementById(id)"
+          new = "const URL='/data/bet-history-public.json',TZ='America/Vancouver',UNIT_RATE=.03,TARGET_UNIT=100,$=id=>document.getElementById(id)"
+          if old not in s: raise SystemExit('Missing JS constants')
+          s = s.replace(old, new, 1)
+
+          old = "function W(r){return{id:r[0],book:String(r[1]||'Unknown'),d:new Date(r[3]),sport:String(r[5]||'Other').trim()||'Other',label:String(r[7]||'Untitled'),risk:+r[9]||0,result:String(r[10]||''),p:+r[11]||0,phase:String(r[12]||''),legs:Array.isArray(r[16])?r[16]:[]}}"
+          new = "function W(r,scale){return{id:r[0],book:String(r[1]||'Unknown'),d:new Date(r[3]),sport:String(r[5]||'Other').trim()||'Other',label:String(r[7]||'Untitled'),risk:(+r[9]||0)*scale,result:String(r[10]||''),p:(+r[11]||0)*scale,phase:String(r[12]||''),legs:Array.isArray(r[16])?r[16]:[]}}"
+          if old not in s: raise SystemExit('Missing W parser')
+          s = s.replace(old, new, 1)
+
+          old = "function render(j){let all=(j.wagers||[]).map(W).filter(settled).sort((a,b)=>a.d-b.d);"
+          new = "function render(j){let bankroll=+j.bankrollCad||0,rawUnit=bankroll*UNIT_RATE,scale=rawUnit>0?TARGET_UNIT/rawUnit:1,all=(j.wagers||[]).map(r=>W(r,scale)).filter(settled).sort((a,b)=>a.d-b.d);"
+          if old not in s: raise SystemExit('Missing render opener')
+          s = s.replace(old, new, 1)
+
+          old = "set('gen',j.generatedAt?DT.format(new Date(j.generatedAt)):'—');set('through',D.format(all.at(-1).d));set('file','PUBLIC BET HISTORY // STATIC PUBLIC LEDGER');set('status',j.validation?.status==='PASS'?'PUBLIC SOURCE VERIFIED // LIVE':'PUBLIC SOURCE LOADED');set('bank',money(j.bankrollCad));set('profit',sm(j.summary?.cashProfit));tone($('profit'),j.summary?.cashProfit);set('roi',pct(j.summary?.cashRoiPercent));tone($('roi'),j.summary?.cashRoiPercent);set('bets',N.format(j.summary?.cashBets??all.length));set('risk',money(j.summary?.cashRisked??stats(all).risk));"
+          new = "let scaledProfit=(+j.summary?.cashProfit||0)*scale,scaledRisk=Number.isFinite(+j.summary?.cashRisked)?(+j.summary.cashRisked)*scale:stats(all).risk;set('gen',j.generatedAt?DT.format(new Date(j.generatedAt)):'—');set('through',D.format(all.at(-1).d));set('scale',rawUnit>0?`${money(rawUnit)} → $100 · ×${scale.toFixed(4)}`:'UNAVAILABLE');set('status',j.validation?.status==='PASS'?'PUBLIC SOURCE VERIFIED // LIVE':'PUBLIC SOURCE LOADED');set('bank',money(bankroll));set('profit',sm(scaledProfit));tone($('profit'),scaledProfit);set('roi',pct(j.summary?.cashRoiPercent));tone($('roi'),j.summary?.cashRoiPercent);set('bets',N.format(j.summary?.cashBets??all.length));set('risk',money(scaledRisk));"
+          if old not in s: raise SystemExit('Missing summary render block')
+          s = s.replace(old, new, 1)
+
+          old = "set('walk',`Current bankroll ${money(j.bankrollCad)}. Authoritative cash P/L ${sm(j.summary?.cashProfit)} at ${pct(j.summary?.cashRoiPercent)} ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}. The next public Bet History update becomes the next Muddy Numbers report.`)"
+          new = "set('walk',`Source bankroll ${money(bankroll)} remains unscaled. Current 3% source unit ${money(rawUnit)} is normalized to $100 at ×${scale.toFixed(4)}. Normalized cash P/L ${sm(scaledProfit)} at ${pct(j.summary?.cashRoiPercent)} ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)"
+          if old not in s: raise SystemExit('Missing walk text')
+          s = s.replace(old, new, 1)
+
+          p.write_text(s)
+
+          prof_path = Path('data/characters/eddie-numbers.json')
+          prof = json.loads(prof_path.read_text())
+          prof['updatedAt'] = '2026-08-23T20:06:00-07:00'
+          prof['authority']['presentationScale'] = {
+            'mode': 'current-bankroll-unit-normalized',
+            'unitPercent': 0.03,
+            'targetUnitCad': 100,
+            'multiplierFormula': '100 / (bankrollCad * 0.03)',
+            'bankrollUnscaled': True,
+            'appliesTo': 'all displayed wager/performance dollar amounts; counts, ROI and percentage ratios are unchanged'
+          }
+          prof['authority']['updateModel'] = 'The live V3 Hotline fetches /data/bet-history-public.json directly with cache bypass. It preserves the source bankroll exactly, calculates the current 3% bankroll unit, and automatically applies 100 / (bankroll × 3%) to all displayed wager/performance dollar amounts so the active public unit is $100.'
+          prof['hotlineStyle']['ledgerRules']['moneyRule'] = 'Keep bankrollCad unscaled. For every other displayed wager/performance dollar amount, multiply the public-ledger source value by 100 / (bankrollCad × 0.03). Recalculate the multiplier automatically whenever the public bankroll changes. ROI, counts and percentage ratios remain unchanged.'
+          prof['guardrails']['bankrollUnscaled'] = True
+          prof['guardrails']['publicUnitNormalization'] = 'Current 3% source-bankroll unit is normalized to $100 for all Hotline wager/performance dollar presentation; multiplier updates automatically from the public bankroll.'
+          prof_path.write_text(json.dumps(prof, indent=2, ensure_ascii=False) + '\n')
+          PY
+      - name: Verify normalized presentation
+        run: |
+          grep -F "UNIT_RATE=.03,TARGET_UNIT=100" syndicates/generated/eddie-numbers/hotline.html
+          grep -F "map(r=>W(r,scale))" syndicates/generated/eddie-numbers/hotline.html
+          grep -F '$100 Unit Scale' syndicates/generated/eddie-numbers/hotline.html
+          grep -F 'source bankroll // unscaled' syndicates/generated/eddie-numbers/hotline.html
+          grep -F 'multiplierFormula' data/characters/eddie-numbers.json
+      - name: Commit normalization
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/generated/eddie-numbers/hotline.html data/characters/eddie-numbers.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Normalize Eddie ledger performance to $100 unit"
+          git push
