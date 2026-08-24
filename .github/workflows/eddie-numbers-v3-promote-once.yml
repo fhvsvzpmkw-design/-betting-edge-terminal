@@ -1,0 +1,146 @@
+name: Eddie Numbers V3 promote once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/eddie-numbers-v3-promote-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Eddie Numbers V3
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          stamp = '2026-08-23T19:29:00-07:00'
+          src_path = Path('syndicates/sharp-room/incoming.html')
+          src = src_path.read_text()
+          html = src
+          html = html.replace('data-shell-version="1"', 'data-shell-version="3"', 1)
+          html = html.replace('data-authority="ledger"', 'data-authority="public-ledger"', 1)
+
+          v3_css = r'''
+.v3Banner{background:#02070c;border-bottom:1px solid #5e4d1f}.v3Banner img{display:block;width:100%;max-height:430px;object-fit:cover}.v3Hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(190px,.55fr) minmax(250px,.55fr);gap:15px;align-items:center;padding:16px}.v3Hero .copy h1{margin:3px 0;font:italic clamp(48px,7vw,78px)/.88 Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif}.v3Hero .copy h1 span{color:var(--g)}.v3Hero .copy h2{margin:8px 0 0;font:900 15px system-ui,sans-serif;letter-spacing:.12em}.v3Hero .copy p{max-width:720px;color:#ccdae2;font:650 12px/1.48 system-ui,sans-serif}.v3Logo{text-align:center}.v3Logo img{width:100%;max-width:330px;filter:drop-shadow(0 12px 24px #000b)}.v3Feature{margin-top:10px;overflow:hidden;position:relative}.v3Feature img{display:block;width:100%;max-height:590px;object-fit:cover}.v3FeatureCaption{position:absolute;left:10px;right:10px;bottom:10px;padding:8px 10px;border:1px solid #6b5b25;border-radius:8px;background:#02070ce6;color:#d4bd78;font-size:8px;font-weight:900;letter-spacing:.08em}.voiceHead{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;margin-bottom:9px}.voiceAvatar{width:110px;aspect-ratio:1/1;object-fit:contain;filter:drop-shadow(0 8px 18px #0009)}.voiceKicker{color:var(--c);font-size:8px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}.v3BrandNote{color:#d4bd78;font-size:8px;font-weight:900;letter-spacing:.08em;margin-top:5px}.source strong{font-size:17px}.mast{border-color:#6a5724}.panel.v3Feature{border-color:#806426}@media(max-width:900px){.v3Hero{grid-template-columns:1fr 220px}.v3Hero .source{grid-column:1/-1}.v3Logo img{max-width:220px}}@media(max-width:700px){.v3Hero{grid-template-columns:1fr}.v3Logo{order:-1}.v3Logo img{max-width:260px}.voiceHead{grid-template-columns:85px 1fr}.voiceAvatar{width:85px}}@media(max-width:520px){.v3FeatureCaption{position:static;border-width:1px 0 0;border-radius:0}.v3Banner img{max-height:310px}}
+'''
+          if '</style>' not in html:
+              raise SystemExit('style close not found')
+          html = html.replace('</style>', v3_css + '</style>', 1)
+
+          header_re = re.compile(r'<header class="panel mast".*?</header>', re.S)
+          if not header_re.search(html):
+              raise SystemExit('masthead not found')
+          new_header = r'''<header class="panel mast" data-zone="masthead"><div class="bar"><span><b>EDDIE “MUDDY” NUMBERS</b> // MUDDY NUMBERS NETWORK</span><span>PUBLIC LEDGER // ACTUAL CAD // LAS VEGAS MAIN SHEET</span></div><div class="v3Banner"><img src="../../../assets/syndicates/04_eddie_numbers_header_banner.png" alt="Illustrated Muddy Numbers Ledger Desk banner featuring Eddie Numbers in a high-gloss Las Vegas sportsbook setting"></div><div class="v3Hero"><div class="copy"><div class="ey">FICTIONAL SPORTS-GAMBLING HALL OF FAMER // NATIONAL SPORTS-NETWORK COMMENTATOR // LEDGER ANALYST</div><h1><span>MUDDY</span> NUMBERS</h1><h2>LEDGER DESK // THE MAIN SHEET</h2><p>Eddie “Muddy” Numbers works the public ledger like a veteran Las Vegas main-sheet analyst: exact all-time cash totals from the authoritative public summary, then high-gloss week, month, sport, book, behaviour and recent-ticket analysis from settled public wager rows. The character world is fictional; the accounting below is live public-ledger data.</p><div class="v3BrandNote">ARTWORK IS PRESENTATION ONLY // LIVE NUMBERS ARE RENDERED FROM THE PUBLIC LEDGER</div></div><div class="v3Logo"><img src="../../../assets/syndicates/03_muddy_numbers_ledger_desk_logo.png" alt="Muddy Numbers Ledger Desk logo"></div><aside class="source" data-zone="issue-meta"><small>Authority</small><strong>PUBLIC BET HISTORY</strong><div id="status" class="live">LOADING CURRENT LEDGER…</div><small>Ledger generated</small><b id="gen">—</b><small>Data through</small><b id="through">—</b><small>Source file</small><b id="file">—</b></aside></div></header>'''
+          html = header_re.sub(new_header, html, count=1)
+
+          score_re = re.compile(r'(<section class="score" data-zone="ledger-scoreboard">.*?</section>)', re.S)
+          m = score_re.search(html)
+          if not m:
+              raise SystemExit('scoreboard not found')
+          feature = r'''<section class="panel v3Feature" data-zone="hero"><img src="../../../assets/syndicates/01_eddie_numbers_main_hero.png" alt="Illustrated Eddie Numbers at a Las Vegas sportsbook analysis desk"><div class="v3FeatureCaption">MUDDY NUMBERS VISUAL DESK // ILLUSTRATION ONLY. BANKROLL, P/L, ROI, CHARTS AND TICKET RESULTS BELOW ARE GENERATED FROM THE PUBLIC LEDGER.</div></section>'''
+          html = html[:m.end()] + feature + html[m.end():]
+
+          voice_old = '<article class="panel voice" data-zone="character-voice"><h3>EDDIE: WHAT THE NUMBERS SAY</h3>'
+          voice_new = '<article class="panel voice" data-zone="character-voice"><div class="voiceHead"><img class="voiceAvatar" src="../../../assets/syndicates/02_eddie_numbers_portrait_cutout.png" alt="Illustrated portrait of Eddie Muddy Numbers"><div><div class="voiceKicker">HALL OF FAME LEDGER READ // LAS VEGAS</div><h3>EDDIE: WHAT THE NUMBERS SAY</h3><div class="v3BrandNote">THE PUBLIC LEDGER GETS THE FIRST WORD.</div></div></div>'
+          if voice_old not in html:
+              raise SystemExit('voice block marker not found')
+          html = html.replace(voice_old, voice_new, 1)
+
+          html = html.replace('Authority: public Bet History via /api/bet-history.', 'Authority: public Bet History via /data/bet-history-public.json.', 1)
+          html = html.replace("const URL='/api/bet-history'", "const URL='/data/bet-history-public.json'", 1)
+          html = html.replace("set('file',j.publicProjection?'PUBLIC BET HISTORY // API':'PUBLIC BET HISTORY');", "set('file','PUBLIC BET HISTORY // STATIC PUBLIC LEDGER');", 1)
+
+          out = Path('syndicates/generated/eddie-numbers')
+          out.mkdir(parents=True, exist_ok=True)
+          (out / 'hotline.html').write_text(html)
+          (out / 'shell-v3.html').write_text(html)
+
+          pth = Path('data/characters/eddie-numbers.json')
+          profile = json.loads(pth.read_text())
+          profile['updatedAt'] = stamp
+          profile['identity']['role'] = 'Fictional sports-gambling Hall of Famer, national sports-network commentator and Las Vegas main-sheet analyst for the public Bet History ledger'
+          profile['identity']['corePromise'] = 'Turn the authoritative public Bet History ledger into a high-gloss Las Vegas sportsbook performance report in actual Canadian dollars. Exact cash totals come from the public summary; period, sport, book, behaviour and recent-ticket views are calculated only from settled public wager rows.'
+          profile['authority']['source'] = '/data/bet-history-public.json'
+          profile['authority']['updateModel'] = 'The live V3 Hotline fetches /data/bet-history-public.json directly with cache bypass and recalculates on every page load. Eddie never reads the raw private ledger and uses the same public Bet History source lineage as F3.'
+          profile['authority']['scope'] = 'Public Bet History accounting and historical performance only. Betting Edge remains authoritative for current market recommendations. Exact cash totals come from the public summary; row-derived analysis uses only the public wager rows.'
+          hs = profile['hotlineStyle']
+          hs['visualTheme'] = 'High-gloss Las Vegas sportsbook main-sheet set: black glass, midnight navy, metallic gold, electric-blue data light, premium broadcast graphics and Eddie as the Hall of Fame ledger analyst.'
+          hs['layoutStyle'] = 'Image-rich V3 control room with a wide Muddy Numbers banner, standalone Ledger Desk logo, full Eddie sportsbook hero, live public-ledger scoreboard, cumulative P/L curve, weekly and monthly reconciliation, sport and book bars, transparent Muddy Meters, recent-ticket tape and an Eddie portrait beside the analyst close.'
+          hs['headlineStyle'] = 'Oversized MUDDY NUMBERS / LEDGER DESK branding with the main-sheet identity treated like a premium national sports-broadcast insert.'
+          hs['ledgerRules']['source'] = '/data/bet-history-public.json'
+          hs['ledgerRules']['never'] = 'Do not access or reference the raw private ledger, do not treat row index 14 as free-bet status, do not invent cash classifications, do not mix Betting Edge BET/LEAN/WAIT/PASS states into ledger accounting, do not use fictional scaling, and do not bake live accounting figures into artwork.'
+          hs['shell'] = {'id':'muddy-ledger-desk','version':3,'portable':True,'status':'locked'}
+          profile['imageAssets'] = {
+              'mainHero':'./assets/syndicates/01_eddie_numbers_main_hero.png',
+              'portraitCutout':'./assets/syndicates/02_eddie_numbers_portrait_cutout.png',
+              'ledgerDeskLogo':'./assets/syndicates/03_muddy_numbers_ledger_desk_logo.png',
+              'headerBanner':'./assets/syndicates/04_eddie_numbers_header_banner.png',
+              'avatar':'./assets/syndicates/eddie-numbers.png'
+          }
+          profile['continuity']['track'] = [
+              'ledger generatedAt','latest recorded wager date','bankroll','all-time cash P/L and ROI','current ledger week','current ledger month','sport and sportsbook breakdowns','behaviour ratios','last ten settled public wagers'
+          ]
+          profile['guardrails']['ledgerAuthority'] = 'The public Bet History projection at /data/bet-history-public.json is Eddie Numbers authoritative data source.'
+          pth.write_text(json.dumps(profile, indent=2) + '\n')
+
+          reg_path = Path('data/hotline-shells.json')
+          reg = json.loads(reg_path.read_text())
+          reg['updatedAt'] = stamp
+          target = next((x for x in reg['shells'] if x.get('id') == 'muddy-ledger-desk'), None)
+          if not target:
+              raise SystemExit('muddy-ledger-desk registry entry not found')
+          target['version'] = 3
+          target['description'] = 'Image-rich high-gloss Las Vegas sportsbook main-sheet presentation for Eddie “Muddy” Numbers: wide banner, Ledger Desk logo, Eddie hero and portrait layered over authoritative public-ledger accounting, charts, Muddy Meters and recent-ticket analysis.'
+          target['path'] = './syndicates/generated/eddie-numbers/shell-v3.html'
+          target['liveUrl'] = './syndicates/generated/eddie-numbers/hotline.html'
+          req = target['compatibility']['requiredZones']
+          if 'hero' not in req:
+              req.insert(2, 'hero')
+          reg_path.write_text(json.dumps(reg, indent=2) + '\n')
+
+          syn_path = Path('data/syndicates.json')
+          syn = json.loads(syn_path.read_text())
+          syn['updatedAt'] = stamp
+          eddie = next((x for x in syn['profiles'] if x.get('id') == 'eddie-numbers'), None)
+          if not eddie:
+              raise SystemExit('eddie syndicate profile not found')
+          eddie['url'] = './syndicates/generated/eddie-numbers/hotline.html'
+          # Keep the original avatar/headshot exactly as requested; V3 imagery belongs inside the Hotline.
+          syn_path.write_text(json.dumps(syn, separators=(',', ':')) + '\n')
+          PY
+      - name: Verify Eddie V3
+        run: |
+          grep -F 'data-shell-version="3"' syndicates/generated/eddie-numbers/hotline.html
+          grep -F '/data/bet-history-public.json' syndicates/generated/eddie-numbers/hotline.html
+          grep -F '01_eddie_numbers_main_hero.png' syndicates/generated/eddie-numbers/hotline.html
+          grep -F '02_eddie_numbers_portrait_cutout.png' syndicates/generated/eddie-numbers/hotline.html
+          grep -F '03_muddy_numbers_ledger_desk_logo.png' syndicates/generated/eddie-numbers/hotline.html
+          grep -F '04_eddie_numbers_header_banner.png' syndicates/generated/eddie-numbers/hotline.html
+          python - <<'PY'
+          import json
+          p=json.load(open('data/characters/eddie-numbers.json'))
+          assert p['authority']['source']=='/data/bet-history-public.json'
+          assert p['hotlineStyle']['shell']['version']==3
+          assert p['imageAssets']['avatar']=='./assets/syndicates/eddie-numbers.png'
+          r=json.load(open('data/hotline-shells.json'))
+          s=next(x for x in r['shells'] if x['id']=='muddy-ledger-desk')
+          assert s['version']==3 and 'generated/eddie-numbers' in s['liveUrl']
+          d=json.load(open('data/syndicates.json'))
+          e=next(x for x in d['profiles'] if x['id']=='eddie-numbers')
+          assert e['headshot']=='./assets/syndicates/eddie-numbers.png?v=1'
+          assert e['url']=='./syndicates/generated/eddie-numbers/hotline.html'
+          PY
+      - name: Commit Eddie V3
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/generated/eddie-numbers data/characters/eddie-numbers.json data/hotline-shells.json data/syndicates.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Promote Eddie Numbers to image-rich Ledger Desk V3"
+          git push
