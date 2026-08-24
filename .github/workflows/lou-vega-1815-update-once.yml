@@ -1,0 +1,120 @@
+name: Lou Vega 18:15 update once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/lou-vega-1815-update-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-lou:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Lou current to Aug 23 18:15
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          page_path = Path('syndicates/generated/lou-vega/hotline.html')
+          s = page_path.read_text()
+
+          s = re.sub(r'<title>.*?</title>', '<title>Vegas by the Slice — 18:15 Late / West Coast — Aug 23</title>', s, count=1)
+          s = re.sub(r'<!-- VEGAS BY THE SLICE v3 // .*? EDITION\nBetting Edge report data is authoritative\. Lou\'s route, food and casino-floor commentary is fictional presentation only\. -->', '<!-- VEGAS BY THE SLICE v3 // 18:15 EDITION\nBetting Edge report data is authoritative. Lou\'s route, food and casino-floor commentary is fictional presentation only. -->', s, count=1, flags=re.S)
+
+          s = re.sub(r'(<div class="headcopy"><div class="eyebrow">.*?</div><h1>.*?</h1>)<p>.*?</p>', r'\1<p>The late route found a bigger board and less usable action: 160 events came through, but every Bet365 quote in the snapshot is stale. The same-day window is closed, five Monday openers are DraftKings-only, and Lou has no coupon worth buying.</p>', s, count=1, flags=re.S)
+          s = re.sub(r'<div class="issue" data-zone="issue-meta">.*?</div></header>', '<div class="issue" data-zone="issue-meta"><b>18:15 LATE / WEST COAST // AUG 23</b><br>FEED 18:08 PT<br>ISSUED 18:25 PT<br><b>0 BET · 0 LEAN · 0 WAIT · 5 PASS · $0</b></div></header>', s, count=1, flags=re.S)
+
+          ticker = '''<div class="ticker"><span class="chip hot">SAME-DAY WINDOW: CLOSED</span><span class="chip">BET365: STALE</span><span class="chip">DRAFTKINGS-ONLY MONDAY OPENERS</span><span class="chip">0 LIVE COUPONS</span><span class="chip hot">SPORTS RISK: $0</span></div>'''
+          s = re.sub(r'<div class="ticker">.*?</div>\n<div class="bodypad">', ticker + '\n<div class="bodypad">', s, count=1, flags=re.S)
+
+          recs = '''
+<article class="item"><div class="itemhead"><b>TOMAS CURRAS ABASOLO MONEYLINE</b><span class="status pass">PASS</span></div><div class="pricegrid"><div class="price"><small>DRAFTKINGS</small><strong>+390 @ 17:42</strong></div><div class="price"><small>BET365</small><strong>STALE</strong></div><div class="price"><small>FAIR</small><strong>+426</strong></div><div class="price"><small>PLAY TO</small><strong>NO BET</strong></div></div><p class="reason">The only fresh approved-book quote is below the +426 single-book benchmark, with no second fresh book or independent matchup signal to justify paying the margin.</p><div class="louline">LOU: “Four-to-one looks pretty until the shop’s own math says I need better. One window is a stop, not a shopping trip.”</div></article>
+<article class="item"><div class="itemhead"><b>BOLOGNA–LAZIO UNDER 2.5</b><span class="status pass">PASS</span></div><div class="pricegrid"><div class="price"><small>DRAFTKINGS</small><strong>-161 @ 18:08</strong></div><div class="price"><small>BET365</small><strong>STALE</strong></div><div class="price"><small>FAIR</small><strong>-133</strong></div><div class="price"><small>PLAY TO</small><strong>NO BET</strong></div></div><p class="reason">The exact total is fresh at DraftKings, but -161 is materially shorter than -133 fair and the second approved book is outside the quote clock.</p><div class="louline">LOU: “Paying one-sixty-one on a one-book total is how dinner turns into a cover charge.”</div></article>
+<article class="item"><div class="itemhead"><b>OSASUNA–LEVANTE UNDER 2.5</b><span class="status pass">PASS</span></div><div class="pricegrid"><div class="price"><small>DRAFTKINGS</small><strong>-132 @ 17:59</strong></div><div class="price"><small>BET365</small><strong>STALE</strong></div><div class="price"><small>FAIR</small><strong>-116</strong></div><div class="price"><small>PLAY TO</small><strong>NO BET</strong></div></div><p class="reason">The fresh -132 price does not reach the -116 single-book benchmark, and lineup, travel and second-book confirmation are unresolved.</p><div class="louline">LOU: “Fresh doesn’t mean cheap. One-thirty-two is still the wrong side of the receipt.”</div></article>
+<article class="item"><div class="itemhead"><b>ROMA–FIORENTINA OVER 2.5</b><span class="status pass">PASS</span></div><div class="pricegrid"><div class="price"><small>DRAFTKINGS</small><strong>-116 @ 17:59</strong></div><div class="price"><small>BET365</small><strong>STALE</strong></div><div class="price"><small>FAIR</small><strong>+102</strong></div><div class="price"><small>PLAY TO</small><strong>NO BET</strong></div></div><p class="reason">The over is fresh but priced at -116 against a +102 one-book fair benchmark, with no fresh Bet365 quote or independent lineup/weather edge.</p><div class="louline">LOU: “Minus money for something the margin says should be plus money? Keep walking.”</div></article>
+<article class="item"><div class="itemhead"><b>TALLERES–ROSARIO CENTRAL DRAW</b><span class="status pass">PASS</span></div><div class="pricegrid"><div class="price"><small>DRAFTKINGS</small><strong>+175 @ 17:49</strong></div><div class="price"><small>BET365</small><strong>STALE</strong></div><div class="price"><small>FAIR</small><strong>+192</strong></div><div class="price"><small>PLAY TO</small><strong>NO BET</strong></div></div><p class="reason">The full DraftKings three-way market is fresh, but +175 remains below +192 fair and there is no fresh second book or verified matchup edge.</p><div class="louline">LOU: “The draw ticket is short and the second window is dark. No coupon.”</div></article>
+'''
+          s = re.sub(r'(<section class="board" data-zone="menu-board"><h2>).*?(</h2><div data-zone="recommendations">).*?(</div></section>)', r'\1LATE-NIGHT MENU\2' + recs + r'\3', s, count=1, flags=re.S)
+
+          lower = '''<div class="lower"><section class="coupons" data-zone="coupon-book"><div class="sectionhead"><h2>COUPON BOOK</h2><span class="serial">TEAR · SAVE · RECHECK</span></div><div class="coupon"><span class="stamp">EXPIRED</span><b>SHAKIRA AUSTIN U2.5 ASSISTS</b><br>The 15:15 WAIT is no longer a current file in the 18:15 report. The same-day late window is closed.<br><b>No carry-forward ticket.</b></div><div class="coupon"><span class="stamp">SHRED</span><b>FIVE MONDAY OPENERS</b><br>Every current candidate is DraftKings-only and priced below its single-book benchmark. Nothing goes in the save pile.</div></section><aside class="route" data-zone="floor-walk"><div class="portrait-window"><img src="../../../assets/syndicates/02_lou_vega_portrait_cutout.png" alt="Illustrated portrait of Lou Two Slice Vega"></div><div class="route-sign">NIGHT ROUTE // WALLET CLOSED →</div><div class="step"><b>NIGHT WINDOW</b><br>The same-day sports board is done. Lou does not turn Monday openers into Sunday-night action just because the screen is still lit.</div><div class="step"><b>TWO-SLICE DINNER</b><br>A fictional pizza stop fills the route while the second book catches up. Dinner is not evidence; a fresh executable number is.</div><div class="step"><b>COMP-DESK RULE</b><br>A freebie never repairs a bad sports price. Five passes stay five passes.</div></aside></div>'''
+          s = re.sub(r'<div class="lower">.*?</aside></div>\n<div class="cards">', lower + '\n<div class="cards">', s, count=1, flags=re.S)
+
+          cards = '''<div class="cards"><section class="card dinner"><h3>TWO-SLICE DINNER // CHECK</h3><div class="checkline"><span>SPORTS TICKETS</span><b>0</b></div><div class="checkline"><span>LIVE COUPONS</span><b>0</b></div><div class="checkline"><span>SPORTS RISK</span><b>$0</b></div><p>Five Monday prices made the menu and all five get sent back. Lou can spend more time on dinner because there is no sports transaction to finish.</p></section><section class="card best"><h3>BEST NUMBER IN TOWN</h3><strong>NONE TO BUY</strong><p><b>FIVE DRAFTKINGS-ONLY OPENERS — PASS.</b></p><p>Fresh quotes are present, but every current price is below the report’s single-book benchmark and Bet365 is stale.</p></section></div>'''
+          s = re.sub(r'<div class="cards">.*?</section></div>\n<div class="laststop"', cards + '\n<div class="laststop"', s, count=1, flags=re.S)
+
+          last = '''<div class="laststop" data-zone="last-stop"><div class="hero-crop"><img src="../../../assets/syndicates/01_lou_vega_main_hero.png" alt="Illustrated Lou Vega Vegas by the Slice hero artwork"></div><div><b>LAST STOP // 18:15</b><p>The 160-event late feed is bigger than the afternoon sheet, but the usable market is worse: Bet365 is stale, the same-day window is closed and the five fresh Monday candidates are all one-book prices below fair.</p><p><b>0 BET · 0 LEAN · 0 WAIT · 5 PASS · NEW RISK $0.</b></p><p>Lou tears up the afternoon coupon, finishes dinner and leaves Monday’s board for Monday’s fresh prices.</p></div></div>'''
+          s = re.sub(r'<div class="laststop" data-zone="last-stop">.*?</div></div>\n<div class="footer"', last + '\n<div class="footer"', s, count=1, flags=re.S)
+
+          footer = '''<div class="footer" data-zone="footer">SOURCE: Betting Edge 18:15 LATE / WEST COAST issued 2026-08-23 18:25:21 PT from the 18:08 PT feed. Betting Edge controls all statuses, prices, fair values, play-to decisions and risk. Lou's food, casino-floor and route story is fictional presentation only.<div class="assetnote">Decorative artwork is presentation only; any illustrated slips, boards, chips or props are not live odds or issued plays.</div></div>'''
+          s = re.sub(r'<div class="footer" data-zone="footer">.*?</div></div></article>', footer + '</div></article>', s, count=1, flags=re.S)
+
+          # Basic verification before writing.
+          required = ['18:15 LATE / WEST COAST // AUG 23', '0 BET · 0 LEAN · 0 WAIT · 5 PASS · $0', 'TOMAS CURRAS ABASOLO MONEYLINE', 'SAME-DAY WINDOW: CLOSED', 'LAST STOP // 18:15']
+          for item in required:
+              if item not in s:
+                  raise SystemExit(f'Missing expected 18:15 content: {item}')
+          if '15:15 EVENING // AUG 23' in s:
+              raise SystemExit('Old 15:15 issue meta still present')
+
+          page_path.write_text(s)
+          archive_path = Path('syndicates/generated/lou-vega/archive/2026-08-23/1815.html')
+          archive_path.write_text(s)
+
+          idx_path = Path('syndicates/generated/lou-vega/archive/index.json')
+          idx = json.loads(idx_path.read_text())
+          issue_id = '2026-08-23T1815|lou-vega'
+          if not any(x.get('id') == issue_id for x in idx['issues']):
+              idx['issues'].append({
+                  'id': issue_id,
+                  'characterId': 'lou-vega',
+                  'profileId': 'lou-vega',
+                  'displayName': 'LOU VEGA',
+                  'publication': 'VEGAS BY THE SLICE',
+                  'date': '2026-08-23',
+                  'session': '1815',
+                  'label': '18:15 LATE / WEST COAST',
+                  'issuedAt': '2026-08-23T18:25:21.777-07:00',
+                  'sourceReport': 'data/history/runs/2026-08-23/late-182521.json',
+                  'path': '2026-08-23/1815.html',
+                  'shellId': 'vegas-by-the-slice',
+                  'shellVersion': 3
+              })
+          idx['updatedAt'] = '2026-08-23T18:25:21.777-07:00'
+          idx_path.write_text(json.dumps(idx, indent=2, ensure_ascii=False) + '\n')
+
+          prof_path = Path('data/characters/lou-vega.json')
+          prof = json.loads(prof_path.read_text())
+          prof['updatedAt'] = '2026-08-23T20:28:00-07:00'
+          c = prof['continuity']
+          c['currentMood'] = 'The Aug. 23 18:15 late route is all discipline: the 18:08 feed contains 160 events, but every Bet365 market in the snapshot is stale and the same-day window is closed. The five current Monday openers are DraftKings-only and all price below their single-book no-vig benchmarks. Lou has 0 BET, 0 LEAN, 0 WAIT and 5 PASS with $0 new risk; the afternoon Austin WAIT coupon is no longer a current file and gets torn up.'
+          c['lastReportSeen'] = {
+              'slot': 'late',
+              'label': '18:15 LATE / WEST COAST',
+              'timestamp': '2026-08-23T18:25:21.777-07:00'
+          }
+          threads = c.get('ongoingThreads', [])
+          threads = [t for t in threads if not t.startswith('The current 15:15 report leaves one WAIT coupon:')]
+          threads.append('The current 18:15 report has no live coupons: five DraftKings-only Monday openers are PASS, Bet365 is stale, the same-day late window is closed and new risk remains zero.')
+          c['ongoingThreads'] = threads
+          prof_path.write_text(json.dumps(prof, indent=2, ensure_ascii=False) + '\n')
+          PY
+      - name: Verify Lou 18:15 files
+        run: |
+          grep -F '18:15 LATE / WEST COAST // AUG 23' syndicates/generated/lou-vega/hotline.html
+          grep -F '0 BET · 0 LEAN · 0 WAIT · 5 PASS · $0' syndicates/generated/lou-vega/hotline.html
+          grep -F 'TOMAS CURRAS ABASOLO MONEYLINE' syndicates/generated/lou-vega/hotline.html
+          test -f syndicates/generated/lou-vega/archive/2026-08-23/1815.html
+          grep -F '2026-08-23T1815|lou-vega' syndicates/generated/lou-vega/archive/index.json
+          grep -F '18:15 LATE / WEST COAST' data/characters/lou-vega.json
+      - name: Commit Lou 18:15 current
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/generated/lou-vega/hotline.html syndicates/generated/lou-vega/archive/2026-08-23/1815.html syndicates/generated/lou-vega/archive/index.json data/characters/lou-vega.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Update Lou current to Aug 23 18:15"
+          git push
