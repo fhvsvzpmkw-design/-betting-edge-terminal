@@ -47,9 +47,9 @@ jobs:
             git reset --hard origin/main
             node tools/build-pizza-plays.mjs
             node tools/build-pizza-plays.mjs --check
-            git add -- data/pizza-plays.json
+            git add -- data/pizza-plays.json data/history/pizza-plays
             if git diff --cached --quiet; then
-              echo "Pizza Plays already matches the latest Betting Edge report."
+              echo "Pizza Plays and immutable archive already match the latest Betting Edge report."
               published=1
               break
             fi
