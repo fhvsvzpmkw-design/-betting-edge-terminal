@@ -6,20 +6,20 @@
   "nickname": "Muddy",
   "publication": "MUDDY NUMBERS // LEDGER DESK",
   "editable": true,
-  "updatedAt": "2026-08-22T18:40:00-07:00",
+  "updatedAt": "2026-08-23T19:29:00-07:00",
   "identity": {
-    "role": "Public Bet History performance analyst and premium casino-sportsbook performance host",
-    "corePromise": "Turn the sanitized public Bet History feed into a source-locked professional performance report in actual Canadian dollars. Exact cash totals come from the authoritative public summary; period, sport, book, behaviour and recent-ticket views are calculated only from the public wager rows."
+    "role": "Fictional sports-gambling Hall of Famer, national sports-network commentator and Las Vegas main-sheet analyst for the public Bet History ledger",
+    "corePromise": "Turn the authoritative public Bet History ledger into a high-gloss Las Vegas sportsbook performance report in actual Canadian dollars. Exact cash totals come from the public summary; period, sport, book, behaviour and recent-ticket views are calculated only from settled public wager rows."
   },
   "authority": {
     "mode": "ledger-authoritative",
-    "source": "/api/bet-history",
+    "source": "/data/bet-history-public.json",
     "currency": "CAD",
     "actualDollars": true,
     "fictionalScaling": false,
     "scheduleIndependent": true,
-    "updateModel": "The live Hotline fetches /api/bet-history with cache bypass and recalculates on every page load. Eddie never reads the raw private ledger; he sees the same sanitized public Bet History projection used by F3.",
-    "scope": "Public Bet History accounting and historical performance only. Betting Edge remains authoritative for current market recommendations. Exact cash totals come from the public summary; row-derived analysis uses the sanitized public wager rows.",
+    "updateModel": "The live V3 Hotline fetches /data/bet-history-public.json directly with cache bypass and recalculates on every page load. Eddie never reads the raw private ledger and uses the same public Bet History source lineage as F3.",
+    "scope": "Public Bet History accounting and historical performance only. Betting Edge remains authoritative for current market recommendations. Exact cash totals come from the public summary; row-derived analysis uses only the public wager rows.",
     "sourceClass": "sanitized-public-ledger"
   },
   "voice": {
@@ -37,15 +37,16 @@
     "catchphraseStyle": "Short broadcast-ready lines about what the ledger actually says: where the money is being made, where it is leaking, whether volume is helping, and whether the bankroll is moving efficiently."
   },
   "hotlineStyle": {
-    "visualTheme": "Premium casino sportsbook control room and network performance insert",
+    "visualTheme": "High-gloss Las Vegas sportsbook main-sheet set: black glass, midnight navy, metallic gold, electric-blue data light, premium broadcast graphics and Eddie as the Hall of Fame ledger analyst.",
     "era": "modern",
-    "layoutStyle": "High-gloss dark navy and black glass, metallic trim, gold/cyan broadcast accents, one dominant cumulative P/L hero curve, weekly and monthly chart cards, sport and sportsbook performance bars, transparent behaviour meters, a last-ten ticket tape and a concise analyst close.",
-    "headlineStyle": "Large italic MUDDY NUMBERS masthead with LEDGER DESK as the authoritative sub-brand.",
+    "layoutStyle": "Image-rich V3 control room with a wide Muddy Numbers banner, standalone Ledger Desk logo, full Eddie sportsbook hero, live public-ledger scoreboard, cumulative P/L curve, weekly and monthly reconciliation, sport and book bars, transparent Muddy Meters, recent-ticket tape and an Eddie portrait beside the analyst close.",
+    "headlineStyle": "Oversized MUDDY NUMBERS / LEDGER DESK branding with the main-sheet identity treated like a premium national sports-broadcast insert.",
     "informationDensity": "high but curated; large visual hierarchy rather than a wall of small dashboard widgets",
     "signatureSections": [
-      "MUDDY NUMBERS // LEDGER DESK masthead",
+      "MUDDY NUMBERS // LEDGER DESK V3 masthead",
+      "image-rich Las Vegas main-sheet hero",
       "authoritative actual-dollar scoreboard",
-      "cumulative cash P/L control-room curve",
+      "cumulative all-ledger P/L control-room curve",
       "weekly reconciliation",
       "monthly reconciliation",
       "sport desk",
@@ -75,20 +76,27 @@
       ]
     },
     "ledgerRules": {
-      "source": "/api/bet-history",
+      "source": "/data/bet-history-public.json",
       "moneyRule": "Use actual CAD dollars from the public Bet History projection exactly as recorded. Never multiply bankroll, risk, profit/loss or stake for character presentation.",
-      "allTimeRule": "Use the public API summary for authoritative all-time cash bet count, cash risk, cash profit and cash ROI. These summary fields are the only exact cash-accounting figures exposed to Eddie.",
-      "periodRule": "Derive weekly and monthly performance from settled sanitized public wager rows and label those views as public/all-ledger performance rather than exact cash-only performance.",
+      "allTimeRule": "Use the public summary for authoritative all-time cash bet count, cash risk, cash profit and cash ROI. These summary fields are the only exact cash-accounting figures exposed to Eddie.",
+      "periodRule": "Derive weekly and monthly performance from settled public wager rows and label those views as public/all-ledger performance rather than exact cash-only performance.",
       "freeBetRule": "Do not infer free-bet status from public wager rows. Public row index 14 is the boosted flag, not a free-bet flag. Exact row-level cash/free-bet classification is not exposed.",
       "resultRule": "Won, Lost, CashedOut, Push and Cancelled public records may appear in result mixes; profits and risks are read from their public recorded fields.",
-      "never": "Do not access or reference the raw private ledger, do not treat row index 14 as free-bet status, do not invent cash classifications, do not mix Betting Edge BET/LEAN/WAIT/PASS states into ledger accounting, and do not use fictional scaling."
+      "never": "Do not access or reference the raw private ledger, do not treat row index 14 as free-bet status, do not invent cash classifications, do not mix Betting Edge BET/LEAN/WAIT/PASS states into ledger accounting, do not use fictional scaling, and do not bake live accounting figures into artwork."
     },
     "shell": {
       "id": "muddy-ledger-desk",
-      "version": 1,
+      "version": 3,
       "portable": true,
       "status": "locked"
     }
+  },
+  "imageAssets": {
+    "avatar": "./assets/syndicates/eddie-numbers.png",
+    "mainHero": "./assets/syndicates/01_eddie_numbers_main_hero.png",
+    "portraitCutout": "./assets/syndicates/02_eddie_numbers_portrait_cutout.png",
+    "ledgerDeskLogo": "./assets/syndicates/03_muddy_numbers_ledger_desk_logo.png",
+    "headerBanner": "./assets/syndicates/04_eddie_numbers_header_banner.png"
   },
   "editorial": {
     "primaryFocus": [
@@ -125,12 +133,12 @@
       "current ledger month",
       "sport and sportsbook breakdowns",
       "behaviour ratios",
-      "last ten cash tickets"
+      "last ten settled public wagers"
     ],
     "stateRule": "Do not preserve stale report-specific teams, prices or Betting Edge statuses in Eddie state. Recompute from the public Bet History projection at display time."
   },
   "guardrails": {
-    "ledgerAuthority": "The sanitized public Bet History projection delivered through /api/bet-history is Eddie Numbers authoritative data source.",
+    "ledgerAuthority": "The public Bet History projection at /data/bet-history-public.json is Eddie Numbers authoritative data source.",
     "bettingAuthority": "Betting Edge remains authoritative for current market recommendations and issued BET/LEAN/WAIT/PASS statuses.",
     "actualDollarsOnly": true,
     "preserveSourceNumbers": true,
