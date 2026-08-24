@@ -58,7 +58,7 @@ function buildFromReport(report, reportPath) {
       excludedStatuses: ['PASS'],
       statusPriority: ['BET', 'LEAN', 'WAIT'],
       withinStatus: 'Higher published EV first; issued report order breaks ties.',
-      note: 'Pizza Plays is a Lou Two Slice overlay. It never changes the VigScope status, stake, target price, fair value, or ledger.'
+      note: 'Pizza Plays is a Lou Two Slice overlay. It does not calculate, recommend, or display stake sizing, and it never changes the VigScope status, target price, fair value, or ledger.'
     }
   };
 
@@ -94,7 +94,6 @@ function buildFromReport(report, reportPath) {
       fair: text(rec?.fair, '—'),
       edge: text(rec?.edge, '—'),
       movement: text(rec?.move),
-      sourceStake: text(rec?.stake, '$0'),
       whyThisOne: why,
       edgeRead: edgeRead || 'No published fair-value note.',
       lousRead: louRead(item),
@@ -138,6 +137,7 @@ function selfTest() {
   };
   const output = validate(buildFromReport(fixture, 'fixture.json'));
   if (output.play.title !== 'Card B' || output.play.vigScopeStatus !== 'WAIT') throw new Error('Pizza self-test ranking failed');
+  if ('sourceStake' in output.play) throw new Error('Pizza self-test stake-neutrality failed');
   console.log('Pizza Plays self-test OK');
 }
 
