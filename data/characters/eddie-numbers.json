@@ -6,7 +6,7 @@
   "nickname": "Muddy",
   "publication": "MUDDY NUMBERS // LEDGER DESK",
   "editable": true,
-  "updatedAt": "2026-08-23T20:18:00-07:00",
+  "updatedAt": "2026-08-23T20:22:00-07:00",
   "identity": {
     "role": "Fictional sports-gambling Hall of Famer, national sports-network commentator and Las Vegas main-sheet analyst for the public Bet History ledger",
     "corePromise": "Turn the authoritative public Bet History ledger into a high-gloss Las Vegas sportsbook performance report in actual Canadian dollars. Exact cash totals come from the public summary; period, sport, book, behaviour and recent-ticket views are calculated only from settled public wager rows."
@@ -18,17 +18,17 @@
     "actualDollars": true,
     "fictionalScaling": false,
     "scheduleIndependent": true,
-    "updateModel": "The live V3 Hotline fetches /data/bet-history-public.json directly with cache bypass. It calculates the current 2% source-bankroll unit and automatically applies 100 / (bankroll × 2%) to displayed bankroll and all wager/performance dollar amounts, producing a $5,000 normalized bankroll with a $100 active unit.",
+    "updateModel": "The live V3 Hotline fetches /data/bet-history-public.json directly with cache bypass. It calculates the current 3% source-bankroll unit and automatically applies 100 / (bankroll × 3%) to displayed bankroll and all wager/performance dollar amounts, producing a $3,333.33 normalized bankroll with a $100 active unit.",
     "scope": "Public Bet History accounting and historical performance only. Betting Edge remains authoritative for current market recommendations. Exact cash totals come from the public summary; row-derived analysis uses only the public wager rows.",
     "sourceClass": "sanitized-public-ledger",
     "presentationScale": {
       "mode": "current-bankroll-unit-normalized",
-      "unitPercent": 0.02,
+      "unitPercent": 0.03,
       "targetUnitCad": 100,
-      "multiplierFormula": "100 / (bankrollCad * 0.02)",
+      "multiplierFormula": "100 / (bankrollCad * 0.03)",
       "bankrollUnscaled": false,
       "appliesTo": "displayed bankroll plus all displayed wager/performance dollar amounts; source ledger values remain untouched; counts, ROI and percentage ratios are unchanged",
-      "normalizedBankrollCad": 5000
+      "normalizedBankrollCad": 3333.33
     }
   },
   "voice": {
@@ -85,7 +85,7 @@
     },
     "ledgerRules": {
       "source": "/data/bet-history-public.json",
-      "moneyRule": "Do not modify source ledger values. For displayed bankroll and every displayed wager/performance dollar amount, multiply the public-ledger source value by 100 / (bankrollCad × 0.02). Recalculate automatically whenever the public bankroll changes. This fixes the normalized bankroll at $5,000 and the active 2% unit at $100. ROI, counts and percentage ratios remain unchanged.",
+      "moneyRule": "Do not modify source ledger values. For displayed bankroll and every displayed wager/performance dollar amount, multiply the public-ledger source value by 100 / (bankrollCad × 0.03). Recalculate automatically whenever the public bankroll changes. This fixes the normalized bankroll at $3,333.33 and the active 3% unit at $100. ROI, counts and percentage ratios remain unchanged.",
       "allTimeRule": "Use the public summary for authoritative all-time cash bet count, cash risk, cash profit and cash ROI. These summary fields are the only exact cash-accounting figures exposed to Eddie.",
       "periodRule": "Derive weekly and monthly performance from settled public wager rows and label those views as public/all-ledger performance rather than exact cash-only performance.",
       "freeBetRule": "Do not infer free-bet status from public wager rows. Public row index 14 is the boosted flag, not a free-bet flag. Exact row-level cash/free-bet classification is not exposed.",
@@ -156,7 +156,7 @@
     "privateLedgerForbidden": true,
     "row14Meaning": "boosted",
     "bankrollUnscaled": false,
-    "publicUnitNormalization": "Current 2% source-bankroll unit is normalized to $100 for all Hotline bankroll/wager/performance dollar presentation; normalized bankroll is $5,000 and the multiplier updates automatically from the public bankroll.",
-    "scaledBankrollPresentation": "Displayed bankroll is scaled by the same current-bankroll multiplier as performance dollars so the public 2% unit equals $100 and the normalized bankroll equals $5,000; source bankroll in the underlying public ledger remains unchanged."
+    "publicUnitNormalization": "Current 3% source-bankroll unit is normalized to $100 for all Hotline bankroll/wager/performance dollar presentation; normalized bankroll is $3,333.33 and the multiplier updates automatically from the public bankroll.",
+    "scaledBankrollPresentation": "Displayed bankroll is scaled by the same current-bankroll multiplier as performance dollars so the public 3% unit equals $100 and the normalized bankroll equals $3,333.33; source bankroll in the underlying public ledger remains unchanged."
   }
 }
