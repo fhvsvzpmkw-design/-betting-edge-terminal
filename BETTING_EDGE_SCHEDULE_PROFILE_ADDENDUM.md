@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL — SCHEDULING LAYER  
 **Effective:** 2026-08-19  
-**Updated:** 2026-08-24 — Cloudflare scheduler cutover / 10-minute odds lead  
+**Updated:** 2026-08-24 — Cloudflare-only scheduler / 10-minute odds lead  
 **Timezone:** `America/Vancouver`  
 **Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0  
 **Schedule definitions:** `data/schedule-profiles.json`  
@@ -20,9 +20,9 @@ One Vancouver operating day uses one profile. Once that operating day begins, it
 
 The active profile supplies exactly five primary odds pulses and five report windows. The Odds-API spending target remains five primary pulls per operating day. Every primary odds pulse is scheduled **10 minutes before its corresponding report window**.
 
-Cloudflare Worker Cron is the primary timing layer during cutover. It wakes only at minute marks `:05`, `:20` and `:50`, resolves the Vancouver-local active profile, and dispatches the existing GitHub odds workflow only when that exact minute is a configured pulse. The Worker does not perform the quota-heavy odds collection itself.
+Cloudflare Worker Cron is the sole automatic odds-scheduling clock. It wakes only at minute marks `:05`, `:20` and `:50`, resolves the Vancouver-local active profile, and dispatches the existing GitHub odds workflow only when that exact minute is a configured pulse. The Worker does not perform the quota-heavy odds collection itself.
 
-GitHub cron remains temporarily enabled as a fallback. Its UTC wake coverage is deliberately placed about five minutes after the corresponding Cloudflare pulse across PDT and PST. If Cloudflare has already produced the slot, the canonical-slot duplicate gate exits before another Odds-API request. Once Cloudflare scheduling has demonstrated stable production operation, the fallback cron layer can be removed without changing the five canonical slots or report times.
+The GitHub odds workflow has no scheduled cron trigger. It runs automatically only when dispatched by the Cloudflare Worker; `workflow_dispatch` remains available as the intentional manual recovery path. Canonical-slot duplicate protection remains in the workflow for scheduled Cloudflare dispatches.
 
 Profile configuration may be prepared outside the live terminal for a future operating day. The current Preferences / Operations pane is deliberately **display-only** for active-day scheduling. It may show the active profile, pulse/report pairs, seasonal reference profiles, featured Vig Scope checkpoints and History translation, but it does not change the already-active operating day.
 
@@ -75,7 +75,7 @@ New report-history/index records should retain, when available:
 - `scheduledLabel`
 - `featuredVigScope`
 
-Odds snapshots use `scheduleMeta` for the corresponding profile/pulse provenance and identify the trigger source when available (`cloudflare-cron`, `github-cron`, or `manual`).
+Odds snapshots use `scheduleMeta` for the corresponding profile/pulse provenance. New automatic snapshots identify `triggerSource: cloudflare-cron`; intentional manual refreshes identify `triggerSource: manual`. Historical cutover snapshots may retain `github-cron` provenance.
 
 ## Vig Scope
 
