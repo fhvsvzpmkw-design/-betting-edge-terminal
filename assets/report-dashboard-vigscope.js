@@ -60,6 +60,15 @@
   cardView.async=false;
   document.head.appendChild(cardView);
 
+  // One local authority owns the visible main-menu order and function-key map.
+  // It keeps F1 VigScope and TAB Preferences fixed while allowing the middle
+  // items to be press-held and reordered without mutating the canonical DOM.
+  const menuOrder=document.createElement('script');
+  menuOrder.id='menuOrderControllerLoader';
+  menuOrder.src=`./assets/menu-order-controller.js?v=1&b=${UI_CACHE_BUST}`;
+  menuOrder.async=false;
+  document.head.appendChild(menuOrder);
+
   // VigScope, Market, Bet History and Results share the menu-first/full-page
   // navigation shell. Results reuses the internal engine route at F8 so the
   // public navigation contract does not need a disruptive route migration.
