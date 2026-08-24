@@ -29,3 +29,39 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy cloudflare-worker/src/index.js --name betting-edge-terminal --compatibility-date 2026-08-22
+
+      - name: Verify live mutable-file cache policy
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          verify_url() {
+            local url="$1"
+            local label="$2"
+            local headers=""
+
+            for attempt in $(seq 1 12); do
+              headers="$(curl --silent --show-error --fail --head \
+                "${url}?verify=${GITHUB_SHA}-${attempt}" || true)"
+
+              if printf '%s\n' "$headers" | grep -Eiq '^cache-control:.*no-store' \
+                && printf '%s\n' "$headers" | grep -Eiq '^cloudflare-cdn-cache-control:[[:space:]]*no-store' \
+                && printf '%s\n' "$headers" | grep -Eiq '^cdn-cache-control:[[:space:]]*no-store' \
+                && printf '%s\n' "$headers" | grep -Eiq '^x-vigwire-origin:[[:space:]]*github-pages'; then
+                echo "LIVE CACHE VERIFY PASS: ${label}"
+                return 0
+              fi
+
+              echo "Live cache headers not ready for ${label} (attempt ${attempt}/12)."
+              printf '%s\n' "$headers"
+              sleep 5
+            done
+
+            echo "LIVE CACHE VERIFY FAILED: ${label}"
+            printf '%s\n' "$headers"
+            return 1
+          }
+
+          verify_url "https://vigwirelabs.com/data/pizza-plays.json" "Pizza Plays JSON"
+          verify_url "https://vigwirelabs.com/runner.html" "runner.html"
+          verify_url "https://vigwirelabs.com/assets/special-desks-ui.js" "special-desks-ui.js"
