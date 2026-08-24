@@ -9,6 +9,7 @@ const HOLD_MS=430;
 const MOVE_CANCEL_PX=12;
 const DEFAULT_MIDDLE=['market','history','syndicate','pizza','crypto','meat','engine'];
 const WORKSPACE_CLASSES=['runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
+const HTML_SHIELD_IDS=new Set(['pizza','crypto']);
 const DEFINITIONS={
   board:{label:'VIGSCOPE',selector:'.btn[data-view="board"]'},
   market:{label:'MARKET',selector:'.btn[data-view="market"]'},
@@ -70,8 +71,26 @@ function keyFor(id,order=middle){
   return idx>=0?`F${idx+1}`:'';
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function shieldCanonicalHtml(b,id){
+  if(!HTML_SHIELD_IDS.has(id)||b?.dataset?.menuHtmlShield==='1')return;
+  try{
+    const win=b.ownerDocument?.defaultView;
+    const proto=win?.Element?.prototype;
+    const desc=proto&&Object.getOwnPropertyDescriptor(proto,'innerHTML');
+    if(!desc?.get||!desc?.set)return;
+    let canonical=desc.get.call(b);
+    Object.defineProperty(b,'innerHTML',{
+      configurable:true,
+      enumerable:false,
+      get(){return canonical},
+      set(value){canonical=String(value);desc.set.call(this,canonical)}
+    });
+    b.dataset.menuHtmlShield='1';
+  }catch{}
+}
 function patchButtonKey(b,key,id){
   if(!b||!key)return;
+  shieldCanonicalHtml(b,id);
   b.dataset.menuId=id;
   b.dataset.menuKey=key;
   b.dataset.menuReorderable=String(DEFAULT_MIDDLE.includes(id));
@@ -182,7 +201,7 @@ function apply(d,force=false,order=middle){
   const normalized=applyVisual(d,order);
   if(force||JSON.stringify(normalized)!==JSON.stringify(middle))middle=normalizeMiddle(normalized);
   renderPreferenceBox(d);
-  d.documentElement.dataset.menuOrderAuthority='1-safe-text';
+  d.documentElement.dataset.menuOrderAuthority='1-safe-shield';
   if(d.defaultView)d.defaultView.BettingEdgeMenuOrder=window.BettingEdgeMenuOrder;
   return true;
 }
