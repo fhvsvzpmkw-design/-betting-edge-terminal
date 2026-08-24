@@ -107,7 +107,7 @@ def new_entry(pdf: Path) -> dict:
         "desk": inferred["desk"],
         "bytes": pdf.stat().st_size,
         "tags": inferred["tags"],
-        "status": "SOURCE AVAILABLE // NOT ANALYZED",
+        "status": "SOURCE AVAILABLE // PENDING REVIEW",
         "reviewMode": "ONE-TIME FULL SOURCE REVIEW",
         "publicationStatus": "PRIVATE // NOT PUBLISHED",
         "reviewedAt": None,
