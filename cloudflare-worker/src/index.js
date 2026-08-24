@@ -5,7 +5,7 @@ const PRIVATE_LEDGER_API = "https://api.github.com/repos/fhvsvzpmkw-design/betti
 const SCHEDULE_CONFIG_URL = `${GITHUB_PAGES_ORIGIN}/data/schedule-profiles.json`;
 const SCHEDULE_STATE_URL = `${GITHUB_PAGES_ORIGIN}/data/schedule-state.json`;
 const ODDS_WORKFLOW_DISPATCH_URL = "https://api.github.com/repos/fhvsvzpmkw-design/-betting-edge-terminal/actions/workflows/odds-refresh.yml/dispatches";
-const SCHEDULER_CRON = "* * * * *";
+const SCHEDULER_CRON = "5,20,50 * * * *";
 
 const SLOT_CODES = {
   open: "o",
@@ -436,11 +436,11 @@ export default {
             latestRun: latest.id,
             historyUpdatedAt: updatedAt,
             scheduler: {
-              mode: "cloudflare-minute-dispatch",
+              mode: "cloudflare-scheduled-dispatch",
               cron: SCHEDULER_CRON,
               tokenConfigured: Boolean(schedulerToken(env)),
               source: "public schedule profile + state",
-              cutover: "parallel-with-github-cron-fallback",
+              cutover: "cloudflare-only",
             },
           },
           { headers: { "Cache-Control": "no-store" } },
