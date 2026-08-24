@@ -44,9 +44,10 @@ function iconFor(item){
 }
 function statusLabel(item){
   const raw=String(item?.status||'').trim().toUpperCase();
-  if(item?.reviewedAt||raw.includes('ANALYZED')||raw.includes('REVIEWED'))return 'ANALYZED // PRESEASON RESEARCH';
+  if(raw.includes('NOT ANALYZED')||raw.includes('PENDING'))return 'SOURCE AVAILABLE // NOT ANALYZED';
   if(raw.includes('SUPERSEDED'))return 'SUPERSEDED';
   if(raw.includes('VERIFIED'))return 'CURRENTLY VERIFIED';
+  if(item?.reviewedAt||raw.includes('ANALYZED')||raw.includes('REVIEWED'))return 'ANALYZED // PRESEASON RESEARCH';
   return 'SOURCE AVAILABLE // NOT ANALYZED';
 }
 function statusClass(item){
@@ -56,7 +57,6 @@ function statusClass(item){
   if(label==='SUPERSEDED')return 'superseded';
   return 'available';
 }
-function sourceCount(){return Array.isArray(manifest?.sources)?manifest.sources.length:0}
 function sportKeys(){
   const seen=[];
   (manifest?.sources||[]).forEach(item=>{const key=shortDesk(item);if(key&&!seen.includes(key))seen.push(key)});
@@ -78,6 +78,7 @@ function groupSources(items){
   });
   return Array.from(groups.values()).sort((a,b)=>a.desk.localeCompare(b.desk)||b.season.localeCompare(a.season,undefined,{numeric:true}));
 }
+function analyzedSources(){return (manifest?.sources||[]).filter(x=>statusLabel(x).startsWith('ANALYZED')&&x?.publicFindings)}
 
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
@@ -97,18 +98,40 @@ function ensureStyle(d){
     body.runnerSeasonPreviewsLoaded #${PANEL_ID}{display:block!important;margin-top:0!important}
     body.runnerSeasonPreviewsLoaded #${PANEL_ID}~*{display:none!important}
 
-    .meatDeskHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #4a302b;padding-bottom:10px;flex-wrap:wrap}.meatDeskHead h2{margin:0;color:#ffd0bb;font-size:18px;letter-spacing:.12em}.meatDeskHead p{margin:5px 0 0;color:#9c827b;font-size:8px;line-height:1.55;letter-spacing:.05em}.meatDeskBadge{border:1px solid #81584d;color:#f0b5a4;background:#100705;padding:6px 9px;font-size:8px;font-weight:950;letter-spacing:.09em;line-height:1.45}.meatDeskPrivacy{margin:10px 0 0;border:1px solid #49342f;background:#070403;padding:8px 10px;color:#b9968b;font-size:8px;font-weight:850;line-height:1.5;letter-spacing:.06em}.meatDeskPrivacy b{color:#f0b5a4}
-    .meatShelfTools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:11px 0 8px}.meatSearch{flex:1 1 220px;min-height:36px;border:1px solid #4a302b;background:#080404;color:#e9d8d1;padding:8px 10px;font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}.meatFilter{border:1px solid #594039;background:#080404;color:#a98f87;padding:7px 9px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer}.meatFilter.active{border-color:#d88672;color:#ffd5c6;background:#190908}
+    .meatDeskHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #4a302b;padding-bottom:10px;flex-wrap:wrap}
+    .meatDeskHead h2{margin:0;color:#ffd0bb;font-size:18px;letter-spacing:.12em}.meatDeskHead p{margin:5px 0 0;color:#9c827b;font-size:8px;line-height:1.55;letter-spacing:.05em}
+    .meatDeskBadge{border:1px solid #81584d;color:#f0b5a4;background:#100705;padding:6px 9px;font-size:8px;font-weight:950;letter-spacing:.09em;line-height:1.45}
+    .meatDeskPrivacy{margin:10px 0 0;border:1px solid #49342f;background:#070403;padding:8px 10px;color:#b9968b;font-size:8px;font-weight:850;line-height:1.5;letter-spacing:.06em}.meatDeskPrivacy b{color:#f0b5a4}
+
+    .meatBoard{margin-top:13px;border:1px solid #5e3f37;background:#080403;padding:10px}
+    .meatBoardHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid #3e2a25;padding-bottom:8px}
+    .meatBoardTitle{color:#ffd1bf;font-size:11px;font-weight:950;letter-spacing:.11em}.meatBoardState{margin-top:4px;color:#c79586;font-size:7px;font-weight:900;letter-spacing:.08em}
+    .meatBoardCount{border:1px solid #665045;background:#0c0705;padding:6px 8px;color:#dcb7a9;font-size:7px;font-weight:950;line-height:1.45;text-align:right}
+    .meatBoardWarn{margin-top:8px;border:1px solid #6d5732;background:#0d0903;color:#e6c78b;padding:7px 8px;font-size:7px;font-weight:900;line-height:1.45;letter-spacing:.055em}
+    .meatSectionTitle{margin:12px 0 6px;color:#ba8374;font-size:8px;font-weight:950;letter-spacing:.12em}
+    .meatFindingsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+    .meatFinding{border:1px solid #46332e;background:#070403;padding:8px;min-width:0}
+    .meatFindingTop{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}.meatFindingTier{font-size:6.5px;font-weight:950;letter-spacing:.09em;border:1px solid #5e5441;padding:3px 5px;color:#dbc58e;white-space:nowrap}.meatFindingTier.strong{color:#bde7c5;border-color:#466a4c}.meatFindingTier.carry{color:#d7dca1;border-color:#61633f}
+    .meatFindingTitle{color:#f0d6ce;font-size:9px;font-weight:950;line-height:1.3}.meatFindingLine{margin-top:4px;color:#e6b087;font-size:7px;font-weight:950;letter-spacing:.06em}
+    .meatFindingWhy{margin-top:6px;color:#a9948d;font-size:7px;line-height:1.45}.meatFindingNext{margin-top:5px;color:#7f9aa6;font-size:6.8px;line-height:1.4}
+    .meatCompactList{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px}.meatCompact{border:1px solid #3d302b;background:#060303;padding:7px}.meatCompact b{color:#e8c5b8;font-size:8px}.meatCompact span{display:block;margin-top:3px;color:#9b8881;font-size:6.8px;line-height:1.4}
+    .meatConflict{border-color:#66413e}.meatConflict b{color:#e2a19c}
+    .meatSystem{margin-top:7px;border:1px solid #5c5732;background:#090803;padding:8px}.meatSystemTitle{color:#e0d38e;font-size:8px;font-weight:950;letter-spacing:.09em}.meatSystemRule{margin-top:5px;color:#a9a176;font-size:7px;line-height:1.45}.meatSystemExamples{margin-top:5px;color:#8fa3a8;font-size:6.8px;line-height:1.5}.meatSystemState{margin-top:6px;color:#d9b36e;font-size:6.8px;font-weight:950;letter-spacing:.06em}
+
+    .meatShelfTools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:13px 0 8px}.meatSearch{flex:1 1 220px;min-height:36px;border:1px solid #4a302b;background:#080404;color:#e9d8d1;padding:8px 10px;font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;outline:none}.meatFilter{border:1px solid #594039;background:#080404;color:#a98f87;padding:7px 9px;font:900 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer}.meatFilter.active{border-color:#d88672;color:#ffd5c6;background:#190908}
     .meatGroup{margin-top:14px}.meatGroup[hidden]{display:none!important}.meatGroupHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px solid #34231f;color:#d8a99b;font-size:9px;font-weight:950;letter-spacing:.11em}.meatGroupCount{color:#755f58;font-size:7px}
     .meatShelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:11px;padding:10px 0 5px}.meatSource{min-width:0;border:1px solid #51362f;border-left:4px solid #784b3f;background:linear-gradient(145deg,#100706,#050303);padding:10px;display:grid;grid-template-columns:38px minmax(0,1fr);gap:9px;align-items:start;box-shadow:inset 0 0 0 1px rgba(255,220,205,.025)}.meatSourceIcon{width:38px;height:45px;border:1px solid #553930;background:#0b0504;display:grid;place-items:center;font-size:22px}.meatSourceMain{min-width:0}.meatSourceKicker{color:#a47b70;font-size:7px;font-weight:950;letter-spacing:.09em}.meatSourceTitle{margin-top:4px;color:#f2d8cf;font-size:10px;font-weight:950;line-height:1.3}.meatSourceMeta{margin-top:5px;color:#866f68;font-size:7px;line-height:1.45}.meatSourceStatus{grid-column:1/-1;margin-top:2px;border:1px solid #523b34;background:#090504;padding:6px 7px;font-size:7px;font-weight:950;letter-spacing:.08em}.meatSourceStatus.available{color:#efb39f;border-color:#775044}.meatSourceStatus.analyzed{color:#b9e6c5;border-color:#44634c}.meatSourceStatus.verified{color:#cfe8ff;border-color:#466477}.meatSourceStatus.superseded{color:#9b8f8a;border-color:#514845}.meatSourceFoot{grid-column:1/-1;color:#6f5b55;font-size:6.5px;line-height:1.4;letter-spacing:.06em}.meatEmpty{margin-top:14px;border:1px dashed #81584d;padding:18px;text-align:center;color:#c99c8e;font-size:10px}
-    @media(max-width:760px){#${PANEL_ID}{margin-left:7px;margin-right:7px;padding:9px}.meatShelf{grid-template-columns:1fr}.meatDeskBadge{width:100%}}
+    @media(max-width:760px){#${PANEL_ID}{margin-left:7px;margin-right:7px;padding:9px}.meatShelf{grid-template-columns:1fr}.meatDeskBadge{width:100%}.meatFindingsGrid,.meatCompactList{grid-template-columns:1fr}}
   `;
   d.head.appendChild(s);
 }
 
 function setButtonCopy(b){
-  const count=Array.isArray(manifest?.sources)?manifest.sources.length:null,mode=analysisModeLabel();
-  const msg=count===null?`PRIVATE RESEARCH DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`:`${count} SOURCE${count===1?'':'S'} REGISTERED&nbsp;&nbsp; // &nbsp;&nbsp;${esc(mode)} MANUAL REVIEW&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
+  const count=Array.isArray(manifest?.sources)?manifest.sources.length:null;
+  const analyzed=analyzedSources().length;
+  const msg=count===null
+    ?`PRIVATE RESEARCH DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`
+    :`${count} SOURCE${count===1?'':'S'} REGISTERED&nbsp;&nbsp; // &nbsp;&nbsp;${analyzed} ANALYZED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
   const html=`<span class="f6Main"><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="f6Message">${msg}</span>`;
   if(b.innerHTML!==html)b.innerHTML=html;
 }
@@ -142,21 +165,51 @@ function sourceHtml(item){
     <div class="meatSourceIcon" aria-hidden="true">${iconFor(item)}</div>
     <div class="meatSourceMain"><div class="meatSourceKicker">${esc(desk)} // ${esc(season)}</div><div class="meatSourceTitle">${title}</div><div class="meatSourceMeta">${publisher}${size?` // ${size}`:''}</div></div>
     <div class="meatSourceStatus ${klass}">${esc(status)}</div>
-    <div class="meatSourceFoot">PRIVATE RESEARCH SOURCE // DOCUMENT ACCESS DISABLED // ANALYSIS RUNS MANUALLY</div>
+    <div class="meatSourceFoot">PRIVATE SOURCE DOCUMENT // DOCUMENT ACCESS DISABLED // SANITIZED FINDINGS ONLY</div>
   </article>`;
+}
+function findingCard(x){
+  const strong=String(x?.tier||'').toUpperCase().includes('STRONG');
+  const tierClass=strong?'strong':'carry';
+  return `<article class="meatFinding">
+    <div class="meatFindingTop"><div class="meatFindingTitle">${esc(x?.title||'UNTITLED')}</div><span class="meatFindingTier ${tierClass}">${esc(x?.tier||'CARRY')}</span></div>
+    ${x?.sourceLine?`<div class="meatFindingLine">SOURCE LINE // ${esc(x.sourceLine)}</div>`:''}
+    ${x?.why?`<div class="meatFindingWhy">${esc(x.why)}</div>`:''}
+    ${x?.next?`<div class="meatFindingNext">NEXT // ${esc(x.next)}</div>`:''}
+  </article>`;
+}
+function compactCard(x,kind='watch'){
+  const main=kind==='watch'?[x?.title,x?.angle].filter(Boolean).join(' // '):x?.title;
+  const detail=kind==='watch'?x?.reason:x?.detail;
+  return `<article class="meatCompact${kind==='conflict'?' meatConflict':''}"><b>${esc(main||'UNTITLED')}</b>${detail?`<span>${esc(detail)}</span>`:''}</article>`;
+}
+function boardHtml(item){
+  const f=item?.publicFindings||{},carries=Array.isArray(f.carries)?f.carries:[],watch=Array.isArray(f.watch)?f.watch:[],conflicts=Array.isArray(f.conflicts)?f.conflicts:[],system=f.earlySeason||null;
+  return `<section class="meatBoard">
+    <div class="meatBoardHead">
+      <div><div class="meatBoardTitle">${esc(f.label||`${item.title} // PRESEASON BOARD`)}</div><div class="meatBoardState">${esc(f.state||'PRESEASON RESEARCH')}</div></div>
+      <div class="meatBoardCount">${carries.length} CARRIES // ${watch.length} WATCH<br>${conflicts.length} CONFLICTS // BETTING EDGE REVIEW PENDING</div>
+    </div>
+    ${f.disclaimer?`<div class="meatBoardWarn">${esc(f.disclaimer)}</div>`:''}
+    ${carries.length?`<div class="meatSectionTitle">CARRY BOARD // SOURCE-DERIVED CANDIDATES</div><div class="meatFindingsGrid">${carries.map(findingCard).join('')}</div>`:''}
+    ${watch.length?`<div class="meatSectionTitle">WATCH BOARD // NEEDS PRICE, FACT OR MARKET CONFIRMATION</div><div class="meatCompactList">${watch.map(x=>compactCard(x,'watch')).join('')}</div>`:''}
+    ${conflicts.length?`<div class="meatSectionTitle">CONFLICT BOARD // DO NOT FORCE CONSENSUS</div><div class="meatCompactList">${conflicts.map(x=>compactCard(x,'conflict')).join('')}</div>`:''}
+    ${system?`<div class="meatSectionTitle">EARLY-SEASON SYSTEM</div><div class="meatSystem"><div class="meatSystemTitle">${esc(system.title||'EARLY-SEASON SYSTEM')}</div><div class="meatSystemRule">${esc(system.rule||'')}</div><div class="meatSystemExamples">${(system.sourceExamples||[]).map(x=>`• ${esc(x)}`).join('<br>')}</div><div class="meatSystemState">${esc(system.state||'VERIFY BEFORE USE')}</div></div>`:''}
+  </section>`;
 }
 function libraryHtml(){
   const sources=Array.isArray(manifest?.sources)?manifest.sources:[];
-  const groups=groupSources(sources);
-  const analyzed=sources.filter(x=>statusLabel(x).startsWith('ANALYZED')).length;
-  return `<div class="meatDeskHead"><div><h2>🥩 MEAT DESK</h2><p>PRIVATE PRESEASON RESEARCH REGISTRY // SPORT → SEASON → SOURCE</p></div><div class="meatDeskBadge">${sources.length} SOURCE${sources.length===1?'':'S'} // ${analyzed} ANALYZED<br>REVIEW MODE: ${esc(analysisModeLabel())} // MANUAL ONLY</div></div>
-    <div class="meatDeskPrivacy"><b>DESK POLICY:</b> SOURCE PRESENCE AND REVIEW STATUS ONLY. ORIGINAL DOCUMENTS AND PRIVATE RESEARCH ARE NOT OPENED OR EXPOSED FROM THIS SCREEN.</div>
+  const groups=groupSources(sources),analyzed=analyzedSources();
+  return `<div class="meatDeskHead"><div><h2>🥩 MEAT DESK</h2><p>PRESEASON TOUT + RESEARCH DESK // SPORT → SEASON → SOURCE</p></div><div class="meatDeskBadge">${sources.length} SOURCE${sources.length===1?'':'S'} // ${analyzed.length} ANALYZED<br>REVIEW MODE: ${esc(analysisModeLabel())} // MANUAL ONLY</div></div>
+    <div class="meatDeskPrivacy"><b>DESK POLICY:</b> SOURCE DOCUMENTS AND DETAILED RESEARCH STAY PRIVATE. THE SCREEN SHOWS ONLY APPROVED, SANITIZED FINDINGS. THESE ARE PRESEASON CANDIDATES — NOT CURRENT BETTING EDGE PLAYS.</div>
+    ${analyzed.map(boardHtml).join('')}
     <div class="meatShelfTools"><input class="meatSearch" type="search" placeholder="SEARCH SOURCES…" aria-label="Search Meat Desk sources">${filtersHtml()}</div>
     ${groups.length?groups.map(group=>`<section class="meatGroup" data-meat-group="${esc(group.desk)}"><div class="meatGroupHead"><span>${esc(group.desk)} // ${esc(group.season)}</span><span class="meatGroupCount">${group.items.length} SOURCE${group.items.length===1?'':'S'}</span></div><div class="meatShelf">${group.items.map(sourceHtml).join('')}</div></section>`).join(''):`<div class="meatEmpty">NO RESEARCH SOURCES REGISTERED.</div>`}`;
 }
 function renderPanel(d){
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),nav=tabs?.parentElement;if(!nav)return;
-  let p=d.getElementById(PANEL_ID);if(!p){p=d.createElement('section');p.id=PANEL_ID;p.setAttribute('aria-label','Meat Desk private source registry');nav.insertAdjacentElement('afterend',p)}
+  let p=d.getElementById(PANEL_ID);
+  if(!p){p=d.createElement('section');p.id=PANEL_ID;p.setAttribute('aria-label','Meat Desk research board');nav.insertAdjacentElement('afterend',p)}
   p.innerHTML=libraryHtml();
 }
 function applyShelfFilter(d){
@@ -185,7 +238,8 @@ function bindPanel(d){
 function closeDesk(d,b){d.body.classList.remove('runnerSeasonPreviewsLoaded');if(b){b.classList.remove('active');b.setAttribute('aria-pressed','false')}}
 function bindNav(d,b,pref,tabs){
   if(b.dataset.bound!=='1'){
-    b.dataset.bound='1';b.addEventListener('click',()=>{
+    b.dataset.bound='1';
+    b.addEventListener('click',()=>{
       const open=!d.body.classList.contains('runnerSeasonPreviewsLoaded');
       d.body.classList.remove('runnerSyndicateLoaded','runnerPreferencesLoaded');pref?.classList.remove('active');
       d.body.classList.toggle('runnerSeasonPreviewsLoaded',open);b.classList.toggle('active',open);b.setAttribute('aria-pressed',String(open));
@@ -196,9 +250,13 @@ function bindNav(d,b,pref,tabs){
   if(pref&&pref.dataset.meatDeskBound!=='1'){pref.dataset.meatDeskBound='1';pref.addEventListener('click',()=>closeDesk(d,b))}
   if(tabs.dataset.meatDeskBound!=='1'){tabs.dataset.meatDeskBound='1';tabs.addEventListener('click',e=>{const x=e.target.closest('.btn');if(x&&x!==b)closeDesk(d,b)})}
   if(d.documentElement.dataset.meatDeskKeysBound!=='1'&&pref){
-    d.documentElement.dataset.meatDeskKeysBound='1';d.addEventListener('keydown',e=>{
+    d.documentElement.dataset.meatDeskKeysBound='1';
+    d.addEventListener('keydown',e=>{
       if(e.key==='F7'){e.preventDefault();b.click();return}
-      if(e.key==='Tab'&&!d.body.classList.contains('runnerPreferencesLoaded')){const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;e.preventDefault();pref.click()}
+      if(e.key==='Tab'&&!d.body.classList.contains('runnerPreferencesLoaded')){
+        const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;
+        e.preventDefault();pref.click();
+      }
     },true);
   }
 }
@@ -206,7 +264,8 @@ function ensureUi(d){
   if(!d?.body)return false;ensureStyle(d);
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');if(!tabs)return false;
   const pref=d.getElementById(PREF_BUTTON_ID);if(!pref)return false;
-  let b=d.getElementById(BUTTON_ID);if(!b){b=d.createElement('button');b.type='button';b.id=BUTTON_ID;b.className='btn';b.setAttribute('aria-pressed','false');tabs.appendChild(b)}
+  let b=d.getElementById(BUTTON_ID);
+  if(!b){b=d.createElement('button');b.type='button';b.id=BUTTON_ID;b.className='btn';b.setAttribute('aria-pressed','false');tabs.appendChild(b)}
   setButtonCopy(b);setPreferenceCopy(pref);
   if(tabs.lastElementChild!==pref)tabs.appendChild(pref);
   if(!d.getElementById(PANEL_ID))renderPanel(d);
@@ -219,8 +278,15 @@ async function loadManifest(){
 }
 function attach(){
   const d=appDoc();if(!d?.body)return false;
-  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureUi(d)));observer.observe(d.body,{subtree:true,childList:true})}
+  if(d!==lastDoc){
+    lastDoc=d;
+    if(observer)observer.disconnect();
+    observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureUi(d)));
+    observer.observe(d.body,{subtree:true,childList:true});
+  }
   ensureUi(d);loadManifest();return true;
 }
-let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>200)clearInterval(timer)},100);setInterval(()=>{const d=appDoc();if(d)ensureUi(d)},1200);
+let tries=0;
+const timer=setInterval(()=>{tries++;if(attach()||tries>200)clearInterval(timer)},100);
+setInterval(()=>{const d=appDoc();if(d)ensureUi(d)},1200);
 })();
