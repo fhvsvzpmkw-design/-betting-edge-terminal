@@ -2,8 +2,21 @@ name: Refresh Betting Edge odds
 
 on:
   workflow_dispatch:
+    inputs:
+      trigger_mode:
+        description: Trigger source for this odds refresh
+        required: false
+        default: manual
+        type: choice
+        options:
+          - manual
+          - cloudflare_scheduled
+      scheduled_at:
+        description: Cloudflare scheduled timestamp (ISO-8601; scheduled mode only)
+        required: false
+        type: string
   schedule:
-    # UTC trigger coverage for every seasonal-profile pulse in both PDT/PST.
+    # Temporary fallback during Cloudflare scheduler cutover.
     # The Vancouver-local profile resolver exits before any Odds-API request
     # unless this wake-up belongs to the active profile and canonical slot.
     - cron: '45 0 * * *'
@@ -46,17 +59,39 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Validate Cloudflare dispatch envelope
+        if: github.event_name == 'workflow_dispatch' && inputs.trigger_mode == 'cloudflare_scheduled'
+        env:
+          SCHEDULED_AT: ${{ inputs.scheduled_at }}
+        run: |
+          node <<'NODE'
+          const raw=String(process.env.SCHEDULED_AT||'').trim();
+          const scheduled=Date.parse(raw);
+          if(!raw||!Number.isFinite(scheduled)) throw new Error('Cloudflare scheduled dispatch requires a valid scheduled_at timestamp');
+          const ageMinutes=Math.abs(Date.now()-scheduled)/60000;
+          if(ageMinutes>35) throw new Error(`Cloudflare scheduled_at is outside the 35-minute dispatch window (${ageMinutes.toFixed(1)}m)`);
+          console.log(`Cloudflare dispatch envelope OK // scheduled_at=${raw} // age=${ageMinutes.toFixed(1)}m`);
+          NODE
+
       - name: Resolve active Vancouver schedule profile
         id: schedule
         env:
-          EVENT_NAME: ${{ github.event_name }}
-        run: node tools/schedule-profile.mjs resolve-workflow >> "$GITHUB_OUTPUT"
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
+        run: |
+          if [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
+            export EVENT_NAME=schedule
+          else
+            export EVENT_NAME="${GITHUB_EVENT_NAME}"
+          fi
+          node tools/schedule-profile.mjs resolve-workflow >> "$GITHUB_OUTPUT"
 
       - name: Gate duplicate profile slot
         id: gate
         if: steps.schedule.outputs.should_run == 'true'
         env:
-          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
           OPERATING_DATE: ${{ steps.schedule.outputs.operating_date }}
           PROFILE_ID: ${{ steps.schedule.outputs.profile_id }}
           CANONICAL_SLOT: ${{ steps.schedule.outputs.canonical_slot }}
@@ -64,7 +99,9 @@ jobs:
         run: |
           node <<'NODE' >> "$GITHUB_OUTPUT"
           const fs=require('node:fs');
-          const eventName=process.env.EVENT_NAME||'';
+          const githubEventName=process.env.GITHUB_EVENT_NAME||'';
+          const triggerMode=process.env.TRIGGER_MODE||'';
+          const eventName=githubEventName==='workflow_dispatch'&&triggerMode==='cloudflare_scheduled'?'schedule':githubEventName;
           if(eventName==='workflow_dispatch'){
             console.log('execute=true');
             console.log('reason=manual');
@@ -138,12 +175,18 @@ jobs:
           PLANNED_PULSE: ${{ steps.schedule.outputs.planned_pulse_time }}
           PLANNED_REPORT: ${{ steps.schedule.outputs.planned_report_time }}
           FEATURED_VIG: ${{ steps.schedule.outputs.featured_vig_scope }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
+          TRIGGER_SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
         run: |
           node <<'NODE'
           const fs=require('node:fs');
           const p='data/live-odds.json';
           const j=JSON.parse(fs.readFileSync(p,'utf8'));
           const canonicalRaw=String(process.env.CANONICAL_SLOT||'').trim();
+          const githubEventName=String(process.env.GITHUB_EVENT_NAME||'');
+          const triggerMode=String(process.env.TRIGGER_MODE||'');
+          const triggerSource=triggerMode==='cloudflare_scheduled'?'cloudflare-cron':githubEventName==='schedule'?'github-cron':'manual';
           j.scheduleMeta={
             schema:1,
             operatingDate:process.env.OPERATING_DATE||null,
@@ -153,7 +196,9 @@ jobs:
             slot:process.env.SLOT_NAME||null,
             plannedPulseTime:process.env.PLANNED_PULSE||null,
             plannedReportTime:process.env.PLANNED_REPORT||null,
-            featuredVigScope:String(process.env.FEATURED_VIG||'').toLowerCase()==='true'
+            featuredVigScope:String(process.env.FEATURED_VIG||'').toLowerCase()==='true',
+            triggerSource,
+            triggerScheduledAt:process.env.TRIGGER_SCHEDULED_AT||null
           };
           fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');
           JSON.parse(fs.readFileSync(p,'utf8'));
@@ -199,10 +244,21 @@ jobs:
 
       - name: Schedule summary
         if: always()
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
         run: |
+          if [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
+            trigger_source="cloudflare-cron"
+          elif [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
+            trigger_source="github-cron"
+          else
+            trigger_source="manual"
+          fi
           {
             echo "## Betting Edge odds scheduler"
             echo
+            echo "- Trigger: \`${trigger_source}\`"
             echo "- Profile: \`${{ steps.schedule.outputs.profile_label }}\`"
             echo "- Operating day: \`${{ steps.schedule.outputs.operating_date }}\`"
             echo "- Canonical slot: \`${{ steps.schedule.outputs.canonical_slot }}\`"
@@ -211,4 +267,5 @@ jobs:
             echo "- Featured Vig Scope: \`${{ steps.schedule.outputs.featured_vig_scope }}\`"
             echo "- Gate: \`${{ steps.gate.outputs.reason || 'not-due' }}\`"
             echo "- Five-pull daily cap: unchanged"
+            echo "- GitHub cron fallback: enabled during Cloudflare cutover"
           } >> "$GITHUB_STEP_SUMMARY"
