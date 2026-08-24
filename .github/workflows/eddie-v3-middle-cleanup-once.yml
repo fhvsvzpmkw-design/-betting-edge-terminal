@@ -1,0 +1,57 @@
+name: Eddie V3 middle cleanup once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/eddie-v3-middle-cleanup-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Simplify Eddie V3 brand band
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('syndicates/generated/eddie-numbers/hotline.html')
+          s = p.read_text()
+
+          old_css = '.brandrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(190px,.55fr) minmax(250px,.55fr);gap:15px;align-items:center;padding:16px}.ey{color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.14em}.brandcopy h1{margin:4px 0;font:italic clamp(48px,7vw,78px)/.88 Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif}.brandcopy h1 span{color:var(--gold)}.brandcopy h2{margin:8px 0 0;font:900 15px system-ui,sans-serif;letter-spacing:.12em}.brandcopy p{max-width:720px;color:#cbd9e1;font:650 12px/1.48 system-ui,sans-serif}.brandnote{color:#d6bd77;font-size:8px;font-weight:900;letter-spacing:.08em;margin-top:5px}.logo{text-align:center}.logo img{display:block;width:100%;max-width:330px;margin:auto;filter:drop-shadow(0 13px 26px #000b)}.source{padding:11px;border:1px solid #55758a;border-radius:12px;background:#081b28;min-width:0}.source small,.stat small,.mini small{display:block;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase}.source strong{display:block;color:var(--gold);font-size:17px}.live{color:var(--up);font-weight:900}'
+          new_css = '.brandrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,320px);gap:16px 20px;align-items:center;padding:15px 16px 12px}.ey{color:var(--cyan);font-size:8px;font-weight:900;letter-spacing:.14em}.brandcopy h2{margin:5px 0 0;font:900 clamp(22px,3.2vw,32px)/1.05 system-ui,sans-serif;letter-spacing:.09em}.brandcopy p{max-width:720px;margin:10px 0 0;color:#cbd9e1;font:650 12px/1.5 system-ui,sans-serif}.brandnote{color:#d6bd77;font-size:7px;font-weight:900;letter-spacing:.08em;margin-top:8px}.logo{text-align:right}.logo img{display:block;width:100%;max-width:300px;margin-left:auto;filter:drop-shadow(0 13px 26px #000b)}.source{grid-column:1/-1;display:grid;grid-template-columns:minmax(240px,1.3fr) repeat(3,minmax(125px,.7fr));gap:10px 14px;align-items:end;padding:10px 12px;border:1px solid #55758a;border-radius:12px;background:#081b28;min-width:0}.sourceMain{min-width:0}.sourceMetric{min-width:0;border-left:1px solid #29485b;padding-left:12px}.source small,.stat small,.mini small{display:block;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase}.source strong{display:block;color:var(--gold);font-size:16px}.source b{display:block;margin-top:2px}.live{color:var(--up);font-weight:900}'
+          if old_css not in s:
+              raise SystemExit('Expected Eddie brand CSS not found')
+          s = s.replace(old_css, new_css, 1)
+
+          old_html = '<div class="brandrow"><div class="brandcopy"><div class="ey">FICTIONAL SPORTS-GAMBLING HALL OF FAMER // NATIONAL SPORTS-NETWORK COMMENTATOR // LEDGER ANALYST</div><h1><span>MUDDY</span> NUMBERS</h1><h2>LEDGER DESK // THE MAIN SHEET</h2><p>Eddie “Muddy” Numbers works the public ledger like a veteran Las Vegas main-sheet analyst: exact all-time cash totals from the authoritative public summary, then high-gloss week, month, sport, book, behaviour and recent-ticket analysis from settled public wager rows. The character world is fictional; the accounting below is live public-ledger data.</p><div class="brandnote">ARTWORK IS PRESENTATION ONLY // LIVE NUMBERS ARE RENDERED FROM THE PUBLIC LEDGER</div></div><div class="logo"><img src="../../../assets/syndicates/03_muddy_numbers_ledger_desk_logo.png" alt="Muddy Numbers Ledger Desk logo"></div><aside class="source" data-zone="issue-meta"><small>Authority</small><strong>PUBLIC BET HISTORY</strong><div id="status" class="live">LOADING CURRENT LEDGER…</div><small>Ledger generated</small><b id="gen">—</b><small>Data through</small><b id="through">—</b><small>Source file</small><b id="file">—</b></aside></div>'
+          new_html = '<div class="brandrow"><div class="brandcopy"><div class="ey">HALL OF FAME LEDGER ANALYST // LAS VEGAS MAIN SHEET</div><h2>LEDGER DESK // THE MAIN SHEET</h2><p>Eddie “Muddy” Numbers works the public ledger from the Las Vegas main sheet: exact all-time cash totals from the authoritative public summary, with week, month, sport, book, behaviour and recent-ticket analysis calculated from settled public wager rows.</p><div class="brandnote">FICTIONAL CHARACTER // LIVE NUMBERS FROM THE PUBLIC LEDGER</div></div><div class="logo"><img src="../../../assets/syndicates/03_muddy_numbers_ledger_desk_logo.png" alt="Muddy Numbers Ledger Desk logo"></div><aside class="source" data-zone="issue-meta"><div class="sourceMain"><small>Authority</small><strong>PUBLIC BET HISTORY</strong><div id="status" class="live">LOADING CURRENT LEDGER…</div></div><div class="sourceMetric"><small>Ledger generated</small><b id="gen">—</b></div><div class="sourceMetric"><small>Data through</small><b id="through">—</b></div><div class="sourceMetric"><small>Source file</small><b id="file">—</b></div></aside></div>'
+          if old_html not in s:
+              raise SystemExit('Expected Eddie brand HTML not found')
+          s = s.replace(old_html, new_html, 1)
+
+          old_media = '@media(max-width:900px){.brandrow{grid-template-columns:1fr 220px}.source{grid-column:1/-1}.score{grid-template-columns:repeat(3,1fr)}.meters{grid-template-columns:repeat(2,1fr)}.tickets{grid-template-columns:repeat(5,1fr)}}@media(max-width:700px){.brandrow,.grid2,.read{grid-template-columns:1fr}.logo{order:-1}.logo img{max-width:260px}.metrics{grid-template-columns:1fr 1fr}canvas{height:210px}.voicehead{grid-template-columns:85px 1fr}.voicehead img{width:85px}}'
+          new_media = '@media(max-width:900px){.brandrow{grid-template-columns:minmax(0,1fr) 220px}.source{grid-column:1/-1;grid-template-columns:minmax(210px,1.2fr) repeat(3,minmax(105px,.7fr))}.score{grid-template-columns:repeat(3,1fr)}.meters{grid-template-columns:repeat(2,1fr)}.tickets{grid-template-columns:repeat(5,1fr)}}@media(max-width:700px){.brandrow,.grid2,.read{grid-template-columns:1fr}.logo{text-align:left}.logo img{max-width:230px;margin:0}.source{grid-column:auto;grid-template-columns:1fr 1fr}.sourceMain{grid-column:1/-1}.sourceMetric{border-left:0;border-top:1px solid #29485b;padding:8px 0 0}.metrics{grid-template-columns:1fr 1fr}canvas{height:210px}.voicehead{grid-template-columns:85px 1fr}.voicehead img{width:85px}}'
+          if old_media not in s:
+              raise SystemExit('Expected Eddie responsive CSS not found')
+          s = s.replace(old_media, new_media, 1)
+
+          p.write_text(s)
+          PY
+      - name: Verify cleanup
+        run: |
+          ! grep -F '<h1><span>MUDDY</span> NUMBERS</h1>' syndicates/generated/eddie-numbers/hotline.html
+          grep -F 'HALL OF FAME LEDGER ANALYST // LAS VEGAS MAIN SHEET' syndicates/generated/eddie-numbers/hotline.html
+          grep -F 'sourceMetric' syndicates/generated/eddie-numbers/hotline.html
+          grep -F '03_muddy_numbers_ledger_desk_logo.png' syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/generated/eddie-numbers/hotline.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Clean up Eddie V3 brand band"
+          git push
