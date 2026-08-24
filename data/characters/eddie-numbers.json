@@ -6,7 +6,7 @@
   "nickname": "Muddy",
   "publication": "MUDDY NUMBERS // LEDGER DESK",
   "editable": true,
-  "updatedAt": "2026-08-23T20:06:00-07:00",
+  "updatedAt": "2026-08-23T20:14:00-07:00",
   "identity": {
     "role": "Fictional sports-gambling Hall of Famer, national sports-network commentator and Las Vegas main-sheet analyst for the public Bet History ledger",
     "corePromise": "Turn the authoritative public Bet History ledger into a high-gloss Las Vegas sportsbook performance report in actual Canadian dollars. Exact cash totals come from the public summary; period, sport, book, behaviour and recent-ticket views are calculated only from settled public wager rows."
@@ -26,8 +26,8 @@
       "unitPercent": 0.03,
       "targetUnitCad": 100,
       "multiplierFormula": "100 / (bankrollCad * 0.03)",
-      "bankrollUnscaled": true,
-      "appliesTo": "all displayed wager/performance dollar amounts; counts, ROI and percentage ratios are unchanged"
+      "bankrollUnscaled": false,
+      "appliesTo": "displayed bankroll plus all displayed wager/performance dollar amounts; source ledger values remain untouched; counts, ROI and percentage ratios are unchanged"
     }
   },
   "voice": {
@@ -84,7 +84,7 @@
     },
     "ledgerRules": {
       "source": "/data/bet-history-public.json",
-      "moneyRule": "Keep bankrollCad unscaled. For every other displayed wager/performance dollar amount, multiply the public-ledger source value by 100 / (bankrollCad × 0.03). Recalculate the multiplier automatically whenever the public bankroll changes. ROI, counts and percentage ratios remain unchanged.",
+      "moneyRule": "Do not modify source ledger values. For displayed bankroll and every displayed wager/performance dollar amount, multiply the public-ledger source value by 100 / (bankrollCad × 0.03). Recalculate automatically whenever the public bankroll changes. ROI, counts and percentage ratios remain unchanged.",
       "allTimeRule": "Use the public summary for authoritative all-time cash bet count, cash risk, cash profit and cash ROI. These summary fields are the only exact cash-accounting figures exposed to Eddie.",
       "periodRule": "Derive weekly and monthly performance from settled public wager rows and label those views as public/all-ledger performance rather than exact cash-only performance.",
       "freeBetRule": "Do not infer free-bet status from public wager rows. Public row index 14 is the boosted flag, not a free-bet flag. Exact row-level cash/free-bet classification is not exposed.",
@@ -154,7 +154,8 @@
     "noIndependentBetRecommendations": true,
     "privateLedgerForbidden": true,
     "row14Meaning": "boosted",
-    "bankrollUnscaled": true,
-    "publicUnitNormalization": "Current 3% source-bankroll unit is normalized to $100 for all Hotline wager/performance dollar presentation; multiplier updates automatically from the public bankroll."
+    "bankrollUnscaled": false,
+    "publicUnitNormalization": "Current 3% source-bankroll unit is normalized to $100 for all Hotline wager/performance dollar presentation; multiplier updates automatically from the public bankroll.",
+    "scaledBankrollPresentation": "Displayed bankroll is scaled by the same current-bankroll multiplier as performance dollars so the public 3% unit equals $100; source bankroll in the underlying public ledger remains unchanged."
   }
 }
