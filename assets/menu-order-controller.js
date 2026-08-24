@@ -69,28 +69,38 @@ function keyFor(id,order=middle){
   const idx=['board',...normalizeMiddle(order)].indexOf(id);
   return idx>=0?`F${idx+1}`:'';
 }
-function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function patchButtonKey(b,key,id){
   if(!b||!key)return;
   b.dataset.menuId=id;
   b.dataset.menuKey=key;
   b.dataset.menuReorderable=String(DEFAULT_MIDDLE.includes(id));
   if(key.startsWith('F'))b.setAttribute('aria-keyshortcuts',key);else b.removeAttribute('aria-keyshortcuts');
-  const next=b.innerHTML.replace(/\[(?:F(?:[1-9]|1[0-2])|TAB)\]/g,`[${key}]`);
-  if(next!==b.innerHTML)b.innerHTML=next;
+  const showText=b.ownerDocument?.defaultView?.NodeFilter?.SHOW_TEXT||4;
+  const walker=b.ownerDocument.createTreeWalker(b,showText);
+  const rx=/\[(?:F(?:[1-9]|1[0-2])|TAB)\]/g;
+  let node=null;
+  while((node=walker.nextNode())){
+    const value=node.nodeValue||'';
+    const next=value.replace(rx,`[${key}]`);
+    if(next!==value)node.nodeValue=next;
+  }
 }
 function workspaceSafety(d){
-  const active=WORKSPACE_CLASSES.find(c=>d.body.classList.contains(c));
+  const f5=d.getElementById('runnerSyndicateF5');
+  const connecting=f5?.dataset?.state==='connecting';
+  d.body.classList.toggle('runnerSyndicateConnecting',Boolean(connecting));
+  const active=connecting?'runnerSyndicateConnecting':WORKSPACE_CLASSES.find(c=>d.body.classList.contains(c));
   if(!active)return;
   d.body.classList.remove('runnerMenuHome','runnerPrimaryViewLoaded','runnerMenuReordering');
   delete d.body.dataset.primaryView;
   d.querySelectorAll('.primaryShellActive').forEach(x=>x.classList.remove('primaryShellActive'));
-  const id=active==='runnerSyndicateLoaded'?'runnerSyndicateF5':active==='runnerPizzaLoaded'?'runnerPizzaF6':active==='runnerCryptoLoaded'?'runnerCryptoF7':active==='runnerSeasonPreviewsLoaded'?'runnerSeasonPreviewF6':'runnerPreferencesF6';
+  const id=(active==='runnerSyndicateConnecting'||active==='runnerSyndicateLoaded')?'runnerSyndicateF5':active==='runnerPizzaLoaded'?'runnerPizzaF6':active==='runnerCryptoLoaded'?'runnerCryptoF7':active==='runnerSeasonPreviewsLoaded'?'runnerSeasonPreviewF6':'runnerPreferencesF6';
   const b=d.getElementById(id);
   if(b){b.style.setProperty('display','grid','important');b.style.setProperty('visibility','visible','important')}
 }
 function clearWorkspaceSafetyStyles(d){
-  if(WORKSPACE_CLASSES.some(c=>d.body.classList.contains(c)))return;
+  if(d.body.classList.contains('runnerSyndicateConnecting')||WORKSPACE_CLASSES.some(c=>d.body.classList.contains(c)))return;
   ['runnerSyndicateF5','runnerPizzaF6','runnerCryptoF7','runnerSeasonPreviewF6','runnerPreferencesF6'].forEach(id=>{
     const b=d.getElementById(id);if(!b)return;
     b.style.removeProperty('display');b.style.removeProperty('visibility');
@@ -114,11 +124,17 @@ function ensureStyle(d){
     body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
     body.runnerMenuHome.runnerMenuReordering .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grabbing}
     body.runnerMenuHome .runnerNavPad .tabs>.btn.menuOrderDragging{position:relative;z-index:5;opacity:.82;transform:scale(.985);outline:2px solid #ffe96b;outline-offset:2px;box-shadow:0 0 18px rgba(255,233,107,.20)!important}
+    body.runnerSyndicateConnecting main.term>header.top{display:flex!important;position:sticky!important;top:0!important;z-index:120!important;background:#030811!important;box-shadow:0 8px 18px rgba(0,0,0,.42)!important}
+    body.runnerSyndicateConnecting .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
+    body.runnerSyndicateConnecting .runnerNavPad .tabs{grid-template-columns:1fr!important}
+    body.runnerSyndicateConnecting .runnerNavPad .tabs>.btn:not(#runnerSyndicateF5){display:none!important}
+    body.runnerSyndicateConnecting .runnerNavPad .tabs>#runnerSyndicateF5,
     body.runnerSyndicateLoaded .runnerNavPad .tabs>#runnerSyndicateF5,
     body.runnerPizzaLoaded .runnerNavPad .tabs>#runnerPizzaF6,
     body.runnerCryptoLoaded .runnerNavPad .tabs>#runnerCryptoF7,
     body.runnerSeasonPreviewsLoaded .runnerNavPad .tabs>#runnerSeasonPreviewF6,
     body.runnerPreferencesLoaded .runnerNavPad .tabs>#runnerPreferencesF6{display:grid!important;visibility:visible!important;grid-column:1/-1!important}
+    body.runnerSyndicateConnecting .runnerNavPad~*{display:none!important}
     #${HINT_ID}{display:none;margin-top:8px;padding:7px 9px;border:1px dashed #31566d;background:#020a10;color:#7f9aa8;text-align:center;font-size:8px;font-weight:900;letter-spacing:.09em;line-height:1.45}
     body.runnerMenuHome #${HINT_ID}{display:block}
     #${PREF_BOX_ID}{margin:11px 0;border:1px solid #31566d;background:linear-gradient(180deg,#020b12,#01070b);padding:11px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -133,7 +149,7 @@ function ensureStyle(d){
     #${PREF_BOX_ID} .menuPrefRow.locked{border-color:#526a42}.menuPrefRow.locked b,.menuPrefRow.locked em{color:#d8f78c!important}
     #${PREF_BOX_ID} .menuPrefReset{width:100%;margin-top:8px;border:1px solid #5a7483;background:#04111a;color:#b9dfff;padding:9px;font:900 10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.07em;cursor:pointer}
     #${PREF_BOX_ID} .menuPrefReset:hover,#${PREF_BOX_ID} .menuPrefReset:focus{border-color:#64d7ff;color:#e7f8ff;background:#071923}
-    @media(max-width:560px){#${PREF_BOX_ID} .menuPrefHead span{text-align:left}#${PREF_BOX_ID} .menuPrefRow{grid-template-columns:46px minmax(0,1fr) auto}}
+    @media(max-width:560px){body.runnerSyndicateConnecting main.term>header.top{display:block!important}#${PREF_BOX_ID} .menuPrefHead span{text-align:left}#${PREF_BOX_ID} .menuPrefRow{grid-template-columns:46px minmax(0,1fr) auto}}
   `;d.head.appendChild(s)
 }
 function ensureHint(d){
@@ -166,7 +182,7 @@ function apply(d,force=false,order=middle){
   const normalized=applyVisual(d,order);
   if(force||JSON.stringify(normalized)!==JSON.stringify(middle))middle=normalizeMiddle(normalized);
   renderPreferenceBox(d);
-  d.documentElement.dataset.menuOrderAuthority='1-safe-sync';
+  d.documentElement.dataset.menuOrderAuthority='1-safe-text';
   if(d.defaultView)d.defaultView.BettingEdgeMenuOrder=window.BettingEdgeMenuOrder;
   return true;
 }
@@ -253,7 +269,7 @@ function attach(){
     if(observer)observer.disconnect();
     bindPointer(d);bindKeys(d);
     observer=new MutationObserver(()=>reconcileMutation(d));
-    observer.observe(d.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class']});
+    observer.observe(d.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','data-state']});
   }
   bindKeys(d);apply(d);return true;
 }
@@ -268,5 +284,5 @@ window.BettingEdgeMenuOrder={
 
 let tries=0;attach();
 const timer=setInterval(()=>{tries++;if(attach()||tries>300)clearInterval(timer)},25);
-setInterval(()=>{const d=appDoc();if(d&&!drag?.dragging)apply(d)},750);
+setInterval(()=>{const d=appDoc();if(d&&!drag?.dragging)apply(d)},1000);
 })();
