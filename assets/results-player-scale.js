@@ -1,9 +1,9 @@
 (()=>{
 'use strict';
 
-const STYLE_ID='resultsValuePresentationV3';
+const STYLE_ID='resultsValuePresentationV4';
 const INDEX_URL='./data/history/results-index.json';
-const VERSION='3';
+const VERSION='4';
 let cached=null;
 let loading=false;
 let applying=false;
@@ -22,13 +22,15 @@ function pct(v){const n=Number(v);return finite(v)?`${n>0?'+':''}${n.toFixed(2)}
 function cash(v){if(!finite(v))return '—';const n=Number(v),sign=n>0?'+':n<0?'-':'';return `${sign}$${Math.abs(n).toFixed(2)}`}
 function valueClass(v){return !finite(v)?'neutral':Number(v)>0?'positive':Number(v)<0?'negative':'neutral'}
 function gradeText(row){const g=row?.grades||{};return `${Number(g.WIN||0)}-${Number(g.LOSS||0)}`}
+function pizzaRecord(row){const g=row?.grades||{};return `${Number(g.WIN||0)}-${Number(g.LOSS||0)}-${Number(g.PUSH||0)}`}
+function pizzaStatusRow(pizza,status){return (pizza?.bySourceStatus||[]).find(x=>String(x?.status||'').toUpperCase()===status)||{status,plays:0,settled:0,pending:0,priced:0,grades:{},profitLossCad:null,roiPct:null}}
 
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
   const s=d.createElement('style');
   s.id=STYLE_ID;
   s.textContent=`
-    :root{--value-steel:#6f8faa;--value-silver:#c7d2dc;--value-muted:#8ea0af;--value-line:#35506a;--value-panel:#08111b;--value-panel2:#0b1622;--value-gold:#d8b45a}
+    :root{--value-steel:#6f8faa;--value-silver:#c7d2dc;--value-muted:#8ea0af;--value-line:#35506a;--value-panel:#08111b;--value-panel2:#0b1622;--value-gold:#d8b45a;--pizza-orange:#e88742;--pizza-line:#75401f;--pizza-panel:#120804}
     body.runnerMenuHome .runnerNavPad .tabs>.btn[data-view="engine"],
     body.runnerPrimaryViewLoaded[data-primary-view="engine"] .runnerNavPad .tabs>.btn.primaryShellActive{border-color:var(--value-steel)!important;color:var(--value-silver)!important;background:#09131d!important;box-shadow:inset 0 0 0 1px rgba(111,143,170,.10),0 0 12px rgba(111,143,170,.12)!important;text-shadow:none!important}
     body.runnerMenuHome .runnerNavPad .tabs>.btn[data-view="engine"] .primaryMenuMessage,
@@ -56,15 +58,15 @@ function ensureStyle(d){
 
     #engine.resultsDesk .actualPlayerState{font-size:clamp(28px,4.7vw,54px);font-weight:950;line-height:1.02;letter-spacing:.015em;color:var(--value-silver);margin-top:15px}
     #engine.resultsDesk .actualPlayerCash{font-size:clamp(48px,7.5vw,84px);font-weight:950;line-height:.95;letter-spacing:-.04em;margin-top:13px;text-shadow:0 0 16px currentColor}
-    #engine.resultsDesk .actualPlayerCash.positive,#engine.resultsDesk .decisionBig.positive,#engine.resultsDesk .decisionMetric b.positive,#engine.resultsDesk .decisionStatusCash.positive{color:var(--green)}
-    #engine.resultsDesk .actualPlayerCash.negative,#engine.resultsDesk .decisionBig.negative,#engine.resultsDesk .decisionMetric b.negative,#engine.resultsDesk .decisionStatusCash.negative{color:var(--red)}
-    #engine.resultsDesk .actualPlayerCash.neutral,#engine.resultsDesk .decisionBig.neutral,#engine.resultsDesk .decisionMetric b.neutral,#engine.resultsDesk .decisionStatusCash.neutral{color:var(--value-silver)}
+    #engine.resultsDesk .actualPlayerCash.positive,#engine.resultsDesk .decisionBig.positive,#engine.resultsDesk .decisionMetric b.positive,#engine.resultsDesk .decisionStatusCash.positive,#engine.resultsDesk .pizzaCash.positive,#engine.resultsDesk .pizzaMetric b.positive,#engine.resultsDesk .pizzaStatusCash.positive{color:var(--green)}
+    #engine.resultsDesk .actualPlayerCash.negative,#engine.resultsDesk .decisionBig.negative,#engine.resultsDesk .decisionMetric b.negative,#engine.resultsDesk .decisionStatusCash.negative,#engine.resultsDesk .pizzaCash.negative,#engine.resultsDesk .pizzaMetric b.negative,#engine.resultsDesk .pizzaStatusCash.negative{color:var(--red)}
+    #engine.resultsDesk .actualPlayerCash.neutral,#engine.resultsDesk .decisionBig.neutral,#engine.resultsDesk .decisionMetric b.neutral,#engine.resultsDesk .decisionStatusCash.neutral,#engine.resultsDesk .pizzaCash.neutral,#engine.resultsDesk .pizzaMetric b.neutral,#engine.resultsDesk .pizzaStatusCash.neutral{color:var(--value-silver)}
     #engine.resultsDesk .actualPlayerLabel{color:var(--value-silver);font-size:clamp(12px,1.7vw,19px);font-weight:950;letter-spacing:.07em;margin-top:7px}
     #engine.resultsDesk .actualPlayerRule{color:#aebbc5;font-size:9px;line-height:1.5;margin-top:10px;font-weight:800}
     #engine.resultsDesk .actualPlayerNote{color:var(--value-muted);font-size:9px;line-height:1.45;margin-top:5px}
     #engine.resultsDesk .actualNoBetBadge{display:inline-block;border:1px solid var(--value-gold);color:#e0c377;background:#171308;padding:4px 7px;font-size:8px;font-weight:950;letter-spacing:.07em;margin-top:9px}
 
-    #engine.resultsDesk .decisionValueBox,#engine.resultsDesk .modelCalibrationBox{border:1px solid var(--value-line);background:var(--value-panel);padding:12px;margin-top:9px}
+    #engine.resultsDesk .decisionValueBox,#engine.resultsDesk .modelCalibrationBox,#engine.resultsDesk .pizzaValueBox{border:1px solid var(--value-line);background:var(--value-panel);padding:12px;margin-top:9px}
     #engine.resultsDesk .decisionHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
     #engine.resultsDesk .counterBadge,#engine.resultsDesk .modelBadge{border:1px solid var(--value-gold);color:#e0c377;background:#171308;padding:3px 7px;font-size:8px;font-weight:950;letter-spacing:.07em;white-space:nowrap}
     #engine.resultsDesk .decisionHero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(270px,.85fr);gap:10px;margin-top:10px}
@@ -86,14 +88,33 @@ function ensureStyle(d){
     #engine.resultsDesk .decisionStatusMeta{color:var(--value-muted);font-size:8px;line-height:1.45;margin-top:5px}
     #engine.resultsDesk .decisionMethod{border-left:3px solid var(--value-gold);padding:7px 9px;background:#0c0e0c;color:#9eaaaf;font-size:8px;line-height:1.5;margin-top:9px}
 
+    #engine.resultsDesk .pizzaValueBox{border-color:var(--pizza-line);background:radial-gradient(circle at 10% 0,rgba(232,135,66,.09),transparent 36%),linear-gradient(180deg,#100804,#080503)}
+    #engine.resultsDesk .pizzaValueBox .resultsSection{color:#ffc18a!important}
+    #engine.resultsDesk .pizzaBadge{border:1px solid var(--pizza-orange);color:#ffc18a;background:#1b0b04;padding:3px 7px;font-size:8px;font-weight:950;letter-spacing:.07em;white-space:nowrap}
+    #engine.resultsDesk .pizzaHero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:10px;margin-top:10px}
+    #engine.resultsDesk .pizzaMain{border:1px solid #8b4b24;background:linear-gradient(180deg,#160a04,#090503);padding:13px;display:flex;flex-direction:column;justify-content:center}
+    #engine.resultsDesk .pizzaCash{font-size:clamp(42px,6.2vw,70px);font-weight:950;line-height:.95;letter-spacing:-.035em;margin-top:8px;text-shadow:0 0 14px currentColor}
+    #engine.resultsDesk .pizzaLabel{color:#ffd2ad;font-size:11px;font-weight:950;letter-spacing:.07em;margin-top:7px}
+    #engine.resultsDesk .pizzaSub{color:#a9866c;font-size:8px;line-height:1.5;margin-top:6px}
+    #engine.resultsDesk .pizzaMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    #engine.resultsDesk .pizzaMetric{border:1px solid #70401f;background:#0d0603;padding:10px}
+    #engine.resultsDesk .pizzaMetric .key{color:#a98469!important}
+    #engine.resultsDesk .pizzaMetric b{display:block;color:#ffd5b1;font-size:clamp(20px,2.8vw,30px);margin-top:5px}
+    #engine.resultsDesk .pizzaStatusGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+    #engine.resultsDesk .pizzaStatusCard{border:1px solid #603719;background:#0c0603;padding:10px;min-height:100px}
+    #engine.resultsDesk .pizzaStatusName{font-size:10px;font-weight:950;letter-spacing:.06em;color:#e8a66f}
+    #engine.resultsDesk .pizzaStatusCash{font-size:22px;font-weight:950;margin-top:7px}
+    #engine.resultsDesk .pizzaStatusMeta{color:#a17e66;font-size:8px;line-height:1.45;margin-top:5px}
+    #engine.resultsDesk .pizzaMethod{border-left:3px solid var(--pizza-orange);padding:7px 9px;background:#120804;color:#b28d72;font-size:8px;line-height:1.5;margin-top:9px}
+
     #engine.resultsDesk .modelGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
     #engine.resultsDesk .modelMetric{border:1px solid #3b5265;background:#060d14;padding:11px}
     #engine.resultsDesk .modelMetric .key{color:#9aaab7!important}
     #engine.resultsDesk .modelMetric b{display:block;color:var(--value-silver);font-size:clamp(22px,3vw,31px);margin-top:6px}
     #engine.resultsDesk .modelMethod{color:var(--value-muted);font-size:8px;line-height:1.5;margin-top:8px}
 
-    @media(max-width:760px){#engine.resultsDesk .decisionHero{grid-template-columns:1fr}#engine.resultsDesk .decisionStatusGrid{grid-template-columns:1fr}}
-    @media(max-width:560px){#engine.resultsDesk .modelGrid{grid-template-columns:1fr}}
+    @media(max-width:760px){#engine.resultsDesk .decisionHero,#engine.resultsDesk .pizzaHero{grid-template-columns:1fr}#engine.resultsDesk .decisionStatusGrid,#engine.resultsDesk .pizzaStatusGrid{grid-template-columns:1fr}}
+    @media(max-width:560px){#engine.resultsDesk .modelGrid,#engine.resultsDesk .pizzaMetrics{grid-template-columns:1fr}}
   `;
   d.head.appendChild(s);
 }
@@ -110,12 +131,13 @@ function apply(d,index){
   const proof=engine.querySelector('.proofBox');
   if(!hero||!main||!stack||!proof)return false;
   ensureStyle(d);
-  if(hero.dataset.valuePresentation===VERSION&&engine.querySelector('#resultsDecisionValueBox')&&engine.querySelector('#resultsModelCalibrationBox'))return true;
+  if(hero.dataset.valuePresentation===VERSION&&engine.querySelector('#resultsDecisionValueBox')&&engine.querySelector('#resultsPizzaValueBox')&&engine.querySelector('#resultsModelCalibrationBox'))return true;
 
   applying=true;
   try{
     const player=index?.playerValueAnalytics||{};
     const decision=index?.decisionValueAnalytics||{};
+    const pizza=index?.pizzaPlayAnalytics||{};
     const pa=index?.priceAnalytics||{};
     const playerPriced=Number(player.pricedBets||0);
     const hasPlayerSample=playerPriced>0;
@@ -127,7 +149,7 @@ function apply(d,index){
     const title=hero.querySelector('.resultsTitle');
     const sub=hero.querySelector('.resultsSub');
     if(title)title.textContent='VIGSCOPE // $100 PLAYER VALUE';
-    if(sub)sub.textContent='ACTUAL BET PERFORMANCE // DECISION VALUE // MODEL CALIBRATION';
+    if(sub)sub.textContent='ACTUAL BET PERFORMANCE // DECISION VALUE // PIZZA PLAYS // MODEL CALIBRATION';
     hero.dataset.valuePresentation=VERSION;
 
     main.innerHTML=`
@@ -151,6 +173,7 @@ function apply(d,index){
     engine.querySelector('#resultsPlayerScaleBox')?.remove();
     engine.querySelector('#resultsCalibrationBox')?.remove();
     engine.querySelector('#resultsDecisionValueBox')?.remove();
+    engine.querySelector('#resultsPizzaValueBox')?.remove();
     engine.querySelector('#resultsModelCalibrationBox')?.remove();
 
     const lean=statusRow(decision,'LEAN'),wait=statusRow(decision,'WAIT'),pass=statusRow(decision,'PASS');
@@ -180,19 +203,46 @@ function apply(d,index){
     `;
     proof.insertAdjacentElement('beforebegin',decisionBox);
 
+    const pizzaBet=pizzaStatusRow(pizza,'BET'),pizzaLean=pizzaStatusRow(pizza,'LEAN'),pizzaWait=pizzaStatusRow(pizza,'WAIT');
+    const pizzaBox=d.createElement('div');
+    pizzaBox.id='resultsPizzaValueBox';
+    pizzaBox.className='pizzaValueBox';
+    pizzaBox.innerHTML=`
+      <div class="decisionHead"><div><div class="resultsSection">PIZZA PLAYS // TRACKED VALUE</div><div class="resultsNote">LOU TWO SLICE'S PUBLISHED ONE-CARD RECORD, SETTLED WITH THE BANKROLL THAT EXISTED WHEN EACH PLAY WAS ISSUED.</div></div><div class="pizzaBadge">3% FROZEN UNIT</div></div>
+      <div class="pizzaHero">
+        <div class="pizzaMain">
+          <div class="key">CUMULATIVE PIZZA P/L</div>
+          <div class="pizzaCash ${valueClass(pizza.profitLossCad)}">${esc(cash(finite(pizza.profitLossCad)?pizza.profitLossCad:0))}</div>
+          <div class="pizzaLabel">${esc(pizzaRecord(pizza))} W-L-P // ${Number(pizza.pending||0)} PENDING</div>
+          <div class="pizzaSub">EACH PLAY RISKS ONE PIZZA TRACKING UNIT. THAT UNIT IS FROZEN AT 3% OF THE ACTUAL BANKROLL STORED IN ITS SOURCE BETTING EDGE REPORT.</div>
+        </div>
+        <div class="pizzaMetrics">
+          <div class="pizzaMetric"><div class="key">CURRENT TRACKING UNIT</div><b>${finite(pizza.currentTrackingUnitCad)?esc(cash(pizza.currentTrackingUnitCad).replace(/^\+/,'')):'—'}</b></div>
+          <div class="pizzaMetric"><div class="key">NET PIZZA UNITS</div><b class="${valueClass(pizza.netUnits)}">${finite(pizza.netUnits)?esc(signed(pizza.netUnits,2))+'u':'—'}</b></div>
+          <div class="pizzaMetric"><div class="key">PIZZA ROI</div><b class="${valueClass(pizza.roiPct)}">${finite(pizza.roiPct)?esc(pct(pizza.roiPct)):'—'}</b></div>
+          <div class="pizzaMetric"><div class="key">TRACKED / SETTLED</div><b>${Number(pizza.plays||0)} / ${Number(pizza.settled||0)}</b></div>
+        </div>
+      </div>
+      <div class="pizzaStatusGrid">
+        ${[pizzaBet,pizzaLean,pizzaWait].map(row=>`<div class="pizzaStatusCard"><div class="pizzaStatusName">SOURCE VIGSCOPE ${esc(row.status)}</div><div class="pizzaStatusCash ${valueClass(row.profitLossCad)}">${finite(row.profitLossCad)?esc(cash(row.profitLossCad)):'—'}</div><div class="pizzaStatusMeta">${esc(pizzaRecord(row))} W-L-P // ${Number(row.plays||0)} PLAYS // ${Number(row.pending||0)} PENDING<br>${finite(row.roiPct)?esc(pct(row.roiPct))+' ROI':'ROI —'}</div></div>`).join('')}
+      </div>
+      <div class="pizzaMethod">PERFORMANCE ACCOUNTING ONLY: THE PIZZA PLAYS CARD REMAINS STAKE-NEUTRAL. VIGSCOPE VALUE FREEZES 3% OF THE SOURCE REPORT BANKROLL AS THAT PLAY'S TRACKING UNIT, THEN APPLIES THE EXACT ISSUED-PRICE SETTLEMENT RESULT TO CALCULATE THE PLUS/MINUS.</div>
+    `;
+    decisionBox.insertAdjacentElement('afterend',pizzaBox);
+
     const calibration=d.createElement('div');
     calibration.id='resultsModelCalibrationBox';
     calibration.className='modelCalibrationBox';
     calibration.innerHTML=`
-      <div class="decisionHead"><div><div class="resultsSection">MODEL CALIBRATION // FLAT 1u TEST</div><div class="resultsNote">BROAD PRICE-ADJUSTED ENGINE TEST KEPT SEPARATE FROM PLAYER P/L AND DECISION VALUE.</div></div><div class="modelBadge">MODEL</div></div>
+      <div class="decisionHead"><div><div class="resultsSection">MODEL CALIBRATION // FLAT 1u TEST</div><div class="resultsNote">BROAD PRICE-ADJUSTED ENGINE TEST KEPT SEPARATE FROM PLAYER P/L, PIZZA TRACKING AND DECISION VALUE.</div></div><div class="modelBadge">MODEL</div></div>
       <div class="modelGrid">
         <div class="modelMetric"><div class="key">FLAT NET</div><b>${esc(signed(pa.netUnits,2))}u</b></div>
         <div class="modelMetric"><div class="key">FLAT ROI</div><b>${esc(pct(pa.roiPct))}</b></div>
         <div class="modelMetric"><div class="key">PRICED CARDS</div><b>${Number(pa.pricedCards||0)}</b></div>
       </div>
-      <div class="modelMethod">FLAT 1-UNIT RISK PER PRICE-RESOLVABLE COMPLETED CARD. THIS REMAINS USEFUL MODEL CALIBRATION, BUT IT DOES NOT REPRESENT CASH WON BY A $100 PLAYER.</div>
+      <div class="modelMethod">FLAT 1-UNIT RISK PER PRICE-RESOLVABLE COMPLETED CARD. THIS REMAINS USEFUL MODEL CALIBRATION, BUT IT DOES NOT REPRESENT CASH WON BY A $100 PLAYER OR PIZZA PLAYS.</div>
     `;
-    decisionBox.insertAdjacentElement('afterend',calibration);
+    pizzaBox.insertAdjacentElement('afterend',calibration);
     return true;
   }finally{
     applying=false;
