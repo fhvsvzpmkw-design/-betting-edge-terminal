@@ -1,0 +1,60 @@
+name: Eddie V3 source bankroll and scaled tags once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/eddie-v3-source-bankroll-scaled-tags-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  relabel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Relabel source bankroll and scaled performance
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('syndicates/generated/eddie-numbers/hotline.html')
+          s = p.read_text()
+
+          css_anchor = '.source b{display:block;margin-top:2px}.live{color:var(--up);font-weight:900}'
+          css_new = '.source b{display:block;margin-top:2px}.scaledTag{display:inline-block;margin-left:5px;padding:2px 5px;border:1px solid #8b722f;border-radius:999px;background:#f0c65d12;color:var(--gold);font:900 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;vertical-align:1px}.live{color:var(--up);font-weight:900}'
+          if css_anchor not in s:
+              raise SystemExit('CSS anchor missing')
+          s = s.replace(css_anchor, css_new, 1)
+
+          replacements = [
+            ('<small>Current Bankroll</small><b id="bank">—</b><div class="sub">source bankroll // unscaled</div>', '<small>Source Bankroll</small><b id="bank">—</b><div class="sub">actual public-ledger CAD // unscaled</div>'),
+            ('<small>All-Time Cash P/L</small><b id="profit">—</b><div class="sub">$100-unit normalized</div>', '<small>All-Time Cash P/L <span class="scaledTag">SCALED</span></small><b id="profit">—</b><div class="sub">$100 unit</div>'),
+            ('<small>Cash Risked</small><b id="risk">—</b><div class="sub">$100-unit normalized</div>', '<small>Cash Risked <span class="scaledTag">SCALED</span></small><b id="risk">—</b><div class="sub">$100 unit</div>'),
+            ('<h3>Settled Performance Curve</h3>', '<h3>Settled Performance Curve <span class="scaledTag">SCALED</span></h3>'),
+            ('<h3>Ledger Week to Date</h3>', '<h3>Ledger Week to Date <span class="scaledTag">SCALED</span></h3>'),
+            ('<h3 id="monthName">Ledger Month</h3>', '<h3 id="monthName">Ledger Month <span class="scaledTag">SCALED</span></h3>'),
+            ('<h3>Sport Desk</h3>', '<h3>Sport Desk <span class="scaledTag">SCALED</span></h3>'),
+            ('<h3>Sportsbook Windows</h3>', '<h3>Sportsbook Windows <span class="scaledTag">SCALED</span></h3>'),
+            ('<h3>Recent Tape</h3>', '<h3>Recent Tape <span class="scaledTag">SCALED</span></h3>'),
+          ]
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'Missing expected text: {old}')
+              s = s.replace(old, new, 1)
+
+          p.write_text(s)
+          PY
+      - name: Verify labels
+        run: |
+          grep -F '<small>Source Bankroll</small>' syndicates/generated/eddie-numbers/hotline.html
+          grep -F 'scaledTag">SCALED' syndicates/generated/eddie-numbers/hotline.html
+          ! grep -F '<small>Current Bankroll</small>' syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit labels
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/generated/eddie-numbers/hotline.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Label Eddie source bankroll and scaled performance"
+          git push
