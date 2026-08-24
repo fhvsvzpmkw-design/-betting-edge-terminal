@@ -39,6 +39,10 @@ function cryptoButtonMessage(){
   const cardText=cardCount?` // ${cardCount} LIVE CARD${cardCount===1?'':'S'}`:'';
   return `${sourceCount} WEB SOURCE${sourceCount===1?'':'S'} // ${publishedModeLabel()}${cardText}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN`;
 }
+function pizzaButtonMessage(){
+  if(String(pizza?.status||'').toUpperCase()==='PLAY'&&pizza?.play)return `LOU TWO SLICE // 1 COMPELLED VIGSCOPE CARD&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN`;
+  return `LOU TWO SLICE // OVEN CLOSED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN`;
+}
 function closeSpecial(d){
   d.body.classList.remove('runnerPizzaLoaded','runnerCryptoLoaded');
   d.getElementById(PIZZA_ID)?.classList.remove('active');
@@ -70,8 +74,9 @@ function ensureStyle(d){
     body.runnerCryptoLoaded .runnerNavPad .tabs>.btn:not(#${CRYPTO_ID}){display:none!important}
     body.runnerPizzaLoaded #${PIZZA_PANEL},body.runnerCryptoLoaded #${CRYPTO_PANEL}{display:block!important;margin-top:0!important}
     body.runnerPizzaLoaded #${PIZZA_PANEL}~*,body.runnerCryptoLoaded #${CRYPTO_PANEL}~*{display:none!important}
-    .specialHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}.specialHead h2{margin:0;font-size:18px;letter-spacing:.12em}.pizzaHead h2{color:#ffc078}.cryptoHead h2{color:#d9d1ff;text-shadow:0 0 10px rgba(157,126,255,.18);font-size:20px}.specialHead p{margin:5px 0 0;color:#998f8a;font-size:8px;line-height:1.5;letter-spacing:.05em}.cryptoHead p{color:#8e83b4;font-size:10px}.specialBadge{border:1px solid currentColor;padding:6px 9px;font-size:8px;font-weight:950;letter-spacing:.09em}.pizzaBadge{color:#ffb066;background:#160904}.cryptoBadge{color:#c6b8ff;background:#0b0818;font-size:10px}
+    .specialHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}.specialHead h2{margin:0;font-size:18px;letter-spacing:.12em}.pizzaHead h2{color:#ffc078;text-shadow:0 0 12px rgba(255,148,65,.16);font-size:20px}.cryptoHead h2{color:#d9d1ff;text-shadow:0 0 10px rgba(157,126,255,.18);font-size:20px}.specialHead p{margin:5px 0 0;color:#998f8a;font-size:8px;line-height:1.5;letter-spacing:.05em}.pizzaHead p{color:#b28161;font-size:10px}.cryptoHead p{color:#8e83b4;font-size:10px}.specialBadge{border:1px solid currentColor;padding:6px 9px;font-size:8px;font-weight:950;letter-spacing:.09em}.pizzaBadge{color:#ffb066;background:#160904;font-size:10px}.cryptoBadge{color:#c6b8ff;background:#0b0818;font-size:10px}
     .specialShelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:12px}.specialCard{min-height:150px;border:1px solid rgba(255,255,255,.13);background:rgba(0,0,0,.20);padding:14px;display:grid;align-content:center;gap:8px}.specialIcon{font-size:36px}.specialCard b{font-size:13px;letter-spacing:.06em}.specialCard span{font-size:9px;line-height:1.5;color:#9e9691}.specialEmpty{margin-top:16px;border:1px dashed rgba(255,255,255,.25);padding:26px 16px;text-align:center}.specialEmpty strong{display:block;font-size:14px;letter-spacing:.08em}.specialEmpty span{display:block;margin-top:8px;color:#938b87;font-size:9px;line-height:1.55}
+    .pizzaBoard{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}.pizzaPick{position:relative;border:2px solid #a95625;border-left:5px solid #ff8c3a;background:linear-gradient(180deg,#130904,#080402);padding:16px;box-shadow:inset 0 0 0 1px rgba(255,166,80,.04),0 0 18px rgba(178,72,18,.10);font-size:17px}.pizzaPickHead{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.pizzaIdentity{min-width:0}.pizzaLouTag{display:inline-block;border:2px solid #ff9346;color:#ffd09a;background:#1b0a03;padding:6px 10px;font-size:14px;font-weight:950;letter-spacing:.10em;box-shadow:0 0 11px rgba(255,140,58,.14)}.pizzaPick h3{margin:10px 0 0;color:#fff0dc;font-size:24px;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}.pizzaSourceState{text-align:right;min-width:190px}.pizzaSourceState small{display:block;color:#9d6f52;font-size:11px;font-weight:950;letter-spacing:.11em;margin-bottom:5px}.pizzaSourceState strong{display:block;color:#ffb36f;font-size:20px;font-weight:950;letter-spacing:.08em}.pizzaSourceState span{display:block;margin-top:5px;color:#a47d65;font-size:10px;font-weight:900;letter-spacing:.06em}.pizzaMarketStrip{margin-top:14px;background:#090402;border:1px solid #7e3f1e;padding:13px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pizzaMarketCell{min-width:0}.pizzaMarketCell small{display:block;color:#9a6c4f;font-size:11px;font-weight:950;letter-spacing:.10em;margin-bottom:6px}.pizzaMarketCell strong{display:block;color:#ffe5c7;font-size:20px;font-weight:950;line-height:1.35;overflow-wrap:anywhere}.pizzaMarketCell.target strong{color:#ffc17f}.pizzaMarketCell.edge strong{color:#ffad62}.pizzaEventMeta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;padding:10px 12px;border:1px solid #4c2817;background:#080403;color:#c9a991;font-size:13px;font-weight:800;line-height:1.5;letter-spacing:.025em}.pizzaEventMeta b{color:#ffb16a;font-size:10px;letter-spacing:.09em}.pizzaExplainGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px}.pizzaExplain{border:1px solid #55301d;background:#0b0503;padding:12px;min-height:118px}.pizzaExplain small{display:block;color:#ff9d54;font-size:11px;font-weight:950;letter-spacing:.11em;margin-bottom:8px}.pizzaExplain strong{display:block;color:#dcc1ac;font-size:15px;font-weight:800;line-height:1.5}.pizzaExplain.lou{border-color:#8f4721;background:#100603}.pizzaExplain.lou strong{color:#ffe0bd}.pizzaExplain.watch{border-color:#6d3624}.pizzaExplain.watch small{color:#e58a5c}.pizzaSourceNote{margin-top:10px;color:#906e59;font-size:11px;line-height:1.5;letter-spacing:.025em}.pizzaSourceNote b{color:#c98b61}.pizzaTimestamp{margin-top:10px;text-align:right;color:#765442;font-size:10px;font-weight:900;letter-spacing:.08em}
     .cryptoSourceBar{display:grid;grid-template-columns:minmax(0,1.35fr) repeat(3,minmax(110px,.65fr));gap:8px;margin-top:11px}.cryptoSourceCell{border:1px solid rgba(147,121,232,.24);background:#070711;padding:10px 11px;min-width:0}.cryptoSourceCell small{display:block;color:#8177a5;font-size:9px;font-weight:950;letter-spacing:.12em;margin-bottom:4px}.cryptoSourceCell strong,.cryptoSourceCell a{display:block;color:#d1c8f4;font-size:12px;font-weight:950;line-height:1.35;letter-spacing:.045em;text-decoration:none;overflow-wrap:anywhere}.cryptoSourceCell a:hover{color:#fff}.cryptoSourceCell.cryptoNoVig strong{color:#9a90bc}
     .cryptoSummary{margin-top:10px;border-left:4px solid #785dbd;background:#090711;padding:10px 12px;color:#aba2c5;font-size:11px;line-height:1.55;letter-spacing:.025em}.cryptoSummary b{color:#ddd7ef;letter-spacing:.08em}
     .cryptoBoard{display:grid;grid-template-columns:1fr;gap:13px;margin-top:12px}
@@ -82,9 +87,9 @@ function ensureStyle(d){
     .cryptoMarketStrip{margin-top:14px;background:#040710;border:1px solid #654f94;padding:13px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.cryptoMarketCell{min-width:0}.cryptoMarketCell small{display:block;color:#807696;font-size:12px;font-weight:950;letter-spacing:.10em;margin-bottom:6px}.cryptoMarketCell strong{display:block;color:#e9e5f6;font-size:24px;font-weight:950;line-height:1.25;overflow-wrap:anywhere}.cryptoMarketCell.marketMove strong{color:#c4b8e8;font-size:19px;line-height:1.4}.cryptoMarketCell.marketDecision strong{color:var(--status);font-size:19px}
     .cryptoSourceNote{margin-top:9px;color:#807790;font-size:13px;line-height:1.45;letter-spacing:.035em}.cryptoSourceNote b{color:#b8aecb}.cryptoWhy{margin-top:11px;border-left:4px solid var(--status);padding:10px 12px;background:#0b0912;color:#b9b3c5;font-size:18px;line-height:1.5}.cryptoWhy b{color:var(--status);letter-spacing:.06em}.cryptoAnalysisBtn{width:100%;margin-top:11px;font:inherit;font-weight:950;padding:11px;background:#100b1c;color:#d7ccff;border:1px solid #725bb0;cursor:pointer;letter-spacing:.06em}.cryptoAnalysisBtn:hover{border-color:#a68cff;color:#fff}.cryptoDetail{margin-top:9px;border:1px dotted #574774;background:#03050a;padding:11px;display:none;color:#9d95ad;font-size:16px;line-height:1.55}.cryptoDetail.open{display:block}.cryptoDetailGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cryptoDetailCell{border:1px solid #302942;background:#070711;padding:9px}.cryptoDetailCell small{display:block;color:#746b83;font-size:11px;font-weight:950;letter-spacing:.10em;margin-bottom:5px}.cryptoDetailCell strong{display:block;color:#c8bfd8;font-size:15px;line-height:1.4}
     .cryptoPasses{margin-top:12px;border:1px solid rgba(94,76,143,.30);background:rgba(8,6,18,.60)}.cryptoPasses summary{cursor:pointer;list-style:none;padding:9px 11px;color:#9a90b3;font-size:11px;font-weight:950;letter-spacing:.11em}.cryptoPasses summary::-webkit-details-marker{display:none}.cryptoPasses[open] summary{border-bottom:1px solid rgba(94,76,143,.24)}.cryptoPassList{display:grid;gap:7px;padding:9px}.cryptoPass{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;border-left:3px solid #ff738a;background:#07070d;padding:9px}.cryptoPass strong{color:#bbb4c7;font-size:13px;letter-spacing:.05em}.cryptoPass span{display:block;margin-top:3px;color:#817a8d;font-size:11px;line-height:1.4}.cryptoPass b{color:#ff8295;font-size:11px;letter-spacing:.08em}.cryptoTimestamp{margin-top:10px;text-align:right;color:#6e667e;font-size:10px;font-weight:900;letter-spacing:.08em}
-    @media(max-width:900px){.cryptoMarketStrip{grid-template-columns:repeat(2,minmax(0,1fr))}.cryptoDetailGrid{grid-template-columns:1fr}}
+    @media(max-width:900px){.pizzaMarketStrip,.cryptoMarketStrip{grid-template-columns:repeat(2,minmax(0,1fr))}.pizzaExplainGrid{grid-template-columns:1fr}.cryptoDetailGrid{grid-template-columns:1fr}}
     @media(max-width:720px){#${PIZZA_PANEL},#${CRYPTO_PANEL}{margin-left:7px;margin-right:7px;padding:10px}.specialShelf{grid-template-columns:1fr}.cryptoSourceBar{grid-template-columns:1fr 1fr}.cryptoSourceBar .cryptoSourceCell:first-child{grid-column:1/-1}}
-    @media(max-width:560px){.cryptoSourceBar{grid-template-columns:1fr}.cryptoSourceBar .cryptoSourceCell:first-child{grid-column:auto}.cryptoPickHead{display:block}.cryptoPickState{text-align:left;min-width:0;margin-top:11px}.cryptoMarketStrip{grid-template-columns:1fr}.cryptoPick h3{font-size:21px}.cryptoWhy{font-size:16px}.cryptoStatusTag{font-size:14px}.cryptoDecisionTag{font-size:14px}.cryptoEventMeta{font-size:13px}.cryptoPickState strong{font-size:18px}.cryptoMarketCell strong{font-size:22px}.cryptoMarketCell.marketMove strong,.cryptoMarketCell.marketDecision strong{font-size:18px}}
+    @media(max-width:560px){.pizzaPickHead,.cryptoPickHead{display:block}.pizzaSourceState,.cryptoPickState{text-align:left;min-width:0;margin-top:11px}.pizzaMarketStrip,.cryptoSourceBar,.cryptoMarketStrip{grid-template-columns:1fr}.cryptoSourceBar .cryptoSourceCell:first-child{grid-column:auto}.pizzaPick h3{font-size:21px}.pizzaMarketCell strong{font-size:18px}.pizzaExplain strong{font-size:14px}.cryptoPick h3{font-size:21px}.cryptoWhy{font-size:16px}.cryptoStatusTag{font-size:14px}.cryptoDecisionTag{font-size:14px}.cryptoEventMeta{font-size:13px}.cryptoPickState strong{font-size:18px}.cryptoMarketCell strong{font-size:22px}.cryptoMarketCell.marketMove strong,.cryptoMarketCell.marketDecision strong{font-size:18px}}
   `;d.head.appendChild(s)
 }
 function itemCard(item,kind){
@@ -100,7 +105,38 @@ function displayDate(value){
   const m=text.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return text.toUpperCase();
   const d=new Date(`${text}T12:00:00`);return d.toLocaleDateString('en-CA',{month:'short',day:'numeric',timeZone:'America/Vancouver'}).toUpperCase();
 }
+function ptDateTime(value){
+  const d=new Date(String(value||''));if(!Number.isFinite(d.getTime()))return '';
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}).format(d).toUpperCase();
+}
 function priceText(v){return String(v??'').trim()||'—'}
+function pizzaPanelHtml(data){
+  const play=data?.play;const source=data?.source||{};const live=String(data?.status||'').toUpperCase()==='PLAY'&&play;
+  const reportLabel=esc(source.reportLabel||source.slot||'CURRENT REPORT');
+  const badge=live?`ONE SLICE // ${reportLabel}`:`OVEN CLOSED // ${reportLabel}`;
+  const head=`<div class="specialHead pizzaHead"><div><h2>PIZZA PLAYS</h2><p>LOU TWO SLICE // ONE COMPELLED VIGSCOPE PLAY // ORANGE BOARD</p></div><div class="specialBadge pizzaBadge">${badge}</div></div>`;
+  if(!live){return `${head}<div class="specialEmpty"><strong>LOU KEEPS THE DOUGH IN THE DRAWER</strong><span>${esc(data?.reason||'Every current VigScope card is PASS. No Pizza Play is forced.')}</span></div>`}
+  const eventStart=ptDateTime(play?.feed?.eventDate);const sourceOrdinal=Number(play?.sourceOrdinal)||1;
+  const eventMeta=[play?.meta?`<span><b>EVENT //</b> ${esc(play.meta)}</span>`:'',eventStart?`<span><b>START //</b> ${esc(eventStart)} PT</span>`:''].filter(Boolean).join('');
+  return `${head}<div class="pizzaBoard"><article class="pizzaPick">
+    <div class="pizzaPickHead"><div class="pizzaIdentity"><span class="pizzaLouTag">LOU TWO SLICE // ONE PLAY</span><h3>${esc(play?.title||'UNTITLED VIGSCOPE CARD')}</h3></div><div class="pizzaSourceState"><small>VIGSCOPE CARD STATUS</small><strong>${esc(play?.vigScopeStatus||'—')}</strong><span>CARD ${sourceOrdinal} // ${reportLabel}</span></div></div>
+    <div class="pizzaMarketStrip">
+      <div class="pizzaMarketCell"><small>BOOK / PRICE</small><strong>${esc(play?.book||'—')} // ${esc(priceText(play?.price))}</strong></div>
+      <div class="pizzaMarketCell target"><small>TARGET PRICE</small><strong>${esc(priceText(play?.targetPrice))}</strong></div>
+      <div class="pizzaMarketCell"><small>FAIR VALUE</small><strong>${esc(priceText(play?.fair))}</strong></div>
+      <div class="pizzaMarketCell edge"><small>PUBLISHED EDGE</small><strong>${esc(priceText(play?.edge))}</strong></div>
+    </div>
+    ${eventMeta?`<div class="pizzaEventMeta">${eventMeta}</div>`:''}
+    <div class="pizzaExplainGrid">
+      <div class="pizzaExplain"><small>WHY THIS ONE</small><strong>${esc(play?.whyThisOne||'Highest-ranked live VigScope card.')}</strong></div>
+      <div class="pizzaExplain"><small>THE EDGE</small><strong>${esc(play?.edgeRead||[play?.fair,play?.edge].filter(Boolean).join(' // '))}</strong></div>
+      <div class="pizzaExplain lou"><small>LOU'S READ</small><strong>${esc(play?.lousRead||'Lou makes this his one Pizza Play.')}</strong></div>
+      <div class="pizzaExplain watch"><small>WATCH OUT</small><strong>${esc(play?.watchOut||play?.vigScopeNote||'Respect the original VigScope conditions.')}</strong></div>
+    </div>
+    <div class="pizzaSourceNote"><b>VIGSCOPE NOTE //</b> ${esc(play?.vigScopeNote||'')} ${play?.sourceNote?`<br><b>SOURCE //</b> ${esc(play.sourceNote)}`:''}${data?.selectionRule?.note?`<br><b>RULE //</b> ${esc(data.selectionRule.note)}`:''}</div>
+    ${data?.generatedAt?`<div class="pizzaTimestamp">BUILT FROM ${esc(data.generatedAt)} // AMERICA/VANCOUVER</div>`:''}
+  </article></div>`;
+}
 function fallbackEvent(card){
   const key=[card?.selection,card?.market].filter(Boolean).join(' ').toUpperCase();
   if(key.includes('CAMERON'))return {event:'MVPW-06 · UK VS USA',eventDate:'AUG 29, 2026',eventStartPt:'11:00 AM PT',venue:'BP PULSE LIVE · BIRMINGHAM'};
@@ -166,14 +202,15 @@ function cryptoPanelHtml(data){
     ${activeHtml}${passHtml}${generated?`<div class="cryptoTimestamp">ANALYZED ${generated} // AMERICA/VANCOUVER</div>`:''}`;
 }
 function panelHtml(kind,data){
+  if(kind==='pizza')return pizzaPanelHtml(data||{});
   if(kind==='crypto'&&data?.board)return cryptoPanelHtml(data);
-  const isPizza=kind==='pizza';const items=Array.isArray(data?.items)?data.items:[];
-  const title=isPizza?'PIZZA PLAYS':'CRYPTO SPECIALS';
-  const desc=isPizza?'LONG SHOTS // PREMIUM PLAYS // SPECIAL COLLECTION':'PREMIUM WEB LINKS // CRYPTO ANALYSIS // SPECIAL COLLECTION';
-  const badge=isPizza?'COLLECTION RESERVED':`${items.length} WEB SOURCE${items.length===1?'':'S'} // ${cryptoAnalysisModeLabel()}`;
-  const emptyTitle=isPizza?'THE OVEN IS EMPTY':'THE VAULT IS EMPTY';
-  const emptyText=isPizza?'Long-shot and premium Pizza Plays will live here when the collection is defined.':'Add one curated web-page URL here. New sources remain pending until an analysis is published.';
-  return `<div class="specialHead ${isPizza?'pizzaHead':'cryptoHead'}"><div><h2>${title}</h2><p>${desc}</p></div><div class="specialBadge ${isPizza?'pizzaBadge':'cryptoBadge'}">${badge}</div></div>${items.length?`<div class="specialShelf">${items.map(x=>itemCard(x,kind)).join('')}</div>`:`<div class="specialEmpty"><strong>${emptyTitle}</strong><span>${emptyText}</span></div>`}`;
+  const items=Array.isArray(data?.items)?data.items:[];
+  const title='CRYPTO SPECIALS';
+  const desc='PREMIUM WEB LINKS // CRYPTO ANALYSIS // SPECIAL COLLECTION';
+  const badge=`${items.length} WEB SOURCE${items.length===1?'':'S'} // ${cryptoAnalysisModeLabel()}`;
+  const emptyTitle='THE VAULT IS EMPTY';
+  const emptyText='Add one curated web-page URL here. New sources remain pending until an analysis is published.';
+  return `<div class="specialHead cryptoHead"><div><h2>${title}</h2><p>${desc}</p></div><div class="specialBadge cryptoBadge">${badge}</div></div>${items.length?`<div class="specialShelf">${items.map(x=>itemCard(x,kind)).join('')}</div>`:`<div class="specialEmpty"><strong>${emptyTitle}</strong><span>${emptyText}</span></div>`}`;
 }
 function bindCryptoDetails(d){
   const panel=d.getElementById(CRYPTO_PANEL);if(!panel||panel.dataset.detailBound==='1')return;panel.dataset.detailBound='1';
@@ -190,7 +227,8 @@ function ensureButtons(d){
   const meat=d.getElementById(MEAT_ID),pref=d.getElementById(PREF_ID),f5=d.getElementById('runnerSyndicateF5');if(!meat||!pref||!f5)return false;
   const board=d.getElementById('runnerBoardF1')||tabs.querySelector('.btn[data-view="board"]'),market=d.getElementById('runnerMarketF2')||tabs.querySelector('.btn[data-view="market"]'),history=d.getElementById('runnerHistoryF3')||tabs.querySelector('.btn[data-view="history"]'),engine=d.getElementById('runnerEngineF8')||tabs.querySelector('.btn[data-view="engine"]');
   ensureStyle(d);
-  let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.innerHTML=buttonHtml('F5','🍕 PIZZA PLAYS 🍕','LONG SHOTS + PREMIUM&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN','pizza');p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
+  let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
+  const pizzaHtml=buttonHtml('F5','🍕 PIZZA PLAYS 🍕',pizzaButtonMessage(),'pizza');if(p.innerHTML!==pizzaHtml)p.innerHTML=pizzaHtml;
   let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
   const cryptoHtml=buttonHtml('F6','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
   meat.setAttribute('aria-label','Meat Desk');
