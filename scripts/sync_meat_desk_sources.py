@@ -3,8 +3,9 @@
 
 The PDF folder is the active-library source of truth. Existing manifest metadata is
 preserved for files that remain present. Newly added PDFs are registered as
-PENDING ANALYSIS. Entries whose PDF has been removed disappear from the active
-manifest.
+available but not analyzed. Entries whose PDF has been removed disappear from the
+active manifest. This script registers sources only; it never analyzes document
+content.
 """
 
 from __future__ import annotations
@@ -23,6 +24,8 @@ DEFAULT_POLICY = {
     "publication": "PUBLISH AFTER REVIEW",
     "runtimeUse": "SAVED RESEARCH INDEX ONLY",
     "decisionPolicy": "REFERENCE CONTEXT ONLY // EXISTING BETTING EDGE ENGINE MAKES BET DECISIONS",
+    "analysisTrigger": "MANUAL CHATGPT UPLOAD ONLY",
+    "sourceAccess": "PRIVATE // NO PUBLIC DOCUMENT ACCESS",
 }
 
 
@@ -58,6 +61,21 @@ def infer_metadata(filename: str) -> dict:
         kind = "NFL BETTING SOURCE"
         season = f"{year} NFL"
         tags = ["NFL", year]
+    elif "nhl" in lower or "hockey" in lower:
+        desk = "NHL"
+        kind = "NHL BETTING SOURCE"
+        season = f"{year} NHL"
+        tags = ["NHL", year]
+    elif "ncaab" in lower or "ncaamb" in lower or "college-basketball" in lower or "college basketball" in lower or "cbb" in lower:
+        desk = "CBB"
+        kind = "COLLEGE BASKETBALL BETTING SOURCE"
+        season = f"{year} CBB"
+        tags = ["CBB", year]
+    elif "nba" in lower or "basketball" in lower:
+        desk = "NBA"
+        kind = "NBA BETTING SOURCE"
+        season = f"{year} NBA"
+        tags = ["NBA", year]
     elif "derby" in lower or "racing" in lower or "horse" in lower:
         desk = "RACING"
         kind = "HORSE RACING BETTING SOURCE"
@@ -89,13 +107,13 @@ def new_entry(pdf: Path) -> dict:
         "desk": inferred["desk"],
         "bytes": pdf.stat().st_size,
         "tags": inferred["tags"],
-        "status": "PENDING ANALYSIS",
+        "status": "SOURCE AVAILABLE // NOT ANALYZED",
         "reviewMode": "ONE-TIME FULL SOURCE REVIEW",
-        "publicationStatus": "PENDING",
+        "publicationStatus": "PRIVATE // NOT PUBLISHED",
         "reviewedAt": None,
         "publishedAt": None,
-        "use": "Meat Desk reference source. Existing Betting Edge engine remains the betting-decision layer.",
-        "notes": "Automatically registered from source-pdfs. Queued for one-time full-source analysis, structured research extraction and Meat Desk publication.",
+        "use": "Private Meat Desk reference source. Existing Betting Edge engine remains the betting-decision layer.",
+        "notes": "Registered from source-pdfs. No automatic analysis. Full-source review is triggered only after the source is manually uploaded to ChatGPT and approved for analysis.",
     }
 
 
@@ -124,7 +142,7 @@ def main() -> None:
     present_names = {pdf.name for pdf in pdfs}
 
     # Preserve the current desk ordering for surviving sources, then append new
-    # PDFs alphabetically. This avoids reshuffling the shelf on every sync.
+    # PDFs alphabetically. This avoids reshuffling the registry on every sync.
     sources = []
     used = set()
     for source in existing_sources:
@@ -152,7 +170,9 @@ def main() -> None:
     manifest["title"] = manifest.get("title") or "Meat Desk Source Library"
     manifest["updatedAt"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     manifest["sourceFolder"] = "research/season-previews/source-pdfs/"
-    manifest["analysisPolicy"] = manifest.get("analysisPolicy") or DEFAULT_POLICY
+    policy = dict(DEFAULT_POLICY)
+    policy.update(manifest.get("analysisPolicy") or {})
+    manifest["analysisPolicy"] = policy
     manifest["sources"] = sources
 
     with MANIFEST_PATH.open("w", encoding="utf-8") as handle:
