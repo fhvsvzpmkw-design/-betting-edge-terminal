@@ -179,10 +179,10 @@ function setLedgerText(){
 }
 async function loadLedger(){
   let payload=null,lastError=null;
-  for(const path of ['./api/bet-history','./data/bet-history-public.json']){
+  for(const path of ['./data/bet-history-public.json']){
     try{
       const res=await fetch(path+'?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Ledger HTTP '+res.status+' @ '+path);const candidate=await res.json();
-      if(!candidate||!Array.isArray(candidate.wagers)||!candidate.validation)throw new Error('Invalid ledger schema @ '+path);payload=candidate;payload.deliverySource=path.includes('/api/')?'PRIVATE MASTER // CLOUDFLARE':'STATIC PUBLIC FALLBACK';break;
+      if(!candidate||!Array.isArray(candidate.wagers)||!candidate.validation)throw new Error('Invalid ledger schema @ '+path);payload=candidate;payload.deliverySource='PUBLIC LEDGER // STATIC PUBLIC PROJECTION';break;
     }catch(error){lastError=error}
   }
   if(!payload)throw lastError||new Error('Ledger unavailable');LEDGER_META=payload;MASTER=payload.wagers;DATA=MASTER.map(rec);
