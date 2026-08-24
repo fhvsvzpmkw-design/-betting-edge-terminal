@@ -63,12 +63,13 @@ function resetOrder(){
   const d=appDoc();if(d)apply(d,true);
   return [...middle];
 }
+function currentOrder(){return drag?.dragging?drag.draft:middle}
 function keyFor(id,order=middle){
   if(id==='preferences')return 'TAB';
   const idx=['board',...normalizeMiddle(order)].indexOf(id);
   return idx>=0?`F${idx+1}`:'';
 }
-function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
 function patchButtonKey(b,key,id){
   if(!b||!key)return;
   b.dataset.menuId=id;
@@ -95,7 +96,7 @@ function clearWorkspaceSafetyStyles(d){
     b.style.removeProperty('display');b.style.removeProperty('visibility');
   });
 }
-function applyVisual(d,order=middle){
+function applyVisual(d,order=currentOrder()){
   const normalized=normalizeMiddle(order);
   const board=button(d,'board'),prefs=button(d,'preferences');
   if(board){board.style.order='0';patchButtonKey(board,'F1','board')}
@@ -165,14 +166,20 @@ function apply(d,force=false,order=middle){
   const normalized=applyVisual(d,order);
   if(force||JSON.stringify(normalized)!==JSON.stringify(middle))middle=normalizeMiddle(normalized);
   renderPreferenceBox(d);
-  d.documentElement.dataset.menuOrderAuthority='1-safe';
+  d.documentElement.dataset.menuOrderAuthority='1-safe-sync';
   if(d.defaultView)d.defaultView.BettingEdgeMenuOrder=window.BettingEdgeMenuOrder;
   return true;
 }
 function schedule(d){
-  if(scheduled)return;scheduled=true;
+  if(scheduled||drag?.dragging)return;scheduled=true;
   const w=d?.defaultView||window;
   w.requestAnimationFrame(()=>{scheduled=false;apply(d)})
+}
+function reconcileMutation(d){
+  if(!d?.body)return;
+  workspaceSafety(d);clearWorkspaceSafetyStyles(d);
+  applyVisual(d,currentOrder());
+  if(!drag?.dragging)schedule(d);
 }
 function clearHold(){if(drag?.timer){clearTimeout(drag.timer);drag.timer=null}}
 function cleanupDrag(d){
@@ -213,7 +220,7 @@ function bindPointer(d){
     if(!drag.dragging){if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>MOVE_CANCEL_PX)cleanupDrag(d);return}
     e.preventDefault();
     const next=draftForY(d,drag.id,e.clientY,drag.draft);
-    if(JSON.stringify(next)!==JSON.stringify(drag.draft)){drag.draft=next;applyVisual(d,next);renderPreferenceBox(d)}
+    if(JSON.stringify(next)!==JSON.stringify(drag.draft)){drag.draft=next;applyVisual(d,next)}
   },{capture:true,passive:false});
   const finish=e=>{
     if(!drag||e.pointerId!==drag.pointerId)return;
@@ -245,7 +252,7 @@ function attach(){
     lastDoc=d;
     if(observer)observer.disconnect();
     bindPointer(d);bindKeys(d);
-    observer=new MutationObserver(()=>schedule(d));
+    observer=new MutationObserver(()=>reconcileMutation(d));
     observer.observe(d.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class']});
   }
   bindKeys(d);apply(d);return true;
@@ -261,5 +268,5 @@ window.BettingEdgeMenuOrder={
 
 let tries=0;attach();
 const timer=setInterval(()=>{tries++;if(attach()||tries>300)clearInterval(timer)},25);
-setInterval(()=>{const d=appDoc();if(d)apply(d)},350);
+setInterval(()=>{const d=appDoc();if(d&&!drag?.dragging)apply(d)},750);
 })();
