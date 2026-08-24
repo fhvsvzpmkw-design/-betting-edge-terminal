@@ -1,0 +1,36 @@
+name: Wire VigWire Hotline share asset once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/share-hotline-asset-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  wire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Point share control to VigWire Hotline asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f assets/syndicates/vigwire-hotline-share.png
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('syndicates/slot-host.html')
+          s=p.read_text()
+          old="const SHARE_ASSET='../assets/syndicates/IMG_0388.png';"
+          new="const SHARE_ASSET='../assets/syndicates/vigwire-hotline-share.png';"
+          if old not in s:
+              raise SystemExit('old SHARE_ASSET reference not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add syndicates/slot-host.html
+          git commit -m "Use VigWire Hotline share button"
+          git push
