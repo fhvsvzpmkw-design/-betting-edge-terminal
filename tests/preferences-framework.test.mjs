@@ -7,7 +7,7 @@ const framework=fs.readFileSync('assets/preferences-framework.js','utf8');
 const bootstrap=fs.readFileSync('assets/report-dashboard-vigscope.js','utf8');
 const contract=fs.readFileSync('BETTING_EDGE_CONTRACT.md','utf8');
 
-assert(prefs.schema===1,'preferences schema must be 1');
+assert(prefs.schema===2,'preferences schema must be 2');
 assert(prefs.states&&typeof prefs.states==='object','preferences states are required');
 for(const id of ['active','display_only','reserved'])assert(prefs.states[id],`missing preference state ${id}`);
 assert(Array.isArray(prefs.modules)&&prefs.modules.length>=8,'preferences must define the wave-one modules');
