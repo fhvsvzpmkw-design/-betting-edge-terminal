@@ -2,6 +2,10 @@ const HISTORY_URL = "https://raw.githubusercontent.com/fhvsvzpmkw-design/-bettin
 const GITHUB_PAGES_ORIGIN = "https://fhvsvzpmkw-design.github.io/-betting-edge-terminal";
 const CANONICAL_HOST = "vigwirelabs.com";
 const PRIVATE_LEDGER_API = "https://api.github.com/repos/fhvsvzpmkw-design/betting-edge-private/contents/data/betting-ledger.json?ref=main";
+const SCHEDULE_CONFIG_URL = `${GITHUB_PAGES_ORIGIN}/data/schedule-profiles.json`;
+const SCHEDULE_STATE_URL = `${GITHUB_PAGES_ORIGIN}/data/schedule-state.json`;
+const ODDS_WORKFLOW_DISPATCH_URL = "https://api.github.com/repos/fhvsvzpmkw-design/-betting-edge-terminal/actions/workflows/odds-refresh.yml/dispatches";
+const SCHEDULER_CRON = "* * * * *";
 
 const SLOT_CODES = {
   open: "o",
@@ -52,6 +56,126 @@ async function loadLatestRun() {
   }
 
   return { latest, id, updatedAt: history?.updated_at || null };
+}
+
+function schedulerToken(env) {
+  return String(env?.GITHUB_ACTIONS_TOKEN || env?.GITHUB_PRIVATE_TOKEN || "").trim();
+}
+
+function vancouverClock(date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Vancouver",
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const hour = values.hour === "24" ? "00" : values.hour;
+  return {
+    date: `${values.year}-${values.month}-${values.day}`,
+    time: `${hour}:${values.minute}`,
+  };
+}
+
+async function loadSchedulerDocuments(scheduledTime) {
+  const query = `scheduler=${encodeURIComponent(String(scheduledTime))}`;
+  const headers = {
+    Accept: "application/json",
+    "User-Agent": "VigWire-Labs-Scheduler",
+  };
+  const [configResponse, stateResponse] = await Promise.all([
+    fetch(`${SCHEDULE_CONFIG_URL}?${query}`, { headers, cache: "no-store" }),
+    fetch(`${SCHEDULE_STATE_URL}?${query}`, { headers, cache: "no-store" }),
+  ]);
+
+  if (!configResponse.ok || !stateResponse.ok) {
+    throw new Error(`scheduler config fetch failed: profiles=${configResponse.status} state=${stateResponse.status}`);
+  }
+
+  const [config, state] = await Promise.all([configResponse.json(), stateResponse.json()]);
+  if (config?.schema !== 1 || config?.timezone !== "America/Vancouver" || Number(config?.maxDailyPrimaryPulls) !== 5) {
+    throw new Error("scheduler profile configuration failed validation");
+  }
+  if (state?.schema !== 1 || typeof state?.defaultProfileId !== "string") {
+    throw new Error("scheduler state failed validation");
+  }
+  return { config, state };
+}
+
+function resolveScheduledSlot(scheduledTime, config, state) {
+  const instant = new Date(Number(scheduledTime));
+  if (!Number.isFinite(instant.getTime())) throw new Error("invalid Cloudflare scheduledTime");
+  const clock = vancouverClock(instant);
+
+  let profileId = state.defaultProfileId || config.legacyProfileId;
+  const selections = (Array.isArray(state.selections) ? state.selections : [])
+    .filter((item) => item && typeof item.effectiveOperatingDate === "string" && typeof item.profileId === "string")
+    .slice()
+    .sort(
+      (a, b) =>
+        String(a.effectiveOperatingDate).localeCompare(String(b.effectiveOperatingDate)) ||
+        String(a.selectedAt || "").localeCompare(String(b.selectedAt || "")),
+    );
+
+  for (const selection of selections) {
+    if (selection.effectiveOperatingDate <= clock.date) profileId = selection.profileId;
+  }
+
+  const profile = config?.profiles?.[profileId];
+  if (!profile || !Array.isArray(profile.slots) || profile.slots.length !== 5) {
+    throw new Error(`scheduler resolved invalid profile: ${profileId}`);
+  }
+
+  const slot = profile.slots.find((candidate) => String(candidate?.pulseTime || "") === clock.time);
+  if (!slot) return null;
+
+  return {
+    operatingDate: clock.date,
+    profileId,
+    profileLabel: profile.name || profileId,
+    canonicalSlot: Number(slot.canonicalSlot),
+    slot: String(slot.slot || ""),
+    plannedPulseTime: String(slot.pulseTime || ""),
+    plannedReportTime: String(slot.reportTime || ""),
+    scheduledAt: instant.toISOString(),
+  };
+}
+
+async function dispatchScheduledOdds(scheduledTime, env) {
+  const { config, state } = await loadSchedulerDocuments(scheduledTime);
+  const slot = resolveScheduledSlot(scheduledTime, config, state);
+  if (!slot) return { dispatched: false, reason: "not-a-pulse-minute" };
+
+  const token = schedulerToken(env);
+  if (!token) throw new Error("GitHub Actions scheduler token unavailable");
+
+  const response = await fetch(ODDS_WORKFLOW_DISPATCH_URL, {
+    method: "POST",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2026-03-10",
+      "User-Agent": "VigWire-Labs-Scheduler",
+    },
+    body: JSON.stringify({
+      ref: "main",
+      inputs: {
+        trigger_mode: "cloudflare_scheduled",
+        scheduled_at: slot.scheduledAt,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 300);
+    throw new Error(`GitHub odds workflow dispatch failed: ${response.status} ${detail}`);
+  }
+
+  return { dispatched: true, ...slot };
 }
 
 async function loadPrivateLedger(env) {
@@ -311,6 +435,13 @@ export default {
             latestShortId: id,
             latestRun: latest.id,
             historyUpdatedAt: updatedAt,
+            scheduler: {
+              mode: "cloudflare-minute-dispatch",
+              cron: SCHEDULER_CRON,
+              tokenConfigured: Boolean(schedulerToken(env)),
+              source: "public schedule profile + state",
+              cutover: "parallel-with-github-cron-fallback",
+            },
           },
           { headers: { "Cache-Control": "no-store" } },
         );
@@ -359,6 +490,20 @@ export default {
       return await proxyGitHubPages(request);
     } catch {
       return errorResponse("VigWire Labs content is temporarily unavailable.");
+    }
+  },
+
+  async scheduled(controller, env) {
+    try {
+      const result = await dispatchScheduledOdds(controller.scheduledTime, env);
+      if (result.dispatched) {
+        console.log(
+          `CLOUDFLARE ODDS SCHEDULER DISPATCH // ${result.operatingDate} ${result.plannedPulseTime} PT // ${result.profileId} // SLOT ${result.canonicalSlot}`,
+        );
+      }
+    } catch (error) {
+      console.error("Cloudflare odds scheduler failed", error);
+      throw error;
     }
   },
 };
