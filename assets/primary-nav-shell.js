@@ -97,7 +97,6 @@ function ensureStyle(d){
 
     body.${MENU_CLASS} .runnerNavPad{padding-top:14px!important;padding-bottom:10px!important;margin-top:0!important}
     body.${MENU_CLASS} .runnerNavPad~*{display:none!important}
-    body.${MENU_CLASS} .f3sourcebar,body.${MENU_CLASS} footer.foot{display:none!important}
     body.${MENU_CLASS} .runnerNavPad .tabs{grid-template-columns:1fr!important;gap:9px!important}
     body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view]{grid-column:1/-1!important;display:grid!important;place-items:center!important;gap:7px!important;min-height:62px!important;padding:10px 8px!important;background:#03101b!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.04),0 0 8px rgba(57,231,255,.05)!important}
     body.${MENU_CLASS} .runnerNavPad .tabs>.btn[data-view].active{background:inherit!important}
