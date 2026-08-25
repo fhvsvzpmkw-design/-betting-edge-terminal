@@ -1,0 +1,53 @@
+name: Fix syndicate open once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-syndicate-open-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make Syndicate workspace own its open state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('runner.html')
+          s=p.read_text()
+
+          old="const isLoaded=d.body.classList.contains('runnerSyndicateLoaded');if(isLoaded){"
+          new="const state=f5.dataset.state;const isLoaded=d.body.classList.contains('runnerSyndicateLoaded');if(isLoaded&&state!=='error'){"
+          assert old in s, 'syndicate loaded-state check not found'
+          s=s.replace(old,new,1)
+
+          old="}setF5State(f5,'connecting');pinSyndicateTop(d,f5,app);f5.disabled=true;try{await buildSyndicateWorkspace(d,navPad);d.body.classList.add('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','true');setF5State(f5,'connected');"
+          new="}setF5State(f5,'connecting');d.body.classList.add('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','true');pinSyndicateTop(d,f5,app);f5.disabled=true;try{await buildSyndicateWorkspace(d,navPad);setF5State(f5,'connected');"
+          assert old in s, 'syndicate async-open sequence not found'
+          s=s.replace(old,new,1)
+
+          old="}catch(err){d.body.classList.remove('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','false');setF5State(f5,'error');"
+          new="}catch(err){f5.setAttribute('aria-pressed','true');setF5State(f5,'error');"
+          assert old in s, 'syndicate error-close sequence not found'
+          s=s.replace(old,new,1)
+
+          # Structural checks: open state now precedes the manifest await, and
+          # failures stay in the workspace so the user can see/retry them.
+          needle="setF5State(f5,'connecting');d.body.classList.add('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','true');pinSyndicateTop(d,f5,app);f5.disabled=true;try{await buildSyndicateWorkspace"
+          assert needle in s
+          assert "if(isLoaded&&state!=='error')" in s
+          p.write_text(s)
+          PY
+      - name: Commit syndicate open-state fix
+        run: |
+          git config user.name "fhvsvzpmkw-design"
+          git config user.email "fhvsvzpmkw@privaterelay.appleid.com"
+          git add runner.html
+          git diff --cached --check
+          git commit -m "Open Syndicate workspace before manifest load"
+          git push
