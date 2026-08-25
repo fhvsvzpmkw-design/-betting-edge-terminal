@@ -152,6 +152,7 @@ function enterMenu(d){
   delete d.body.dataset.primaryView;
   restoreAllMenuButtons(d);
   clearPrimaryActive(d);
+  d.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));
   d.body.classList.add(MENU_CLASS);
   try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
 }
