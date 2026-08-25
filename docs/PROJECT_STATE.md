@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-24 — VigScope UI v1.5 night-lock checkpoint
+**Last updated:** 2026-08-25 — Research Library v1.8 R3 promotion checkpoint
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -9,37 +9,40 @@ This file is the practical current-state snapshot. It is not a replacement for `
 ## Current version boundary
 
 - **Production governance:** `BETTING_EDGE_CONTRACT.md` — **v1.0 OPERATIONAL**.
-- **Contract v1.0 blob:** `815a511301bd7a5aa3770baf0e32a00a28e2f548`.
+- **Current Contract v1.0 blob:** `8bb1756a573d50d03ef99cd24eedb228d08d7632`.
 - **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`.
 - **VigScope presentation:** `runner.html` — **Terminal UI v1.5**.
 - **UI v1.5 runner blob at promotion:** `8d3dd16e1f77c415e267064d6ced3ceec371dc29`.
-- **Report engine/core:** `runner-core.html` + `index.html` — **v1.3**, unchanged by the v1.0/v1.5 promotion.
-- **Research Library:** **v1.7**, read-only production authority.
-- **Report provenance:** schema **3**; new reports record Contract v1.0 provenance, historical sidecars remain immutable.
+- **Report engine/core:** `runner-core.html` + `index.html` — **v1.3**, unchanged by the v1.0/v1.5 promotion and v1.8 Research Library promotion.
+- **Research Library:** **v1.8**, R3 live read-only production authority.
+- **Research inventory:** **130 logical items / 108 sources / 30 evidence clusters**.
+- **Report provenance:** schema **3**; new reports record Contract v1.0 provenance and active Research Library version, historical sidecars remain immutable.
 - **Authoritative rollback system:** Git history.
-- **Night-lock checkpoint:** branch `night-lock-2026-08-24` at main commit `1e1551baa6bf5dfc4104ad21e33424969466402b` — Contract v1.0 / Terminal UI v1.5 / core v1.3 / Research Library v1.7.
+- **Night-lock checkpoint:** branch `night-lock-2026-08-24` at main commit `1e1551baa6bf5dfc4104ad21e33424969466402b` — historical Contract v1.0 / Terminal UI v1.5 / core v1.3 / Research Library v1.7 checkpoint.
 
 The pre-promotion rollback boundary is main commit `9de8bf2b5a6e95dc2545fa8011f493d46aedc93f`, final Contract v0.9 blob `59d8dda8d8e491255d5792329a9446eb01960a34`, and UI v1.4 runner blob `999a1e00261cb05b9b5045bda1285310df168efb`.
 
-Contract v1.0 is a consolidation of the final proven v0.9 rule set. It does not introduce a new sportsbook, staking model, risk tolerance, freshness rule, Odds-API budget, report-engine version or Research Library version.
+Contract v1.0 is a consolidation of the final proven v0.9 rule set. It did not itself introduce a new sportsbook, staking model, risk tolerance, freshness rule, Odds-API budget, report-engine version or Research Library version. Research Library v1.8 was promoted independently on 2026-08-25 while preserving the Contract v1.0 execution/risk boundary.
 
 ## Production report governance
 
-All enabled Betting Edge report automations now perform the active schedule-profile gate first and, when the trigger is active, require:
+All enabled Betting Edge report automations perform the active schedule-profile gate first and, when the trigger is active, require:
 
 - **Contract v1.0 OPERATIONAL**;
 - **VigScope UI v1.5**;
 - **Betting Edge core v1.3**;
-- Research Library **v1.7** with validation PASS;
+- Research Library **v1.8 / R3 live read-only** with validation PASS;
 - 75-minute live-feed freshness;
 - 30-minute executable-quote freshness;
 - exact event/market/selection identity;
 - exact player-prop identity when applicable;
 - fair-value work before BET;
 - normal BET / LEAN / WAIT / PASS and stake/risk invariants;
+- mandatory Stage 1 / Stage 2 personnel handling where material;
+- current WAIT qualification rules requiring a genuinely live candidate rather than a sportsbook outlier alone;
 - immutable report + schema-3 sidecar + `run-history.json` publication.
 
-The 2026-08-22 `18:15 LATE / WEST COAST` report remains the final same-day Contract v0.9 issuance and is not rewritten. The first eligible report after the promotion is the live v1.0 observation checkpoint.
+The 2026-08-22 `18:15 LATE / WEST COAST` report remains the final same-day Contract v0.9 issuance and is not rewritten. Historical v1.7-issued reports remain immutable after the v1.8 Research Library promotion.
 
 ## Seasonal schedule profiles
 
@@ -84,7 +87,7 @@ Research/provenance sidecars are stored under:
 
 `run-history.json` is the compact index/navigation layer. It cannot override an issued payload.
 
-New Contract v1.0 schema-3 sidecars record the exact Contract v1.0 blob SHA resolved before handicapping. Historical v0.9 schema-3 and older schema-2 sidecars remain valid immutable evidence.
+New Contract v1.0 schema-3 sidecars record the exact Contract v1.0 blob SHA resolved before handicapping and the active Research Library version. Historical v0.9 schema-3, v1.7-era schema-3 and older schema-2 sidecars remain valid immutable evidence.
 
 Result/price observations live separately under `data/history/observations/...` and never rewrite the issued decision.
 
@@ -103,7 +106,7 @@ Current principles:
 
 ## Private ledger and F3 Bet History
 
-The raw master betting ledger is now outside the public repository runtime surface.
+The raw master betting ledger is outside the public repository runtime surface.
 
 Current architecture:
 
@@ -156,20 +159,33 @@ Hotline archives remain immutable per character/date/edition.
 
 ## Research Library
 
-Production Research Library remains **1.7** in `R1_CANONICAL_READ_ONLY` / R3 live read-only History Fit mode.
+Production Research Library is **v1.8** in **R3 live read-only History Fit** mode.
 
-The v1.8 candidate remains staging/evaluation only. Its existence does not alter Contract v1.0, production fair value, play-to, status, stake or executable price.
+`research/manifest.json` is the production compatibility pointer and records `activeLibraryVersion: "1.8"`, Contract v1.0 compatibility and R3 live read-only runtime state.
 
-`research/manifest.json` is the production compatibility pointer and now identifies Contract v1.0 compatibility while retaining `activeLibraryVersion: "1.7"`.
+Current inventory is:
+
+- **130 logical items**;
+- **108 source records**;
+- **30 evidence/conflict clusters**;
+- **104 primary-prior retrieval items**;
+- **25 synthesis items**;
+- **1 inference item**.
+
+The v1.8 base candidate had already passed 15/15 narrative History Fit cases and 9/9 hard-boundary cases. The 2026-08-25 R3 gap-closure pass added focused evidence for extreme longshots, soccer liquidity/book dispersion, college football, WNBA game markets and MLB doubles/stolen-base/runs-scored mechanisms while preserving explicit calibration gaps where evidence remains insufficient.
+
+Research Library v1.8 remains read-only. It does not create BETs, count as an extra BET-confirmation vote, provide executable sportsbook prices, override identity/freshness/fair-value gates, or directly rewrite fair value, model error, play-to, status, stake or risk.
+
+Promotion record: `research/V1_8_PROMOTION_2026-08-25.md`. Validation record: `research/tests/V1_8_R3_VALIDATION_2026-08-25.json`.
 
 ## Governance tracks
 
 - **C-track:** Contract v1.0 operational.
-- **R-track:** R3 — live read-only Research Fit using production Research Library v1.7.
+- **R-track:** R3 — live read-only Research Fit using production Research Library v1.8.
 - **H-track:** H3 — live immutable issued-report/provenance history.
 - **S-track:** S0 — Shadow History inactive.
 
-Contract v1.0 formalizes the final v0.9 operating rules already in production, including fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH guardrails and repository-controlled report-card targeting.
+Contract v1.0 governs the production execution boundary, including fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH guardrails, repository-controlled report-card targeting and the operational two-stage personnel-information process. Research Library versions remain independently promoted within that boundary.
 
 ## Current rollback / acceptance checkpoints
 
@@ -187,6 +203,8 @@ Current runtime architecture moved the betting master to the private repository 
 
 ### 2026-08-22 — Contract v1.0 / UI v1.5 consolidation
 
-The final v0.9 governance state was promoted to Contract v1.0, accumulated presentation work was declared VigScope UI v1.5, core stayed v1.3, Research Library stayed v1.7, and enabled report automations were advanced to the new production boundary.
+The final v0.9 governance state was promoted to Contract v1.0, accumulated presentation work was declared VigScope UI v1.5, core stayed v1.3 and Research Library remained v1.7 at that historical checkpoint.
 
-The next verification point is the first eligible scheduled report under Contract v1.0. Verify successful v1.0/v1.5 preflight, normal feed handling, immutable publication, exact v1.0 sidecar provenance and compact-link delivery before treating the cutover observation as complete.
+### 2026-08-25 — Research Library v1.8 R3 promotion
+
+The previously tested 120-item v1.8 candidate was reopened after sufficient v1.7 live-production soak. A focused R3 gap-closure pass added 10 logical items, 8 sources and 4 evidence clusters, producing the active 130-item / 108-source / 30-cluster v1.8 library. Validation passed all ID, source, cluster, market-boundary and R3 hard-boundary checks. The active manifest was switched to v1.8 without changing core v1.3, Contract v1.0, supported books, staking/risk rules, report lanes or Odds-API budget.
