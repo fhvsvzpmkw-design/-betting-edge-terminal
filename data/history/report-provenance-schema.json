@@ -1,11 +1,11 @@
 {
   "schema": 3,
-  "purpose": "Durable research/provenance sidecar for an issued Betting Edge report. The sidecar enriches history without enlarging or mutating the runner payload, records the authoritative production contract used at issuance, and may retain structured personnel-sweep evidence for material decisions.",
+  "purpose": "Durable research/provenance sidecar for an issued Betting Edge report. The sidecar enriches history without enlarging or mutating the runner payload, records the authoritative production contract used at issuance, and may retain structured personnel-sweep and WAIT-qualification evidence for material decisions.",
   "sidecarPath": "data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json",
   "compatibility": {
     "historicalSchema2Valid": true,
     "historicalSchema3Valid": true,
-    "rule": "Schema-2 sidecars and previously issued schema-3 sidecars remain valid immutable historical evidence. The personnelEvidence extension and explicit personnelRequired gate are additive for new reports and do not require rewriting historical sidecars."
+    "rule": "Schema-2 sidecars and previously issued schema-3 sidecars remain valid immutable historical evidence. The personnelEvidence, explicit personnelRequired gate and waitQualification extension are additive for new reports and do not require rewriting historical sidecars."
   },
   "reportReference": {
     "fields": {
@@ -55,6 +55,16 @@
     "stage2GateFields": {
       "personnelRequired": "boolean required on every new recommendation after the Stage 2 publication-gate cutover; true when Stage 2 personnel work was material to the serious candidate or materially affects the final decision, including a personnel-driven PASS",
       "rule": "personnelRequired is the primary structured trigger for personnelEvidence. Recommendation wording that signals lineup, batting order, participation, role, minutes, starter, active/inactive or identity-context dependence is a conservative backstop and may not be used to mark personnelRequired=false to evade Stage 2 evidence."
+    },
+    "waitQualification": {
+      "requiredWhen": "For new reports after the WAIT-qualification publication cutover, every recommendation whose final status is WAIT must include this record.",
+      "fields": {
+        "actionableIfResolved": "must be true; means the candidate has a plausible path to LEAN/BET or materially closer actionability if the named blockers clear under fresh re-handicapping",
+        "blockers": "non-empty array of the specific unresolved gates preventing action now",
+        "independentSignals": "non-empty array of current signals materially separate from the Bet365/DraftKings quote pair or market-derived no-vig calculation; each signal must contain origin and finding",
+        "rationale": "concise explanation of why the candidate merits WAIT rather than PASS despite the unresolved blockers"
+      },
+      "rule": "A sportsbook outlier, cross-book price gap, positive market-derived no-vig residual, stale/missing comparison quote, or unresolved personnel fact does not by itself qualify a recommendation for WAIT. At least one current independent non-market signal must support the underlying handicap, and the recommendation must be plausibly actionable if its blockers clear. Bet365, DraftKings, Odds-API/live-feed rows, a two-book no-vig benchmark, or market consensus may not be recorded as the required independent signal. If these conditions are not met, use PASS with the appropriate fair-value-confidence, price-quality, information or identity reason."
     },
     "personnelEvidence": {
       "requiredWhen": "For new reports, include on a recommendation when personnelRequired=true. This includes Stage 2 personnel work material to a serious candidate or an unresolved personnel assumption materially affecting BET/LEAN/WAIT/PASS status, fair value, uncertainty or playTo. Historical sidecars are not backfilled.",
