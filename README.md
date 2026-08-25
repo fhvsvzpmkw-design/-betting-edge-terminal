@@ -19,14 +19,14 @@ The current presentation release is **VigScope Terminal UI v1.5** in `runner.htm
 
 v1.5 is a consolidation boundary for the accumulated production presentation work now operating together, including the manifest-driven Syndicate workspace and independent hotline shells, the rebuilt F3 Bet History/public performance surface, the current Preferences/report-card presentation, and the private-ledger public-projection architecture. It does not imply a betting-engine rewrite.
 
-The underlying `runner-core.html` / `index.html` report engine/core remains **v1.3**. The authoritative governance contract is **Betting Edge Contract v1.0 OPERATIONAL**. The production Research Library remains **v1.7 read-only**.
+The underlying `runner-core.html` / `index.html` report engine/core remains **v1.3**. The authoritative governance contract is **Betting Edge Contract v1.0 OPERATIONAL**. The production Research Library is **v1.8 R3 live read-only**.
 
 These versions are intentionally independent:
 
 - **Terminal / product UI:** v1.5
 - **Report engine/core:** v1.3
 - **Governance contract:** v1.0
-- **Research Library:** v1.7
+- **Research Library:** v1.8 / R3 live read-only
 - **Hotline shells:** independently versioned per character/publication
 
 ## F3 Bet History and ledger boundary
@@ -45,7 +45,7 @@ Betting Edge report data remains authoritative wherever a character hotline pres
 
 The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v1.0 OPERATIONAL**.
 
-Contract v1.0 is a controlled consolidation of the final operational v0.9 rule set. It preserves the inherited execution/pricing/risk baseline and the already-operational durable-history, exact-identity, fair-value-confidence, spread-lineage, PRICE WATCH and repository-controlled report-card rules. It does not introduce a new staking model, add books, increase the odds-refresh budget, alter the five report lanes or promote Research Library v1.8.
+Contract v1.0 is a controlled consolidation of the final operational v0.9 rule set. It preserves the inherited execution/pricing/risk baseline and the already-operational durable-history, exact-identity, fair-value-confidence, spread-lineage, PRICE WATCH and repository-controlled report-card rules. It does not introduce a new staking model, add books, increase the odds-refresh budget or alter the five report lanes. Research Library versions are promoted independently; the current v1.8 R3 promotion does not change the Contract v1.0 version or its execution/risk boundary.
 
 The production contract continues to incorporate by fixed Git blob identity:
 
@@ -53,9 +53,9 @@ The production contract continues to incorporate by fixed Git blob identity:
 - [`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9.md) as the durable-history/provenance design delta;
 - [`BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md) as the player-prop identity delta.
 
-Those draft files remain historical design artifacts and are **not independently operational**. The v0.9 production acceptance record remains immutable historical evidence at [`BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`](BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md). The current promotion record is [`BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`](BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md).
+Those draft files remain historical design artifacts and are **not independently operational**. The v0.9 production acceptance record remains immutable historical evidence at [`BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`](BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md). The Contract v1.0 promotion record is [`BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`](BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md). The current Research Library promotion record is [`research/V1_8_PROMOTION_2026-08-25.md`](research/V1_8_PROMOTION_2026-08-25.md).
 
-Every scheduled production report must resolve the production contract and current approved runner before handicapping. If authority cannot be resolved, the report must stop before analysis rather than silently falling back to a draft or an older production version.
+Every scheduled production report must resolve the production contract and current approved runner before handicapping. Research Fit resolves the active Research Library through `research/manifest.json`. If production authority cannot be resolved, the relevant layer must fail closed rather than silently falling back to a draft or superseded production version.
 
 ## Repository change safety policy
 
