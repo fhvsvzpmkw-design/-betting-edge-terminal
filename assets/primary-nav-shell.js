@@ -187,6 +187,12 @@ function bind(d){
     const view=navButton.dataset?.view;
 
     if(view&&VIEWS[view]){
+      // The legacy terminal programmatically activates its first tab during boot.
+      // Ignore that synthetic click until the user actually interacts with the menu.
+      if(!e.isTrusted&&d.documentElement.dataset.primaryNavUserActivated!=='1'){
+        e.preventDefault();e.stopImmediatePropagation();enterMenu(d);return;
+      }
+      if(e.isTrusted)d.documentElement.dataset.primaryNavUserActivated='1';
       if(d.body.classList.contains(SHELL_CLASS)&&d.body.dataset.primaryView===view){
         e.preventDefault();e.stopImmediatePropagation();enterMenu(d);return;
       }
@@ -194,6 +200,8 @@ function bind(d){
       queueMicrotask(()=>openShell(d,view));
       return;
     }
+
+    if(e.isTrusted)d.documentElement.dataset.primaryNavUserActivated='1';
 
     // Syndicate, Pizza, Crypto, Meat and Preferences own their page logic.
     // Remove the menu/shell before their handlers run, then return to the menu
@@ -205,6 +213,7 @@ function bind(d){
 
   d.addEventListener('keydown',e=>{
     const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;
+    if(e.isTrusted)d.documentElement.dataset.primaryNavUserActivated='1';
     if(e.key==='F4'){
       e.preventDefault();e.stopImmediatePropagation();d.getElementById('runnerSyndicateF5')?.click();return;
     }
