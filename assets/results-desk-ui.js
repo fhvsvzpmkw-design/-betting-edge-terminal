@@ -59,10 +59,7 @@ function ensureStyle(d){
   s.id=STYLE_ID;
   s.textContent=`
     :root{--results-accent:${ACCENT};--results-soft:${ACCENT_SOFT}}
-    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-view="engine"],
-    body.runnerPrimaryViewLoaded[data-primary-view="engine"] .runnerNavPad .tabs>.btn.primaryShellActive{border-color:var(--results-accent)!important;color:var(--results-accent)!important;background:#03121b!important;box-shadow:inset 0 0 0 1px rgba(57,231,255,.08),0 0 13px rgba(57,231,255,.13)!important;text-shadow:0 0 7px rgba(57,231,255,.22)!important}
-    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-view="engine"] .primaryMenuMessage,
-    body.runnerPrimaryViewLoaded[data-primary-view="engine"] .primaryShellMessage{color:#a7c7d8!important}
+    /* Primary navigation shell is the sole authority for the F8 menu tile and active page header theme. */
     #engine.resultsDesk{--rline:#244b61;--rpanel:#06111b;--rpanel2:#081824;--rgreen:#58ff88;--ryellow:#ffe96b;--rred:#ff6178;color:var(--text)}
     #engine.resultsDesk .resultsValueHero{border:2px solid #5bd8e8;background:radial-gradient(circle at 14% 8%,rgba(57,231,255,.09),transparent 34%),linear-gradient(180deg,#07131d,#03090f);padding:14px;box-shadow:0 0 20px rgba(57,231,255,.10),inset 0 0 24px rgba(88,255,136,.025)}
     #engine.resultsDesk .resultsTitle{color:var(--results-accent);font-weight:950;letter-spacing:.09em;font-size:15px;text-align:center}
@@ -156,17 +153,6 @@ function ensureStyle(d){
     @media(max-width:440px){#engine.resultsDesk .proofGrid{grid-template-columns:1fr}#engine.resultsDesk .statusPerfRow{grid-template-columns:60px 1fr 72px}#engine.resultsDesk .resultsTitle{font-size:12px}}
   `;
   d.head.appendChild(s);
-}
-
-function patchF8(d){
-  const b=d.querySelector('.runnerNavPad .tabs>.btn[data-view="engine"]')||d.querySelector('.tabs>.btn[data-view="engine"]');
-  if(!b)return;
-  const shell=d.body.classList.contains('runnerPrimaryViewLoaded')&&d.body.dataset.primaryView==='engine';
-  const menu=d.body.classList.contains('runnerMenuHome');
-  const desired=shell
-    ? '<span class="primaryShellMain"><b>[F8]</b>&nbsp; 🧠 VIGSCOPE VALUE 🧠</span><span class="primaryShellMessage">VALUE + PERFORMANCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO RETURN TO MENU</span>'
-    : '<span class="primaryMenuMain"><b>[F8]</b>&nbsp; 🧠 VIGSCOPE VALUE 🧠</span><span class="primaryMenuMessage">VALUE + PERFORMANCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN</span>';
-  if((menu||shell)&&b.innerHTML!==desired)b.innerHTML=desired;
 }
 
 function rowTable(rows,label){
@@ -319,7 +305,6 @@ async function load(d){
 function install(d){
   if(!d?.body)return false;
   ensureStyle(d);
-  patchF8(d);
   const engine=d.getElementById('engine');
   if(!engine)return false;
   if(engine.dataset[INSTALLED]!=='1'){
@@ -327,11 +312,6 @@ function install(d){
     load(d);
   }else if(cached){
     refreshCash(d,cached.priceAnalytics||{});
-  }
-  if(d.documentElement.dataset.resultsDeskObserver!=='1'){
-    d.documentElement.dataset.resultsDeskObserver='1';
-    const obs=new MutationObserver(()=>patchF8(d));
-    obs.observe(d.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','data-primary-view']});
   }
   return true;
 }
