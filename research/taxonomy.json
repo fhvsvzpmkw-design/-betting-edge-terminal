@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "libraryVersion": "1.7",
-  "generatedAtUtc": "2026-08-14T20:06:13Z",
+  "libraryVersion": "1.8",
+  "generatedAtUtc": "2026-08-25T23:29:42Z",
   "controlledValues": {
     "itemType": [
       "research_prior",
@@ -40,7 +40,8 @@
       "MMA/UFC",
       "Boxing",
       "CFL",
-      "College Football/Basketball"
+      "College Football/Basketball",
+      "WNBA"
     ],
     "marketClasses": [
       "general_research",
@@ -276,11 +277,176 @@
       ],
       "relationship": "complementary_market_structure",
       "canonicalInterpretation": "Soccer prices are highly informative but calibration varies by league, book and market structure. Best-price/consensus information and model-versus-market comparison are more useful than generic soccer trends."
+    },
+    "v18_market_structure_transportability": {
+      "title": "Market structure changes what price behavior means",
+      "members": [
+        "v18_soccer_market_structure_1x2_vs_asian_handicap",
+        "v18_online_bookmaker_orderflow_price_adjustment",
+        "v18_retail_betting_market_regime",
+        "v18_football_key_numbers_demand_not_information"
+      ],
+      "relationship": "structure_and_demand_can_change_calibration_without_implying_information",
+      "canonicalInterpretation": "Match the historical prior to the actual price architecture and market regime. Movement, favorite/longshot behavior, and threshold demand should not be transferred mechanically across products."
+    },
+    "v18_replication_data_quality": {
+      "title": "Replication and data quality outrank headline profitability",
+      "members": [
+        "v18_tennis_replication_bad_odds_transportability",
+        "v18_mlb_no_universal_prop_recalibration"
+      ],
+      "relationship": "out_of_sample_and_data_quality_guardrail",
+      "canonicalInterpretation": "A historical betting pattern is not transportable until data integrity and later-period behavior survive. Large samples do not rescue a correction that fails forward holdout."
+    },
+    "v18_nfl_market_behavior": {
+      "title": "NFL demand behavior is not equivalent to edge",
+      "members": [
+        "v18_nfl_anchoring_preseason_closing_prices",
+        "v18_nfl_totals_momentum_behavior",
+        "v18_football_key_numbers_demand_not_information"
+      ],
+      "relationship": "behavioral_effects_with_efficiency_caution",
+      "canonicalInterpretation": "Anchoring, momentum, and key-number demand can move NFL prices without providing a robust automatic betting signal. Current price and candidate-specific evidence remain primary."
+    },
+    "v18_player_prop_directness_boundary": {
+      "title": "Player forecastability and sportsbook calibration are separate evidence layers",
+      "members": [
+        "v18_nba_player_prop_closing_context",
+        "v18_nba_stat_specific_forecastability",
+        "v18_wnba_direct_prop_calibration_gap",
+        "v18_nhl_sog_forecastability",
+        "v18_nhl_goalie_hot_hand_caution",
+        "v18_nfl_receiving_target_catch_context",
+        "v18_nfl_direct_player_prop_calibration_gap",
+        "v18_mlb_pitcher_k_matchup_mechanism",
+        "v18_mlb_hits_total_bases_contact_quality",
+        "v18_mlb_no_universal_prop_recalibration",
+        "v18_mlb_walks_rbis_limited_recalibration_signal",
+        "v18_nba_individualized_forecast_methodology",
+        "v18_nba_external_projection_caution",
+        "v18_nhl_rink_recording_data_quality_caution",
+        "v18_nhl_shooter_goalie_xg_mechanism",
+        "v18_nfl_injury_participation_role_caution"
+      ],
+      "relationship": "mechanism_does_not_imply_mispricing",
+      "canonicalInterpretation": "Use mechanism evidence to judge whether a player/stat forecast is well grounded. Use direct market evidence separately to judge historical price calibration. Never promote mechanism evidence into a price edge."
+    },
+    "v18_mlb_prop_calibration": {
+      "title": "MLB player props are price-first and market-specific",
+      "members": [
+        "v18_mlb_pitcher_k_matchup_mechanism",
+        "v18_mlb_hits_total_bases_contact_quality",
+        "v18_mlb_no_universal_prop_recalibration",
+        "v18_mlb_walks_rbis_limited_recalibration_signal"
+      ],
+      "relationship": "mechanism_plus_forward_holdout_direct_market_evidence",
+      "canonicalInterpretation": "Strikeouts, hits, home runs and total bases do not justify a broad historical correction after forward holdout. Walks and RBIs retain only a limited, cautious calibration signal. Candidate-specific current pricing remains decisive."
+    },
+    "v18_nhl_prop_mechanisms": {
+      "title": "NHL props require stat-specific mechanism evidence",
+      "members": [
+        "v18_nhl_sog_forecastability",
+        "v18_nhl_goalie_hot_hand_caution",
+        "v18_nhl_rink_recording_data_quality_caution",
+        "v18_nhl_shooter_goalie_xg_mechanism"
+      ],
+      "relationship": "stat_specific_mechanism_with_direct_price_gap",
+      "canonicalInterpretation": "SOG can use role/context forecastability; goalie saves should separate volume from save efficiency and avoid hot-hand assumptions. Direct closing-price calibration remains thinner than mechanism evidence."
+    },
+    "v18_nba_wnba_prop_transportability": {
+      "title": "NBA player-prop evidence does not automatically transport to WNBA",
+      "members": [
+        "v18_nba_player_prop_closing_context",
+        "v18_nba_stat_specific_forecastability",
+        "v18_wnba_direct_prop_calibration_gap",
+        "v18_nba_individualized_forecast_methodology",
+        "v18_nba_external_projection_caution"
+      ],
+      "relationship": "same_sport_family_cross_league_transport_gap",
+      "canonicalInterpretation": "NBA evidence supports stat-specific basketball modeling and rejects a simple universal directional bias, but WNBA direct closing-price calibration remains an explicit gap."
+    },
+    "v18_nfl_prop_transportability": {
+      "title": "NFL player-stat mechanisms are stronger than direct prop calibration",
+      "members": [
+        "v18_nfl_receiving_target_catch_context",
+        "v18_nfl_direct_player_prop_calibration_gap",
+        "v18_nfl_injury_participation_role_caution"
+      ],
+      "relationship": "mechanism_strong_direct_market_gap",
+      "canonicalInterpretation": "Target opportunity, catch probability, defender context and yardage distribution can improve receiving analysis, but History Fit should remain NR/caveated when asked for broad direct sportsbook-prop calibration."
+    },
+    "v18_parlay_margin_structure": {
+      "title": "Multi-leg products carry structural margin caution",
+      "members": [
+        "v18_parlay_contract_choice_margin",
+        "v18_retail_betting_market_regime"
+      ],
+      "relationship": "transaction_margin_plus_regime_context",
+      "canonicalInterpretation": "Parlay/SGP products should receive explicit margin and dependence caution. Large historical hold does not itself define the fair price of a specific multi-leg wager."
+    },
+    "v18_external_projection_signal_caution": {
+      "title": "Player-performance forecasts are inputs, not independent sportsbook edge signals",
+      "members": [
+        "v18_nba_stat_specific_forecastability",
+        "v18_nba_individualized_forecast_methodology",
+        "v18_nba_external_projection_caution",
+        "v18_nhl_sog_forecastability",
+        "v18_nfl_receiving_target_catch_context",
+        "v18_mlb_pitcher_k_matchup_mechanism"
+      ],
+      "relationship": "forecast_mechanism_separate_from_market_calibration",
+      "canonicalInterpretation": "A forecast can be useful without proving sportsbook mispricing. History Fit may use independent mechanism research while reserving direct market-calibration claims for explicitly qualified price evidence."
+    },
+    "v18_extreme_tail_market_structure": {
+      "title": "Extreme longshots and outlier quotes require market-structure caution",
+      "members": [
+        "v18_extreme_longshot_fixed_odds_caution",
+        "v18_soccer_liquidity_price_dispersion_caution",
+        "v18_extreme_tail_book_gap_synthesis",
+        "v18_online_bookmaker_orderflow_price_adjustment",
+        "consensus_beats_individual_book"
+      ],
+      "relationship": "market_structure_and_price_uncertainty",
+      "canonicalInterpretation": "A long price or one-book outlier is not an independent edge. Extreme tails can carry favorite-longshot bias, and quote differences can reflect liquidity/order-flow structure. Require separately supported current handicap evidence before describing the price as a serious candidate."
+    },
+    "v18_college_football_market_structure": {
+      "title": "College-football direct market structure and team-total evidence",
+      "members": [
+        "v18_college_football_team_total_censoring_bias",
+        "v18_college_football_sportsbook_demand_pricing",
+        "college_moneyline_flb"
+      ],
+      "relationship": "direct_college_market_evidence_with_era_caveats",
+      "canonicalInterpretation": "Use exact college-football market evidence before NFL analogy. Team-total censoring is a direct historical inefficiency candidate; demand/pricing evidence shows sportsbook behavior need not be pure forecast information. Current-era local validation remains required."
+    },
+    "v18_wnba_game_market_era": {
+      "title": "WNBA game-market evidence is direct but era-sensitive",
+      "members": [
+        "v18_wnba_game_market_efficiency_era_limited",
+        "v18_wnba_direct_prop_calibration_gap"
+      ],
+      "relationship": "game_market_directness_vs_prop_gap",
+      "canonicalInterpretation": "Historical WNBA spread evidence may inform game-market History Fit with strong era caveats. It does not close the modern WNBA player-prop calibration gap and should not inherit NBA prop grades."
+    },
+    "v18_mlb_rare_batter_prop_mechanisms": {
+      "title": "MLB rare batter props: mechanism evidence versus price calibration",
+      "members": [
+        "v18_mlb_doubles_contact_quality_mechanism",
+        "v18_mlb_stolen_base_attempt_success_mechanism",
+        "v18_mlb_runs_scored_batting_order_opportunity",
+        "v18_mlb_doubles_stolen_base_direct_price_gap",
+        "v18_mlb_hits_total_bases_contact_quality",
+        "v18_mlb_no_universal_prop_recalibration"
+      ],
+      "relationship": "mechanism_specific_but_market_calibration_limited",
+      "canonicalInterpretation": "Use exact prop mechanics—contact quality for doubles, attempt/success context for steals, lineup/opportunity for runs—but do not mistake mechanism evidence for direct sportsbook calibration. Rare 0.5-event props retain large uncertainty unless locally validated."
     }
   },
   "retrievalRoleRules": {
     "primary_prior": "May be retrieved as direct research context. A/B/C items can contribute research evidence weight inside History Fit; they still do not count as live BET signals.",
     "synthesis": "Summary/resolution only. Useful for interpretation and gap statements, never an additional evidence vote.",
     "inference": "Design inference only. May frame caution/market separation, never treated as empirical study evidence."
-  }
+  },
+  "candidateBuildId": "v1.8-r3-production-2026-08-25",
+  "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
 }

@@ -1,4 +1,4 @@
-# Betting Edge Research Library — Canonical v1.7
+# Betting Edge Research Library — Canonical v1.8
 
 **Status:** R2 manual read validation passed — R3 live read-only across all scheduled report lanes  
 **Contract compatibility:** Betting Edge Contract v1.0 OPERATIONAL  
@@ -6,9 +6,9 @@
 
 ## Purpose
 
-This folder consolidates the seven Betting Edge Research Prior Library passes (`v1.0` through `v1.6`) into one stable, versioned, machine-readable research source for History Fit.
+This folder now materializes the approved v1.8 Research Library: the canonical v1.7 base plus the tested v1.8 R2 candidate and the focused 2026-08-25 R3 gap-closure overlay, while preserving R3 read-only History Fit boundaries.
 
-The source set contains **96 logical items**:
+The source set contains **130 logical items** after v1.8 R3 materialization. The original v1.7 base contained 96 logical items; v1.8 adds the tested candidate and focused gap-closure records without rewriting historical issued reports.
 
 - 78 primary research priors
 - 10 targeted question resolutions
@@ -92,4 +92,8 @@ The R2 manual read suite is stored at `research/tests/R2_MANUAL_READ_TEST_2026-0
 
 All scheduled report lanes use the same R3 read-only Research Fit process and preserve structured Research Fit/provenance in separate history sidecars while keeping the runner payload compact.
 
-Research Library v1.7 remains unchanged by the Contract v1.0 promotion. The next production observation is simply the first v1.0-issued report confirming that the existing Research Fit layer continues to read normally and records the new contract authority in provenance without changing price, status, stake or risk behavior.
+Research Library v1.8 is the active R3 live read-only library under Contract v1.0. It does not change executable price, fair value, model error, play-to, status, stake or risk by itself; it improves retrieval specificity, conflict handling and explicit gap recognition.
+
+## v1.8 R3 gap closure
+
+The 2026-08-25 R3 pass used live-production soak evidence to target extreme-tail/book-gap interpretation, low-liquidity soccer, college football, WNBA game markets and exact MLB doubles/stolen-base/runs-scored mechanisms. See `research/staging/V1_8_GAP_AUDIT_R3_2026-08-25.md` and `research/V1_8_PROMOTION_2026-08-25.md`. Unresolved exact-market gaps remain explicit rather than being filled by analogy.
