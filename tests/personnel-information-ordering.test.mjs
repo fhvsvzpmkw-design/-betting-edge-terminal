@@ -28,6 +28,51 @@ requireText(
   'Betting Edge must not require a candidate to survive a pre-information value screen before personnel information is allowed to influence fair value.',
   'production contract anti-blind-screen rule'
 );
+requireText(
+  contract,
+  'Stage 2 has a mandatory completion standard:',
+  'authoritative Stage 2 completion standard'
+);
+requireText(
+  contract,
+  '**Correct dependency first.**',
+  'authoritative Stage 2 dependency safeguard'
+);
+requireText(
+  contract,
+  '**Official source first, then 3-to-5 fallback when unresolved.**',
+  'authoritative Stage 2 source-depth safeguard'
+);
+requireText(
+  contract,
+  '**Sport-wide application.**',
+  'authoritative Stage 2 sport-wide safeguard'
+);
+requireText(
+  contract,
+  '**Source conflict.**',
+  'authoritative Stage 2 source-conflict safeguard'
+);
+requireText(
+  contract,
+  '**Decision sensitivity.**',
+  'authoritative Stage 2 decision-sensitivity safeguard'
+);
+requireText(
+  contract,
+  '**Structured evidence.**',
+  'authoritative Stage 2 evidence safeguard'
+);
+requireText(
+  contract,
+  '`personnelSweepPath: "BETTING_EDGE_PERSONNEL_SWEEP.md"`',
+  'authoritative personnel provenance path'
+);
+requireText(
+  contract,
+  'structured `personnelEvidence` record',
+  'authoritative personnel evidence requirement'
+);
 requireOrder(
   contract,
   [
@@ -218,4 +263,4 @@ if (personnel.includes('survives the initial event/market/selection identity, pr
   throw new Error('Old post-value-only Personnel Sweep rule is still present');
 }
 
-console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + SPORT-WIDE STAGE 2 DEPTH + SAFEGUARDS — PASS');
+console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + AUTHORITATIVE SPORT-WIDE STAGE 2 DEPTH + SAFEGUARDS — PASS');
