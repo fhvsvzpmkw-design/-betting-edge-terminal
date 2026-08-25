@@ -47,6 +47,45 @@ Stage 2 must build the best currently supportable personnel picture before final
 
 The findings from Stage 2 must be applied back into the current handicap. Reassess fair value, uncertainty/model error and `playTo` as appropriate before final status. A final status may not simply reuse a provisional pre-sweep fair value when the deep sweep found material new information.
 
+### Stage 2 completion standard
+
+Stage 2 is not complete merely because an official source still shows `TBD`, `unconfirmed`, `questionable`, `lineup not posted`, or an equivalent unresolved state.
+
+When a material personnel fact remains unresolved after the official-source check, Stage 2 must perform a **fixture-specific or participant-specific fallback sweep across 3 to 5 distinct credible current fallback sources, in addition to the official-source check, where those sources are available**.
+
+The fallback sweep must:
+
+- search the exact event, team or participant rather than relying only on generic league/team pages;
+- seek expected or projected lineups, likely starters, injuries, suspensions, scratches, rotation, rest, role, batting position, minutes/usage, goalkeeper/QB/pitcher status and other facts material to the wager;
+- prefer genuinely independent source origins rather than duplicated syndication, mirrors or five pages repeating the same report;
+- include local/beat reporting, reputable competition-focused reporting, established lineup/injury services and high-quality projected-lineup sources when useful;
+- continue beyond the first useful secondary source when additional credible sources can materially strengthen, contradict or refine the personnel picture;
+- never add weak, stale or anonymous sources merely to reach the source-count target.
+
+If fewer than 3 credible current fallback sources can be found after a reasonable event-specific search, Stage 2 must record the source shortfall rather than pretending the search was complete. The personnel state should remain appropriately `PARTIAL` or `UNKNOWN` unless the available evidence is strong enough to support another state.
+
+A Stage 2 record should distinguish **no information exists yet** from **information was not searched deeply enough**. At minimum, material Stage 2 work must retain the official source checked, the fallback sources checked, the check time, the personnel confidence state, the material facts found, and the unresolved facts that remain.
+
+### Soccer Stage 2 search depth and timing
+
+For a soccer candidate that reaches Stage 2, the event-specific search must explicitly seek:
+
+- confirmed or projected XI for both sides;
+- injuries, suspensions and key absences;
+- expected rotation and competition-specific squad changes;
+- goalkeeper changes;
+- role/status of any player specifically material to the handicap;
+- credible local/team news that may not yet appear on the official lineup page.
+
+Time to kickoff increases the required urgency, not the permission to stop early:
+
+- **More than 2 hours before kickoff:** use the best available projections and team news; official confirmation may reasonably be unavailable.
+- **Within 2 hours of kickoff:** treat projected XI, local/team reporting and material role news as high-priority Stage 2 inputs.
+- **Within 90 minutes of kickoff:** if the official XI is still unavailable, the 3-to-5-source fallback sweep is mandatory for a personnel-dependent serious candidate unless fewer credible sources genuinely exist and the shortfall is recorded.
+- **Within 75 minutes of kickoff:** re-check the authoritative lineup source once near the end of Stage 2 before final status assignment when lineup confirmation remains a material blocker.
+
+This timing rule does not create an extra scheduled report lane and does not trigger an additional Odds-API request. It governs the depth of the personnel research performed inside the current report lane.
+
 ## Source priority
 
 1. **Official primary sources first:** league/team/club sites, official injury or availability reports, roster/squad releases, transaction wires, probable-starter boards, game notes, and official team channels used for lineup publication.
@@ -85,6 +124,7 @@ Projected information must never be presented as confirmed.
 4. When official confirmation is a condition in `playTo` or player-prop participation/identity rules, the recommendation cannot become `BET` until confirmation exists and the executable price still passes all ordinary gates.
 5. Personnel information may create, remove, strengthen or weaken apparent value, but may not override identity, freshness, exposure, staking or other hard gates.
 6. Stage 1 information may create a serious candidate; Stage 2 and the normal Betting Edge gates determine whether that candidate can become actionable.
+7. For material Stage 2 work, retain the pre-sweep fair-value/uncertainty state and the post-sweep fair-value/uncertainty state. If no material change results, record `NO MATERIAL CHANGE`; do not silently carry the provisional number forward without showing that Stage 2 was applied.
 
 ## Later-lane behavior
 
@@ -100,8 +140,26 @@ When personnel information materially affects a recommendation, the report/card 
 
 The Stage 1 scan may be summarized at event level when the same fact informs several markets. Stage 2 material facts should be attributable closely enough to support later re-check and audit.
 
+For new reports, structured Stage 2 evidence belongs in the durable report provenance sidecar rather than bloating the runner card. For a personnel-dependent serious candidate, retain enough structured evidence to show:
+
+- `stage2CheckedAt`;
+- authoritative/official sources checked;
+- 3 to 5 distinct fallback sources when the official state remained unresolved and credible fallback sources were available;
+- any `sourceShortfall` when fewer than 3 credible fallback sources existed;
+- material `facts` found;
+- `personnelState` (`CONFIRMED`, `STRONG PROJECTION`, `PARTIAL`, or `UNKNOWN`);
+- material `unresolved` facts;
+- pre-Stage-2 and post-Stage-2 fair-value/uncertainty state; and
+- the resulting decision impact, including `NO MATERIAL CHANGE` when appropriate.
+
+The source-count rule measures distinct credible source origins, not the number of URLs opened.
+
 ## Change note — 2026-08-25 ordering correction
 
 The original activation wording placed the Personnel Sweep only after a candidate survived an initial value screen. That ordering could miss value created by injuries, absences, rotation or role changes because the relevant information was not guaranteed to enter fair value before screening.
 
 The operational correction is the two-stage process above: **Material Information Scan before provisional fair value; Deep Personnel Sweep after the provisional screen; then explicit re-evaluation before final status.** No pricing-freshness, book, staking, exposure or odds-budget rule is changed by this correction.
+
+## Change note — 2026-08-25 Stage 2 depth correction
+
+Stage 2 now requires an event-specific 3-to-5-source fallback sweep when official material personnel information remains unresolved and credible fallback sources are available. Soccer candidates receive explicit time-to-kickoff search depth, and material Stage 2 work must be recorded in provenance so `TBD` cannot function as an undocumented stopping point.
