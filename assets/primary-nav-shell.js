@@ -11,6 +11,7 @@ const VIEWS={
   engine:{key:'F8',label:'🧠 VIGSCOPE VALUE 🧠',sub:'VALUE + PERFORMANCE'}
 };
 let lastDoc=null;
+let hierarchyPatchTimer=null,hierarchyStats=null,lightHierarchyDoc=null,lightHierarchyObserver=null;
 
 function appDoc(){
   try{
@@ -18,6 +19,67 @@ function appDoc(){
     const app=core?.contentDocument?.getElementById('app');
     return app?.contentDocument||null;
   }catch{return null}
+}
+function scheduleLightHierarchyPatch(){
+  if(hierarchyPatchTimer!==null)return;
+  hierarchyPatchTimer=setTimeout(()=>{
+    hierarchyPatchTimer=null;
+    try{if(typeof applyHierarchyPatch==='function')applyHierarchyPatch()}catch{}
+    try{
+      const d=appDoc(),stats=d?.querySelector('.stats');
+      if(stats&&stats!==hierarchyStats&&typeof hierarchyObserver!=='undefined'&&hierarchyObserver){
+        hierarchyStats=stats;
+        hierarchyObserver.observe(stats,{subtree:true,childList:true,characterData:true});
+      }
+    }catch{}
+  },80);
+}
+function optimizeHierarchyWatch(){
+  try{
+    if(typeof hierarchyObserver==='undefined'||typeof applyHierarchyPatch!=='function')return false;
+    const d=appDoc();if(!d?.body)return false;
+    if(d===lightHierarchyDoc&&hierarchyObserver===lightHierarchyObserver)return true;
+    if(hierarchyObserver)hierarchyObserver.disconnect();
+    hierarchyStats=d.querySelector('.stats');
+    hierarchyObserver=new MutationObserver(scheduleLightHierarchyPatch);
+    lightHierarchyObserver=hierarchyObserver;
+    lightHierarchyDoc=d;
+    hierarchyObserver.observe(d.body,{subtree:true,childList:true});
+    if(hierarchyStats)hierarchyObserver.observe(hierarchyStats,{subtree:true,childList:true,characterData:true});
+    return true;
+  }catch{return false}
+}
+function hookAppLoad(){
+  try{
+    const core=document.getElementById('core');
+    const app=core?.contentDocument?.getElementById('app');
+    if(!app)return false;
+    if(app.dataset.primaryNavPerfLoadBound!=='5'){
+      app.dataset.primaryNavPerfLoadBound='5';
+      app.addEventListener('load',()=>{
+        lastDoc=null;lightHierarchyDoc=null;lightHierarchyObserver=null;hierarchyStats=null;
+        try{if(typeof applyHierarchyPatch==='function')applyHierarchyPatch()}catch{}
+        attach();
+        optimizeHierarchyWatch();
+        setTimeout(optimizeHierarchyWatch,120);
+      });
+    }
+    return true;
+  }catch{return false}
+}
+function hookCoreLoad(){
+  const core=document.getElementById('core');if(!core)return false;
+  if(core.dataset.primaryNavPerfLoadBound!=='5'){
+    core.dataset.primaryNavPerfLoadBound='5';
+    core.addEventListener('load',()=>{
+      lastDoc=null;lightHierarchyDoc=null;lightHierarchyObserver=null;hierarchyStats=null;
+      hookAppLoad();
+      setTimeout(()=>{attach();optimizeHierarchyWatch()},0);
+      setTimeout(optimizeHierarchyWatch,120);
+    });
+  }
+  hookAppLoad();
+  return true;
 }
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
@@ -156,6 +218,16 @@ function attach(){
   if(!d.body.classList.contains(MENU_CLASS)&&!d.body.classList.contains(SHELL_CLASS)&&!workspaceOpen(d))syncMenu(d);
   return true;
 }
-let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
-setInterval(attach,650);
+hookCoreLoad();
+let tries=0;const timer=setInterval(()=>{
+  tries++;
+  hookAppLoad();
+  if(attach()){
+    optimizeHierarchyWatch();
+    setTimeout(optimizeHierarchyWatch,120);
+    clearInterval(timer);
+    return;
+  }
+  if(tries>250)clearInterval(timer);
+},40);
 })();
