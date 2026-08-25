@@ -1,0 +1,690 @@
+{
+  "schema": 1,
+  "overlayId": "v1.8-gap-closure-r3-2026-08-25",
+  "targetLibraryVersion": "1.8",
+  "baseBuildId": "v1.8-merged-candidate-r1-2026-08-15",
+  "state": "APPROVED_FOR_R3_MATERIALIZATION",
+  "runtimeAuthority": false,
+  "reason": "Production v1.7 soak exposed concrete knowledge gaps in extreme longshots, thin soccer/book dispersion, college football, WNBA game markets and exact MLB prop mechanisms. This focused overlay extends the already-tested v1.8 candidate without weakening R3 read-only boundaries.",
+  "sources": [
+    {
+      "sourceId": "v18r3src_whelan_2024",
+      "canonicalCitation": "Whelan (2024), Risk aversion and favourite-longshot bias in a competitive fixed-odds betting market, Economica 91(361), 188-209",
+      "identifier": "10.1111/ecca.12500",
+      "identifierType": "doi",
+      "sourceClass": "peer_reviewed",
+      "referencedBy": [
+        "v18_extreme_longshot_fixed_odds_caution"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_flepp_nuesch_franck_2017",
+      "canonicalCitation": "Flepp, Nüesch & Franck (2017), The liquidity advantage of the quote-driven market: Evidence from the betting industry, Quarterly Review of Economics and Finance 64, 306-317",
+      "identifier": "10.1016/j.qref.2016.07.016",
+      "identifierType": "doi",
+      "sourceClass": "peer_reviewed",
+      "referencedBy": [
+        "v18_soccer_liquidity_price_dispersion_caution"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_arscott_2023",
+      "canonicalCitation": "Arscott (2023), Market Efficiency and Censoring Bias in College Football Gambling, Journal of Sports Economics 24(5), 664-689",
+      "identifier": "10.1177/15270025221148991",
+      "identifierType": "doi",
+      "sourceClass": "peer_reviewed",
+      "referencedBy": [
+        "v18_college_football_team_total_censoring_bias"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_paul_weinbach_ncaa_2009",
+      "canonicalCitation": "Paul & Weinbach (2009), Sportsbook Behavior in the NCAA Football Betting Market: Tests of the Traditional and Levitt Models of Sportsbook Behavior, Journal of Prediction Markets 3(2), 21-37",
+      "identifier": "10.5750/jpm.v3i2.460",
+      "identifierType": "doi",
+      "sourceClass": "peer_reviewed",
+      "referencedBy": [
+        "v18_college_football_sportsbook_demand_pricing"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_paul_weinbach_wnba_2014",
+      "canonicalCitation": "Paul & Weinbach (2014), Market Efficiency and Behavioral Biases in the WNBA Betting Market, International Journal of Financial Studies 2(2), 193-202",
+      "identifier": "10.3390/ijfs2020193",
+      "identifierType": "doi",
+      "sourceClass": "peer_reviewed",
+      "referencedBy": [
+        "v18_wnba_game_market_efficiency_era_limited"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_mlb_statcast_catcher_throwing",
+      "canonicalCitation": "MLB Baseball Savant, Statcast Catcher Throwing / Caught Stealing Above Average",
+      "identifier": "baseballsavant.mlb.com/leaderboard/catcher-throwing",
+      "identifierType": "official_web_resource",
+      "sourceClass": "official_league_metric",
+      "referencedBy": [
+        "v18_mlb_stolen_base_attempt_success_mechanism"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_mlb_statcast_baserunning",
+      "canonicalCitation": "MLB Baseball Savant, Statcast Baserunning Run Value",
+      "identifier": "baseballsavant.mlb.com/leaderboard/baserunning-run-value",
+      "identifierType": "official_web_resource",
+      "sourceClass": "official_league_metric",
+      "referencedBy": [
+        "v18_mlb_stolen_base_attempt_success_mechanism"
+      ]
+    },
+    {
+      "sourceId": "v18r3src_sokol_2003",
+      "canonicalCitation": "Sokol (2003), A Robust Heuristic for Batting Order Optimization Under Uncertainty, Journal of Heuristics 9, 353-370",
+      "identifier": "10.1023/A:1025657820328",
+      "identifierType": "doi",
+      "sourceClass": "peer_reviewed",
+      "referencedBy": [
+        "v18_mlb_runs_scored_batting_order_opportunity"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "priorId": "v18_extreme_longshot_fixed_odds_caution",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_extreme_longshot_fixed_odds_caution",
+      "scope": {
+        "legacyScope": "Cross-Sport",
+        "sports": ["Cross-Sport"],
+        "marketClasses": ["moneyline", "margin_devig", "market_structure", "market_efficiency"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "extreme_longshot_fixed_odds",
+      "topic": "extreme longshot fixed-odds pricing",
+      "evidence": {
+        "tier": "B",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": true,
+        "independentResearchSourceEligible": true,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "Modern competitive fixed-odds markets can exhibit favorite-longshot bias even without a monopoly bookmaker. Whelan documents rising loss rates as implied win probability falls in 56,004 professional tennis matches, with especially poor outcomes for extreme longshots, and shows bettor disagreement plus bookmaker risk aversion can generate the pattern.",
+      "guidance": "Treat extreme long prices as requiring more, not less, independent support. Do not apply the tennis loss curve numerically across sports; use the result as a market-structure caution against treating a large payout or one-book outlier as evidence of value.",
+      "historyFitRole": "caution",
+      "provenance": {
+        "sourceIds": ["v18r3src_whelan_2024"],
+        "directness": "fixed_odds_market_structure_with_direct_tennis_empirics",
+        "transportability": "medium_cross_sport_mechanism_only",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["favorite_longshot_sport_specificity", "v18_extreme_tail_market_structure"],
+      "relationshipSummary": [
+        {"clusterId": "favorite_longshot_sport_specificity", "relationship": "modern_fixed_odds_mechanism"},
+        {"clusterId": "v18_extreme_tail_market_structure", "relationship": "r3_gap_closure"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Production WAIT drift increasingly surfaced +400 to +1200 tails from book/no-vig disagreement.",
+        "limitation": "Direct empirical calibration is tennis; cross-sport use is mechanism/caution only."
+      }
+    },
+    {
+      "priorId": "v18_soccer_liquidity_price_dispersion_caution",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_soccer_liquidity_price_dispersion_caution",
+      "scope": {
+        "legacyScope": "Soccer",
+        "sports": ["Soccer"],
+        "marketClasses": ["moneyline", "derivatives", "market_structure", "market_efficiency", "margin_devig"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "low_liquidity_quote_dispersion",
+      "topic": "soccer liquidity and cross-market quote dispersion",
+      "evidence": {
+        "tier": "B",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": true,
+        "independentResearchSourceEligible": true,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "Across more than 1.8 million matched bookmaker/exchange odds for 17,410 soccer matches, relative quote attractiveness depended materially on exchange liquidity: bookmakers could offer higher odds and bettor returns in low-liquidity conditions. Price differences can therefore reflect market structure and liquidity provision rather than a clean fundamental probability error.",
+      "guidance": "On obscure leagues and thin derivatives, treat large cross-book or book-vs-market dispersion as uncertainty unless independent matchup evidence resolves it. Do not infer a true edge from the longest quote alone.",
+      "historyFitRole": "caution",
+      "provenance": {
+        "sourceIds": ["v18r3src_flepp_nuesch_franck_2017"],
+        "directness": "direct_soccer_market_structure",
+        "transportability": "high_for_soccer_liquidity_mechanism",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["soccer_market_information", "v18_market_structure_transportability", "v18_extreme_tail_market_structure"],
+      "relationshipSummary": [
+        {"clusterId": "soccer_market_information", "relationship": "liquidity_extension"},
+        {"clusterId": "v18_market_structure_transportability", "relationship": "liquidity_condition"},
+        {"clusterId": "v18_extreme_tail_market_structure", "relationship": "r3_gap_closure"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Production surfaced obscure soccer longshots and derivatives with large book gaps.",
+        "limitation": "Bookmaker-vs-exchange liquidity evidence does not prove that any specific Bet365/DraftKings gap is mispriced."
+      }
+    },
+    {
+      "priorId": "v18_college_football_team_total_censoring_bias",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_college_football_team_total_censoring_bias",
+      "scope": {
+        "legacyScope": "College Football",
+        "sports": ["College Football/Basketball"],
+        "marketClasses": ["spread", "totals", "market_efficiency"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "college_football_team_totals",
+      "topic": "college football team totals and zero-score censoring",
+      "evidence": {
+        "tier": "B",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": true,
+        "independentResearchSourceEligible": true,
+        "directMarketCalibrationEvidenceEligible": true
+      },
+      "finding": "College-football team totals and point spreads jointly encode team-score forecasts, but scores are censored at zero. Arscott finds this creates a systematic bias in the implied score forecasts and reports a simple historical team-total strategy above 55% over roughly two decades.",
+      "guidance": "Treat this as a direct historical team-total/spread inefficiency candidate that requires current-era replication before operational use. Do not convert the published historical rule into a mechanical bet or apply it to full-game totals without exact-market validation.",
+      "historyFitRole": "support",
+      "provenance": {
+        "sourceIds": ["v18r3src_arscott_2023"],
+        "directness": "direct_college_football_betting_market",
+        "transportability": "medium_high_with_current_era_replication_needed",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_college_football_market_structure"],
+      "relationshipSummary": [
+        {"clusterId": "v18_college_football_market_structure", "relationship": "direct_team_total_evidence"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "v1.7 college-football coverage was sparse ahead of the 2026 season.",
+        "limitation": "Historical backtest; current market regime and exact implementation require local validation."
+      }
+    },
+    {
+      "priorId": "v18_college_football_sportsbook_demand_pricing",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_college_football_sportsbook_demand_pricing",
+      "scope": {
+        "legacyScope": "College Football",
+        "sports": ["College Football/Basketball"],
+        "marketClasses": ["spread", "totals", "market_structure", "market_efficiency"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "ncaa_football_sportsbook_behavior",
+      "topic": "college football sportsbook demand and pricing",
+      "evidence": {
+        "tier": "B",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": true,
+        "independentResearchSourceEligible": true,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "Using actual NCAA football betting percentages, Paul & Weinbach find sportsbooks did not simply balance dollars. Bettor demand leaned more to road favorites/high spreads and to overs as totals rose or games were televised; pricing sometimes appeared profit-maximizing when behavioral biases were clearest, while most other propositions behaved more like forecasts.",
+      "guidance": "Do not interpret public demand, a high spread/total or a sportsbook move as pure information. Use the evidence as college-football market-structure context and keep current price/handicap validation primary.",
+      "historyFitRole": "mixed",
+      "provenance": {
+        "sourceIds": ["v18r3src_paul_weinbach_ncaa_2009"],
+        "directness": "direct_ncaa_football_sportsbook_behavior",
+        "transportability": "medium_due_era_and_book_structure_change",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_college_football_market_structure", "movement_information_vs_overreaction"],
+      "relationshipSummary": [
+        {"clusterId": "v18_college_football_market_structure", "relationship": "sportsbook_behavior_context"},
+        {"clusterId": "movement_information_vs_overreaction", "relationship": "demand_not_pure_information"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "College football needed direct market-structure evidence, not NFL analogy.",
+        "limitation": "Older sportsbook era; use qualitatively unless replicated in current regulated markets."
+      }
+    },
+    {
+      "priorId": "v18_wnba_game_market_efficiency_era_limited",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_wnba_game_market_efficiency_era_limited",
+      "scope": {
+        "legacyScope": "WNBA",
+        "sports": ["WNBA"],
+        "marketClasses": ["spread", "market_efficiency", "market_structure"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "wnba_game_spread_efficiency",
+      "topic": "WNBA game-market efficiency",
+      "evidence": {
+        "tier": "B",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": true,
+        "independentResearchSourceEligible": true,
+        "directMarketCalibrationEvidenceEligible": true
+      },
+      "finding": "Using WNBA betting data from 2007-2012, Paul & Weinbach find clear bettor preference for the best teams, especially road favorites, but simple strategies exploiting those preferences did not earn statistically significant profits.",
+      "guidance": "Use as direct WNBA game-spread evidence with a large era/liquidity discount. It does not calibrate 2026 WNBA moneylines or player props and should not be used to import NBA prop confidence into WNBA markets.",
+      "historyFitRole": "mixed",
+      "provenance": {
+        "sourceIds": ["v18r3src_paul_weinbach_wnba_2014"],
+        "directness": "direct_wnba_game_spread_market",
+        "transportability": "low_to_medium_due_2007_2012_market_regime",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_nba_wnba_prop_transportability", "v18_wnba_game_market_era"],
+      "relationshipSummary": [
+        {"clusterId": "v18_nba_wnba_prop_transportability", "relationship": "game_market_not_prop_evidence"},
+        {"clusterId": "v18_wnba_game_market_era", "relationship": "direct_but_era_limited"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "v1.8 shadow returned NR for WNBA game markets because existing additions were prop-specific.",
+        "limitation": "2007-2012 spread sample predates the current WNBA market regime; no direct prop inference."
+      }
+    },
+    {
+      "priorId": "v18_mlb_doubles_contact_quality_mechanism",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_mlb_doubles_contact_quality_mechanism",
+      "scope": {
+        "legacyScope": "MLB",
+        "sports": ["MLB"],
+        "marketClasses": ["player_props", "model_evaluation"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "batter_doubles",
+      "topic": "MLB batter doubles contact-quality mechanism",
+      "evidence": {
+        "tier": "D",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "CONTEXT_ONLY",
+        "independentStudyWeightEligible": false,
+        "independentResearchSourceEligible": false,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "MLB Statcast xSLG assigns single, double, triple and home-run probabilities to batted balls using comparable exit velocity and launch angle outcomes, with sprint speed incorporated for some contact types. Doubles probability is therefore a contact-quality/outcome-distribution problem rather than a recent-doubles-count problem.",
+      "guidance": "Use contact quality, expected plate appearances, opposing pitcher/bullpen, park/outfield context and lineup slot as mechanism inputs. This official metric does not calibrate sportsbook doubles prices and cannot by itself support a WAIT/BET.",
+      "historyFitRole": "methodology",
+      "provenance": {
+        "sourceIds": ["v18src_mlb_statcast_expected_stats"],
+        "directness": "official_mlb_contact_quality_metric_exact_hit_type_output",
+        "transportability": "high_mechanism_low_market_calibration",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_mlb_prop_calibration", "v18_mlb_rare_batter_prop_mechanisms"],
+      "relationshipSummary": [
+        {"clusterId": "v18_mlb_prop_calibration", "relationship": "mechanism_not_market_calibration"},
+        {"clusterId": "v18_mlb_rare_batter_prop_mechanisms", "relationship": "doubles_mechanism"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Doubles props repeatedly appeared in production with NR despite available official hit-type mechanism evidence.",
+        "limitation": "No direct sportsbook doubles-prop calibration is established."
+      }
+    },
+    {
+      "priorId": "v18_mlb_stolen_base_attempt_success_mechanism",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_mlb_stolen_base_attempt_success_mechanism",
+      "scope": {
+        "legacyScope": "MLB",
+        "sports": ["MLB"],
+        "marketClasses": ["player_props", "model_evaluation"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "batter_stolen_bases",
+      "topic": "MLB stolen-base opportunity and success mechanism",
+      "evidence": {
+        "tier": "D",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "CONTEXT_ONLY",
+        "independentStudyWeightEligible": false,
+        "independentResearchSourceEligible": false,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "Official Statcast steal models condition expected caught-stealing probability on runner distance/speed plus pitcher/catcher and pitch context. Baserunning Run Value separately models steal opportunities against the pitcher/catcher pair. A stolen-base prop therefore requires both opportunity/attempt probability and conditional success probability.",
+      "guidance": "Do not price a stolen-base over from season SB rate or sprint speed alone. Require confirmed lineup/slot, on-base opportunity, runner intent/tendency, pitcher hold/pickoff context and catcher throwing context; preserve a large market-calibration uncertainty margin.",
+      "historyFitRole": "methodology",
+      "provenance": {
+        "sourceIds": ["v18r3src_mlb_statcast_catcher_throwing", "v18r3src_mlb_statcast_baserunning"],
+        "directness": "official_mlb_attempt_success_mechanism",
+        "transportability": "high_mechanism_low_market_calibration",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_mlb_prop_calibration", "v18_mlb_rare_batter_prop_mechanisms"],
+      "relationshipSummary": [
+        {"clusterId": "v18_mlb_prop_calibration", "relationship": "mechanism_not_market_calibration"},
+        {"clusterId": "v18_mlb_rare_batter_prop_mechanisms", "relationship": "stolen_base_mechanism"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Stolen-base longshots appeared in production without exact-market mechanism guidance.",
+        "limitation": "Official Statcast models outcome/attempt context, not sportsbook prop-price calibration."
+      }
+    },
+    {
+      "priorId": "v18_mlb_runs_scored_batting_order_opportunity",
+      "itemType": "research_prior",
+      "retrievalRole": "primary_prior",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_mlb_runs_scored_batting_order_opportunity",
+      "scope": {
+        "legacyScope": "MLB",
+        "sports": ["MLB"],
+        "marketClasses": ["player_props", "model_evaluation"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "batter_runs_scored",
+      "topic": "MLB runs-scored batting-order opportunity",
+      "evidence": {
+        "tier": "B",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "V1_8_R3_GAP_CLOSURE",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": true,
+        "independentResearchSourceEligible": true,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "Batting-order optimization research using Markov-chain structure shows lineup sequence materially changes expected run production. For an individual runs-scored prop, batting slot and the quality/on-base/power environment behind the runner are opportunity variables rather than cosmetic lineup details.",
+      "guidance": "Model run-scored opportunity through confirmed batting slot, reach-base probability, expected plate appearances and downstream lineup conversion context. Do not infer a direct sportsbook edge from batting order alone.",
+      "historyFitRole": "support",
+      "provenance": {
+        "sourceIds": ["v18r3src_sokol_2003"],
+        "directness": "baseball_run_generation_mechanism",
+        "transportability": "medium_to_high_mechanism_only",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_mlb_rare_batter_prop_mechanisms", "v18_player_prop_directness_boundary"],
+      "relationshipSummary": [
+        {"clusterId": "v18_mlb_rare_batter_prop_mechanisms", "relationship": "run_opportunity_mechanism"},
+        {"clusterId": "v18_player_prop_directness_boundary", "relationship": "mechanism_not_market_calibration"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Runs-scored props were being handled with generic prop language instead of exact opportunity mechanics.",
+        "limitation": "Batting-order/run-production research is not direct single-player sportsbook calibration."
+      }
+    },
+    {
+      "priorId": "v18_mlb_doubles_stolen_base_direct_price_gap",
+      "itemType": "gap_resolution",
+      "retrievalRole": "synthesis",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_mlb_doubles_stolen_base_direct_price_gap",
+      "scope": {
+        "legacyScope": "MLB",
+        "sports": ["MLB"],
+        "marketClasses": ["player_props", "market_efficiency"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "doubles_and_stolen_bases_direct_calibration_gap",
+      "topic": "MLB doubles and stolen-base direct sportsbook calibration gap",
+      "evidence": {
+        "tier": "GAP",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "TRUE_EXACT_MARKET_CALIBRATION_GAP",
+        "confidence": "GAP",
+        "independentStudyWeightEligible": false,
+        "independentResearchSourceEligible": false,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "R3 verified useful mechanism evidence for doubles and stolen-base opportunity but did not verify robust direct closing-price calibration for these exact sportsbook prop families. Generic MLB hits/total-bases/RBI or cross-sport prop evidence must not be treated as exact-market calibration.",
+      "guidance": "Return NR or mechanism-only History Fit when direct calibration is required. Preserve larger uncertainty/model-error allowances and do not promote a large book gap into a serious edge merely because one quote is long.",
+      "historyFitRole": "gap",
+      "provenance": {
+        "sourceIds": [],
+        "directness": "explicit_gap_after_targeted_r3_search",
+        "transportability": "exact_market_gap",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_mlb_prop_calibration", "v18_mlb_rare_batter_prop_mechanisms"],
+      "relationshipSummary": [
+        {"clusterId": "v18_mlb_prop_calibration", "relationship": "exact_market_gap"},
+        {"clusterId": "v18_mlb_rare_batter_prop_mechanisms", "relationship": "gap_boundary"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Prevents mechanism evidence from being mistaken for direct price calibration in the exact prop families causing current WAIT drift.",
+        "limitation": "Gap item is intentionally non-predictive."
+      }
+    },
+    {
+      "priorId": "v18_extreme_tail_book_gap_synthesis",
+      "itemType": "question_resolution",
+      "retrievalRole": "synthesis",
+      "sourcePackage": "v1.8-r3",
+      "sourcePackageOrdinal": null,
+      "legacyLabel": "v18_extreme_tail_book_gap_synthesis",
+      "scope": {
+        "legacyScope": "Cross-Sport",
+        "sports": ["Cross-Sport"],
+        "marketClasses": ["moneyline", "player_props", "derivatives", "margin_devig", "market_structure"],
+        "timing": ["pregame"]
+      },
+      "marketClassDetail": "extreme_tail_cross_book_disagreement",
+      "topic": "extreme-tail and cross-book disagreement synthesis",
+      "evidence": {
+        "tier": "SYNTHESIS",
+        "tierAssignment": "v1.8_gap_closure_r3_2026-08-25",
+        "legacyStatus": "R3_SYNTHESIS",
+        "confidence": "MEDIUM_HIGH",
+        "independentStudyWeightEligible": false,
+        "independentResearchSourceEligible": false,
+        "directMarketCalibrationEvidenceEligible": false
+      },
+      "finding": "Across the Research Library, extreme-tail pricing, bookmaker risk aversion, order flow, liquidity and competitor-quote information all imply the same boundary: a large cross-book gap is evidence of price uncertainty/market structure, not an independent handicap signal. The longest quote can be useful execution only after a separately supported case exists.",
+      "guidance": "For History Fit, distinguish 'best price available' from 'independently supported value.' When the candidate case is only one-book outlier + no-vig residual + unresolved information, prefer caution/NR and do not describe the structure as near-actionable research support.",
+      "historyFitRole": "caution",
+      "provenance": {
+        "sourceIds": [],
+        "directness": "synthesis_of_existing_and_r3_market_structure_evidence",
+        "transportability": "cross_sport_boundary_only",
+        "r3OverlayId": "v1.8-gap-closure-r3-2026-08-25"
+      },
+      "runtimeBoundary": {
+        "readOnlyAtR3": true,
+        "mayCreateBet": false,
+        "mayCountAsIndependentBetSignal": false,
+        "mayDirectlyRewriteFairValue": false,
+        "mayDirectlyRewriteModelErrorParameters": false,
+        "mayDirectlyRewritePlayTo": false,
+        "mayDirectlyRewriteStatus": false,
+        "mayDirectlyRewriteStake": false
+      },
+      "clusterIds": ["v18_extreme_tail_market_structure", "v18_player_prop_directness_boundary", "v18_market_structure_transportability"],
+      "relationshipSummary": [
+        {"clusterId": "v18_extreme_tail_market_structure", "relationship": "synthesis"},
+        {"clusterId": "v18_player_prop_directness_boundary", "relationship": "book_gap_not_prop_mechanism"},
+        {"clusterId": "v18_market_structure_transportability", "relationship": "cross_market_boundary"}
+      ],
+      "v18R3Metadata": {
+        "whyAdded": "Creates one retrievable explanation for the exact production failure mode without turning it into a new betting rule.",
+        "limitation": "Synthesis item; never an independent evidence vote."
+      }
+    }
+  ],
+  "clusters": {
+    "v18_extreme_tail_market_structure": {
+      "title": "Extreme longshots and outlier quotes require market-structure caution",
+      "members": [
+        "v18_extreme_longshot_fixed_odds_caution",
+        "v18_soccer_liquidity_price_dispersion_caution",
+        "v18_extreme_tail_book_gap_synthesis",
+        "v18_online_bookmaker_orderflow_price_adjustment",
+        "consensus_beats_individual_book"
+      ],
+      "relationship": "market_structure_and_price_uncertainty",
+      "canonicalInterpretation": "A long price or one-book outlier is not an independent edge. Extreme tails can carry favorite-longshot bias, and quote differences can reflect liquidity/order-flow structure. Require separately supported current handicap evidence before describing the price as a serious candidate."
+    },
+    "v18_college_football_market_structure": {
+      "title": "College-football direct market structure and team-total evidence",
+      "members": [
+        "v18_college_football_team_total_censoring_bias",
+        "v18_college_football_sportsbook_demand_pricing",
+        "college_moneyline_flb"
+      ],
+      "relationship": "direct_college_market_evidence_with_era_caveats",
+      "canonicalInterpretation": "Use exact college-football market evidence before NFL analogy. Team-total censoring is a direct historical inefficiency candidate; demand/pricing evidence shows sportsbook behavior need not be pure forecast information. Current-era local validation remains required."
+    },
+    "v18_wnba_game_market_era": {
+      "title": "WNBA game-market evidence is direct but era-sensitive",
+      "members": [
+        "v18_wnba_game_market_efficiency_era_limited",
+        "v18_wnba_direct_prop_calibration_gap"
+      ],
+      "relationship": "game_market_directness_vs_prop_gap",
+      "canonicalInterpretation": "Historical WNBA spread evidence may inform game-market History Fit with strong era caveats. It does not close the modern WNBA player-prop calibration gap and should not inherit NBA prop grades."
+    },
+    "v18_mlb_rare_batter_prop_mechanisms": {
+      "title": "MLB rare batter props: mechanism evidence versus price calibration",
+      "members": [
+        "v18_mlb_doubles_contact_quality_mechanism",
+        "v18_mlb_stolen_base_attempt_success_mechanism",
+        "v18_mlb_runs_scored_batting_order_opportunity",
+        "v18_mlb_doubles_stolen_base_direct_price_gap",
+        "v18_mlb_hits_total_bases_contact_quality",
+        "v18_mlb_no_universal_prop_recalibration"
+      ],
+      "relationship": "mechanism_specific_but_market_calibration_limited",
+      "canonicalInterpretation": "Use exact prop mechanics—contact quality for doubles, attempt/success context for steals, lineup/opportunity for runs—but do not mistake mechanism evidence for direct sportsbook calibration. Rare 0.5-event props retain large uncertainty unless locally validated."
+    }
+  },
+  "remainingExplicitGaps": [
+    "WNBA direct closing player-prop calibration",
+    "NFL multi-book direct player-prop calibration",
+    "MLB direct closing calibration for doubles and stolen-base props",
+    "Boxing derivative-market calibration",
+    "CFL broad pregame calibration",
+    "Current-era replication of older WNBA game-market findings"
+  ],
+  "boundaries": {
+    "mayCreateBet": false,
+    "mayCountAsIndependentBetSignal": false,
+    "maySupplyExecutablePrice": false,
+    "mayOverrideIdentityOrFreshness": false,
+    "mayDirectlyRewriteFairValue": false,
+    "mayDirectlyRewriteModelError": false,
+    "mayDirectlyRewritePlayTo": false,
+    "mayDirectlyRewriteStatus": false,
+    "mayDirectlyRewriteStake": false,
+    "normalReportsRemainReadOnly": true
+  }
+}
