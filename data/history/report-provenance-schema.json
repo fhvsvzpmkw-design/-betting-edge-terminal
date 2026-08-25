@@ -56,18 +56,26 @@
       "requiredWhen": "For new reports, include on a recommendation when Stage 2 personnel work is material to a serious candidate or when an unresolved personnel assumption materially affects BET/LEAN/WAIT status, fair value, uncertainty or playTo. Historical sidecars are not backfilled.",
       "fields": {
         "stage2CheckedAt": "timestamp or lane-local date/time showing when the deep personnel sweep was performed",
+        "dependencyTarget": "the exact personnel dependency or dependencies verified as causally relevant to the wager, oriented to the correct team/opponent/participant/role",
+        "dependencyRationale": "concise explanation of why the dependency can materially affect this exact market/selection",
         "officialSources": "array of authoritative source records checked for the material personnel facts",
         "fallbackSources": "array of distinct credible current fallback source records; when the official state remains unresolved, target 3 to 5 distinct fallback source origins where available",
         "fallbackSourceCount": "integer count of distinct credible fallback source origins actually used/checked",
         "sourceShortfall": "null or concise explanation when fewer than 3 credible current fallback sources genuinely exist after an event-specific search",
         "facts": "array of material personnel facts found, with projected facts clearly distinguished from confirmed facts",
         "personnelState": "CONFIRMED|STRONG PROJECTION|PARTIAL|UNKNOWN",
+        "sourceConflict": "NONE|MINOR|MATERIAL",
+        "conflictSummary": "null or concise description of the material disagreement among credible sources",
+        "conflictResolution": "null or concise rationale explaining why higher-quality, more direct or more current evidence resolves a conflict; required before STRONG PROJECTION when a material conflict had existed",
         "unresolved": "array of material personnel questions that remain unresolved",
+        "decisionSensitivity": "specific plausible personnel outcome(s) that would materially change fair value, uncertainty, playTo or status; use NO MATERIAL PERSONNEL SENSITIVITY when none remains",
         "preStage2Fair": "concise pre-sweep fair-value and/or uncertainty state",
         "postStage2Fair": "concise post-sweep fair-value and/or uncertainty state",
         "decisionImpact": "concise statement of how Stage 2 changed the decision, or NO MATERIAL CHANGE"
       },
-      "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate."
+      "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate.",
+      "dependencyRule": "Personnel evidence must be tied to the actual causal dependency of the exact wager before it is used. Wrong-team, wrong-opponent or wrong-role dependencies must be corrected and researched again where necessary before final status.",
+      "conflictRule": "A material unresolved source conflict prevents STRONG PROJECTION. Preserve PARTIAL/UNKNOWN and widen uncertainty unless a clear quality/directness/recency hierarchy resolves the disagreement and the resolution rationale is recorded."
     }
   },
   "boundaries": {
