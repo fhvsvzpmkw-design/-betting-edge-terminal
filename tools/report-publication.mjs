@@ -115,14 +115,17 @@ function validateReport(report){
   return report;
 }
 function materialPersonnelSignal(rec){
-  const status=String(rec?.status||'').toUpperCase();
-  if(!['BET','LEAN','WAIT'].includes(status)) return false;
   const text=[rec?.meta,rec?.playTo,rec?.support,rec?.contrary,rec?.analysis]
     .filter(value=>typeof value==='string' && value.trim())
     .join(' ');
   return PERSONNEL_SIGNAL.test(text);
 }
 function nonEmptyString(value){return typeof value==='string' && value.trim().length>0;}
+function normalizedSourceOrigin(value){
+  const normalized=String(value).trim().toLowerCase().replace(/\s+/g,' ');
+  const withoutProtocol=normalized.replace(/^https?:\/\//,'').replace(/^www\./,'');
+  return withoutProtocol.includes('.') ? withoutProtocol.split('/')[0] : withoutProtocol.replace(/\/+$/,'');
+}
 function validatePersonnelEvidence(evidence,index){
   assert(evidence && typeof evidence==='object' && !Array.isArray(evidence),`Sidecar recommendation ${index+1} requires personnelEvidence before publication`);
   validTimestamp(evidence.stage2CheckedAt,`Sidecar recommendation ${index+1} personnelEvidence.stage2CheckedAt`);
@@ -130,6 +133,12 @@ function validatePersonnelEvidence(evidence,index){
   assert(nonEmptyString(evidence.dependencyRationale),`Sidecar recommendation ${index+1} personnelEvidence.dependencyRationale is required`);
   assert(Array.isArray(evidence.officialSources) && evidence.officialSources.length>0,`Sidecar recommendation ${index+1} personnelEvidence.officialSources must contain at least one authoritative source`);
   assert(Array.isArray(evidence.fallbackSources),`Sidecar recommendation ${index+1} personnelEvidence.fallbackSources must be an array`);
+  const fallbackOrigins=evidence.fallbackSources.map((source,sourceIndex)=>{
+    assert(source && typeof source==='object' && !Array.isArray(source),`Sidecar recommendation ${index+1} personnelEvidence.fallbackSources[${sourceIndex}] must be an object`);
+    assert(nonEmptyString(source.origin),`Sidecar recommendation ${index+1} personnelEvidence.fallbackSources[${sourceIndex}].origin is required`);
+    return normalizedSourceOrigin(source.origin);
+  });
+  assert(new Set(fallbackOrigins).size===fallbackOrigins.length,`Sidecar recommendation ${index+1} personnelEvidence.fallbackSources must use distinct source origins`);
   assert(Number.isInteger(evidence.fallbackSourceCount) && evidence.fallbackSourceCount>=0,`Sidecar recommendation ${index+1} personnelEvidence.fallbackSourceCount must be a non-negative integer`);
   assert(evidence.fallbackSourceCount===evidence.fallbackSources.length,`Sidecar recommendation ${index+1} personnelEvidence.fallbackSourceCount must match fallbackSources length`);
   assert(evidence.sourceShortfall===null || nonEmptyString(evidence.sourceShortfall),`Sidecar recommendation ${index+1} personnelEvidence.sourceShortfall must be null or a non-empty explanation`);
@@ -200,8 +209,18 @@ function validateSidecar(sidecar,report,reportPath,{strict=false}={}){
       assert(Array.isArray(item.priorIds),`Sidecar recommendation ${i+1} priorIds must be an array`);
       assert(Array.isArray(item.synthesisIds),`Sidecar recommendation ${i+1} synthesisIds must be an array`);
       assert(Array.isArray(item.clusterIds),`Sidecar recommendation ${i+1} clusterIds must be an array`);
-      if(stage2Enforced && (materialPersonnelSignal(rec) || item.personnelEvidence)){
-        validatePersonnelEvidence(item.personnelEvidence,i);
+      if(stage2Enforced){
+        assert(typeof item.personnelRequired==='boolean',`Sidecar recommendation ${i+1} personnelRequired must be an explicit boolean after the Stage 2 publication-gate cutover`);
+        const textSignal=materialPersonnelSignal(rec);
+        if(textSignal){
+          assert(item.personnelRequired===true,`Sidecar recommendation ${i+1} cannot mark personnelRequired=false while the issued card signals material personnel dependence`);
+        }
+        if(item.personnelEvidence){
+          assert(item.personnelRequired===true,`Sidecar recommendation ${i+1} cannot carry personnelEvidence while personnelRequired=false`);
+        }
+        if(item.personnelRequired){
+          validatePersonnelEvidence(item.personnelEvidence,i);
+        }
       }
     }
   }
@@ -499,13 +518,22 @@ function selfTest(){
         researchLibraryVersion:'1.7'
       },
       recommendations:[
-        {ordinal:1,title:'Gamma over 0.5 doubles',status:'WAIT',grade:'NR',priorIds:[],synthesisIds:[],clusterIds:[],directness:'gap',transportability:'not_applicable',mechanism:'x',limitation:'y',displayText:'NR — direct fit unavailable'}
+        {ordinal:1,title:'Gamma over 0.5 doubles',status:'WAIT',grade:'NR',priorIds:[],synthesisIds:[],clusterIds:[],directness:'gap',transportability:'not_applicable',mechanism:'x',limitation:'y',displayText:'NR — direct fit unavailable',personnelRequired:true}
       ],
       boundaries:{}
     };
     expectValidationFailure(
       ()=>validateSidecar(stage2BaseSidecar,stage2Report,stage2BaseSidecar.reportReference.reportPath,{strict:true}),
       'Stage 2 gate must reject a personnel-dependent WAIT without personnelEvidence'
+    );
+
+    const evasionSidecar={
+      ...stage2BaseSidecar,
+      recommendations:[{...stage2BaseSidecar.recommendations[0],personnelRequired:false}]
+    };
+    expectValidationFailure(
+      ()=>validateSidecar(evasionSidecar,stage2Report,evasionSidecar.reportReference.reportPath,{strict:true}),
+      'Stage 2 gate must reject personnelRequired=false when issued wording signals material personnel dependence'
     );
 
     const twoSourceEvidence={
@@ -549,6 +577,22 @@ function selfTest(){
     };
     validateSidecar(threeSourceSidecar,stage2Report,threeSourceSidecar.reportReference.reportPath,{strict:true});
 
+    const duplicateSourceSidecar={
+      ...stage2BaseSidecar,
+      recommendations:[{
+        ...stage2BaseSidecar.recommendations[0],
+        personnelEvidence:{
+          ...twoSourceEvidence,
+          fallbackSources:[{origin:'Source-A'},{origin:' source-a '},{origin:'source-c'}],
+          fallbackSourceCount:3
+        }
+      }]
+    };
+    expectValidationFailure(
+      ()=>validateSidecar(duplicateSourceSidecar,stage2Report,duplicateSourceSidecar.reportReference.reportPath,{strict:true}),
+      'Stage 2 gate must reject duplicate normalized fallback-source origins'
+    );
+
     const shortfallSidecar={
       ...stage2BaseSidecar,
       recommendations:[{
@@ -561,7 +605,7 @@ function selfTest(){
     };
     validateSidecar(shortfallSidecar,stage2Report,shortfallSidecar.reportReference.reportPath,{strict:true});
 
-    console.log('REPORT HISTORY SELF-TEST OK — historical v0.9 + current v1.0 + Stage 2 personnel publication gate');
+    console.log('REPORT HISTORY SELF-TEST OK — historical v0.9 + current v1.0 + explicit Stage 2 dependency + distinct fallback origins');
   }finally{
     fs.rmSync(root,{recursive:true,force:true});
   }
