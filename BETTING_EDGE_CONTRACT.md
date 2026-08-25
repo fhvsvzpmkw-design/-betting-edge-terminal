@@ -237,13 +237,19 @@ Guardrails are mandatory:
 
 PRICE WATCH therefore distinguishes a **price-sensitive PASS** from an ordinary PASS without weakening the existing four-status decision system.
 
-## 6.3 Mandatory Personnel Sweep addendum
+## 6.3 Mandatory two-stage personnel-information process
 
-Before final status assignment for any candidate surviving the initial identity, executable-price freshness and value screen, every scheduled lane must resolve and apply `BETTING_EDGE_PERSONNEL_SWEEP.md` from the authoritative `main` branch.
+Personnel information is an input to fair value and must not be treated only as a confirmation check after the value decision has already been made. Every scheduled lane must resolve and apply `BETTING_EDGE_PERSONNEL_SWEEP.md` from the authoritative `main` branch using the following two-stage order.
 
-The addendum is operational report-generation policy and is subordinate to this production contract; if wording conflicts, this contract controls. Its source hierarchy, confidence states, sport-specific minimum checks, uncertainty treatment and later-lane recheck rules are mandatory.
+**Stage 1 — Material Information Scan:** after live-feed/data validity, exact event/market/selection identity and basic executable-price eligibility are established, but before the provisional current handicap and fair-value/value screen, perform the broad current-information scan defined in the addendum. Its purpose is to identify material absences, starters, rotation, scratches, role changes and comparable information early enough to affect the baseline handicap. A selection may enter the serious-candidate pool because Stage 1 information creates or materially improves apparent value. Betting Edge must not require a candidate to survive a pre-information value screen before personnel information is allowed to influence fair value.
 
-The Personnel Sweep is current-information research, not Research Library evidence. It may inform the current handicap but may not override event/market/selection identity, executable-price freshness, supported-book, fair-value, exposure, staking or other hard gates. It must not trigger an additional Odds-API request or alter the production refresh budget.
+**Stage 2 — Deep Personnel Sweep:** after Stage 1 has informed the provisional current handicap and fair-value/value screen, perform deeper personnel research on serious candidates, candidates created or materially strengthened by Stage 1, and candidates whose apparent value materially depends on unresolved personnel assumptions.
+
+Material Stage 2 findings must be applied back into the current handicap. Fair value, uncertainty/model error and `playTo` must be reassessed as appropriate before final `BET`, `LEAN`, `WAIT`, or `PASS` assignment. A final status may not simply reuse a provisional pre-sweep fair value when the deep sweep found material new information.
+
+The addendum is operational report-generation policy and is subordinate to this production contract; if wording conflicts, this contract controls. Its source hierarchy, confidence states, sport-specific checks, materiality treatment and later-lane behavior are mandatory.
+
+The two-stage personnel process is current-information research, not Research Library evidence. It may create, remove, strengthen or weaken apparent value but may not override event/market/selection identity, executable-price freshness, supported-book, fair-value, exposure, staking or other hard gates. It must not trigger an additional Odds-API request or alter the production refresh budget.
 
 ---
 
@@ -421,17 +427,19 @@ Draft files may still be recorded as historical design provenance, but they are 
 For every valid scheduled report:
 
 1. production contract / runner preflight;
-2. live-feed freshness and identity validation;
-3. independent current handicap;
-4. mandatory Personnel Sweep for every candidate surviving the initial screen, under `BETTING_EDGE_PERSONNEL_SWEEP.md`;
-5. Research Fit read-only pass;
-6. payload construction and all inherited hard-gate validation;
-7. create and retain validated long fallback;
-8. store the exact issued payload;
-9. store matching production-provenance/Research Fit sidecar;
-10. append/merge the exact `run-history.json` entry without overwriting prior issued evidence;
-11. after history success, deliver deterministic compact `r.html?id=` link as primary;
-12. if history publication fails after report validation, deliver the unchanged long fallback with `HISTORY SAVE FAILED — REPORT VALID`.
+2. live-feed freshness, exact identity and basic executable-price eligibility validation;
+3. Stage 1 Material Information Scan over the eligible current slate under `BETTING_EDGE_PERSONNEL_SWEEP.md`;
+4. provisional independent current handicap, fair-value construction and value screen using the Stage 1 information;
+5. Stage 2 Deep Personnel Sweep for serious candidates, candidates created or materially strengthened by Stage 1, and candidates materially dependent on unresolved personnel assumptions;
+6. apply material Stage 2 findings back into the current handicap; reassess fair value, uncertainty/model error and `playTo`, then form the provisional current recommendation;
+7. Research Fit read-only pass;
+8. payload construction and all inherited hard-gate validation;
+9. create and retain validated long fallback;
+10. store the exact issued payload;
+11. store matching production-provenance/Research Fit sidecar;
+12. append/merge the exact `run-history.json` entry without overwriting prior issued evidence;
+13. after history success, deliver deterministic compact `r.html?id=` link as primary;
+14. if history publication fails after report validation, deliver the unchanged long fallback with `HISTORY SAVE FAILED — REPORT VALID`.
 
 History/share work may not create, change or suppress a betting decision that has already passed the core report gates.
 
@@ -462,6 +470,14 @@ The following artifacts remain historical and must not be deleted as part of pro
 
 The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`, including the exact rollback boundary and equivalence statement.
 
+### Operational change record — 2026-08-25 — personnel-information ordering correction
+
+**Issue:** The first Personnel Sweep activation placed deep personnel research only after a candidate survived an initial value screen. Because injuries, lineups, starters, rotation and role changes are themselves legitimate fair-value inputs, that sequence could discard a market before discovering information capable of creating or materially changing value.
+
+**Decision:** Replace the single post-screen sweep with the two-stage personnel-information process in Section 6.3 and `BETTING_EDGE_PERSONNEL_SWEEP.md`: Stage 1 Material Information Scan before provisional fair value; Stage 2 Deep Personnel Sweep after the provisional screen; then explicit current-evidence re-evaluation before final status.
+
+**Intentionally unchanged:** feed and exact-quote freshness rules; Bet365/DraftKings supported-book boundary; fair-value quality requirements; BET/LEAN/WAIT/PASS semantics; staking/exposure limits; Research Library authority; odds-refresh schedule and request budget; issued-report immutability.
+
 Git history is the authoritative rollback system. Existing issued reports and sidecars are append-only historical evidence.
 
 Do not bundle unrelated UI feature development, Shadow History activation, new staking methodology, new books, Research Library promotion, or odds-refresh budget changes into this contract activation. The associated v1.5 runner change is a version-boundary declaration for already-deployed presentation work; it does not change the v1.3 report engine/core.
@@ -474,4 +490,4 @@ Any future contract version requires explicit change control, regression/equival
 
 Betting Edge governance version **1.0 is operational** on the authoritative `main` branch.
 
-This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH and the repository-controlled report-card target remain governed behavior.
+This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, the repository-controlled report-card target and the operational two-stage personnel-information process remain governed behavior.
