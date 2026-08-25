@@ -4,6 +4,9 @@ import path from 'node:path';
 import os from 'node:os';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
+// The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
+// All report bundles dated 2026-08-23 or later are Contract v1.0 production evidence.
+const CONTRACT_V1_FROM = Date.parse('2026-08-23T00:00:00-07:00');
 const SLOT_CODES = Object.freeze({open:'o', main:'m', final_morning:'f', evening:'e', late:'l'});
 const STATUS_KEYS = Object.freeze(['bet','lean','wait','pass']);
 const SHA40 = /^[0-9a-f]{40}$/i;
@@ -72,6 +75,11 @@ function shortId(report){
   assert(match,`Cannot derive short ID from ${report.ts}`);
   return `${match[1].slice(2)}${match[2]}${match[3]}${SLOT_CODES[report.slot]}${match[4]}${match[5]}${match[6]}`;
 }
+function expectedContractVersion(report){
+  const reportMs = Date.parse(report?.ts);
+  assert(Number.isFinite(reportMs),`Cannot resolve production contract version from report timestamp: ${report?.ts}`);
+  return reportMs>=CONTRACT_V1_FROM ? '1.0' : '0.9';
+}
 function actualCounts(recs){
   const counts = {bet:0,lean:0,wait:0,pass:0};
   for(const [index,rec] of recs.entries()){
@@ -115,7 +123,11 @@ function validateSidecar(sidecar,report,reportPath,{strict=false}={}){
     assert(sidecar.schema===3,'Strict bundle publication requires schema 3');
     const provenance = sidecar.provenance;
     assert(provenance && typeof provenance==='object','Schema-3 provenance is required');
-    assert(provenance.productionContractVersion==='0.9','Schema-3 productionContractVersion must be 0.9');
+    const requiredContractVersion = expectedContractVersion(report);
+    assert(
+      provenance.productionContractVersion===requiredContractVersion,
+      `Schema-3 productionContractVersion must be ${requiredContractVersion} for report ${report.ts}`
+    );
     assert(provenance.productionContractOperational===true,'Schema-3 production contract must be operational');
     assert(provenance.productionContractPath==='BETTING_EDGE_CONTRACT.md','Schema-3 production contract path is invalid');
     assert(SHA40.test(String(provenance.productionContractBlobSha||'')),'Schema-3 productionContractBlobSha must be a Git SHA');
@@ -281,6 +293,13 @@ function verifyIndex(root,{targetTs}={}){
   console.log(`REPORT HISTORY VERIFY OK ${index.runs.length} runs${targetTs?` target=${targetTs}`:''}`);
 }
 
+function expectValidationFailure(fn,label){
+  let failed=false;
+  try{fn();}
+  catch{failed=true;}
+  assert(failed,label);
+}
+
 function selfTest(){
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'betting-edge-report-publication-'));
   try{
@@ -293,7 +312,9 @@ function selfTest(){
       schedule:[],
       runs:[]
     }));
-    const report={
+
+    // Historical schema-3 Contract v0.9 bundle remains valid and immutable.
+    const historicalReport={
       slot:'evening',
       label:'15:15 EVENING',
       ts:'2026-08-17T15:15:01-07:00',
@@ -306,14 +327,14 @@ function selfTest(){
         {status:'PASS',title:'Beta ML',hist:'C — limited fit'}
       ]
     };
-    const sidecar={
+    const historicalSidecar={
       schema:3,
       reportReference:{
-        slot:report.slot,
-        label:report.label,
-        ts:report.ts,
+        slot:historicalReport.slot,
+        label:historicalReport.label,
+        ts:historicalReport.ts,
         reportPath:'data/history/runs/2026-08-17/evening-151501.json',
-        feedGeneratedAt:report.feedGeneratedAt
+        feedGeneratedAt:historicalReport.feedGeneratedAt
       },
       provenance:{
         productionContractVersion:'0.9',
@@ -329,14 +350,56 @@ function selfTest(){
       ],
       boundaries:{}
     };
-    const reportFile=path.join(root,'input-report.json');
-    const sidecarFile=path.join(root,'input-sidecar.json');
-    writeAtomic(reportFile,jsonText(report));
-    writeAtomic(sidecarFile,jsonText(sidecar));
-    publish(root,reportFile,sidecarFile);
-    publish(root,reportFile,sidecarFile);
-    verifyIndex(root,{targetTs:report.ts});
-    console.log('REPORT HISTORY SELF-TEST OK');
+    const historicalReportFile=path.join(root,'input-historical-report.json');
+    const historicalSidecarFile=path.join(root,'input-historical-sidecar.json');
+    writeAtomic(historicalReportFile,jsonText(historicalReport));
+    writeAtomic(historicalSidecarFile,jsonText(historicalSidecar));
+    publish(root,historicalReportFile,historicalSidecarFile);
+    publish(root,historicalReportFile,historicalSidecarFile);
+    verifyIndex(root,{targetTs:historicalReport.ts});
+
+    // New production bundles dated 2026-08-23 onward require Contract v1.0 provenance.
+    const currentReport={
+      ...historicalReport,
+      slot:'main',
+      label:'08:00 MAIN',
+      ts:'2026-08-23T08:00:01-07:00',
+      feedGeneratedAt:'2026-08-23T14:55:00.000Z'
+    };
+    const currentSidecar={
+      ...historicalSidecar,
+      reportReference:{
+        slot:currentReport.slot,
+        label:currentReport.label,
+        ts:currentReport.ts,
+        reportPath:'data/history/runs/2026-08-23/main-080001.json',
+        feedGeneratedAt:currentReport.feedGeneratedAt
+      },
+      provenance:{
+        ...historicalSidecar.provenance,
+        productionContractVersion:'1.0',
+        productionContractBlobSha:'815a511301bd7a5aa3770baf0e32a00a28e2f548',
+        feedBlobSha:'2222222222222222222222222222222222222222'
+      }
+    };
+    const currentReportFile=path.join(root,'input-current-report.json');
+    const currentSidecarFile=path.join(root,'input-current-sidecar.json');
+    writeAtomic(currentReportFile,jsonText(currentReport));
+    writeAtomic(currentSidecarFile,jsonText(currentSidecar));
+    publish(root,currentReportFile,currentSidecarFile);
+    publish(root,currentReportFile,currentSidecarFile);
+    verifyIndex(root,{targetTs:currentReport.ts});
+
+    const wrongCurrentSidecar={
+      ...currentSidecar,
+      provenance:{...currentSidecar.provenance,productionContractVersion:'0.9'}
+    };
+    expectValidationFailure(
+      ()=>validateSidecar(wrongCurrentSidecar,currentReport,currentSidecar.reportReference.reportPath,{strict:true}),
+      'Current Contract v1.0 report must reject v0.9 sidecar provenance'
+    );
+
+    console.log('REPORT HISTORY SELF-TEST OK — historical v0.9 + current v1.0 provenance');
   }finally{
     fs.rmSync(root,{recursive:true,force:true});
   }
