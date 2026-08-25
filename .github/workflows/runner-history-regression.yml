@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths:
+      - BETTING_EDGE_CONTRACT.md
+      - BETTING_EDGE_PERSONNEL_SWEEP.md
       - r.html
       - runner.html
       - assets/report-dashboard-vigscope.js
@@ -18,6 +20,7 @@ on:
       - syndicates/**/*.html
       - syndicates/**/archive/index.json
       - tools/schedule-profile.mjs
+      - tests/personnel-information-ordering.test.mjs
       - tests/preferences-framework.test.mjs
       - tests/schedule-profile.test.mjs
       - tests/syndicate-hotline-completeness.test.mjs
@@ -26,6 +29,8 @@ on:
       - .github/workflows/runner-history-regression.yml
   pull_request:
     paths:
+      - BETTING_EDGE_CONTRACT.md
+      - BETTING_EDGE_PERSONNEL_SWEEP.md
       - r.html
       - runner.html
       - assets/report-dashboard-vigscope.js
@@ -40,6 +45,7 @@ on:
       - syndicates/**/*.html
       - syndicates/**/archive/index.json
       - tools/schedule-profile.mjs
+      - tests/personnel-information-ordering.test.mjs
       - tests/preferences-framework.test.mjs
       - tests/schedule-profile.test.mjs
       - tests/syndicate-hotline-completeness.test.mjs
@@ -67,6 +73,8 @@ jobs:
           node --check assets/preferences-framework.js
           node --check assets/report-dashboard-vigscope.js
           node --check assets/menu-order-controller.js
+      - name: Run personnel information ordering regression
+        run: node tests/personnel-information-ordering.test.mjs
       - name: Run short-link history regression
         run: node tests/runner-history-session-applicability.test.js
       - name: Run runner session strip regression
