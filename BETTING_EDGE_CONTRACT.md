@@ -237,6 +237,14 @@ Guardrails are mandatory:
 
 PRICE WATCH therefore distinguishes a **price-sensitive PASS** from an ordinary PASS without weakening the existing four-status decision system.
 
+## 6.3 Mandatory Personnel Sweep addendum
+
+Before final status assignment for any candidate surviving the initial identity, executable-price freshness and value screen, every scheduled lane must resolve and apply `BETTING_EDGE_PERSONNEL_SWEEP.md` from the authoritative `main` branch.
+
+The addendum is operational report-generation policy and is subordinate to this production contract; if wording conflicts, this contract controls. Its source hierarchy, confidence states, sport-specific minimum checks, uncertainty treatment and later-lane recheck rules are mandatory.
+
+The Personnel Sweep is current-information research, not Research Library evidence. It may inform the current handicap but may not override event/market/selection identity, executable-price freshness, supported-book, fair-value, exposure, staking or other hard gates. It must not trigger an additional Odds-API request or alter the production refresh budget.
+
 ---
 
 # 7. Research Library — production R3 behavior
@@ -415,14 +423,15 @@ For every valid scheduled report:
 1. production contract / runner preflight;
 2. live-feed freshness and identity validation;
 3. independent current handicap;
-4. Research Fit read-only pass;
-5. payload construction and all inherited hard-gate validation;
-6. create and retain validated long fallback;
-7. store the exact issued payload;
-8. store matching production-provenance/Research Fit sidecar;
-9. append/merge the exact `run-history.json` entry without overwriting prior issued evidence;
-10. after history success, deliver deterministic compact `r.html?id=` link as primary;
-11. if history publication fails after report validation, deliver the unchanged long fallback with `HISTORY SAVE FAILED — REPORT VALID`.
+4. mandatory Personnel Sweep for every candidate surviving the initial screen, under `BETTING_EDGE_PERSONNEL_SWEEP.md`;
+5. Research Fit read-only pass;
+6. payload construction and all inherited hard-gate validation;
+7. create and retain validated long fallback;
+8. store the exact issued payload;
+9. store matching production-provenance/Research Fit sidecar;
+10. append/merge the exact `run-history.json` entry without overwriting prior issued evidence;
+11. after history success, deliver deterministic compact `r.html?id=` link as primary;
+12. if history publication fails after report validation, deliver the unchanged long fallback with `HISTORY SAVE FAILED — REPORT VALID`.
 
 History/share work may not create, change or suppress a betting decision that has already passed the core report gates.
 
