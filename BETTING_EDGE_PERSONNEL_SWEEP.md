@@ -53,6 +53,8 @@ Stage 2 is not complete merely because an official source still shows `TBD`, `un
 
 When a material personnel fact remains unresolved after the official-source check, Stage 2 must perform a **fixture-specific or participant-specific fallback sweep across 3 to 5 distinct credible current fallback sources, in addition to the official-source check, where those sources are available**.
 
+This 3-to-5-source fallback standard is **sport-wide**. It applies whenever material personnel information remains unresolved in soccer, college football, NFL, NHL, NBA, WNBA, MLB and any other supported sport where personnel can materially affect the wager.
+
 The fallback sweep must:
 
 - search the exact event, team or participant rather than relying only on generic league/team pages;
@@ -60,15 +62,20 @@ The fallback sweep must:
 - prefer genuinely independent source origins rather than duplicated syndication, mirrors or five pages repeating the same report;
 - include local/beat reporting, reputable competition-focused reporting, established lineup/injury services and high-quality projected-lineup sources when useful;
 - continue beyond the first useful secondary source when additional credible sources can materially strengthen, contradict or refine the personnel picture;
+- use **3 strong independent fallback sources as the minimum target**, and continue toward **4 or 5** when sources disagree, information is stale/ambiguous, the projection remains weak, or the personnel question could materially create, remove or flip an actionable edge;
 - never add weak, stale or anonymous sources merely to reach the source-count target.
 
 If fewer than 3 credible current fallback sources can be found after a reasonable event-specific search, Stage 2 must record the source shortfall rather than pretending the search was complete. The personnel state should remain appropriately `PARTIAL` or `UNKNOWN` unless the available evidence is strong enough to support another state.
 
 A Stage 2 record should distinguish **no information exists yet** from **information was not searched deeply enough**. At minimum, material Stage 2 work must retain the official source checked, the fallback sources checked, the check time, the personnel confidence state, the material facts found, and the unresolved facts that remain.
 
-### Soccer Stage 2 search depth and timing
+### Major-sport Stage 2 search depth and timing
 
-For a soccer candidate that reaches Stage 2, the event-specific search must explicitly seek:
+Time to game increases the required urgency, not the permission to stop early. The exact release pattern differs by sport, so Stage 2 must seek the information that is normally meaningful for that sport rather than applying a soccer-only lineup model.
+
+#### Soccer
+
+For a soccer candidate that reaches Stage 2, explicitly seek:
 
 - confirmed or projected XI for both sides;
 - injuries, suspensions and key absences;
@@ -77,14 +84,84 @@ For a soccer candidate that reaches Stage 2, the event-specific search must expl
 - role/status of any player specifically material to the handicap;
 - credible local/team news that may not yet appear on the official lineup page.
 
-Time to kickoff increases the required urgency, not the permission to stop early:
+Timing:
 
 - **More than 2 hours before kickoff:** use the best available projections and team news; official confirmation may reasonably be unavailable.
 - **Within 2 hours of kickoff:** treat projected XI, local/team reporting and material role news as high-priority Stage 2 inputs.
 - **Within 90 minutes of kickoff:** if the official XI is still unavailable, the 3-to-5-source fallback sweep is mandatory for a personnel-dependent serious candidate unless fewer credible sources genuinely exist and the shortfall is recorded.
 - **Within 75 minutes of kickoff:** re-check the authoritative lineup source once near the end of Stage 2 before final status assignment when lineup confirmation remains a material blocker.
 
-This timing rule does not create an extra scheduled report lane and does not trigger an additional Odds-API request. It governs the depth of the personnel research performed inside the current report lane.
+#### College football and NFL
+
+For a college-football or NFL candidate that reaches Stage 2, explicitly seek:
+
+- starting quarterback status and credible backup expectation;
+- official injury/availability designation and game-status changes;
+- major offensive-line absences or reshuffles;
+- material skill-position absences, snap/role changes and depth-chart movement;
+- defensive front, secondary or other unit absences that materially change the matchup;
+- suspensions, late scratches, travel/disciplinary absences and credible pregame reports;
+- local beat/practice reporting when the official designation does not resolve expected participation or workload.
+
+Timing:
+
+- **Game day:** current official injury/availability information, depth-chart context and credible local/beat reporting are mandatory Stage 2 inputs for personnel-dependent serious candidates.
+- **Within 3 hours of kickoff:** unresolved QB, major-line, key-skill or other material availability questions require the 3-to-5-source fallback sweep unless a source shortfall is recorded.
+- **Inside the normal pregame inactive/availability window:** re-check the authoritative league/team status source before final assignment when the unresolved player is material. For NFL this includes the official inactive release; for college football use the best authoritative team/conference availability channel because release practices vary.
+
+#### NHL
+
+For an NHL candidate that reaches Stage 2, explicitly seek:
+
+- confirmed or strongly projected starting goalie for both teams;
+- morning-skate participation and line rushes;
+- scratches, late injury status and rest decisions;
+- material line-combination changes;
+- power-play-unit and top-six/top-four role changes when relevant;
+- credible beat/team reporting when official status is incomplete.
+
+Timing:
+
+- **Game day:** goalie expectation, morning-skate information and key injury/scratch context are mandatory Stage 2 inputs where material.
+- **Within 4 hours of puck drop:** unresolved starting-goalie or key-player questions on a serious candidate require the 3-to-5-source fallback sweep unless a source shortfall is recorded.
+- **Within 90 minutes of puck drop:** re-check current goalie, scratch and lineup/line-combination reporting when those facts remain material to the wager.
+
+#### NBA and WNBA
+
+For an NBA or WNBA candidate that reaches Stage 2, explicitly seek:
+
+- official injury-report status and active/inactive information;
+- expected starters;
+- credible minutes limits or workload restrictions;
+- rest management and back-to-back decisions;
+- usage/role changes caused by absences;
+- shootaround/practice participation and credible coach/beat reporting;
+- late scratches and lineup changes, especially for player props.
+
+Timing:
+
+- **Game day:** the current official injury report plus credible team/beat context are mandatory Stage 2 inputs for personnel-dependent serious candidates.
+- **Within 3 hours of tipoff:** unresolved participation, starting-role or material minutes questions require the 3-to-5-source fallback sweep unless a source shortfall is recorded.
+- **Within 90 minutes of tipoff:** re-check active/inactive status, expected starters and material minutes/role reporting.
+- **Near the final starting-lineup window:** if a player-specific market still depends on an unresolved starter/role assumption, re-check the authoritative or highest-quality current lineup source before final assignment.
+
+#### MLB
+
+For an MLB candidate that reaches Stage 2, explicitly seek:
+
+- confirmed or projected starting lineup and batting order;
+- confirmed/probable opposing starter and any opener/bullpen-game indication;
+- scratches, rest days and late role changes;
+- platoon expectation and material batting-order movement;
+- credible beat/team reporting when the official lineup or starter board remains incomplete.
+
+Timing:
+
+- **More than 3 hours before first pitch:** use credible lineup projections, starter information and team/beat context; official batting order may reasonably be unavailable.
+- **Within 2 hours of first pitch:** unresolved lineup, batting-order or opposing-starter questions on a serious candidate require the 3-to-5-source fallback sweep unless a source shortfall is recorded.
+- **Within 90 minutes of first pitch:** re-check the authoritative lineup/starter source when confirmation remains material, especially for player props.
+
+These timing rules do not create extra scheduled report lanes and do not trigger additional Odds-API requests. They govern the depth of personnel research performed inside the current report lane.
 
 ## Source priority
 
@@ -162,4 +239,4 @@ The operational correction is the two-stage process above: **Material Informatio
 
 ## Change note — 2026-08-25 Stage 2 depth correction
 
-Stage 2 now requires an event-specific 3-to-5-source fallback sweep when official material personnel information remains unresolved and credible fallback sources are available. Soccer candidates receive explicit time-to-kickoff search depth, and material Stage 2 work must be recorded in provenance so `TBD` cannot function as an undocumented stopping point.
+Stage 2 now requires an event-specific 3-to-5-source fallback sweep when official material personnel information remains unresolved and credible fallback sources are available. The rule is sport-wide, with explicit search targets and time-to-game escalation for soccer, college football, NFL, NHL, NBA, WNBA and MLB. Material Stage 2 work must be recorded in provenance so `TBD` cannot function as an undocumented stopping point.
