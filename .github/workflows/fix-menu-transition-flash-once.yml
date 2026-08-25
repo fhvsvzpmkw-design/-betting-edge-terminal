@@ -1,0 +1,36 @@
+name: Fix menu transition flash once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-menu-transition-flash-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore menu before browser paint
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/primary-nav-shell.js')
+          s=p.read_text()
+          old="    setTimeout(()=>syncMenu(d),0);\n    setTimeout(()=>syncMenu(d),180);"
+          new="    queueMicrotask(()=>syncMenu(d));\n    setTimeout(()=>syncMenu(d),180);"
+          assert old in s, 'special desk return scheduling not found'
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Commit transition fix
+        run: |
+          git config user.name "fhvsvzpmkw-design"
+          git config user.email "fhvsvzpmkw@privaterelay.appleid.com"
+          git add assets/primary-nav-shell.js
+          git diff --cached --check
+          git commit -m "Restore menu before transition paint"
+          git push
