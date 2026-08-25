@@ -5,7 +5,7 @@
   "compatibility": {
     "historicalSchema2Valid": true,
     "historicalSchema3Valid": true,
-    "rule": "Schema-2 sidecars and previously issued schema-3 sidecars remain valid immutable historical evidence. The personnelEvidence extension is additive for new reports and does not require rewriting historical sidecars."
+    "rule": "Schema-2 sidecars and previously issued schema-3 sidecars remain valid immutable historical evidence. The personnelEvidence extension and explicit personnelRequired gate are additive for new reports and do not require rewriting historical sidecars."
   },
   "reportReference": {
     "fields": {
@@ -52,15 +52,19 @@
       "limitation": "strongest caveat, conflict, era issue or research gap",
       "displayText": "the concise History Fit wording placed in the issued report's existing hist field"
     },
+    "stage2GateFields": {
+      "personnelRequired": "boolean required on every new recommendation after the Stage 2 publication-gate cutover; true when Stage 2 personnel work was material to the serious candidate or materially affects the final decision, including a personnel-driven PASS",
+      "rule": "personnelRequired is the primary structured trigger for personnelEvidence. Recommendation wording that signals lineup, batting order, participation, role, minutes, starter, active/inactive or identity-context dependence is a conservative backstop and may not be used to mark personnelRequired=false to evade Stage 2 evidence."
+    },
     "personnelEvidence": {
-      "requiredWhen": "For new reports, include on a recommendation when Stage 2 personnel work is material to a serious candidate or when an unresolved personnel assumption materially affects BET/LEAN/WAIT status, fair value, uncertainty or playTo. Historical sidecars are not backfilled.",
+      "requiredWhen": "For new reports, include on a recommendation when personnelRequired=true. This includes Stage 2 personnel work material to a serious candidate or an unresolved personnel assumption materially affecting BET/LEAN/WAIT/PASS status, fair value, uncertainty or playTo. Historical sidecars are not backfilled.",
       "fields": {
         "stage2CheckedAt": "timestamp or lane-local date/time showing when the deep personnel sweep was performed",
         "dependencyTarget": "the exact personnel dependency or dependencies verified as causally relevant to the wager, oriented to the correct team/opponent/participant/role",
         "dependencyRationale": "concise explanation of why the dependency can materially affect this exact market/selection",
         "officialSources": "array of authoritative source records checked for the material personnel facts",
-        "fallbackSources": "array of distinct credible current fallback source records; when the official state remains unresolved, target 3 to 5 distinct fallback source origins where available",
-        "fallbackSourceCount": "integer count of distinct credible fallback source origins actually used/checked",
+        "fallbackSources": "array of distinct credible current fallback source records; every record must carry a non-empty canonical origin; when the official state remains unresolved, target 3 to 5 distinct fallback source origins where available",
+        "fallbackSourceCount": "integer count of distinct credible fallback source origins actually used/checked; must equal the fallbackSources array length after origin deduplication",
         "sourceShortfall": "null or concise explanation when fewer than 3 credible current fallback sources genuinely exist after an event-specific search",
         "facts": "array of material personnel facts found, with projected facts clearly distinguished from confirmed facts",
         "personnelState": "CONFIRMED|STRONG PROJECTION|PARTIAL|UNKNOWN",
@@ -73,7 +77,7 @@
         "postStage2Fair": "concise post-sweep fair-value and/or uncertainty state",
         "decisionImpact": "concise statement of how Stage 2 changed the decision, or NO MATERIAL CHANGE"
       },
-      "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate.",
+      "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Each fallback source must carry a canonical origin. Duplicate normalized origins are rejected by the publication gate and do not count toward fallbackSourceCount. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate.",
       "dependencyRule": "Personnel evidence must be tied to the actual causal dependency of the exact wager before it is used. Wrong-team, wrong-opponent or wrong-role dependencies must be corrected and researched again where necessary before final status.",
       "conflictRule": "A material unresolved source conflict prevents STRONG PROJECTION. Preserve PARTIAL/UNKNOWN and widen uncertainty unless a clear quality/directness/recency hierarchy resolves the disagreement and the resolution rationale is recorded."
     }
