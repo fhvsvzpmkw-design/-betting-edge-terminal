@@ -19,7 +19,7 @@ const DEFINITIONS={
   pizza:{selector:'#runnerPizzaF6',id:'runnerPizzaF6',key:'F5',html:'<span class="canonicalMenuMain"><b>[F5]</b>&nbsp; 🍕 PIZZA PLAYS 🍕</span><span class="canonicalMenuMessage">LOU TWO SLICE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN</span>'},
   crypto:{selector:'#runnerCryptoF7',id:'runnerCryptoF7',key:'F6',html:'<span class="canonicalMenuMain"><b>[F6]</b>&nbsp; 🔒 CRYPTO SPECIALS 🔒</span><span class="canonicalMenuMessage">DAILY WEB INTELLIGENCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN</span>'},
   meat:{selector:'#runnerSeasonPreviewF6',id:'runnerSeasonPreviewF6',key:'F7',html:'<span class="canonicalMenuMain"><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="canonicalMenuMessage">PRIVATE RESEARCH DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN</span>'},
-  engine:{selector:'.btn[data-view="engine"]',key:'F8',html:'<span class="primaryMenuMain"><b>[F8]</b>&nbsp; ⚙️ ENGINE ⚙️</span><span class="primaryMenuMessage">ENGINE STATUS&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN</span>'},
+  engine:{selector:'.btn[data-view="engine"]',key:'F8',html:'<span class="primaryMenuMain"><b>[F8]</b>&nbsp; 🧠 VIGSCOPE VALUE 🧠</span><span class="primaryMenuMessage">VALUE + PERFORMANCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN</span>'},
   preferences:{selector:'#runnerPreferencesF6',id:'runnerPreferencesF6',key:'TAB',html:'<span class="canonicalMenuMain"><b>[TAB]</b>&nbsp; ⚙ PREFERENCES</span><span class="canonicalMenuMessage">OPERATIONS + DISPLAY&nbsp;&nbsp; // &nbsp;&nbsp;PRESS TO OPEN</span>'}
 };
 
@@ -61,7 +61,7 @@ function ensureStyle(d){
     .term .tabs>.btn[data-menu-id="pizza"]{border-color:#c97035!important;color:#ffd7a3!important;background:#100704!important}
     .term .tabs>.btn[data-menu-id="crypto"]{border-color:#6552a8!important;color:#cfc4ff!important;background:#070611!important}
     .term .tabs>.btn[data-menu-id="meat"]{border-color:#9b5b50!important;color:#ffd0bb!important;background:#0a0505!important}
-    .term .tabs>.btn[data-menu-id="engine"]{border-color:var(--mag)!important;color:var(--mag)!important;background:#16091a!important}
+    .term .tabs>.btn[data-menu-id="engine"]{border-color:#6f8faa!important;color:#c7d2dc!important;background:#09131d!important}
     .term .tabs>.btn[data-menu-id="preferences"]{border-color:#4d6b7d!important;color:#b9dfff!important;background:#020a10!important}
     .term .tabs>.btn[data-menu-id].active{color:inherit!important}
   `;
