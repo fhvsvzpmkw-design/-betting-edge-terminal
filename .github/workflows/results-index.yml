@@ -10,6 +10,7 @@ on:
       - "data/history/pizza-plays/**"
       - "tools/build-results-index.mjs"
       - "tools/add-results-player-value.mjs"
+      - "tools/add-results-shadow-v2.mjs"
       - ".github/workflows/results-index.yml"
 
 permissions:
@@ -38,6 +39,9 @@ jobs:
 
       - name: Add stake-aware player and Pizza value
         run: node tools/add-results-player-value.mjs
+
+      - name: Add Decision Value Shadow Review V2
+        run: node tools/add-results-shadow-v2.mjs
 
       - name: Publish results index
         run: |
