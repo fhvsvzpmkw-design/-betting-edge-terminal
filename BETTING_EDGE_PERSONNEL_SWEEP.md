@@ -69,6 +69,38 @@ If fewer than 3 credible current fallback sources can be found after a reasonabl
 
 A Stage 2 record should distinguish **no information exists yet** from **information was not searched deeply enough**. At minimum, material Stage 2 work must retain the official source checked, the fallback sources checked, the check time, the personnel confidence state, the material facts found, and the unresolved facts that remain.
 
+### Stage 2 dependency validation safeguard
+
+Before the deep source hunt, Stage 2 must identify the **actual personnel dependency of the exact wager** and verify that the dependency is oriented to the correct team, opponent, participant and role.
+
+The research target may not be assumed from the event alone. Stage 2 must state why the personnel fact can materially affect the exact market/selection being handicapped.
+
+Examples:
+
+- an MLB hitter prop depends on the hitter's own participation/batting position **and the opposing pitcher**, not the hitter's own-team pitcher;
+- an MLB pitcher prop depends on that pitcher's role/workload and the opposing batting order;
+- an NFL/CFB receiver prop may depend on the receiver's own role/QB status and material opposing coverage/secondary personnel;
+- an NHL scorer/shot prop may depend on the player's own line/PP role and the opposing goalie/defensive matchup;
+- an NBA/WNBA player prop may depend on the player's active/minutes/starting role and teammate absences that materially change usage or assists/rebounds opportunities;
+- a soccer side/total/player market must identify which starting-XI, goalkeeper, striker, creator, defender or rotation facts actually affect that specific handicap.
+
+If Stage 2 discovers that the initial dependency target was wrong, incomplete or pointed at the wrong side of the matchup, it must correct the dependency **before finalizing the research**, repeat the relevant source search against the correct dependency where necessary, and reapply the corrected information to the handicap. A wrong dependency may not be preserved merely because it appeared in an earlier lane or card.
+
+### Source-conflict and decision-sensitivity safeguard
+
+Stage 2 must evaluate whether the credible current sources **converge or conflict** on each material personnel fact.
+
+- Record source conflict as `NONE`, `MINOR`, or `MATERIAL`, with the material disagreement summarized when present.
+- A `STRONG PROJECTION` may not be assigned while a **material unresolved source conflict** remains. It may be used only when higher-quality, more direct or more current evidence clearly resolves the disagreement and the resolution rationale is recorded.
+- When credible sources disagree and no clear quality/recency hierarchy resolves them, preserve `PARTIAL` or `UNKNOWN`, widen uncertainty/model error, and continue toward the 4-to-5-source end of the fallback range when useful.
+- Do not average incompatible personnel claims into a false consensus.
+
+For every personnel-dependent serious candidate, Stage 2 must also record **decision sensitivity**: the specific plausible personnel outcome or outcomes that would materially change fair value, uncertainty, `playTo`, or final status.
+
+Examples include `QB OUT -> PASS`, `STARTING GOALIE CONFIRMED -> REPRICE`, `PLAYER STARTS WITHOUT MINUTES LIMIT -> EDGE REMAINS`, or `FULL-STRENGTH XI -> DRAW EDGE GONE`.
+
+If no plausible remaining personnel outcome would materially change the decision, record `NO MATERIAL PERSONNEL SENSITIVITY`. Later lanes should prioritize the unresolved facts named in decision sensitivity rather than repeating unrelated research.
+
 ### Major-sport Stage 2 search depth and timing
 
 Time to game increases the required urgency, not the permission to stop early. The exact release pattern differs by sport, so Stage 2 must seek the information that is normally meaningful for that sport rather than applying a soccer-only lineup model.
@@ -187,8 +219,8 @@ Research depth is proportional. Stage 1 protects the breadth of the board from i
 Record the best-supported state of material personnel information:
 
 - `CONFIRMED` — an authoritative current source confirms the relevant fact.
-- `STRONG PROJECTION` — multiple credible current sources, or one high-quality direct source, support the expected state but it is not official.
-- `PARTIAL` — some material facts are known while important components remain unresolved.
+- `STRONG PROJECTION` — multiple credible current sources, or one high-quality direct source, support the expected state but it is not official and no material unresolved source conflict remains.
+- `PARTIAL` — some material facts are known while important components remain unresolved or materially conflicting.
 - `UNKNOWN` — material personnel information cannot be supported well enough to use.
 
 Projected information must never be presented as confirmed.
@@ -202,12 +234,15 @@ Projected information must never be presented as confirmed.
 5. Personnel information may create, remove, strengthen or weaken apparent value, but may not override identity, freshness, exposure, staking or other hard gates.
 6. Stage 1 information may create a serious candidate; Stage 2 and the normal Betting Edge gates determine whether that candidate can become actionable.
 7. For material Stage 2 work, retain the pre-sweep fair-value/uncertainty state and the post-sweep fair-value/uncertainty state. If no material change results, record `NO MATERIAL CHANGE`; do not silently carry the provisional number forward without showing that Stage 2 was applied.
+8. A final decision may not rely on a personnel fact until the dependency-validation safeguard establishes why that fact is relevant to the exact wager.
+9. Material unresolved source conflict must be reflected in the personnel state and uncertainty margin; it may not be hidden behind a consensus label.
+10. Decision sensitivity must identify which unresolved personnel outcome could still alter the recommendation, or explicitly state that none remains material.
 
 ## Later-lane behavior
 
 Every later scheduled lane must repeat the Stage 1 Material Information Scan over the remaining eligible slate so newly released personnel information can create or destroy value even in markets that were not serious candidates in the prior lane.
 
-Within Stage 2, later lanes should prioritize unresolved `STRONG PROJECTION`, `PARTIAL` and `UNKNOWN` states for tracked `BET`, `LEAN` and `WAIT` candidates. Re-check the unresolved facts first instead of repeating the entire deep research process unless new information materially changes event context.
+Within Stage 2, later lanes should prioritize unresolved `STRONG PROJECTION`, `PARTIAL` and `UNKNOWN` states for tracked `BET`, `LEAN` and `WAIT` candidates. Re-check the unresolved facts and decision-sensitivity triggers first instead of repeating the entire deep research process unless new information materially changes event context.
 
 Any promotion or downgrade after new personnel information must also reconcile the current exact sportsbook quote and all normal Betting Edge execution gates.
 
@@ -220,12 +255,15 @@ The Stage 1 scan may be summarized at event level when the same fact informs sev
 For new reports, structured Stage 2 evidence belongs in the durable report provenance sidecar rather than bloating the runner card. For a personnel-dependent serious candidate, retain enough structured evidence to show:
 
 - `stage2CheckedAt`;
+- the validated `dependencyTarget` and why it is material to the exact wager;
 - authoritative/official sources checked;
 - 3 to 5 distinct fallback sources when the official state remained unresolved and credible fallback sources were available;
 - any `sourceShortfall` when fewer than 3 credible fallback sources existed;
 - material `facts` found;
 - `personnelState` (`CONFIRMED`, `STRONG PROJECTION`, `PARTIAL`, or `UNKNOWN`);
+- material `sourceConflict` and any conflict-resolution rationale;
 - material `unresolved` facts;
+- `decisionSensitivity` identifying the personnel outcome that could still change the recommendation, or `NO MATERIAL PERSONNEL SENSITIVITY`;
 - pre-Stage-2 and post-Stage-2 fair-value/uncertainty state; and
 - the resulting decision impact, including `NO MATERIAL CHANGE` when appropriate.
 
@@ -240,3 +278,7 @@ The operational correction is the two-stage process above: **Material Informatio
 ## Change note — 2026-08-25 Stage 2 depth correction
 
 Stage 2 now requires an event-specific 3-to-5-source fallback sweep when official material personnel information remains unresolved and credible fallback sources are available. The rule is sport-wide, with explicit search targets and time-to-game escalation for soccer, college football, NFL, NHL, NBA, WNBA and MLB. Material Stage 2 work must be recorded in provenance so `TBD` cannot function as an undocumented stopping point.
+
+## Change note — 2026-08-25 Stage 2 safeguard correction
+
+Stage 2 now validates the causal personnel dependency of the exact wager before deep research, corrects wrong-side or wrong-participant dependencies, treats unresolved material source conflict as a confidence/uncertainty constraint, and records decision sensitivity so later lanes know which personnel outcome could actually change the recommendation.
