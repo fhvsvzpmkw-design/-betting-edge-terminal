@@ -11,12 +11,17 @@ const CONTRACT_V1_FROM = Date.parse('2026-08-23T00:00:00-07:00');
 // report must prove material Stage 2 personnel work before publication when the card
 // still depends on lineup, participation, role, minutes, starter or identity context.
 const STAGE2_EVIDENCE_FROM = Date.parse('2026-08-25T15:24:44-07:00');
+// The same forward-only cutover also tightens WAIT semantics: WAIT must represent a
+// genuinely live candidate with current independent non-market support, not merely a
+// sportsbook outlier, cross-book gap or positive no-vig residual waiting on another gate.
+const WAIT_QUALIFICATION_FROM = STAGE2_EVIDENCE_FROM;
 const SLOT_CODES = Object.freeze({open:'o', main:'m', final_morning:'f', evening:'e', late:'l'});
 const STATUS_KEYS = Object.freeze(['bet','lean','wait','pass']);
 const SHA40 = /^[0-9a-f]{40}$/i;
 const PERSONNEL_STATES = new Set(['CONFIRMED','STRONG PROJECTION','PARTIAL','UNKNOWN']);
 const SOURCE_CONFLICT_STATES = new Set(['NONE','MINOR','MATERIAL']);
 const PERSONNEL_SIGNAL = /\b(lineup|batting order|participation|role|minutes?|identity(?:-|\s)?context|starter|starting lineup|active\/inactive)\b/i;
+const MARKET_ONLY_WAIT_ORIGIN = /\b(bet\s*365|draftkings|odds[-\s]?api(?:\.io)?|live[-\s]?odds|sportsbook(?:\s+pair)?|two[-\s]?book|no[-\s]?vig|market consensus|market-derived)\b/i;
 
 function die(message){
   throw new Error(message);
@@ -126,6 +131,22 @@ function normalizedSourceOrigin(value){
   const withoutProtocol=normalized.replace(/^https?:\/\//,'').replace(/^www\./,'');
   return withoutProtocol.includes('.') ? withoutProtocol.split('/')[0] : withoutProtocol.replace(/\/+$/,'');
 }
+function validateWaitQualification(qualification,index){
+  assert(qualification && typeof qualification==='object' && !Array.isArray(qualification),`Sidecar recommendation ${index+1} WAIT requires waitQualification before publication`);
+  assert(qualification.actionableIfResolved===true,`Sidecar recommendation ${index+1} WAIT must be plausibly actionable if its blockers resolve`);
+  assert(Array.isArray(qualification.blockers) && qualification.blockers.length>0,`Sidecar recommendation ${index+1} waitQualification.blockers must be a non-empty array`);
+  for(const [blockerIndex,blocker] of qualification.blockers.entries()){
+    assert(nonEmptyString(blocker),`Sidecar recommendation ${index+1} waitQualification.blockers[${blockerIndex}] must be non-empty`);
+  }
+  assert(Array.isArray(qualification.independentSignals) && qualification.independentSignals.length>0,`Sidecar recommendation ${index+1} WAIT requires at least one current independent non-market signal`);
+  for(const [signalIndex,signal] of qualification.independentSignals.entries()){
+    assert(signal && typeof signal==='object' && !Array.isArray(signal),`Sidecar recommendation ${index+1} waitQualification.independentSignals[${signalIndex}] must be an object`);
+    assert(nonEmptyString(signal.origin),`Sidecar recommendation ${index+1} waitQualification.independentSignals[${signalIndex}].origin is required`);
+    assert(nonEmptyString(signal.finding),`Sidecar recommendation ${index+1} waitQualification.independentSignals[${signalIndex}].finding is required`);
+    assert(!MARKET_ONLY_WAIT_ORIGIN.test(signal.origin),`Sidecar recommendation ${index+1} WAIT independent signal cannot be a sportsbook, odds feed, no-vig calculation or market consensus`);
+  }
+  assert(nonEmptyString(qualification.rationale),`Sidecar recommendation ${index+1} waitQualification.rationale is required`);
+}
 function validatePersonnelEvidence(evidence,index){
   assert(evidence && typeof evidence==='object' && !Array.isArray(evidence),`Sidecar recommendation ${index+1} requires personnelEvidence before publication`);
   validTimestamp(evidence.stage2CheckedAt,`Sidecar recommendation ${index+1} personnelEvidence.stage2CheckedAt`);
@@ -192,6 +213,7 @@ function validateSidecar(sidecar,report,reportPath,{strict=false}={}){
     assert(typeof provenance.researchLibraryVersion==='string' && provenance.researchLibraryVersion,'Schema-3 researchLibraryVersion is required');
 
     const stage2Enforced=Date.parse(report.ts)>=STAGE2_EVIDENCE_FROM;
+    const waitQualificationEnforced=Date.parse(report.ts)>=WAIT_QUALIFICATION_FROM;
     if(stage2Enforced){
       assert(provenance.personnelSweepPath==='BETTING_EDGE_PERSONNEL_SWEEP.md','Schema-3 personnelSweepPath is required after the Stage 2 publication-gate cutover');
       assert(SHA40.test(String(provenance.personnelSweepBlobSha||'')),'Schema-3 personnelSweepBlobSha must be a Git SHA after the Stage 2 publication-gate cutover');
@@ -220,6 +242,14 @@ function validateSidecar(sidecar,report,reportPath,{strict=false}={}){
         }
         if(item.personnelRequired){
           validatePersonnelEvidence(item.personnelEvidence,i);
+        }
+      }
+      if(waitQualificationEnforced){
+        const status=String(rec.status||'').toUpperCase();
+        if(status==='WAIT'){
+          validateWaitQualification(item.waitQualification,i);
+        }else{
+          assert(!item.waitQualification,`Sidecar recommendation ${i+1} waitQualification is only valid for WAIT status`);
         }
       }
     }
@@ -498,6 +528,12 @@ function selfTest(){
         }
       ]
     };
+    const validWaitQualification={
+      actionableIfResolved:true,
+      blockers:['Starting lineup confirmation'],
+      independentSignals:[{origin:'internal matchup model',finding:'Conditional on a confirmed start, the current matchup estimate remains materially stronger than the market-derived benchmark.'}],
+      rationale:'The candidate has current independent matchup support and can become actionable if the participation blocker clears under fresh pricing.'
+    };
     const stage2BaseSidecar={
       schema:3,
       reportReference:{
@@ -518,7 +554,7 @@ function selfTest(){
         researchLibraryVersion:'1.7'
       },
       recommendations:[
-        {ordinal:1,title:'Gamma over 0.5 doubles',status:'WAIT',grade:'NR',priorIds:[],synthesisIds:[],clusterIds:[],directness:'gap',transportability:'not_applicable',mechanism:'x',limitation:'y',displayText:'NR — direct fit unavailable',personnelRequired:true}
+        {ordinal:1,title:'Gamma over 0.5 doubles',status:'WAIT',grade:'NR',priorIds:[],synthesisIds:[],clusterIds:[],directness:'gap',transportability:'not_applicable',mechanism:'x',limitation:'y',displayText:'NR — direct fit unavailable',personnelRequired:true,waitQualification:validWaitQualification}
       ],
       boundaries:{}
     };
@@ -605,7 +641,37 @@ function selfTest(){
     };
     validateSidecar(shortfallSidecar,stage2Report,shortfallSidecar.reportReference.reportPath,{strict:true});
 
-    console.log('REPORT HISTORY SELF-TEST OK — historical v0.9 + current v1.0 + explicit Stage 2 dependency + distinct fallback origins');
+    // WAIT qualification gate: a market-only outlier is PASS material, not WAIT material.
+    const marketOnlyWaitSidecar={
+      ...threeSourceSidecar,
+      recommendations:[{
+        ...threeSourceSidecar.recommendations[0],
+        waitQualification:{
+          actionableIfResolved:true,
+          blockers:['Book agreement'],
+          independentSignals:[{origin:'Bet365',finding:'Bet365 is much longer than DraftKings on the exact selection.'}],
+          rationale:'The apparent edge is the book gap.'
+        }
+      }]
+    };
+    expectValidationFailure(
+      ()=>validateSidecar(marketOnlyWaitSidecar,stage2Report,marketOnlyWaitSidecar.reportReference.reportPath,{strict:true}),
+      'WAIT gate must reject a sportsbook/book-gap observation as the required independent signal'
+    );
+
+    const notActionableWaitSidecar={
+      ...threeSourceSidecar,
+      recommendations:[{
+        ...threeSourceSidecar.recommendations[0],
+        waitQualification:{...validWaitQualification,actionableIfResolved:false}
+      }]
+    };
+    expectValidationFailure(
+      ()=>validateSidecar(notActionableWaitSidecar,stage2Report,notActionableWaitSidecar.reportReference.reportPath,{strict:true}),
+      'WAIT gate must reject a candidate that is not plausibly actionable even if blockers clear'
+    );
+
+    console.log('REPORT HISTORY SELF-TEST OK — historical v0.9 + current v1.0 + Stage 2 personnel gate + independent WAIT qualification');
   }finally{
     fs.rmSync(root,{recursive:true,force:true});
   }
