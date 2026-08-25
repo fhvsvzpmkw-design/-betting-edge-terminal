@@ -145,7 +145,7 @@ function workspaceOpen(d){
   const pageClasses=['runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
   if(pageClasses.some(c=>body.classList.contains(c)))return true;
   const f5=d.getElementById('runnerSyndicateF5');
-  return f5?.dataset?.state==='connecting';
+  return ['connecting','connected','error'].includes(String(f5?.dataset?.state||''));
 }
 function leaveMenu(d){d.body.classList.remove(MENU_CLASS)}
 function enterMenu(d){
