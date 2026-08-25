@@ -171,6 +171,101 @@
       body.runnerPreferencesLoaded #runnerPreferencesF6{grid-column:1/-1!important;display:grid!important;place-items:center!important}
       body.runnerPreferencesLoaded #runnerSchedulePreferences{display:block!important;margin-top:0!important}
       body.runnerPreferencesLoaded #runnerSchedulePreferences~*{display:none!important}
+
+      /* Pizza Plays is a ticket view, not a second analysis dashboard. */
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .deskSectionBar{display:none!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaBoard{margin-top:10px!important;gap:0!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaPick{
+        border:1px solid #a85d2b!important;
+        border-left:4px solid #ff9a49!important;
+        background:linear-gradient(180deg,#100703,#060301)!important;
+        padding:13px 14px!important;
+        box-shadow:inset 0 0 0 1px rgba(255,174,98,.025),0 0 14px rgba(203,88,28,.08)!important;
+        font-size:15px!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaPickHead{align-items:center!important;gap:12px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaLouTag{
+        border:1px solid #ff9346!important;
+        padding:5px 9px!important;
+        font-size:11px!important;
+        box-shadow:none!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaPick h3{
+        margin-top:8px!important;
+        font-size:clamp(22px,3vw,28px)!important;
+        line-height:1.12!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceState{min-width:150px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceState small{font-size:9px!important;margin-bottom:3px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceState strong{font-size:16px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceState span{font-size:8px!important;margin-top:3px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketStrip{
+        margin-top:11px!important;
+        border:1px dashed #84451f!important;
+        border-left:0!important;
+        border-right:0!important;
+        background:#080402!important;
+        padding:10px 3px!important;
+        grid-template-columns:repeat(4,minmax(0,1fr))!important;
+        gap:8px!important;
+        box-shadow:none!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketCell{padding:0 8px!important;border-left:1px solid #4a2817!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketCell:first-child{border-left:0!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketCell small{font-size:9px!important;margin-bottom:4px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketCell strong{font-size:16px!important;line-height:1.28!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaEventMeta{
+        margin-top:7px!important;
+        padding:7px 1px 0!important;
+        border:0!important;
+        border-top:1px solid #442414!important;
+        background:transparent!important;
+        font-size:11px!important;
+        gap:4px 12px!important;
+        box-shadow:none!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaEventMeta b{font-size:8px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplainGrid{
+        display:grid!important;
+        grid-template-columns:1fr 1fr!important;
+        gap:7px!important;
+        margin-top:9px!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplainGrid .pizzaExplain:nth-child(1),
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplainGrid .pizzaExplain:nth-child(2){display:none!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplain{
+        min-height:0!important;
+        padding:9px 10px!important;
+        background:#090402!important;
+        border:1px solid #4f2a18!important;
+        box-shadow:none!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplain small{font-size:9px!important;margin-bottom:5px!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplain strong{font-size:12px!important;line-height:1.42!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplain.lou{border-left:3px solid #ff9a49!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplain.watch{border-left:3px solid #c86a3b!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceNote{
+        margin-top:8px!important;
+        padding-top:7px!important;
+        border-top:1px dashed #4a2817!important;
+        color:#80604e!important;
+        font-size:9px!important;
+        line-height:1.45!important;
+      }
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceNote b{color:#a97859!important}
+      body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaTimestamp{margin-top:7px!important;font-size:8px!important}
+      @media(max-width:720px){
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaPick{padding:11px!important}
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketStrip{grid-template-columns:repeat(2,minmax(0,1fr))!important;row-gap:10px!important}
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketCell:nth-child(3){border-left:0!important}
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaExplainGrid{grid-template-columns:1fr!important}
+      }
+      @media(max-width:560px){
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaPickHead{display:block!important}
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaSourceState{text-align:left!important;min-width:0!important;margin-top:8px!important}
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketStrip{grid-template-columns:1fr 1fr!important}
+        body.runnerPizzaLoaded #runnerPizzaWorkspace .pizzaMarketCell strong{font-size:15px!important}
+      }
     `;
     d.head.appendChild(style);
     return true;
