@@ -142,6 +142,28 @@
     });
   }
 
+  function bindCryptoAnalysisButtons(d){
+    if(!d?.body)return;
+    d.querySelectorAll('#runnerCryptoWorkspace [data-crypto-detail]').forEach(button=>{
+      if(button.dataset.cryptoDirectBound==='1')return;
+      button.dataset.cryptoDirectBound='1';
+      button.onclick=event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        const id=button.dataset.cryptoDetail;
+        const detail=id?d.getElementById(id):null;
+        if(!detail)return;
+        const open=!detail.classList.contains('open');
+        detail.classList.toggle('open',open);
+        button.textContent=open?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS';
+      };
+    });
+    if(d.documentElement.dataset.cryptoAnalysisObserverBound==='1')return;
+    d.documentElement.dataset.cryptoAnalysisObserverBound='1';
+    const observer=new MutationObserver(()=>requestAnimationFrame(()=>bindCryptoAnalysisButtons(d)));
+    observer.observe(d.body,{subtree:true,childList:true});
+  }
+
   function applyFix(){
     let d=null;
     try{
@@ -151,6 +173,7 @@
     }catch(e){return false}
     if(!d?.head)return false;
     bindPreferencesPage(d);
+    bindCryptoAnalysisButtons(d);
     if(d.getElementById(STYLE_ID))return true;
     const style=d.createElement('style');
     style.id=STYLE_ID;
