@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-22 — Contract v1.0 / VigScope UI v1.5 production consolidation  
+**Last updated:** 2026-08-24 — VigScope UI v1.5 night-lock checkpoint
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -17,6 +17,7 @@ This file is the practical current-state snapshot. It is not a replacement for `
 - **Research Library:** **v1.7**, read-only production authority.
 - **Report provenance:** schema **3**; new reports record Contract v1.0 provenance, historical sidecars remain immutable.
 - **Authoritative rollback system:** Git history.
+- **Night-lock checkpoint:** branch `night-lock-2026-08-24` at main commit `1e1551baa6bf5dfc4104ad21e33424969466402b` — Contract v1.0 / Terminal UI v1.5 / core v1.3 / Research Library v1.7.
 
 The pre-promotion rollback boundary is main commit `9de8bf2b5a6e95dc2545fa8011f493d46aedc93f`, final Contract v0.9 blob `59d8dda8d8e491255d5792329a9446eb01960a34`, and UI v1.4 runner blob `999a1e00261cb05b9b5045bda1285310df168efb`.
 

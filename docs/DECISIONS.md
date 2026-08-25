@@ -1,8 +1,12 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-18 — odds-refresh scheduler simplification
+**Last updated:** 2026-08-24 — current production/version boundary clarified
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
+
+## Current production boundary
+
+As of the 2026-08-24 night lock, current production authority is **Betting Edge Contract v1.0 OPERATIONAL**, **VigScope Terminal UI v1.5**, **report engine/core v1.3**, and **Research Library v1.7 read-only**. Earlier decision entries that describe v0.9, v1.3.x UI patches, or other prior versions as current record the state that existed when those decisions were made; they remain historical evidence and do not override this current boundary.
 
 ## D-001 — Git history is the authoritative rollback system
 
@@ -225,11 +229,11 @@ H-track history records what Betting Edge actually issued. It is intentionally s
 
 **Reason:** Durable auditability of real issued reports is useful now and can be implemented safely without activating a more complex candidate-level Shadow History collector.
 
-## D-025 — v0.9 is the operational production contract
+## D-025 — v0.9 operational contract promotion
 
-**Status:** Active as of 2026-08-15
+**Status:** Superseded by Contract v1.0 on 2026-08-22
 
-`BETTING_EDGE_CONTRACT.md` is the authoritative production governance file and declares version 0.9 operational. It incorporates the exact v0.8 baseline, v0.9 durable-history/provenance delta and player-prop delta by fixed Git blob identity.
+`BETTING_EDGE_CONTRACT.md` was deliberately promoted as version 0.9 operational on 2026-08-15. This entry records that historical promotion; current production authority is Contract v1.0. It incorporates the exact v0.8 baseline, v0.9 durable-history/provenance delta and player-prop delta by fixed Git blob identity.
 
 All five scheduled report lanes must resolve this production contract and the current approved runner before handicapping. If either cannot be resolved or the contract does not identify itself as operational v0.9, the lane stops with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
 

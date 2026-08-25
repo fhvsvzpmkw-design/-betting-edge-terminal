@@ -1,6 +1,6 @@
 # Betting Edge — Roadmap
 
-**Last updated:** 2026-08-16 — first real v1.8 shadow comparison complete; promotion still on hold
+**Last updated:** 2026-08-24 — Contract v1.0 / VigScope UI v1.5 night-lock alignment; v1.8 Research Library promotion still on hold
 
 This roadmap separates completed foundations from active near-term work and later integration. Preserve the working pipeline, prove each new layer independently, and keep unrelated change families separate.
 
@@ -16,8 +16,8 @@ This roadmap separates completed foundations from active near-term work and late
 
 ### Runner / terminal
 
-- Runner is at **v1.3**.
-- Static shell is aligned to v1.3.
+- Terminal / product presentation is **VigScope Terminal UI v1.5**.
+- Report engine/core remains **v1.3** in `runner-core.html` + `index.html`; the UI and core versions are intentionally independent.
 - `runner.html.old` remains a convenient quick backup.
 - Device-local prior-run history exists as a fallback/cache.
 - Repository-backed same-day session switching exists for the five standard report windows through `r.html` + `run-history.json`.
@@ -55,21 +55,21 @@ This roadmap separates completed foundations from active near-term work and late
 - All five scheduled report lanes are configured for exact issued-payload archive plus read-only Research Fit/provenance sidecars.
 - 15:15 + 18:15 live archive/index/lineage acceptance passed on 2026-08-15.
 - Same-lane manual recovery was proven on the 2026-08-16 Evening and Late / West Coast lanes and is documented in `docs/OPERATIONS.md`, `docs/DECISIONS.md` and `docs/PROJECT_STATE.md`.
-- `BETTING_EDGE_CONTRACT.md` **v0.9 is OPERATIONAL**.
-- All five scheduled report lanes now perform production-contract/runner preflight before handicapping.
-- Player-prop executable identity tightening is operational as v0.9 Invariant 23.
+- `BETTING_EDGE_CONTRACT.md` **v1.0 is OPERATIONAL**; v0.9 remains immutable historical acceptance evidence.
+- All five scheduled report lanes perform production-contract/runner preflight against **Contract v1.0 / UI v1.5 / core v1.3** before handicapping.
+- Player-prop executable identity tightening originated under v0.9 Invariant 23 and remains inherited by Contract v1.0.
 - v0.8/v0.9 draft files remain preserved historical design artifacts.
 
 ## Priority 0 — Continue post-cutover observation and v1.8 soak
 
-v0.9 is active. The near-term goal remains operational observation and evidence collection, not another contract change or speculative production rewrite.
+Contract v1.0 / VigScope UI v1.5 / core v1.3 are active. The near-term goal remains operational observation and evidence collection, not another contract change or speculative production rewrite.
 
 ### P0.1 — Verify 06:00 production preflight and archive
 
 On post-cutover 06:00 runs verify:
 
-1. `BETTING_EDGE_CONTRACT.md` resolves as operational v0.9 before analysis;
-2. current runner v1.3 resolves;
+1. `BETTING_EDGE_CONTRACT.md` resolves as **v1.0 OPERATIONAL** before analysis;
+2. VigScope Terminal UI **v1.5** resolves with report core **v1.3**;
 3. fresh odds feed is used normally;
 4. exact issued payload is archived;
 5. schema-3 sidecar records exact production contract blob SHA;
@@ -175,7 +175,7 @@ Durable H-track report history is not Shadow History. The v1.8 Research Library 
 
 ## Priority 2 — Player-prop identity and learning
 
-### P2.1 — Observe v0.9 player-prop identity in live reports
+### P2.1 — Observe Contract v1.0 player-prop identity in live reports
 
 The first live player-specific recommendation after cutover should be checked for:
 
@@ -223,7 +223,7 @@ Longer-term architecture should allow different users to supply their own ledger
 
 ## Priority 4 — Contract evolution
 
-v0.9 activation is complete. Future governance work is now **post-v0.9 evolution**, not activation.
+Contract v1.0 promotion is complete. Future governance work is now **post-v1.0 evolution**, not activation.
 
 Potential future contract work must follow explicit versioned change control and live regression testing. Likely candidates include:
 
@@ -233,7 +233,7 @@ Potential future contract work must follow explicit versioned change control and
 - any future authenticated central persistence of browser-side repricing;
 - major changes to supported books, freshness gates, staking methodology or report payload architecture.
 
-Do not edit v0.9 merely to make a failing implementation appear compliant. Diagnose the failing layer first. Do not promote a research-soak wording observation into contract language without enough repeated real evidence to justify it.
+Do not edit Contract v1.0 merely to make a failing implementation appear compliant. Diagnose the failing layer first. Do not promote a research-soak wording observation into contract language without enough repeated real evidence to justify it.
 
 ## Priority 5 — Broader refinement
 
