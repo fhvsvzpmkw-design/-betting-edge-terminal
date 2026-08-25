@@ -227,9 +227,11 @@ function ensureButtons(d){
   const meat=d.getElementById(MEAT_ID),pref=d.getElementById(PREF_ID),f5=d.getElementById('runnerSyndicateF5');if(!meat||!pref||!f5)return false;
   const board=d.getElementById('runnerBoardF1')||tabs.querySelector('.btn[data-view="board"]'),market=d.getElementById('runnerMarketF2')||tabs.querySelector('.btn[data-view="market"]'),history=d.getElementById('runnerHistoryF3')||tabs.querySelector('.btn[data-view="history"]'),engine=d.getElementById('runnerEngineF8')||tabs.querySelector('.btn[data-view="engine"]');
   ensureStyle(d);
-  let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn';p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
+  let p=d.getElementById(PIZZA_ID);if(!p){p=d.createElement('button');p.type='button';p.id=PIZZA_ID;p.className='btn'}
+  if(p.dataset.specialDeskOpenBound!=='1'){p.dataset.specialDeskOpenBound='1';p.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerPizzaLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerPizzaLoaded');p.classList.add('active');ensurePanel(d,PIZZA_PANEL,'pizza',pizza)}})}
   const pizzaHtml=buttonHtml('F5','🍕 PIZZA PLAYS 🍕',pizzaButtonMessage(),'pizza');if(p.innerHTML!==pizzaHtml)p.innerHTML=pizzaHtml;
-  let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
+  let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn'}
+  if(c.dataset.specialDeskOpenBound!=='1'){c.dataset.specialDeskOpenBound='1';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
   const cryptoHtml=buttonHtml('F6','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
   meat.setAttribute('aria-label','Meat Desk');
   const ordered=[board,market,history,f5,p,c,meat,engine,pref].filter(Boolean),current=[...tabs.children].filter(node=>ordered.includes(node));
