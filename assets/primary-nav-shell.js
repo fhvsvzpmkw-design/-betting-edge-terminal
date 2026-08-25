@@ -208,7 +208,7 @@ function bind(d){
     // Remove the menu/shell before their handlers run, then return to the menu
     // whenever they close.
     leaveMenu(d);closeShell(d);
-    setTimeout(()=>syncMenu(d),0);
+    queueMicrotask(()=>syncMenu(d));
     setTimeout(()=>syncMenu(d),180);
   },true);
 
