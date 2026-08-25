@@ -1,0 +1,75 @@
+name: Fix syndicate page ownership once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-syndicate-page-ownership-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make Syndicate own page state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('runner.html')
+          s=p.read_text()
+          marker="function applyHierarchyPatch(){"
+          helper="""function setSyndicatePageOpen(d,open){
+  if(open){
+    d.body.classList.remove('runnerMenuHome','runnerPrimaryViewLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded');
+    delete d.body.dataset.primaryView;
+    d.body.classList.add('runnerSyndicateLoaded');
+    return;
+  }
+  d.body.classList.remove('runnerSyndicateLoaded');
+}
+"""
+          assert marker in s, 'runner hierarchy marker not found'
+          assert 'function setSyndicatePageOpen' not in s
+          s=s.replace(marker,helper+marker,1)
+
+          old="if(isLoaded&&state!=='error'){d.body.classList.remove('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','false');setF5State(f5,'disconnected');"
+          new="if(isLoaded&&state!=='error'){setSyndicatePageOpen(d,false);f5.setAttribute('aria-pressed','false');setF5State(f5,'disconnected');"
+          assert old in s, 'syndicate close sequence not found'
+          s=s.replace(old,new,1)
+
+          old="}setF5State(f5,'connecting');d.body.classList.add('runnerSyndicateLoaded');f5.setAttribute('aria-pressed','true');"
+          new="}setF5State(f5,'connecting');setSyndicatePageOpen(d,true);f5.setAttribute('aria-pressed','true');"
+          assert old in s, 'syndicate open sequence not found'
+          s=s.replace(old,new,1)
+
+          old="try{await buildSyndicateWorkspace(d,navPad);setF5State(f5,'connected');"
+          new="try{await buildSyndicateWorkspace(d,navPad);setSyndicatePageOpen(d,true);setF5State(f5,'connected');"
+          assert old in s, 'syndicate success sequence not found'
+          s=s.replace(old,new,1)
+
+          old="}catch(err){f5.setAttribute('aria-pressed','true');setF5State(f5,'error');"
+          new="}catch(err){setSyndicatePageOpen(d,true);f5.setAttribute('aria-pressed','true');setF5State(f5,'error');"
+          assert old in s, 'syndicate error sequence not found'
+          s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('assets/primary-nav-shell.js')
+          s=p.read_text()
+          old="  return f5?.dataset?.state==='connecting';"
+          new="  return ['connecting','connected','error'].includes(String(f5?.dataset?.state||''));"
+          assert old in s, 'primary-nav syndicate workspace state check not found'
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Commit Syndicate ownership fix
+        run: |
+          git config user.name "fhvsvzpmkw-design"
+          git config user.email "fhvsvzpmkw@privaterelay.appleid.com"
+          git add runner.html assets/primary-nav-shell.js
+          git diff --cached --check
+          git commit -m "Make Syndicate page own menu state"
+          git push
