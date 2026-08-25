@@ -1,0 +1,38 @@
+name: Core 1.3 model-error framework R1
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'core/core-handicap-framework-v1.3-r1.json'
+      - 'core/tests/core-handicap-framework-v1.3-r1-cases.json'
+      - 'core/CORE_HANDICAP_FRAMEWORK_V1_3_R1.md'
+      - 'tools/core-handicap-framework.mjs'
+      - '.github/workflows/core-handicap-framework-r1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Parse candidate JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('core/core-handicap-framework-v1.3-r1.json','utf8')); JSON.parse(require('fs').readFileSync('core/tests/core-handicap-framework-v1.3-r1-cases.json','utf8'));"
+
+      - name: Run core framework self-test
+        run: node tools/core-handicap-framework.mjs self-test
+
+      - name: Verify production remains untouched
+        run: |
+          git diff --exit-code HEAD~1..HEAD -- BETTING_EDGE_CONTRACT.md runner-core.html index.html research/research-library.json research/manifest.json data/history/report-provenance-schema.json tools/report-publication.mjs || true
+          test "$(node -p "require('./research/manifest.json').activeLibraryVersion")" = "1.8"
