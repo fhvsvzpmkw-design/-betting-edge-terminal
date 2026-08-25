@@ -78,39 +78,6 @@
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
-  // F3 finishes its public-ledger initialization asynchronously. The old Engine
-  // panel contains four nodes that F3/health still update during that one-time
-  // completion. Preserve those real nodes outside Engine before Results replaces
-  // the Engine markup, so the F3 completion path cannot throw midway through.
-  let healthCompatTimer=null;
-  function preserveLegacyHealthCompat(){
-    try{
-      const core=document.getElementById('core');
-      const app=core?.contentDocument?.getElementById('app');
-      const d=app?.contentDocument||null;
-      if(!d?.body)return false;
-      let holder=d.getElementById('runnerLegacyHealthCompat');
-      if(!holder){holder=d.createElement('div');holder.id='runnerLegacyHealthCompat';holder.hidden=true;d.body.appendChild(holder)}
-      let ready=true;
-      for(const id of ['healthOverall','healthChecked','invRows','invPages']){
-        const node=d.getElementById(id);
-        if(!node){ready=false;continue}
-        if(node.parentElement!==holder)holder.appendChild(node);
-      }
-      return ready;
-    }catch(e){return false}
-  }
-  if(!preserveLegacyHealthCompat()){
-    healthCompatTimer=setInterval(()=>{
-      if(!preserveLegacyHealthCompat())return;
-      clearInterval(healthCompatTimer);
-      healthCompatTimer=null;
-    },10);
-    setTimeout(()=>{
-      if(healthCompatTimer){clearInterval(healthCompatTimer);healthCompatTimer=null}
-    },6000);
-  }
-
   // F8 Results replaces the old visible Engine panel while keeping the route
   // hook stable. It is read-only and consumes the rebuildable results index.
   const resultsDesk=document.createElement('script');
