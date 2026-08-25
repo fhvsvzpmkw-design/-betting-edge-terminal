@@ -5,8 +5,7 @@ const STORAGE_KEY='bettingEdge.preferences.mainMenuOrder.v1';
 const STYLE_ID='runnerMenuOrderControllerStyle';
 const HINT_ID='runnerMenuOrderHint';
 const PREF_BOX_ID='runnerMenuOrderPreference';
-const HOLD_MS=430;
-const MOVE_CANCEL_PX=12;
+const HANDLE_CLASS='menuOrderHandle';
 const DEFAULT_MIDDLE=['market','history','syndicate','pizza','crypto','meat','engine'];
 const WORKSPACE_CLASSES=['runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
 const HTML_SHIELD_IDS=new Set(['pizza','crypto']);
@@ -88,12 +87,23 @@ function shieldCanonicalHtml(b,id){
     b.dataset.menuHtmlShield='1';
   }catch{}
 }
+function ensureDragHandle(b,id){
+  if(!b||!DEFAULT_MIDDLE.includes(id))return;
+  let handle=b.querySelector(`.${HANDLE_CLASS}`);
+  if(handle)return;
+  handle=b.ownerDocument.createElement('span');
+  handle.className=HANDLE_CLASS;
+  handle.setAttribute('aria-hidden','true');
+  handle.textContent='↕';
+  b.appendChild(handle);
+}
 function patchButtonKey(b,key,id){
   if(!b||!key)return;
   shieldCanonicalHtml(b,id);
   b.dataset.menuId=id;
   b.dataset.menuKey=key;
   b.dataset.menuReorderable=String(DEFAULT_MIDDLE.includes(id));
+  ensureDragHandle(b,id);
   if(key.startsWith('F'))b.setAttribute('aria-keyshortcuts',key);else b.removeAttribute('aria-keyshortcuts');
   const showText=b.ownerDocument?.defaultView?.NodeFilter?.SHOW_TEXT||4;
   const walker=b.ownerDocument.createTreeWalker(b,showText);
@@ -140,8 +150,9 @@ function applyVisual(d,order=currentOrder()){
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
   const s=d.createElement('style');s.id=STYLE_ID;s.textContent=`
-    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
-    body.runnerMenuHome.runnerMenuReordering .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{cursor:grabbing}
+    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"]{position:relative;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"] .${HANDLE_CLASS}{position:absolute;top:0;right:0;bottom:0;width:38px;display:flex;align-items:center;justify-content:center;z-index:4;color:#718c9a;font:900 18px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+    body.runnerMenuHome .runnerNavPad .tabs>.btn[data-menu-reorderable="true"] .${HANDLE_CLASS}:active,body.runnerMenuHome.runnerMenuReordering .runnerNavPad .tabs>.btn[data-menu-reorderable="true"] .${HANDLE_CLASS}{cursor:grabbing;color:#ffe96b}
     body.runnerMenuHome .runnerNavPad .tabs>.btn.menuOrderDragging{position:relative;z-index:5;opacity:.82;transform:scale(.985);outline:2px solid #ffe96b;outline-offset:2px;box-shadow:0 0 18px rgba(255,233,107,.20)!important}
     body.runnerSyndicateConnecting main.term>header.top{display:flex!important;position:sticky!important;top:0!important;z-index:120!important;background:#030811!important;box-shadow:0 8px 18px rgba(0,0,0,.42)!important}
     body.runnerSyndicateConnecting .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
@@ -174,13 +185,14 @@ function ensureStyle(d){
 function ensureHint(d){
   const root=tabs(d),nav=root?.parentElement;if(!root||!nav)return;
   let hint=d.getElementById(HINT_ID);
-  if(!hint){hint=d.createElement('div');hint.id=HINT_ID;hint.textContent='PRESS + HOLD TO REORDER // F1 VIGSCOPE + TAB PREFERENCES LOCKED';root.insertAdjacentElement('afterend',hint)}
+  if(!hint){hint=d.createElement('div');hint.id=HINT_ID;root.insertAdjacentElement('afterend',hint)}
+  hint.textContent='DRAG ↕ TO REORDER // F1 VIGSCOPE + TAB PREFERENCES LOCKED';
 }
 function preferenceRows(){
   const ids=['board',...middle,'preferences'];
   return ids.map(id=>{
     const locked=id==='board'||id==='preferences';
-    return `<div class="menuPrefRow${locked?' locked':''}"><b>[${escapeHtml(keyFor(id))}]</b><span>${escapeHtml(DEFINITIONS[id].label)}</span><em>${locked?'LOCKED':'HOLD + DRAG'}</em></div>`;
+    return `<div class="menuPrefRow${locked?' locked':''}"><b>[${escapeHtml(keyFor(id))}]</b><span>${escapeHtml(DEFINITIONS[id].label)}</span><em>${locked?'LOCKED':'DRAG ↕'}</em></div>`;
   }).join('')
 }
 function renderPreferenceBox(d){
@@ -201,7 +213,7 @@ function apply(d,force=false,order=middle){
   const normalized=applyVisual(d,order);
   if(force||JSON.stringify(normalized)!==JSON.stringify(middle))middle=normalizeMiddle(normalized);
   renderPreferenceBox(d);
-  d.documentElement.dataset.menuOrderAuthority='1-safe-shield';
+  d.documentElement.dataset.menuOrderAuthority='1-direct-drag';
   if(d.defaultView)d.defaultView.BettingEdgeMenuOrder=window.BettingEdgeMenuOrder;
   return true;
 }
@@ -216,9 +228,7 @@ function reconcileMutation(d){
   applyVisual(d,currentOrder());
   if(!drag?.dragging)schedule(d);
 }
-function clearHold(){if(drag?.timer){clearTimeout(drag.timer);drag.timer=null}}
 function cleanupDrag(d){
-  clearHold();
   if(drag?.button){drag.button.classList.remove('menuOrderDragging');try{drag.button.releasePointerCapture?.(drag.pointerId)}catch{}}
   d.body.classList.remove('runnerMenuReordering');
   drag=null;
@@ -245,14 +255,15 @@ function bindPointer(d){
   d.addEventListener('pointerdown',e=>{
     if(!d.body.classList.contains('runnerMenuHome'))return;
     if(e.pointerType==='mouse'&&e.button!==0)return;
-    const b=e.target.closest?.('.runnerNavPad .tabs>.btn[data-menu-id]');
-    const id=b?.dataset?.menuId;if(!b||!DEFAULT_MIDDLE.includes(id))return;
-    clearHold();drag={id,button:b,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,dragging:false,draft:[...middle],timer:null};
-    drag.timer=setTimeout(()=>beginDrag(d),HOLD_MS);
+    const handle=e.target.closest?.(`.${HANDLE_CLASS}`);
+    const b=handle?.closest?.('.runnerNavPad .tabs>.btn[data-menu-id]');
+    const id=b?.dataset?.menuId;if(!handle||!b||!DEFAULT_MIDDLE.includes(id))return;
+    e.preventDefault();e.stopPropagation();
+    drag={id,button:b,pointerId:e.pointerId,dragging:false,draft:[...middle]};
+    beginDrag(d);
   },true);
   d.addEventListener('pointermove',e=>{
-    if(!drag||e.pointerId!==drag.pointerId)return;
-    if(!drag.dragging){if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>MOVE_CANCEL_PX)cleanupDrag(d);return}
+    if(!drag||e.pointerId!==drag.pointerId||!drag.dragging)return;
     e.preventDefault();
     const next=draftForY(d,drag.id,e.clientY,drag.draft);
     if(JSON.stringify(next)!==JSON.stringify(drag.draft)){drag.draft=next;applyVisual(d,next)}
