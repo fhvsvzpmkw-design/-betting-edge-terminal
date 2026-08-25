@@ -11,6 +11,8 @@ on:
       - runner.html
       - assets/report-dashboard-vigscope.js
       - assets/menu-order-controller.js
+      - assets/primary-nav-shell.js
+      - assets/results-desk-ui.js
       - assets/schedule-profile-ui.js
       - assets/preferences-framework.js
       - data/preferences.json
@@ -21,6 +23,7 @@ on:
       - syndicates/**/*.html
       - syndicates/**/archive/index.json
       - tools/schedule-profile.mjs
+      - tests/f8-nav-theme-authority.test.mjs
       - tests/personnel-information-ordering.test.mjs
       - tests/preferences-framework.test.mjs
       - tests/schedule-profile.test.mjs
@@ -37,6 +40,8 @@ on:
       - runner.html
       - assets/report-dashboard-vigscope.js
       - assets/menu-order-controller.js
+      - assets/primary-nav-shell.js
+      - assets/results-desk-ui.js
       - assets/schedule-profile-ui.js
       - assets/preferences-framework.js
       - data/preferences.json
@@ -47,6 +52,7 @@ on:
       - syndicates/**/*.html
       - syndicates/**/archive/index.json
       - tools/schedule-profile.mjs
+      - tests/f8-nav-theme-authority.test.mjs
       - tests/personnel-information-ordering.test.mjs
       - tests/preferences-framework.test.mjs
       - tests/schedule-profile.test.mjs
@@ -70,11 +76,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Syntax-check F6 preference runtime
+      - name: Syntax-check runner UI modules
         run: |
           node --check assets/preferences-framework.js
           node --check assets/report-dashboard-vigscope.js
           node --check assets/menu-order-controller.js
+          node --check assets/primary-nav-shell.js
+          node --check assets/results-desk-ui.js
+      - name: Run F8 navigation theme authority regression
+        run: node tests/f8-nav-theme-authority.test.mjs
       - name: Run personnel information ordering regression
         run: node tests/personnel-information-ordering.test.mjs
       - name: Run short-link history regression
