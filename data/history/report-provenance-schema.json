@@ -1,10 +1,11 @@
 {
   "schema": 3,
-  "purpose": "Durable research/provenance sidecar for an issued Betting Edge report. The sidecar enriches history without enlarging or mutating the runner payload and records the authoritative production contract used at issuance.",
+  "purpose": "Durable research/provenance sidecar for an issued Betting Edge report. The sidecar enriches history without enlarging or mutating the runner payload, records the authoritative production contract used at issuance, and may retain structured personnel-sweep evidence for material decisions.",
   "sidecarPath": "data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json",
   "compatibility": {
     "historicalSchema2Valid": true,
-    "rule": "Schema-2 sidecars issued before the v0.9 production cutover remain valid immutable historical evidence. Schema-3 sidecars issued under contract v0.9 also remain valid immutable evidence and are not rewritten merely because the current production contract is v1.0."
+    "historicalSchema3Valid": true,
+    "rule": "Schema-2 sidecars and previously issued schema-3 sidecars remain valid immutable historical evidence. The personnelEvidence extension is additive for new reports and does not require rewriting historical sidecars."
   },
   "reportReference": {
     "fields": {
@@ -22,6 +23,8 @@
       "productionContractOperational": "boolean; required post-cutover and must be true",
       "productionContractPath": "string; required post-cutover and currently BETTING_EDGE_CONTRACT.md",
       "productionContractBlobSha": "exact Git blob SHA of the authoritative production contract read before handicapping",
+      "personnelSweepPath": "string; required for new reports using the operational personnel process and currently BETTING_EDGE_PERSONNEL_SWEEP.md",
+      "personnelSweepBlobSha": "exact Git blob SHA of the operational personnel addendum resolved for the report",
       "runnerVersion": "string",
       "runnerBlobSha": "git blob SHA or null if unavailable",
       "feedBlobSha": "git blob SHA of data/live-odds.json used for issuance or null if unavailable",
@@ -34,7 +37,7 @@
       "governanceDraftOperational": "optional historical design provenance only; must not imply draft authority after production cutover",
       "governanceDraftBlobSha": "optional exact Git blob SHA of historical design draft"
     },
-    "productionRule": "New sidecars must record productionContractVersion=1.0, productionContractOperational=true, productionContractPath=BETTING_EDGE_CONTRACT.md, and the exact productionContractBlobSha resolved before handicapping. Historical v0.9 sidecars remain valid and immutable. Draft provenance is optional and non-authoritative."
+    "productionRule": "New sidecars must record productionContractVersion=1.0, productionContractOperational=true, productionContractPath=BETTING_EDGE_CONTRACT.md, the exact productionContractBlobSha resolved before handicapping, and the operational personnel addendum path/blob SHA when the personnel process is in force. Historical sidecars remain valid and immutable."
   },
   "recommendations": {
     "shape": "array aligned to the issued recs by stable title/identity and ordinal",
@@ -48,6 +51,23 @@
       "mechanism": "concise historical mechanism",
       "limitation": "strongest caveat, conflict, era issue or research gap",
       "displayText": "the concise History Fit wording placed in the issued report's existing hist field"
+    },
+    "personnelEvidence": {
+      "requiredWhen": "For new reports, include on a recommendation when Stage 2 personnel work is material to a serious candidate or when an unresolved personnel assumption materially affects BET/LEAN/WAIT status, fair value, uncertainty or playTo. Historical sidecars are not backfilled.",
+      "fields": {
+        "stage2CheckedAt": "timestamp or lane-local date/time showing when the deep personnel sweep was performed",
+        "officialSources": "array of authoritative source records checked for the material personnel facts",
+        "fallbackSources": "array of distinct credible current fallback source records; when the official state remains unresolved, target 3 to 5 distinct fallback source origins where available",
+        "fallbackSourceCount": "integer count of distinct credible fallback source origins actually used/checked",
+        "sourceShortfall": "null or concise explanation when fewer than 3 credible current fallback sources genuinely exist after an event-specific search",
+        "facts": "array of material personnel facts found, with projected facts clearly distinguished from confirmed facts",
+        "personnelState": "CONFIRMED|STRONG PROJECTION|PARTIAL|UNKNOWN",
+        "unresolved": "array of material personnel questions that remain unresolved",
+        "preStage2Fair": "concise pre-sweep fair-value and/or uncertainty state",
+        "postStage2Fair": "concise post-sweep fair-value and/or uncertainty state",
+        "decisionImpact": "concise statement of how Stage 2 changed the decision, or NO MATERIAL CHANGE"
+      },
+      "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate."
     }
   },
   "boundaries": {
