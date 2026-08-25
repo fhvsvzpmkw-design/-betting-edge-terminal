@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const contract = fs.readFileSync('BETTING_EDGE_CONTRACT.md', 'utf8');
 const personnel = fs.readFileSync('BETTING_EDGE_PERSONNEL_SWEEP.md', 'utf8');
+const provenance = fs.readFileSync('data/history/report-provenance-schema.json', 'utf8');
 
 function requireText(text, needle, label) {
   if (!text.includes(needle)) throw new Error(`${label} missing: ${needle}`);
@@ -59,8 +60,65 @@ requireOrder(
   'personnel two-stage process'
 );
 
+requireText(
+  personnel,
+  'fallback sweep across 3 to 5 distinct credible current fallback sources, in addition to the official-source check',
+  'Stage 2 fallback source-depth rule'
+);
+requireText(
+  personnel,
+  'If fewer than 3 credible current fallback sources can be found after a reasonable event-specific search, Stage 2 must record the source shortfall',
+  'Stage 2 source-shortfall rule'
+);
+requireText(
+  personnel,
+  'Within 90 minutes of kickoff',
+  'soccer Stage 2 timing escalation'
+);
+requireText(
+  personnel,
+  'Within 75 minutes of kickoff',
+  'soccer authoritative-lineup recheck'
+);
+requireText(
+  personnel,
+  'record `NO MATERIAL CHANGE`',
+  'Stage 2 explicit re-handicap result'
+);
+
+requireText(
+  provenance,
+  '"personnelEvidence"',
+  'personnel provenance block'
+);
+requireText(
+  provenance,
+  '"fallbackSources"',
+  'personnel fallback-source provenance'
+);
+requireText(
+  provenance,
+  '"sourceShortfall"',
+  'personnel source-shortfall provenance'
+);
+requireText(
+  provenance,
+  '"preStage2Fair"',
+  'personnel pre-Stage-2 fair provenance'
+);
+requireText(
+  provenance,
+  '"postStage2Fair"',
+  'personnel post-Stage-2 fair provenance'
+);
+requireText(
+  provenance,
+  '"decisionImpact"',
+  'personnel decision-impact provenance'
+);
+
 if (personnel.includes('survives the initial event/market/selection identity, price-freshness and value screen')) {
   throw new Error('Old post-value-only Personnel Sweep rule is still present');
 }
 
-console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING — PASS');
+console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + STAGE 2 DEPTH — PASS');
