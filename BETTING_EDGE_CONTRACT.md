@@ -245,9 +245,18 @@ Personnel information is an input to fair value and must not be treated only as 
 
 **Stage 2 — Deep Personnel Sweep:** after Stage 1 has informed the provisional current handicap and fair-value/value screen, perform deeper personnel research on serious candidates, candidates created or materially strengthened by Stage 1, and candidates whose apparent value materially depends on unresolved personnel assumptions.
 
-Material Stage 2 findings must be applied back into the current handicap. Fair value, uncertainty/model error and `playTo` must be reassessed as appropriate before final `BET`, `LEAN`, `WAIT`, or `PASS` assignment. A final status may not simply reuse a provisional pre-sweep fair value when the deep sweep found material new information.
+Stage 2 has a mandatory completion standard:
 
-The addendum is operational report-generation policy and is subordinate to this production contract; if wording conflicts, this contract controls. Its source hierarchy, confidence states, sport-specific checks, materiality treatment and later-lane behavior are mandatory.
+1. **Correct dependency first.** Before the deep source hunt, identify the actual personnel dependency of the exact wager and orient it to the correct team, opponent, participant and role. A wrong or incomplete dependency must be corrected and the relevant research repeated before final status. For example, an MLB hitter prop depends on the hitter's participation/batting position and the **opposing pitcher**, not the hitter's own-team pitcher.
+2. **Official source first, then 3-to-5 fallback when unresolved.** When a material personnel fact remains `TBD`, unconfirmed, questionable, not posted or otherwise unresolved after the authoritative-source check, perform an event-/participant-specific sweep across **3 to 5 distinct credible current fallback source origins** where available. Three strong independent sources are the minimum target; continue toward four or five when sources disagree, are stale or ambiguous, the projection remains weak, or the personnel question could create, remove or flip an actionable edge. Duplicated syndication, mirrors and weak/stale sources do not count merely to satisfy the target. If fewer than three credible current fallback sources genuinely exist, record the source shortfall.
+3. **Sport-wide application.** This depth rule applies to soccer, college football, NFL, NHL, NBA, WNBA, MLB and other supported sports. The sport-specific targets and time-to-game escalation in `BETTING_EDGE_PERSONNEL_SWEEP.md` are mandatory; the research target must reflect the sport's actual release pattern rather than forcing every sport into a generic lineup model.
+4. **Confidence state.** Record the material personnel state as `CONFIRMED`, `STRONG PROJECTION`, `PARTIAL`, or `UNKNOWN`. Projected information may not be represented as confirmed.
+5. **Source conflict.** Classify credible-source disagreement as `NONE`, `MINOR`, or `MATERIAL`. A material unresolved conflict prevents `STRONG PROJECTION`. When no clear quality/directness/recency hierarchy resolves the disagreement, preserve `PARTIAL` or `UNKNOWN`, widen uncertainty/model error, and continue toward the four-to-five-source end of the fallback range when useful. Do not average incompatible personnel claims into a false consensus.
+6. **Decision sensitivity.** For every personnel-dependent serious candidate, identify the plausible personnel outcome or outcomes that would materially change fair value, uncertainty, `playTo`, or final status. When none remains, record `NO MATERIAL PERSONNEL SENSITIVITY`. Later lanes prioritize the unresolved facts named by this sensitivity rather than repeating unrelated research.
+7. **Re-handicap explicitly.** Material Stage 2 findings must be applied back into the current handicap. Fair value, uncertainty/model error and `playTo` must be reassessed as appropriate before final `BET`, `LEAN`, `WAIT`, or `PASS` assignment. Retain the pre-Stage-2 and post-Stage-2 fair-value/uncertainty state; if the deep sweep produces no material change, record `NO MATERIAL CHANGE` rather than silently carrying the provisional number forward.
+8. **Structured evidence.** For material Stage 2 work, the durable sidecar must retain enough evidence to audit the search and decision: check time, dependency target/rationale, official sources, fallback sources/count, source shortfall where applicable, material facts, personnel state, source conflict and any resolution, unresolved facts, decision sensitivity, pre-/post-Stage-2 fair-value/uncertainty state and decision impact.
+
+The addendum is operational report-generation policy and is subordinate to this production contract; if wording conflicts, this contract controls. Its source hierarchy, confidence states, sport-specific checks, time-to-game escalation, source-depth standard, dependency validation, conflict handling, decision-sensitivity treatment, materiality treatment and later-lane behavior are mandatory.
 
 The two-stage personnel process is current-information research, not Research Library evidence. It may create, remove, strengthen or weaken apparent value but may not override event/market/selection identity, executable-price freshness, supported-book, fair-value, exposure, staking or other hard gates. It must not trigger an additional Odds-API request or alter the production refresh budget.
 
@@ -409,12 +418,16 @@ Required production-contract provenance includes:
 - `productionContractOperational: true`;
 - `productionContractPath: "BETTING_EDGE_CONTRACT.md"`;
 - exact `productionContractBlobSha` fetched for that report;
+- `personnelSweepPath: "BETTING_EDGE_PERSONNEL_SWEEP.md"` when the operational personnel process is in force;
+- exact `personnelSweepBlobSha` resolved for that report;
 - current runner version/blob SHA where available;
 - exact feed blob SHA where available;
 - Research Library version/blob SHA;
 - History Fit policy blob SHA;
 - Research manifest blob SHA;
 - active R2 validation blob SHA.
+
+For a recommendation where Stage 2 personnel work is material to a serious candidate or materially affects `BET`/`LEAN`/`WAIT`, fair value, uncertainty or `playTo`, the sidecar must also carry the current schema's structured `personnelEvidence` record. That record must be sufficient to audit dependency orientation, official/fallback source depth, source conflict, confidence state, unresolved facts, decision sensitivity, the pre-/post-Stage-2 fair-value or uncertainty state, and the decision impact. Historical sidecars are not backfilled.
 
 Historical schema-2 sidecars issued before the v0.9 cutover remain valid historical evidence and must not be rewritten merely to adopt schema 3. Schema-3 sidecars issued under contract v0.9 likewise remain immutable valid historical evidence; new sidecars after this promotion record contract v1.0.
 
@@ -430,13 +443,13 @@ For every valid scheduled report:
 2. live-feed freshness, exact identity and basic executable-price eligibility validation;
 3. Stage 1 Material Information Scan over the eligible current slate under `BETTING_EDGE_PERSONNEL_SWEEP.md`;
 4. provisional independent current handicap, fair-value construction and value screen using the Stage 1 information;
-5. Stage 2 Deep Personnel Sweep for serious candidates, candidates created or materially strengthened by Stage 1, and candidates materially dependent on unresolved personnel assumptions;
-6. apply material Stage 2 findings back into the current handicap; reassess fair value, uncertainty/model error and `playTo`, then form the provisional current recommendation;
+5. Stage 2 Deep Personnel Sweep for serious candidates, candidates created or materially strengthened by Stage 1, and candidates materially dependent on unresolved personnel assumptions; validate the exact wager dependency, apply the sport-wide 3-to-5-source fallback completion rule when official material information remains unresolved, and resolve/record source conflict and decision sensitivity;
+6. apply material Stage 2 findings back into the current handicap; reassess fair value, uncertainty/model error and `playTo`, record the pre-/post-Stage-2 state and decision impact, then form the provisional current recommendation;
 7. Research Fit read-only pass;
 8. payload construction and all inherited hard-gate validation;
 9. create and retain validated long fallback;
 10. store the exact issued payload;
-11. store matching production-provenance/Research Fit sidecar;
+11. store matching production-provenance/Research Fit sidecar, including required material `personnelEvidence`;
 12. append/merge the exact `run-history.json` entry without overwriting prior issued evidence;
 13. after history success, deliver deterministic compact `r.html?id=` link as primary;
 14. if history publication fails after report validation, deliver the unchanged long fallback with `HISTORY SAVE FAILED — REPORT VALID`.
@@ -468,7 +481,7 @@ The following artifacts remain historical and must not be deleted as part of pro
 - `BETTING_EDGE_V0.9_PREFLIGHT_2026-08-15.md`;
 - `BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`.
 
-The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`, including the exact rollback boundary and equivalence statement.
+The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`, including the exact rollback boundary and equivalence statement. That historical acceptance record is not rewritten by later v1.0 operational clarifications.
 
 ### Operational change record — 2026-08-25 — personnel-information ordering correction
 
@@ -477,6 +490,14 @@ The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-
 **Decision:** Replace the single post-screen sweep with the two-stage personnel-information process in Section 6.3 and `BETTING_EDGE_PERSONNEL_SWEEP.md`: Stage 1 Material Information Scan before provisional fair value; Stage 2 Deep Personnel Sweep after the provisional screen; then explicit current-evidence re-evaluation before final status.
 
 **Intentionally unchanged:** feed and exact-quote freshness rules; Bet365/DraftKings supported-book boundary; fair-value quality requirements; BET/LEAN/WAIT/PASS semantics; staking/exposure limits; Research Library authority; odds-refresh schedule and request budget; issued-report immutability.
+
+### Operational change record — 2026-08-25 — Stage 2 depth, dependency and conflict safeguards
+
+**Issue:** A generic instruction to perform deeper personnel research could still stop too early at `TBD`/unconfirmed official information, search the wrong personnel dependency for an exact wager, treat duplicated or conflicting projections as consensus, or fail to show whether newly found personnel information actually changed the handicap.
+
+**Decision:** Clarify Section 6.3 and the operational addendum so Stage 2 now requires: correct-wager dependency validation; authoritative-source-first research; a sport-wide 3-to-5-distinct-source fallback sweep when material official information remains unresolved; sport-specific time-to-game escalation; `CONFIRMED`/`STRONG PROJECTION`/`PARTIAL`/`UNKNOWN` confidence states; explicit `NONE`/`MINOR`/`MATERIAL` source-conflict handling; a prohibition on `STRONG PROJECTION` while material unresolved conflict remains; decision-sensitivity capture; explicit pre-/post-Stage-2 re-handicapping; and structured material personnel evidence in the durable sidecar.
+
+**Classification:** This is an analytical-depth and auditability clarification within Contract v1.0. It does not change sportsbooks, feed/quote freshness, staking, exposure, risk tolerance, report lanes, runner/core versions, Research Library authority, odds-refresh cadence or API request budget.
 
 Git history is the authoritative rollback system. Existing issued reports and sidecars are append-only historical evidence.
 
@@ -490,4 +511,4 @@ Any future contract version requires explicit change control, regression/equival
 
 Betting Edge governance version **1.0 is operational** on the authoritative `main` branch.
 
-This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, the repository-controlled report-card target and the operational two-stage personnel-information process remain governed behavior.
+This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, the repository-controlled report-card target and the operational two-stage personnel-information process—including sport-wide Stage 2 source depth, exact-wager dependency validation, source-conflict handling, decision sensitivity and explicit re-handicapping—remain governed behavior.
