@@ -117,7 +117,7 @@ function bind(d){
   d.documentElement.dataset.primaryNavShellBound='5';
   ensureStyle(d);
   restoreAllMenuButtons(d);
-  openShell(d,'board');
+  enterMenu(d);
 
   d.addEventListener('click',e=>{
     const navButton=e.target.closest?.('.runnerNavPad .tabs>.btn,.tabs>.btn');if(!navButton)return;
