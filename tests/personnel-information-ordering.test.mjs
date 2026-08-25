@@ -81,6 +81,42 @@ requireText(
   'Stage 2 source-shortfall rule'
 );
 
+requireText(
+  personnel,
+  '### Stage 2 dependency validation safeguard',
+  'Stage 2 dependency-validation safeguard'
+);
+requireText(
+  personnel,
+  'an MLB hitter prop depends on the hitter\'s own participation/batting position **and the opposing pitcher**',
+  'MLB hitter opposing-pitcher dependency orientation'
+);
+requireText(
+  personnel,
+  'If Stage 2 discovers that the initial dependency target was wrong, incomplete or pointed at the wrong side of the matchup',
+  'Stage 2 dependency correction rule'
+);
+requireText(
+  personnel,
+  '### Source-conflict and decision-sensitivity safeguard',
+  'Stage 2 conflict/sensitivity safeguard'
+);
+requireText(
+  personnel,
+  'A `STRONG PROJECTION` may not be assigned while a **material unresolved source conflict** remains.',
+  'Stage 2 strong-projection conflict block'
+);
+requireText(
+  personnel,
+  'For every personnel-dependent serious candidate, Stage 2 must also record **decision sensitivity**',
+  'Stage 2 decision-sensitivity rule'
+);
+requireText(
+  personnel,
+  '`NO MATERIAL PERSONNEL SENSITIVITY`',
+  'Stage 2 no-material-sensitivity state'
+);
+
 for (const [needle, label] of [
   ['#### Soccer', 'soccer Stage 2 policy'],
   ['#### College football and NFL', 'college football/NFL Stage 2 policy'],
@@ -129,6 +165,16 @@ requireText(
 );
 requireText(
   provenance,
+  '"dependencyTarget"',
+  'personnel dependency-target provenance'
+);
+requireText(
+  provenance,
+  '"dependencyRationale"',
+  'personnel dependency-rationale provenance'
+);
+requireText(
+  provenance,
   '"fallbackSources"',
   'personnel fallback-source provenance'
 );
@@ -136,6 +182,21 @@ requireText(
   provenance,
   '"sourceShortfall"',
   'personnel source-shortfall provenance'
+);
+requireText(
+  provenance,
+  '"sourceConflict"',
+  'personnel source-conflict provenance'
+);
+requireText(
+  provenance,
+  '"conflictResolution"',
+  'personnel conflict-resolution provenance'
+);
+requireText(
+  provenance,
+  '"decisionSensitivity"',
+  'personnel decision-sensitivity provenance'
 );
 requireText(
   provenance,
@@ -157,4 +218,4 @@ if (personnel.includes('survives the initial event/market/selection identity, pr
   throw new Error('Old post-value-only Personnel Sweep rule is still present');
 }
 
-console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + SPORT-WIDE STAGE 2 DEPTH — PASS');
+console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + SPORT-WIDE STAGE 2 DEPTH + SAFEGUARDS — PASS');
