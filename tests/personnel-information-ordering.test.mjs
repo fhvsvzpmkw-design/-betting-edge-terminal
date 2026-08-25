@@ -67,18 +67,54 @@ requireText(
 );
 requireText(
   personnel,
+  'This 3-to-5-source fallback standard is **sport-wide**.',
+  'sport-wide Stage 2 fallback rule'
+);
+requireText(
+  personnel,
+  'use **3 strong independent fallback sources as the minimum target**, and continue toward **4 or 5**',
+  'adaptive 3-to-5 Stage 2 depth rule'
+);
+requireText(
+  personnel,
   'If fewer than 3 credible current fallback sources can be found after a reasonable event-specific search, Stage 2 must record the source shortfall',
   'Stage 2 source-shortfall rule'
+);
+
+for (const [needle, label] of [
+  ['#### Soccer', 'soccer Stage 2 policy'],
+  ['#### College football and NFL', 'college football/NFL Stage 2 policy'],
+  ['#### NHL', 'NHL Stage 2 policy'],
+  ['#### NBA and WNBA', 'NBA/WNBA Stage 2 policy'],
+  ['#### MLB', 'MLB Stage 2 policy']
+]) {
+  requireText(personnel, needle, label);
+}
+
+requireText(
+  personnel,
+  'Within 3 hours of kickoff',
+  'football Stage 2 timing escalation'
+);
+requireText(
+  personnel,
+  'Within 4 hours of puck drop',
+  'NHL Stage 2 timing escalation'
+);
+requireText(
+  personnel,
+  'Within 3 hours of tipoff',
+  'NBA/WNBA Stage 2 timing escalation'
+);
+requireText(
+  personnel,
+  'Within 2 hours of first pitch',
+  'MLB Stage 2 timing escalation'
 );
 requireText(
   personnel,
   'Within 90 minutes of kickoff',
   'soccer Stage 2 timing escalation'
-);
-requireText(
-  personnel,
-  'Within 75 minutes of kickoff',
-  'soccer authoritative-lineup recheck'
 );
 requireText(
   personnel,
@@ -121,4 +157,4 @@ if (personnel.includes('survives the initial event/market/selection identity, pr
   throw new Error('Old post-value-only Personnel Sweep rule is still present');
 }
 
-console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + STAGE 2 DEPTH — PASS');
+console.log('BETTING EDGE PERSONNEL INFORMATION ORDERING + SPORT-WIDE STAGE 2 DEPTH — PASS');
