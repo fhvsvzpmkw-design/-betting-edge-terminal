@@ -1,0 +1,107 @@
+name: Research Library v1.8 R3 promotion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/staging/V1_8_GAP_AUDIT_R3_2026-08-25.md'
+      - 'research/staging/V1_8_GAP_CLOSURE_R3_2026-08-25.json'
+      - 'research/staging/build_v18_r3_production.py'
+      - '.github/workflows/research-v18-r3-promotion.yml'
+
+concurrency:
+  group: research-v18-r3-promotion
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-and-promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Materialize v1.8 R3 production library
+        run: python research/staging/build_v18_r3_production.py
+
+      - name: Parse all active JSON artifacts
+        run: |
+          python -m json.tool research/research-library.json >/dev/null
+          python -m json.tool research/source-registry.json >/dev/null
+          python -m json.tool research/taxonomy.json >/dev/null
+          python -m json.tool research/history-fit-policy.json >/dev/null
+          python -m json.tool research/manifest.json >/dev/null
+          python -m json.tool research/tests/V1_8_R3_VALIDATION_2026-08-25.json >/dev/null
+          python -m json.tool research/CHECKSUMS.json >/dev/null
+
+      - name: Assert v1.8 active manifest and R3 boundaries
+        run: |
+          python <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('.')
+          m = json.loads((root/'research/manifest.json').read_text())
+          p = json.loads((root/'research/history-fit-policy.json').read_text())
+          l = json.loads((root/'research/research-library.json').read_text())
+          v = json.loads((root/'research/tests/V1_8_R3_VALIDATION_2026-08-25.json').read_text())
+          assert m['activeLibraryVersion'] == '1.8'
+          assert m['status'] == 'R3_LIVE_READ_ONLY'
+          assert p['libraryVersion'] == '1.8'
+          assert p['hardBoundaries']['mayCreateBet'] is False
+          assert p['hardBoundaries']['mayCountAsExtraBetSignalAtR3'] is False
+          assert l['library']['logicalItemCount'] == 130
+          assert l['library']['sourceRegistryCount'] == 108
+          assert l['library']['evidenceClusterCount'] == 30
+          assert v['state'] == 'PASS'
+          assert all(v['checks'].values())
+          print('V1.8 R3 ACTIVE VALIDATION OK')
+          PY
+
+      - name: Commit canonical v1.8 research artifacts
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-research-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            research/research-library.json \
+            research/source-registry.json \
+            research/taxonomy.json \
+            research/history-fit-policy.json \
+            research/manifest.json \
+            research/README.md \
+            research/CHECKSUMS.json \
+            research/tests/V1_8_R3_VALIDATION_2026-08-25.json \
+            research/V1_8_PROMOTION_2026-08-25.md
+          if git diff --cached --quiet; then
+            echo "Canonical v1.8 artifacts already materialized."
+            exit 0
+          fi
+          git commit -m "Promote Research Library v1.8 R3"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Verify remote v1.8 manifest
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          python <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/manifest.json').read_text())
+          v=json.loads(Path('research/tests/V1_8_R3_VALIDATION_2026-08-25.json').read_text())
+          assert m['activeLibraryVersion']=='1.8'
+          assert m['status']=='R3_LIVE_READ_ONLY'
+          assert v['state']=='PASS'
+          print('REMOTE V1.8 R3 READ-BACK OK')
+          PY
