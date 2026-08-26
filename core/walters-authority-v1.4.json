@@ -1,47 +1,16 @@
 {
   "schema": 1,
   "configId": "walters-authority-v1.4",
-  "state": "STAGING_RUNTIME_CONTROL_FOR_CORE_1_4",
+  "state": "OPERATIONAL",
   "targetCoreVersion": "1.4",
   "mode": "BET_AUTHORITY",
-  "allowedModes": [
-    "OFF",
-    "ADVISORY",
-    "BET_AUTHORITY"
-  ],
+  "allowedModes": ["OFF", "ADVISORY", "BET_AUTHORITY"],
   "purpose": "Allow Billy Walters-derived intelligence to be disabled, used as advisory context, or given authority to originate Betting Edge BET recommendations without rebuilding or re-versioning Core 1.4.",
-  "operationalRule": "Changing only mode is intended to take effect for the next eligible Core 1.4 handicap/report run. Historical issued reports remain immutable and retain the Walters mode active when issued.",
+  "operationalRule": "Changing only mode takes effect for the next eligible Core 1.4 handicap/report run. Historical issued reports remain immutable and retain the Walters mode active when issued.",
   "modes": {
-    "OFF": {
-      "ingestWalters": false,
-      "compareWithCore": false,
-      "showWaltersContext": false,
-      "mayTriggerReReview": false,
-      "mayInfluenceCoreFairValue": false,
-      "mayCountAsIndependentCurrentSupport": false,
-      "mayOriginateBet": false,
-      "description": "Walters intelligence is disabled for current handicapping."
-    },
-    "ADVISORY": {
-      "ingestWalters": true,
-      "compareWithCore": true,
-      "showWaltersContext": true,
-      "mayTriggerReReview": true,
-      "mayInfluenceCoreFairValue": false,
-      "mayCountAsIndependentCurrentSupport": false,
-      "mayOriginateBet": false,
-      "description": "Walters intelligence is visible and auditable and may trigger explicit re-review, but it cannot directly create a recommendation."
-    },
-    "BET_AUTHORITY": {
-      "ingestWalters": true,
-      "compareWithCore": true,
-      "showWaltersContext": true,
-      "mayTriggerReReview": true,
-      "mayInfluenceCoreFairValue": true,
-      "mayCountAsIndependentCurrentSupport": true,
-      "mayOriginateBet": true,
-      "description": "A complete, current, arithmetic-verified Walters handicap may originate a Betting Edge BET recommendation and may contribute to Core 1.4 fair value as one independent handicap input. The resulting BET must still pass all normal hard execution, uncertainty, price and exposure gates."
-    }
+    "OFF": {"ingestWalters":false,"compareWithCore":false,"showWaltersContext":false,"mayTriggerReReview":false,"mayInfluenceCoreFairValue":false,"mayCountAsIndependentCurrentSupport":false,"mayOriginateBet":false,"description":"Walters intelligence is disabled for current handicapping."},
+    "ADVISORY": {"ingestWalters":true,"compareWithCore":true,"showWaltersContext":true,"mayTriggerReReview":true,"mayInfluenceCoreFairValue":false,"mayCountAsIndependentCurrentSupport":false,"mayOriginateBet":false,"description":"Walters intelligence is visible and auditable and may trigger explicit re-review, but it cannot directly create a recommendation."},
+    "BET_AUTHORITY": {"ingestWalters":true,"compareWithCore":true,"showWaltersContext":true,"mayTriggerReReview":true,"mayInfluenceCoreFairValue":true,"mayCountAsIndependentCurrentSupport":true,"mayOriginateBet":true,"description":"A complete, current, arithmetic-verified Walters handicap may originate a Betting Edge BET recommendation and may contribute to Core 1.4 fair value as one independent handicap input. The resulting BET must still pass all normal hard execution, uncertainty, price and exposure gates."}
   },
   "betAuthorityEligibility": {
     "requiredWhenModeIsBET_AUTHORITY": [
@@ -81,14 +50,14 @@
   "provenanceRequired": {
     "waltersMode": "OFF|ADVISORY|BET_AUTHORITY",
     "waltersInterfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
-    "waltersAvailability": "AVAILABLE|PARTIAL|UNAVAILABLE|OFF",
+    "waltersAvailability": "AVAILABLE|PARTIAL|UNAVAILABLE|OFF|NOT_APPLICABLE",
     "waltersContribution": "NONE|ADVISORY_ONLY|CORE_FAIR_INPUT|BET_ORIGINATOR",
     "waltersOriginatedCandidate": "boolean",
-    "coreFairBeforeWalters": "number|null",
-    "coreFairAfterWalters": "number|null",
-    "waltersFair": "number|null",
+    "coreFairBeforeWalters": "number|string|null",
+    "coreFairAfterWalters": "number|string|null",
+    "waltersFair": "number|string|null",
     "waltersComparisonState": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE|OFF",
     "waltersReviewImpact": "concise explanation or NO MATERIAL CHANGE",
-    "waltersBetRationale": "required when Walters originated the BET; otherwise null"
+    "waltersBetRationale": "required when Walters originated the candidate; otherwise null"
   }
 }
