@@ -8,7 +8,7 @@
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Authoritative branch:** `main`  
 **Production filename:** `BETTING_EDGE_CONTRACT.md`  
-**Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.3  
+**Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.4  
 **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`
 
 > **THIS FILE IS OPERATIONAL.**
@@ -79,6 +79,8 @@ Every scheduled lane must perform this sequence before analysis:
 3. retain the exact production-contract Git blob SHA for durable provenance;
 4. resolve the current approved `runner.html` in the same repository context and verify the expected production runner family/version;
 5. only then read and validate the live odds feed and begin handicapping.
+
+For report timestamps at or after **2026-08-25 17:20:00 America/Vancouver**, production preflight must additionally resolve `core/core-v1.4-production.json`, verify `coreVersion: "1.4"` and `state: "OPERATIONAL"`, retain its exact Git blob SHA, resolve its pinned model-error framework and Walters interface, and resolve the current `core/walters-authority-v1.4.json` runtime mode before handicapping. The current Walters authority blob SHA and mode must be retained for report provenance. A Core 1.4 authority conflict is a preflight failure. Governance Contract v1.0 and Core version 1.4 are independent version tracks.
 
 If steps 1-4 cannot be completed or authority conflicts, stop with:
 
@@ -266,7 +268,7 @@ The two-stage personnel process is current-information research, not Research Li
 
 The Betting Edge Research Library remains a **read-only** report input.
 
-Current approved library at activation: **1.7**.
+Current approved production library: **1.8** (R3 live read-only).
 
 Scheduled reports must form the provisional current handicap first, then read the approved Research Library manifest/policy/taxonomy/library and apply History Fit under the inherited rules.
 
@@ -286,6 +288,24 @@ Direct sport/market/timing evidence outranks analogy. Conflicts, era drift and e
 Visible `rec.hist` remains concise. Structured research/provenance belongs in the durable sidecar rather than bloating the runner payload.
 
 ---
+
+## 7.1 Core 1.4 — operational handicap/model-error and Walters authority
+
+Core 1.4 is operational for report timestamps at or after **2026-08-25T17:20:00-07:00**. Earlier issued reports remain immutable Core 1.3 historical evidence. The authoritative Core 1.4 manifest is `core/core-v1.4-production.json`.
+
+Every Core 1.4 serious candidate must carry a structured Core assessment in the durable sidecar. The production model-error framework classifies the fair-value basis, supported-book dispersion, liquidity risk, tail risk, exact-market calibration, personnel sensitivity and independent current support, then assigns `STANDARD`, `ELEVATED`, `HIGH` or `UNQUANTIFIED`. The production publication gate recomputes this state from the recorded inputs. A `BET` is prohibited when that recomputation says the candidate is not eligible by the Core 1.4 model-error layer.
+
+Research Library v1.8 remains read-only and may not itself create a BET or directly move the fair-value point estimate. Core 1.4 may use only the fixed graduated allowlist in its operational model-error framework, and those approved findings may **raise** the model-error floor or prevent false precision; they may not lower the floor, manufacture independent current support or set stake. The set of applicable graduated research IDs is derived from the Core context and may not be selectively omitted to evade an uncertainty rule.
+
+Billy Walters-derived handicapping is a separate Core 1.4 specialist engine, not a Research Library vote. Runtime authority is controlled by `core/walters-authority-v1.4.json` and may be switched forward-only without re-versioning Core 1.4:
+
+- `OFF` — Walters is not used for current handicapping;
+- `ADVISORY` — Walters may be compared with the Core and trigger review but may not originate a recommendation;
+- `BET_AUTHORITY` — an eligible, current, arithmetic-verified Walters handicap may originate an exact NFL spread or moneyline BET candidate and may stand as/contribute an independent fair-value input.
+
+Core 1.4 activates with Walters in **`BET_AUTHORITY`**. Walters BET authority is handicap/recommendation authority only. It may not override exact identity, feed freshness, executable-quote freshness, personnel requirements, price-quality/model-error boundaries, exposure controls or final staking policy; it may not supply a fabricated executable price or rewrite issued history. Walters-created candidates must record their Walters fair, source timing, exact proposed market/selection and rationale. Missing or unavailable Walters data does not block an otherwise valid report.
+
+Core 1.4 consciously does **not** activate the Results/CLV feedback learning loop, Shadow History, learned player/team associations or personal-ledger calibration. Those remain later tracks and are not prerequisites for Core 1.4.
 
 # 8. Invariants 9-22 — durable history and delivery are operational
 
@@ -463,7 +483,7 @@ History/share work may not create, change or suppress a betting decision that ha
 At v1.0 production activation:
 
 - **C-track: C2 — v1.0 OPERATIONAL.** `BETTING_EDGE_CONTRACT.md` is authoritative production governance. C2 represents a controlled consolidation of the final v0.9 operating rule set, not a new betting methodology.
-- **R-track: R3 — LIVE READ-ONLY HISTORY FIT.** Production Research Library remains v1.7 and read-only; this contract promotion does not promote the staged v1.8 candidate.
+- **R-track: R3 — LIVE READ-ONLY HISTORY FIT.** Production Research Library is v1.8 and read-only. Core 1.4 may consume only its fixed graduated model-error allowlist under Section 7.1; normal History Fit remains non-authoritative for BET creation.
 - **H-track: H3 — LIVE ISSUED-REPORT / PROVENANCE HISTORY.** Existing archive + sidecar + index + same-day lineage/navigation behavior remains operational.
 - **S-track: S0 — INACTIVE.** Shadow History remains separate and is not activated by v1.0.
 
@@ -499,9 +519,17 @@ The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-
 
 **Classification:** This is an analytical-depth and auditability clarification within Contract v1.0. It does not change sportsbooks, feed/quote freshness, staking, exposure, risk tolerance, report lanes, runner/core versions, Research Library authority, odds-refresh cadence or API request budget.
 
+### Operational change record — 2026-08-25 — Core 1.4 production integration
+
+**Decision:** Promote the tested Core 1.4 model-error framework and production manifest at 17:20 PT; require structured Core assessment and machine recomputation during publication; keep Research Library v1.8 one-way for model-error only; activate the Walters runtime authority switch in `BET_AUTHORITY` so an eligible Walters handicap may originate a BET candidate while preserving all hard execution/staking gates.
+
+**Intentionally deferred:** Results/CLV feedback learning, Shadow History, learned player/team associations and personal-ledger calibration.
+
+**Intentionally unchanged:** Bet365/DraftKings execution boundary; 75-minute feed freshness; 30-minute executable-quote freshness; staking/exposure methodology; scheduled report lanes; odds/API request budget; issued-report immutability.
+
 Git history is the authoritative rollback system. Existing issued reports and sidecars are append-only historical evidence.
 
-Do not bundle unrelated UI feature development, Shadow History activation, new staking methodology, new books, Research Library promotion, or odds-refresh budget changes into this contract activation. The associated v1.5 runner change is a version-boundary declaration for already-deployed presentation work; it does not change the v1.3 report engine/core.
+Do not bundle unrelated UI feature development, Shadow History activation, new staking methodology, new books, Research Library promotion, or odds-refresh budget changes into this contract activation. The VigScope v1.5 runner remains the presentation shell. Core 1.4 is the operational report-engine/handicap version for post-cutover reports and is versioned independently from the runner and Governance Contract.
 
 Any future contract version requires explicit change control, regression/equivalence review and deliberate production promotion.
 

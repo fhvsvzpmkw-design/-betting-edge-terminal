@@ -1,11 +1,11 @@
 {
   "schema": 3,
-  "purpose": "Durable research/provenance sidecar for an issued Betting Edge report. The sidecar enriches history without enlarging or mutating the runner payload, records the authoritative production contract used at issuance, and may retain structured personnel-sweep and WAIT-qualification evidence for material decisions.",
+  "purpose": "Durable research/Core/provenance sidecar for an issued Betting Edge report. The sidecar enriches immutable history, records production contract and Core authority used at issuance, and retains structured Core 1.4 model-error, Walters, personnel-sweep and WAIT-qualification evidence where applicable.",
   "sidecarPath": "data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json",
   "compatibility": {
     "historicalSchema2Valid": true,
     "historicalSchema3Valid": true,
-    "rule": "Schema-2 sidecars and previously issued schema-3 sidecars remain valid immutable historical evidence. The personnelEvidence, explicit personnelRequired gate and waitQualification extension are additive for new reports and do not require rewriting historical sidecars."
+    "rule": "Schema-2 and previously issued schema-3 sidecars remain valid immutable historical evidence. Stage 2, WAIT qualification, Core 1.4 coreAssessment and waltersEvidence are additive forward-only extensions and do not require rewriting historical sidecars."
   },
   "reportReference": {
     "fields": {
@@ -35,9 +35,19 @@
       "r2ValidationBlobSha": "git blob SHA of the active R2 manual read test",
       "governanceDraftVersion": "optional historical design provenance only",
       "governanceDraftOperational": "optional historical design provenance only; must not imply draft authority after production cutover",
-      "governanceDraftBlobSha": "optional exact Git blob SHA of historical design draft"
+      "governanceDraftBlobSha": "optional exact Git blob SHA of historical design draft",
+      "coreVersion": "string; required for reports at/after the Core 1.4 cutover and currently 1.4",
+      "coreProductionPath": "string; required for Core 1.4 and currently core/core-v1.4-production.json",
+      "coreProductionBlobSha": "exact Git blob SHA of the operational Core 1.4 production manifest resolved before handicapping",
+      "coreFrameworkPath": "string; operational Core 1.4 model-error framework path",
+      "coreFrameworkBlobSha": "exact Git blob SHA of the Core 1.4 model-error framework used for the report",
+      "waltersInterfacePath": "string; operational Walters Core 1.4 interface path",
+      "waltersInterfaceBlobSha": "exact Git blob SHA of the Walters interface used for the report",
+      "waltersAuthorityPath": "string; runtime Walters authority config path",
+      "waltersAuthorityBlobSha": "exact Git blob SHA of the Walters authority config resolved for the report",
+      "waltersMode": "OFF|ADVISORY|BET_AUTHORITY; exact Walters mode resolved before handicapping"
     },
-    "productionRule": "New sidecars must record productionContractVersion=1.0, productionContractOperational=true, productionContractPath=BETTING_EDGE_CONTRACT.md, the exact productionContractBlobSha resolved before handicapping, and the operational personnel addendum path/blob SHA when the personnel process is in force. Historical sidecars remain valid and immutable."
+    "productionRule": "New sidecars must record productionContractVersion=1.0, productionContractOperational=true, productionContractPath=BETTING_EDGE_CONTRACT.md, the exact productionContractBlobSha resolved before handicapping, and the operational personnel addendum path/blob SHA when the personnel process is in force. Historical sidecars remain valid and immutable. For report timestamps at/after 2026-08-25T17:20:00-07:00, sidecars must additionally record Core 1.4 production/framework provenance, Research Library v1.8 provenance, and exact Walters interface/authority blob SHA plus active Walters mode."
   },
   "recommendations": {
     "shape": "array aligned to the issued recs by stable title/identity and ordinal",
@@ -90,6 +100,43 @@
       "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Each fallback source must carry a canonical origin. Duplicate normalized origins are rejected by the publication gate and do not count toward fallbackSourceCount. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate.",
       "dependencyRule": "Personnel evidence must be tied to the actual causal dependency of the exact wager before it is used. Wrong-team, wrong-opponent or wrong-role dependencies must be corrected and researched again where necessary before final status.",
       "conflictRule": "A material unresolved source conflict prevents STRONG PROJECTION. Preserve PARTIAL/UNKNOWN and widen uncertainty unless a clear quality/directness/recency hierarchy resolves the disagreement and the resolution rationale is recorded."
+    },
+    "coreAssessment": {
+      "requiredWhen": "Every recommendation in a report at/after the Core 1.4 cutover.",
+      "fields": {
+        "frameworkId": "must match the operational Core 1.4 framework ID",
+        "context": "structured fairValueBasis, bookDispersion, liquidityRisk, tailRisk, directCalibration, personnelSensitivity, independentCurrentSupport, sport/market/timing, movement flags and automatically applicable graduatedResearchIds",
+        "fairValueBasisRationale": "why the fair is independent, market-anchored, market-derived-only or unavailable",
+        "uncertaintyStatement": "candidate-specific uncertainty/model-error statement",
+        "modelErrorState": "STANDARD|ELEVATED|HIGH|UNQUANTIFIED",
+        "betEligibleByModelError": "boolean recomputed by the production Core 1.4 gate",
+        "effects": "array of framework effects",
+        "appliedRules": "array of applied base/research rules",
+        "reasons": "array of framework reasons",
+        "rationale": "concise decision interpretation"
+      },
+      "rule": "The production gate recomputes modelErrorState and bet eligibility from the context and rejects forged/omitted applicable research rules. A BET may not publish when Core 1.4 recomputation blocks it."
+    },
+    "waltersEvidence": {
+      "requiredWhen": "Every recommendation in a report at/after the Core 1.4 cutover; non-eligible markets record NOT_APPLICABLE. Eligible NFL spread/moneyline candidates resolve Walters availability whenever Walters mode is not OFF.",
+      "fields": {
+        "applicable": "boolean",
+        "mode": "OFF|ADVISORY|BET_AUTHORITY",
+        "availability": "AVAILABLE|PARTIAL|UNAVAILABLE|OFF|NOT_APPLICABLE",
+        "originatedCandidate": "boolean",
+        "contribution": "NONE|ADVISORY_ONLY|CORE_FAIR_INPUT|BET_ORIGINATOR",
+        "waltersFair": "number|string|null",
+        "coreFairBeforeWalters": "number|string|null",
+        "coreFairAfterWalters": "number|string|null",
+        "comparisonState": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE|OFF",
+        "reviewImpact": "concise effect on review",
+        "betRationale": "required for Walters-originated candidate",
+        "proposedMarket": "required for Walters-originated candidate",
+        "proposedSelection": "required for Walters-originated candidate",
+        "sourceAsOf": "required timestamp for Walters-originated candidate",
+        "generatedAt": "required timestamp for Walters-originated candidate"
+      },
+      "rule": "BET_AUTHORITY may originate an eligible NFL spread/moneyline candidate, but the final recommendation must still pass Core 1.4 model-error and all normal Betting Edge hard gates. Walters is at most one independent handicap input."
     }
   },
   "boundaries": {
@@ -103,7 +150,12 @@
     "researchMayDirectlyChangeStake": false,
     "normalReportMayWriteResearchLibrary": false,
     "issuedPayloadImmutableAfterDelivery": true,
-    "sidecarAppendOnlyHistoricalEvidence": true
+    "sidecarAppendOnlyHistoricalEvidence": true,
+    "researchMayRaiseModelErrorFloorThroughCore14Allowlist": true,
+    "researchMayLowerModelErrorFloor": false,
+    "waltersMayOriginateBetWhenBetAuthority": true,
+    "waltersMayContributeIndependentFairWhenBetAuthority": true,
+    "waltersMayOverrideIdentityFreshnessPersonnelPriceExposureOrStaking": false
   },
   "failureBehavior": {
     "researchUnavailable": "Use HISTORY LIBRARY UNAVAILABLE in the issued hist field as appropriate and do not fabricate prior IDs.",
