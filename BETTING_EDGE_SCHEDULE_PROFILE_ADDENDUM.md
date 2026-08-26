@@ -2,29 +2,45 @@
 
 **Status:** OPERATIONAL — SCHEDULING LAYER  
 **Effective:** 2026-08-19  
-**Updated:** 2026-08-24 — Cloudflare-only scheduler / 10-minute odds lead  
+**Updated:** 2026-08-25 — Core 1.4 alignment / two-minute odds backstop  
 **Timezone:** `America/Vancouver`  
-**Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0  
+**Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0 + Core v1.4 production manifest  
 **Schedule definitions:** `data/schedule-profiles.json`  
 **Daily profile state:** `data/schedule-state.json`
 
 ## Scope
 
-This addendum changes **trigger timing, report-lane clock labels, seasonal pulse placement, History translation and featured Vig Scope checkpoints only**. It does not change Betting Edge pricing, identity, freshness, fair-value, decision, staking, risk, Research Fit, immutable-history or delivery gates.
+This addendum governs trigger timing, report-lane clock labels, seasonal pulse placement, History translation and featured VigScope checkpoints only. It does not change Betting Edge pricing, identity, freshness, fair-value, model-error, decision, staking, risk, Research Fit, Walters authority, immutable-history or delivery rules.
 
-The fixed lane times listed in Section 5 of `BETTING_EDGE_CONTRACT.md` are the legacy MLB/Summer operating schedule. Production scheduling resolves the active daily profile from `data/schedule-profiles.json` and `data/schedule-state.json` before analysis. The canonical slot keys remain `open`, `main`, `final_morning`, `evening`, and `late`, preserving historical compatibility.
+The canonical slot keys remain `open`, `main`, `final_morning`, `evening` and `late`, preserving historical compatibility. Production scheduling resolves the active daily profile from `data/schedule-profiles.json` and `data/schedule-state.json` before analysis.
 
 ## Daily operating rule
 
 One Vancouver operating day uses one profile. Once that operating day begins, its selected profile is authoritative for the entire day: **the run is the run**. No terminal interaction may change the active day's profile, pulse times or report times.
 
-The active profile supplies exactly five primary odds pulses and five report windows. The Odds-API spending target remains five primary pulls per operating day. Every primary odds pulse is scheduled **10 minutes before its corresponding report window**.
+The active profile supplies exactly five primary odds pulses and five report windows. The Odds-API spending target remains five primary pulls per operating day. Every configured primary odds pulse is scheduled 10 minutes before its corresponding report window.
 
-Cloudflare Worker Cron is the sole automatic odds-scheduling clock. It wakes only at minute marks `:05`, `:20` and `:50`, resolves the Vancouver-local active profile, and dispatches the existing GitHub odds workflow only when that exact minute is a configured pulse. The Worker does not perform the quota-heavy odds collection itself.
+Profile configuration may be prepared for a future operating day. The current Preferences / Operations pane remains display-only for active-day scheduling.
 
-The GitHub odds workflow has no scheduled cron trigger. It runs automatically only when dispatched by the Cloudflare Worker; `workflow_dispatch` remains available as the intentional manual recovery path. Canonical-slot duplicate protection remains in the workflow for scheduled Cloudflare dispatches.
+## Automatic odds scheduling
 
-Profile configuration may be prepared outside the live terminal for a future operating day. The current Preferences / Operations pane is deliberately **display-only** for active-day scheduling. It may show the active profile, pulse/report pairs, seasonal reference profiles, featured Vig Scope checkpoints and History translation, but it does not change the already-active operating day.
+Cloudflare Worker Cron remains the **primary odds scheduler**. It wakes at the configured minute marks, resolves the Vancouver-local active profile and dispatches the existing GitHub odds workflow only when that exact minute is a configured pulse. The Worker does not perform the quota-heavy odds collection itself.
+
+Because the Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25, `.github/workflows/odds-refresh-backstop.yml` is now an operational safety layer.
+
+The backstop:
+
+1. wakes two minutes after every currently configured possible seasonal pulse;
+2. resolves the active Vancouver profile using the same schedule-profile logic;
+3. checks whether that operating date/profile/canonical slot already published in `data/live-odds.json.scheduleMeta`;
+4. does nothing when the slot is already present;
+5. otherwise dispatches the existing protected `odds-refresh.yml` workflow using same-repository GitHub Actions authority.
+
+The target odds workflow retains its serialization, profile gate, canonical-slot duplicate protection and five-primary-pull cap. The backstop therefore provides dispatch recovery without intentionally adding a second Odds-API pull for a successful slot.
+
+`workflow_dispatch` remains available as the intentional manual recovery path. A manual pull should be used only after confirming that neither the primary dispatch nor the backstop has produced a usable fresh snapshot and that a new pull is still operationally useful.
+
+The first live proof of the new backstop remains pending the next due slot. Cloudflare scheduler authentication/dispatch reliability remains a separate infrastructure issue to diagnose; it is not a Core v1.4 methodology issue.
 
 ## Active profile timing
 
@@ -62,7 +78,7 @@ Clock time is profile-specific; canonical slot identity is permanent:
 4. `evening`
 5. `late`
 
-History compares equivalent canonical slots across different daily profiles. It never rewrites actual issued timestamps, actual feed timestamps, report payloads, odds snapshot SHAs or archived files. Planned pulse/report times are schedule metadata; actual timestamps remain historical truth.
+History compares equivalent canonical slots across profiles. It never rewrites actual issued timestamps, feed timestamps, report payloads, odds snapshot SHAs or archived files. Planned pulse/report times are metadata; actual timestamps remain historical truth.
 
 New report-history/index records should retain, when available:
 
@@ -75,14 +91,25 @@ New report-history/index records should retain, when available:
 - `scheduledLabel`
 - `featuredVigScope`
 
-Odds snapshots use `scheduleMeta` for the corresponding profile/pulse provenance. New automatic snapshots identify `triggerSource: cloudflare-cron`; intentional manual refreshes identify `triggerSource: manual`. Historical cutover snapshots may retain `github-cron` provenance.
+Odds snapshots use `scheduleMeta` for corresponding profile/pulse provenance. Existing automatic snapshots may identify `triggerSource: cloudflare-cron`; intentional manual refreshes identify `triggerSource: manual`. The current backstop dispatches through the scheduled target mode, so a recovered snapshot may still carry `cloudflare-cron` trigger-source text until provenance is separately refined. Do not infer scheduler origin from that field alone while this known limitation exists.
 
-## Vig Scope
+## VigScope
 
-The active profile marks exactly three canonical slots as featured Vig Scope checkpoints. This **does not choose or improve the Vig Scope state**. The displayed state must still be derived from the actual Market Heat, Price Pressure and Market Agreement inputs. Profile metadata controls only which three daily readings receive featured checkpoint treatment in the terminal and History.
+The active profile marks exactly three canonical slots as featured VigScope checkpoints. This does not choose or improve the VigScope state. The displayed state remains derived from actual Market Heat, Price Pressure and Market Agreement inputs. Profile metadata controls only which three daily readings receive featured checkpoint treatment in the terminal and History.
 
 ## Report automation gate
 
-Every possible seasonal report-time trigger must first resolve the active Vancouver profile. If that trigger clock is not a report time in the active profile, it exits before handicapping and before any history write. If it matches, the report uses the profile's canonical slot key, current planned label/time and featured-Vig metadata while obeying the full **Contract v1.0** production rules.
+Every possible seasonal report-time trigger first resolves the active Vancouver profile. If that trigger clock is not a report time in the active profile, it exits before handicapping and before any history write.
 
-All enabled report automations must therefore verify **Contract v1.0 OPERATIONAL** and the current approved runner boundary **VigScope UI v1.5 / Betting Edge core v1.3** before handicapping. Historical report tasks and issued reports remain immutable evidence under the contract version that governed them at issuance.
+When the trigger matches, the report must require:
+
+- `BETTING_EDGE_CONTRACT.md` v1.0 OPERATIONAL;
+- VigScope Terminal UI v1.5;
+- `core/core-v1.4-production.json` Core v1.4 OPERATIONAL;
+- Research Library v1.8 / R3 live read-only;
+- current Walters authority mode and exact provenance;
+- the normal freshness, identity, personnel, model-error, price, stake/risk and immutable-history gates.
+
+Scheduled report lanes target up to **nine meaningful cards**. Nine is a presentation/review target, not a quota: reports may contain fewer cards and zero BETs, and weak filler must not be manufactured to reach nine.
+
+Historical report tasks and issued reports remain immutable evidence under the contract/core/research state that governed them at issuance.
