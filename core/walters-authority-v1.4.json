@@ -7,10 +7,10 @@
   "allowedModes": [
     "OFF",
     "ADVISORY",
-    "CORE_INPUT"
+    "BET_AUTHORITY"
   ],
-  "purpose": "Allow Billy Walters-derived intelligence to be disabled, used as advisory context, or promoted to an active Core 1.4 handicap input without rebuilding or re-versioning the core.",
-  "operationalRule": "Changing only mode is intended to take effect for the next eligible Core 1.4 handicap/report run. Historical issued reports remain immutable and retain the Walters mode that was active when they were issued.",
+  "purpose": "Allow Billy Walters-derived intelligence to be disabled, used as advisory context, or given authority to originate Betting Edge BET recommendations without rebuilding or re-versioning Core 1.4.",
+  "operationalRule": "Changing only mode is intended to take effect for the next eligible Core 1.4 handicap/report run. Historical issued reports remain immutable and retain the Walters mode active when issued.",
   "modes": {
     "OFF": {
       "ingestWalters": false,
@@ -19,7 +19,8 @@
       "mayTriggerReReview": false,
       "mayInfluenceCoreFairValue": false,
       "mayCountAsIndependentCurrentSupport": false,
-      "description": "Walters intelligence is disabled for current handicapping. The report may record that the Walters layer was OFF for provenance."
+      "mayOriginateBet": false,
+      "description": "Walters intelligence is disabled for current handicapping."
     },
     "ADVISORY": {
       "ingestWalters": true,
@@ -28,41 +29,49 @@
       "mayTriggerReReview": true,
       "mayInfluenceCoreFairValue": false,
       "mayCountAsIndependentCurrentSupport": false,
-      "description": "Walters intelligence is visible and auditable and may trigger explicit re-review, but it does not directly move Core fair value or count as independent current support."
+      "mayOriginateBet": false,
+      "description": "Walters intelligence is visible and auditable and may trigger explicit re-review, but it cannot directly create a recommendation."
     },
-    "CORE_INPUT": {
+    "BET_AUTHORITY": {
       "ingestWalters": true,
       "compareWithCore": true,
       "showWaltersContext": true,
       "mayTriggerReReview": true,
       "mayInfluenceCoreFairValue": true,
       "mayCountAsIndependentCurrentSupport": true,
-      "description": "Walters intelligence is an active Core 1.4 handicap input. A complete, current, arithmetic-verified Walters fair may influence the Core fair-value point estimate and may count as one independent handicap input, subject to source-distinctness and current-evidence rules."
+      "mayOriginateBet": true,
+      "description": "A complete, current, arithmetic-verified Walters handicap may originate a Betting Edge BET recommendation and may contribute to Core 1.4 fair value as one independent handicap input. The resulting BET must still pass all normal hard execution, uncertainty, price and exposure gates."
     }
   },
-  "coreInputEligibility": {
-    "requiredWhenModeIsCORE_INPUT": [
+  "betAuthorityEligibility": {
+    "requiredWhenModeIsBET_AUTHORITY": [
       "Walters availability is AVAILABLE",
       "fairSpread.status is AVAILABLE",
       "fairSpread.arithmeticVerified is true",
       "sourceAsOf and generatedAt are valid/current for the event context",
-      "power/injury/game-factor sourceRefs are present enough to audit the fair build",
+      "power, personnel and game-factor sourceRefs are sufficient to audit the fair build",
       "material unresolved personnel uncertainty is passed through Core personnel/model-error handling",
-      "spread-vs-moneyline logic fails closed when the corrected Page 270 logic is unavailable",
-      "the Walters input is not merely the Bet365/DraftKings quote pair, no-vig residual, market consensus or price movement restated as a model"
+      "the recommended market/selection has exact Betting Edge identity",
+      "the executable Bet365/DraftKings quote is within the normal freshness limit",
+      "the Walters edge clears the applicable Core 1.4 conservative uncertainty/model-error boundary",
+      "spread-vs-moneyline logic fails closed when corrected Page 270 logic is unavailable",
+      "the Walters handicap is not merely the Bet365/DraftKings quote pair, no-vig residual, market consensus or price movement restated as a model"
     ],
-    "independentSupportRule": "In CORE_INPUT mode Walters may count as at most one independent current handicap input. Its underlying source package may not be decomposed into multiple votes merely because it contains several Walters factors.",
-    "fairValueRule": "In CORE_INPUT mode Core 1.4 may use Walters fair value explicitly in the point estimate or model blend, but the contribution and resulting fair must be recorded. Walters may not silently overwrite a separate Core model.",
-    "modelErrorRule": "Walters uncertainty may raise the Core model-error floor. Activating CORE_INPUT does not by itself lower any existing model-error floor or erase calibration/liquidity/personnel uncertainty."
+    "originationRule": "BET_AUTHORITY may originate a BET even if the ordinary Core handicap did not first nominate the wager. The Walters record must identify the exact market, side, fair, uncertainty and rationale; normal Betting Edge publication/execution gates then determine whether the originated recommendation can be issued.",
+    "independentSupportRule": "Walters counts as at most one independent current handicap input. Its component factors or chapters cannot be decomposed into multiple votes.",
+    "fairValueRule": "Walters fair value may explicitly contribute to the Core 1.4 point estimate or stand as the originating independent fair for a Walters-created candidate. The contribution and resulting fair must be recorded; it may not silently overwrite another Core model.",
+    "modelErrorRule": "Walters uncertainty may raise the Core model-error floor. BET_AUTHORITY does not erase calibration, liquidity, personnel or price-quality uncertainty.",
+    "playToRule": "Walters may propose the economic boundary used to construct a candidate, but final issued playTo must still be produced/validated under Core 1.4 conservative execution rules.",
+    "stakeRule": "Walters may originate BET status but does not directly set risk. Existing Betting Edge staking/exposure policy sizes any issued BET."
   },
   "hardBoundariesAllModes": {
-    "mayCreateBetDirectly": false,
     "mayOverrideExactIdentity": false,
     "mayOverrideFeedFreshness": false,
     "mayOverrideExecutableQuoteFreshness": false,
     "mayOverridePersonnelGate": false,
     "mayOverridePriceQualityGate": false,
     "mayOverrideExposureGate": false,
+    "mayBypassModelErrorBoundary": false,
     "maySetStakeDirectly": false,
     "maySupplyExecutablePrice": false,
     "mayIncreaseOddsApiCalls": false,
@@ -70,14 +79,16 @@
     "mayRewriteHistoricalReports": false
   },
   "provenanceRequired": {
-    "waltersMode": "OFF|ADVISORY|CORE_INPUT",
+    "waltersMode": "OFF|ADVISORY|BET_AUTHORITY",
     "waltersInterfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
     "waltersAvailability": "AVAILABLE|PARTIAL|UNAVAILABLE|OFF",
-    "waltersContribution": "NONE|ADVISORY_ONLY|CORE_FAIR_INPUT",
+    "waltersContribution": "NONE|ADVISORY_ONLY|CORE_FAIR_INPUT|BET_ORIGINATOR",
+    "waltersOriginatedCandidate": "boolean",
     "coreFairBeforeWalters": "number|null",
     "coreFairAfterWalters": "number|null",
     "waltersFair": "number|null",
     "waltersComparisonState": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE|OFF",
-    "waltersReviewImpact": "concise explanation or NO MATERIAL CHANGE"
+    "waltersReviewImpact": "concise explanation or NO MATERIAL CHANGE",
+    "waltersBetRationale": "required when Walters originated the BET; otherwise null"
   }
 }
