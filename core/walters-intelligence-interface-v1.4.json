@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "interfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
-  "state": "STAGING_REQUIRED_1_4_CAPABILITY_WITH_RUNTIME_AUTHORITY_SWITCH",
+  "state": "STAGING_REQUIRED_1_4_CAPABILITY_WITH_RUNTIME_BET_AUTHORITY_SWITCH",
   "targetCoreVersion": "1.4",
-  "purpose": "Provide Core 1.4 a stable, auditable input contract for Billy Walters-derived handicapping intelligence whose analytical authority is controlled at runtime by core/walters-authority-v1.4.json.",
+  "purpose": "Provide Core 1.4 a stable, auditable Billy Walters handicapping interface whose authority can be switched OFF, ADVISORY or BET_AUTHORITY at runtime.",
   "authorityControl": {
     "configPath": "core/walters-authority-v1.4.json",
-    "allowedModes": ["OFF", "ADVISORY", "CORE_INPUT"],
+    "allowedModes": ["OFF", "ADVISORY", "BET_AUTHORITY"],
     "defaultMode": "ADVISORY",
     "rule": "Core 1.4 resolves the current Walters authority mode before handicapping each eligible candidate/report. A mode change applies forward only and never rewrites issued history."
   },
@@ -15,20 +15,20 @@
     "designBlobSha": "6970a28928549cead6204799ebf23aedd767b791",
     "primaryMethodSource": "Billy Walters, Gambler, Chapters 21 and 22, using approved structured summaries and user-supplied source material rather than repository-stored unauthorized full chapter text",
     "page270CorrectionRequired": true,
-    "page270Rule": "Spread-versus-moneyline conversion must use the corrected, internally reconciled source logic. If the approved correction cannot be resolved, return SPREAD_VS_ML_UNAVAILABLE rather than infer or reconstruct from an inconsistent historical chart."
+    "page270Rule": "Spread-versus-moneyline conversion must use the corrected, internally reconciled source logic. If the approved correction cannot be resolved, return SPREAD_VS_ML_UNAVAILABLE rather than infer from an inconsistent historical chart."
   },
   "coverage": {
     "primaryInitialSport": "NFL",
     "initialMarketClasses": ["spread", "moneyline"],
-    "futureExpansion": "Other sports/markets may use the same interface only after their Walters methodology mapping is explicitly defined and tested.",
+    "futureExpansion": "Other sports/markets may use the interface only after their Walters methodology mapping is explicitly defined and tested.",
     "availabilityIsReportBlocking": false,
     "interfaceResolutionRequiredForCore14": true,
-    "meaning": "When Walters mode is not OFF, Core 1.4 must know whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE for an eligible candidate. Missing Walters data does not block an otherwise valid Betting Edge report."
+    "meaning": "When Walters mode is not OFF, Core 1.4 must resolve whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE. Missing Walters data does not block an otherwise valid Betting Edge report."
   },
   "availabilityStates": ["AVAILABLE", "PARTIAL", "UNAVAILABLE"],
   "comparisonStates": ["ALIGNED", "MIXED", "CONFLICT", "NOT_COMPARABLE", "UNAVAILABLE"],
   "spreadMoneylineStates": ["AVAILABLE", "NOT_APPLICABLE", "SPREAD_VS_ML_UNAVAILABLE"],
-  "waltersVerdicts": ["ALIGNED", "MARGINAL", "VALUE_CANDIDATE", "NO_VALUE", "INSUFFICIENT_DATA"],
+  "waltersVerdicts": ["ALIGNED", "MARGINAL", "VALUE_CANDIDATE", "BET_CANDIDATE", "NO_VALUE", "INSUFFICIENT_DATA"],
   "recordShape": {
     "candidateKey": "stable Core 1.4 candidate identity key",
     "availability": "AVAILABLE|PARTIAL|UNAVAILABLE",
@@ -42,7 +42,7 @@
     },
     "source": {
       "methodologyVersion": "Walters methodology package/interface version",
-      "sourceAsOf": "timestamp/date through which the Walters inputs are current",
+      "sourceAsOf": "timestamp/date through which Walters inputs are current",
       "generatedAt": "timestamp Walters record was generated",
       "sourceRefs": "array of provenance references for power ratings, personnel, game factors and any conversion tables used",
       "notes": "optional source/completeness note"
@@ -63,7 +63,7 @@
       "unresolved": "array of material unresolved player/position-group questions"
     },
     "gameFactors": {
-      "factors": "array of {factor, adjustment, state, rationale, sourceRefs}; adjustment uses home-positive point convention; state is APPLIED|NO_ADJUSTMENT|INSUFFICIENT_EVIDENCE",
+      "factors": "array of {factor, adjustment, state, rationale, sourceRefs}; home-positive point convention; APPLIED|NO_ADJUSTMENT|INSUFFICIENT_EVIDENCE",
       "netHomeAdjustment": "number|null"
     },
     "fairSpread": {
@@ -72,6 +72,14 @@
       "componentEquation": "human-readable rating + home field + personnel + factors path",
       "uncertainty": "concise range/confidence note",
       "status": "AVAILABLE|PARTIAL|UNAVAILABLE"
+    },
+    "proposedWager": {
+      "market": "spread|moneyline|null",
+      "selection": "exact proposed team/side|null",
+      "waltersFair": "number|null",
+      "targetPriceOrLine": "number|string|null",
+      "edgeRationale": "why Walters views the exact wager as actionable|null",
+      "status": "NO_WAGER|VALUE_CANDIDATE|BET_CANDIDATE"
     },
     "keyNumbers": {
       "status": "AVAILABLE|PARTIAL|UNAVAILABLE",
@@ -91,15 +99,15 @@
       "book": "book/source label|null",
       "observedAt": "timestamp|null",
       "executionAuthority": false,
-      "rule": "This is comparison context only. Core 1.4 obtains executable identity/price/freshness from the normal Betting Edge feed and gates."
+      "rule": "Comparison context only. Executable identity/price/freshness comes from the normal Betting Edge feed and hard gates."
     },
-    "waltersVerdict": "ALIGNED|MARGINAL|VALUE_CANDIDATE|NO_VALUE|INSUFFICIENT_DATA",
+    "waltersVerdict": "ALIGNED|MARGINAL|VALUE_CANDIDATE|BET_CANDIDATE|NO_VALUE|INSUFFICIENT_DATA",
     "coreComparison": {
       "coreFairSpread": "number|null",
       "waltersFairSpread": "number|null",
       "differencePoints": "number|null",
       "state": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE",
-      "materialityRationale": "why the agreement/disagreement is or is not material, including key-number context",
+      "materialityRationale": "why agreement/disagreement is or is not material, including key-number context",
       "reviewRequired": "boolean"
     }
   },
@@ -108,37 +116,40 @@
       "ingest": false,
       "compare": false,
       "mayInfluenceCoreFairValue": false,
-      "mayCountAsIndependentCurrentSupport": false
+      "mayCountAsIndependentCurrentSupport": false,
+      "mayOriginateBet": false
     },
     "ADVISORY": {
       "ingest": true,
       "compare": true,
       "mayTriggerExplicitReReview": true,
       "mayInfluenceCoreFairValue": false,
-      "mayCountAsIndependentCurrentSupport": false
+      "mayCountAsIndependentCurrentSupport": false,
+      "mayOriginateBet": false
     },
-    "CORE_INPUT": {
+    "BET_AUTHORITY": {
       "ingest": true,
       "compare": true,
       "mayTriggerExplicitReReview": true,
       "mayInfluenceCoreFairValue": true,
       "mayCountAsIndependentCurrentSupport": true,
-      "eligibilityRule": "Only a complete/current/arithmetic-verified Walters build meeting the runtime authority configuration's source-distinctness and audit rules may receive active Core-input authority."
+      "mayOriginateBet": true,
+      "eligibilityRule": "Only a complete/current/arithmetic-verified Walters build satisfying the authority configuration may originate BET. The resulting wager must still pass normal Core 1.4 model-error, identity, freshness, personnel, price-quality, exposure and staking rules."
     }
   },
   "hardBoundariesAllModes": {
-    "mayCreateBetDirectly": false,
     "mayOverrideIdentity": false,
     "mayOverridePriceFreshness": false,
     "mayOverridePersonnelGate": false,
+    "mayOverridePriceQualityGate": false,
     "mayOverrideExposureGate": false,
-    "maySetPlayToDirectly": false,
+    "mayBypassModelErrorBoundary": false,
     "maySetStakeDirectly": false,
     "maySupplyExecutablePrice": false,
     "mayRewriteHistoricalReports": false
   },
-  "futureActivationBoundary": {
-    "runtimeCoreInputModeAvailableIn14": true,
-    "rule": "CORE_INPUT may influence fair value and count as one independent current handicap input, but cannot bypass normal Betting Edge hard gates. Any authority beyond these configured modes requires a separately versioned activation and regression approval."
+  "runtimeAuthorityBoundary": {
+    "betAuthorityAvailableIn14": true,
+    "rule": "BET_AUTHORITY can originate a BET and contribute a fair-value input, but it cannot bypass Betting Edge hard gates. Switching back to ADVISORY or OFF removes that authority on future reports without changing the Core 1.4 version."
   }
 }
