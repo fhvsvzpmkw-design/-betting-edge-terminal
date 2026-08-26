@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "configId": "walters-authority-v1.4",
+  "state": "STAGING_RUNTIME_CONTROL_FOR_CORE_1_4",
+  "targetCoreVersion": "1.4",
+  "mode": "ADVISORY",
+  "allowedModes": [
+    "OFF",
+    "ADVISORY",
+    "CORE_INPUT"
+  ],
+  "purpose": "Allow Billy Walters-derived intelligence to be disabled, used as advisory context, or promoted to an active Core 1.4 handicap input without rebuilding or re-versioning the core.",
+  "operationalRule": "Changing only mode is intended to take effect for the next eligible Core 1.4 handicap/report run. Historical issued reports remain immutable and retain the Walters mode that was active when they were issued.",
+  "modes": {
+    "OFF": {
+      "ingestWalters": false,
+      "compareWithCore": false,
+      "showWaltersContext": false,
+      "mayTriggerReReview": false,
+      "mayInfluenceCoreFairValue": false,
+      "mayCountAsIndependentCurrentSupport": false,
+      "description": "Walters intelligence is disabled for current handicapping. The report may record that the Walters layer was OFF for provenance."
+    },
+    "ADVISORY": {
+      "ingestWalters": true,
+      "compareWithCore": true,
+      "showWaltersContext": true,
+      "mayTriggerReReview": true,
+      "mayInfluenceCoreFairValue": false,
+      "mayCountAsIndependentCurrentSupport": false,
+      "description": "Walters intelligence is visible and auditable and may trigger explicit re-review, but it does not directly move Core fair value or count as independent current support."
+    },
+    "CORE_INPUT": {
+      "ingestWalters": true,
+      "compareWithCore": true,
+      "showWaltersContext": true,
+      "mayTriggerReReview": true,
+      "mayInfluenceCoreFairValue": true,
+      "mayCountAsIndependentCurrentSupport": true,
+      "description": "Walters intelligence is an active Core 1.4 handicap input. A complete, current, arithmetic-verified Walters fair may influence the Core fair-value point estimate and may count as one independent handicap input, subject to source-distinctness and current-evidence rules."
+    }
+  },
+  "coreInputEligibility": {
+    "requiredWhenModeIsCORE_INPUT": [
+      "Walters availability is AVAILABLE",
+      "fairSpread.status is AVAILABLE",
+      "fairSpread.arithmeticVerified is true",
+      "sourceAsOf and generatedAt are valid/current for the event context",
+      "power/injury/game-factor sourceRefs are present enough to audit the fair build",
+      "material unresolved personnel uncertainty is passed through Core personnel/model-error handling",
+      "spread-vs-moneyline logic fails closed when the corrected Page 270 logic is unavailable",
+      "the Walters input is not merely the Bet365/DraftKings quote pair, no-vig residual, market consensus or price movement restated as a model"
+    ],
+    "independentSupportRule": "In CORE_INPUT mode Walters may count as at most one independent current handicap input. Its underlying source package may not be decomposed into multiple votes merely because it contains several Walters factors.",
+    "fairValueRule": "In CORE_INPUT mode Core 1.4 may use Walters fair value explicitly in the point estimate or model blend, but the contribution and resulting fair must be recorded. Walters may not silently overwrite a separate Core model.",
+    "modelErrorRule": "Walters uncertainty may raise the Core model-error floor. Activating CORE_INPUT does not by itself lower any existing model-error floor or erase calibration/liquidity/personnel uncertainty."
+  },
+  "hardBoundariesAllModes": {
+    "mayCreateBetDirectly": false,
+    "mayOverrideExactIdentity": false,
+    "mayOverrideFeedFreshness": false,
+    "mayOverrideExecutableQuoteFreshness": false,
+    "mayOverridePersonnelGate": false,
+    "mayOverridePriceQualityGate": false,
+    "mayOverrideExposureGate": false,
+    "maySetStakeDirectly": false,
+    "maySupplyExecutablePrice": false,
+    "mayIncreaseOddsApiCalls": false,
+    "mayChangeExecutionBooks": false,
+    "mayRewriteHistoricalReports": false
+  },
+  "provenanceRequired": {
+    "waltersMode": "OFF|ADVISORY|CORE_INPUT",
+    "waltersInterfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
+    "waltersAvailability": "AVAILABLE|PARTIAL|UNAVAILABLE|OFF",
+    "waltersContribution": "NONE|ADVISORY_ONLY|CORE_FAIR_INPUT",
+    "coreFairBeforeWalters": "number|null",
+    "coreFairAfterWalters": "number|null",
+    "waltersFair": "number|null",
+    "waltersComparisonState": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE|OFF",
+    "waltersReviewImpact": "concise explanation or NO MATERIAL CHANGE"
+  }
+}
