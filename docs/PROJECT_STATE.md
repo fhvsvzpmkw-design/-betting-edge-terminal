@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-25 — Research Library v1.8 R3 promotion checkpoint
+**Last updated:** 2026-08-25 — Core 1.4 production integration checkpoint
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -9,14 +9,14 @@ This file is the practical current-state snapshot. It is not a replacement for `
 ## Current version boundary
 
 - **Production governance:** `BETTING_EDGE_CONTRACT.md` — **v1.0 OPERATIONAL**.
-- **Current Contract v1.0 blob:** `8bb1756a573d50d03ef99cd24eedb228d08d7632`.
+- **Current Contract v1.0 blob:** `0951371364e8e888af6007da9865a84d3ffe113c`.
 - **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`.
 - **VigScope presentation:** `runner.html` — **Terminal UI v1.5**.
 - **UI v1.5 runner blob at promotion:** `8d3dd16e1f77c415e267064d6ced3ceec371dc29`.
-- **Report engine/core:** `runner-core.html` + `index.html` — **v1.3**, unchanged by the v1.0/v1.5 promotion and v1.8 Research Library promotion.
+- **Report engine/core:** **Core v1.4 OPERATIONAL** — production authority `core/core-v1.4-production.json`; `runner-core.html` + `index.html` remain the inner UI/runtime shell.
 - **Research Library:** **v1.8**, R3 live read-only production authority.
 - **Research inventory:** **130 logical items / 108 sources / 30 evidence clusters**.
-- **Report provenance:** schema **3**; new reports record Contract v1.0 provenance and active Research Library version, historical sidecars remain immutable.
+- **Report provenance:** schema **3**; post-Core-1.4 reports additionally record Core production/framework SHAs, model-error assessment, Walters interface/authority SHAs and runtime mode; historical sidecars remain immutable.
 - **Authoritative rollback system:** Git history.
 - **Night-lock checkpoint:** branch `night-lock-2026-08-24` at main commit `1e1551baa6bf5dfc4104ad21e33424969466402b` — historical Contract v1.0 / Terminal UI v1.5 / core v1.3 / Research Library v1.7 checkpoint.
 
@@ -30,7 +30,7 @@ All enabled Betting Edge report automations perform the active schedule-profile 
 
 - **Contract v1.0 OPERATIONAL**;
 - **VigScope UI v1.5**;
-- **Betting Edge core v1.3**;
+- **Betting Edge Core v1.4 OPERATIONAL** with the current Core production/framework provenance resolved before handicapping;
 - Research Library **v1.8 / R3 live read-only** with validation PASS;
 - 75-minute live-feed freshness;
 - 30-minute executable-quote freshness;
@@ -182,6 +182,7 @@ Promotion record: `research/V1_8_PROMOTION_2026-08-25.md`. Validation record: `r
 
 - **C-track:** Contract v1.0 operational.
 - **R-track:** R3 — live read-only Research Fit using production Research Library v1.8.
+- **Core track:** v1.4 operational — explicit fair-value basis/model-error framework with Walters runtime authority switch currently at BET_AUTHORITY.
 - **H-track:** H3 — live immutable issued-report/provenance history.
 - **S-track:** S0 — Shadow History inactive.
 
@@ -208,3 +209,7 @@ The final v0.9 governance state was promoted to Contract v1.0, accumulated prese
 ### 2026-08-25 — Research Library v1.8 R3 promotion
 
 The previously tested 120-item v1.8 candidate was reopened after sufficient v1.7 live-production soak. A focused R3 gap-closure pass added 10 logical items, 8 sources and 4 evidence clusters, producing the active 130-item / 108-source / 30-cluster v1.8 library. Validation passed all ID, source, cluster, market-boundary and R3 hard-boundary checks. The active manifest was switched to v1.8 without changing core v1.3, Contract v1.0, supported books, staking/risk rules, report lanes or Odds-API budget.
+
+### 2026-08-25 — Core 1.4 production integration
+
+Core 1.4 was activated forward-only at `2026-08-25T17:20:00-07:00`. It consolidates the proven 1.3 handicap foundation with explicit fair-value-basis/model-error states, fixed Research Library v1.8 uncertainty graduation, Stage 2 personnel sensitivity, WAIT discipline and switchable Walters authority. Walters launches at `BET_AUTHORITY` and may originate eligible NFL spread/moneyline candidates, but cannot bypass identity, freshness, personnel, price-quality/model-error, playTo, exposure or staking gates. Post-cutover sidecars require structured `coreAssessment` and `waltersEvidence`; the publication verification recomputes Core 1.4 model error. Results/CLV learning, Shadow History, learned associations and personal-ledger calibration remain deliberately deferred. Supported books, staking, report schedules and Odds-API budget are unchanged.

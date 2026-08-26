@@ -19,12 +19,12 @@ The current presentation release is **VigScope Terminal UI v1.5** in `runner.htm
 
 v1.5 is a consolidation boundary for the accumulated production presentation work now operating together, including the manifest-driven Syndicate workspace and independent hotline shells, the rebuilt F3 Bet History/public performance surface, the current Preferences/report-card presentation, and the private-ledger public-projection architecture. It does not imply a betting-engine rewrite.
 
-The underlying `runner-core.html` / `index.html` report engine/core remains **v1.3**. The authoritative governance contract is **Betting Edge Contract v1.0 OPERATIONAL**. The production Research Library is **v1.8 R3 live read-only**.
+The underlying Betting Edge report engine/core is now **Core v1.4 OPERATIONAL**, with `core/core-v1.4-production.json` as its production manifest and `runner-core.html` / `index.html` as the inner presentation/runtime shell. The authoritative governance contract remains **Betting Edge Contract v1.0 OPERATIONAL**. The production Research Library is **v1.8 R3 live read-only**. Walters launches in switchable **BET_AUTHORITY** mode for eligible NFL spread/moneyline work.
 
 These versions are intentionally independent:
 
 - **Terminal / product UI:** v1.5
-- **Report engine/core:** v1.3
+- **Report engine/core:** v1.4
 - **Governance contract:** v1.0
 - **Research Library:** v1.8 / R3 live read-only
 - **Hotline shells:** independently versioned per character/publication
