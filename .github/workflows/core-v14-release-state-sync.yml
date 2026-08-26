@@ -1,0 +1,59 @@
+name: Core 1.4 release-state sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/sync-core-v14-release-state.mjs'
+      - '.github/workflows/core-v14-release-state-sync.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: core-v14-release-state-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sync release state
+        run: node tools/sync-core-v14-release-state.mjs
+      - name: Verify intentional history-key continuity
+        run: |
+          grep -q 'VIGSCOPE CORE v1.4' index.html
+          grep -q "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';" runner-core.html
+          grep -q 'Report engine/core:** v1.4' README.md
+          grep -q 'Core 1.4 production integration checkpoint' docs/PROJECT_STATE.md
+      - name: Commit synced state
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add README.md docs/PROJECT_STATE.md index.html runner-core.html
+          if git diff --cached --quiet; then
+            echo 'Core 1.4 release state already synchronized.'
+            exit 0
+          fi
+          git commit -m 'Sync Core 1.4 release state'
+          git push origin HEAD:main
+      - name: Remote read-back
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          grep -q 'VIGSCOPE CORE v1.4' index.html
+          grep -q 'Core v1.4 OPERATIONAL' docs/PROJECT_STATE.md
+          grep -q 'Report engine/core:** v1.4' README.md
+          grep -q "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';" runner-core.html
