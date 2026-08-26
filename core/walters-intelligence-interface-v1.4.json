@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "interfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
-  "state": "STAGING_REQUIRED_1_4_CAPABILITY_WITH_RUNTIME_BET_AUTHORITY_SWITCH",
+  "state": "OPERATIONAL",
   "targetCoreVersion": "1.4",
   "purpose": "Provide Core 1.4 a stable, auditable Billy Walters handicapping interface whose authority can be switched OFF, ADVISORY or BET_AUTHORITY at runtime.",
   "authorityControl": {
@@ -23,7 +23,7 @@
     "futureExpansion": "Other sports/markets may use the interface only after their Walters methodology mapping is explicitly defined and tested.",
     "availabilityIsReportBlocking": false,
     "interfaceResolutionRequiredForCore14": true,
-    "meaning": "When Walters mode is not OFF, Core 1.4 must resolve whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE. Missing Walters data does not block an otherwise valid Betting Edge report."
+    "meaning": "When Walters mode is not OFF, Core 1.4 must resolve whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE for an eligible market. Missing Walters data does not block an otherwise valid Betting Edge report."
   },
   "availabilityStates": ["AVAILABLE", "PARTIAL", "UNAVAILABLE"],
   "comparisonStates": ["ALIGNED", "MIXED", "CONFLICT", "NOT_COMPARABLE", "UNAVAILABLE"],
@@ -32,110 +32,23 @@
   "recordShape": {
     "candidateKey": "stable Core 1.4 candidate identity key",
     "availability": "AVAILABLE|PARTIAL|UNAVAILABLE",
-    "eventIdentity": {
-      "sport": "controlled sport label",
-      "league": "league/competition label",
-      "eventId": "provider/core event identifier when available",
-      "away": "away participant",
-      "home": "home participant",
-      "startTime": "ISO event start timestamp"
-    },
-    "source": {
-      "methodologyVersion": "Walters methodology package/interface version",
-      "sourceAsOf": "timestamp/date through which Walters inputs are current",
-      "generatedAt": "timestamp Walters record was generated",
-      "sourceRefs": "array of provenance references for power ratings, personnel, game factors and any conversion tables used",
-      "notes": "optional source/completeness note"
-    },
-    "power": {
-      "awayNeutralRating": "number|null",
-      "homeNeutralRating": "number|null",
-      "rawHomeDifferential": "number|null; home rating minus away rating",
-      "awayPriorRating": "number|null",
-      "homePriorRating": "number|null",
-      "awayUpdate": "number|null",
-      "homeUpdate": "number|null",
-      "confidence": "HIGH|MEDIUM|LOW|UNQUANTIFIED"
-    },
-    "personnel": {
-      "adjustments": "array of {participant, player, position, participation, effectiveness, pointImpact, replacementQuality, clusterImpact, uncertainty, sourceRefs}",
-      "netHomeAdjustment": "number|null; home-positive point convention",
-      "unresolved": "array of material unresolved player/position-group questions"
-    },
-    "gameFactors": {
-      "factors": "array of {factor, adjustment, state, rationale, sourceRefs}; home-positive point convention; APPLIED|NO_ADJUSTMENT|INSUFFICIENT_EVIDENCE",
-      "netHomeAdjustment": "number|null"
-    },
-    "fairSpread": {
-      "homePerspective": "number|null; negative means home favorite, positive means home underdog",
-      "arithmeticVerified": "boolean",
-      "componentEquation": "human-readable rating + home field + personnel + factors path",
-      "uncertainty": "concise range/confidence note",
-      "status": "AVAILABLE|PARTIAL|UNAVAILABLE"
-    },
-    "proposedWager": {
-      "market": "spread|moneyline|null",
-      "selection": "exact proposed team/side|null",
-      "waltersFair": "number|null",
-      "targetPriceOrLine": "number|string|null",
-      "edgeRationale": "why Walters views the exact wager as actionable|null",
-      "status": "NO_WAGER|VALUE_CANDIDATE|BET_CANDIDATE"
-    },
-    "keyNumbers": {
-      "status": "AVAILABLE|PARTIAL|UNAVAILABLE",
-      "crossings": "array of material NFL key-number crossings between Walters fair and market reference",
-      "tableRef": "provenance reference to the current calibrated key-number table when used"
-    },
-    "spreadVsMoneyline": {
-      "status": "AVAILABLE|NOT_APPLICABLE|SPREAD_VS_ML_UNAVAILABLE",
-      "preferredExpression": "SPREAD|MONEYLINE|NO_PREFERENCE|UNAVAILABLE",
-      "logicRef": "provenance reference to corrected conversion logic",
-      "rationale": "concise comparison rationale"
-    },
-    "marketReference": {
-      "spread": "number|null",
-      "spreadPrice": "American odds|null",
-      "moneyline": "American odds|null",
-      "book": "book/source label|null",
-      "observedAt": "timestamp|null",
-      "executionAuthority": false,
-      "rule": "Comparison context only. Executable identity/price/freshness comes from the normal Betting Edge feed and hard gates."
-    },
+    "eventIdentity": {"sport":"controlled sport label","league":"league/competition label","eventId":"provider/core event identifier when available","away":"away participant","home":"home participant","startTime":"ISO event start timestamp"},
+    "source": {"methodologyVersion":"Walters methodology package/interface version","sourceAsOf":"timestamp/date through which Walters inputs are current","generatedAt":"timestamp Walters record was generated","sourceRefs":"array of provenance references for power ratings, personnel, game factors and any conversion tables used","notes":"optional source/completeness note"},
+    "power": {"awayNeutralRating":"number|null","homeNeutralRating":"number|null","rawHomeDifferential":"number|null; home rating minus away rating","awayPriorRating":"number|null","homePriorRating":"number|null","awayUpdate":"number|null","homeUpdate":"number|null","confidence":"HIGH|MEDIUM|LOW|UNQUANTIFIED"},
+    "personnel": {"adjustments":"array of material player/position adjustments","netHomeAdjustment":"number|null; home-positive point convention","unresolved":"array of material unresolved player/position-group questions"},
+    "gameFactors": {"factors":"array of factor/adjustment/state/rationale/sourceRefs records","netHomeAdjustment":"number|null"},
+    "fairSpread": {"homePerspective":"number|null; negative means home favorite, positive means home underdog","arithmeticVerified":"boolean","componentEquation":"human-readable rating + home field + personnel + factors path","uncertainty":"concise range/confidence note","status":"AVAILABLE|PARTIAL|UNAVAILABLE"},
+    "proposedWager": {"market":"spread|moneyline|null","selection":"exact proposed team/side|null","waltersFair":"number|string|null","targetPriceOrLine":"number|string|null","edgeRationale":"why Walters views the exact wager as actionable|null","status":"NO_WAGER|VALUE_CANDIDATE|BET_CANDIDATE"},
+    "keyNumbers": {"status":"AVAILABLE|PARTIAL|UNAVAILABLE","crossings":"array of material NFL key-number crossings between Walters fair and market reference","tableRef":"provenance reference to the current calibrated key-number table when used"},
+    "spreadVsMoneyline": {"status":"AVAILABLE|NOT_APPLICABLE|SPREAD_VS_ML_UNAVAILABLE","preferredExpression":"SPREAD|MONEYLINE|NO_PREFERENCE|UNAVAILABLE","logicRef":"provenance reference to corrected conversion logic","rationale":"concise comparison rationale"},
+    "marketReference": {"spread":"number|null","spreadPrice":"American odds|null","moneyline":"American odds|null","book":"book/source label|null","observedAt":"timestamp|null","executionAuthority":false,"rule":"Comparison context only. Executable identity/price/freshness comes from the normal Betting Edge feed and hard gates."},
     "waltersVerdict": "ALIGNED|MARGINAL|VALUE_CANDIDATE|BET_CANDIDATE|NO_VALUE|INSUFFICIENT_DATA",
-    "coreComparison": {
-      "coreFairSpread": "number|null",
-      "waltersFairSpread": "number|null",
-      "differencePoints": "number|null",
-      "state": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE",
-      "materialityRationale": "why agreement/disagreement is or is not material, including key-number context",
-      "reviewRequired": "boolean"
-    }
+    "coreComparison": {"coreFairSpread":"number|null","waltersFairSpread":"number|null","differencePoints":"number|null","state":"ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE","materialityRationale":"why agreement/disagreement is or is not material, including key-number context","reviewRequired":"boolean"}
   },
   "modeBehavior": {
-    "OFF": {
-      "ingest": false,
-      "compare": false,
-      "mayInfluenceCoreFairValue": false,
-      "mayCountAsIndependentCurrentSupport": false,
-      "mayOriginateBet": false
-    },
-    "ADVISORY": {
-      "ingest": true,
-      "compare": true,
-      "mayTriggerExplicitReReview": true,
-      "mayInfluenceCoreFairValue": false,
-      "mayCountAsIndependentCurrentSupport": false,
-      "mayOriginateBet": false
-    },
-    "BET_AUTHORITY": {
-      "ingest": true,
-      "compare": true,
-      "mayTriggerExplicitReReview": true,
-      "mayInfluenceCoreFairValue": true,
-      "mayCountAsIndependentCurrentSupport": true,
-      "mayOriginateBet": true,
-      "eligibilityRule": "Only a complete/current/arithmetic-verified Walters build satisfying the authority configuration may originate BET. The resulting wager must still pass normal Core 1.4 model-error, identity, freshness, personnel, price-quality, exposure and staking rules."
-    }
+    "OFF": {"ingest":false,"compare":false,"mayInfluenceCoreFairValue":false,"mayCountAsIndependentCurrentSupport":false,"mayOriginateBet":false},
+    "ADVISORY": {"ingest":true,"compare":true,"mayTriggerExplicitReReview":true,"mayInfluenceCoreFairValue":false,"mayCountAsIndependentCurrentSupport":false,"mayOriginateBet":false},
+    "BET_AUTHORITY": {"ingest":true,"compare":true,"mayTriggerExplicitReReview":true,"mayInfluenceCoreFairValue":true,"mayCountAsIndependentCurrentSupport":true,"mayOriginateBet":true,"eligibilityRule":"Only a complete/current/arithmetic-verified Walters build satisfying the authority configuration may originate BET. The resulting wager must still pass normal Core 1.4 model-error, identity, freshness, personnel, price-quality, exposure and staking rules."}
   },
   "hardBoundariesAllModes": {
     "mayOverrideIdentity": false,
