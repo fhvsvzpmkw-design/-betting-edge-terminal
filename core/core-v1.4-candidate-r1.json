@@ -4,10 +4,10 @@
   "state": "STAGING_CANDIDATE_NOT_RUNTIME_AUTHORITY",
   "targetCoreVersion": "1.4",
   "currentProductionCoreVersion": "1.3",
-  "purpose": "Assemble the Core 1.4 consolidation release from the proven Core 1.3 foundation, the tested one-way model-error framework, Research Library v1.8 calibration knowledge and the required Walters Intelligence access layer while explicitly deferring later learning systems.",
+  "purpose": "Assemble Core 1.4 from the proven Core 1.3 foundation, the tested one-way model-error framework, Research Library v1.8 calibration knowledge and a switchable Walters handicapping engine with optional BET origination authority.",
   "scopeAuthority": {
     "path": "core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md",
-    "blobSha": "bbf04e29176aa2c01e87f84aee3079d14ba955ff"
+    "blobSha": "532933010dcb590383bd3888fef50f2b00edb496"
   },
   "components": {
     "modelErrorFramework": {
@@ -26,11 +26,14 @@
     "waltersIntelligence": {
       "requiredCapability": true,
       "interfacePath": "core/walters-intelligence-interface-v1.4.json",
-      "interfaceBlobSha": "c910ef4192b58e446fb0a6ec1f9a5a4a93a37b3e",
+      "interfaceBlobSha": "9cb4dbbe02298ef24dd5514e7f8e7610fb855d96",
+      "authorityPath": "core/walters-authority-v1.4.json",
+      "authorityBlobSha": "aa89129f2b48dce535792dbe661e6f8731267925",
       "sourceDesignPath": "research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md",
       "sourceDesignBlobSha": "6970a28928549cead6204799ebf23aedd767b791",
-      "initialRoleIn14": "ADVISORY_SPECIALIST_INTELLIGENCE_WITH_REVIEW_TRIGGER",
-      "weightedCoreInputNow": false,
+      "runtimeModes": ["OFF", "ADVISORY", "BET_AUTHORITY"],
+      "defaultMode": "ADVISORY",
+      "betOriginationModeAvailable": true,
       "missingDataBlocksReport": false
     },
     "personnelProcess": {
@@ -55,7 +58,8 @@
     "MOVEMENT_NOT_AUTOMATIC_SHARP_PROOF",
     "WAIT_REQUIRES_LIVE_UNDERLYING_CASE",
     "RESEARCH_V1_8_ONE_WAY_MODEL_ERROR_INFLUENCE",
-    "WALTERS_INTELLIGENCE_ACCESS_AND_COMPARISON",
+    "WALTERS_RUNTIME_AUTHORITY_SWITCH",
+    "WALTERS_BET_ORIGINATION_AUTHORITY",
     "STRUCTURED_CORE_PROVENANCE"
   ],
   "explicitlyDeferredFrom14": [
@@ -74,25 +78,40 @@
     "paidOddsDependencyAdded": false,
     "runnerUiRedesignRequired": false
   },
-  "waltersInitialBoundaries": {
-    "mayCreateBet": false,
-    "mayCountAsIndependentCurrentSupport": false,
-    "mayDirectlyMoveCoreFairValue": false,
-    "mayLowerModelError": false,
-    "maySetPlayTo": false,
-    "maySetStake": false,
-    "maySupplyExecutablePrice": false,
-    "mayOverrideHardGates": false,
-    "mayTriggerExplicitReReview": true,
-    "mayBeComparedWithCoreAndMarket": true
+  "waltersAuthority": {
+    "OFF": {
+      "mayOriginateBet": false,
+      "mayInfluenceCoreFairValue": false,
+      "mayCountAsIndependentCurrentSupport": false
+    },
+    "ADVISORY": {
+      "mayOriginateBet": false,
+      "mayInfluenceCoreFairValue": false,
+      "mayCountAsIndependentCurrentSupport": false,
+      "mayTriggerExplicitReReview": true
+    },
+    "BET_AUTHORITY": {
+      "mayOriginateBet": true,
+      "mayInfluenceCoreFairValue": true,
+      "mayCountAsIndependentCurrentSupport": true,
+      "mayTriggerExplicitReReview": true
+    },
+    "hardBoundariesAllModes": {
+      "mayOverrideIdentityFreshnessPersonnelPriceExposureGates": false,
+      "mayBypassModelErrorBoundary": false,
+      "maySetStakeDirectly": false,
+      "maySupplyExecutablePrice": false,
+      "mayRewriteHistoricalReports": false
+    }
   },
   "promotionRequirements": [
     "ALL_CORE_1_3_R1_MODEL_ERROR_REGRESSIONS_PASS",
-    "WALTERS_INTERFACE_VALIDATION_PASS",
+    "WALTERS_INTERFACE_AND_AUTHORITY_VALIDATION_PASS",
+    "WALTERS_BET_AUTHORITY_POSITIVE_AND_FAIL_CLOSED_TESTS_PASS",
     "CORE_1_4_COMBINED_REGRESSION_PASS",
-    "STRUCTURED_SIDECAR_PROVENANCE_FOR_CORE_1_4",
+    "STRUCTURED_SIDECAR_PROVENANCE_FOR_CORE_1_4_AND_WALTERS_MODE",
     "FORWARD_ONLY_CUTOVER_WITH_HISTORICAL_REPORTS_IMMUTABLE",
-    "GOVERNANCE_BOUNDARY_UPDATED_FOR_ONE_WAY_RESEARCH_MODEL_ERROR_AND_WALTERS_ADVISORY_ACCESS",
+    "GOVERNANCE_BOUNDARY_UPDATED_FOR_ONE_WAY_RESEARCH_MODEL_ERROR_AND_SWITCHABLE_WALTERS_BET_AUTHORITY",
     "NO_STAKING_BOOK_SCHEDULE_API_BUDGET_REGRESSION",
     "EXPLICIT_CORE_1_4_PROMOTION_APPROVAL"
   ]
