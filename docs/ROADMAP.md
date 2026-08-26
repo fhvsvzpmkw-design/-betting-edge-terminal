@@ -1,289 +1,256 @@
 # Betting Edge — Roadmap
 
-**Last updated:** 2026-08-24 — Contract v1.0 / VigScope UI v1.5 night-lock alignment; v1.8 Research Library promotion still on hold
+**Last updated:** 2026-08-25 — Core 1.4 production closeout
 
-This roadmap separates completed foundations from active near-term work and later integration. Preserve the working pipeline, prove each new layer independently, and keep unrelated change families separate.
+This roadmap separates completed foundations from active near-term work. Preserve the working pipeline, prove new layers independently, and avoid turning reliability or presentation fixes into unnecessary Core-version changes.
 
 ## Completed foundations
 
-### Repository and deployment
+### Production boundary
 
-- GitHub repository is the active project source.
-- Direct GitHub create/update/delete capability has been tested successfully.
-- Repository safety policy is documented in `README.md`.
-- Git history is the authoritative rollback system.
-- GitHub Pages deployment remains part of the verification path for web changes.
+- Betting Edge Contract **v1.0 OPERATIONAL**.
+- VigScope Terminal UI **v1.5**.
+- Betting Edge Core **v1.4 OPERATIONAL**.
+- Research Library **v1.8 / R3 live read-only**.
+- Walters runtime authority switch operational, currently `BET_AUTHORITY` for eligible NFL spread/moneyline.
+- Stage 1 + material Stage 2 personnel workflow operational.
+- Schema-3 Core/Research/Walters provenance operational.
+- Core 1.4 publication gate and model-error recomputation operational.
+- First Core 1.4 production issuance completed and verified on the 2026-08-25 late lane.
+- Core 1.4 closeout record: `BETTING_EDGE_CORE_V1_4_CLOSEOUT_2026-08-25.md`.
 
-### Runner / terminal
+### Core 1.4 model-error layer
 
-- Terminal / product presentation is **VigScope Terminal UI v1.5**.
-- Report engine/core remains **v1.3** in `runner-core.html` + `index.html`; the UI and core versions are intentionally independent.
-- `runner.html.old` remains a convenient quick backup.
-- Device-local prior-run history exists as a fallback/cache.
-- Repository-backed same-day session switching exists for the five standard report windows through `r.html` + `run-history.json`.
-- Repricing is an overlay over the immutable issued report.
-- Bet365 / DraftKings best-price selection and deterministic equal-price tie handling are implemented.
-- Structured identity matching is preferred over text fallback.
-- Player-prop `rec.feed` exact identity is supported by the current runner.
-- Meter-only terminal UI patch passed the 18:15 live regression.
+Operational production controls now include:
 
-### Odds reliability and provenance
+- explicit fair-value basis;
+- book-dispersion, liquidity, tail-risk, calibration and personnel uncertainty;
+- `STANDARD / ELEVATED / HIGH / UNQUANTIFIED` model-error states;
+- fixed Research v1.8 graduation rules that may raise uncertainty only;
+- tighter WAIT rules requiring independent current support/actionability;
+- fail-closed BET eligibility under HIGH/UNQUANTIFIED uncertainty;
+- Walters evidence/origination provenance when applicable.
 
-- Odds-API.io refresh workflow exists.
-- Bet365 and DraftKings are the active pricing books.
-- Paired/backup schedule attempts exist for report windows.
-- Zombie protection rejects badly delayed scheduled runs before quota use.
-- Hard request budgeting and safety reserve exist.
-- Invalid refreshes are designed to preserve the prior good feed.
-- Scheduler canaries provide independent diagnostic signals.
-- `data/history/odds-index.json` exists as a compact snapshot-provenance index.
-- `.github/workflows/odds-history-index.yml` is an isolated post-refresh indexing workflow; it does not modify the production odds-refresh workflow.
-- Full odds snapshots remain authoritative in Git history and are not duplicated into the history directory.
+The first 1.4 report demonstrated the intended effect by moving a prior market-disagreement WAIT to PASS rather than treating a large supported-book split as edge.
 
-### Data / research / governance
+### Report presentation target
 
-- Betting ledger is in repository data.
-- Durable issued-run storage and `run-history.json` are established.
-- Research Library **1.7** is canonical and read-only.
-- Research Library **1.8** promotion candidate is fully built/tested in staging only: 120 logical items, 100 source records, 26 evidence clusters; Candidate Freeze R2 24/24, narrative tests 15/15, hard-boundary tests 9/9.
-- The first real v1.7/v1.8 same-candidate shadow comparison is recorded at `research/staging/V1_8_SHADOW_COMPARISON_2026-08-16.json`: five real report runs, 14 issued-card observations, six unique candidates, 0 upgrades, 0 cross-letter-band downgrades, 2 within-B-band softenings and 4 unchanged grades.
-- The first comparison produced no production recommendation/status/stake/fair-value/play-to changes and exposed one useful soak calibration: movement should not be rendered as synonymous with sharp/informed action because bookmaker movement can also reflect demand/order flow.
-- The first comparison also correctly preserved WNBA game-moneyline and MLS three-way calibration gaps rather than forcing wrong-market or cross-league analogies.
-- v1.8 promotion is explicitly **ON HOLD** while production v1.7 continues its operational soak and broader shadow comparison period.
-- R2 manual Research Library read testing passed for direct/mixed evidence, era conflict and explicit research-gap handling.
-- `data/history/report-provenance-schema.json` is now **schema 3** for post-cutover production sidecars; schema-2 historical sidecars remain valid.
-- All five scheduled report lanes are configured for exact issued-payload archive plus read-only Research Fit/provenance sidecars.
-- 15:15 + 18:15 live archive/index/lineage acceptance passed on 2026-08-15.
-- Same-lane manual recovery was proven on the 2026-08-16 Evening and Late / West Coast lanes and is documented in `docs/OPERATIONS.md`, `docs/DECISIONS.md` and `docs/PROJECT_STATE.md`.
-- `BETTING_EDGE_CONTRACT.md` **v1.0 is OPERATIONAL**; v0.9 remains immutable historical acceptance evidence.
-- All five scheduled report lanes perform production-contract/runner preflight against **Contract v1.0 / UI v1.5 / core v1.3** before handicapping.
-- Player-prop executable identity tightening originated under v0.9 Invariant 23 and remains inherited by Contract v1.0.
-- v0.8/v0.9 draft files remain preserved historical design artifacts.
+Scheduled report lanes now target **up to nine meaningful cards**. Nine is not a bet quota and weak filler must not be manufactured. Zero BETs and fewer than nine cards are valid.
 
-## Priority 0 — Continue post-cutover observation and v1.8 soak
+Pizza Plays remains downstream: no qualifying VigScope play means no forced Pizza selection.
 
-Contract v1.0 / VigScope UI v1.5 / core v1.3 are active. The near-term goal remains operational observation and evidence collection, not another contract change or speculative production rewrite.
+### Scheduling profiles
 
-### P0.1 — Verify 06:00 production preflight and archive
+Current seasonal profiles are operational with five primary odds pulls per Vancouver operating day:
 
-On post-cutover 06:00 runs verify:
+- MLB/Summer: 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15.
+- NFL/Football: 05:50→06:00, 07:50→08:00, 08:50→09:00, 12:05→12:15, 16:50→17:00.
+- NBA/NHL Winter: 05:50→06:00, 10:50→11:00, 13:50→14:00, 15:50→16:00, 17:50→18:00.
 
-1. `BETTING_EDGE_CONTRACT.md` resolves as **v1.0 OPERATIONAL** before analysis;
-2. VigScope Terminal UI **v1.5** resolves with report core **v1.3**;
-3. fresh odds feed is used normally;
-4. exact issued payload is archived;
-5. schema-3 sidecar records exact production contract blob SHA;
-6. `run-history.json` receives the correct `open` entry;
-7. compact short link resolves normally;
-8. long fallback remains equivalent and available.
+Canonical lanes remain `open`, `main`, `final_morning`, `evening`, `late`.
 
-### P0.2 — Verify 08:00 and 09:30 source-backed morning lineage
+### Odds reliability architecture
 
-Confirm later morning lanes can hydrate/use the actual archived earlier morning reports while preserving date boundaries and without treating same-day report history as an extra Research Library vote.
+- `.github/workflows/odds-refresh.yml` remains the protected odds workflow.
+- Bet365 + DraftKings remain the execution/validation pair.
+- Cloudflare Worker Cron remains the primary scheduler.
+- `.github/workflows/odds-refresh-backstop.yml` now provides a two-minute GitHub dispatch backstop after a missed Cloudflare→GitHub handoff on 2026-08-25.
+- The target odds workflow retains serialization, active-profile gating, canonical-slot duplicate protection and the five-primary-pull cap.
+- Manual workflow dispatch remains the final human fallback.
+- `data/history/odds-index.json` remains compact odds provenance; full snapshots remain in Git history.
 
-### P0.3 — Verify 15:15 and 18:15 under production contract
+The old scheduler-canary model is no longer part of current operations.
 
-Continue observing the accepted history/share behavior with schema-3 production-contract provenance. If a standard lane is missed while its betting window remains useful, use the documented same-lane recovery procedure rather than creating a new report lane.
+### Durable history and closure
 
-### P0.4 — Fresh-device / late-arrival history test
+- Immutable issued report storage is established.
+- Schema-3 research/Core/Walters sidecars are established.
+- `run-history.json` remains the navigation/index layer.
+- Result/price observations remain separate under `data/history/observations/`.
+- Daily 05:00 Result Closure can process legacy Core v1.3 and current Core v1.4 cards without mutating issued analysis/provenance.
+- Current closure quotas remain 20 previous-day unique events + 10 older backlog unique events.
 
-After multiple same-day lanes have archived, open Betting Edge on a browser/device with no local runner history.
+### Separate desks
 
-**Success condition:** successfully archived earlier same-day lanes appear through repository-backed history. `CLEAR LOCAL HISTORY` must not remove repository-backed reports.
+- Crypto Specials remains independent of Core 1.4 and now runs daily at **10:30 America/Vancouver** to avoid the NBA/NHL 11:00 report-time collision.
+- Crypto may use market-information concepts but does not run Core model-error, Walters, VigScope publication or ledger writes.
+- Pizza Plays remains a downstream selection/presentation layer rather than a separate handicap engine.
 
-### P0.5 — Continue scheduler observation
+## Priority 0 — Observe Core 1.4 in production
 
-Use odds-refresh runs plus scheduler canaries to determine whether scheduled dispatch remains reliable over multiple windows.
+The immediate phase is **observe and verify**, not Core 1.5.
 
-Goal: reduce unnecessary manual refreshes while retaining the documented manual odds-refresh and report-lane recovery paths.
+### P0.1 — First full Core 1.4 morning funnel
 
-### P0.6 — Trace any remaining `UNCATEGORIZED` output
+Observe the next complete sequence:
 
-If an actual run still shows `UNCATEGORIZED`:
+1. 05:00 Result Closure;
+2. 05:50 odds pull;
+3. 06:00 Open report;
+4. 07:50 odds pull;
+5. 08:00 Main report;
+6. 09:20 odds pull;
+7. 09:30 Final Morning report.
 
-- capture the exact run payload;
-- determine whether the value originated in report generation, payload normalization, runner rendering, or upstream odds categorization;
-- patch only the producing layer;
-- compare the result against the known-good runner/workflow state.
+Review whether:
 
-Do not make a speculative runner change without reproducing the source.
+- Core 1.4 preflight/provenance is exact;
+- nine-card targeting does not create filler;
+- WAITs resolve instead of accumulating;
+- genuine independent fair construction appears where available;
+- zero-BET outcomes remain acceptable when evidence is insufficient.
 
-### P0.7 — Complete v1.7 History Fit soak before any v1.8 promotion
+### P0.2 — Prove the scheduler backstop
 
-Production Research Library **v1.7** remains the runtime authority. The completed v1.8 candidate stays frozen in staging.
+At the next due odds slot verify:
 
-Minimum gate before reopening promotion:
+- whether Cloudflare dispatches normally;
+- whether the +2-minute GitHub backstop wakes;
+- whether it correctly does nothing when the canonical slot is already present;
+- or successfully dispatches the protected odds workflow when the slot is missing;
+- whether only one actual Odds-API pull is consumed.
 
-1. continue observing real production candidates on v1.7;
-2. review History Fit retrieval relevance, grade reasonableness, explanation quality, NR handling and deduplication;
-3. shadow-compare v1.8 against the same real candidates without changing issued reports;
-4. confirm no R3 hard-boundary regression;
-5. require explicit promotion approval.
+Do not call the backstop proven until a real due slot has been observed.
 
-**Progress as of 2026-08-16:** the first real same-candidate comparison is complete and positive-but-insufficient-alone. It covered six unique game-moneyline candidates. v1.8 made no unsupported upgrades, softened two movement-heavy MLB narratives within the B band, preserved a direct MLB B fit on the Rays, and correctly left WNBA/MLS direct-calibration gaps at NR.
+### P0.3 — Repair Cloudflare native dispatch
 
-**Next high-value evidence:** prioritize real **NFL** and **player-prop** candidates because v1.8 contains substantially more genuinely new direct evidence in those areas than today's game-moneyline slate exposed. Continue using exact sport/market matching and do not force v1.8 evidence into an unrelated market merely to avoid NR.
+Diagnose the Worker→GitHub Actions credential/handoff separately from the backstop.
 
-The frozen v1.8 candidate may be used for shadow evaluation only. It must not alter fair value, play-to, status, model error, stake, executable price, runner output, production manifest or scheduled-report authority.
+Current leading suspect is the distinction between a dedicated Actions-capable token and the Worker’s private-repository-token fallback, but the exact runtime root cause is not yet proven.
 
-### P0.8 — Calibrate movement language during the soak
+Desired end state:
 
-The first real v1.8 comparison exposed a wording/calibration issue rather than a production betting defect.
+- dedicated long-lived Actions dispatch credential where required;
+- Worker health output distinguishes Actions dispatch credential state from private-ledger credential state;
+- native Cloudflare dispatch proves reliable over multiple slots;
+- backstop retained until reliability is demonstrated.
 
-Working rule:
+### P0.4 — Fix backstop provenance labeling
 
-- **movement is observed market evidence; it is not proof of sharp/informed action**;
-- bookmaker movement may reflect new information, informed trading, ordinary demand, inventory/risk management or other order-flow effects;
-- same-direction steam/favorite flips can remain relevant context, but their cause should not be asserted without supporting evidence;
-- current executable value and no-vig/fair comparison remain separate from the interpretation of why a line moved.
+Current backstop dispatch uses scheduled target mode, so a recovered snapshot may still say `triggerSource: cloudflare-cron`.
 
-For now this is a **soak finding**, not a reason to rewrite Contract 0.9, production v1.7, the runner or the History Fit policy. Continue watching real v1.7/v1.8 comparisons to determine whether the wording issue is systematic enough to justify a future narrow policy/prompt refinement.
+Add a distinct fallback source/mode later so history can differentiate:
 
-## Priority 1 — History and learning evidence
+- Cloudflare primary;
+- GitHub cron backstop;
+- intentional manual dispatch.
 
-### P1.1 — Develop the lower History box
+Do not change this in a way that bypasses the existing duplicate/profile gates.
 
-Expand the terminal's History area from basic same-day navigation into useful repository-backed decision context without turning it into clutter.
+### P0.5 — Observe Stage 2 personnel on a real material candidate
 
-Candidate outputs:
+The first Core 1.4 report did not materially exercise Stage 2 personnel depth. Capture the first serious candidate where lineup/injury/role uncertainty matters and verify:
 
-- prior same-day report evolution;
-- recommendation status changes;
-- prior issued price and `playTo`;
-- relevant Research Fit evolution;
-- later result/CLV context when available;
-- compact links/summaries rather than raw-history dumps.
+- correct dependency identification;
+- official-source-first check;
+- 3–5 fallback origins where required;
+- source conflict/shortfall recording;
+- explicit pre/post re-handicap impact;
+- fail-closed behavior when material uncertainty remains.
 
-Keep this separate from the v0.9 production cutover and from odds-refresh workflow changes.
+### P0.6 — Observe Walters-vs-market trajectory
 
-### P1.2 — Add result / CLV observation history
+On eligible NFL spread/moneyline boards, record more than just whether Walters creates a BET.
 
-After the full five-lane archive behavior is observed reliably, add a later observation layer for:
+Watch:
 
-- subsequent verified prices;
-- closing price / CLV;
+- Walters fair;
+- ordinary Core/market fair;
+- gap between Walters and the live market;
+- movement over later runs toward/away from Walters;
+- whether disagreement is explainable by personnel, timing, key numbers or model error;
+- whether Walters-originated candidates survive all ordinary Core gates.
+
+The goal is to learn whether the independent Walters construction is informative, not to maximize Walters bet count.
+
+## Priority 1 — Result / CLV feedback design
+
+The current 05:00 Result Closure is an audit layer only. It must not become a learning loop by accident.
+
+Future work may design a separate results/CLV feedback system covering:
+
+- issued price vs later verified price;
+- closing-line value when safely established;
 - result/outcome;
-- whether the thesis failed because of price, handicap, information timing or normal variance.
+- cause-of-failure classification;
+- aggregate calibration by sport/market/timing/model-error state.
 
-Do not rewrite the original issued report when adding later observations.
+Any learning feedback into Core requires explicit design and promotion. It remains **deferred beyond Core 1.4**.
 
-### P1.3 — Shadow History remains separate
+## Priority 2 — Shadow History
 
-Shadow History remains **S0 / inactive**. Before activation it needs explicit design for candidate-level prospective calibration, storage growth, evaluation cadence and separation from actual issued-report history.
+Shadow History remains **S0 / inactive**.
 
-Durable H-track report history is not Shadow History. The v1.8 Research Library staging comparisons are promotion-evaluation evidence and do not activate S-track Shadow History.
+Before activation define:
 
-## Priority 2 — Player-prop identity and learning
+- candidate-level collection scope;
+- storage growth limits;
+- evaluation cadence;
+- separation from issued-report history;
+- safeguards against circular self-training;
+- promotion/rollback criteria.
 
-### P2.1 — Observe Contract v1.0 player-prop identity in live reports
+Do not confuse durable H-track issued history with Shadow History.
 
-The first live player-specific recommendation after cutover should be checked for:
+## Priority 3 — Learned player/team associations
 
-- exact event/player/market/side/line identity;
-- complete `rec.feed` fields;
-- correct zero-stake failure behavior on ambiguity;
-- unchanged identity in the archived issued payload;
-- exact-line repricing rather than silent line substitution.
+Structured odds/history may eventually support recurring player/team association learning for MLB, NFL/NCAAF/CFL, NBA/WNBA and NHL.
 
-When a suitable real player-prop candidate occurs, also run the same-candidate v1.7/v1.8 shadow comparison. This is one of the highest-value next tests because much of v1.8's new direct evidence is prop-specific.
+This remains subordinate to current authoritative participation validation and is explicitly deferred beyond Core 1.4.
 
-### P2.2 — Grow player/team association evidence from existing odds history
+## Priority 4 — Personal-ledger calibration
 
-Use accumulated structured odds snapshots/history to learn recurring player/team associations for MLB, NFL/NCAAF/CFL, NBA/WNBA and NHL without making a separate roster database mandatory for execution.
+Personal betting history may eventually provide secondary calibration/context, but must remain separate from broad research and current market value.
 
-Any learned association layer must remain subordinate to current authoritative participation validation when identity is uncertain.
-
-### P2.3 — Review odds-refresh player-prop coverage
-
-Continue reviewing `.github/workflows/odds-refresh.yml` for sport-specific player-prop coverage, identity completeness and request efficiency. Do not increase request volume merely to collect redundant identity information.
-
-## Priority 3 — Personal ledger integration
-
-The personal betting ledger is useful but should remain separate from broad research evidence.
-
-### P3.1 — Define the user-history interface
-
-Design how a user's uploaded/persisted ledger can provide secondary context such as:
+Potential outputs:
 
 - sport-specific performance;
 - market-type performance;
 - timing tendencies;
-- repeated behavioral strengths/weaknesses;
-- risk/stake adherence.
+- stake/risk adherence;
+- repeated behavioral strengths/weaknesses.
 
-### P3.2 — Prevent circular decision logic
+It must not become circular logic that recommends a bet merely because the user historically likes that bet type.
 
-Personal history should not become a reason to recommend a bet merely because the user has historically liked that type of bet.
+## Priority 5 — Research gap closure
 
-Use it as calibration/context, not as a replacement for current market value and matchup analysis.
+Research v1.8 is production read-only. Current explicit direct-calibration gaps remain valuable targets for future evidence work, especially:
 
-### P3.3 — Support per-user ledgers later
+- WNBA closing player props;
+- NFL multi-book direct player props;
+- MLB doubles/stolen-base direct closing calibration;
+- boxing derivatives;
+- CFL broad pregame calibration;
+- current-era replication of older WNBA game-market evidence.
 
-Longer-term architecture should allow different users to supply their own ledger while the canonical Research Library remains shared and read-only.
+Research promotion remains independent from Core versioning.
 
-## Priority 4 — Contract evolution
+## Priority 6 — UI / presentation refinement
 
-Contract v1.0 promotion is complete. Future governance work is now **post-v1.0 evolution**, not activation.
+Keep presentation changes narrow and separate from pipeline reliability.
 
-Potential future contract work must follow explicit versioned change control and live regression testing. Likely candidates include:
+Near-term candidates:
 
-- formal result/CLV observation governance;
-- Shadow History activation rules if approved;
-- learned player/team association governance;
-- any future authenticated central persistence of browser-side repricing;
-- major changes to supported books, freshness gates, staking methodology or report payload architecture.
-
-Do not edit Contract v1.0 merely to make a failing implementation appear compliant. Diagnose the failing layer first. Do not promote a research-soak wording observation into contract language without enough repeated real evidence to justify it.
-
-## Priority 5 — Broader refinement
-
-### Market/source coverage
-
-- Evaluate whether additional free books/sources provide enough incremental value to justify added request complexity.
-- Improve DraftKings coverage diagnostics where markets are absent.
-- Treat direct WNBA game-moneyline calibration and direct MLS/North-American soccer three-way calibration as genuine research gaps; do not fill them by transporting player-prop or European numerical findings across the wrong market/league.
-- Preserve the no-paid-subscription constraint unless the project owner deliberately changes it.
-
-### Terminal clarity
-
-- Continue improving explanatory language and category naming only when a real output exposes a need.
-- Keep visual changes incremental and separate from pipeline debugging.
-- Preserve compact terminal-style presentation.
-- Current meter design is a known-good UI checkpoint.
-
-### Automated project health
-
-Potential future health checks:
-
-- Pages deployment failure;
-- odds-refresh workflow failure;
-- odds-history-index workflow failure;
-- repeated zombie/missed schedule behavior;
-- canary failure;
-- stale live feed near a report window;
-- production-contract preflight failure;
-- research/checksum integrity failure;
-- missing issued-report or schema-3 sidecar archive after a scheduled report.
-
-Automation should notify only on meaningful health changes rather than producing routine noise.
+- verify Pizza Plays quality under Core 1.4 before tightening its downstream selection rule;
+- preserve no-selection state when all eligible cards are PASS/unqualified;
+- finish known styling regressions without touching Core/scheduler logic;
+- improve card/menu interactions only where actual use exposes friction.
 
 ## Explicit non-goals for the current phase
 
-- No broad rewrite of Betting Edge's live decision process.
-- No automatic Research Library writes during normal reports.
-- No v1.8 production promotion from a single positive shadow comparison.
-- No automatic inference that steam/movement means sharp action.
-- No wrong-market evidence transport merely to avoid an NR grade.
+- No automatic Core 1.5 merely because Core 1.4 is closed.
+- No loosening of Core 1.4 to increase BET count or fill nine cards.
 - No Shadow History activation without separate approval.
-- No bulky structured research metadata inside long runner URLs.
-- No unnecessary paid data subscription.
-- No speculative fixes across multiple layers when one layer has not been proven faulty.
-- No replacement of the issued report during repricing or later result/CLV enrichment.
-- No claim that individual browser reprice clicks are centrally archived.
-- No weakening of production-contract preflight to hide scheduler/history failures.
+- No results/CLV learning loop hidden inside the 05:00 closure audit.
+- No Research writes during normal reports.
+- No paid odds API or extra execution books by default.
+- No staking-methodology change.
+- No forced Pizza Play.
+- No assumption that line movement proves sharp action.
+- No broad multi-layer rewrite to solve a scheduler or UI problem.
 
 ## Working principle
 
 **Stabilize → observe → validate → document → integrate.**
 
-The 2026-08-16 cycle produced both recovery evidence and the first real v1.8 shadow evidence. The next move is continued **observe → validate** on more varied real candidates, especially NFL and player props, rather than further production tinkering tonight.
+Core v1.4 is now the production baseline. The next evidence should come from real operation: scheduler reliability, the first full morning funnel, material personnel cases and eligible Walters boards.
