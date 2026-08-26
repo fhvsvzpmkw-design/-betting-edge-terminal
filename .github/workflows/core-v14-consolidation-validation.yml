@@ -1,0 +1,40 @@
+name: Core 1.4 consolidation validation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md'
+      - 'core/walters-intelligence-interface-v1.4.json'
+      - 'core/tests/walters-interface-v1.4.test.mjs'
+      - 'research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md'
+      - '.github/workflows/core-v14-consolidation-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Parse Walters interface JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('core/walters-intelligence-interface-v1.4.json','utf8')); console.log('Walters interface JSON OK')"
+
+      - name: Validate Walters interface and authority boundaries
+        run: node core/tests/walters-interface-v1.4.test.mjs
+
+      - name: Verify Core 1.4 scope exclusions
+        run: |
+          grep -q 'Results / CLV feedback learning loop' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
+          grep -q 'Shadow History activation' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
+          grep -q 'Learned player/team associations and personal-ledger calibration' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
+          grep -q 'Walters Intelligence Access Layer — REQUIRED 1.4 CAPABILITY' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
+          echo 'Core 1.4 scope freeze OK'
