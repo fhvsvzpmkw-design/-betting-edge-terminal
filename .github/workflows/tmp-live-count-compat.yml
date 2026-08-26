@@ -1,0 +1,45 @@
+name: Temporary live count compatibility patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/tmp-live-count-compat.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch short-link loader
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('r.html')
+          text=p.read_text()
+          old="    const priorRuns=await sameDayPriorRuns(index,entry);\n    const hydrated={...run,prior_runs:priorRuns};"
+          new="""    const priorRuns=await sameDayPriorRuns(index,entry);
+    const canonicalCounts={bet:0,lean:0,wait:0,pass:0};
+    for(const rec of Array.isArray(run.recs)?run.recs:[]){
+      const status=String(rec&&rec.status||'').trim().toLowerCase();
+      if(Object.hasOwn(canonicalCounts,status))canonicalCounts[status]++;
+    }
+    const hydrated={...run,counts:canonicalCounts,prior_runs:priorRuns};"""
+          if old not in text:
+              raise SystemExit('r.html loader marker not found')
+          p.write_text(text.replace(old,new,1))
+          PY
+      - name: Commit live compatibility fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add r.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: derive short-link counts from issued recommendations"
+          git push origin HEAD:main
