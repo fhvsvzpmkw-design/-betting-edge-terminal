@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "frameworkId": "core-1.4-model-error-r1-2026-08-25",
+  "state": "OPERATIONAL",
+  "coreFamilyVersion": "1.4",
+  "productionRevision": "R1",
+  "activatedAt": "2026-08-25T17:20:00-07:00",
+  "purpose": "Operational Core 1.4 model-error framework. Approved Research Library v1.8 findings may raise uncertainty/model-error floors and block false precision, but may not lower model error, directly move a fair-value point estimate, create independent current support, create a BET, set stake, or override identity/freshness/personnel/exposure gates. Walters authority is a separate controlled Core 1.4 input.",
+  "researchAuthority": {
+    "libraryVersion": "1.8",
+    "libraryPath": "research/research-library.json",
+    "libraryBlobSha": "1bfcd2f07cc39d64fabc065b6030fc3615f58ce7",
+    "manifestPath": "research/manifest.json",
+    "manifestBlobSha": "9ab907f096344816340384dd9cf8bd5624356898",
+    "graduationMode": "FIXED_PRIOR_ALLOWLIST_ONLY",
+    "runtimeHistoryFitGradeControlsCore": false
+  },
+  "controlledValues": {
+    "fairValueBasis": ["INDEPENDENT_MODEL", "MARKET_ANCHORED_MODEL", "MARKET_DERIVED_ONLY", "UNAVAILABLE"],
+    "bookDispersion": ["NONE", "MODERATE", "MATERIAL"],
+    "liquidityRisk": ["NORMAL", "THIN", "UNKNOWN"],
+    "tailRisk": ["NORMAL", "ELEVATED", "EXTREME"],
+    "directCalibration": ["DIRECT", "LIMITED", "GAP", "UNKNOWN"],
+    "personnelSensitivity": ["NONE", "RESOLVED", "UNRESOLVED"],
+    "independentCurrentSupport": ["NONE", "WEAK", "MODERATE", "STRONG"],
+    "modelErrorState": ["STANDARD", "ELEVATED", "HIGH", "UNQUANTIFIED"]
+  },
+  "modelErrorOrder": ["STANDARD", "ELEVATED", "HIGH", "UNQUANTIFIED"],
+  "baseRules": [
+    {"id":"fair-unavailable","when":{"fairValueBasis":["UNAVAILABLE"]},"floor":"UNQUANTIFIED","reason":"No defensible fair-value basis means model error cannot be responsibly bounded."},
+    {"id":"market-derived-only","when":{"fairValueBasis":["MARKET_DERIVED_ONLY"]},"floor":"ELEVATED","reason":"A de-vig/book-derived benchmark is not an independent fair-value model."},
+    {"id":"material-book-dispersion","when":{"bookDispersion":["MATERIAL"]},"floor":"HIGH","reason":"Material supported-book disagreement is uncertainty/price-quality evidence."},
+    {"id":"thin-liquidity","when":{"liquidityRisk":["THIN"]},"floor":"ELEVATED","reason":"Thin markets require wider error allowances and stronger independent evidence."},
+    {"id":"extreme-tail","when":{"tailRisk":["EXTREME"]},"floor":"ELEVATED","reason":"Extreme-tail prices receive an uncertainty floor rather than extra confidence from payout size."},
+    {"id":"extreme-tail-market-only","when":{"all":[{"tailRisk":["EXTREME"]},{"fairValueBasis":["MARKET_DERIVED_ONLY"]}]},"floor":"HIGH","reason":"Extreme-tail plus market-only fair construction is especially vulnerable to false precision."},
+    {"id":"calibration-gap","when":{"directCalibration":["GAP"]},"floor":"ELEVATED","reason":"An exact-market calibration gap prevents normal-confidence treatment."},
+    {"id":"unresolved-personnel","when":{"personnelSensitivity":["UNRESOLVED"]},"floor":"ELEVATED","reason":"Material unresolved participation/role/lineup inputs widen the current distribution."}
+  ],
+  "graduatedResearchRules": [
+    {"priorId":"v18_extreme_longshot_fixed_odds_caution","when":{"tailRisk":["EXTREME"]},"floor":"ELEVATED","effects":["PROHIBIT_LONGSHOT_PAYOUT_AS_EVIDENCE","NO_MODEL_ERROR_COMPRESSION"],"reason":"Modern fixed-odds evidence supports extra caution in extreme tails; cross-sport use is qualitative only."},
+    {"priorId":"v18_extreme_longshot_fixed_odds_caution","when":{"all":[{"tailRisk":["EXTREME"]},{"any":[{"fairValueBasis":["MARKET_DERIVED_ONLY"]},{"bookDispersion":["MATERIAL"]}]}]},"floor":"HIGH","effects":["PROHIBIT_MARKET_ONLY_BET","NO_MODEL_ERROR_COMPRESSION"],"reason":"Extreme-tail pricing plus market-only construction or material dispersion requires a high error floor."},
+    {"priorId":"v18_soccer_liquidity_price_dispersion_caution","when":{"all":[{"sport":["Soccer"]},{"liquidityRisk":["THIN"]}]},"floor":"ELEVATED","effects":["NO_MODEL_ERROR_COMPRESSION"],"reason":"Direct soccer evidence shows price attractiveness and dispersion depend on liquidity structure."},
+    {"priorId":"v18_soccer_liquidity_price_dispersion_caution","when":{"all":[{"sport":["Soccer"]},{"liquidityRisk":["THIN"]},{"bookDispersion":["MATERIAL"]}]},"floor":"HIGH","effects":["PROHIBIT_MARKET_ONLY_BET","NO_MODEL_ERROR_COMPRESSION"],"reason":"Thin soccer plus material quote dispersion is not a stable independent fair-value signal."},
+    {"priorId":"v18_online_bookmaker_orderflow_price_adjustment","when":{"movementPrimaryEvidence":[true]},"floor":"ELEVATED","effects":["MARKET_MOVEMENT_NOT_INDEPENDENT_SUPPORT"],"reason":"Bookmaker moves can reflect order flow/demand as well as private information."},
+    {"priorId":"v18_mlb_no_universal_prop_recalibration","when":{"all":[{"sport":["MLB"]},{"marketDetail":["hits","total_bases","home_runs","pitcher_strikeouts"]},{"historicalDirectionalRecalibrationPrimary":[true]}]},"floor":"ELEVATED","effects":["PROHIBIT_UNIVERSAL_PROP_BIAS_CORRECTION","NO_MODEL_ERROR_COMPRESSION"],"reason":"Forward holdout did not support a universal historical over/under correction across these MLB prop families."},
+    {"priorId":"v18_wnba_direct_prop_calibration_gap","when":{"all":[{"sport":["WNBA"]},{"marketClass":["player_props"]}]},"floor":"ELEVATED","effects":["NO_INHERITED_NBA_PROP_CONFIDENCE"],"reason":"WNBA player props still lack strong direct closing-price calibration."},
+    {"priorId":"v18_nfl_direct_player_prop_calibration_gap","when":{"all":[{"sport":["NFL"]},{"marketClass":["player_props"]}]},"floor":"ELEVATED","effects":["NO_INHERITED_GAME_MARKET_CONFIDENCE"],"reason":"NFL player-stat mechanism evidence is stronger than direct multi-book prop calibration."},
+    {"priorId":"v18_mlb_doubles_stolen_base_direct_price_gap","when":{"all":[{"sport":["MLB"]},{"marketDetail":["doubles","stolen_bases"]}]},"floor":"HIGH","effects":["PROHIBIT_MARKET_ONLY_BET","MECHANISM_NOT_PRICE_CALIBRATION"],"reason":"Doubles and stolen-base mechanisms are useful, but exact sportsbook closing calibration remains a verified gap."},
+    {"priorId":"gr_boxing_derivatives","when":{"all":[{"sport":["Boxing"]},{"marketClass":["derivatives"]}]},"floor":"HIGH","effects":["MECHANISM_NOT_PRICE_CALIBRATION"],"reason":"Boxing derivative markets retain a direct calibration gap and cannot inherit fight-winner confidence."},
+    {"priorId":"gr_cfl_pregame","when":{"all":[{"sport":["CFL"]},{"timing":["pregame"]}]},"floor":"ELEVATED","effects":["NO_INHERITED_NFL_CONFIDENCE"],"reason":"Broad CFL pregame calibration remains materially thinner than NFL evidence."},
+    {"priorId":"v18_wnba_game_market_efficiency_era_limited","when":{"all":[{"sport":["WNBA"]},{"marketClass":["spread","moneyline","totals"]}]},"floor":"ELEVATED","effects":["ERA_TRANSPORTABILITY_CAUTION"],"reason":"Direct WNBA game-market evidence exists but is from an older market regime and requires current-era caution."}
+  ],
+  "decisionRules": {
+    "STANDARD":{"uncertaintyRangeRequiredForSeriousCandidate":true,"betEligibilityByModelError":"NORMAL_CORE_PROCESS"},
+    "ELEVATED":{"uncertaintyRangeRequiredForSeriousCandidate":true,"betEligibilityByModelError":"REQUIRES_AT_LEAST_MODERATE_INDEPENDENT_CURRENT_SUPPORT_AND_CONSERVATIVE_BOUND_CLEARANCE","marketDerivedOnlyWithWeakOrNoIndependentSupport":"BLOCK_BET"},
+    "HIGH":{"uncertaintyRangeRequiredForSeriousCandidate":true,"betEligibilityByModelError":"REQUIRES_STRONG_INDEPENDENT_CURRENT_SUPPORT_AND_CONSERVATIVE_BOUND_CLEARANCE","marketDerivedOnly":"BLOCK_BET","waitEligibility":"ONLY_IF_ACTIONABLE_BLOCKER_AND_AT_LEAST_MODERATE_INDEPENDENT_CURRENT_SUPPORT"},
+    "UNQUANTIFIED":{"uncertaintyRangeRequiredForSeriousCandidate":true,"betEligibilityByModelError":"BLOCK_BET","playToGuidance":"THRESHOLD_UNAVAILABLE_UNTIL_MODEL_ERROR_CAN_BE_BOUNDED"}
+  },
+  "firstPhaseBoundaries": {
+    "researchMayRaiseModelErrorFloor": true,
+    "researchMayLowerModelErrorFloor": false,
+    "researchMayMoveFairValuePointEstimate": false,
+    "researchMayCreateIndependentCurrentSupport": false,
+    "researchMayCreateBet": false,
+    "researchMaySetStake": false,
+    "historyFitGradeMayControlCore": false,
+    "gapItemIsPredictiveNegativeEvidence": false,
+    "mechanismEvidenceEqualsPriceCalibration": false
+  }
+}
