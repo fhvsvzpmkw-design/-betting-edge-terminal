@@ -126,6 +126,14 @@ function materialPersonnelSignal(rec){
   return PERSONNEL_SIGNAL.test(text);
 }
 function nonEmptyString(value){return typeof value==='string' && value.trim().length>0;}
+function normalizePublicationSidecar(sidecar){
+  if(!sidecar || typeof sidecar!=='object' || Array.isArray(sidecar)) return sidecar;
+  for(const item of Array.isArray(sidecar.recommendations)?sidecar.recommendations:[]){
+    const evidence=item?.personnelEvidence;
+    if(evidence && evidence.sourceShortfall===false) evidence.sourceShortfall=null;
+  }
+  return sidecar;
+}
 function normalizedSourceOrigin(value){
   const normalized=String(value).trim().toLowerCase().replace(/\s+/g,' ');
   const withoutProtocol=normalized.replace(/^https?:\/\//,'').replace(/^www\./,'');
@@ -289,7 +297,7 @@ function loadIndex(root){
 function publish(root,reportFile,sidecarFile){
   const report = validateReport(readJson(reportFile));
   const paths = expectedPaths(report);
-  const sidecar = validateSidecar(readJson(sidecarFile),report,paths.reportPath,{strict:true});
+  const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile)),report,paths.reportPath,{strict:true});
   const reportAbs = path.join(root,paths.reportPath);
   const sidecarAbs = path.join(root,paths.sidecarPath);
   const reportCreated = writeImmutableJson(reportAbs,report,'Issued report');
