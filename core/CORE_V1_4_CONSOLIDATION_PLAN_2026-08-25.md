@@ -114,7 +114,7 @@ Core 1.4 ships with three switchable modes that can be changed without rebuildin
 - `ADVISORY` — Walters is visible/comparable and may trigger re-review, but cannot directly create a recommendation.
 - `BET_AUTHORITY` — an eligible Walters handicap can influence Core fair value, count as one independent handicap input, and **originate a BET recommendation itself**.
 
-The default initial mode is `ADVISORY`; this is a runtime setting, not a permanent authority ceiling.
+The default initial mode is `BET_AUTHORITY`. This is a runtime setting, not a permanent authority requirement; it can be switched immediately to `ADVISORY` or `OFF` for future reports if monitoring shows the Walters package needs adjustment.
 
 ### Meaning of Walters BET authority
 
