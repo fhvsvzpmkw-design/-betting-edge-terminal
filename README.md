@@ -1,75 +1,137 @@
 # Betting Edge Terminal
 
+## Current production boundary
+
+- **VigScope Terminal UI:** v1.5
+- **Betting Edge Core:** v1.4 OPERATIONAL
+- **Governance Contract:** v1.0 OPERATIONAL
+- **Research Library:** v1.8 / R3 live read-only
+- **Walters mode:** runtime-switchable, currently `BET_AUTHORITY` for eligible NFL spread/moneyline
+- **Timezone:** `America/Vancouver`
+- **Primary books:** Bet365 + DraftKings
+
+Core v1.4 became the forward production baseline at `2026-08-25T17:20:00-07:00`. Historical Core v1.3 reports remain immutable.
+
+Core v1.4 closeout: [`BETTING_EDGE_CORE_V1_4_CLOSEOUT_2026-08-25.md`](BETTING_EDGE_CORE_V1_4_CLOSEOUT_2026-08-25.md).
+
 ## Project documentation
 
-The repository includes four durable project references:
+Current operating references:
 
-- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current production state, versions, runtime boundaries, active data/research/governance status, and known-good checkpoints.
-- [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — daily refresh/report timing, scheduler diagnostics, zombie protection, manual recovery, repricing checks, history/share-link handling, and deployment verification.
-- [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable architectural and operating decisions, including the reasoning behind them.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — completed foundations, current priorities, planned History/Research/ledger work, and future contract evolution.
+- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — practical current production state and open operational items.
+- [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — report/odds schedule, recovery, Core 1.4 gate order, Result Closure, Crypto Specials and downstream boundaries.
+- [`BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`](BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md) — seasonal profile timing and scheduler/backstop behavior.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — post-Core-1.4 observation and future work.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable historical architectural decisions. Dated entries record the state when they were made; current production authority is the boundary above plus `docs/PROJECT_STATE.md`.
+- [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md) — authoritative production governance contract.
+
+## Core v1.4 production authority
+
+Authoritative Core files include:
+
+- `core/core-v1.4-production.json`
+- `core/core-handicap-framework-v1.4.json`
+- `core/walters-intelligence-interface-v1.4.json`
+- `core/walters-authority-v1.4.json`
+- `BETTING_EDGE_PERSONNEL_SWEEP.md`
+- `tools/core-v14-publication-gate.mjs`
+- `data/history/report-provenance-schema.json`
+
+Core v1.4 adds explicit fair-value basis/model-error states, Research v1.8 uncertainty graduation, stronger personnel handling, tighter WAIT qualification and switchable Walters authority while preserving the existing execution/freshness/staking boundaries.
+
+## Report-card target
+
+Scheduled report lanes target **up to nine meaningful cards**. Nine is a review/presentation target, not a bet quota. Fewer cards and zero BETs are valid; weak filler must not be created merely to fill the board.
+
+Pizza Plays remains downstream of VigScope. If there is no suitable qualifying play, no Pizza selection is preferable to forcing a weak or extreme longshot.
+
+## Current schedule profiles
+
+Canonical slots remain `open`, `main`, `final_morning`, `evening`, `late`.
+
+Current Vancouver pulse → report pairs:
+
+| Profile | Pulse → report pairs |
+|---|---|
+| MLB / SUMMER | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
+| NFL / FOOTBALL | 05:50→06:00, 07:50→08:00, 08:50→09:00, 12:05→12:15, 16:50→17:00 |
+| NBA + NHL / WINTER | 05:50→06:00, 10:50→11:00, 13:50→14:00, 15:50→16:00, 17:50→18:00 |
+
+The active-day profile and five-primary-pull cap are controlled by `data/schedule-state.json` and `data/schedule-profiles.json`.
+
+## Odds scheduler
+
+Cloudflare Worker Cron remains the **primary odds scheduler**.
+
+After the Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25, `.github/workflows/odds-refresh-backstop.yml` was added as a **two-minute dispatch backstop**. It checks whether the canonical slot already published and only dispatches the existing protected `odds-refresh.yml` when the slot is missing.
+
+The odds workflow retains active-profile validation, serialization, duplicate protection and the five-primary-pull cap. Manual workflow dispatch remains the final recovery path.
+
+The first live proof of the new backstop remains pending the next due slot. The underlying Cloudflare dispatch path still requires separate reliability diagnosis; that is infrastructure work, not a Core v1.4 methodology change.
+
+## Result Closure
+
+A separate daily **05:00 America/Vancouver** Result Closure task grades finished issued cards and works through unresolved backlog.
+
+It is an audit layer only. It can process legacy Core v1.3 and current Core v1.4 reports but may write only `data/history/observations/...` sidecars. It must never mutate issued status, price, fair, playTo, stake, `coreAssessment`, Walters evidence, Research/Core/Walters provenance, or the betting ledger for hypothetical LEAN/WAIT/PASS outcomes.
+
+Current event quotas are 20 previous-day unique events plus 10 older backlog unique events.
+
+## Crypto Specials
+
+Crypto Specials remains independent from Core v1.4 and runs daily at **10:30 America/Vancouver**.
+
+It may use the useful market-information pass—current/best price, line shopping, implied/no-vig probability, disagreement, movement, maturity and target-price discipline—but does not run Core v1.4 model-error, Walters authority, VigScope publication, report history or betting-ledger workflows.
+
+It writes only `data/crypto-specials.json`.
+
+## Durable history
+
+Issued reports:
+
+`data/history/runs/YYYY-MM-DD/<slot>-HHMMSS.json`
+
+Research/Core/Walters provenance:
+
+`data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json`
+
+Result/price observations:
+
+`data/history/observations/YYYY-MM-DD/<slot>-HHMMSS.json`
+
+`run-history.json` is the compact navigation/index layer and cannot override an issued report.
+
+## F3 Bet History / private ledger boundary
+
+The public terminal does not use the raw private betting ledger directly.
+
+Current architecture:
+
+**private master ledger → Cloudflare Worker → sanitized `/api/bet-history` projection → F3 Bet History + Eddie Numbers**
+
+Eddie Numbers uses the public projection, not the private ledger. `data/bet-history-public.json` remains a sanitized fallback.
+
+## Syndicate / hotline boundary
+
+Character profiles, hotlines and visual framing are presentation layers. Betting Edge report data remains authoritative wherever a hotline references current recommendations.
+
+Hotline shell versions are independent from Terminal/Core/Contract versions.
 
 ## Splash branding
 
-Current splash identity is centralized in `r.html` under `BRAND_CONFIG`. For a splash rename, update `appName` and/or `companyName`, then verify the GitHub Pages deployment and the splash-to-report transition. Terminal branding remains separate and should be changed independently when a broader product rename is intended.
+Splash identity is centralized in `r.html` under `BRAND_CONFIG`. A splash rename should update `appName` and/or `companyName`, then verify GitHub Pages and splash-to-report transition. Terminal branding remains a separate change.
 
-## Current production version boundary
+## Repository change safety
 
-The current presentation release is **VigScope Terminal UI v1.5** in `runner.html`.
+For direct edits:
 
-v1.5 is a consolidation boundary for the accumulated production presentation work now operating together, including the manifest-driven Syndicate workspace and independent hotline shells, the rebuilt F3 Bet History/public performance surface, the current Preferences/report-card presentation, and the private-ledger public-projection architecture. It does not imply a betting-engine rewrite.
+1. fetch current `main` state first;
+2. make only the intended change;
+3. preserve Git as the rollback authority;
+4. validate changed JSON/workflow/runtime files appropriately;
+5. commit with a narrow description;
+6. read the committed state back;
+7. verify Pages/Actions where relevant;
+8. restore the exact prior Git version on regression rather than reconstructing by hand.
 
-The underlying Betting Edge report engine/core is now **Core v1.4 OPERATIONAL**, with `core/core-v1.4-production.json` as its production manifest and `runner-core.html` / `index.html` as the inner presentation/runtime shell. The authoritative governance contract remains **Betting Edge Contract v1.0 OPERATIONAL**. The production Research Library is **v1.8 R3 live read-only**. Walters launches in switchable **BET_AUTHORITY** mode for eligible NFL spread/moneyline work.
-
-These versions are intentionally independent:
-
-- **Terminal / product UI:** v1.5
-- **Report engine/core:** v1.4
-- **Governance contract:** v1.0
-- **Research Library:** v1.8 / R3 live read-only
-- **Hotline shells:** independently versioned per character/publication
-
-## F3 Bet History and ledger boundary
-
-The public terminal does not use the raw private betting ledger as a browser-facing data source. The authoritative master ledger is held in the private repository and a Cloudflare Worker exposes the sanitized public `/api/bet-history` projection used by F3 and other approved public-facing views. A sanitized repository fallback may be used when necessary; private ticket/reference identifiers remain excluded.
-
-F3 is the public performance/history surface. Exact cash-accounting summary totals come from the sanctioned public projection summary, while public wager rows remain sanitized and must not be heuristically treated as an exact cash/free-bet classifier.
-
-## Syndicate presentation
-
-Syndicate slots are externally configured by `data/syndicates.json`. Character profiles, nameplates, avatars, hotline shells, live editions and archives remain independently maintainable. Shell versions are independent from the terminal UI version; promoting the terminal or governance contract does not renumber a character shell.
-
-Betting Edge report data remains authoritative wherever a character hotline presents current recommendations. Fictional character voice, setting, visuals and editorial framing are presentation only and may not alter issued status, price, fair value, play-to or risk.
-
-## Production governance
-
-The authoritative production contract is [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md), **v1.0 OPERATIONAL**.
-
-Contract v1.0 is a controlled consolidation of the final operational v0.9 rule set. It preserves the inherited execution/pricing/risk baseline and the already-operational durable-history, exact-identity, fair-value-confidence, spread-lineage, PRICE WATCH and repository-controlled report-card rules. It does not introduce a new staking model, add books, increase the odds-refresh budget or alter the five report lanes. Research Library versions are promoted independently; the current v1.8 R3 promotion does not change the Contract v1.0 version or its execution/risk boundary.
-
-The production contract continues to incorporate by fixed Git blob identity:
-
-- [`BETTING_EDGE_CONTRACT_DRAFT_v0.8.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.8.md) as the inherited execution/pricing/risk baseline;
-- [`BETTING_EDGE_CONTRACT_DRAFT_v0.9.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9.md) as the durable-history/provenance design delta;
-- [`BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md`](BETTING_EDGE_CONTRACT_DRAFT_v0.9_PLAYER_PROP_DELTA.md) as the player-prop identity delta.
-
-Those draft files remain historical design artifacts and are **not independently operational**. The v0.9 production acceptance record remains immutable historical evidence at [`BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md`](BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md). The Contract v1.0 promotion record is [`BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`](BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md). The current Research Library promotion record is [`research/V1_8_PROMOTION_2026-08-25.md`](research/V1_8_PROMOTION_2026-08-25.md).
-
-Every scheduled production report must resolve the production contract and current approved runner before handicapping. Research Fit resolves the active Research Library through `research/manifest.json`. If production authority cannot be resolved, the relevant layer must fail closed rather than silently falling back to a draft or superseded production version.
-
-## Repository change safety policy
-
-Direct edits to this repository use the following default safety process:
-
-1. Fetch the current file from `main` before editing and record its current Git blob/commit as the rollback point.
-2. Make only the intended change; unrelated files stay out of the commit.
-3. Compare the before/after versions and check for accidental deletions or unrelated edits.
-4. Validate the changed file appropriately (for example JSON parsing, workflow integrity, expected runner sections, or other file-specific checks).
-5. Commit with a clear, narrow description of the change.
-6. Read the committed file back from GitHub to confirm the repository contains the intended result.
-7. When relevant, verify GitHub Pages or GitHub Actions completes successfully after the commit.
-8. If validation fails or behavior regresses, restore the exact previous Git version rather than manually reconstructing the file.
-
-Git history is the authoritative rollback system for all repository files. Named `.old` files may be retained where they provide a useful quick backup, but they do not replace Git history. Obsolete duplicate workflow backups should not be retained merely for rollback when Git history already preserves the exact prior version.
-
-Higher-risk files — including the runner, odds-refresh workflows, scheduler logic, research governance, production contract integration and private/public ledger boundary — receive stricter before/after comparison and validation before a change is treated as complete.
+Higher-risk files—runner, odds workflows, scheduler logic, production Core/Contract integration, Research governance and ledger boundaries—require stricter before/after validation.
