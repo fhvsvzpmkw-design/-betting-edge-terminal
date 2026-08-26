@@ -30,7 +30,7 @@ for(const [path,expected] of pinned){
 }
 
 assert(candidate.components.waltersIntelligence.requiredCapability===true,'Walters must be required Core 1.4 capability');
-assert(candidate.components.waltersIntelligence.defaultMode==='ADVISORY','Walters initial runtime mode must be ADVISORY');
+assert(candidate.components.waltersIntelligence.defaultMode==='BET_AUTHORITY','Walters initial runtime mode must be BET_AUTHORITY');
 assert(candidate.components.waltersIntelligence.betOriginationModeAvailable===true,'Core 1.4 must include Walters BET origination mode');
 assert(candidate.components.waltersIntelligence.missingDataBlocksReport===false,'Missing Walters data must not block valid reports');
 for(const mode of ['OFF','ADVISORY','BET_AUTHORITY']){
