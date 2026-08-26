@@ -33,10 +33,10 @@ jobs:
         run: node tools/sync-core-v14-release-state.mjs
       - name: Verify intentional history-key continuity
         run: |
-          grep -q 'VIGSCOPE CORE v1.4' index.html
-          grep -q "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';" runner-core.html
-          grep -q 'Report engine/core:** v1.4' README.md
-          grep -q 'Core 1.4 production integration checkpoint' docs/PROJECT_STATE.md
+          grep -Fq 'VIGSCOPE CORE v1.4' index.html
+          grep -Fq "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';" runner-core.html
+          grep -Fq 'Report engine/core:** v1.4' README.md
+          grep -Fq 'Core 1.4 production integration checkpoint' docs/PROJECT_STATE.md
       - name: Commit synced state
         run: |
           set -euo pipefail
@@ -53,7 +53,7 @@ jobs:
         run: |
           git fetch origin main
           git reset --hard origin/main
-          grep -q 'VIGSCOPE CORE v1.4' index.html
-          grep -q 'Core v1.4 OPERATIONAL' docs/PROJECT_STATE.md
-          grep -q 'Report engine/core:** v1.4' README.md
-          grep -q "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';" runner-core.html
+          grep -Fq 'VIGSCOPE CORE v1.4' index.html
+          grep -Fq 'Core v1.4 OPERATIONAL' docs/PROJECT_STATE.md
+          grep -Fq 'Report engine/core:** v1.4' README.md
+          grep -Fq "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';" runner-core.html
