@@ -1,5 +1,5 @@
 name: Report history publication
-# Recovery verification trigger for the complete 2026-08-17 15:15 report bundle.
+# Production report bundle validation and durable publication.
 
 on:
   workflow_dispatch:
@@ -17,16 +17,23 @@ on:
         required: false
         type: string
       sidecar_json_b64:
-        description: Base64 or Base64URL encoded matching schema-3 Research Fit sidecar JSON (publish mode)
+        description: Base64 or Base64URL encoded matching schema-3 Research Fit/Core provenance sidecar JSON (publish mode)
         required: false
         type: string
   push:
     branches: [main]
     paths:
       - BETTING_EDGE_CONTRACT.md
+      - core/core-v1.4-production.json
+      - core/core-handicap-framework-v1.4.json
+      - core/walters-intelligence-interface-v1.4.json
+      - core/walters-authority-v1.4.json
+      - data/history/report-provenance-schema.json
       - data/history/runs/**
       - data/history/research-fit/**
       - run-history.json
+      - tools/core-handicap-framework.mjs
+      - tools/core-v14-publication-gate.mjs
       - tools/report-publication.mjs
       - tools/spread-lineage.mjs
       - tools/selection-availability.mjs
@@ -38,9 +45,16 @@ on:
   pull_request:
     paths:
       - BETTING_EDGE_CONTRACT.md
+      - core/core-v1.4-production.json
+      - core/core-handicap-framework-v1.4.json
+      - core/walters-intelligence-interface-v1.4.json
+      - core/walters-authority-v1.4.json
+      - data/history/report-provenance-schema.json
       - data/history/runs/**
       - data/history/research-fit/**
       - run-history.json
+      - tools/core-handicap-framework.mjs
+      - tools/core-v14-publication-gate.mjs
       - tools/report-publication.mjs
       - tools/spread-lineage.mjs
       - tools/selection-availability.mjs
@@ -68,6 +82,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate Core 1.4 model-error framework
+        run: node tools/core-handicap-framework.mjs self-test
+      - name: Exercise Core 1.4 production gate
+        run: node tools/core-v14-publication-gate.mjs self-test
       - name: Exercise publisher path
         run: node tools/report-publication.mjs self-test
       - name: Exercise tracked selection availability
@@ -78,6 +96,8 @@ jobs:
         run: node tests/spread-lineage-primary-line-fixtures.test.js
       - name: Verify durable report history
         run: node tools/report-publication.mjs verify
+      - name: Verify Core 1.4 post-cutover history
+        run: node tools/core-v14-publication-gate.mjs verify-history
 
   publish:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'publish' }}
@@ -114,6 +134,8 @@ jobs:
           decode('REPORT_JSON_B64', '/tmp/report.json');
           decode('SIDECAR_JSON_B64', '/tmp/sidecar.json');
           NODE
+      - name: Enforce Core 1.4 production handicap and Walters authority
+        run: node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Guard tracked selection continuity
         run: |
           node <<'NODE'
@@ -199,6 +221,7 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
+            node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
             git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
             if git diff --cached --quiet; then
@@ -221,6 +244,7 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           node tools/report-publication.mjs verify --ts "$REPORT_TS"
+          node tools/core-v14-publication-gate.mjs verify-history
       - name: Publication summary
         env:
           SHORT_ID: ${{ steps.bundle.outputs.short_id }}
@@ -234,6 +258,7 @@ jobs:
             echo "- Report: \`$REPORT_PATH\`"
             echo "- Sidecar: \`$SIDECAR_PATH\`"
             echo "- Index: \`run-history.json\`"
+            echo "- Core gate: passed"
             echo "- Read-back: passed"
             echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
           } >> "$GITHUB_STEP_SUMMARY"
