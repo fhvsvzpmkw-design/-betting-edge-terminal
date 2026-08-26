@@ -6,8 +6,8 @@ import {fileURLToPath} from 'node:url';
 
 const HERE=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(HERE,'..');
-const DEFAULT_FRAMEWORK=path.join(ROOT,'core/core-handicap-framework-v1.3-r1.json');
-const DEFAULT_CASES=path.join(ROOT,'core/tests/core-handicap-framework-v1.3-r1-cases.json');
+const DEFAULT_FRAMEWORK=path.join(ROOT,'core/core-handicap-framework-v1.4.json');
+const DEFAULT_CASES=path.join(ROOT,'core/tests/core-handicap-framework-v1.4-cases.json');
 const LIBRARY=path.join(ROOT,'research/research-library.json');
 const MANIFEST=path.join(ROOT,'research/manifest.json');
 
@@ -17,7 +17,7 @@ function readJson(file){return JSON.parse(fs.readFileSync(file,'utf8'))}
 function gitBlobSha(file){const data=fs.readFileSync(file);return crypto.createHash('sha1').update(Buffer.from(`blob ${data.length}\0`)).update(data).digest('hex')}
 function nonEmpty(v){return typeof v==='string'&&v.trim().length>0}
 
-function matchCondition(condition,context){
+export function matchCondition(condition,context){
   if(!condition||typeof condition!=='object'||Array.isArray(condition)) return false;
   if(Array.isArray(condition.all)) return condition.all.every(c=>matchCondition(c,context));
   if(Array.isArray(condition.any)) return condition.any.some(c=>matchCondition(c,context));
@@ -28,10 +28,14 @@ function matchCondition(condition,context){
   });
 }
 
-function validateFramework(framework,library,manifest){
+export function validateFramework(framework,library=readJson(LIBRARY),manifest=readJson(MANIFEST)){
   assert(framework?.schema===1,'Framework schema must be 1');
-  assert(framework.state==='STAGING_CANDIDATE_NOT_RUNTIME_AUTHORITY','R1 must remain staging until explicit promotion');
-  assert(framework.coreFamilyVersion==='1.3','Framework must target core family 1.3');
+  assert(['STAGING_CANDIDATE_NOT_RUNTIME_AUTHORITY','OPERATIONAL'].includes(framework.state),`Unsupported framework state ${framework.state}`);
+  if(framework.state==='OPERATIONAL'){
+    assert(framework.coreFamilyVersion==='1.4','Operational framework must target Core 1.4');
+  }else{
+    assert(framework.coreFamilyVersion==='1.3','Staging R1 framework must target Core 1.3');
+  }
   assert(framework.researchAuthority?.libraryVersion==='1.8','Framework must pin Research Library v1.8');
   assert(library?.library?.version==='1.8','Active Research Library must be v1.8');
   assert(manifest?.activeLibraryVersion==='1.8','Active research manifest must be v1.8');
@@ -43,7 +47,7 @@ function validateFramework(framework,library,manifest){
   assert(states.length===4,'Expected four model-error states');
   const stateSet=new Set(states);
   for(const rule of framework.baseRules||[]){
-    assert(nonEmpty(rule.id), 'Every base rule requires id');
+    assert(nonEmpty(rule.id),'Every base rule requires id');
     assert(stateSet.has(rule.floor),`Invalid base-rule floor ${rule.floor}`);
     assert(rule.when&&typeof rule.when==='object',`Base rule ${rule.id} requires condition`);
   }
@@ -58,15 +62,16 @@ function validateFramework(framework,library,manifest){
   }
 
   const boundaries=framework.firstPhaseBoundaries||{};
-  assert(boundaries.researchMayRaiseModelErrorFloor===true,'First phase must allow only explicit upward model-error graduation');
+  assert(boundaries.researchMayRaiseModelErrorFloor===true,'First phase must allow explicit upward model-error graduation');
   assert(boundaries.researchMayLowerModelErrorFloor===false,'First phase must prohibit research-driven model-error compression');
-  assert(boundaries.researchMayMoveFairValuePointEstimate===false,'First phase must not move fair-value point estimates');
+  assert(boundaries.researchMayMoveFairValuePointEstimate===false,'Research may not move fair-value point estimates in this Core 1.4 phase');
   assert(boundaries.researchMayCreateIndependentCurrentSupport===false,'Research cannot manufacture independent current support');
   assert(boundaries.researchMayCreateBet===false,'Research cannot create BET');
   assert(boundaries.researchMaySetStake===false,'Research cannot set stake');
+  return framework;
 }
 
-function evaluate(framework,context){
+export function evaluate(framework,context){
   const order=new Map(framework.modelErrorOrder.map((state,index)=>[state,index]));
   let state='STANDARD';
   const reasons=[];
@@ -107,7 +112,7 @@ function evaluate(framework,context){
   };
 }
 
-function validateContext(framework,context,label){
+export function validateContext(framework,context,label='Core assessment'){
   const c=framework.controlledValues;
   for(const key of ['fairValueBasis','bookDispersion','liquidityRisk','tailRisk','directCalibration','personnelSensitivity','independentCurrentSupport']){
     assert((c[key]||[]).includes(context[key]),`${label} has invalid ${key}: ${context[key]}`);
@@ -119,14 +124,19 @@ function validateContext(framework,context,label){
   assert(typeof context.movementPrimaryEvidence==='boolean',`${label} movementPrimaryEvidence must be boolean`);
   assert(typeof context.historicalDirectionalRecalibrationPrimary==='boolean',`${label} historicalDirectionalRecalibrationPrimary must be boolean`);
   assert(Array.isArray(context.graduatedResearchIds),`${label} graduatedResearchIds must be an array`);
+  return context;
 }
 
-function selfTest(frameworkFile=DEFAULT_FRAMEWORK,casesFile=DEFAULT_CASES){
+export function loadProductionFramework(){
+  const framework=readJson(DEFAULT_FRAMEWORK);
+  validateFramework(framework);
+  return framework;
+}
+
+export function selfTest(frameworkFile=DEFAULT_FRAMEWORK,casesFile=DEFAULT_CASES){
   const framework=readJson(frameworkFile);
   const cases=readJson(casesFile);
-  const library=readJson(LIBRARY);
-  const manifest=readJson(MANIFEST);
-  validateFramework(framework,library,manifest);
+  validateFramework(framework);
   assert(cases.frameworkId===framework.frameworkId,'Test suite frameworkId mismatch');
   assert(Array.isArray(cases.cases)&&cases.cases.length>0,'Test suite must contain cases');
 
@@ -154,6 +164,7 @@ function main(){
   if(command==='self-test') return selfTest(path.resolve(frameworkFile),path.resolve(casesFile));
   if(command==='evaluate'){
     const framework=readJson(path.resolve(frameworkFile));
+    validateFramework(framework);
     const context=JSON.parse(fs.readFileSync(0,'utf8'));
     validateContext(framework,context,'stdin context');
     console.log(JSON.stringify(evaluate(framework,context),null,2));
@@ -162,4 +173,7 @@ function main(){
   fail('Usage: core-handicap-framework.mjs self-test [FRAMEWORK] [CASES] | evaluate FRAMEWORK < context.json');
 }
 
-try{main()}catch(error){console.error(`CORE HANDICAP FRAMEWORK ERROR: ${error.message}`);process.exit(1)}
+const invokedAsScript=process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url);
+if(invokedAsScript){
+  try{main()}catch(error){console.error(`CORE HANDICAP FRAMEWORK ERROR: ${error.message}`);process.exit(1)}
+}
