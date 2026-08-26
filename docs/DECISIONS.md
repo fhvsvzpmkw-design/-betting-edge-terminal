@@ -1,12 +1,12 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-24 — current production/version boundary clarified
+**Last updated:** 2026-08-25 — Core 1.4 production closeout
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
 ## Current production boundary
 
-As of the 2026-08-24 night lock, current production authority is **Betting Edge Contract v1.0 OPERATIONAL**, **VigScope Terminal UI v1.5**, **report engine/core v1.3**, and **Research Library v1.7 read-only**. Earlier decision entries that describe v0.9, v1.3.x UI patches, or other prior versions as current record the state that existed when those decisions were made; they remain historical evidence and do not override this current boundary.
+Current production authority is **Betting Edge Contract v1.0 OPERATIONAL**, **VigScope Terminal UI v1.5**, **Betting Edge Core v1.4 OPERATIONAL**, and **Research Library v1.8 / R3 live read-only**. Walters is runtime-switchable and currently operates in `BET_AUTHORITY` for eligible NFL spread/moneyline. Earlier decision entries describe the state that existed when those decisions were made; they remain historical evidence but do not override this current boundary or `docs/PROJECT_STATE.md`.
 
 ## D-001 — Git history is the authoritative rollback system
 
@@ -54,15 +54,13 @@ Betting Edge is being developed around sources that do not require adding a recu
 
 ## D-006 — Use one scheduled odds refresh per window with manual fallback
 
-**Status:** Active as of 2026-08-18; supersedes the earlier paired-trigger form of this decision
+**Status:** Superseded by D-031 on 2026-08-25
 
-Each important odds window now uses **one scheduled cron trigger at the intended refresh slot**: 05:45, 07:45, 09:15, 14:55 and 17:55 Vancouver. Paired/backup scheduled attempts are no longer the production design.
+This decision records the 2026-08-18 state in which each important odds window used one scheduled trigger and manual `workflow_dispatch` was the explicit recovery path. At that time the active MLB refresh slots were 05:45, 07:45, 09:15, 14:55 and 17:55 Vancouver.
 
-Manual `workflow_dispatch` is the explicit fallback when the scheduled trigger is missed, materially delayed, fails, or does not leave a usable snapshot while a new pull still has practical value. The 25-minute stale-job cutoff remains active so delayed scheduled jobs fail before spending quota.
+The current scheduler architecture is documented in D-031 and `BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`.
 
-The current workflow control profile uses a hard request budget of **90**, a safety reserve of **5**, optional work stopping at **85**, a core request planning target of **34**, and a deep request planning target of **6**.
-
-**Reason:** A single production trigger keeps each window simple and predictable, avoids duplicate scheduled attempts and unnecessary quota pressure, and makes recovery an explicit operational action rather than another automatic cron. Manual fallback plus zombie protection preserves a recovery path without creating overlapping scheduled work.
+**Reason:** The historical single-trigger design simplified quota control and removed paired automatic attempts. The later Cloudflare-primary/two-minute-backstop architecture preserves the same duplicate/quota discipline while adding dispatch recovery.
 
 ## D-007 — Kill stale scheduled jobs before they spend quota
 
@@ -74,11 +72,11 @@ A scheduled odds-refresh job arriving more than 25 minutes after its target slot
 
 ## D-008 — Keep scheduler diagnostics independent of the odds API
 
-**Status:** Active
+**Status:** Superseded by D-031 on 2026-08-25
 
-Scheduler canary workflows are diagnostic, read-only with respect to betting data, and make no odds API calls.
+Scheduler canary workflows were previously used as read-only diagnostic signals and made no odds API calls. Those canaries are no longer part of current operations.
 
-**Reason:** This creates a clean signal for distinguishing GitHub scheduler behavior from errors inside the odds workflow.
+**Reason:** The canaries were useful during the earlier GitHub-scheduler diagnostic phase. Current scheduler reliability is instead observed through Cloudflare primary dispatch, the protected odds workflow, the two-minute GitHub backstop and actual canonical-slot publication.
 
 ## D-009 — Issued reports are immutable; repricing is an overlay
 
@@ -98,7 +96,7 @@ Structured event, market, and selection identity is the preferred basis for matc
 
 ## D-011 — Equal best-price ties are deterministic
 
-**Status:** Active in runner v1.3 and production contract v0.9
+**Status:** Active principle; originated in runner v1.3 / Contract v0.9
 
 When multiple books share the best live price:
 
@@ -127,13 +125,13 @@ Identity mismatches, unavailable markets, unverified prices, and started/closed 
 
 ## D-014 — Research Library remains read-only in production R3
 
-**Status:** Active; R2 passed and R3 live acceptance passed on 2026-08-15
+**Status:** Superseded by D-032 on 2026-08-25
 
-Research Library 1.7 remains canonical/read-only and requires no runtime research writes. The R2 manual-read suite passed on 2026-08-15. All five scheduled report lanes read the library after the provisional current handicap is formed, render concise History Fit in the existing `hist` field, and preserve structured Research Fit/provenance in a separate history sidecar.
+This entry records the original v1.7 R3 live-read acceptance state. Research remained read-only, ran after the provisional current handicap and could not create a BET or directly change fair value, `playTo`, status, stake, identity or price freshness.
 
-The 15:15 + 18:15 live sequence passed the first R3/H3 acceptance pair. Post-cutover sidecars use schema 3 and record the exact operational v0.9 production-contract blob used at issuance.
+The current production Research authority is v1.8 / R3 live read-only under D-032.
 
-**Reason:** Research can enrich auditability and calibration without becoming betting authority. It still cannot create a BET or directly change fair value, `playTo`, status, stake, identity, or price freshness.
+**Reason:** Research can enrich auditability and calibration without becoming unconstrained betting authority.
 
 ## D-015 — User betting history is a separate secondary context
 
@@ -203,7 +201,7 @@ The index is maintained by a separate `.github/workflows/odds-history-index.yml`
 
 The issued runner payload remains compact. Structured Research Fit/provenance is stored separately under `data/history/research-fit/...` and linked by exact slot/run timestamp.
 
-Player-specific recommendations may additionally carry the narrow runner-supported `rec.feed` identity object required by production v0.9. That identity object is execution provenance, not bulky Research Fit metadata.
+Player-specific recommendations may additionally carry the narrow runner-supported `rec.feed` identity object required by production governance. That identity object is execution provenance, not bulky Research Fit metadata.
 
 The issued payload remains authoritative for the recommendation. The sidecar records research/provenance context and must not rewrite issued status, price, fair value, `playTo`, stake or analysis.
 
@@ -211,87 +209,133 @@ The issued payload remains authoritative for the recommendation. The sidecar rec
 
 ## D-023 — Configure all five lanes consistently; accept behavior incrementally
 
-**Status:** Active; configuration complete and first live acceptance pair passed
+**Status:** Active principle; original acceptance completed
 
-The project owner deliberately chose to configure all five scheduled report lanes consistently so Research Fit/history behavior would not be forgotten or drift between lanes. The 15:15 and 18:15 live chains were then used as the first acceptance pair and passed on 2026-08-15.
+The project owner deliberately chose to configure all five scheduled report lanes consistently so Research Fit/history behavior would not be forgotten or drift between lanes. The 15:15 and 18:15 live chains were used as the first acceptance pair in the earlier v0.9/v1.7 phase.
 
-The next step is observation of the first full post-cutover five-lane day, not another broad configuration change.
+The same principle now applies to Core v1.4: configure every possible seasonal report trigger consistently, then judge actual behavior through live operating evidence rather than assuming configuration alone proves success.
 
 **Reason:** Configuration consistency and live acceptance are different questions. Preconfiguring all lanes reduces administrative drift while live evidence verifies the actual path.
 
-## D-024 — v0.9 H-track is separate from Shadow History
+## D-024 — H-track issued history is separate from Shadow History
 
-**Status:** Active; H3 live after 2026-08-15 acceptance, S-track remains S0
+**Status:** Active
 
-Production v0.9 has a dedicated **H-track** for durable issued-report and market provenance. It covers exact issued report archives, Research Fit/provenance sidecars, `run-history.json`, compact Git-backed odds-snapshot indexing, source-backed same-day lineage and archive-backed session navigation.
+The H-track records what Betting Edge actually issued: immutable report archives, Research/Core/Walters provenance sidecars, `run-history.json`, compact Git-backed odds-snapshot indexing, same-day lineage and archive-backed navigation.
 
-H-track history records what Betting Edge actually issued. It is intentionally separate from the S-track / Shadow History concept, which remains inactive and would concern broader prospective candidate-level calibration if later justified.
+H-track history remains intentionally separate from the S-track / Shadow History concept, which is still inactive and would concern broader prospective candidate-level calibration if later approved.
 
-**Reason:** Durable auditability of real issued reports is useful now and can be implemented safely without activating a more complex candidate-level Shadow History collector.
+**Reason:** Durable auditability of issued reports is useful without activating a more complex candidate-level Shadow History collector.
 
 ## D-025 — v0.9 operational contract promotion
 
 **Status:** Superseded by Contract v1.0 on 2026-08-22
 
-`BETTING_EDGE_CONTRACT.md` was deliberately promoted as version 0.9 operational on 2026-08-15. This entry records that historical promotion; current production authority is Contract v1.0. It incorporates the exact v0.8 baseline, v0.9 durable-history/provenance delta and player-prop delta by fixed Git blob identity.
-
-All five scheduled report lanes must resolve this production contract and the current approved runner before handicapping. If either cannot be resolved or the contract does not identify itself as operational v0.9, the lane stops with `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
-
-New post-cutover sidecars record the exact production contract blob SHA used by the report.
+`BETTING_EDGE_CONTRACT.md` was deliberately promoted as version 0.9 operational on 2026-08-15. This entry records that historical promotion; current production authority is Contract v1.0.
 
 **Reason:** Production authority should be explicit, auditable and fail closed rather than depend on conversational memory or an implicitly promoted draft.
 
 ## D-026 — Exact player-prop identity is a hard production invariant
 
-**Status:** Active under v0.9 Invariant 23
+**Status:** Active; inherited into Contract v1.0 / Core v1.4
 
-Every displayed player-specific prop must validate exact event, player, market, side, line and approved-book quote. When feed context is insufficient, current player/team/game participation is validated with an authoritative current roster, lineup, injury, transaction or official game-status source.
+Every displayed player-specific prop must validate exact event, player, market, side, line and approved-book quote. When feed context is insufficient, current player/team/game participation is validated with authoritative current information.
 
 Every displayed player prop preserves exact machine-readable `rec.feed` identity in the issued payload. Ambiguous identity forces zero stake, and a later different prop line is treated as a different selection rather than an exact reprice.
 
-**Reason:** Player props are especially vulnerable to fuzzy identity and line-substitution errors. Exact structured identity allows safe issuance, durable auditability and exact repricing without requiring a separate roster database as the primary execution authority.
+**Reason:** Player props are especially vulnerable to fuzzy identity and line-substitution errors. Exact structured identity allows safe issuance, durable auditability and exact repricing.
 
 ## D-027 — Preserve structured identity for every displayed game market
 
-**Status:** Active as of 2026-08-16
+**Status:** Active
 
-All five scheduled report lanes preserve exact machine-readable `rec.feed` identity for every displayed moneyline, spread and game total, regardless of BET / LEAN / WAIT / PASS status. The identity is copied from the exact live-odds event, market and selection used for issuance and is not reconstructed from display text.
+All scheduled report lanes preserve exact machine-readable `rec.feed` identity for every displayed moneyline, spread and game total, regardless of BET / LEAN / WAIT / PASS status. The identity is copied from the exact live-odds event, market and selection used for issuance and is not reconstructed from display text.
 
-New cards therefore use structured repricing first. Existing immutable reports without `rec.feed` remain valid and use fail-closed fallback matching. The fallback accepts `a.m.` / `p.m.` and existing 24-hour PT time formats, but still returns `IDENTITY MISMATCH` when a single event cannot be established safely.
+Existing immutable reports without `rec.feed` remain valid and use fail-closed fallback matching.
 
-This is an implementation hardening of the operational v0.9 requirement that event / market / selection identity precede executable price. It does not rewrite Contract 0.9, alter report status or stake semantics, activate recovery analysis, or change the five history slots.
-
-**Reason:** Exact structured identity prevents ordinary game cards from depending on lossy title parsing, while the improved fallback preserves compatibility with archived reports without weakening fail-closed behavior.
+**Reason:** Exact structured identity prevents ordinary game cards from depending on lossy title parsing while preserving compatibility with archived reports.
 
 ## D-028 — Report recovery stays in the original lane
 
-**Status:** Active operating decision as of 2026-08-16
+**Status:** Active operating decision
 
-When a standard Betting Edge report lane fails to produce a usable issued report but the relevant betting window can still be meaningfully recovered, the recovery is a new issuance in the **same canonical lane**. It is not a sixth report lane and does not change the five-slot production model.
+When a standard report lane fails to produce a usable issued report but the relevant betting window can still be meaningfully recovered, the recovery is a new issuance in the **same canonical lane**. It is not a sixth report lane.
 
-The recovery keeps the original slot (`open`, `main`, `final_morning`, `evening`, or `late`), appends `— RECOVERY` to the normal display label, and uses a fresh actual `run.ts` rather than backdating to the scheduled issuance time. It must pass the same v0.9 preflight, feed/quote freshness, identity, fair-value, Research Fit, status/stake/risk and payload-validation rules as a normal report.
+The recovery keeps the original slot, appends `— RECOVERY`, uses the actual issue time and must pass the same current production gates as a normal report. It requests another odds pull only when necessary and still useful. Every recovery is archived as a separate immutable issuance and never overwrites earlier genuine reports.
 
-Recovery does not automatically require another odds API pull. Use the newest valid feed when it satisfies normal gates; request a fresh pull only when it is actually needed and still operationally useful. A stale or unverifiable exact price remains a zero-risk failure state. Zero BETs is a valid recovery outcome.
-
-Every recovery is archived as a separate immutable issued payload with its matching schema-3 Research Fit/provenance sidecar and `run-history.json` entry. It must never overwrite a missed scheduled slot or an earlier genuine issuance. The normal deterministic short-link scheme continues to use the original lane code plus the actual recovery timestamp, allowing the newest valid same-day recovery to represent that lane in navigation without changing the lane model.
-
-The first observed pair was the 2026-08-16 15:15 Evening recovery and 18:15 Late / West Coast recovery. Both preserved zero risk when the available candidates failed ordinary value and/or executable-price gates.
-
-**Reason:** Recovery should restore report coverage without relaxing confidence, pricing or identity requirements. Treating recovery as same-lane issuance preserves schedule semantics, immutable history, provenance and the existing five-lane UI while avoiding a parallel recovery architecture.
-
-This decision documents proven operating behavior only. It does not amend `BETTING_EDGE_CONTRACT.md` v0.9, automate recovery, alter the runner, or change the odds-refresh scheduler/workflow.
+**Reason:** Recovery should restore report coverage without relaxing confidence, pricing or identity requirements or creating a parallel report architecture.
 
 ## D-029 — Runner UI patch versions may advance independently
 
-**Status:** Active as of 2026-08-17
+**Status:** Active principle; v1.3.1 example is historical
 
-`runner.html` now declares presentation/UI version **v1.3.1**, while the underlying report engine in `runner-core.html` and `index.html` remains **v1.3** and the production governance contract remains **v0.9**.
+The earlier v1.3.1 presentation patch demonstrated that the UI version can advance independently from the report engine/core and governance contract. Current production now uses VigScope UI v1.5 and Core v1.4, still on independent version tracks.
 
-The accepted v1.3.1 hierarchy places F1–F4 directly below the terminal header, removes the duplicated upper status strip, keeps bankroll as a compact header readout, moves New Risk into the BET counter, and uses four-column layouts when space permits with 2 × 2 navigation and outcome grids at narrower iPad and iPhone widths.
+A presentation-only version change must not be treated as a Core or Contract promotion and must not migrate issued payloads/history or change decision semantics unless explicitly designed to do so.
 
-A presentation-only patch version must not be treated as an engine or contract promotion. UI v1.3.1 does not migrate issued payloads, browser history keys, durable archive schemas, odds/repricing logic, recommendation status, stake semantics, or report-generation rules.
+**Reason:** Independent presentation versioning preserves an accurate audit trail without implying analytical or governance changes that did not occur.
 
-**Reason:** Versioning the presentation layer independently preserves an accurate audit trail without implying analytical or governance changes that did not occur.
+## D-030 — Core v1.4 is the forward production baseline
+
+**Status:** Active as of 2026-08-25
+
+Core v1.4 became operational forward-only at `2026-08-25T17:20:00-07:00`. It preserves the proven v1.3 execution baseline while adding explicit fair-value-basis/model-error classification, fixed Research v1.8 uncertainty graduation, Stage 2 personnel sensitivity, tighter WAIT discipline and switchable Walters authority.
+
+Post-cutover reports require structured `coreAssessment` and `waltersEvidence` and are machine-checked by the Core v1.4 publication gate. Historical Core v1.3 reports remain immutable.
+
+Scheduled lanes target up to **nine meaningful cards**. Nine is a review/presentation target, not a BET quota; weaker standards or filler are forbidden merely to reach nine.
+
+**Reason:** Core v1.4 makes uncertainty and independent-support requirements explicit without loosening the hard execution/risk boundary.
+
+## D-031 — Cloudflare is primary; GitHub provides a two-minute odds dispatch backstop
+
+**Status:** Active as of 2026-08-25
+
+Cloudflare Worker Cron remains the primary odds scheduler. After the Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25, `.github/workflows/odds-refresh-backstop.yml` was added as a narrow two-minute recovery layer.
+
+The backstop wakes after currently configured possible seasonal pulses, resolves the active profile and checks whether the operating-date/profile/canonical slot already published. If present it does nothing; if missing it dispatches the existing protected odds workflow.
+
+The target workflow retains serialization, profile validation, canonical-slot duplicate protection and the five-primary-pull daily cap. Manual dispatch remains the final human fallback.
+
+Scheduler canaries are retired and are not part of this architecture.
+
+The native Cloudflare dispatch path still requires reliability diagnosis. The backstop remains until that path proves dependable over multiple slots.
+
+**Reason:** Recover a missed scheduler handoff without reintroducing paired Odds-API pulls or weakening quota/duplicate safeguards.
+
+## D-032 — Research Library v1.8 is production read-only authority
+
+**Status:** Active as of 2026-08-25
+
+Research Library v1.8 / R3 is the production Research authority. Normal History Fit remains read-only and cannot create BET, supply executable price, directly move the fair point estimate, lower model error or set stake.
+
+Core v1.4 has a fixed graduated Research allowlist that may **raise** the model-error floor when a documented uncertainty/calibration rule applies. That controlled uncertainty effect is part of Core v1.4, not an unconstrained Research vote.
+
+**Reason:** Preserve evidence-based calibration and explicit gaps without allowing Research to become a hidden second betting engine.
+
+## D-033 — Result Closure is a separate version-tolerant audit layer
+
+**Status:** Active as of 2026-08-25
+
+The daily 05:00 Result Closure task may process both legacy Core v1.3 and current Core v1.4 issued cards. It grades the issued selection under the historical issuance record and writes only observation sidecars.
+
+It must never mutate issued status, price, fair, `playTo`, stake, `coreAssessment`, Walters evidence, personnel evidence or schema-3 Core/Research/Walters provenance.
+
+Current verification quotas remain 20 previous-day unique events plus 10 older backlog unique events, deduplicated by exact event identity.
+
+**Reason:** Outcome auditing should remain useful across Core versions without turning retrospective results into a silent re-handicap or learning loop.
+
+## D-034 — Crypto Specials remains independent from Core v1.4
+
+**Status:** Active as of 2026-08-25
+
+Crypto Specials is a separate editorial/research pipeline scheduled at 10:30 America/Vancouver. It may use market-information concepts such as current/best price, line shopping, no-vig probability, book disagreement, movement, market maturity and target-price discipline.
+
+It does not run Core v1.4 model-error, Walters authority, VigScope publication, Betting Edge report-history publication or betting-ledger writes. It writes only `data/crypto-specials.json`.
+
+The 10:30 schedule avoids the NBA/NHL 11:00 seasonal report-time collision.
+
+**Reason:** Preserve the value of the Crypto Specials workflow without contaminating Core production governance or creating unnecessary schedule contention.
 
 ---
 
