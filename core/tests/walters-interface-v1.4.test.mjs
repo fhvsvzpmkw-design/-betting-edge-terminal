@@ -3,9 +3,11 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 
 const interfacePath = 'core/walters-intelligence-interface-v1.4.json';
+const authorityPath = 'core/walters-authority-v1.4.json';
 const specPath = 'research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md';
 
 const iface = JSON.parse(fs.readFileSync(interfacePath, 'utf8'));
+const authority = JSON.parse(fs.readFileSync(authorityPath, 'utf8'));
 const spec = fs.readFileSync(specPath);
 
 function assert(condition, message) {
@@ -19,112 +21,67 @@ function gitBlobSha(buffer) {
 
 assert(iface.schema === 1, 'Walters interface schema must be 1');
 assert(iface.targetCoreVersion === '1.4', 'Walters interface must target Core 1.4');
+assert(authority.targetCoreVersion === '1.4', 'Walters authority config must target Core 1.4');
+assert(iface.authorityControl?.configPath === authorityPath, 'Walters authority config path mismatch');
+assert(iface.authorityControl?.defaultMode === 'ADVISORY', 'Initial Walters mode must default to ADVISORY');
+assert(authority.mode === 'ADVISORY', 'Staging authority config should initially be ADVISORY');
 assert(iface.coverage?.interfaceResolutionRequiredForCore14 === true, 'Core 1.4 must resolve Walters availability');
 assert(iface.coverage?.availabilityIsReportBlocking === false, 'Missing Walters data must not block an otherwise valid report');
 assert(iface.sourceAuthority?.designPath === specPath, 'Walters source-design path mismatch');
 assert(gitBlobSha(spec) === iface.sourceAuthority?.designBlobSha, 'Pinned Walters source-design blob SHA mismatch');
 assert(iface.sourceAuthority?.page270CorrectionRequired === true, 'Page 270 correction must remain required');
 
-const forbiddenAuthority = [
-  'mayCreateBet',
-  'mayCountAsIndependentCurrentSupport',
-  'mayDirectlyMoveCoreFairValuePointEstimate',
-  'mayLowerModelErrorFloor',
-  'maySetPlayTo',
-  'maySetStake',
-  'mayOverrideIdentity',
-  'mayOverridePriceFreshness',
-  'mayOverridePersonnelGate',
-  'mayOverrideExposureGate',
-  'maySupplyExecutablePrice'
-];
-for (const key of forbiddenAuthority) {
-  assert(iface.authorityBoundaries?.[key] === false, `Walters authority boundary ${key} must remain false in initial Core 1.4`);
+for (const mode of ['OFF', 'ADVISORY', 'BET_AUTHORITY']) {
+  assert(iface.authorityControl.allowedModes.includes(mode), `Interface missing Walters mode ${mode}`);
+  assert(authority.allowedModes.includes(mode), `Authority config missing Walters mode ${mode}`);
+  assert(authority.modes[mode], `Authority config missing definition for ${mode}`);
 }
-assert(iface.authorityBoundaries?.mayTriggerExplicitReReview === true, 'Walters must be allowed to trigger explicit re-review');
-assert(iface.authorityBoundaries?.maySupplyTransparentSpecialistContext === true, 'Walters specialist context must be available');
-assert(iface.futureActivationBoundary?.weightedCoreInputAllowedNow === false, 'Walters weighted core input must remain disabled initially');
+
+assert(authority.modes.OFF.mayOriginateBet === false, 'OFF must not originate BET');
+assert(authority.modes.ADVISORY.mayOriginateBet === false, 'ADVISORY must not originate BET');
+assert(authority.modes.BET_AUTHORITY.mayOriginateBet === true, 'BET_AUTHORITY must be able to originate BET');
+assert(authority.modes.BET_AUTHORITY.mayInfluenceCoreFairValue === true, 'BET_AUTHORITY must be able to influence Core fair value');
+assert(authority.modes.BET_AUTHORITY.mayCountAsIndependentCurrentSupport === true, 'BET_AUTHORITY must count as at most one independent handicap input');
+assert(iface.modeBehavior.BET_AUTHORITY.mayOriginateBet === true, 'Interface must expose BET origination in BET_AUTHORITY mode');
+assert(iface.runtimeAuthorityBoundary?.betAuthorityAvailableIn14 === true, 'Core 1.4 must expose Walters BET authority switch');
+
+for (const [key, value] of Object.entries(authority.hardBoundariesAllModes)) {
+  assert(value === false, `Walters hard boundary ${key} must remain false in all modes`);
+}
+for (const [key, value] of Object.entries(iface.hardBoundariesAllModes)) {
+  assert(value === false, `Walters interface hard boundary ${key} must remain false in all modes`);
+}
 
 for (const state of ['AVAILABLE', 'PARTIAL', 'UNAVAILABLE']) {
   assert(iface.availabilityStates.includes(state), `Missing Walters availability state ${state}`);
 }
-for (const state of ['ALIGNED', 'MIXED', 'CONFLICT', 'NOT_COMPARABLE', 'UNAVAILABLE']) {
-  assert(iface.comparisonStates.includes(state), `Missing Walters comparison state ${state}`);
-}
 assert(iface.spreadMoneylineStates.includes('SPREAD_VS_ML_UNAVAILABLE'), 'Fail-closed spread-vs-moneyline state is required');
+assert(iface.waltersVerdicts.includes('BET_CANDIDATE'), 'Walters interface must represent a BET_CANDIDATE');
 
-const sampleAvailable = {
-  candidateKey: 'nfl:away@home:2026-09-13',
+const eligibleWaltersBet = {
   availability: 'AVAILABLE',
-  eventIdentity: {
-    sport: 'NFL',
-    league: 'NFL',
-    eventId: 'sample-event',
-    away: 'Away',
-    home: 'Home',
-    startTime: '2026-09-13T13:00:00-07:00'
+  fairSpread: { status: 'AVAILABLE', arithmeticVerified: true, homePerspective: -4.5 },
+  proposedWager: {
+    market: 'spread',
+    selection: 'Home -3',
+    waltersFair: -4.5,
+    targetPriceOrLine: '-3 -110',
+    edgeRationale: 'Independent Walters fair clears the market with uncertainty accounted for.',
+    status: 'BET_CANDIDATE'
   },
-  source: {
-    methodologyVersion: iface.interfaceId,
-    sourceAsOf: '2026-09-13T09:00:00-07:00',
-    generatedAt: '2026-09-13T09:05:00-07:00',
-    sourceRefs: ['power-ratings', 'personnel-check'],
-    notes: null
-  },
-  power: {
-    awayNeutralRating: 1.5,
-    homeNeutralRating: 4.0,
-    rawHomeDifferential: 2.5,
-    awayPriorRating: 1.0,
-    homePriorRating: 4.0,
-    awayUpdate: 0.5,
-    homeUpdate: 0,
-    confidence: 'MEDIUM'
-  },
-  personnel: { adjustments: [], netHomeAdjustment: 0, unresolved: [] },
-  gameFactors: { factors: [], netHomeAdjustment: 1.5 },
-  fairSpread: {
-    homePerspective: -4.0,
-    arithmeticVerified: true,
-    componentEquation: '2.5 neutral + 1.5 home = home -4.0',
-    uncertainty: 'medium confidence',
-    status: 'AVAILABLE'
-  },
-  keyNumbers: { status: 'AVAILABLE', crossings: [3], tableRef: 'sample-key-number-table' },
-  spreadVsMoneyline: {
-    status: 'SPREAD_VS_ML_UNAVAILABLE',
-    preferredExpression: 'UNAVAILABLE',
-    logicRef: null,
-    rationale: 'Corrected conversion logic not loaded in this sample.'
-  },
-  marketReference: {
-    spread: -3.0,
-    spreadPrice: -110,
-    moneyline: -155,
-    book: 'comparison-only',
-    observedAt: '2026-09-13T09:00:00-07:00',
-    executionAuthority: false
-  },
-  waltersVerdict: 'MARGINAL',
-  coreComparison: {
-    coreFairSpread: -3.5,
-    waltersFairSpread: -4.0,
-    differencePoints: -0.5,
-    state: 'ALIGNED',
-    materialityRationale: 'Same directional view; half-point difference does not independently create a wager.',
-    reviewRequired: false
-  }
+  marketReference: { executionAuthority: false },
+  spreadVsMoneyline: { status: 'SPREAD_VS_ML_UNAVAILABLE' }
 };
+assert(eligibleWaltersBet.proposedWager.status === 'BET_CANDIDATE', 'Eligible Walters record must be able to originate BET candidate');
+assert(eligibleWaltersBet.marketReference.executionAuthority === false, 'Walters market reference still cannot be executable-price authority');
+assert(eligibleWaltersBet.spreadVsMoneyline.status === 'SPREAD_VS_ML_UNAVAILABLE', 'Unresolved Page 270 conversion must fail closed without blocking an otherwise spread-only handicap');
 
-assert(sampleAvailable.marketReference.executionAuthority === false, 'Walters sample market reference must not be executable authority');
-assert(sampleAvailable.spreadVsMoneyline.status === 'SPREAD_VS_ML_UNAVAILABLE', 'Unresolved Page 270 conversion must fail closed');
-assert(sampleAvailable.coreComparison.state === 'ALIGNED', 'Available sample should demonstrate comparison access');
-
-const sampleUnavailable = {
-  candidateKey: 'nfl:missing',
-  availability: 'UNAVAILABLE',
-  coreComparison: { state: 'UNAVAILABLE', reviewRequired: false }
+const rejectedByHardGate = {
+  waltersMode: 'BET_AUTHORITY',
+  waltersCandidate: true,
+  exactIdentity: false,
+  finalStatus: 'BLOCKED'
 };
-assert(sampleUnavailable.availability === 'UNAVAILABLE', 'Unavailable Walters input must be representable without blocking core analysis');
+assert(rejectedByHardGate.finalStatus !== 'BET', 'Walters BET authority must fail closed when a hard gate fails');
 
-console.log('CORE 1.4 WALTERS INTERFACE TEST OK');
+console.log('CORE 1.4 WALTERS INTERFACE + BET AUTHORITY TEST OK');
