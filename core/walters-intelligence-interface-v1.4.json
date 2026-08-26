@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "interfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
+  "state": "STAGING_REQUIRED_1_4_CAPABILITY_NOT_RUNTIME_AUTHORITY",
+  "targetCoreVersion": "1.4",
+  "purpose": "Provide Core 1.4 a stable, auditable input contract for Billy Walters-derived handicapping intelligence without granting that layer automatic fair-value, independent-signal, status, playTo, staking or execution authority.",
+  "sourceAuthority": {
+    "designPath": "research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md",
+    "designBlobSha": "6970a28928549cead6204799ebf23aedd767b791",
+    "primaryMethodSource": "Billy Walters, Gambler, Chapters 21 and 22, using approved structured summaries and user-supplied source material rather than repository-stored unauthorized full chapter text",
+    "page270CorrectionRequired": true,
+    "page270Rule": "Spread-versus-moneyline conversion must use the corrected, internally reconciled source logic. If the approved correction cannot be resolved, return SPREAD_VS_ML_UNAVAILABLE rather than infer or reconstruct from an inconsistent historical chart."
+  },
+  "coverage": {
+    "primaryInitialSport": "NFL",
+    "initialMarketClasses": [
+      "spread",
+      "moneyline"
+    ],
+    "futureExpansion": "Other sports/markets may use the same interface only after their Walters methodology mapping is explicitly defined and tested.",
+    "availabilityIsReportBlocking": false,
+    "interfaceResolutionRequiredForCore14": true,
+    "meaning": "Core 1.4 must know whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE for an eligible candidate. Missing Walters data does not block an otherwise valid Betting Edge report."
+  },
+  "availabilityStates": [
+    "AVAILABLE",
+    "PARTIAL",
+    "UNAVAILABLE"
+  ],
+  "comparisonStates": [
+    "ALIGNED",
+    "MIXED",
+    "CONFLICT",
+    "NOT_COMPARABLE",
+    "UNAVAILABLE"
+  ],
+  "spreadMoneylineStates": [
+    "AVAILABLE",
+    "NOT_APPLICABLE",
+    "SPREAD_VS_ML_UNAVAILABLE"
+  ],
+  "waltersVerdicts": [
+    "ALIGNED",
+    "MARGINAL",
+    "VALUE_CANDIDATE",
+    "NO_VALUE",
+    "INSUFFICIENT_DATA"
+  ],
+  "recordShape": {
+    "candidateKey": "stable Core 1.4 candidate identity key",
+    "availability": "AVAILABLE|PARTIAL|UNAVAILABLE",
+    "eventIdentity": {
+      "sport": "controlled sport label",
+      "league": "league/competition label",
+      "eventId": "provider/core event identifier when available",
+      "away": "away participant",
+      "home": "home participant",
+      "startTime": "ISO event start timestamp"
+    },
+    "source": {
+      "methodologyVersion": "Walters methodology package/interface version",
+      "sourceAsOf": "timestamp/date through which the Walters inputs are current",
+      "generatedAt": "timestamp Walters record was generated",
+      "sourceRefs": "array of provenance references for power ratings, personnel, game factors and any conversion tables used",
+      "notes": "optional source/completeness note"
+    },
+    "power": {
+      "awayNeutralRating": "number|null",
+      "homeNeutralRating": "number|null",
+      "rawHomeDifferential": "number|null; home rating minus away rating",
+      "awayPriorRating": "number|null",
+      "homePriorRating": "number|null",
+      "awayUpdate": "number|null",
+      "homeUpdate": "number|null",
+      "confidence": "HIGH|MEDIUM|LOW|UNQUANTIFIED"
+    },
+    "personnel": {
+      "adjustments": "array of {participant, player, position, participation, effectiveness, pointImpact, replacementQuality, clusterImpact, uncertainty, sourceRefs}",
+      "netHomeAdjustment": "number|null; home-positive point convention",
+      "unresolved": "array of material unresolved player/position-group questions"
+    },
+    "gameFactors": {
+      "factors": "array of {factor, adjustment, state, rationale, sourceRefs}; adjustment uses home-positive point convention; state is APPLIED|NO_ADJUSTMENT|INSUFFICIENT_EVIDENCE",
+      "netHomeAdjustment": "number|null"
+    },
+    "fairSpread": {
+      "homePerspective": "number|null; negative means home favorite, positive means home underdog",
+      "arithmeticVerified": "boolean",
+      "componentEquation": "human-readable rating + home field + personnel + factors path",
+      "uncertainty": "concise range/confidence note",
+      "status": "AVAILABLE|PARTIAL|UNAVAILABLE"
+    },
+    "keyNumbers": {
+      "status": "AVAILABLE|PARTIAL|UNAVAILABLE",
+      "crossings": "array of material NFL key-number crossings between Walters fair and market reference",
+      "tableRef": "provenance reference to the current calibrated key-number table when used"
+    },
+    "spreadVsMoneyline": {
+      "status": "AVAILABLE|NOT_APPLICABLE|SPREAD_VS_ML_UNAVAILABLE",
+      "preferredExpression": "SPREAD|MONEYLINE|NO_PREFERENCE|UNAVAILABLE",
+      "logicRef": "provenance reference to corrected conversion logic",
+      "rationale": "concise comparison rationale"
+    },
+    "marketReference": {
+      "spread": "number|null",
+      "spreadPrice": "American odds|null",
+      "moneyline": "American odds|null",
+      "book": "book/source label|null",
+      "observedAt": "timestamp|null",
+      "executionAuthority": false,
+      "rule": "This is comparison context only. Core 1.4 obtains executable identity/price/freshness from the normal Betting Edge feed and gates."
+    },
+    "waltersVerdict": "ALIGNED|MARGINAL|VALUE_CANDIDATE|NO_VALUE|INSUFFICIENT_DATA",
+    "coreComparison": {
+      "coreFairSpread": "number|null",
+      "waltersFairSpread": "number|null",
+      "differencePoints": "number|null",
+      "state": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE",
+      "materialityRationale": "why the agreement/disagreement is or is not material, including key-number context",
+      "reviewRequired": "boolean"
+    }
+  },
+  "initialCore14Use": {
+    "ingestWhenAvailable": true,
+    "recordAvailabilityWhenMissing": true,
+    "compareToCoreFair": true,
+    "compareToCurrentMarket": true,
+    "recordAgreementConflict": true,
+    "materialConflictTriggersReReview": true,
+    "reReviewMeaning": "Re-open current evidence and model assumptions. Any resulting fair-value change must be justified by explicit current-model/current-evidence reasoning rather than Walters disagreement alone.",
+    "futureCalibrationDataValue": "Preserve Walters projections and comparison state so later approved CLV/result work can evaluate whether/how Walters deserves quantitative weight. Results/CLV learning itself is not part of Core 1.4."
+  },
+  "authorityBoundaries": {
+    "mayCreateBet": false,
+    "mayCountAsIndependentCurrentSupport": false,
+    "mayDirectlyMoveCoreFairValuePointEstimate": false,
+    "mayLowerModelErrorFloor": false,
+    "maySetPlayTo": false,
+    "maySetStake": false,
+    "mayOverrideIdentity": false,
+    "mayOverridePriceFreshness": false,
+    "mayOverridePersonnelGate": false,
+    "mayOverrideExposureGate": false,
+    "maySupplyExecutablePrice": false,
+    "mayTriggerExplicitReReview": true,
+    "maySupplyTransparentSpecialistContext": true
+  },
+  "futureActivationBoundary": {
+    "weightedCoreInputAllowedNow": false,
+    "promotionRequirement": "Any future change that lets Walters directly move fair value, lower model error, count as independent support, set playTo or influence stake requires a separately versioned activation, calibration evidence, regression testing and explicit approval."
+  }
+}
