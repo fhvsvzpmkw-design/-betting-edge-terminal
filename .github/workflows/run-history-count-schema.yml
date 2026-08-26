@@ -1,0 +1,89 @@
+name: Run history count schema guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - run-history.json
+      - .github/workflows/run-history-count-schema.yml
+  pull_request:
+    paths:
+      - run-history.json
+      - .github/workflows/run-history-count-schema.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: run-history-count-schema
+  cancel-in-progress: false
+
+jobs:
+  normalize-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && 'main' || github.head_ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Normalize canonical count keys
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const file = 'run-history.json';
+          const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const canonical = ['bet','lean','wait','pass'];
+          let changed = false;
+          for (const run of doc.runs || []) {
+            if (!run.counts || typeof run.counts !== 'object' || Array.isArray(run.counts)) {
+              throw new Error(`COUNT SCHEMA VIOLATION: ${run.id || run.ts || 'unknown run'} has invalid counts`);
+            }
+            const normalized = {};
+            for (const key of canonical) {
+              const lower = run.counts[key];
+              const upper = run.counts[key.toUpperCase()];
+              const value = lower ?? upper;
+              if (!Number.isInteger(value) || value < 0) {
+                throw new Error(`COUNT SCHEMA VIOLATION: ${run.id || run.ts || 'unknown run'} counts.${key} is missing or invalid`);
+              }
+              normalized[key] = value;
+            }
+            const keys = Object.keys(run.counts);
+            if (keys.length !== canonical.length || canonical.some(k => run.counts[k] !== normalized[k])) changed = true;
+            run.counts = normalized;
+            if (Number.isInteger(run.recCount)) {
+              const total = canonical.reduce((sum, key) => sum + normalized[key], 0);
+              if (total !== run.recCount) throw new Error(`COUNT SCHEMA VIOLATION: ${run.id || run.ts || 'unknown run'} counts total ${total} != recCount ${run.recCount}`);
+            }
+          }
+          if (changed) fs.writeFileSync(file, JSON.stringify(doc, null, 2) + '\n');
+          NODE
+      - name: Verify lowercase schema
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const doc = JSON.parse(fs.readFileSync('run-history.json', 'utf8'));
+          const canonical = ['bet','lean','wait','pass'];
+          for (const run of doc.runs || []) {
+            const keys = Object.keys(run.counts || {}).sort();
+            const expected = [...canonical].sort();
+            if (JSON.stringify(keys) !== JSON.stringify(expected)) throw new Error(`COUNT SCHEMA VIOLATION: ${run.id || run.ts}`);
+          }
+          console.log(`COUNT SCHEMA OK: ${(doc.runs || []).length} runs`);
+          NODE
+      - name: Commit normalization
+        if: github.event_name == 'push'
+        run: |
+          if git diff --quiet -- run-history.json; then
+            echo 'No normalization required.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add run-history.json
+          git commit -m 'history: normalize canonical count keys'
+          git pull --rebase origin main
+          git push origin HEAD:main
