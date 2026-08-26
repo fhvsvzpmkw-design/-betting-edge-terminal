@@ -1,0 +1,216 @@
+name: One-time Stage 2 history repair
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/history-stage2-repair-once-20260826.yml
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: betting-edge-history-stage2-repair-once-20260826
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Repair archived Stage 2 metadata
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const MAIN_FILE = 'data/history/research-fit/2026-08-26/main-082200.json';
+          const FINAL_FILE = 'data/history/research-fit/2026-08-26/final_morning-094246.json';
+
+          function assert(condition, message) {
+            if (!condition) throw new Error(message);
+          }
+          function nonEmpty(value) {
+            return typeof value === 'string' && value.trim().length > 0;
+          }
+          function load(file) {
+            const text = fs.readFileSync(file, 'utf8');
+            return { text, data: JSON.parse(text) };
+          }
+          function recommendation(data, ordinal, expectedTitle) {
+            const rec = (data.recommendations || []).find(item => item.ordinal === ordinal);
+            assert(rec, `Missing recommendation ${ordinal}`);
+            assert(rec.title === expectedTitle, `Recommendation ${ordinal} title drifted: ${rec.title}`);
+            return rec;
+          }
+          function setShortfall(rec, message) {
+            const evidence = rec.personnelEvidence;
+            assert(evidence, `${rec.title} is missing personnelEvidence`);
+            if (!nonEmpty(evidence.sourceShortfall)) evidence.sourceShortfall = message;
+          }
+          function save(file, original, data) {
+            const next = JSON.stringify(data, null, 2) + '\n';
+            if (next !== original) {
+              fs.writeFileSync(file, next, 'utf8');
+              console.log(`REPAIRED ${file}`);
+              return true;
+            }
+            console.log(`UNCHANGED ${file}`);
+            return false;
+          }
+          function validateRelevantSidecar(data, label) {
+            const allowedStates = new Set(['CONFIRMED', 'STRONG PROJECTION', 'PARTIAL', 'UNKNOWN']);
+            for (const rec of data.recommendations || []) {
+              if (!rec.personnelRequired) continue;
+              const evidence = rec.personnelEvidence;
+              assert(evidence, `${label} ${rec.ordinal} missing personnelEvidence`);
+              assert(Array.isArray(evidence.officialSources) && evidence.officialSources.length > 0,
+                `${label} ${rec.ordinal} requires an authoritative source check`);
+              assert(Array.isArray(evidence.fallbackSources), `${label} ${rec.ordinal} fallbackSources must be an array`);
+              assert(evidence.fallbackSourceCount === evidence.fallbackSources.length,
+                `${label} ${rec.ordinal} fallbackSourceCount mismatch`);
+              assert(allowedStates.has(evidence.personnelState),
+                `${label} ${rec.ordinal} invalid personnelState ${evidence.personnelState}`);
+              const unresolved = Array.isArray(evidence.unresolved) ? evidence.unresolved : [];
+              const unresolvedMaterial = evidence.personnelState !== 'CONFIRMED' || unresolved.length > 0;
+              if (unresolvedMaterial) {
+                assert(evidence.fallbackSourceCount >= 3 || nonEmpty(evidence.sourceShortfall),
+                  `${label} ${rec.ordinal} unresolved personnel lacks depth or sourceShortfall`);
+                if (evidence.fallbackSourceCount < 3) {
+                  assert(['PARTIAL', 'UNKNOWN'].includes(evidence.personnelState),
+                    `${label} ${rec.ordinal} overstates personnel certainty`);
+                }
+              }
+              if (String(rec.status).toUpperCase() === 'WAIT') {
+                const qualification = rec.waitQualification;
+                assert(qualification && qualification.actionableIfResolved === true,
+                  `${label} ${rec.ordinal} WAIT lacks actionable qualification`);
+                assert(Array.isArray(qualification.blockers) && qualification.blockers.length > 0,
+                  `${label} ${rec.ordinal} WAIT lacks blockers`);
+                assert(Array.isArray(qualification.independentSignals) && qualification.independentSignals.length > 0,
+                  `${label} ${rec.ordinal} WAIT lacks independent signals`);
+                assert(nonEmpty(qualification.rationale), `${label} ${rec.ordinal} WAIT lacks rationale`);
+              }
+            }
+          }
+
+          const main = load(MAIN_FILE);
+          const main5 = recommendation(main.data, 5, 'Nick Sogard over 0.5 stolen bases');
+          setShortfall(main5,
+            'Only two distinct current fallback sources were available; the Aug. 26 lineup and batting order remained unresolved at issuance.');
+
+          const main6 = recommendation(main.data, 6, 'Jung Hoo Lee over 0.5 stolen bases');
+          setShortfall(main6,
+            'Only two distinct current fallback sources were available; the Aug. 26 batting order and opposing catcher remained unresolved at issuance.');
+
+          const main7 = recommendation(main.data, 7, 'Diamond Miller over 1.5 three-pointers');
+          main7.personnelEvidence.personnelState = 'PARTIAL';
+          setShortfall(main7,
+            'Only one distinct current fallback source was available; exact minutes on the back-to-back remained unresolved at issuance.');
+
+          const main8 = recommendation(main.data, 8, 'FK Prepere moneyline');
+          if (!main8.waitQualification) {
+            main8.waitQualification = {
+              actionableIfResolved: true,
+              blockers: [
+                'Official FK Prepere and Slovan Liberec starting lineups'
+              ],
+              independentSignals: [
+                {
+                  origin: 'Slovan Liberec official fixture preview',
+                  finding: 'The club confirmed the MOL Cup tie and opponent.'
+                },
+                {
+                  origin: 'FotMob lineup projection',
+                  finding: 'Predicted lineups and listed absences supplied current non-market personnel context.'
+                }
+              ],
+              rationale: 'The lineup blocker was concrete and imminent; any action still required a fresh independent fair, executable price and all production gates.'
+            };
+          }
+
+          const main9 = recommendation(main.data, 9, 'FK Meteor Prague VIII draw');
+          setShortfall(main9,
+            'Only one distinct current fallback source was available; official cup lineups remained unresolved at issuance.');
+
+          const final = load(FINAL_FILE);
+          const final8 = recommendation(final.data, 8, 'Diamond Miller over 1.5 three-pointers');
+          final8.personnelEvidence.personnelState = 'PARTIAL';
+          setShortfall(final8,
+            'Only one distinct current fallback source was available; exact minutes on the back-to-back remained unresolved at issuance.');
+
+          const final9 = recommendation(final.data, 9, 'Zamora FC–Real Frontera draw');
+          const final9Evidence = final9.personnelEvidence;
+          assert(final9Evidence, 'Final recommendation 9 is missing personnelEvidence');
+          if (!Array.isArray(final9Evidence.officialSources)) final9Evidence.officialSources = [];
+          if (final9Evidence.officialSources.length === 0) {
+            final9Evidence.officialSources.push({
+              origin: 'Federación Venezolana de Fútbol official site',
+              url: 'https://www.fvf.com.ve/',
+              asOf: '2026-08-26T09:42:46.426-07:00',
+              fact: 'Official federation channels were checked; no current lineup or match preview was available.'
+            });
+          }
+          if (final9Evidence.personnelState === 'UNRESOLVED') final9Evidence.personnelState = 'UNKNOWN';
+
+          validateRelevantSidecar(main.data, '08:00');
+          validateRelevantSidecar(final.data, '09:30');
+
+          const changed = [
+            save(MAIN_FILE, main.text, main.data),
+            save(FINAL_FILE, final.text, final.data)
+          ].some(Boolean);
+          assert(changed, 'The one-time history repair produced no file changes');
+          NODE
+
+      - name: Verify complete report history
+        run: |
+          node tools/report-publication.mjs verify
+          node tools/core-v14-publication-gate.mjs verify-history
+
+      - name: Commit repaired history metadata
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/history/research-fit/2026-08-26/main-082200.json \
+                  data/history/research-fit/2026-08-26/final_morning-094246.json
+          git commit -m "history: repair Stage 2 verification metadata"
+          git push origin HEAD:main
+
+      - name: Dispatch clean report-history verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 2
+          curl --fail-with-body -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/report-history.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"mode":"verify"}}'
+
+      - name: Summary
+        run: |
+          {
+            echo "## Stage 2 history repair completed"
+            echo
+            echo "- 08:00 unresolved-source metadata normalized"
+            echo "- 08:00 WAIT qualification restored"
+            echo "- 09:30 minutes uncertainty normalized"
+            echo "- 09:30 official FVF source check recorded"
+            echo "- Local durable-history and Core 1.4 history verification passed"
+            echo "- Fresh Report history publication verification dispatched"
+          } >> "$GITHUB_STEP_SUMMARY"
