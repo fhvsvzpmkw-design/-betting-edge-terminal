@@ -1,26 +1,27 @@
 name: Temporary Core 1.4 count compatibility patch
 on:
   push:
-    branches: [fix/core14-derived-counts]
-    paths:
-      - .github/workflows/tmp-core14-count-compat.yml
+    branches:
+      - 'fix/core14-derived-counts'
 jobs:
   patch:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout branch
+        uses: actions/checkout@v4
         with:
           ref: fix/core14-derived-counts
           fetch-depth: 0
-      - name: Derive display counts from recommendations
+      - name: Patch display loader
+        shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           needle = "    const priorRuns=await sameDayPriorRuns(index,entry);\n    const hydrated={...run,prior_runs:priorRuns};"
           repl = """    const priorRuns=await sameDayPriorRuns(index,entry);
-    // Display compatibility only: recommendations remain the issued source of truth.
+    // Display-only compatibility: derive summary counts from the issued recommendations.
     const canonicalCounts={bet:0,lean:0,wait:0,pass:0};
     for(const rec of Array.isArray(run.recs)?run.recs:[]){
       const status=String(rec&&rec.status||'').trim().toLowerCase();
@@ -30,7 +31,8 @@ jobs:
           changed=[]
           for name in ('r.html','index.html'):
               p=Path(name)
-              if not p.exists(): continue
+              if not p.exists():
+                  continue
               text=p.read_text()
               if needle in text:
                   p.write_text(text.replace(needle,repl,1))
@@ -39,11 +41,12 @@ jobs:
               raise SystemExit('No compatible loader marker found')
           print('patched:', ', '.join(changed))
           PY
-      - name: Commit branch test patch
+      - name: Commit patch
+        shell: bash
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add r.html index.html
-          git diff --cached --quiet && exit 0
-          git commit -m "fix: derive VigScope display counts from issued recommendations"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'fix: derive VigScope display counts from issued recommendations'
           git push origin HEAD:fix/core14-derived-counts
