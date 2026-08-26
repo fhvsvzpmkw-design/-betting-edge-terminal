@@ -5,8 +5,13 @@ on:
   push:
     paths:
       - 'core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md'
+      - 'core/core-v1.4-candidate-r1.json'
       - 'core/walters-intelligence-interface-v1.4.json'
+      - 'core/walters-authority-v1.4.json'
+      - 'core/core-handicap-framework-v1.3-r1.json'
+      - 'core/tests/core-v1.4-candidate.test.mjs'
       - 'core/tests/walters-interface-v1.4.test.mjs'
+      - 'research/research-library.json'
       - 'research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md'
       - '.github/workflows/core-v14-consolidation-validation.yml'
 
@@ -25,16 +30,23 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Parse Walters interface JSON
-        run: node -e "JSON.parse(require('fs').readFileSync('core/walters-intelligence-interface-v1.4.json','utf8')); console.log('Walters interface JSON OK')"
+      - name: Parse Core 1.4 JSON controls
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('core/core-v1.4-candidate-r1.json','utf8')); console.log('Core 1.4 candidate JSON OK')"
+          node -e "JSON.parse(require('fs').readFileSync('core/walters-intelligence-interface-v1.4.json','utf8')); console.log('Walters interface JSON OK')"
+          node -e "JSON.parse(require('fs').readFileSync('core/walters-authority-v1.4.json','utf8')); console.log('Walters authority JSON OK')"
 
-      - name: Validate Walters interface and authority boundaries
+      - name: Validate Walters interface and BET authority boundaries
         run: node core/tests/walters-interface-v1.4.test.mjs
 
-      - name: Verify Core 1.4 scope exclusions
+      - name: Validate assembled Core 1.4 candidate
+        run: node core/tests/core-v1.4-candidate.test.mjs
+
+      - name: Verify Core 1.4 scope freeze
         run: |
           grep -q 'Results / CLV feedback learning loop' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
           grep -q 'Shadow History activation' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
           grep -q 'Learned player/team associations and personal-ledger calibration' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
-          grep -q 'Walters Intelligence Access Layer — REQUIRED 1.4 CAPABILITY' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
+          grep -q 'Walters Intelligence Engine — REQUIRED 1.4 CAPABILITY' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
+          grep -q 'BET_AUTHORITY' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md
           echo 'Core 1.4 scope freeze OK'
