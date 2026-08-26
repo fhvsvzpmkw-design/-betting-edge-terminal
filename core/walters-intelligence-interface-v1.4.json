@@ -1,9 +1,15 @@
 {
   "schema": 1,
   "interfaceId": "core-1.4-walters-intelligence-r1-2026-08-25",
-  "state": "STAGING_REQUIRED_1_4_CAPABILITY_NOT_RUNTIME_AUTHORITY",
+  "state": "STAGING_REQUIRED_1_4_CAPABILITY_WITH_RUNTIME_AUTHORITY_SWITCH",
   "targetCoreVersion": "1.4",
-  "purpose": "Provide Core 1.4 a stable, auditable input contract for Billy Walters-derived handicapping intelligence without granting that layer automatic fair-value, independent-signal, status, playTo, staking or execution authority.",
+  "purpose": "Provide Core 1.4 a stable, auditable input contract for Billy Walters-derived handicapping intelligence whose analytical authority is controlled at runtime by core/walters-authority-v1.4.json.",
+  "authorityControl": {
+    "configPath": "core/walters-authority-v1.4.json",
+    "allowedModes": ["OFF", "ADVISORY", "CORE_INPUT"],
+    "defaultMode": "ADVISORY",
+    "rule": "Core 1.4 resolves the current Walters authority mode before handicapping each eligible candidate/report. A mode change applies forward only and never rewrites issued history."
+  },
   "sourceAuthority": {
     "designPath": "research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md",
     "designBlobSha": "6970a28928549cead6204799ebf23aedd767b791",
@@ -13,39 +19,16 @@
   },
   "coverage": {
     "primaryInitialSport": "NFL",
-    "initialMarketClasses": [
-      "spread",
-      "moneyline"
-    ],
+    "initialMarketClasses": ["spread", "moneyline"],
     "futureExpansion": "Other sports/markets may use the same interface only after their Walters methodology mapping is explicitly defined and tested.",
     "availabilityIsReportBlocking": false,
     "interfaceResolutionRequiredForCore14": true,
-    "meaning": "Core 1.4 must know whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE for an eligible candidate. Missing Walters data does not block an otherwise valid Betting Edge report."
+    "meaning": "When Walters mode is not OFF, Core 1.4 must know whether Walters intelligence is AVAILABLE, PARTIAL or UNAVAILABLE for an eligible candidate. Missing Walters data does not block an otherwise valid Betting Edge report."
   },
-  "availabilityStates": [
-    "AVAILABLE",
-    "PARTIAL",
-    "UNAVAILABLE"
-  ],
-  "comparisonStates": [
-    "ALIGNED",
-    "MIXED",
-    "CONFLICT",
-    "NOT_COMPARABLE",
-    "UNAVAILABLE"
-  ],
-  "spreadMoneylineStates": [
-    "AVAILABLE",
-    "NOT_APPLICABLE",
-    "SPREAD_VS_ML_UNAVAILABLE"
-  ],
-  "waltersVerdicts": [
-    "ALIGNED",
-    "MARGINAL",
-    "VALUE_CANDIDATE",
-    "NO_VALUE",
-    "INSUFFICIENT_DATA"
-  ],
+  "availabilityStates": ["AVAILABLE", "PARTIAL", "UNAVAILABLE"],
+  "comparisonStates": ["ALIGNED", "MIXED", "CONFLICT", "NOT_COMPARABLE", "UNAVAILABLE"],
+  "spreadMoneylineStates": ["AVAILABLE", "NOT_APPLICABLE", "SPREAD_VS_ML_UNAVAILABLE"],
+  "waltersVerdicts": ["ALIGNED", "MARGINAL", "VALUE_CANDIDATE", "NO_VALUE", "INSUFFICIENT_DATA"],
   "recordShape": {
     "candidateKey": "stable Core 1.4 candidate identity key",
     "availability": "AVAILABLE|PARTIAL|UNAVAILABLE",
@@ -120,33 +103,42 @@
       "reviewRequired": "boolean"
     }
   },
-  "initialCore14Use": {
-    "ingestWhenAvailable": true,
-    "recordAvailabilityWhenMissing": true,
-    "compareToCoreFair": true,
-    "compareToCurrentMarket": true,
-    "recordAgreementConflict": true,
-    "materialConflictTriggersReReview": true,
-    "reReviewMeaning": "Re-open current evidence and model assumptions. Any resulting fair-value change must be justified by explicit current-model/current-evidence reasoning rather than Walters disagreement alone.",
-    "futureCalibrationDataValue": "Preserve Walters projections and comparison state so later approved CLV/result work can evaluate whether/how Walters deserves quantitative weight. Results/CLV learning itself is not part of Core 1.4."
+  "modeBehavior": {
+    "OFF": {
+      "ingest": false,
+      "compare": false,
+      "mayInfluenceCoreFairValue": false,
+      "mayCountAsIndependentCurrentSupport": false
+    },
+    "ADVISORY": {
+      "ingest": true,
+      "compare": true,
+      "mayTriggerExplicitReReview": true,
+      "mayInfluenceCoreFairValue": false,
+      "mayCountAsIndependentCurrentSupport": false
+    },
+    "CORE_INPUT": {
+      "ingest": true,
+      "compare": true,
+      "mayTriggerExplicitReReview": true,
+      "mayInfluenceCoreFairValue": true,
+      "mayCountAsIndependentCurrentSupport": true,
+      "eligibilityRule": "Only a complete/current/arithmetic-verified Walters build meeting the runtime authority configuration's source-distinctness and audit rules may receive active Core-input authority."
+    }
   },
-  "authorityBoundaries": {
-    "mayCreateBet": false,
-    "mayCountAsIndependentCurrentSupport": false,
-    "mayDirectlyMoveCoreFairValuePointEstimate": false,
-    "mayLowerModelErrorFloor": false,
-    "maySetPlayTo": false,
-    "maySetStake": false,
+  "hardBoundariesAllModes": {
+    "mayCreateBetDirectly": false,
     "mayOverrideIdentity": false,
     "mayOverridePriceFreshness": false,
     "mayOverridePersonnelGate": false,
     "mayOverrideExposureGate": false,
+    "maySetPlayToDirectly": false,
+    "maySetStakeDirectly": false,
     "maySupplyExecutablePrice": false,
-    "mayTriggerExplicitReReview": true,
-    "maySupplyTransparentSpecialistContext": true
+    "mayRewriteHistoricalReports": false
   },
   "futureActivationBoundary": {
-    "weightedCoreInputAllowedNow": false,
-    "promotionRequirement": "Any future change that lets Walters directly move fair value, lower model error, count as independent support, set playTo or influence stake requires a separately versioned activation, calibration evidence, regression testing and explicit approval."
+    "runtimeCoreInputModeAvailableIn14": true,
+    "rule": "CORE_INPUT may influence fair value and count as one independent current handicap input, but cannot bypass normal Betting Edge hard gates. Any authority beyond these configured modes requires a separately versioned activation and regression approval."
   }
 }
