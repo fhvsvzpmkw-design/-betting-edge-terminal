@@ -221,13 +221,13 @@
         "fairValueBasisRationale": "Supported-book baseline adjusted by confirmed starters, team strength and venue.",
         "uncertaintyStatement": "Bullpen, lineup and run-environment variance require a normal margin.",
         "modelErrorState": "ELEVATED",
-        "betEligibleByModelError": false,
+        "betEligibleByModelError": true,
         "effects": [],
         "appliedRules": [
           "base:unresolved-personnel"
         ],
         "reasons": [
-          "Material unresolved starter information widens the distribution."
+          "Material unresolved participation/role/lineup inputs widen the current distribution."
         ],
         "rationale": "Unresolved starter and price block action."
       },
@@ -720,10 +720,10 @@
         "modelErrorState": "HIGH",
         "betEligibleByModelError": false,
         "effects": [
-          "PROHIBIT_LONGSHOT_PAYOUT_AS_EVIDENCE",
+          "MECHANISM_NOT_PRICE_CALIBRATION",
           "NO_MODEL_ERROR_COMPRESSION",
-          "PROHIBIT_MARKET_ONLY_BET",
-          "MECHANISM_NOT_PRICE_CALIBRATION"
+          "PROHIBIT_LONGSHOT_PAYOUT_AS_EVIDENCE",
+          "PROHIBIT_MARKET_ONLY_BET"
         ],
         "appliedRules": [
           "base:material-book-dispersion",
@@ -736,10 +736,14 @@
           "research:v18_mlb_doubles_stolen_base_direct_price_gap"
         ],
         "reasons": [
-          "Material supported-book disagreement is uncertainty evidence.",
-          "Thin markets require wider error allowances.",
-          "The exact-market calibration gap prevents normal confidence.",
-          "Applicable Research v1.8 rules prohibit false precision."
+          "Material supported-book disagreement is uncertainty/price-quality evidence.",
+          "Thin markets require wider error allowances and stronger independent evidence.",
+          "Extreme-tail prices receive an uncertainty floor rather than extra confidence from payout size.",
+          "An exact-market calibration gap prevents normal-confidence treatment.",
+          "Material unresolved participation/role/lineup inputs widen the current distribution.",
+          "Modern fixed-odds evidence supports extra caution in extreme tails; cross-sport use is qualitative only.",
+          "Extreme-tail pricing plus market-only construction or material dispersion requires a high error floor.",
+          "Doubles and stolen-base mechanisms are useful, but exact sportsbook closing calibration remains a verified gap."
         ],
         "rationale": "HIGH model error blocks BET; current evidence does not clear the conservative bound."
       },
@@ -812,13 +816,13 @@
           }
         ],
         "fallbackSourceCount": 1,
-        "sourceShortfall": null,
+        "sourceShortfall": "Only one distinct current fallback source was available; exact minutes on the back-to-back remained unresolved at issuance.",
         "facts": [
           "Active roster",
           "21 points Tuesday",
           "Back-to-back"
         ],
-        "personnelState": "CONFIRMED",
+        "personnelState": "PARTIAL",
         "sourceConflict": "NONE",
         "conflictSummary": null,
         "conflictResolution": null,
@@ -864,10 +868,10 @@
           "research:v18_wnba_direct_prop_calibration_gap"
         ],
         "reasons": [
-          "Material supported-book disagreement is uncertainty evidence.",
-          "Thin markets require wider error allowances.",
-          "The exact-market calibration gap prevents normal confidence.",
-          "Applicable Research v1.8 rules prohibit false precision."
+          "Material supported-book disagreement is uncertainty/price-quality evidence.",
+          "Thin markets require wider error allowances and stronger independent evidence.",
+          "An exact-market calibration gap prevents normal-confidence treatment.",
+          "WNBA player props still lack strong direct closing-price calibration."
         ],
         "rationale": "HIGH model error blocks BET; current evidence does not clear the conservative bound."
       },
@@ -912,7 +916,14 @@
         "stage2CheckedAt": "2026-08-26T09:42:46.426-07:00",
         "dependencyTarget": "Zamora and Real Frontera lineups",
         "dependencyRationale": "Cup rotation materially changes the extreme-tail distribution.",
-        "officialSources": [],
+        "officialSources": [
+          {
+            "origin": "Federación Venezolana de Fútbol official site",
+            "url": "https://www.fvf.com.ve/",
+            "asOf": "2026-08-26T09:42:46.426-07:00",
+            "fact": "Official federation channels were checked; no current lineup or match preview was available."
+          }
+        ],
         "fallbackSources": [],
         "fallbackSourceCount": 0,
         "sourceShortfall": "No current official club/FVF lineup or preview and no 3–5-source credible fallback set was available.",
@@ -920,7 +931,7 @@
           "Exact two-book identity verified",
           "Material 725-cent draw split"
         ],
-        "personnelState": "UNRESOLVED",
+        "personnelState": "UNKNOWN",
         "sourceConflict": "NONE",
         "conflictSummary": null,
         "conflictResolution": null,
@@ -959,8 +970,8 @@
         "modelErrorState": "HIGH",
         "betEligibleByModelError": false,
         "effects": [
-          "PROHIBIT_LONGSHOT_PAYOUT_AS_EVIDENCE",
           "NO_MODEL_ERROR_COMPRESSION",
+          "PROHIBIT_LONGSHOT_PAYOUT_AS_EVIDENCE",
           "PROHIBIT_MARKET_ONLY_BET"
         ],
         "appliedRules": [
@@ -976,10 +987,16 @@
           "research:v18_soccer_liquidity_price_dispersion_caution"
         ],
         "reasons": [
-          "Market-derived fair is not independent.",
-          "Book disagreement is uncertainty evidence.",
-          "Thin extreme-tail cup markets need wider error.",
-          "No independent support cleared the HIGH-error floor."
+          "A de-vig/book-derived benchmark is not an independent fair-value model.",
+          "Material supported-book disagreement is uncertainty/price-quality evidence.",
+          "Thin markets require wider error allowances and stronger independent evidence.",
+          "Extreme-tail prices receive an uncertainty floor rather than extra confidence from payout size.",
+          "Extreme-tail plus market-only fair construction is especially vulnerable to false precision.",
+          "Material unresolved participation/role/lineup inputs widen the current distribution.",
+          "Modern fixed-odds evidence supports extra caution in extreme tails; cross-sport use is qualitative only.",
+          "Extreme-tail pricing plus market-only construction or material dispersion requires a high error floor.",
+          "Direct soccer evidence shows price attractiveness and dispersion depend on liquidity structure.",
+          "Thin soccer plus material quote dispersion is not a stable independent fair-value signal."
         ],
         "rationale": "Support is below the HIGH-error WAIT floor, so PASS."
       },
