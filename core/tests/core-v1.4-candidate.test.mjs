@@ -17,10 +17,11 @@ assert(candidate.currentProductionCoreVersion==='1.3','Candidate must preserve c
 assert(candidate.state==='STAGING_CANDIDATE_NOT_RUNTIME_AUTHORITY','Candidate must remain staging before explicit promotion');
 
 const pinned = [
-  ['core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md',candidate.scopeAuthority.blobSha],
+  [candidate.scopeAuthority.path,candidate.scopeAuthority.blobSha],
   [candidate.components.modelErrorFramework.path,candidate.components.modelErrorFramework.blobSha],
   [candidate.components.researchLibrary.path,candidate.components.researchLibrary.blobSha],
   [candidate.components.waltersIntelligence.interfacePath,candidate.components.waltersIntelligence.interfaceBlobSha],
+  [candidate.components.waltersIntelligence.authorityPath,candidate.components.waltersIntelligence.authorityBlobSha],
   [candidate.components.waltersIntelligence.sourceDesignPath,candidate.components.waltersIntelligence.sourceDesignBlobSha]
 ];
 for(const [path,expected] of pinned){
@@ -28,9 +29,13 @@ for(const [path,expected] of pinned){
   assert(gitBlobSha(path)===expected,`Pinned Core 1.4 component drift: ${path}`);
 }
 
-assert(candidate.components.waltersIntelligence.requiredCapability===true,'Walters must be a required Core 1.4 capability');
-assert(candidate.components.waltersIntelligence.weightedCoreInputNow===false,'Walters weighted core input must not be active initially');
+assert(candidate.components.waltersIntelligence.requiredCapability===true,'Walters must be required Core 1.4 capability');
+assert(candidate.components.waltersIntelligence.defaultMode==='ADVISORY','Walters initial runtime mode must be ADVISORY');
+assert(candidate.components.waltersIntelligence.betOriginationModeAvailable===true,'Core 1.4 must include Walters BET origination mode');
 assert(candidate.components.waltersIntelligence.missingDataBlocksReport===false,'Missing Walters data must not block valid reports');
+for(const mode of ['OFF','ADVISORY','BET_AUTHORITY']){
+  assert(candidate.components.waltersIntelligence.runtimeModes.includes(mode),`Core 1.4 missing Walters runtime mode ${mode}`);
+}
 
 for(const deferred of [
   'RESULTS_CLV_FEEDBACK_LEARNING_LOOP',
@@ -41,25 +46,20 @@ for(const deferred of [
   assert(candidate.explicitlyDeferredFrom14.includes(deferred),`Core 1.4 missing explicit deferral: ${deferred}`);
 }
 
-for(const key of [
-  'mayCreateBet',
-  'mayCountAsIndependentCurrentSupport',
-  'mayDirectlyMoveCoreFairValue',
-  'mayLowerModelError',
-  'maySetPlayTo',
-  'maySetStake',
-  'maySupplyExecutablePrice',
-  'mayOverrideHardGates'
-]){
-  assert(candidate.waltersInitialBoundaries[key]===false,`Walters initial Core 1.4 boundary ${key} must remain false`);
+assert(candidate.waltersAuthority.OFF.mayOriginateBet===false,'Walters OFF must not originate BET');
+assert(candidate.waltersAuthority.ADVISORY.mayOriginateBet===false,'Walters ADVISORY must not originate BET');
+assert(candidate.waltersAuthority.BET_AUTHORITY.mayOriginateBet===true,'Walters BET_AUTHORITY must originate BET');
+assert(candidate.waltersAuthority.BET_AUTHORITY.mayInfluenceCoreFairValue===true,'Walters BET_AUTHORITY must influence Core fair value');
+assert(candidate.waltersAuthority.BET_AUTHORITY.mayCountAsIndependentCurrentSupport===true,'Walters BET_AUTHORITY must be one independent handicap input');
+for(const [key,value] of Object.entries(candidate.waltersAuthority.hardBoundariesAllModes)){
+  assert(value===false,`Core 1.4 Walters hard boundary ${key} must remain false`);
 }
-assert(candidate.waltersInitialBoundaries.mayTriggerExplicitReReview===true,'Walters must be allowed to trigger explicit re-review');
-assert(candidate.waltersInitialBoundaries.mayBeComparedWithCoreAndMarket===true,'Walters must be available for Core/market comparison');
 
 assert(candidate.unchangedProductionConstraints.stakingMethodologyChanged===false,'Core 1.4 must not silently change staking');
 assert(candidate.unchangedProductionConstraints.oddsApiBudgetChanged===false,'Core 1.4 must not silently change odds API budget');
 assert(candidate.unchangedProductionConstraints.reportScheduleChanged===false,'Core 1.4 must not silently change report schedule');
 assert(candidate.unchangedProductionConstraints.paidOddsDependencyAdded===false,'Core 1.4 must not add paid odds dependency');
 assert(candidate.unchangedProductionConstraints.books.join('|')==='Bet365|DraftKings','Core 1.4 execution books must remain unchanged');
+assert(candidate.promotionRequirements.includes('WALTERS_BET_AUTHORITY_POSITIVE_AND_FAIL_CLOSED_TESTS_PASS'),'Promotion must require Walters BET positive/fail-closed tests');
 
 console.log('CORE 1.4 CANDIDATE TEST OK');
