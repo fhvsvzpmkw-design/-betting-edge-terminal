@@ -23,20 +23,27 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Repair archived Stage 2 metadata
+      - name: Repair Stage 2 and derived Core 1.4 history metadata
         run: |
-          node <<'NODE'
-          const fs = require('node:fs');
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {evaluate, loadProductionFramework, matchCondition} from './tools/core-handicap-framework.mjs';
 
+          const CORE_V14_FROM = Date.parse('2026-08-25T17:20:00-07:00');
           const MAIN_FILE = 'data/history/research-fit/2026-08-26/main-082200.json';
           const FINAL_FILE = 'data/history/research-fit/2026-08-26/final_morning-094246.json';
+          const index = JSON.parse(fs.readFileSync('run-history.json', 'utf8'));
+          const production = JSON.parse(fs.readFileSync('core/core-v1.4-production.json', 'utf8'));
+          const activeFrameworkBlobSha = production.modelErrorFramework.blobSha;
+          const framework = loadProductionFramework();
+          const files = new Map();
 
           function assert(condition, message) {
             if (!condition) throw new Error(message);
@@ -45,8 +52,11 @@ jobs:
             return typeof value === 'string' && value.trim().length > 0;
           }
           function load(file) {
-            const text = fs.readFileSync(file, 'utf8');
-            return { text, data: JSON.parse(text) };
+            if (!files.has(file)) {
+              const text = fs.readFileSync(file, 'utf8');
+              files.set(file, {text, data: JSON.parse(text)});
+            }
+            return files.get(file).data;
           }
           function recommendation(data, ordinal, expectedTitle) {
             const rec = (data.recommendations || []).find(item => item.ordinal === ordinal);
@@ -59,15 +69,27 @@ jobs:
             assert(evidence, `${rec.title} is missing personnelEvidence`);
             if (!nonEmpty(evidence.sourceShortfall)) evidence.sourceShortfall = message;
           }
-          function save(file, original, data) {
-            const next = JSON.stringify(data, null, 2) + '\n';
-            if (next !== original) {
-              fs.writeFileSync(file, next, 'utf8');
-              console.log(`REPAIRED ${file}`);
-              return true;
+          function expectedResearchIds(context) {
+            return [...new Set((framework.graduatedResearchRules || [])
+              .filter(rule => matchCondition(rule.when, context))
+              .map(rule => rule.priorId))].sort();
+          }
+          function normalizeCoreDerivedFields(data, file) {
+            if (data.provenance?.coreFrameworkBlobSha !== activeFrameworkBlobSha) {
+              console.log(`CORE DERIVATION SKIPPED historical framework ${file}`);
+              return;
             }
-            console.log(`UNCHANGED ${file}`);
-            return false;
+            for (const rec of data.recommendations || []) {
+              const assessment = rec.coreAssessment;
+              if (!assessment?.context) continue;
+              assessment.context.graduatedResearchIds = expectedResearchIds(assessment.context);
+              const actual = evaluate(framework, assessment.context);
+              assessment.modelErrorState = actual.modelErrorState;
+              assessment.betEligibleByModelError = actual.betEligibleByModelError;
+              assessment.effects = actual.effects;
+              assessment.appliedRules = actual.appliedRules;
+              assessment.reasons = actual.reasons;
+            }
           }
           function validateRelevantSidecar(data, label) {
             const allowedStates = new Set(['CONFIRMED', 'STRONG PROJECTION', 'PARTIAL', 'UNKNOWN']);
@@ -104,28 +126,35 @@ jobs:
               }
             }
           }
+          function serialize(original, data) {
+            const pretty = original.includes('\n');
+            const trailingNewline = original.endsWith('\n');
+            return (pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data)) + (trailingNewline ? '\n' : '');
+          }
+
+          for (const entry of index.runs || []) {
+            if (Date.parse(entry.ts) < CORE_V14_FROM || !entry.researchFitPath) continue;
+            load(entry.researchFitPath);
+          }
 
           const main = load(MAIN_FILE);
-          const main5 = recommendation(main.data, 5, 'Nick Sogard over 0.5 stolen bases');
-          setShortfall(main5,
-            'Only two distinct current fallback sources were available; the Aug. 26 lineup and batting order remained unresolved at issuance.');
-
-          const main6 = recommendation(main.data, 6, 'Jung Hoo Lee over 0.5 stolen bases');
-          setShortfall(main6,
-            'Only two distinct current fallback sources were available; the Aug. 26 batting order and opposing catcher remained unresolved at issuance.');
-
-          const main7 = recommendation(main.data, 7, 'Diamond Miller over 1.5 three-pointers');
+          setShortfall(
+            recommendation(main, 5, 'Nick Sogard over 0.5 stolen bases'),
+            'Only two distinct current fallback sources were available; the Aug. 26 lineup and batting order remained unresolved at issuance.'
+          );
+          setShortfall(
+            recommendation(main, 6, 'Jung Hoo Lee over 0.5 stolen bases'),
+            'Only two distinct current fallback sources were available; the Aug. 26 batting order and opposing catcher remained unresolved at issuance.'
+          );
+          const main7 = recommendation(main, 7, 'Diamond Miller over 1.5 three-pointers');
           main7.personnelEvidence.personnelState = 'PARTIAL';
           setShortfall(main7,
             'Only one distinct current fallback source was available; exact minutes on the back-to-back remained unresolved at issuance.');
-
-          const main8 = recommendation(main.data, 8, 'FK Prepere moneyline');
+          const main8 = recommendation(main, 8, 'FK Prepere moneyline');
           if (!main8.waitQualification) {
             main8.waitQualification = {
               actionableIfResolved: true,
-              blockers: [
-                'Official FK Prepere and Slovan Liberec starting lineups'
-              ],
+              blockers: ['Official FK Prepere and Slovan Liberec starting lineups'],
               independentSignals: [
                 {
                   origin: 'Slovan Liberec official fixture preview',
@@ -139,18 +168,17 @@ jobs:
               rationale: 'The lineup blocker was concrete and imminent; any action still required a fresh independent fair, executable price and all production gates.'
             };
           }
-
-          const main9 = recommendation(main.data, 9, 'FK Meteor Prague VIII draw');
-          setShortfall(main9,
-            'Only one distinct current fallback source was available; official cup lineups remained unresolved at issuance.');
+          setShortfall(
+            recommendation(main, 9, 'FK Meteor Prague VIII draw'),
+            'Only one distinct current fallback source was available; official cup lineups remained unresolved at issuance.'
+          );
 
           const final = load(FINAL_FILE);
-          const final8 = recommendation(final.data, 8, 'Diamond Miller over 1.5 three-pointers');
+          const final8 = recommendation(final, 8, 'Diamond Miller over 1.5 three-pointers');
           final8.personnelEvidence.personnelState = 'PARTIAL';
           setShortfall(final8,
             'Only one distinct current fallback source was available; exact minutes on the back-to-back remained unresolved at issuance.');
-
-          const final9 = recommendation(final.data, 9, 'Zamora FC–Real Frontera draw');
+          const final9 = recommendation(final, 9, 'Zamora FC–Real Frontera draw');
           const final9Evidence = final9.personnelEvidence;
           assert(final9Evidence, 'Final recommendation 9 is missing personnelEvidence');
           if (!Array.isArray(final9Evidence.officialSources)) final9Evidence.officialSources = [];
@@ -164,14 +192,24 @@ jobs:
           }
           if (final9Evidence.personnelState === 'UNRESOLVED') final9Evidence.personnelState = 'UNKNOWN';
 
-          validateRelevantSidecar(main.data, '08:00');
-          validateRelevantSidecar(final.data, '09:30');
+          validateRelevantSidecar(main, '08:00');
+          validateRelevantSidecar(final, '09:30');
 
-          const changed = [
-            save(MAIN_FILE, main.text, main.data),
-            save(FINAL_FILE, final.text, final.data)
-          ].some(Boolean);
-          assert(changed, 'The one-time history repair produced no file changes');
+          for (const [file, record] of files) normalizeCoreDerivedFields(record.data, file);
+
+          const changedFiles = [];
+          for (const [file, record] of files) {
+            const next = serialize(record.text, record.data);
+            if (next !== record.text) {
+              fs.writeFileSync(file, next, 'utf8');
+              changedFiles.push(file);
+              console.log(`REPAIRED ${file}`);
+            } else {
+              console.log(`UNCHANGED ${file}`);
+            }
+          }
+          assert(changedFiles.length > 0, 'The one-time history repair produced no file changes');
+          console.log(`REPAIR FILE COUNT ${changedFiles.length}`);
           NODE
 
       - name: Verify complete report history
@@ -179,14 +217,14 @@ jobs:
           node tools/report-publication.mjs verify
           node tools/core-v14-publication-gate.mjs verify-history
 
-      - name: Commit repaired history metadata
+      - name: Commit repaired history metadata and remove one-time workflow
         run: |
           set -euo pipefail
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add data/history/research-fit/2026-08-26/main-082200.json \
-                  data/history/research-fit/2026-08-26/final_morning-094246.json
-          git commit -m "history: repair Stage 2 verification metadata"
+          git add data/history/research-fit
+          git rm .github/workflows/history-stage2-repair-once-20260826.yml
+          git commit -m "history: repair Stage 2 and Core 1.4 verification metadata"
           git push origin HEAD:main
 
       - name: Dispatch clean report-history verification
@@ -205,12 +243,12 @@ jobs:
       - name: Summary
         run: |
           {
-            echo "## Stage 2 history repair completed"
+            echo "## History verification repair completed"
             echo
-            echo "- 08:00 unresolved-source metadata normalized"
+            echo "- Stage 2 source-shortfall metadata repaired"
             echo "- 08:00 WAIT qualification restored"
-            echo "- 09:30 minutes uncertainty normalized"
             echo "- 09:30 official FVF source check recorded"
-            echo "- Local durable-history and Core 1.4 history verification passed"
+            echo "- Current-framework Core 1.4 derived fields recomputed"
+            echo "- Durable-history and Core 1.4 history verification passed before commit"
             echo "- Fresh Report history publication verification dispatched"
           } >> "$GITHUB_STEP_SUMMARY"
