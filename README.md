@@ -21,7 +21,7 @@ Current operating references:
 - [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — practical current production state and open operational items.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — report/odds schedule, recovery, Core 1.4 gate order, Result Closure, Crypto Specials and downstream boundaries.
 - [`docs/PUBLIC_LEDGER_OPERATIONS.md`](docs/PUBLIC_LEDGER_OPERATIONS.md) — canonical public-ledger path, privacy boundary, upload/replacement procedure, compatibility sync and recovery.
-- [`BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`](BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md) — seasonal profile timing and scheduler/backstop behavior.
+- [`BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`](BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md) — seasonal profile timing and scheduler behavior.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — post-Core-1.4 observation and future work.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable historical architectural decisions. Dated entries record the state when they were made; current production authority is the boundary above plus `docs/PROJECT_STATE.md`.
 - [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md) — authoritative production governance contract.
@@ -62,13 +62,13 @@ The active-day profile and five-primary-pull cap are controlled by `data/schedul
 
 ## Odds scheduler
 
-Cloudflare Worker Cron remains the **primary odds scheduler**.
+Cloudflare Worker Cron is the **single automatic odds scheduler**.
 
-After the Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25, `.github/workflows/odds-refresh-backstop.yml` was added as a **two-minute dispatch backstop**. It checks whether the canonical slot already published and only dispatches the existing protected `odds-refresh.yml` when the slot is missing.
+The temporary GitHub Actions two-minute scheduler backstop was removed on 2026-08-26. Scheduled odds pulls are now intentionally simple: Cloudflare dispatches the protected `odds-refresh.yml`; if a scheduled dispatch is missed, recovery is manual rather than a second automatic scheduler.
 
-The odds workflow retains active-profile validation, serialization, duplicate protection and the five-primary-pull cap. Manual workflow dispatch remains the final recovery path.
+The odds workflow retains active-profile validation, serialization, duplicate protection and the five-primary-pull cap. Manual workflow dispatch remains the explicit recovery path.
 
-The first live proof of the new backstop remains pending the next due slot. The underlying Cloudflare dispatch path still requires separate reliability diagnosis; that is infrastructure work, not a Core v1.4 methodology change.
+The underlying Cloudflare dispatch path should continue to be observed for reliability; that is infrastructure work, not a Core v1.4 methodology change.
 
 ## Result Closure
 
