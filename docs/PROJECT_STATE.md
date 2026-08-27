@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-25 — Core 1.4 production closeout  
+**Last updated:** 2026-08-26 — canonical public ledger boundary established  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -18,6 +18,7 @@ This is the practical current-state snapshot. It does not replace `BETTING_EDGE_
 - **Initial Walters coverage:** NFL spread + NFL moneyline.
 - **Personnel process:** Stage 1 broad current information plus mandatory Stage 2 depth/re-handicap when material.
 - **Report provenance:** schema 3 with Core/Research/Walters exact provenance and structured `coreAssessment` / `waltersEvidence` after the Core 1.4 cutover.
+- **Canonical public ledger:** `data/ledger/public-ledger.json`, sanitized public projection only.
 - **Authoritative rollback:** Git history.
 
 Core v1.4 preserves the proven v1.3 execution baseline but adds explicit fair-value-basis/model-error classification, fixed Research v1.8 uncertainty graduation, stronger personnel sensitivity, tighter WAIT qualification and switchable Walters authority.
@@ -160,11 +161,21 @@ The 10:30 time avoids collision with the NBA/NHL 11:00 seasonal report lane.
 
 ## Private ledger / F3 boundary
 
-Current public architecture remains:
+The public/customer-facing ledger contract is now anchored at:
 
-**private master ledger → Cloudflare Worker → sanitized `/api/bet-history` projection → F3 Bet History + Eddie Numbers**
+`data/ledger/public-ledger.json`
 
-The raw private ledger must not become a public runtime dependency. Eddie Numbers uses the sanctioned public projection, not the raw private ledger.
+The current architecture supports both a private-derived projection and a future customer-supplied sanitized public ledger:
+
+**private/accounting source → sanitization boundary → canonical public ledger contract → F3 Bet History + Eddie Numbers / Muddy Numbers**
+
+Current Cloudflare production may still build the live sanitized `/api/bet-history` projection from the private master ledger behind the server boundary. The public repository additionally maintains the stable canonical upload/static contract at `data/ledger/public-ledger.json`.
+
+Only the canonical public-ledger file is intended for manual replacement or future customer upload. `.github/workflows/public-ledger-sync.yml` validates it, then generates byte-identical compatibility copies at `data/bet-history-public.json` and `api/bet-history`.
+
+`tests/muddy-ledger-desk.test.mjs` enforces that the public ledger remains sanitized, compatibility files do not drift, and Eddie Numbers never becomes dependent on the raw private ledger.
+
+The raw private ledger must not become a public runtime dependency. Full operating procedure: `docs/PUBLIC_LEDGER_OPERATIONS.md`.
 
 ## Research Library
 
@@ -192,4 +203,5 @@ Core v1.4 is the forward production baseline. Near-term work is **observation an
 - observe a full Core v1.4 morning/day funnel;
 - inspect Walters-vs-market behavior when eligible NFL boards appear;
 - verify Stage 2 personnel depth on a genuinely personnel-sensitive candidate;
-- keep Pizza Plays and other downstream presentation layers from forcing weak selections.
+- keep Pizza Plays and other downstream presentation layers from forcing weak selections;
+- keep the canonical public-ledger upload/sync boundary stable as customer-facing ledger support evolves.
