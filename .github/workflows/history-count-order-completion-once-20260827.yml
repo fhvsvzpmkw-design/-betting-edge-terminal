@@ -51,8 +51,8 @@ jobs:
 
           replaceOnce(
             "  return counts;\n}\nfunction validateReport(report){",
-            "  return counts;\n}\nfunction verificationReport(report){\n  const calculated=actualCounts(Array.isArray(report?.recs)?report.recs:[]);\n  const existing=(report?.counts && typeof report.counts==='object' && !Array.isArray(report.counts))?report.counts:{};\n  const canonical={};\n  for(const key of STATUS_KEYS){\n    if(Number.isInteger(existing[key]) && existing[key]>=0){\n      canonical[key]=existing[key];\n      continue;\n    }\n    assert(!Object.hasOwn(existing,key) && calculated[key]===0,`Stored report counts.${key} is invalid or omits a non-zero value: ${report?.ts}`);\n    canonical[key]=0;\n  }\n  return {...report,counts:canonical};\n}\nfunction validateReport(report){",
-            'allow verification-only normalization of omitted zero counts'
+            "  return counts;\n}\nfunction verificationReport(report){\n  const calculated=actualCounts(Array.isArray(report?.recs)?report.recs:[]);\n  const existing=(report?.counts && typeof report.counts==='object' && !Array.isArray(report.counts))?report.counts:{};\n  const canonical={};\n  for(const key of STATUS_KEYS){\n    const upper=key.toUpperCase();\n    const hasLower=Object.hasOwn(existing,key);\n    const hasUpper=Object.hasOwn(existing,upper);\n    if(hasLower && hasUpper){\n      assert(existing[key]===existing[upper],`Stored report has conflicting count keys ${key}/${upper}: ${report?.ts}`);\n    }\n    const value=hasLower?existing[key]:(hasUpper?existing[upper]:undefined);\n    if(Number.isInteger(value) && value>=0){\n      canonical[key]=value;\n      continue;\n    }\n    assert(!hasLower && !hasUpper && calculated[key]===0,`Stored report counts.${key} is invalid or omits a non-zero value: ${report?.ts}`);\n    canonical[key]=0;\n  }\n  return {...report,counts:canonical};\n}\nfunction validateReport(report){",
+            'allow verification-only normalization of historical count casing and omitted zeros'
           );
 
           replaceOnce(
