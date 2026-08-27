@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-26 — canonical public ledger boundary established  
+**Last updated:** 2026-08-26 — Cloudflare-only automatic scheduling; canonical public ledger boundary established  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -99,8 +99,9 @@ Current configured Vancouver pulse → report pairs:
 ## Odds scheduler and recovery
 
 - **Primary odds workflow:** `.github/workflows/odds-refresh.yml`.
-- **Primary scheduler:** Cloudflare Worker Cron.
-- **Backstop:** `.github/workflows/odds-refresh-backstop.yml`, two minutes after configured possible pulses.
+- **Single automatic scheduler:** Cloudflare Worker Cron.
+- **Automatic GitHub scheduler backstop:** removed 2026-08-26.
+- **Manual recovery:** explicit `odds-refresh.yml` workflow dispatch when a scheduled Cloudflare handoff is missed.
 - **Books:** Bet365 + DraftKings.
 - **Feed freshness:** 75 minutes.
 - **Executable quote freshness:** 30 minutes.
@@ -108,9 +109,9 @@ Current configured Vancouver pulse → report pairs:
 
 The Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25. A manual pull around 18:08 supplied the valid snapshot used by the first Core v1.4 18:15 report.
 
-The new GitHub backstop checks whether the canonical slot already published and dispatches the protected existing odds workflow only if the slot is missing. The target workflow retains duplicate/profile gates, so the backstop is intended to recover a missed dispatch without spending an additional Odds-API pull after a successful slot.
+A temporary two-minute GitHub Actions backstop was subsequently added but removed on 2026-08-26 to keep scheduling understandable and single-source. There is now no second automatic scheduler. If Cloudflare misses a pulse, recovery is manual and deliberate.
 
-The first live proof of the backstop remains pending the next due slot. Cloudflare authentication/dispatch reliability remains an infrastructure item to repair; do not treat it as a Core v1.4 regression.
+Cloudflare authentication/dispatch reliability remains an infrastructure item to observe and repair as needed; do not treat it as a Core v1.4 regression.
 
 ## Report automation boundary
 
@@ -198,8 +199,8 @@ Also unchanged: no paid odds API, no additional execution books, no staking-meth
 
 Core v1.4 is the forward production baseline. Near-term work is **observation and reliability**, not Core v1.5 by default:
 
-- prove the new scheduler backstop on live slots;
-- repair the native Cloudflare→GitHub dispatch path;
+- observe the Cloudflare scheduler across live slots;
+- use manual GitHub dispatch only when a scheduled Cloudflare handoff is actually missed;
 - observe a full Core v1.4 morning/day funnel;
 - inspect Walters-vs-market behavior when eligible NFL boards appear;
 - verify Stage 2 personnel depth on a genuinely personnel-sensitive candidate;
