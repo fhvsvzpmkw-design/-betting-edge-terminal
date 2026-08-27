@@ -18,10 +18,34 @@
       "FRESH DISCOVERY",
       "LEVEL 3 GOD MODE",
       "BETTING EDGE MARKET PASS",
+      "INTERNAL ODDS SNAPSHOT FIRST WITHIN 30 HOURS",
       "CARRY-FORWARD REVIEW",
       "MERGE + PUBLISH DAILY CARDS"
     ],
     "marketPass": "BETTING EDGE MARKET INTELLIGENCE ONLY",
+    "oddsSourcePolicy": {
+      "version": 1,
+      "effectiveFrom": "NEXT CRYPTO SPECIALS ANALYSIS",
+      "internalSnapshot": {
+        "path": "data/live-odds.json",
+        "useWhenEventWithinHours": 30,
+        "bookmakers": [
+          "Bet365",
+          "DraftKings"
+        ],
+        "mode": "READ ONLY",
+        "priority": "CHECK FIRST DURING THE CURRENT MARKET PASS",
+        "requirements": [
+          "SNAPSHOT AND MARKET PASS THEIR RECORDED FRESHNESS LIMITS",
+          "EXACT EVENT IDENTITY MATCH",
+          "EXACT MARKET AND SELECTION MATCH"
+        ],
+        "systemBoundary": "PRICE SOURCE ONLY · CORE STATUS DOES NOT BLOCK OR AUTHORIZE CRYPTO SPECIALS"
+      },
+      "continuationRule": "AFTER THE INTERNAL CHECK, CONTINUE EXTERNAL LINE SHOPPING WHEN THE EVENT OR MARKET IS MISSING, THE QUOTE IS STALE, ONLY ONE INTERNAL BOOK RETURNS, A BETTER NUMBER MAY EXIST, OR A BROADER NO-VIG OR MARKET-DISAGREEMENT CHECK IS NEEDED",
+      "externalConfirmationRule": "AN EXTERNAL PRICE MAY ACTIVATE PLAY ONLY WHEN THE EXACT MARKET AND PRICE ARE CONFIRMED WITH THE NAMED SPORTSBOOK; AGGREGATOR-ONLY PRICES ARE MARKET REFERENCES",
+      "cardDisclosureRule": "CARDS MUST LABEL INTERNAL BET365 OR DRAFTKINGS PRICES, DIRECTLY CONFIRMED EXTERNAL BOOK PRICES, AND AGGREGATOR-ONLY REFERENCES DISTINCTLY"
+    },
     "vigScopeApproval": false,
     "bettingEdgePublication": false,
     "ledgerWrite": false,
