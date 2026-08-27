@@ -6,6 +6,7 @@
 
   const STORAGE_KEY='bettingEdge.preferences.cardView';
   const LINK_ID='vigScopeCardViewStylesheet';
+  const SMOOTH_STYLE_ID='vigScopeScrollSmoothness';
   const STYLE_VERSION='1';
   const STYLES={
     normal:`./assets/card-normal.css?v=${STYLE_VERSION}`,
@@ -31,6 +32,16 @@
     }catch(e){return 'normal'}
   }
 
+  function ensureSmoothnessStyle(d){
+    if(!d?.head)return false;
+    if(d.getElementById(SMOOTH_STYLE_ID))return true;
+    const style=d.createElement('style');
+    style.id=SMOOTH_STYLE_ID;
+    style.textContent='.term:after{display:none!important}';
+    d.head.appendChild(style);
+    return true
+  }
+
   function ensureStylesheet(d,value){
     if(!d?.head)return false;
     const normalized=ALLOWED.has(value)?value:'normal';
@@ -53,6 +64,7 @@
   function apply(d,value=readValue()){
     if(!d?.documentElement)return false;
     const normalized=ALLOWED.has(value)?value:'normal';
+    ensureSmoothnessStyle(d);
     ensureStylesheet(d,normalized);
     d.documentElement.dataset.cardView=normalized;
     if(d.body)d.body.dataset.cardView=normalized;
