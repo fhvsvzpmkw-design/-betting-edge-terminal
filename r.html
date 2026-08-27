@@ -4,33 +4,474 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-<title>VigScope — Market Intelligence</title>
+<title>Market Intelligence</title>
+<link rel="icon" type="image/png" href="./assets/brand/vigwire-icon.png">
+<link rel="icon" href="./assets/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png">
+<link rel="canonical" href="https://vigwirelabs.com/">
+<meta name="description" content="VigScope Market Intelligence by VigWire Labs.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VigWire Labs">
+<meta property="og:title" content="VigScope — Market Intelligence">
+<meta property="og:description" content="Market intelligence from VigWire Labs.">
+<meta property="og:url" content="https://vigwirelabs.com/">
+<meta property="og:image" content="https://vigwirelabs.com/assets/brand/vigwire-share-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="VigWire Labs — VigScope Market Intelligence">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VigScope — Market Intelligence">
+<meta name="twitter:description" content="Market intelligence from VigWire Labs.">
+<meta name="twitter:image" content="https://vigwirelabs.com/assets/brand/vigwire-share-card.png">
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01040a}body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}#app{border:0;width:100%;height:100%;display:block;background:#01040a}#msg{position:fixed;z-index:20;inset:0;display:grid;place-items:center;padding:24px;background:#01040a;color:#58ff88;font-weight:900;letter-spacing:.04em;text-align:center}#msg.error{color:#ff9cad}
+:root{
+  --bg:#01040a;
+  --green:#76ff75;
+  --green-soft:#52e96d;
+  --yellow:#ffd739;
+  --red:#ff5d57;
+  --cyan:#8dfff0;
+  --fade-ms:300ms;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);overflow:hidden}
+body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+#app{
+  border:0;
+  width:100%;
+  height:100%;
+  display:block;
+  background:var(--bg);
+  opacity:0;
+  transition:opacity var(--fade-ms) ease;
+}
+#app.ready{opacity:1}
+#splash{
+  position:fixed;
+  z-index:20;
+  inset:0;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  color:var(--green);
+  background:
+    radial-gradient(circle at 50% 42%,rgba(53,166,89,.10),transparent 42%),
+    linear-gradient(180deg,#020712 0%,#01040a 48%,#010308 100%);
+  opacity:1;
+  transition:opacity var(--fade-ms) ease;
+}
+#splash.fade{opacity:0;pointer-events:none}
+#splash:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 4px);
+  opacity:.65;
+}
+#splash:after{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.42) 76%,rgba(0,0,0,.82) 100%);
+}
+.splash-inner{
+  position:relative;
+  z-index:1;
+  width:min(94vw,1040px);
+  height:min(88dvh,760px);
+  min-height:520px;
+  display:grid;
+  grid-template-rows:auto auto 1fr auto;
+  align-items:start;
+  text-align:center;
+  padding:max(22px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+}
+.brand{
+  padding-top:clamp(4px,2vh,18px);
+  text-shadow:0 0 7px rgba(118,255,117,.66),0 0 18px rgba(82,233,109,.22);
+}
+.brand-name{
+  margin:0;
+  color:var(--green);
+  font-size:clamp(28px,5.6vw,62px);
+  line-height:.98;
+  font-weight:900;
+  letter-spacing:clamp(.16em,1.2vw,.30em);
+  white-space:nowrap;
+}
+.brand-sub{
+  margin-top:clamp(12px,2vh,21px);
+  font-size:clamp(16px,2.8vw,29px);
+  line-height:1.1;
+  font-weight:900;
+  letter-spacing:.035em;
+}
+.brand-power{
+  margin-top:clamp(12px,1.8vh,18px);
+  color:var(--green-soft);
+  font-size:clamp(10px,1.7vw,16px);
+  line-height:1.25;
+  font-weight:800;
+  letter-spacing:.015em;
+}
+.brand-version{
+  margin-top:6px;
+  color:var(--green-soft);
+  font-size:clamp(9px,1.45vw,14px);
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+.personality{
+  align-self:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  padding-top:clamp(28px,6vh,62px);
+  padding-bottom:clamp(18px,4vh,38px);
+  text-shadow:0 0 7px rgba(118,255,117,.58),0 0 18px rgba(82,233,109,.18);
+}
+.legit{
+  color:var(--green);
+  font-size:clamp(17px,3.2vw,31px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.035em;
+  white-space:nowrap;
+}
+.bolt{color:var(--yellow);text-shadow:0 0 8px rgba(255,215,57,.55)}
+.specials{
+  margin-top:clamp(24px,4.2vh,40px);
+  color:var(--green);
+  font-size:clamp(10px,2.05vw,19px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.015em;
+  white-space:nowrap;
+}
+.pizza,.lock{color:var(--yellow);text-shadow:0 0 7px rgba(255,215,57,.38)}
+.meats{
+  margin-top:clamp(23px,4vh,38px);
+  color:var(--green);
+  font-size:clamp(12px,2.15vw,20px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.meat{color:var(--red);text-shadow:0 0 7px rgba(255,93,87,.38)}
+.ready{
+  align-self:end;
+  color:var(--green-soft);
+  font-size:clamp(11px,1.8vw,16px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.03em;
+  text-shadow:0 0 6px rgba(118,255,117,.45);
+  padding-bottom:clamp(3px,1.2vh,12px);
+}
+.cursor{display:inline-block;margin-left:2px;animation:blink .72s steps(1,end) infinite}
+@keyframes blink{50%{opacity:.12}}
+#msg{
+  display:none;
+  position:fixed;
+  z-index:30;
+  left:12px;
+  right:12px;
+  top:max(12px,env(safe-area-inset-top));
+  padding:12px;
+  background:#07131b;
+  color:#a9fff0;
+  border:1px solid #1fd6c3;
+  font:12px ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+#msg.error{display:block;background:#25060d;color:#ff9cad;border-color:#ff6178}
+@media(max-width:560px){
+  .splash-inner{width:96vw;height:92dvh;min-height:430px}
+  .brand-name{letter-spacing:.12em}
+  .specials{letter-spacing:0}
+}
+@media(orientation:portrait) and (max-width:1100px){
+  .brand-name{
+    font-size:clamp(20px,4.8vw,48px);
+    letter-spacing:.13em;
+  }
+  .personality{transform:translateY(-5.5dvh)}
+  .ready{transform:translateY(-2.8dvh)}
+}
+@media(max-height:620px){
+  .splash-inner{height:96dvh;min-height:0}
+  .brand{padding-top:0}
+  .personality{padding-top:14px;padding-bottom:12px}
+  .specials{margin-top:16px}
+  .meats{margin-top:15px}
+}
+@media(orientation:landscape) and (max-height:500px) and (max-width:950px){
+  .splash-inner{
+    width:94vw;
+    height:94dvh;
+    min-height:0;
+    padding-top:4px;
+    padding-bottom:4px;
+  }
+  .brand-name{
+    font-size:clamp(24px,4.2vw,38px);
+    letter-spacing:.14em;
+  }
+  .brand-sub{
+    margin-top:8px;
+    font-size:clamp(14px,2.1vw,20px);
+  }
+  .brand-power{
+    margin-top:7px;
+    font-size:clamp(9px,1.4vw,12px);
+  }
+  .brand-version{
+    margin-top:3px;
+    font-size:clamp(8px,1.2vw,11px);
+  }
+  .personality{padding-top:8px;padding-bottom:4px}
+  .legit{font-size:clamp(16px,2.5vw,23px)}
+  .specials{
+    margin-top:11px;
+    font-size:clamp(10px,1.6vw,14px);
+  }
+  .meats{
+    margin-top:10px;
+    font-size:clamp(11px,1.7vw,15px);
+  }
+  .ready{
+    font-size:clamp(10px,1.4vw,12px);
+    padding-bottom:2px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app,#splash{transition:none}
+  .cursor{animation:none}
+}
 </style>
 </head>
 <body>
-<div id="msg">VIGSCOPE // LOADING REPORT</div>
+<div id="splash" aria-label="Market Intelligence">
+  <div class="splash-inner">
+    <div class="brand">
+      <h1 class="brand-name"></h1>
+      <div class="brand-sub"></div>
+      <div class="brand-power"></div>
+      <div class="brand-version">TERMINAL UI // v1.5</div>
+    </div>
+
+    <div></div>
+
+    <div class="personality">
+      <div class="legit"><span class="bolt">⚡</span>&nbsp; 2 LEGIT 2 QUIT &nbsp;<span class="bolt">⚡</span></div>
+      <div class="specials"><span class="pizza">🍕</span>&nbsp; PIZZA PLAYS &nbsp;<span class="pizza">🍕</span>&nbsp;&nbsp;&nbsp; <span class="lock">🔒</span>&nbsp; CRYPTO SPECIALS &nbsp;<span class="lock">🔒</span></div>
+      <div class="meats"><span class="meat">🥩</span>&nbsp; WE GOT THE MEATS &nbsp;<span class="meat">🥩</span></div>
+    </div>
+
+    <div class="ready">TERMINAL READY <span class="cursor">▌</span></div>
+  </div>
+</div>
+<div id="msg"></div>
 <iframe id="app" title="VigScope Terminal UI"></iframe>
 <script>
+// BRAND SETTINGS — company/app naming changes should happen here first.
+const BRAND_CONFIG={
+  appName:'VigScope',
+  companyName:'VigWire Labs',
+  descriptor:'Market Intelligence',
+  terminalName:'VigScope Terminal UI'
+};
+
+function spacedBrandText(name){
+  return String(name||'').trim().split(/\s+/).map(word=>Array.from(word.toUpperCase()).join(' ')).join('\u00a0\u00a0');
+}
+
+// SPLASH SETTINGS — non-brand copy/timing changes should happen in this block only.
+const SPLASH_CONFIG={
+  minimumDisplayMs:1600,
+  fadeMs:300,
+  copy:{
+    browserTitle:`${BRAND_CONFIG.appName} ${BRAND_CONFIG.descriptor}`,
+    ariaLabel:`${BRAND_CONFIG.appName} ${BRAND_CONFIG.descriptor}`,
+    terminalTitle:`${BRAND_CONFIG.terminalName} v1.5`,
+    titleText:spacedBrandText(BRAND_CONFIG.appName),
+    subtitle:BRAND_CONFIG.descriptor.toUpperCase(),
+    poweredBy:`POWERED BY ${BRAND_CONFIG.companyName.toUpperCase()}`,
+    version:'TERMINAL UI // v1.5',
+    legit:'2 LEGIT 2 QUIT',
+    pizza:'PIZZA PLAYS',
+    crypto:'CRYPTO SPECIALS',
+    meats:'WE GOT THE MEATS',
+    ready:'TERMINAL READY'
+  }
+};
+
 const INDEX_URL='./run-history.json';
 const SLOT_CODES={open:'o',main:'m',final_morning:'f',evening:'e',late:'l'};
 const SLOT_MINUTES={open:360,main:480,final_morning:570,evening:915,late:1095};
-const RETRY_MS=3000,MAX_WAIT_MS=90000;
-const frame=document.getElementById('app'),msg=document.getElementById('msg');
-window.addEventListener('pageshow',event=>{if(!event.persisted)return;const u=new URL(location.href);u.searchParams.set('_fresh',Date.now());location.replace(u.pathname+u.search+u.hash)});
-function shortId(entry){const ts=String(entry&&entry.ts||''),slot=String(entry&&entry.slot||''),m=ts.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/),code=SLOT_CODES[slot];return m&&code?`${m[1].slice(2)}${m[2]}${m[3]}${code}${m[4]}${m[5]}${m[6]}`:''}
+const RETRY_MS=3000;
+const MAX_WAIT_MS=90000;
+const SPLASH_MIN_MS=Math.max(0,Number(SPLASH_CONFIG.minimumDisplayMs)||0);
+const SPLASH_FADE_MS=Math.max(0,Number(SPLASH_CONFIG.fadeMs)||0);
+const splashStarted=Date.now();
+window.addEventListener('pageshow',event=>{if(!event.persisted)return;const fresh=new URL(location.href);fresh.searchParams.set('_fresh',String(Date.now()));location.replace(fresh.pathname+fresh.search+fresh.hash)});
+
+function applySplashConfig(){
+  const c=SPLASH_CONFIG.copy;
+  document.title=c.browserTitle;
+  if(document.documentElement&&document.documentElement.style&&document.documentElement.style.setProperty){
+    document.documentElement.style.setProperty('--fade-ms',SPLASH_FADE_MS+'ms');
+  }
+  if(!document.querySelector)return;
+  const splashNode=document.getElementById('splash');
+  const frameNode=document.getElementById('app');
+  const title=document.querySelector('.brand-name');
+  const subtitle=document.querySelector('.brand-sub');
+  const powered=document.querySelector('.brand-power');
+  const version=document.querySelector('.brand-version');
+  const legit=document.querySelector('.legit');
+  const specials=document.querySelector('.specials');
+  const meats=document.querySelector('.meats');
+  const ready=document.querySelector('.ready');
+  if(splashNode)splashNode.setAttribute('aria-label',c.ariaLabel);
+  if(frameNode)frameNode.setAttribute('title',c.terminalTitle);
+  if(title)title.textContent=c.titleText;
+  if(subtitle)subtitle.textContent=c.subtitle;
+  if(powered)powered.textContent=c.poweredBy;
+  if(version)version.textContent=c.version;
+  if(legit)legit.innerHTML='<span class="bolt">⚡</span>&nbsp; '+c.legit+' &nbsp;<span class="bolt">⚡</span>';
+  if(specials)specials.innerHTML='<span class="pizza">🍕</span>&nbsp; '+c.pizza+' &nbsp;<span class="pizza">🍕</span>&nbsp;&nbsp;&nbsp; <span class="lock">🔒</span>&nbsp; '+c.crypto+' &nbsp;<span class="lock">🔒</span>';
+  if(meats)meats.innerHTML='<span class="meat">🥩</span>&nbsp; '+c.meats+' &nbsp;<span class="meat">🥩</span>';
+  if(ready)ready.innerHTML=c.ready+' <span class="cursor">▌</span>';
+}
+applySplashConfig();
+
+const splash=document.getElementById('splash');
+const msg=document.getElementById('msg');
+const frame=document.getElementById('app');
+function shortId(entry){
+  const ts=String(entry&&entry.ts||'');
+  const slot=String(entry&&entry.slot||'');
+  const m=ts.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+  const code=SLOT_CODES[slot];
+  return m&&code?`${m[1].slice(2)}${m[2]}${m[3]}${code}${m[4]}${m[5]}${m[6]}`:'';
+}
 function dateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
-function vancouverNow(now=new Date()){try{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now),v=t=>parts.find(p=>p.type===t)?.value||'';return{day:`${v('year')}-${v('month')}-${v('day')}`,minutes:Number(v('hour'))*60+Number(v('minute'))}}catch(e){return{day:'',minutes:-1}}}
-function sessionApplicable(slot,day,now=new Date()){const current=vancouverNow(now),minutes=SLOT_MINUTES[slot];if(!day||!Number.isFinite(minutes)||!current.day)return false;if(day<current.day)return true;if(day>current.day)return false;return current.minutes>=minutes}
-function b64ue(v){const bytes=new TextEncoder().encode(v);let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-function wait(ms){return new Promise(r=>setTimeout(r,ms))}
-async function fetchJson(url){const res=await fetch(url+(url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(!res.ok){const e=new Error('HTTP '+res.status);e.httpStatus=res.status;throw e}return res.json()}
-async function resolveRun(id){const started=Date.now();let last='RUN NOT FOUND';while(Date.now()-started<=MAX_WAIT_MS){try{const index=await fetchJson(INDEX_URL),runs=Array.isArray(index&&index.runs)?index.runs:[],matches=runs.filter(x=>shortId(x)===id);if(matches.length>1)throw new Error('SHORT RUN ID IS NOT UNIQUE');if(matches.length===1){const entry=matches[0];if(!entry.path)throw new Error('ARCHIVED RUN PATH MISSING');try{return{entry,run:await fetchJson('./'+String(entry.path).replace(/^\/+/,'')),index}}catch(e){if(e&&e.httpStatus===404)last='ARCHIVED RUN IS STILL PUBLISHING';else throw e}}else last='RUN ARCHIVE IS STILL PUBLISHING'}catch(e){if(/NOT UNIQUE|PATH MISSING/.test(String(e&&e.message||e)))throw e;last='RUN HISTORY IS STILL PUBLISHING'}await wait(RETRY_MS)}throw new Error(last+' — TRY THE LINK AGAIN IN A MOMENT')}
-async function sameDayPriorRuns(index,currentEntry,now=new Date()){const day=dateKey(currentEntry&&currentEntry.ts);if(!day)return[];const runs=Array.isArray(index&&index.runs)?index.runs:[],latestBySlot=new Map();for(const entry of runs){const slot=String(entry&&entry.slot||'');if(!SLOT_CODES[slot]||!entry.path||dateKey(entry.ts)!==day||!sessionApplicable(slot,day,now))continue;if(String(entry.ts||'')===String(currentEntry.ts||'')&&slot===String(currentEntry.slot||''))continue;const prior=latestBySlot.get(slot);if(!prior||String(entry.ts||'')>String(prior.ts||''))latestBySlot.set(slot,entry)}const loaded=[];for(const entry of latestBySlot.values()){try{const run=await fetchJson('./'+String(entry.path).replace(/^\/+/,''));if(String(run.ts||'')!==String(entry.ts||''))continue;if(String(run.slot||'')!==String(entry.slot||''))continue;if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))continue;loaded.push(run)}catch(e){console.warn('Same-day archived run unavailable',entry&&entry.path,e)}}return loaded}
-function countsFromRecommendations(run){const counts={bet:0,lean:0,wait:0,pass:0};for(const rec of Array.isArray(run&&run.recs)?run.recs:[]){const status=String(rec&&rec.status||'').trim().toLowerCase();if(Object.hasOwn(counts,status))counts[status]++}return counts}
-async function load(){try{const id=String(new URLSearchParams(location.search).get('id')||'').trim().toLowerCase();if(!/^[0-9]{6}[omfel][0-9]{6}$/.test(id))throw new Error('INVALID OR MISSING SHORT RUN ID');const{entry,run,index}=await resolveRun(id);if(String(run.ts||'')!==String(entry.ts||''))throw new Error('RUN TIMESTAMP VALIDATION FAILED');if(String(run.slot||'')!==String(entry.slot||''))throw new Error('RUN SLOT VALIDATION FAILED');if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))throw new Error('RUN FEED PROVENANCE VALIDATION FAILED');const priorRuns=await sameDayPriorRuns(index,entry);const hydrated={...run,counts:countsFromRecommendations(run),prior_runs:priorRuns};frame.addEventListener('load',()=>msg.remove(),{once:true});frame.src='./runner.html?build='+Date.now()+'#run='+b64ue(JSON.stringify(hydrated))}catch(e){msg.classList.add('error');msg.textContent='VIGSCOPE SHORT LINK ERROR // '+String(e&&e.message||e)}}
+function vancouverNow(now=new Date()){
+  try{
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now);
+    const value=t=>parts.find(p=>p.type===t)?.value||'';
+    return {day:`${value('year')}-${value('month')}-${value('day')}`,minutes:Number(value('hour'))*60+Number(value('minute'))}
+  }catch(e){return {day:'',minutes:-1}}
+}
+function sessionApplicable(slot,day,now=new Date()){
+  const current=vancouverNow(now),minutes=SLOT_MINUTES[slot];
+  if(!day||!Number.isFinite(minutes)||!current.day)return false;
+  if(day<current.day)return true;
+  if(day>current.day)return false;
+  return current.minutes>=minutes;
+}
+function b64ue(v){
+  const bytes=new TextEncoder().encode(v);let bin='';
+  bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function fail(text){msg.textContent=text;msg.classList.add('error')}
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function revealTerminal(){
+  const elapsed=Date.now()-splashStarted;
+  const remaining=Math.max(0,SPLASH_MIN_MS-elapsed);
+  setTimeout(()=>{
+    frame.classList.add('ready');
+    splash.classList.add('fade');
+    setTimeout(()=>splash.remove(),SPLASH_FADE_MS+60);
+  },remaining);
+}
+async function fetchJson(url){
+  const res=await fetch(url+(url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});
+  if(!res.ok){const e=new Error('HTTP '+res.status);e.httpStatus=res.status;throw e}
+  return res.json();
+}
+async function resolveRun(id){
+  const started=Date.now();
+  let lastError='RUN NOT FOUND';
+  while(Date.now()-started<=MAX_WAIT_MS){
+    try{
+      const index=await fetchJson(INDEX_URL);
+      const runs=Array.isArray(index&&index.runs)?index.runs:[];
+      const matches=runs.filter(x=>shortId(x)===id);
+      if(matches.length>1)throw new Error('SHORT RUN ID IS NOT UNIQUE');
+      if(matches.length===1){
+        const entry=matches[0];
+        if(!entry.path)throw new Error('ARCHIVED RUN PATH MISSING');
+        try{
+          const run=await fetchJson('./'+String(entry.path).replace(/^\/+/,''));
+          return {entry,run,index};
+        }catch(e){
+          if(e&&e.httpStatus===404)lastError='ARCHIVED RUN IS STILL PUBLISHING';
+          else throw e;
+        }
+      }else lastError='RUN ARCHIVE IS STILL PUBLISHING';
+    }catch(e){
+      if(/NOT UNIQUE|PATH MISSING/.test(String(e&&e.message||e)))throw e;
+      lastError='RUN HISTORY IS STILL PUBLISHING';
+    }
+    await wait(RETRY_MS);
+  }
+  throw new Error(lastError+' — TRY THE LINK AGAIN IN A MOMENT');
+}
+async function sameDayPriorRuns(index,currentEntry,now=new Date()){
+  const day=dateKey(currentEntry&&currentEntry.ts);
+  if(!day)return [];
+  const runs=Array.isArray(index&&index.runs)?index.runs:[];
+  const latestBySlot=new Map();
+  runs.forEach(entry=>{
+    const slot=String(entry&&entry.slot||'');
+    if(!SLOT_CODES[slot]||!entry.path||dateKey(entry.ts)!==day||!sessionApplicable(slot,day,now))return;
+    if(String(entry.ts||'')===String(currentEntry.ts||'')&&slot===String(currentEntry.slot||''))return;
+    const prior=latestBySlot.get(slot);
+    if(!prior||String(entry.ts||'')>String(prior.ts||''))latestBySlot.set(slot,entry);
+  });
+  const loaded=[];
+  for(const entry of latestBySlot.values()){
+    try{
+      const run=await fetchJson('./'+String(entry.path).replace(/^\/+/,''));
+      if(String(run.ts||'')!==String(entry.ts||''))continue;
+      if(String(run.slot||'')!==String(entry.slot||''))continue;
+      if(dateKey(run.ts)!==day)continue;
+      if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))continue;
+      loaded.push(run);
+    }catch(e){console.warn('Same-day archived run unavailable',entry&&entry.path,e)}
+  }
+  return loaded;
+}
+function countsFromRecommendations(run){
+  const counts={bet:0,lean:0,wait:0,pass:0};
+  for(const rec of Array.isArray(run&&run.recs)?run.recs:[]){
+    const status=String(rec&&rec.status||'').trim().toLowerCase();
+    if(Object.hasOwn(counts,status))counts[status]++;
+  }
+  return counts;
+}
+async function load(){
+  try{
+    const id=String(new URLSearchParams(location.search).get('id')||'').trim().toLowerCase();
+    if(!/^[0-9]{6}[omfel][0-9]{6}$/.test(id))throw new Error('INVALID OR MISSING SHORT RUN ID');
+    const {entry,run,index}=await resolveRun(id);
+    if(String(run.ts||'')!==String(entry.ts||''))throw new Error('RUN TIMESTAMP VALIDATION FAILED');
+    if(String(run.slot||'')!==String(entry.slot||''))throw new Error('RUN SLOT VALIDATION FAILED');
+    if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))throw new Error('RUN FEED PROVENANCE VALIDATION FAILED');
+    const priorRuns=await sameDayPriorRuns(index,entry);
+    const hydrated={...run,counts:countsFromRecommendations(run),prior_runs:priorRuns};
+    frame.addEventListener('load',revealTerminal,{once:true});
+    frame.src='./runner.html?build='+Date.now()+'#run='+b64ue(JSON.stringify(hydrated));
+  }catch(e){fail('VIGSCOPE SHORT LINK ERROR // '+String(e&&e.message||e))}
+}
 load();
 </script>
 </body>
