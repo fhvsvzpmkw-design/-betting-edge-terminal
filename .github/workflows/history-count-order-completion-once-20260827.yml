@@ -50,6 +50,12 @@ jobs:
           );
 
           replaceOnce(
+            "  return counts;\n}\nfunction validateReport(report){",
+            "  return counts;\n}\nfunction verificationReport(report){\n  const reportMs=Date.parse(report?.ts);\n  if(!Number.isFinite(reportMs) || reportMs>=STRICT_BUNDLE_FROM) return report;\n  const calculated=actualCounts(Array.isArray(report?.recs)?report.recs:[]);\n  const existing=(report?.counts && typeof report.counts==='object' && !Array.isArray(report.counts))?report.counts:{};\n  const canonical={};\n  for(const key of STATUS_KEYS){\n    if(Number.isInteger(existing[key]) && existing[key]>=0){\n      canonical[key]=existing[key];\n      continue;\n    }\n    assert(!Object.hasOwn(existing,key) && calculated[key]===0,`Historical report counts.${key} is invalid or omits a non-zero value: ${report?.ts}`);\n    canonical[key]=0;\n  }\n  return {...report,counts:canonical};\n}\nfunction validateReport(report){",
+            'allow only legacy omitted zero counts during verification'
+          );
+
+          replaceOnce(
             '    counts:report.counts,',
             '    counts:canonicalCounts(report.counts),',
             'canonicalize new index entries'
@@ -67,10 +73,23 @@ jobs:
             'normalize legacy index counts during publication'
           );
 
+          const reportRead = 'const report = validateReport(readJson(reportAbs));';
+          replaceOnce(
+            reportRead,
+            'const report = validateReport(verificationReport(readJson(reportAbs)));',
+            'legacy-compatible indexed report verification'
+          );
+
           replaceOnce(
             '    assert(normalizedJson(entry.counts)===normalizedJson(report.counts),`Index counts do not match report: ${entry.id}`);',
             '    assert(countsEqual(entry.counts,report.counts),`Index counts do not match report: ${entry.id}`);',
             'make verifier count comparison order-insensitive'
+          );
+
+          replaceOnce(
+            '    const report=validateReport(readJson(file));',
+            '    const report=validateReport(verificationReport(readJson(file)));',
+            'legacy-compatible stored report verification'
           );
 
           fs.writeFileSync(sourcePath, source, 'utf8');
@@ -79,6 +98,11 @@ jobs:
           const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
           for (const entry of index.runs || []) {
             const counts = entry.counts || {};
+            for (const key of ['bet','lean','wait','pass']) {
+              if (!Number.isInteger(counts[key]) || counts[key] < 0) {
+                throw new Error(`run-history ${entry.id} has invalid counts.${key}`);
+              }
+            }
             entry.counts = {
               bet: counts.bet,
               lean: counts.lean,
