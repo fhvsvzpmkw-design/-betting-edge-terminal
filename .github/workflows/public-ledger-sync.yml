@@ -22,27 +22,42 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Validate public ledger
+
+      - name: Validate canonical public ledger
         run: |
           node - <<'NODE'
           const fs=require('node:fs');
           const p='data/ledger/public-ledger.json';
           const j=JSON.parse(fs.readFileSync(p,'utf8'));
-          if(j.publicProjection!==true) throw new Error('publicProjection must be true');
-          if(!Array.isArray(j.wagers)) throw new Error('wagers must be an array');
-          if(j.wagers.some(r=>Array.isArray(r)&&r[2]!==null)) throw new Error('public ledger leaks sportsbook reference');
-          console.log(`PUBLIC LEDGER OK: ${j.wagers.length} wagers`);
+          const fail=m=>{throw new Error(m)};
+          if(j.schema!==2) fail('public ledger schema must be 2');
+          if(j.publicProjection!==true) fail('publicProjection must be true');
+          if(!Array.isArray(j.wagers)) fail('wagers must be an array');
+          if(!j.validation || typeof j.validation!=='object') fail('validation block missing');
+          if(!j.summary || typeof j.summary!=='object') fail('summary block missing');
+          if(j.wagers.some(r=>!Array.isArray(r))) fail('every wager must be an array');
+          if(j.wagers.some(r=>r[2]!==null)) fail('public ledger leaks sportsbook/private reference at row index 2');
+          if(Number(j.validation.uniqueWagers)!==j.wagers.length) fail('validation.uniqueWagers does not match wagers length');
+          console.log(`PUBLIC LEDGER CONTRACT PASS: ${j.wagers.length} wagers`);
           NODE
+
       - name: Sync compatibility paths
         run: |
           mkdir -p api data
           cp data/ledger/public-ledger.json data/bet-history-public.json
           cp data/ledger/public-ledger.json api/bet-history
+
+      - name: Verify compatibility copies
+        run: |
+          cmp --silent data/ledger/public-ledger.json data/bet-history-public.json
+          cmp --silent data/ledger/public-ledger.json api/bet-history
+          echo 'PUBLIC LEDGER COMPATIBILITY PATHS: PASS'
+
       - name: Commit synchronized public ledger
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/bet-history-public.json api/bet-history
           git diff --cached --quiet && exit 0
-          git commit -m "ledger: sync public ledger compatibility paths"
+          git commit -m "ledger: sync canonical public ledger compatibility paths"
           git push origin HEAD:main
