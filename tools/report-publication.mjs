@@ -171,11 +171,15 @@ function materialPersonnelSignal(rec){
   return PERSONNEL_SIGNAL.test(text);
 }
 function nonEmptyString(value){return typeof value==='string' && value.trim().length>0;}
-function normalizePublicationSidecar(sidecar){
+function normalizePublicationSidecar(sidecar,report){
   if(!sidecar || typeof sidecar!=='object' || Array.isArray(sidecar)) return sidecar;
-  for(const item of Array.isArray(sidecar.recommendations)?sidecar.recommendations:[]){
+  const items=Array.isArray(sidecar.recommendations)?sidecar.recommendations:[];
+  for(const [index,item] of items.entries()){
     const evidence=item?.personnelEvidence;
     if(evidence && evidence.sourceShortfall===false) evidence.sourceShortfall=null;
+    if(item && typeof item==='object' && !Array.isArray(item) && report?.recs?.[index]){
+      item.displayText=report.recs[index].hist;
+    }
   }
   return sidecar;
 }
@@ -346,7 +350,7 @@ function loadIndex(root){
 function publish(root,reportFile,sidecarFile){
   const report = validateReport(readJson(reportFile));
   const paths = expectedPaths(report);
-  const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile)),report,paths.reportPath,{strict:true});
+  const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true});
   const reportAbs = path.join(root,paths.reportPath);
   const sidecarAbs = path.join(root,paths.sidecarPath);
   const reportCreated = writeImmutableJson(reportAbs,report,'Issued report');
@@ -528,7 +532,14 @@ function selfTest(){
       slot:'main',
       label:'08:00 MAIN',
       ts:'2026-08-23T08:00:01-07:00',
-      feedGeneratedAt:'2026-08-23T14:55:00.000Z'
+      feedGeneratedAt:'2026-08-23T14:55:00.000Z',
+      recs:[
+        {...historicalReport.recs[0]},
+        {
+          ...historicalReport.recs[1],
+          hist:'C+ — related MLB/no-vig evidence; direct full-game totals calibration is limited.'
+        }
+      ]
     };
     const currentSidecar={
       ...historicalSidecar,
@@ -544,7 +555,14 @@ function selfTest(){
         productionContractVersion:'1.0',
         productionContractBlobSha:'815a511301bd7a5aa3770baf0e32a00a28e2f548',
         feedBlobSha:'2222222222222222222222222222222222222222'
-      }
+      },
+      recommendations:[
+        {...historicalSidecar.recommendations[0]},
+        {
+          ...historicalSidecar.recommendations[1],
+          displayText:'C+ — related MLB/no-vig evidence; direct totals calibration is limited.'
+        }
+      ]
     };
     const currentReportFile=path.join(root,'input-current-report.json');
     const currentSidecarFile=path.join(root,'input-current-sidecar.json');
@@ -553,6 +571,18 @@ function selfTest(){
     publish(root,currentReportFile,currentSidecarFile);
     publish(root,currentReportFile,currentSidecarFile);
     verifyIndex(root,{targetTs:currentReport.ts});
+
+    const storedCurrentSidecar=readJson(path.join(root,'data/history/research-fit/2026-08-23/main-080001.json'));
+    assert(
+      storedCurrentSidecar.recommendations[1].displayText===currentReport.recs[1].hist,
+      'Publication must derive sidecar displayText from report hist'
+    );
+    const tamperedCurrentSidecar=JSON.parse(JSON.stringify(storedCurrentSidecar));
+    tamperedCurrentSidecar.recommendations[1].displayText='C+ — related MLB/no-vig evidence; direct totals calibration is limited.';
+    expectValidationFailure(
+      ()=>validateSidecar(tamperedCurrentSidecar,currentReport,currentSidecar.reportReference.reportPath,{strict:true}),
+      'Stored verifier must reject sidecar displayText drift from report hist'
+    );
 
     const wrongCurrentSidecar={
       ...currentSidecar,
