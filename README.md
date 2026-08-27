@@ -20,6 +20,7 @@ Current operating references:
 
 - [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — practical current production state and open operational items.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — report/odds schedule, recovery, Core 1.4 gate order, Result Closure, Crypto Specials and downstream boundaries.
+- [`docs/PUBLIC_LEDGER_OPERATIONS.md`](docs/PUBLIC_LEDGER_OPERATIONS.md) — canonical public-ledger path, privacy boundary, upload/replacement procedure, compatibility sync and recovery.
 - [`BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`](BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md) — seasonal profile timing and scheduler/backstop behavior.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — post-Core-1.4 observation and future work.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable historical architectural decisions. Dated entries record the state when they were made; current production authority is the boundary above plus `docs/PROJECT_STATE.md`.
@@ -107,9 +108,15 @@ The public terminal does not use the raw private betting ledger directly.
 
 Current architecture:
 
-**private master ledger → Cloudflare Worker → sanitized `/api/bet-history` projection → F3 Bet History + Eddie Numbers**
+**private master ledger → sanitization boundary → sanitized `/api/bet-history` projection → F3 Bet History + Eddie Numbers**
 
-Eddie Numbers uses the public projection, not the private ledger. `data/bet-history-public.json` remains a sanitized fallback.
+The stable customer-facing ledger contract is:
+
+`data/ledger/public-ledger.json`
+
+That file is the only public-ledger file intended to be manually replaced or supplied by a future customer upload flow. `.github/workflows/public-ledger-sync.yml` validates it and synchronizes generated compatibility copies at `data/bet-history-public.json` and `api/bet-history`.
+
+Eddie Numbers uses the public projection, not the private ledger. Public modules must never require the private ledger path or credentials. The complete update/recovery procedure is documented in [`docs/PUBLIC_LEDGER_OPERATIONS.md`](docs/PUBLIC_LEDGER_OPERATIONS.md).
 
 ## Syndicate / hotline boundary
 
