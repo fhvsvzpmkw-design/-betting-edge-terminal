@@ -92,6 +92,30 @@ function expectedContractVersion(report){
   assert(Number.isFinite(reportMs),`Cannot resolve production contract version from report timestamp: ${report?.ts}`);
   return reportMs>=CONTRACT_V1_FROM ? '1.0' : '0.9';
 }
+function canonicalCounts(counts){
+  assert(counts && typeof counts==='object' && !Array.isArray(counts),'Counts must be an object');
+  const canonical={};
+  for(const key of STATUS_KEYS){
+    assert(Number.isInteger(counts[key]) && counts[key]>=0,`counts.${key} must be a non-negative integer`);
+    canonical[key]=counts[key];
+  }
+  return canonical;
+}
+function countsEqual(left,right){
+  if(!left || !right) return false;
+  return STATUS_KEYS.every(key=>left[key]===right[key]);
+}
+function normalizeIndexCounts(index){
+  let changed=false;
+  for(const entry of index.runs||[]){
+    const canonical=canonicalCounts(entry.counts);
+    if(normalizedJson(entry.counts)!==normalizedJson(canonical)){
+      entry.counts=canonical;
+      changed=true;
+    }
+  }
+  return changed;
+}
 function actualCounts(recs){
   const counts = {bet:0,lean:0,wait:0,pass:0};
   for(const [index,rec] of recs.entries()){
@@ -100,6 +124,27 @@ function actualCounts(recs){
     counts[status]++;
   }
   return counts;
+}
+function verificationReport(report){
+  const calculated=actualCounts(Array.isArray(report?.recs)?report.recs:[]);
+  const existing=(report?.counts && typeof report.counts==='object' && !Array.isArray(report.counts))?report.counts:{};
+  const canonical={};
+  for(const key of STATUS_KEYS){
+    const upper=key.toUpperCase();
+    const hasLower=Object.hasOwn(existing,key);
+    const hasUpper=Object.hasOwn(existing,upper);
+    if(hasLower && hasUpper){
+      assert(existing[key]===existing[upper],`Stored report has conflicting count keys ${key}/${upper}: ${report?.ts}`);
+    }
+    const value=hasLower?existing[key]:(hasUpper?existing[upper]:undefined);
+    if(Number.isInteger(value) && value>=0){
+      canonical[key]=value;
+      continue;
+    }
+    assert(!hasLower && !hasUpper && calculated[key]===0,`Stored report counts.${key} is invalid or omits a non-zero value: ${report?.ts}`);
+    canonical[key]=0;
+  }
+  return {...report,counts:canonical};
 }
 function validateReport(report){
   assert(report && typeof report==='object' && !Array.isArray(report),'Report must be a JSON object');
@@ -275,7 +320,7 @@ function buildIndexEntry(report,sidecar,paths){
     path:paths.reportPath,
     bankroll:report.bankroll,
     risk:report.risk,
-    counts:report.counts,
+    counts:canonicalCounts(report.counts),
     recCount:report.recs.length,
     researchFitPath:paths.sidecarPath,
     feedBlobSha:sidecar.provenance.feedBlobSha,
@@ -284,6 +329,10 @@ function buildIndexEntry(report,sidecar,paths){
 }
 function entryMatches(existing,expected){
   for(const key of Object.keys(expected)){
+    if(key==='counts'){
+      if(!countsEqual(existing.counts,expected.counts)) return false;
+      continue;
+    }
     if(normalizedJson(existing[key])!==normalizedJson(expected[key])) return false;
   }
   return true;
@@ -309,7 +358,7 @@ function publish(root,reportFile,sidecarFile){
   assert(sameId.length<=1,`run-history.json contains duplicate ID ${expected.id}`);
   const samePath = index.runs.filter(entry=>entry.path===expected.path && entry.id!==expected.id);
   assert(samePath.length===0,`Report path is already indexed to another run: ${expected.path}`);
-  let indexChanged = false;
+  let indexChanged = normalizeIndexCounts(index);
   if(sameId.length===1){
     assert(entryMatches(sameId[0],expected),`Existing index entry conflicts with report bundle: ${expected.id}`);
   }else{
@@ -352,7 +401,7 @@ function verifyIndex(root,{targetTs}={}){
     assert(!paths.has(entry.path),`Duplicate report path in index: ${entry.path}`); paths.add(entry.path);
     const reportAbs = path.join(root,entry.path);
     assert(fs.existsSync(reportAbs),`Indexed report is missing: ${entry.path}`);
-    const report = validateReport(readJson(reportAbs));
+    const report = validateReport(verificationReport(readJson(reportAbs)));
     const expected = expectedPaths(report);
     assert(entry.path===expected.reportPath,`Indexed path does not match report timestamp/slot: ${entry.path}`);
     assert(entry.id===`${report.ts}|${report.slot}`,`Index ID does not match report: ${entry.id}`);
@@ -363,7 +412,7 @@ function verifyIndex(root,{targetTs}={}){
     assert(entry.feedGeneratedAt===report.feedGeneratedAt,`Index feedGeneratedAt does not match report: ${entry.id}`);
     assert(entry.bankroll===report.bankroll,`Index bankroll does not match report: ${entry.id}`);
     assert(entry.risk===report.risk,`Index risk does not match report: ${entry.id}`);
-    assert(normalizedJson(entry.counts)===normalizedJson(report.counts),`Index counts do not match report: ${entry.id}`);
+    assert(countsEqual(entry.counts,report.counts),`Index counts do not match report: ${entry.id}`);
     assert(entry.recCount===report.recs.length,`Index recCount does not match report: ${entry.id}`);
     const sid=shortId(report);
     assert(!shortIds.has(sid),`Duplicate deterministic short ID: ${sid}`); shortIds.add(sid);
@@ -388,7 +437,7 @@ function verifyIndex(root,{targetTs}={}){
 
   const payloadFiles=walkJson(path.join(root,'data/history/runs'));
   for(const file of payloadFiles){
-    const report=validateReport(readJson(file));
+    const report=validateReport(verificationReport(readJson(file)));
     const reportPath=rel(root,file);
     const entry=index.runs.find(item=>item.id===`${report.ts}|${report.slot}`);
     assert(entry,`Stored issued report is not indexed: ${reportPath}`);
