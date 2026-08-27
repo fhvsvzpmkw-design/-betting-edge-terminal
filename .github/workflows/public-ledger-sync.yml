@@ -1,0 +1,48 @@
+name: Public Ledger Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/ledger/public-ledger.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: public-ledger-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Validate public ledger
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p='data/ledger/public-ledger.json';
+          const j=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(j.publicProjection!==true) throw new Error('publicProjection must be true');
+          if(!Array.isArray(j.wagers)) throw new Error('wagers must be an array');
+          if(j.wagers.some(r=>Array.isArray(r)&&r[2]!==null)) throw new Error('public ledger leaks sportsbook reference');
+          console.log(`PUBLIC LEDGER OK: ${j.wagers.length} wagers`);
+          NODE
+      - name: Sync compatibility paths
+        run: |
+          mkdir -p api data
+          cp data/ledger/public-ledger.json data/bet-history-public.json
+          cp data/ledger/public-ledger.json api/bet-history
+      - name: Commit synchronized public ledger
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/bet-history-public.json api/bet-history
+          git diff --cached --quiet && exit 0
+          git commit -m "ledger: sync public ledger compatibility paths"
+          git push origin HEAD:main
