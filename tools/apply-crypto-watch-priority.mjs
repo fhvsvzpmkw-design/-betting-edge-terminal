@@ -61,7 +61,7 @@ replaceRegexOnce(
 );
 
 replaceRegexOnce(
-  /([ \t]*)eventCandidatesTotal: 0,\n([ \t]*)coreCandidatesSelected: 0,/,
+  /([ \t]*)eventCandidatesTotal: 0,\n(?:[ \t]*\n)?([ \t]*)coreCandidatesSelected: 0,/,
   (match, eventIndent, coreIndent) =>
     `${eventIndent}eventCandidatesTotal: 0,\n` +
     `${coreIndent}cryptoWatchActive: cryptoFightWatchlist.length,\n` +
