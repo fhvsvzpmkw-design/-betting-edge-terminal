@@ -3,6 +3,7 @@
 
 const LEDGER_URL='./data/bet-history-public.json';
 let latestText=null;
+let latestBankrollCad=null;
 let observedDocument=null;
 let observer=null;
 let boundApp=null;
@@ -23,13 +24,24 @@ function innerDocument(){
   }catch(e){return {app:null,d:null}}
 }
 
+function pizzaCurrentUnitNode(d){
+  for(const metric of d.querySelectorAll('#resultsPizzaValueBox .pizzaMetric')){
+    const key=String(metric.querySelector('.key')?.textContent||'').trim().toUpperCase();
+    if(key==='CURRENT UNIT')return metric.querySelector('b');
+  }
+  return null;
+}
+
 function applyLatest(d){
   if(!d?.body||!latestText)return false;
   const source=d.getElementById('masterBankroll');
   const visible=d.querySelector('#runnerBankrollCompact .runnerBankrollValue');
+  const pizzaUnit=pizzaCurrentUnitNode(d);
+  const pizzaUnitText=Number.isFinite(latestBankrollCad)?formatCad(latestBankrollCad*0.03):null;
   if(source&&source.textContent!==latestText)source.textContent=latestText;
   if(visible&&visible.textContent!==latestText)visible.textContent=latestText;
-  return Boolean(source||visible);
+  if(pizzaUnit&&pizzaUnitText&&pizzaUnit.textContent!==pizzaUnitText)pizzaUnit.textContent=pizzaUnitText;
+  return Boolean(source||visible||pizzaUnit);
 }
 
 function observeInner(){
@@ -78,9 +90,11 @@ async function refresh(force=false){
       const response=await fetch(`${LEDGER_URL}?header_sync=${Date.now()}`,{cache:'no-store'});
       if(!response.ok)throw new Error(`ledger ${response.status}`);
       const payload=await response.json();
-      const next=formatCad(payload?.bankrollCad);
-      if(!next)throw new Error('invalid bankrollCad');
+      const bankrollCad=Number(payload?.bankrollCad);
+      const next=formatCad(bankrollCad);
+      if(!next||!Number.isFinite(bankrollCad))throw new Error('invalid bankrollCad');
       latestText=next;
+      latestBankrollCad=bankrollCad;
       observeInner();
       applyCurrent();
       setTimeout(applyCurrent,80);
