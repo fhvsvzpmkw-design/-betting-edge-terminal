@@ -634,7 +634,7 @@ jobs:
             if (/\bnba\b/.test(text)) return 'NBA';
             if (/\bwnba\b/.test(text)) return 'WNBA';
             if (/\bnfl\b/.test(text)) return 'NFL';
-            if (/\bncaaf\b|\bncaa football\b|college football/.test(text)) return 'NCAAF';
+            if (sport === 'american-football' && /\bncaaf\b|\bncaa\b|college/.test(text)) return 'NCAAF';
             if (/\bncaa\b|college basketball/.test(text) && sport === 'basketball') return 'NCAAB';
             if (/\bcfl\b|canadian football/.test(text)) return 'CFL';
             if (sport === 'boxing' || /boxing/.test(sport)) return 'BOXING';
