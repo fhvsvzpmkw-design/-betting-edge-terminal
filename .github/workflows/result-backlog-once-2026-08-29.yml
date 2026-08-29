@@ -1,4 +1,4 @@
-name: One-off exact result backlog closure 2026-08-29
+name: One-off result index finalization 2026-08-29
 
 on:
   push:
@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  close:
+  finalize:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -28,26 +28,21 @@ jobs:
       - name: Refresh main
         run: git pull --ff-only origin main
 
-      - name: Apply exact result verification
+      - name: Rebuild results index
         run: |
-          V=data/history/verifications/2026-08-29-backlog.json
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-25/open-061031.json "$V"
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-25/main-080346.json "$V"
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-25/final_morning-093741.json "$V"
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-25/evening-152443.json "$V"
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-25/late-182223.json "$V"
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-26/main-082200.json "$V"
-          node tools/verify-issued-results.mjs data/history/runs/2026-08-26/final_morning-094246.json "$V"
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
 
-      - name: Publish closed observations
+      - name: Publish results index
         run: |
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/history/observations/2026-08-25 data/history/observations/2026-08-26
+          git add data/history/results-index.json
           if git diff --cached --quiet; then
-            echo "No observation changes."
+            echo "No results index changes."
             exit 0
           fi
-          git commit -m "Close exact historical result backlog"
+          git commit -m "Rebuild Betting Edge results index after backlog closure"
           git pull --rebase origin main
           git push
