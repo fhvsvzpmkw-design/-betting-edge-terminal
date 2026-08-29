@@ -129,6 +129,12 @@ jobs:
           print(f'Extracted known-good odds worker: {len(worker)} bytes')
           PY
 
+      - name: Apply Crypto fight-watch priority
+        if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
+        run: |
+          node tools/apply-crypto-watch-priority.mjs /tmp/betting-edge-odds-worker.js
+          node --check /tmp/betting-edge-odds-worker.js
+
       - name: Pull quota-balanced Bet365 + DraftKings odds
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
@@ -236,6 +242,7 @@ jobs:
             echo "- Planned report: \`${{ steps.schedule.outputs.planned_report_time }} PT\`"
             echo "- Featured Vig Scope: \`${{ steps.schedule.outputs.featured_vig_scope }}\`"
             echo "- Gate: \`${{ steps.gate.outputs.reason || 'not-due' }}\`"
+            echo "- Crypto fight watch: exact-pair priority inside 30 hours"
             echo "- Five-pull daily cap: unchanged"
             echo "- Scheduled clock: Cloudflare only"
           } >> "$GITHUB_STEP_SUMMARY"
