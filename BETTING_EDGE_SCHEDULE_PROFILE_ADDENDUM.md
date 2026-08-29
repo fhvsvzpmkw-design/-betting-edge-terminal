@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL — SCHEDULING LAYER  
 **Effective:** 2026-08-19  
-**Updated:** 2026-08-25 — Core 1.4 alignment / two-minute odds backstop  
+**Updated:** 2026-08-29 — football primary-market coverage requirement  
 **Timezone:** `America/Vancouver`  
 **Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0 + Core v1.4 production manifest  
 **Schedule definitions:** `data/schedule-profiles.json`  
@@ -10,7 +10,7 @@
 
 ## Scope
 
-This addendum governs trigger timing, report-lane clock labels, seasonal pulse placement, History translation and featured VigScope checkpoints only. It does not change Betting Edge pricing, identity, freshness, fair-value, model-error, decision, staking, risk, Research Fit, Walters authority, immutable-history or delivery rules.
+This addendum governs trigger timing, report-lane clock labels, seasonal pulse placement, History translation, featured VigScope checkpoints and required scheduled-sweep market coverage. It does not change Betting Edge pricing, identity, freshness, fair-value, model-error, decision, staking, risk, Research Fit, Walters authority, immutable-history or delivery rules.
 
 The canonical slot keys remain `open`, `main`, `final_morning`, `evening` and `late`, preserving historical compatibility. Production scheduling resolves the active daily profile from `data/schedule-profiles.json` and `data/schedule-state.json` before analysis.
 
@@ -68,6 +68,29 @@ The first live proof of the new backstop remains pending the next due slot. Clou
 - 15:50 odds → 16:00 report
 - 17:50 odds → 18:00 report
 
+## NFL / NCAAF primary-market coverage
+
+Every scheduled Betting Edge report that includes an NFL or NCAAF game must treat the three standard full-game markets as independent primary candidates whenever an executable market is available:
+
+- spread;
+- moneyline;
+- total.
+
+For each covered football game, each available primary market must be independently handicapped and independently passed through the normal Betting Edge decision gates. The resulting market-level decision is independently `BET`, `LEAN`, `WAIT` or `PASS` under the existing contract/Core rules.
+
+A decision in one market never substitutes for evaluation of another. In particular:
+
+- a moneyline BET/LEAN/WAIT/PASS does not satisfy the spread requirement;
+- a spread BET/LEAN/WAIT/PASS does not satisfy the moneyline requirement;
+- neither side-market decision satisfies the total requirement;
+- discovering or citing an external spread or total during matchup research is not equivalent to handicapping that market through the Betting Edge gate.
+
+The sweep must compare the independently evaluated markets before selecting the report's meaningful cards. A game may therefore produce more than one meaningful card when separate markets independently qualify. The nine-card presentation target remains a presentation target, not a reason to suppress a stronger football market or manufacture filler.
+
+If a normally expected primary football market cannot be evaluated because no executable market is available in the supported feed, the run should preserve that as an availability limitation rather than silently treating another market as its substitute.
+
+This requirement applies to NFL and NCAAF games regardless of which seasonal schedule profile is active. It changes market-coverage completeness only; all existing freshness, identity, personnel, model-error, price, staking, risk, Walters and publication requirements remain authoritative.
+
 ## Canonical History translation
 
 Clock time is profile-specific; canonical slot identity is permanent:
@@ -108,7 +131,8 @@ When the trigger matches, the report must require:
 - `core/core-v1.4-production.json` Core v1.4 OPERATIONAL;
 - Research Library v1.8 / R3 live read-only;
 - current Walters authority mode and exact provenance;
-- the normal freshness, identity, personnel, model-error, price, stake/risk and immutable-history gates.
+- the normal freshness, identity, personnel, model-error, price, stake/risk and immutable-history gates;
+- for NFL/NCAAF, complete independent spread + moneyline + total primary-market evaluation as specified above.
 
 Scheduled report lanes target up to **nine meaningful cards**. Nine is a presentation/review target, not a quota: reports may contain fewer cards and zero BETs, and weak filler must not be manufactured to reach nine.
 
