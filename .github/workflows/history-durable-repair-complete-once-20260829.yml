@@ -146,28 +146,42 @@ jobs:
               }
             }
 
-            if(Date.parse(entry.ts) >= CORE_CUTOFF && sidecar.provenance?.coreFrameworkBlobSha === activeFrameworkBlobSha){
+            if(Date.parse(entry.ts) >= CORE_CUTOFF){
               for(const item of items){
                 const a = item.coreAssessment;
                 if(!a?.context) throw new Error(`${sidecarPath} #${item.ordinal}: missing Core 1.4 assessment context`);
-                const expectedIds = expectedResearchIds(a.context);
-                const normalizedContext = {...a.context,graduatedResearchIds:expectedIds};
-                const actual = evaluate(framework,normalizedContext);
-                const mismatch =
-                  !Array.isArray(a.context.graduatedResearchIds) || !setEqual(new Set(a.context.graduatedResearchIds||[]),new Set(expectedIds)) ||
-                  a.modelErrorState !== actual.modelErrorState ||
-                  a.betEligibleByModelError !== actual.betEligibleByModelError ||
-                  !Array.isArray(a.effects) || !setEqual(new Set(a.effects||[]),new Set(actual.effects)) ||
-                  !Array.isArray(a.appliedRules) || !setEqual(new Set(a.appliedRules||[]),new Set(actual.appliedRules));
-                if(mismatch){
-                  a.context.graduatedResearchIds = expectedIds;
-                  a.modelErrorState = actual.modelErrorState;
-                  a.betEligibleByModelError = actual.betEligibleByModelError;
-                  a.effects = actual.effects;
-                  a.appliedRules = actual.appliedRules;
-                  a.reasons = actual.reasons;
+
+                const w = item.waltersEvidence;
+                const waltersEligible = a.context.sport === 'NFL' && ['spread','moneyline'].includes(a.context.marketClass);
+                if(waltersEligible && w?.availability === 'STALE'){
+                  if(w.applicable !== true || w.originatedCandidate !== false || w.contribution !== 'NONE' || (w.waltersFair !== null && w.waltersFair !== undefined) || !/not current|stale/i.test(String(w.reviewImpact||''))){
+                    throw new Error(`${sidecarPath} #${item.ordinal}: STALE Walters record is not safe to normalize to UNAVAILABLE`);
+                  }
+                  w.availability = 'UNAVAILABLE';
                   changed = true;
-                  repairs.push(`CORE ${entry.ts} #${item.ordinal} ${item.title}`);
+                  repairs.push(`WALTERS ${entry.ts} #${item.ordinal} ${item.title} STALE→UNAVAILABLE`);
+                }
+
+                if(sidecar.provenance?.coreFrameworkBlobSha === activeFrameworkBlobSha){
+                  const expectedIds = expectedResearchIds(a.context);
+                  const normalizedContext = {...a.context,graduatedResearchIds:expectedIds};
+                  const actual = evaluate(framework,normalizedContext);
+                  const mismatch =
+                    !Array.isArray(a.context.graduatedResearchIds) || !setEqual(new Set(a.context.graduatedResearchIds||[]),new Set(expectedIds)) ||
+                    a.modelErrorState !== actual.modelErrorState ||
+                    a.betEligibleByModelError !== actual.betEligibleByModelError ||
+                    !Array.isArray(a.effects) || !setEqual(new Set(a.effects||[]),new Set(actual.effects)) ||
+                    !Array.isArray(a.appliedRules) || !setEqual(new Set(a.appliedRules||[]),new Set(actual.appliedRules));
+                  if(mismatch){
+                    a.context.graduatedResearchIds = expectedIds;
+                    a.modelErrorState = actual.modelErrorState;
+                    a.betEligibleByModelError = actual.betEligibleByModelError;
+                    a.effects = actual.effects;
+                    a.appliedRules = actual.appliedRules;
+                    a.reasons = actual.reasons;
+                    changed = true;
+                    repairs.push(`CORE ${entry.ts} #${item.ordinal} ${item.title}`);
+                  }
                 }
               }
             }
@@ -202,6 +216,7 @@ jobs:
             .github/workflows/history-durable-repair-final-once-20260829.yml \
             .github/workflows/history-sidecar-alignment-audit-once-20260829.yml \
             .github/workflows/history-core14-derived-audit-once-20260829.yml \
+            .github/workflows/history-walters-evidence-audit-once-20260829.yml \
             .github/workflows/history-durable-repair-complete-once-20260829.yml; do
             if [ -e "$file" ]; then git rm -f "$file"; fi
           done
