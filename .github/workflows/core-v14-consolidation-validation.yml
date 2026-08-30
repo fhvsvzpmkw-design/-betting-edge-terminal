@@ -17,6 +17,7 @@ on:
       - 'tools/core-handicap-framework.mjs'
       - 'tools/core-v14-publication-gate.mjs'
       - 'tools/report-sidecar-contract.mjs'
+      - 'tools/selection-continuity.mjs'
       - 'tools/selection-availability.mjs'
       - 'tests/selection-availability.test.mjs'
       - 'tools/spread-lineage.mjs'
@@ -46,6 +47,8 @@ jobs:
         run: node core/tests/walters-interface-v1.4.test.mjs
       - name: Validate report-to-sidecar derivation contract
         run: node tools/report-sidecar-contract.mjs self-test
+      - name: Validate selection-continuity contract
+        run: node tools/selection-continuity.mjs self-test
       - name: Validate tracked non-spread availability contract
         run: node tests/selection-availability.test.mjs
       - name: Validate spread-lineage contract
