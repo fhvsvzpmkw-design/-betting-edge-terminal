@@ -34,8 +34,8 @@ body.hotlineFullscreen{display:block;overflow:hidden}body.hotlineFullscreen .syn
 <button id="fullscreenClose" class="fullscreenClose" type="button" aria-label="Close full screen hotline">CLOSE ×</button>
 <script>
 const MANIFEST='../data/syndicates.json';
-const STORAGE_KEY='bettingEdge.syndicateSlots.v4';
-const FALLBACK_DEFAULTS=['eddie-numbers','lou-vega','vic-fremont',null];
+const STORAGE_KEY='bettingEdge.syndicateSlots.v5';
+const FALLBACK_DEFAULTS=['eddie-numbers','lou-vega','vic-fremont','graham-mercer'];
 const SHARE_ASSET='../assets/syndicates/vigwire-hotline-share.png';
 const TOP_OVERLAY_ID='vigwireHotlineFullscreenOverlay';
 const TOP_STYLE_ID='vigwireHotlineFullscreenOverlayStyle';
@@ -58,8 +58,8 @@ slotName.textContent=`F${slotIndex+1} // SYNDICATE SLOT`;
 function initials(label,index){const v=String(label||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();return v||String(index+1).padStart(2,'0')}
 function normalizeProfile(p,i){const label=String(p&&(p.name||p.label)||`PROFILE ${i+1}`);return{id:String(p&&p.id||`profile-${i+1}`),label,subtitle:String(p&&(p.title||p.subtitle||p.tagline)||'PRIVATE WIRE'),status:String(p&&p.status||'LIVE'),enabled:Boolean(p&&p.enabled!==false&&p.url),url:p&&p.url?String(p.url):null,avatar:String(p&&(p.fallback||p.avatar||p.initials)||initials(label,i)),avatarUrl:p&&(p.headshot||p.avatarUrl)?String(p.headshot||p.avatarUrl):null,avatarAlt:String(p&&(p.headshotAlt||p.avatarAlt)||`${label} headshot`),avatarPosition:String(p&&(p.headshotPosition||p.avatarPosition)||'50% 32%'),accent:String(p&&p.accent||'#c9a43b')}}
 function normalizedDefaults(raw){const source=Array.isArray(raw&&raw.defaults)&&raw.defaults.length===4?raw.defaults:FALLBACK_DEFAULTS;return source.map(v=>v==null?null:String(v))}
-function loadAssignments(defaults){try{const raw=JSON.parse(localStorage.getItem(STORAGE_KEY));if(Array.isArray(raw)&&raw.length===4)return raw.map(v=>v==null?null:String(v))}catch(e){}return defaults.slice()}
-function saveAssignments(a){localStorage.setItem(STORAGE_KEY,JSON.stringify(a))}
+function loadAssignments(defaults){try{const raw=JSON.parse(sessionStorage.getItem(STORAGE_KEY));if(Array.isArray(raw)&&raw.length===4)return raw.map(v=>v==null?null:String(v))}catch(e){}return defaults.slice()}
+function saveAssignments(a){sessionStorage.setItem(STORAGE_KEY,JSON.stringify(a))}
 function resolveProjectUrl(path){return new URL(path,new URL('../',location.href)).href}
 function emptyProfile(index){return{id:null,label:`EMPTY ${index+1}`,subtitle:'SLOT AVAILABLE',status:'OPEN',enabled:false,url:null,avatar:String(index+1).padStart(2,'0'),avatarUrl:null,avatarAlt:'Empty syndicate slot',avatarPosition:'50% 32%',accent:'#53636b'}}
 function updateLoadedCount(){loadedCount.textContent=`${assignments.filter(Boolean).length} / 4`}
