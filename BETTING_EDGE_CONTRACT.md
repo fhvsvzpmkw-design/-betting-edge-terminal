@@ -10,6 +10,7 @@
 **Production filename:** `BETTING_EDGE_CONTRACT.md`  
 **Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.4  
 **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`
+**Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  
 
 > **THIS FILE IS OPERATIONAL.**
 >
@@ -540,3 +541,77 @@ Any future contract version requires explicit change control, regression/equival
 Betting Edge governance version **1.0 is operational** on the authoritative `main` branch.
 
 This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, the repository-controlled report-card target and the operational two-stage personnel-information process—including sport-wide Stage 2 source depth, exact-wager dependency validation, source-conflict handling, decision sensitivity and explicit re-handicapping—remain governed behavior.
+
+---
+
+# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership
+
+**Status:** OPERATIONAL CLARIFICATION WITHIN CONTRACT v1.0.  
+**Effective:** 2026-08-30, America/Vancouver.  
+**Version effect:** Governance Contract remains `1.0`; Core remains `1.4`.
+
+This amendment governs production publication after its effective date and **supersedes any conflicting earlier wording in Sections 8.4, 8.8 and 11**, including the former assumption that a scheduled ChatGPT task may first write permanent History and only afterward discover a durable-history verification failure, or that a failed publication may be presented as an issued report through `HISTORY SAVE FAILED — REPORT VALID` / long-link fallback behavior.
+
+## 15.1 Candidate / issuance boundary
+
+A scheduled ChatGPT Betting Edge lane is a **candidate producer only**. Completing handicapping, report construction or schema-3 sidecar construction does not by itself create an issued report.
+
+After all normal analysis and payload gates, the task must freeze the complete report candidate and matching schema-3 sidecar. It may then write only the repository-controlled staging bundle used by the production staged-publication workflow. It must not directly create, update, delete, repair or index:
+
+- `data/history/runs/**`;
+- `data/history/research-fit/**`;
+- `run-history.json`.
+
+A pre-publication serialized/long payload may exist as diagnostic or recovery transport, but it does not confer issuance authority and must not be presented as a successfully issued scheduled report when staged publication is blocked or pending.
+
+## 15.2 Publisher ownership and fail-closed validation
+
+The repository-controlled production publisher alone owns permanent Betting Edge History. Before any new candidate enters permanent History it must require clean existing durable history and validate the frozen candidate through the current production gates, including as applicable:
+
+1. Core 1.4 schema and controlled-value validation;
+2. framework recomputation of `modelErrorState`, `betEligibleByModelError`, `effects`, `appliedRules` and `reasons`;
+3. report/sidecar recommendation consistency and required WAIT qualification;
+4. current Walters authority/provenance requirements;
+5. same-day tracked-selection continuity;
+6. tracked non-spread availability;
+7. spread-lineage reconciliation;
+8. ordinary report-publication integrity and path/index invariants.
+
+The publisher may accept the frozen candidate unchanged or reject it fail-closed. Publication validation may not silently repair, reinterpret or mutate the candidate merely to make a gate pass.
+
+A candidate that fails a required publication gate is **not an issued report** and must not be written into permanent History. Surface:
+
+`PUBLICATION BLOCKED — CANDIDATE NOT STORED`
+
+If the candidate has been staged but publication has not completed by the scheduled task's end, surface:
+
+`PUBLICATION PENDING — CANDIDATE STAGED`
+
+Neither state authorizes a compact short link, a claim of durable storage, or presentation of the candidate as issued History.
+
+## 15.3 Atomic durable issuance and read-back
+
+Only after all required publication gates pass may the publisher atomically write the exact frozen report payload, matching schema-3 sidecar and complete updated `run-history.json` without overwriting prior issued evidence.
+
+The publisher must then fetch authoritative `main` again and remotely read back/verify the exact report, sidecar and History index. **Successful durable read-back is the issuance boundary.** Only then does the candidate become a durable issued Betting Edge report and only then may the deterministic compact `r.html?id=` link be released as the normal scheduled-report share link.
+
+A publication failure must not trigger a fresh odds pull, a rerun of the handicap, a replacement recommendation set, mutation of the frozen candidate, or blockage of the next independently scheduled lane.
+
+## 15.4 Intentionally unchanged
+
+This amendment changes publication ownership and failure semantics only. It does **not** change:
+
+- the five standard production report lanes: `06:00`, `08:00`, `09:30`, `15:15`, `18:15` America/Vancouver;
+- Bet365 / DraftKings execution-book authority;
+- the 75-minute feed-freshness gate;
+- the 30-minute executable-quote-freshness gate;
+- handicap or fair-value methodology;
+- BET / LEAN / WAIT / PASS semantics;
+- Core 1.4 version or model-error framework;
+- Research Library v1.8 authority;
+- Walters runtime authority model;
+- staking, exposure or risk tolerance;
+- odds-refresh cadence or API request budget;
+- immutable treatment of reports that were already validly issued before this amendment.
+
+**Reason for amendment:** post-cutover scheduled runs demonstrated that newly generated sidecar metadata could be written into durable History before exact production recomputation exposed defects such as unsupported controlled values, missing required WAIT qualification or recorded model-error state inconsistent with the current framework. This amendment makes the already-deployed fail-closed staged publisher the formal Contract v1.0 governance boundary so those defects are rejected before permanent issuance rather than discovered after storage.
