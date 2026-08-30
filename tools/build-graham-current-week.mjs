@@ -12,6 +12,7 @@ const LIVE=path.join(ROOT,'data/live-odds.json');
 const OUT=path.join(ROOT,'data/walters/nfl/current-week-terminal.json');
 
 function readJson(file){return JSON.parse(fs.readFileSync(file,'utf8'))}
+function numeric(v){if(v===null||v===undefined||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null}
 function roundHalf(v){return Number.isFinite(v)?Math.round(v*2)/2:null}
 function latestSnapshot(game){const rows=Array.isArray(game?.dailySnapshots)?game.dailySnapshots:[];return rows.slice().sort((a,b)=>Number(a.sequence||0)-Number(b.sequence||0)).at(-1)||null}
 
@@ -27,32 +28,31 @@ const fixtures=observer?.status==='ok'&&Array.isArray(observer.fixtures)?observe
 const games=(numbers.games||[]).map(game=>{
   const awayRating=ratingByAbbr.get(game.away)||null;
   const homeRating=ratingByAbbr.get(game.home)||null;
-  const awayCurrent=Number(awayRating?.currentRating);
-  const homeCurrent=Number(homeRating?.currentRating);
-  const neutralBaseHome=Number.isFinite(awayCurrent)&&Number.isFinite(homeCurrent)?roundHalf(awayCurrent-homeCurrent):null;
-  const awayFpi=Number(awayRating?.externalComparisons?.espnFpi?.rating);
-  const homeFpi=Number(homeRating?.externalComparisons?.espnFpi?.rating);
-  const espnNeutralHome=Number.isFinite(awayFpi)&&Number.isFinite(homeFpi)?roundHalf(awayFpi-homeFpi):null;
+  const awayCurrent=numeric(awayRating?.currentRating);
+  const homeCurrent=numeric(homeRating?.currentRating);
+  const neutralBaseHome=awayCurrent!==null&&homeCurrent!==null?roundHalf(awayCurrent-homeCurrent):null;
+  const awayFpi=numeric(awayRating?.externalComparisons?.espnFpi?.rating);
+  const homeFpi=numeric(homeRating?.externalComparisons?.espnFpi?.rating);
+  const espnNeutralHome=awayFpi!==null&&homeFpi!==null?roundHalf(awayFpi-homeFpi):null;
   const official=latestSnapshot(marketByKey.get(game.gameKey));
   const matched=matchNflFixture(game,fixtures);
   const livePinnacle=matched?extractPinnacleHomeSpread(matched.fixture,observer?.generatedAt):null;
-  const officialPinnacle=Number.isFinite(Number(official?.pinnacleSpreadHome))?Number(official.pinnacleSpreadHome):null;
-  const pinnacleSpreadHome=livePinnacle?.homeSpread??officialPinnacle;
+  const officialPinnacle=numeric(official?.pinnacleSpreadHome);
+  const pinnacleSpreadHome=numeric(livePinnacle?.homeSpread??officialPinnacle);
   const pinnacleObservedAt=livePinnacle?.observedAt??official?.pinnacleObservedAt??null;
-  const pinnacleStatus=Number.isFinite(Number(pinnacleSpreadHome))?'AVAILABLE':official?.pinnacleStatus||'PENDING';
-  const graham=Number(game.grahamFairHome);
-  const priorGraham=Number(game.priorGrahamFairHome);
-  const grahamFairHome=Number.isFinite(graham)?graham:null;
-  const gap=grahamFairHome!==null&&Number.isFinite(Number(pinnacleSpreadHome))?roundHalf(Number(pinnacleSpreadHome)-grahamFairHome):null;
-  const grahamMove=grahamFairHome!==null&&Number.isFinite(priorGraham)?roundHalf(grahamFairHome-priorGraham):null;
-  const pinnacleMove=Number.isFinite(Number(pinnacleSpreadHome))&&Number.isFinite(Number(officialPinnacle))?roundHalf(Number(pinnacleSpreadHome)-officialPinnacle):null;
+  const pinnacleStatus=pinnacleSpreadHome!==null?'AVAILABLE':official?.pinnacleStatus||'PENDING';
+  const grahamFairHome=numeric(game.grahamFairHome);
+  const priorGraham=numeric(game.priorGrahamFairHome);
+  const gap=grahamFairHome!==null&&pinnacleSpreadHome!==null?roundHalf(pinnacleSpreadHome-grahamFairHome):null;
+  const grahamMove=grahamFairHome!==null&&priorGraham!==null?roundHalf(grahamFairHome-priorGraham):null;
+  const pinnacleMove=pinnacleSpreadHome!==null&&officialPinnacle!==null?roundHalf(pinnacleSpreadHome-officialPinnacle):null;
   return {
     gameKey:game.gameKey,away:game.away,home:game.home,startTimePacific:game.startTimePacific,
-    awayRating:Number.isFinite(awayCurrent)?awayCurrent:null,homeRating:Number.isFinite(homeCurrent)?homeCurrent:null,neutralBaseHome,
+    awayRating:awayCurrent,homeRating:homeCurrent,neutralBaseHome,
     espnNeutralHome,
     grahamFairHome,grahamAsOf:game.grahamAsOf||null,numberStatus:game.numberStatus||'PENDING',grahamMove,
     informationStatus:game.informationStatus||'PENDING',researchSummary:game.researchSummary||null,adjustments:Array.isArray(game.adjustments)?game.adjustments:[],
-    pinnacleSpreadHome:Number.isFinite(Number(pinnacleSpreadHome))?Number(pinnacleSpreadHome):null,
+    pinnacleSpreadHome,
     pinnacleObservedAt,pinnacleStatus,pinnacleHomePriceAmerican:livePinnacle?.homePriceAmerican??null,pinnacleAwayPriceAmerican:livePinnacle?.awayPriceAmerican??null,
     pinnacleSelectionMethod:livePinnacle?.selectionMethod??(officialPinnacle!==null?'OFFICIAL_DAILY_SNAPSHOT':null),
     pinnacleFixtureId:matched?.fixture?.fixtureId||null,pinnacleMatchMethod:matched?.matchedBy||null,pinnacleMove,
