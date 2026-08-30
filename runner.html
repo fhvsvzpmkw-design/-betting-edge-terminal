@@ -71,6 +71,14 @@ function setSyndicatePageOpen(d,open){
   }
   d.body.classList.remove('runnerSyndicateLoaded');
 }
+function sortRecommendationCards(d){
+  const live=d.getElementById('runnerLive');if(!live)return;
+  const cards=[...live.children].filter(x=>x.classList&&x.classList.contains('runnerCard'));if(cards.length<2)return;
+  const rank={BET:0,LEAN:1,WAIT:2,PASS:3};
+  const ordered=cards.map((card,index)=>{const status=String(card.querySelector('.callBadge')?.textContent||'PASS').trim().toUpperCase();return{card,index,rank:rank[status]??4}}).sort((a,b)=>a.rank-b.rank||a.index-b.index).map(x=>x.card);
+  if(ordered.every((card,index)=>card===cards[index]))return;
+  ordered.forEach(card=>live.appendChild(card));
+}
 function applyHierarchyPatch(){
   const app=innerAppFrame();let d=null;try{d=app&&app.contentDocument}catch(e){return false}if(!d||!d.head||!d.body)return false;
   d.documentElement.dataset.uiVersion=UI_VERSION;if(d.title!==`VigScope Terminal UI v${UI_VERSION}`)d.title=`VigScope Terminal UI v${UI_VERSION}`;if(app&&app.title!==`VigScope Terminal UI v${UI_VERSION}`)app.title=`VigScope Terminal UI v${UI_VERSION}`;if(core.title!==`VigScope Terminal UI v${UI_VERSION}`)core.title=`VigScope Terminal UI v${UI_VERSION}`;
@@ -120,7 +128,7 @@ function applyHierarchyPatch(){
   const stats=d.querySelector('.stats'),statValues=stats?[...stats.querySelectorAll('.stat b')]:[];if(stats)stats.setAttribute('aria-hidden','true');const titleGroup=top&&top.firstElementChild;let bankroll=d.getElementById('runnerBankrollCompact');if(titleGroup&&!bankroll){bankroll=d.createElement('div');bankroll.id='runnerBankrollCompact';bankroll.setAttribute('aria-label','Current bankroll and new risk');const key=d.createElement('span');key.className='runnerBankrollKey';key.textContent='BANKROLL';const value=d.createElement('b');value.className='runnerBankrollValue';bankroll.append(key,value);titleGroup.appendChild(bankroll)}
   if(bankroll&&!bankroll.querySelector('.runnerNewRiskValue')){bankroll.setAttribute('aria-label','Current bankroll and new risk');const divider=d.createElement('span');divider.className='runnerMetricDivider';divider.setAttribute('aria-hidden','true');const riskKey=d.createElement('span');riskKey.className='runnerNewRiskKey';riskKey.textContent='NEW RISK';const riskValue=d.createElement('b');riskValue.className='runnerNewRiskValue';bankroll.append(divider,riskKey,riskValue)}
   const bankrollValue=bankroll&&bankroll.querySelector('.runnerBankrollValue'),nextBankroll=statValues[0]&&statValues[0].textContent||'$0.00';if(bankrollValue&&bankrollValue.textContent!==nextBankroll)bankrollValue.textContent=nextBankroll;
-  const headerRiskValue=bankroll&&bankroll.querySelector('.runnerNewRiskValue'),nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';if(headerRiskValue&&headerRiskValue.textContent!==nextRisk)headerRiskValue.textContent=nextRisk;d.querySelectorAll('.runnerRiskMini').forEach(x=>x.remove());return true
+  const headerRiskValue=bankroll&&bankroll.querySelector('.runnerNewRiskValue'),nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';if(headerRiskValue&&headerRiskValue.textContent!==nextRisk)headerRiskValue.textContent=nextRisk;d.querySelectorAll('.runnerRiskMini').forEach(x=>x.remove());sortRecommendationCards(d);return true
 }
 function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
 art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});const coreUrl=new URL('./runner-core.html',location.href);for(const [k,v] of new URLSearchParams(location.search))coreUrl.searchParams.set(k,v);coreUrl.searchParams.set('build',String(Date.now()));coreUrl.hash=location.hash;core.src=coreUrl.pathname+coreUrl.search+coreUrl.hash;startWhenVisible();
