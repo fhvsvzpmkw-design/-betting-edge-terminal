@@ -33,15 +33,26 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          import {evaluate, loadProductionFramework, matchCondition} from './tools/core-handicap-framework.mjs';
 
-          const CUTOFF = Date.parse('2026-08-25T15:24:44-07:00');
+          const WAIT_CUTOFF = Date.parse('2026-08-25T15:24:44-07:00');
+          const CORE_CUTOFF = Date.parse('2026-08-25T17:20:00-07:00');
           const MARKET_ONLY = /\b(bet\s*365|draftkings|odds[-\s]?api(?:\.io)?|live[-\s]?odds|sportsbook(?:\s+pair)?|two[-\s]?book|no[-\s]?vig|market consensus|market-derived)\b/i;
           const index = JSON.parse(fs.readFileSync('run-history.json','utf8'));
+          const production = JSON.parse(fs.readFileSync('core/core-v1.4-production.json','utf8'));
+          const framework = loadProductionFramework();
+          const frameworkData = fs.readFileSync(production.modelErrorFramework.path);
+          const activeFrameworkBlobSha = crypto.createHash('sha1').update(Buffer.from(`blob ${frameworkData.length}\0`)).update(frameworkData).digest('hex');
           const changedFiles = new Set();
           const repairs = [];
 
           function nonEmpty(v){ return typeof v === 'string' && v.trim().length > 0; }
           function serialize(original,data){ return JSON.stringify(data,null,2) + (original.endsWith('\n') ? '\n' : ''); }
+          function setEqual(a,b){ return a.size===b.size && [...a].every(v=>b.has(v)); }
+          function expectedResearchIds(context){
+            return [...new Set((framework.graduatedResearchRules||[]).filter(rule=>matchCondition(rule.when,context)).map(rule=>rule.priorId))].sort();
+          }
           function validQualification(q){
             if(!q || typeof q !== 'object' || Array.isArray(q) || q.actionableIfResolved !== true) return false;
             if(!Array.isArray(q.blockers) || !q.blockers.length || q.blockers.some(x=>!nonEmpty(x))) return false;
@@ -90,7 +101,7 @@ jobs:
             const report = JSON.parse(fs.readFileSync(entry.path,'utf8'));
             let changed = false;
 
-            if(Number.isFinite(Date.parse(entry.ts)) && Date.parse(entry.ts) >= CUTOFF){
+            if(Number.isFinite(Date.parse(entry.ts)) && Date.parse(entry.ts) >= WAIT_CUTOFF){
               for(const rec of sidecar.recommendations || []){
                 if(String(rec?.status || '').toUpperCase() === 'WAIT' && !validQualification(rec.waitQualification)){
                   const q = deriveQualification(rec);
@@ -135,6 +146,32 @@ jobs:
               }
             }
 
+            if(Date.parse(entry.ts) >= CORE_CUTOFF && sidecar.provenance?.coreFrameworkBlobSha === activeFrameworkBlobSha){
+              for(const item of items){
+                const a = item.coreAssessment;
+                if(!a?.context) throw new Error(`${sidecarPath} #${item.ordinal}: missing Core 1.4 assessment context`);
+                const expectedIds = expectedResearchIds(a.context);
+                const normalizedContext = {...a.context,graduatedResearchIds:expectedIds};
+                const actual = evaluate(framework,normalizedContext);
+                const mismatch =
+                  !Array.isArray(a.context.graduatedResearchIds) || !setEqual(new Set(a.context.graduatedResearchIds||[]),new Set(expectedIds)) ||
+                  a.modelErrorState !== actual.modelErrorState ||
+                  a.betEligibleByModelError !== actual.betEligibleByModelError ||
+                  !Array.isArray(a.effects) || !setEqual(new Set(a.effects||[]),new Set(actual.effects)) ||
+                  !Array.isArray(a.appliedRules) || !setEqual(new Set(a.appliedRules||[]),new Set(actual.appliedRules));
+                if(mismatch){
+                  a.context.graduatedResearchIds = expectedIds;
+                  a.modelErrorState = actual.modelErrorState;
+                  a.betEligibleByModelError = actual.betEligibleByModelError;
+                  a.effects = actual.effects;
+                  a.appliedRules = actual.appliedRules;
+                  a.reasons = actual.reasons;
+                  changed = true;
+                  repairs.push(`CORE ${entry.ts} #${item.ordinal} ${item.title}`);
+                }
+              }
+            }
+
             if(changed){
               fs.writeFileSync(sidecarPath,serialize(original,sidecar),'utf8');
               changedFiles.add(sidecarPath);
@@ -164,6 +201,7 @@ jobs:
             .github/workflows/history-durable-audit-once-20260829.yml \
             .github/workflows/history-durable-repair-final-once-20260829.yml \
             .github/workflows/history-sidecar-alignment-audit-once-20260829.yml \
+            .github/workflows/history-core14-derived-audit-once-20260829.yml \
             .github/workflows/history-durable-repair-complete-once-20260829.yml; do
             if [ -e "$file" ]; then git rm -f "$file"; fi
           done
