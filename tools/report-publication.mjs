@@ -242,7 +242,7 @@ function validatePersonnelEvidence(evidence,index){
     assert(evidence.personnelState!=='STRONG PROJECTION',`Sidecar recommendation ${index+1} cannot claim STRONG PROJECTION with MATERIAL source conflict`);
   }
 }
-function validateSidecar(sidecar,report,reportPath,{strict=false}={}){
+function validateSidecar(sidecar,report,reportPath,{strict=false,collectRecommendationErrors=false}={}){
   assert(sidecar && typeof sidecar==='object' && !Array.isArray(sidecar),'Sidecar must be a JSON object');
   assert(sidecar.schema===2 || sidecar.schema===3,`Unsupported sidecar schema: ${sidecar.schema}`);
   const ref = sidecar.reportReference;
@@ -277,38 +277,50 @@ function validateSidecar(sidecar,report,reportPath,{strict=false}={}){
     }
 
     assert(sidecar.recommendations.length===report.recs.length,'Sidecar recommendation count does not match report');
+    const recommendationErrors=[];
     for(let i=0;i<report.recs.length;i++){
       const item = sidecar.recommendations[i];
       const rec = report.recs[i];
-      assert(item && typeof item==='object',`Sidecar recommendation ${i+1} is invalid`);
-      assert(item.ordinal===i+1,`Sidecar recommendation ${i+1} has invalid ordinal`);
-      assert(item.title===rec.title,`Sidecar recommendation ${i+1} title does not match report`);
-      assert(item.status===rec.status,`Sidecar recommendation ${i+1} status does not match report`);
-      assert(item.displayText===rec.hist,`Sidecar recommendation ${i+1} displayText does not match report hist`);
-      assert(Array.isArray(item.priorIds),`Sidecar recommendation ${i+1} priorIds must be an array`);
-      assert(Array.isArray(item.synthesisIds),`Sidecar recommendation ${i+1} synthesisIds must be an array`);
-      assert(Array.isArray(item.clusterIds),`Sidecar recommendation ${i+1} clusterIds must be an array`);
-      if(stage2Enforced){
-        assert(typeof item.personnelRequired==='boolean',`Sidecar recommendation ${i+1} personnelRequired must be an explicit boolean after the Stage 2 publication-gate cutover`);
-        const textSignal=materialPersonnelSignal(rec);
-        if(textSignal){
-          assert(item.personnelRequired===true,`Sidecar recommendation ${i+1} cannot mark personnelRequired=false while the issued card signals material personnel dependence`);
+      const validateRecommendation=()=>{
+        assert(item && typeof item==='object',`Sidecar recommendation ${i+1} is invalid`);
+        assert(item.ordinal===i+1,`Sidecar recommendation ${i+1} has invalid ordinal`);
+        assert(item.title===rec.title,`Sidecar recommendation ${i+1} title does not match report`);
+        assert(item.status===rec.status,`Sidecar recommendation ${i+1} status does not match report`);
+        assert(item.displayText===rec.hist,`Sidecar recommendation ${i+1} displayText does not match report hist`);
+        assert(Array.isArray(item.priorIds),`Sidecar recommendation ${i+1} priorIds must be an array`);
+        assert(Array.isArray(item.synthesisIds),`Sidecar recommendation ${i+1} synthesisIds must be an array`);
+        assert(Array.isArray(item.clusterIds),`Sidecar recommendation ${i+1} clusterIds must be an array`);
+        if(stage2Enforced){
+          assert(typeof item.personnelRequired==='boolean',`Sidecar recommendation ${i+1} personnelRequired must be an explicit boolean after the Stage 2 publication-gate cutover`);
+          const textSignal=materialPersonnelSignal(rec);
+          if(textSignal){
+            assert(item.personnelRequired===true,`Sidecar recommendation ${i+1} cannot mark personnelRequired=false while the issued card signals material personnel dependence`);
+          }
+          if(item.personnelEvidence){
+            assert(item.personnelRequired===true,`Sidecar recommendation ${i+1} cannot carry personnelEvidence while personnelRequired=false`);
+          }
+          if(item.personnelRequired){
+            validatePersonnelEvidence(item.personnelEvidence,i);
+          }
         }
-        if(item.personnelEvidence){
-          assert(item.personnelRequired===true,`Sidecar recommendation ${i+1} cannot carry personnelEvidence while personnelRequired=false`);
+        if(waitQualificationEnforced){
+          const status=String(rec.status||'').toUpperCase();
+          if(status==='WAIT'){
+            validateWaitQualification(item.waitQualification,i);
+          }else{
+            assert(!item.waitQualification,`Sidecar recommendation ${i+1} waitQualification is only valid for WAIT status`);
+          }
         }
-        if(item.personnelRequired){
-          validatePersonnelEvidence(item.personnelEvidence,i);
-        }
+      };
+      if(!collectRecommendationErrors){
+        validateRecommendation();
+        continue;
       }
-      if(waitQualificationEnforced){
-        const status=String(rec.status||'').toUpperCase();
-        if(status==='WAIT'){
-          validateWaitQualification(item.waitQualification,i);
-        }else{
-          assert(!item.waitQualification,`Sidecar recommendation ${i+1} waitQualification is only valid for WAIT status`);
-        }
-      }
+      try{validateRecommendation();}
+      catch(error){recommendationErrors.push(`recommendation ${i+1} ${rec?.title||item?.title||'UNKNOWN'}: ${error.message}`);}
+    }
+    if(recommendationErrors.length){
+      die(`Sidecar contains ${recommendationErrors.length} recommendation defect(s):\n- ${recommendationErrors.join('\n- ')}`);
     }
   }
   return sidecar;
@@ -398,66 +410,84 @@ function rel(root,file){return path.relative(root,file).split(path.sep).join('/'
 function verifyIndex(root,{targetTs}={}){
   const {index} = loadIndex(root);
   const ids = new Set(), paths = new Set(), shortIds = new Set();
+  const errors=[];
   let targetFound = !targetTs;
-  for(const entry of index.runs){
-    assert(entry && typeof entry==='object','Index entry must be an object');
-    assert(!ids.has(entry.id),`Duplicate index ID: ${entry.id}`); ids.add(entry.id);
-    assert(!paths.has(entry.path),`Duplicate report path in index: ${entry.path}`); paths.add(entry.path);
-    const reportAbs = path.join(root,entry.path);
-    assert(fs.existsSync(reportAbs),`Indexed report is missing: ${entry.path}`);
-    const report = validateReport(verificationReport(readJson(reportAbs)));
-    const expected = expectedPaths(report);
-    assert(entry.path===expected.reportPath,`Indexed path does not match report timestamp/slot: ${entry.path}`);
-    assert(entry.id===`${report.ts}|${report.slot}`,`Index ID does not match report: ${entry.id}`);
-    assert(entry.date===reportDate(report.ts),`Index date does not match report: ${entry.id}`);
-    assert(entry.slot===report.slot,`Index slot does not match report: ${entry.id}`);
-    assert(entry.label===report.label,`Index label does not match report: ${entry.id}`);
-    assert(entry.ts===report.ts,`Index ts does not match report: ${entry.id}`);
-    assert(entry.feedGeneratedAt===report.feedGeneratedAt,`Index feedGeneratedAt does not match report: ${entry.id}`);
-    assert(entry.bankroll===report.bankroll,`Index bankroll does not match report: ${entry.id}`);
-    assert(entry.risk===report.risk,`Index risk does not match report: ${entry.id}`);
-    assert(countsEqual(entry.counts,report.counts),`Index counts do not match report: ${entry.id}`);
-    assert(entry.recCount===report.recs.length,`Index recCount does not match report: ${entry.id}`);
-    const sid=shortId(report);
-    assert(!shortIds.has(sid),`Duplicate deterministic short ID: ${sid}`); shortIds.add(sid);
+  const capture=(scope,fn)=>{
+    try{return fn();}
+    catch(error){errors.push(`${scope}: ${error.message}`);return undefined;}
+  };
 
-    const strict = Date.parse(report.ts)>=STRICT_BUNDLE_FROM;
-    if(strict) assert(entry.researchFitPath===expected.sidecarPath,`Post-cutover run is missing exact researchFitPath: ${entry.id}`);
-    if(entry.researchFitPath){
-      assert(entry.researchFitPath===expected.sidecarPath,`Sidecar path does not match report timestamp/slot: ${entry.id}`);
-      const sidecarAbs=path.join(root,entry.researchFitPath);
-      assert(fs.existsSync(sidecarAbs),`Indexed sidecar is missing: ${entry.researchFitPath}`);
-      const sidecar=validateSidecar(readJson(sidecarAbs),report,entry.path,{strict});
-      if(sidecar.provenance?.feedBlobSha && entry.feedBlobSha){
-        assert(entry.feedBlobSha===sidecar.provenance.feedBlobSha,`Index feedBlobSha does not match sidecar: ${entry.id}`);
+  for(const [entryIndex,entry] of index.runs.entries()){
+    if(targetTs && entry?.ts===targetTs) targetFound=true;
+    capture(`index[${entryIndex}] ${entry?.id||entry?.path||'UNKNOWN'}`,()=>{
+      assert(entry && typeof entry==='object','Index entry must be an object');
+      assert(!ids.has(entry.id),`Duplicate index ID: ${entry.id}`); ids.add(entry.id);
+      assert(!paths.has(entry.path),`Duplicate report path in index: ${entry.path}`); paths.add(entry.path);
+      const reportAbs = path.join(root,entry.path);
+      assert(fs.existsSync(reportAbs),`Indexed report is missing: ${entry.path}`);
+      const report = validateReport(verificationReport(readJson(reportAbs)));
+      const expected = expectedPaths(report);
+      assert(entry.path===expected.reportPath,`Indexed path does not match report timestamp/slot: ${entry.path}`);
+      assert(entry.id===`${report.ts}|${report.slot}`,`Index ID does not match report: ${entry.id}`);
+      assert(entry.date===reportDate(report.ts),`Index date does not match report: ${entry.id}`);
+      assert(entry.slot===report.slot,`Index slot does not match report: ${entry.id}`);
+      assert(entry.label===report.label,`Index label does not match report: ${entry.id}`);
+      assert(entry.ts===report.ts,`Index ts does not match report: ${entry.id}`);
+      assert(entry.feedGeneratedAt===report.feedGeneratedAt,`Index feedGeneratedAt does not match report: ${entry.id}`);
+      assert(entry.bankroll===report.bankroll,`Index bankroll does not match report: ${entry.id}`);
+      assert(entry.risk===report.risk,`Index risk does not match report: ${entry.id}`);
+      assert(countsEqual(entry.counts,report.counts),`Index counts do not match report: ${entry.id}`);
+      assert(entry.recCount===report.recs.length,`Index recCount does not match report: ${entry.id}`);
+      const sid=shortId(report);
+      assert(!shortIds.has(sid),`Duplicate deterministic short ID: ${sid}`); shortIds.add(sid);
+
+      const strict = Date.parse(report.ts)>=STRICT_BUNDLE_FROM;
+      if(strict) assert(entry.researchFitPath===expected.sidecarPath,`Post-cutover run is missing exact researchFitPath: ${entry.id}`);
+      if(entry.researchFitPath){
+        assert(entry.researchFitPath===expected.sidecarPath,`Sidecar path does not match report timestamp/slot: ${entry.id}`);
+        const sidecarAbs=path.join(root,entry.researchFitPath);
+        assert(fs.existsSync(sidecarAbs),`Indexed sidecar is missing: ${entry.researchFitPath}`);
+        const sidecar=validateSidecar(readJson(sidecarAbs),report,entry.path,{strict,collectRecommendationErrors:true});
+        if(sidecar.provenance?.feedBlobSha && entry.feedBlobSha){
+          assert(entry.feedBlobSha===sidecar.provenance.feedBlobSha,`Index feedBlobSha does not match sidecar: ${entry.id}`);
+        }
+        if(sidecar.provenance?.researchLibraryVersion && entry.researchLibraryVersion){
+          assert(entry.researchLibraryVersion===sidecar.provenance.researchLibraryVersion,`Index researchLibraryVersion does not match sidecar: ${entry.id}`);
+        }
       }
-      if(sidecar.provenance?.researchLibraryVersion && entry.researchLibraryVersion){
-        assert(entry.researchLibraryVersion===sidecar.provenance.researchLibraryVersion,`Index researchLibraryVersion does not match sidecar: ${entry.id}`);
-      }
-    }
-    if(report.ts===targetTs) targetFound=true;
+    });
   }
-  assert(targetFound,`Target report is not indexed: ${targetTs}`);
+  if(!targetFound) errors.push(`target: Target report is not indexed: ${targetTs}`);
 
   const payloadFiles=walkJson(path.join(root,'data/history/runs'));
   for(const file of payloadFiles){
-    const report=validateReport(verificationReport(readJson(file)));
-    const reportPath=rel(root,file);
-    const entry=index.runs.find(item=>item.id===`${report.ts}|${report.slot}`);
-    assert(entry,`Stored issued report is not indexed: ${reportPath}`);
-    assert(entry.path===reportPath,`Stored issued report index path mismatch: ${reportPath}`);
+    capture(`stored report ${rel(root,file)}`,()=>{
+      const report=validateReport(verificationReport(readJson(file)));
+      const reportPath=rel(root,file);
+      const entry=index.runs.find(item=>item.id===`${report.ts}|${report.slot}`);
+      assert(entry,`Stored issued report is not indexed: ${reportPath}`);
+      assert(entry.path===reportPath,`Stored issued report index path mismatch: ${reportPath}`);
+    });
   }
   const sidecarFiles=walkJson(path.join(root,'data/history/research-fit'));
   for(const file of sidecarFiles){
-    const sidecar=readJson(file);
-    const ref=sidecar.reportReference;
-    assert(ref && typeof ref.ts==='string' && typeof ref.slot==='string',`Sidecar has invalid reportReference: ${rel(root,file)}`);
-    const entry=index.runs.find(item=>item.id===`${ref.ts}|${ref.slot}`);
-    assert(entry,`Sidecar has no indexed report: ${rel(root,file)}`);
-    assert(entry.researchFitPath===rel(root,file),`Sidecar is not linked by the matching index entry: ${rel(root,file)}`);
+    capture(`stored sidecar ${rel(root,file)}`,()=>{
+      const sidecar=readJson(file);
+      const ref=sidecar.reportReference;
+      assert(ref && typeof ref.ts==='string' && typeof ref.slot==='string',`Sidecar has invalid reportReference: ${rel(root,file)}`);
+      const entry=index.runs.find(item=>item.id===`${ref.ts}|${ref.slot}`);
+      assert(entry,`Sidecar has no indexed report: ${rel(root,file)}`);
+      assert(entry.researchFitPath===rel(root,file),`Sidecar is not linked by the matching index entry: ${rel(root,file)}`);
+    });
   }
-  const newest=index.runs.reduce((max,entry)=>String(entry.ts)>max?String(entry.ts):max,'');
-  assert(index.updated_at===newest,`run-history.json updated_at=${index.updated_at} does not match newest run=${newest}`);
+  capture('run-history updated_at',()=>{
+    const newest=index.runs.reduce((max,entry)=>String(entry.ts)>max?String(entry.ts):max,'');
+    assert(index.updated_at===newest,`run-history.json updated_at=${index.updated_at} does not match newest run=${newest}`);
+  });
+
+  if(errors.length){
+    die(`REPORT HISTORY VERIFY FOUND ${errors.length} defect(s):\n- ${errors.join('\n- ')}`);
+  }
   console.log(`REPORT HISTORY VERIFY OK ${index.runs.length} runs${targetTs?` target=${targetTs}`:''}`);
 }
 

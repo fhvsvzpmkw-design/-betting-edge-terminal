@@ -179,7 +179,7 @@ function validateProvenance(runtime,provenance,{compareCurrent}){
   }
 }
 
-function validateBundle(runtime,report,sidecar,{compareCurrent=true,recompute=true}={}){
+function validateBundle(runtime,report,sidecar,{compareCurrent=true,recompute=true,collectRecommendationErrors=false}={}){
   const reportMs=Date.parse(report?.ts);
   assert(Number.isFinite(reportMs),'Report ts must be valid');
   if(reportMs<CORE_V14_FROM) return {core14:false};
@@ -187,12 +187,24 @@ function validateBundle(runtime,report,sidecar,{compareCurrent=true,recompute=tr
   validateProvenance(runtime,sidecar.provenance,{compareCurrent});
   assert(Array.isArray(report.recs)&&Array.isArray(sidecar.recommendations),'Core 1.4 report/sidecar recommendations are required');
   assert(report.recs.length===sidecar.recommendations.length,'Core 1.4 sidecar recommendation count mismatch');
+  const recommendationErrors=[];
   for(let i=0;i<report.recs.length;i++){
     const rec={...report.recs[i],__reportTs:report.ts};
     const item=sidecar.recommendations[i];
-    assert(String(item?.status||'').toUpperCase()===String(rec?.status||'').toUpperCase(),`Recommendation ${i+1} status mismatch between report and sidecar`);
-    validateCoreAssessment(runtime,item.coreAssessment,rec,i,{recompute});
-    validateWaltersEvidence(runtime,item.waltersEvidence,item.coreAssessment,rec,i,sidecar.provenance.waltersMode);
+    const validateRecommendation=()=>{
+      assert(String(item?.status||'').toUpperCase()===String(rec?.status||'').toUpperCase(),`Recommendation ${i+1} status mismatch between report and sidecar`);
+      validateCoreAssessment(runtime,item.coreAssessment,rec,i,{recompute});
+      validateWaltersEvidence(runtime,item.waltersEvidence,item.coreAssessment,rec,i,sidecar.provenance.waltersMode);
+    };
+    if(!collectRecommendationErrors){
+      validateRecommendation();
+      continue;
+    }
+    try{validateRecommendation();}
+    catch(error){recommendationErrors.push(`recommendation ${i+1} ${rec?.title||'UNKNOWN'}: ${error.message}`);}
+  }
+  if(recommendationErrors.length){
+    fail(`Core 1.4 bundle contains ${recommendationErrors.length} recommendation defect(s):\n- ${recommendationErrors.join('\n- ')}`);
   }
   return {core14:true};
 }
@@ -253,15 +265,23 @@ function selfTest(root){
 function verifyHistory(root){
   const runtime=loadRuntime(root);
   const index=readJson(path.join(root,'run-history.json'));
+  const errors=[];
   let checked=0;
-  for(const entry of index.runs||[]){
+  for(const [entryIndex,entry] of (index.runs||[]).entries()){
     if(Date.parse(entry.ts)<CORE_V14_FROM) continue;
-    const report=readJson(path.join(root,entry.path));
-    assert(entry.researchFitPath,`Core 1.4 indexed report is missing sidecar ${entry.id}`);
-    const sidecar=readJson(path.join(root,entry.researchFitPath));
-    const currentFramework=sidecar.provenance?.coreFrameworkBlobSha===gitBlobSha(runtime.frameworkFile);
-    validateBundle(runtime,report,sidecar,{compareCurrent:false,recompute:currentFramework});
-    checked++;
+    try{
+      const report=readJson(path.join(root,entry.path));
+      assert(entry.researchFitPath,`Core 1.4 indexed report is missing sidecar ${entry.id}`);
+      const sidecar=readJson(path.join(root,entry.researchFitPath));
+      const currentFramework=sidecar.provenance?.coreFrameworkBlobSha===gitBlobSha(runtime.frameworkFile);
+      validateBundle(runtime,report,sidecar,{compareCurrent:false,recompute:currentFramework,collectRecommendationErrors:true});
+      checked++;
+    }catch(error){
+      errors.push(`index[${entryIndex}] ${entry?.id||entry?.ts||'UNKNOWN'}: ${error.message}`);
+    }
+  }
+  if(errors.length){
+    fail(`CORE 1.4 HISTORY VERIFY FOUND ${errors.length} bundle defect(s):\n- ${errors.join('\n- ')}`);
   }
   console.log(`CORE 1.4 HISTORY VERIFY OK ${checked} post-cutover bundles`);
 }
