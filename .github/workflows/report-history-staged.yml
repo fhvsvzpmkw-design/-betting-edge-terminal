@@ -1,12 +1,15 @@
 name: Report history staged publication
 # Fail-closed production publication for ChatGPT scheduled runs.
 # Scheduled tasks may write only the staging bundle; this workflow alone mutates durable History.
+# Manual dispatch or a publisher-workflow change may replay the exact preserved staging bundle.
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - data/history/staging/report-bundle.json
+      - .github/workflows/report-history-staged.yml
 
 concurrency:
   group: betting-edge-report-history
