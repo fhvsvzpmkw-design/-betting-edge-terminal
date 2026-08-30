@@ -11,4 +11,7 @@ assert(src.includes("close.className='vigwireHotlineTopClose'"),'top-level close
 assert(src.includes("share.className='vigwireHotlineTopShare'"),'top-level share control missing');
 const overlayCss=(src.match(/function ensureTopOverlayStyle\(d\)\{[\s\S]*?\nfunction closeTopFullscreen/)||[''])[0];
 assert(overlayCss&&!overlayCss.includes('100vh'),'top-level Hotline overlay must not use 100vh');
+assert(src.includes('body.hotlineFullscreen .frame{width:100%;height:100%}'),'fallback Hotline iframe must use container height');
+const fallback=(src.match(/function ensureParentFullscreenStyle\(\)\{[\s\S]*?\nfunction enterFullscreen/)||[''])[0];
+assert(fallback&&!fallback.includes('100vh'),'fallback parent fullscreen path must not force viewport height');
 console.log('HOTLINE FULLSCREEN STRUCTURE: PASS');
