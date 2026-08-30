@@ -1,0 +1,181 @@
+name: Report history staged publication
+# Fail-closed production publication for ChatGPT scheduled runs.
+# Scheduled tasks may write only the staging bundle; this workflow alone mutates durable History.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/history/staging/report-bundle.json
+
+concurrency:
+  group: betting-edge-report-history
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require clean durable history before candidate publication
+        run: |
+          node tools/report-publication.mjs verify
+          node tools/core-v14-publication-gate.mjs verify-history
+      - name: Extract staged candidate bundle
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const file = 'data/history/staging/report-bundle.json';
+          const bundle = JSON.parse(fs.readFileSync(file, 'utf8'));
+          if (bundle.schema !== 1) throw new Error('Staging bundle schema must be 1');
+          if (typeof bundle.candidateId !== 'string' || !bundle.candidateId.trim()) throw new Error('Staging candidateId is required');
+          if (typeof bundle.phase !== 'string' || !bundle.phase.trim()) throw new Error('Staging phase is required');
+          if (!bundle.report || typeof bundle.report !== 'object' || Array.isArray(bundle.report)) throw new Error('Staging report object is required');
+          if (!bundle.sidecar || typeof bundle.sidecar !== 'object' || Array.isArray(bundle.sidecar)) throw new Error('Staging sidecar object is required');
+          if (bundle.sidecar.schema !== 3) throw new Error('Staging sidecar schema must be 3');
+          if (!bundle.report.ts || !Number.isFinite(Date.parse(bundle.report.ts))) throw new Error('Staging report.ts must be a valid timestamp');
+          fs.writeFileSync('/tmp/report.json', JSON.stringify(bundle.report, null, 2) + '\n');
+          fs.writeFileSync('/tmp/sidecar.json', JSON.stringify(bundle.sidecar, null, 2) + '\n');
+          NODE
+      - name: Enforce Core 1.4 production handicap and Walters authority
+        run: node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Guard tracked selection continuity
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('/tmp/report.json', 'utf8'));
+          const index = JSON.parse(fs.readFileSync('run-history.json', 'utf8'));
+          const reportMs = Date.parse(report.ts);
+          const day = String(report.ts || '').slice(0, 10);
+          const prior = (index.runs || [])
+            .filter(entry => String(entry.ts || '').slice(0, 10) === day && Date.parse(entry.ts) < reportMs && entry.path)
+            .sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0];
+          if (!prior) {
+            console.log('SELECTION CONTINUITY OK: no prior same-day report');
+            process.exit(0);
+          }
+          const previous = JSON.parse(fs.readFileSync(prior.path, 'utf8'));
+          const currentByKey = new Map((report.recs || []).map(rec => [String(rec?.feed?.selectionKey || '').trim(), rec]).filter(([key]) => key));
+          const currentSpreadByEventSide = new Map((report.recs || [])
+            .filter(rec => String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() === 'spread' && rec?.feed?.eventId && rec?.feed?.side)
+            .map(rec => [`${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`, rec]));
+          const active = new Set(['BET', 'LEAN', 'WAIT']);
+          const resolved = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
+          const missing = [];
+          for (const rec of previous.recs || []) {
+            const priorStatus = String(rec?.status || '').toUpperCase();
+            if (!active.has(priorStatus)) continue;
+            const key = String(rec?.feed?.selectionKey || '').trim();
+            if (!key) continue;
+            const current = currentByKey.get(key);
+            if (current) {
+              const nextStatus = String(current?.status || '').toUpperCase();
+              if (!resolved.has(nextStatus)) {
+                throw new Error(`SELECTION CONTINUITY VIOLATION: tracked selection ${key} must receive a fresh BET/LEAN/WAIT/PASS decision; got ${current?.status}`);
+              }
+              const stake = Number(String(current?.stake ?? '0').replace(/[$,\s]/g, ''));
+              if (nextStatus === 'BET') {
+                if (!(Number.isFinite(stake) && stake > 0)) throw new Error(`SELECTION CONTINUITY VIOLATION: ${key} resolved to BET without positive stake`);
+                if (!String(current?.price || '').trim() || !String(current?.fair || '').trim() || !String(current?.playTo || '').trim()) {
+                  throw new Error(`SELECTION CONTINUITY VIOLATION: ${key} resolved to BET without current price, fair value and playTo`);
+                }
+              } else if (Number.isFinite(stake) && stake !== 0) {
+                throw new Error(`SELECTION CONTINUITY VIOLATION: ${key} resolved to ${nextStatus} with non-zero stake`);
+              }
+              console.log(`SELECTION CONTINUITY RE-EVALUATED: ${key} ${priorStatus} -> ${nextStatus}`);
+              continue;
+            }
+            const eventDate = String(rec?.feed?.eventDate || '').trim();
+            const eventMs = Date.parse(eventDate);
+            if (Number.isFinite(eventMs) && reportMs >= eventMs) continue;
+            const marketKey = String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase();
+            if (marketKey === 'spread' && rec?.feed?.eventId && rec?.feed?.side) {
+              const lineageKey = `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`;
+              const movedSpread = currentSpreadByEventSide.get(lineageKey);
+              if (movedSpread) {
+                console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${key} -> ${String(movedSpread?.feed?.selectionKey || 'NEW LINE')}`);
+                continue;
+              }
+            }
+            missing.push(`${rec.status} ${rec.title} [${key}] event=${eventDate || 'UNKNOWN'}`);
+          }
+          if (missing.length) {
+            throw new Error(`SELECTION CONTINUITY VIOLATION: a tracked BET/LEAN/WAIT vanished before event start. Carry it forward and freshly re-evaluate it as BET/LEAN/WAIT/PASS on the current snapshot; prior status is not sticky and BET is allowed when all current gates pass. A sportsbook dropping the market does not authorize silent omission. Prior=${prior.path}. Missing: ${missing.join('; ')}`);
+          }
+          console.log(`SELECTION CONTINUITY OK: ${prior.path}`);
+          NODE
+      - name: Verify tracked non-spread book availability
+        run: node tools/selection-availability.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Reconcile tracked spread lineage
+        run: node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Validate bundle and derive paths
+        id: bundle
+        run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Commit payload, sidecar and index together
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          published=0
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/report-publication.mjs verify
+            node tools/core-v14-publication-gate.mjs verify-history
+            node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+            git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
+            if git diff --cached --quiet; then
+              echo "Bundle already exists unchanged."
+              published=1
+              break
+            fi
+            git commit -m "history: publish ${REPORT_TS} staged report bundle"
+            if git push origin HEAD:main; then
+              published=1
+              break
+            fi
+            echo "Push raced another repository update; retrying from current main."
+          done
+          test "$published" -eq 1
+      - name: Remote read-back gate
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          node tools/report-publication.mjs verify --ts "$REPORT_TS"
+          node tools/core-v14-publication-gate.mjs verify-history
+      - name: Publication summary
+        env:
+          SHORT_ID: ${{ steps.bundle.outputs.short_id }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          {
+            echo "## Betting Edge staged report published"
+            echo
+            echo "- Short ID: \`$SHORT_ID\`"
+            echo "- Report: \`$REPORT_PATH\`"
+            echo "- Sidecar: \`$SIDECAR_PATH\`"
+            echo "- Index: \`run-history.json\`"
+            echo "- Preflight history: passed"
+            echo "- Core gate: passed"
+            echo "- Read-back: passed"
+            echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
+          } >> "$GITHUB_STEP_SUMMARY"
