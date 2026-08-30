@@ -145,6 +145,13 @@ jobs:
           EVENT_SCHEDULE: seasonal-profile
         run: node /tmp/betting-edge-odds-worker.js
 
+      - name: Observe OddsPapi sharp market
+        if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
+        continue-on-error: true
+        env:
+          ODDSPAPI_API_KEY: ${{ secrets.ODDSPAPI_API_KEY }}
+        run: node tools/oddspapi-observer.mjs
+
       - name: Attach schedule provenance
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
@@ -191,11 +198,18 @@ jobs:
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          # Preserve the exact snapshot that already passed worker validation.
-          # A push collision must never cause another Odds-API pull.
+          # Preserve the exact snapshots that already passed their worker stages.
+          # A push collision must never cause another odds API pull.
           candidate="$(mktemp)"
           cp data/live-odds.json "$candidate"
           candidate_epoch="$(node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); const t=Date.parse(d.generatedAt||""); if(!Number.isFinite(t)) process.exit(2); process.stdout.write(String(t));' "$candidate")"
+
+          observer_candidate="$(mktemp)"
+          have_observer=false
+          if [ -f data/oddspapi-observer.json ]; then
+            cp data/oddspapi-observer.json "$observer_candidate"
+            have_observer=true
+          fi
 
           for attempt in 1 2 3 4; do
             git fetch origin main
@@ -206,7 +220,13 @@ jobs:
             fi
             git reset --hard origin/main
             cp "$candidate" data/live-odds.json
+            if [ "$have_observer" = true ]; then
+              cp "$observer_candidate" data/oddspapi-observer.json
+            fi
             git add -- data/live-odds.json
+            if [ "$have_observer" = true ]; then
+              git add -- data/oddspapi-observer.json
+            fi
             if git diff --cached --quiet; then
               echo "No validated odds changes to publish."
               exit 0
@@ -216,7 +236,7 @@ jobs:
               echo "Validated seasonal-profile odds snapshot published on attempt $attempt."
               exit 0
             fi
-            echo "Publish collision on attempt $attempt; retrying the same validated snapshot."
+            echo "Publish collision on attempt $attempt; retrying the same validated snapshots."
           done
           echo "Validated odds snapshot could not be published after 4 attempts." >&2
           exit 1
@@ -243,6 +263,7 @@ jobs:
             echo "- Featured Vig Scope: \`${{ steps.schedule.outputs.featured_vig_scope }}\`"
             echo "- Gate: \`${{ steps.gate.outputs.reason || 'not-due' }}\`"
             echo "- Crypto fight watch: exact-pair priority inside 30 hours"
+            echo "- OddsPapi observer: observation-only, 25-request reserve protected"
             echo "- Five-pull daily cap: unchanged"
             echo "- Scheduled clock: Cloudflare only"
           } >> "$GITHUB_STEP_SUMMARY"
