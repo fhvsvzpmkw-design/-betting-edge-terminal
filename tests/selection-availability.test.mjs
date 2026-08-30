@@ -26,20 +26,36 @@ const feed = {
 };
 const baseReport = {
   slot: 'final_morning', ts: '2026-08-21T09:36:18-07:00', feedGeneratedAt: feed.generatedAt,
-  recs: [{ status: 'WAIT', title: 'Ernie Clement over 0.5 runs scored', book: 'Bet365', price: '+265 B365 (09:13 PT)', stake: '$0', feed: prior.recs[0].feed }]
+  recs: [{ status: 'WAIT', title: 'Ernie Clement over 0.5 runs scored', book: 'Bet365', price: '+265', stake: '$0', feed: prior.recs[0].feed }]
 };
 
 const quotes = exactBookQuotes(feed, prior.recs[0]);
 assert.deepEqual(quotes.map(q => [q.book, q.american]), [['Bet365', '+265']]);
 
+// Canonical representation: book and American price are separate structured fields.
 const correct = auditTrackedAvailability({ previous: prior, report: baseReport, feed });
 assert.equal(correct.ok, true, correct.violations.join('; '));
+assert.equal(correct.diagnostics[0].representation, 'STRUCTURED_BOOK_PRICE');
+
+// Legacy combined display text remains readable during migration.
+const legacyCorrect = structuredClone(baseReport);
+delete legacyCorrect.recs[0].book;
+legacyCorrect.recs[0].price = '+265 B365 (09:13 PT)';
+const legacy = auditTrackedAvailability({ previous: prior, report: legacyCorrect, feed });
+assert.equal(legacy.ok, true, legacy.violations.join('; '));
+assert.equal(legacy.diagnostics[0].representation, 'LEGACY_PRICE_TEXT');
 
 const falseUnavailable = structuredClone(baseReport);
 falseUnavailable.recs[0].price = 'MARKET UNAVAILABLE';
 const missingFresh = auditTrackedAvailability({ previous: prior, report: falseUnavailable, feed });
 assert.equal(missingFresh.ok, false);
-assert.match(missingFresh.violations.join(' '), /Bet365 \+265 exists/i);
+assert.match(missingFresh.violations.join(' '), /fresh exact supported-book quote exists/i);
+
+const wrongPrice = structuredClone(baseReport);
+wrongPrice.recs[0].price = '+260';
+const mismatchedPrice = auditTrackedAvailability({ previous: prior, report: wrongPrice, feed });
+assert.equal(mismatchedPrice.ok, false);
+assert.match(mismatchedPrice.violations.join(' '), /does not match bound fresh exact Bet365 \+265/i);
 
 const ghostDraftKings = structuredClone(baseReport);
 ghostDraftKings.recs[0].price = '+265 B365 (09:13 PT); +196 DK (09:16 PT)';
@@ -60,9 +76,37 @@ const mlFeed = {
   }}]
 };
 const mlReport = {
-  ts: '2026-08-21T09:36:18-07:00', recs: [{ status: 'WAIT', title: 'Toronto Blue Jays moneyline', price: '+205 B365; +179 DK', stake: '$0', feed: mlPrior.recs[0].feed }]
+  ts: '2026-08-21T09:36:18-07:00', recs: [{ status: 'WAIT', title: 'Toronto Blue Jays moneyline', book: 'Bet365', price: '+205', stake: '$0', feed: mlPrior.recs[0].feed }]
 };
 const mlAudit = auditTrackedAvailability({ previous: mlPrior, report: mlReport, feed: mlFeed });
-assert.equal(mlAudit.ok, true, mlAudit.violations.join('; '));
+assert.equal(mlAudit.ok, true, mlAudit.violations.join('; '), 'a structured primary execution quote does not need every fresh secondary book embedded in price text');
+
+const wrongBookPrice = structuredClone(mlReport);
+wrongBookPrice.recs[0].book = 'DraftKings';
+wrongBookPrice.recs[0].price = '+180';
+const wrongBookAudit = auditTrackedAvailability({ previous: mlPrior, report: wrongBookPrice, feed: mlFeed });
+assert.equal(wrongBookAudit.ok, false);
+assert.match(wrongBookAudit.violations.join(' '), /DraftKings \+180 does not match bound fresh exact DraftKings \+179/i);
+
+// Regression fixture for the 2026-08-30 09:30 Chicago White Sox failure.
+const whiteSoxKey = '63301819|ml|away||';
+const whiteSoxPrior = {
+  recs: [{
+    status: 'LEAN', title: 'Chicago White Sox moneyline',
+    feed: { eventId: '63301819', marketKey: 'ml', market: 'ML', side: 'away', selectionKey: whiteSoxKey, eventDate: '2026-08-30T18:10:00Z' }
+  }]
+};
+const whiteSoxFeed = {
+  generatedAt: '2026-08-30T16:23:28.232Z', events: [{ id: '63301819', bookmakers: {
+    Bet365: [{ name: 'ML', marketKey: 'ml', updatedAt: '2026-08-30T16:21:00.000Z', odds: [{ home: '1.80', away: '2.05', selectionKeys: { home: '63301819|ml|home||', away: whiteSoxKey } }] }]
+  }}]
+};
+const whiteSoxReport = {
+  ts: '2026-08-30T09:38:30-07:00', recs: [{
+    status: 'LEAN', title: 'Chicago White Sox moneyline', book: 'Bet365', price: '+105', stake: '$0', feed: whiteSoxPrior.recs[0].feed
+  }]
+};
+const whiteSoxAudit = auditTrackedAvailability({ previous: whiteSoxPrior, report: whiteSoxReport, feed: whiteSoxFeed });
+assert.equal(whiteSoxAudit.ok, true, whiteSoxAudit.violations.join('; '));
 
 console.log('SELECTION AVAILABILITY TEST OK');
