@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import {matchNflFixture,extractPinnacleHomeSpread} from './graham-market-utils.mjs';
+import {matchNflFixture,extractPinnacleHomeSpread,extractPinnacleMoneyline} from './graham-market-utils.mjs';
 
 const ROOT=process.cwd();
 const NUMBERS=path.join(ROOT,'data/walters/nfl/2026/week-01-current-numbers.json');
@@ -37,15 +37,20 @@ const games=(numbers.games||[]).map(game=>{
   const official=latestSnapshot(marketByKey.get(game.gameKey));
   const matched=matchNflFixture(game,fixtures);
   const livePinnacle=matched?extractPinnacleHomeSpread(matched.fixture,observer?.generatedAt):null;
+  const liveMoneyline=matched?extractPinnacleMoneyline(matched.fixture,observer?.generatedAt):null;
   const officialPinnacle=numeric(official?.pinnacleSpreadHome);
   const pinnacleSpreadHome=numeric(livePinnacle?.homeSpread??officialPinnacle);
   const pinnacleObservedAt=livePinnacle?.observedAt??official?.pinnacleObservedAt??null;
   const pinnacleStatus=pinnacleSpreadHome!==null?'AVAILABLE':official?.pinnacleStatus||'PENDING';
+  const pinnacleHomeMoneylineAmerican=numeric(liveMoneyline?.homeMoneylineAmerican);
+  const pinnacleAwayMoneylineAmerican=numeric(liveMoneyline?.awayMoneylineAmerican);
+  const pinnacleMoneylineStatus=pinnacleHomeMoneylineAmerican!==null&&pinnacleAwayMoneylineAmerican!==null?'AVAILABLE':'PENDING';
   const grahamFairHome=numeric(game.grahamFairHome);
   const priorGraham=numeric(game.priorGrahamFairHome);
   const gap=grahamFairHome!==null&&pinnacleSpreadHome!==null?roundHalf(pinnacleSpreadHome-grahamFairHome):null;
   const grahamMove=grahamFairHome!==null&&priorGraham!==null?roundHalf(grahamFairHome-priorGraham):null;
   const pinnacleMove=pinnacleSpreadHome!==null&&officialPinnacle!==null?roundHalf(pinnacleSpreadHome-officialPinnacle):null;
+  const moneylineSelectorStatus=grahamFairHome===null?'FAIR_LINE_PENDING':pinnacleMoneylineStatus!=='AVAILABLE'?'MARKET_PENDING':'MARKET_READY_AWAITING_SPREAD_QUALIFICATION';
   return {
     gameKey:game.gameKey,away:game.away,home:game.home,startTimePacific:game.startTimePacific,
     awayRating:awayCurrent,homeRating:homeCurrent,neutralBaseHome,
@@ -56,6 +61,12 @@ const games=(numbers.games||[]).map(game=>{
     pinnacleObservedAt,pinnacleStatus,pinnacleHomePriceAmerican:livePinnacle?.homePriceAmerican??null,pinnacleAwayPriceAmerican:livePinnacle?.awayPriceAmerican??null,
     pinnacleSelectionMethod:livePinnacle?.selectionMethod??(officialPinnacle!==null?'OFFICIAL_DAILY_SNAPSHOT':null),
     pinnacleFixtureId:matched?.fixture?.fixtureId||null,pinnacleMatchMethod:matched?.matchedBy||null,pinnacleMove,
+    pinnacleHomeMoneylineAmerican,pinnacleAwayMoneylineAmerican,
+    pinnacleMoneylineObservedAt:liveMoneyline?.observedAt??null,pinnacleMoneylineStatus,
+    pinnacleMoneylineMarketId:liveMoneyline?.marketId??null,pinnacleMoneylineBookmakerMarketId:liveMoneyline?.bookmakerMarketId??null,
+    pinnacleMoneylineHomeLimit:liveMoneyline?.homeLimit??null,pinnacleMoneylineAwayLimit:liveMoneyline?.awayLimit??null,
+    pinnacleMoneylineSelectionMethod:liveMoneyline?.selectionMethod??null,
+    moneylineSelectorStatus,
     grahamHomeStrengthGap:gap,
     officialDailySequence:official?.sequence??null,officialDailyCapturedAt:official?.capturedAt??null
   };
@@ -67,11 +78,12 @@ const out={
   lastResearchAt:numbers.lastResearchAt||null,marketObservedAt:observer?.generatedAt||null,
   sourceScheduleMeta:live?.scheduleMeta||null,
   displayPolicy:{mode:'CURRENT_WEEK_TERMINAL',marketIsolation:true,pinnacleRole:'SHARP_MARKET_BENCHMARK_ONLY',bettingAuthority:false,rawOutput:true},
-  signConvention:{spreadHome:'Negative = home favorite; positive = home underdog.',gap:'Pinnacle home spread minus Graham home fair. Positive = Graham stronger on home; negative = Graham stronger on away.'},
+  moneylinePolicy:{method:'WALTERS_PAGES_270_272_WAGER_FORM_SELECTOR',standaloneGrahamFairMoneyline:false,role:'EXECUTION_FORM_COMPARISON_AFTER_SPREAD_QUALIFICATION',bookExactSpreadPriceAmerican:-110,marketCanChangeGrahamFair:false,autoCreatesBet:false},
+  signConvention:{spreadHome:'Negative = home favorite; positive = home underdog.',gap:'Pinnacle home spread minus Graham home fair. Positive = Graham stronger on home; negative = Graham stronger on away.',moneylinePair:'Displayed as away / home American prices.'},
   games,
   ratings:(ratings.teams||[]).map(t=>({abbr:t.abbr,team:t.team,currentRating:t.currentRating,priorRating:t.priorRating,lastDelta:t.lastDelta,lastUpdatedAt:t.lastUpdatedAt,espnFpi:t.externalComparisons?.espnFpi||null}))
 };
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');
 JSON.parse(fs.readFileSync(OUT,'utf8'));
-console.log(`GRAHAM TERMINAL BUILT // WEEK ${out.week} // ${games.length} GAMES // ${games.filter(g=>g.grahamFairHome!==null).length} GRAHAM NUMBERS // ${games.filter(g=>g.pinnacleSpreadHome!==null).length} PINNACLE LINES`);
+console.log(`GRAHAM TERMINAL BUILT // WEEK ${out.week} // ${games.length} GAMES // ${games.filter(g=>g.grahamFairHome!==null).length} GRAHAM NUMBERS // ${games.filter(g=>g.pinnacleSpreadHome!==null).length} PINNACLE LINES // ${games.filter(g=>g.pinnacleMoneylineStatus==='AVAILABLE').length} PINNACLE MONEYLINES`);
