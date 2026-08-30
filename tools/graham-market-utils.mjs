@@ -33,6 +33,7 @@ function parseHandle(handle){
   return null;
 }
 function quoteTime(q){for(const v of [q?.bookmakerChangedAt,q?.changedAt]){const t=Date.parse(v||'');if(Number.isFinite(t))return t}return 0}
+function americanNumber(value){const n=Number(String(value??'').trim().replace(/^\+/,''));return Number.isFinite(n)&&Math.abs(n)>=100?n:null}
 
 export function extractPinnacleHomeSpread(fixture,observerGeneratedAt=null){
   const book=fixture?.pinnacle;
@@ -74,4 +75,52 @@ export function extractPinnacleHomeSpread(fixture,observerGeneratedAt=null){
   }
   candidates.sort((a,b)=>b.limitScore-a.limitScore||a.balanceScore-b.balanceScore||String(a.marketId).localeCompare(String(b.marketId)));
   return candidates[0]||null;
+}
+
+export function extractPinnacleMoneyline(fixture,observerGeneratedAt=null){
+  const book=fixture?.pinnacle;
+  if(!book||book.bookmakerIsActive===false||book.suspended===true)return null;
+  const candidates=[];
+  for(const market of book.markets||[]){
+    if(market?.marketActive===false)continue;
+    const label=String(market?.bookmakerMarketId||'').toLowerCase();
+    if(!label.includes('moneyline'))continue;
+    let home=null,away=null;
+    for(const outcome of market?.outcomes||[]){
+      for(const q of outcome?.players||[]){
+        if(q?.active===false)continue;
+        const side=String(q?.bookmakerOutcomeId||'').trim().toLowerCase();
+        if(side!=='home'&&side!=='away')continue;
+        const priceAmerican=americanNumber(q?.priceAmerican);
+        if(priceAmerican===null)continue;
+        const candidate={...q,priceAmerican};
+        if(side==='home')home=candidate;
+        if(side==='away')away=candidate;
+      }
+    }
+    if(!home||!away)continue;
+    const limits=[Number(home.limit),Number(away.limit)].filter(Number.isFinite);
+    const limitScore=limits.length===2?Math.min(...limits):limits.length===1?limits[0]:-1;
+    const mainLineScore=(home.mainLine===true?1:0)+(away.mainLine===true?1:0);
+    const actualObservedMs=Math.max(quoteTime(home),quoteTime(away),Date.parse(fixture?.updatedAt||'')||0);
+    const observedMs=actualObservedMs||(Date.parse(observerGeneratedAt||'')||0);
+    candidates.push({
+      homeMoneylineAmerican:home.priceAmerican,
+      awayMoneylineAmerican:away.priceAmerican,
+      homeLimit:Number.isFinite(Number(home.limit))?Number(home.limit):null,
+      awayLimit:Number.isFinite(Number(away.limit))?Number(away.limit):null,
+      marketId:String(market?.marketId||''),
+      bookmakerMarketId:market?.bookmakerMarketId||null,
+      observedAt:observedMs?new Date(observedMs).toISOString():observerGeneratedAt,
+      limitScore,
+      mainLineScore,
+      observedMs,
+      selectionMethod:'highest-two-sided-limit_then-mainline_then-freshness'
+    });
+  }
+  candidates.sort((a,b)=>b.limitScore-a.limitScore||b.mainLineScore-a.mainLineScore||b.observedMs-a.observedMs||String(a.marketId).localeCompare(String(b.marketId)));
+  const selected=candidates[0]||null;
+  if(!selected)return null;
+  const {observedMs,...result}=selected;
+  return result;
 }
