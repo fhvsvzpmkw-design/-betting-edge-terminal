@@ -1,5 +1,4 @@
 name: Contract v1.0 staged-publication amendment
-# Existing workflow trigger revision: apply the dated amendment to the authoritative contract.
 
 on:
   push:
@@ -18,107 +17,25 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Apply Contract v1.0 publication-ownership amendment
+      - name: Apply amendment
+        env:
+          AMENDMENT_B64: LS0tCgojIDE1LiBPcGVyYXRpb25hbCBhbWVuZG1lbnQg4oCUIDIwMjYtMDgtMzAg4oCUIGZhaWwtY2xvc2VkIHN0YWdlZCBwdWJsaWNhdGlvbiBvd25lcnNoaXAKCioqU3RhdHVzOioqIE9QRVJBVElPTkFMIENMQVJJRklDQVRJT04gV0lUSElOIENPTlRSQUNUIHYxLjAuICAKKipFZmZlY3RpdmU6KiogMjAyNi0wOC0zMCwgQW1lcmljYS9WYW5jb3V2ZXIuICAKKipWZXJzaW9uIGVmZmVjdDoqKiBHb3Zlcm5hbmNlIENvbnRyYWN0IHJlbWFpbnMgYDEuMGA7IENvcmUgcmVtYWlucyBgMS40YC4KClRoaXMgYW1lbmRtZW50IGdvdmVybnMgcHJvZHVjdGlvbiBwdWJsaWNhdGlvbiBhZnRlciBpdHMgZWZmZWN0aXZlIGRhdGUgYW5kICoqc3VwZXJzZWRlcyBhbnkgY29uZmxpY3RpbmcgZWFybGllciB3b3JkaW5nIGluIFNlY3Rpb25zIDguNCwgOC44IGFuZCAxMSoqLCBpbmNsdWRpbmcgdGhlIGZvcm1lciBhc3N1bXB0aW9uIHRoYXQgYSBzY2hlZHVsZWQgQ2hhdEdQVCB0YXNrIG1heSBmaXJzdCB3cml0ZSBwZXJtYW5lbnQgSGlzdG9yeSBhbmQgb25seSBhZnRlcndhcmQgZGlzY292ZXIgYSBkdXJhYmxlLWhpc3RvcnkgdmVyaWZpY2F0aW9uIGZhaWx1cmUsIG9yIHRoYXQgYSBmYWlsZWQgcHVibGljYXRpb24gbWF5IGJlIHByZXNlbnRlZCBhcyBhbiBpc3N1ZWQgcmVwb3J0IHRocm91Z2ggYEhJU1RPUlkgU0FWRSBGQUlMRUQg4oCUIFJFUE9SVCBWQUxJRGAgLyBsb25nLWxpbmsgZmFsbGJhY2sgYmVoYXZpb3IuCgojIyAxNS4xIENhbmRpZGF0ZSAvIGlzc3VhbmNlIGJvdW5kYXJ5CgpBIHNjaGVkdWxlZCBDaGF0R1BUIEJldHRpbmcgRWRnZSBsYW5lIGlzIGEgKipjYW5kaWRhdGUgcHJvZHVjZXIgb25seSoqLiBDb21wbGV0aW5nIGhhbmRpY2FwcGluZywgcmVwb3J0IGNvbnN0cnVjdGlvbiBvciBzY2hlbWEtMyBzaWRlY2FyIGNvbnN0cnVjdGlvbiBkb2VzIG5vdCBieSBpdHNlbGYgY3JlYXRlIGFuIGlzc3VlZCByZXBvcnQuCgpBZnRlciBhbGwgbm9ybWFsIGFuYWx5c2lzIGFuZCBwYXlsb2FkIGdhdGVzLCB0aGUgdGFzayBtdXN0IGZyZWV6ZSB0aGUgY29tcGxldGUgcmVwb3J0IGNhbmRpZGF0ZSBhbmQgbWF0Y2hpbmcgc2NoZW1hLTMgc2lkZWNhci4gSXQgbWF5IHRoZW4gd3JpdGUgb25seSB0aGUgcmVwb3NpdG9yeS1jb250cm9sbGVkIHN0YWdpbmcgYnVuZGxlIHVzZWQgYnkgdGhlIHByb2R1Y3Rpb24gc3RhZ2VkLXB1YmxpY2F0aW9uIHdvcmtmbG93LiBJdCBtdXN0IG5vdCBkaXJlY3RseSBjcmVhdGUsIHVwZGF0ZSwgZGVsZXRlLCByZXBhaXIgb3IgaW5kZXg6CgotIGBkYXRhL2hpc3RvcnkvcnVucy8qKmA7Ci0gYGRhdGEvaGlzdG9yeS9yZXNlYXJjaC1maXQvKipgOwotIGBydW4taGlzdG9yeS5qc29uYC4KCkEgcHJlLXB1YmxpY2F0aW9uIHNlcmlhbGl6ZWQvbG9uZyBwYXlsb2FkIG1heSBleGlzdCBhcyBkaWFnbm9zdGljIG9yIHJlY292ZXJ5IHRyYW5zcG9ydCwgYnV0IGl0IGRvZXMgbm90IGNvbmZlciBpc3N1YW5jZSBhdXRob3JpdHkgYW5kIG11c3Qgbm90IGJlIHByZXNlbnRlZCBhcyBhIHN1Y2Nlc3NmdWxseSBpc3N1ZWQgc2NoZWR1bGVkIHJlcG9ydCB3aGVuIHN0YWdlZCBwdWJsaWNhdGlvbiBpcyBibG9ja2VkIG9yIHBlbmRpbmcuCgojIyAxNS4yIFB1Ymxpc2hlciBvd25lcnNoaXAgYW5kIGZhaWwtY2xvc2VkIHZhbGlkYXRpb24KClRoZSByZXBvc2l0b3J5LWNvbnRyb2xsZWQgcHJvZHVjdGlvbiBwdWJsaXNoZXIgYWxvbmUgb3ducyBwZXJtYW5lbnQgQmV0dGluZyBFZGdlIEhpc3RvcnkuIEJlZm9yZSBhbnkgbmV3IGNhbmRpZGF0ZSBlbnRlcnMgcGVybWFuZW50IEhpc3RvcnkgaXQgbXVzdCByZXF1aXJlIGNsZWFuIGV4aXN0aW5nIGR1cmFibGUgaGlzdG9yeSBhbmQgdmFsaWRhdGUgdGhlIGZyb3plbiBjYW5kaWRhdGUgdGhyb3VnaCB0aGUgY3VycmVudCBwcm9kdWN0aW9uIGdhdGVzLCBpbmNsdWRpbmcgYXMgYXBwbGljYWJsZToKCjEuIENvcmUgMS40IHNjaGVtYSBhbmQgY29udHJvbGxlZC12YWx1ZSB2YWxpZGF0aW9uOwoyLiBmcmFtZXdvcmsgcmVjb21wdXRhdGlvbiBvZiBgbW9kZWxFcnJvclN0YXRlYCwgYGJldEVsaWdpYmxlQnlNb2RlbEVycm9yYCwgYGVmZmVjdHNgLCBgYXBwbGllZFJ1bGVzYCBhbmQgYHJlYXNvbnNgOwozLiByZXBvcnQvc2lkZWNhciByZWNvbW1lbmRhdGlvbiBjb25zaXN0ZW5jeSBhbmQgcmVxdWlyZWQgV0FJVCBxdWFsaWZpY2F0aW9uOwo0LiBjdXJyZW50IFdhbHRlcnMgYXV0aG9yaXR5L3Byb3ZlbmFuY2UgcmVxdWlyZW1lbnRzOwo1LiBzYW1lLWRheSB0cmFja2VkLXNlbGVjdGlvbiBjb250aW51aXR5Owo2LiB0cmFja2VkIG5vbi1zcHJlYWQgYXZhaWxhYmlsaXR5Owo3LiBzcHJlYWQtbGluZWFnZSByZWNvbmNpbGlhdGlvbjsKOC4gb3JkaW5hcnkgcmVwb3J0LXB1YmxpY2F0aW9uIGludGVncml0eSBhbmQgcGF0aC9pbmRleCBpbnZhcmlhbnRzLgoKVGhlIHB1Ymxpc2hlciBtYXkgYWNjZXB0IHRoZSBmcm96ZW4gY2FuZGlkYXRlIHVuY2hhbmdlZCBvciByZWplY3QgaXQgZmFpbC1jbG9zZWQuIFB1YmxpY2F0aW9uIHZhbGlkYXRpb24gbWF5IG5vdCBzaWxlbnRseSByZXBhaXIsIHJlaW50ZXJwcmV0IG9yIG11dGF0ZSB0aGUgY2FuZGlkYXRlIG1lcmVseSB0byBtYWtlIGEgZ2F0ZSBwYXNzLgoKQSBjYW5kaWRhdGUgdGhhdCBmYWlscyBhIHJlcXVpcmVkIHB1YmxpY2F0aW9uIGdhdGUgaXMgKipub3QgYW4gaXNzdWVkIHJlcG9ydCoqIGFuZCBtdXN0IG5vdCBiZSB3cml0dGVuIGludG8gcGVybWFuZW50IEhpc3RvcnkuIFN1cmZhY2U6CgpgUFVCTElDQVRJT04gQkxPQ0tFRCDigJQgQ0FORElEQVRFIE5PVCBTVE9SRURgCgpJZiB0aGUgY2FuZGlkYXRlIGhhcyBiZWVuIHN0YWdlZCBidXQgcHVibGljYXRpb24gaGFzIG5vdCBjb21wbGV0ZWQgYnkgdGhlIHNjaGVkdWxlZCB0YXNrJ3MgZW5kLCBzdXJmYWNlOgoKYFBVQkxJQ0FUSU9OIFBFTkRJTkcg4oCUIENBTkRJREFURSBTVEFHRURgCgpOZWl0aGVyIHN0YXRlIGF1dGhvcml6ZXMgYSBjb21wYWN0IHNob3J0IGxpbmssIGEgY2xhaW0gb2YgZHVyYWJsZSBzdG9yYWdlLCBvciBwcmVzZW50YXRpb24gb2YgdGhlIGNhbmRpZGF0ZSBhcyBpc3N1ZWQgSGlzdG9yeS4KCiMjIDE1LjMgQXRvbWljIGR1cmFibGUgaXNzdWFuY2UgYW5kIHJlYWQtYmFjawoKT25seSBhZnRlciBhbGwgcmVxdWlyZWQgcHVibGljYXRpb24gZ2F0ZXMgcGFzcyBtYXkgdGhlIHB1Ymxpc2hlciBhdG9taWNhbGx5IHdyaXRlIHRoZSBleGFjdCBmcm96ZW4gcmVwb3J0IHBheWxvYWQsIG1hdGNoaW5nIHNjaGVtYS0zIHNpZGVjYXIgYW5kIGNvbXBsZXRlIHVwZGF0ZWQgYHJ1bi1oaXN0b3J5Lmpzb25gIHdpdGhvdXQgb3ZlcndyaXRpbmcgcHJpb3IgaXNzdWVkIGV2aWRlbmNlLgoKVGhlIHB1Ymxpc2hlciBtdXN0IHRoZW4gZmV0Y2ggYXV0aG9yaXRhdGl2ZSBgbWFpbmAgYWdhaW4gYW5kIHJlbW90ZWx5IHJlYWQgYmFjay92ZXJpZnkgdGhlIGV4YWN0IHJlcG9ydCwgc2lkZWNhciBhbmQgSGlzdG9yeSBpbmRleC4gKipTdWNjZXNzZnVsIGR1cmFibGUgcmVhZC1iYWNrIGlzIHRoZSBpc3N1YW5jZSBib3VuZGFyeS4qKiBPbmx5IHRoZW4gZG9lcyB0aGUgY2FuZGlkYXRlIGJlY29tZSBhIGR1cmFibGUgaXNzdWVkIEJldHRpbmcgRWRnZSByZXBvcnQgYW5kIG9ubHkgdGhlbiBtYXkgdGhlIGRldGVybWluaXN0aWMgY29tcGFjdCBgci5odG1sP2lkPWAgbGluayBiZSByZWxlYXNlZCBhcyB0aGUgbm9ybWFsIHNjaGVkdWxlZC1yZXBvcnQgc2hhcmUgbGluay4KCkEgcHVibGljYXRpb24gZmFpbHVyZSBtdXN0IG5vdCB0cmlnZ2VyIGEgZnJlc2ggb2RkcyBwdWxsLCBhIHJlcnVuIG9mIHRoZSBoYW5kaWNhcCwgYSByZXBsYWNlbWVudCByZWNvbW1lbmRhdGlvbiBzZXQsIG11dGF0aW9uIG9mIHRoZSBmcm96ZW4gY2FuZGlkYXRlLCBvciBibG9ja2FnZSBvZiB0aGUgbmV4dCBpbmRlcGVuZGVudGx5IHNjaGVkdWxlZCBsYW5lLgoKIyMgMTUuNCBJbnRlbnRpb25hbGx5IHVuY2hhbmdlZAoKVGhpcyBhbWVuZG1lbnQgY2hhbmdlcyBwdWJsaWNhdGlvbiBvd25lcnNoaXAgYW5kIGZhaWx1cmUgc2VtYW50aWNzIG9ubHkuIEl0IGRvZXMgKipub3QqKiBjaGFuZ2U6CgotIHRoZSBmaXZlIHN0YW5kYXJkIHByb2R1Y3Rpb24gcmVwb3J0IGxhbmVzOiBgMDY6MDBgLCBgMDg6MDBgLCBgMDk6MzBgLCBgMTU6MTVgLCBgMTg6MTVgIEFtZXJpY2EvVmFuY291dmVyOwotIEJldDM2NSAvIERyYWZ0S2luZ3MgZXhlY3V0aW9uLWJvb2sgYXV0aG9yaXR5OwotIHRoZSA3NS1taW51dGUgZmVlZC1mcmVzaG5lc3MgZ2F0ZTsKLSB0aGUgMzAtbWludXRlIGV4ZWN1dGFibGUtcXVvdGUtZnJlc2huZXNzIGdhdGU7Ci0gaGFuZGljYXAgb3IgZmFpci12YWx1ZSBtZXRob2RvbG9neTsKLSBCRVQgLyBMRUFOIC8gV0FJVCAvIFBBU1Mgc2VtYW50aWNzOwotIENvcmUgMS40IHZlcnNpb24gb3IgbW9kZWwtZXJyb3IgZnJhbWV3b3JrOwotIFJlc2VhcmNoIExpYnJhcnkgdjEuOCBhdXRob3JpdHk7Ci0gV2FsdGVycyBydW50aW1lIGF1dGhvcml0eSBtb2RlbDsKLSBzdGFraW5nLCBleHBvc3VyZSBvciByaXNrIHRvbGVyYW5jZTsKLSBvZGRzLXJlZnJlc2ggY2FkZW5jZSBvciBBUEkgcmVxdWVzdCBidWRnZXQ7Ci0gaW1tdXRhYmxlIHRyZWF0bWVudCBvZiByZXBvcnRzIHRoYXQgd2VyZSBhbHJlYWR5IHZhbGlkbHkgaXNzdWVkIGJlZm9yZSB0aGlzIGFtZW5kbWVudC4KCioqUmVhc29uIGZvciBhbWVuZG1lbnQ6KiogcG9zdC1jdXRvdmVyIHNjaGVkdWxlZCBydW5zIGRlbW9uc3RyYXRlZCB0aGF0IG5ld2x5IGdlbmVyYXRlZCBzaWRlY2FyIG1ldGFkYXRhIGNvdWxkIGJlIHdyaXR0ZW4gaW50byBkdXJhYmxlIEhpc3RvcnkgYmVmb3JlIGV4YWN0IHByb2R1Y3Rpb24gcmVjb21wdXRhdGlvbiBleHBvc2VkIGRlZmVjdHMgc3VjaCBhcyB1bnN1cHBvcnRlZCBjb250cm9sbGVkIHZhbHVlcywgbWlzc2luZyByZXF1aXJlZCBXQUlUIHF1YWxpZmljYXRpb24gb3IgcmVjb3JkZWQgbW9kZWwtZXJyb3Igc3RhdGUgaW5jb25zaXN0ZW50IHdpdGggdGhlIGN1cnJlbnQgZnJhbWV3b3JrLiBUaGlzIGFtZW5kbWVudCBtYWtlcyB0aGUgYWxyZWFkeS1kZXBsb3llZCBmYWlsLWNsb3NlZCBzdGFnZWQgcHVibGlzaGVyIHRoZSBmb3JtYWwgQ29udHJhY3QgdjEuMCBnb3Zlcm5hbmNlIGJvdW5kYXJ5IHNvIHRob3NlIGRlZmVjdHMgYXJlIHJlamVjdGVkIGJlZm9yZSBwZXJtYW5lbnQgaXNzdWFuY2UgcmF0aGVyIHRoYW4gZGlzY292ZXJlZCBhZnRlciBzdG9yYWdlLgo=
         run: |
-          python3 <<'PY'
+          python3 - <<'PY'
+          import base64, os
           from pathlib import Path
-
-          p = Path('BETTING_EDGE_CONTRACT.md')
-          text = p.read_text()
-          marker = '# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership'
-          if marker in text:
-              print('Amendment already present.')
-              raise SystemExit(0)
-
-          header = '**Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`\n'
-          if header not in text:
-              raise SystemExit('Contract header marker not found')
-          text = text.replace(
-              header,
-              header + '**Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  \n',
-              1,
-          )
-
-          amendment = r'''
-
----
-
-# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership
-
-**Status:** OPERATIONAL CLARIFICATION WITHIN CONTRACT v1.0.  
-**Effective:** 2026-08-30, America/Vancouver.  
-**Version effect:** Governance Contract remains `1.0`; Core remains `1.4`.
-
-This amendment governs production publication after its effective date and **supersedes any conflicting earlier wording in Sections 8.4, 8.8 and 11**, including the former assumption that a scheduled ChatGPT task may first write permanent History and only afterward discover a durable-history verification failure, or that a failed publication may be presented as an issued report through `HISTORY SAVE FAILED — REPORT VALID` / long-link fallback behavior.
-
-## 15.1 Candidate / issuance boundary
-
-A scheduled ChatGPT Betting Edge lane is a **candidate producer only**. Completing handicapping, report construction or schema-3 sidecar construction does not by itself create an issued report.
-
-After all normal analysis and payload gates, the task must freeze the complete report candidate and matching schema-3 sidecar. It may then write only the repository-controlled staging bundle used by the production staged-publication workflow. It must not directly create, update, delete, repair or index:
-
-- `data/history/runs/**`;
-- `data/history/research-fit/**`;
-- `run-history.json`.
-
-A pre-publication serialized/long payload may exist as diagnostic or recovery transport, but it does not confer issuance authority and must not be presented as a successfully issued scheduled report when staged publication is blocked or pending.
-
-## 15.2 Publisher ownership and fail-closed validation
-
-The repository-controlled production publisher alone owns permanent Betting Edge History. Before any new candidate enters permanent History it must require clean existing durable history and validate the frozen candidate through the current production gates, including as applicable:
-
-1. Core 1.4 schema and controlled-value validation;
-2. framework recomputation of `modelErrorState`, `betEligibleByModelError`, `effects`, `appliedRules` and `reasons`;
-3. report/sidecar recommendation consistency and required WAIT qualification;
-4. current Walters authority/provenance requirements;
-5. same-day tracked-selection continuity;
-6. tracked non-spread availability;
-7. spread-lineage reconciliation;
-8. ordinary report-publication integrity and path/index invariants.
-
-The publisher may accept the frozen candidate unchanged or reject it fail-closed. Publication validation may not silently repair, reinterpret or mutate the candidate merely to make a gate pass.
-
-A candidate that fails a required publication gate is **not an issued report** and must not be written into permanent History. Surface:
-
-`PUBLICATION BLOCKED — CANDIDATE NOT STORED`
-
-If the candidate has been staged but publication has not completed by the scheduled task's end, surface:
-
-`PUBLICATION PENDING — CANDIDATE STAGED`
-
-Neither state authorizes a compact short link, a claim of durable storage, or presentation of the candidate as issued History.
-
-## 15.3 Atomic durable issuance and read-back
-
-Only after all required publication gates pass may the publisher atomically write the exact frozen report payload, matching schema-3 sidecar and complete updated `run-history.json` without overwriting prior issued evidence.
-
-The publisher must then fetch authoritative `main` again and remotely read back/verify the exact report, sidecar and History index. **Successful durable read-back is the issuance boundary.** Only then does the candidate become a durable issued Betting Edge report and only then may the deterministic compact `r.html?id=` link be released as the normal scheduled-report share link.
-
-A publication failure must not trigger a fresh odds pull, a rerun of the handicap, a replacement recommendation set, mutation of the frozen candidate, or blockage of the next independently scheduled lane.
-
-## 15.4 Intentionally unchanged
-
-This amendment changes publication ownership and failure semantics only. It does **not** change:
-
-- the five standard production report lanes: `06:00`, `08:00`, `09:30`, `15:15`, `18:15` America/Vancouver;
-- Bet365 / DraftKings execution-book authority;
-- the 75-minute feed-freshness gate;
-- the 30-minute executable-quote-freshness gate;
-- handicap or fair-value methodology;
-- BET / LEAN / WAIT / PASS semantics;
-- Core 1.4 version or model-error framework;
-- Research Library v1.8 authority;
-- Walters runtime authority model;
-- staking, exposure or risk tolerance;
-- odds-refresh cadence or API request budget;
-- immutable treatment of reports that were already validly issued before this amendment.
-
-**Reason for amendment:** post-cutover scheduled runs demonstrated that newly generated sidecar metadata could be written into durable History before exact production recomputation exposed defects such as unsupported controlled values, missing required WAIT qualification or recorded model-error state inconsistent with the current framework. This amendment makes the already-deployed fail-closed staged publisher the formal Contract v1.0 governance boundary so those defects are rejected before permanent issuance rather than discovered after storage.
-'''
-
-          p.write_text(text.rstrip() + amendment + '\n')
+          p=Path('BETTING_EDGE_CONTRACT.md')
+          text=p.read_text()
+          marker='# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership'
+          if marker not in text:
+              header='**Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`\n'
+              if header not in text:
+                  raise SystemExit('Contract header marker not found')
+              text=text.replace(header, header+'**Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  \n', 1)
+              amendment=base64.b64decode(os.environ['AMENDMENT_B64']).decode()
+              p.write_text(text.rstrip()+'\n\n'+amendment.rstrip()+'\n')
           PY
-      - name: Verify amendment and unchanged lane times
+      - name: Verify amendment
         run: |
           grep -Fq '# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership' BETTING_EDGE_CONTRACT.md
           grep -Fq 'PUBLICATION BLOCKED — CANDIDATE NOT STORED' BETTING_EDGE_CONTRACT.md
@@ -128,13 +45,10 @@ This amendment changes publication ownership and failure semantics only. It does
           grep -Fq '09:30 FINAL MORNING' BETTING_EDGE_CONTRACT.md
           grep -Fq '15:15 EVENING' BETTING_EDGE_CONTRACT.md
           grep -Fq '18:15 LATE / WEST COAST' BETTING_EDGE_CONTRACT.md
-      - name: Commit authoritative contract amendment
+      - name: Commit amendment
         run: |
           set -euo pipefail
-          if git diff --quiet -- BETTING_EDGE_CONTRACT.md; then
-            echo 'No contract change needed.'
-            exit 0
-          fi
+          if git diff --quiet -- BETTING_EDGE_CONTRACT.md; then exit 0; fi
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add BETTING_EDGE_CONTRACT.md
