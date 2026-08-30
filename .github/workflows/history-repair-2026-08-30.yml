@@ -79,4 +79,12 @@ jobs:
           git add data/history/research-fit/2026-08-30/open-060530.json
           git diff --cached --quiet && exit 0
           git commit -m "history: repair 2026-08-30 open Core metadata"
-          git push origin HEAD:main
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push raced another repository update; retrying."
+          done
+          exit 1
