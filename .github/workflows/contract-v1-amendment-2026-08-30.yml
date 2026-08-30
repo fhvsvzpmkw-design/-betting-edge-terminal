@@ -1,4 +1,5 @@
 name: Contract v1.0 staged-publication amendment
+# Existing workflow trigger revision: apply the dated amendment to the authoritative contract.
 
 on:
   push:
@@ -13,132 +14,121 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Check out main
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-      - name: Apply v1.0 operational amendment
+      - name: Apply Contract v1.0 publication-ownership amendment
         run: |
           python3 <<'PY'
           from pathlib import Path
 
-          path = Path('BETTING_EDGE_CONTRACT.md')
-          text = path.read_text()
-          marker = '**Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  '
+          p = Path('BETTING_EDGE_CONTRACT.md')
+          text = p.read_text()
+          marker = '# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership'
           if marker in text:
-              print('Amendment already present; no content change required.')
+              print('Amendment already present.')
               raise SystemExit(0)
 
-          acceptance = '**Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`\n'
-          if acceptance not in text:
+          header = '**Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`\n'
+          if header not in text:
               raise SystemExit('Contract header marker not found')
-          text = text.replace(acceptance, acceptance + marker + '\n', 1)
+          text = text.replace(
+              header,
+              header + '**Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  \n',
+              1,
+          )
 
-          def replace_section(start, end, replacement):
-              nonlocal_text = None
-              return
+          amendment = r'''
 
-          start = text.index('## 8.4 History failure isolation\n')
-          end = text.index('## 8.5 Odds history authority\n', start)
-          section_84 = '''## 8.4 Candidate / issuance boundary and publication failure isolation
+---
 
-A scheduled ChatGPT lane is a **candidate producer**, not durable-history authority. Completing handicapping and payload construction does not by itself create an issued report.
+# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership
 
-Before durable issuance, the lane must freeze the complete report candidate and matching schema-3 sidecar, then stage that pair only through the repository-controlled staging path. The scheduled lane must not directly create, update, delete, repair or index:
+**Status:** OPERATIONAL CLARIFICATION WITHIN CONTRACT v1.0.  
+**Effective:** 2026-08-30, America/Vancouver.  
+**Version effect:** Governance Contract remains `1.0`; Core remains `1.4`.
+
+This amendment governs production publication after its effective date and **supersedes any conflicting earlier wording in Sections 8.4, 8.8 and 11**, including the former assumption that a scheduled ChatGPT task may first write permanent History and only afterward discover a durable-history verification failure, or that a failed publication may be presented as an issued report through `HISTORY SAVE FAILED — REPORT VALID` / long-link fallback behavior.
+
+## 15.1 Candidate / issuance boundary
+
+A scheduled ChatGPT Betting Edge lane is a **candidate producer only**. Completing handicapping, report construction or schema-3 sidecar construction does not by itself create an issued report.
+
+After all normal analysis and payload gates, the task must freeze the complete report candidate and matching schema-3 sidecar. It may then write only the repository-controlled staging bundle used by the production staged-publication workflow. It must not directly create, update, delete, repair or index:
 
 - `data/history/runs/**`;
 - `data/history/research-fit/**`;
 - `run-history.json`.
 
-The production publisher owns permanent History. Before writing durable History it must require clean existing durable history and validate the frozen candidate through the current production gates, including Core 1.4 controlled-value/recomputation validation, recommendation/sidecar consistency, same-day selection continuity, tracked non-spread availability, spread lineage and normal report-publication integrity.
+A pre-publication serialized/long payload may exist as diagnostic or recovery transport, but it does not confer issuance authority and must not be presented as a successfully issued scheduled report when staged publication is blocked or pending.
 
-A candidate that fails any required publication gate is **not an issued report** and must not be written into permanent History. Surface:
+## 15.2 Publisher ownership and fail-closed validation
+
+The repository-controlled production publisher alone owns permanent Betting Edge History. Before any new candidate enters permanent History it must require clean existing durable history and validate the frozen candidate through the current production gates, including as applicable:
+
+1. Core 1.4 schema and controlled-value validation;
+2. framework recomputation of `modelErrorState`, `betEligibleByModelError`, `effects`, `appliedRules` and `reasons`;
+3. report/sidecar recommendation consistency and required WAIT qualification;
+4. current Walters authority/provenance requirements;
+5. same-day tracked-selection continuity;
+6. tracked non-spread availability;
+7. spread-lineage reconciliation;
+8. ordinary report-publication integrity and path/index invariants.
+
+The publisher may accept the frozen candidate unchanged or reject it fail-closed. Publication validation may not silently repair, reinterpret or mutate the candidate merely to make a gate pass.
+
+A candidate that fails a required publication gate is **not an issued report** and must not be written into permanent History. Surface:
 
 `PUBLICATION BLOCKED — CANDIDATE NOT STORED`
 
-If the candidate has been staged but the owning publication workflow has not completed by the end of the scheduled task, surface:
+If the candidate has been staged but publication has not completed by the scheduled task's end, surface:
 
 `PUBLICATION PENDING — CANDIDATE STAGED`
 
-Do not release a compact short link, claim durable storage, or describe the candidate as issued while publication is blocked or pending.
+Neither state authorizes a compact short link, a claim of durable storage, or presentation of the candidate as issued History.
 
-Publication failure must not trigger a fresh odds pull, a rerun of the handicap, a replacement recommendation set, or mutation of the frozen candidate merely to make a gate pass. A later scheduled lane remains independent and proceeds under its own current preflight and feed.
+## 15.3 Atomic durable issuance and read-back
 
-Only after the publisher atomically writes the exact report payload, matching schema-3 sidecar and updated `run-history.json`, then successfully re-reads and verifies the durable artifacts from `main`, does the candidate become durable issued History.
+Only after all required publication gates pass may the publisher atomically write the exact frozen report payload, matching schema-3 sidecar and complete updated `run-history.json` without overwriting prior issued evidence.
 
+The publisher must then fetch authoritative `main` again and remotely read back/verify the exact report, sidecar and History index. **Successful durable read-back is the issuance boundary.** Only then does the candidate become a durable issued Betting Edge report and only then may the deterministic compact `r.html?id=` link be released as the normal scheduled-report share link.
+
+A publication failure must not trigger a fresh odds pull, a rerun of the handicap, a replacement recommendation set, mutation of the frozen candidate, or blockage of the next independently scheduled lane.
+
+## 15.4 Intentionally unchanged
+
+This amendment changes publication ownership and failure semantics only. It does **not** change:
+
+- the five standard production report lanes: `06:00`, `08:00`, `09:30`, `15:15`, `18:15` America/Vancouver;
+- Bet365 / DraftKings execution-book authority;
+- the 75-minute feed-freshness gate;
+- the 30-minute executable-quote-freshness gate;
+- handicap or fair-value methodology;
+- BET / LEAN / WAIT / PASS semantics;
+- Core 1.4 version or model-error framework;
+- Research Library v1.8 authority;
+- Walters runtime authority model;
+- staking, exposure or risk tolerance;
+- odds-refresh cadence or API request budget;
+- immutable treatment of reports that were already validly issued before this amendment.
+
+**Reason for amendment:** post-cutover scheduled runs demonstrated that newly generated sidecar metadata could be written into durable History before exact production recomputation exposed defects such as unsupported controlled values, missing required WAIT qualification or recorded model-error state inconsistent with the current framework. This amendment makes the already-deployed fail-closed staged publisher the formal Contract v1.0 governance boundary so those defects are rejected before permanent issuance rather than discovered after storage.
 '''
-          text = text[:start] + section_84 + text[end:]
 
-          start = text.index('## 8.8 Long fallback before history dependency\n')
-          end = text.index('## 8.9 Primary compact share link\n', start)
-          section_88 = '''## 8.8 Pre-publication transport is not issuance authority
-
-A self-contained serialized/long payload may be retained as a diagnostic or recovery transport for a frozen candidate, but possession of that payload does not make the candidate an issued Betting Edge report and does not bypass staged publication.
-
-For normal scheduled production after the 2026-08-30 amendment, a failed or pending staged publication must not be presented to the user as a successful issued report through a long-link fallback. Durable issuance and the primary share link require successful publisher ownership and remote read-back under Section 8.4.
-
-'''
-          text = text[:start] + section_88 + text[end:]
-
-          start = text.index('# 11. Production delivery sequence\n')
-          end = text.index('\n---\n\n# 12. Activation tracks', start)
-          section_11 = '''# 11. Production delivery sequence
-
-For every valid scheduled report:
-
-1. production contract / runner preflight;
-2. live-feed freshness, exact identity and basic executable-price eligibility validation;
-3. Stage 1 Material Information Scan over the eligible current slate under `BETTING_EDGE_PERSONNEL_SWEEP.md`;
-4. provisional independent current handicap, fair-value construction and value screen using the Stage 1 information;
-5. Stage 2 Deep Personnel Sweep for serious candidates, candidates created or materially strengthened by Stage 1, and candidates materially dependent on unresolved personnel assumptions; validate the exact wager dependency, apply the sport-wide 3-to-5-source fallback completion rule when official material information remains unresolved, and resolve/record source conflict and decision sensitivity;
-6. apply material Stage 2 findings back into the current handicap; reassess fair value, uncertainty/model error and `playTo`, record the pre-/post-Stage-2 state and decision impact, then form the provisional current recommendation;
-7. Research Fit read-only pass;
-8. construct the complete report candidate and matching schema-3 sidecar, then validate and freeze both objects without mutating durable History;
-9. stage only the frozen candidate pair through the repository-controlled staging path; the scheduled task must not directly write `data/history/runs/**`, `data/history/research-fit/**`, or `run-history.json`;
-10. the production publisher verifies existing durable History, recomputes/validates Core 1.4 controlled metadata and Walters authority, checks report/sidecar consistency, selection continuity, tracked non-spread availability, spread lineage and publication integrity;
-11. only after all gates pass, the publisher atomically stores the exact issued payload, matching production-provenance sidecar and complete updated `run-history.json` without overwriting prior issued evidence;
-12. fetch authoritative `main` again and remotely read back/verify the exact report, sidecar and History index;
-13. after successful read-back, treat the candidate as issued and deliver deterministic compact `r.html?id=` link as primary;
-14. if the publisher rejects the candidate before durable storage, surface `PUBLICATION BLOCKED — CANDIDATE NOT STORED`, do not release a short link and do not mutate/rerun the frozen candidate merely to make the gate pass;
-15. if staged publication is still incomplete at scheduled-task end, surface `PUBLICATION PENDING — CANDIDATE STAGED`, do not claim issuance/storage success and do not release a short link.
-
-History/share work may not create, change or suppress a betting decision inside the frozen candidate. Publication validation may only accept the frozen candidate unchanged or reject it fail-closed before issuance.
-'''
-          text = text[:start] + section_11 + text[end:]
-
-          change_marker = 'Git history is the authoritative rollback system. Existing issued reports and sidecars are append-only historical evidence.\n'
-          if change_marker not in text:
-              raise SystemExit('Change-control insertion marker not found')
-          change_record = '''### Operational change record — 2026-08-30 — fail-closed staged publication ownership
-
-**Issue:** Scheduled report tasks could write report payloads, schema-3 sidecars and `run-history.json` into permanent History before the exact production validator recomputed Core 1.4 controlled metadata. A newly written bundle could therefore become durable first and only then fail verification because of malformed or drifted sidecar metadata such as an unsupported controlled value, missing WAIT qualification, or a recorded model-error state inconsistent with framework recomputation.
-
-**Decision:** Establish a hard candidate/issuance boundary. Scheduled ChatGPT report lanes are candidate producers only and may stage a frozen report + schema-3 sidecar pair; they may not mutate durable report History directly. The repository-controlled publication workflow owns pre-publication clean-history verification, Core 1.4 recomputation, recommendation/sidecar consistency, selection continuity, non-spread availability, spread lineage, atomic report/sidecar/index storage and remote read-back. A candidate that fails those gates is not issued and is reported as `PUBLICATION BLOCKED — CANDIDATE NOT STORED`; a still-running publication is `PUBLICATION PENDING — CANDIDATE STAGED`. Compact sharing is released only after successful durable read-back.
-
-**Classification:** This is a publication-integrity and governance hardening amendment within Contract v1.0. It does not change the five standard report lanes, supported books, 75-minute feed freshness, 30-minute executable-quote freshness, handicap methodology, Core 1.4 version, Research Library authority, Walters authority model, staking/exposure methodology, risk tolerance, odds-refresh cadence or API request budget.
-
-'''
-          text = text.replace(change_marker, change_record + change_marker, 1)
-
-          declaration = 'Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, the repository-controlled report-card target and the operational two-stage personnel-information process—including sport-wide Stage 2 source depth, exact-wager dependency validation, source-conflict handling, decision sensitivity and explicit re-handicapping—remain governed behavior.'
-          replacement = declaration + ' The 2026-08-30 v1.0 amendment additionally makes fail-closed staged publication and publisher-owned durable issuance governed behavior.'
-          if declaration not in text:
-              raise SystemExit('Production declaration marker not found')
-          text = text.replace(declaration, replacement, 1)
-
-          path.write_text(text)
-          print('Contract v1.0 staged-publication amendment applied.')
+          p.write_text(text.rstrip() + amendment + '\n')
           PY
-      - name: Sanity-check amendment text
+      - name: Verify amendment and unchanged lane times
         run: |
-          grep -Fq 'Operational amendment:** 2026-08-30 — fail-closed staged publication ownership' BETTING_EDGE_CONTRACT.md
+          grep -Fq '# 15. Operational amendment — 2026-08-30 — fail-closed staged publication ownership' BETTING_EDGE_CONTRACT.md
           grep -Fq 'PUBLICATION BLOCKED — CANDIDATE NOT STORED' BETTING_EDGE_CONTRACT.md
           grep -Fq 'PUBLICATION PENDING — CANDIDATE STAGED' BETTING_EDGE_CONTRACT.md
-          grep -Fq 'Scheduled ChatGPT report lanes are candidate producers only' BETTING_EDGE_CONTRACT.md
           grep -Fq '06:00 OPEN / OVERNIGHT' BETTING_EDGE_CONTRACT.md
+          grep -Fq '08:00 MAIN' BETTING_EDGE_CONTRACT.md
+          grep -Fq '09:30 FINAL MORNING' BETTING_EDGE_CONTRACT.md
+          grep -Fq '15:15 EVENING' BETTING_EDGE_CONTRACT.md
           grep -Fq '18:15 LATE / WEST COAST' BETTING_EDGE_CONTRACT.md
-      - name: Commit amendment
+      - name: Commit authoritative contract amendment
         run: |
           set -euo pipefail
           if git diff --quiet -- BETTING_EDGE_CONTRACT.md; then
@@ -152,8 +142,6 @@ History/share work may not create, change or suppress a betting decision inside 
           for attempt in 1 2 3; do
             git fetch origin main
             git rebase origin/main
-            if git push origin HEAD:main; then
-              exit 0
-            fi
+            if git push origin HEAD:main; then exit 0; fi
           done
           exit 1
