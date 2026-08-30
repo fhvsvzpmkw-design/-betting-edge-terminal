@@ -50,14 +50,15 @@ jobs:
             node tools/build-pizza-plays.mjs --check
 
             # A workflow-authored Pizza commit cannot trigger another push workflow
-            # with GITHUB_TOKEN. Rebuild the downstream Value index here so the
-            # immutable Pizza archive and its performance accounting publish atomically.
+            # with GITHUB_TOKEN. Rebuild all downstream results analytics here so the
+            # immutable Pizza archive, VigScope Value and Decision Value publish atomically.
             node tools/build-results-index.mjs
             node tools/add-results-player-value.mjs
+            node tools/add-results-shadow-v2.mjs
 
             git add -- data/pizza-plays.json data/history/pizza-plays data/history/results-index.json
             if git diff --cached --quiet; then
-              echo "Pizza Plays, immutable archive and VigScope Value already match the latest report."
+              echo "Pizza Plays, immutable archive, VigScope Value and Decision Value already match the latest report."
               published=1
               break
             fi
@@ -67,6 +68,6 @@ jobs:
               published=1
               break
             fi
-            echo "Push raced another repository update; rebuilding Pizza and Value from current main."
+            echo "Push raced another repository update; rebuilding Pizza and results analytics from current main."
           done
           test "$published" -eq 1
