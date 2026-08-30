@@ -27,8 +27,9 @@ jobs:
 
       - name: Apply audited Graham research transaction
         run: |
-          node tools/apply-graham-research-input.mjs data/walters/nfl/current-research-input.json
+          node tools/apply-graham-research-parts.mjs data/walters/nfl/current-research-input.json
           node --check tools/apply-graham-research-input.mjs
+          node --check tools/apply-graham-research-parts.mjs
 
       - name: Verify market isolation and outputs
         run: |
@@ -40,7 +41,7 @@ jobs:
           const numbers=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-current-numbers.json','utf8'));
           if(input.marketViewed!==false) throw new Error('marketViewed must remain false');
           if(power.teams.length!==32) throw new Error('expected 32 power-rating teams');
-          if(Object.values(power.teams).some(t=>!Number.isFinite(Number(t.externalComparisons?.espnFpi?.rating)))) throw new Error('missing ESPN FPI capture');
+          if(power.teams.some(t=>!Number.isFinite(Number(t.externalComparisons?.espnFpi?.rating)))) throw new Error('missing ESPN FPI capture');
           if(research.sweeps.at(-1)?.teamFindings?.length!==32) throw new Error('initial sweep missing team findings');
           if(numbers.games.length!==16||numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome)))) throw new Error('Week 1 Graham numbers incomplete');
           console.log('GRAHAM INITIAL RESEARCH VERIFY: PASS // MARKET ISOLATION PRESERVED');
