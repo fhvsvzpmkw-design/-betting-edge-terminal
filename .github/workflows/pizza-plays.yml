@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   publish:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.name == 'Report history staged publication' || (github.event.workflow_run.name == 'Report history publication' && github.event.workflow_run.event == 'workflow_dispatch'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
