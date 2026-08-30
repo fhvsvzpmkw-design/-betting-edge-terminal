@@ -80,6 +80,7 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
+            git clean -f -- "$REPORT_PATH" "$SIDECAR_PATH"
             node tools/report-publication.mjs verify
             node tools/core-v14-publication-gate.mjs verify-history
             node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
