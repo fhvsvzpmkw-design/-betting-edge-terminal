@@ -12,7 +12,7 @@ main{max-width:1180px;margin:auto;padding:14px 12px 30px}.shell{border:1px solid
 .kicker{color:var(--green);font-weight:900;letter-spacing:.12em}.title{margin:3px 0 1px;color:var(--gold);font-size:clamp(24px,5vw,42px);line-height:1}.sub{color:var(--muted)}
 .status{display:flex;flex-wrap:wrap;gap:7px 16px;margin-top:10px;padding-top:8px;border-top:1px dashed #23372e}.status b{color:var(--ink)}.status span{color:var(--muted)}
 .section{padding:12px 14px;border-bottom:1px solid #17271f}.section-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:8px}.section-head h2{margin:0;color:var(--gold);font-size:13px;letter-spacing:.08em}.section-head div{color:var(--muted);font-size:10px}
-.board-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.board{min-width:900px;border:1px solid var(--line)}.row{display:grid;grid-template-columns:128px 100px 86px 100px 112px 72px 72px minmax(150px,1fr);align-items:center;border-top:1px solid #16251e}.row:first-child{border-top:0}.row>div{padding:8px 9px;border-left:1px solid #16251e}.row>div:first-child{border-left:0}.head{background:#0b1712;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.07em}.game{color:#fff;font-weight:900}.power,.base{color:#9fb4a7}.graham{color:var(--green);font-weight:950}.pinnacle{color:var(--gold);font-weight:950}.gap{font-weight:950}.info{color:#9cb1a4;font-size:10px}.pending{color:#7e8c84}.positive{color:var(--green)}.negative{color:var(--bad)}
+.board-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.board{min-width:1010px;border:1px solid var(--line)}.row{display:grid;grid-template-columns:128px 96px 82px 96px 108px 100px 66px 66px minmax(140px,1fr);align-items:center;border-top:1px solid #16251e}.row:first-child{border-top:0}.row>div{padding:8px 9px;border-left:1px solid #16251e}.row>div:first-child{border-left:0}.head{background:#0b1712;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.07em}.game{color:#fff;font-weight:900}.power,.base{color:#9fb4a7}.graham{color:var(--green);font-weight:950}.pinnacle,.moneyline{color:var(--gold);font-weight:950}.moneyline{white-space:nowrap}.gap{font-weight:950}.info{color:#9cb1a4;font-size:10px}.pending{color:#7e8c84}.positive{color:var(--green)}.negative{color:var(--bad)}
 .ratings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line)}.rating{display:grid;grid-template-columns:42px 1fr auto auto;gap:8px;padding:7px 8px;border-right:1px solid #17271f;border-bottom:1px solid #17271f}.rating:nth-child(4n){border-right:0}.abbr{color:#fff;font-weight:950}.rname{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rnum{color:var(--green);font-weight:950}.delta{color:var(--gold)}
 .note{padding:11px 14px;color:var(--muted);font-size:10px;line-height:1.6}.note b{color:var(--gold)}.error{padding:18px;color:var(--bad)}
 @media(max-width:760px){main{padding:8px 7px 22px}.ratings{grid-template-columns:repeat(2,minmax(0,1fr))}.rating:nth-child(4n){border-right:1px solid #17271f}.rating:nth-child(2n){border-right:0}.section{padding:10px 8px}.top{padding:13px 10px}}
@@ -23,18 +23,18 @@ main{max-width:1180px;margin:auto;padding:14px 12px 30px}.shell{border:1px solid
 <header class="top">
 <div class="kicker">GRAHAM MERCER // THE MEMBER</div>
 <div class="title">THE NINETEENTH HOLE</div>
-<div class="sub">NFL CURRENT-WEEK NUMBERS TERMINAL</div>
+<div class="sub">NFL CURRENT-WEEK SPREAD + MONEYLINE TERMINAL</div>
 <div class="status" id="status"><span>LOADING CURRENT SHEET…</span></div>
 </header>
 <section class="section">
-<div class="section-head"><h2 id="weekTitle">CURRENT WEEK</h2><div>HOME-SPREAD SIGN: − HOME FAV / + HOME DOG</div></div>
+<div class="section-head"><h2 id="weekTitle">CURRENT WEEK</h2><div>SPREAD: − HOME FAV / + HOME DOG &nbsp; // &nbsp; ML: AWAY / HOME</div></div>
 <div class="board-wrap"><div class="board" id="board"><div class="error">LOADING…</div></div></div>
 </section>
 <section class="section">
 <div class="section-head"><h2>32-TEAM CARRIED POWER SHEET</h2><div>ORIGIN SEED PRESERVED // CURRENT RATING CARRIES FORWARD</div></div>
 <div class="ratings" id="ratings"><div class="error">LOADING…</div></div>
 </section>
-<footer class="note"><b>MARKET ISOLATION:</b> Graham’s independent fair number is completed before Pinnacle is compared. Pinnacle is a sharp-market benchmark, not a power-rating source and not betting authority. Neutral base is shown separately from the completed Graham number. A pending number remains pending rather than being inferred from the market.</footer>
+<footer class="note"><b>MARKET ISOLATION:</b> Graham’s independent fair number is completed before Pinnacle is compared. Pinnacle is a sharp-market benchmark, not a power-rating source and not betting authority. Neutral base is shown separately from the completed Graham number. A pending number remains pending rather than being inferred from the market.<br><b>MONEYLINE LAYER:</b> PIN ML shows raw Pinnacle away/home prices when available. Under the governed Walters pages 270–272 method, moneyline is a wager-form selector only after a spread side qualifies; this terminal does not invent a standalone Graham fair moneyline from the market or from an unsupported conversion.</footer>
 </article></main>
 <script>
 const FEED='../../../data/walters/nfl/current-week-terminal.json';
@@ -42,13 +42,15 @@ const $=id=>document.getElementById(id);
 function n(v,d=1){return Number.isFinite(Number(v))?Number(v).toFixed(d).replace(/\.0$/,''):'—'}
 function line(v,away,home){if(!Number.isFinite(Number(v)))return'<span class="pending">PENDING</span>';const x=Number(v);if(Math.abs(x)<.001)return'PICK';return x<0?`${home} -${n(Math.abs(x))}`:`${away} -${n(Math.abs(x))}`}
 function signed(v){if(!Number.isFinite(Number(v)))return'<span class="pending">—</span>';const x=Number(v);return`${x>0?'+':''}${n(x)}`}
+function american(v){if(!Number.isFinite(Number(v)))return null;const x=Math.round(Number(v));return`${x>0?'+':''}${x}`}
+function moneylinePair(g){const away=american(g.pinnacleAwayMoneylineAmerican),home=american(g.pinnacleHomeMoneylineAmerican);if(!away||!home)return'<span class="pending">PENDING</span>';return`${away} / ${home}`}
 function gapClass(v){if(!Number.isFinite(Number(v))||Number(v)===0)return'';return Number(v)>0?'positive':'negative'}
 function stamp(v){if(!v)return'PENDING';const d=new Date(v);if(!Number.isFinite(d.getTime()))return String(v);return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(d)+' PT'}
 function render(data){
   $('weekTitle').textContent=`NFL WEEK ${data.week} // ${data.games?.length||0} GAMES`;
   $('status').innerHTML=`<span>FEED <b>${stamp(data.generatedAt)}</b></span><span>INFO <b>${stamp(data.lastResearchAt)}</b></span><span>PINNACLE <b>${stamp(data.marketObservedAt)}</b></span><span>STATE <b>${data.state||'UNKNOWN'}</b></span>`;
-  const rows=(data.games||[]).map(g=>`<div class="row"><div class="game">${g.away} @ ${g.home}</div><div class="power">${n(g.awayRating)} / ${n(g.homeRating)}</div><div class="base">${line(g.neutralBaseHome,g.away,g.home)}</div><div class="graham">${line(g.grahamFairHome,g.away,g.home)}</div><div class="pinnacle">${line(g.pinnacleSpreadHome,g.away,g.home)}</div><div class="gap ${gapClass(g.grahamHomeStrengthGap)}">${signed(g.grahamHomeStrengthGap)}</div><div>${signed(g.pinnacleMove)}</div><div class="info">${g.informationStatus||g.numberStatus||'PENDING'}</div></div>`).join('');
-  $('board').innerHTML=`<div class="row head"><div>MATCHUP</div><div>POWER A/H</div><div>NEUTRAL</div><div>GRAHAM</div><div>PINNACLE</div><div>GAP</div><div>MKT Δ</div><div>INFO CHECK</div></div>${rows||'<div class="error">NO WEEKLY GAMES</div>'}`;
+  const rows=(data.games||[]).map(g=>`<div class="row"><div class="game">${g.away} @ ${g.home}</div><div class="power">${n(g.awayRating)} / ${n(g.homeRating)}</div><div class="base">${line(g.neutralBaseHome,g.away,g.home)}</div><div class="graham">${line(g.grahamFairHome,g.away,g.home)}</div><div class="pinnacle">${line(g.pinnacleSpreadHome,g.away,g.home)}</div><div class="moneyline">${moneylinePair(g)}</div><div class="gap ${gapClass(g.grahamHomeStrengthGap)}">${signed(g.grahamHomeStrengthGap)}</div><div>${signed(g.pinnacleMove)}</div><div class="info">${g.informationStatus||g.numberStatus||'PENDING'}</div></div>`).join('');
+  $('board').innerHTML=`<div class="row head"><div>MATCHUP</div><div>POWER A/H</div><div>NEUTRAL</div><div>GRAHAM</div><div>PINNACLE</div><div>PIN ML A/H</div><div>GAP</div><div>MKT Δ</div><div>INFO CHECK</div></div>${rows||'<div class="error">NO WEEKLY GAMES</div>'}`;
   const ratings=(data.ratings||[]).slice().sort((a,b)=>Number(b.currentRating)-Number(a.currentRating)||String(a.abbr).localeCompare(String(b.abbr)));
   $('ratings').innerHTML=ratings.length?ratings.map(r=>`<div class="rating"><span class="abbr">${r.abbr}</span><span class="rname">${r.team||''}</span><span class="rnum">${n(r.currentRating)}</span><span class="delta">${Number(r.lastDelta)?signed(r.lastDelta):'—'}</span></div>`).join(''):'<div class="error">POWER SHEET WILL POPULATE ON THE NEXT GRAHAM BUILD.</div>';
 }
