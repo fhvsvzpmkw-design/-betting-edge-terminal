@@ -1,0 +1,60 @@
+name: Apply Graham research input
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/walters/nfl/current-research-input.json
+  workflow_dispatch:
+
+concurrency:
+  group: graham-research-input
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout triggering main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply audited Graham research transaction
+        run: |
+          node tools/apply-graham-research-input.mjs data/walters/nfl/current-research-input.json
+          node --check tools/apply-graham-research-input.mjs
+
+      - name: Verify market isolation and outputs
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+          const input=JSON.parse(fs.readFileSync('data/walters/nfl/current-research-input.json','utf8'));
+          const power=JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json','utf8'));
+          const research=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-research-ledger.json','utf8'));
+          const numbers=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-current-numbers.json','utf8'));
+          if(input.marketViewed!==false) throw new Error('marketViewed must remain false');
+          if(power.teams.length!==32) throw new Error('expected 32 power-rating teams');
+          if(Object.values(power.teams).some(t=>!Number.isFinite(Number(t.externalComparisons?.espnFpi?.rating)))) throw new Error('missing ESPN FPI capture');
+          if(research.sweeps.at(-1)?.teamFindings?.length!==32) throw new Error('initial sweep missing team findings');
+          if(numbers.games.length!==16||numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome)))) throw new Error('Week 1 Graham numbers incomplete');
+          console.log('GRAHAM INITIAL RESEARCH VERIFY: PASS // MARKET ISOLATION PRESERVED');
+          NODE
+
+      - name: Publish Graham research outputs
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/walters/nfl-power-ratings-ledger.json data/walters/nfl/2026/week-01-research-ledger.json data/walters/nfl/2026/week-01-current-numbers.json
+          if git diff --cached --quiet; then
+            echo "No Graham research changes to publish."
+            exit 0
+          fi
+          git commit -m "Apply Graham Week 1 initial research"
+          git push origin HEAD:main
