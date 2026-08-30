@@ -8,6 +8,7 @@ const INDEX_PATH=path.join(ROOT,'data/history/results-index.json');
 const UNIT_BASE_PCT=0.03;
 const NON_BET_STATUSES=new Set(['LEAN','WAIT','PASS']);
 const STATUS_ORDER=['LEAN','WAIT','PASS'];
+const DAY_MS=24*60*60*1000;
 
 function readJson(file){
   try{return JSON.parse(fs.readFileSync(file,'utf8'))}
@@ -55,6 +56,18 @@ function gradeCounts(rows){
   }
   return out;
 }
+function dateKey(card){
+  const direct=cleanText(card?.date);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(direct))return direct;
+  const run=cleanText(card?.runId);
+  const match=run.match(/^\d{4}-\d{2}-\d{2}/);
+  return match?match[0]:null;
+}
+function dateMs(date){
+  if(!date)return null;
+  const parsed=Date.parse(`${date}T00:00:00Z`);
+  return Number.isFinite(parsed)?parsed:null;
+}
 
 const index=readJson(INDEX_PATH);
 if(!index||!Array.isArray(index.cards)){
@@ -83,7 +96,8 @@ function enrichDecision(card){
     ...card,
     shadowUnits:units,
     frozenUnitCad:hasDollar?unitCad:null,
-    shadowProfitLossCad:hasDollar?units*unitCad:null
+    shadowProfitLossCad:hasDollar?units*unitCad:null,
+    decisionDate:dateKey(card)
   };
 }
 function aggregate(rows,status=null){
@@ -131,13 +145,60 @@ function aggregate(rows,status=null){
     cappedDecisionScore:protectedRows.length-missedRows.length
   };
 }
+function grouped(rows,getter){
+  const groups=new Map();
+  for(const row of rows){
+    const name=cleanText(getter(row))||'UNKNOWN';
+    if(!groups.has(name))groups.set(name,[]);
+    groups.get(name).push(row);
+  }
+  return [...groups.entries()]
+    .map(([name,items])=>({name,...aggregate(items)}))
+    .sort((a,b)=>b.priced-a.priced||a.name.localeCompare(b.name));
+}
+function eligibleCalibration(rows,minSample=5){
+  return rows.filter(row=>row.priced>=minSample&&Number.isFinite(Number(row.shadowRoiPct)));
+}
+function calibrationState(row){
+  if(!row||row.priced<5||!Number.isFinite(Number(row.shadowRoiPct)))return'SMALL SAMPLE';
+  const roi=Number(row.shadowRoiPct);
+  if(roi<=-5)return'FILTER HELPING';
+  if(roi>=5)return'TOO TIGHT';
+  return'MIXED';
+}
 
 const finalDecisions=latestFinalNonBetDecisions(index.cards).map(enrichDecision);
 const overall=aggregate(finalDecisions);
 const byStatus=STATUS_ORDER.map(status=>aggregate(finalDecisions,status));
+const byMarket=grouped(finalDecisions,row=>row.market);
+const marketCalibration=eligibleCalibration(byMarket);
+const bestMarket=marketCalibration.length?[...marketCalibration].sort((a,b)=>Number(a.shadowRoiPct)-Number(b.shadowRoiPct))[0]:null;
+const weakestMarket=marketCalibration.length?[...marketCalibration].sort((a,b)=>Number(b.shadowRoiPct)-Number(a.shadowRoiPct))[0]:null;
+const statusCalibration=eligibleCalibration(byStatus);
+const weakestStatus=statusCalibration.length?[...statusCalibration].sort((a,b)=>Number(b.shadowRoiPct)-Number(a.shadowRoiPct))[0]:null;
+
+const dated=finalDecisions.map(row=>({row,ms:dateMs(row.decisionDate)})).filter(x=>x.ms!==null);
+const latestMs=dated.length?Math.max(...dated.map(x=>x.ms)):null;
+let recentSevenDay=null,previousSevenDay=null,recentTrend='NO BASELINE',recentTrendDeltaRoiPct=null;
+if(latestMs!==null){
+  const recentStart=latestMs-6*DAY_MS;
+  const previousStart=latestMs-13*DAY_MS;
+  const previousEnd=latestMs-7*DAY_MS;
+  const recentRows=dated.filter(x=>x.ms>=recentStart&&x.ms<=latestMs).map(x=>x.row);
+  const previousRows=dated.filter(x=>x.ms>=previousStart&&x.ms<=previousEnd).map(x=>x.row);
+  recentSevenDay={start:new Date(recentStart).toISOString().slice(0,10),end:new Date(latestMs).toISOString().slice(0,10),...aggregate(recentRows)};
+  previousSevenDay={start:new Date(previousStart).toISOString().slice(0,10),end:new Date(previousEnd).toISOString().slice(0,10),...aggregate(previousRows)};
+  if(recentSevenDay.priced>=5&&previousSevenDay.priced>=5&&Number.isFinite(Number(recentSevenDay.shadowRoiPct))&&Number.isFinite(Number(previousSevenDay.shadowRoiPct))){
+    recentTrendDeltaRoiPct=round(Number(recentSevenDay.shadowRoiPct)-Number(previousSevenDay.shadowRoiPct),2);
+    if(recentTrendDeltaRoiPct<=-2)recentTrend='IMPROVING';
+    else if(recentTrendDeltaRoiPct>=2)recentTrend='WEAKENING';
+    else recentTrend='STABLE';
+  }
+}
 
 index.decisionValueShadowV2={
   version:2,
+  presentationVersion:3,
   methodology:'one final non-BET decision per exact unique selectionKey. Repeated report-lane appearances are deduplicated to the last issued decision. Price-based shadow results require a completed result and a non-null exact issued-price unit result. Each valid decision risks one historical full unit frozen at 3% of the bankroll stored in that final source report. Dollar P/L is the sum of those historically frozen units, not a flat-$100 conversion.',
   referenceUnitBasePct:3,
   unitDefinition:'1.00u = 3% of bankroll in the final source report for that decision',
@@ -163,13 +224,23 @@ index.decisionValueShadowV2={
   missedOutcomes:overall.missedOutcomes,
   neutralOutcomes:overall.neutralOutcomes,
   cappedDecisionScore:overall.cappedDecisionScore,
-  byStatus,
+  byStatus:byStatus.map(row=>({...row,calibrationState:calibrationState(row)})),
+  byMarket,
+  diagnostics:{
+    bestMarket,
+    weakestMarket,
+    weakestStatus:weakestStatus?{...weakestStatus,calibrationState:calibrationState(weakestStatus)}:null,
+    recentSevenDay,
+    previousSevenDay,
+    recentTrend,
+    recentTrendDeltaRoiPct
+  },
   notes:[
-    'Positive NET DECISION VALUE means not betting protected more shadow value than it missed; negative means the hypothetical one-unit non-BET portfolio would have made money.',
-    'CAPPED DECISION SCORE gives each valid decision at most +1 for a protected losing outcome, -1 for a missed winning outcome, and 0 for push/void. It prevents a single longshot payout from dominating the outcome-count calibration.',
-    'A winning PASS or WAIT does not by itself prove the original decision was analytically wrong; this panel is retrospective outcome/price calibration, not a re-handicap.'
+    'Negative shadow ROI means the bets that were filtered out would have lost money; that is evidence the filters helped.',
+    'Positive shadow ROI means the filtered-out bets would have made money; that is a sign the filter may have been too tight.',
+    'This is retrospective calibration only, not actual ledger profit and not a re-handicap.'
   ]
 };
 
 fs.writeFileSync(INDEX_PATH,`${JSON.stringify(index,null,2)}\n`,'utf8');
-console.log(`${path.relative(ROOT,INDEX_PATH)}: Decision Value Shadow Review V2 (${overall.priced}/${finalDecisions.length} valid priced; ${overall.dollarValued} dollar-valued; ${round(overall.shadowNetUnits,2)}u shadow; ${round(overall.decisionValueCad,2)} CAD decision value)`);
+console.log(`${path.relative(ROOT,INDEX_PATH)}: Filter Calibration Shadow Review (${overall.priced}/${finalDecisions.length} valid priced; ${round(overall.shadowNetUnits,2)}u if played; ${round(overall.shadowRoiPct,2)}% shadow ROI)`);
