@@ -22,14 +22,25 @@ const seedMap=new Map(seed.powerRatings.map(r=>[r.team,r.rating]));
 for(const team of ledger.teams){
   assert(seedMap.has(team.team),`seed is missing ${team.team}`);
   assert(team.seedRating===seedMap.get(team.team),`${team.team} seedRating does not match preserved VSiN seed`);
-  assert(team.currentRating===team.seedRating,`${team.team} initial currentRating must start from seedRating`);
-  assert(team.priorRating===null,`${team.team} initial priorRating must be null`);
-  assert(Array.isArray(team.history)&&team.history.length===1,`${team.team} must start with exactly one seed history event`);
-  const h=team.history[0];
-  assert(h.type==='SEED'&&h.toRating===team.seedRating,`${team.team} seed history event is invalid`);
+  assert(Number.isFinite(team.currentRating),`${team.team} currentRating must be numeric`);
+  assert(Array.isArray(team.history)&&team.history.length>=1,`${team.team} must retain rating history`);
+  const first=team.history[0];
+  const last=team.history.at(-1);
+  assert(first.type==='SEED'&&first.toRating===team.seedRating,`${team.team} immutable seed history event is invalid`);
+  assert(last.toRating===team.currentRating,`${team.team} currentRating must equal the last history event`);
+  if(team.history.length===1){
+    assert(team.priorRating===null,`${team.team} initial priorRating must be null`);
+  }else{
+    const previous=team.history.at(-2);
+    assert(team.priorRating===previous.toRating,`${team.team} priorRating must equal the previous carried rating`);
+    assert(last.fromRating===team.priorRating,`${team.team} latest history event must start from priorRating`);
+    assert(Number((last.fromRating+last.delta).toFixed(3))===last.toRating,`${team.team} latest history arithmetic is invalid`);
+  }
   assert(team.externalComparisons?.espnFpi?.role==='INDEPENDENT_COMPARISON_ONLY',`${team.team} ESPN role must remain comparison-only`);
 }
 
+const bufBefore=ledger.teams.find(t=>t.abbr==='BUF');
+const balBefore=ledger.teams.find(t=>t.abbr==='BAL');
 const tmp=path.join(os.tmpdir(),`walters-power-ledger-${process.pid}.json`);
 fs.copyFileSync(ledgerPath,tmp);
 try{
@@ -38,13 +49,14 @@ try{
   const after=JSON.parse(fs.readFileSync(tmp,'utf8'));
   const buf=after.teams.find(t=>t.abbr==='BUF');
   const bal=after.teams.find(t=>t.abbr==='BAL');
-  assert(buf.seedRating===28.5,'Buffalo immutable seed changed');
-  assert(buf.priorRating===28.5,'Buffalo prior rating was not preserved');
-  assert(buf.currentRating===29,'Buffalo carried rating did not advance to 29.0');
+  const expected=Number((bufBefore.currentRating+0.5).toFixed(3));
+  assert(buf.seedRating===bufBefore.seedRating,'Buffalo immutable seed changed');
+  assert(buf.priorRating===bufBefore.currentRating,'Buffalo prior rating was not preserved');
+  assert(buf.currentRating===expected,'Buffalo carried rating did not advance by +0.5');
   assert(buf.lastDelta===0.5,'Buffalo last delta incorrect');
-  assert(buf.history.length===2,'Buffalo update history was not appended');
-  assert(buf.history.at(-1).fromRating===28.5&&buf.history.at(-1).toRating===29,'Buffalo transition history incorrect');
-  assert(bal.seedRating===28.5&&bal.currentRating===28.5&&bal.history.length===1,'unrelated team was modified');
+  assert(buf.history.length===bufBefore.history.length+1,'Buffalo update history was not appended');
+  assert(buf.history.at(-1).fromRating===bufBefore.currentRating&&buf.history.at(-1).toRating===expected,'Buffalo transition history incorrect');
+  assert(bal.seedRating===balBefore.seedRating&&bal.currentRating===balBefore.currentRating&&bal.history.length===balBefore.history.length,'unrelated team was modified');
 } finally {
   try{fs.unlinkSync(tmp)}catch{}
 }
