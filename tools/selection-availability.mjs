@@ -19,6 +19,11 @@ function rowLabel(row) { return String(row?.label || row?.player || row?.partici
 function rowLine(row) { for (const key of ['hdp', 'line', 'total', 'points']) { const n = Number(row?.[key]); if (Number.isFinite(n)) return n; } return null; }
 function decimalOdds(value) { const n = Number(value); return Number.isFinite(n) && n > 1.001 ? n : null; }
 function americanOdds(value) { const d = decimalOdds(value); if (!d) return null; const n = d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); return n > 0 ? `+${n}` : String(n); }
+function americanPriceToken(value) {
+  const source = String(value || '').replace(/−/g, '-');
+  const match = source.match(/(?:^|[^0-9])([+-]\d{2,4})(?!\d)/);
+  return match ? match[1] : null;
+}
 function selectionIdentity(row, side, event, market) {
   const s = String(side || '').toLowerCase();
   const supplied = row?.selectionKeys?.[s] || row?.identity?.selectionKeys?.[s] || row?.selectionKey || row?.identity?.selectionKey;
@@ -27,8 +32,14 @@ function selectionIdentity(row, side, event, market) {
   return [eventIdentity(event), marketIdentity(market), s, rowLabel(row), line === null ? '' : String(line)].join('|');
 }
 function isSpread(rec) { return String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() === 'spread'; }
+function canonicalBook(value) {
+  const source = String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (source === 'BET365' || source === 'B365') return 'Bet365';
+  if (source === 'DRAFTKINGS' || source === 'DK') return 'DraftKings';
+  return null;
+}
 function bookAliases(book) { return book === 'Bet365' ? ['BET365', 'B365'] : ['DRAFTKINGS', 'DK']; }
-function escaped(value) { return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function escaped(value) { return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 function quotedBookPrice(text, book, american) {
   const source = String(text || '').toUpperCase().replace(/−/g, '-');
   const price = escaped(String(american));
@@ -84,11 +95,22 @@ export function exactBookQuotes(feed, rec) {
   return quotes;
 }
 
+function structuredCurrentQuote(rec) {
+  const suppliedBook = String(rec?.book || '').trim();
+  if (!suppliedBook) return null;
+  return {
+    suppliedBook,
+    book: canonicalBook(suppliedBook),
+    american: americanPriceToken(rec?.price)
+  };
+}
+
 export function auditTrackedAvailability({ previous, report, feed }) {
   const currentByKey = new Map((report?.recs || []).map(rec => [String(rec?.feed?.selectionKey || '').trim(), rec]).filter(([key]) => key));
   const reportMs = parseMs(report?.ts);
   const diagnostics = [];
   const violations = [];
+
   for (const prior of previous?.recs || []) {
     if (!ACTIVE.has(String(prior?.status || '').toUpperCase()) || isSpread(prior)) continue;
     const key = String(prior?.feed?.selectionKey || '').trim();
@@ -97,17 +119,57 @@ export function auditTrackedAvailability({ previous, report, feed }) {
     if (eventMs !== null && reportMs !== null && reportMs >= eventMs) continue;
     const current = currentByKey.get(key);
     if (!current) continue;
+
     const quotes = exactBookQuotes(feed, prior);
     const available = new Map(quotes.map(q => [q.book, q]));
     const priceText = String(current?.price || '');
-    diagnostics.push({ selectionKey: key, title: prior.title, quotes });
-    for (const quote of quotes) {
-      if (!quotedBookPrice(priceText, quote.book, quote.american)) violations.push(`${prior.title}: fresh exact ${quote.book} ${quote.american} exists in the bound snapshot but the current price field does not show it`);
+    const structured = structuredCurrentQuote(current);
+    diagnostics.push({
+      selectionKey: key,
+      title: prior.title,
+      quotes,
+      currentBook: current?.book || null,
+      currentPrice: current?.price || null,
+      representation: structured ? 'STRUCTURED_BOOK_PRICE' : 'LEGACY_PRICE_TEXT'
+    });
+
+    if (quotes.length) {
+      if (structured) {
+        if (!structured.book) {
+          violations.push(`${prior.title}: current book ${structured.suppliedBook} is not a supported execution book`);
+        } else if (!structured.american) {
+          violations.push(`${prior.title}: fresh exact supported-book quote exists but current price ${priceText || 'EMPTY'} is not an American price`);
+        } else {
+          const bound = available.get(structured.book);
+          if (!bound) {
+            violations.push(`${prior.title}: current ${structured.book} ${structured.american} is not fresh/exact in the bound snapshot; fresh supported quotes are ${quotes.map(q => `${q.book} ${q.american}`).join(', ')}`);
+          } else if (bound.american !== structured.american) {
+            violations.push(`${prior.title}: current ${structured.book} ${structured.american} does not match bound fresh exact ${structured.book} ${bound.american}`);
+          }
+        }
+      } else {
+        for (const quote of quotes) {
+          if (!quotedBookPrice(priceText, quote.book, quote.american)) {
+            violations.push(`${prior.title}: fresh exact ${quote.book} ${quote.american} exists in the bound snapshot but legacy current price text does not show it`);
+          }
+        }
+      }
+    } else if (structured?.book && structured.american) {
+      violations.push(`${prior.title}: current field shows ${structured.book} ${structured.american} even though no fresh exact supported-book quote exists in the bound snapshot`);
     }
+
     for (const book of BOOKS) {
-      if (!available.has(book) && anyNumericBookPrice(priceText, book)) violations.push(`${prior.title}: current price field shows a numeric ${book} quote even though no fresh exact ${book} quote exists in the bound snapshot`);
+      const mentionsNumericBookPrice = anyNumericBookPrice(priceText, book);
+      if (!mentionsNumericBookPrice) continue;
+      const bound = available.get(book);
+      if (!bound) {
+        violations.push(`${prior.title}: current price text shows a numeric ${book} quote even though no fresh exact ${book} quote exists in the bound snapshot`);
+      } else if (!quotedBookPrice(priceText, book, bound.american)) {
+        violations.push(`${prior.title}: current price text shows ${book} with a price that does not match bound fresh exact ${book} ${bound.american}`);
+      }
     }
   }
+
   return { ok: violations.length === 0, diagnostics, violations };
 }
 
