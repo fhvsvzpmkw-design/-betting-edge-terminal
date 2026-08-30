@@ -1,0 +1,75 @@
+name: One-time Core 1.4 derived-history audit
+
+on:
+  push:
+    branches: [history-wait-repair-20260829]
+    paths:
+      - .github/workflows/history-core14-derived-audit-once-20260829.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: history-wait-repair-20260829
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enumerate every current-framework Core 1.4 derivation mismatch
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          import {evaluate, loadProductionFramework, matchCondition} from './tools/core-handicap-framework.mjs';
+
+          const CORE_V14_FROM=Date.parse('2026-08-25T17:20:00-07:00');
+          const index=JSON.parse(fs.readFileSync('run-history.json','utf8'));
+          const production=JSON.parse(fs.readFileSync('core/core-v1.4-production.json','utf8'));
+          const framework=loadProductionFramework();
+          const frameworkFile=production.modelErrorFramework.path;
+          const data=fs.readFileSync(frameworkFile);
+          const activeFrameworkBlobSha=crypto.createHash('sha1').update(Buffer.from(`blob ${data.length}\0`)).update(data).digest('hex');
+          const issues=[];
+          let currentBundles=0;
+          let currentRecommendations=0;
+          let historicalFrameworkBundles=0;
+
+          function setEqual(a,b){return a.size===b.size&&[...a].every(v=>b.has(v));}
+          function expectedResearchIds(context){
+            return [...new Set((framework.graduatedResearchRules||[]).filter(rule=>matchCondition(rule.when,context)).map(rule=>rule.priorId))].sort();
+          }
+          function issue(entry,rec,field,recorded,computed){
+            issues.push(`${entry.ts} | ${entry.researchFitPath} | #${rec.ordinal} ${rec.title} | ${field} | recorded=${JSON.stringify(recorded)} | computed=${JSON.stringify(computed)}`);
+          }
+
+          for(const entry of index.runs||[]){
+            if(Date.parse(entry.ts)<CORE_V14_FROM || !entry.researchFitPath) continue;
+            const sidecar=JSON.parse(fs.readFileSync(entry.researchFitPath,'utf8'));
+            if(sidecar.provenance?.coreFrameworkBlobSha!==activeFrameworkBlobSha){historicalFrameworkBundles++;continue;}
+            currentBundles++;
+            for(const rec of sidecar.recommendations||[]){
+              const a=rec.coreAssessment;
+              if(!a?.context){issue(entry,rec,'coreAssessment.context',a?.context,'required');continue;}
+              currentRecommendations++;
+              const expectedIds=expectedResearchIds(a.context);
+              if(!Array.isArray(a.context.graduatedResearchIds) || !setEqual(new Set(a.context.graduatedResearchIds||[]),new Set(expectedIds))) issue(entry,rec,'context.graduatedResearchIds',a.context.graduatedResearchIds,expectedIds);
+              const normalizedContext={...a.context,graduatedResearchIds:expectedIds};
+              const actual=evaluate(framework,normalizedContext);
+              if(a.modelErrorState!==actual.modelErrorState) issue(entry,rec,'modelErrorState',a.modelErrorState,actual.modelErrorState);
+              if(a.betEligibleByModelError!==actual.betEligibleByModelError) issue(entry,rec,'betEligibleByModelError',a.betEligibleByModelError,actual.betEligibleByModelError);
+              if(!Array.isArray(a.effects) || !setEqual(new Set(a.effects||[]),new Set(actual.effects))) issue(entry,rec,'effects',a.effects,actual.effects);
+              if(!Array.isArray(a.appliedRules) || !setEqual(new Set(a.appliedRules||[]),new Set(actual.appliedRules))) issue(entry,rec,'appliedRules',a.appliedRules,actual.appliedRules);
+            }
+          }
+          console.log(`CORE AUDIT CURRENT-FRAMEWORK BUNDLES ${currentBundles}`);
+          console.log(`CORE AUDIT CURRENT-FRAMEWORK RECOMMENDATIONS ${currentRecommendations}`);
+          console.log(`CORE AUDIT HISTORICAL-FRAMEWORK BUNDLES ${historicalFrameworkBundles}`);
+          console.log(`CORE AUDIT ISSUE COUNT ${issues.length}`);
+          for(const x of issues) console.log(`ISSUE ${x}`);
+          if(issues.length) throw new Error(`Core 1.4 derived audit found ${issues.length} mismatch(es)`);
+          NODE
