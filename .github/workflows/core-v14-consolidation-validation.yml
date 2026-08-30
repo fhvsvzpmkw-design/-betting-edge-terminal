@@ -2,6 +2,7 @@ name: Core 1.4 production validation
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     paths:
       - 'core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md'
@@ -15,6 +16,12 @@ on:
       - 'research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md'
       - 'tools/core-handicap-framework.mjs'
       - 'tools/core-v14-publication-gate.mjs'
+      - 'tools/report-sidecar-contract.mjs'
+      - 'tools/selection-availability.mjs'
+      - 'tests/selection-availability.test.mjs'
+      - 'tools/spread-lineage.mjs'
+      - 'tools/report-publication.mjs'
+      - '.github/workflows/report-history-staged.yml'
       - '.github/workflows/core-v14-consolidation-validation.yml'
 
 permissions:
@@ -37,6 +44,14 @@ jobs:
         run: node tools/core-handicap-framework.mjs self-test
       - name: Validate Walters interface and BET authority boundaries
         run: node core/tests/walters-interface-v1.4.test.mjs
+      - name: Validate report-to-sidecar derivation contract
+        run: node tools/report-sidecar-contract.mjs self-test
+      - name: Validate tracked non-spread availability contract
+        run: node tests/selection-availability.test.mjs
+      - name: Validate spread-lineage contract
+        run: node tools/spread-lineage.mjs self-test
+      - name: Validate durable report publication contract
+        run: node tools/report-publication.mjs self-test
       - name: Validate production publication gate
         run: node tools/core-v14-publication-gate.mjs self-test
       - name: Verify Core 1.4 scope freeze
