@@ -82,7 +82,7 @@ Avoid constant crust, cheese, topping, oven and slice jokes. Lou is a Vegas char
 **Character:** LOU “TWO SLICE” VEGA  
 **Publisher / asset author:** VigWire Labs
 
-The approved **Vegas by the Slice v2** shell is the standing visual identity. Normal report updates refresh the edition and preserve that page architecture.
+The approved **Vegas by the Slice v3** shell is the standing visual identity. V2 remains preserved as historical shell material. Normal report updates refresh the edition and preserve the v3 page architecture.
 
 ### Visual language
 
