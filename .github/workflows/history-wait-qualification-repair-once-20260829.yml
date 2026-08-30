@@ -1,4 +1,4 @@
-name: One-time WAIT qualification history repair
+name: One-time durable-history transition repair
 
 on:
   push:
@@ -135,6 +135,108 @@ jobs:
           for (const file of changedFiles) console.log(`CHANGED ${file}`);
           NODE
 
+      - name: Audit all Stage 2 transition metadata before commit
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const CUTOFF = Date.parse('2026-08-25T15:24:44-07:00');
+          const MARKET_ONLY = /\b(bet\s*365|draftkings|odds[-\s]?api(?:\.io)?|live[-\s]?odds|sportsbook(?:\s+pair)?|two[-\s]?book|no[-\s]?vig|market consensus|market-derived)\b/i;
+          const PERSONNEL_STATES = new Set(['CONFIRMED','STRONG PROJECTION','PARTIAL','UNKNOWN']);
+          const SOURCE_CONFLICT_STATES = new Set(['NONE','MINOR','MATERIAL']);
+          const index = JSON.parse(fs.readFileSync('run-history.json', 'utf8'));
+          const issues = [];
+          let recommendationCount = 0;
+          let personnelCount = 0;
+          let waitCount = 0;
+
+          function nonEmpty(value) {
+            return typeof value === 'string' && value.trim().length > 0;
+          }
+          function issue(entry, rec, message, extra='') {
+            issues.push(`${entry.ts} | ${entry.researchFitPath} | #${rec?.ordinal ?? '?'} ${rec?.title || 'UNKNOWN'} | ${message}${extra ? ` | ${extra}` : ''}`);
+          }
+          function validQualification(q) {
+            if (!q || typeof q !== 'object' || Array.isArray(q)) return false;
+            if (q.actionableIfResolved !== true) return false;
+            if (!Array.isArray(q.blockers) || !q.blockers.length || q.blockers.some(x => !nonEmpty(x))) return false;
+            if (!Array.isArray(q.independentSignals) || !q.independentSignals.length) return false;
+            for (const signal of q.independentSignals) {
+              if (!signal || typeof signal !== 'object' || Array.isArray(signal)) return false;
+              if (!nonEmpty(signal.origin) || !nonEmpty(signal.finding) || MARKET_ONLY.test(signal.origin)) return false;
+            }
+            return nonEmpty(q.rationale);
+          }
+
+          for (const entry of (index.runs || []).filter(e => e?.researchFitPath && Date.parse(e.ts) >= CUTOFF).sort((a,b)=>Date.parse(a.ts)-Date.parse(b.ts))) {
+            const sidecar = JSON.parse(fs.readFileSync(entry.researchFitPath, 'utf8'));
+            for (const rec of sidecar.recommendations || []) {
+              recommendationCount++;
+              const status = String(rec?.status || '').toUpperCase();
+              if (typeof rec.personnelRequired !== 'boolean') issue(entry, rec, 'personnelRequired is not an explicit boolean');
+              if (rec.personnelEvidence && rec.personnelRequired !== true) issue(entry, rec, 'personnelEvidence exists while personnelRequired is not true');
+              if (rec.personnelRequired === true) {
+                personnelCount++;
+                const e = rec.personnelEvidence;
+                if (!e || typeof e !== 'object' || Array.isArray(e)) {
+                  issue(entry, rec, 'missing personnelEvidence');
+                } else {
+                  if (!nonEmpty(e.stage2CheckedAt) || !Number.isFinite(Date.parse(e.stage2CheckedAt))) issue(entry, rec, 'invalid personnelEvidence.stage2CheckedAt');
+                  if (!nonEmpty(e.dependencyTarget)) issue(entry, rec, 'missing personnelEvidence.dependencyTarget');
+                  if (!nonEmpty(e.dependencyRationale)) issue(entry, rec, 'missing personnelEvidence.dependencyRationale');
+                  if (!Array.isArray(e.officialSources) || e.officialSources.length === 0) {
+                    const candidates = (Array.isArray(e.fallbackSources) ? e.fallbackSources : [])
+                      .map(s => `${s?.origin || '?'} ${s?.url || ''}`.trim())
+                      .join(' ; ');
+                    issue(entry, rec, 'officialSources has no authoritative source', candidates ? `fallback candidates: ${candidates}` : 'no fallback candidates');
+                  }
+                  if (!Array.isArray(e.fallbackSources)) {
+                    issue(entry, rec, 'fallbackSources is not an array');
+                  } else {
+                    const origins = [];
+                    for (let i=0;i<e.fallbackSources.length;i++) {
+                      const source = e.fallbackSources[i];
+                      if (!source || typeof source !== 'object' || Array.isArray(source)) issue(entry, rec, `fallbackSources[${i}] is invalid`);
+                      else if (!nonEmpty(source.origin)) issue(entry, rec, `fallbackSources[${i}].origin is missing`);
+                      else origins.push(String(source.origin).trim().toLowerCase().replace(/\s+/g,' '));
+                    }
+                    if (new Set(origins).size !== origins.length) issue(entry, rec, 'fallbackSources contains duplicate origins');
+                    if (!Number.isInteger(e.fallbackSourceCount) || e.fallbackSourceCount < 0 || e.fallbackSourceCount !== e.fallbackSources.length) issue(entry, rec, 'fallbackSourceCount does not match fallbackSources length');
+                  }
+                  if (!(e.sourceShortfall === null || nonEmpty(e.sourceShortfall))) issue(entry, rec, 'sourceShortfall must be null or non-empty');
+                  if (!Array.isArray(e.facts)) issue(entry, rec, 'facts is not an array');
+                  if (!PERSONNEL_STATES.has(e.personnelState)) issue(entry, rec, `invalid personnelState=${e.personnelState}`);
+                  if (!SOURCE_CONFLICT_STATES.has(e.sourceConflict)) issue(entry, rec, `invalid sourceConflict=${e.sourceConflict}`);
+                  if (!Array.isArray(e.unresolved)) issue(entry, rec, 'unresolved is not an array');
+                  if (!nonEmpty(e.decisionSensitivity)) issue(entry, rec, 'missing decisionSensitivity');
+                  if (!nonEmpty(e.preStage2Fair)) issue(entry, rec, 'missing preStage2Fair');
+                  if (!nonEmpty(e.postStage2Fair)) issue(entry, rec, 'missing postStage2Fair');
+                  if (!nonEmpty(e.decisionImpact)) issue(entry, rec, 'missing decisionImpact');
+                  const unresolved = Array.isArray(e.unresolved) ? e.unresolved : [];
+                  const fallbackCount = Array.isArray(e.fallbackSources) ? e.fallbackSources.length : 0;
+                  const unresolvedMaterial = e.personnelState !== 'CONFIRMED' || unresolved.length > 0;
+                  if (unresolvedMaterial && fallbackCount < 3 && !nonEmpty(e.sourceShortfall)) issue(entry, rec, 'unresolved personnel has fewer than 3 fallback sources and no sourceShortfall');
+                  if (unresolvedMaterial && fallbackCount < 3 && !['PARTIAL','UNKNOWN'].includes(e.personnelState)) issue(entry, rec, `personnelState=${e.personnelState} overstates certainty with fewer than 3 fallback sources`);
+                  if (e.sourceConflict === 'MATERIAL' && e.personnelState === 'STRONG PROJECTION') issue(entry, rec, 'STRONG PROJECTION is invalid with MATERIAL source conflict');
+                }
+              }
+              if (status === 'WAIT') {
+                waitCount++;
+                if (!validQualification(rec.waitQualification)) issue(entry, rec, 'WAIT qualification remains invalid after repair');
+              } else if (rec.waitQualification) {
+                issue(entry, rec, `waitQualification present on non-WAIT status ${status}`);
+              }
+            }
+          }
+
+          console.log(`STAGE2 AUDIT RECOMMENDATIONS ${recommendationCount}`);
+          console.log(`STAGE2 AUDIT PERSONNEL-REQUIRED ${personnelCount}`);
+          console.log(`STAGE2 AUDIT WAITS ${waitCount}`);
+          console.log(`STAGE2 AUDIT ISSUE COUNT ${issues.length}`);
+          for (const line of issues) console.log(`ISSUE ${line}`);
+          if (issues.length) throw new Error(`Stage 2 transition audit found ${issues.length} issue(s)`);
+          NODE
+
       - name: Verify complete durable history after repair
         run: |
           node tools/report-publication.mjs verify
@@ -150,7 +252,7 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No repair changes were required.'
           else
-            git commit -m 'history: repair post-cutover WAIT qualification metadata'
+            git commit -m 'history: repair post-cutover durable-history metadata'
             git push origin HEAD:history-wait-repair-20260829
           fi
 
@@ -164,10 +266,10 @@ jobs:
       - name: Summary
         run: |
           {
-            echo '## WAIT qualification history repair'
+            echo '## Durable-history transition repair'
             echo
-            echo '- Audited every indexed WAIT at or after the 2026-08-25 15:24:44 PDT cutover'
-            echo '- Repaired only missing/invalid WAIT qualification metadata derivable from preserved sidecar evidence'
+            echo '- Audited every indexed recommendation at or after the 2026-08-25 15:24:44 PDT cutover'
+            echo '- Repaired only WAIT qualification metadata derivable from preserved sidecar evidence'
             echo '- Did not change issued report payloads, statuses, prices, fairs, play-to values or stakes'
             echo '- Durable report-history verification passed on the repaired branch'
             echo '- Core 1.4 post-cutover history verification passed on the repaired branch'
