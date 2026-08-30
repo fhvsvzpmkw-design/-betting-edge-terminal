@@ -6,7 +6,9 @@ const API_KEY=String(process.env.ODDSPAPI_API_KEY||'').trim();
 const PRIMARY_FILE=path.join('data','live-odds.json');
 const OUTFILE=path.join('data','oddspapi-observer.json');
 const RESERVE=25;
-const RETENTION_HORIZONS_HOURS={default:30,NFL:192,NFL_PRESEASON:192,BOXING:30};
+// Keep enough regular-season NFL runway for Graham's current-week board to be
+// initialized before Week 1 while leaving the tighter preseason horizon alone.
+const RETENTION_HORIZONS_HOURS={default:30,NFL:384,NFL_PRESEASON:192,BOXING:30};
 const ALWAYS_OBSERVE=new Set(['NFL','NFL_PRESEASON']);
 const TOURNAMENTS=[
   {key:'NBA',id:132},{key:'NFL',id:31},{key:'NFL_PRESEASON',id:233},
