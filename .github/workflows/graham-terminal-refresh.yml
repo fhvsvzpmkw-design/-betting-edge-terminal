@@ -1,0 +1,75 @@
+name: Refresh Graham NFL terminal
+
+on:
+  workflow_run:
+    workflows:
+      - Refresh Betting Edge odds
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: graham-nfl-terminal-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Rebuild and publish Graham terminal
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            # No external API calls occur here. These tools only consume the
+            # odds and research state that is already committed to main.
+            node tools/capture-graham-daily-pinnacle.mjs
+            node tools/build-graham-current-week.mjs
+
+            git add -- data/walters/nfl/current-week-terminal.json
+            git add -- data/walters/nfl/2026/week-01-daily-market-ledger.json
+
+            if git diff --cached --quiet; then
+              echo "Graham terminal already current."
+              exit 0
+            fi
+
+            git commit -m "Refresh Graham NFL terminal"
+            if git push origin HEAD:main; then
+              echo "Graham terminal published on attempt $attempt."
+              exit 0
+            fi
+            echo "Graham terminal publish collision on attempt $attempt; rebuilding from latest main."
+          done
+
+          echo "Graham terminal could not be published after 4 attempts." >&2
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Graham Mercer // The Nineteenth Hole"
+            echo
+            echo "- Trigger: post-odds refresh"
+            echo "- External API calls: none"
+            echo "- Live board: current NFL week"
+            echo "- Official daily Pinnacle capture: 15:15 report only, when an independent Graham number exists"
+            echo "- Market isolation: Graham number first; Pinnacle comparison second"
+          } >> "$GITHUB_STEP_SUMMARY"
