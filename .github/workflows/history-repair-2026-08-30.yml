@@ -1,0 +1,82 @@
+name: One-time Aug 30 history metadata repair
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/history-repair-2026-08-30.yml
+
+concurrency:
+  group: betting-edge-report-history
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Repair derived Core 1.4 metadata on the 06:00 sidecar
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {evaluate, loadProductionFramework} from './tools/core-handicap-framework.mjs';
+
+          const file = 'data/history/research-fit/2026-08-30/open-060530.json';
+          const sidecar = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const framework = loadProductionFramework();
+          let normalized = 0;
+
+          for (const item of sidecar.recommendations || []) {
+            const assessment = item?.coreAssessment;
+            const context = assessment?.context;
+            if (!assessment || !context) continue;
+
+            if (context.bookDispersion === 'MINOR') {
+              context.bookDispersion = 'MODERATE';
+              normalized++;
+            }
+
+            const actual = evaluate(framework, context);
+            assessment.modelErrorState = actual.modelErrorState;
+            assessment.betEligibleByModelError = actual.betEligibleByModelError;
+            assessment.effects = actual.effects;
+            assessment.appliedRules = actual.appliedRules;
+            assessment.reasons = actual.reasons;
+          }
+
+          if (normalized !== 2) {
+            throw new Error(`Expected exactly two MINOR dispersion repairs, found ${normalized}`);
+          }
+
+          fs.writeFileSync(file, JSON.stringify(sidecar, null, 2) + '\n');
+          NODE
+      - name: Verify all durable history after repair
+        run: |
+          set +e
+          node tools/report-publication.mjs verify
+          publisher=$?
+          node tools/core-v14-publication-gate.mjs verify-history
+          core=$?
+          if [ "$publisher" -ne 0 ] || [ "$core" -ne 0 ]; then
+            exit 1
+          fi
+      - name: Commit repaired sidecar only
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/history/research-fit/2026-08-30/open-060530.json
+          git diff --cached --quiet && exit 0
+          git commit -m "history: repair 2026-08-30 open Core metadata"
+          git push origin HEAD:main
