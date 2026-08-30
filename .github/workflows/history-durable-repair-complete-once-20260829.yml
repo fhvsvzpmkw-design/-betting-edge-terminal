@@ -151,6 +151,12 @@ jobs:
                 const a = item.coreAssessment;
                 if(!a?.context) throw new Error(`${sidecarPath} #${item.ordinal}: missing Core 1.4 assessment context`);
 
+                if(entry.ts === '2026-08-29T09:31:08.000-07:00' && item.ordinal === 9 && item.title === 'Jacksonville State Gamecocks moneyline' && a.context.bookDispersion === 'LOW'){
+                  a.context.bookDispersion = 'MODERATE';
+                  changed = true;
+                  repairs.push(`CORE-CONTEXT ${entry.ts} #9 Jacksonville State Gamecocks moneyline bookDispersion LOW→MODERATE`);
+                }
+
                 const w = item.waltersEvidence;
                 const waltersEligible = a.context.sport === 'NFL' && ['spread','moneyline'].includes(a.context.marketClass);
                 if(waltersEligible && w?.availability === 'STALE'){
@@ -217,6 +223,7 @@ jobs:
             .github/workflows/history-sidecar-alignment-audit-once-20260829.yml \
             .github/workflows/history-core14-derived-audit-once-20260829.yml \
             .github/workflows/history-walters-evidence-audit-once-20260829.yml \
+            .github/workflows/history-core14-context-audit-once-20260829.yml \
             .github/workflows/history-durable-repair-complete-once-20260829.yml; do
             if [ -e "$file" ]; then git rm -f "$file"; fi
           done
