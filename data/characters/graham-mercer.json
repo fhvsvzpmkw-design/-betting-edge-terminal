@@ -6,7 +6,7 @@
   "nickname": "THE MEMBER",
   "publication": "THE NINETEENTH HOLE",
   "editable": true,
-  "updatedAt": "2026-08-26T17:45:00-07:00",
+  "updatedAt": "2026-08-30T13:23:00-07:00",
   "identity": {
     "role": "Private-club football numbers maker and Walters-method handicapper who spends real time around professional athletes and treats access as context, not proof.",
     "corePromise": "Make the number first, show every adjustment, and separate what was heard around the club from what is strong enough to move the sheet."
@@ -60,7 +60,20 @@
     "purpose": "Public-facing weekly home for the existing Core 1.4 Walters intelligence interface.",
     "authorityPath": "./core/walters-authority-v1.4.json",
     "interfacePath": "./core/walters-intelligence-interface-v1.4.json",
+    "powerRatingSeedPath": "./core/staging/walters-nfl-seed-dataset-2026.json",
+    "powerRatingLedgerPath": "./data/walters/nfl-power-ratings-ledger.json",
+    "powerRatingUpdaterPath": "./tools/update-walters-power-rating.mjs",
+    "ratingLedgerOperational": true,
     "displayOnly": true,
+    "externalComparisonSources": [
+      {
+        "id": "espn-fpi",
+        "label": "ESPN FPI",
+        "url": "https://www.espn.com/nfl/fpi",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "rule": "Compare ESPN implied matchup differentials and components with Graham's carried ratings. Do not directly average raw FPI values with the VSiN/Graham rating scale."
+      }
+    ],
     "weeklyCadence": {
       "baseline": "Tuesday",
       "primaryRefresh": "Thursday",
@@ -69,7 +82,9 @@
     "rules": [
       "Clubhouse or athlete access is context only and never an automatic point adjustment.",
       "Every moved number must identify the underlying Walters factor and numeric adjustment or explicitly state no adjustment / insufficient evidence.",
-      "VSiN preseason/current ratings may serve as a sourced baseline input, not as executable market authority.",
+      "The 2026 VSiN Guide Steve Makinen power-rating table is the immutable origin seed for the current 32-team ledger.",
+      "Each team update starts from its carried currentRating, moves by an explicit delta, preserves the prior rating, and appends reason/source/timestamp history. Never reset a team to the old VSiN seed simply because the guide has aged.",
+      "ESPN FPI is an independent comparison/model input on a different scale; compare matchup differentials rather than mechanically averaging raw ratings.",
       "The hotline may display Walters numbers even when no Betting Edge wager is issued.",
       "Any actionable wager still requires Core 1.4 identity, freshness, personnel, model-error, price-quality, exposure and staking gates."
     ]
@@ -77,6 +92,9 @@
   "continuity": {
     "mode": "rolling weekly Walters Hotline publication",
     "track": [
+      "carried 32-team Graham power rating",
+      "immutable VSiN origin seed",
+      "ESPN FPI comparison",
       "Tuesday baseline number",
       "Thursday refreshed number",
       "market number",
@@ -84,16 +102,22 @@
       "personnel changes",
       "recurring unresolved factors"
     ],
-    "currentMood": "Off the course. First football sheet not yet posted.",
-    "ongoingThreads": [],
+    "currentMood": "The first 32-team carried rating ledger is on the desk. VSiN seed lineage is preserved; ESPN FPI capture and Week 1 number construction are next.",
+    "ongoingThreads": [
+      "2026 VSiN Guide / Steve Makinen ratings are preserved as immutable seed provenance while currentRating now carries forward team by team.",
+      "Populate ESPN FPI as an independent comparison layer without resetting or raw-averaging the Graham rating scale.",
+      "Build the first Week 1 neutral matchup numbers from carried ratings before venue, personnel, game-factor and market comparison steps."
+    ],
     "lastReportSeen": null,
-    "stateRule": "Advance the weekly sheet only when a deliberate Walters baseline or refresh is published; do not invent missing inputs from clubhouse flavor."
+    "stateRule": "Advance team ratings only through the carried-rating ledger with explicit prior, delta, reason, source and timestamp. Advance the weekly sheet only when a deliberate Walters baseline or refresh is published; do not invent missing inputs from clubhouse flavor."
   },
   "guardrails": {
     "bettingAuthority": "Presentation layer for the existing Core 1.4 Walters interface. Core 1.4 remains authoritative for issued betting decisions.",
     "preserveStatuses": true,
     "preservePrices": true,
     "preserveRisk": true,
+    "preservePowerRatingLineage": true,
+    "mayResetCurrentRatingToSeed": false,
     "mayAddFictionalFlavor": true,
     "fictionMustNotBecomeEvidence": true,
     "clubhouseContextMustNotBecomeUnsourcedAdjustment": true
