@@ -170,9 +170,9 @@
       .watchMarketConditions{margin-top:5px;color:#d6c983;font-size:9px}.watchMarketConditions b{color:#fff0a2}
 
       /* Compact Reprice at the top; run times dock below the VIG SCOPE instrument. */
-      .runnerHeadRight>.runnerRefresh{margin:0!important;padding:4px 0 0!important;border:0!important;background:transparent!important;box-shadow:none!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:5px 8px!important;align-items:center!important}
+      .runnerHeadRight>.runnerRefresh{margin:0!important;padding:3px 0 0!important;border:0!important;background:transparent!important;box-shadow:none!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:4px 6px!important;align-items:center!important}
       .runnerHeadRight>.runnerRefresh .runnerRefreshActions{display:block!important;margin:0!important;padding:0!important}
-      .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{min-height:28px!important;padding:5px 8px!important;font-size:9px!important;line-height:1!important;white-space:nowrap!important}
+      .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{min-height:22px!important;padding:3px 5px!important;font-size:8px!important;line-height:1!important;white-space:nowrap!important}
       .runnerHeadRight>.runnerRefresh .runnerRefreshStatus{margin:0!important;padding:0!important;border:0!important;background:transparent!important;font-size:8px!important;line-height:1.3!important;color:var(--muted)!important;text-align:left!important}
       .runnerHeadRight>.runnerRefresh .deltaStrip{grid-column:1/-1!important;margin:2px 0 0!important}
       #runnerLive>.runnerSessionDock{margin:10px 0 8px!important}
@@ -185,12 +185,13 @@
         #runnerLive .runnerHeadRight{min-width:0!important;max-width:470px!important;width:min(100%,470px)!important;justify-self:end!important}
         #runnerLive .runnerFresh{justify-content:flex-end!important;text-align:right!important}
         .runnerHeadRight>.runnerRefresh{justify-content:end!important}
+        .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{min-height:21px!important;padding:3px 5px!important;font-size:7.5px!important}
       }
 
       @media(max-width:520px){
         .gameWindowIntel{margin-top:5px}.gameWindowState{padding:3px 6px;font-size:8px;letter-spacing:.055em}.watchMarketIntel{padding:7px 8px}.watchMarketFacts{gap:7px}.watchMarketTitle{font-size:10px}.watchMarketBadge{font-size:9px}
-        .runnerHeadRight>.runnerRefresh{grid-template-columns:auto minmax(0,1fr)!important;gap:5px 7px!important}
-        .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{font-size:9px!important;padding:5px 7px!important}
+        .runnerHeadRight>.runnerRefresh{grid-template-columns:auto minmax(0,1fr)!important;gap:4px 5px!important}
+        .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{font-size:8px!important;padding:3px 5px!important;min-height:22px!important}
         .runnerHeadRight>.runnerRefresh .runnerRefreshStatus{font-size:7.5px!important}
         #runnerLive>.runnerSessionDock>.sessionStrip{gap:5px!important;overflow-x:auto!important}
         #runnerLive>.runnerSessionDock>.sessionStrip .sessionChip{font-size:11px!important;min-width:64px!important;min-height:38px!important;padding:8px 6px!important}
