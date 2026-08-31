@@ -1,0 +1,62 @@
+name: Scroll next two-loop cleanup
+on:
+  push:
+    branches: [fix/scroll-next-two-loops]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/scroll-next-two-loops
+          fetch-depth: 0
+      - name: Remove only Meat and Preferences persistent loops
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              text=p.read_text()
+              count=text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one target, found {count}')
+              p.write_text(text.replace(old,new,1))
+
+          replace_once(
+              'assets/season-previews-ui.js',
+              "let n=0,t=setInterval(()=>{if(attach()||++n>200)clearInterval(t)},100);setInterval(()=>{let q=d();if(q)ensure(q)},1200);",
+              "let n=0,t=setInterval(()=>{if(attach()||++n>200)clearInterval(t)},100);window.addEventListener('pageshow',()=>{let q=d();if(q)ensure(q)});"
+          )
+
+          replace_once(
+              'assets/preferences-framework.js',
+              "  let tries=0;\n  const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);\n  setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500);",
+              "  let tries=0;\n  const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);\n  window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});"
+          )
+          PY
+      - name: Verify exact scope
+        run: |
+          node --check assets/season-previews-ui.js
+          node --check assets/preferences-framework.js
+          python3 - <<'PY'
+          from pathlib import Path
+          meat=Path('assets/season-previews-ui.js').read_text()
+          prefs=Path('assets/preferences-framework.js').read_text()
+          assert "setInterval(()=>{let q=d();if(q)ensure(q)},1200)" not in meat
+          assert "setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500)" not in prefs
+          print('next two-loop cleanup static checks passed')
+          PY
+          git diff --check
+          CHANGED="$(git diff --name-only)"
+          test "$CHANGED" = $'assets/preferences-framework.js\nassets/season-previews-ui.js'
+      - name: Save narrow cleanup
+        run: |
+          rm .github/workflows/scroll-next-two-loops.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/preferences-framework.js assets/season-previews-ui.js .github/workflows/scroll-next-two-loops.yml
+          git commit -m 'Remove Meat and Preferences polling loops'
+          git push origin HEAD:fix/scroll-next-two-loops
