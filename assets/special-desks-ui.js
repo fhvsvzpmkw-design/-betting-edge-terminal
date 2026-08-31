@@ -296,5 +296,5 @@ Promise.all([
   fetch(`${CRYPTO_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
 ]).then(([p,c])=>{pizza=p;crypto=c;const d=appDoc();if(d)ensureButtons(d)});
 let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
-setInterval(()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}},600);
+window.addEventListener('pageshow',()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}});
 })();
