@@ -1,10 +1,13 @@
-name: Build canonical VigScope shell
+name: Canonical VigScope build
 
 on:
   push:
-    branches: [refactor/canonical-vigscope]
+    branches:
+      - refactor/canonical-vigscope
     paths:
       - .github/workflows/canonical-vigscope-build.yml
+      - tools/build-canonical-vigscope.py
+      - tests/canonical-vigscope-smoke.mjs
 
 permissions:
   contents: write
@@ -14,50 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out branch
+        uses: actions/checkout@v4
         with:
           ref: refactor/canonical-vigscope
           fetch-depth: 0
 
-      - name: Generate canonical current app
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          index = Path('index.html').read_text(encoding='utf-8')
-          core = Path('runner-core.html').read_text(encoding='utf-8')
-          runner = Path('runner.html').read_text(encoding='utf-8')
-          style_match = re.search(r'<style>([\s\S]*?)</style>', index, re.I)
-          history_match = re.search(r'<section id="history"[\s\S]*?</section>', index, re.I)
-          if not style_match or not history_match: raise SystemExit('Could not extract base VigScope style/history shell')
-          index_scripts = re.findall(r'<script>([\s\S]*?)</script>', index, re.I)
-          base_scripts = [s for s in index_scripts if not ('run-history.json' in s and 'runArchiveSync' in s)]
-          core_scripts = re.findall(r'<script>([\s\S]*?)</script>', core, re.I)
-          runtime = next((s for s in core_scripts if "const HISTORY_KEY='bettingEdge.runnerHistory.v1.3'" in s), None)
-          if runtime is None: raise SystemExit('Could not extract runner-core runtime')
-          runtime = runtime.replace("$('#app').src='./index.html?build='+Date.now();\n", '')
-          Path('assets/runner-core-runtime.js').write_text(runtime.strip()+"\n", encoding='utf-8')
-          history = history_match.group(0)
-          style = style_match.group(1)
-          base_runtime = '\n'.join(f'<script>\n{s}\n</script>' for s in base_scripts)
-          app = f'''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>VigScope Terminal UI v1.5 App</title><style>{style}</style></head><body>
-<main class="term"><header class="top"><div><div class="title">VIGSCOPE TERMINAL UI v1.5</div><div class="small muted">CURRENT APPLICATION SHELL</div></div></header>
-<section class="stats grid"><div class="stat"><div class="key">BANKROLL</div><b class="g" id="masterBankroll">$0.00</b></div><div class="stat"><div class="key">NEW RISK</div><b>$0.00</b></div><div class="stat"><div class="key">MASTER WAGERS</div><b class="c" id="masterWagers">—</b></div><div class="stat"><div class="key">LEDGER PAGES</div><b class="g" id="masterPages">—</b></div><div class="stat"><div class="key">BET</div><b class="y">0</b></div><div class="stat"><div class="key">LEAN</div><b class="y">0</b></div><div class="stat"><div class="key">WAIT / PASS</div><b class="c">0 / 0</b></div></section>
-<div class="pad"><div class="qa"><span class="tag g" id="qaCount">LEDGER: CHECKING</span></div></div><div class="pad"><nav class="tabs"><button class="btn" data-view="board">[F1] BOARD</button><button class="btn" data-view="market">[F2] MARKET</button><button class="btn" data-view="history">[F3] BET HISTORY</button><button class="btn" data-view="engine">[F4] ENGINE</button></nav></div>
-<section id="board" class="view pad hidden"></section><section id="market" class="view pad hidden"></section>{history}<section id="engine" class="view pad hidden"></section><footer class="foot"></footer></main>
-<div id="app" style="display:none!important" aria-hidden="true"></div><div id="err" style="display:none;position:fixed;z-index:2147482000;left:10px;right:10px;top:10px;padding:10px;background:#25060d;color:#ff9cad;border:1px solid #ff6178;font:12px ui-monospace,SFMono-Regular,Menlo,monospace"></div>
-<script>(()=>{{const app=document.getElementById('app');try{{Object.defineProperty(app,'contentDocument',{{configurable:true,get:()=>document}})}}catch(e){{}}try{{Object.defineProperty(app,'contentWindow',{{configurable:true,get:()=>window}})}}catch(e){{}}}})();</script>
-{base_runtime}
-<script src="./assets/runner-core-runtime.js"></script><script>(()=>{{const app=document.getElementById('app');app.dispatchEvent(new Event('load'));document.dispatchEvent(new CustomEvent('vigscope-app-ready'));}})();</script></body></html>'''
-          for text in ['CORE v1.4 RUN ARCHIVE','NEW YORK LIBERTY @ INDIANA FEVER','CURRENT REFERENCE BOARD // SNAPSHOT + ATTRIBUTION','CORE v1.4 SOURCE MONITOR // FREE STACK','CUSTOMER SPORTSBOOK MODEL // v1.3 ACTIVE DESIGN']:
-              if text in app: raise SystemExit(f'Legacy page content leaked into canonical app: {text}')
-          Path('runner-app.html').write_text(app, encoding='utf-8')
-          old = "const coreUrl=new URL('./runner-core.html',location.href);"
-          new = "const coreUrl=new URL('./runner-app.html',location.href);"
-          if old not in runner: raise SystemExit('runner.html core target not found')
-          Path('runner.html').write_text(runner.replace(old,new,1), encoding='utf-8')
-          PY
+      - name: Generate canonical app
+        run: python3 tools/build-canonical-vigscope.py
 
       - name: Static checks
         run: |
@@ -73,48 +40,24 @@ jobs:
           ! grep -q "SOURCE MONITOR // FREE STACK" runner-app.html
           test "$(grep -o '<iframe' runner-app.html | wc -l)" -eq 0
 
+      - name: Install smoke-test browser client
+        run: npm --silent install puppeteer-core@24 >/dev/null 2>&1
+
       - name: Chromium smoke test
         run: |
           CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$CHROME"
-          npm --silent install puppeteer-core@24 >/dev/null 2>&1
           python3 -m http.server 8765 >/tmp/vigscope-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
-          PAYLOAD=$(python3 - <<'PY'
-          import base64,json
-          p={"slot":"late","label":"18:15 LATE / WEST COAST","ts":"2026-08-30T18:21:30.000-07:00","bankroll":495.41,"risk":0,"counts":{"bet":0,"lean":0,"wait":0,"pass":5},"summary":"CANONICAL SHELL SMOKE TEST","recs":[]}
-          print(base64.urlsafe_b64encode(json.dumps(p,separators=(',',':')).encode()).decode().rstrip('='))
-          PY
-          )
-          CHROME="$CHROME" PAYLOAD="$PAYLOAD" node <<'JS'
-          const puppeteer=require('puppeteer-core');
-          (async()=>{
-            const browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
-            const page=await browser.newPage();
-            const pageErrors=[]; page.on('pageerror',e=>pageErrors.push(String(e)));
-            await page.goto('http://127.0.0.1:8765/runner.html#run='+process.env.PAYLOAD,{waitUntil:'networkidle0',timeout:45000});
-            await new Promise(r=>setTimeout(r,6500));
-            const state=await page.evaluate(()=>{const core=document.getElementById('core');const cd=core&&core.contentDocument;const shim=cd&&cd.getElementById('app');const d=shim&&shim.contentDocument;const text=d?d.documentElement.textContent:'';return {coreSrc:core&&core.getAttribute('src'),nestedIframes:cd?cd.querySelectorAll('iframe').length:-1,shimTag:shim&&shim.tagName,title:d&&d.querySelector('.top .title')&&d.querySelector('.top .title').textContent,runnerLive:!!(d&&d.getElementById('runnerLive')),runnerTitle:d&&d.querySelector('#runnerLive .runnerTitle')&&d.querySelector('#runnerLive .runnerTitle').textContent,historyPreserved:!!(d&&d.getElementById('summaryOverallRoi')&&d.getElementById('ledgerBody')),oldArchive:text.includes('CORE v1.4 RUN ARCHIVE'),oldLiberty:text.includes('NEW YORK LIBERTY @ INDIANA FEVER'),oldSourceMonitor:text.includes('CORE v1.4 SOURCE MONITOR // FREE STACK'),oldMarket:text.includes('CURRENT REFERENCE BOARD // SNAPSHOT + ATTRIBUTION')};});
-            console.log(JSON.stringify({state,pageErrors},null,2));
-            const fail=m=>{throw new Error(m)};
-            if(!String(state.coreSrc||'').includes('runner-app.html'))fail('runner did not target canonical app');
-            if(state.nestedIframes!==0)fail('canonical app still contains an inner iframe');
-            if(state.shimTag!=='DIV')fail('compatibility shim is not a DIV');
-            if(!String(state.title||'').includes('VIGSCOPE TERMINAL UI v1.5'))fail('v1.5 title overlay missing');
-            if(!state.runnerLive||!String(state.runnerTitle||'').includes('18:15'))fail('current runner report did not render');
-            if(!state.historyPreserved)fail('F3 history/ledger structure was not preserved');
-            if(state.oldArchive||state.oldLiberty||state.oldSourceMonitor||state.oldMarket)fail('legacy visible page content remains');
-            if(pageErrors.length)fail('page errors: '+pageErrors.join(' | '));
-            await browser.close();
-          })().catch(e=>{console.error(e);process.exit(1)});
-          JS
+          PAYLOAD=$(python3 -c 'import base64,json; p={"slot":"late","label":"18:15 LATE / WEST COAST","ts":"2026-08-30T18:21:30.000-07:00","bankroll":495.41,"risk":0,"counts":{"bet":0,"lean":0,"wait":0,"pass":5},"summary":"CANONICAL SHELL SMOKE TEST","recs":[]}; print(base64.urlsafe_b64encode(json.dumps(p,separators=(",",":")).encode()).decode().rstrip("="))')
+          CHROME="$CHROME" PAYLOAD="$PAYLOAD" node tests/canonical-vigscope-smoke.mjs
 
-      - name: Commit canonical shell and remove one-time workflow
+      - name: Save canonical app and remove one-time workflow
         run: |
           rm -f .github/workflows/canonical-vigscope-build.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add runner.html runner-app.html assets/runner-core-runtime.js .github/workflows/canonical-vigscope-build.yml
+          git add runner.html runner-app.html assets/runner-core-runtime.js tools/build-canonical-vigscope.py tests/canonical-vigscope-smoke.mjs .github/workflows/canonical-vigscope-build.yml
           git commit -m "Promote current VigScope UI to canonical app"
           git push origin HEAD:refactor/canonical-vigscope
