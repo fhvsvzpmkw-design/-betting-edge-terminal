@@ -1,0 +1,46 @@
+name: Narrow special desks observer
+on:
+  push:
+    branches: [fix/narrow-special-desks-observer-run]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/narrow-special-desks-observer-run
+      - name: Narrow only Pizza Crypto observer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/special-desks-ui.js')
+          s=p.read_text()
+          old="""function attach(){\n  const d=appDoc();if(!d?.body)return false;\n  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));observer.observe(d.body,{subtree:true,childList:true,characterData:true})}\n  bindKeys(d);ensureButtons(d);return true;\n}"""
+          new="""function attach(){\n  const d=appDoc();if(!d?.body)return false;\n  const nav=d.querySelector('.runnerNavPad');if(!nav)return false;\n  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));observer.observe(nav,{subtree:true,childList:true})}\n  bindKeys(d);return ensureButtons(d);\n}"""
+          if old not in s:
+              raise SystemExit('special desks attach pattern not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Verify exact scope
+        run: |
+          node --check assets/special-desks-ui.js
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('assets/special-desks-ui.js').read_text()
+          assert "observer.observe(nav,{subtree:true,childList:true})" in s
+          assert "observer.observe(d.body,{subtree:true,childList:true,characterData:true})" not in s
+          assert "const nav=d.querySelector('.runnerNavPad');if(!nav)return false;" in s
+          assert "bindKeys(d);return ensureButtons(d);" in s
+          PY
+          test "$(git diff --name-only)" = "assets/special-desks-ui.js"
+          git diff --check
+      - name: Save narrow cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/special-desks-ui.js
+          git commit -m "Narrow Pizza Crypto observer"
+          git push origin HEAD:fix/narrow-special-desks-observer-run
