@@ -129,7 +129,8 @@ async function load(){
   loading=false;
 }
 function patch(){const d=doc();if(!d||!cached)return false;return apply(d,cached)}
-load().then(patch);
+function obs(){const d=doc(),engine=d?.getElementById('engine');if(!engine||engine.dataset.whyVigScopeObserver==='1')return false;engine.dataset.whyVigScopeObserver='1';let q=false;new MutationObserver(()=>{if(!cached||q||applying)return;q=true;requestAnimationFrame(()=>{q=false;apply(d,cached)})}).observe(engine,{childList:true,subtree:true});return true}
+load().then(()=>{obs();patch()});
 let tries=0;
 const boot=setInterval(()=>{
   tries++;
@@ -137,6 +138,5 @@ const boot=setInterval(()=>{
   if(!cached&&!loading)load().then(patch);
   if((cached&&patch())||tries>250)clearInterval(boot);
 },60);
-setInterval(()=>patch(),700);
-setInterval(()=>load().then(patch),60000);
+window.addEventListener('pageshow',()=>load().then(()=>{obs();patch()}));
 })();

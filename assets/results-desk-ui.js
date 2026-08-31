@@ -323,5 +323,5 @@ const timer=setInterval(()=>{
   if(d&&install(d))clearInterval(timer);
   if(tries>250)clearInterval(timer);
 },40);
-setInterval(()=>{const d=appDoc();if(d)install(d)},700);
+function refreshCachedValue(){const d=appDoc();if(d&&cached)refreshCash(d,cached.priceAnalytics||{})}window.addEventListener('pageshow',refreshCachedValue);window.addEventListener('focus',refreshCachedValue);
 })();

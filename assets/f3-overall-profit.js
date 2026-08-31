@@ -69,7 +69,7 @@ function observeDocument(d){
   observedDocument=d;
   ensureOverallProfit(d);
   observer=new MutationObserver(()=>ensureOverallProfit(d));
-  observer.observe(d.body,{subtree:true,childList:true,characterData:true});
+  const target=d.getElementById('history')||d.body;observer.observe(target,{subtree:true,childList:true,characterData:true});
 }
 
 function scheduleRetry(){

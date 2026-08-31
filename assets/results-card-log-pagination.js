@@ -154,7 +154,28 @@ async function load(){
 }
 function tick(){const d=appDoc();if(d)apply(d)}
 
-load().then(tick);
-setInterval(tick,150);
-setInterval(()=>load().then(tick),60000);
+function bindResultsCardLogObserver(){
+  const d=appDoc(),engine=d?.getElementById('engine');
+  if(!engine)return false;
+  if(engine.dataset.resultsCardLogObserver==='1')return true;
+  engine.dataset.resultsCardLogObserver='1';
+  let queued=false;
+  const observer=new MutationObserver(()=>{
+    if(queued||applying)return;
+    queued=true;
+    requestAnimationFrame(()=>{queued=false;apply(d)});
+  });
+  observer.observe(engine,{childList:true,subtree:true});
+  return true;
+}
+load().then(()=>{bindResultsCardLogObserver();tick()});
+let observerTries=0;
+const observerBoot=setInterval(()=>{
+  observerTries+=1;
+  if(bindResultsCardLogObserver()){
+    tick();
+    clearInterval(observerBoot);
+  }else if(observerTries>120)clearInterval(observerBoot);
+},100);
+window.addEventListener('pageshow',()=>load().then(tick));
 })();
