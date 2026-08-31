@@ -329,6 +329,6 @@ Promise.all([
   hotlineShells=shellData;
   let tries=0;
   const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);
-  setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500);
+  window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});
 }).catch(e=>console.warn('Preferences framework unavailable',e));
 })();

@@ -35,5 +35,5 @@ function bind(q){if(q.documentElement.dataset.mdShelf==='1')return;q.documentEle
 function ensure(q){if(!q?.body)return false;css(q);if(!button(q))return false;if(!q.getElementById(W))render(q);bind(q);return true}
 async function load(){if(asked)return;asked=true;try{let r=await fetch(`${M}?v=${Date.now()}`,{cache:'no-store'});if(r.ok)data=await r.json()}catch{}let q=d();if(q){ensure(q);button(q);if(q.body.classList.contains('runnerSeasonPreviewsLoaded'))render(q)}}
 function attach(){let q=d();if(!q?.body)return false;if(q!==doc){doc=q;if(obs)obs.disconnect();obs=new MutationObserver(()=>requestAnimationFrame(()=>ensure(q)));obs.observe(q.body,{subtree:true,childList:true})}ensure(q);load();return true}
-let n=0,t=setInterval(()=>{if(attach()||++n>200)clearInterval(t)},100);setInterval(()=>{let q=d();if(q)ensure(q)},1200);
+let n=0,t=setInterval(()=>{if(attach()||++n>200)clearInterval(t)},100);window.addEventListener('pageshow',()=>{let q=d();if(q)ensure(q)});
 })();
