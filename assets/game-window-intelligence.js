@@ -173,7 +173,7 @@
       #runnerLive .runnerHead.runnerUtilityDetached{grid-template-columns:1fr!important}
       #runnerLive .runnerHead.runnerUtilityDetached>.runnerHeadRight{display:none!important}
       #runnerLive>.runnerUtilityDock{margin:8px 0 8px!important;display:grid!important;gap:5px!important}
-      #runnerLive>.runnerUtilityDock>.runnerFresh{margin:0!important;padding:6px 8px!important;justify-content:flex-start!important;text-align:left!important}
+      #runnerLive>.runnerUtilityDock>.runnerFresh{margin:0!important;padding:6px 8px!important;justify-content:center!important;text-align:center!important}
       #runnerLive>.runnerUtilityDock>.runnerRefresh{margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:4px 6px!important;align-items:center!important}
       #runnerLive>.runnerUtilityDock>.runnerRefresh .runnerRefreshActions{display:block!important;margin:0!important;padding:0!important}
       #runnerLive>.runnerUtilityDock>.runnerRefresh .runnerRefreshBtn{min-height:22px!important;padding:3px 5px!important;font-size:8px!important;line-height:1!important;white-space:nowrap!important}
