@@ -1,0 +1,78 @@
+=== contentDocument references ===
+./syndicates/slot-host.html:74:function getPreviewScrollTop(){try{const frame=currentPreviewFrame();if(!frame||!frame.contentWindow)return 0;const d=frame.contentDocument;return Number(frame.contentWindow.scrollY||(d&&d.scrollingElement&&d.scrollingElement.scrollTop)||0)||0}catch(e){return 0}}
+./syndicates/slot-host.html:81:function bindHotlineTap(frame){frame.addEventListener('load',()=>{try{const d=frame.contentDocument;if(!d||d.documentElement.dataset.hotlineTapBound==='1')return;d.documentElement.dataset.hotlineTapBound='1';d.addEventListener('click',e=>{const t=e.target;if(t&&t.closest&&t.closest('a,button,input,select,textarea,label,[role="button"],[contenteditable="true"]'))return;enterFullscreen()})}catch(e){}})}
+./runner-core.html:638:  const frame=$('#app'),d=frame.contentDocument;if(!d)return;
+./runner.html:43:function innerAppFrame(){try{return core.contentDocument&&core.contentDocument.getElementById('app')}catch(e){return null}}
+./runner.html:45:function resetRunnerScroll(app){try{app&&app.contentWindow&&app.contentWindow.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){}try{app&&app.contentDocument&&app.contentDocument.scrollingElement&&(app.contentDocument.scrollingElement.scrollTop=0)}catch(e){}}
+./runner.html:84:  const app=innerAppFrame();let d=null;try{d=app&&app.contentDocument}catch(e){return false}if(!d||!d.head||!d.body)return false;
+./runner.html:134:function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
+./assets/results-player-base-v5.js:4:function doc(){try{const c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
+./assets/season-previews-ui.js:5:function d(){try{let c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
+./assets/special-desks-ui.js:19:    const app=core?.contentDocument?.getElementById('app');
+./assets/special-desks-ui.js:20:    return app?.contentDocument||null;
+./assets/preferences-framework.js:20:    const app=core?.contentDocument?.getElementById('app');
+./assets/preferences-framework.js:21:    return app?.contentDocument||null;
+./assets/results-desk-ui.js:15:    const app=core?.contentDocument?.getElementById('app');
+./assets/results-desk-ui.js:16:    return app?.contentDocument||null;
+./assets/schedule-profile-ui.js:14:    const app=core?.contentDocument?.getElementById('app');
+./assets/schedule-profile-ui.js:15:    return app?.contentDocument||null;
+./assets/terminal-header-bankroll-sync.js:22:    const app=core?.contentDocument?.getElementById('app')||null;
+./assets/terminal-header-bankroll-sync.js:23:    return {app,d:app?.contentDocument||null};
+./assets/why-vigscope-v2.js:14:    const app=core?.contentDocument?.getElementById('app');
+./assets/why-vigscope-v2.js:15:    return app?.contentDocument||null;
+./assets/primary-nav-shell.js:19:    const app=core?.contentDocument?.getElementById('app');
+./assets/primary-nav-shell.js:20:    return app?.contentDocument||null;
+./assets/primary-nav-shell.js:55:    const app=core?.contentDocument?.getElementById('app');
+./assets/game-window-intelligence.js:263:      const d=app?.contentDocument;
+./assets/game-window-intelligence.js:289:      const d=app?.contentDocument;
+./assets/game-window-intelligence.js:333:      const d=app?.contentDocument;
+./assets/card-view-preference.js:23:      const app=core?.contentDocument?.getElementById('app');
+./assets/card-view-preference.js:24:      return app?.contentDocument||null;
+./assets/menu-order-controller.js:31:    const app=core?.contentDocument?.getElementById('app');
+./assets/menu-order-controller.js:32:    return app?.contentDocument||null;
+./assets/f3-overall-profit.js:87:    app=core?.contentDocument?.getElementById('app')||null;
+./assets/f3-overall-profit.js:96:  try{d=app.contentDocument}catch(e){return scheduleRetry()}
+./assets/results-card-log-pagination.js:17:    const app=core?.contentDocument?.getElementById('app');
+./assets/results-card-log-pagination.js:18:    return app?.contentDocument||null;
+./assets/report-dashboard-vigscope.js:171:      const app=core?.contentDocument?.getElementById('app');
+./assets/report-dashboard-vigscope.js:172:      d=app?.contentDocument||null;
+./assets/report-dashboard-vigscope.js:300:      const d=core?.contentDocument||null;
+./assets/decision-shadow-v2-ui.js:4:function doc(){try{const c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
+
+=== app frame references ===
+./syndicates/walters.html:19:function render(data){const app=document.getElementById('app');const meters=Array.isArray(data&&data.meters)?data.meters:[];const notes=Array.isArray(data&&data.notes)?data.notes:[];if(String(data&&data.status||'').toUpperCase()==='EMPTY'&&!meters.length&&!notes.length){app.className='empty';app.innerHTML=`<b>${esc(data&&data.title||'WALTERS')}</b><span>${esc(data&&data.summary||'REPORT SLOT READY')}</span>`;return}app.className='';app.innerHTML=`<div class="head"><div><div class="title">💵 ${esc(data&&data.title||'WALTERS')} // ${esc(data&&data.subtitle||'SYNDICATE 01')}</div><div class="sub">${esc(data&&data.summary||'')}</div></div><div class="tag">${esc(data&&data.status||'ACTIVE')}</div></div>${meters.length?`<div class="meters">${meters.map(meterHtml).join('')}</div>`:''}${notes.length?`<div class="notes">${notes.map(n=>`<div>${esc(n)}</div>`).join('')}</div>`:''}<div class="foot">${esc(data&&data.footer||'')}</div>`}
+./syndicates/walters.html:20:fetch(`${DATA_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`data ${r.status}`);return r.json()}).then(render).catch(err=>{const app=document.getElementById('app');app.className='empty';app.innerHTML=`<b>WALTERS LOAD FAILED</b><span>${esc(err.message||err)}</span>`});
+./runner-core.html:12:#app{border:0;width:100%;height:100%;display:block;background:#01040a}
+./runner-core.html:21:$('#app').src='./index.html?build='+Date.now();
+./runner-core.html:638:  const frame=$('#app'),d=frame.contentDocument;if(!d)return;
+./runner-core.html:743:$('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='VigScope runner error: '+e.message;x.style.display='block';console.error(e)}});
+./r.html:39:#app{
+./r.html:48:#app.ready{opacity:1}
+./r.html:253:  #app,#splash{transition:none}
+./r.html:332:  const frameNode=document.getElementById('app');
+./r.html:356:const frame=document.getElementById('app');
+./runner.html:43:function innerAppFrame(){try{return core.contentDocument&&core.contentDocument.getElementById('app')}catch(e){return null}}
+./runner.html:135:art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});const coreUrl=new URL('./runner-core.html',location.href);for(const [k,v] of new URLSearchParams(location.search))coreUrl.searchParams.set(k,v);coreUrl.searchParams.set('build',String(Date.now()));coreUrl.hash=location.hash;core.src=coreUrl.pathname+coreUrl.search+coreUrl.hash;startWhenVisible();
+./tests/runner-session-strip-applicability.test.js:6:const html = fs.readFileSync(path.join(__dirname, '..', 'runner-core.html'), 'utf8');
+./tests/runner-session-strip-applicability.test.js:8:assert(scriptMatch, 'runner-core.html script block not found');
+./tests/runner-session-strip-applicability.test.js:45:vm.runInContext(sessionSource, context, { filename: 'runner-core.html' });
+./tests/price-watch-guardrails.test.js:4:const runner = fs.readFileSync('runner-core.html', 'utf8');
+./assets/results-player-base-v5.js:4:function doc(){try{const c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
+./assets/season-previews-ui.js:5:function d(){try{let c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
+./assets/special-desks-ui.js:19:    const app=core?.contentDocument?.getElementById('app');
+./assets/preferences-framework.js:20:    const app=core?.contentDocument?.getElementById('app');
+./assets/results-desk-ui.js:15:    const app=core?.contentDocument?.getElementById('app');
+./assets/schedule-profile-ui.js:14:    const app=core?.contentDocument?.getElementById('app');
+./assets/terminal-header-bankroll-sync.js:22:    const app=core?.contentDocument?.getElementById('app')||null;
+./assets/why-vigscope-v2.js:14:    const app=core?.contentDocument?.getElementById('app');
+./assets/primary-nav-shell.js:19:    const app=core?.contentDocument?.getElementById('app');
+./assets/primary-nav-shell.js:55:    const app=core?.contentDocument?.getElementById('app');
+./assets/game-window-intelligence.js:262:      const app=document.getElementById('app');
+./assets/game-window-intelligence.js:288:      const app=document.getElementById('app');
+./assets/game-window-intelligence.js:332:      const app=document.getElementById('app');
+./assets/card-view-preference.js:23:      const app=core?.contentDocument?.getElementById('app');
+./assets/menu-order-controller.js:31:    const app=core?.contentDocument?.getElementById('app');
+./assets/f3-overall-profit.js:87:    app=core?.contentDocument?.getElementById('app')||null;
+./assets/results-card-log-pagination.js:17:    const app=core?.contentDocument?.getElementById('app');
+./assets/report-dashboard-vigscope.js:171:      const app=core?.contentDocument?.getElementById('app');
+./assets/decision-shadow-v2-ui.js:4:function doc(){try{const c=document.getElementById('core'),a=c?.contentDocument?.getElementById('app');return a?.contentDocument||null}catch{return null}}
