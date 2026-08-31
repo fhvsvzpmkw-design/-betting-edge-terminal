@@ -132,7 +132,22 @@ function applyHierarchyPatch(){
   const headerRiskValue=bankroll&&bankroll.querySelector('.runnerNewRiskValue'),nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';if(headerRiskValue&&headerRiskValue.textContent!==nextRisk)headerRiskValue.textContent=nextRisk;d.querySelectorAll('.runnerRiskMini').forEach(x=>x.remove());sortRecommendationCards(d);return true
 }
 function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
-art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',()=>{coreLoaded=true;watchHierarchy();reveal()},{once:true});const coreUrl=new URL('./runner-core.html',location.href);for(const [k,v] of new URLSearchParams(location.search))coreUrl.searchParams.set(k,v);coreUrl.searchParams.set('build',String(Date.now()));coreUrl.hash=location.hash;core.src=coreUrl.pathname+coreUrl.search+coreUrl.hash;startWhenVisible();
+function installDirectAppShim(){
+  let d=null;try{d=core.contentDocument}catch(e){return null}if(!d||!d.body)return null;
+  let app=d.getElementById('app');if(!app){app=d.createElement('div');app.id='app';app.style.display='none';app.setAttribute('aria-hidden','true');app.dataset.vigscopeDirectShim='1';d.body.appendChild(app)}
+  try{Object.defineProperty(app,'contentDocument',{configurable:true,get:()=>d})}catch(e){try{app.contentDocument=d}catch(_){}}
+  try{Object.defineProperty(app,'contentWindow',{configurable:true,get:()=>d.defaultView})}catch(e){try{app.contentWindow=d.defaultView}catch(_){}}
+  let err=d.getElementById('err');if(!err){err=d.createElement('div');err.id='err';err.style.cssText='display:none;position:fixed;z-index:2147482000;left:10px;right:10px;top:10px;padding:10px;background:#25060d;color:#ff9cad;border:1px solid #ff6178;font:12px ui-monospace,SFMono-Regular,Menlo,monospace';d.body.appendChild(err)}
+  return app
+}
+function bootDirectCore(){
+  let d=null;try{d=core.contentDocument}catch(e){}const app=installDirectAppShim();if(!d||!d.head||!app){setTimeout(bootDirectCore,30);return}
+  let settled=false;const finish=()=>{if(settled)return;settled=true;coreLoaded=true;watchHierarchy();reveal()};
+  d.addEventListener('vigscope-core-ready',finish,{once:true});
+  const loader=d.createElement('script');loader.id='runnerCoreDirectLoader';loader.src=`./assets/runner-core-direct-loader.js?build=${Date.now()}`;loader.async=false;loader.onerror=finish;d.head.appendChild(loader);
+  setTimeout(finish,6000)
+}
+art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});core.addEventListener('load',bootDirectCore,{once:true});const coreUrl=new URL('./index.html',location.href);for(const [k,v] of new URLSearchParams(location.search))coreUrl.searchParams.set(k,v);coreUrl.searchParams.set('build',String(Date.now()));coreUrl.hash=location.hash;core.src=coreUrl.pathname+coreUrl.search+coreUrl.hash;startWhenVisible();
 </script>
 <script>
 (()=>{const s=document.createElement('script');s.src=`./assets/report-dashboard-vigscope.js?build=${Date.now()}`;s.async=false;document.head.appendChild(s)})();
