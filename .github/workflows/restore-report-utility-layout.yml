@@ -1,13 +1,9 @@
 name: Restore report utility layout
-
 on:
   push:
-    branches:
-      - fix/restore-report-utility-layout
-
+    branches: [fix/restore-report-utility-layout]
 permissions:
   contents: write
-
 jobs:
   patch:
     runs-on: ubuntu-latest
@@ -15,78 +11,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: fix/restore-report-utility-layout
-          fetch-depth: 0
       - name: Restore layout without broad page watching
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('assets/game-window-intelligence.js')
           s=p.read_text()
-          old="""  function bindRunnerUtilityLayout(){
-    try{
-      const app=document.getElementById('app');
-      const d=app?.contentDocument;
-      if(!d?.body)return false;
-      compactRunnerUtilityLayout();
-      if(d.documentElement.dataset.runnerUtilityLayoutBound==='1')return true;
-      d.documentElement.dataset.runnerUtilityLayoutBound='1';
-      let frame=null;
-      const observer=new MutationObserver(()=>{
-        if(frame)return;
-        frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})
-      });
-      observer.observe(d.body,{subtree:true,childList:true});
-      return true
-    }catch(e){return false}
-  }
-"""
-          new="""  function bindRunnerUtilityLayout(){
-    try{
-      const app=document.getElementById('app');
-      const d=app?.contentDocument;
-      if(!d?.body)return false;
-      const live=d.getElementById('runnerLive');
-      if(!live)return false;
-      compactRunnerUtilityLayout();
-      if(live.dataset.runnerUtilityLayoutBound==='1')return true;
-      live.dataset.runnerUtilityLayoutBound='1';
-      let frame=null;
-      const observer=new MutationObserver(()=>{
-        if(frame)return;
-        frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})
-      });
-      observer.observe(live,{subtree:true,childList:true});
-      return true
-    }catch(e){return false}
-  }
-"""
-          if s.count(old)!=1:
-              raise SystemExit(f'bind block match count {s.count(old)}')
-          s=s.replace(old,new)
-          old2="""      if(state?.defaultProfileId)scheduleState=state;
-      rerender()
-"""
-          new2="""      if(state?.defaultProfileId)scheduleState=state;
-      rerender();
-      setTimeout(bindRunnerUtilityLayout,0);
-      setTimeout(compactRunnerUtilityLayout,80)
-"""
-          if s.count(old2)!=1:
-              raise SystemExit(f'schedule rerender match count {s.count(old2)}')
-          s=s.replace(old2,new2)
-          old3="""      if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bindRunnerUtilityLayout()}catch(e){}},0);
-      else setTimeout(bindRunnerUtilityLayout,0);
-      setInterval(refreshLiveChips,LIVE_TIMER_MS);
-"""
-          new3="""      if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bindRunnerUtilityLayout()}catch(e){}},0);
-      else setTimeout(bindRunnerUtilityLayout,0);
-      setTimeout(bindRunnerUtilityLayout,80);
-      setTimeout(bindRunnerUtilityLayout,250);
-      setInterval(refreshLiveChips,LIVE_TIMER_MS);
-"""
-          if s.count(old3)!=1:
-              raise SystemExit(f'install block match count {s.count(old3)}')
-          s=s.replace(old3,new3)
+          old="  function bindRunnerUtilityLayout(){\n    try{\n      const app=document.getElementById('app');\n      const d=app?.contentDocument;\n      if(!d?.body)return false;\n      compactRunnerUtilityLayout();\n      if(d.documentElement.dataset.runnerUtilityLayoutBound==='1')return true;\n      d.documentElement.dataset.runnerUtilityLayoutBound='1';\n      let frame=null;\n      const observer=new MutationObserver(()=>{\n        if(frame)return;\n        frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})\n      });\n      observer.observe(d.body,{subtree:true,childList:true});\n      return true\n    }catch(e){return false}\n  }\n"
+          new="  function bindRunnerUtilityLayout(){\n    try{\n      const app=document.getElementById('app');\n      const d=app?.contentDocument;\n      if(!d?.body)return false;\n      const live=d.getElementById('runnerLive');\n      if(!live)return false;\n      compactRunnerUtilityLayout();\n      if(live.dataset.runnerUtilityLayoutBound==='1')return true;\n      live.dataset.runnerUtilityLayoutBound='1';\n      let frame=null;\n      const observer=new MutationObserver(()=>{\n        if(frame)return;\n        frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})\n      });\n      observer.observe(live,{subtree:true,childList:true});\n      return true\n    }catch(e){return false}\n  }\n"
+          if s.count(old)!=1: raise SystemExit(f'bind block match count {s.count(old)}')
+          s=s.replace(old,new,1)
+          old2="      if(state?.defaultProfileId)scheduleState=state;\n      rerender()\n"
+          new2="      if(state?.defaultProfileId)scheduleState=state;\n      rerender();\n      setTimeout(bindRunnerUtilityLayout,0);\n      setTimeout(compactRunnerUtilityLayout,80)\n"
+          if s.count(old2)!=1: raise SystemExit(f'schedule rerender match count {s.count(old2)}')
+          s=s.replace(old2,new2,1)
+          old3="      if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bindRunnerUtilityLayout()}catch(e){}},0);\n      else setTimeout(bindRunnerUtilityLayout,0);\n      setInterval(refreshLiveChips,LIVE_TIMER_MS);\n"
+          new3="      if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bindRunnerUtilityLayout()}catch(e){}},0);\n      else setTimeout(bindRunnerUtilityLayout,0);\n      setTimeout(bindRunnerUtilityLayout,80);\n      setTimeout(bindRunnerUtilityLayout,250);\n      setInterval(refreshLiveChips,LIVE_TIMER_MS);\n"
+          if s.count(old3)!=1: raise SystemExit(f'install block match count {s.count(old3)}')
+          s=s.replace(old3,new3,1)
           p.write_text(s)
           PY
       - name: Verify exact scope
@@ -96,7 +38,6 @@ jobs:
           ! grep -F "observer.observe(d.body,{subtree:true,childList:true})" assets/game-window-intelligence.js
           grep -F "setTimeout(bindRunnerUtilityLayout,250);" assets/game-window-intelligence.js
           git diff --check
-          test "$(git diff --name-only | wc -l)" -eq 1
           test "$(git diff --name-only)" = "assets/game-window-intelligence.js"
       - name: Save layout fix
         run: |
