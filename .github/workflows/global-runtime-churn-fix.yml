@@ -1,0 +1,180 @@
+name: Global scroll runtime cleanup
+on:
+  push:
+    branches: [fix/global-scroll-runtime-churn]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/global-scroll-runtime-churn
+          fetch-depth: 0
+      - name: Remove global runtime churn
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def rep(path, old, new, count=1):
+              p=Path(path); text=p.read_text()
+              actual=text.count(old)
+              if actual < count:
+                  raise SystemExit(f'{path}: expected at least {count} occurrence(s), found {actual}: {old[:90]!r}')
+              text=text.replace(old,new,count)
+              p.write_text(text)
+
+          # runner.html: the CRT overlay is already intended to be disabled; do it in base CSS
+          # and scope hierarchy watching to the few containers that actually drive the header/cards.
+          rep('runner.html', '.term:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff05 0,#ffffff05 1px,transparent 1px,transparent 4px);opacity:.22}', '.term:after{display:none!important}')
+          rep('runner.html', "function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}", "function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);const nav=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),stats=d.querySelector('.stats'),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');if(nav)hierarchyObserver.observe(nav,{subtree:true,childList:true});if(stats)hierarchyObserver.observe(stats,{subtree:true,childList:true,characterData:true});if(live)hierarchyObserver.observe(live,{subtree:true,childList:true});if(term)hierarchyObserver.observe(term,{childList:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}")
+
+          # Primary navigation previously re-expanded the hierarchy watcher to the entire body.
+          p=Path('assets/primary-nav-shell.js'); text=p.read_text()
+          old="""    try{\n      const d=appDoc(),stats=d?.querySelector('.stats');\n      if(stats&&stats!==hierarchyStats&&typeof hierarchyObserver!=='undefined'&&hierarchyObserver){\n        hierarchyStats=stats;\n        hierarchyObserver.observe(stats,{subtree:true,childList:true,characterData:true});\n      }\n    }catch{}"""
+          new="""    try{\n      const d=appDoc(),stats=d?.querySelector('.stats'),nav=d?.querySelector('.runnerNavPad .tabs')||d?.querySelector('.tabs'),live=d?.getElementById('runnerLive');\n      if(typeof hierarchyObserver!=='undefined'&&hierarchyObserver){\n        if(nav)hierarchyObserver.observe(nav,{subtree:true,childList:true});\n        if(live)hierarchyObserver.observe(live,{subtree:true,childList:true});\n        if(stats){hierarchyStats=stats;hierarchyObserver.observe(stats,{subtree:true,childList:true,characterData:true})}\n      }\n    }catch{}"""
+          if old not in text: raise SystemExit('primary-nav schedule block not found')
+          text=text.replace(old,new,1)
+          pattern=r"function optimizeHierarchyWatch\(\)\{.*?\n\}\nfunction hookAppLoad\(\)\{"
+          replacement="""function optimizeHierarchyWatch(){\n  try{\n    if(typeof hierarchyObserver==='undefined'||typeof applyHierarchyPatch!=='function')return false;\n    const d=appDoc();if(!d?.body)return false;\n    if(d===lightHierarchyDoc&&hierarchyObserver===lightHierarchyObserver)return true;\n    if(hierarchyObserver)hierarchyObserver.disconnect();\n    hierarchyStats=d.querySelector('.stats');\n    hierarchyObserver=new MutationObserver(scheduleLightHierarchyPatch);\n    lightHierarchyObserver=hierarchyObserver;\n    lightHierarchyDoc=d;\n    const nav=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');\n    if(nav)hierarchyObserver.observe(nav,{subtree:true,childList:true});\n    if(live)hierarchyObserver.observe(live,{subtree:true,childList:true});\n    if(hierarchyStats)hierarchyObserver.observe(hierarchyStats,{subtree:true,childList:true,characterData:true});\n    if(term)hierarchyObserver.observe(term,{childList:true});\n    return true;\n  }catch{return false}\n}\nfunction hookAppLoad(){"""
+          text,n=re.subn(pattern,replacement,text,count=1,flags=re.S)
+          if n!=1: raise SystemExit(f'primary-nav optimize block replacements={n}')
+          p.write_text(text)
+
+          # Card style: watch only the card container, and replace the permanent 150 ms poll
+          # with a bounded boot retry plus real page lifecycle events.
+          rep('assets/card-view-preference.js', "      observer.observe(d.body,{subtree:true,childList:true});", "      const target=d.getElementById('runnerLive');\n      if(target)observer.observe(target,{subtree:true,childList:true});")
+          p=Path('assets/card-view-preference.js'); text=p.read_text()
+          pattern=r"  const timer=setInterval\(\(\)=>\{.*?\n  \},150\);\n\n  window\.addEventListener\('beforeunload',\(\)=>\{\n    clearInterval\(timer\);\n    if\(observer\)observer\.disconnect\(\)\n  \},\{once:true\}\);"
+          replacement="""  let bootTries=0;\n  function boot(){\n    const d=appDoc();\n    if(d&&attach(d))return;\n    bootTries+=1;\n    if(bootTries<150)setTimeout(boot,40)\n  }\n  boot();\n  window.addEventListener('pageshow',()=>{const d=appDoc();if(d)attach(d)});\n  window.addEventListener('beforeunload',()=>{if(observer)observer.disconnect()},{once:true});"""
+          text,n=re.subn(pattern,replacement,text,count=1,flags=re.S)
+          if n!=1: raise SystemExit(f'card-view poll replacements={n}')
+          p.write_text(text)
+
+          # Preferences: only its panel and recommendation cards need mutation watching.
+          rep('assets/preferences-framework.js', "    observer.observe(d.body,{subtree:true,childList:true});", "    const panel=d.getElementById('runnerSchedulePreferences'),live=d.getElementById('runnerLive');\n    if(panel)observer.observe(panel,{subtree:true,childList:true});\n    if(live)observer.observe(live,{subtree:true,childList:true});")
+          rep('assets/preferences-framework.js', "  let tries=0;\n  const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);\n  setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500);", "  let tries=0;\n  const boot=()=>{tries++;if(attach()||tries>180)return;setTimeout(boot,100)};\n  boot();\n  window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});")
+
+          # Pizza/Crypto: no permanent 600 ms maintenance loop; tabs are the only ownership surface.
+          rep('assets/special-desks-ui.js', "  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));observer.observe(d.body,{subtree:true,childList:true,characterData:true})}", "  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));const target=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');if(target)observer.observe(target,{subtree:true,childList:true})}")
+          rep('assets/special-desks-ui.js', "let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);\nsetInterval(()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}},600);", "let tries=0;const boot=()=>{tries++;if(attach()||tries>250)return;setTimeout(boot,40)};boot();\nwindow.addEventListener('pageshow',()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}});")
+
+          # Meat Desk: make the button update idempotent, scope its observer to nav/top-level desk
+          # changes, and remove the permanent 1.2 s ensure loop.
+          rep('assets/season-previews-ui.js', "let a=src(),an=a.filter(x=>st(x)[0]==='ANALYZED').length;b.innerHTML=`<span><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class=\"sub\">${data?`${a.length}/${MAX} SOURCES // ${an} ANALYZED`:'PRIVATE RESEARCH DESK'} &nbsp;//&nbsp; PRESS [F7] TO OPEN</span>`;", "let a=src(),an=a.filter(x=>st(x)[0]==='ANALYZED').length,html=`<span><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class=\"sub\">${data?`${a.length}/${MAX} SOURCES // ${an} ANALYZED`:'PRIVATE RESEARCH DESK'} &nbsp;//&nbsp; PRESS [F7] TO OPEN</span>`;if(b.innerHTML!==html)b.innerHTML=html;")
+          rep('assets/season-previews-ui.js', "function attach(){let q=d();if(!q?.body)return false;if(q!==doc){doc=q;if(obs)obs.disconnect();obs=new MutationObserver(()=>requestAnimationFrame(()=>ensure(q)));obs.observe(q.body,{subtree:true,childList:true})}ensure(q);load();return true}", "function attach(){let q=d();if(!q?.body)return false;if(q!==doc){doc=q;if(obs)obs.disconnect();obs=new MutationObserver(()=>requestAnimationFrame(()=>ensure(q)));const nav=q.querySelector('.runnerNavPad .tabs')||q.querySelector('.tabs'),term=q.querySelector('main.term');if(nav)obs.observe(nav,{subtree:true,childList:true});if(term)obs.observe(term,{childList:true})}ensure(q);load();return true}")
+          rep('assets/season-previews-ui.js', "let n=0,t=setInterval(()=>{if(attach()||++n>200)clearInterval(t)},100);setInterval(()=>{let q=d();if(q)ensure(q)},1200);", "let n=0;const boot=()=>{if(attach()||++n>200)return;setTimeout(boot,100)};boot();window.addEventListener('pageshow',()=>{let q=d();if(q)ensure(q)});")
+
+          # Schedule profile: history/VigScope are the only mutation surfaces it owns.
+          rep('assets/schedule-profile-ui.js', "    observer=new MutationObserver(()=>requestAnimationFrame(()=>patch(d)));\n    observer.observe(d.body,{subtree:true,childList:true,characterData:true});", "    observer=new MutationObserver(()=>requestAnimationFrame(()=>patch(d)));\n    const targets=[d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),d.getElementById('history'),d.getElementById('runnerVigScope')].filter(Boolean);\n    targets.forEach(target=>observer.observe(target,{subtree:true,childList:true,characterData:true}));")
+          rep('assets/schedule-profile-ui.js', "  let n=0;\n  const t=setInterval(()=>{n++;if(attach()||n>180)clearInterval(t)},100);\n  setInterval(()=>{const d=appDoc();if(d)patch(d)},1200);", "  let n=0;\n  const boot=()=>{n++;if(attach()||n>180)return;setTimeout(boot,100)};\n  boot();\n  window.addEventListener('pageshow',()=>{const d=appDoc();if(d)patch(d)});")
+
+          # Game-window utility layout lives entirely under runnerLive.
+          rep('assets/game-window-intelligence.js', "      observer.observe(d.body,{subtree:true,childList:true});", "      const target=d.getElementById('runnerLive');\n      if(target)observer.observe(target,{subtree:true,childList:true});")
+
+          # Crypto analysis binding: observe the crypto workspace only, with bounded retries while it mounts.
+          rep('assets/report-dashboard-vigscope.js', "    if(d.documentElement.dataset.cryptoAnalysisObserverBound==='1')return;\n    d.documentElement.dataset.cryptoAnalysisObserverBound='1';\n    const observer=new MutationObserver(()=>requestAnimationFrame(()=>bindCryptoAnalysisButtons(d)));\n    observer.observe(d.body,{subtree:true,childList:true});", "    const workspace=d.getElementById('runnerCryptoWorkspace');\n    if(!workspace){\n      if(d.documentElement.dataset.cryptoAnalysisRetryBound!=='1'){\n        d.documentElement.dataset.cryptoAnalysisRetryBound='1';\n        [100,300,800,1600].forEach(delay=>setTimeout(()=>bindCryptoAnalysisButtons(d),delay));\n      }\n      return;\n    }\n    if(workspace.dataset.cryptoAnalysisObserverBound==='1')return;\n    workspace.dataset.cryptoAnalysisObserverBound='1';\n    const observer=new MutationObserver(()=>requestAnimationFrame(()=>bindCryptoAnalysisButtons(d)));\n    observer.observe(workspace,{subtree:true,childList:true});")
+
+          # F3 overall profit only depends on F3 nodes.
+          rep('assets/f3-overall-profit.js', "  observer=new MutationObserver(()=>ensureOverallProfit(d));\n  observer.observe(d.body,{subtree:true,childList:true,characterData:true});", "  observer=new MutationObserver(()=>ensureOverallProfit(d));\n  const target=d.getElementById('history');\n  if(target)observer.observe(target,{subtree:true,childList:true,characterData:true});")
+
+          # Header bankroll sync: top chrome + Value panel only; do not watch the whole document.
+          rep('assets/terminal-header-bankroll-sync.js', "    observer=new MutationObserver(()=>applyLatest(d));\n    observer.observe(d.body,{subtree:true,childList:true,characterData:true});", "    observer=new MutationObserver(()=>applyLatest(d));\n    const targets=[d.querySelector('.top'),d.getElementById('engine')].filter(Boolean);\n    targets.forEach(target=>observer.observe(target,{subtree:true,childList:true}));")
+
+          # Known-good dashboard rollback module is still loaded: restrict its patch observer to runnerLive.
+          rep('assets/report-dashboard-vigscope.js.old', "      observer=new MutationObserver(()=>schedulePatch(d));\n      observer.observe(d.body,{subtree:true,childList:true,characterData:true});", "      observer=new MutationObserver(()=>schedulePatch(d));\n      const target=d.getElementById('runnerLive');\n      if(target)observer.observe(target,{subtree:true,childList:true,characterData:true});")
+          PY
+      - name: Add global runtime smoke test
+        run: |
+          cat > tests/global-scroll-runtime-smoke.mjs <<'EOF'
+          import puppeteer from 'puppeteer-core';
+          const executablePath=process.env.CHROME;
+          const payload=process.env.PAYLOAD;
+          if(!executablePath||!payload)throw new Error('CHROME and PAYLOAD are required');
+          const browser=await puppeteer.launch({headless:true,executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});
+          const page=await browser.newPage();
+          await page.setViewport({width:390,height:844,deviceScaleFactor:2,isMobile:true,hasTouch:true});
+          const errors=[];page.on('pageerror',e=>errors.push(String(e)));
+          await page.evaluateOnNewDocument(()=>{
+            const audit=window.__vigRuntimeAudit={intervals:[],observers:[]};
+            const nativeSetInterval=window.setInterval.bind(window),nativeClearInterval=window.clearInterval.bind(window);
+            window.setInterval=(fn,ms,...args)=>{const rec={id:null,ms:Number(ms)||0,active:true};const id=nativeSetInterval(fn,ms,...args);rec.id=id;audit.intervals.push(rec);return id};
+            window.clearInterval=id=>{for(const rec of audit.intervals)if(rec.id===id)rec.active=false;return nativeClearInterval(id)};
+            const NativeMO=window.MutationObserver;
+            window.MutationObserver=class{
+              constructor(cb){this.rec={active:false,targets:[]};audit.observers.push(this.rec);this.inner=new NativeMO(cb)}
+              observe(target,opts){this.rec.active=true;this.rec.targets.push({body:target===document.body,id:target?.id||'',tag:target?.tagName||'',subtree:Boolean(opts?.subtree)});return this.inner.observe(target,opts)}
+              disconnect(){this.rec.active=false;return this.inner.disconnect()}
+              takeRecords(){return this.inner.takeRecords()}
+            };
+          });
+          await page.goto(`http://127.0.0.1:8765/runner.html#run=${payload}`,{waitUntil:'domcontentloaded',timeout:45000});
+          await new Promise(r=>setTimeout(r,5000));
+          await page.click('.btn[data-view="board"]');
+          await new Promise(r=>setTimeout(r,900));
+          const board=await page.evaluate(()=>({cards:document.querySelectorAll('#runnerLive .runnerCard').length,height:document.scrollingElement?.scrollHeight||0,view:document.body.dataset.primaryView||''}));
+          await page.evaluate(()=>window.scrollTo(0,Math.max(0,(document.scrollingElement?.scrollHeight||0)*0.65)));
+          await new Promise(r=>setTimeout(r,700));
+          const scrolled=await page.evaluate(()=>window.scrollY);
+          await page.evaluate(()=>window.scrollTo(0,0));
+          await page.click('.btn[data-view="board"]');
+          await new Promise(r=>setTimeout(r,250));
+          await page.click('.btn[data-view="engine"]');
+          await new Promise(r=>setTimeout(r,1200));
+          const valueReady=await page.evaluate(()=>Boolean(document.querySelector('#engine.resultsDesk')));
+          await new Promise(r=>setTimeout(r,3500));
+          const audit=await page.evaluate(()=>({
+            fast:window.__vigRuntimeAudit.intervals.filter(x=>x.active&&x.ms<5000).map(x=>x.ms),
+            body:window.__vigRuntimeAudit.observers.filter(x=>x.active&&x.targets.some(t=>t.body&&t.subtree)).map(x=>x.targets),
+            activeIntervals:window.__vigRuntimeAudit.intervals.filter(x=>x.active).map(x=>x.ms),
+            observerTargets:window.__vigRuntimeAudit.observers.filter(x=>x.active).flatMap(x=>x.targets).map(t=>`${t.tag}#${t.id}:${t.subtree?'subtree':'direct'}`)
+          }));
+          console.log(JSON.stringify({board,scrolled,valueReady,audit,errors},null,2));
+          if(board.cards<4)throw new Error(`expected recommendation cards, got ${board.cards}`);
+          if(board.view!=='board')throw new Error(`board shell did not open: ${board.view}`);
+          if(board.height<=844||scrolled<50)throw new Error(`native scrolling did not move: height=${board.height} y=${scrolled}`);
+          if(!valueReady)throw new Error('VigScope Value did not render');
+          if(audit.fast.length)throw new Error(`fast permanent intervals remain: ${audit.fast.join(',')}`);
+          if(audit.body.length)throw new Error(`whole-body subtree observers remain: ${JSON.stringify(audit.body)}`);
+          if(errors.length)throw new Error(`page errors: ${errors.join(' | ')}`);
+          await browser.close();
+          EOF
+      - name: Static checks
+        run: |
+          for f in assets/primary-nav-shell.js assets/card-view-preference.js assets/preferences-framework.js assets/special-desks-ui.js assets/season-previews-ui.js assets/schedule-profile-ui.js assets/game-window-intelligence.js assets/report-dashboard-vigscope.js assets/f3-overall-profit.js assets/terminal-header-bankroll-sync.js; do node --check "$f"; done
+          node -e "new Function(require('fs').readFileSync('assets/report-dashboard-vigscope.js.old','utf8'))"
+          ! grep -q "observer.observe(d.body,{subtree:true" assets/card-view-preference.js assets/preferences-framework.js assets/special-desks-ui.js assets/season-previews-ui.js assets/schedule-profile-ui.js assets/game-window-intelligence.js assets/report-dashboard-vigscope.js assets/f3-overall-profit.js assets/terminal-header-bankroll-sync.js assets/report-dashboard-vigscope.js.old
+          ! grep -q "setInterval(()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}},600" assets/special-desks-ui.js
+          ! grep -q "setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500" assets/preferences-framework.js
+          ! grep -q "setInterval(()=>{let q=d();if(q)ensure(q)},1200" assets/season-previews-ui.js
+          ! grep -q "setInterval(()=>{const d=appDoc();if(d)patch(d)},1200" assets/schedule-profile-ui.js
+      - name: Install browser client
+        run: npm --silent install puppeteer-core@24 >/dev/null 2>&1
+      - name: Mobile runtime smoke test
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME"
+          python3 -m http.server 8765 >/tmp/vigscope-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          PAYLOAD=$(python3 - <<'PY'
+          import base64,json
+          recs=[]
+          for i in range(8):
+              recs.append({"status":"PASS","title":f"SCROLL TEST CARD {i+1}","sport":"MLB","market":"Moneyline","price":"Bet365 +120 (snapshot 18:15)","book":"Bet365","fair":"+110","playTo":"+125","betAt":"+125","stake":"$0","source":"Bet365 // DraftKings","move":"UNCHANGED","analysis":"Mobile scroll runtime test detail. "*12,"why":"Render enough content to exercise native scrolling."})
+          p={"slot":"late","label":"18:15 LATE / WEST COAST","ts":"2026-08-30T18:21:30.000-07:00","bankroll":495.41,"risk":0,"counts":{"bet":0,"lean":0,"wait":0,"pass":8},"summary":"GLOBAL SCROLL RUNTIME SMOKE TEST","recs":recs}
+          print(base64.urlsafe_b64encode(json.dumps(p,separators=(',',':')).encode()).decode().rstrip('='))
+          PY
+          )
+          CHROME="$CHROME" PAYLOAD="$PAYLOAD" node tests/global-scroll-runtime-smoke.mjs
+      - name: Save cleanup and remove one-time workflows
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/runtime-churn-audit.yml .github/workflows/global-runtime-churn-fix.yml
+          git add runner.html assets/primary-nav-shell.js assets/card-view-preference.js assets/preferences-framework.js assets/special-desks-ui.js assets/season-previews-ui.js assets/schedule-profile-ui.js assets/game-window-intelligence.js assets/report-dashboard-vigscope.js assets/report-dashboard-vigscope.js.old assets/f3-overall-profit.js assets/terminal-header-bankroll-sync.js tests/global-scroll-runtime-smoke.mjs
+          git commit -m "Remove global VigScope scroll runtime churn"
+          git push origin HEAD:fix/global-scroll-runtime-churn
