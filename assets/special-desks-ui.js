@@ -288,13 +288,13 @@ function bindKeys(d){
 }
 function attach(){
   const d=appDoc();if(!d?.body)return false;
-  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));observer.observe(d.body,{subtree:true,childList:true,characterData:true})}
+  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));const target=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');if(target)observer.observe(target,{subtree:true,childList:true})}
   bindKeys(d);ensureButtons(d);return true;
 }
 Promise.all([
   fetch(`${PIZZA_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
   fetch(`${CRYPTO_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
 ]).then(([p,c])=>{pizza=p;crypto=c;const d=appDoc();if(d)ensureButtons(d)});
-let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
-setInterval(()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}},600);
+let tries=0;const boot=()=>{tries++;if(attach()||tries>250)return;setTimeout(boot,40)};boot();
+window.addEventListener('pageshow',()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}});
 })();

@@ -271,7 +271,8 @@ function attach(){
     lastDoc=d;
     if(observer)observer.disconnect();
     observer=new MutationObserver(()=>requestAnimationFrame(()=>patch(d)));
-    observer.observe(d.body,{subtree:true,childList:true,characterData:true});
+    const targets=[d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),d.getElementById('history'),d.getElementById('runnerVigScope')].filter(Boolean);
+    targets.forEach(target=>observer.observe(target,{subtree:true,childList:true,characterData:true}));
     d.addEventListener('change',e=>{if(e.target?.id==='runDateSelect')setTimeout(()=>patchHistory(d),0)});
   }
   patch(d);
@@ -279,7 +280,8 @@ function attach(){
 }
 load().then(()=>{
   let n=0;
-  const t=setInterval(()=>{n++;if(attach()||n>180)clearInterval(t)},100);
-  setInterval(()=>{const d=appDoc();if(d)patch(d)},1200);
+  const boot=()=>{n++;if(attach()||n>180)return;setTimeout(boot,100)};
+  boot();
+  window.addEventListener('pageshow',()=>{const d=appDoc();if(d)patch(d)});
 }).catch(e=>console.warn('Schedule profile UI unavailable',e));
 })();

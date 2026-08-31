@@ -330,7 +330,8 @@
       observedDocument=d;
       patchDashboard(d);
       observer=new MutationObserver(()=>schedulePatch(d));
-      observer.observe(d.body,{subtree:true,childList:true,characterData:true});
+      const target=d.getElementById('runnerLive');
+      if(target)observer.observe(target,{subtree:true,childList:true,characterData:true});
     };
 
     app.addEventListener('load',attachDocument,{once:false});

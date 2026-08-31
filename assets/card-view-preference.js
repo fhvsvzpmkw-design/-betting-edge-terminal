@@ -79,7 +79,8 @@
       lastDoc=d;
       if(observer)observer.disconnect();
       observer=new MutationObserver(()=>requestAnimationFrame(()=>apply(d)));
-      observer.observe(d.body,{subtree:true,childList:true});
+      const target=d.getElementById('runnerLive');
+      if(target)observer.observe(target,{subtree:true,childList:true});
       d.addEventListener('change',event=>{
         const control=event.target?.closest?.('[data-pref-choice="card_view"]');
         if(!control)return;
@@ -93,15 +94,14 @@
     return true
   }
 
-  const timer=setInterval(()=>{
+  let bootTries=0;
+  function boot(){
     const d=appDoc();
-    if(d)attach(d);
-    const current=readValue();
-    if(d&&current!==lastValue)apply(d,current)
-  },150);
-
-  window.addEventListener('beforeunload',()=>{
-    clearInterval(timer);
-    if(observer)observer.disconnect()
-  },{once:true});
+    if(d&&attach(d))return;
+    bootTries+=1;
+    if(bootTries<150)setTimeout(boot,40)
+  }
+  boot();
+  window.addEventListener('pageshow',()=>{const d=appDoc();if(d)attach(d)});
+  window.addEventListener('beforeunload',()=>{if(observer)observer.disconnect()},{once:true});
 })();

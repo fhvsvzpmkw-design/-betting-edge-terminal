@@ -26,10 +26,11 @@ function scheduleLightHierarchyPatch(){
     hierarchyPatchTimer=null;
     try{if(typeof applyHierarchyPatch==='function')applyHierarchyPatch()}catch{}
     try{
-      const d=appDoc(),stats=d?.querySelector('.stats');
-      if(stats&&stats!==hierarchyStats&&typeof hierarchyObserver!=='undefined'&&hierarchyObserver){
-        hierarchyStats=stats;
-        hierarchyObserver.observe(stats,{subtree:true,childList:true,characterData:true});
+      const d=appDoc(),stats=d?.querySelector('.stats'),nav=d?.querySelector('.runnerNavPad .tabs')||d?.querySelector('.tabs'),live=d?.getElementById('runnerLive');
+      if(typeof hierarchyObserver!=='undefined'&&hierarchyObserver){
+        if(nav)hierarchyObserver.observe(nav,{subtree:true,childList:true});
+        if(live)hierarchyObserver.observe(live,{subtree:true,childList:true});
+        if(stats){hierarchyStats=stats;hierarchyObserver.observe(stats,{subtree:true,childList:true,characterData:true})}
       }
     }catch{}
   },80);
@@ -44,8 +45,11 @@ function optimizeHierarchyWatch(){
     hierarchyObserver=new MutationObserver(scheduleLightHierarchyPatch);
     lightHierarchyObserver=hierarchyObserver;
     lightHierarchyDoc=d;
-    hierarchyObserver.observe(d.body,{subtree:true,childList:true});
+    const nav=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs'),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');
+    if(nav)hierarchyObserver.observe(nav,{subtree:true,childList:true});
+    if(live)hierarchyObserver.observe(live,{subtree:true,childList:true});
     if(hierarchyStats)hierarchyObserver.observe(hierarchyStats,{subtree:true,childList:true,characterData:true});
+    if(term)hierarchyObserver.observe(term,{childList:true});
     return true;
   }catch{return false}
 }

@@ -340,7 +340,8 @@
         if(frame)return;
         frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})
       });
-      observer.observe(d.body,{subtree:true,childList:true});
+      const target=d.getElementById('runnerLive');
+      if(target)observer.observe(target,{subtree:true,childList:true});
       return true
     }catch(e){return false}
   }

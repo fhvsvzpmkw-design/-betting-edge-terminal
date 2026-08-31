@@ -312,7 +312,9 @@ function attach(){
       render(d);
       applyDetailDefaults(d);
     }));
-    observer.observe(d.body,{subtree:true,childList:true});
+    const panel=d.getElementById('runnerSchedulePreferences'),live=d.getElementById('runnerLive');
+    if(panel)observer.observe(panel,{subtree:true,childList:true});
+    if(live)observer.observe(live,{subtree:true,childList:true});
   }
   render(d);
   applyDetailDefaults(d);
@@ -328,7 +330,8 @@ Promise.all([
   syndicates=syndicateData;
   hotlineShells=shellData;
   let tries=0;
-  const timer=setInterval(()=>{tries++;if(attach()||tries>180)clearInterval(timer)},100);
-  setInterval(()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}},1500);
+  const boot=()=>{tries++;if(attach()||tries>180)return;setTimeout(boot,100)};
+  boot();
+  window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});
 }).catch(e=>console.warn('Preferences framework unavailable',e));
 })();

@@ -158,10 +158,18 @@
         button.textContent=open?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS';
       };
     });
-    if(d.documentElement.dataset.cryptoAnalysisObserverBound==='1')return;
-    d.documentElement.dataset.cryptoAnalysisObserverBound='1';
+    const workspace=d.getElementById('runnerCryptoWorkspace');
+    if(!workspace){
+      if(d.documentElement.dataset.cryptoAnalysisRetryBound!=='1'){
+        d.documentElement.dataset.cryptoAnalysisRetryBound='1';
+        [100,300,800,1600].forEach(delay=>setTimeout(()=>bindCryptoAnalysisButtons(d),delay));
+      }
+      return;
+    }
+    if(workspace.dataset.cryptoAnalysisObserverBound==='1')return;
+    workspace.dataset.cryptoAnalysisObserverBound='1';
     const observer=new MutationObserver(()=>requestAnimationFrame(()=>bindCryptoAnalysisButtons(d)));
-    observer.observe(d.body,{subtree:true,childList:true});
+    observer.observe(workspace,{subtree:true,childList:true});
   }
 
   function applyFix(){

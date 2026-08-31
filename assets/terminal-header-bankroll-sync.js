@@ -60,7 +60,8 @@ function observeInner(){
     if(observer)observer.disconnect();
     observedDocument=d;
     observer=new MutationObserver(()=>applyLatest(d));
-    observer.observe(d.body,{subtree:true,childList:true,characterData:true});
+    const targets=[d.querySelector('.top'),d.getElementById('engine')].filter(Boolean);
+    targets.forEach(target=>observer.observe(target,{subtree:true,childList:true}));
   }
 
   applyLatest(d);
