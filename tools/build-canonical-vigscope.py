@@ -21,7 +21,10 @@ if runtime is None:
     raise SystemExit('Could not extract runner-core runtime')
 # The canonical app is the document itself; there is no nested index.html iframe.
 runtime = runtime.replace("$('#app').src='./index.html?build='+Date.now();\n", '')
-Path('assets/runner-core-runtime.js').write_text(runtime.strip() + '\n', encoding='utf-8')
+# runner-core.html used to have its own global scope. Preserve that isolation
+# now that its logic shares one document with the retained history runtime.
+runtime = "(()=>{\n" + runtime.strip() + "\n})();\n"
+Path('assets/runner-core-runtime.js').write_text(runtime, encoding='utf-8')
 
 style = style_match.group(1)
 history = history_match.group(0)
