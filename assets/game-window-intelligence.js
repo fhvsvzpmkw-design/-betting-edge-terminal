@@ -179,6 +179,14 @@
       #runnerLive>.runnerSessionDock>.sessionStrip{margin:0!important;gap:7px!important}
       #runnerLive>.runnerSessionDock>.sessionStrip .sessionChip{font-size:12px!important;font-weight:950!important;letter-spacing:.045em!important;min-height:40px!important;padding:9px 8px!important}
 
+      /* iPad portrait keeps the report title left and odds/Reprice anchored right. */
+      @media(min-width:721px) and (max-width:900px){
+        #runnerLive .runnerHead{grid-template-columns:minmax(240px,1fr) minmax(390px,1.35fr)!important;gap:14px!important;align-items:start!important}
+        #runnerLive .runnerHeadRight{min-width:0!important;max-width:470px!important;width:min(100%,470px)!important;justify-self:end!important}
+        #runnerLive .runnerFresh{justify-content:flex-end!important;text-align:right!important}
+        .runnerHeadRight>.runnerRefresh{justify-content:end!important}
+      }
+
       @media(max-width:520px){
         .gameWindowIntel{margin-top:5px}.gameWindowState{padding:3px 6px;font-size:8px;letter-spacing:.055em}.watchMarketIntel{padding:7px 8px}.watchMarketFacts{gap:7px}.watchMarketTitle{font-size:10px}.watchMarketBadge{font-size:9px}
         .runnerHeadRight>.runnerRefresh{grid-template-columns:auto minmax(0,1fr)!important;gap:5px 7px!important}
