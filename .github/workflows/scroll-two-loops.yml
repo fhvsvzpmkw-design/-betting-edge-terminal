@@ -1,7 +1,8 @@
 name: Scroll two-loop cleanup
 on:
   push:
-    branches: [fix/scroll-two-loops]
+    branches:
+      - fix/scroll-two-loops
 permissions:
   contents: write
 jobs:
@@ -12,74 +13,20 @@ jobs:
         with:
           ref: fix/scroll-two-loops
           fetch-depth: 0
-      - name: Remove only two persistent loops
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          def replace_once(path, old, new):
-              p=Path(path)
-              text=p.read_text()
-              if text.count(old)!=1:
-                  raise SystemExit(f'{path}: expected exactly one target, found {text.count(old)}')
-              p.write_text(text.replace(old,new,1))
-
-          replace_once('assets/card-view-preference.js', '''  const timer=setInterval(()=>{
-    const d=appDoc();
-    if(d)attach(d);
-    const current=readValue();
-    if(d&&current!==lastValue)apply(d,current)
-  },150);
-
-  window.addEventListener('beforeunload',()=>{
-    clearInterval(timer);
-    if(observer)observer.disconnect()
-  },{once:true});''', '''  let bootTries=0;
-  function boot(){
-    const d=appDoc();
-    if(d&&attach(d))return;
-    bootTries+=1;
-    if(bootTries<150)setTimeout(boot,40)
-  }
-  boot();
-  window.addEventListener('pageshow',()=>{
-    const d=appDoc();
-    if(d)attach(d)
-  });
-  window.addEventListener('storage',event=>{
-    if(event.key!==STORAGE_KEY)return;
-    const d=appDoc();
-    if(d)apply(d,readValue())
-  });
-  window.addEventListener('beforeunload',()=>{
-    if(observer)observer.disconnect()
-  },{once:true});''')
-
-          replace_once('assets/special-desks-ui.js', '''let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
-setInterval(()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}},600);
-})();''', '''let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
-window.addEventListener('pageshow',()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}});
-})();''')
-          PY
-      - name: Verify exact scope
+      - name: Patch two loops
+        run: python3 .github/scripts/patch-scroll-two-loops.py
+      - name: Verify
         run: |
           node --check assets/card-view-preference.js
           node --check assets/special-desks-ui.js
-          python3 - <<'PY'
-          from pathlib import Path
-          card=Path('assets/card-view-preference.js').read_text()
-          desks=Path('assets/special-desks-ui.js').read_text()
-          assert '},150);' not in card, '150ms card poll still present'
-          assert '},600);' not in desks, '600ms desks poll still present'
-          print('two-loop cleanup static checks passed')
-          PY
+          ! grep -q '},150);' assets/card-view-preference.js
+          ! grep -q '},600);' assets/special-desks-ui.js
           git diff --check
-          git diff -- assets/card-view-preference.js assets/special-desks-ui.js
-      - name: Save cleanup and remove temporary workflow
+      - name: Commit narrow cleanup
         run: |
-          rm .github/workflows/scroll-two-loops.yml
+          rm .github/workflows/scroll-two-loops.yml .github/scripts/patch-scroll-two-loops.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/card-view-preference.js assets/special-desks-ui.js .github/workflows/scroll-two-loops.yml
+          git add assets/card-view-preference.js assets/special-desks-ui.js .github/workflows/scroll-two-loops.yml .github/scripts/patch-scroll-two-loops.py
           git commit -m 'Remove two persistent UI polling loops'
           git push origin HEAD:fix/scroll-two-loops
