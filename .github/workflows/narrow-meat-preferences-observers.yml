@@ -1,0 +1,66 @@
+name: Narrow Meat and Preferences observers
+on:
+  push:
+    branches: [fix/narrow-meat-preferences-observers-run]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/narrow-meat-preferences-observers-run
+          fetch-depth: 0
+      - name: Narrow only two observers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              text=p.read_text()
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'{path}: expected exactly one target, found {count}')
+              p.write_text(text.replace(old,new,1))
+
+          replace_once(
+              'assets/season-previews-ui.js',
+              "function attach(){let q=d();if(!q?.body)return false;if(q!==doc){doc=q;if(obs)obs.disconnect();obs=new MutationObserver(()=>requestAnimationFrame(()=>ensure(q)));obs.observe(q.body,{subtree:true,childList:true})}ensure(q);load();return true}",
+              "function attach(){let q=d();if(!q?.body)return false;if(q!==doc){doc=q;if(obs)obs.disconnect();obs=new MutationObserver(()=>requestAnimationFrame(()=>ensure(q)));const nav=q.querySelector('.runnerNavPad .tabs')||q.querySelector('.tabs'),term=q.querySelector('main.term');if(nav)obs.observe(nav,{childList:true});if(term)obs.observe(term,{childList:true})}ensure(q);load();return true}"
+          )
+
+          replace_once(
+              'assets/preferences-framework.js',
+              "    observer.observe(d.body,{subtree:true,childList:true});",
+              "    const panel=d.getElementById('runnerSchedulePreferences'),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');\n    if(panel)observer.observe(panel,{subtree:true,childList:true});\n    if(live)observer.observe(live,{subtree:true,childList:true});\n    if(term)observer.observe(term,{childList:true});"
+          )
+          PY
+      - name: Verify exact scope
+        run: |
+          node --check assets/season-previews-ui.js
+          node --check assets/preferences-framework.js
+          python3 - <<'PY'
+          from pathlib import Path
+          meat=Path('assets/season-previews-ui.js').read_text()
+          prefs=Path('assets/preferences-framework.js').read_text()
+          assert "obs.observe(q.body,{subtree:true,childList:true})" not in meat
+          assert "observer.observe(d.body,{subtree:true,childList:true});" not in prefs
+          assert "if(nav)obs.observe(nav,{childList:true})" in meat
+          assert "if(term)obs.observe(term,{childList:true})" in meat
+          assert "if(panel)observer.observe(panel,{subtree:true,childList:true});" in prefs
+          assert "if(live)observer.observe(live,{subtree:true,childList:true});" in prefs
+          assert "if(term)observer.observe(term,{childList:true});" in prefs
+          print('observer narrowing checks passed')
+          PY
+          test "$(git diff --name-only | sort | tr '\n' ' ')" = "assets/preferences-framework.js assets/season-previews-ui.js "
+          git diff --check
+      - name: Save narrow cleanup
+        run: |
+          rm .github/workflows/narrow-meat-preferences-observers.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/preferences-framework.js assets/season-previews-ui.js .github/workflows/narrow-meat-preferences-observers.yml
+          git commit -m 'Narrow Meat and Preferences observers'
+          git push origin HEAD:fix/narrow-meat-preferences-observers-run
