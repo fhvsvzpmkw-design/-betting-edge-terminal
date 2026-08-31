@@ -9,8 +9,8 @@ const page=await browser.newPage();
 const pageErrors=[];
 page.on('pageerror',error=>pageErrors.push(String(error)));
 
-await page.goto(`http://127.0.0.1:8765/runner.html#run=${payload}`,{waitUntil:'networkidle0',timeout:45000});
-await new Promise(resolve=>setTimeout(resolve,6500));
+await page.goto(`http://127.0.0.1:8765/runner.html#run=${payload}`,{waitUntil:'domcontentloaded',timeout:20000});
+await new Promise(resolve=>setTimeout(resolve,8000));
 
 const state=await page.evaluate(()=>{
   const core=document.getElementById('core');
