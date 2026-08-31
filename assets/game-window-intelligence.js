@@ -332,15 +332,17 @@
       const app=document.getElementById('app');
       const d=app?.contentDocument;
       if(!d?.body)return false;
+      const live=d.getElementById('runnerLive');
+      if(!live)return false;
       compactRunnerUtilityLayout();
-      if(d.documentElement.dataset.runnerUtilityLayoutBound==='1')return true;
-      d.documentElement.dataset.runnerUtilityLayoutBound='1';
+      if(live.dataset.runnerUtilityLayoutBound==='1')return true;
+      live.dataset.runnerUtilityLayoutBound='1';
       let frame=null;
       const observer=new MutationObserver(()=>{
         if(frame)return;
         frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})
       });
-      observer.observe(d.body,{subtree:true,childList:true});
+      observer.observe(live,{subtree:true,childList:true});
       return true
     }catch(e){return false}
   }
@@ -354,7 +356,9 @@
       ]);
       if(cfg?.profiles)scheduleCfg=cfg;
       if(state?.defaultProfileId)scheduleState=state;
-      rerender()
+      rerender();
+      setTimeout(bindRunnerUtilityLayout,0);
+      setTimeout(compactRunnerUtilityLayout,80)
     }catch(e){console.warn('VigScope watch-market schedule authority fallback active',e)}
   }
 
@@ -371,6 +375,8 @@
       try{run=typeof activeRun!=='undefined'?activeRun:null}catch(e){}
       if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bindRunnerUtilityLayout()}catch(e){}},0);
       else setTimeout(bindRunnerUtilityLayout,0);
+      setTimeout(bindRunnerUtilityLayout,80);
+      setTimeout(bindRunnerUtilityLayout,250);
       setInterval(refreshLiveChips,LIVE_TIMER_MS);
       loadScheduleAuthority();
       return true
