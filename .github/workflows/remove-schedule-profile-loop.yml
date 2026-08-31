@@ -1,0 +1,46 @@
+name: Remove schedule profile polling loop
+on:
+  push:
+    branches: [fix/remove-schedule-profile-loop-run]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/remove-schedule-profile-loop-run
+          fetch-depth: 0
+      - name: Remove only 1.2 second Schedule Profile loop
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('assets/schedule-profile-ui.js')
+          text=p.read_text()
+          old="""load().then(()=>{\n  let n=0;\n  const t=setInterval(()=>{n++;if(attach()||n>180)clearInterval(t)},100);\n  setInterval(()=>{const d=appDoc();if(d)patch(d)},1200);\n}).catch(e=>console.warn('Schedule profile UI unavailable',e));"""
+          new="""load().then(()=>{\n  let n=0;\n  const t=setInterval(()=>{n++;if(attach()||n>180)clearInterval(t)},100);\n}).catch(e=>console.warn('Schedule profile UI unavailable',e));"""
+          if text.count(old)!=1:
+              raise SystemExit(f'expected exactly one Schedule Profile loop block, found {text.count(old)}')
+          p.write_text(text.replace(old,new,1))
+          PY
+      - name: Verify exact scope
+        run: |
+          node --check assets/schedule-profile-ui.js
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path('assets/schedule-profile-ui.js').read_text()
+          assert "setInterval(()=>{const d=appDoc();if(d)patch(d)},1200);" not in text
+          assert "const t=setInterval(()=>{n++;if(attach()||n>180)clearInterval(t)},100);" in text
+          print('Schedule Profile 1.2-second loop removed; boot retry preserved')
+          PY
+          git diff --check
+          git diff -- assets/schedule-profile-ui.js
+      - name: Save narrow cleanup
+        run: |
+          rm .github/workflows/remove-schedule-profile-loop.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/schedule-profile-ui.js .github/workflows/remove-schedule-profile-loop.yml
+          git commit -m 'Remove Schedule Profile polling loop'
+          git push origin HEAD:fix/remove-schedule-profile-loop-run
