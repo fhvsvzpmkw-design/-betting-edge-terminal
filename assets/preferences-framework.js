@@ -312,7 +312,10 @@ function attach(){
       render(d);
       applyDetailDefaults(d);
     }));
-    observer.observe(d.body,{subtree:true,childList:true});
+    const panel=d.getElementById('runnerSchedulePreferences'),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');
+    if(panel)observer.observe(panel,{subtree:true,childList:true});
+    if(live)observer.observe(live,{subtree:true,childList:true});
+    if(term)observer.observe(term,{childList:true});
   }
   render(d);
   applyDetailDefaults(d);
