@@ -280,6 +280,5 @@ function attach(){
 load().then(()=>{
   let n=0;
   const t=setInterval(()=>{n++;if(attach()||n>180)clearInterval(t)},100);
-  setInterval(()=>{const d=appDoc();if(d)patch(d)},1200);
 }).catch(e=>console.warn('Schedule profile UI unavailable',e));
 })();
