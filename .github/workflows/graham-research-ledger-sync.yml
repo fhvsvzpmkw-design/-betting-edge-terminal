@@ -1,0 +1,82 @@
+name: Graham research ledger sync
+
+on:
+  push:
+    paths:
+      - '.github/workflows/graham-research-ledger-sync.yml'
+      - 'data/walters/nfl/20*/week-*-research-events/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: graham-research-ledger-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Append research events to weekly ledgers
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          changed = []
+          for events_dir in sorted(Path('data/walters/nfl').glob('20*/week-*-research-events')):
+              ledger_path = events_dir.parent / (events_dir.name.replace('-research-events', '-research-ledger.json'))
+              if not ledger_path.exists():
+                  continue
+              ledger = json.loads(ledger_path.read_text())
+              sweeps = ledger.setdefault('sweeps', [])
+              existing = {
+                  (s.get('sequence'), s.get('type'), s.get('startedAt'))
+                  for s in sweeps
+              }
+              appended = 0
+              for event_path in sorted(events_dir.glob('*.json')):
+                  event = json.loads(event_path.read_text())
+                  sweep = {
+                      k: event[k]
+                      for k in (
+                          'sequence','type','startedAt','completedAt','scope','sourcesChecked',
+                          'teamFindings','ratingChanges','matchupChanges','espnFpiCapture','summary'
+                      )
+                      if k in event
+                  }
+                  # Preserve source-lock audit data when present without weakening the ledger's required fields.
+                  if 'methodologySource' in event:
+                      sweep['methodologySource'] = event['methodologySource']
+                  key = (sweep.get('sequence'), sweep.get('type'), sweep.get('startedAt'))
+                  if key in existing:
+                      continue
+                  sweeps.append(sweep)
+                  existing.add(key)
+                  appended += 1
+              if appended:
+                  sweeps.sort(key=lambda x: (x.get('startedAt') or '', x.get('sequence') or -1))
+                  completed = [s.get('completedAt') for s in sweeps if s.get('completedAt')]
+                  if completed:
+                      ledger['updatedAt'] = max(completed)
+                  ledger_path.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + '\n')
+                  changed.append(str(ledger_path))
+
+          print('changed=' + ','.join(changed))
+          PY
+
+      - name: Commit ledger updates
+        run: |
+          if git diff --quiet -- data/walters/nfl; then
+            echo 'No ledger updates required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/walters/nfl/*/week-*-research-ledger.json
+          git commit -m 'Append Graham research event to weekly ledger'
+          git push
