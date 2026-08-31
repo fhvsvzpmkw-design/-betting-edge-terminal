@@ -54,9 +54,19 @@ export function extractPinnacleHomeSpread(fixture,observerGeneratedAt=null){
       }
     }
     if(!home||!away||!Number.isFinite(home.line)||!Number.isFinite(away.line))continue;
-    if(Math.abs(home.line+away.line)>0.01)continue;
+
+    // OddsPapi currently encodes many Pinnacle spreads with the same signed
+    // handicap on both side handles (for example -3.5/home and -3.5/away).
+    // The side token identifies the selection and the numeric handle is the
+    // home-perspective market line. Keep compatibility with feeds that expose
+    // traditional opposite-signed side handles as well.
+    const sameSignedEncoding=Math.abs(home.line-away.line)<=0.01;
+    const oppositeSignedEncoding=Math.abs(home.line+away.line)<=0.01;
+    if(!sameSignedEncoding&&!oppositeSignedEncoding)continue;
+
     const limits=[Number(home.limit),Number(away.limit)].filter(Number.isFinite);
     const limitScore=limits.length===2?Math.min(...limits):limits.length===1?limits[0]:-1;
+    const mainLineScore=(home.mainLine===true?1:0)+(away.mainLine===true?1:0);
     const balanceScore=Math.abs(Number(home.price)-Number(away.price));
     const observedMs=Math.max(quoteTime(home),quoteTime(away),Date.parse(fixture?.updatedAt||'')||0,Date.parse(observerGeneratedAt||'')||0);
     candidates.push({
@@ -68,12 +78,14 @@ export function extractPinnacleHomeSpread(fixture,observerGeneratedAt=null){
       marketId:String(market?.marketId||''),
       bookmakerMarketId:market?.bookmakerMarketId||null,
       observedAt:observedMs?new Date(observedMs).toISOString():observerGeneratedAt,
+      mainLineScore,
       limitScore,
       balanceScore:Number.isFinite(balanceScore)?balanceScore:999,
-      selectionMethod:'highest-two-sided-limit_then-price-balance'
+      lineEncoding:sameSignedEncoding?'ODDSPAPI_HOME_PERSPECTIVE':'OPPOSITE_SIGNED_SIDES',
+      selectionMethod:'mainline_then_highest-two-sided-limit_then_price-balance'
     });
   }
-  candidates.sort((a,b)=>b.limitScore-a.limitScore||a.balanceScore-b.balanceScore||String(a.marketId).localeCompare(String(b.marketId)));
+  candidates.sort((a,b)=>b.mainLineScore-a.mainLineScore||b.limitScore-a.limitScore||a.balanceScore-b.balanceScore||String(a.marketId).localeCompare(String(b.marketId)));
   return candidates[0]||null;
 }
 
