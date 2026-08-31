@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>VigScope Terminal UI v1.5 App</title>
+<style>
+:root{--bg:#030811;--panel:#071321;--panel2:#091a2a;--cyan:#39e7ff;--green:#58ff88;--yellow:#ffe96b;--mag:#ff4fd8;--red:#ff6178;--text:#d9f6ff;--muted:#7ea0ad;--line:#16445a;--blue:#2f84ff}*{box-sizing:border-box}body{margin:0;background:#01040a;color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.term{max-width:1500px;margin:0 auto;background:var(--bg);min-height:100vh;border-left:2px solid var(--cyan);border-right:2px solid var(--cyan);box-shadow:0 0 40px #00c8ff18;position:relative}.term:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff05 0,#ffffff05 1px,transparent 1px,transparent 4px);opacity:.22}.pad{padding:12px}.top{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--cyan);padding:13px}.title{color:var(--cyan);font-weight:900;letter-spacing:.08em;font-size:clamp(17px,2vw,25px)}.small{font-size:12px}.muted{color:var(--muted)}.g{color:var(--green)}.y{color:var(--yellow)}.c{color:var(--cyan)}.m{color:var(--mag)}.r{color:var(--red)}.grid{display:grid;gap:8px}.stats{grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line);padding:8px}.stat,.box{background:var(--panel);border:1px solid var(--line);padding:10px}.stat b{font-size:17px}.key{color:var(--muted);font-size:10px;letter-spacing:.09em;text-transform:uppercase}.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.btn{font:inherit;font-weight:900;cursor:pointer;background:#03101b;color:var(--cyan);border:2px solid var(--cyan);padding:10px}.btn.active{background:var(--cyan);color:#001018}.subtabs{display:flex;flex-wrap:wrap;gap:6px}.subbtn{font:inherit;font-weight:800;cursor:pointer;background:#03101b;color:var(--cyan);border:1px solid var(--cyan);padding:7px 9px}.subbtn.active{color:var(--yellow);border-color:var(--yellow);background:#241f03}.qa{display:flex;flex-wrap:wrap;gap:8px}.tag{display:inline-block;border:1px solid currentColor;padding:3px 7px;font-size:11px;font-weight:900}.notice{border:1px solid var(--yellow);background:#1a1505;padding:10px}.cards{display:grid;gap:11px}.card{background:var(--panel);border:2px solid var(--cyan);padding:14px}.card.wait{border-color:var(--cyan)}.card.pass{border-color:var(--muted)}.card.lean{border-color:var(--yellow)}.cardhead{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.stars{font-size:34px;line-height:1;color:var(--yellow);font-weight:900}.marketline{margin-top:12px;background:#04111d;border:1px solid var(--mag);padding:11px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.marketline>div{min-width:0}.bigprice{font-size:20px;font-weight:900}.evidence{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}.evidence>div{background:#04111d;border:1px solid var(--line);padding:8px;font-size:12px}.why{margin-top:10px;border-left:4px solid var(--red);padding:7px 10px;background:#16080d}.analysisBtn{width:100%;margin-top:10px;font:inherit;font-weight:900;padding:9px;background:#201a03;color:var(--yellow);border:2px solid var(--yellow);cursor:pointer}.detail{margin-top:8px;border:1px dotted var(--line);background:#020912;padding:10px;display:none}.detail.open{display:block}.cols{grid-template-columns:repeat(3,1fr)}.riskbar{height:12px;border:1px solid var(--line);padding:2px}.riskbar span{display:block;height:100%;background:var(--green);width:0}.markettable,.datatable{width:100%;border-collapse:collapse}.markettable th,.markettable td,.datatable th,.datatable td{padding:7px 8px;text-align:left;border-top:1px dotted var(--line);font-size:12px}.markettable th,.datatable th{color:var(--cyan);font-size:10px;letter-spacing:.06em}.scroll{overflow-x:auto}.filters{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:7px}.filters input,.filters select,.jump input{width:100%;background:#020912;color:var(--text);border:1px solid var(--line);font:inherit;padding:8px}.wagerBtn{max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:transparent;border:0;color:var(--cyan);font:inherit;cursor:pointer;padding:0;text-align:left}.pager{display:flex;justify-content:space-between;align-items:center;gap:10px}.pagebtn{font:inherit;font-weight:900;background:#03101b;color:var(--cyan);border:2px solid var(--cyan);padding:8px 11px;cursor:pointer}.pagebtn:disabled{opacity:.35}.jump{display:flex;align-items:center;gap:5px;max-width:185px}.hidden{display:none!important}.pipeline{grid-template-columns:repeat(7,1fr)}.invariant{display:flex;justify-content:space-between;border-top:1px dotted var(--line);padding:8px 0}.sectiontitle{color:var(--cyan);font-weight:900;letter-spacing:.06em}.sourceNote{font-size:11px;color:var(--muted);margin-top:6px}.ledgerDetail{white-space:pre-wrap;line-height:1.45}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.marketline{grid-template-columns:repeat(2,1fr)}.evidence{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.pipeline{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.tabs{grid-template-columns:repeat(2,1fr)}.marketline,.evidence,.filters{grid-template-columns:1fr}.cardhead{display:block}.pager{flex-wrap:wrap;justify-content:center}.top{display:block}.top .right{margin-top:8px;text-align:left!important}}
+
+.sourcegrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.sourcecard{border:1px solid var(--border);padding:9px;background:var(--panel2)}.sourcecard .srcname{font-weight:900;letter-spacing:.05em}.intelbar{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.intelchip{border:1px solid var(--border);padding:4px 7px;font-size:.72rem}.polybox{border:1px solid var(--m);padding:9px;margin-top:9px;background:color-mix(in srgb,var(--m) 5%,var(--panel))}.srcstatus{font-size:.73rem;margin-top:4px}.bookslot{border:1px solid var(--c);padding:10px;min-height:72px}.bookslot.secondary{border-style:dashed}.qaok{color:var(--g);font-weight:900}.qawarn{color:var(--y);font-weight:900}@media(max-width:820px){.sourcegrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.sourcegrid{grid-template-columns:1fr}}
+.bookselect{margin-top:7px;margin-bottom:6px;width:100%;border:1px solid var(--c);background:var(--panel);color:var(--text);font:inherit;padding:6px} 
+.runarchive{margin-top:10px;border:2px solid var(--cyan);background:var(--panel);padding:11px}.runarchivehead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.runcontrols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:9px}.runbtn{font:inherit;font-weight:900;cursor:pointer;background:#03101b;color:var(--cyan);border:1px solid var(--cyan);padding:8px 6px;min-height:48px}.runbtn.active{background:var(--cyan);color:#001018}.runbtn .rt{display:block;font-size:12px}.runbtn .rl{display:block;font-size:9px;letter-spacing:.04em;margin-top:3px}.runarchivebar{display:grid;grid-template-columns:minmax(180px,1fr) 2fr;gap:8px;margin-top:8px}.runarchivebar select{width:100%;background:#020912;color:var(--text);border:1px solid var(--line);font:inherit;padding:8px}.runsummary{margin-top:8px;border-left:4px solid var(--cyan);background:#04111d;padding:9px}.runcounts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.runcount{border:1px solid var(--line);padding:7px;background:#020912}.runcount b{display:block;font-size:17px}.runmeta{font-size:11px;color:var(--muted);line-height:1.45}.runempty{margin-top:8px;padding:11px;border:1px dashed var(--yellow);color:var(--yellow)}.runrecwrap{margin-top:8px;overflow-x:auto}.runrectable{width:100%;border-collapse:collapse}.runrectable th,.runrectable td{padding:7px 8px;text-align:left;border-top:1px dotted var(--line);font-size:11px;vertical-align:top}.runrectable th{color:var(--cyan);font-size:9px;letter-spacing:.06em}.runstatus{font-weight:900}.runstatus.bet{color:var(--green)}.runstatus.lean{color:var(--yellow)}.runstatus.wait{color:var(--cyan)}.runstatus.pass{color:var(--muted)}
+@media(max-width:820px){.runcontrols{grid-template-columns:repeat(2,minmax(0,1fr))}.runarchivebar{grid-template-columns:1fr}.runcounts{grid-template-columns:repeat(2,1fr)}}
+
+#history{--f3accent:var(--blue);--f3soft:#8ca9c5}
+#history .subbtn{color:var(--f3accent);border-color:var(--f3accent);background:#06101f}
+#history .subbtn.active{color:var(--yellow);border-color:var(--yellow);background:#211e08}
+#history .sectiontitle,#history .datatable th{color:var(--f3accent)}
+#history .key,#history .sourceNote{color:var(--f3soft);opacity:1}
+#history .stat,#history .box{border-color:#173a63}
+#history .datatable td{border-top-color:#173a63}
+#history .pagebtn{color:var(--f3accent);border-color:var(--f3accent)}
+#history .filters input,#history .filters select,#history .jump input{border-color:#173a63}
+#ledger .filters{grid-template-columns:2fr 1fr}
+#history .cashProfitLine{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#history .cashRoiInline{color:var(--f3soft);font-size:11px;white-space:nowrap}
+#history .cashRoiInline b{color:var(--green);font-size:14px}
+@media(max-width:560px){#history .cashProfitLine{display:block}#history .cashRoiInline{display:block;margin-top:4px;font-size:9px}#history .cashRoiInline b{font-size:12px}}
+#history .f3premium{position:relative;border:2px solid #d3ad43;background:radial-gradient(circle at 50% 0%,#2a210b 0%,#171207 34%,#090b10 100%);box-shadow:0 0 20px #d3ad4324,inset 0 0 0 1px #6f5720;padding:13px}
+#history .f3premiumHead,#history .premiumInsightHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#history .f3premiumTitle{color:#f0c85b;font-weight:900;letter-spacing:.08em;font-size:13px}
+#history .f3premiumBadge,#history .premiumInsightBadge{border:1px solid #d3ad43;color:#f0c85b;background:#211a07;padding:3px 7px;font-size:9px;font-weight:900;letter-spacing:.08em}
+#history .premiumgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+#history .premiummetric{border:1px solid #806426;background:linear-gradient(180deg,#151006,#0b0d11);padding:12px}
+#history .premiummetric .key{color:#c4a65c}
+#history .premiummetric .bigprice{color:#ffd96b;font-size:29px;text-shadow:0 0 12px #d3ad4340}
+#history .premiumhint{color:#a99055;font-size:10px;margin-top:5px;letter-spacing:.04em}
+#history .premiumSummaryRow{grid-template-columns:1fr 1fr}
+#history .premiumInsight{border:2px solid #b99036;background:linear-gradient(180deg,#171208 0%,#0a0d12 100%);box-shadow:0 0 16px #b9903620,inset 0 0 0 1px #4d3b14}
+#history .premiumInsight .sectiontitle{color:#e7bd53}
+#history .premiumInsight .bigprice{color:#ffd96b;font-size:28px;text-shadow:0 0 10px #d3ad4338}
+#history .premiumInsight .small{color:#b7a06a}
+#history .advantageMultiple{color:#f0c85b;font-size:16px;font-weight:900;margin-top:2px;margin-bottom:4px;letter-spacing:.03em}
+#history .allInPerformance{border-color:#d3ad43;box-shadow:0 0 24px #d3ad432b,inset 0 0 0 1px #6f5720}
+#history .premiumDeck{margin-top:3px;color:#a99055;font-size:9px;letter-spacing:.06em}
+#history .premiumFourGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+#history .premiumFourGrid .premiummetric{position:relative;overflow:hidden;border:1px solid #8b6b28;background:linear-gradient(180deg,#171207 0%,#0b0d11 100%);box-shadow:inset 0 0 0 1px #3e3011,0 0 12px #d3ad4312}
+#history .premiumFourGrid .premiummetric:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#f0c85b 0%,#a57f2f 62%,transparent 100%)}
+#history .premiumFourGrid .premiummetric .key{color:#d0ad59}
+#history .premiumFourGrid .premiummetric .bigprice{color:#ffd96b;text-shadow:0 0 12px #d3ad4340}
+#history .premiumFourGrid .premiumhint{color:#a99055}
+@media(max-width:560px){#history .premiumFourGrid{grid-template-columns:1fr}}
+@media(max-width:560px){#history .premiumgrid,#history .premiumSummaryRow{grid-template-columns:1fr}}
+@media(max-width:560px){#ledger .filters{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="term">
+<header class="top"><div><div class="title">VIGSCOPE TERMINAL UI v1.5</div><div class="small muted">CURRENT APPLICATION SHELL</div></div></header>
+<section class="stats grid">
+<div class="stat"><div class="key">BANKROLL</div><b class="g" id="masterBankroll">$0.00</b></div>
+<div class="stat"><div class="key">NEW RISK</div><b>$0.00</b></div>
+<div class="stat"><div class="key">MASTER WAGERS</div><b class="c" id="masterWagers">—</b></div>
+<div class="stat"><div class="key">LEDGER PAGES</div><b class="g" id="masterPages">—</b></div>
+<div class="stat"><div class="key">BET</div><b class="y">0</b></div>
+<div class="stat"><div class="key">LEAN</div><b class="y">0</b></div>
+<div class="stat"><div class="key">WAIT / PASS</div><b class="c">0 / 0</b></div>
+</section>
+<div class="pad"><div class="qa"><span class="tag g" id="qaCount">LEDGER: CHECKING</span></div></div>
+<div class="pad"><nav class="tabs">
+<button class="btn" data-view="board">[F1] BOARD</button>
+<button class="btn" data-view="market">[F2] MARKET</button>
+<button class="btn" data-view="history">[F3] BET HISTORY</button>
+<button class="btn" data-view="engine">[F4] ENGINE</button>
+</nav></div>
+<section id="board" class="view pad hidden"></section>
+<section id="market" class="view pad hidden"></section>
+<section id="history" class="view pad hidden"><div class="subtabs"><button class="subbtn active" data-h="summary">SUMMARY</button><button class="subbtn" data-h="sports">SPORTS</button><button class="subbtn" data-h="types">BET TYPES</button><button class="subbtn" data-h="books">BOOKS</button><button class="subbtn" data-h="time">TIME</button><button class="subbtn" data-h="ledger">LEDGER</button></div>
+<div id="summary" class="hview" style="margin-top:10px"><div class="grid" style="grid-template-columns:repeat(4,1fr)"><div class="stat"><div class="key">UNIQUE WAGERS</div><b class="c" id="summaryWagers">—</b></div><div class="stat"><div class="key">CASH BETS</div><b id="summaryCashBets">—</b></div><div class="stat"><div class="key">CASH RISKED</div><b id="summaryCashRisked">—</b></div><div class="stat"><div class="key">CASH PROFIT</div><div class="cashProfitLine"><b id="summaryCashProfit">—</b><span class="cashRoiInline">// ROI <b id="summaryCashRoi">—</b></span></div></div></div><div class="box f3premium allInPerformance" style="margin-top:9px"><div class="f3premiumHead"><div><div class="f3premiumTitle">ALL-IN PERFORMANCE</div><div class="premiumDeck">SUBSCRIBER PERFORMANCE LAYER // CASH + PROMO INTELLIGENCE</div></div><span class="f3premiumBadge">PREMIUM</span></div><div class="premiumFourGrid"><div class="premiummetric"><div class="key">OVERALL ROI</div><div class="bigprice" id="summaryOverallRoi">—</div><div class="premiumhint">CASH + PROMO LEDGER</div></div><div class="premiummetric"><div class="key">PROMO / NON-CASH PROFIT</div><div class="bigprice" id="summaryPromoProfit">—</div><div class="premiumhint">BONUS + FREE BET VALUE INCLUDED</div></div><div class="premiummetric"><div class="key">PREGAME SINGLE WAGERS</div><div class="bigprice" id="summaryPregameRoi">—</div><div class="premiumhint" id="summaryPregameMeta">CALCULATING…</div></div><div class="premiummetric"><div class="key">ALL-IN ADVANTAGE</div><div class="bigprice" id="summaryRoiUplift">—</div><div class="advantageMultiple" id="summaryRoiMultiple">—</div><div class="premiumhint">PROMO + BONUS ALERTS INCLUDED</div></div></div></div><div id="historySource" class="hidden"></div></div>
+<div id="sports" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">ALL SETTLED WAGERS // SPORT</div><div class="scroll"><table class="datatable"><thead><tr><th>SPORT</th><th>BETS</th><th>PROFIT</th><th>ROI</th></tr></thead><tbody id="sportsBody"></tbody></table></div><div class="sourceNote">Public performance view. Cash-accounting totals remain authoritative in Summary.</div></div>
+<div id="types" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">PREGAME SINGLE WAGERS // BET TYPES</div><div class="scroll"><table class="datatable"><thead><tr><th>TYPE</th><th>BETS</th><th>RISKED</th><th>PROFIT</th><th>ROI</th></tr></thead><tbody id="typesBody"></tbody></table></div><div class="sourceNote">Live descriptive taxonomy derived from public wager descriptions and leg labels.</div></div>
+<div id="timing" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">TIMING // SETTLED WAGERS</div><div class="scroll"><table class="datatable"><thead><tr><th>TIMING</th><th>BETS</th><th>RISKED</th><th>PROFIT</th><th>ROI</th></tr></thead><tbody id="timingBody"></tbody></table></div><div id="timingNote" class="sourceNote">Calculated live from the public projection.</div></div>
+<div id="prices" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">PREGAME SINGLE WAGERS // PRICE BANDS</div><div class="scroll"><table class="datatable"><thead><tr><th>ODDS</th><th>BETS</th><th>PROFIT</th><th>ROI</th></tr></thead><tbody id="pricesBody"></tbody></table></div><div class="sourceNote">Descriptive only. No broad odds band is treated as a betting rule.</div></div>
+<div id="books" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">SPORTSBOOK PERFORMANCE // SETTLED WAGERS</div><div class="scroll"><table class="datatable"><thead><tr><th>BOOK</th><th>BETS</th><th>RISKED</th><th>PROFIT</th><th>ROI</th></tr></thead><tbody id="booksBody"></tbody></table></div><div class="sourceNote">Book names are public-facing; sportsbook ticket/reference IDs remain removed.</div></div>
+<div id="time" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">SETTLED PERFORMANCE // YEAR</div><div class="scroll"><table class="datatable"><thead><tr><th>YEAR</th><th>BETS</th><th>PROFIT</th><th>ROI</th></tr></thead><tbody id="timeBody"></tbody></table></div></div>
+<div id="clv" class="hview hidden box" style="margin-top:10px"><div class="sectiontitle">CLOSING-LINE VALUE</div><div class="grid cols" style="margin-top:9px"><div><div class="key">WAGERS WITH CLV</div><b id="clvCount">—</b></div><div><div class="key">MEAN CLV</div><b id="clvMean">—</b></div><div><div class="key">MEDIAN CLV</div><b id="clvMedian">—</b></div></div><div id="clvCoverage" class="sourceNote">Coverage is calculated live from the public projection.</div></div>
+<div id="ledger" class="hview hidden" style="margin-top:10px"><div class="box"><div class="sectiontitle">LEDGER</div><div id="ledgerStatus" class="sourceNote">LOADING…</div><span id="ledgerCountTag" class="hidden"></span></div><div class="box filters" style="margin-top:8px"><label><span class="key">SEARCH</span><input id="search" placeholder="bet, event, team, player…"></label><label><span class="key">RESULT</span><select id="result"><option value="">ALL</option><option>Won</option><option>Lost</option><option>CashedOut</option><option>Push</option><option>Cancelled</option></select></label></div><div class="box scroll" style="margin-top:8px"><table class="datatable"><thead><tr><th>DATE</th><th>BET</th><th>ODDS</th><th>STAKE</th><th>RESULT</th><th>P/L</th></tr></thead><tbody id="ledgerBody"></tbody></table></div><div class="box pager" style="margin-top:8px"><button id="prev" class="pagebtn">◀ PREV 10</button><div style="text-align:center"><b id="range">SHOWING</b><br><span id="pageInfo" class="sourceNote"></span></div><div class="jump"><span class="key">PAGE</span><input id="pageJump" inputmode="numeric" value="1"><button id="goPage" class="pagebtn">GO</button></div><button id="next" class="pagebtn">NEXT 10 ▶</button></div></div></section>
+<section id="engine" class="view pad hidden"></section>
+<footer class="foot"></footer>
+</main>
+<div id="app" style="display:none!important" aria-hidden="true"></div>
+<div id="err" style="display:none;position:fixed;z-index:2147482000;left:10px;right:10px;top:10px;padding:10px;background:#25060d;color:#ff9cad;border:1px solid #ff6178;font:12px ui-monospace,SFMono-Regular,Menlo,monospace"></div>
+<script>
+(()=>{
+  const app=document.getElementById('app');
+  try{Object.defineProperty(app,'contentDocument',{configurable:true,get:()=>document})}catch(e){}
+  try{Object.defineProperty(app,'contentWindow',{configurable:true,get:()=>window})}catch(e){}
+})();
+</script>
+<script>
+
+function initBookSelectors(){const ids=['book1','book2','book3','book4'];const summary=document.getElementById('bookSummary');function update(){const vals=ids.map(id=>document.getElementById(id)?.value||'');const picked=vals.filter(Boolean);const dup=picked.some((v,i)=>picked.indexOf(v)!==i);if(summary){summary.textContent=picked.length?`ACTIVE BOOK SET // ${picked.join(' · ')}${dup?' // DUPLICATE SELECTION — FIX':''}`:'No customer books selected in this local build yet.';summary.className='sourceNote '+(dup?'r':'g')}try{localStorage.setItem('bettingEdgeBooks',JSON.stringify(vals))}catch(e){}}let saved=[];try{saved=JSON.parse(localStorage.getItem('bettingEdgeBooks')||'[]')}catch(e){}ids.forEach((id,i)=>{const el=document.getElementById(id);if(!el)return;if(saved[i])el.value=saved[i];el.addEventListener('change',update)});update()}
+document.addEventListener('DOMContentLoaded',initBookSelectors);
+let MASTER=[];
+let DATA=[];
+let LEDGER_META=null;
+const ROWS=10;let page=0;
+const $=id=>document.getElementById(id); const views=['board','market','history','engine'];
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{views.forEach(v=>$(v).classList.toggle('hidden',v!==b.dataset.view));document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));});
+const hviews=['summary','sports','types','timing','prices','books','time','clv','ledger'];document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{hviews.forEach(v=>$(v).classList.toggle('hidden',v!==b.dataset.h));document.querySelectorAll('[data-h]').forEach(x=>x.classList.toggle('active',x===b));if(b.dataset.h==='ledger')render();});
+document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{const d=$(b.dataset.detail);const open=!d.classList.contains('open');d.classList.toggle('open');b.textContent=open?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS';});
+function rec(r){return {id:r[0],book:r[1]||'Unknown',placed:r[3],settled:r[4],sport:r[5]||'',league:r[6]||'',desc:r[7]||'',odds:+r[8],risk:+r[9]||0,result:r[10]||'',pl:+r[11]||0,timing:r[12]||'UNKNOWN',clv:r[13],boosted:!!r[14],events:Array.isArray(r[15])?r[15]:[],legs:Array.isArray(r[16])?r[16]:[],tags:r[17]||''}}
+
+function money(n){const a=Math.abs(n).toFixed(2);return n<0?'-$'+a:n>0?'+$'+a:'$0.00'}function odds(n){return n>0?'+'+n:String(n)}function localDate(s){if(!s)return'—';const d=new Date(s);if(Number.isNaN(d.getTime()))return s;return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d).replace(',','')}
+function corpus(x){return [x.book,x.sport,x.league,x.desc,x.result,...x.events,...x.legs].join(' ').toLowerCase()}
+function filtered(){let d=DATA.slice(),q=$('search').value.trim().toLowerCase(),res=$('result').value;if(q)d=d.filter(x=>corpus(x).includes(q));if(res)d=d.filter(x=>x.result===res);const t=x=>Date.parse(x.placed)||0;d.sort((a,b)=>t(b)-t(a)||b.id-a.id);return d}
+function td(tr,text,cls=''){const e=document.createElement('td');e.textContent=text;if(cls)e.className=cls;tr.appendChild(e)}
+function render(){const d=filtered(),pages=Math.max(1,Math.ceil(d.length/ROWS));page=Math.max(0,Math.min(page,pages-1));const start=page*ROWS;const body=$('ledgerBody');body.replaceChildren();d.slice(start,start+ROWS).forEach(x=>{const tr=document.createElement('tr');const bet=x.legs.length>1?(x.desc||x.legs.length+'-LEG PARLAY'):x.desc;td(tr,localDate(x.placed).split(' ')[0]);td(tr,bet||'—');td(tr,odds(x.odds));td(tr,'$'+x.risk.toFixed(2));td(tr,x.result==='CashedOut'?'CASHED OUT':String(x.result||'—').toUpperCase(),x.result==='Won'?'g':x.result==='Lost'?'r':'y');td(tr,money(x.pl),x.pl>0?'g':x.pl<0?'r':'');body.appendChild(tr)});$('range').textContent=d.length?`SHOWING ${start+1}–${Math.min(start+ROWS,d.length)} OF ${d.length.toLocaleString()}`:'NO MATCHES';$('pageInfo').textContent=`PAGE ${page+1} / ${pages}`;$('pageJump').value=page+1;$('prev').disabled=page===0;$('next').disabled=page>=pages-1}
+function resultSettled(x){return ['Won','Lost','CashedOut','Push','Cancelled'].includes(x.result)}
+function statAgg(rows){const risk=rows.reduce((t,x)=>t+(Number(x.risk)||0),0),profit=rows.reduce((t,x)=>t+(Number(x.pl)||0),0);return {bets:rows.length,risk,profit,roi:risk?profit/risk*100:0}}
+function statTone(n){return n>0?'g':n<0?'r':'y'}
+function pct(n,d=2){return (Number(n)>0?'+':'')+Number(n||0).toFixed(d)+'%'}
+function setTone(id,n,base=''){const x=$(id);if(x)x.className=(base?base+' ':'')+statTone(Number(n)||0)}
+function tableRow(body,cells){const tr=document.createElement('tr');for(const c of cells)td(tr,c.text,c.cls||'');body.appendChild(tr)}
+function groupStats(rows,keyFn){const m=new Map();for(const x of rows){const k=keyFn(x)||'Other / Unclassified';if(!m.has(k))m.set(k,[]);m.get(k).push(x)}return [...m].map(([name,a])=>({name,...statAgg(a)}))}
+function publicBetType(x){const t=[x.desc,...x.legs].join(' ').toLowerCase();if(/goalscorer|touchdown|rush yds|rushing yards|receiv|passing|shots|rebounds|assists|strikeouts|total bases|hits, runs|player |offsides|saves|aces|double faults|home runs|rbis|runs scored|stolen base|fight outcome|round betting/.test(t))return 'Props';if(/spread|point spread|run line|puck line|handicap/.test(t))return 'Spread';if(/money line|moneyline|to advance|match winner|draw no bet| to win\b/.test(t))return 'Moneyline';if(/total|over |under |o\/u|team points|team total/.test(t))return 'Totals';return 'Props'}
+function wagerYear(x){const d=new Date(x.placed);if(!Number.isFinite(d.getTime()))return 'Unknown';try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric'}).format(d)}catch(e){return String(d.getUTCFullYear())}}
+function renderHistoryStats(){
+  const settled=DATA.filter(resultSettled),single=x=>x.legs.length<=1,pregameSingles=settled.filter(x=>x.timing==='PREGAME'&&single(x)),pre=statAgg(pregameSingles);
+  const preRoi=$('summaryPregameRoi');if(preRoi){preRoi.textContent=pct(pre.roi);preRoi.className='bigprice '+statTone(pre.roi)}
+  const preMeta=$('summaryPregameMeta');if(preMeta)preMeta.textContent=pre.bets.toLocaleString()+' bets // '+money(pre.profit)+' // $'+pre.risk.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})+' risked';
+  const src=$('historySource');if(src)src.textContent='PUBLIC STATS // SANITIZED PUBLIC LEDGER // '+(LEDGER_META.deliverySource||'CLOUDFLARE');
+
+  const sports=$('sportsBody');if(sports){sports.replaceChildren();for(const s of groupStats(settled,x=>x.sport).sort((a,b)=>b.profit-a.profit||b.bets-a.bets))tableRow(sports,[{text:s.name},{text:s.bets.toLocaleString()},{text:money(s.profit),cls:statTone(s.profit)},{text:pct(s.roi),cls:statTone(s.roi)}])}
+
+  const types=$('typesBody');if(types){types.replaceChildren();const grouped=Object.fromEntries(groupStats(pregameSingles,publicBetType).map(x=>[x.name,x]));for(const name of ['Spread','Props','Moneyline','Totals']){const s=grouped[name]||{bets:0,risk:0,profit:0,roi:0};tableRow(types,[{text:name},{text:s.bets.toLocaleString()},{text:'$'+s.risk.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})},{text:money(s.profit),cls:statTone(s.profit)},{text:pct(s.roi),cls:statTone(s.roi)}])}}
+
+  const timing=$('timingBody');if(timing){timing.replaceChildren();const grouped=Object.fromEntries(groupStats(settled,x=>x.timing||'UNKNOWN').map(x=>[x.name,x]));for(const name of ['PREGAME','AFTER START','UNKNOWN']){const s=grouped[name];if(!s)continue;tableRow(timing,[{text:name},{text:s.bets.toLocaleString()},{text:'$'+s.risk.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})},{text:money(s.profit),cls:statTone(s.profit)},{text:pct(s.roi),cls:statTone(s.roi)}])}const p=grouped.PREGAME,a=grouped['AFTER START'],note=$('timingNote');if(note&&p&&a)note.textContent='Pregame '+pct(p.roi)+' ROI vs after-start '+pct(a.roi)+' ROI across the sanitized settled-wager sample. Descriptive history, not an automatic betting rule.'}
+
+  const bands=[['≤ -131',x=>x.odds<=-131],['-130 to -101',x=>x.odds>=-130&&x.odds<=-101],['-100 to +130',x=>x.odds>=-100&&x.odds<=130],['+131 to +200',x=>x.odds>=131&&x.odds<=200],['+201+',x=>x.odds>=201]];const prices=$('pricesBody');if(prices){prices.replaceChildren();for(const [name,test] of bands){const s=statAgg(pregameSingles.filter(test));tableRow(prices,[{text:name},{text:s.bets.toLocaleString()},{text:money(s.profit),cls:statTone(s.profit)},{text:pct(s.roi),cls:statTone(s.roi)}])}}
+
+  const books=$('booksBody');if(books){books.replaceChildren();for(const s of groupStats(settled,x=>x.book).sort((a,b)=>b.bets-a.bets||b.profit-a.profit))tableRow(books,[{text:s.name},{text:s.bets.toLocaleString()},{text:'$'+s.risk.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})},{text:money(s.profit),cls:statTone(s.profit)},{text:pct(s.roi),cls:statTone(s.roi)}])}
+
+  const time=$('timeBody');if(time){time.replaceChildren();for(const s of groupStats(settled,wagerYear).sort((a,b)=>String(a.name).localeCompare(String(b.name))))tableRow(time,[{text:s.name},{text:s.bets.toLocaleString()},{text:money(s.profit),cls:statTone(s.profit)},{text:pct(s.roi),cls:statTone(s.roi)}])}
+
+  const clv=settled.map(x=>x.clv).filter(v=>v!==null&&v!==''&&Number.isFinite(Number(v))).map(Number).sort((a,b)=>a-b),mean=clv.length?clv.reduce((t,x)=>t+x,0)/clv.length:0,median=clv.length?(clv.length%2?clv[(clv.length-1)/2]:(clv[clv.length/2-1]+clv[clv.length/2])/2):0;const count=$('clvCount'),mn=$('clvMean'),md=$('clvMedian'),cov=$('clvCoverage');if(count)count.textContent=clv.length.toLocaleString();if(mn){mn.textContent=pct(mean*100);mn.className=statTone(mean)}if(md){md.textContent=pct(median*100);md.className=statTone(median)}if(cov)cov.textContent='CLV coverage '+(settled.length?((clv.length/settled.length)*100).toFixed(1):'0.0')+'% of settled public wagers // calculated live.';
+}
+
+function setLedgerText(){
+  const v=LEDGER_META.validation||{},s=LEDGER_META.summary||{},mix=s.resultMix||{},count=DATA.length,pages=Math.ceil(count/ROWS);
+  const put=(id,value)=>{const x=$(id);if(x)x.textContent=value};
+  put('masterBankroll','$'+Number(LEDGER_META.bankrollCad||0).toFixed(2));put('masterWagers',count.toLocaleString());put('masterPages',pages);
+  put('summaryWagers',count.toLocaleString());put('summaryCashBets',Number(s.cashBets||0).toLocaleString());put('summaryCashRisked','$'+Number(s.cashRisked||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  put('summaryCashProfit',(Number(s.cashProfit||0)>=0?'+':'-')+'$'+Math.abs(Number(s.cashProfit||0)).toFixed(2));put('summaryCashRoi',(Number(s.cashRoiPercent||0)>=0?'+':'')+Number(s.cashRoiPercent||0).toFixed(2)+'%');setTone('summaryCashProfit',Number(s.cashProfit||0));setTone('summaryCashRoi',Number(s.cashRoiPercent||0));
+  const overall=statAgg(DATA),promoProfit=overall.profit-Number(s.cashProfit||0);put('summaryOverallRoi',pct(overall.roi));put('summaryPromoProfit',money(promoProfit));
+  const cashRiskExact=Number(s.cashRisked||0),cashProfitExact=Number(s.cashProfit||0),cashRoiExact=cashRiskExact?cashProfitExact/cashRiskExact*100:0;
+  const roiMultiple=cashRoiExact>0?overall.roi/cashRoiExact:0,roiUplift=cashRoiExact>0?(roiMultiple-1)*100:0;
+  put('summaryRoiUplift',cashRoiExact>0?pct(roiUplift,1):'—');put('summaryRoiMultiple',cashRoiExact>0?roiMultiple.toFixed(2)+'× ROI':'—');
+  put('ledgerCountTag',count.toLocaleString()+' UNIQUE // '+pages+' PAGES');
+  const ok=v.status==='PASS'&&count===Number(v.uniqueWagers)&&pages===Number(v.pagesAt10Rows);
+  $('qaCount').textContent='LEDGER: '+(ok?'PASS':'FAIL')+' '+count.toLocaleString()+'/'+Number(v.uniqueWagers||0).toLocaleString()+' // '+pages+' PAGES';$('qaCount').className='tag '+(ok?'g':'r');
+  $('ledgerStatus').textContent='UPDATED '+new Date(LEDGER_META.generatedAt).toLocaleString('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true})+' PT';
+}
+async function loadLedger(){
+  let payload=null,lastError=null;
+  for(const path of ['./data/bet-history-public.json']){
+    try{
+      const res=await fetch(path+'?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Ledger HTTP '+res.status+' @ '+path);const candidate=await res.json();
+      if(!candidate||!Array.isArray(candidate.wagers)||!candidate.validation)throw new Error('Invalid ledger schema @ '+path);payload=candidate;payload.deliverySource='PUBLIC LEDGER // STATIC PUBLIC PROJECTION';break;
+    }catch(error){lastError=error}
+  }
+  if(!payload)throw lastError||new Error('Ledger unavailable');LEDGER_META=payload;MASTER=payload.wagers;DATA=MASTER.map(rec);
+}
+function init(){setLedgerText();renderHistoryStats();render()}
+$('prev').onclick=()=>{page--;render()};$('next').onclick=()=>{page++;render()};$('goPage').onclick=()=>{const d=filtered(),pages=Math.max(1,Math.ceil(d.length/ROWS));const n=parseInt($('pageJump').value,10);if(Number.isFinite(n)){page=Math.max(0,Math.min(n-1,pages-1));render()}};["search","result"].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{page=0;render()}));loadLedger().then(()=>{init()}).catch(error=>{$('qaCount').textContent='LEDGER: LOAD FAILED';$('qaCount').className='tag r';$('ledgerStatus').textContent='LEDGER LOAD FAILED // '+error.message;console.error(error)});
+
+</script>
+<script src="./assets/runner-core-runtime.js"></script>
+<script>
+(()=>{
+  const app=document.getElementById('app');
+  app.dispatchEvent(new Event('load'));
+  document.dispatchEvent(new CustomEvent('vigscope-app-ready'));
+})();
+</script>
+</body>
+</html>
