@@ -1,0 +1,63 @@
+name: VigScope Value polling optimization
+
+on:
+  push:
+    branches: [fix/vigscope-value-polling]
+    paths:
+      - .github/workflows/vigscope-value-polling-fix.yml
+      - tools/optimize-vigscope-value.py
+      - tests/vigscope-value-scroll-smoke.mjs
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/vigscope-value-polling
+          fetch-depth: 0
+
+      - name: Optimize Value-page background work
+        run: python3 tools/optimize-vigscope-value.py
+
+      - name: Static checks
+        run: |
+          node --check assets/results-desk-ui.js
+          node --check assets/results-card-log-pagination.js
+          node --check assets/results-player-base-v5.js
+          node --check assets/decision-shadow-v2-ui.js
+          node --check assets/why-vigscope-v2.js
+          node --check assets/f3-overall-profit.js
+          ! grep -q 'setInterval(tick,150)' assets/results-card-log-pagination.js
+          ! grep -q "setInterval(()=>{const d=appDoc();if(d)install(d)},700)" assets/results-desk-ui.js
+          ! grep -q "setInterval(()=>{patch();if(!cached&&!loading)load().then(patch)},700)" assets/results-player-base-v5.js
+          ! grep -q "setInterval(()=>{patch();if(!cached&&!loading)load().then(patch)},700)" assets/decision-shadow-v2-ui.js
+          ! grep -q 'setInterval(()=>patch(),700)' assets/why-vigscope-v2.js
+          grep -q 'resultsCardLogObserver' assets/results-card-log-pagination.js
+          grep -q "getElementById('history')||d.body" assets/f3-overall-profit.js
+
+      - name: Install browser client
+        run: npm --silent install puppeteer-core@24 >/dev/null 2>&1
+
+      - name: VigScope Value mobile smoke test
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME"
+          python3 -m http.server 8765 >/tmp/vigscope-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          CHROME="$CHROME" node tests/vigscope-value-scroll-smoke.mjs
+
+      - name: Save optimization and remove one-time workflow
+        run: |
+          rm -f .github/workflows/vigscope-value-polling-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/results-desk-ui.js assets/results-card-log-pagination.js assets/results-player-base-v5.js assets/decision-shadow-v2-ui.js assets/why-vigscope-v2.js assets/f3-overall-profit.js tools/optimize-vigscope-value.py tests/vigscope-value-scroll-smoke.mjs .github/workflows/vigscope-value-polling-fix.yml
+          git commit -m "Reduce VigScope Value background polling"
+          git push origin HEAD:fix/vigscope-value-polling
