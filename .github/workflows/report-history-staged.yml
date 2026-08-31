@@ -56,6 +56,10 @@ jobs:
         run: |
           node tools/report-sidecar-contract.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
           node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Validate complete Core assessment trace
+        run: |
+          node tools/core-assessment-trace-gate.mjs self-test
+          node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
       - name: Enforce Core 1.4 production handicap and Walters authority
         run: node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Guard tracked selection continuity
@@ -84,6 +88,7 @@ jobs:
             node tools/report-publication.mjs verify
             node tools/core-v14-publication-gate.mjs verify-history
             node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
             node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
             git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
