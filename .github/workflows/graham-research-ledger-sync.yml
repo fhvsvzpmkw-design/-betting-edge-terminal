@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Append research events to weekly ledgers
+      - name: Sync research events to weekly ledgers and current boards
         run: |
           python - <<'PY'
           import json
@@ -29,54 +29,96 @@ jobs:
 
           changed = []
           for events_dir in sorted(Path('data/walters/nfl').glob('20*/week-*-research-events')):
-              ledger_path = events_dir.parent / (events_dir.name.replace('-research-events', '-research-ledger.json'))
-              if not ledger_path.exists():
+              event_paths = sorted(events_dir.glob('*.json'))
+              if not event_paths:
                   continue
-              ledger = json.loads(ledger_path.read_text())
-              sweeps = ledger.setdefault('sweeps', [])
-              existing = {
-                  (s.get('sequence'), s.get('type'), s.get('startedAt'))
-                  for s in sweeps
-              }
-              appended = 0
-              for event_path in sorted(events_dir.glob('*.json')):
-                  event = json.loads(event_path.read_text())
-                  sweep = {
-                      k: event[k]
-                      for k in (
-                          'sequence','type','startedAt','completedAt','scope','sourcesChecked',
-                          'teamFindings','ratingChanges','matchupChanges','espnFpiCapture','summary'
-                      )
-                      if k in event
+              events = [json.loads(p.read_text()) for p in event_paths]
+
+              ledger_path = events_dir.parent / (events_dir.name.replace('-research-events', '-research-ledger.json'))
+              if ledger_path.exists():
+                  ledger = json.loads(ledger_path.read_text())
+                  sweeps = ledger.setdefault('sweeps', [])
+                  existing = {
+                      (s.get('sequence'), s.get('type'), s.get('startedAt'))
+                      for s in sweeps
                   }
-                  # Preserve source-lock audit data when present without weakening the ledger's required fields.
-                  if 'methodologySource' in event:
-                      sweep['methodologySource'] = event['methodologySource']
-                  key = (sweep.get('sequence'), sweep.get('type'), sweep.get('startedAt'))
-                  if key in existing:
-                      continue
-                  sweeps.append(sweep)
-                  existing.add(key)
-                  appended += 1
-              if appended:
-                  sweeps.sort(key=lambda x: (x.get('startedAt') or '', x.get('sequence') or -1))
-                  completed = [s.get('completedAt') for s in sweeps if s.get('completedAt')]
-                  if completed:
-                      ledger['updatedAt'] = max(completed)
-                  ledger_path.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + '\n')
-                  changed.append(str(ledger_path))
+                  appended = 0
+                  for event in events:
+                      sweep = {
+                          k: event[k]
+                          for k in (
+                              'sequence','type','startedAt','completedAt','scope','sourcesChecked',
+                              'teamFindings','ratingChanges','matchupChanges','espnFpiCapture','summary'
+                          )
+                          if k in event
+                      }
+                      if 'methodologySource' in event:
+                          sweep['methodologySource'] = event['methodologySource']
+                      key = (sweep.get('sequence'), sweep.get('type'), sweep.get('startedAt'))
+                      if key in existing:
+                          continue
+                      sweeps.append(sweep)
+                      existing.add(key)
+                      appended += 1
+                  if appended:
+                      sweeps.sort(key=lambda x: (x.get('startedAt') or '', x.get('sequence') or -1))
+                      completed = [s.get('completedAt') for s in sweeps if s.get('completedAt')]
+                      if completed:
+                          ledger['updatedAt'] = max(completed)
+                      ledger_path.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + '\n')
+                      changed.append(str(ledger_path))
+
+              current_path = events_dir.parent / (events_dir.name.replace('-research-events', '-current-numbers.json'))
+              if current_path.exists():
+                  board = json.loads(current_path.read_text())
+                  latest = max(events, key=lambda e: e.get('completedAt') or e.get('startedAt') or '')
+                  latest_at = latest.get('completedAt') or latest.get('startedAt')
+                  board_changed = False
+                  if latest_at and board.get('lastResearchAt') != latest_at:
+                      board['lastResearchAt'] = latest_at
+                      board['updatedAt'] = latest_at
+                      board['lastInformationReviewAt'] = latest_at
+                      board_changed = True
+                  summary = latest.get('summary') or {}
+                  if summary.get('fairNumberMoves') == 0:
+                      state = 'INFORMATION_REVIEW_CURRENT_FAIR_PRESERVED_PROVISIONAL'
+                      if board.get('state') != state:
+                          board['state'] = state
+                          board_changed = True
+                  matchup_by_key = {
+                      m.get('gameKey'): m for m in (latest.get('matchupChanges') or []) if m.get('gameKey')
+                  }
+                  for game in board.get('games') or []:
+                      review = matchup_by_key.get(game.get('gameKey'))
+                      if not review:
+                          continue
+                      status = 'REVIEWED_NO_MATERIAL_CHANGE_SOURCE_LOCKED' if review.get('action') == 'PRESERVE_PRIOR_PROVISIONAL_NUMBER' else game.get('informationStatus')
+                      if status and game.get('informationStatus') != status:
+                          game['informationStatus'] = status
+                          board_changed = True
+                      if latest_at and game.get('lastInformationReviewAt') != latest_at:
+                          game['lastInformationReviewAt'] = latest_at
+                          board_changed = True
+                  if latest.get('methodologySource'):
+                      method_status = latest['methodologySource'].get('status')
+                      if method_status and board.get('methodologySourceStatus') != method_status:
+                          board['methodologySourceStatus'] = method_status
+                          board_changed = True
+                  if board_changed:
+                      current_path.write_text(json.dumps(board, indent=2, ensure_ascii=False) + '\n')
+                      changed.append(str(current_path))
 
           print('changed=' + ','.join(changed))
           PY
 
-      - name: Commit ledger updates
+      - name: Commit synchronized research state
         run: |
           if git diff --quiet -- data/walters/nfl; then
-            echo 'No ledger updates required.'
+            echo 'No research-state updates required.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/walters/nfl/*/week-*-research-ledger.json
-          git commit -m 'Append Graham research event to weekly ledger'
+          git add data/walters/nfl/*/week-*-research-ledger.json data/walters/nfl/*/week-*-current-numbers.json
+          git commit -m 'Sync Graham research event to weekly state'
           git push
