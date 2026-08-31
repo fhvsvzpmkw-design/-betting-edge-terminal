@@ -36,7 +36,8 @@ jobs:
           PY
       - name: Verify narrow UI-only change
         run: |
-          node --check assets/report-dashboard-vigscope.js.old
+          cp assets/report-dashboard-vigscope.js.old /tmp/report-dashboard-vigscope.js
+          node --check /tmp/report-dashboard-vigscope.js
           grep -F "const refresh=live.querySelector('.runnerRefresh');" assets/report-dashboard-vigscope.js.old
           grep -F "runnerSessionDock" assets/report-dashboard-vigscope.js.old
           grep -F "width:auto!important" assets/report-dashboard-vigscope.js.old
