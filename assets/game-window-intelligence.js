@@ -169,22 +169,23 @@
       .watchMarketFact{color:#d6c983;font-size:9px}.watchMarketFact b{color:#fff0a2;font-size:10px}
       .watchMarketConditions{margin-top:5px;color:#d6c983;font-size:9px}.watchMarketConditions b{color:#fff0a2}
 
-      /* Report utility layout: compact Reprice near freshness, prominent run times below summary. */
+      /* Compact Reprice at the top; run times dock below the VIG SCOPE instrument. */
       .runnerHeadRight>.runnerRefresh{margin:0!important;padding:4px 0 0!important;border:0!important;background:transparent!important;box-shadow:none!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:5px 8px!important;align-items:center!important}
       .runnerHeadRight>.runnerRefresh .runnerRefreshActions{display:block!important;margin:0!important;padding:0!important}
       .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{min-height:28px!important;padding:5px 8px!important;font-size:9px!important;line-height:1!important;white-space:nowrap!important}
       .runnerHeadRight>.runnerRefresh .runnerRefreshStatus{margin:0!important;padding:0!important;border:0!important;background:transparent!important;font-size:8px!important;line-height:1.3!important;color:var(--muted)!important;text-align:left!important}
       .runnerHeadRight>.runnerRefresh .deltaStrip{grid-column:1/-1!important;margin:2px 0 0!important}
-      #runnerLive>.sessionStrip{margin:10px 0 8px!important;gap:7px!important}
-      #runnerLive>.sessionStrip .sessionChip{font-size:12px!important;font-weight:950!important;letter-spacing:.045em!important;min-height:40px!important;padding:9px 8px!important}
+      #runnerLive>.runnerSessionDock{margin:10px 0 8px!important}
+      #runnerLive>.runnerSessionDock>.sessionStrip{margin:0!important;gap:7px!important}
+      #runnerLive>.runnerSessionDock>.sessionStrip .sessionChip{font-size:12px!important;font-weight:950!important;letter-spacing:.045em!important;min-height:40px!important;padding:9px 8px!important}
 
       @media(max-width:520px){
         .gameWindowIntel{margin-top:5px}.gameWindowState{padding:3px 6px;font-size:8px;letter-spacing:.055em}.watchMarketIntel{padding:7px 8px}.watchMarketFacts{gap:7px}.watchMarketTitle{font-size:10px}.watchMarketBadge{font-size:9px}
         .runnerHeadRight>.runnerRefresh{grid-template-columns:auto minmax(0,1fr)!important;gap:5px 7px!important}
         .runnerHeadRight>.runnerRefresh .runnerRefreshBtn{font-size:9px!important;padding:5px 7px!important}
         .runnerHeadRight>.runnerRefresh .runnerRefreshStatus{font-size:7.5px!important}
-        #runnerLive>.sessionStrip{gap:5px!important;overflow-x:auto!important}
-        #runnerLive>.sessionStrip .sessionChip{font-size:11px!important;min-width:64px!important;min-height:38px!important;padding:8px 6px!important}
+        #runnerLive>.runnerSessionDock>.sessionStrip{gap:5px!important;overflow-x:auto!important}
+        #runnerLive>.runnerSessionDock>.sessionStrip .sessionChip{font-size:11px!important;min-width:64px!important;min-height:38px!important;padding:8px 6px!important}
       }
     `;
     d.head.appendChild(style)
@@ -281,9 +282,9 @@
       const live=d.getElementById('runnerLive');
       if(!live)return false;
       const headRight=live.querySelector('.runnerHeadRight');
-      let refresh=[...live.children].find(x=>x.classList?.contains('runnerRefresh'))||headRight?.querySelector('.runnerRefresh');
-      const session=[...live.children].find(x=>x.classList?.contains('sessionStrip'));
-      const summary=[...live.children].find(x=>x.classList?.contains('runnerSummary'));
+      const refresh=live.querySelector('.runnerRefresh');
+      const session=live.querySelector('.sessionStrip');
+      const intel=live.querySelector(':scope > #runnerMarketIntel');
       if(refresh&&headRight&&refresh.parentElement!==headRight)headRight.appendChild(refresh);
       if(refresh){
         const status=refresh.querySelector('.runnerRefreshStatus');
@@ -296,7 +297,12 @@
           status.dataset.compactDefault='1'
         }
       }
-      if(session&&summary&&session.previousElementSibling!==summary)summary.insertAdjacentElement('afterend',session);
+      if(session&&intel){
+        let dock=live.querySelector(':scope > .runnerSessionDock');
+        if(!dock){dock=d.createElement('div');dock.className='runnerSessionDock'}
+        if(session.parentElement!==dock)dock.appendChild(session);
+        if(intel.nextElementSibling!==dock)intel.insertAdjacentElement('afterend',dock)
+      }
       return true
     }catch(e){return false}
   }
