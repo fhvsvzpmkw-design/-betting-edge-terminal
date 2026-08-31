@@ -288,8 +288,9 @@ function bindKeys(d){
 }
 function attach(){
   const d=appDoc();if(!d?.body)return false;
-  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));observer.observe(d.body,{subtree:true,childList:true,characterData:true})}
-  bindKeys(d);ensureButtons(d);return true;
+  const nav=d.querySelector('.runnerNavPad');if(!nav)return false;
+  if(d!==lastDoc){lastDoc=d;if(observer)observer.disconnect();bindKeys(d);observer=new MutationObserver(()=>requestAnimationFrame(()=>ensureButtons(d)));observer.observe(nav,{subtree:true,childList:true})}
+  bindKeys(d);return ensureButtons(d);
 }
 Promise.all([
   fetch(`${PIZZA_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
