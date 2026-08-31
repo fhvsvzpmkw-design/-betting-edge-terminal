@@ -93,15 +93,24 @@
     return true
   }
 
-  const timer=setInterval(()=>{
+  let bootTries=0;
+  function boot(){
     const d=appDoc();
-    if(d)attach(d);
-    const current=readValue();
-    if(d&&current!==lastValue)apply(d,current)
-  },150);
-
+    if(d&&attach(d))return;
+    bootTries+=1;
+    if(bootTries<150)setTimeout(boot,40)
+  }
+  boot();
+  window.addEventListener('pageshow',()=>{
+    const d=appDoc();
+    if(d)attach(d)
+  });
+  window.addEventListener('storage',event=>{
+    if(event.key!==STORAGE_KEY)return;
+    const d=appDoc();
+    if(d)apply(d,readValue())
+  });
   window.addEventListener('beforeunload',()=>{
-    clearInterval(timer);
     if(observer)observer.disconnect()
   },{once:true});
 })();
