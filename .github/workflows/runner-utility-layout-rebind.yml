@@ -1,0 +1,103 @@
+name: Rebind runner utility layout
+on:
+  push:
+    branches: [fix/runner-utility-layout-rebind]
+    paths: ['.github/workflows/runner-utility-layout-rebind.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/runner-utility-layout-rebind
+          fetch-depth: 0
+      - name: Make utility layout self-contained and scoped
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('assets/game-window-intelligence.js')
+          s=p.read_text()
+          old="""  function bindRunnerUtilityLayout(){
+    try{
+      const app=document.getElementById('app');
+      const d=app?.contentDocument;
+      if(!d?.body)return false;
+      compactRunnerUtilityLayout();
+      if(d.documentElement.dataset.runnerUtilityLayoutBound==='1')return true;
+      d.documentElement.dataset.runnerUtilityLayoutBound='1';
+      let frame=null;
+      const observer=new MutationObserver(()=>{
+        if(frame)return;
+        frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})
+      });
+      observer.observe(d.body,{subtree:true,childList:true});
+      return true
+    }catch(e){return false}
+  }
+"""
+          new="""  function bindRunnerUtilityLayout(){
+    try{
+      const app=document.getElementById('app');
+      const d=app?.contentDocument;
+      if(!d?.body)return false;
+      const live=d.getElementById('runnerLive');
+      if(!live)return false;
+      compactRunnerUtilityLayout();
+      if(live.dataset.runnerUtilityLayoutBound==='1')return true;
+      live.dataset.runnerUtilityLayoutBound='1';
+      let frame=null;
+      const observer=new MutationObserver(()=>{
+        if(frame)return;
+        frame=d.defaultView.requestAnimationFrame(()=>{frame=null;compactRunnerUtilityLayout()})
+      });
+      observer.observe(live,{subtree:true,childList:true});
+      return true
+    }catch(e){return false}
+  }
+
+  function bootRunnerUtilityLayout(){
+    let tries=0;
+    const attempt=()=>{
+      tries++;
+      if(bindRunnerUtilityLayout()||tries>120)return;
+      setTimeout(attempt,50)
+    };
+    attempt()
+  }
+"""
+          if old not in s:
+              raise SystemExit('bindRunnerUtilityLayout block not found')
+          s=s.replace(old,new,1)
+          old2="""      if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bindRunnerUtilityLayout()}catch(e){}},0);
+      else setTimeout(bindRunnerUtilityLayout,0);
+"""
+          new2="""      if(run&&typeof apply==='function')setTimeout(()=>{try{apply(run);bootRunnerUtilityLayout()}catch(e){}},0);
+      else setTimeout(bootRunnerUtilityLayout,0);
+"""
+          if old2 not in s:
+              raise SystemExit('utility boot call block not found')
+          s=s.replace(old2,new2,1)
+          p.write_text(s)
+          PY
+      - name: Verify exact regression fix
+        run: |
+          node --check assets/game-window-intelligence.js
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('assets/game-window-intelligence.js').read_text()
+          assert "observer.observe(live,{subtree:true,childList:true})" in s
+          assert "observer.observe(d.body,{subtree:true,childList:true})" not in s
+          assert "function bootRunnerUtilityLayout()" in s
+          assert "apply(run);bootRunnerUtilityLayout()" in s
+          PY
+          git diff --check
+          test "$(git diff --name-only | tr '\n' ' ')" = "assets/game-window-intelligence.js "
+      - name: Save regression fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/game-window-intelligence.js
+          git commit -m 'Rebind compact report utility layout'
+          git push origin HEAD:fix/runner-utility-layout-rebind
