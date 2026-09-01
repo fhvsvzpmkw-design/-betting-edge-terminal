@@ -38,7 +38,7 @@ const forbidden=/\b(Pinnacle|Bet365|DraftKings|sportsbook consensus|line movemen
 if(forbidden.test(JSON.stringify(input)))fail('forbidden market-derived text found in numeric input');
 
 const openCases=new Map();
-for(const game of screen.screens||[])for(const c of game.cases||[])if(c.screeningStatus==='OPEN_SHADOW_NUMERIC_CALIBRATION_PENDING')openCases.set(c.matchupCaseId,c);
+for(const game of screen.screens||[])for(const c of game.cases||[])if(c.screeningStatus==='OPEN_SHADOW_NUMERIC_CALIBRATION_PENDING')openCases.set(c.matchupCaseId,{...c,gameKey:game.gameKey});
 const decisions=Array.isArray(input.decisions)?input.decisions:[];
 if(!decisions.length)fail('no numeric decisions');
 const seen=new Set();
