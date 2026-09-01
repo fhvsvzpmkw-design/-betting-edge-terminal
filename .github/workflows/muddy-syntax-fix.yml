@@ -1,0 +1,46 @@
+name: Muddy Syntax Fix
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-syntax-fix.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fix missing statement separator
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const paths=['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html'];
+          for(const p of paths){
+            let s=fs.readFileSync(p,'utf8');
+            const bad="Mo=capitalStats(month),OM=capitalStats(oldM)set('gen'";
+            const good="Mo=capitalStats(month),OM=capitalStats(oldM);set('gen'";
+            if(!s.includes(bad)) throw new Error(p+' expected syntax defect not found');
+            s=s.replace(bad,good);
+            fs.writeFileSync(p,s);
+            const m=s.match(/<script>([\s\S]*?)<\/script>/);
+            if(!m) throw new Error(p+' inline script missing');
+            fs.writeFileSync('/tmp/muddy.js',m[1]);
+            require('child_process').execFileSync(process.execPath,['--check','/tmp/muddy.js'],{stdio:'inherit'});
+          }
+          NODE
+      - name: Verify Muddy guardrails
+        run: |
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          grep -q "OM=capitalStats(oldM);set('gen'" syndicates/generated/eddie-numbers/hotline.html
+          ! grep -q "muddy-funding-overlay\|UNIT_RATE\|TARGET_UNIT\|bankroll\*scale" syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit syntax repair
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: repair inline runtime syntax'
+          git push origin main
