@@ -1,0 +1,61 @@
+name: Pinnacle benchmark validation
+
+on:
+  pull_request:
+    paths:
+      - core/core-v1.4-production.json
+      - core/pinnacle-sharp-benchmark-v1.4.json
+      - tools/pinnacle-sharp-benchmark.mjs
+      - tools/pinnacle-benchmark-publication-gate.mjs
+      - tools/oddspapi-observer.mjs
+      - .github/workflows/odds-refresh.yml
+      - .github/workflows/report-history-staged.yml
+      - .github/workflows/pinnacle-benchmark-validation.yml
+  push:
+    branches: [main]
+    paths:
+      - core/core-v1.4-production.json
+      - core/pinnacle-sharp-benchmark-v1.4.json
+      - tools/pinnacle-sharp-benchmark.mjs
+      - tools/pinnacle-benchmark-publication-gate.mjs
+      - tools/oddspapi-observer.mjs
+      - .github/workflows/odds-refresh.yml
+      - .github/workflows/report-history-staged.yml
+      - .github/workflows/pinnacle-benchmark-validation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check tools/pinnacle-sharp-benchmark.mjs
+          node --check tools/pinnacle-benchmark-publication-gate.mjs
+          node --check tools/oddspapi-observer.mjs
+      - name: Benchmark math and authority tests
+        run: |
+          node tools/pinnacle-sharp-benchmark.mjs self-test
+          node tools/pinnacle-benchmark-publication-gate.mjs self-test
+      - name: Validate production JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('core/core-v1.4-production.json','utf8'));JSON.parse(require('fs').readFileSync('core/pinnacle-sharp-benchmark-v1.4.json','utf8'));console.log('Production JSON valid')"
+      - name: Preserve pre-cutover history
+        run: |
+          node tools/pinnacle-benchmark-publication-gate.mjs validate \
+            --report data/history/runs/2026-09-01/final_morning-093530.json \
+            --sidecar data/history/research-fit/2026-09-01/final_morning-093530.json
+      - name: Existing Core regression
+        run: |
+          node tools/core-assessment-trace-gate.mjs self-test
+          node tools/core-v14-publication-gate.mjs verify-history

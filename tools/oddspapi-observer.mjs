@@ -1,11 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {annotatePinnacle,AUTHORITY} from './pinnacle-sharp-benchmark.mjs';
 
 const API_BASE='https://api.oddspapi.io/v4';
 const API_KEY=String(process.env.ODDSPAPI_API_KEY||'').trim();
 const PRIMARY_FILE=path.join('data','live-odds.json');
 const OUTFILE=path.join('data','oddspapi-observer.json');
 const RESERVE=25;
+const QUOTE_FRESHNESS_MINUTES=30;
+const FUTURE_CLOCK_SKEW_TOLERANCE_MINUTES=5;
 // Keep enough regular-season NFL runway for Graham's current-week board to be
 // initialized before Week 1 while leaving the tighter preseason horizon alone.
 const RETENTION_HORIZONS_HOURS={default:30,NFL:384,NFL_PRESEASON:192,BOXING:30};
@@ -32,7 +35,7 @@ function summarizePinnacle(book){if(!book||typeof book!=='object')return null;co
 function matchPrimary(f,events){const a=token(f?.participant1Name),b=token(f?.participant2Name),st=Date.parse(f?.startTime||'');if(!a||!b||!Number.isFinite(st))return null;for(const e of events||[]){const h=token(e?.home),aw=token(e?.away),es=Date.parse(e?.date||'');if(!h||!aw||!Number.isFinite(es)||Math.abs(es-st)>3*3600000)continue;if((a===h&&b===aw)||(a===aw&&b===h))return{eventId:String(e?.id||''),eventKey:String(e?.eventKey||e?.identity?.eventKey||''),matchedBy:'exact-participant-pair+start-time'}}return null}
 
 const primary=readJson(PRIMARY_FILE),now=Date.now();
-const observation={schema:2,mode:'observation-only',authoritative:false,source:'OddsPapi v4',generatedAt:new Date(now).toISOString(),horizonHours:RETENTION_HORIZONS_HOURS.default,retentionHorizonsHours:{...RETENTION_HORIZONS_HOURS},sourceOfTruth:{Bet365:'Odds-API.io v3',DraftKings:'Odds-API.io v3',Pinnacle:'OddsPapi v4'},status:'not-run',quota:null,requestedBookmaker:'pinnacle',tournaments:[],fixtureCountRaw:0,fixtureCount:0,primaryMatches:0,fixtures:[],diagnostics:{billableRequestsThisRun:0,discoveryRequests:0,oddsRequests:0,activePrimaryCategories:[],alwaysObservedCategories:[...ALWAYS_OBSERVE].sort(),skippedCategories:[],errors:[]}};
+const observation={schema:3,mode:'official-sharp-benchmark',authoritative:true,authorityScope:'sharp-market-benchmark-only',benchmarkAuthority:AUTHORITY,executionAuthority:false,decisionAuthority:false,fairValueAuthority:false,source:'OddsPapi v4',generatedAt:new Date(now).toISOString(),horizonHours:RETENTION_HORIZONS_HOURS.default,retentionHorizonsHours:{...RETENTION_HORIZONS_HOURS},benchmarkPolicy:{path:'core/pinnacle-sharp-benchmark-v1.4.json',policyId:'pinnacle-sharp-benchmark-v1.4-2026-09-01',quoteFreshnessMinutes:QUOTE_FRESHNESS_MINUTES,futureClockSkewToleranceMinutes:FUTURE_CLOCK_SKEW_TOLERANCE_MINUTES,requiresExactMarketAndSelectionMatchAtReportTime:true},sourceOfTruth:{Bet365:'Odds-API.io v3',DraftKings:'Odds-API.io v3',Pinnacle:'OddsPapi v4'},status:'not-run',quota:null,requestedBookmaker:'pinnacle',tournaments:[],fixtureCountRaw:0,fixtureCount:0,primaryMatches:0,qualifiedBenchmarkMarkets:0,fixtures:[],diagnostics:{billableRequestsThisRun:0,discoveryRequests:0,oddsRequests:0,activePrimaryCategories:[],alwaysObservedCategories:[...ALWAYS_OBSERVE].sort(),skippedCategories:[],errors:[]}};
 
 async function main(){
   if(!primary||!Array.isArray(primary.events)){observation.status='primary-snapshot-unavailable';writeJson(OUTFILE,observation);return}
@@ -45,7 +48,7 @@ async function main(){
     const payload=await apiGet('/odds-by-tournaments',{bookmaker:'pinnacle',tournamentIds:selected.map(t=>t.id).join(','),language:'en',verbosity:3,oddsFormat:'american'});
     observation.diagnostics.billableRequestsThisRun=1;observation.diagnostics.oddsRequests=1;
     const rows=payloadRows(payload);observation.fixtureCountRaw=rows.length;
-    for(const f of rows){const st=Date.parse(f?.startTime||'');const retentionHorizonHours=fixtureHorizonHours(f);const end=now+retentionHorizonHours*3600000;if(!Number.isFinite(st)||st<now-2*3600000||st>end)continue;const pinnacle=summarizePinnacle(f?.bookmakerOdds?.pinnacle);if(!pinnacle)continue;const match=matchPrimary(f,primary.events);if(match)observation.primaryMatches++;observation.fixtures.push({fixtureId:f?.fixtureId||null,sportId:f?.sportId??null,tournamentId:f?.tournamentId??null,startTime:f?.startTime||null,updatedAt:f?.updatedAt||null,statusName:f?.statusName||null,participant1Name:f?.participant1Name||null,participant2Name:f?.participant2Name||null,retentionHorizonHours,primaryMatch:match,pinnacle})}
+    for(const f of rows){const st=Date.parse(f?.startTime||'');const retentionHorizonHours=fixtureHorizonHours(f);const end=now+retentionHorizonHours*3600000;if(!Number.isFinite(st)||st<now-2*3600000||st>end)continue;const pinnacle=summarizePinnacle(f?.bookmakerOdds?.pinnacle);if(!pinnacle)continue;const match=matchPrimary(f,primary.events);if(match)observation.primaryMatches++;annotatePinnacle(pinnacle,{generatedAt:observation.generatedAt,primaryMatch:match,quoteFreshnessMinutes:QUOTE_FRESHNESS_MINUTES,futureClockSkewToleranceMinutes:FUTURE_CLOCK_SKEW_TOLERANCE_MINUTES});observation.qualifiedBenchmarkMarkets+=Number(pinnacle.qualifiedBenchmarkMarkets||0);observation.fixtures.push({fixtureId:f?.fixtureId||null,sportId:f?.sportId??null,tournamentId:f?.tournamentId??null,startTime:f?.startTime||null,updatedAt:f?.updatedAt||null,statusName:f?.statusName||null,participant1Name:f?.participant1Name||null,participant2Name:f?.participant2Name||null,retentionHorizonHours,primaryMatch:match,pinnacle})}
     observation.fixtureCount=observation.fixtures.length;observation.status='ok';
   }catch(e){observation.diagnostics.billableRequestsThisRun=1;observation.diagnostics.oddsRequests=1;observation.status='odds-error';observation.diagnostics.errors.push(safeError(e))}
   writeJson(OUTFILE,observation);

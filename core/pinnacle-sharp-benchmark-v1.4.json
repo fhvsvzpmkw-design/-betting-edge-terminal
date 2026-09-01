@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "policyId": "pinnacle-sharp-benchmark-v1.4-2026-09-01",
+  "targetCoreVersion": "1.4",
+  "state": "OPERATIONAL",
+  "activatedAt": "2026-09-01T10:30:00-07:00",
+  "timezone": "America/Vancouver",
+  "book": "Pinnacle",
+  "source": "OddsPapi v4",
+  "observerPath": "data/oddspapi-observer.json",
+  "authority": "OFFICIAL_NON_EXECUTABLE_SHARP_BENCHMARK",
+  "executionAuthority": false,
+  "decisionAuthority": false,
+  "fairValueAuthority": false,
+  "rules": {
+    "observerFreshnessMinutes": 75,
+    "quoteFreshnessMinutes": 30,
+    "futureClockSkewToleranceMinutes": 5,
+    "requiresPrimaryEventMatch": true,
+    "requiresExactMarketAndSelectionMatchAtReportTime": true,
+    "requiresBookmakerActive": true,
+    "rejectsSuspendedBookmaker": true,
+    "requiresMarketActive": true,
+    "requiresActiveQuotes": true,
+    "requiresMainLine": true,
+    "requiresCompleteTwoWayPairForNoVig": true
+  },
+  "permissions": {
+    "maySupplyExecutablePrice": false,
+    "mayOriginateBet": false,
+    "maySetStake": false,
+    "mayDirectlyChangeFairValuePointEstimate": false,
+    "mayDirectlyChangePlayTo": false,
+    "mayDirectlyChangeStatus": false,
+    "mayProvideOfficialNoVigBenchmark": true,
+    "mayConfirmSharpMarketAlignment": true,
+    "mayExposeSharpMarketConflict": true,
+    "mayRaiseUncertaintyOrModelErrorOnMaterialConflict": true,
+    "mayBlockEntireReportWhenUnavailable": false
+  },
+  "executionBooksRemain": [
+    "Bet365",
+    "DraftKings"
+  ],
+  "unavailableState": "PINNACLE_BENCHMARK_UNAVAILABLE",
+  "qualifiedState": "QUALIFIED",
+  "reporting": {
+    "futureReportsMustDistinguishExecutablePriceFromPinnacleBenchmark": true,
+    "futureReportsMustNotDescribePinnacleAsExecutable": true,
+    "preferredFields": [
+      "state",
+      "authority",
+      "price",
+      "pairedPrice",
+      "noVigProbability",
+      "noVigPriceAmerican",
+      "quoteChangedAt",
+      "limit"
+    ]
+  },
+  "historicalReports": "IMMUTABLE"
+}
