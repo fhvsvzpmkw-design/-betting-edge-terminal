@@ -28,7 +28,7 @@ assert(!live.includes('PRIVATE MASTER // CLOUDFLARE'),'Private-master label leak
 assert(!live.includes('Authority: private ledger'),'Private-ledger authority leaked into Eddie Hotline');
 assert(!live.includes('../../data/betting-ledger.json'),'Live desk still exposes raw ledger path');
 assert(live.includes("cache:'no-store'"),'Ledger fetch must bypass browser cache');
-assert(live.includes("html('tickets',last.map"),'Recent ticket tape must render ticket cards as HTML');
+assert(live.includes("$('tickets').innerHTML=last.map")||live.includes("html('tickets',last.map"),'Recent ticket tape must render ticket cards as HTML');
 assert(canonical.schema===2,'Canonical public ledger schema must remain 2');
 assert(canonical.publicProjection===true,'Canonical public ledger must remain sanitized');
 assert(Array.isArray(canonical.wagers)&&canonical.wagers.length>0,'Canonical public ledger wagers missing');
