@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "productionId": "walters-nfl-matchup-production-v1",
+  "stage": "M4",
+  "state": "READY_FOR_ACTIVATION",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Activate only the production classes accepted by M3, add exact value-invariant committee support to the existing Graham personnel overlay, preserve exact internal fair arithmetic, and keep unresolved intervals and nonzero opponent-specific matchup increments fail closed.",
+  "dependsOn": {
+    "m3Result": "data/walters/nfl/matchup-stage3/week-01-acceptance-result.json",
+    "m3Current": "data/walters/nfl/matchup-stage3/stage3-current.json",
+    "basePersonnelProduction": "data/walters/nfl/personnel-production-current.json",
+    "personnelCalibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "committeeCalibrationV2": "data/walters/nfl/committee-replacement-calibration-v2.json",
+    "matchupCalibration": "data/walters/nfl/matchup-calibration-v1.json",
+    "multiroleCalibration": "data/walters/nfl/multirole-replacement-calibration-v1.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "activationGate": {
+    "requiredM3State": "PASS_SCOPED_M4_CANDIDATE",
+    "requireM4ActivationCandidate": true,
+    "requireMarketViewedFalse": true,
+    "requireBasePersonnelProductionOperational": true,
+    "requireActiveWeekAuthority": "GRAHAM_WEEK_ROLLOVER",
+    "requireProtectedLiveArtifactsUnchangedDuringActivation": true
+  },
+  "acceptedProductionScope": {
+    "EXACT_ONE_FOR_ONE": {
+      "enabled": true,
+      "owner": "walters-personnel-production-v1",
+      "m4Action": "DELEGATE_EXISTING_ENGINE",
+      "rule": "M4 does not create a second one-for-one arithmetic path. The existing governed personnel production engine remains authoritative. Never reapply an already-present healthy-minus-replacement loss."
+    },
+    "VALUE_INVARIANT_COMMITTEE": {
+      "enabled": true,
+      "owner": "walters-nfl-matchup-production-v1",
+      "m4Action": "ALLOW_EXACT_COMMITTEE_PERSONNEL_EVENT",
+      "requirements": [
+        "current material unavailability evidence",
+        "verified active replacement committee",
+        "at least two included committee members",
+        "every included committee member has a calibrated locked Walters value",
+        "all included committee members have the identical locked Walters value",
+        "baseline contributors are explicitly excluded from replacement credit when applicable",
+        "applicable cluster/double-count review passes",
+        "exact team loss is reproducible without workload-share assumptions",
+        "opponent-specific matchup increment is exactly zero under the current M4 scope",
+        "marketViewed is false",
+        "unique matchupEventId and batchId"
+      ],
+      "formula": "effectiveReplacementValue = common locked Walters value; teamContributionDelta = effectiveReplacementValue - healthyValue"
+    },
+    "ZERO_MATCHUP_REVIEW": {
+      "enabled": true,
+      "numericAuthority": 0,
+      "rule": "A completed opponent-specific football review may validly resolve to zero additional matchup points. Zero is recorded as a reviewed decision, not treated as missing analysis."
+    }
+  },
+  "blockedProductionScope": {
+    "RANGE_ONLY_COMMITTEE": "BLOCK_EXACT_FAIR_UNRESOLVED",
+    "MULTIROLE_INTERVAL": "BLOCK_MULTIROLE_UNRESOLVED",
+    "NONZERO_OPPONENT_MATCHUP_INCREMENT": "BLOCK_NONZERO_MATCHUP_NOT_ACCEPTED",
+    "NEGATIVE_NONZERO_OPPONENT_MATCHUP_INCREMENT": "BLOCK_NONZERO_MATCHUP_NOT_ACCEPTED",
+    "INVENTED_WORKLOAD_SHARES": "BLOCK_COMMITTEE_ROLE_SHARE_INVENTED",
+    "MARKET_DERIVED_MATCHUP_VALUE": "BLOCK_MARKET_CONTAMINATION"
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "line movement",
+      "market-implied player value",
+      "betting percentages",
+      "closing-line value"
+    ]
+  },
+  "unifiedPersonnelLedger": {
+    "rule": "Accepted M4 committee events are written into the active week personnel ledger currentCases map as NUMERIC_ELIGIBLE exact events so future base-personnel recomputations retain the committee effect.",
+    "eventResolutionStatus": "RESOLVED_VALUE_INVARIANT_COMMITTEE",
+    "eventValueStatus": "NUMERIC_ELIGIBLE",
+    "separateBatchIndex": "processedMatchupBatchIds",
+    "preserveEventHistory": true
+  },
+  "recomputePolicy": {
+    "rule": "After an accepted committee event, recompute the affected game's entire personnel overlay from current numeric-eligible personnel cases rather than stacking a new delta onto the existing overlay.",
+    "clusterAuthority": "data/walters/nfl/personnel-calibration-v1.json",
+    "exactFairRequired": true,
+    "boardRoundingIncrement": 0.5,
+    "temporaryOverlayMayChangeCarriedTeamRating": false
+  },
+  "doubleCountGuards": [
+    "Do not reapply a one-for-one loss already present on the live board.",
+    "Do not credit a baseline starter's full value again as committee replacement value without distinct incremental role evidence.",
+    "Do not apply receiver or defensive-line cluster treatment twice.",
+    "Do not combine a separate unavailable player into another case without its own governed personnel event.",
+    "Do not use opponent-specific narrative to resolve an otherwise unresolved replacement interval.",
+    "Do not carry temporary personnel or matchup overlays into the team power rating."
+  ],
+  "staging": {
+    "path": "data/walters/nfl/matchup-production-staging.json",
+    "stateRequired": "READY",
+    "workflow": ".github/workflows/graham-matchup-production.yml",
+    "calculator": "tools/apply-graham-matchup-production.mjs",
+    "taskRule": "Research tasks may stage only current football evidence that independently satisfies an accepted M4 class. Repository code owns locked-value lookup, exact arithmetic, double-count checks, ledger mutation and live Graham recomputation."
+  },
+  "activationOutputs": {
+    "productionManifest": "data/walters/nfl/matchup-production-current.json",
+    "stage4Current": "data/walters/nfl/matchup-stage4/stage4-current.json"
+  },
+  "m5Policy": "M4 activation itself must not copy any M2 shadow number into the live board. M5 must re-evaluate the active week from current football evidence and stage only currently valid accepted cases."
+}
