@@ -1,0 +1,90 @@
+name: Graham matchup production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/walters/nfl/matchup-production-staging.json
+  workflow_dispatch:
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify M4 production scope and active week
+        run: |
+          node --check tools/apply-graham-matchup-production.mjs
+          node --check tools/graham-active-week.mjs
+          node tools/graham-active-week.mjs --json >/dev/null
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const prod=JSON.parse(fs.readFileSync('data/walters/nfl/matchup-production-current.json','utf8'));
+          const m3=JSON.parse(fs.readFileSync('data/walters/nfl/matchup-stage3/stage3-current.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          const staging=JSON.parse(fs.readFileSync('data/walters/nfl/matchup-production-staging.json','utf8'));
+          if(prod.state!=='OPERATIONAL_SCOPED'||prod.productionAuthority!==true)throw new Error('M4 production not operational');
+          if(prod.productionScope?.valueInvariantCommittee?.enabled!==true)throw new Error('value-invariant committee authority missing');
+          if(prod.productionScope?.rangeOnlyCommittee?.enabled!==false||prod.productionScope?.multiroleInterval?.enabled!==false||prod.productionScope?.nonzeroOpponentMatchupIncrement?.enabled!==false)throw new Error('M4 blocked scope unexpectedly enabled');
+          if(m3.state!=='PASS_SCOPED_M4_CANDIDATE')throw new Error('M3 acceptance missing');
+          if(active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER')throw new Error('active Graham week invalid');
+          if(staging.state!=='READY'||staging.marketViewed!==false)throw new Error('M4 staging invalid');
+          if(Number(staging.season)!==Number(active.season)||Number(staging.week)!==Number(active.week))throw new Error('M4 staging cross-week mismatch');
+          console.log(`GRAHAM MATCHUP PRODUCTION PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')}`);
+          NODE
+
+      - name: Apply scoped M4 staging batch
+        run: node tools/apply-graham-matchup-production.mjs data/walters/nfl/matchup-production-staging.json
+
+      - name: Verify durable outputs and market isolation
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const s=JSON.parse(fs.readFileSync('data/walters/nfl/matchup-production-staging.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          const week=String(Number(active.week)).padStart(2,'0');
+          const ledger=JSON.parse(fs.readFileSync(`data/walters/nfl/${active.season}/week-${week}-personnel-ledger.json`,'utf8'));
+          const numbers=JSON.parse(fs.readFileSync(`data/walters/nfl/${active.season}/week-${week}-current-numbers.json`,'utf8'));
+          const research=JSON.parse(fs.readFileSync(`data/walters/nfl/${active.season}/week-${week}-research-ledger.json`,'utf8'));
+          if(Number(s.season)!==Number(active.season)||Number(s.week)!==Number(active.week))throw new Error('active week changed during M4 transaction');
+          if(s.marketViewed!==false||ledger.marketViewed!==false||numbers.matchupExpansionProduction?.marketViewed!==false)throw new Error('market isolation failed');
+          if(!(ledger.processedMatchupBatchIds||[]).includes(s.batchId))throw new Error('M4 batch not durable');
+          if(numbers.matchupExpansionProduction?.lastBatchId!==s.batchId)throw new Error('M4 numbers batch mismatch');
+          if(research.sweeps.at(-1)?.summary?.marketViewed!==false)throw new Error('research market isolation failed');
+          if(numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))throw new Error('invalid Graham fair');
+          console.log(`GRAHAM MATCHUP PRODUCTION VERIFY: PASS // ${s.batchId}`);
+          NODE
+
+      - name: Publish scoped M4 outputs
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          git add -- "$ACTIVE_PERSONNEL" "$ACTIVE_RESEARCH" "$ACTIVE_NUMBERS"
+          if git diff --cached --quiet; then
+            echo "No new M4 matchup production outputs to publish."
+            exit 0
+          fi
+          git commit -m "Apply Graham scoped matchup batch"
+          git push origin HEAD:main
