@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'data/ledger/public-ledger.json'
+      - 'data/ledger/funding-layer.json'
+      - 'tests/ledger-funding-layer.test.mjs'
+      - '.github/workflows/public-ledger-sync.yml'
   workflow_dispatch:
 
 permissions:
@@ -40,6 +43,9 @@ jobs:
           if(Number(j.validation.uniqueWagers)!==j.wagers.length) fail('validation.uniqueWagers does not match wagers length');
           console.log(`PUBLIC LEDGER CONTRACT PASS: ${j.wagers.length} wagers`);
           NODE
+
+      - name: Validate promotional funding layer
+        run: node tests/ledger-funding-layer.test.mjs
 
       - name: Sync compatibility paths
         run: |
