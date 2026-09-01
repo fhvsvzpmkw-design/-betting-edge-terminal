@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "modelLockId": "walters-nfl-s-factor-s2-model-lock-v1",
+  "calibrationId": "walters-nfl-s-factor-calibration-v1",
+  "stage": "S2",
+  "state": "MODEL_LOCKED_BEFORE_HOLDOUT",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "source": {
+    "scheduleUrl": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+    "fallbackUrl": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+    "primaryTrainingSeasons": [2021, 2022, 2023, 2024],
+    "rareEventBackfillSeasons": [2015, 2016, 2017, 2018, 2019],
+    "validationSeasons": [2025],
+    "excludedOutcomeSeasons": [2020],
+    "contextOnlySeasons": [2014, 2020, 2026],
+    "targetGameType": "REG",
+    "fieldWhitelist": ["game_id","season","game_type","week","gameday","weekday","gametime","away_team","away_score","home_team","home_score","location","overtime","away_rest","home_rest","div_game","roof","surface","stadium_id","stadium"],
+    "forbiddenFields": ["away_moneyline","home_moneyline","spread_line","away_spread_odds","home_spread_odds","total_line","under_odds","over_odds"]
+  },
+  "registry": {
+    "teamGeography": "data/walters/nfl/s-factors/registries/team-geography-v1.json",
+    "surfaceRule": "For each team-season, derive governed home-surface class from the modal non-neutral surface of that club's scheduled home games in the same season. This is schedule/venue metadata only and may use the full season because no outcome or market field is involved.",
+    "surfaceClasses": {"NATURAL":["grass"],"SYNTHETIC":"every non-empty surface value not classified NATURAL"},
+    "neutralVenueRule": "Neutral/international travel, body-clock and altitude features are excluded unless an explicit versioned neutral-venue registry resolves the venue. Other independently resolvable families remain eligible."
+  },
+  "h4Control": {
+    "productionManifest": "data/walters/nfl/home-field/home-field-production-current.json",
+    "requiredState": "OPERATIONAL_SCOPED",
+    "domesticHomeAdvantagePoints": 2.082,
+    "neutralHomeAdvantagePoints": 0.0,
+    "rule": "S2 estimates only residual schedule effects after the governed H4 base location term; it never changes H4."
+  },
+  "teamStrengthControl": {
+    "method": "ROLLING_RIDGE_PAIRWISE_TEAM_STRENGTH",
+    "ridgePenalty": 8.0,
+    "lookbackEligibleSeasons": 2,
+    "currentSeasonPriorGamesIncluded": true,
+    "excludedOutcomeSeasons": [2020],
+    "rule": "Before each target week, fit market-free team point strengths from completed prior regular-season score margins after removing the H4 base location term. Use the two most recent eligible prior seasons plus completed current-season games. Ratings are sealed before the target week's outcomes and centered to zero."
+  },
+  "pregameStrengthTiersForBookByeRows": {
+    "method": "SEALED_RATING_PERCENTILE",
+    "belowAverageMaxPercentile": 0.40,
+    "greatMinPercentile": 0.80,
+    "averageRange": [0.40, 0.80],
+    "rule": "Tiers reproduce the printed bye-row shape for diagnostic BOOK-EXACT/scalar models only. Current family fitting also receives continuous sealed pregame strength interactions and is not required to preserve these categorical magnitudes."
+  },
+  "featureRules": {
+    "TURF_SURFACE": "Compare away team's governed season home-surface class with the current governed home venue surface; same = signed -1 book S unit to home, opposite = +1. Neutral/unresolved surface cases fail closed for this family.",
+    "DIVISION_CONFERENCE": "Same division = signed -1 book S unit to home. Different conference = signed +1. Same-conference non-division = zero reference.",
+    "REST_PRIMETIME": "Use weekday, scheduled kickoff and immediately prior game weekday/venue. Current-game home Thursday night=+2, Sunday night=+4, Monday night=+2 book units. Prior-Monday rows use the printed home/away previous-venue magnitudes with sign expressed as home-benefit units. Zero printed rows remain zero. Also derive clipped home-minus-away rest-days as a current-calibration extension with zero prior.",
+    "ROAD_DENSITY": "Current visitor fires +2 home-benefit book units only when the current game is its third designated away game among its trailing four scheduled games including current.",
+    "OVERTIME_RECOVERY": "If home team immediately follows an overtime game, prior-home OT=-4 home-benefit units and prior-away OT=-2. If away team follows OT, signs reverse to +4/+2.",
+    "BYE": "Rest >=12 days defines off-bye. Apply the printed tier magnitude to the team, using sealed pregame rating percentile; away rows use the printed away magnitude and negative home-benefit sign. Also derive continuous sealed strength x bye interaction with zero prior for partial-pool testing.",
+    "SUPER_BOWL_AFTEREFFECT": "Use prior-season Super Bowl winner/loser identity. First game uses the printed first-game magnitude instead of also stacking the first-four row; games 2-4 use first-four magnitude. Team benefit is signed toward that team; loser effect is signed toward its opponent.",
+    "TRAVEL_DISTANCE": "For non-neutral games, compute great-circle miles from away team's governed home base to current home team's governed home base. 2000+ miles fires the printed +1 home book unit. Partial-pool extensions use prelocked 750-1249, 1250-1999 and 2000+ bins plus continuous thousands-of-miles, all with zero prior. Named regional rows are never encoded.",
+    "TIME_ZONE_BODY_CLOCK": "For non-neutral games, compare away team home/body-clock zone with home venue zone. BOOK-EXACT diagnostic rows use 13:00 ET-equivalent early games for PACIFIC/MOUNTAIN visitors and night kickoff for EASTERN/CENTRAL/MOUNTAIN visitors. Partial-pool extensions use signed zone displacement and kickoff bucket rather than named team exceptions.",
+    "CONSECUTIVE_REMOTE": "Visitor fires +2 home book units only when current and immediately prior scheduled games are both at least two nominal time-zone bands from its home zone and the prior game was also away from home.",
+    "BOUNCE_BACK": "Previous same-season loss 19-28 produces team benefit 2 book units; 29+ produces 4 book units, never both. Apply signed toward home/away team as appropriate.",
+    "ALTITUDE_EXPOSURE": "Extension only. A non-neutral visitor to a HIGH registry home environment creates a +1 raw altitude indicator with coefficient prior zero. It is never included in BOOK-EXACT/scalar S units.",
+    "MATCHUP_VARIABLE": "Excluded and always zero; personnel and matchup production own it."
+  },
+  "candidateModels": {
+    "S_ZERO_BASELINE":{"type":"fixed","description":"No S adjustment."},
+    "S_BOOK_EXACT_020":{"type":"fixed","pointsPerSUnit":0.20,"description":"Supported printed rows at exactly 0.20 point per signed S unit; BW-A006 named regional rows blocked."},
+    "S_CURRENT_SCALAR":{"type":"ridge_scalar","ridgePenalty":8.0,"prior":0.0,"description":"One current points-per-book-S-unit coefficient estimated on 2021-24 only."},
+    "S_PARTIAL_POOL_FAMILY":{"type":"ridge_factor","ridgePenalty":48.0,"printedFactorPrior":"S_CURRENT_SCALAR","extensionPrior":0.0,"description":"Factor-level coefficients shrink toward the current scalar for printed features and zero for extensions; family summaries are sample-weighted diagnostics."}
+  },
+  "evaluation": {
+    "target": "observed home margin minus sealed pregame team-strength differential minus governed H4 base location points",
+    "metrics": ["meanError","mae","rmse"],
+    "modelAcceptance": "A calibrated model is aggregate-accepted only if held-out 2025 MAE and RMSE both equal or improve S_ZERO_BASELINE and absolute mean error does not exceed S_ZERO_BASELINE by more than 0.05 point.",
+    "selection": "Prefer S_CURRENT_SCALAR when aggregate-accepted. S_PARTIAL_POOL_FAMILY may outrank it only if it equals or improves the scalar on both held-out MAE and RMSE and its absolute mean error is no more than 0.05 point worse.",
+    "familyMinimumPrimaryEvents": 60,
+    "familyMinimumValidationEvents": 15,
+    "familyValidationToleranceMae": 0.02,
+    "familyRule": "A family becomes an S3 numeric candidate only when deterministic, non-conflicted, sufficiently sampled, coefficient direction is not materially reversed in validation, and its affected-game held-out MAE is no more than 0.02 worse than zero on those same games. Rare-event backfill can stabilize diagnostics but cannot by itself satisfy current-regime production support.",
+    "coefficientSafety": "Any fitted single printed-factor coefficient with absolute effect greater than 1.00 point per S unit is automatically shadow-only pending audit; any extension coefficient implying greater than 1.50 points for a normal single-game trigger is shadow-only."
+  },
+  "outputs": {
+    "sourceSnapshot": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+    "surfaceRegistry": "data/walters/nfl/s-factors/registries/surface-registry-2021-2026-v1.json",
+    "derivedFeatures": "data/walters/nfl/s-factors/s2-derived-features-2021-2025.csv",
+    "release": "data/walters/nfl/s-factors/s-factor-release-2026-v1.json",
+    "audit": "data/walters/nfl/s-factors/s2-validation-audit-v1.json",
+    "current": "data/walters/nfl/s-factors/s2-current.json"
+  },
+  "failClosedCodes": ["FAIL_CLOSED_S2_S1_CONTRACT","FAIL_CLOSED_S2_H4_AUTHORITY","FAIL_CLOSED_S2_MARKET_FIELD","FAIL_CLOSED_S2_SOURCE_DOWNLOAD","FAIL_CLOSED_S2_TEAM_REGISTRY","FAIL_CLOSED_S2_FEATURE_IDENTITY","FAIL_CLOSED_S2_HOLDOUT_MUTATION","FAIL_CLOSED_S2_PROTECTED_ARTIFACT_MUTATION"]
+}
