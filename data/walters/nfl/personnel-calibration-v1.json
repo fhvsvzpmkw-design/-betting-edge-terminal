@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-personnel-calibration-v1",
+  "season": 2026,
+  "status": "ACTIVE_SOURCE_LOCKED_CALIBRATED",
+  "effectiveAt": "2026-09-01T11:15:00-07:00",
+  "purpose": "Convert current NFL personnel availability into auditable point-spread-equivalent Graham matchup adjustments using the source-locked Walters Chapters 21-22 framework.",
+  "sourceAuthority": {
+    "primary": "Billy Walters with Armen Keteyian, Gambler, Chapters 21-22, especially pp. 237-238 and 245-263",
+    "principles": [
+      "Every relevant variable must be expressed in point-spread-equivalent units.",
+      "Key players receive numerical values; published rankings may be used only after conversion to point-spread-relevant values.",
+      "If a player is out, remove his value and add the replacement player's value.",
+      "If a player plays hurt, reduce his value according to a specifically supported effectiveness percentage.",
+      "Cluster injuries may be nonlinear and require unit-specific treatment.",
+      "Quarterbacks use a separate valuation scale.",
+      "Current personnel adjustments are game-specific overlays unless an explicit carried-rating transaction separately changes the base team rating."
+    ],
+    "waltersReferenceTargets": {
+      "nonQbNonZeroAverage": 0.63,
+      "nonQbBestTypicalRange": [2.5, 3.0],
+      "nonQbApproxNonZeroShare": 0.60,
+      "nonQbApproxMeaningfulOver025Share": 0.38,
+      "qbMinimum": 6.0,
+      "qbMaximum": 9.5,
+      "qbAverage": 7.74
+    }
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "sportsbook spread or price",
+      "consensus line",
+      "line movement",
+      "market-implied player value",
+      "betting percentages"
+    ],
+    "rule": "Never reverse-engineer a player or replacement value from a sportsbook move."
+  },
+  "rankingLayer": {
+    "provider": "EA SPORTS Madden NFL 27 official ratings database",
+    "role": "PUBLIC_PLAYER_RANKING_INPUT_ONLY",
+    "sourceUrl": "https://www.ea.com/games/madden-nfl/ratings",
+    "waltersCompatibility": "Chapter 22 explicitly permits Madden or ESPN player rankings as a starting ranking system but requires conversion into point-spread values.",
+    "snapshotPolicy": "Lock the first verified 2026 OVR captured for a player under this calibration. Do not automatically follow later Madden rating changes; a later value change requires an explicit PLAYER_VALUE_RECALIBRATION event to avoid double counting weekly performance.",
+    "requiredFields": ["player", "team", "position", "maddenOvr", "capturedAt", "sourceUrl"]
+  },
+  "nonQbConversion": {
+    "eligiblePositions": ["WR", "TE", "RB", "FB", "LT", "LG", "C", "RG", "RT", "EDGE", "LE", "RE", "DT", "NT", "LB", "MLB", "OLB", "CB", "FS", "SS"],
+    "method": "MADDEN_OVR_BAND_TO_WALTERS_POINTS",
+    "bands": [
+      {"ovrMin": 0, "ovrMax": 69, "points": 0.0},
+      {"ovrMin": 70, "ovrMax": 74, "points": 0.1},
+      {"ovrMin": 75, "ovrMax": 79, "points": 0.25},
+      {"ovrMin": 80, "ovrMax": 84, "points": 0.5},
+      {"ovrMin": 85, "ovrMax": 89, "points": 1.0},
+      {"ovrMin": 90, "ovrMax": 94, "points": 1.5},
+      {"ovrMin": 95, "ovrMax": 97, "points": 2.0},
+      {"ovrMin": 98, "ovrMax": 98, "points": 2.5},
+      {"ovrMin": 99, "ovrMax": 99, "points": 3.0}
+    ],
+    "distributionAudit": {
+      "role": "CALIBRATION_GUARD_NOT_DAILY_INPUT",
+      "expectedNonZeroShareRange": [0.55, 0.65],
+      "expectedMeaningfulOver025ShareRange": [0.32, 0.43],
+      "expectedNonZeroAverageRange": [0.55, 0.75],
+      "actionOnFailure": "FREEZE_NEW_VALUE_ASSIGNMENTS_AND_REQUIRE_RECALIBRATION_REVIEW"
+    }
+  },
+  "qbConversion": {
+    "eligiblePositions": ["QB"],
+    "method": "MADDEN_OVR_BAND_TO_WALTERS_QB_POINTS",
+    "bands": [
+      {"ovrMin": 0, "ovrMax": 64, "points": 6.0},
+      {"ovrMin": 65, "ovrMax": 69, "points": 6.5},
+      {"ovrMin": 70, "ovrMax": 74, "points": 7.0},
+      {"ovrMin": 75, "ovrMax": 79, "points": 7.5},
+      {"ovrMin": 80, "ovrMax": 84, "points": 8.0},
+      {"ovrMin": 85, "ovrMax": 89, "points": 8.5},
+      {"ovrMin": 90, "ovrMax": 94, "points": 9.0},
+      {"ovrMin": 95, "ovrMax": 99, "points": 9.5}
+    ],
+    "distributionAudit": {
+      "expectedRange": [6.0, 9.5],
+      "expectedMeanRange": [7.4, 8.1],
+      "actionOnFailure": "REVIEW_QB_CURVE_BEFORE_BULK_RECALIBRATION"
+    }
+  },
+  "availabilityRules": {
+    "ACTIVE_FULL": {"automatic": true, "effectiveContributionRule": "healthyValue", "numericMove": false},
+    "OUT": {"automatic": true, "effectiveContributionRule": "replacementValue", "requiresReplacement": true},
+    "IR": {"automatic": true, "effectiveContributionRule": "replacementValue", "requiresReplacement": true},
+    "SUSPENDED": {"automatic": true, "effectiveContributionRule": "replacementValue", "requiresReplacement": true},
+    "COMMISSIONER_EXEMPT": {"automatic": true, "effectiveContributionRule": "replacementValue", "requiresReplacement": true},
+    "PLAYING_LIMITED": {"automatic": false, "effectiveContributionRule": "healthyValue * approvedEffectivenessPct", "requiresApprovedEffectivenessPct": true},
+    "QUESTIONABLE": {"automatic": false, "action": "REVIEW_REQUIRED_AVAILABILITY", "note": "Do not turn the designation alone into a point estimate."},
+    "DOUBTFUL": {"automatic": false, "action": "REVIEW_REQUIRED_AVAILABILITY", "note": "Do not turn the designation alone into a point estimate."},
+    "GAME_TIME_DECISION": {"automatic": false, "action": "REVIEW_REQUIRED_AVAILABILITY"},
+    "UNKNOWN": {"automatic": false, "action": "REVIEW_REQUIRED_AVAILABILITY"}
+  },
+  "replacementRule": {
+    "outFormula": "teamContributionDelta = replacementValue - healthyValue",
+    "playingHurtFormula": "teamContributionDelta = (healthyValue * approvedEffectivenessPct) - healthyValue",
+    "missingReplacementAction": "REVIEW_REQUIRED_REPLACEMENT_VALUE",
+    "replacementSelection": "Use the current verified depth-chart/role replacement expected to absorb the missing player's primary role; cite the roster/depth source. Never choose a replacement based on market reaction."
+  },
+  "clusterRules": {
+    "RECEIVER": {
+      "members": ["WR", "TE"],
+      "automaticWhen": "two highest-valued currently expected receiving options are simultaneously unavailable",
+      "multiplier": 1.5,
+      "sourceBasis": "Walters example: top two receivers valued 2.5 and 1.5 may be worth 50 percent more together than their additive loss."
+    },
+    "DEFENSIVE_LINE": {
+      "members": ["EDGE", "LE", "RE", "DT", "NT"],
+      "automaticWhen": "two or more positive-value defensive-line players are simultaneously unavailable and their replacements are verified",
+      "multiplier": 1.4,
+      "sourceBasis": "Walters gives a defensive-lineman cluster example of adding roughly 40 percent."
+    },
+    "OFFENSIVE_LINE": {"members": ["LT", "LG", "C", "RG", "RT"], "multiplier": 1.0, "multipleMaterialLossAction": "REVIEW_REQUIRED_CLUSTER_CONTEXT"},
+    "DEFENSIVE_BACK": {"members": ["CB", "FS", "SS"], "multiplier": 1.0, "multipleMaterialLossAction": "REVIEW_REQUIRED_CLUSTER_CONTEXT"},
+    "LINEBACKER": {"members": ["LB", "MLB", "OLB"], "multiplier": 1.0, "multipleMaterialLossAction": "REVIEW_REQUIRED_CLUSTER_CONTEXT"},
+    "RUNNING_BACK": {"members": ["RB", "FB"], "multiplier": 1.0, "multipleMaterialLossAction": "REVIEW_REQUIRED_CLUSTER_CONTEXT"}
+  },
+  "matchupOverride": {
+    "allowed": true,
+    "automatic": false,
+    "statusRequired": "WALTERS_CALIBRATED_MATCHUP_OVERRIDE",
+    "rule": "A base player value may be overridden for a specific matchup only when matchup mechanics make the player's absence materially different from normal, with explicit football reasoning and sourceRefs. The override must never use a market move as evidence.",
+    "sourceExample": "Walters describes Tristan Wirfs as normally around 1.3 points but potentially worth as many as 6 in a specific Rams matchup because of the pass-rush, backup injury and cascading protection effects."
+  },
+  "gameApplication": {
+    "teamDeltaDefinition": "replacement/effective contribution minus healthy contribution; a negative number weakens that team",
+    "homePlayerFormula": "pointsToHomeSpread = -teamContributionDelta",
+    "awayPlayerFormula": "pointsToHomeSpread = teamContributionDelta",
+    "fairFormula": "newGrahamFairHome = priorIndependentFairHome + sum(new governed game-specific adjustment deltas)",
+    "rounding": "Preserve calculations to 0.05 internally; publish Graham fair to the board's existing half-point convention unless the current board explicitly supports finer precision.",
+    "carriedRatingRule": "Do not write a temporary injury/personnel overlay into currentRating. A permanent carried-rating move requires its own separately audited transaction."
+  },
+  "doubleCountGuard": {
+    "pregame": "Personnel overlay is applied once to the matchup fair.",
+    "postgame": "TGPL injury differential accounts for the injury environment when learning from the result. Do not then carry the same pregame injury overlay forward a second time.",
+    "ratingInputChange": "A later player-value recalibration is not retroactively applied to completed TGPL calculations unless an explicit correction transaction is approved."
+  },
+  "failClosedCodes": [
+    "REVIEW_REQUIRED_PLAYER_VALUE",
+    "REVIEW_REQUIRED_REPLACEMENT_VALUE",
+    "REVIEW_REQUIRED_AVAILABILITY",
+    "REVIEW_REQUIRED_EFFECTIVENESS",
+    "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+    "REVIEW_REQUIRED_SPECIALIST_VALUE"
+  ],
+  "successCode": "MOVED_PERSONNEL_GOVERNED",
+  "auditRecordRequired": [
+    "gameKey",
+    "team",
+    "side",
+    "player",
+    "position",
+    "availabilityStatus",
+    "healthyValue",
+    "replacementPlayer",
+    "replacementValue",
+    "approvedEffectivenessPct",
+    "rawTeamContributionDelta",
+    "clusterGroup",
+    "clusterMultiplier",
+    "finalTeamContributionDelta",
+    "pointsToHomeSpread",
+    "priorGrahamFairHome",
+    "newGrahamFairHome",
+    "rankingSourceRef",
+    "availabilitySourceRefs",
+    "replacementSourceRefs",
+    "calibrationId",
+    "calculatedAt"
+  ]
+}
