@@ -1,9 +1,18 @@
 name: Refresh Graham NFL terminal
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-terminal-refresh.yml
+      - data/walters/nfl/20*/week-*-current-numbers.json
+      - data/walters/nfl-power-ratings-ledger.json
   workflow_run:
     workflows:
       - Refresh Betting Edge odds
+      - Graham personnel production
+      - Apply Graham research input
+      - Graham research ledger sync
     types:
       - completed
   workflow_dispatch:
@@ -17,7 +26,7 @@ permissions:
 
 jobs:
   refresh:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -33,13 +42,22 @@ jobs:
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
 
+          TRIGGER_EVENT="${{ github.event_name }}"
+          TRIGGER_WORKFLOW="${{ github.event.workflow_run.name }}"
+
           for attempt in 1 2 3 4; do
             git fetch origin main
             git reset --hard origin/main
 
-            # No external API calls occur here. These tools only consume the
-            # odds and research state that is already committed to main.
-            node tools/capture-graham-daily-pinnacle.mjs
+            # No external API calls occur here. The terminal always rebuilds from
+            # committed Graham and market state. Only a genuine odds-refresh
+            # completion may perform the governed 15:15 daily Pinnacle capture.
+            if [ "$TRIGGER_EVENT" = "workflow_run" ] && [ "$TRIGGER_WORKFLOW" = "Refresh Betting Edge odds" ]; then
+              node tools/capture-graham-daily-pinnacle.mjs
+            else
+              echo "GRAHAM RESEARCH REFRESH // preserving existing Pinnacle snapshot and timestamp"
+            fi
+
             node tools/build-graham-current-week.mjs
 
             git add -- data/walters/nfl/current-week-terminal.json
@@ -67,10 +85,12 @@ jobs:
           {
             echo "## Graham Mercer // The Nineteenth Hole"
             echo
-            echo "- Trigger: post-odds refresh"
+            echo "- Trigger: odds refresh or Graham research/personnel publication"
             echo "- External API calls: none"
             echo "- Live board: current NFL week"
-            echo "- Live Pinnacle comparison: rebuilt after every successful odds refresh"
-            echo "- Official daily Pinnacle capture: 15:15 report only, when an independent Graham number exists"
-            echo "- Market isolation: Graham number first; Pinnacle comparison second"
+            echo "- Graham fair: rebuilt immediately after governed Graham research changes"
+            echo "- Pinnacle on research-only refresh: latest committed snapshot preserved with its original timestamp"
+            echo "- Pinnacle on odds refresh: refreshed comparison consumed after the odds workflow completes"
+            echo "- Official daily Pinnacle capture: 15:15 odds-refresh path only, when an independent Graham number exists"
+            echo "- Market isolation: football information moves Graham; market refresh changes only the comparison"
           } >> "$GITHUB_STEP_SUMMARY"
