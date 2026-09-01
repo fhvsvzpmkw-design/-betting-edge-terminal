@@ -25,13 +25,15 @@ jobs:
           fetch-depth: 0
 
       - name: Rebuild active Meat Desk manifest
-        run: python3 scripts/sync_meat_desk_sources.py
+        run: |
+          python3 scripts/sync_meat_desk_sources.py
+          python3 scripts/patch_meat_desk_public_findings.py
 
       - name: Commit manifest changes
         shell: bash
         run: |
           if git diff --quiet -- research/season-previews/manifest.json; then
-            echo 'Meat Desk manifest already matches the PDF folder.'
+            echo 'Meat Desk manifest already matches the PDF folder and approved review metadata.'
             exit 0
           fi
 
