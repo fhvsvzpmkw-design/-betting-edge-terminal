@@ -21,10 +21,10 @@ for(const profile of roster){
  const liveText=read(live);assert(liveText.length>=6000,`${id}: latest Hotline appears abbreviated (${liveText.length} chars)`);
  for(const marker of required[id])assert(liveText.includes(marker),`${id}: missing full-edition marker "${marker}"`);
  if(character?.authority?.mode==='ledger-authoritative'){
-  assert(character.authority.source==='data/betting-ledger.json',`${id}: ledger authority source mismatch`);
+  assert(character.authority.source==='/api/bet-history',`${id}: ledger authority source mismatch`);
   assert(character.authority.actualDollars===true,`${id}: ledger authority must use actual dollars`);
   assert(character.authority.fictionalScaling===false,`${id}: fictional scaling must be disabled`);
-  assert(liveText.includes("../../data/betting-ledger.json"),`${id}: live desk does not fetch the authoritative ledger`);
+  assert(liveText.includes("/api/bet-history"),`${id}: live desk does not fetch the authoritative public ledger`);
   assert(liveText.includes("cache:'no-store'"),`${id}: live desk must bypass stale ledger cache`);
   continue;
  }
