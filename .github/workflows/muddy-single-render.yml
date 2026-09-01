@@ -1,0 +1,54 @@
+name: Muddy Single Renderer
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-single-render.yml'
+permissions:
+  contents: write
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Collapse Muddy to one renderer
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const paths=['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html'];
+          for(const p of paths){
+            let s=fs.readFileSync(p,'utf8');
+            s=s.replace('<div class="stat"><small>All-Time Cash P/L</small><b id="profit">—</b><div class="sub">actual CAD</div></div><div class="stat"><small>All-Time Cash ROI</small><b id="roi">—</b><div class="sub">profit ÷ cash risk</div></div><div class="stat"><small>Cash Wagers</small><b id="bets">—</b><div class="sub">authoritative summary</div></div><div class="stat"><small>Cash Risked</small><b id="risk">—</b><div class="sub">actual CAD</div></div>','<div class="stat"><small>Overall P/L</small><b id="profit">—</b><div class="sub">full ledger</div></div><div class="stat"><small>Overall ROI</small><b id="roi">—</b><div class="sub">profit ÷ actual capital risk</div></div><div class="stat"><small>Total Wagers</small><b id="bets">—</b><div class="sub">cash + promotional</div></div><div class="stat"><small>Actual Capital Risk</small><b id="risk">—</b><div class="sub">actual CAD</div></div>');
+            s=s.replace("const URL='/api/bet-history',TZ='America/Vancouver',","const URL='/api/bet-history',FUNDING='/data/ledger/funding-layer.json',TZ='America/Vancouver',");
+            s=s.replace('function render(j){','function render(j,f){');
+            const old="let scaledProfit=(+j.summary?.cashProfit||0),scaledRisk=Number.isFinite(+j.summary?.cashRisked)?(+j.summary.cashRisked):stats(all).risk;";
+            const neu="const allIn=f?.summary?.allIn,cash=f?.summary?.cash,promo=f?.summary?.promotional;if(!allIn)throw Error('Funding summary missing');let scaledProfit=+allIn.profitCad||0,scaledRisk=+allIn.actualCapitalRiskCad||0;";
+            if(!s.includes(old)) throw new Error(p+' headline source pattern missing');
+            s=s.replace(old,neu);
+            s=s.replace("set('roi',pct(j.summary?.cashRoiPercent));tone($('roi'),j.summary?.cashRoiPercent);set('bets',N.format(j.summary?.cashBets??all.length));set('risk',money(scaledRisk));","set('roi',(+allIn.actualCapitalRoiPercent||0).toFixed(2)+'%');tone($('roi'),allIn.actualCapitalRoiPercent);set('bets',N.format(allIn.wagers||all.length));set('risk',money(scaledRisk));");
+            s=s.replace("set('walk',`Actual bankroll ${money(bankroll)}. Cash P/L ${sm(scaledProfit)} at ${pct(j.summary?.cashRoiPercent)} cash ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)","set('walk',`Actual bankroll ${money(bankroll)}. Overall P/L ${sm(allIn.profitCad)} at ${(+allIn.actualCapitalRoiPercent||0).toFixed(2)}% full ROI. Cash P/L ${sm(cash?.profitCad||0)} at ${(+cash?.roiPercent||0).toFixed(2)}% cash ROI. Promo contribution ${sm(promo?.profitCad||0)}. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)");
+            s=s.replace(/<script id="muddy-funding-overlay">[\s\S]*?<\/script><\/body><\/html>$/,'</body></html>');
+            s=s.replace("fetch(`${URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Ledger fetch '+r.status);return r.json()}).then(render).catch(e=>{","Promise.all([fetch(`${URL}?v=${Date.now()}`,{cache:'no-store'}),fetch(`${FUNDING}?v=${Date.now()}`,{cache:'no-store'})]).then(async([lr,fr])=>{if(!lr.ok)throw Error('Ledger fetch '+lr.status);if(!fr.ok)throw Error('Funding fetch '+fr.status);return [await lr.json(),await fr.json()]}).then(([j,f])=>render(j,f)).catch(e=>{");
+            if(s.includes('muddy-funding-overlay')) throw new Error(p+' overlay still present');
+            if(!s.includes('Promise.all([fetch(`${URL}?v=${Date.now()}`')) throw new Error(p+' single coordinated fetch missing');
+            if(!s.includes('function render(j,f)')) throw new Error(p+' unified render signature missing');
+            if(s.includes("set('profit',sm(+j.summary?.cashProfit")) throw new Error(p+' cash headline writer remains');
+            fs.writeFileSync(p,s);
+          }
+          NODE
+      - name: Verify unified renderer
+        run: |
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          ! grep -q 'muddy-funding-overlay\|UNIT_RATE\|TARGET_UNIT\|W(r,scale)\|bankroll\*scale' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'function render(j,f)' syndicates/generated/eddie-numbers/hotline.html
+          grep -q "FUNDING='/data/ledger/funding-layer.json'" syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit unified Muddy renderer
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: unify ledger and funding render path'
+          git push origin main
