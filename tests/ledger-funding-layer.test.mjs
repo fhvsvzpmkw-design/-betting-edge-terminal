@@ -9,6 +9,19 @@ assert(funding.classification?.default==='CASH','default funding class must be C
 assert(Array.isArray(funding.promotionalWagers),'promotionalWagers missing');
 assert(Number(funding.validation?.uniqueWagers)===ledger.wagers.length,'funding/ledger wager count drift');
 assert(Number(funding.validation?.promotionalWagers)===funding.promotionalWagers.length,'promotional count drift');
+const mismatches=[];
+for(const [id,kind,nominal,actual] of funding.promotionalWagers){
+  const lr=Number(ledger.wagers[id-1]?.[9]);
+  if(Math.abs(lr-Number(nominal))>=0.00001){
+    const candidates=[];
+    for(let j=Math.max(1,id-20);j<=Math.min(ledger.wagers.length,id+20);j++){
+      if(Math.abs(Number(ledger.wagers[j-1]?.[9])-Number(nominal))<0.00001)candidates.push(j);
+    }
+    mismatches.push({id,kind,nominal,actual,ledgerRisk:lr,candidates});
+  }
+}
+if(mismatches.length) console.log('FUNDING ALIGNMENT MISMATCHES '+JSON.stringify(mismatches));
+assert(mismatches.length===0,`funding row alignment has ${mismatches.length} mismatch(es)`);
 const seen=new Set();
 const overrides=new Map();
 for(const r of funding.promotionalWagers){
@@ -18,8 +31,6 @@ for(const r of funding.promotionalWagers){
   assert(!seen.has(id),`duplicate public wager id ${id} in funding layer`); seen.add(id);
   assert(ledger.wagers[id-1]?.[0]===id,`funding row ${id} is not aligned with public ledger`);
   assert(kind==='FREE_BET'||kind==='MIXED_PROMO',`invalid promotional funding class at ${id}`);
-  const ledgerRisk=Number(ledger.wagers[id-1][9]);
-  assert(Math.abs(ledgerRisk-Number(nominal))<0.00001,`nominal risk mismatch at public id ${id}: ledger=${ledgerRisk}, funding=${nominal}`);
   assert(Number(actual)>=0&&Number(actual)<=Number(nominal),`actual capital risk out of range at ${id}`);
   if(kind==='FREE_BET') assert(Number(actual)===0,`FREE_BET actual risk must be zero at ${id}`);
   if(kind==='MIXED_PROMO') assert(Number(actual)>0,`MIXED_PROMO actual risk must be positive at ${id}`);
