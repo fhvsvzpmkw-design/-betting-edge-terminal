@@ -1,0 +1,57 @@
+name: Walters Matchup M2F Walker Shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/multirole-replacement-calibration-v1.json'
+      - 'data/walters/nfl/matchup-stage2/week-01-walker-steelers-input.json'
+      - 'tools/run-walters-matchup-m2f-walker.mjs'
+      - '.github/workflows/walters-matchup-m2f-walker.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-matchup-m2f-walker-shadow
+  cancel-in-progress: false
+
+jobs:
+  walker-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve active Graham week
+        run: node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Run Walker multi-role and Steelers matchup shadow
+        run: node tools/run-walters-matchup-m2f-walker.mjs
+
+      - name: Verify protected live artifacts are untouched
+        run: |
+          git diff --exit-code -- data/walters/nfl/2026/week-01-current-numbers.json
+          git diff --exit-code -- data/walters/nfl/2026/week-01-personnel-ledger.json
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Commit M2F shadow artifacts
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/walters/nfl/matchup-stage2/week-01-walker-steelers-result.json data/walters/nfl/matchup-stage2/stage2-current.json
+          if git diff --cached --quiet; then
+            echo "M2F shadow artifacts unchanged"
+            exit 0
+          fi
+          git commit -m "Record Walker Steelers M2F shadow case"
+          git push
