@@ -2,10 +2,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {matchNflFixture,extractPinnacleHomeSpread} from './graham-market-utils.mjs';
+import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 
 const ROOT=process.cwd();
-const NUMBERS=path.join(ROOT,'data/walters/nfl/2026/week-01-current-numbers.json');
-const MARKET=path.join(ROOT,'data/walters/nfl/2026/week-01-daily-market-ledger.json');
+const ACTIVE=resolveGrahamActiveWeek({root:ROOT});
+const NUMBERS=ACTIVE.absolutePaths.currentNumbers;
+const MARKET=ACTIVE.absolutePaths.dailyMarketLedger;
 const OBSERVER=path.join(ROOT,'data/oddspapi-observer.json');
 const LIVE=path.join(ROOT,'data/live-odds.json');
 function readJson(f){return JSON.parse(fs.readFileSync(f,'utf8'))}
@@ -15,7 +17,7 @@ function roundHalf(v){return Math.round(v*2)/2}
 const numbers=readJson(NUMBERS),market=readJson(MARKET),observer=readJson(OBSERVER),live=readJson(LIVE);
 const reportTime=String(live?.scheduleMeta?.plannedReportTime||'');
 if(reportTime!=='15:15'){
-  console.log(`GRAHAM DAILY CAPTURE SKIP // REPORT ${reportTime||'UNKNOWN'} != 15:15`);
+  console.log(`GRAHAM DAILY CAPTURE SKIP // ${ACTIVE.season} W${ACTIVE.weekToken} // REPORT ${reportTime||'UNKNOWN'} != 15:15`);
   process.exit(0);
 }
 const reviewDate=String(live?.scheduleMeta?.operatingDate||numbers.updatedAt||'').slice(0,10);
@@ -51,6 +53,7 @@ for(const marketGame of market.games||[]){
 if(appended){
   market.updatedAt=new Date().toISOString();market.state='DAILY_CAPTURE_ACTIVE';
   fs.writeFileSync(MARKET,JSON.stringify(market,null,2)+'\n');
-  JSON.parse(fs.readFileSync(MARKET,'utf8'));
+  const verify=JSON.parse(fs.readFileSync(MARKET,'utf8'));
+  if(Number(verify.season)!==ACTIVE.season||Number(verify.week)!==ACTIVE.week)throw new Error('Graham daily capture active-week verification failed');
 }
-console.log(`GRAHAM DAILY CAPTURE // ${reviewDate} // APPENDED ${appended}`);
+console.log(`GRAHAM DAILY CAPTURE // ${ACTIVE.season} W${ACTIVE.weekToken} // ${reviewDate} // APPENDED ${appended}`);
