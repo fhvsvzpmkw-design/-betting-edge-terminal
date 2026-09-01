@@ -51,9 +51,9 @@ The Syndicate system deliberately separates three layers:
 
 1. **Character** — identity, voice, editorial behavior and continuity.
 2. **Hotline shell** — visual presentation, CSS, masthead, page architecture and content zones.
-3. **Hotline edition** — the current Betting Edge report rendered through that character and shell.
+3. **Hotline edition** — the current authoritative source rendered through that character and shell.
 
-A character may later use another compatible shell without becoming a different character. A shell may later be distributed independently as a free or paid installable asset without carrying character identity or Betting Edge authority with it.
+A character may later use another compatible shell without becoming a different character. A shell may later be distributed independently as a free or paid installable asset without carrying character identity or source authority with it.
 
 ## Shell lifecycle
 
@@ -101,9 +101,27 @@ A newly created profile uses:
 
 When an image is supplied, save it under repository assets and change only that character's headshot metadata. Do not recreate the character, shell or Hotline.
 
-## First and later Hotline updates
+## Source-specific live desks
 
-When the character receives a report, build the edition from:
+A character may deliberately stop being a normal Betting Edge report derivative and declare another durable source of truth. This is a product-boundary change, not fictional flavor.
+
+When a source-specific desk is created:
+
+1. add an explicit `authority` block to the character profile;
+2. name the exact authoritative repository source;
+3. state whether the desk itself has betting authority;
+4. create a new shell version when the page architecture materially changes;
+5. preserve all earlier shell files and archived issues unchanged;
+6. use `cache: 'no-store'` when the live desk reads a current repository feed;
+7. add/update guardrail tests so the live source path and authority boundary are verified.
+
+A source-specific live desk does **not** need to equal the latest archived report edition byte-for-byte. The pre-transition archive remains immutable historical evidence; the new live desk follows its declared source.
+
+Example: Jesse Bains v3 declares `data/walters/nfl/current-week-terminal.json` as an NFL-only Graham-terminal source. Jesse is presentation/reaction only and is not betting authority. His v1/v2 Betting Edge editions remain frozen in `syndicates/death-angel/archive/`.
+
+## First and later report-driven Hotline updates
+
+For a normal report-driven character, build the edition from:
 
 1. the authoritative issued Betting Edge report;
 2. the character profile;
