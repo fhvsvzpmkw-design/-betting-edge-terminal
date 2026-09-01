@@ -1,0 +1,66 @@
+name: Muddy Presentation Expansion
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-presentation-expansion.yml'
+permissions:
+  contents: write
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Expand Muddy actual-ledger presentation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const paths=['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html'];
+          for(const p of paths){
+            let s=fs.readFileSync(p,'utf8');
+            if(s.includes('data-zone="funding-split"')) continue;
+            s=s.replace('.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}', '.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.split3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fundCard{padding:12px}.fundCard h3{margin:0 0 8px;font:900 13px system-ui,sans-serif}.fundLine{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-top:1px solid #18384a}.fundLine:first-of-type{border-top:0}.fundLine span{color:var(--muted);font-size:9px}.fundLine b{font-size:11px}.fundTag{display:inline-block;margin-top:4px;padding:2px 5px;border:1px solid #466579;border-radius:999px;color:var(--cyan);font:900 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.05em}.fundTag.free{border-color:#7b6326;color:var(--gold)}.fundTag.mixed{border-color:#5a5279;color:#c6b8ff}');
+            s=s.replace('@media(max-width:900px){.brandrow', '@media(max-width:900px){.split3{grid-template-columns:1fr}.brandrow');
+            const anchor='<div class="sectiontitle">CONTROL ROOM // ALL-LEDGER CUMULATIVE P/L</div>';
+            const block='<div class="sectiontitle">LEDGER FUNDING // ALL ACTION + CASH + PROMO</div><section class="split3" data-zone="funding-split"><article class="panel fundCard"><h3>ALL ACTION</h3><div class="fundLine"><span>Wagers</span><b id="allWagers">—</b></div><div class="fundLine"><span>Actual capital risk</span><b id="allRisk">—</b></div><div class="fundLine"><span>P/L</span><b id="allProfit">—</b></div><div class="fundLine"><span>ROI</span><b id="allRoi">—</b></div></article><article class="panel fundCard"><h3>CASH ACTION</h3><div class="fundLine"><span>Wagers</span><b id="cashWagers">—</b></div><div class="fundLine"><span>Cash risk</span><b id="cashRisk">—</b></div><div class="fundLine"><span>P/L</span><b id="cashProfit">—</b></div><div class="fundLine"><span>ROI</span><b id="cashRoi">—</b></div></article><article class="panel fundCard"><h3>PROMO ACTION</h3><div class="fundLine"><span>Wagers</span><b id="promoWagers">—</b></div><div class="fundLine"><span>Free / mixed</span><b id="promoMix">—</b></div><div class="fundLine"><span>Nominal volume</span><b id="promoVolume">—</b></div><div class="fundLine"><span>P/L contribution</span><b id="promoProfit">—</b></div></article></section>';
+            if(!s.includes(anchor)) throw new Error(p+' control-room anchor missing');
+            s=s.replace(anchor,block+anchor);
+            const src="const allIn=f?.summary?.allIn,cash=f?.summary?.cash,promo=f?.summary?.promotional;if(!allIn)throw Error('Funding summary missing');let scaledProfit=+allIn.profitCad||0,scaledRisk=+allIn.actualCapitalRiskCad||0;";
+            const ext=src+"const fundingMap=new Map((f.promotionalWagers||[]).map(r=>[+r[0],String(r[1]||'CASH')]));const fundingClass=id=>fundingMap.get(+id)||'CASH';";
+            if(!s.includes(src)) throw new Error(p+' unified funding source missing');
+            s=s.replace(src,ext);
+            const statWrite="set('risk',money(scaledRisk));";
+            const splitWrite="set('risk',money(scaledRisk));set('allWagers',N.format(allIn.wagers||0));set('allRisk',money(allIn.actualCapitalRiskCad));set('allProfit',sm(allIn.profitCad));tone($('allProfit'),allIn.profitCad);set('allRoi',(+allIn.actualCapitalRoiPercent||0).toFixed(2)+'%');tone($('allRoi'),allIn.actualCapitalRoiPercent);set('cashWagers',N.format(cash?.wagers||0));set('cashRisk',money(cash?.riskCad||0));set('cashProfit',sm(cash?.profitCad||0));tone($('cashProfit'),cash?.profitCad||0);set('cashRoi',(+cash?.roiPercent||0).toFixed(2)+'%');tone($('cashRoi'),cash?.roiPercent||0);set('promoWagers',N.format(promo?.wagers||0));set('promoMix',`${N.format(promo?.freeBetWagers||0)} free · ${N.format(promo?.mixedPromoWagers||0)} mixed`);set('promoVolume',money(promo?.nominalRiskCad||0));set('promoProfit',sm(promo?.profitCad||0));tone($('promoProfit'),promo?.profitCad||0);";
+            if(!s.includes(statWrite)) throw new Error(p+' headline risk writer missing');
+            s=s.replace(statWrite,splitWrite);
+            const ticketOld='<small>#${i+1} · ${x.book}</small><b>${x.result';
+            const ticketNew='<small>#${i+1} · ${x.book}</small><span class="fundTag ${fundingClass(x.id)==="FREE_BET"?"free":fundingClass(x.id)==="MIXED_PROMO"?"mixed":""}">${fundingClass(x.id).replace("_"," ")}</span><b>${x.result';
+            if(!s.includes(ticketOld)) throw new Error(p+' recent-ticket pattern missing');
+            s=s.replace(ticketOld,ticketNew);
+            const readAnchor="$('read').innerHTML=`<p><b>WEEK:</b>";
+            if(!s.includes(readAnchor)) throw new Error(p+' Eddie read pattern missing');
+            s=s.replace(readAnchor,"$('read').innerHTML=`<p><b>ALL ACTION:</b> ${sm(allIn.profitCad)} on ${money(allIn.actualCapitalRiskCad)} actual capital risk (${(+allIn.actualCapitalRoiPercent||0).toFixed(2)}% ROI). Cash action is ${sm(cash?.profitCad||0)} at ${(+cash?.roiPercent||0).toFixed(2)}%; promos contributed ${sm(promo?.profitCad||0)} across ${promo?.wagers||0} wagers.</p><p><b>WEEK:</b>");
+            if(s.includes('muddy-funding-overlay')) throw new Error(p+' dual renderer returned');
+            if(s.includes('UNIT_RATE')||s.includes('TARGET_UNIT')||s.includes('W(r,scale)')||s.includes('bankroll*scale')) throw new Error(p+' scaling returned');
+            fs.writeFileSync(p,s);
+          }
+          NODE
+      - name: Verify expanded Muddy desk
+        run: |
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          grep -q 'data-zone="funding-split"' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'ALL ACTION' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'CASH ACTION' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'PROMO ACTION' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'fundingClass(x.id)' syndicates/generated/eddie-numbers/hotline.html
+          ! grep -q 'muddy-funding-overlay\|UNIT_RATE\|TARGET_UNIT\|W(r,scale)\|bankroll\*scale' syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit expanded Muddy desk
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: add all cash promo presentation'
+          git push origin main
