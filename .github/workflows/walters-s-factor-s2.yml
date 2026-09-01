@@ -9,6 +9,7 @@ on:
       - 'data/walters/nfl/s-factors/s2-model-lock-v1.json'
       - 'data/walters/nfl/s-factors/registries/team-geography-v1.json'
       - 'tools/run-walters-s-factor-s2.py'
+      - 'tools/apply-walters-s-factor-s2-family-gates.py'
       - '.github/workflows/walters-s-factor-s2.yml'
 
 permissions:
@@ -66,8 +67,9 @@ jobs:
       - name: Run S2 current calibration
         run: |
           set -euo pipefail
-          python -m py_compile tools/run-walters-s-factor-s2.py
+          python -m py_compile tools/run-walters-s-factor-s2.py tools/apply-walters-s-factor-s2-family-gates.py
           python tools/run-walters-s-factor-s2.py
+          python tools/apply-walters-s-factor-s2-family-gates.py
 
       - name: Validate generated S2 release
         run: |
@@ -83,11 +85,13 @@ jobs:
           assert release['trainingSeasons']==[2021,2022,2023,2024] and release['validationSeasons']==[2025]
           assert release['h4Control']['homeAdvantagePoints']==2.082
           assert release['sampleCounts']['primaryTraining']>=900 and release['sampleCounts']['validation']>=240
+          assert release['familyGateImplementationCorrection']['coefficientsRefit'] is False
+          assert release['familyGateImplementationCorrection']['thresholdsChanged'] is False
           forbidden={'away_moneyline','home_moneyline','spread_line','away_spread_odds','home_spread_odds','total_line','under_odds','over_odds'}
           with open('data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv',newline='') as f:
               fields=set(next(csv.reader(f)))
           assert not (fields & forbidden), fields & forbidden
-          print('WALTERS S2 RELEASE VERIFY: PASS // HOLDOUT 2025 // NO MARKET FIELDS // NO LIVE AUTHORITY')
+          print('WALTERS S2 RELEASE VERIFY: PASS // HOLDOUT 2025 // PRELOCKED FAMILY GATES // NO MARKET FIELDS // NO LIVE AUTHORITY')
           PY
 
       - name: Verify governed production artifacts unchanged
@@ -139,7 +143,8 @@ jobs:
           print('## Walters S-factor S2')
           print()
           print(f"- State: {x['state']}")
-          print(f"- Selected model: {x['selectedModel']}")
+          print(f"- Aggregate selected model: {x['selectedModel']}")
+          print(f"- S3 scoped model: {x.get('s3ScopedModel','n/a')}")
           print(f"- Current scalar points/S: {x['currentScalarSpreadPointsPerSUnit']}")
           print(f"- S3 numeric families: {', '.join(x['s3NumericFamilies']) if x['s3NumericFamilies'] else 'none'}")
           print(f"- Held-out scoped metrics: {x['s3ScopedValidation']}")
