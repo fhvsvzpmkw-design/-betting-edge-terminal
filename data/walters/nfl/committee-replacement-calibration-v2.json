@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-committee-replacement-calibration-v2",
+  "stage": "M2E",
+  "state": "SHADOW_ONLY",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "supersedesForNewShadowCases": "data/walters/nfl/committee-replacement-calibration-v1.json",
+  "purpose": "Extend the shadow committee method to role-distribution cases where exact workload shares remain unresolved but the verified replacement set is point-value invariant, while preventing double-counting of players who already occupy an independent baseline role.",
+  "dependsOn": {
+    "priorCommitteeCalibration": "data/walters/nfl/committee-replacement-calibration-v1.json",
+    "personnelCalibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "matchupCalibration": "data/walters/nfl/matchup-calibration-v1.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "governingRules": [
+    "The unavailable player's governed healthy value remains unchanged.",
+    "The active replacement committee must be supported by current football role evidence and every included member must have a locked Walters value.",
+    "Do not assign arbitrary workload percentages.",
+    "A player already occupying an independent baseline role may not receive full replacement credit again merely because the injury changes target distribution. Such a player must be excluded from replacement arithmetic unless current evidence establishes a distinct incremental replacement role.",
+    "Every exclusion must identify the double-count risk and cite current role evidence.",
+    "If all included replacement candidates have the same locked Walters value, the effective replacement value is mathematically invariant to their unknown workload shares and may be treated as exact in shadow arithmetic.",
+    "Value invariance does not resolve route alignment, target distribution, blocking, rushing usage, complementarity, cluster effects or opponent-specific matchup effects; those remain separate football questions.",
+    "If included replacement values differ and exact workload shares are unresolved, use the v1 interval method rather than selecting a midpoint.",
+    "Market lines, prices, movement and betting percentages are forbidden inputs."
+  ],
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "line movement",
+      "market-implied player value",
+      "betting percentages",
+      "closing-line value"
+    ]
+  },
+  "committeeMath": {
+    "valueInvariantCondition": "All verified included committee members have identical locked Walters values.",
+    "valueInvariantFormula": "effectiveReplacementValue = common locked Walters value, independent of role shares, because sum(roleShare_i * commonValue) = commonValue when shares sum to 1.",
+    "teamLoss": "healthyValue - effectiveReplacementValue",
+    "teamContributionDelta": "effectiveReplacementValue - healthyValue",
+    "homeSign": "pointsToHomeSpread = -teamContributionDelta",
+    "awaySign": "pointsToHomeSpread = teamContributionDelta",
+    "displayRounding": 0.5
+  },
+  "doubleCountGuard": {
+    "baselineContributor": "Do not credit an already-counted independent starter's full player value as a replacement value unless evidence establishes that the original baseline did not already include that contribution.",
+    "receiverCluster": "Do not apply the Walters receiver cluster multiplier unless the governed cluster trigger independently passes; a single unavailable receiver plus role redistribution is not itself a cluster event.",
+    "matchup": "Opponent-specific matchup points are applied only after committee personnel loss is established and may not restate the same personnel loss.",
+    "teamRating": "Temporary committee or matchup overlays may not change the carried team rating."
+  },
+  "shadowAcceptance": {
+    "productionUse": false,
+    "valueInvariantCommitteeMayResolveExactReplacementValue": true,
+    "exactWorkloadSharesStillUnresolved": true,
+    "opponentMatchupRequiresSeparateReview": true,
+    "reopenOn": [
+      "committee member availability change",
+      "new official or reliable depth-chart or alignment evidence",
+      "a previously excluded baseline player assumes a distinct incremental replacement role",
+      "another receiver or tight end loss creates a potential governed receiver cluster",
+      "opponent-specific coverage evidence materially changes the value of the loss"
+    ]
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_COMMITTEE_CANDIDATE_SET_UNRESOLVED",
+    "FAIL_CLOSED_COMMITTEE_PLAYER_VALUE_MISSING",
+    "FAIL_CLOSED_COMMITTEE_BASELINE_DOUBLE_COUNT",
+    "FAIL_CLOSED_COMMITTEE_VALUE_NOT_INVARIANT",
+    "FAIL_CLOSED_COMMITTEE_CLUSTER_DOUBLE_COUNT",
+    "FAIL_CLOSED_COMMITTEE_MARKET_CONTAMINATION"
+  ]
+}
