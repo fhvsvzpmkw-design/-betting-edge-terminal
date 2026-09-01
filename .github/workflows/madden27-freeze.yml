@@ -42,15 +42,21 @@ jobs:
           current=json.loads((root/'madden27-current.json').read_text())
           normalized=json.loads((root/current['normalizedPath']).read_text())
           raw=json.loads((root/current['rawPath']).read_text())
+          reconciliation=json.loads((root/current['reconciliationPath']).read_text())
           count=int(current['officialPlayerCount'])
           assert count >= 2300, f'unexpected official count {count}'
           assert len(raw['players']) == count
           assert len(normalized['players']) == count
           ids=[str(p['eaPlayerId']) for p in normalized['players']]
           assert len(ids)==len(set(ids)), 'duplicate EA player IDs in normalized snapshot'
+          audit=normalized['normalizationAudit']
+          assert audit['unmappedTeamPlayerCount']==0, f"unmapped team players: {audit['unmappedTeams']}"
+          assert audit['unmappedPositionPlayerCount']==0, f"unmapped position players: {audit['unmappedPositions']}"
           assert current['sourceAuthority']=='EA_OFFICIAL_MADDEN_NFL_27'
           assert current['state']=='FROZEN_STAGE_1'
-          print(f'MADDEN 27 STAGE 1 VERIFY: PASS // {count} OFFICIAL PLAYERS // {len(set(ids))} UNIQUE IDS')
+          assert current['stage2Authority'] is False
+          assert reconciliation['officialCurrentCount']==count
+          print(f"MADDEN 27 STAGE 1 VERIFY: PASS // {count} OFFICIAL PLAYERS // {len(set(ids))} UNIQUE IDS // 0 UNMAPPED TEAMS // 0 UNMAPPED POSITIONS")
           PY
 
       - name: Publish frozen snapshot
