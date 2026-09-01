@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "productionId": "walters-personnel-production-v1",
+  "state": "OPERATIONAL",
+  "activatedAt": "2026-09-01T12:10:26-07:00",
+  "season": 2026,
+  "sourceAuthority": {
+    "stage1MaddenManifest": "data/walters/nfl/madden27/madden27-current.json",
+    "stage2Manifest": "data/walters/nfl/player-values/stage2-current.json",
+    "stage3Manifest": "data/walters/nfl/stage3/stage3-current.json",
+    "calibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json"
+  },
+  "activationGate": {
+    "requireStage2AuditPass": true,
+    "requireStage3ShadowAcceptancePass": true,
+    "requireMarketViewedFalse": true,
+    "productionAuthority": true,
+    "userApprovedActivationAt": "2026-09-01T12:10:26-07:00"
+  },
+  "productionRules": {
+    "marketIsolationRequired": true,
+    "marketInputsForbidden": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "consensus spread or price",
+      "line movement",
+      "market-implied player value",
+      "betting percentages"
+    ],
+    "numericPersonnelMoveRequires": [
+      "current material availability evidence",
+      "governed locked player value",
+      "resolved current role replacement",
+      "governed locked replacement value",
+      "sourceRefs",
+      "explicit reason",
+      "unique personnelEventId"
+    ],
+    "resolvedStatuses": ["OUT", "IR", "SUSPENDED", "COMMISSIONER_EXEMPT"],
+    "playingLimitedRequiresApprovedEffectivenessPct": true,
+    "questionableOrDoubtfulDesignationAloneCannotMoveFair": true,
+    "committeeOrMultiroleReplacementMustFailClosed": true,
+    "qbRequiresAdditionalWaltersPerformanceValidation": true,
+    "temporaryPersonnelOverlayMayNotChangeCarriedTeamRating": true,
+    "allInternalPersonnelMathUsesExactFairBeforeBoardRounding": true,
+    "boardRoundingIncrement": 0.5,
+    "duplicateEventIdsAreIdempotent": true
+  },
+  "staging": {
+    "path": "data/walters/nfl/personnel-staging.json",
+    "stateRequired": "READY",
+    "workflow": ".github/workflows/graham-personnel-production.yml",
+    "calculator": "tools/apply-graham-personnel-staging.mjs",
+    "taskRule": "Scheduled Graham tasks discover and verify personnel facts, then submit a market-isolated staging batch. The repository workflow owns numeric calculation and live-board mutation."
+  },
+  "durableOutputs": {
+    "personnelLedgerPattern": "data/walters/nfl/2026/week-XX-personnel-ledger.json",
+    "currentNumbersPattern": "data/walters/nfl/2026/week-XX-current-numbers.json",
+    "researchLedgerPattern": "data/walters/nfl/2026/week-XX-research-ledger.json"
+  },
+  "productionAuthority": true
+}
