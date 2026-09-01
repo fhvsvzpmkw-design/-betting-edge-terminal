@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-committee-replacement-calibration-v1",
+  "stage": "M2C",
+  "state": "SHADOW_ONLY",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Allow a currently unresolved one-for-many personnel replacement to be studied as a bounded, role-weighted committee without inventing workload percentages or changing live Graham numbers.",
+  "dependsOn": {
+    "personnelCalibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "matchupCalibration": "data/walters/nfl/matchup-calibration-v1.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "governingRules": [
+    "The unavailable player's governed healthy value remains unchanged.",
+    "Every committee member must be a currently verified replacement candidate for the affected role and must have a locked Walters value in the player registry.",
+    "Do not assign arbitrary workload percentages. Exact role shares require explicit current football evidence.",
+    "When exact shares are unresolved, a registry-only replacement envelope may be calculated from the minimum and maximum locked values among the verified active committee members.",
+    "The envelope is an uncertainty interval, not permission to choose its midpoint or whichever endpoint is convenient.",
+    "A shadow fair interval may be computed only from the existing independent Graham fair and the existing personnel sign convention.",
+    "If both ends of the exact shadow interval round to the same half-point display, that display may be marked interval-invariant in shadow testing only; the exact fair remains unresolved inside the interval.",
+    "Committee complementarity, role specialization, blocking/receiving fit, opponent-specific effects and clusters are not assumed to be captured by the registry-only envelope. They require separate football evidence and must not be double-counted.",
+    "Market lines, prices, movement and betting percentages are forbidden inputs."
+  ],
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "line movement",
+      "market-implied player value",
+      "betting percentages",
+      "closing-line value"
+    ]
+  },
+  "committeeMath": {
+    "exactShareFormula": "effectiveReplacementValue = sum(roleShare_i * lockedReplacementValue_i), with roleShare_i >= 0 and sum(roleShare_i) = 1, only when role shares are evidence-supported.",
+    "unresolvedShareEnvelope": "replacementValueMin = min(lockedReplacementValues); replacementValueMax = max(lockedReplacementValues).",
+    "teamLossEnvelope": "teamLossMin = healthyValue - replacementValueMax; teamLossMax = healthyValue - replacementValueMin.",
+    "teamContributionDeltaEnvelope": "replacementValue - healthyValue at each envelope endpoint.",
+    "homeSign": "pointsToHomeSpread = -teamContributionDelta",
+    "awaySign": "pointsToHomeSpread = teamContributionDelta",
+    "displayRounding": 0.5
+  },
+  "shadowAcceptance": {
+    "exactSharesRequiredForSingleExactFair": true,
+    "intervalAllowedForShadow": true,
+    "productionUse": false,
+    "intervalInvariantDisplayIsNotExactAuthority": true,
+    "reopenOn": [
+      "official or reliable workload-share evidence",
+      "committee member availability change",
+      "practice-squad elevation or roster transaction affecting the committee",
+      "specific role specialization evidence that invalidates the registry-only envelope",
+      "opponent-specific matchup evidence"
+    ]
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_COMMITTEE_CANDIDATE_SET_UNRESOLVED",
+    "FAIL_CLOSED_COMMITTEE_PLAYER_VALUE_MISSING",
+    "FAIL_CLOSED_COMMITTEE_ROLE_SHARE_INVENTED",
+    "FAIL_CLOSED_COMMITTEE_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_COMMITTEE_EXACT_FAIR_UNRESOLVED"
+  ]
+}
