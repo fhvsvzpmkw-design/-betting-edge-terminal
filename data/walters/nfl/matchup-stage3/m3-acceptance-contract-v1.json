@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "acceptanceId": "walters-nfl-matchup-m3-acceptance-v1",
+  "stage": "M3",
+  "state": "LOCKED_ACCEPTANCE_TEST",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Convert the M2 shadow findings into explicit production eligibility classes without granting production authority or changing any live Graham number.",
+  "dependsOn": {
+    "matchupCalibration": "data/walters/nfl/matchup-calibration-v1.json",
+    "committeeV1": "data/walters/nfl/committee-replacement-calibration-v1.json",
+    "committeeV2": "data/walters/nfl/committee-replacement-calibration-v2.json",
+    "multiroleV1": "data/walters/nfl/multirole-replacement-calibration-v1.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "shadowArchetypes": [
+    {
+      "id": "EXACT_ONE_FOR_ONE_MATCHUP_ZERO",
+      "resultPath": "data/walters/nfl/matchup-stage2/week-01-shadow-numeric-result.json",
+      "caseKey": "2026-W01-LAC-Tyler-Biadasz",
+      "expectedM3Decision": "ACCEPT_EXACT_ONE_FOR_ONE",
+      "note": "The governed one-for-one personnel loss is exact. A zero opponent-specific matchup increment is a valid completed review, not a missing adjustment. M4 must never reapply a personnel loss already present on the live board."
+    },
+    {
+      "id": "RANGE_COMMITTEE_DISPLAY_INVARIANT",
+      "resultPath": "data/walters/nfl/matchup-stage2/week-01-committee-jacobs-minnesota-result.json",
+      "caseKey": "2026-W01-GB-Josh-Jacobs",
+      "expectedM3Decision": "BLOCK_EXACT_FAIR_UNRESOLVED",
+      "note": "A display-invariant interval is useful shadow information but does not satisfy the exact-fair production requirement."
+    },
+    {
+      "id": "VALUE_INVARIANT_COMMITTEE_EXACT",
+      "resultPath": "data/walters/nfl/matchup-stage2/week-01-pearsall-rams-result.json",
+      "caseKey": "2026-W01-SF-Ricky-Pearsall",
+      "expectedM3Decision": "ACCEPT_VALUE_INVARIANT_COMMITTEE",
+      "note": "Unknown workload shares are permissible only because every verified included replacement has the same locked value, baseline contributors are excluded, the cluster guard passes, and the exact replacement value is therefore mathematically invariant."
+    },
+    {
+      "id": "MULTIROLE_INTERVAL_DISPLAY_NOT_INVARIANT",
+      "resultPath": "data/walters/nfl/matchup-stage2/week-01-walker-steelers-result.json",
+      "caseKey": "2026-W01-ATL-Jalon-Walker",
+      "expectedM3Decision": "BLOCK_MULTIROLE_UNRESOLVED",
+      "note": "Role redistribution and vacated-role cascades remain blocked when the valid interval spans more than one Graham display outcome."
+    }
+  ],
+  "productionEligibilityRules": {
+    "EXACT_ONE_FOR_ONE": {
+      "m4Candidate": true,
+      "requirements": [
+        "availability and replacement are resolved by current football evidence",
+        "healthy and replacement Walters values are exact and locked",
+        "personnel arithmetic is reproducible",
+        "cluster treatment is resolved",
+        "marketViewed is false",
+        "any matchup increment is independently governed",
+        "an already-applied personnel loss is not applied a second time"
+      ]
+    },
+    "VALUE_INVARIANT_COMMITTEE": {
+      "m4Candidate": true,
+      "requirements": [
+        "verified active replacement set",
+        "all included replacement candidates have the identical locked Walters value",
+        "baseline contributors are excluded from replacement credit unless distinct incremental role evidence exists",
+        "applicable cluster guard passes",
+        "the exact replacement value and exact team loss are reproducible without invented workload percentages",
+        "marketViewed is false"
+      ]
+    },
+    "RANGE_ONLY_COMMITTEE": {
+      "m4Candidate": false,
+      "rule": "Block production numeric authority whenever exact replacement value or exact Graham fair remains unresolved, even when the entire interval rounds to one display number."
+    },
+    "MULTIROLE_INTERVAL": {
+      "m4Candidate": false,
+      "rule": "Block production whenever role shares, vacated-role backfills or separate unavailable players prevent an exact contribution calculation. A multi-display interval is an automatic fail-closed condition."
+    }
+  },
+  "matchupIncrementRules": {
+    "zeroIncrement": "A case-specific football review may validly resolve to zero additional opponent-specific points.",
+    "nonzeroIncrementM4Candidate": false,
+    "nonzeroIncrementRule": "Do not grant automated nonzero opponent-specific matchup authority in M4 from this acceptance pass because M2 has not yet produced a successfully calibrated nonzero matchup-increment shadow case. Continue to allow evidence-based screening, but any proposed nonzero opponent increment must fail closed for separate acceptance until an additional shadow calibration passes.",
+    "negativeIncrement": "Same restriction as a positive nonzero increment.",
+    "marketRule": "Market reaction, sportsbook lines, prices, movement and betting percentages are forbidden evidence."
+  },
+  "doubleCountRules": [
+    "Never reapply the base healthy-minus-replacement personnel loss when it is already present on the live board.",
+    "Never credit an existing baseline starter's full player value again as committee replacement value without distinct incremental role evidence.",
+    "Never apply a receiver or defensive-line cluster multiplier unless its separate governed trigger passes.",
+    "Never combine a separate unavailable player into another player's case without a distinct governed personnel event and an explicit no-double-count reconciliation.",
+    "Temporary personnel, committee and matchup overlays never change the carried team power rating."
+  ],
+  "m3PassRequirements": [
+    "all four archetype result files are present and market-isolated",
+    "all four shadow runs preserved the live board",
+    "Biadasz is accepted as exact one-for-one with zero matchup increment",
+    "Jacobs is blocked because exact fair remains unresolved",
+    "Pearsall is accepted as an exact value-invariant committee case with cluster and baseline double-count guards passing",
+    "Walker is blocked because the multi-role interval is unresolved and not display-invariant",
+    "no nonzero opponent-specific matchup increment is granted automated M4 authority",
+    "protected live artifacts remain unchanged during M3"
+  ],
+  "m3PassState": "PASS_SCOPED_M4_CANDIDATE",
+  "m3FailState": "FAIL_CLOSED_NO_M4_CANDIDATE"
+}
