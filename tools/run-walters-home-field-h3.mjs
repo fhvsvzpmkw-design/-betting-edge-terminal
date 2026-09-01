@@ -24,6 +24,7 @@ const round=(n,d=3)=>Number(Number(n).toFixed(d));
 const roundHalf=n=>Math.round((Number(n)+Number.EPSILON)*2)/2;
 const finite=v=>Number.isFinite(Number(v));
 const fail=msg=>{throw new Error(`WALTERS HOME FIELD H3 FAILED // ${msg}`);};
+const snapshotTeam=t=>t==='LAR'?'LA':t;
 
 function parseCsv(text){
   const rows=[];let row=[],field='',quoted=false;
@@ -42,7 +43,7 @@ function parseCsv(text){
   if(field.length||row.length){row.push(field.replace(/\r$/,''));rows.push(row);}
   if(!rows.length)return [];
   const header=rows[0];
-  return rows.slice(1).filter(r=>r.some(v=>v!=='')) .map(r=>Object.fromEntries(header.map((h,i)=>[h,r[i]??''])));
+  return rows.slice(1).filter(r=>r.some(v=>v!=='')).map(r=>Object.fromEntries(header.map((h,i)=>[h,r[i]??''])));
 }
 
 for(const p of [CONTRACT,H2_CURRENT,H2_RELEASE,H2_AUDIT,POWER,REGISTRY,NUMBERS])if(!fs.existsSync(p))fail(`missing ${path.relative(ROOT,p)}`);
@@ -74,7 +75,8 @@ const leagueHfa=Number(release.leagueBaselineHomeAdvantagePoints);
 if(!Number.isFinite(leagueHfa)||leagueHfa<=0)fail('invalid H2 league baseline');
 
 function scheduleMatch(g){
-  const hits=schedules.filter(r=>r.home_team===g.home&&r.away_team===g.away);
+  const home=snapshotTeam(g.home),away=snapshotTeam(g.away);
+  const hits=schedules.filter(r=>r.home_team===home&&r.away_team===away);
   if(hits.length!==1)fail(`FAIL_CLOSED_H3_SCHEDULE_IDENTITY:${g.gameKey}:${hits.length}`);
   return hits[0];
 }
@@ -151,7 +153,6 @@ if(!leagueVal||!teamVal)fail('H2 validation metrics missing');
 const teamVenueOutperformsOrTies=Number(teamVal.mae)<=Number(leagueVal.mae)&&Number(teamVal.rmse)<=Number(leagueVal.rmse);
 const leagueBaselineH4Candidate=audit.validation.pass===true;
 const teamVenueH4Candidate=leagueBaselineH4Candidate&&teamVenueOutperformsOrTies;
-const neutralPolicyH4Candidate=(classCounts.NEUTRAL||0)+(classCounts.INTERNATIONAL_NEUTRAL||0)>=0;
 const state=teamVenueH4Candidate?'PASS_SHADOW_ACCEPTANCE_FULL_H4_CANDIDATE':'PASS_SHADOW_ACCEPTANCE_LEAGUE_BASELINE_H4_CANDIDATE_TEAM_VENUE_DIAGNOSTIC';
 
 const protectedAfter={
