@@ -35,9 +35,14 @@ Real casino progressives, paytables, machine inventories, promotions, comps, res
 ## Police Quest / Jesse Bains reference pack
 
 - [Police Quest series reference index](police-quest-series-reference-index.md)
-- [Jesse Bains / Death Angel canon and language guide](jesse-bains-canon-language-guide.md)
+- [Jesse Bains / Death Angel historical canon and language guide](jesse-bains-canon-language-guide.md)
+- [Jesse Bains historical Hotel Delphoria scene bank](jesse-bains-scene-bank.md)
+- [Jesse Bains v3 Graham NFL production reference](jesse-bains-v3-graham-nfl-reference.md)
+- [Jesse Bains v3 Hotel Delphoria NFL scene bank](jesse-bains-v3-scene-bank.md)
 
 The Police Quest material is maintained as a source map and derived character guide rather than a repository copy of third-party manuals or transcripts. PQ1 AGI/VGA and PQ2 are the controlling sources for Jesse Bains, the Death Angel, Hotel Delphoria and Jesse's gambling-world language. PQ3 is secondary Lytton/Bains legacy material. PQ4 and the SWAT branch are later procedural/style references and must not silently overwrite Jesse's late-1980s voice.
+
+Jesse v1/v2 used the historical character guides while rendering issued Betting Edge reports. Those archived editions remain immutable. Jesse v3 is a deliberate product boundary: the live Hotel Delphoria NFL Book uses `data/walters/nfl/current-week-terminal.json` for football facts while the v3 reference and scene bank control fictional presentation. Graham's terminal remains non-betting-authority; Jesse may not turn a Graham/Pinnacle attention gap into a wager.
 
 ### Police Quest copyright boundary
 
@@ -45,9 +50,9 @@ Do not commit complete externally hosted manuals, hint books, transcripts or sca
 
 ### Operational boundary
 
-This material is research evidence, not executable policy. It does not independently change the Betting Edge runner, production contract, pricing rules, staking rules, report behavior or issued recommendations.
+Police Quest source material controls fictional identity, setting and voice only. It never changes a Graham fair number, Pinnacle quote, GAP, market movement, moneyline selector, Betting Edge rule, staking rule or issued recommendation.
 
-Any operational adoption must occur in a separate derived-analysis document and then through the repository’s normal contract and acceptance process. Derived documents should cite their source material and must not rewrite source evidence to fit an implementation.
+For Jesse v3, operational football data comes only from the separately governed Graham current-week terminal. The v3 production reference defines how that data may be presented; it does not create new football evidence.
 
 ### Maintenance rule
 
