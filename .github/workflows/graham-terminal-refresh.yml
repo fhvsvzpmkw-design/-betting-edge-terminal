@@ -5,8 +5,12 @@ on:
     branches: [main]
     paths:
       - .github/workflows/graham-terminal-refresh.yml
+      - data/walters/nfl/active-week.json
       - data/walters/nfl/20*/week-*-current-numbers.json
       - data/walters/nfl-power-ratings-ledger.json
+      - tools/graham-active-week.mjs
+      - tools/build-graham-current-week.mjs
+      - tools/capture-graham-daily-pinnacle.mjs
   workflow_run:
     workflows:
       - Refresh Betting Edge odds
@@ -49,6 +53,9 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            node tools/graham-active-week.mjs
+            ACTIVE_MARKET_LEDGER="$(node tools/graham-active-week.mjs --path dailyMarketLedger)"
+
             # No external API calls occur here. The terminal always rebuilds from
             # committed Graham and market state. Only a genuine odds-refresh
             # completion may perform the governed 15:15 daily Pinnacle capture.
@@ -61,7 +68,7 @@ jobs:
             node tools/build-graham-current-week.mjs
 
             git add -- data/walters/nfl/current-week-terminal.json
-            git add -- data/walters/nfl/2026/week-01-daily-market-ledger.json
+            git add -- "$ACTIVE_MARKET_LEDGER"
 
             if git diff --cached --quiet; then
               echo "Graham terminal already current."
@@ -82,12 +89,14 @@ jobs:
       - name: Summary
         if: always()
         run: |
+          ACTIVE="$(node tools/graham-active-week.mjs 2>/dev/null || true)"
           {
             echo "## Graham Mercer // The Nineteenth Hole"
             echo
-            echo "- Trigger: odds refresh or Graham research/personnel publication"
+            echo "- Trigger: odds refresh or Graham research/personnel/active-week publication"
+            echo "- Active week: ${ACTIVE:-unresolved}"
             echo "- External API calls: none"
-            echo "- Live board: current NFL week"
+            echo "- Live board: repository active NFL week"
             echo "- Graham fair: rebuilt immediately after governed Graham research changes"
             echo "- Pinnacle on research-only refresh: latest committed snapshot preserved with its original timestamp"
             echo "- Pinnacle on odds refresh: refreshed comparison consumed after the odds workflow completes"
