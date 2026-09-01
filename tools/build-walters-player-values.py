@@ -52,18 +52,19 @@ def percentile(sorted_values: list[float], p: float) -> float:
 
 def summarize_values(records: list[dict]) -> dict:
     vals = [float(r['waltersPoints']) for r in records if r.get('waltersPoints') is not None]
-    nonzero = [v for v in vals if v > 0]
+    nonzero = [v for v in vals if v >= 0.10]
     meaningful = [v for v in vals if v > 0.25]
     ordered = sorted(vals)
+    ovr_counts = Counter(int(r['maddenOvr']) for r in records if r.get('maddenOvr') is not None)
     return {
         'count': len(vals),
-        'zeroCount': sum(1 for v in vals if v == 0),
-        'nonZeroCount': len(nonzero),
-        'nonZeroShare': round(len(nonzero) / len(vals), 6) if vals else 0,
+        'zeroOrBelow010Count': sum(1 for v in vals if v < 0.10),
+        'nonZeroAtLeast010Count': len(nonzero),
+        'nonZeroAtLeast010Share': round(len(nonzero) / len(vals), 6) if vals else 0,
         'meaningfulOver025Count': len(meaningful),
         'meaningfulOver025Share': round(len(meaningful) / len(vals), 6) if vals else 0,
         'meanAll': round(mean(vals), 6) if vals else 0,
-        'meanNonZero': round(mean(nonzero), 6) if nonzero else 0,
+        'meanNonZeroAtLeast010': round(mean(nonzero), 6) if nonzero else 0,
         'minimum': min(vals) if vals else None,
         'maximum': max(vals) if vals else None,
         'p50': round(percentile(ordered, 0.50), 3) if vals else None,
@@ -71,6 +72,7 @@ def summarize_values(records: list[dict]) -> dict:
         'p90': round(percentile(ordered, 0.90), 3) if vals else None,
         'p95': round(percentile(ordered, 0.95), 3) if vals else None,
         'valueCounts': {str(k): v for k, v in sorted(Counter(vals).items(), key=lambda kv: float(kv[0]))},
+        'maddenOvrCounts': {str(k): v for k, v in sorted(ovr_counts.items())},
     }
 
 
@@ -84,6 +86,10 @@ def top_n_per_team(records: list[dict], n: int) -> list[dict]:
         rows = sorted(rows, key=lambda r: (-int(r.get('maddenOvr') or 0), int(r['eaPlayerId']) if str(r['eaPlayerId']).isdigit() else str(r['eaPlayerId'])))
         selected.extend(rows[:n])
     return selected
+
+
+def top_n_overall(records: list[dict], n: int) -> list[dict]:
+    return sorted(records, key=lambda r: (-int(r.get('maddenOvr') or 0), int(r['eaPlayerId']) if str(r['eaPlayerId']).isdigit() else str(r['eaPlayerId'])))[:n]
 
 
 def main() -> None:
@@ -144,25 +150,39 @@ def main() -> None:
     non_qb_nfl = [r for r in calibrated_nfl if r['curve'] == 'NON_QB']
     qb_nfl = [r for r in calibrated_nfl if r['curve'] == 'QB']
 
-    # Walters disclosed distribution targets are used as the approval cohort against the
-    # full current NFL-team player population that has a governed non-QB curve. Roster-scale
-    # top-53 and top-46 cohorts are retained as diagnostics only; they never select replacements.
-    non_qb_summary = summarize_values(non_qb_nfl)
-    qb_summary = summarize_values(qb_nfl)
+    # Source-locked audit population:
+    # p.250 says approximately 1,700 active-roster players; 32 x 53 = 1,696.
+    # We therefore use an OVR-ranked top-53-per-team statistical cohort ONLY to calibrate
+    # the distribution. It is not a roster/depth authority and never selects replacements.
+    # p.254 explicitly says Walters had 67 ranked QBs, so QB distribution is audited on the
+    # top 67 Madden-ranked QBs. Stage 3 will replace these statistical cohorts with verified
+    # current roster/depth roles for actual injury calculations.
     top53 = top_n_per_team(calibrated_nfl, 53)
     top53_non_qb = [r for r in top53 if r['curve'] == 'NON_QB']
+    top67_qb = top_n_overall(qb_nfl, 67)
+    non_qb_summary = summarize_values(top53_non_qb)
+    qb_summary = summarize_values(top67_qb)
+
     top46 = top_n_per_team(calibrated_nfl, 46)
     top46_non_qb = [r for r in top46 if r['curve'] == 'NON_QB']
+    all_non_qb_summary = summarize_values(non_qb_nfl)
+    all_qb_summary = summarize_values(qb_nfl)
 
     nq_guard = calibration['nonQbConversion']['distributionAudit']
     qb_guard = calibration['qbConversion']['distributionAudit']
     targets = calibration['sourceAuthority']['waltersReferenceTargets']
     checks = [
         {
-            'id': 'NON_QB_NONZERO_SHARE',
-            'actual': non_qb_summary['nonZeroShare'],
+            'id': 'ACTIVE_ROSTER_SCALE_COUNT',
+            'actual': len(top53),
+            'expected': 1696,
+            'pass': len(top53) == 1696,
+        },
+        {
+            'id': 'NON_QB_NONZERO_AT_LEAST_010_SHARE',
+            'actual': non_qb_summary['nonZeroAtLeast010Share'],
             'expected': nq_guard['expectedNonZeroShareRange'],
-            'pass': in_range(non_qb_summary['nonZeroShare'], nq_guard['expectedNonZeroShareRange']),
+            'pass': in_range(non_qb_summary['nonZeroAtLeast010Share'], nq_guard['expectedNonZeroShareRange']),
         },
         {
             'id': 'NON_QB_MEANINGFUL_SHARE',
@@ -172,15 +192,21 @@ def main() -> None:
         },
         {
             'id': 'NON_QB_NONZERO_AVERAGE',
-            'actual': non_qb_summary['meanNonZero'],
+            'actual': non_qb_summary['meanNonZeroAtLeast010'],
             'expected': nq_guard['expectedNonZeroAverageRange'],
-            'pass': in_range(non_qb_summary['meanNonZero'], nq_guard['expectedNonZeroAverageRange']),
+            'pass': in_range(non_qb_summary['meanNonZeroAtLeast010'], nq_guard['expectedNonZeroAverageRange']),
         },
         {
             'id': 'NON_QB_ELITE_CEILING',
             'actual': non_qb_summary['maximum'],
             'expected': targets['nonQbBestTypicalRange'],
             'pass': in_range(non_qb_summary['maximum'], targets['nonQbBestTypicalRange']),
+        },
+        {
+            'id': 'QB_RANKED_COUNT',
+            'actual': len(top67_qb),
+            'expected': 67,
+            'pass': len(top67_qb) == 67,
         },
         {
             'id': 'QB_MINIMUM',
@@ -232,16 +258,28 @@ def main() -> None:
         'sourcePlayerCount': len(records),
         'calibratedNflTeamPlayerCount': len(calibrated_nfl),
         'specialistReviewCount': sum(1 for r in records if r['valueStatus'] == 'INELIGIBLE_SPECIALIST_REVIEW_REQUIRED'),
-        'approvalCohort': {
-            'definition': 'All current EA records assigned to an NFL team with a governed non-QB or QB calibration curve. No sportsbook or depth-chart information is used.',
-            'nonQb': non_qb_summary,
-            'qb': qb_summary,
+        'sourceLockedAuditCohorts': {
+            'nonQb': {
+                'definition': 'Non-QBs inside a 32 x 53 OVR-ranked statistical roster-scale cohort (1,696 total players), matching Walters p.250 approximately 1,700 active-roster scale. Calibration-only; not roster/depth authority.',
+                **non_qb_summary,
+            },
+            'qb': {
+                'definition': 'Top 67 current NFL-team QBs by locked Madden OVR, matching Walters p.254 explicit 67 ranked-quarterback database size. Calibration-only; not starter/depth authority.',
+                **qb_summary,
+            },
         },
         'diagnosticCohorts': {
-            'top53PerTeamByMaddenOvrNotRosterAuthority': summarize_values(top53_non_qb),
-            'top46PerTeamByMaddenOvrNotRosterAuthority': summarize_values(top46_non_qb),
+            'allEaAssignedNonQb': all_non_qb_summary,
+            'allEaAssignedQb': all_qb_summary,
+            'top46PerTeamNonQbNotRosterAuthority': summarize_values(top46_non_qb),
         },
-        'waltersReferenceTargets': targets,
+        'waltersReferenceTargets': {
+            **targets,
+            'sourceExactNonQbAtLeast010Count': 991,
+            'sourceExactNonQbMeaningfulOver025Count': 612,
+            'sourceExactRankedQbCount': 67,
+            'sourceApproxActiveRosterPlayers': 1700,
+        },
         'checks': checks,
         'pass': audit_pass,
         'failureAction': None if audit_pass else 'DO_NOT_ACTIVATE_PLAYER_VALUES; recalibrate conversion bands and rerun Stage 2.',
@@ -273,9 +311,11 @@ def main() -> None:
     write_json(OUT_ROOT / 'calibration-audit-v1.json', audit)
     write_json(OUT_ROOT / 'stage2-current.json', current_stage2)
 
-    print(f"WALTERS STAGE 2 BUILD // {len(records)} RECORDS // {len(calibrated_nfl)} NFL CALIBRATED // {len(qb_nfl)} QB // {len(non_qb_nfl)} NON-QB")
-    print(f"NON-QB // NONZERO {non_qb_summary['nonZeroShare']:.4f} // >.25 {non_qb_summary['meaningfulOver025Share']:.4f} // NONZERO AVG {non_qb_summary['meanNonZero']:.4f} // MAX {non_qb_summary['maximum']}")
-    print(f"QB // MEAN {qb_summary['meanAll']:.4f} // MIN {qb_summary['minimum']} // MAX {qb_summary['maximum']}")
+    print(f"WALTERS STAGE 2 BUILD // {len(records)} RECORDS // {len(calibrated_nfl)} NFL CALIBRATED // SOURCE COHORT {len(top53)} // QB COHORT {len(top67_qb)}")
+    print(f"NON-QB SOURCE COHORT // N={non_qb_summary['count']} // >=.10 {non_qb_summary['nonZeroAtLeast010Share']:.4f} // >.25 {non_qb_summary['meaningfulOver025Share']:.4f} // >=.10 AVG {non_qb_summary['meanNonZeroAtLeast010']:.4f} // MAX {non_qb_summary['maximum']}")
+    print(f"QB SOURCE COHORT // N={qb_summary['count']} // MEAN {qb_summary['meanAll']:.4f} // MIN {qb_summary['minimum']} // MAX {qb_summary['maximum']}")
+    print('NON-QB OVR HISTOGRAM // ' + json.dumps(non_qb_summary['maddenOvrCounts'], sort_keys=True))
+    print('QB OVR HISTOGRAM // ' + json.dumps(qb_summary['maddenOvrCounts'], sort_keys=True))
     for check in checks:
         print(f"CHECK {check['id']}: {'PASS' if check['pass'] else 'FAIL'} // actual={check['actual']} expected={check['expected']}")
     print(f"STAGE 2 AUDIT: {'PASS' if audit_pass else 'FAIL_RECALIBRATION_REQUIRED'}")
