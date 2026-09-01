@@ -1,0 +1,57 @@
+name: Walters Matchup M2 Shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/matchup-calibration-v1.json'
+      - 'data/walters/nfl/matchup-stage2/week-01-shadow-input.json'
+      - 'tools/run-walters-matchup-m2.mjs'
+      - '.github/workflows/walters-matchup-m2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-matchup-m2-shadow
+  cancel-in-progress: false
+
+jobs:
+  shadow-screen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve active Graham week
+        run: node tools/graham-active-week.mjs --field week
+
+      - name: Run M2 all-game shadow screen
+        run: node tools/run-walters-matchup-m2.mjs
+
+      - name: Verify protected live artifacts are untouched
+        run: |
+          git diff --exit-code -- data/walters/nfl/2026/week-01-current-numbers.json
+          git diff --exit-code -- data/walters/nfl/2026/week-01-personnel-ledger.json
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Commit shadow artifacts
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/walters/nfl/matchup-stage2/week-01-shadow-screen.json data/walters/nfl/matchup-stage2/stage2-current.json
+          if git diff --cached --quiet; then
+            echo "M2 shadow artifacts unchanged"
+            exit 0
+          fi
+          git commit -m "Record Walters matchup M2 Week 1 shadow screen"
+          git push
