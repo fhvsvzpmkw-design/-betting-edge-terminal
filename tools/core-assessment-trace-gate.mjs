@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evaluate, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
+import { auditLiquidityReport, loadLiquidityPolicy } from './core-liquidity-classification.mjs';
 
 function fail(message) { throw new Error(message); }
 function assert(condition, message) { if (!condition) fail(message); }
@@ -72,6 +73,11 @@ export function auditReport(report, framework = loadProductionFramework()) {
     compareSetField(errors, i, 'reasons', assessment.reasons, actual.reasons);
   }
 
+  const liquidityPolicy = loadLiquidityPolicy();
+  for (const liquidityError of auditLiquidityReport(report, liquidityPolicy)) {
+    errors.push(`liquidity classification: ${liquidityError}`);
+  }
+
   return errors;
 }
 
@@ -90,6 +96,7 @@ function syntheticAssessment(framework, context) {
 
 function selfTest() {
   const framework = loadProductionFramework();
+  loadLiquidityPolicy();
   const panamaContext = {
     sport: 'Basketball',
     marketClass: 'moneyline',
@@ -124,6 +131,28 @@ function selfTest() {
   const allErrors = auditReport(twoBad, framework);
   assert(allErrors.some(error => error.startsWith('recommendation 1')), 'Aggregate audit must retain recommendation 1 defect');
   assert(allErrors.some(error => error.startsWith('recommendation 2')), 'Aggregate audit must retain recommendation 2 defect');
+
+  const mlbBase = {
+    sport: 'MLB',
+    marketClass: 'moneyline',
+    marketDetail: 'full_game_moneyline',
+    timing: 'pregame',
+    fairValueBasis: 'MARKET_ANCHORED_MODEL',
+    bookDispersion: 'NONE',
+    liquidityRisk: 'NORMAL',
+    tailRisk: 'NORMAL',
+    directCalibration: 'DIRECT',
+    personnelSensitivity: 'RESOLVED',
+    independentCurrentSupport: 'STRONG',
+    movementPrimaryEvidence: false,
+    historicalDirectionalRecalibrationPrimary: false,
+    graduatedResearchIds: []
+  };
+  const mlbNormal = { recs: [{ title: 'Synthetic MLB moneyline', status: 'PASS', coreAssessment: syntheticAssessment(framework, mlbBase) }] };
+  assert(auditReport(mlbNormal, framework).length === 0, 'Mainstream MLB full-game moneyline with NORMAL liquidity must pass');
+  const mlbThinContext = { ...mlbBase, liquidityRisk: 'THIN' };
+  const mlbThin = { recs: [{ title: 'Synthetic MLB moneyline', status: 'PASS', coreAssessment: syntheticAssessment(framework, mlbThinContext) }] };
+  assert(auditReport(mlbThin, framework).some(error => error.includes('mlb-primary-moneyline-normal')), 'Mainstream MLB full-game moneyline with THIN liquidity must fail');
 
   console.log('CORE ASSESSMENT TRACE SELF-TEST OK');
 }
