@@ -1,0 +1,80 @@
+name: Walters Matchup M4 Activation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/matchup-stage4/m4-production-contract-v1.json'
+      - 'data/walters/nfl/matchup-stage3/week-01-acceptance-result.json'
+      - 'data/walters/nfl/matchup-stage3/stage3-current.json'
+      - 'tools/run-walters-matchup-m4-activation.mjs'
+      - 'tools/apply-graham-matchup-production.mjs'
+      - '.github/workflows/graham-matchup-production.yml'
+      - '.github/workflows/walters-matchup-m4-activation.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-matchup-m4-activation
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify executable syntax and active week
+        run: |
+          node --check tools/run-walters-matchup-m4-activation.mjs
+          node --check tools/apply-graham-matchup-production.mjs
+          node --check tools/graham-active-week.mjs
+          node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Activate scoped M4 production authority
+        run: node tools/run-walters-matchup-m4-activation.mjs
+
+      - name: Verify activation did not mutate live Graham artifacts
+        run: |
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          git diff --exit-code -- "$ACTIVE_PERSONNEL"
+          git diff --exit-code -- "$ACTIVE_NUMBERS"
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Verify M4 manifest scope
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync('data/walters/nfl/matchup-production-current.json','utf8'));
+          if(p.state!=='OPERATIONAL_SCOPED'||p.productionAuthority!==true)throw new Error('M4 manifest not operational');
+          if(p.productionScope?.exactOneForOne?.enabled!==true||p.productionScope?.valueInvariantCommittee?.enabled!==true||p.productionScope?.zeroMatchupReview?.enabled!==true)throw new Error('accepted M4 scope missing');
+          if(p.productionScope?.rangeOnlyCommittee?.enabled!==false||p.productionScope?.multiroleInterval?.enabled!==false||p.productionScope?.nonzeroOpponentMatchupIncrement?.enabled!==false)throw new Error('blocked M4 scope unexpectedly enabled');
+          if(p.m5CatchupRequired!==true)throw new Error('M5 catch-up gate missing');
+          console.log('WALTERS MATCHUP M4 MANIFEST VERIFY: PASS');
+          NODE
+
+      - name: Commit M4 activation artifacts
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/walters/nfl/matchup-production-current.json data/walters/nfl/matchup-stage4/stage4-current.json
+          if git diff --cached --quiet; then
+            echo "M4 activation artifacts unchanged"
+            exit 0
+          fi
+          git commit -m "Activate scoped Walters matchup M4 production"
+          git push origin HEAD:main
