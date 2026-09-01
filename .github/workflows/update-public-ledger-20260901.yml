@@ -1,0 +1,132 @@
+name: Update public ledger 2026-09-01
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-public-ledger-20260901.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-public-ledger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply verified sanitized ledger delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          path = Path('data/ledger/public-ledger.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+
+          if data.get('schema') != 2 or data.get('publicProjection') is not True:
+              raise SystemExit('Unexpected public ledger contract')
+          wagers = data.get('wagers')
+          if not isinstance(wagers, list):
+              raise SystemExit('Public wagers missing')
+          if any((not isinstance(r, list)) or len(r) < 18 or r[2] is not None for r in wagers):
+              raise SystemExit('Public ledger privacy validation failed before update')
+          if len(wagers) not in (1627, 1632):
+              raise SystemExit(f'Unexpected starting public wager count: {len(wagers)}')
+
+          additions = [
+              [1628, 'Bet365', None, '2026-08-29 02:31:20+00', '2026-08-29 02:31:20+00', 'Baseball', 'MLB', 'BAL Orioles @ Athletics - BAL Orioles - Money Line', -109, 15, 'Won', 13.77, 'AFTER START', None, False, ['Oakland Athletics vs Baltimore Orioles'], ['BAL Orioles @ Athletics - BAL Orioles - Money Line'], '[]'],
+              [1629, 'Bet365', None, '2026-08-29 03:01:57+00', '2026-08-29 03:01:57+00', 'Basketball', 'WNBA', 'TOR Tempo @ LV Aces - TOR Tempo - Money Line', 700, 2, 'Lost', -2, 'AFTER START', -0.0434, False, ['Las Vegas Aces vs Toronto Tempo'], ['TOR Tempo @ LV Aces - TOR Tempo - Money Line'], '[]'],
+              [1630, 'Bet365', None, '2026-08-29 23:24:06+00', '2026-08-29 23:24:06+00', 'Boxing', '', 'Moses Itauma v Filip Hrgovic - Moses Itauma by KO, TKO or DQ - Fight Outcome', 120, 6.5, 'Lost', -6.5, 'AFTER START', None, False, [], ['Moses Itauma v Filip Hrgovic - Moses Itauma by KO, TKO or DQ - Fight Outcome'], '[]'],
+              [1631, 'Bet365', None, '2026-08-30 00:09:26+00', '2026-08-30 00:09:26+00', 'Football', 'NCAA Football', 'New Mexico State @ Florida State - New Mexico State +31.5 - Spread 2-Way', -115, 13, 'Won', 11.31, 'AFTER START', None, False, ['Florida State Seminoles vs New Mexico State Aggies'], ['New Mexico State @ Florida State - New Mexico State +31.5 - Spread 2-Way'], '[]'],
+              [1632, 'Bet365', None, '2026-08-30 02:28:50+00', '2026-08-30 02:28:50+00', 'Football', 'NCAA Football', 'Memphis @ UNLV - Memphis +4.5 - Spread', -105, 13, 'Won', 12.39, 'AFTER START', 0.0249, False, ['UNLV Rebels vs Memphis Tigers'], ['Memphis @ UNLV - Memphis +4.5 - Spread'], '[]']
+          ]
+
+          if len(wagers) == 1627:
+              expected_ids = list(range(1, 1628))
+              actual_ids = [int(r[0]) for r in wagers]
+              if actual_ids != expected_ids:
+                  raise SystemExit('Existing public surrogate IDs are not contiguous 1..1627')
+              if data.get('validation', {}).get('uniqueWagers') != 1627:
+                  raise SystemExit('Starting validation count is not 1627')
+              if data.get('summary', {}).get('resultMix') != {'Won': 638, 'Lost': 851, 'CashedOut': 133, 'Push': 2, 'Cancelled': 3}:
+                  raise SystemExit('Starting result mix does not match reconciled baseline')
+              if float(data.get('bankrollCad')) != 495.41:
+                  raise SystemExit('Starting bankroll does not match reconciled baseline')
+
+              # Guard against accidental duplicate public additions.
+              existing = {(r[3], r[7], r[8], r[9], r[10], r[11]) for r in wagers}
+              for r in additions:
+                  sig = (r[3], r[7], r[8], r[9], r[10], r[11])
+                  if sig in existing:
+                      raise SystemExit(f'Duplicate addition detected: {r[7]}')
+              wagers.extend(additions)
+          else:
+              if wagers[-5:] != additions:
+                  raise SystemExit('Existing 1632-wager public ledger has unexpected tail')
+
+          if len(wagers) != 1632:
+              raise SystemExit(f'Unexpected ending wager count: {len(wagers)}')
+          if any(r[2] is not None for r in wagers):
+              raise SystemExit('Sanitized public ledger contains a private reference')
+
+          data['generatedAt'] = datetime.now(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+          data['bankrollCad'] = 524.38
+          data['validation'] = {
+              'uniqueWagers': 1632,
+              'pagesAt10Rows': 164,
+              'status': 'PASS'
+          }
+          data['summary'] = {
+              'cashBets': 1519,
+              'cashRisked': 8970.87,
+              'cashProfit': 192.54,
+              'cashRoiPercent': 2.15,
+              'resultMix': {
+                  'Won': 641,
+                  'Lost': 853,
+                  'CashedOut': 133,
+                  'Push': 2,
+                  'Cancelled': 3
+              }
+          }
+
+          path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+          PY
+
+      - name: Validate and commit canonical public ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const j=JSON.parse(fs.readFileSync('data/ledger/public-ledger.json','utf8'));
+          if(j.schema!==2) throw new Error('schema must be 2');
+          if(j.publicProjection!==true) throw new Error('publicProjection must be true');
+          if(!Array.isArray(j.wagers) || j.wagers.length!==1632) throw new Error('expected 1632 wagers');
+          if(j.wagers.some(r=>!Array.isArray(r) || r.length<18 || r[2]!==null)) throw new Error('private reference leak');
+          if(Number(j.validation?.uniqueWagers)!==1632) throw new Error('validation count mismatch');
+          if(Number(j.validation?.pagesAt10Rows)!==164) throw new Error('pagination mismatch');
+          if(Number(j.bankrollCad)!==524.38) throw new Error('bankroll mismatch');
+          if(Number(j.summary?.cashBets)!==1519) throw new Error('cash bet count mismatch');
+          if(Number(j.summary?.cashRisked)!==8970.87) throw new Error('cash risk mismatch');
+          if(Number(j.summary?.cashProfit)!==192.54) throw new Error('cash profit mismatch');
+          if(Number(j.summary?.cashRoiPercent)!==2.15) throw new Error('cash ROI mismatch');
+          console.log('PUBLIC LEDGER UPDATE VALIDATION: PASS');
+          NODE
+          git config user.name 'betting-edge-public-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -- data/ledger/public-ledger.json
+          if git diff --cached --quiet; then
+            echo 'Canonical public ledger already matches Sep 1 projection.'
+            exit 0
+          fi
+          git commit -m 'ledger: publish sanitized Sep 1 public projection'
+          git push origin HEAD:main
