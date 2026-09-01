@@ -40,12 +40,16 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Verify active-week resolver and next-week path contract
+      - name: Verify active-week resolver and simulated next week
         run: |
           set -euo pipefail
           node --check tools/graham-active-week.mjs
           node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import os from 'node:os';
+          import path from 'node:path';
           import {resolveGrahamActiveWeek,grahamWeekPaths} from './tools/graham-active-week.mjs';
+
           const active=resolveGrahamActiveWeek();
           const nextWeek=active.week+1;
           const next=grahamWeekPaths(active.season,nextWeek);
@@ -60,8 +64,31 @@ jobs:
           for(const [key,value] of Object.entries(expected)){
             if(next.relative[key]!==value)throw new Error(`next-week path mismatch for ${key}: ${next.relative[key]} != ${value}`);
           }
-          if(next.week!==nextWeek||next.season!==active.season)throw new Error('next-week resolver arithmetic failed');
-          console.log(`GRAHAM WEEK RESOLVER TEST: PASS // ACTIVE ${active.season} W${active.weekToken} // PREVIEW ${next.season} W${next.weekToken}`);
+
+          // Full non-mutating rollover simulation: create a temporary repository
+          // root with an active Week N+1 manifest and the three required files,
+          // then require the same production resolver to accept it.
+          const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'graham-week-test-'));
+          try{
+            const nflDir=path.join(tmp,'data/walters/nfl');
+            const seasonDir=path.join(nflDir,String(active.season));
+            fs.mkdirSync(seasonDir,{recursive:true});
+            const manifest={schema:1,state:'ACTIVE',season:active.season,week:nextWeek,timezone:'America/Vancouver',authority:'GRAHAM_WEEK_ROLLOVER'};
+            fs.writeFileSync(path.join(nflDir,'active-week.json'),JSON.stringify(manifest,null,2)+'\n');
+            for(const key of ['currentNumbers','researchLedger','dailyMarketLedger']){
+              const rel=next.relative[key];
+              const file=path.join(tmp,rel);
+              fs.mkdirSync(path.dirname(file),{recursive:true});
+              fs.writeFileSync(file,JSON.stringify({schema:1,season:active.season,week:nextWeek},null,2)+'\n');
+            }
+            const simulated=resolveGrahamActiveWeek({root:tmp});
+            if(simulated.season!==active.season||simulated.week!==nextWeek)throw new Error('simulated next-week resolver returned wrong season/week');
+            if(simulated.paths.currentNumbers!==expected.currentNumbers||simulated.paths.dailyMarketLedger!==expected.dailyMarketLedger)throw new Error('simulated next-week resolver returned wrong paths');
+          } finally {
+            fs.rmSync(tmp,{recursive:true,force:true});
+          }
+
+          console.log(`GRAHAM WEEK RESOLVER TEST: PASS // ACTIVE ${active.season} W${active.weekToken} // SIMULATED ${next.season} W${next.weekToken}`);
           NODE
 
       - name: Rebuild and publish Graham terminal
@@ -119,7 +146,7 @@ jobs:
             echo
             echo "- Trigger: odds refresh or Graham research/personnel/active-week publication"
             echo "- Active week: ${ACTIVE:-unresolved}"
-            echo "- Active-week resolver regression: current + next-week path contract checked"
+            echo "- Active-week resolver regression: live week + simulated next week checked"
             echo "- External API calls: none"
             echo "- Live board: repository active NFL week"
             echo "- Graham fair: rebuilt immediately after governed Graham research changes"
