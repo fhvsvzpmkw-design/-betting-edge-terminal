@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "stage": "M3",
+  "state": "PASS_SCOPED_M4_CANDIDATE",
+  "season": 2026,
+  "week": 1,
+  "updatedAt": "2026-09-01T21:08:28.620Z",
+  "acceptanceId": "walters-nfl-matchup-m3-acceptance-v1",
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "m4ActivationCandidate": true,
+  "m4Scope": {
+    "exactOneForOne": true,
+    "valueInvariantCommittee": true,
+    "rangeOnlyCommittee": false,
+    "multiroleInterval": false,
+    "zeroMatchupReview": true,
+    "nonzeroOpponentMatchupIncrement": false,
+    "note": "Automated nonzero opponent-specific matchup increments remain disabled until a separate nonzero shadow calibration passes."
+  },
+  "resultPath": "data/walters/nfl/matchup-stage3/week-01-acceptance-result.json",
+  "summary": {
+    "archetypesTested": 4,
+    "acceptedArchetypes": 2,
+    "blockedArchetypes": 2,
+    "nonzeroOpponentMatchupSamples": 0,
+    "liveMoves": 0
+  },
+  "nextGate": [
+    "Build M4 production activation only for the accepted scoped classes.",
+    "Keep range-only committees and unresolved multi-role cases fail closed.",
+    "Keep automated nonzero opponent-specific matchup increments disabled until a separate nonzero shadow case passes acceptance.",
+    "After M4, perform the one-time active-week catch-up rebuild from current football evidence rather than copying shadow outputs."
+  ]
+}
