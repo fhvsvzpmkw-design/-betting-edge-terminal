@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "auditId": "walters-nfl-home-field-h2-validation-audit-v1",
+  "stage": "H2",
+  "season": 2026,
+  "week": 1,
+  "generatedAt": "2026-09-01T21:57:51.602050Z",
+  "marketViewed": false,
+  "sourceSnapshot": {
+    "provider": "nflverse",
+    "repository": "nflverse/nflverse-data",
+    "releaseTag": "schedules",
+    "asset": "games.csv",
+    "assetId": 540187709,
+    "browserDownloadUrl": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+    "assetUpdatedAt": "2026-09-01T21:46:52Z",
+    "assetSha256": "322fe330cbcf157ad15dc5494b12b85b842012c0328e1d04b51af924999f2715",
+    "filteredSnapshotPath": "data/walters/nfl/home-field/source/nflverse-schedules-hfa-snapshot-2026-09-01.csv",
+    "fieldWhitelist": [
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "home_team",
+      "away_team",
+      "home_score",
+      "away_score",
+      "location",
+      "stadium_id",
+      "stadium"
+    ],
+    "rowWindow": {
+      "minSeason": 2021,
+      "maxSeason": 2026,
+      "gameType": "REG"
+    },
+    "rule": "The full external asset must match the pinned SHA-256 before any field is read. Only whitelisted fields may be written to the durable H2 snapshot.",
+    "externalSha256": "322fe330cbcf157ad15dc5494b12b85b842012c0328e1d04b51af924999f2715",
+    "filteredSha256": "5c3f02dfe4357d8debfa95ed923a79a622fcaabfc9f098a1d71c10a45d277bc7",
+    "filteredRows": 1631,
+    "upstreamHeaderCount": 46,
+    "upstreamSourceFieldsIgnored": 35
+  },
+  "training": {
+    "seasons": [
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "games": 1087,
+    "domesticGames": 1068,
+    "neutralGames": 19,
+    "excluded": {},
+    "ridgeResidualSigma": 11.85,
+    "lockedPenalties": {
+      "teamSeasonStrength": 8.0,
+      "leagueHomeBaseline": 1e-06,
+      "seasonHomeDeviation": 64.0,
+      "teamVenueHomeDeviation": 96.0,
+      "validationTeamStrength": 8.0
+    },
+    "holdoutLeagueBaselineForecast": 2.067,
+    "baselineForecastSourceSeasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "baselineForecastSeasonDeviations": [
+      0.106,
+      0.512,
+      -0.254
+    ]
+  },
+  "validation": {
+    "seasons": [
+      2025
+    ],
+    "games": 272,
+    "excluded": {},
+    "leagueOnly": {
+      "domestic": {
+        "n": 265,
+        "meanError": 0.105,
+        "mae": 9.289,
+        "rmse": 11.645,
+        "absoluteMeanBias": 0.105
+      },
+      "neutral": {
+        "n": 7,
+        "meanError": -0.382,
+        "mae": 7.028,
+        "rmse": 10.758,
+        "absoluteMeanBias": 0.382
+      },
+      "unseenTeamVenueGames": 0
+    },
+    "candidateTeamVenue": {
+      "domestic": {
+        "n": 265,
+        "meanError": 0.101,
+        "mae": 9.305,
+        "rmse": 11.655,
+        "absoluteMeanBias": 0.101
+      },
+      "neutral": {
+        "n": 7,
+        "meanError": -0.382,
+        "mae": 7.028,
+        "rmse": 10.758,
+        "absoluteMeanBias": 0.382
+      },
+      "unseenTeamVenueGames": 0
+    },
+    "diagnosticGeneric1_5": {
+      "n": 265,
+      "meanError": 0.673,
+      "mae": 9.299,
+      "rmse": 11.664,
+      "absoluteMeanBias": 0.673
+    },
+    "diagnosticBookExample2_0": {
+      "n": 265,
+      "meanError": 0.173,
+      "mae": 9.289,
+      "rmse": 11.645,
+      "absoluteMeanBias": 0.173
+    },
+    "candidateMinusLeagueOnly": {
+      "domesticMae": 0.016,
+      "domesticRmse": 0.011,
+      "absoluteDomesticBias": -0.005
+    },
+    "checks": {
+      "minimumTrainingDomesticGames": true,
+      "minimumValidationDomesticGames": true,
+      "maeVsLeagueOnly": true,
+      "rmseVsLeagueOnly": true,
+      "biasVsLeagueOnly": true
+    },
+    "pass": true
+  },
+  "protectedArtifactSha256Before": {
+    "currentNumbers": "1aeae1df6731e26a6cc97238abc1821db1b28c96e220169c7997bab54f4e518d",
+    "personnelLedger": "66e501592c64cb8137c6e2b7facdeb92a2ad409e4db5c7e89922c9291d58ba41",
+    "powerRatings": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "playerValueRegistry": "43ce924df786e3d39ffc3b027cbd5f0bef4e1f8f171421da5ee257fffddda339"
+  },
+  "protectedArtifactSha256After": {
+    "currentNumbers": "1aeae1df6731e26a6cc97238abc1821db1b28c96e220169c7997bab54f4e518d",
+    "personnelLedger": "66e501592c64cb8137c6e2b7facdeb92a2ad409e4db5c7e89922c9291d58ba41",
+    "powerRatings": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "playerValueRegistry": "43ce924df786e3d39ffc3b027cbd5f0bef4e1f8f171421da5ee257fffddda339"
+  },
+  "finalRelease": {
+    "releasePath": "data/walters/nfl/home-field/home-field-release-2026-v1.json",
+    "leagueBaselineHomeAdvantagePoints": 2.082,
+    "teamVenueEstimateCount": 32,
+    "unresolvedVenueCount": 0,
+    "newVenueCount": 0
+  }
+}

@@ -1,0 +1,927 @@
+{
+  "schema": 1,
+  "releaseId": "walters-nfl-home-field-2026-v1",
+  "calibrationId": "walters-nfl-home-field-calibration-v1",
+  "h2Id": "walters-nfl-home-field-h2-v1",
+  "stage": "H2",
+  "state": "PASS_CURRENT_CALIBRATION_SHADOW_RELEASE",
+  "season": 2026,
+  "generatedAt": "2026-09-01T21:57:51.602050Z",
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "trainingSeasons": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "validationSeasons": [
+    2025
+  ],
+  "refitSeasons": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "sourceSnapshot": {
+    "provider": "nflverse",
+    "repository": "nflverse/nflverse-data",
+    "releaseTag": "schedules",
+    "asset": "games.csv",
+    "assetId": 540187709,
+    "browserDownloadUrl": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+    "assetUpdatedAt": "2026-09-01T21:46:52Z",
+    "assetSha256": "322fe330cbcf157ad15dc5494b12b85b842012c0328e1d04b51af924999f2715",
+    "filteredSnapshotPath": "data/walters/nfl/home-field/source/nflverse-schedules-hfa-snapshot-2026-09-01.csv",
+    "fieldWhitelist": [
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "home_team",
+      "away_team",
+      "home_score",
+      "away_score",
+      "location",
+      "stadium_id",
+      "stadium"
+    ],
+    "rowWindow": {
+      "minSeason": 2021,
+      "maxSeason": 2026,
+      "gameType": "REG"
+    },
+    "rule": "The full external asset must match the pinned SHA-256 before any field is read. Only whitelisted fields may be written to the durable H2 snapshot.",
+    "externalSha256": "322fe330cbcf157ad15dc5494b12b85b842012c0328e1d04b51af924999f2715",
+    "filteredSha256": "5c3f02dfe4357d8debfa95ed923a79a622fcaabfc9f098a1d71c10a45d277bc7",
+    "filteredRows": 1631,
+    "upstreamHeaderCount": 46,
+    "upstreamSourceFieldsIgnored": 35,
+    "filteredSnapshotSha256": "5c3f02dfe4357d8debfa95ed923a79a622fcaabfc9f098a1d71c10a45d277bc7"
+  },
+  "fieldWhitelist": [
+    "season",
+    "game_type",
+    "week",
+    "gameday",
+    "home_team",
+    "away_team",
+    "home_score",
+    "away_score",
+    "location",
+    "stadium_id",
+    "stadium"
+  ],
+  "model": {
+    "family": "RIDGE_PARTIAL_POOLING_TEAM_SEASON_PLUS_HOME_TEAM_VENUE",
+    "penalties": {
+      "teamSeasonStrength": 8.0,
+      "leagueHomeBaseline": 1e-06,
+      "seasonHomeDeviation": 64.0,
+      "teamVenueHomeDeviation": 96.0,
+      "validationTeamStrength": 8.0
+    },
+    "finalGames": 1359,
+    "finalDomesticGames": 1333,
+    "finalExcluded": {},
+    "finalResidualSigma": 11.801,
+    "2026BaselineSourceSeasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "2026BaselineSeasonDeviations": [
+      0.485,
+      -0.279,
+      0.107
+    ]
+  },
+  "leagueBaselineHomeAdvantagePoints": 2.082,
+  "teamVenueEstimates": [
+    {
+      "team": "ARI",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:PHO00",
+      "stadium": "State Farm Stadium",
+      "stadiumId": "PHO00",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": -0.739,
+      "homeLocationAdvantagePoints": 1.343,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "ATL",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:ATL97",
+      "stadium": "Mercedes-Benz Stadium",
+      "stadiumId": "ATL97",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": -0.433,
+      "homeLocationAdvantagePoints": 1.648,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "BAL",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:BAL00",
+      "stadium": "M&T Bank Stadium",
+      "stadiumId": "BAL00",
+      "sampleGames": 43,
+      "teamVenueDeviationPoints": 0.215,
+      "homeLocationAdvantagePoints": 2.297,
+      "uncertaintyPoints": 1.536
+    },
+    {
+      "team": "BUF",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:BUF00",
+      "stadium": "Highmark Stadium",
+      "stadiumId": "BUF00",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": 1.118,
+      "homeLocationAdvantagePoints": 3.2,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "CAR",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:CAR00",
+      "stadium": "Bank of America Stadium",
+      "stadiumId": "CAR00",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": -0.426,
+      "homeLocationAdvantagePoints": 1.655,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "CHI",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:CHI98",
+      "stadium": "Soldier Field",
+      "stadiumId": "CHI98",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": 0.389,
+      "homeLocationAdvantagePoints": 2.471,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "CIN",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:CIN00",
+      "stadium": "Paycor Stadium",
+      "stadiumId": "CIN00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.019,
+      "homeLocationAdvantagePoints": 2.101,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "CLE",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:CLE00",
+      "stadium": "Huntington Bank Field",
+      "stadiumId": "CLE00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.272,
+      "homeLocationAdvantagePoints": 2.354,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "DAL",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:DAL00",
+      "stadium": "AT&T Stadium",
+      "stadiumId": "DAL00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.459,
+      "homeLocationAdvantagePoints": 2.541,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "DEN",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:DEN00",
+      "stadium": "Empower Field at Mile High",
+      "stadiumId": "DEN00",
+      "sampleGames": 43,
+      "teamVenueDeviationPoints": 0.627,
+      "homeLocationAdvantagePoints": 2.709,
+      "uncertaintyPoints": 1.536
+    },
+    {
+      "team": "DET",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:DET00",
+      "stadium": "Ford Field",
+      "stadiumId": "DET00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.906,
+      "homeLocationAdvantagePoints": 2.988,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "GB",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:GNB00",
+      "stadium": "Lambeau Field",
+      "stadiumId": "GNB00",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": 0.645,
+      "homeLocationAdvantagePoints": 2.726,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "HOU",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:HOU00",
+      "stadium": "Reliant Stadium",
+      "stadiumId": "HOU00",
+      "sampleGames": 43,
+      "teamVenueDeviationPoints": -0.72,
+      "homeLocationAdvantagePoints": 1.362,
+      "uncertaintyPoints": 1.536
+    },
+    {
+      "team": "IND",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:IND00",
+      "stadium": "Lucas Oil Stadium",
+      "stadiumId": "IND00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.027,
+      "homeLocationAdvantagePoints": 2.055,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "JAX",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:JAX00",
+      "stadium": "EverBank Stadium",
+      "stadiumId": "JAX00",
+      "sampleGames": 38,
+      "teamVenueDeviationPoints": 0.185,
+      "homeLocationAdvantagePoints": 2.266,
+      "uncertaintyPoints": 1.606
+    },
+    {
+      "team": "KC",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:KAN00",
+      "stadium": "GEHA Field at Arrowhead Stadium",
+      "stadiumId": "KAN00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.652,
+      "homeLocationAdvantagePoints": 2.734,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "LAC",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:LAX01",
+      "stadium": "SoFi Stadium",
+      "stadiumId": "LAX01",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.061,
+      "homeLocationAdvantagePoints": 2.02,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "LAR",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:LAX01",
+      "stadium": "SoFi Stadium",
+      "stadiumId": "LAX01",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.13,
+      "homeLocationAdvantagePoints": 2.212,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "LV",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:VEG00",
+      "stadium": "Allegiant Stadium",
+      "stadiumId": "VEG00",
+      "sampleGames": 43,
+      "teamVenueDeviationPoints": -0.538,
+      "homeLocationAdvantagePoints": 1.544,
+      "uncertaintyPoints": 1.536
+    },
+    {
+      "team": "MIA",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:MIA00",
+      "stadium": "Hard Rock Stadium",
+      "stadiumId": "MIA00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.659,
+      "homeLocationAdvantagePoints": 2.74,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "MIN",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:MIN01",
+      "stadium": "U.S. Bank Stadium",
+      "stadiumId": "MIN01",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": 0.394,
+      "homeLocationAdvantagePoints": 2.476,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "NE",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:BOS00",
+      "stadium": "Gillette Stadium",
+      "stadiumId": "BOS00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.364,
+      "homeLocationAdvantagePoints": 1.717,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "NO",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:NOR00",
+      "stadium": "Caesars Superdome",
+      "stadiumId": "NOR00",
+      "sampleGames": 40,
+      "teamVenueDeviationPoints": -0.709,
+      "homeLocationAdvantagePoints": 1.372,
+      "uncertaintyPoints": 1.577
+    },
+    {
+      "team": "NYG",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:NYC01",
+      "stadium": "MetLife Stadium",
+      "stadiumId": "NYC01",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.792,
+      "homeLocationAdvantagePoints": 1.29,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "NYJ",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:NYC01",
+      "stadium": "MetLife Stadium",
+      "stadiumId": "NYC01",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.479,
+      "homeLocationAdvantagePoints": 1.603,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "PHI",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:PHI00",
+      "stadium": "Lincoln Financial Field",
+      "stadiumId": "PHI00",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": -0.066,
+      "homeLocationAdvantagePoints": 2.016,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "PIT",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:PIT00",
+      "stadium": "Acrisure Stadium",
+      "stadiumId": "PIT00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.093,
+      "homeLocationAdvantagePoints": 1.989,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "SEA",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:SEA00",
+      "stadium": "Lumen Field",
+      "stadiumId": "SEA00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.505,
+      "homeLocationAdvantagePoints": 1.576,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "SF",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:SFO01",
+      "stadium": "Levi's Stadium",
+      "stadiumId": "SFO01",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": 0.253,
+      "homeLocationAdvantagePoints": 2.334,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "TB",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:TAM00",
+      "stadium": "Raymond James Stadium",
+      "stadiumId": "TAM00",
+      "sampleGames": 41,
+      "teamVenueDeviationPoints": 0.034,
+      "homeLocationAdvantagePoints": 2.116,
+      "uncertaintyPoints": 1.563
+    },
+    {
+      "team": "TEN",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:NAS00",
+      "stadium": "Nissan Stadium",
+      "stadiumId": "NAS00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.093,
+      "homeLocationAdvantagePoints": 1.989,
+      "uncertaintyPoints": 1.55
+    },
+    {
+      "team": "WAS",
+      "venueStatus": "DOMESTIC_HOME",
+      "stadiumKey": "id:WAS00",
+      "stadium": "Northwest Stadium",
+      "stadiumId": "WAS00",
+      "sampleGames": 42,
+      "teamVenueDeviationPoints": -0.911,
+      "homeLocationAdvantagePoints": 1.171,
+      "uncertaintyPoints": 1.55
+    }
+  ],
+  "visitorRoadEstimates": [
+    {
+      "team": "ARI",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "ATL",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "BAL",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "BUF",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "CAR",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "CHI",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "CIN",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "CLE",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "DAL",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "DEN",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "DET",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "GB",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "HOU",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "IND",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "JAX",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "KC",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "LAC",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "LAR",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "LV",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "MIA",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "MIN",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "NE",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "NO",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "NYG",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "NYJ",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "PHI",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "PIT",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "SEA",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "SF",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "TB",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "TEN",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    },
+    {
+      "team": "WAS",
+      "roadDeviationPoints": 0,
+      "status": "NOT_IDENTIFIABLE_V1"
+    }
+  ],
+  "venueClassifications": [
+    {
+      "team": "ARI",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:PHO00",
+      "stadium": "State Farm Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "ATL",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:ATL97",
+      "stadium": "Mercedes-Benz Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "BAL",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:BAL00",
+      "stadium": "M&T Bank Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "BUF",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:BUF00",
+      "stadium": "Highmark Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "CAR",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:CAR00",
+      "stadium": "Bank of America Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "CHI",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:CHI98",
+      "stadium": "Soldier Field",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "CIN",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:CIN00",
+      "stadium": "Paycor Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "CLE",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:CLE00",
+      "stadium": "Huntington Bank Field",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "DAL",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:DAL00",
+      "stadium": "AT&T Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "DEN",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:DEN00",
+      "stadium": "Empower Field at Mile High",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "DET",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:DET00",
+      "stadium": "Ford Field",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "GB",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:GNB00",
+      "stadium": "Lambeau Field",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "HOU",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:HOU00",
+      "stadium": "Reliant Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "IND",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:IND00",
+      "stadium": "Lucas Oil Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "JAX",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:JAX00",
+      "stadium": "EverBank Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "KC",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:KAN00",
+      "stadium": "GEHA Field at Arrowhead Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "LAC",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:LAX01",
+      "stadium": "SoFi Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "LAR",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:LAX01",
+      "stadium": "SoFi Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "LV",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:VEG00",
+      "stadium": "Allegiant Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "MIA",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:MIA00",
+      "stadium": "Hard Rock Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "MIN",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:MIN01",
+      "stadium": "U.S. Bank Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "NE",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:BOS00",
+      "stadium": "Gillette Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "NO",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:NOR00",
+      "stadium": "Caesars Superdome",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "NYG",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:NYC01",
+      "stadium": "MetLife Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "NYJ",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:NYC01",
+      "stadium": "MetLife Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "PHI",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:PHI00",
+      "stadium": "Lincoln Financial Field",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "PIT",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:PIT00",
+      "stadium": "Acrisure Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "SEA",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:SEA00",
+      "stadium": "Lumen Field",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "SF",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:SFO01",
+      "stadium": "Levi's Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "TB",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:TAM00",
+      "stadium": "Raymond James Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "TEN",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:NAS00",
+      "stadium": "Nissan Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    },
+    {
+      "team": "WAS",
+      "classification": "DOMESTIC_HOME",
+      "stadiumKey": "id:WAS00",
+      "stadium": "Northwest Stadium",
+      "reason": "Known completed team/venue pair receives its locked ridge deviation."
+    }
+  ],
+  "uncertainty": {
+    "method": "SHRUNK_SAMPLE_HEURISTIC",
+    "formula": "max(0.25, residualSigma / sqrt(teamVenueTrainingGames + 16))",
+    "newVenueFloor": 0.75,
+    "residualSigma": 11.801
+  },
+  "validationMetrics": {
+    "seasons": [
+      2025
+    ],
+    "games": 272,
+    "excluded": {},
+    "leagueOnly": {
+      "domestic": {
+        "n": 265,
+        "meanError": 0.105,
+        "mae": 9.289,
+        "rmse": 11.645,
+        "absoluteMeanBias": 0.105
+      },
+      "neutral": {
+        "n": 7,
+        "meanError": -0.382,
+        "mae": 7.028,
+        "rmse": 10.758,
+        "absoluteMeanBias": 0.382
+      },
+      "unseenTeamVenueGames": 0
+    },
+    "candidateTeamVenue": {
+      "domestic": {
+        "n": 265,
+        "meanError": 0.101,
+        "mae": 9.305,
+        "rmse": 11.655,
+        "absoluteMeanBias": 0.101
+      },
+      "neutral": {
+        "n": 7,
+        "meanError": -0.382,
+        "mae": 7.028,
+        "rmse": 10.758,
+        "absoluteMeanBias": 0.382
+      },
+      "unseenTeamVenueGames": 0
+    },
+    "diagnosticGeneric1_5": {
+      "n": 265,
+      "meanError": 0.673,
+      "mae": 9.299,
+      "rmse": 11.664,
+      "absoluteMeanBias": 0.673
+    },
+    "diagnosticBookExample2_0": {
+      "n": 265,
+      "meanError": 0.173,
+      "mae": 9.289,
+      "rmse": 11.645,
+      "absoluteMeanBias": 0.173
+    },
+    "candidateMinusLeagueOnly": {
+      "domesticMae": 0.016,
+      "domesticRmse": 0.011,
+      "absoluteDomesticBias": -0.005
+    },
+    "checks": {
+      "minimumTrainingDomesticGames": true,
+      "minimumValidationDomesticGames": true,
+      "maeVsLeagueOnly": true,
+      "rmseVsLeagueOnly": true,
+      "biasVsLeagueOnly": true
+    },
+    "pass": true
+  },
+  "protectedArtifactSha256": {
+    "currentNumbers": "1aeae1df6731e26a6cc97238abc1821db1b28c96e220169c7997bab54f4e518d",
+    "personnelLedger": "66e501592c64cb8137c6e2b7facdeb92a2ad409e4db5c7e89922c9291d58ba41",
+    "powerRatings": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "playerValueRegistry": "43ce924df786e3d39ffc3b027cbd5f0bef4e1f8f171421da5ee257fffddda339"
+  },
+  "h3Authority": false,
+  "h3Rule": "H2 release is shadow-only. H3 must rebuild every active-week location term in shadow while preserving personnel/matchup overlays and carried ratings before any H4 production activation."
+}
