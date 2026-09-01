@@ -4,7 +4,7 @@
   "sport": "NFL",
   "season": 2026,
   "state": "ACTIVE",
-  "updatedAt": "2026-09-01T04:35:00Z",
+  "updatedAt": "2026-09-01T18:15:00Z",
   "purpose": "Declare durable non-market research inputs that Graham Mercer must consult during governed NFL information reviews without granting those sources automatic numeric authority over carried ratings or BW FAIR.",
   "governance": {
     "marketIndependenceRequired": true,
@@ -70,6 +70,32 @@
         "source consensus or disagreement by itself"
       ],
       "notes": "This is an update layer on VSiN 1.0, not a second Graham model. It provides reviewed current-information leads and provenance; the governing Walters package and explicit audited adjustment process remain the only path to a Graham numeric change."
+    },
+    {
+      "id": "ea-madden-nfl-27-player-ratings",
+      "publisher": "EA SPORTS",
+      "title": "Madden NFL 27 Player Ratings",
+      "version": "2026",
+      "role": "WALTERS_CALIBRATION_RANKING_INPUT",
+      "url": "https://www.ea.com/games/madden-nfl/ratings",
+      "calibration": "data/walters/nfl/personnel-calibration-v1.json",
+      "status": "ACTIVE",
+      "requiredUse": [
+        "Use only as a public player-ranking input for the governed Walters conversion layer when a material player's locked 2026 base value is not already stored.",
+        "Capture player, team, position, OVR, timestamp and source URL before converting the rating into point-spread-equivalent value.",
+        "Lock the first verified 2026 OVR under calibration v1; later Madden changes do not silently change the Graham player value.",
+        "Verify the actual current replacement from current roster/depth reporting before calculating an absence adjustment."
+      ],
+      "policy": {
+        "maySupplyPlayerRankingInput": true,
+        "mayBeConvertedByGovernedWaltersCalibration": true,
+        "mayMoveFairDirectly": false,
+        "mayMoveCarriedRatingDirectly": false,
+        "maySupplyExecutablePrice": false,
+        "mayCreateBet": false,
+        "marketDataProhibited": true
+      },
+      "notes": "Walters explicitly identifies Madden/ESPN player rankings as possible ranking inputs but requires conversion to point-spread-equivalent numerical values. This source is therefore subordinate to personnel-calibration-v1 and has no standalone numeric authority."
     }
   ]
 }
