@@ -28,6 +28,15 @@ for(const profile of roster){
   assert(liveText.includes("cache:'no-store'"),`${id}: live desk must bypass stale ledger cache`);
   continue;
  }
+ if(character?.authority?.mode==='graham-terminal-authoritative'){
+  assert(character.authority.source==='data/walters/nfl/current-week-terminal.json',`${id}: Graham terminal authority source mismatch`);
+  assert(character.authority.scope==='NFL_ONLY',`${id}: Graham derivative must remain NFL-only`);
+  assert(character.authority.bettingAuthority===false,`${id}: Jesse must not become betting authority`);
+  assert(liveText.includes("../../data/walters/nfl/current-week-terminal.json"),`${id}: live desk does not fetch the Graham terminal`);
+  assert(liveText.includes("cache:'no-store'"),`${id}: live desk must bypass stale Graham cache`);
+  assert(liveText.includes('ATTENTION_GAP=1.5'),`${id}: 1.5-point Graham attention guard missing`);
+  continue;
+ }
  const last=character?.continuity?.lastReportSeen;assert(last?.timestamp&&last?.label&&last?.slot,`${id}: continuity.lastReportSeen incomplete`);
  const date=last.timestamp.slice(0,10),m=String(last.label).match(/\b(\d{1,2}):(\d{2})\b/);assert(m,`${id}: cannot derive session from ${last.label}`);
  const session=`${m[1].padStart(2,'0')}${m[2]}`,root=path.posix.dirname(live),archive=`${root}/archive/${date}/${session}.html`,indexPath=`${root}/archive/index.json`;
@@ -38,4 +47,4 @@ for(const profile of roster){
  assert(fs.existsSync(issue.sourceReport),`${id}: authoritative source report missing ${issue.sourceReport}`);const report=readJson(issue.sourceReport);
  assert(report.ts===last.timestamp,`${id}: character continuity is not on authoritative report timestamp`);assert(report.slot===last.slot,`${id}: character continuity slot mismatch`);assert(report.label===last.label,`${id}: character continuity label mismatch`);
 }
-console.log('SYNDICATE HOTLINES OK // EDDIE=LIVE LEDGER AUTHORITY // REPORT HOTLINES=LIVE ARCHIVE CONTINUITY');
+console.log('SYNDICATE HOTLINES OK // SOURCE-SPECIFIC DESKS USE DECLARED AUTHORITY // REPORT HOTLINES=LIVE ARCHIVE CONTINUITY');
