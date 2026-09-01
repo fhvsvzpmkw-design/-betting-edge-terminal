@@ -36,6 +36,7 @@ jobs:
         run: |
           node tools/report-publication.mjs verify
           node tools/core-v14-publication-gate.mjs verify-history
+          node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
       - name: Extract staged candidate bundle
         run: |
           node <<'NODE'
@@ -57,12 +58,19 @@ jobs:
         run: |
           node tools/report-sidecar-contract.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
           node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Canonicalize official Pinnacle benchmark provenance
+        run: |
+          node tools/pinnacle-sharp-benchmark.mjs self-test
+          node tools/pinnacle-benchmark-publication-gate.mjs self-test
+          node tools/pinnacle-benchmark-publication-gate.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Validate complete Core assessment trace
         run: |
           node tools/core-assessment-trace-gate.mjs self-test
           node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
       - name: Enforce Core 1.4 production handicap and Walters authority
         run: node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Enforce official non-executable Pinnacle benchmark
+        run: node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Guard tracked selection continuity
         run: node tools/selection-continuity.mjs audit --report /tmp/report.json
       - name: Verify tracked non-spread book availability
@@ -88,7 +96,9 @@ jobs:
             git clean -f -- "$REPORT_PATH" "$SIDECAR_PATH"
             node tools/report-publication.mjs verify
             node tools/core-v14-publication-gate.mjs verify-history
+            node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
             node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
             node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
@@ -109,11 +119,14 @@ jobs:
       - name: Remote read-back gate
         env:
           REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
         run: |
           git fetch origin main
           git reset --hard origin/main
           node tools/report-publication.mjs verify --ts "$REPORT_TS"
           node tools/core-v14-publication-gate.mjs verify-history
+          node tools/pinnacle-benchmark-publication-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
       - name: Publication summary
         env:
           SHORT_ID: ${{ steps.bundle.outputs.short_id }}
@@ -129,6 +142,7 @@ jobs:
             echo "- Index: \`run-history.json\`"
             echo "- Preflight history: passed"
             echo "- Core gate: passed"
+            echo "- Pinnacle benchmark gate: passed (official, non-executable)"
             echo "- Read-back: passed"
             echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
           } >> "$GITHUB_STEP_SUMMARY"
