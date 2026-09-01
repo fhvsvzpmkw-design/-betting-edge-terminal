@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "auditId": "graham-walters-player-value-distribution-audit-v1",
+  "state": "FAIL_RECALIBRATION_REQUIRED",
+  "generatedAt": "2026-09-01T11:51:01-07:00",
+  "calibrationId": "walters-nfl-personnel-calibration-v1",
+  "sourceDataset": "madden27-normalized-2026-09-01.json",
+  "sourcePlayerCount": 2364,
+  "calibratedNflTeamPlayerCount": 2262,
+  "specialistReviewCount": 102,
+  "approvalCohort": {
+    "definition": "All current EA records assigned to an NFL team with a governed non-QB or QB calibration curve. No sportsbook or depth-chart information is used.",
+    "nonQb": {
+      "count": 2153,
+      "zeroCount": 903,
+      "nonZeroCount": 1250,
+      "nonZeroShare": 0.580585,
+      "meaningfulOver025Count": 352,
+      "meaningfulOver025Share": 0.163493,
+      "meanAll": 0.218207,
+      "meanNonZero": 0.37584,
+      "minimum": 0.0,
+      "maximum": 3.0,
+      "p50": 0.1,
+      "p75": 0.25,
+      "p90": 0.5,
+      "p95": 1.0,
+      "valueCounts": {
+        "0.0": 903,
+        "0.1": 538,
+        "0.25": 360,
+        "0.5": 178,
+        "1.0": 89,
+        "1.5": 57,
+        "2.0": 19,
+        "2.5": 5,
+        "3.0": 4
+      }
+    },
+    "qb": {
+      "count": 109,
+      "zeroCount": 0,
+      "nonZeroCount": 109,
+      "nonZeroShare": 1.0,
+      "meaningfulOver025Count": 109,
+      "meaningfulOver025Share": 1.0,
+      "meanAll": 6.862385,
+      "meanNonZero": 6.862385,
+      "minimum": 6.0,
+      "maximum": 9.5,
+      "p50": 6.5,
+      "p75": 7.0,
+      "p90": 8.5,
+      "p95": 9.0,
+      "valueCounts": {
+        "6.0": 35,
+        "6.5": 30,
+        "7.0": 17,
+        "7.5": 9,
+        "8.0": 5,
+        "8.5": 4,
+        "9.0": 6,
+        "9.5": 3
+      }
+    }
+  },
+  "diagnosticCohorts": {
+    "top53PerTeamByMaddenOvrNotRosterAuthority": {
+      "count": 1635,
+      "zeroCount": 385,
+      "nonZeroCount": 1250,
+      "nonZeroShare": 0.764526,
+      "meaningfulOver025Count": 352,
+      "meaningfulOver025Share": 0.215291,
+      "meanAll": 0.287339,
+      "meanNonZero": 0.37584,
+      "minimum": 0.0,
+      "maximum": 3.0,
+      "p50": 0.1,
+      "p75": 0.25,
+      "p90": 1.0,
+      "p95": 1.5,
+      "valueCounts": {
+        "0.0": 385,
+        "0.1": 538,
+        "0.25": 360,
+        "0.5": 178,
+        "1.0": 89,
+        "1.5": 57,
+        "2.0": 19,
+        "2.5": 5,
+        "3.0": 4
+      }
+    },
+    "top46PerTeamByMaddenOvrNotRosterAuthority": {
+      "count": 1420,
+      "zeroCount": 183,
+      "nonZeroCount": 1237,
+      "nonZeroShare": 0.871127,
+      "meaningfulOver025Count": 352,
+      "meaningfulOver025Share": 0.247887,
+      "meanAll": 0.32993,
+      "meanNonZero": 0.378739,
+      "minimum": 0.0,
+      "maximum": 3.0,
+      "p50": 0.25,
+      "p75": 0.25,
+      "p90": 1.0,
+      "p95": 1.5,
+      "valueCounts": {
+        "0.0": 183,
+        "0.1": 525,
+        "0.25": 360,
+        "0.5": 178,
+        "1.0": 89,
+        "1.5": 57,
+        "2.0": 19,
+        "2.5": 5,
+        "3.0": 4
+      }
+    }
+  },
+  "waltersReferenceTargets": {
+    "nonQbNonZeroAverage": 0.63,
+    "nonQbBestTypicalRange": [
+      2.5,
+      3.0
+    ],
+    "nonQbApproxNonZeroShare": 0.6,
+    "nonQbApproxMeaningfulOver025Share": 0.38,
+    "qbMinimum": 6.0,
+    "qbMaximum": 9.5,
+    "qbAverage": 7.74
+  },
+  "checks": [
+    {
+      "id": "NON_QB_NONZERO_SHARE",
+      "actual": 0.580585,
+      "expected": [
+        0.55,
+        0.65
+      ],
+      "pass": true
+    },
+    {
+      "id": "NON_QB_MEANINGFUL_SHARE",
+      "actual": 0.163493,
+      "expected": [
+        0.32,
+        0.43
+      ],
+      "pass": false
+    },
+    {
+      "id": "NON_QB_NONZERO_AVERAGE",
+      "actual": 0.37584,
+      "expected": [
+        0.55,
+        0.75
+      ],
+      "pass": false
+    },
+    {
+      "id": "NON_QB_ELITE_CEILING",
+      "actual": 3.0,
+      "expected": [
+        2.5,
+        3.0
+      ],
+      "pass": true
+    },
+    {
+      "id": "QB_MINIMUM",
+      "actual": 6.0,
+      "expected": 6.0,
+      "pass": true
+    },
+    {
+      "id": "QB_MAXIMUM",
+      "actual": 9.5,
+      "expected": 9.5,
+      "pass": true
+    },
+    {
+      "id": "QB_MEAN",
+      "actual": 6.862385,
+      "expected": [
+        7.4,
+        8.1
+      ],
+      "pass": false
+    }
+  ],
+  "pass": false,
+  "failureAction": "DO_NOT_ACTIVATE_PLAYER_VALUES; recalibrate conversion bands and rerun Stage 2.",
+  "marketViewed": false,
+  "contentSha256Canonical": "fe3855efee5f2a7f8e98d121a7e6df5dd23173cfeae125b8892f61d33a07fda0"
+}
