@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "productionId": "walters-nfl-home-field-production-v1",
+  "calibrationId": "walters-nfl-home-field-calibration-v1",
+  "stage": "H4",
+  "state": "READY_FOR_SCOPED_ACTIVATION",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Activate only the home-field scope accepted by H3 and H3V: the independently calibrated 2.082-point league domestic home advantage and explicit zero base home advantage for resolved neutral/international-neutral games. Team/stadium deviations remain shadow-only because their year-to-year survival was not sufficient for production authority.",
+  "dependsOn": {
+    "h1Contract": "data/walters/nfl/home-field/home-field-calibration-v1.json",
+    "h2Release": "data/walters/nfl/home-field/home-field-release-2026-v1.json",
+    "h2Current": "data/walters/nfl/home-field/h2-current.json",
+    "h3Result": "data/walters/nfl/home-field/h3-week-01-shadow-result.json",
+    "h3Current": "data/walters/nfl/home-field/h3-current.json",
+    "h3vResult": "data/walters/nfl/home-field/h3v-selective-venue-result-v1.json",
+    "h3vCurrent": "data/walters/nfl/home-field/h3v-current.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "acceptedProductionScope": {
+    "DOMESTIC_LEAGUE_BASELINE": {
+      "enabled": true,
+      "homeLocationAdvantagePoints": 2.082,
+      "pointsToHomeSpread": -2.082,
+      "rule": "For a governed DOMESTIC_HOME game, replace the provisional 1.5-point location term with the accepted 2.082 league baseline while preserving every non-location component exactly."
+    },
+    "NEUTRAL_ZERO_BASE": {
+      "enabled": true,
+      "homeLocationAdvantagePoints": 0,
+      "pointsToHomeSpread": 0,
+      "eligibleVenueClasses": [
+        "NEUTRAL",
+        "INTERNATIONAL_NEUTRAL"
+      ],
+      "rule": "Resolved neutral and international-neutral games carry zero base HFA. Travel, time zone, weather and other game factors remain separate layers."
+    }
+  },
+  "blockedProductionScope": {
+    "TEAM_VENUE_BLANKET": {
+      "enabled": false,
+      "failClosedCode": "FAIL_CLOSED_H4_TEAM_VENUE_NOT_ACCEPTED",
+      "reason": "H2 team/venue deviations did not equal or beat league-only HFA on both held-out MAE and RMSE."
+    },
+    "SELECTIVE_VENUE_ADJUSTMENTS": {
+      "enabled": false,
+      "failClosedCode": "FAIL_CLOSED_H4_SELECTIVE_VENUE_NOT_QUALIFIED",
+      "reason": "H3V survivalCoefficientK was 0.034 and zero venues qualified under the pre-2025 rolling rules."
+    },
+    "RELOCATED_OR_SHARED_UNRESOLVED": {
+      "enabled": false,
+      "failClosedCode": "FAIL_CLOSED_H4_VENUE_CLASS_UNRESOLVED"
+    }
+  },
+  "activationGates": {
+    "requiredH2State": "PASS_CURRENT_CALIBRATION_SHADOW_RELEASE",
+    "requiredH3State": "PASS_SHADOW_ACCEPTANCE_LEAGUE_BASELINE_H4_CANDIDATE_TEAM_VENUE_DIAGNOSTIC",
+    "requiredH3VState": "PASS_NO_SELECTIVE_VENUES_H4_LEAGUE_ONLY",
+    "requireH3LeagueBaselineCandidate": true,
+    "requireH3TeamVenueCandidate": false,
+    "requireH3VSelectiveVenueAdjustments": false,
+    "requireH3VQualifiedVenueCount": 0,
+    "requireMarketViewedFalse": true,
+    "requireActiveWeekAuthority": "GRAHAM_WEEK_ROLLOVER",
+    "requireEveryActiveGameClassifiedByH3": true,
+    "requireNoUnresolvedH3Games": true
+  },
+  "arithmetic": {
+    "homeSpreadConvention": "Positive HFA benefits the home team, so pointsToHomeSpread is negative.",
+    "recomputeFormula": "nonLocationExactFairHome = currentGrahamExactFairHome - currentLocationPointsToHomeSpread; newGrahamExactFairHome = nonLocationExactFairHome + governedH4LocationPointsToHomeSpread",
+    "precision": "Preserve the exact 2.082 location value and exact fair internally; display rounds to the ordinary nearest 0.5 point.",
+    "idempotency": "A game already marked with this productionId and the exact governed location term is not adjusted a second time."
+  },
+  "preservationRules": {
+    "personnelOverlay": "personnelOverlayPointsToHomeSpread must remain numerically unchanged. If personnelBaselineExactFairHome exists, recompute it only as new exact fair minus the unchanged personnel overlay so the stored decomposition remains internally consistent.",
+    "otherAdjustments": "Every non-HOME_FIELD/non-VENUE adjustment is preserved byte-for-field in the game adjustment list.",
+    "carriedRatings": "Never change data/walters/nfl-power-ratings-ledger.json.",
+    "playerValues": "Never change the Madden/Walters player-value registry.",
+    "personnelLedger": "Never change the active personnel ledger during H4 home-field activation.",
+    "gameFactors": "Rest, travel, time-zone, altitude, weather, surface, crowd/noise and other S/W-factor mechanisms receive no new numeric authority from H4.",
+    "market": "Pinnacle, Bet365, DraftKings and all market prices remain forbidden H4 inputs."
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "opening spread",
+      "closing spread",
+      "line movement",
+      "market-implied home advantage",
+      "ATS result",
+      "betting percentages",
+      "closing-line value"
+    ]
+  },
+  "outputs": {
+    "productionManifest": "data/walters/nfl/home-field/home-field-production-current.json",
+    "h4Current": "data/walters/nfl/home-field/h4-current.json",
+    "activeCurrentNumbers": "RESOLVE_FROM_ACTIVE_WEEK",
+    "activeResearchLedger": "RESOLVE_FROM_ACTIVE_WEEK"
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_H4_H2_NOT_ACCEPTED",
+    "FAIL_CLOSED_H4_H3_NOT_ACCEPTED",
+    "FAIL_CLOSED_H4_H3V_NOT_ACCEPTED",
+    "FAIL_CLOSED_H4_ACTIVE_WEEK_IDENTITY",
+    "FAIL_CLOSED_H4_GAME_IDENTITY",
+    "FAIL_CLOSED_H4_VENUE_CLASS_UNRESOLVED",
+    "FAIL_CLOSED_H4_LIVE_LOCATION_TERM_UNEXPECTED",
+    "FAIL_CLOSED_H4_TEAM_VENUE_NOT_ACCEPTED",
+    "FAIL_CLOSED_H4_SELECTIVE_VENUE_NOT_QUALIFIED",
+    "FAIL_CLOSED_H4_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_H4_PERSONNEL_OVERLAY_CHANGED",
+    "FAIL_CLOSED_H4_PROTECTED_ARTIFACT_CHANGED"
+  ]
+}
