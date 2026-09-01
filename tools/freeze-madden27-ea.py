@@ -9,6 +9,7 @@ import math
 import re
 import time
 import urllib.request
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -16,7 +17,7 @@ from zoneinfo import ZoneInfo
 EA_BASE = "https://www.ea.com"
 EA_RATINGS = f"{EA_BASE}/games/madden-nfl/ratings"
 THIRD_PARTY_CSV = "https://raw.githubusercontent.com/zachxwalton/madden-ratings-breakdown/main/scraper/output/madden27_ratings.csv"
-USER_AGENT = "BettingEdge-Madden27-Freezer/1.0 (+source-locked Walters research)"
+USER_AGENT = "BettingEdge-Madden27-Freezer/1.1 (+source-locked Walters research)"
 ROOT = Path("data/walters/nfl/madden27")
 
 TEAM_ABBR = {
@@ -26,20 +27,28 @@ TEAM_ABBR = {
     "Denver Broncos": "DEN", "Detroit Lions": "DET", "Green Bay Packers": "GB",
     "Houston Texans": "HOU", "Indianapolis Colts": "IND", "Jacksonville Jaguars": "JAX",
     "Kansas City Chiefs": "KC", "Las Vegas Raiders": "LV", "Los Angeles Chargers": "LAC",
-    "Los Angeles Rams": "LAR", "Miami Dolphins": "MIA", "Minnesota Vikings": "MIN",
-    "New England Patriots": "NE", "New Orleans Saints": "NO", "New York Giants": "NYG",
+    "LA Chargers": "LAC", "Los Angeles Rams": "LAR", "LA Rams": "LAR",
+    "Miami Dolphins": "MIA", "Minnesota Vikings": "MIN", "New England Patriots": "NE",
+    "New Orleans Saints": "NO", "New York Giants": "NYG", "NY Giants": "NYG",
     "New York Jets": "NYJ", "NY Jets": "NYJ", "Philadelphia Eagles": "PHI",
     "Pittsburgh Steelers": "PIT", "San Francisco 49ers": "SF", "Seattle Seahawks": "SEA",
     "Tampa Bay Buccaneers": "TB", "Tennessee Titans": "TEN", "Washington Commanders": "WAS",
 }
+FREE_AGENT_LABELS = {"Free Agents", "Free Agent", "FA"}
 
 POSITION_MAP = {
     "QB": "QB", "HB": "RB", "RB": "RB", "FB": "FB", "WR": "WR", "TE": "TE",
     "LT": "LT", "LG": "LG", "C": "C", "RG": "RG", "RT": "RT",
     "LEDG": "EDGE", "REDG": "EDGE", "LE": "EDGE", "RE": "EDGE",
-    "DT": "DT", "NT": "NT", "LOLB": "OLB", "ROLB": "OLB", "OLB": "OLB",
-    "MLB": "MLB", "LB": "LB", "CB": "CB", "FS": "FS", "SS": "SS",
+    "DT": "DT", "NT": "NT",
+    "SAM": "OLB", "WILL": "OLB", "LOLB": "OLB", "ROLB": "OLB", "OLB": "OLB",
+    "MIKE": "MLB", "MLB": "MLB", "LB": "LB",
+    "CB": "CB", "FS": "FS", "SS": "SS",
     "K": "K", "P": "P", "LS": "LS",
+}
+CALIBRATION_POSITIONS = {
+    "QB", "RB", "FB", "WR", "TE", "LT", "LG", "C", "RG", "RT",
+    "EDGE", "DT", "NT", "OLB", "MLB", "LB", "CB", "FS", "SS",
 }
 
 
@@ -73,7 +82,7 @@ def fetch_ea_players() -> tuple[str, int, list[dict]]:
         time.sleep(0.20)
         payload = get_json(template.format(page=page))
         players.extend(payload["pageProps"]["ratingDetails"]["items"])
-    unique = {}
+    unique: dict[str, dict] = {}
     for player in players:
         pid = str(player.get("id", "")).strip()
         if not pid:
@@ -94,6 +103,15 @@ def normalize_player(player: dict) -> dict:
     team = player.get("team") or {}
     team_name = str(team.get("label") or "").strip()
     raw_position = str((player.get("position") or {}).get("id") or "").upper().strip()
+    team_abbr = TEAM_ABBR.get(team_name)
+    if team_abbr:
+        team_status = "NFL_TEAM"
+    elif not team_name or team_name in FREE_AGENT_LABELS or "free agent" in team_name.lower():
+        team_status = "FREE_AGENT"
+    else:
+        team_status = "OTHER"
+    canonical_position = POSITION_MAP.get(raw_position, "UNKNOWN")
+
     abilities = []
     for ability in player.get("playerAbilities") or []:
         abilities.append({
@@ -103,8 +121,6 @@ def normalize_player(player: dict) -> dict:
     stats = {str(k): value_of(v) for k, v in (player.get("stats") or {}).items()}
     first = str(player.get("firstName") or "").strip()
     last = str(player.get("lastName") or "").strip()
-    team_abbr = TEAM_ABBR.get(team_name)
-    canonical_position = POSITION_MAP.get(raw_position, raw_position or "UNKNOWN")
     return {
         "eaPlayerId": str(player.get("id")),
         "firstName": first,
@@ -112,10 +128,10 @@ def normalize_player(player: dict) -> dict:
         "fullName": f"{first} {last}".strip(),
         "teamName": team_name or None,
         "teamAbbr": team_abbr,
-        "teamStatus": "NFL_TEAM" if team_abbr else ("FREE_AGENT" if not team_name or "free" in team_name.lower() else "OTHER"),
+        "teamStatus": team_status,
         "rawPosition": raw_position or None,
         "position": canonical_position,
-        "personnelCalibrationEligible": canonical_position not in {"K", "P", "LS", "UNKNOWN"},
+        "personnelCalibrationEligible": canonical_position in CALIBRATION_POSITIONS,
         "overall": player.get("overallRating"),
         "age": player.get("age"),
         "heightInches": player.get("height"),
@@ -132,16 +148,38 @@ def normalize_player(player: dict) -> dict:
     }
 
 
+def normalization_audit(players: list[dict]) -> dict:
+    unmapped_teams = Counter((p.get("teamName") or "<blank>") for p in players if p.get("teamStatus") == "OTHER")
+    unmapped_positions = Counter((p.get("rawPosition") or "<blank>") for p in players if p.get("position") == "UNKNOWN")
+    team_status = Counter(p.get("teamStatus") for p in players)
+    positions = Counter(p.get("position") for p in players)
+    raw_positions = Counter(p.get("rawPosition") or "<blank>" for p in players)
+    return {
+        "status": "PASS" if not unmapped_teams and not unmapped_positions else "REVIEW_REQUIRED",
+        "unmappedTeamPlayerCount": sum(unmapped_teams.values()),
+        "unmappedTeams": dict(sorted(unmapped_teams.items())),
+        "unmappedPositionPlayerCount": sum(unmapped_positions.values()),
+        "unmappedPositions": dict(sorted(unmapped_positions.items())),
+        "teamStatusCounts": dict(sorted(team_status.items())),
+        "canonicalPositionCounts": dict(sorted(positions.items())),
+        "rawPositionCounts": dict(sorted(raw_positions.items())),
+        "calibrationEligibleCount": sum(1 for p in players if p.get("personnelCalibrationEligible")),
+        "specialistOrUnsupportedCount": sum(1 for p in players if not p.get("personnelCalibrationEligible")),
+    }
+
+
 def reconcile_with_public_snapshot(official_players: list[dict]) -> dict:
     official = {str(p.get("id")): p for p in official_players}
     try:
         text = get_bytes(THIRD_PARTY_CSV).decode("utf-8")
         rows = list(csv.DictReader(io.StringIO(text)))
         third = {str(r.get("player_id", "")).strip(): r for r in rows if str(r.get("player_id", "")).strip()}
-        official_only = sorted(set(official) - set(third), key=lambda x: int(x) if x.isdigit() else x)
-        third_only = sorted(set(third) - set(official), key=lambda x: int(x) if x.isdigit() else x)
+        official_ids, third_ids = set(official), set(third)
+        shared = official_ids & third_ids
+        official_only = sorted(official_ids - third_ids, key=lambda x: int(x) if x.isdigit() else x)
+        third_only = sorted(third_ids - official_ids, key=lambda x: int(x) if x.isdigit() else x)
         overall_changes = []
-        for pid in sorted(set(official) & set(third), key=lambda x: int(x) if x.isdigit() else x):
+        for pid in sorted(shared, key=lambda x: int(x) if x.isdigit() else x):
             old = str(third[pid].get("overall", "")).strip()
             new = str(official[pid].get("overallRating", "")).strip()
             if old and new and old != new:
@@ -163,13 +201,19 @@ def reconcile_with_public_snapshot(official_players: list[dict]) -> dict:
             "sourceUrl": THIRD_PARTY_CSV,
             "publicSnapshotCount": len(third),
             "officialCurrentCount": len(official),
+            "netPlayerCountDifferenceOfficialMinusPublic": len(official) - len(third),
+            "sharedEaPlayerIdCount": len(shared),
+            "officialOnlyCount": len(official_only),
+            "publicSnapshotOnlyCount": len(third_only),
+            "populationChurnBeyondNetCount": bool(official_only or third_only),
             "officialOnly": [describe_official(pid) for pid in official_only],
             "publicSnapshotOnly": [describe_third(pid) for pid in third_only],
             "overallChangeCount": len(overall_changes),
             "overallChanges": overall_changes,
+            "interpretation": "The net count difference is not treated as a one-player identity discrepancy when official-only/public-only populations are non-zero. Current EA is authoritative; the public snapshot is comparison evidence only.",
         }
     except Exception as exc:
-        return {"status": "COMPARISON_FAILED_NON_BLOCKING", "sourceUrl": THIRD_PARTY_CSV, "error": f"{type(exc).__name__}: {exc}"}
+        return {"status": "COMPARISON_FAILED_NON_BLOCKING", "sourceUrl": THIRD_PARTY_CSV, "officialCurrentCount": len(official), "error": f"{type(exc).__name__}: {exc}"}
 
 
 def sha256_json(obj) -> str:
@@ -190,6 +234,7 @@ def main() -> None:
     normalized_players = [normalize_player(p) for p in players]
     normalized_players.sort(key=lambda p: int(p["eaPlayerId"]) if str(p["eaPlayerId"]).isdigit() else str(p["eaPlayerId"]))
     raw_players = sorted(players, key=lambda p: int(p.get("id")) if str(p.get("id", "")).isdigit() else str(p.get("id", "")))
+    audit = normalization_audit(normalized_players)
     reconciliation = reconcile_with_public_snapshot(players)
 
     raw_name = f"ea-madden27-raw-{date_key}.json"
@@ -224,6 +269,7 @@ def main() -> None:
             "specialistsRetainedButCalibrationIneligible": True,
             "maddenValuesNotYetConvertedToWaltersPoints": True,
         },
+        "normalizationAudit": audit,
         "players": normalized_players,
     }
     reconciliation_doc = {
@@ -255,6 +301,9 @@ def main() -> None:
         "rawPath": raw_name,
         "normalizedPath": normalized_name,
         "reconciliationPath": reconciliation_name,
+        "normalizationAuditStatus": audit["status"],
+        "unmappedTeamPlayerCount": audit["unmappedTeamPlayerCount"],
+        "unmappedPositionPlayerCount": audit["unmappedPositionPlayerCount"],
         "rawCanonicalSha256": raw_sha,
         "normalizedCanonicalSha256": normalized_sha,
         "stage2Authority": False,
@@ -262,7 +311,8 @@ def main() -> None:
     }
     write_json(ROOT / "madden27-current.json", current)
     print(f"MADDEN 27 EA FREEZE COMPLETE // {total} OFFICIAL PLAYERS // {captured_at}")
-    print(f"RECONCILIATION // {reconciliation.get('status')} // PUBLIC COUNT {reconciliation.get('publicSnapshotCount','n/a')}")
+    print(f"NORMALIZATION // {audit['status']} // UNMAPPED TEAMS {audit['unmappedTeamPlayerCount']} // UNMAPPED POSITIONS {audit['unmappedPositionPlayerCount']}")
+    print(f"RECONCILIATION // {reconciliation.get('status')} // PUBLIC COUNT {reconciliation.get('publicSnapshotCount','n/a')} // OFFICIAL ONLY {reconciliation.get('officialOnlyCount','n/a')} // PUBLIC ONLY {reconciliation.get('publicSnapshotOnlyCount','n/a')}")
 
 
 if __name__ == "__main__":
