@@ -24,6 +24,7 @@ jobs:
             s=s.replace(/function W\(r,scale\)/g,'function W(r)');
             s=s.replace(/risk:\(\+r\[9\]\|\|0\)\*scale/g,'risk:(+r[9]||0)');
             s=s.replace(/p:\(\+r\[11\]\|\|0\)\*scale/g,'p:(+r[11]||0)');
+            s=s.replace(/phase:String\(r\[12\]\|\|''\),legs:/g,"phase:String(r[12]||''),boosted:!!r[14],legs:");
             s=s.replace(/rawUnit=bankroll\*UNIT_RATE,scale=rawUnit>0\?TARGET_UNIT\/rawUnit:1,/g,'');
             s=s.replace(/\.map\(r=>W\(r,scale\)\)/g,'.map(r=>W(r))');
             s=s.replace(/\(\+j\.summary\?\.cashProfit\|\|0\)\*scale/g,'(+j.summary?.cashProfit||0)');
@@ -40,6 +41,7 @@ jobs:
             const found=bad.filter(x=>s.includes(x));
             if(found.length) throw new Error(`${p}: residual scaling tokens: ${found.join(', ')}`);
             if(!s.includes("const URL='/api/bet-history'")) throw new Error(`${p}: canonical public endpoint missing`);
+            if(!s.includes('boosted:!!r[14]')) throw new Error(`${p}: boosted marker missing`);
             fs.writeFileSync(p,s);
           }
           const profilePath='data/characters/eddie-numbers.json';
@@ -54,6 +56,7 @@ jobs:
           node tests/ledger-funding-layer.test.mjs
           node tests/muddy-ledger-desk.test.mjs
           grep -q "const URL='/api/bet-history'" syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'boosted:!!r\[14\]' syndicates/generated/eddie-numbers/hotline.html
           ! grep -q 'UNIT_RATE\|TARGET_UNIT\|W(r,scale)\|bankroll\*scale\|active unit is \$100\|\$100-unit normalized' syndicates/generated/eddie-numbers/hotline.html
       - name: Commit corrected page
         run: |
