@@ -1,29 +1,30 @@
 {
   "schema": 1,
-  "stage": "M2D",
-  "state": "SHADOW_MINNESOTA_MATCHUP_DISPLAY_INVARIANT",
+  "stage": "M2E",
+  "state": "SHADOW_RECEIVER_COMMITTEE_EXACT_MATCHUP_ZERO_LIVE_UNCHANGED",
   "season": 2026,
   "week": 1,
-  "updatedAt": "2026-09-01T20:46:28.324Z",
+  "updatedAt": "2026-09-01T20:54:32.871Z",
   "productionAuthority": false,
   "liveBoardMutationAllowed": false,
   "marketViewed": false,
-  "calibrationId": "walters-nfl-matchup-calibration-v1",
-  "committeeResultPath": "data/walters/nfl/matchup-stage2/week-01-committee-jacobs-result.json",
-  "minnesotaInputPath": "data/walters/nfl/matchup-stage2/week-01-committee-jacobs-minnesota-input.json",
-  "minnesotaResultPath": "data/walters/nfl/matchup-stage2/week-01-committee-jacobs-minnesota-result.json",
+  "committeeCalibrationId": "walters-nfl-committee-replacement-calibration-v2",
+  "matchupCalibrationId": "walters-nfl-matchup-calibration-v1",
+  "pearsallInputPath": "data/walters/nfl/matchup-stage2/week-01-pearsall-rams-input.json",
+  "pearsallResultPath": "data/walters/nfl/matchup-stage2/week-01-pearsall-rams-result.json",
   "summary": {
-    "committeeLossMin": 1.5,
-    "committeeLossMax": 1.7,
-    "matchupIncrementMin": 0,
-    "matchupIncrementMax": 0,
-    "displayInvariant": true,
-    "displayValue": 0,
+    "healthyValue": 0.9,
+    "effectiveReplacementValue": 0.5,
+    "teamLoss": 0.4,
+    "matchupIncrement": 0,
+    "liveDisplay": -2,
+    "shadowDisplay": -2.5,
+    "shadowDisplayMove": -0.5,
     "liveMoves": 0
   },
   "nextGate": [
-    "Keep the Jacobs/Minnesota case shadow-only until committee workload evidence resolves or production acceptance is approved.",
-    "Reopen on listed Green Bay or Minnesota football triggers only; do not use market movement as evidence.",
-    "Continue additional committee and matchup shadow cases before production activation."
+    "Treat the Pearsall result as the first nonzero shadow display effect; do not mutate the live board.",
+    "Run a defensive multi-role shadow case to test role decomposition and double-count controls.",
+    "After at least one defensive multi-role case, build the M3 acceptance gate for possible production activation."
   ]
 }
