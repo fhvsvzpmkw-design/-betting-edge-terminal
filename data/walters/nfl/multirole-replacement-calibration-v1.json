@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-multirole-replacement-calibration-v1",
+  "stage": "M2F",
+  "state": "SHADOW_ONLY",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Govern shadow evaluation of an unavailable player whose normal football responsibilities are redistributed across multiple positions or role families, without inventing role shares, summing overlapping full-player values, or mutating live Graham numbers.",
+  "dependsOn": {
+    "committeeCalibrationV2": "data/walters/nfl/committee-replacement-calibration-v2.json",
+    "personnelCalibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "matchupCalibration": "data/walters/nfl/matchup-calibration-v1.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "governingRules": [
+    "The unavailable player's governed healthy value remains unchanged and is counted once.",
+    "A multi-role case must identify the football role families actually redistributed by current team evidence.",
+    "Do not split the unavailable player's Walters value into edge, coverage, run-defense, blitz or other role percentages unless explicit governed role-share calibration exists.",
+    "Do not add the full Walters values of several replacement players together to replace one player's value.",
+    "Players already carrying independent baseline responsibilities may be listed as role absorbers but their full value may not automatically be credited again as replacement value.",
+    "When current evidence supports several plausible role absorbers with different locked Walters values and no exact role-share/cascade mapping, use a conservative replacement-value envelope rather than a midpoint.",
+    "The envelope is a shadow uncertainty interval only. If it crosses more than one half-point Graham display bucket, fail closed and authorize no live move.",
+    "A separate opponent-specific matchup review may be performed, but it may not resolve an otherwise unresolved base replacement interval by reference to narrative alone.",
+    "A separate concurrent absence such as suspension or injury must not be folded into this case unless it has its own governed personnel event; avoid double counting.",
+    "Market lines, prices, movement and betting percentages are forbidden inputs."
+  ],
+  "roleFamilyPolicy": {
+    "allowedExamples": [
+      "EDGE_PASS_RUSH_RUN_EDGE",
+      "OFFBALL_COVERAGE_BLITZ",
+      "PROTECTION_COMMUNICATION",
+      "SLOT_OUTSIDE_COVERAGE"
+    ],
+    "rule": "Role families describe mechanics only; they do not receive arbitrary numerical weights."
+  },
+  "shadowMath": {
+    "replacementEnvelope": "replacementValueMin = minimum locked value among verified incremental role absorbers; replacementValueMax = maximum plausible replacement credit after double-count review.",
+    "teamLossEnvelope": "teamLossMin = healthyValue - replacementValueMax; teamLossMax = healthyValue - replacementValueMin.",
+    "awaySign": "pointsToHomeSpread = -teamLoss for an unavailable away-team player.",
+    "homeSign": "pointsToHomeSpread = +teamLoss for an unavailable home-team player.",
+    "displayRounding": 0.5,
+    "displayInvariantGate": "Both ends of the shadow exact fair interval must round to the same display number before an interval-derived display can be considered resolved in shadow."
+  },
+  "doubleCountGuard": {
+    "baselineContributor": "Do not give full replacement credit to a player already counted in an independent role unless a distinct incremental role is established.",
+    "vacatedRoleCascade": "If an existing starter shifts to cover the missing player, the role that starter vacates must be resolved before treating the shift as full replacement credit.",
+    "concurrentAbsence": "A second unavailable player remains a separate personnel event and may not be embedded in the first player's replacement value.",
+    "cluster": "Do not apply a cluster multiplier unless the existing governed cluster trigger independently passes.",
+    "matchup": "Opponent-specific matchup effects are downstream of the personnel interval and may not restate the same loss."
+  },
+  "acceptance": {
+    "productionUse": false,
+    "exactRoleSharesRequiredForExactReplacementValue": true,
+    "intervalAllowedForShadow": true,
+    "displayInvariantIntervalMayAdvance": true,
+    "displayNonInvariantIntervalMustFailClosed": true
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_MULTIROLE_ROLE_SHARE_UNRESOLVED",
+    "FAIL_CLOSED_MULTIROLE_BASELINE_DOUBLE_COUNT",
+    "FAIL_CLOSED_MULTIROLE_VACATED_ROLE_UNRESOLVED",
+    "FAIL_CLOSED_MULTIROLE_CONCURRENT_ABSENCE_DOUBLE_COUNT",
+    "FAIL_CLOSED_MULTIROLE_DISPLAY_NOT_INVARIANT",
+    "FAIL_CLOSED_MULTIROLE_MATCHUP_EVIDENCE_INSUFFICIENT",
+    "FAIL_CLOSED_MULTIROLE_MARKET_CONTAMINATION"
+  ]
+}
