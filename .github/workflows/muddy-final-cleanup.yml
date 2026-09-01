@@ -1,0 +1,58 @@
+name: Muddy Final Cleanup
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-final-cleanup.yml'
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply contained Muddy cleanup
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const paths=['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html'];
+          for(const p of paths){
+            let s=fs.readFileSync(p,'utf8');
+            s=s.replace('Eddie “Muddy” Numbers works the public ledger from the Las Vegas main sheet. Eddie “Muddy” Numbers works the sanitized public ledger in actual Canadian dollars.','Eddie “Muddy” Numbers works the sanitized public ledger from the Las Vegas main sheet in actual Canadian dollars.');
+            const src="const fundingMap=new Map((f.promotionalWagers||[]).map(r=>[+r[0],String(r[1]||'CASH')]));const fundingClass=id=>fundingMap.get(+id)||'CASH';";
+            const ext="const fundingRows=new Map((f.promotionalWagers||[]).map(r=>[+r[0],r]));const fundingClass=id=>String(fundingRows.get(+id)?.[1]||'CASH'),actualRisk=w=>{const r=fundingRows.get(+w.id);return r?Number(r[3]||0):Number(w.risk||0)};function capitalStats(a){let s={bets:a.length,risk:0,p:0,w:0,l:0,c:0};a.forEach(x=>{s.risk+=actualRisk(x);s.p+=x.p;if(x.result==='Won')s.w++;else if(x.result==='Lost')s.l++;else if(x.result==='CashedOut')s.c++});s.roi=s.risk?s.p/s.risk*100:0;s.avg=s.bets?s.risk/s.bets:0;return s}";
+            if(!s.includes(src)) throw new Error(p+' funding map pattern missing');
+            s=s.replace(src,ext);
+            const periodSrc="Wk=stats(week),OW=stats(oldW),Mo=stats(month),OM=stats(oldM);";
+            const periodExt="Wk=capitalStats(week),OW=capitalStats(oldW),Mo=capitalStats(month),OM=capitalStats(oldM);";
+            if(!s.includes(periodSrc)) throw new Error(p+' period stats pattern missing');
+            s=s.replace(periodSrc,periodExt);
+            const meterSrc="meter('win',(Mo.w+Mo.l)?Mo.w/(Mo.w+Mo.l)*100:0);meter('cash',Mo.bets?Mo.c/Mo.bets*100:0);";
+            const meterExt="const monthWins=month.filter(x=>x.result==='Won').length,monthLosses=month.filter(x=>x.result==='Lost').length,monthCashouts=month.filter(x=>x.result==='CashedOut').length;meter('win',(monthWins+monthLosses)?monthWins/(monthWins+monthLosses)*100:0);meter('cash',month.length?monthCashouts/month.length*100:0);";
+            if(!s.includes(meterSrc)) throw new Error(p+' meter pattern missing');
+            s=s.replace(meterSrc,meterExt);
+            s=s.replace('Month settled public-row risk placed before start.','Month actual-capital risk placed before start.');
+            s=s.replace('Month settled public-row risk recorded after start.','Month actual-capital risk recorded after start.');
+            s=s.replace('Month risk on multi-leg or labelled parlays.','Month actual-capital risk on multi-leg or labelled parlays.');
+            if(s.includes('muddy-funding-overlay')||s.includes('UNIT_RATE')||s.includes('TARGET_UNIT')||s.includes('bankroll*scale')) throw new Error(p+' forbidden legacy renderer/scaling found');
+            fs.writeFileSync(p,s);
+          }
+          NODE
+      - name: Verify contained cleanup
+        run: |
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          grep -q 'function capitalStats(a)' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'monthWins=month.filter' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'actualRisk=w=>' syndicates/generated/eddie-numbers/hotline.html
+          ! grep -q 'works the public ledger from the Las Vegas main sheet. Eddie' syndicates/generated/eddie-numbers/hotline.html
+          ! grep -q 'muddy-funding-overlay\|UNIT_RATE\|TARGET_UNIT\|bankroll\*scale' syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit contained cleanup
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: finalize meters and funding-aware periods'
+          git push origin main
