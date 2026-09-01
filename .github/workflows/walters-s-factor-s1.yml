@@ -1,0 +1,54 @@
+name: Walters S Factor S1 Contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/s-factors/s-factor-calibration-v1.json'
+      - 'tools/validate-walters-s-factor-s1.mjs'
+      - '.github/workflows/walters-s-factor-s1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walters-s-factor-s1
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify active Graham week
+        run: node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Validate S1 factor contract
+        run: |
+          node --check tools/validate-walters-s-factor-s1.mjs
+          node tools/validate-walters-s-factor-s1.mjs
+
+      - name: Verify S1 did not mutate governed production artifacts
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          git diff --exit-code -- "$ACTIVE_NUMBERS"
+          if [ -f "$ACTIVE_PERSONNEL" ]; then git diff --exit-code -- "$ACTIVE_PERSONNEL"; fi
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/home-field/home-field-production-current.json
+          git diff --exit-code -- data/walters/nfl/personnel-production-current.json
+          git diff --exit-code -- data/walters/nfl/matchup-production-current.json
+          echo "WALTERS S FACTOR S1 GOVERNED ARTIFACT GUARD: PASS"
