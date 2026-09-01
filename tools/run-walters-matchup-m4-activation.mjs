@@ -34,7 +34,7 @@ if(m3Current.state!=='PASS_SCOPED_M4_CANDIDATE'||m3Current.m4ActivationCandidate
 if(m3.m4Scope?.exactOneForOne!==true||m3.m4Scope?.valueInvariantCommittee!==true||m3.m4Scope?.rangeOnlyCommittee!==false||m3.m4Scope?.multiroleInterval!==false||m3.m4Scope?.zeroMatchupReview!==true||m3.m4Scope?.nonzeroOpponentMatchupIncrement!==false)fail('M3_SCOPE_CHANGED');
 if(baseProd.state!=='OPERATIONAL'||baseProd.productionAuthority!==true)fail('BASE_PERSONNEL_PRODUCTION_NOT_OPERATIONAL');
 for(const [name,obj] of [['matchup',matchup],['committee-v2',committee2],['multirole',multirole]])if(obj.marketViewed!==false)fail(`${name.toUpperCase()}_MARKET_CONTAMINATED`);
-if(ACTIVE.authority!=='GRAHAM_WEEK_ROLLOVER'||ACTIVE.state!=='ACTIVE')fail('ACTIVE_WEEK_AUTHORITY');
+if(ACTIVE.manifest?.authority!=='GRAHAM_WEEK_ROLLOVER'||ACTIVE.manifest?.state!=='ACTIVE')fail('ACTIVE_WEEK_AUTHORITY');
 
 const protectedBefore={
   currentNumbers:hash(ACTIVE.absolutePaths.currentNumbers),
@@ -68,7 +68,7 @@ const manifest={
     multiroleCalibration:path.relative(ROOT,MULTIROLE),
     playerValueRegistry:'data/walters/nfl/player-values/player-values-2026-v1.json'
   },
-  activeWeekAtActivation:{season:ACTIVE.season,week:ACTIVE.week,authority:ACTIVE.authority},
+  activeWeekAtActivation:{season:ACTIVE.season,week:ACTIVE.week,authority:ACTIVE.manifest.authority},
   productionScope:{
     exactOneForOne:{enabled:true,owner:baseProd.productionId,delegated:true,reapplyExistingLoss:false},
     valueInvariantCommittee:{enabled:true,owner:contract.productionId,exactValueRequired:true},
