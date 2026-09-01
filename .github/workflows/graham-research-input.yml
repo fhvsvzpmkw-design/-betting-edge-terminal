@@ -25,6 +25,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Verify source-locked personnel calibration
+        run: |
+          node tools/walters-personnel-calibration.mjs data/walters/nfl/personnel-calibration-v1.json
+          node --check tools/walters-personnel-calibration.mjs
+
       - name: Apply audited Graham research transaction
         run: |
           node tools/apply-graham-research-parts.mjs data/walters/nfl/current-research-input.json
@@ -39,12 +44,14 @@ jobs:
           const power=JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json','utf8'));
           const research=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-research-ledger.json','utf8'));
           const numbers=JSON.parse(fs.readFileSync('data/walters/nfl/2026/week-01-current-numbers.json','utf8'));
+          const calibration=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-calibration-v1.json','utf8'));
           if(input.marketViewed!==false) throw new Error('marketViewed must remain false');
+          if(calibration.status!=='ACTIVE_SOURCE_LOCKED_CALIBRATED') throw new Error('Walters personnel calibration not active');
           if(power.teams.length!==32) throw new Error('expected 32 power-rating teams');
           if(power.teams.some(t=>!Number.isFinite(Number(t.externalComparisons?.espnFpi?.rating)))) throw new Error('missing ESPN FPI capture');
           if(research.sweeps.at(-1)?.teamFindings?.length!==32) throw new Error('initial sweep missing team findings');
           if(numbers.games.length!==16||numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome)))) throw new Error('Week 1 Graham numbers incomplete');
-          console.log('GRAHAM INITIAL RESEARCH VERIFY: PASS // MARKET ISOLATION PRESERVED');
+          console.log('GRAHAM INITIAL RESEARCH VERIFY: PASS // MARKET ISOLATION + PERSONNEL CALIBRATION PRESERVED');
           NODE
 
       - name: Publish Graham research outputs
