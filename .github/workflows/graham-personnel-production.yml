@@ -1,0 +1,77 @@
+name: Graham personnel production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/walters/nfl/personnel-staging.json
+      - data/walters/nfl/personnel-production-current.json
+      - tools/apply-graham-personnel-staging.mjs
+  workflow_dispatch:
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify production contract and calculator syntax
+        run: |
+          node --check tools/apply-graham-personnel-staging.mjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const prod=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-production-current.json','utf8'));
+          const s2=JSON.parse(fs.readFileSync('data/walters/nfl/player-values/stage2-current.json','utf8'));
+          const s3=JSON.parse(fs.readFileSync('data/walters/nfl/stage3/stage3-current.json','utf8'));
+          if(prod.state!=='OPERATIONAL'||prod.productionAuthority!==true)throw new Error('production contract not operational');
+          if(s2.auditPass!==true)throw new Error('Stage 2 audit not passed');
+          if(s3.acceptancePass!==true)throw new Error('Stage 3 acceptance not passed');
+          console.log('GRAHAM PERSONNEL PRODUCTION PREFLIGHT: PASS');
+          NODE
+
+      - name: Apply governed personnel staging batch
+        if: ${{ hashFiles('data/walters/nfl/personnel-staging.json') != '' }}
+        run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json
+
+      - name: Verify market isolation and live outputs
+        if: ${{ hashFiles('data/walters/nfl/personnel-staging.json') != '' }}
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const s=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
+          const week=String(Number(s.week)).padStart(2,'0');
+          const ledger=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-personnel-ledger.json`,'utf8'));
+          const numbers=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-current-numbers.json`,'utf8'));
+          const research=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-research-ledger.json`,'utf8'));
+          if(s.marketViewed!==false||ledger.marketViewed!==false||numbers.personnelProduction?.marketViewed!==false)throw new Error('market isolation failed');
+          if(!ledger.processedBatchIds.includes(s.batchId))throw new Error('batch not durable');
+          if(research.sweeps.at(-1)?.summary?.marketViewed!==false)throw new Error('research market isolation failed');
+          if(numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))throw new Error('invalid fair number');
+          console.log(`GRAHAM PERSONNEL PRODUCTION VERIFY: PASS // ${s.batchId}`);
+          NODE
+
+      - name: Publish governed personnel outputs
+        if: ${{ hashFiles('data/walters/nfl/personnel-staging.json') != '' }}
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/walters/nfl/2026/week-*-personnel-ledger.json data/walters/nfl/2026/week-*-research-ledger.json data/walters/nfl/2026/week-*-current-numbers.json
+          if git diff --cached --quiet; then
+            echo "No new personnel production outputs to publish."
+            exit 0
+          fi
+          git commit -m "Apply Graham governed personnel batch"
+          git push origin HEAD:main
