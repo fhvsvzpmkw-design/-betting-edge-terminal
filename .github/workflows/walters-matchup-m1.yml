@@ -1,0 +1,24 @@
+name: Walters Matchup M1 Verify
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'data/walters/nfl/matchup-calibration-v1.json'
+      - 'data/walters/nfl/personnel-calibration-v1.json'
+      - 'tools/validate-walters-matchup-m1.mjs'
+      - '.github/workflows/walters-matchup-m1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify matchup Stage M1 contract
+        run: node tools/validate-walters-matchup-m1.mjs
