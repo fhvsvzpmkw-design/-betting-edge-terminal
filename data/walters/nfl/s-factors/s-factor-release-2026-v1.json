@@ -1,0 +1,918 @@
+{
+  "schema": 1,
+  "releaseId": "walters-nfl-s-factor-release-2026-v1",
+  "calibrationId": "walters-nfl-s-factor-calibration-v1",
+  "stage": "S2",
+  "state": "PASS_CURRENT_CALIBRATION_NO_S3_NUMERIC_CANDIDATE",
+  "season": 2026,
+  "generatedAt": "2026-09-01T23:04:40.613510Z",
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "trainingSeasons": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "rareEventBackfillSeasons": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019
+  ],
+  "validationSeasons": [
+    2025
+  ],
+  "sourceSnapshots": [
+    {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+      "sha256": "33c594bacd9cc9169ee6886e78ea17e410b7c3a5058fba59e2a7edd2688f2f1d",
+      "persistedPath": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+      "persistedSha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+      "upstreamColumnCount": 46,
+      "persistedFieldWhitelist": [
+        "game_id",
+        "season",
+        "game_type",
+        "week",
+        "gameday",
+        "weekday",
+        "gametime",
+        "away_team",
+        "away_score",
+        "home_team",
+        "home_score",
+        "location",
+        "overtime",
+        "away_rest",
+        "home_rest",
+        "div_game",
+        "roof",
+        "surface",
+        "stadium_id",
+        "stadium"
+      ]
+    }
+  ],
+  "registrySnapshots": [
+    {
+      "path": "data/walters/nfl/s-factors/registries/team-geography-v1.json",
+      "sha256": "7a0cb2ae6009cdf5d87115a29d2c642152715661f6bb81e60c6f01b5b831b628"
+    },
+    {
+      "path": "data/walters/nfl/s-factors/registries/surface-registry-2021-2026-v1.json",
+      "sha256": "0bfcc30f1764f23dd37fd527b3a9b683544f30f2320333c99413c9360a169935"
+    }
+  ],
+  "h4Control": {
+    "homeAdvantagePoints": 2.082,
+    "neutralPoints": 0.0,
+    "productionId": "walters-nfl-home-field-production-v1"
+  },
+  "modelId": "S_ZERO_BASELINE",
+  "bookExactSpreadPointsPerSUnit": 0.2,
+  "currentScalarSpreadPointsPerSUnit": -0.071079,
+  "currentScalarSurvivalRatioVsBook": -0.355394,
+  "modelMetrics": {
+    "training": {
+      "S_ZERO_BASELINE": {
+        "n": 1087,
+        "meanError": -0.003398,
+        "mae": 10.731203,
+        "rmse": 13.675397
+      },
+      "S_BOOK_EXACT_020": {
+        "n": 1087,
+        "meanError": -0.51453,
+        "mae": 10.803305,
+        "rmse": 13.743665
+      },
+      "S_CURRENT_SCALAR": {
+        "n": 1087,
+        "meanError": 0.178255,
+        "mae": 10.724022,
+        "rmse": 13.670341
+      },
+      "S_PARTIAL_POOL_FAMILY": {
+        "n": 1087,
+        "meanError": 0.133588,
+        "mae": 10.658372,
+        "rmse": 13.51665
+      }
+    },
+    "validation": {
+      "S_ZERO_BASELINE": {
+        "n": 272,
+        "meanError": 0.060011,
+        "mae": 10.691084,
+        "rmse": 13.560282
+      },
+      "S_BOOK_EXACT_020": {
+        "n": 272,
+        "meanError": -0.488518,
+        "mae": 10.71049,
+        "rmse": 13.591032
+      },
+      "S_CURRENT_SCALAR": {
+        "n": 272,
+        "meanError": 0.254955,
+        "mae": 10.715683,
+        "rmse": 13.567461
+      },
+      "S_PARTIAL_POOL_FAMILY": {
+        "n": 272,
+        "meanError": 0.23945,
+        "mae": 10.838538,
+        "rmse": 13.754303
+      }
+    },
+    "selectedScopedValidation": {
+      "n": 272,
+      "meanError": 0.060011,
+      "mae": 10.691084,
+      "rmse": 13.560282
+    }
+  },
+  "aggregateAcceptance": {
+    "scalarAccepted": false,
+    "partialPoolAccepted": false,
+    "selectedModel": "S_ZERO_BASELINE",
+    "scopedAccepted": false
+  },
+  "s3ScopeCandidate": {
+    "numericFamilies": [],
+    "modelId": "S_ZERO_BASELINE",
+    "nonNumericFamilies": [
+      "ALTITUDE_EXPOSURE",
+      "BOUNCE_BACK",
+      "BYE",
+      "CONSECUTIVE_REMOTE",
+      "DIVISION_CONFERENCE",
+      "OVERTIME_RECOVERY",
+      "REST_PRIMETIME",
+      "ROAD_DENSITY",
+      "SUPER_BOWL_AFTEREFFECT",
+      "TIME_ZONE_BODY_CLOCK",
+      "TRAVEL_DISTANCE",
+      "TURF_SURFACE"
+    ],
+    "rule": "Only listed numericFamilies may advance to active-week S3 shadow; S2 itself has no live authority."
+  },
+  "familyEstimates": [
+    {
+      "family": "ALTITUDE_EXPOSURE",
+      "weightedCoefficient": 1.472573,
+      "features": [
+        "EXT_ALTITUDE_HIGH"
+      ]
+    },
+    {
+      "family": "BOUNCE_BACK",
+      "weightedCoefficient": -0.163259,
+      "features": [
+        "S_AWAY_BOUNCE",
+        "S_HOME_BOUNCE"
+      ]
+    },
+    {
+      "family": "BYE",
+      "weightedCoefficient": 0.01469,
+      "features": [
+        "EXT_BYE_STRENGTH",
+        "S_AWAY_BYE",
+        "S_HOME_BYE"
+      ]
+    },
+    {
+      "family": "CONSECUTIVE_REMOTE",
+      "weightedCoefficient": 1.711135,
+      "features": [
+        "S_SECOND_REMOTE_TWO_TZ"
+      ]
+    },
+    {
+      "family": "DIVISION_CONFERENCE",
+      "weightedCoefficient": -0.022633,
+      "features": [
+        "S_DIFFERENT_CONFERENCE",
+        "S_SAME_DIVISION"
+      ]
+    },
+    {
+      "family": "OVERTIME_RECOVERY",
+      "weightedCoefficient": -0.170322,
+      "features": [
+        "S_AWAY_OFF_AWAY_OT",
+        "S_AWAY_OFF_HOME_OT",
+        "S_HOME_OFF_AWAY_OT",
+        "S_HOME_OFF_HOME_OT"
+      ]
+    },
+    {
+      "family": "REST_PRIMETIME",
+      "weightedCoefficient": 0.009146,
+      "features": [
+        "EXT_REST_DIFF_DAYS",
+        "S_AWAY_OFF_MNF_AWAY",
+        "S_AWAY_OFF_MNF_HOME",
+        "S_HOME_MONDAY_NIGHT",
+        "S_HOME_OFF_MNF_AWAY",
+        "S_HOME_SUNDAY_NIGHT",
+        "S_HOME_THURSDAY_NIGHT"
+      ]
+    },
+    {
+      "family": "ROAD_DENSITY",
+      "weightedCoefficient": -0.061004,
+      "features": [
+        "S_THIRD_AWAY_IN_FOUR"
+      ]
+    },
+    {
+      "family": "SUPER_BOWL_AFTEREFFECT",
+      "weightedCoefficient": -0.070134,
+      "features": [
+        "S_SB_LOSER",
+        "S_SB_WINNER"
+      ]
+    },
+    {
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "weightedCoefficient": -0.138476,
+      "features": [
+        "EXT_TZ_EARLY_EASTWARD",
+        "EXT_TZ_NIGHT_WESTWARD",
+        "S_EARLY_MOUNTAIN",
+        "S_EARLY_WEST",
+        "S_NIGHT_CENTRAL",
+        "S_NIGHT_EAST",
+        "S_NIGHT_MOUNTAIN"
+      ]
+    },
+    {
+      "family": "TRAVEL_DISTANCE",
+      "weightedCoefficient": -0.493059,
+      "features": [
+        "EXT_TRAVEL_1000MI",
+        "EXT_TRAVEL_1250_1999",
+        "EXT_TRAVEL_750_1249",
+        "EXT_TRAVEL_X_ROAD",
+        "S_TRAVEL_2000_PLUS"
+      ]
+    },
+    {
+      "family": "TURF_SURFACE",
+      "weightedCoefficient": 0.388778,
+      "features": [
+        "EXT_SURFACE_AWAY_SYNTH_MISMATCH",
+        "S_TURF_OPPOSITE",
+        "S_TURF_SAME"
+      ]
+    }
+  ],
+  "familyGates": [
+    {
+      "family": "ALTITUDE_EXPOSURE",
+      "primaryEvents": 34,
+      "validationEvents": 9,
+      "rareBackfillEvents": 40,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 10.910847,
+      "validationAffectedFamilyMae": 10.910847,
+      "countGate": false,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "BOUNCE_BACK",
+      "primaryEvents": 193,
+      "validationEvents": 52,
+      "rareBackfillEvents": 206,
+      "rareBackfillAllowed": true,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 11.633161,
+      "validationAffectedFamilyMae": 11.633161,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "BYE",
+      "primaryEvents": 115,
+      "validationEvents": 29,
+      "rareBackfillEvents": 149,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 8.689231,
+      "validationAffectedFamilyMae": 8.689231,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "CONSECUTIVE_REMOTE",
+      "primaryEvents": 30,
+      "validationEvents": 4,
+      "rareBackfillEvents": 36,
+      "rareBackfillAllowed": true,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 7.617989,
+      "validationAffectedFamilyMae": 7.617989,
+      "countGate": false,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": false,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "DIVISION_CONFERENCE",
+      "primaryEvents": 704,
+      "validationEvents": 176,
+      "rareBackfillEvents": 800,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 10.641439,
+      "validationAffectedFamilyMae": 10.641439,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "OVERTIME_RECOVERY",
+      "primaryEvents": 122,
+      "validationEvents": 28,
+      "rareBackfillEvents": 133,
+      "rareBackfillAllowed": true,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 9.370734,
+      "validationAffectedFamilyMae": 9.370734,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": false,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "REST_PRIMETIME",
+      "primaryEvents": 541,
+      "validationEvents": 139,
+      "rareBackfillEvents": 626,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 9.596507,
+      "validationAffectedFamilyMae": 9.596507,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "ROAD_DENSITY",
+      "primaryEvents": 312,
+      "validationEvents": 80,
+      "rareBackfillEvents": 352,
+      "rareBackfillAllowed": true,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 9.999351,
+      "validationAffectedFamilyMae": 9.999351,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "SUPER_BOWL_AFTEREFFECT",
+      "primaryEvents": 32,
+      "validationEvents": 7,
+      "rareBackfillEvents": 39,
+      "rareBackfillAllowed": true,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 6.888205,
+      "validationAffectedFamilyMae": 6.888205,
+      "countGate": false,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": true,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "primaryEvents": 398,
+      "validationEvents": 103,
+      "rareBackfillEvents": 472,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 10.522311,
+      "validationAffectedFamilyMae": 10.522311,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": false,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "TRAVEL_DISTANCE",
+      "primaryEvents": 1066,
+      "validationEvents": 265,
+      "rareBackfillEvents": 1258,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 10.790498,
+      "validationAffectedFamilyMae": 10.790498,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": false,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    },
+    {
+      "family": "TURF_SURFACE",
+      "primaryEvents": 1068,
+      "validationEvents": 265,
+      "rareBackfillEvents": 1260,
+      "rareBackfillAllowed": false,
+      "trainAlignmentSlope": null,
+      "validationAlignmentSlope": null,
+      "validationAffectedZeroMae": 10.790498,
+      "validationAffectedFamilyMae": 10.790498,
+      "countGate": true,
+      "directionGate": false,
+      "heldoutMaeGate": true,
+      "coefficientSafetyGate": false,
+      "s3NumericCandidate": false,
+      "reason": "aggregate model is zero"
+    }
+  ],
+  "factorEstimates": [
+    {
+      "feature": "EXT_ALTITUDE_HIGH",
+      "family": "ALTITUDE_EXPOSURE",
+      "coefficient": 1.472573,
+      "printed": false,
+      "safety": {
+        "coefficient": 1.472573,
+        "normalTriggerAbsPoints": 1.472573,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_BYE_STRENGTH",
+      "family": "BYE",
+      "coefficient": 0.0805,
+      "printed": false,
+      "safety": {
+        "coefficient": 0.0805,
+        "normalTriggerAbsPoints": 0.0805,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_REST_DIFF_DAYS",
+      "family": "REST_PRIMETIME",
+      "coefficient": 0.209936,
+      "printed": false,
+      "safety": {
+        "coefficient": 0.209936,
+        "normalTriggerAbsPoints": 0.629809,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_SURFACE_AWAY_SYNTH_MISMATCH",
+      "family": "TURF_SURFACE",
+      "coefficient": 0.868036,
+      "printed": false,
+      "safety": {
+        "coefficient": 0.868036,
+        "normalTriggerAbsPoints": 0.868036,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_TRAVEL_1000MI",
+      "family": "TRAVEL_DISTANCE",
+      "coefficient": -0.368614,
+      "printed": false,
+      "safety": {
+        "coefficient": -0.368614,
+        "normalTriggerAbsPoints": 0.921536,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_TRAVEL_1250_1999",
+      "family": "TRAVEL_DISTANCE",
+      "coefficient": -0.481058,
+      "printed": false,
+      "safety": {
+        "coefficient": -0.481058,
+        "normalTriggerAbsPoints": 0.481058,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_TRAVEL_750_1249",
+      "family": "TRAVEL_DISTANCE",
+      "coefficient": -0.601551,
+      "printed": false,
+      "safety": {
+        "coefficient": -0.601551,
+        "normalTriggerAbsPoints": 0.601551,
+        "safe": true
+      }
+    },
+    {
+      "feature": "EXT_TRAVEL_X_ROAD",
+      "family": "TRAVEL_DISTANCE",
+      "coefficient": -0.788147,
+      "printed": false,
+      "safety": {
+        "coefficient": -0.788147,
+        "normalTriggerAbsPoints": 1.970367,
+        "safe": false
+      }
+    },
+    {
+      "feature": "EXT_TZ_EARLY_EASTWARD",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": 0.514127,
+      "printed": false,
+      "safety": {
+        "coefficient": 0.514127,
+        "normalTriggerAbsPoints": 1.542381,
+        "safe": false
+      }
+    },
+    {
+      "feature": "EXT_TZ_NIGHT_WESTWARD",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": -0.447749,
+      "printed": false,
+      "safety": {
+        "coefficient": -0.447749,
+        "normalTriggerAbsPoints": 1.343248,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_AWAY_BOUNCE",
+      "family": "BOUNCE_BACK",
+      "coefficient": 0.15896,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.15896,
+        "normalTriggerAbsPoints": 0.15896,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_AWAY_BYE",
+      "family": "BYE",
+      "coefficient": -0.029505,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.029505,
+        "normalTriggerAbsPoints": 0.029505,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_AWAY_OFF_AWAY_OT",
+      "family": "OVERTIME_RECOVERY",
+      "coefficient": -1.165067,
+      "printed": true,
+      "safety": {
+        "coefficient": -1.165067,
+        "normalTriggerAbsPoints": 1.165067,
+        "safe": false
+      }
+    },
+    {
+      "feature": "S_AWAY_OFF_HOME_OT",
+      "family": "OVERTIME_RECOVERY",
+      "coefficient": -0.105391,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.105391,
+        "normalTriggerAbsPoints": 0.105391,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_AWAY_OFF_MNF_AWAY",
+      "family": "REST_PRIMETIME",
+      "coefficient": 0.179296,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.179296,
+        "normalTriggerAbsPoints": 0.179296,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_AWAY_OFF_MNF_HOME",
+      "family": "REST_PRIMETIME",
+      "coefficient": 0.184343,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.184343,
+        "normalTriggerAbsPoints": 0.184343,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_DIFFERENT_CONFERENCE",
+      "family": "DIVISION_CONFERENCE",
+      "coefficient": -0.737577,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.737577,
+        "normalTriggerAbsPoints": 0.737577,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_EARLY_MOUNTAIN",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": -0.494996,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.494996,
+        "normalTriggerAbsPoints": 0.494996,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_EARLY_WEST",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": -1.396786,
+      "printed": true,
+      "safety": {
+        "coefficient": -1.396786,
+        "normalTriggerAbsPoints": 1.396786,
+        "safe": false
+      }
+    },
+    {
+      "feature": "S_HOME_BOUNCE",
+      "family": "BOUNCE_BACK",
+      "coefficient": -0.418233,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.418233,
+        "normalTriggerAbsPoints": 0.418233,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_BYE",
+      "family": "BYE",
+      "coefficient": -0.05803,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.05803,
+        "normalTriggerAbsPoints": 0.05803,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_MONDAY_NIGHT",
+      "family": "REST_PRIMETIME",
+      "coefficient": -0.15947,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.15947,
+        "normalTriggerAbsPoints": 0.15947,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_OFF_AWAY_OT",
+      "family": "OVERTIME_RECOVERY",
+      "coefficient": -0.063817,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.063817,
+        "normalTriggerAbsPoints": 0.063817,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_OFF_HOME_OT",
+      "family": "OVERTIME_RECOVERY",
+      "coefficient": 0.455837,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.455837,
+        "normalTriggerAbsPoints": 0.455837,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_OFF_MNF_AWAY",
+      "family": "REST_PRIMETIME",
+      "coefficient": -0.790025,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.790025,
+        "normalTriggerAbsPoints": 0.790025,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_SUNDAY_NIGHT",
+      "family": "REST_PRIMETIME",
+      "coefficient": 0.209547,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.209547,
+        "normalTriggerAbsPoints": 0.209547,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_HOME_THURSDAY_NIGHT",
+      "family": "REST_PRIMETIME",
+      "coefficient": -0.659176,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.659176,
+        "normalTriggerAbsPoints": 0.659176,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_NIGHT_CENTRAL",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": -0.187924,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.187924,
+        "normalTriggerAbsPoints": 0.187924,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_NIGHT_EAST",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": -0.201401,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.201401,
+        "normalTriggerAbsPoints": 0.201401,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_NIGHT_MOUNTAIN",
+      "family": "TIME_ZONE_BODY_CLOCK",
+      "coefficient": -0.055616,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.055616,
+        "normalTriggerAbsPoints": 0.055616,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_SAME_DIVISION",
+      "family": "DIVISION_CONFERENCE",
+      "coefficient": 0.573155,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.573155,
+        "normalTriggerAbsPoints": 0.573155,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_SB_LOSER",
+      "family": "SUPER_BOWL_AFTEREFFECT",
+      "coefficient": -0.22007,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.22007,
+        "normalTriggerAbsPoints": 0.22007,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_SB_WINNER",
+      "family": "SUPER_BOWL_AFTEREFFECT",
+      "coefficient": 0.079801,
+      "printed": true,
+      "safety": {
+        "coefficient": 0.079801,
+        "normalTriggerAbsPoints": 0.079801,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_SECOND_REMOTE_TWO_TZ",
+      "family": "CONSECUTIVE_REMOTE",
+      "coefficient": 1.711135,
+      "printed": true,
+      "safety": {
+        "coefficient": 1.711135,
+        "normalTriggerAbsPoints": 1.711135,
+        "safe": false
+      }
+    },
+    {
+      "feature": "S_THIRD_AWAY_IN_FOUR",
+      "family": "ROAD_DENSITY",
+      "coefficient": -0.061004,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.061004,
+        "normalTriggerAbsPoints": 0.061004,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_TRAVEL_2000_PLUS",
+      "family": "TRAVEL_DISTANCE",
+      "coefficient": -0.631832,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.631832,
+        "normalTriggerAbsPoints": 0.631832,
+        "safe": true
+      }
+    },
+    {
+      "feature": "S_TURF_OPPOSITE",
+      "family": "TURF_SURFACE",
+      "coefficient": 1.269838,
+      "printed": true,
+      "safety": {
+        "coefficient": 1.269838,
+        "normalTriggerAbsPoints": 1.269838,
+        "safe": false
+      }
+    },
+    {
+      "feature": "S_TURF_SAME",
+      "family": "TURF_SURFACE",
+      "coefficient": -0.912428,
+      "printed": true,
+      "safety": {
+        "coefficient": -0.912428,
+        "normalTriggerAbsPoints": 0.912428,
+        "safe": true
+      }
+    }
+  ],
+  "sampleCounts": {
+    "primaryTraining": 1087,
+    "rareBackfill": 1280,
+    "validation": 272
+  },
+  "missingness": {
+    "surface_family_unresolved": 46,
+    "travel_family_unresolved": 46,
+    "timezone_family_unresolved": 46
+  },
+  "protectedArtifactSha256": {
+    "currentNumbers": "e90a2165f60e6ca69d29083f5ac6c3c7180c191a73ce1eba850d497880e79576",
+    "powerRatings": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "personnelLedger": "66e501592c64cb8137c6e2b7facdeb92a2ad409e4db5c7e89922c9291d58ba41",
+    "playerValueRegistry": "43ce924df786e3d39ffc3b027cbd5f0bef4e1f8f171421da5ee257fffddda339"
+  },
+  "nextGate": "Build S3 active-week shadow only from the S2 numeric family scope. No live mutation before explicit S4 activation."
+}
