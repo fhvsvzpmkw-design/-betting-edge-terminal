@@ -14,9 +14,12 @@ assert(profile.authority?.mode==='ledger-authoritative','Eddie must remain ledge
 assert(profile.authority?.source==='/api/bet-history','Eddie authority source must be /api/bet-history');
 assert(profile.authority?.sourceClass==='sanitized-public-ledger','Eddie must identify the sanitized public ledger');
 assert(profile.guardrails?.privateLedgerForbidden===true,'Eddie must never read the raw private ledger');
-assert(profile.hotlineStyle?.ledgerRules?.freeBetRule?.includes('index 14 is the boosted flag'),'Eddie free-bet guardrail missing');
+assert(profile.hotlineStyle?.ledgerRules?.freeBetRule?.includes('Public row index 14 is boosted'),'Eddie free-bet guardrail missing');
+assert(profile.hotlineStyle?.ledgerRules?.freeBetRule?.includes('sanitized funding layer classes CASH, FREE_BET and MIXED_PROMO'),'Eddie funding authority guardrail missing');
 assert(profile.authority?.actualDollars===true,'Eddie must use actual CAD dollars');
 assert(profile.authority?.fictionalScaling===false,'Eddie fictional scaling must be disabled');
+assert(profile.authority?.presentationScale?.mode==='none','Eddie presentation scaling must remain disabled');
+assert(profile.guardrails?.bankrollUnscaled===true,'Eddie bankroll must remain unscaled');
 assert(roster.profiles.find(x=>x.characterId==='eddie-numbers')?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie roster title changed');
 assert(roster.slots[0]?.title==='MUDDY NUMBERS // LEDGER DESK','Eddie slot title changed');
 assert(shells.shells.find(x=>x.id==='muddy-ledger-desk'&&x.defaultForCharacter===true),'Muddy Ledger Desk shell is not default');
@@ -24,6 +27,7 @@ for(const marker of ['ACTUAL CAD DOLLARS','ALL-LEDGER CUMULATIVE P/L','PUBLIC LE
 assert(live.includes("const URL='/api/bet-history'"),'Live desk must fetch /api/bet-history');
 assert(live.includes('boosted:!!r[14]'),'Public row index 14 must remain boosted');
 assert(!live.includes('free:!!r[14]'),'Eddie must not treat row index 14 as free-bet status');
+for(const forbidden of ['UNIT_RATE','TARGET_UNIT','W(r,scale)','bankroll*scale','active unit is $100','$100-unit normalized']) assert(!live.includes(forbidden),`Residual Muddy scaling logic detected: ${forbidden}`);
 assert(!live.includes('PRIVATE MASTER // CLOUDFLARE'),'Private-master label leaked into Eddie Hotline');
 assert(!live.includes('Authority: private ledger'),'Private-ledger authority leaked into Eddie Hotline');
 assert(!live.includes('../../data/betting-ledger.json'),'Live desk still exposes raw ledger path');
