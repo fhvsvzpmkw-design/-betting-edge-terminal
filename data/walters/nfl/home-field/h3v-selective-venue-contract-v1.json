@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-home-field-calibration-v1",
+  "h3vId": "walters-nfl-home-field-h3v-selective-venue-v1",
+  "stage": "H3V",
+  "state": "MODEL_LOCKED_PRE_2025_CONFIRMATION",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Determine whether a limited set of persistent team-at-venue home-field deviations can safely survive additional shrinkage beyond the validated 2.082 league baseline, without granting blanket authority to the 32 raw H2 team/venue estimates.",
+  "dependsOn": {
+    "h2Release": "data/walters/nfl/home-field/home-field-release-2026-v1.json",
+    "h2Audit": "data/walters/nfl/home-field/h2-validation-audit-v1.json",
+    "h3Result": "data/walters/nfl/home-field/h3-week-01-shadow-result.json",
+    "h3Current": "data/walters/nfl/home-field/h3-current.json",
+    "sourceSnapshot": "data/walters/nfl/home-field/source/nflverse-schedules-hfa-snapshot-2026-09-01.csv",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "sourceAuthority": {
+    "primary": "Billy Walters with Armen Keteyian, Gambler, Chapters 21-22",
+    "rule": "Home advantage can differ by city/team and over time, but a current production deviation must be earned empirically rather than inferred from reputation or imported from a market price.",
+    "interpretation": "H3V treats the H2 team+stadium coefficient as a team-at-venue signal, not as a pure stadium causal effect. Altitude, weather, travel, rest, surface and crowd narratives do not receive separate production credit here."
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "opening spread",
+      "closing spread",
+      "line movement",
+      "market-implied home advantage",
+      "ATS result",
+      "betting percentages",
+      "closing-line value"
+    ]
+  },
+  "internalRollingCalibration": {
+    "finalConfirmationSeason": 2025,
+    "finalConfirmationMayTuneModel": false,
+    "folds": [
+      {"trainSeasons": [2021], "testSeason": 2022},
+      {"trainSeasons": [2021, 2022], "testSeason": 2023},
+      {"trainSeasons": [2021, 2022, 2023], "testSeason": 2024}
+    ],
+    "ridgePenalties": {
+      "teamSeasonStrength": 8.0,
+      "leagueHomeBaseline": 0.000001,
+      "seasonHomeDeviation": 64.0,
+      "teamVenueHomeDeviation": 96.0,
+      "validationTeamStrength": 8.0
+    },
+    "nextSeasonBaselineRule": "Use the H2 global baseline plus a recency-weighted average of up to the three most recent fitted season home deviations; for early folds with fewer than three seasons, use every available fitted season with weights 1..N oldest-to-newest.",
+    "survivalCoefficient": {
+      "symbol": "k",
+      "formula": "k = clip(sum(d_i * r_i) / sum(d_i^2), 0, 1), where d_i is the prior-fit team-at-venue deviation and r_i is the next-season domestic residual versus league-only HFA after validation-only team-strength nuisance fitting.",
+      "rule": "Estimate one universal persistence/shrinkage coefficient across all internal rolling-fold domestic games. Do not hand-pick a venue-specific weight.",
+      "minimumForSelectiveQualification": 0.05
+    }
+  },
+  "venueQualification": {
+    "unit": "home team + governed stadium identity",
+    "pre2025Only": true,
+    "requirements": {
+      "minimumRollingFoldsWithEstimate": 3,
+      "minimumAbsolutePre2025RawDeviationPoints": 0.5,
+      "minimumProjectionSignAgreementFolds": 2,
+      "minimumObservedResidualSignAgreementFolds": 2,
+      "requirePerVenueAggregateMaeNoWorse": true,
+      "requirePerVenueAggregateRmseNoWorse": true,
+      "requireSameGoverned2026VenueIdentity": true
+    },
+    "rule": "A venue qualifies only from evidence available before the untouched 2025 confirmation. Qualification uses the 2021-2024 fit and 2022-2024 rolling out-of-sample evidence; 2025 may confirm or reject the selective layer as a whole but may not add a venue to the qualified set.",
+    "productionProjectionIfConfirmed": "2026 HFA = 2.082 league baseline + k * final H2 teamVenueDeviationPoints for a prequalified unchanged team-at-venue pair; all other ordinary domestic venues remain at the league baseline."
+  },
+  "final2025Confirmation": {
+    "trainingSeasons": [2021, 2022, 2023, 2024],
+    "testSeason": 2025,
+    "qualifiedVenueSetFrozenBeforeReading2025": true,
+    "acceptance": {
+      "selectiveDomesticMaeMustBeNoWorseThanLeagueOnly": true,
+      "selectiveDomesticRmseMustBeNoWorseThanLeagueOnly": true,
+      "selectiveAbsoluteBiasMayExceedLeagueOnlyByAtMost": 0.15,
+      "minimumDomesticGames": 240
+    },
+    "passState": "PASS_SELECTIVE_VENUE_H4_CANDIDATE",
+    "noVenueState": "PASS_NO_SELECTIVE_VENUES_H4_LEAGUE_ONLY",
+    "failState": "FAIL_CLOSED_SELECTIVE_VENUE_NOT_VALIDATED"
+  },
+  "activeWeekShadow": {
+    "required": true,
+    "leagueBaselineHomeAdvantagePoints": 2.082,
+    "neutralBaseHomeAdvantagePoints": 0,
+    "rule": "Recompute every active-week shadow fair from H3 preservedNonLocationExactFairHome plus the selective H3V location term. Preserve personnel overlays, QB/game-factor adjustments and carried ratings exactly."
+  },
+  "doubleCountGuards": {
+    "altitude": "Do not identify an H3V venue adjustment as a separate altitude factor; any future altitude S-factor requires explicit reconciliation before production.",
+    "travelTimezone": "Travel and time-zone effects remain future S-factor inputs and may not be added inside H3V.",
+    "weather": "Weather remains a future W-factor input and may not be added inside H3V.",
+    "surface": "Surface remains separate unless a later governed study explicitly decomposes it.",
+    "teamStrength": "Never move carried team currentRating from H3V.",
+    "personnel": "Never alter or reapply personnelOverlayPointsToHomeSpread from H3V."
+  },
+  "outputs": {
+    "result": "data/walters/nfl/home-field/h3v-selective-venue-result-v1.json",
+    "current": "data/walters/nfl/home-field/h3v-current.json"
+  },
+  "h4Rule": "H4 may activate selective venue adjustments only if H3V reaches PASS_SELECTIVE_VENUE_H4_CANDIDATE. If H3V fails or qualifies no venues, H4 remains the already accepted league-baseline plus neutral-zero scope.",
+  "failClosedCodes": [
+    "FAIL_CLOSED_H3V_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_H3V_SOURCE_IDENTITY",
+    "FAIL_CLOSED_H3V_MODEL_BOUNDARY",
+    "FAIL_CLOSED_H3V_VENUE_IDENTITY",
+    "FAIL_CLOSED_H3V_SELECTIVE_NOT_VALIDATED",
+    "FAIL_CLOSED_H3V_LIVE_ARTIFACT_MUTATION"
+  ]
+}
