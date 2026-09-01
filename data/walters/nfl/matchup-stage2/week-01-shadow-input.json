@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "inputId": "walters-matchup-m2-week1-shadow-input-v1",
+  "stage": "M2",
+  "state": "READY_SHADOW_ONLY",
+  "season": 2026,
+  "week": 1,
+  "marketViewed": false,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "numericAuthority": false,
+  "contractPath": "data/walters/nfl/matchup-calibration-v1.json",
+  "purpose": "Start Week 1 matchup shadow calibration by screening every active game from the existing market-isolated personnel ledger, opening only evidence-supported opponent-specific cases and leaving all matchup point increments null until a separate numeric calibration is justified.",
+  "candidateEvidence": [
+    {
+      "caseKey": "2026-W01-LAC-Tyler-Biadasz",
+      "gameKey": "2026-W01-ARI-LAC",
+      "matchupFamily": "PROTECTION_CASCADE",
+      "opponentStressPlayerOrUnit": "Arizona pass rush led by starting OLB Josh Sweat",
+      "footballMechanism": "Tyler Biadasz was acquired in part for center-specific A-gap protection, space-blocking and communication responsibilities in Mike McDaniel's offense. His season-ending ACL injury moves rookie Jake Slaughter into the starting center role. Arizona's current official depth chart lists Josh Sweat as a starting OLB, and Cardinals reporting identifies Sweat as the pass-rush leader after a 12-sack 2025 season. That combination is sufficient to open a shadow protection-cascade case for opponent-specific review, but it is not sufficient by itself to invent a point multiplier or matchup increment.",
+      "roleEvidence": [
+        "https://www.chargers.com/news/mike-mcdaniel-jake-slaughter-offensive-line-depth-chart",
+        "https://www.chargers.com/news/offensive-line-mike-mcdaniel-offseason",
+        "https://www.chargers.com/news/players-to-watch-rams-preseason-game"
+      ],
+      "opponentEvidence": [
+        "https://www.azcardinals.com/team/depth-chart-app",
+        "https://www.azcardinals.com/news/cardinals-roster-reset-2026-outside-linebacker"
+      ],
+      "sourceRefs": [
+        "https://www.chargers.com/news/mike-mcdaniel-jake-slaughter-offensive-line-depth-chart",
+        "https://www.chargers.com/news/offensive-line-mike-mcdaniel-offseason",
+        "https://www.chargers.com/news/players-to-watch-rams-preseason-game",
+        "https://www.azcardinals.com/team/depth-chart-app",
+        "https://www.azcardinals.com/news/cardinals-roster-reset-2026-outside-linebacker"
+      ],
+      "screeningDecision": "OPEN_SHADOW_NUMERIC_CALIBRATION_PENDING",
+      "approvedMatchupIncrement": null,
+      "note": "Open the case only. The normal governed personnel loss remains the sole numeric effect until M2 numeric calibration separately approves an increment."
+    }
+  ],
+  "screeningPolicy": {
+    "allActiveGamesRequired": true,
+    "allCurrentPersonnelEventsRequired": true,
+    "resolvedNumericPersonnelCaseNeedsCandidateEvidence": true,
+    "unresolvedPersonnelCaseFailsClosedBeforeMatchupScoring": true,
+    "gameWithoutCurrentMaterialPersonnelEvent": "NO_CURRENT_MATERIAL_PERSONNEL_TRIGGER",
+    "noAutomaticMultipliers": true,
+    "noAutomaticPositionMultipliers": true,
+    "approvedMatchupIncrementMustRemainNull": true,
+    "marketIsolationRequired": true
+  },
+  "nextStep": "After the all-game screen passes, calibrate shadow-only point increments for evidence-ready cases without changing the live Graham board."
+}
