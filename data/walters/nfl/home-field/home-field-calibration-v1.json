@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-home-field-calibration-v1",
+  "stage": "H1",
+  "state": "CONTRACT_LOCKED_SHADOW_ONLY",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Define a source-locked, market-isolated path for replacing Graham's provisional generic domestic home-field allowance with a current team/stadium/season location calibration while preserving neutral-site handling, exact fair arithmetic, carried team ratings, personnel overlays, and separate S/W game-factor authority.",
+  "dependsOn": {
+    "activeWeek": "data/walters/nfl/active-week.json",
+    "powerRatings": "data/walters/nfl-power-ratings-ledger.json",
+    "personnelProduction": "data/walters/nfl/personnel-production-current.json",
+    "matchupProduction": "data/walters/nfl/matchup-production-current.json"
+  },
+  "sourceAuthority": {
+    "primary": "Billy Walters with Armen Keteyian, Gambler, Chapters 21-22",
+    "bookExact": [
+      {
+        "pages": "236-237",
+        "rule": "NFL home-field advantage is not a fixed three points; it changes over time and differs by city/team. Geography, home familiarity, attendance and fan environment may matter."
+      },
+      {
+        "pages": "246-249",
+        "rule": "Home advantage is a distinct point-spread-equivalent game component, separate from team strength, game-specific factors and injuries, and it may vary by both the home and away team."
+      },
+      {
+        "pages": "261-262",
+        "rule": "The 2.0-point home advantage is a worked-example assumption for True Game Performance Level calculations, not a universal production default."
+      }
+    ],
+    "calibrationPlan": {
+      "anomalyId": "BW-A003",
+      "rule": "CURRENT-CALIBRATED home advantage must be estimated as a team/stadium/season effect with shrinkage toward the league level; the two-point book value remains example-only."
+    }
+  },
+  "provenancePolicy": {
+    "BOOK_EXACT": {
+      "numericDefaultAllowed": false,
+      "exampleHomeAdvantagePoints": 2.0,
+      "rule": "Use 2.0 only when reproducing the source worked example."
+    },
+    "WALTERS_CALIBRATED": {
+      "productionUseAllowedInH1": false,
+      "requiredBeforeProduction": [
+        "versioned calibration release",
+        "immutable historical input snapshot",
+        "training and validation window",
+        "team/stadium/season estimates with shrinkage",
+        "neutral/relocated/shared-venue classification",
+        "uncertainty and sample-size fields",
+        "chronological out-of-sample acceptance",
+        "H3 active-week shadow acceptance",
+        "explicit H4 production activation"
+      ]
+    },
+    "SUPPLEMENTAL": {
+      "maySetGrahamFair": false,
+      "rule": "Outside home/road ratings may challenge or diagnose the independent estimate only after the independent HFA result is frozen."
+    }
+  },
+  "currentLiveBaseline": {
+    "domesticGenericHomeAdvantagePoints": 1.5,
+    "homeSpreadConvention": "A positive home advantage makes the home fair spread more negative; pointsToHomeSpread = -homeLocationAdvantagePoints.",
+    "state": "PROVISIONAL_PRESERVE_UNTIL_H4",
+    "neutralSiteRule": "Explicit neutral-site games retain zero base home advantage unless a separately governed venue-specific differential is established.",
+    "rule": "H1-H3 may compare against the live 1.5-point domestic placeholder but may not replace or mutate it."
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "opening spread",
+      "closing spread",
+      "line movement",
+      "market-implied home advantage",
+      "ATS result",
+      "betting percentages",
+      "closing-line value"
+    ],
+    "rule": "Historical and active-week HFA estimation must use football results, venue identity and predeclared non-market contextual facts only. Sportsbook fields present in a source dataset must be excluded by field whitelist."
+  },
+  "historicalDataContract": {
+    "preferredSource": "nflverse schedule/results data with pinned snapshot/version",
+    "initialTrainingWindow": {
+      "seasons": [2021, 2022, 2023, 2024],
+      "gameType": "REG",
+      "excludeSeason": 2020,
+      "reason": "Avoid the COVID attendance regime and reserve 2025 as the first held-out validation season."
+    },
+    "initialValidationWindow": {
+      "seasons": [2025],
+      "gameType": "REG",
+      "rule": "Do not tune the final H2 release on the held-out validation season after reading its evaluation."
+    },
+    "allowedCoreFields": [
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "home_team",
+      "away_team",
+      "home_score",
+      "away_score",
+      "location",
+      "stadium_id",
+      "stadium"
+    ],
+    "optionalNuisanceControls": [
+      "rest differential",
+      "travel distance",
+      "time-zone displacement",
+      "altitude",
+      "roof/exposure class"
+    ],
+    "nuisanceControlRule": "Nuisance controls may be used only to isolate persistent home/venue effects. Their fitted coefficients receive no S-factor or W-factor production authority from this calibration.",
+    "forbiddenSourceFields": [
+      "spread_line",
+      "total_line",
+      "moneyline",
+      "opening line",
+      "closing line",
+      "book price",
+      "ATS result"
+    ],
+    "missingnessPolicy": "A game with unresolved home/away identity, final score, or venue classification is excluded and counted in the audit rather than imputed."
+  },
+  "calibrationStructure": {
+    "target": "Observed home scoring margin after accounting for independently estimated team-season strength and allowed estimation-only nuisance controls.",
+    "modelFamily": "Hierarchical/ridge partial-pooling model with league baseline plus team/stadium/season deviations; exact fitting implementation and regularization are locked in H2 before the held-out result is evaluated.",
+    "leagueBaseline": "Estimate a current league-level home advantage rather than importing the 2.0 worked example or the live 1.5 placeholder.",
+    "teamVenueDeviation": "Estimate persistent home-team/stadium deviation and shrink small/noisy samples toward the league baseline.",
+    "visitorRoadDeviation": "A visitor-specific road tendency may be estimated only when identifiable under the same regularized model; otherwise return zero-with-uncertainty rather than inventing a road coefficient.",
+    "seasonEvolution": "Permit season-level movement around the league baseline so home advantage can change over time without silently rewriting historical releases.",
+    "newStadiumPolicy": "A new or materially changed stadium receives strong shrinkage and explicit NEW_VENUE uncertainty; historical team effects may inform but may not be treated as full new-stadium evidence.",
+    "outputConvention": "homeLocationAdvantagePoints > 0 benefits the home team; pointsToHomeSpread = -homeLocationAdvantagePoints.",
+    "precision": "Preserve at least tenth-point internal HFA values and exact Graham arithmetic before half-point display rounding."
+  },
+  "venueClassification": {
+    "DOMESTIC_HOME": "Normal designated home-team game at the club's governed home venue.",
+    "NEUTRAL": "True neutral-site game; base home advantage = 0.",
+    "INTERNATIONAL_NEUTRAL": "International game with no accepted local-home differential; base home advantage = 0 and travel/time-zone effects remain outside HFA.",
+    "RELOCATED_HOME": "Designated home game moved away from the governed home venue; requires explicit venue review and cannot inherit the normal home value automatically.",
+    "SHARED_VENUE_OR_METRO": "Same-stadium or same-metro opponent situation; requires explicit classification and may not blindly use ordinary home value.",
+    "NEW_VENUE": "First-season/materially changed stadium; use strong shrinkage and elevated uncertainty.",
+    "UNRESOLVED": "Fail closed; preserve prior governed fair."
+  },
+  "doubleCountGuard": {
+    "teamStrength": "Home advantage is a game-specific location term and never changes carried currentRating.",
+    "personnel": "Personnel and matchup overlays remain separate and must survive any later HFA recomputation unchanged unless their own governed evidence changes.",
+    "restTravelTimezone": "Rest, travel distance and time-zone effects belong to the future S-factor layer. If used as estimation-only nuisance controls, they may not also be embedded as a named HFA production increment.",
+    "weather": "Weather and temperature belong to the future W-factor/matchup layer and may not be applied again as HFA.",
+    "surface": "Turf/surface game factors remain separate from persistent venue calibration unless H2 explicitly proves a stable venue-only component and documents the separation.",
+    "supplementalBenchmark": "A supplemental published HFA or road rating may not be averaged into, anchor, or overwrite the independent calibrated value."
+  },
+  "supplementalBenchmark": {
+    "source": "2026 VSiN NFL Betting Guide, Steve Makinen home/road field ratings",
+    "role": "SUPPLEMENTAL_POST_FREEZE_DIAGNOSTIC_ONLY",
+    "currentContext": "The guide reports a league home-field level around 2.0 entering 2026 and publishes team-specific home and road field ratings from a prior performance study.",
+    "marketContaminationGuard": "Do not use the VSiN values as H2 fitting targets or direct Graham inputs. Compare only after the independent H2 release is frozen.",
+    "diagnosticsAllowed": [
+      "rank-order comparison",
+      "absolute-difference flags",
+      "city/venue outlier review",
+      "new-stadium or travel-context review"
+    ]
+  },
+  "requiredReleaseRecord": [
+    "releaseId",
+    "calibrationId",
+    "season",
+    "generatedAt",
+    "trainingSeasons",
+    "validationSeasons",
+    "sourceSnapshot",
+    "fieldWhitelist",
+    "leagueBaselineHomeAdvantagePoints",
+    "teamVenueEstimates",
+    "visitorRoadEstimates",
+    "venueClassifications",
+    "uncertainty",
+    "marketViewed",
+    "validationMetrics",
+    "protectedArtifactSha256"
+  ],
+  "validationRequirements": {
+    "chronologicalHoldout": true,
+    "metrics": [
+      "mean error of home-margin residual",
+      "mean absolute error",
+      "root mean squared error",
+      "home/away residual bias",
+      "team/venue subgroup stability",
+      "neutral-site residual bias",
+      "release stability versus league-only baseline"
+    ],
+    "comparisonBaselines": [
+      "league-only independently estimated HFA",
+      "current live generic 1.5 HFA as diagnostic only",
+      "BOOK-EXACT 2.0 worked-example value as diagnostic only"
+    ],
+    "marketBenchmarkTiming": "Any sportsbook/closing-market comparison, if performed at all, occurs only after the HFA release and active-week shadow fairs are frozen and cannot retroactively tune H2/H3."
+  },
+  "stageH2EntryGate": {
+    "required": [
+      "H1 validator passes",
+      "no live board or carried-rating mutation",
+      "market-isolation and source-field whitelist locked",
+      "historical training/validation windows locked before evaluation",
+      "neutral/relocated/shared/new-venue classifications are explicit",
+      "partial-pooling model implementation is reproducible"
+    ],
+    "nextState": "H2_CURRENT_HOME_FIELD_CALIBRATION"
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_HFA_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_HFA_VENUE_UNRESOLVED",
+    "FAIL_CLOSED_HFA_NEUTRAL_CLASSIFICATION_UNRESOLVED",
+    "FAIL_CLOSED_HFA_SOURCE_FIELD_VIOLATION",
+    "FAIL_CLOSED_HFA_SAMPLE_INSUFFICIENT",
+    "FAIL_CLOSED_HFA_MODEL_NOT_VALIDATED",
+    "FAIL_CLOSED_HFA_DOUBLE_COUNT_RISK",
+    "FAIL_CLOSED_HFA_CROSS_WEEK_IDENTITY"
+  ]
+}
