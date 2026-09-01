@@ -1,0 +1,56 @@
+name: Walters Matchup M2 Minnesota Shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/matchup-stage2/week-01-committee-jacobs-minnesota-input.json'
+      - 'tools/run-walters-matchup-m2-minnesota.mjs'
+      - '.github/workflows/walters-matchup-m2-minnesota.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-matchup-m2-minnesota-shadow
+  cancel-in-progress: false
+
+jobs:
+  minnesota-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve active Graham week
+        run: node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Run Minnesota-specific Jacobs matchup shadow
+        run: node tools/run-walters-matchup-m2-minnesota.mjs
+
+      - name: Verify protected live artifacts are untouched
+        run: |
+          git diff --exit-code -- data/walters/nfl/2026/week-01-current-numbers.json
+          git diff --exit-code -- data/walters/nfl/2026/week-01-personnel-ledger.json
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Commit Minnesota shadow artifacts
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/walters/nfl/matchup-stage2/week-01-committee-jacobs-minnesota-result.json data/walters/nfl/matchup-stage2/stage2-current.json
+          if git diff --cached --quiet; then
+            echo "Minnesota shadow artifacts unchanged"
+            exit 0
+          fi
+          git commit -m "Record Jacobs Minnesota matchup shadow"
+          git push
