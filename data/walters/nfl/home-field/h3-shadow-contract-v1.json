@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "acceptanceId": "walters-nfl-home-field-h3-shadow-v1",
+  "calibrationId": "walters-nfl-home-field-calibration-v1",
+  "stage": "H3",
+  "state": "READY_FOR_ACTIVE_WEEK_SHADOW",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Apply the frozen H2 home-field release to every game in the current active Graham week in shadow, explicitly classify venue type, preserve all non-location football adjustments and personnel overlays, and determine the proper scope for any later H4 production activation without changing the live board.",
+  "dependsOn": {
+    "h1Contract": "data/walters/nfl/home-field/home-field-calibration-v1.json",
+    "h2Current": "data/walters/nfl/home-field/h2-current.json",
+    "h2Release": "data/walters/nfl/home-field/home-field-release-2026-v1.json",
+    "h2Audit": "data/walters/nfl/home-field/h2-validation-audit-v1.json",
+    "h2Snapshot": "data/walters/nfl/home-field/source/nflverse-schedules-hfa-snapshot-2026-09-01.csv",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "governingRules": [
+    "H3 is shadow-only and may not mutate current Graham fairs, carried power ratings, personnel ledgers, or the player-value registry.",
+    "For a normal domestic home game, replace only the existing live location term with the H2 location term in shadow. All other exact fair components remain unchanged.",
+    "For a neutral or international-neutral game, the base home-location term is zero unless a later governed venue-specific differential is explicitly accepted.",
+    "Personnel overlays, QB uncertainty, weather, rest, travel, time-zone, surface and other non-HFA factors may not be absorbed into HFA or recomputed by H3.",
+    "Market data may not be used to classify, calibrate, accept, reject or tune an H3 result.",
+    "H3 must produce both a league-baseline shadow and a team/venue shadow so the H4 scope decision can distinguish evidence for a general league HFA from evidence for team-specific deviations.",
+    "A team/venue estimate may not receive H4 production candidacy merely because it changes a displayed Graham number; H2 chronological validation remains the governing evidence for whether team-specific deviations improve out-of-sample prediction.",
+    "Exact internal arithmetic is preserved before half-point display rounding."
+  ],
+  "venueClassificationPolicy": {
+    "source": "Pinned H2 nflverse filtered schedule snapshot plus current active-board identity.",
+    "DOMESTIC_HOME": "Snapshot location=Home and the game is not a shared-venue opponent matchup or otherwise specially classified.",
+    "NEUTRAL": "Snapshot location=Neutral at a domestic neutral site.",
+    "INTERNATIONAL_NEUTRAL": "Snapshot location=Neutral at an international venue; base home-location advantage remains zero.",
+    "SHARED_VENUE_OR_METRO": "If both opponents share the same governed home stadium/metro, do not blindly use normal home value; fail closed unless explicitly resolved.",
+    "RELOCATED_HOME": "A designated home game at a non-governed home venue requires explicit review and cannot inherit the normal team estimate automatically.",
+    "UNRESOLVED": "Any schedule identity or venue classification ambiguity fails closed."
+  },
+  "shadowArithmetic": {
+    "currentNonLocationExact": "currentExactFairHome - currentLocationPointsToHomeSpread",
+    "leagueBaselineLocationPointsToHomeSpread": "DOMESTIC_HOME => -H2.leagueBaselineHomeAdvantagePoints; neutral classes => 0",
+    "teamVenueLocationPointsToHomeSpread": "DOMESTIC_HOME => -H2.teamVenueEstimate[home].homeLocationAdvantagePoints; neutral classes => 0",
+    "leagueShadowExactFairHome": "currentNonLocationExact + leagueBaselineLocationPointsToHomeSpread",
+    "teamVenueShadowExactFairHome": "currentNonLocationExact + teamVenueLocationPointsToHomeSpread",
+    "displayRoundingIncrement": 0.5
+  },
+  "acceptanceRequirements": [
+    "H2 state is PASS_CURRENT_CALIBRATION_SHADOW_RELEASE with validationPass=true.",
+    "Every active-week game matches exactly one H2 snapshot record by season, home team and away team.",
+    "Every active-week game receives an explicit venue class with no unresolved classifications.",
+    "Every domestic home team has exactly one H2 team/venue estimate.",
+    "The current live location adjustment is identifiable and consistent with the active-board venue class.",
+    "Every shadow exact fair is reproducible by replacing only the location term.",
+    "Personnel overlays and all protected live artifacts remain byte-identical during H3.",
+    "Market isolation remains false/clean throughout H3."
+  ],
+  "h4ScopeDecisionRule": {
+    "leagueBaselineCandidate": "May advance when H2 chronological validation passed and H3 has no unresolved active-week venue or arithmetic cases.",
+    "teamVenueCandidate": "May advance only if the H2 team/venue candidate is no worse than the H2 league-only model on BOTH held-out domestic MAE and RMSE and H3 has no unresolved venue/arithmetic cases.",
+    "teamVenueIfNotSuperior": "Remain shadow/diagnostic even if individual Week 1 team-specific numbers appear intuitive or materially different.",
+    "neutralPolicyCandidate": "Zero base HFA for explicit neutral/international-neutral games may advance if identity/classification is resolved."
+  },
+  "outputs": {
+    "result": "data/walters/nfl/home-field/h3-week-01-shadow-result.json",
+    "current": "data/walters/nfl/home-field/h3-current.json"
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_H3_H2_NOT_ACCEPTED",
+    "FAIL_CLOSED_H3_SCHEDULE_IDENTITY",
+    "FAIL_CLOSED_H3_VENUE_UNRESOLVED",
+    "FAIL_CLOSED_H3_SHARED_VENUE_UNRESOLVED",
+    "FAIL_CLOSED_H3_RELOCATED_HOME_UNRESOLVED",
+    "FAIL_CLOSED_H3_HOME_ESTIMATE_MISSING",
+    "FAIL_CLOSED_H3_LIVE_LOCATION_TERM_UNRESOLVED",
+    "FAIL_CLOSED_H3_ARITHMETIC",
+    "FAIL_CLOSED_H3_DOUBLE_COUNT_RISK",
+    "FAIL_CLOSED_H3_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_H3_LIVE_ARTIFACT_MUTATION"
+  ]
+}
