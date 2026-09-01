@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "policyId": "core-1.4-liquidity-classification-r1-2026-09-01",
+  "state": "OPERATIONAL",
+  "targetCoreVersion": "1.4",
+  "purpose": "Deterministically separate structural market liquidity risk from executable-book availability, quote freshness, personnel uncertainty and sharp-benchmark availability when constructing Core 1.4 context.",
+  "controlledValues": ["NORMAL", "THIN", "UNKNOWN"],
+  "principles": {
+    "structuralNotAvailability": "liquidityRisk describes the underlying competition/market structure. It is not a count of currently fresh Bet365/DraftKings quotes.",
+    "executionAvailabilitySeparateGate": true,
+    "pinnacleAvailabilitySeparate": true,
+    "personnelUncertaintySeparate": true,
+    "priceMagnitudeAloneNotThin": true,
+    "rule": "Do not label a mainstream primary game market THIN merely because only one execution book is currently usable, the other execution book is absent/stale, Pinnacle is unavailable, or personnel is unresolved. Those conditions have their own Core/publication treatment."
+  },
+  "deterministicRules": [
+    {
+      "id": "mlb-primary-moneyline-normal",
+      "when": {
+        "sport": ["MLB"],
+        "marketClass": ["moneyline"],
+        "marketDetail": ["moneyline", "full_game_moneyline"]
+      },
+      "requiredLiquidityRisk": "NORMAL",
+      "reason": "A standard pregame MLB full-game moneyline is a mainstream primary market, not a structurally thin competition or derivative."
+    },
+    {
+      "id": "mlb-primary-spread-normal",
+      "when": {
+        "sport": ["MLB"],
+        "marketClass": ["spread"],
+        "marketDetail": ["spread", "run_line", "full_game_spread", "full_game_run_line"]
+      },
+      "requiredLiquidityRisk": "NORMAL",
+      "reason": "A standard pregame MLB full-game run line/spread is a mainstream primary market."
+    },
+    {
+      "id": "mlb-primary-total-normal",
+      "when": {
+        "sport": ["MLB"],
+        "marketClass": ["totals", "total"],
+        "marketDetail": ["total", "full_game_total", "full_game_totals"]
+      },
+      "requiredLiquidityRisk": "NORMAL",
+      "reason": "A standard pregame MLB full-game total is a mainstream primary market."
+    }
+  ],
+  "thinEvidence": {
+    "required": "THIN requires affirmative structural evidence that the competition or exact market is meaningfully less liquid/robust than a mainstream primary market.",
+    "validExamples": [
+      "niche or low-turnover competition",
+      "fragile derivative or alternate market",
+      "documented sparse market-making or materially restricted market depth"
+    ],
+    "invalidExamples": [
+      "only one fresh Bet365/DraftKings quote",
+      "one execution book unavailable or stale",
+      "Pinnacle benchmark unavailable",
+      "large American odds alone",
+      "unresolved lineup, starter, role or bullpen information"
+    ]
+  },
+  "outsideDeterministicScope": {
+    "rule": "For markets not covered by a deterministic rule, classify from explicit market-structure evidence. Use UNKNOWN when structural liquidity cannot be responsibly established; never infer THIN solely from quote availability."
+  },
+  "historyPolicy": {
+    "issuedReportsImmutable": true,
+    "rule": "This policy governs candidates produced after activation. Earlier issued reports are not rewritten solely to change a liquidityRisk label."
+  }
+}
