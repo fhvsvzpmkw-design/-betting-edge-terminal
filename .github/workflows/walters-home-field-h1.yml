@@ -1,0 +1,51 @@
+name: Walters Home Field H1 Contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/home-field/home-field-calibration-v1.json'
+      - 'tools/validate-walters-home-field-h1.mjs'
+      - '.github/workflows/walters-home-field-h1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walters-home-field-h1
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify active Graham week
+        run: node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Validate H1 home-field contract
+        run: |
+          node --check tools/validate-walters-home-field-h1.mjs
+          node tools/validate-walters-home-field-h1.mjs
+
+      - name: Verify H1 did not mutate live artifacts
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          git diff --exit-code -- "$ACTIVE_NUMBERS"
+          if [ -f "$ACTIVE_PERSONNEL" ]; then git diff --exit-code -- "$ACTIVE_PERSONNEL"; fi
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          echo "WALTERS HOME FIELD H1 LIVE ARTIFACT GUARD: PASS"
