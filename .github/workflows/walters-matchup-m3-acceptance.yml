@@ -10,7 +10,7 @@ on:
       - 'data/walters/nfl/matchup-stage2/week-01-committee-jacobs-minnesota-result.json'
       - 'data/walters/nfl/matchup-stage2/week-01-pearsall-rams-result.json'
       - 'data/walters/nfl/matchup-stage2/week-01-walker-steelers-result.json'
-      - 'tools/run-walters-matchup-m3-acceptance.mjs'
+      - 'tools/run-walters-matchup-m3-acceptance-v2.mjs'
       - '.github/workflows/walters-matchup-m3-acceptance.yml'
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
         run: node tools/graham-active-week.mjs --json >/dev/null
 
       - name: Run M3 acceptance gate
-        run: node tools/run-walters-matchup-m3-acceptance.mjs
+        run: node tools/run-walters-matchup-m3-acceptance-v2.mjs
 
       - name: Verify protected live artifacts are untouched
         run: |
