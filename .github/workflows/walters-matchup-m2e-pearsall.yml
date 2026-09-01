@@ -1,0 +1,57 @@
+name: Walters Matchup M2E Pearsall Shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/committee-replacement-calibration-v2.json'
+      - 'data/walters/nfl/matchup-stage2/week-01-pearsall-rams-input.json'
+      - 'tools/run-walters-matchup-m2e-pearsall.mjs'
+      - '.github/workflows/walters-matchup-m2e-pearsall.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-matchup-m2e-pearsall-shadow
+  cancel-in-progress: false
+
+jobs:
+  pearsall-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve active Graham week
+        run: node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Run Pearsall receiver committee and Rams matchup shadow
+        run: node tools/run-walters-matchup-m2e-pearsall.mjs
+
+      - name: Verify protected live artifacts are untouched
+        run: |
+          git diff --exit-code -- data/walters/nfl/2026/week-01-current-numbers.json
+          git diff --exit-code -- data/walters/nfl/2026/week-01-personnel-ledger.json
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Commit M2E shadow artifacts
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/walters/nfl/matchup-stage2/week-01-pearsall-rams-result.json data/walters/nfl/matchup-stage2/stage2-current.json
+          if git diff --cached --quiet; then
+            echo "M2E shadow artifacts unchanged"
+            exit 0
+          fi
+          git commit -m "Record Pearsall Rams M2E shadow case"
+          git push
