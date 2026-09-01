@@ -145,12 +145,16 @@ jobs:
           EVENT_SCHEDULE: seasonal-profile
         run: node /tmp/betting-edge-odds-worker.js
 
-      - name: Observe OddsPapi sharp market
+      - name: Refresh official Pinnacle sharp benchmark
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
-        continue-on-error: true
         env:
           ODDSPAPI_API_KEY: ${{ secrets.ODDSPAPI_API_KEY }}
-        run: node tools/oddspapi-observer.mjs
+        run: |
+          node --check tools/pinnacle-sharp-benchmark.mjs
+          node --check tools/oddspapi-observer.mjs
+          node tools/pinnacle-sharp-benchmark.mjs self-test
+          node tools/oddspapi-observer.mjs
+          node tools/pinnacle-sharp-benchmark.mjs validate-observer data/oddspapi-observer.json
 
       - name: Attach schedule provenance
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
@@ -263,7 +267,7 @@ jobs:
             echo "- Featured Vig Scope: \`${{ steps.schedule.outputs.featured_vig_scope }}\`"
             echo "- Gate: \`${{ steps.gate.outputs.reason || 'not-due' }}\`"
             echo "- Crypto fight watch: exact-pair priority inside 30 hours"
-            echo "- OddsPapi observer: observation-only, 25-request reserve protected"
+            echo "- Pinnacle: official non-executable sharp benchmark via OddsPapi; 25-request reserve protected"
             echo "- Five-pull daily cap: unchanged"
             echo "- Scheduled clock: Cloudflare only"
           } >> "$GITHUB_STEP_SUMMARY"
