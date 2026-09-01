@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-
-const DEFAULT_LEDGER='data/walters/nfl/2026/week-01-daily-market-ledger.json';
+import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 
 function parseArgs(argv){
   const out={sources:[]};
@@ -38,6 +37,7 @@ function usage(){
     '  use --pinnacle-status PINNACLE_UNAVAILABLE and omit --pinnacle; a null market observation is appended rather than substituting another book.',
     '',
     'Rules:',
+    '  * The default ledger is resolved from data/walters/nfl/active-week.json.',
     '  * Graham fair must already be complete before recording the market comparison.',
     '  * Daily snapshots are append-only; this tool never replaces an earlier observation.',
     '  * Positive grahamHomeStrengthGap means Graham rates the home team stronger than Pinnacle.'
@@ -75,12 +75,19 @@ function main(){
   const allowedTypes=new Set(['DAILY','GAME_DAY','CLOSE','BACKFILL','CORRECTION']);
   if(!allowedTypes.has(type))throw new Error(`Unsupported --type: ${type}`);
 
-  const ledgerPath=path.resolve(args.ledger||DEFAULT_LEDGER);
+  const active=args.ledger?null:resolveGrahamActiveWeek();
+  const ledgerPath=path.resolve(args.ledger||active.paths.dailyMarketLedger);
   const ledger=JSON.parse(fs.readFileSync(ledgerPath,'utf8'));
   if(ledger?.capturePolicy?.immutabilityRule==null)throw new Error('Ledger append-only policy missing');
-  const key=String(args.game).trim().toUpperCase().replace(/^2026-W01-/,'');
-  const game=ledger.games.find(g=>g.gameKey.toUpperCase()===`2026-W01-${key}`||`${g.away}-${g.home}`===key);
-  if(!game)throw new Error(`Unknown Week 1 game: ${args.game}`);
+  if(active&&(Number(ledger.season)!==active.season||Number(ledger.week)!==active.week))throw new Error('Default comparison ledger does not match active Graham week');
+
+  const key=String(args.game).trim().toUpperCase();
+  const game=(ledger.games||[]).find(g=>{
+    const full=String(g.gameKey||'').toUpperCase();
+    const short=`${String(g.away||'').toUpperCase()}-${String(g.home||'').toUpperCase()}`;
+    return full===key||short===key||full.endsWith(`-${key}`);
+  });
+  if(!game)throw new Error(`Unknown game in ${ledger.season} Week ${ledger.week}: ${args.game}`);
   const kick=Date.parse(game.startTimePacific);
   if(!Number.isNaN(kick)&&Date.parse(capturedAt)>=kick&&type!=='CORRECTION'){
     throw new Error('Ordinary comparison capture must be timestamped before kickoff');
@@ -111,7 +118,7 @@ function main(){
   ledger.state='DAILY_CAPTURE_ACTIVE';
 
   const summary=`${game.away}@${game.home} // Graham ${graham} // Pinnacle ${pinnacle==null?status:pinnacle} // gap ${gap==null?'n/a':gap}`;
-  if(args.dryRun){console.log(`DRY RUN // ${summary}`);return;}
+  if(args.dryRun){console.log(`DRY RUN // ${ledger.season} W${String(ledger.week).padStart(2,'0')} // ${summary}`);return;}
   fs.writeFileSync(ledgerPath,`${JSON.stringify(ledger,null,2)}\n`);
   const verify=JSON.parse(fs.readFileSync(ledgerPath,'utf8'));
   const vgame=verify.games.find(g=>g.gameKey===game.gameKey);
@@ -119,7 +126,7 @@ function main(){
   if(!last||last.sequence!==sequence||last.grahamFairHome!==graham||last.pinnacleSpreadHome!==pinnacle||last.grahamHomeStrengthGap!==gap){
     throw new Error('Daily comparison write/read-back verification failed');
   }
-  console.log(`RECORDED // ${summary}`);
+  console.log(`RECORDED // ${verify.season} W${String(verify.week).padStart(2,'0')} // ${summary}`);
 }
 
 try{main();}catch(err){console.error(`PINNACLE COMPARISON FAILED // ${err.message}`);process.exit(1);}
