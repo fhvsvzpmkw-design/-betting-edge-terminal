@@ -42,6 +42,12 @@ jobs:
             if(!s.includes("const URL='/api/bet-history'")) throw new Error(`${p}: canonical public endpoint missing`);
             fs.writeFileSync(p,s);
           }
+          const profilePath='data/characters/eddie-numbers.json';
+          const profile=JSON.parse(fs.readFileSync(profilePath,'utf8'));
+          profile.hotlineStyle.ledgerRules.freeBetRule='Never infer free-bet status from wager rows. Public row index 14 is the boosted flag. Use only the sanitized funding layer classes CASH, FREE_BET and MIXED_PROMO.';
+          profile.editorial.primaryFocus=['actual bankroll and full-ledger P/L','full/all-in actual-capital ROI','cash ROI as a secondary diagnostic','weekly and monthly performance','risk and ticket volume','sport-by-sport results','sportsbook-by-sportsbook results','pregame versus after-start risk','parlay concentration','recent-ticket sequence'];
+          profile.continuity.track=['ledger generatedAt','latest recorded wager date','bankroll','full-ledger P/L and ROI','cash P/L and ROI','promotional contribution','current ledger week','current ledger month','sport and sportsbook breakdowns','behaviour ratios','last ten settled public wagers'];
+          fs.writeFileSync(profilePath,JSON.stringify(profile,null,2)+'\n');
           NODE
       - name: Validate Muddy contracts
         run: |
@@ -53,6 +59,6 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html data/characters/eddie-numbers.json
           git commit -m 'muddy: actual CAD with no residual scaling'
           git push origin main
