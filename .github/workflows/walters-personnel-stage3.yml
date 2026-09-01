@@ -1,0 +1,83 @@
+name: Walters personnel Stage 3 shadow acceptance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/walters-personnel-stage3.yml
+      - tools/run-walters-stage3-week1.py
+      - data/walters/nfl/stage3/week-01-personnel-acceptance-input.json
+      - data/walters/nfl/player-values/stage2-current.json
+      - data/walters/nfl/player-values/player-values-2026-v1.json
+      - data/walters/nfl/2026/week-01-current-numbers.json
+  workflow_dispatch:
+
+concurrency:
+  group: walters-personnel-stage3
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  shadow-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Capture governed files before test
+        run: |
+          sha256sum data/walters/nfl/2026/week-01-current-numbers.json > /tmp/week1.sha
+          sha256sum data/walters/nfl-power-ratings-ledger.json > /tmp/power.sha
+
+      - name: Run Stage 3 shadow acceptance
+        run: python tools/run-walters-stage3-week1.py
+
+      - name: Verify isolation and acceptance
+        run: |
+          sha256sum -c /tmp/week1.sha
+          sha256sum -c /tmp/power.sha
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('data/walters/nfl/stage3')
+          current=json.loads((root/'stage3-current.json').read_text())
+          result=json.loads((root/'week-01-personnel-acceptance-result.json').read_text())
+          assert current['acceptancePass'] is True, current
+          assert current['stage4Authority'] is False
+          assert current['productionAuthority'] is False
+          assert current['marketViewed'] is False
+          assert result['state']=='PASS_SHADOW_ACCEPTANCE'
+          assert result['marketViewed'] is False
+          assert result['liveBoardMutation'] is False
+          assert result['carriedRatingMutation'] is False
+          assert result['productionAuthority'] is False
+          assert result['numericShadowCaseCount'] >= 1
+          assert result['failClosedCaseCount'] >= 1
+          assert all(c['liveBoardChanged'] is False for c in result['cases'])
+          assert all(c['pointsToHomeSpread'] is None for c in result['cases'] if c['shadowStatus']=='FAIL_CLOSED_NO_NUMERIC_MOVE')
+          print(f"WALTERS STAGE 3 VERIFY: PASS // NUMERIC {result['numericShadowCaseCount']} // FAIL-CLOSED {result['failClosedCaseCount']} // LIVE BOARD UNCHANGED")
+          PY
+
+      - name: Publish shadow acceptance artifacts only
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/walters/nfl/stage3/week-01-personnel-acceptance-result.json data/walters/nfl/stage3/stage3-current.json
+          if git diff --cached --quiet; then
+            echo "No Stage 3 artifact changes to publish."
+            exit 0
+          fi
+          git commit -m "Run Walters Stage 3 Week 1 shadow acceptance"
+          git push origin HEAD:main
