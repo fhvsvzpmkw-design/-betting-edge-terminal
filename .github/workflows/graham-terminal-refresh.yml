@@ -40,6 +40,30 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Verify active-week resolver and next-week path contract
+        run: |
+          set -euo pipefail
+          node --check tools/graham-active-week.mjs
+          node --input-type=module - <<'NODE'
+          import {resolveGrahamActiveWeek,grahamWeekPaths} from './tools/graham-active-week.mjs';
+          const active=resolveGrahamActiveWeek();
+          const nextWeek=active.week+1;
+          const next=grahamWeekPaths(active.season,nextWeek);
+          const token=String(nextWeek).padStart(2,'0');
+          const expected={
+            currentNumbers:`data/walters/nfl/${active.season}/week-${token}-current-numbers.json`,
+            researchLedger:`data/walters/nfl/${active.season}/week-${token}-research-ledger.json`,
+            dailyMarketLedger:`data/walters/nfl/${active.season}/week-${token}-daily-market-ledger.json`,
+            personnelLedger:`data/walters/nfl/${active.season}/week-${token}-personnel-ledger.json`,
+            researchEventsDir:`data/walters/nfl/${active.season}/week-${token}-research-events`
+          };
+          for(const [key,value] of Object.entries(expected)){
+            if(next.relative[key]!==value)throw new Error(`next-week path mismatch for ${key}: ${next.relative[key]} != ${value}`);
+          }
+          if(next.week!==nextWeek||next.season!==active.season)throw new Error('next-week resolver arithmetic failed');
+          console.log(`GRAHAM WEEK RESOLVER TEST: PASS // ACTIVE ${active.season} W${active.weekToken} // PREVIEW ${next.season} W${next.weekToken}`);
+          NODE
+
       - name: Rebuild and publish Graham terminal
         run: |
           set -euo pipefail
@@ -95,6 +119,7 @@ jobs:
             echo
             echo "- Trigger: odds refresh or Graham research/personnel/active-week publication"
             echo "- Active week: ${ACTIVE:-unresolved}"
+            echo "- Active-week resolver regression: current + next-week path contract checked"
             echo "- External API calls: none"
             echo "- Live board: repository active NFL week"
             echo "- Graham fair: rebuilt immediately after governed Graham research changes"
