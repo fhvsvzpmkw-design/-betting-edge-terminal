@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-matchup-calibration-v1",
+  "stage": "M1",
+  "state": "CONTRACT_LOCKED_SHADOW_ONLY",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Define the governed football-only rules that may convert an existing Walters personnel loss into a game-specific matchup value without changing the underlying player-value registry, carried team rating, or current Graham board during Stage M1.",
+  "dependsOn": {
+    "personnelCalibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "personnelProduction": "data/walters/nfl/personnel-production-current.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "sourceAuthority": {
+    "primary": "Billy Walters with Armen Keteyian, Gambler, Chapters 21-22",
+    "governingPrinciples": [
+      "All relevant football variables must ultimately be expressed in point-spread-equivalent units.",
+      "Published player rankings are starting inputs only; game-specific football mechanics may make the same player materially more or less valuable in a particular matchup.",
+      "A matchup adjustment must begin from the governed healthy-player value, governed replacement value, current availability, and verified role already established by the personnel system.",
+      "A matchup adjustment is a game-specific overlay and may not silently alter the frozen player-value registry or carried team power rating.",
+      "Market reaction may never be used to infer or calibrate matchup value."
+    ],
+    "sourceLockedExample": {
+      "type": "PASS_PROTECTION_CASCADE",
+      "description": "The existing personnel calibration preserves Walters' example that Tristan Wirfs could be worth substantially more in a particular Rams matchup than his ordinary player value because the opponent pass rush, backup situation, and cascading protection effects change the football consequences of the absence.",
+      "role": "PROOF_OF_CONCEPT_NOT_AUTOMATIC_MULTIPLIER",
+      "rule": "Do not generalize the example into a universal multiplier or cap."
+    }
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "line movement",
+      "market-implied player value",
+      "betting percentages",
+      "closing-line value"
+    ],
+    "rule": "Matchup screening, evidence collection, scoring and shadow calculation must be completed before any contemporaneous market comparison is viewed."
+  },
+  "baseValueRule": {
+    "normalPersonnelLossFormula": "normalTeamLoss = healthyValue - replacementValue for an unavailable healthy starter, after any already-governed effectiveness and cluster treatment",
+    "startingAuthority": "Use only values produced by the active Walters personnel calibration and production ledger.",
+    "noRevaluation": "Stage M1 may not change healthyValue, replacementValue, Madden OVR bands, QB bands, or carried team ratings."
+  },
+  "eligibleMatchupFamilies": {
+    "PASS_PROTECTION_PRESSURE": {
+      "offenseRoles": ["LT", "LG", "C", "RG", "RT", "TE", "RB"],
+      "defenseRoles": ["EDGE", "LE", "RE", "DT", "NT", "LB", "OLB"],
+      "candidateWhen": [
+        "a positive-value blocker is unavailable, limited, or replaced by a materially weaker verified player",
+        "the opponent has a verified high-impact pass-rush player or front expected to attack the affected protection area",
+        "the missing player's role and replacement assignment are sufficiently resolved"
+      ],
+      "requiredFootballEvidence": [
+        "expected protection/alignment responsibility",
+        "replacement role or protection responsibility",
+        "opponent pressure source or front structure",
+        "credible current team/depth/coach/reporting sourceRefs"
+      ],
+      "automaticNumericMove": false
+    },
+    "COVERAGE_TARGET": {
+      "offenseRoles": ["WR", "TE"],
+      "defenseRoles": ["CB", "FS", "SS"],
+      "candidateWhen": [
+        "a positive-value coverage or receiving player is unavailable, limited, or materially replaced",
+        "the opposing offense/defense has a verified primary target, alignment, or coverage responsibility that interacts directly with the loss",
+        "the expected replacement and assignment are sufficiently resolved"
+      ],
+      "requiredFootballEvidence": [
+        "outside/slot/tight-end alignment or coverage role",
+        "expected opposing primary matchup or usage",
+        "replacement assignment",
+        "credible current sourceRefs"
+      ],
+      "automaticNumericMove": false
+    },
+    "MIDDLE_FIELD_COVERAGE": {
+      "offenseRoles": ["TE", "RB", "WR"],
+      "defenseRoles": ["LB", "MLB", "OLB", "FS", "SS"],
+      "candidateWhen": [
+        "the unavailable or limited defender/offensive player has a material middle-field, receiving, coverage, or tackling role",
+        "the opponent is expected to stress that role through tight ends, backs, slot usage, or intermediate middle-field concepts",
+        "the replacement role is sufficiently resolved"
+      ],
+      "requiredFootballEvidence": [
+        "usage/alignment evidence",
+        "coverage or receiving responsibility",
+        "replacement role",
+        "credible current sourceRefs"
+      ],
+      "automaticNumericMove": false
+    },
+    "RUN_GAME_FRONT": {
+      "offenseRoles": ["LT", "LG", "C", "RG", "RT", "TE", "RB", "FB"],
+      "defenseRoles": ["EDGE", "LE", "RE", "DT", "NT", "LB", "MLB", "OLB", "SS"],
+      "candidateWhen": [
+        "a material run-blocking, run-defense, tackling, or ball-carrier role is degraded",
+        "the opponent's expected rushing structure directly stresses that role",
+        "the replacement and assignment are sufficiently resolved"
+      ],
+      "requiredFootballEvidence": [
+        "run-game role or front responsibility",
+        "opponent rushing/front structure",
+        "replacement responsibility",
+        "credible current sourceRefs"
+      ],
+      "automaticNumericMove": false
+    },
+    "PROTECTION_CASCADE": {
+      "offenseRoles": ["LT", "LG", "C", "RG", "RT", "TE", "RB", "QB"],
+      "defenseRoles": ["EDGE", "LE", "RE", "DT", "NT", "LB", "OLB"],
+      "candidateWhen": [
+        "multiple protection roles are degraded or one loss forces a verified secondary protection change",
+        "the opponent has a front or rusher capable of exploiting the resulting protection change",
+        "the cascade is described with explicit football mechanics rather than generic injury accumulation"
+      ],
+      "requiredFootballEvidence": [
+        "which protection responsibilities change",
+        "which additional player or unit role is affected",
+        "why the opponent can exploit the cascade",
+        "credible current sourceRefs"
+      ],
+      "automaticNumericMove": false
+    }
+  },
+  "screeningRules": {
+    "materialityGate": "Do not open a matchup case merely because two opposing players are highly rated. There must be a current personnel, role, or availability change whose normal personnel value could plausibly be materially altered by the opponent-specific football mechanics.",
+    "resolvedRoleRequired": true,
+    "replacementRequiredWhenApplicable": true,
+    "uncertainAssignmentAction": "FAIL_CLOSED_MATCHUP_ROLE_UNRESOLVED",
+    "genericNarrativeAction": "FAIL_CLOSED_MATCHUP_NOT_MATERIAL",
+    "marketReferencedAction": "FAIL_CLOSED_MARKET_CONTAMINATION",
+    "duplicatePersonnelLossAction": "FAIL_CLOSED_DOUBLE_COUNT_RISK"
+  },
+  "numericGovernance": {
+    "stageM1NumericAuthority": false,
+    "automaticMultipliersAllowed": false,
+    "automaticPositionMultipliersAllowed": false,
+    "universalMatchupCapsDefined": false,
+    "shadowFormulaForLaterStages": "matchupAdjustedTeamLoss = normalTeamLoss + approvedMatchupIncrement; pointsToHomeSpread follows the existing home/away sign convention",
+    "approvedMatchupIncrement": "Must remain null in Stage M1. Stage M2 may populate a shadow-only increment only after the matchup family, evidence, normal loss, replacement and football mechanism all pass review.",
+    "negativeAdjustmentAllowedLater": true,
+    "negativeAdjustmentMeaning": "A specific opponent can make the normal personnel loss less damaging than baseline; any reduction must be supported to the same standard as amplification.",
+    "rounding": "Preserve exact internal arithmetic; live half-point board rounding remains outside Stage M1 and is not invoked."
+  },
+  "doubleCountGuard": {
+    "personnel": "The normal healthy-minus-replacement loss is the starting point and may be counted once only.",
+    "clusters": "If a governed receiver or defensive-line cluster multiplier has already changed the normal personnel loss, Stage M2 must begin from that post-cluster loss and may not reapply the cluster effect.",
+    "teamRating": "Never carry a temporary matchup overlay into currentRating.",
+    "gameFactors": "Home field, venue, rest, travel and weather remain separate game adjustments and may not be restated as matchup value.",
+    "postgame": "TGPL/injury-environment learning may not carry a completed pregame matchup overlay forward a second time."
+  },
+  "requiredCaseRecord": [
+    "matchupCaseId",
+    "gameKey",
+    "team",
+    "side",
+    "matchupFamily",
+    "affectedPlayer",
+    "affectedPosition",
+    "availabilityStatus",
+    "healthyValue",
+    "replacementPlayer",
+    "replacementValue",
+    "normalTeamLoss",
+    "existingClusterTreatment",
+    "opponentStressPlayerOrUnit",
+    "footballMechanism",
+    "roleEvidence",
+    "opponentEvidence",
+    "sourceRefs",
+    "marketViewed",
+    "screeningStatus",
+    "approvedMatchupIncrement",
+    "shadowAdjustedTeamLoss",
+    "calibrationId",
+    "calculatedAt"
+  ],
+  "stageM2EntryGate": {
+    "required": [
+      "M1 contract validator passes",
+      "no live board mutation from M1",
+      "no market-derived matchup inputs",
+      "Week 1 candidate screen completed across all active games",
+      "candidate cases contain resolved football roles and sourceRefs",
+      "shadow arithmetic can be reproduced from the existing personnel ledger"
+    ],
+    "nextState": "M2_WEEK1_SHADOW_CALIBRATION"
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_MATCHUP_ROLE_UNRESOLVED",
+    "FAIL_CLOSED_MATCHUP_REPLACEMENT_UNRESOLVED",
+    "FAIL_CLOSED_MATCHUP_NOT_MATERIAL",
+    "FAIL_CLOSED_MATCHUP_EVIDENCE_INSUFFICIENT",
+    "FAIL_CLOSED_MATCHUP_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_MATCHUP_DOUBLE_COUNT_RISK",
+    "FAIL_CLOSED_MATCHUP_NUMERIC_NOT_CALIBRATED"
+  ]
+}
