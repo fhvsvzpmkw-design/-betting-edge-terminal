@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - .github/workflows/graham-personnel-production.yml
       - data/walters/nfl/personnel-staging.json
       - data/walters/nfl/personnel-production-current.json
       - tools/apply-graham-personnel-staging.mjs
@@ -42,11 +43,9 @@ jobs:
           NODE
 
       - name: Apply governed personnel staging batch
-        if: ${{ hashFiles('data/walters/nfl/personnel-staging.json') != '' }}
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json
 
       - name: Verify market isolation and live outputs
-        if: ${{ hashFiles('data/walters/nfl/personnel-staging.json') != '' }}
         run: |
           node - <<'NODE'
           const fs=require('node:fs');
@@ -63,7 +62,6 @@ jobs:
           NODE
 
       - name: Publish governed personnel outputs
-        if: ${{ hashFiles('data/walters/nfl/personnel-staging.json') != '' }}
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
