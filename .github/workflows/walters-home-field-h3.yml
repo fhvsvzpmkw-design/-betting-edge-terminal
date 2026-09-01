@@ -1,0 +1,78 @@
+name: Walters Home Field H3 Shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/home-field/h3-shadow-contract-v1.json'
+      - 'data/walters/nfl/home-field/h2-current.json'
+      - 'data/walters/nfl/home-field/home-field-release-2026-v1.json'
+      - 'data/walters/nfl/home-field/h2-validation-audit-v1.json'
+      - 'tools/run-walters-home-field-h3.mjs'
+      - '.github/workflows/walters-home-field-h3.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-home-field-h3
+  cancel-in-progress: false
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify active Graham week and H2 state
+        run: |
+          node --check tools/graham-active-week.mjs
+          node --check tools/run-walters-home-field-h3.mjs
+          node tools/graham-active-week.mjs --json >/dev/null
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const h2=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/h2-current.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          if(h2.state!=='PASS_CURRENT_CALIBRATION_SHADOW_RELEASE'||h2.validationPass!==true)throw new Error('H2 calibration not accepted');
+          if(active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER')throw new Error('active Graham week invalid');
+          console.log(`WALTERS HOME FIELD H3 PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')}`);
+          NODE
+
+      - name: Run H3 active-week shadow acceptance
+        run: node tools/run-walters-home-field-h3.mjs
+
+      - name: Verify H3 did not mutate live Graham artifacts
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          git diff --exit-code -- "$ACTIVE_NUMBERS"
+          if [ -f "$ACTIVE_PERSONNEL" ]; then git diff --exit-code -- "$ACTIVE_PERSONNEL"; fi
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+          echo "WALTERS HOME FIELD H3 LIVE ARTIFACT GUARD: PASS"
+
+      - name: Publish H3 shadow artifacts
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          ACTIVE_WEEK="$(node -e "const a=require('./data/walters/nfl/active-week.json');process.stdout.write(String(a.week).padStart(2,'0'))")"
+          git add "data/walters/nfl/home-field/h3-week-${ACTIVE_WEEK}-shadow-result.json" data/walters/nfl/home-field/h3-current.json
+          if git diff --cached --quiet; then
+            echo "H3 shadow artifacts unchanged"
+            exit 0
+          fi
+          git commit -m "Record Walters home-field H3 shadow acceptance"
+          git push origin HEAD:main
