@@ -1,0 +1,75 @@
+name: Core 1.4 Liquidity Classification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'core/core-liquidity-classification-v1.4.json'
+      - 'core/core-v1.4-production.json'
+      - 'tools/core-liquidity-classification.mjs'
+      - 'tools/core-assessment-trace-gate.mjs'
+      - '.github/workflows/core-liquidity-classification-v14.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core-v14-liquidity-classification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate liquidity policy and classifier
+        run: |
+          set -euo pipefail
+          node --check tools/core-liquidity-classification.mjs
+          node tools/core-liquidity-classification.mjs self-test
+
+      - name: Validate Core trace integration
+        run: |
+          set -euo pipefail
+          node --check tools/core-assessment-trace-gate.mjs
+          node tools/core-assessment-trace-gate.mjs self-test
+
+      - name: Verify immutable Core 1.4 history remains valid
+        run: node tools/core-v14-publication-gate.mjs verify-history
+
+      - name: Audit issued September 1 15:15 report without mutation
+        run: |
+          set -euo pipefail
+          node tools/core-liquidity-classification.mjs audit --report data/history/runs/2026-09-01/evening-152300.json | tee /tmp/liquidity-audit.json
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const x=JSON.parse(fs.readFileSync('/tmp/liquidity-audit.json','utf8'));
+          if(x.defects!==9) throw new Error(`Expected 9 historical MLB liquidity classification defects, got ${x.defects}`);
+          console.log('HISTORICAL MLB LIQUIDITY AUDIT: 9/9 PRIMARY MONEYLINES WERE MISCLASSIFIED THIN; ISSUED REPORT PRESERVED IMMUTABLE');
+          NODE
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '## Core 1.4 liquidity classification'
+            echo
+            echo '- Mainstream MLB full-game moneyline/spread/total: NORMAL'
+            echo '- One execution book missing/stale: not liquidity evidence'
+            echo '- Pinnacle unavailable: not liquidity evidence'
+            echo '- Personnel uncertainty: separate Core dimension'
+            echo '- September 1 15:15 issued report: audited only, not rewritten'
+            echo '- Future candidates: deterministic liquidity rule enforced by Core trace gate'
+          } >> "$GITHUB_STEP_SUMMARY"
