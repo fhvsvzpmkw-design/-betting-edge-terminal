@@ -4,8 +4,12 @@
 The PDF folder is the active-library source of truth. Existing manifest metadata is
 preserved for files that remain present. Newly added PDFs are registered as
 available but not analyzed. Entries whose PDF has been removed disappear from the
-active manifest. This script registers sources only; it never analyzes document
-content.
+active manifest.
+
+Approved manual-review metadata may be stored as
+research/season-previews/private/*-manifest.json. Those sidecars are merged into
+the matching PDF entry after registration. The sync script never analyzes document
+content; it only applies already-approved review metadata.
 """
 
 from __future__ import annotations
@@ -17,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIR = ROOT / "research" / "season-previews" / "source-pdfs"
+PRIVATE_DIR = ROOT / "research" / "season-previews" / "private"
 MANIFEST_PATH = ROOT / "research" / "season-previews" / "manifest.json"
 
 DEFAULT_POLICY = {
@@ -124,6 +129,59 @@ def load_manifest() -> dict:
         return json.load(handle)
 
 
+def load_review_patches() -> list[dict]:
+    """Load approved manifest patches produced by completed manual reviews."""
+    if not PRIVATE_DIR.exists():
+        return []
+    patches: list[dict] = []
+    for path in sorted(PRIVATE_DIR.glob("*-manifest.json")):
+        try:
+            with path.open("r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(f"Invalid Meat Desk review metadata: {path}: {exc}") from exc
+        patch = payload.get("manifestPatch")
+        if not isinstance(patch, dict):
+            continue
+        source_id = payload.get("sourceId")
+        filename = payload.get("file")
+        if not source_id and not filename:
+            raise RuntimeError(f"Review metadata needs sourceId or file: {path}")
+        patches.append({
+            "sourceId": source_id,
+            "file": filename,
+            "patch": patch,
+            "path": path.relative_to(ROOT).as_posix(),
+        })
+    return patches
+
+
+def apply_review_patches(sources: list[dict], patches: list[dict]) -> list[dict]:
+    """Merge approved manual-review metadata into matching active source entries."""
+    for review in patches:
+        matches = [
+            source
+            for source in sources
+            if (
+                review.get("sourceId")
+                and source.get("id") == review.get("sourceId")
+            ) or (
+                review.get("file")
+                and source.get("file") == review.get("file")
+            )
+        ]
+        if not matches:
+            continue
+        if len(matches) > 1:
+            raise RuntimeError(
+                f"Review metadata matched multiple Meat Desk sources: {review['path']}"
+            )
+        target = matches[0]
+        target.update(review["patch"])
+        target["reviewMetadata"] = review["path"]
+    return sources
+
+
 def main() -> None:
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
     manifest = load_manifest()
@@ -166,6 +224,8 @@ def main() -> None:
         else:
             sources.append(new_entry(pdf))
 
+    sources = apply_review_patches(sources, load_review_patches())
+
     manifest["schema"] = max(int(manifest.get("schema", 0) or 0), 3)
     manifest["title"] = manifest.get("title") or "Meat Desk Source Library"
     manifest["updatedAt"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -186,6 +246,8 @@ def main() -> None:
         print("Added: " + ", ".join(added))
     if removed:
         print("Removed: " + ", ".join(name for name in removed if name))
+    if patches := load_review_patches():
+        print(f"Applied approved review metadata: {len(patches)}")
 
 
 if __name__ == "__main__":
