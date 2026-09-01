@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "registryId": "graham-mercer-nfl-research-sources-v1",
+  "sport": "NFL",
+  "season": 2026,
+  "state": "ACTIVE",
+  "updatedAt": "2026-09-01T04:35:00Z",
+  "purpose": "Declare durable non-market research inputs that Graham Mercer must consult during governed NFL information reviews without granting those sources automatic numeric authority over carried ratings or BW FAIR.",
+  "governance": {
+    "marketIndependenceRequired": true,
+    "rule": "Research sources may identify, confirm, challenge or supersede factual team-state assumptions. They may not set, shade or anchor Graham numbers from sportsbook prices or source opinions.",
+    "numericMoveRule": "A carried Graham rating or fair-number change requires an explicit governed delta/adjustment, reason, sourceRefs and preserved prior value under the source-locked Walters methodology. No source in this registry may silently move BW FAIR.",
+    "freshnessRule": "For factual current status, later official or reliable current reporting outranks an older guide snapshot. Preserve the guide item as provenance when later evidence updates it.",
+    "opinionRule": "VSiN expert picks and Makinen systems are advisory research context only. They are not independent numeric Walters adjustments and may not create a Graham BET or move a Graham fair by themselves.",
+    "priceRule": "Any prices printed in a guide are historical source snapshots and may not supply executable price authority."
+  },
+  "sources": [
+    {
+      "id": "vsin-nfl-2026-origin-seed",
+      "publisher": "VSiN",
+      "title": "2026 VSiN NFL Betting Guide",
+      "version": "PRESEASON 1.0",
+      "role": "IMMUTABLE_ORIGIN_SEED_PROVENANCE",
+      "seedDataset": "core/staging/walters-nfl-seed-dataset-2026.json",
+      "privateResearch": "research/season-previews/private/2026-vsin-nfl-source2-preseason1.json",
+      "lineage": "research/season-previews/private/2026-vsin-nfl-source2-lineage.json",
+      "policy": {
+        "mayResetCarriedRating": false,
+        "mayMoveCarriedRatingDirectly": false,
+        "mayMoveFairDirectly": false,
+        "maySupplyExecutablePrice": false,
+        "mayCreateBet": false
+      },
+      "notes": "Preserves where the 2026 Graham/Makinen rating lineage began. CurrentRating carries forward independently and is never reset merely because this seed exists."
+    },
+    {
+      "id": "vsin-nfl-2026-postpreseason-2",
+      "publisher": "VSiN",
+      "title": "2026 VSiN NFL Betting Guide 2.0",
+      "version": "POST-PRESEASON 2.0",
+      "role": "SUPPLEMENTAL_CURRENT_REVALIDATION",
+      "privateResearch": "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+      "lineage": "research/season-previews/private/2026-vsin-nfl-source2-lineage.json",
+      "sourceManifest": "research/season-previews/manifest.json",
+      "status": "FOUR_PASS_REVIEW_COMPLETE",
+      "requiredUse": [
+        "Consult relevant team-state deltas during Graham baseline, daily, late-delta and Sunday pregame research.",
+        "Use personnel, injury, role, coaching and roster changes as revalidation prompts and attributable evidence where still current.",
+        "Treat the unchanged 32-team Makinen table as confirmation of the origin-seed values only; do not rebase current carried Graham ratings.",
+        "Preserve NEW, UPDATED, CONFIRMED, CLARIFIED, SUPERSEDED, CONFLICT and STALE_REVALIDATE classifications when citing this review.",
+        "Cross-check material guide facts against current official/reliable information before using them as current-status evidence."
+      ],
+      "policy": {
+        "mayFlagPersonnelOrTeamState": true,
+        "mayConfirmOriginSeed": true,
+        "mayTriggerExplicitReReview": true,
+        "mayBeCitedInSourceRefs": true,
+        "mayResetCarriedRating": false,
+        "mayMoveCarriedRatingDirectly": false,
+        "mayMoveFairDirectly": false,
+        "maySupplyExecutablePrice": false,
+        "mayCreateBet": false,
+        "requiresExplicitGovernedDeltaForNumericChange": true
+      },
+      "excludedFromNumericAuthority": [
+        "expert best bets",
+        "Week 1 historical system counts",
+        "futures prices",
+        "Survivor/Circa strategy",
+        "source consensus or disagreement by itself"
+      ],
+      "notes": "This is an update layer on VSiN 1.0, not a second Graham model. It provides reviewed current-information leads and provenance; the governing Walters package and explicit audited adjustment process remain the only path to a Graham numeric change."
+    }
+  ]
+}
