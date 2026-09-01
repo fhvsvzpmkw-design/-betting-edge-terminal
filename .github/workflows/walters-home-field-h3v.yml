@@ -1,0 +1,106 @@
+name: Walters Home Field H3V Selective Venue
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/home-field/h3v-selective-venue-contract-v1.json'
+      - 'tools/run-walters-home-field-h3v.py'
+      - '.github/workflows/walters-home-field-h3v.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-home-field-h3v
+  cancel-in-progress: false
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install locked numeric dependency
+        run: python -m pip install --disable-pip-version-check 'numpy==2.3.2'
+
+      - name: Verify H3 and H3V model boundary
+        run: |
+          node tools/graham-active-week.mjs --json >/dev/null
+          python - <<'PY'
+          import json
+          h3=json.load(open('data/walters/nfl/home-field/h3-current.json'))
+          c=json.load(open('data/walters/nfl/home-field/h3v-selective-venue-contract-v1.json'))
+          assert h3['state']=='PASS_SHADOW_ACCEPTANCE_LEAGUE_BASELINE_H4_CANDIDATE_TEAM_VENUE_DIAGNOSTIC'
+          assert h3['h4ScopeCandidate']['leagueBaseline'] is True
+          assert h3['h4ScopeCandidate']['teamVenue'] is False
+          assert c['stage']=='H3V' and c['state']=='MODEL_LOCKED_PRE_2025_CONFIRMATION'
+          assert c['productionAuthority'] is False and c['liveBoardMutationAllowed'] is False and c['marketViewed'] is False
+          assert c['internalRollingCalibration']['finalConfirmationSeason']==2025
+          assert c['internalRollingCalibration']['finalConfirmationMayTuneModel'] is False
+          assert c['venueQualification']['pre2025Only'] is True
+          print('WALTERS HOME FIELD H3V PREFLIGHT: PASS // MODEL + VENUE SET RULES LOCKED BEFORE 2025 CONFIRMATION')
+          PY
+
+      - name: Run H3V selective venue calibration
+        run: python tools/run-walters-home-field-h3v.py
+
+      - name: Verify H3V did not mutate live Graham artifacts
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          git diff --exit-code -- "$ACTIVE_NUMBERS"
+          git diff --exit-code -- "$ACTIVE_PERSONNEL"
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+          echo "WALTERS HOME FIELD H3V LIVE ARTIFACT GUARD: PASS"
+
+      - name: Verify H3V result boundary
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('data/walters/nfl/home-field/h3v-selective-venue-result-v1.json'))
+          c=json.load(open('data/walters/nfl/home-field/h3v-current.json'))
+          allowed={
+            'PASS_SELECTIVE_VENUE_H4_CANDIDATE',
+            'PASS_NO_SELECTIVE_VENUES_H4_LEAGUE_ONLY',
+            'FAIL_CLOSED_SELECTIVE_VENUE_NOT_VALIDATED'
+          }
+          assert r['state'] in allowed and c['state']==r['state']
+          assert r['productionAuthority'] is False and r['liveBoardMutationAllowed'] is False and r['marketViewed'] is False
+          assert r['h4ScopeCandidate']['teamVenueBlanket'] is False
+          assert r['activeWeekShadow']['liveMoves']==0
+          print(f"WALTERS HOME FIELD H3V RESULT: {r['state']} // k={r['h4ScopeCandidate']['survivalCoefficientK']} // QUALIFIED={r['h4ScopeCandidate']['qualifiedVenueCount']} // 0 LIVE MOVES")
+          PY
+
+      - name: Publish H3V artifacts
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- \
+            data/walters/nfl/home-field/h3v-selective-venue-result-v1.json \
+            data/walters/nfl/home-field/h3v-current.json
+          if git diff --cached --quiet; then
+            echo "No H3V artifacts changed"
+            exit 0
+          fi
+          git commit -m "Record Walters H3V selective venue calibration"
+          git push origin HEAD:main
