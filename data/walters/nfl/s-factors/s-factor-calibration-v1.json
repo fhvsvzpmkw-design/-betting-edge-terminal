@@ -1,0 +1,379 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-s-factor-calibration-v1",
+  "stage": "S1",
+  "state": "CONTRACT_LOCKED_SHADOW_ONLY",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Define a source-locked, market-isolated calibration path for Walters S-factors using deterministic schedule, surface, travel and body-clock facts while preserving H4 home field, personnel, matchup, weather and carried team-rating authority as separate layers.",
+  "dependsOn": {
+    "activeWeek": "data/walters/nfl/active-week.json",
+    "homeFieldProduction": "data/walters/nfl/home-field/home-field-production-current.json",
+    "powerRatings": "data/walters/nfl-power-ratings-ledger.json",
+    "personnelProduction": "data/walters/nfl/personnel-production-current.json",
+    "matchupProduction": "data/walters/nfl/matchup-production-current.json"
+  },
+  "sourceAuthority": {
+    "primary": "Billy Walters with Armen Keteyian, Gambler, Chapters 21-22",
+    "bookExact": [
+      {
+        "pages": "238, 249, 254-257, 262",
+        "ruleIds": ["BW-R012", "BW-R013"],
+        "rule": "S-factors are game-specific point-spread-equivalent adjustments for turf/surface, division/conference familiarity, rest and schedule situations, byes, travel, time zones, bounce-back situations and related special circumstances."
+      },
+      {
+        "pages": "254-255, 262",
+        "ruleIds": ["BW-R013"],
+        "rule": "BOOK-EXACT conversion is 0.20 spread point per S unit; five S units equal one spread point."
+      },
+      {
+        "pages": "255-257",
+        "ruleIds": ["BW-R012", "BW-R013"],
+        "rule": "The printed factor values are explicitly a 2022-23 snapshot and must be reevaluated from year to year; factors may be upgraded, downgraded or eliminated."
+      },
+      {
+        "pages": "262",
+        "ruleIds": ["BW-R013", "BW-R019"],
+        "rule": "S-factors are temporary matchup adjustments applied after the carried power rating is established. The book reports 2022-23 S-factor usage from 0 to 18 units with a 3.2-unit average, equivalent to 0.64 spread point per team at BOOK-EXACT conversion."
+      }
+    ],
+    "sourceBoundary": {
+      "anomalyId": "BW-A006",
+      "rule": "Page 257 contains incomplete/defective named travel-table text and a printed CHC code. Preserve the printed evidence but do not guess the incomplete regional exception or use the defective named row as current calibration truth. Rebuild current travel features from objective schedule/geography facts."
+    },
+    "calibrationPlan": {
+      "rule": "Encode S-factor facts deterministically, estimate their current spread-point effects chronologically and preserve 0.20/S only as the BOOK-EXACT baseline. A current coefficient or factor-specific release is WALTERS_CALIBRATED only after out-of-sample acceptance."
+    }
+  },
+  "provenancePolicy": {
+    "BOOK_EXACT": {
+      "productionUseAllowedInS1": false,
+      "spreadPointsPerSUnit": 0.2,
+      "factorTableEra": "2022-23",
+      "rule": "The printed rows and 0.20/S conversion remain reproducible as the permanent source baseline, but the book itself requires yearly reevaluation before current production use."
+    },
+    "WALTERS_CALIBRATED": {
+      "productionUseAllowedInS1": false,
+      "requiredBeforeProduction": [
+        "versioned S-factor calibration release",
+        "immutable historical schedule/result snapshot",
+        "versioned team alignment and venue geography/time-zone/surface registries",
+        "deterministic feature derivation with no sportsbook inputs",
+        "pre-locked training/validation windows",
+        "chronological out-of-sample acceptance",
+        "family-level sign/stability and sample audit",
+        "active-week S3 shadow acceptance",
+        "explicit S4 production activation"
+      ]
+    },
+    "SUPPLEMENTAL": {
+      "maySetGrahamFair": false,
+      "rule": "Outside scheduling studies may challenge definitions or trigger review only. They cannot set S-factor points without an approved governed calibration release."
+    }
+  },
+  "bookExactTable": [
+    {"factorId": "S_TURF_SAME", "pages": [255], "family": "TURF_SURFACE", "situation": "Home and Visitor have Same Turf", "sUnits": 1, "beneficiary": "VISITOR", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_TURF_OPPOSITE", "pages": [255], "family": "TURF_SURFACE", "situation": "Home and Visitor have Opposite Turf", "sUnits": 1, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_SAME_DIVISION", "pages": [255], "family": "DIVISION_CONFERENCE", "situation": "Home and Visitor are in Same Division", "sUnits": 1, "beneficiary": "VISITOR", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_DIFFERENT_CONFERENCE", "pages": [255], "family": "DIVISION_CONFERENCE", "situation": "Home and Visitor from Different Conferences", "sUnits": 1, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_HOME_THURSDAY_NIGHT", "pages": [255], "family": "REST_PRIMETIME", "situation": "Home Team Thursday Night", "sUnits": 2, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_COMING_OFF_THURSDAY", "pages": [255], "family": "REST_PRIMETIME", "situation": "Teams Coming off Thursday Night", "sUnits": 0, "beneficiary": "NONE", "status": "SUPPORTED_BOOK_EXACT_ZERO"},
+    {"factorId": "S_HOME_SUNDAY_NIGHT", "pages": [255], "family": "REST_PRIMETIME", "situation": "Home Team Sunday Night", "sUnits": 4, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_HOME_MONDAY_NIGHT", "pages": [255], "family": "REST_PRIMETIME", "situation": "Home Team Monday Night", "sUnits": 2, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_HOME_OFF_MNF_HOME", "pages": [255], "family": "REST_PRIMETIME", "situation": "Home Team Coming off Monday Night and Home", "sUnits": 0, "beneficiary": "NONE", "status": "SUPPORTED_BOOK_EXACT_ZERO"},
+    {"factorId": "S_HOME_OFF_MNF_AWAY", "pages": [256], "family": "REST_PRIMETIME", "situation": "Home Team Coming off Monday Night and Away", "sUnits": 4, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_AWAY_OFF_MNF_HOME", "pages": [256], "family": "REST_PRIMETIME", "situation": "Away Team Coming off Monday Night and Home", "sUnits": 6, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_AWAY_OFF_MNF_AWAY", "pages": [256], "family": "REST_PRIMETIME", "situation": "Away Team Coming off Monday Night and Away", "sUnits": 8, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_HOME_SATURDAY_NIGHT", "pages": [256], "family": "REST_PRIMETIME", "situation": "Home Team Saturday Night", "sUnits": 0, "beneficiary": "NONE", "status": "SUPPORTED_BOOK_EXACT_ZERO"},
+    {"factorId": "S_THIRD_AWAY_IN_FOUR", "pages": [256], "family": "ROAD_DENSITY", "situation": "3rd Away Game in Four Games", "sUnits": 2, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_OFF_HOME_OT", "pages": [256], "family": "OVERTIME_RECOVERY", "situation": "Team Coming off Home Overtime Game", "sUnits": 4, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_OFF_AWAY_OT", "pages": [256], "family": "OVERTIME_RECOVERY", "situation": "Team Coming off Away Overtime Game", "sUnits": 2, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BYE_BELOW_AVG", "pages": [256], "family": "BYE", "situation": "Below Average Team Coming off Bye", "sUnits": 4, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BYE_BELOW_AVG_AWAY", "pages": [256], "family": "BYE", "situation": "Below Average Team Coming off Bye and Away", "sUnits": 5, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BYE_AVG", "pages": [256], "family": "BYE", "situation": "Average Team Coming off Bye", "sUnits": 5, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BYE_AVG_AWAY", "pages": [256], "family": "BYE", "situation": "Average Team Coming off Bye and Away", "sUnits": 6, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BYE_GREAT", "pages": [256], "family": "BYE", "situation": "Great Team Coming off Bye", "sUnits": 7, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BYE_GREAT_AWAY", "pages": [256], "family": "BYE", "situation": "Great Team Coming off Bye and Away", "sUnits": 8, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_PLAYOFF_BYE", "pages": [256], "family": "POSTSEASON", "situation": "Bye in the Playoffs", "sUnits": 1, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT_DEFERRED_CURRENT_REGULAR_SEASON"},
+    {"factorId": "S_SB_WINNER_FIRST_GAME", "pages": [256], "family": "SUPER_BOWL_AFTEREFFECT", "situation": "Winner of Super Bowl - First Game of Next Season", "sUnits": 4, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT_RARE"},
+    {"factorId": "S_SB_WINNER_FIRST_FOUR", "pages": [256], "family": "SUPER_BOWL_AFTEREFFECT", "situation": "Winner of Super Bowl - First Four Games of Next Season", "sUnits": 2, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT_RARE"},
+    {"factorId": "S_SB_LOSER_FIRST_GAME", "pages": [256], "family": "SUPER_BOWL_AFTEREFFECT", "situation": "Loser of Super Bowl - First Game of Next Season", "sUnits": 4, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT_RARE"},
+    {"factorId": "S_SB_LOSER_FIRST_FOUR", "pages": [256], "family": "SUPER_BOWL_AFTEREFFECT", "situation": "Loser of Super Bowl - First Four Games of Next Season", "sUnits": 2, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT_RARE"},
+    {"factorId": "S_TRAVEL_2000_PLUS", "pages": [256], "family": "TRAVEL_DISTANCE", "situation": "2000 plus miles", "sUnits": 1, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_TRAVEL_REGIONAL_ROWS", "pages": [256,257], "family": "TRAVEL_DISTANCE", "situation": "Named short-distance/regional visitor-benefit rows", "sUnits": null, "beneficiary": "VISITOR", "status": "BOOK_EVIDENCE_PRESERVED_CURRENT_REBUILD_REQUIRED_BW_A006"},
+    {"factorId": "S_EARLY_WEST", "pages": [257], "family": "TIME_ZONE_BODY_CLOCK", "situation": "10:00 a.m. Games - Penalize West teams", "sUnits": 2, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_EARLY_MOUNTAIN", "pages": [257], "family": "TIME_ZONE_BODY_CLOCK", "situation": "10:00 a.m. Games - Penalize Mountain teams", "sUnits": 1, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_NIGHT_EAST", "pages": [257], "family": "TIME_ZONE_BODY_CLOCK", "situation": "Night Games - Penalize East teams", "sUnits": 6, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_NIGHT_CENTRAL", "pages": [257], "family": "TIME_ZONE_BODY_CLOCK", "situation": "Night Games - Penalize Central teams", "sUnits": 3, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_NIGHT_MOUNTAIN", "pages": [257], "family": "TIME_ZONE_BODY_CLOCK", "situation": "Night Games - Penalize Mountain teams", "sUnits": 1, "beneficiary": "OPPONENT", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_SECOND_REMOTE_TWO_TZ", "pages": [257], "family": "CONSECUTIVE_REMOTE", "situation": "Second Consecutive Game at Least 2 Time Zones Away", "sUnits": 2, "beneficiary": "HOME", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BOUNCE_19", "pages": [257], "family": "BOUNCE_BACK", "situation": "Team Lost Previous Game by 19+ Points", "sUnits": 2, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_BOUNCE_29", "pages": [257], "family": "BOUNCE_BACK", "situation": "Team Lost Previous Game by 29+ Points", "sUnits": 4, "beneficiary": "TEAM", "status": "SUPPORTED_BOOK_EXACT"},
+    {"factorId": "S_MATCHUP_VARIABLE", "pages": [257], "family": "MATCHUP_VARIABLE", "situation": "Offensive and Defensive Matchups, Injuries", "sUnits": null, "beneficiary": "VARIABLE", "status": "EXCLUDED_FROM_S_CALIBRATION_OWNED_BY_MATCHUP_AND_PERSONNEL_LAYERS"}
+  ],
+  "currentLayerBoundary": {
+    "productionStatus": "NO_CURRENT_CALIBRATED_S_FACTOR_AUTHORITY",
+    "rule": "S1-S3 may derive, fit and shadow S-factors but may not mutate the active Graham board. Existing non-S football adjustments remain authoritative until their own governed layer changes.",
+    "expiry": "Every S-factor adjustment is game-specific and expires after that game. It never silently carries into the team's power rating."
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "opening spread",
+      "closing spread",
+      "line movement",
+      "market-implied schedule value",
+      "ATS result",
+      "betting percentages",
+      "closing-line value"
+    ],
+    "rule": "S-factor calibration uses football schedule, venue, geography, surface, rest and result facts only. Sportsbook fields present in upstream data must be excluded by a strict whitelist."
+  },
+  "historicalDataContract": {
+    "preferredScheduleResultSource": "nflverse schedule/results data with pinned snapshot/version",
+    "primaryTrainingWindow": {
+      "seasons": [2021, 2022, 2023, 2024],
+      "gameType": "REG",
+      "reason": "Primary current-regime sample after the 17-game schedule change and consistent with the HFA calibration window."
+    },
+    "rareEventBackfillWindow": {
+      "seasons": [2015, 2016, 2017, 2018, 2019],
+      "gameType": "REG",
+      "allowedFamilies": ["OVERTIME_RECOVERY", "ROAD_DENSITY", "SUPER_BOWL_AFTEREFFECT", "BOUNCE_BACK", "CONSECUTIVE_REMOTE"],
+      "rule": "Older games may stabilize low-frequency families only through explicit partial pooling. A factor whose older and primary-window signs conflict materially cannot receive production authority from the pooled estimate."
+    },
+    "excludedSeason": {
+      "season": 2020,
+      "reason": "COVID attendance, travel and scheduling regime is structurally atypical for current S-factor calibration."
+    },
+    "initialValidationWindow": {
+      "seasons": [2025],
+      "gameType": "REG",
+      "rule": "Do not tune the final S2 release on 2025 after reading held-out evaluation."
+    },
+    "postseasonPolicy": {
+      "initialProductionScope": false,
+      "rule": "Printed playoff-bye factors remain BOOK-EXACT reproducible but postseason current calibration is deferred from the first regular-season S release because of sparse and structurally different samples."
+    },
+    "allowedCoreFields": [
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "weekday",
+      "gametime",
+      "home_team",
+      "away_team",
+      "home_score",
+      "away_score",
+      "location",
+      "stadium_id",
+      "stadium",
+      "roof",
+      "surface",
+      "div_game",
+      "home_rest",
+      "away_rest",
+      "overtime"
+    ],
+    "derivedRegistries": {
+      "teamAlignment": "Versioned season/team conference and division mapping.",
+      "homeVenue": "Versioned season/team governed home stadium and home-surface mapping.",
+      "venueGeography": "Versioned stadium latitude/longitude, elevation and IANA time-zone mapping with source owner and as-of date.",
+      "teamBodyClock": "Versioned team home time-zone mapping derived from governed home venue.",
+      "surfaceClass": "Normalize only to governed coarse classes such as NATURAL_GRASS, ARTIFICIAL and UNRESOLVED; unresolved classification fails closed rather than being guessed."
+    },
+    "registryRequirements": [
+      "source owner",
+      "as-of date",
+      "immutable snapshot or content hash",
+      "field-level mapping",
+      "missingness policy",
+      "season applicability"
+    ],
+    "forbiddenSourceFields": [
+      "spread_line",
+      "total_line",
+      "moneyline",
+      "opening line",
+      "closing line",
+      "book price",
+      "ATS result"
+    ],
+    "missingnessPolicy": "A game with unresolved identity, final score, required schedule fact or required derived registry field is excluded from the affected factor fit and counted in the audit. Other independently resolvable factor families may remain eligible."
+  },
+  "deterministicFeatureContract": {
+    "TURF_SURFACE": "Compare each club's season-specific governed home-surface class. Do not infer surface from team reputation. Same/opposite is derived before outcomes are viewed.",
+    "DIVISION_CONFERENCE": "Use season-specific alignment registry. Same-division and different-conference are independent binary facts; same-conference/non-division is the reference state.",
+    "REST_PRIMETIME": "Derive current weekday/kickoff and prior-game weekday/venue from the schedule. Do not use labels such as short week unless the underlying day/rest facts reproduce them.",
+    "ROAD_DENSITY": "Count designated away games in the current team's trailing four scheduled games, excluding byes. The current game must be the third away game in that four-game window for the printed row to fire.",
+    "OVERTIME_RECOVERY": "Use official final overtime indicator from the immediately preceding completed game and preserve whether that prior game was home or away.",
+    "BYE": "Rest/bye status is objective. Printed Below Average/Average/Great tiers remain BOOK-EXACT; current calibration must define any strength interaction from a sealed pregame carried rating, preferably continuous or pre-locked thresholds, never from the eventual result or market line.",
+    "SUPER_BOWL_AFTEREFFECT": "Use prior-season Super Bowl winner/loser identity and current game number. No narrative championship-hangover judgment is permitted.",
+    "TRAVEL_DISTANCE": "Current calibration uses objective great-circle venue/home-base distance from the versioned geography registry. Named 2022-23 regional rows remain source evidence only and do not become current hard-coded team-pair exceptions.",
+    "TIME_ZONE_BODY_CLOCK": "Derive venue time zone, team home/body-clock time zone and kickoff local/body-clock hour. Current calibration should estimate continuous or pre-locked displacement/time buckets rather than blindly reusing literal 10:00 a.m./night labels.",
+    "CONSECUTIVE_REMOTE": "Require two consecutive scheduled games whose governed venues are at least two time-zone offsets from the team's home/body-clock zone; preserve the exact venue sequence.",
+    "BOUNCE_BACK": "Derive prior-game raw loss margin from final score. The 19+ and 29+ rows are nested; current fitting must prevent double counting and must estimate only incremental next-game effect after pregame team strength is controlled.",
+    "ALTITUDE_EXPOSURE": "CURRENT-CALIBRATION EXTENSION ONLY, not a printed S row. May be researched as an objective venue/travel mechanism using elevation difference and exposure history, but has zero numeric authority unless separately shown to improve held-out prediction without duplicating HFA, weather or team strength.",
+    "MATCHUP_VARIABLE": "Excluded. Personnel and opponent-specific matchup effects remain owned by the existing governed personnel/matchup production layers."
+  },
+  "calibrationStructure": {
+    "target": "Observed home scoring margin after independently controlling team-season strength, season-level location effect and predeclared non-S nuisance structure. No sportsbook line is a target or feature.",
+    "outputConvention": "A positive S benefit to HOME makes the Graham home spread more negative; a positive S benefit to AWAY makes it more positive. Store beneficiarySide, benefitPoints and pointsToHomeSpread explicitly.",
+    "precision": "Preserve at least hundredth-point fitted effects and exact fair arithmetic internally; ordinary Graham display remains half-point rounded only after all governed components are combined.",
+    "modelCandidatesLockedBeforeHoldout": [
+      {
+        "modelId": "S_ZERO_BASELINE",
+        "description": "No S-factor adjustment. Diagnostic reference only."
+      },
+      {
+        "modelId": "S_BOOK_EXACT_020",
+        "description": "Reproduce supported printed S rows at exactly 0.20 spread point per S unit. Diagnostic source baseline only; BW-A006 named travel rows remain blocked."
+      },
+      {
+        "modelId": "S_CURRENT_SCALAR",
+        "description": "Preserve supported printed S-unit shape but estimate one current points-per-S-unit survival coefficient with ridge/chronological fitting. Zero rows remain zero and blocked rows remain blocked."
+      },
+      {
+        "modelId": "S_PARTIAL_POOL_FAMILY",
+        "description": "Estimate family/factor spread-point effects with hierarchical/ridge shrinkage around the current scalar/book-shaped prior. Rare and unstable factors shrink strongly toward zero."
+      }
+    ],
+    "modelSelectionRule": "Prefer the simplest accepted model. S_PARTIAL_POOL_FAMILY may outrank S_CURRENT_SCALAR only if it equals or improves held-out MAE and RMSE, does not worsen absolute mean bias materially, and passes family-level sign/stability/sample gates. Otherwise use the accepted simpler scope or no S-factor production.",
+    "factorRetentionRule": "A printed factor may be downgraded to zero or remain shadow-only when current evidence is weak/unstable. Current calibration does not owe every historical row a nonzero value.",
+    "interactionRule": "Only predeclared interactions may be estimated initially: bye x sealed pregame team strength, time-zone displacement x body-clock kickoff bucket, travel distance x consecutive-road indicator, and surface mismatch x visitor surface class. Additional interactions require a new shadow contract.",
+    "noUniversalCap": "Do not impose an arbitrary per-game S cap merely because the book observed a maximum of 18 units in 2022-23. Extreme totals require an audit and uncertainty review, not silent truncation."
+  },
+  "doubleCountGuard": {
+    "homeFieldH4": "H4 owns base location advantage. Rest, travel, time zone, surface and altitude mechanisms must never be added into HFA or subtracted from H4. S-factor production, if later accepted, is a separate game-specific overlay.",
+    "teamStrength": "S-factors never alter carried currentRating. They expire after the game.",
+    "weeklyLearning": "Prior-game results enter the carried-rating/TGPL layer once. Bounce-back and overtime S factors may capture only incremental next-game residual effects after pregame strength is controlled, never a second copy of the prior result.",
+    "personnel": "Injuries and replacements remain governed by personnel production. The printed Variable matchup/injury row is excluded from S calibration.",
+    "matchup": "Opponent-specific matchup increments remain governed by matchup production and may not be recreated as S points.",
+    "weather": "Temperature, wind, precipitation and roof exposure belong to W-factor calibration, not S. Weather cannot explain an S coefficient or be silently folded into travel/time zone.",
+    "surface": "Surface mismatch belongs to S and therefore may not also appear as a persistent HFA increment or unexplained team-rating change.",
+    "travelItinerary": "Objective schedule-based distance is the initial reproducible feature. Any manually sourced actual itinerary is a separately timestamped supplemental fact and cannot be combined with the same distance effect twice."
+  },
+  "requiredHistoricalRecord": [
+    "season",
+    "week",
+    "gameKey",
+    "gameday",
+    "kickoff",
+    "homeTeam",
+    "awayTeam",
+    "homeScore",
+    "awayScore",
+    "venueClass",
+    "stadiumId",
+    "surfaceClass",
+    "homeRestDays",
+    "awayRestDays",
+    "priorGameFactsHome",
+    "priorGameFactsAway",
+    "travelFactsHome",
+    "travelFactsAway",
+    "timeZoneFactsHome",
+    "timeZoneFactsAway",
+    "factorEvents",
+    "marketViewed"
+  ],
+  "requiredReleaseRecord": [
+    "releaseId",
+    "calibrationId",
+    "season",
+    "generatedAt",
+    "trainingSeasons",
+    "rareEventBackfillSeasons",
+    "validationSeasons",
+    "sourceSnapshots",
+    "registrySnapshots",
+    "fieldWhitelist",
+    "modelId",
+    "bookExactSpreadPointsPerSUnit",
+    "currentScalarSpreadPointsPerSUnit",
+    "familyEstimates",
+    "factorEstimates",
+    "sampleCounts",
+    "uncertainty",
+    "marketViewed",
+    "validationMetrics",
+    "subgroupDiagnostics",
+    "productionCandidateScope",
+    "protectedArtifactSha256"
+  ],
+  "validationRequirements": {
+    "chronologicalHoldout": true,
+    "metrics": [
+      "mean error",
+      "mean absolute error",
+      "root mean squared error",
+      "absolute mean bias",
+      "season stability",
+      "factor-family sign stability",
+      "factor-family sample counts",
+      "rest subgroup residual bias",
+      "travel/time-zone subgroup residual bias",
+      "surface subgroup residual bias"
+    ],
+    "comparisonBaselines": [
+      "S_ZERO_BASELINE",
+      "S_BOOK_EXACT_020",
+      "S_CURRENT_SCALAR",
+      "S_PARTIAL_POOL_FAMILY"
+    ],
+    "familyAcceptanceRule": "No family receives later production authority solely because the aggregate model passes. A production-active family must have a reproducible deterministic fact definition, adequate current-regime support, direction/magnitude stability, no material double-count conflict, and non-degrading held-out behavior.",
+    "rareFactorRule": "Sparse Super Bowl/postseason or other rare factors may remain BOOK-EXACT/shadow-only even if the broader S model passes.",
+    "marketBenchmarkTiming": "Sportsbook or closing-market comparison, if ever performed, occurs only after the S release and active-week shadow board are frozen and cannot tune S2/S3."
+  },
+  "activeWeekShadowContract": {
+    "stage": "S3",
+    "requirements": [
+      "resolve active season/week through active-week manifest",
+      "derive every S fact from schedule/registry evidence before any market comparison",
+      "preserve H4 exact location term unchanged",
+      "preserve personnel and matchup overlays unchanged",
+      "compute exact S overlay separately from carried rating",
+      "show factor-by-factor decomposition and zero factors",
+      "fail closed on unresolved venue/surface/time-zone/travel identity",
+      "protect live board byte-for-byte until explicit S4 activation"
+    ]
+  },
+  "stageS2EntryGate": {
+    "required": [
+      "S1 validator passes",
+      "no live board, H4, personnel, matchup or carried-rating mutation",
+      "market-isolation and strict source-field whitelist locked",
+      "primary 2021-2024 training and 2025 holdout windows locked before evaluation",
+      "rare-event 2015-2019 backfill scope locked",
+      "deterministic schedule/surface/travel/time-zone feature definitions locked",
+      "team alignment and venue geography/time-zone/surface registry contract locked",
+      "zero/book/scalar/partial-pool candidate hierarchy locked before holdout"
+    ],
+    "nextState": "S2_CURRENT_S_FACTOR_CALIBRATION"
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_S_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_S_SOURCE_FIELD_VIOLATION",
+    "FAIL_CLOSED_S_ACTIVE_WEEK_IDENTITY",
+    "FAIL_CLOSED_S_VENUE_IDENTITY_UNRESOLVED",
+    "FAIL_CLOSED_S_SURFACE_UNRESOLVED",
+    "FAIL_CLOSED_S_TIMEZONE_UNRESOLVED",
+    "FAIL_CLOSED_S_TRAVEL_GEOGRAPHY_UNRESOLVED",
+    "FAIL_CLOSED_S_BOOK_TRAVEL_ANOMALY_BW_A006",
+    "FAIL_CLOSED_S_SAMPLE_INSUFFICIENT",
+    "FAIL_CLOSED_S_FACTOR_UNSTABLE",
+    "FAIL_CLOSED_S_MODEL_NOT_VALIDATED",
+    "FAIL_CLOSED_S_DOUBLE_COUNT_HFA",
+    "FAIL_CLOSED_S_DOUBLE_COUNT_RATING",
+    "FAIL_CLOSED_S_DOUBLE_COUNT_PERSONNEL",
+    "FAIL_CLOSED_S_DOUBLE_COUNT_MATCHUP",
+    "FAIL_CLOSED_S_DOUBLE_COUNT_WEATHER"
+  ]
+}
