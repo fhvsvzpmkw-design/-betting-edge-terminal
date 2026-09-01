@@ -1,0 +1,131 @@
+name: Walters Home Field H2 Calibration
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/home-field/home-field-h2-contract-v1.json'
+      - 'tools/run-walters-home-field-h2.py'
+      - '.github/workflows/walters-home-field-h2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-home-field-h2
+  cancel-in-progress: false
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install locked H2 numeric dependency
+        run: python -m pip install --disable-pip-version-check 'numpy==2.3.2'
+
+      - name: Verify H1 and active Graham week
+        run: |
+          node tools/graham-active-week.mjs --json >/dev/null
+          node --check tools/validate-walters-home-field-h1.mjs
+          node tools/validate-walters-home-field-h1.mjs
+
+      - name: Verify H2 model is locked pre-validation
+        run: |
+          python - <<'PY'
+          import json
+          p='data/walters/nfl/home-field/home-field-h2-contract-v1.json'
+          h=json.load(open(p))
+          assert h['stage']=='H2'
+          assert h['state']=='MODEL_LOCKED_PRE_VALIDATION'
+          assert h['productionAuthority'] is False
+          assert h['liveBoardMutationAllowed'] is False
+          assert h['marketViewed'] is False
+          assert h['training']['seasons']==[2021,2022,2023,2024]
+          assert h['validation']['seasons']==[2025]
+          assert h['sourceSnapshot']['assetSha256']=='322fe330cbcf157ad15dc5494b12b85b842012c0328e1d04b51af924999f2715'
+          assert h['model']['penalties']=={
+            'teamSeasonStrength':8.0,
+            'leagueHomeBaseline':0.000001,
+            'seasonHomeDeviation':64.0,
+            'teamVenueHomeDeviation':96.0,
+            'validationTeamStrength':8.0
+          }
+          print('WALTERS HOME FIELD H2 MODEL LOCK: PASS // HOLDOUT UNREAD')
+          PY
+
+      - name: Run H2 source capture and held-out calibration
+        id: h2run
+        shell: bash
+        run: |
+          set +e
+          python tools/run-walters-home-field-h2.py
+          rc=$?
+          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
+          echo "H2_EXIT_CODE=$rc" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Verify H2 did not mutate live Graham artifacts
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          git diff --exit-code -- "$ACTIVE_NUMBERS"
+          git diff --exit-code -- "$ACTIVE_PERSONNEL"
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+          echo "WALTERS HOME FIELD H2 LIVE ARTIFACT GUARD: PASS"
+
+      - name: Publish H2 snapshot and audit artifacts
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          for f in \
+            data/walters/nfl/home-field/source/nflverse-schedules-hfa-snapshot-2026-09-01.csv \
+            data/walters/nfl/home-field/h2-validation-audit-v1.json \
+            data/walters/nfl/home-field/h2-current.json \
+            data/walters/nfl/home-field/home-field-release-2026-v1.json
+          do
+            if [ -f "$f" ]; then git add -- "$f"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "No H2 artifacts changed"
+          else
+            git commit -m "Record Walters home-field H2 calibration"
+            git push origin HEAD:main
+          fi
+
+      - name: Enforce H2 validation result
+        run: |
+          if [ "${H2_EXIT_CODE}" != "0" ]; then
+            echo "H2 held-out calibration did not pass or encountered an error; durable audit artifacts were preserved when available."
+            exit "${H2_EXIT_CODE}"
+          fi
+          python - <<'PY'
+          import json
+          r=json.load(open('data/walters/nfl/home-field/home-field-release-2026-v1.json'))
+          c=json.load(open('data/walters/nfl/home-field/h2-current.json'))
+          assert r['state']=='PASS_CURRENT_CALIBRATION_SHADOW_RELEASE'
+          assert r['productionAuthority'] is False
+          assert r['marketViewed'] is False
+          assert len(r['teamVenueEstimates'])==32
+          assert c['validationPass'] is True
+          print(f"WALTERS HOME FIELD H2 VERIFY: PASS // LEAGUE 2026 HFA {r['leagueBaselineHomeAdvantagePoints']} // 32 TEAMS // SHADOW ONLY // 0 LIVE MOVES")
+          PY
