@@ -1,0 +1,47 @@
+name: Muddy Actual CAD Fix
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-actual-cad-fix.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Remove residual scaling and validate
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const files=['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html'];
+          for(const p of files){
+            let s=fs.readFileSync(p,'utf8');
+            s=s.replace("const URL='/data/bet-history-public.json',TZ='America/Vancouver',UNIT_RATE=.03,TARGET_UNIT=100,","const URL='/api/bet-history',TZ='America/Vancouver',");
+            s=s.replace('function W(r,scale){return{id:r[0],book:String(r[1]||\'Unknown\'),d:new Date(r[3]),sport:String(r[5]||\'Other\').trim()||\'Other\',label:String(r[7]||\'Untitled\'),risk:(+r[9]||0)*scale,result:String(r[10]||\'\'),p:(+r[11]||0)*scale,phase:String(r[12]||\'\'),legs:Array.isArray(r[16])?r[16]:[]}}','function W(r){return{id:r[0],book:String(r[1]||\'Unknown\'),d:new Date(r[3]),sport:String(r[5]||\'Other\').trim()||\'Other\',label:String(r[7]||\'Untitled\'),risk:(+r[9]||0),result:String(r[10]||\'\'),p:(+r[11]||0),phase:String(r[12]||\'\'),legs:Array.isArray(r[16])?r[16]:[]}}');
+            s=s.replace(/let bankroll=\+j\.bankrollCad\|\|0,rawUnit=bankroll\*UNIT_RATE,scale=rawUnit>0\?TARGET_UNIT\/rawUnit:1,all=\(j\.wagers\|\|\[\]\)\.map\(r=>W\(r,scale\)\)/,'let bankroll=+j.bankrollCad||0,all=(j.wagers||[]).map(r=>W(r))');
+            s=s.replace(/let scaledProfit=\(\+j\.summary\?\.cashProfit\|\|0\)\*scale,scaledRisk=Number\.isFinite\(\+j\.summary\?\.cashRisked\)\?\(\+j\.summary\.cashRisked\)\*scale:stats\(all\)\.risk;/,'let scaledProfit=(+j.summary?.cashProfit||0),scaledRisk=Number.isFinite(+j.summary?.cashRisked)?(+j.summary.cashRisked):stats(all).risk;');
+            s=s.replace(/set\('scale',rawUnit>0\?`\$\{money\(rawUnit\)\} → \$100 · ×\$\{scale\.toFixed\(4\)\}`:'UNAVAILABLE'\);/,'set(\'scale\',\'VALIDATED\');');
+            s=s.replace('let scaledBankroll=bankroll*scale;','let scaledBankroll=bankroll;');
+            s=s.replace(/set\('walk',`Source bankroll \$\{money\(bankroll\)\} produces a \$\{money\(rawUnit\)\} 3% unit\. At ×\$\{scale\.toFixed\(4\)\}, the displayed bankroll is \$\{money\(scaledBankroll\)\} and the active unit is \$100\. Normalized cash P\/L \$\{sm\(scaledProfit\)\} at \$\{pct\(j\.summary\?\.cashRoiPercent\)\} ROI\. Public-row week \$\{sm\(Wk\.p\)\}; public-row month \$\{sm\(Mo\.p\)\}\. `\)/,'set(\'walk\',`Actual bankroll ${money(bankroll)}. Cash P/L ${sm(scaledProfit)} at ${pct(j.summary?.cashRoiPercent)} cash ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)');
+            s=s.replace(/Ten most recent settled public wagers, \$100-unit normalized stake and P\/L\./g,'Ten most recent settled public wagers, actual stake and P/L.');
+            s=s.replace(/Authority: public Bet History via \/data\/bet-history-public\.json\. The source ledger remains untouched\. Displayed bankroll, wager and performance dollars are normalized by 100 ÷ \(current bankroll × 3%\), making the current 3% unit equal \$100\. Counts, ROI, win rates and percentage ratios remain unchanged\./g,'Authority: public Bet History via /api/bet-history plus the sanitized public funding layer. All bankroll, wager and performance dollars are actual CAD.');
+            // Fail closed if any active normalization logic or copy survives.
+            if(/TARGET_UNIT|UNIT_RATE|normalized stake|normalized by 100|active unit is \$100|bankroll\*scale|W\(r,scale\)/.test(s)) throw new Error('Residual normalization remains in '+p);
+            fs.writeFileSync(p,s);
+          }
+          NODE
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          grep -q "const URL='/api/bet-history'" syndicates/generated/eddie-numbers/hotline.html
+          ! grep -q 'TARGET_UNIT\|UNIT_RATE\|normalized by 100\|active unit is \$100' syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: remove residual unit scaling'
+          git push origin main
