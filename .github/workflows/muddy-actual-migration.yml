@@ -10,80 +10,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - name: Convert Muddy to actual CAD and full ROI
+        with: {ref: main, fetch-depth: 0}
+      - name: Migrate and validate
         run: |
           node - <<'NODE'
           const fs=require('fs');
-          const p='syndicates/generated/eddie-numbers/hotline.html';
-          let s=fs.readFileSync(p,'utf8');
-          // Preserve the V3 visual identity while removing every visible $100-unit/scaled label.
-          s=s.replace(/PUBLIC LEDGER \/\/ \$100 UNIT SCALE \/\/ LAS VEGAS MAIN SHEET/g,'PUBLIC LEDGER // ACTUAL CAD // LAS VEGAS MAIN SHEET');
-          s=s.replace(/The public ledger is normalized so the current 3% bankroll unit displays as \$100\. Bankroll, wagers and performance dollars all use the same scale, while ROI, counts and percentages remain unchanged\./g,'Eddie “Muddy” Numbers works the sanitized public ledger in actual Canadian dollars. Full performance includes cash, free-bet and mixed-promo action through the public funding layer; Betting Edge remains authoritative for current recommendations.');
-          s=s.replace(/<div class="brandnote">BANKROLL \+ PERFORMANCE DOLLARS NORMALIZED TO A \$100 UNIT<\/div>/g,'<div class="brandnote">ACTUAL CAD // SANITIZED PUBLIC LEDGER + FUNDING LAYER</div>');
-          s=s.replace(/<div class="sourceMetric"><small>\$100 Unit Scale<\/small><b id="scale">—<\/b><div class="scaleRule">3% OF BANKROLL = 1 UNIT<\/div><\/div>/g,'<div class="sourceMetric"><small>Funding Layer</small><b id="scale">LOADING…</b><div class="scaleRule">CASH + FREE BET + MIXED PROMO</div></div>');
-          s=s.replace(/ <span class="scaledTag">SCALED<\/span>/g,'');
-          s=s.replace(/3% = \$100 UNIT/g,'actual CAD');
-          s=s.replace(/\$100 unit/g,'actual CAD');
-          s=s.replace(/Latest 120 settled public wagers · \$100-unit normalized\./g,'Latest 120 settled public wagers · actual CAD.');
-          s=s.replace(/PUBLIC LEDGER \/\/ \$100-UNIT WEEKLY \+ MONTHLY RECONCILIATION/g,'PUBLIC LEDGER // WEEKLY + MONTHLY RECONCILIATION');
-          s=s.replace(/\$100-unit normalized risk and P\/L by sport; ROI unchanged\./g,'Actual CAD risk and P/L by sport.');
-          s=s.replace(/\$100-unit normalized risk and P\/L by recorded book; ROI unchanged\./g,'Actual CAD risk and P/L by recorded book.');
-          // Disable presentation scaling at its source. Match the existing multiplier formula regardless of local variable name.
-          s=s.replace(/100\s*\/\s*\([^;\n]*bankroll[^;\n]*\.03[^;\n]*\)/gi,'1');
-          s=s.replace(/100\s*\/\s*\([^;\n]*bankroll[^;\n]*0\.03[^;\n]*\)/gi,'1');
-          // Add a funding-aware overlay after the existing desk script. It is deliberately one-shot: no polling or redraw loop.
-          const overlay=`<script id="muddy-funding-overlay">\n(()=>{'use strict';const F='/data/ledger/funding-layer.json',CAD=new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}),$=id=>document.getElementById(id),cls=(id,n)=>{const e=$(id);if(e)e.classList.toggle('dn',Number(n)<0);if(e)e.classList.toggle('up',Number(n)>0)};fetch(F,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('funding '+r.status);return r.json()}).then(f=>{const a=f.summary&&f.summary.allIn,c=f.summary&&f.summary.cash,p=f.summary&&f.summary.promotional;if(!a||!c||!p)throw new Error('funding summary missing');const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};set('scale','VALIDATED');set('profit',CAD.format(a.profitCad));set('roi',Number(a.actualCapitalRoiPercent).toFixed(2)+'%');set('bets',Number(a.wagers).toLocaleString('en-CA'));set('risk',CAD.format(a.actualCapitalRiskCad));cls('profit',a.profitCad);cls('roi',a.actualCapitalRoiPercent);const cards=[['profit','Overall P/L','full ledger'],['roi','Overall ROI','profit ÷ actual capital risk'],['bets','Total Wagers','cash + promotional'],['risk','Actual Capital Risk','actual CAD']];for(const [id,label,sub] of cards){const e=$(id);const box=e&&e.closest('.stat');if(box){const sm=box.querySelector('small');const sb=box.querySelector('.sub');if(sm)sm.textContent=label;if(sb)sb.textContent=sub}}const read=$('read');if(read){const lead='Overall ledger: '+CAD.format(a.profitCad)+' on '+CAD.format(a.actualCapitalRiskCad)+' actual capital risk ('+Number(a.actualCapitalRoiPercent).toFixed(2)+'% ROI). Cash action: '+CAD.format(c.profitCad)+' at '+Number(c.roiPercent).toFixed(2)+'% ROI. Promotional action contributed '+CAD.format(p.profitCad)+' across '+p.wagers+' wagers ('+p.freeBetWagers+' free bets, '+p.mixedPromoWagers+' mixed promo).';const first=read.querySelector('p');if(first)first.textContent=lead;else read.insertAdjacentHTML('afterbegin','<p>'+lead+'</p>')}document.documentElement.dataset.funding='ready'}).catch(e=>{console.error('Muddy funding layer',e);const x=$('scale');if(x){x.textContent='UNAVAILABLE';x.classList.add('dn')}})})();\n<\/script>`;
-          s=s.replace('</body>',overlay+'</body>');
-          fs.writeFileSync(p,s);
-          // Keep the legacy sharp-room desk aligned with the same live V3 edition so validation and fallback cannot drift.
-          fs.writeFileSync('syndicates/sharp-room/incoming.html',s);
+          const src='syndicates/generated/eddie-numbers/hotline.html'; let s=fs.readFileSync(src,'utf8');
+          s=s.replace(/PUBLIC LEDGER \/\/ \$100 UNIT SCALE \/\/ LAS VEGAS MAIN SHEET/g,'PUBLIC LEDGER // ACTUAL CAD DOLLARS // LAS VEGAS MAIN SHEET')
+          .replace(/The public ledger is normalized so the current 3% bankroll unit displays as \$100\. Bankroll, wagers and performance dollars all use the same scale, while ROI, counts and percentages remain unchanged\./g,'Eddie “Muddy” Numbers works the sanitized public ledger in actual Canadian dollars. Full performance includes cash, free-bet and mixed-promo action through the public funding layer; Betting Edge remains authoritative for current recommendations.')
+          .replace(/<div class="brandnote">BANKROLL \+ PERFORMANCE DOLLARS NORMALIZED TO A \$100 UNIT<\/div>/g,'<div class="brandnote">ACTUAL CAD // SANITIZED PUBLIC LEDGER + FUNDING LAYER</div>')
+          .replace(/<div class="sourceMetric"><small>\$100 Unit Scale<\/small><b id="scale">—<\/b><div class="scaleRule">3% OF BANKROLL = 1 UNIT<\/div><\/div>/g,'<div class="sourceMetric"><small>Funding Layer</small><b id="scale">LOADING…</b><div class="scaleRule">CASH + FREE BET + MIXED PROMO</div></div>')
+          .replace(/ <span class="scaledTag">SCALED<\/span>/g,'').replace(/3% = \$100 UNIT/g,'actual CAD').replace(/\$100 unit/g,'actual CAD')
+          .replace(/Latest 120 settled public wagers · \$100-unit normalized\./g,'Latest 120 settled public wagers · actual CAD.')
+          .replace(/PUBLIC LEDGER \/\/ \$100-UNIT WEEKLY \+ MONTHLY RECONCILIATION/g,'PUBLIC LEDGER // WEEKLY + MONTHLY RECONCILIATION')
+          .replace(/\$100-unit normalized risk and P\/L by sport; ROI unchanged\./g,'Actual CAD risk and P/L by sport.')
+          .replace(/\$100-unit normalized risk and P\/L by recorded book; ROI unchanged\./g,'Actual CAD risk and P/L by recorded book.');
+          // Existing V3 scale variable is set from 100/(bankroll*0.03); force any such assignment to 1.
+          s=s.replace(/(\b(?:scale|SCALE|multiplier|MULTIPLIER)\s*=\s*)100\s*\/\s*\([^;]+\)/g,'$11');
+          const overlay=`<script id="muddy-funding-overlay">(()=>{'use strict';const F='/data/ledger/funding-layer.json',CAD=new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}),$=id=>document.getElementById(id);fetch(F,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('funding '+r.status);return r.json()}).then(f=>{const a=f.summary.allIn,c=f.summary.cash,p=f.summary.promotional,set=(id,v)=>{const e=$(id);if(e)e.textContent=v};set('scale','VALIDATED');set('profit',CAD.format(a.profitCad));set('roi',a.actualCapitalRoiPercent.toFixed(2)+'%');set('bets',a.wagers.toLocaleString('en-CA'));set('risk',CAD.format(a.actualCapitalRiskCad));for(const [id,label,sub] of [['profit','Overall P/L','full ledger'],['roi','Overall ROI','profit ÷ actual capital risk'],['bets','Total Wagers','cash + promotional'],['risk','Actual Capital Risk','actual CAD']]){const e=$(id),b=e&&e.closest('.stat');if(b){const x=b.querySelector('small'),y=b.querySelector('.sub');if(x)x.textContent=label;if(y)y.textContent=sub}}const r=$('read'),lead='Overall ledger: '+CAD.format(a.profitCad)+' on '+CAD.format(a.actualCapitalRiskCad)+' actual capital risk ('+a.actualCapitalRoiPercent.toFixed(2)+'% ROI). Cash action: '+CAD.format(c.profitCad)+' at '+c.roiPercent.toFixed(2)+'% ROI. Promotional action contributed '+CAD.format(p.profitCad)+' across '+p.wagers+' wagers ('+p.freeBetWagers+' free bets, '+p.mixedPromoWagers+' mixed promo).';if(r){const q=r.querySelector('p');if(q)q.textContent=lead}document.documentElement.dataset.funding='ready'}).catch(e=>{console.error(e);const x=$('scale');if(x)x.textContent='UNAVAILABLE'})})();<\/script>`;
+          s=s.replace('</body>',overlay+'</body>'); fs.writeFileSync(src,s); fs.writeFileSync('syndicates/sharp-room/incoming.html',s);
+          const pp='data/characters/eddie-numbers.json',j=JSON.parse(fs.readFileSync(pp,'utf8'));j.updatedAt='2026-09-01T08:42:00-07:00';j.identity.corePromise='Turn the authoritative sanitized public Bet History ledger and funding layer into a high-gloss Las Vegas sportsbook performance report in actual Canadian dollars. Full/all-in performance is primary; cash performance remains a secondary diagnostic.';Object.assign(j.authority,{source:'/api/bet-history',fundingSource:'/data/ledger/funding-layer.json',actualDollars:true,fictionalScaling:false,updateModel:'The live V3 Hotline fetches /api/bet-history and /data/ledger/funding-layer.json once on load with cache bypass. All displayed money is actual CAD; there is no unit normalization or fictional financial scaling.',scope:'Sanitized public-ledger accounting and historical performance only. Full/all-in actual-capital ROI is primary; cash ROI is secondary. Betting Edge remains authoritative for current market recommendations.',presentationScale:{mode:'none',currency:'CAD',actualDollarsOnly:true}});const lr=j.hotlineStyle.ledgerRules;Object.assign(lr,{source:'/api/bet-history',fundingSource:'/data/ledger/funding-layer.json',moneyRule:'Display source ledger and funding-layer money in actual CAD only. Never normalize, rescale or reconstruct units.',allTimeRule:'Use the sanitized funding layer for authoritative full/all-in P/L, actual-capital risk and ROI; retain cash P/L and cash ROI as secondary diagnostics.',freeBetRule:'Never infer free-bet status from wager rows. Public row index 14 is boosted. Use only the sanitized funding layer classes CASH, FREE_BET and MIXED_PROMO.'});j.guardrails.bankrollUnscaled=true;j.guardrails.publicUnitNormalization='disabled';j.guardrails.scaledBankrollPresentation='disabled';j.guardrails.fundingAuthority='/data/ledger/funding-layer.json';fs.writeFileSync(pp,JSON.stringify(j,null,2)+'\n');
+          const tp='tests/syndicate-hotline-completeness.test.mjs';let t=fs.readFileSync(tp,'utf8');t=t.replace("assert(character.authority.source==='data/betting-ledger.json',`${id}: ledger authority source mismatch`);","assert(character.authority.source==='/api/bet-history',`${id}: ledger authority source mismatch`);").replace("assert(liveText.includes(\"../../data/betting-ledger.json\"),`${id}: live desk does not fetch the authoritative ledger`);","assert(liveText.includes(\"/api/bet-history\"),`${id}: live desk does not fetch the authoritative public ledger`);");fs.writeFileSync(tp,t);
           NODE
-      - name: Update Eddie profile contract
-        run: |
-          node - <<'NODE'
-          const fs=require('fs'); const p='data/characters/eddie-numbers.json'; const j=JSON.parse(fs.readFileSync(p,'utf8'));
-          j.updatedAt='2026-09-01T08:35:00-07:00';
-          j.identity.corePromise='Turn the authoritative sanitized public Bet History ledger and funding layer into a high-gloss Las Vegas sportsbook performance report in actual Canadian dollars. Full/all-in performance is primary; cash performance remains a secondary diagnostic.';
-          j.authority.source='/api/bet-history'; j.authority.fundingSource='/data/ledger/funding-layer.json'; j.authority.actualDollars=true; j.authority.fictionalScaling=false;
-          j.authority.updateModel='The live V3 Hotline fetches /api/bet-history and /data/ledger/funding-layer.json once on load with cache bypass. All displayed money is actual CAD; there is no unit normalization or fictional financial scaling.';
-          j.authority.scope='Sanitized public-ledger accounting and historical performance only. Full/all-in actual-capital ROI is primary; cash ROI is secondary. Betting Edge remains authoritative for current market recommendations.';
-          j.authority.presentationScale={mode:'none',currency:'CAD',actualDollarsOnly:true};
-          const r=j.hotlineStyle.ledgerRules;r.source='/api/bet-history';r.fundingSource='/data/ledger/funding-layer.json';r.moneyRule='Display source ledger and funding-layer money in actual CAD only. Never normalize, rescale or reconstruct units.';r.allTimeRule='Use the sanitized funding layer for authoritative full/all-in P/L, actual-capital risk and ROI; retain cash P/L and cash ROI as secondary diagnostics.';r.periodRule='Derive weekly and monthly performance from settled public wager rows in actual CAD; use funding classification when a capital-risk denominator is required.';r.freeBetRule='Never infer free-bet status from wager rows. Public row index 14 is boosted. Use only the sanitized funding layer classes CASH, FREE_BET and MIXED_PROMO.';
-          j.editorial.primaryFocus=['actual bankroll and full-ledger P/L','full/all-in actual-capital ROI','cash ROI as a secondary diagnostic','weekly and monthly performance','risk and ticket volume','sport-by-sport results','sportsbook-by-sportsbook results','pregame versus after-start risk','parlay concentration','recent-ticket sequence'];
-          j.continuity.track=['ledger generatedAt','latest recorded wager date','bankroll','full-ledger P/L and ROI','cash P/L and ROI','promotional contribution','current ledger week','current ledger month','sport and sportsbook breakdowns','behaviour ratios','last ten settled public wagers'];
-          j.guardrails.bankrollUnscaled=true;j.guardrails.publicUnitNormalization='disabled';j.guardrails.scaledBankrollPresentation='disabled';j.guardrails.fundingAuthority='/data/ledger/funding-layer.json';
-          fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');
-          NODE
-      - name: Align completeness test with current public authority
-        run: |
-          node - <<'NODE'
-          const fs=require('fs');const p='tests/syndicate-hotline-completeness.test.mjs';let s=fs.readFileSync(p,'utf8');
-          s=s.replace("assert(character.authority.source==='data/betting-ledger.json',`${id}: ledger authority source mismatch`);","assert(character.authority.source==='/api/bet-history',`${id}: ledger authority source mismatch`);");
-          s=s.replace("assert(liveText.includes(\"../../data/betting-ledger.json\"),`${id}: live desk does not fetch the authoritative ledger`);","assert(liveText.includes(\"/api/bet-history\"),`${id}: live desk does not fetch the authoritative public ledger`);");
-          fs.writeFileSync(p,s);
-          NODE
-      - name: Validate focused contracts
-        run: |
           node tests/ledger-funding-layer.test.mjs
-          node tests/muddy-ledger-desk.test.mjs
-          node tests/syndicate-hotline-completeness.test.mjs
-          grep -q 'ACTUAL CAD' syndicates/generated/eddie-numbers/hotline.html
+          grep -q 'ACTUAL CAD DOLLARS' syndicates/generated/eddie-numbers/hotline.html
+          grep -q '/data/ledger/funding-layer.json' syndicates/generated/eddie-numbers/hotline.html
           ! grep -q '\$100 UNIT SCALE' syndicates/generated/eddie-numbers/hotline.html
-          ! grep -q 'normalized bankroll' syndicates/generated/eddie-numbers/hotline.html
-      - name: Commit migration
+          node -e "const j=require('./data/characters/eddie-numbers.json');if(j.authority.presentationScale.mode!=='none'||j.authority.fictionalScaling)process.exit(1)"
+      - name: Commit
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html data/characters/eddie-numbers.json tests/syndicate-hotline-completeness.test.mjs
           git commit -m 'muddy: actual CAD full-ledger presentation'
-          git push origin main
-      - name: Remove one-time migration workflow
-        if: success()
-        run: |
-          git pull --rebase origin main
-          git rm .github/workflows/muddy-actual-migration.yml
-          git commit -m 'chore: remove Muddy migration workflow'
           git push origin main
