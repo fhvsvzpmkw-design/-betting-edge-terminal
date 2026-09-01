@@ -55,6 +55,36 @@ jobs:
           node tools/pinnacle-benchmark-publication-gate.mjs validate \
             --report data/history/runs/2026-09-01/final_morning-093530.json \
             --sidecar data/history/research-fit/2026-09-01/final_morning-093530.json
+      - name: Legacy observer degrades to unavailable
+        run: |
+          cp data/oddspapi-observer.json /tmp/observer.original
+          cat > data/oddspapi-observer.json <<'JSON'
+          {
+            "schema": 2,
+            "mode": "observation-only",
+            "authoritative": false,
+            "source": "OddsPapi v4",
+            "generatedAt": "2026-09-01T17:00:00.000Z",
+            "status": "ok",
+            "fixtures": []
+          }
+          JSON
+          cat > /tmp/post-cutover-report.json <<'JSON'
+          {
+            "ts": "2026-09-01T11:00:00-07:00",
+            "recs": []
+          }
+          JSON
+          echo '{"schema":3,"provenance":{}}' > /tmp/post-cutover-sidecar.json
+          node tools/pinnacle-benchmark-publication-gate.mjs normalize --report /tmp/post-cutover-report.json --sidecar /tmp/post-cutover-sidecar.json
+          node - <<'NODE'
+          const p=JSON.parse(require('fs').readFileSync('/tmp/post-cutover-sidecar.json','utf8')).provenance;
+          if(p.pinnacleBenchmarkState!=='PINNACLE_BENCHMARK_UNAVAILABLE') throw new Error('legacy observer did not degrade to unavailable');
+          if(p.pinnacleStatus!=='benchmark-incompatible') throw new Error(`unexpected legacy observer status ${p.pinnacleStatus}`);
+          if(p.pinnacleBenchmarkExecutionAuthority!==false) throw new Error('execution authority boundary drifted');
+          console.log('Legacy observer fallback passed');
+          NODE
+          mv /tmp/observer.original data/oddspapi-observer.json
       - name: Existing Core regression
         run: |
           node tools/core-assessment-trace-gate.mjs self-test

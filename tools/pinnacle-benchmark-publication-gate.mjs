@@ -14,6 +14,7 @@ function readJson(file){return JSON.parse(fs.readFileSync(file,'utf8'))}
 function writeJson(file,value){fs.writeFileSync(file,JSON.stringify(value,null,2)+'\n')}
 function blobSha(file){const data=fs.readFileSync(file);return crypto.createHash('sha1').update(Buffer.from(`blob ${data.length}\0`)).update(data).digest('hex')}
 function parseArgs(argv){const [command,...rest]=argv,args={command};for(let i=0;i<rest.length;i++){const token=rest[i];if(!token.startsWith('--'))fail(`Unexpected argument ${token}`);const key=token.slice(2).replace(/-([a-z])/g,(_,c)=>c.toUpperCase());const next=rest[i+1];if(next&&!next.startsWith('--')){args[key]=next;i++;}else args[key]=true;}return args}
+function officialObserverShape(observer){return observer?.schema===3&&observer?.mode==='official-sharp-benchmark'&&observer?.authoritative===true&&observer?.authorityScope==='sharp-market-benchmark-only'&&observer?.benchmarkAuthority===AUTHORITY&&observer?.executionAuthority===false;}
 
 function runtime(root='.'){
   const prodFile=path.join(root,PROD_PATH);
@@ -58,11 +59,18 @@ function normalize(rt,report,sidecar){
     if(p.pinnacleObserverBlobSha&&p.pinnacleObserverBlobSha!==currentSha) fail('Staged report Pinnacle observer blob does not match the bound current observer');
     p.pinnacleObserverBlobSha=currentSha;
     p.pinnacleGeneratedAt=observer.generatedAt||p.pinnacleGeneratedAt||null;
-    p.pinnacleStatus=observer.status||p.pinnacleStatus||'unknown';
-    p.pinnacleBenchmarkState=observer.status==='ok'?'OFFICIAL_BENCHMARK_AVAILABLE':UNAVAILABLE;
+    p.pinnacleObserverSourceStatus=observer.status||null;
+    if(observer.status==='ok'&&officialObserverShape(observer)){
+      p.pinnacleStatus='ok';
+      p.pinnacleBenchmarkState='OFFICIAL_BENCHMARK_AVAILABLE';
+    }else{
+      p.pinnacleStatus=observer.status==='ok'?'benchmark-incompatible':(observer.status||'unknown');
+      p.pinnacleBenchmarkState=UNAVAILABLE;
+    }
   }else{
     p.pinnacleBenchmarkState=UNAVAILABLE;
     p.pinnacleStatus='observer-missing';
+    p.pinnacleObserverSourceStatus=null;
   }
   return true;
 }
@@ -94,9 +102,7 @@ function validate(rt,report,sidecar){
     check(fs.existsSync(observerFile),'Pinnacle observer is missing despite status ok');
     check(SHA40.test(String(p.pinnacleObserverBlobSha||''))&&p.pinnacleObserverBlobSha===blobSha(observerFile),'Pinnacle observer SHA mismatch');
     const observer=readJson(observerFile);
-    check(observer.schema===3,'Official Pinnacle observer schema must be 3');
-    check(observer.authoritative===true&&observer.authorityScope==='sharp-market-benchmark-only','Pinnacle observer authority scope is invalid');
-    check(observer.benchmarkAuthority===AUTHORITY&&observer.executionAuthority===false,'Pinnacle observer authority boundary is invalid');
+    check(officialObserverShape(observer),'Official Pinnacle observer authority/schema shape is invalid');
     const result=validateObserver(observer,{observerFreshnessMinutes:rt.policy.rules.observerFreshnessMinutes,quoteFreshnessMinutes:rt.policy.rules.quoteFreshnessMinutes,futureClockSkewToleranceMinutes:rt.policy.rules.futureClockSkewToleranceMinutes,asOf:report.ts});
     check(result.ok,`Pinnacle observer validation failed: ${result.errors.join('; ')}`);
   }else{
@@ -104,7 +110,7 @@ function validate(rt,report,sidecar){
   }
 }
 
-function selfTest(){const rt=runtime('.');check(rt.cfg.authority===AUTHORITY,'runtime authority');console.log('Pinnacle benchmark publication gate self-test passed')}
+function selfTest(){const rt=runtime('.');check(rt.cfg.authority===AUTHORITY,'runtime authority');check(officialObserverShape({schema:3,mode:'official-sharp-benchmark',authoritative:true,authorityScope:'sharp-market-benchmark-only',benchmarkAuthority:AUTHORITY,executionAuthority:false}),'official observer shape');check(!officialObserverShape({schema:2,mode:'observation-only',authoritative:false}),'legacy observer must not qualify');console.log('Pinnacle benchmark publication gate self-test passed')}
 
 const args=parseArgs(process.argv.slice(2));
 if(args.command==='self-test'||args.command==='validate-runtime') selfTest();
