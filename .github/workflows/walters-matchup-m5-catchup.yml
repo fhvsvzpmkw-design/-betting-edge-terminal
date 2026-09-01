@@ -1,0 +1,83 @@
+name: Walters Matchup M5 Catch-up
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/matchup-stage5/m5-catchup-input-v1.json'
+      - 'tools/run-walters-matchup-m5-catchup.mjs'
+      - 'tools/finalize-walters-matchup-m5.mjs'
+      - '.github/workflows/walters-matchup-m5-catchup.yml'
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  catchup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify M5 executables and active week
+        run: |
+          node --check tools/run-walters-matchup-m5-catchup.mjs
+          node --check tools/apply-graham-matchup-production.mjs
+          node --check tools/finalize-walters-matchup-m5.mjs
+          node --check tools/graham-active-week.mjs
+          node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Build market-isolated M5 catch-up staging
+        run: node tools/run-walters-matchup-m5-catchup.mjs
+
+      - name: Verify preflight did not mutate live artifacts
+        run: |
+          git diff --exit-code -- data/walters/nfl/2026/week-01-current-numbers.json
+          git diff --exit-code -- data/walters/nfl/2026/week-01-personnel-ledger.json
+          git diff --exit-code -- data/walters/nfl/2026/week-01-research-ledger.json
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Apply accepted M4 cases for M5
+        run: node tools/apply-graham-matchup-production.mjs data/walters/nfl/matchup-production-staging.json
+
+      - name: Finalize and verify M5 catch-up
+        run: node tools/finalize-walters-matchup-m5.mjs
+
+      - name: Verify protected carried ratings remain untouched
+        run: |
+          git diff --exit-code -- data/walters/nfl-power-ratings-ledger.json
+          git diff --exit-code -- data/walters/nfl/player-values/player-values-2026-v1.json
+
+      - name: Publish M5 catch-up outputs
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          git add -- \
+            data/walters/nfl/matchup-production-staging.json \
+            data/walters/nfl/matchup-production-current.json \
+            data/walters/nfl/matchup-stage4/stage4-current.json \
+            data/walters/nfl/matchup-stage5/week-01-catchup-preflight.json \
+            data/walters/nfl/matchup-stage5/week-01-catchup-result.json \
+            data/walters/nfl/matchup-stage5/stage5-current.json \
+            "$ACTIVE_PERSONNEL" "$ACTIVE_RESEARCH" "$ACTIVE_NUMBERS"
+          git commit -m "Complete Walters matchup M5 active-week catch-up"
+          git push origin HEAD:main
