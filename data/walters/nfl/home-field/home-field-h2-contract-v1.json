@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "calibrationId": "walters-nfl-home-field-calibration-v1",
+  "h2Id": "walters-nfl-home-field-h2-v1",
+  "stage": "H2",
+  "state": "MODEL_LOCKED_PRE_VALIDATION",
+  "season": 2026,
+  "productionAuthority": false,
+  "liveBoardMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Lock the exact market-isolated H2 data snapshot, ridge/partial-pooling implementation, penalties, held-out validation procedure and 2026 release construction before reading the 2025 validation metrics.",
+  "dependsOn": {
+    "h1Contract": "data/walters/nfl/home-field/home-field-calibration-v1.json",
+    "h1Validator": "tools/validate-walters-home-field-h1.mjs",
+    "activeWeek": "data/walters/nfl/active-week.json"
+  },
+  "sourceSnapshot": {
+    "provider": "nflverse",
+    "repository": "nflverse/nflverse-data",
+    "releaseTag": "schedules",
+    "asset": "games.csv",
+    "assetId": 540187709,
+    "browserDownloadUrl": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+    "assetUpdatedAt": "2026-09-01T21:46:52Z",
+    "assetSha256": "322fe330cbcf157ad15dc5494b12b85b842012c0328e1d04b51af924999f2715",
+    "filteredSnapshotPath": "data/walters/nfl/home-field/source/nflverse-schedules-hfa-snapshot-2026-09-01.csv",
+    "fieldWhitelist": [
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "home_team",
+      "away_team",
+      "home_score",
+      "away_score",
+      "location",
+      "stadium_id",
+      "stadium"
+    ],
+    "rowWindow": {
+      "minSeason": 2021,
+      "maxSeason": 2026,
+      "gameType": "REG"
+    },
+    "rule": "The full external asset must match the pinned SHA-256 before any field is read. Only whitelisted fields may be written to the durable H2 snapshot."
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenFields": [
+      "spread_line",
+      "total_line",
+      "moneyline",
+      "opening_spread",
+      "closing_spread",
+      "opening line",
+      "closing line",
+      "book price",
+      "ATS result"
+    ],
+    "rule": "H2 code must select fields by positive whitelist; presence of sportsbook fields in the upstream file is irrelevant because they are never loaded into the model record."
+  },
+  "training": {
+    "seasons": [2021, 2022, 2023, 2024],
+    "gameType": "REG",
+    "completedScoresRequired": true,
+    "neutralGamesIncludedForTeamStrength": true,
+    "homeFieldFeaturesOnNeutralGames": false
+  },
+  "validation": {
+    "seasons": [2025],
+    "gameType": "REG",
+    "heldOutFromHfaFit": true,
+    "rule": "No HFA coefficient or regularization parameter may be changed after reading 2025 metrics. Validation-only team-strength nuisance coefficients may be estimated from 2025 score margins using a common league-only HFA offset shared by the candidate and league-only comparison; this does not refit any candidate HFA coefficient."
+  },
+  "model": {
+    "family": "RIDGE_PARTIAL_POOLING_TEAM_SEASON_PLUS_HOME_TEAM_VENUE",
+    "response": "home_score - away_score",
+    "features": {
+      "teamSeasonStrength": "+1 for home team-season and -1 for away team-season on every completed game",
+      "leagueHomeBaseline": "1 for location=Home; 0 for neutral",
+      "seasonHomeDeviation": "one indicator for the game's season when location=Home",
+      "teamVenueHomeDeviation": "one indicator for normalized home-team + stadium identity when location=Home"
+    },
+    "penalties": {
+      "teamSeasonStrength": 8.0,
+      "leagueHomeBaseline": 0.000001,
+      "seasonHomeDeviation": 64.0,
+      "teamVenueHomeDeviation": 96.0,
+      "validationTeamStrength": 8.0
+    },
+    "visitorRoadDeviation": {
+      "enabled": false,
+      "releaseValue": 0,
+      "status": "NOT_IDENTIFIABLE_V1",
+      "rule": "H2 v1 does not add a second visitor-road random effect because it is substantially collinear with team-season strength and home-team/venue effects."
+    },
+    "nextSeasonLeagueBaselineForecast": {
+      "method": "GLOBAL_PLUS_RECENCY_WEIGHTED_LAST_3_SEASON_DEVIATIONS",
+      "weightsOldestToNewest": [1, 2, 3],
+      "rule": "For a next-season forecast use the global ridge baseline plus the weighted average of the three most recent fitted season HFA deviations."
+    },
+    "teamVenueProjection": {
+      "method": "PERSISTENT_SHRUNK_TEAM_VENUE_EFFECT",
+      "rule": "A known 2026 domestic team/stadium pair receives its fitted persistent team-venue deviation. A team/stadium pair unseen in the completed fit receives zero deviation and NEW_VENUE uncertainty rather than inheriting an old stadium's full effect."
+    },
+    "teamCodeNormalization": {
+      "LA": "LAR"
+    },
+    "stadiumKey": "Use stadium_id when present; otherwise normalized stadium text. Pair it with normalized home-team code."
+  },
+  "validationProcedure": {
+    "leagueOnlyForecast": "Use the locked 2021-2024 next-season league baseline forecast with zero team-venue deviations.",
+    "candidateForecast": "Use the same league baseline plus frozen 2021-2024 team-venue deviations for 2025 stadium pairs seen in training; unseen pairs receive zero deviation.",
+    "holdoutStrengthNuisance": "Estimate 2025 team-strength coefficients once after subtracting the league-only domestic HFA forecast. Reuse those exact strengths for both the league-only and candidate residual evaluation.",
+    "evaluationRows": "All completed 2025 REG games; domestic-home metrics are primary and neutral-site residual bias is reported separately.",
+    "metrics": [
+      "domestic mean error",
+      "domestic mean absolute error",
+      "domestic root mean squared error",
+      "domestic absolute mean bias",
+      "neutral mean error",
+      "candidate minus league-only MAE",
+      "candidate minus league-only RMSE"
+    ]
+  },
+  "acceptance": {
+    "candidateDomesticMaeMayExceedLeagueOnlyByAtMost": 0.05,
+    "candidateDomesticRmseMayExceedLeagueOnlyByAtMost": 0.10,
+    "candidateAbsoluteDomesticBiasMayExceedLeagueOnlyByAtMost": 0.15,
+    "minimumTrainingDomesticGames": 900,
+    "minimumValidationDomesticGames": 240,
+    "requireFinite32Team2026Registry": true,
+    "passState": "PASS_CURRENT_CALIBRATION_SHADOW_RELEASE",
+    "failState": "FAIL_CLOSED_HFA_MODEL_NOT_VALIDATED"
+  },
+  "finalReleaseConstruction": {
+    "onlyAfterAcceptance": true,
+    "refitSeasons": [2021, 2022, 2023, 2024, 2025],
+    "sameLockedModelAndPenalties": true,
+    "2026LeagueBaseline": "Apply the locked next-season baseline forecast to the refit through 2025.",
+    "2026VenueIdentity": "Resolve each team's modal location=Home stadium from 2026 schedule rows. If no governed domestic stadium is resolvable, mark UNRESOLVED and do not invent a team HFA.",
+    "uncertainty": {
+      "method": "SHRUNK_SAMPLE_HEURISTIC",
+      "formula": "max(0.25, residualSigma / sqrt(teamVenueTrainingGames + 16))",
+      "newVenueFloor": 0.75,
+      "unseenTeamVenueDeviation": 0
+    },
+    "precisionDecimals": 3,
+    "displayGuidance": "H2 never rounds or mutates the live Graham board; H3 will preserve exact HFA arithmetic before ordinary half-point Graham display rounding."
+  },
+  "venueClassificationRules": {
+    "DOMESTIC_HOME": "2026 location=Home and stadium identity is resolvable for the designated home team.",
+    "NEUTRAL": "2026 location=Neutral; HFA base is zero in H3 unless a separately governed local differential is later approved.",
+    "NEW_VENUE": "2026 domestic home team/stadium pair not observed in 2021-2025 completed training/refit rows.",
+    "SHARED_VENUE_OR_METRO": "Not inferred automatically in H2; flag for H3 explicit game review when opposing clubs share a stadium/metro context.",
+    "RELOCATED_HOME": "Not inferred from designation alone; H3 must review when a current game is moved from the team's modal governed home venue.",
+    "UNRESOLVED": "No reliable 2026 domestic home venue identity; fail closed in H3."
+  },
+  "protectedLiveArtifacts": [
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "ACTIVE_CURRENT_NUMBERS",
+    "ACTIVE_PERSONNEL_LEDGER"
+  ],
+  "outputs": {
+    "release": "data/walters/nfl/home-field/home-field-release-2026-v1.json",
+    "current": "data/walters/nfl/home-field/h2-current.json",
+    "audit": "data/walters/nfl/home-field/h2-validation-audit-v1.json"
+  },
+  "h3EntryGate": [
+    "H1 validator passes",
+    "external source SHA matches the pinned H2 contract",
+    "filtered snapshot contains whitelist only",
+    "2025 chronological HFA holdout passes the locked acceptance thresholds",
+    "32-team 2026 registry is finite or explicitly unresolved",
+    "no live Graham, personnel, player-value or carried-rating artifact changed",
+    "marketViewed remains false"
+  ],
+  "nextState": "H3_ACTIVE_WEEK_SHADOW_ACCEPTANCE"
+}
