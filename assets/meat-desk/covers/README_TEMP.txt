@@ -1,1 +1,0 @@
-Temporary marker; will be removed after binary cover asset commit.
