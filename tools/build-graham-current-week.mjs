@@ -2,11 +2,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {matchNflFixture,extractPinnacleHomeSpread,extractPinnacleMoneyline} from './graham-market-utils.mjs';
+import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 
 const ROOT=process.cwd();
-const NUMBERS=path.join(ROOT,'data/walters/nfl/2026/week-01-current-numbers.json');
+const ACTIVE=resolveGrahamActiveWeek({root:ROOT});
+const NUMBERS=ACTIVE.absolutePaths.currentNumbers;
 const RATINGS=path.join(ROOT,'data/walters/nfl-power-ratings-ledger.json');
-const MARKET=path.join(ROOT,'data/walters/nfl/2026/week-01-daily-market-ledger.json');
+const MARKET=ACTIVE.absolutePaths.dailyMarketLedger;
 const OBSERVER=path.join(ROOT,'data/oddspapi-observer.json');
 const LIVE=path.join(ROOT,'data/live-odds.json');
 const OUT=path.join(ROOT,'data/walters/nfl/current-week-terminal.json');
@@ -75,6 +77,7 @@ const games=(numbers.games||[]).map(game=>{
 const out={
   schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE NINETEENTH HOLE',season:numbers.season,week:numbers.week,
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
+  activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
   lastResearchAt:numbers.lastResearchAt||null,marketObservedAt:observer?.generatedAt||null,
   sourceScheduleMeta:live?.scheduleMeta||null,
   displayPolicy:{mode:'CURRENT_WEEK_TERMINAL',marketIsolation:true,pinnacleRole:'SHARP_MARKET_BENCHMARK_ONLY',bettingAuthority:false,rawOutput:true},
@@ -85,5 +88,6 @@ const out={
 };
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');
-JSON.parse(fs.readFileSync(OUT,'utf8'));
-console.log(`GRAHAM TERMINAL BUILT // WEEK ${out.week} // ${games.length} GAMES // ${games.filter(g=>g.grahamFairHome!==null).length} GRAHAM NUMBERS // ${games.filter(g=>g.pinnacleSpreadHome!==null).length} PINNACLE LINES // ${games.filter(g=>g.pinnacleMoneylineStatus==='AVAILABLE').length} PINNACLE MONEYLINES`);
+const verify=JSON.parse(fs.readFileSync(OUT,'utf8'));
+if(Number(verify.season)!==ACTIVE.season||Number(verify.week)!==ACTIVE.week)throw new Error('Graham terminal active-week verification failed');
+console.log(`GRAHAM TERMINAL BUILT // ${ACTIVE.season} WEEK ${ACTIVE.week} // ${games.length} GAMES // ${games.filter(g=>g.grahamFairHome!==null).length} GRAHAM NUMBERS // ${games.filter(g=>g.pinnacleSpreadHome!==null).length} PINNACLE LINES // ${games.filter(g=>g.pinnacleMoneylineStatus==='AVAILABLE').length} PINNACLE MONEYLINES`);
