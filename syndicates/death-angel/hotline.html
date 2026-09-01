@@ -66,5 +66,5 @@ function render(data){const games=Array.isArray(data.games)?data.games:[];const 
  $('authorityFooter').textContent=`GRAHAM TERMINAL REVIEW // NOT BETTING EDGE. Source: ${data.feedId||'graham current-week terminal'}, generated ${stamp(data.generatedAt)}. Graham's independent fair number is completed before Pinnacle comparison. Pinnacle remains a benchmark, not a Graham power-rating source. A 1.5-point GAP is an attention threshold only. GRAHAM MONEY may express SPREAD / MONEYLINE only when the governed selector resolves. Jesse Bains is fictional presentation and reaction only; this page never creates a BET, fair number or risk.`;
 }
 async function load(){try{const r=await fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);render(await r.json())}catch(e){$('attentionBoard').innerHTML=`<div class="error">GRAHAM SHEET UNAVAILABLE // ${String(e.message||e)}</div>`;$('fullBoard').innerHTML='<div class="error">CURRENT NFL BOARD UNAVAILABLE</div>'}}
-load();setInterval(load,60000);
+load();
 </script></body></html>
