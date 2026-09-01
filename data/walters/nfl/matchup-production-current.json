@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "productionId": "walters-nfl-matchup-production-v1",
+  "stage": "M4",
+  "state": "OPERATIONAL_SCOPED",
+  "season": 2026,
+  "activatedAt": "2026-09-01T21:16:08.053Z",
+  "productionAuthority": true,
+  "liveBoardMutationAllowed": true,
+  "marketViewed": false,
+  "sourceAuthority": {
+    "m3Result": "data/walters/nfl/matchup-stage3/week-01-acceptance-result.json",
+    "m3ResultSha256": "d095066c6aa41f1a6ac2a0168fe0f89b6b37ac1a04947c3562c9da4747bddfce",
+    "m3AcceptanceId": "walters-nfl-matchup-m3-acceptance-v1",
+    "basePersonnelProduction": "data/walters/nfl/personnel-production-current.json",
+    "matchupCalibration": "data/walters/nfl/matchup-calibration-v1.json",
+    "committeeCalibration": "data/walters/nfl/committee-replacement-calibration-v2.json",
+    "multiroleCalibration": "data/walters/nfl/multirole-replacement-calibration-v1.json",
+    "playerValueRegistry": "data/walters/nfl/player-values/player-values-2026-v1.json"
+  },
+  "activeWeekAtActivation": {
+    "season": 2026,
+    "week": 1,
+    "authority": "GRAHAM_WEEK_ROLLOVER"
+  },
+  "productionScope": {
+    "exactOneForOne": {
+      "enabled": true,
+      "owner": "walters-personnel-production-v1",
+      "delegated": true,
+      "reapplyExistingLoss": false
+    },
+    "valueInvariantCommittee": {
+      "enabled": true,
+      "owner": "walters-nfl-matchup-production-v1",
+      "exactValueRequired": true
+    },
+    "zeroMatchupReview": {
+      "enabled": true,
+      "numericAuthority": 0
+    },
+    "rangeOnlyCommittee": {
+      "enabled": false,
+      "failClosedCode": "BLOCK_EXACT_FAIR_UNRESOLVED"
+    },
+    "multiroleInterval": {
+      "enabled": false,
+      "failClosedCode": "BLOCK_MULTIROLE_UNRESOLVED"
+    },
+    "nonzeroOpponentMatchupIncrement": {
+      "enabled": false,
+      "failClosedCode": "BLOCK_NONZERO_MATCHUP_NOT_ACCEPTED"
+    }
+  },
+  "marketIsolation": {
+    "required": true,
+    "forbiddenInputs": [
+      "Pinnacle spread or price",
+      "Bet365 spread or price",
+      "DraftKings spread or price",
+      "sportsbook consensus",
+      "line movement",
+      "market-implied player value",
+      "betting percentages",
+      "closing-line value"
+    ]
+  },
+  "staging": {
+    "path": "data/walters/nfl/matchup-production-staging.json",
+    "stateRequired": "READY",
+    "workflow": ".github/workflows/graham-matchup-production.yml",
+    "calculator": "tools/apply-graham-matchup-production.mjs",
+    "taskRule": "Research tasks may stage only current football evidence that independently satisfies an accepted M4 class. Repository code owns locked-value lookup, exact arithmetic, double-count checks, ledger mutation and live Graham recomputation."
+  },
+  "recomputePolicy": {
+    "rule": "After an accepted committee event, recompute the affected game's entire personnel overlay from current numeric-eligible personnel cases rather than stacking a new delta onto the existing overlay.",
+    "clusterAuthority": "data/walters/nfl/personnel-calibration-v1.json",
+    "exactFairRequired": true,
+    "boardRoundingIncrement": 0.5,
+    "temporaryOverlayMayChangeCarriedTeamRating": false
+  },
+  "doubleCountGuards": [
+    "Do not reapply a one-for-one loss already present on the live board.",
+    "Do not credit a baseline starter's full value again as committee replacement value without distinct incremental role evidence.",
+    "Do not apply receiver or defensive-line cluster treatment twice.",
+    "Do not combine a separate unavailable player into another case without its own governed personnel event.",
+    "Do not use opponent-specific narrative to resolve an otherwise unresolved replacement interval.",
+    "Do not carry temporary personnel or matchup overlays into the team power rating."
+  ],
+  "m5CatchupRequired": true,
+  "m5Policy": "M4 activation itself must not copy any M2 shadow number into the live board. M5 must re-evaluate the active week from current football evidence and stage only currently valid accepted cases.",
+  "activationProtectedArtifactSha256": {
+    "currentNumbers": "fa92a25c9a214c8ad5da584f0fa0808b639645d54e84274b2280b464cc26f663",
+    "personnelLedger": "d5192c57233b7573c21b222007ccda27ab348e736c55c9d6dbd92566736b5c48",
+    "powerRatings": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "playerValueRegistry": "43ce924df786e3d39ffc3b027cbd5f0bef4e1f8f171421da5ee257fffddda339"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "stage": "M4",
+  "state": "OPERATIONAL_SCOPED",
+  "season": 2026,
+  "week": 1,
+  "updatedAt": "2026-09-01T21:16:08.053Z",
+  "productionId": "walters-nfl-matchup-production-v1",
+  "productionAuthority": true,
+  "marketViewed": false,
+  "scope": {
+    "exactOneForOne": {
+      "enabled": true,
+      "owner": "walters-personnel-production-v1",
+      "delegated": true,
+      "reapplyExistingLoss": false
+    },
+    "valueInvariantCommittee": {
+      "enabled": true,
+      "owner": "walters-nfl-matchup-production-v1",
+      "exactValueRequired": true
+    },
+    "zeroMatchupReview": {
+      "enabled": true,
+      "numericAuthority": 0
+    },
+    "rangeOnlyCommittee": {
+      "enabled": false,
+      "failClosedCode": "BLOCK_EXACT_FAIR_UNRESOLVED"
+    },
+    "multiroleInterval": {
+      "enabled": false,
+      "failClosedCode": "BLOCK_MULTIROLE_UNRESOLVED"
+    },
+    "nonzeroOpponentMatchupIncrement": {
+      "enabled": false,
+      "failClosedCode": "BLOCK_NONZERO_MATCHUP_NOT_ACCEPTED"
+    }
+  },
+  "productionManifest": "data/walters/nfl/matchup-production-current.json",
+  "m5CatchupRequired": true,
+  "nextGate": [
+    "Run the one-time active-week M5 catch-up from current football evidence under the accepted M4 scope.",
+    "Do not copy M2 shadow numbers directly into production.",
+    "Keep range-only committees, unresolved multi-role cases and every nonzero opponent-specific matchup increment fail closed.",
+    "After M5, update recurring Graham research tasks so future accepted committee cases stage through the M4 production path."
+  ]
+}
