@@ -8,6 +8,7 @@ on:
       - data/walters/nfl/personnel-staging.json
       - data/walters/nfl/personnel-production-current.json
       - tools/apply-graham-personnel-staging.mjs
+      - tools/graham-active-week.mjs
   workflow_dispatch:
 
 concurrency:
@@ -28,18 +29,24 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Verify production contract and calculator syntax
+      - name: Verify production contract, active week and calculator syntax
         run: |
           node --check tools/apply-graham-personnel-staging.mjs
+          node --check tools/graham-active-week.mjs
+          node tools/graham-active-week.mjs
           node - <<'NODE'
           const fs=require('node:fs');
           const prod=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-production-current.json','utf8'));
           const s2=JSON.parse(fs.readFileSync('data/walters/nfl/player-values/stage2-current.json','utf8'));
           const s3=JSON.parse(fs.readFileSync('data/walters/nfl/stage3/stage3-current.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          const staging=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
           if(prod.state!=='OPERATIONAL'||prod.productionAuthority!==true)throw new Error('production contract not operational');
           if(s2.auditPass!==true)throw new Error('Stage 2 audit not passed');
           if(s3.acceptancePass!==true)throw new Error('Stage 3 acceptance not passed');
-          console.log('GRAHAM PERSONNEL PRODUCTION PREFLIGHT: PASS');
+          if(active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER')throw new Error('active Graham week invalid');
+          if(Number(staging.season)!==Number(active.season)||Number(staging.week)!==Number(active.week))throw new Error(`personnel staging ${staging.season} W${staging.week} does not match active Graham ${active.season} W${active.week}`);
+          console.log(`GRAHAM PERSONNEL PRODUCTION PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')}`);
           NODE
 
       - name: Apply governed personnel staging batch
@@ -50,10 +57,12 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
           const week=String(Number(s.week)).padStart(2,'0');
           const ledger=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-personnel-ledger.json`,'utf8'));
           const numbers=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-current-numbers.json`,'utf8'));
           const research=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-research-ledger.json`,'utf8'));
+          if(Number(s.season)!==Number(active.season)||Number(s.week)!==Number(active.week))throw new Error('active-week changed during personnel transaction');
           if(s.marketViewed!==false||ledger.marketViewed!==false||numbers.personnelProduction?.marketViewed!==false)throw new Error('market isolation failed');
           if(!ledger.processedBatchIds.includes(s.batchId))throw new Error('batch not durable');
           if(research.sweeps.at(-1)?.summary?.marketViewed!==false)throw new Error('research market isolation failed');
@@ -66,7 +75,10 @@ jobs:
           set -euo pipefail
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -- data/walters/nfl/2026/week-*-personnel-ledger.json data/walters/nfl/2026/week-*-research-ledger.json data/walters/nfl/2026/week-*-current-numbers.json
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          git add -- "$ACTIVE_PERSONNEL" "$ACTIVE_RESEARCH" "$ACTIVE_NUMBERS"
           if git diff --cached --quiet; then
             echo "No new personnel production outputs to publish."
             exit 0
