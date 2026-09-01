@@ -1,0 +1,67 @@
+name: Freeze Madden NFL 27 EA ratings
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/freeze-madden27-ea.py
+  workflow_dispatch:
+
+concurrency:
+  group: madden27-ea-freeze
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pull official EA Madden NFL 27 database
+        run: python tools/freeze-madden27-ea.py
+
+      - name: Verify frozen snapshot
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('data/walters/nfl/madden27')
+          current=json.loads((root/'madden27-current.json').read_text())
+          normalized=json.loads((root/current['normalizedPath']).read_text())
+          raw=json.loads((root/current['rawPath']).read_text())
+          count=int(current['officialPlayerCount'])
+          assert count >= 2300, f'unexpected official count {count}'
+          assert len(raw['players']) == count
+          assert len(normalized['players']) == count
+          ids=[str(p['eaPlayerId']) for p in normalized['players']]
+          assert len(ids)==len(set(ids)), 'duplicate EA player IDs in normalized snapshot'
+          assert current['sourceAuthority']=='EA_OFFICIAL_MADDEN_NFL_27'
+          assert current['state']=='FROZEN_STAGE_1'
+          print(f'MADDEN 27 STAGE 1 VERIFY: PASS // {count} OFFICIAL PLAYERS // {len(set(ids))} UNIQUE IDS')
+          PY
+
+      - name: Publish frozen snapshot
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/walters/nfl/madden27
+          if git diff --cached --quiet; then
+            echo "No Madden 27 snapshot changes to publish."
+            exit 0
+          fi
+          git commit -m "Freeze official EA Madden NFL 27 ratings baseline"
+          git push origin HEAD:main
