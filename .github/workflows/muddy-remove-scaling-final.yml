@@ -33,10 +33,9 @@ jobs:
             s=s.replace(/Ten most recent settled public wagers, \$100-unit normalized stake and P\/L\./g,'Ten most recent settled public wagers, actual stake and P/L.');
             s=s.replace(/\$100-unit normalized/g,'actual CAD');
             s=s.replace(/Authority: public Bet History via \/data\/bet-history-public\.json\. The source ledger remains untouched\. Displayed bankroll, wager and performance dollars are normalized by 100 ÷ \(current bankroll × 3%\), making the current 3% unit equal \$100\. Counts, ROI, win rates and percentage ratios remain unchanged\./g,'Authority: public Bet History via /api/bet-history plus the sanitized public funding layer. All bankroll, wager and performance dollars are actual CAD.');
-            s=s.replace(/set\('walk',`Source bankroll \$\{money\(bankroll\)\} produces a \$\{money\(rawUnit\)\} 3% unit\. At ×\$\{scale\.toFixed\(4\)\}, the displayed bankroll is \$\{money\(scaledBankroll\)\} and the active unit is \$100\. Normalized cash P\/L \$\{sm\(scaledProfit\)\} at \$\{pct\(j\.summary\?\.cashRoiPercent\)\} ROI\. Public-row week \$\{sm\(Wk\.p\)\}; public-row month \$\{sm\(Mo\.p\)\}\. `\)/g,"set('walk',`Actual bankroll ${money(bankroll)}. Cash P/L ${sm(scaledProfit)} at ${pct(j.summary?.cashRoiPercent)} cash ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)");
-            // Clean any leftover explanatory prose from the old unit mode.
+            s=s.replace(/set\('walk',`Source bankroll[^`]*`\)/g,"set('walk',`Actual bankroll ${money(bankroll)}. Cash P/L ${sm(scaledProfit)} at ${pct(j.summary?.cashRoiPercent)} cash ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)");
+            s=s.replace(/active unit is \$100/gi,'actual-dollar presentation');
             s=s.replace(/Displayed bankroll, wager and performance dollars are normalized[^<]*/g,'All bankroll, wager and performance dollars are actual CAD. ');
-            // These tokens are not allowed in active page logic after conversion.
             const bad=['UNIT_RATE','TARGET_UNIT','W(r,scale)','*scale','bankroll*scale','active unit is $100','$100-unit normalized'];
             const found=bad.filter(x=>s.includes(x));
             if(found.length) throw new Error(`${p}: residual scaling tokens: ${found.join(', ')}`);
