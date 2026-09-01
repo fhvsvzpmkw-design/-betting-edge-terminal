@@ -1,0 +1,137 @@
+name: Walters Home Field H4 Activation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/home-field/h4-production-contract-v1.json'
+      - 'tools/run-walters-home-field-h4-activation.mjs'
+      - '.github/workflows/walters-home-field-h4.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Synchronize and verify H4 scope
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          node --check tools/graham-active-week.mjs
+          node --check tools/run-walters-home-field-h4-activation.mjs
+          node tools/graham-active-week.mjs --json >/dev/null
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/h4-production-contract-v1.json','utf8'));
+          const h3=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/h3-current.json','utf8'));
+          const h3v=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/h3v-current.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          if(c.stage!=='H4'||c.state!=='READY_FOR_SCOPED_ACTIVATION'||c.productionAuthority!==false||c.marketViewed!==false)throw new Error('H4 contract invalid');
+          if(h3.h4ScopeCandidate?.leagueBaseline!==true||h3.h4ScopeCandidate?.teamVenue!==false||h3.h4ScopeCandidate?.neutralZeroBase!==true)throw new Error('H3 scope changed');
+          if(h3v.h4ScopeCandidate?.leagueBaseline!==true||h3v.h4ScopeCandidate?.neutralZeroBase!==true||h3v.h4ScopeCandidate?.selectiveVenueAdjustments!==false||h3v.h4ScopeCandidate?.teamVenueBlanket!==false||Number(h3v.h4ScopeCandidate?.qualifiedVenueCount)!==0)throw new Error('H3V scope changed');
+          if(Number(h3v.h4ScopeCandidate?.survivalCoefficientK)!==0.034)throw new Error('H3V k changed');
+          if(active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER')throw new Error('active week invalid');
+          console.log(`WALTERS HOME FIELD H4 PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')} // DOMESTIC 2.082 // NEUTRAL 0 // TEAM VENUE OFF`);
+          NODE
+
+      - name: Snapshot protected artifact hashes
+        run: |
+          set -euo pipefail
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          sha256sum "$ACTIVE_PERSONNEL" data/walters/nfl-power-ratings-ledger.json data/walters/nfl/player-values/player-values-2026-v1.json > /tmp/h4-protected-before.sha256
+
+      - name: Activate scoped H4 home field
+        run: node tools/run-walters-home-field-h4-activation.mjs
+
+      - name: Verify protected artifacts unchanged
+        run: |
+          set -euo pipefail
+          ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
+          sha256sum "$ACTIVE_PERSONNEL" data/walters/nfl-power-ratings-ledger.json data/walters/nfl/player-values/player-values-2026-v1.json > /tmp/h4-protected-after.sha256
+          diff -u /tmp/h4-protected-before.sha256 /tmp/h4-protected-after.sha256
+          git diff --exit-code -- "$ACTIVE_PERSONNEL" data/walters/nfl-power-ratings-ledger.json data/walters/nfl/player-values/player-values-2026-v1.json
+          echo "WALTERS HOME FIELD H4 PROTECTED ARTIFACT GUARD: PASS"
+
+      - name: Verify durable H4 scope before publication
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          const token=String(Number(active.week)).padStart(2,'0');
+          const n=JSON.parse(fs.readFileSync(`data/walters/nfl/${active.season}/week-${token}-current-numbers.json`,'utf8'));
+          const p=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/home-field-production-current.json','utf8'));
+          const c=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/h4-current.json','utf8'));
+          if(p.state!=='OPERATIONAL_SCOPED'||p.productionAuthority!==true||p.marketViewed!==false)throw new Error('H4 production manifest invalid');
+          if(p.productionScope?.domesticLeagueBaseline?.homeLocationAdvantagePoints!==2.082)throw new Error('H4 league HFA mismatch');
+          if(p.productionScope?.selectiveVenueAdjustments?.enabled!==false||p.productionScope?.teamVenueBlanket?.enabled!==false)throw new Error('unaccepted venue scope enabled');
+          if(c.state!=='OPERATIONAL_SCOPED'||c.productionAuthority!==true)throw new Error('H4 current invalid');
+          if(n.homeFieldProduction?.domesticLeagueBaselineHomeAdvantagePoints!==2.082||n.homeFieldProduction?.selectiveVenueAdjustments!==false)throw new Error('active numbers H4 metadata invalid');
+          let domestic=0,neutral=0;
+          for(const g of n.games){
+            const loc=(g.adjustments||[]).filter(a=>a.type==='HOME_FIELD'||a.type==='VENUE');
+            if(loc.length!==1)throw new Error(`location adjustment count ${g.gameKey}`);
+            if(g.homeFieldVenueClass==='DOMESTIC_HOME'){
+              domestic++;
+              if(Math.abs(Number(loc[0].pointsToHomeSpread)+2.082)>1e-9)throw new Error(`domestic HFA mismatch ${g.gameKey}`);
+            }else if(['NEUTRAL','INTERNATIONAL_NEUTRAL'].includes(g.homeFieldVenueClass)){
+              neutral++;
+              if(Math.abs(Number(loc[0].pointsToHomeSpread))>1e-9)throw new Error(`neutral HFA mismatch ${g.gameKey}`);
+            }else throw new Error(`unresolved venue class ${g.gameKey}`);
+          }
+          if(domestic!==15||neutral!==1)throw new Error(`venue counts ${domestic}/${neutral}`);
+          console.log(`WALTERS HOME FIELD H4 VERIFY: PASS // 15 DOMESTIC @ 2.082 // 1 NEUTRAL @ 0 // ${p.activationSummary.displayMoves} DISPLAY MOVES // TEAM VENUE OFF`);
+          NODE
+
+      - name: Publish H4 activation
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+          git add -- "$ACTIVE_NUMBERS" "$ACTIVE_RESEARCH" data/walters/nfl/home-field/home-field-production-current.json data/walters/nfl/home-field/h4-current.json
+          if git diff --cached --quiet; then
+            echo "H4 already durably active; no publication needed."
+            exit 0
+          fi
+          git commit -m "Activate Walters home-field H4 production"
+          git push origin HEAD:main
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f data/walters/nfl/home-field/home-field-production-current.json ]; then
+            node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/home-field-production-current.json','utf8'));
+          console.log('## Walters Home Field H4');
+          console.log(`- State: ${p.state}`);
+          console.log(`- Domestic HFA: ${p.productionScope.domesticLeagueBaseline.homeLocationAdvantagePoints}`);
+          console.log('- Neutral base HFA: 0');
+          console.log(`- Selective venue adjustments: ${p.productionScope.selectiveVenueAdjustments.enabled}`);
+          console.log(`- Team venue blanket: ${p.productionScope.teamVenueBlanket.enabled}`);
+          console.log(`- Display moves: ${p.activationSummary.displayMoves}`);
+          console.log('- Carried rating moves: 0');
+          console.log('- Market viewed: false');
+          NODE
+          fi
