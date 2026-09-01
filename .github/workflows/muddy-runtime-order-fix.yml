@@ -1,0 +1,55 @@
+name: Muddy Runtime Order Fix
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-runtime-order-fix.yml'
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Repair Muddy runtime ordering
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const paths=['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html'];
+          for(const p of paths){
+            let s=fs.readFileSync(p,'utf8');
+            const old="week=all.filter(w=>inside(w,ws,a)),oldW=all.filter(w=>inside(w,pws,pwe)),month=all.filter(w=>inside(w,ms,a)),oldM=all.filter(w=>inside(w,pms,pme)),Wk=capitalStats(week),OW=capitalStats(oldW),Mo=capitalStats(month),OM=capitalStats(oldM);const allIn=f?.summary?.allIn,cash=f?.summary?.cash,promo=f?.summary?.promotional;if(!allIn)throw Error('Funding summary missing');let scaledProfit=+allIn.profitCad||0,scaledRisk=+allIn.actualCapitalRiskCad||0;const fundingRows=new Map((f.promotionalWagers||[]).map(r=>[+r[0],r]));const fundingClass=id=>String(fundingRows.get(+id)?.[1]||'CASH'),actualRisk=w=>{const r=fundingRows.get(+w.id);return r?Number(r[3]||0):Number(w.risk||0)};function capitalStats(a){let s={bets:a.length,risk:0,p:0,w:0,l:0,c:0};a.forEach(x=>{s.risk+=actualRisk(x);s.p+=x.p;if(x.result==='Won')s.w++;else if(x.result==='Lost')s.l++;else if(x.result==='CashedOut')s.c++});s.roi=s.risk?s.p/s.risk*100:0;s.avg=s.bets?s.risk/s.bets:0;return s}";
+            const neu="week=all.filter(w=>inside(w,ws,a)),oldW=all.filter(w=>inside(w,pws,pwe)),month=all.filter(w=>inside(w,ms,a)),oldM=all.filter(w=>inside(w,pms,pme));const allIn=f?.summary?.allIn,cash=f?.summary?.cash,promo=f?.summary?.promotional;if(!allIn)throw Error('Funding summary missing');let scaledProfit=+allIn.profitCad||0,scaledRisk=+allIn.actualCapitalRiskCad||0;const fundingRows=new Map((f.promotionalWagers||[]).map(r=>[+r[0],r]));const fundingClass=id=>String(fundingRows.get(+id)?.[1]||'CASH'),actualRisk=w=>{const r=fundingRows.get(+w.id);return r?Number(r[3]||0):Number(w.risk||0)};function capitalStats(a){let s={bets:a.length,risk:0,p:0,w:0,l:0,c:0};a.forEach(x=>{s.risk+=actualRisk(x);s.p+=x.p;if(x.result==='Won')s.w++;else if(x.result==='Lost')s.l++;else if(x.result==='CashedOut')s.c++});s.roi=s.risk?s.p/s.risk*100:0;s.avg=s.bets?s.risk/s.bets:0;return s}let Wk=capitalStats(week),OW=capitalStats(oldW),Mo=capitalStats(month),OM=capitalStats(oldM)";
+            if(!s.includes(old)) throw new Error(p+' runtime-order pattern missing');
+            s=s.replace(old,neu);
+            const riskOld="let mr=Mo.risk||0,pr=month.filter(x=>/^PREGAME$/i.test(x.phase)).reduce((t,x)=>t+x.risk,0),lr=month.filter(x=>/AFTER START|LIVE/i.test(x.phase)).reduce((t,x)=>t+x.risk,0),par=month.filter(x=>x.legs.length>1||/PARLAY/i.test(x.label)).reduce((t,x)=>t+x.risk,0),big=sp.slice().sort((x,y)=>y.risk-x.risk)[0]||{name:'—',risk:0};";
+            const riskNew="let mr=Mo.risk||0,pr=month.filter(x=>/^PREGAME$/i.test(x.phase)).reduce((t,x)=>t+actualRisk(x),0),lr=month.filter(x=>/AFTER START|LIVE/i.test(x.phase)).reduce((t,x)=>t+actualRisk(x),0),par=month.filter(x=>x.legs.length>1||/PARLAY/i.test(x.label)).reduce((t,x)=>t+actualRisk(x),0),sportCapital=[...group(month,x=>x.sport)].map(x=>({name:x.name,risk:month.filter(w=>w.sport===x.name).reduce((t,w)=>t+actualRisk(w),0)})),big=sportCapital.sort((x,y)=>y.risk-x.risk)[0]||{name:'—',risk:0};";
+            if(!s.includes(riskOld)) throw new Error(p+' meter-risk pattern missing');
+            s=s.replace(riskOld,riskNew);
+            if(s.indexOf('actualRisk=w=>')>s.indexOf('Wk=capitalStats(week)')) throw new Error(p+' actualRisk still declared after capitalStats use');
+            if(s.includes('muddy-funding-overlay')||s.includes('UNIT_RATE')||s.includes('TARGET_UNIT')||s.includes('bankroll*scale')) throw new Error(p+' forbidden legacy renderer/scaling found');
+            fs.writeFileSync(p,s);
+          }
+          NODE
+      - name: Verify runtime order and guardrails
+        run: |
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const p='syndicates/generated/eddie-numbers/hotline.html';
+          const s=fs.readFileSync(p,'utf8');
+          if(s.indexOf('actualRisk=w=>')<0||s.indexOf('Wk=capitalStats(week)')<0) throw Error('required runtime tokens missing');
+          if(s.indexOf('actualRisk=w=>')>s.indexOf('Wk=capitalStats(week)')) throw Error('TDZ regression: actualRisk declared after first use');
+          if(!s.includes('reduce((t,x)=>t+actualRisk(x),0)')) throw Error('actual-capital meter reducers missing');
+          console.log('MUDDY RUNTIME ORDER PASS');
+          NODE
+      - name: Commit runtime repair
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: repair runtime order and capital meters'
+          git push origin main
