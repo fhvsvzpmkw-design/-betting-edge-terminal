@@ -1,0 +1,57 @@
+name: Muddy Direct Actual CAD
+on:
+  push:
+    paths:
+      - '.github/workflows/muddy-direct-final.yml'
+permissions:
+  contents: write
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Convert live Muddy scripts to actual CAD
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          for (const p of ['syndicates/generated/eddie-numbers/hotline.html','syndicates/sharp-room/incoming.html']) {
+            let s=fs.readFileSync(p,'utf8');
+            s=s.replace("const URL='/data/bet-history-public.json',TZ='America/Vancouver',UNIT_RATE=.03,TARGET_UNIT=100,","const URL='/api/bet-history',TZ='America/Vancouver',");
+            s=s.replace(/function W\(r,scale\)/g,'function W(r)');
+            s=s.replace(/risk:\(\+r\[9\]\|\|0\)\*scale/g,'risk:(+r[9]||0)');
+            s=s.replace(/p:\(\+r\[11\]\|\|0\)\*scale/g,'p:(+r[11]||0)');
+            if(!s.includes('boosted:!!r[14]')) s=s.replace(/phase:String\(r\[12\]\|\|''\),legs:/g,"phase:String(r[12]||''),boosted:!!r[14],legs:");
+            s=s.replace(/rawUnit=bankroll\*UNIT_RATE,scale=rawUnit>0\?TARGET_UNIT\/rawUnit:1,/g,'');
+            s=s.replace(/\.map\(r=>W\(r,scale\)\)/g,'.map(r=>W(r))');
+            s=s.replace(/\(\+j\.summary\?\.cashProfit\|\|0\)\*scale/g,'(+j.summary?.cashProfit||0)');
+            s=s.replace(/\(\+j\.summary\.cashRisked\)\*scale/g,'(+j.summary.cashRisked)');
+            s=s.replace(/let scaledBankroll=bankroll\*scale;/g,'let scaledBankroll=bankroll;');
+            s=s.replace(/set\('scale',rawUnit>0\?[^;]+;/g,"set('scale','VALIDATED');");
+            s=s.replace(/\$100-unit normalized stake and P\/L/g,'actual stake and P/L');
+            s=s.replace(/\$100-unit normalized/g,'actual CAD');
+            s=s.replace(/set\('walk',`Source bankroll[^`]*`\)/g,"set('walk',`Actual bankroll ${money(bankroll)}. Cash P/L ${sm(scaledProfit)} at ${pct(j.summary?.cashRoiPercent)} cash ROI. Public-row week ${sm(Wk.p)}; public-row month ${sm(Mo.p)}.`)");
+            s=s.replace(/active unit is \$100/gi,'actual-dollar presentation');
+            s=s.replace(/Displayed bankroll, wager and performance dollars are normalized[^<]*/g,'All bankroll, wager and performance dollars are actual CAD. ');
+            const forbidden=['UNIT_RATE','TARGET_UNIT','W(r,scale)','bankroll*scale','active unit is $100','$100-unit normalized'];
+            const left=forbidden.filter(x=>s.includes(x));
+            if(left.length) throw new Error(p+' still contains '+left.join(','));
+            if(!s.includes("const URL='/api/bet-history'")) throw new Error(p+' canonical endpoint missing');
+            if(!s.includes('boosted:!!r[14]')) throw new Error(p+' boosted marker missing');
+            fs.writeFileSync(p,s);
+          }
+          NODE
+      - name: Verify actual CAD page
+        run: |
+          node tests/ledger-funding-layer.test.mjs
+          node tests/muddy-ledger-desk.test.mjs
+          ! grep -q 'UNIT_RATE\|TARGET_UNIT\|W(r,scale)\|bankroll\*scale\|active unit is \$100\|\$100-unit normalized' syndicates/generated/eddie-numbers/hotline.html
+      - name: Commit live page correction
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add syndicates/generated/eddie-numbers/hotline.html syndicates/sharp-room/incoming.html
+          git commit -m 'muddy: remove live residual scaling'
+          git push origin main
