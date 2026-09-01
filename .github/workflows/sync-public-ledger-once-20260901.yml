@@ -1,0 +1,53 @@
+name: Sync public ledger once 2026-09-01
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-public-ledger-once-20260901.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate canonical ledger and sync compatibility paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p='data/ledger/public-ledger.json';
+          const j=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(j.schema!==2 || j.publicProjection!==true) throw new Error('canonical contract mismatch');
+          if(!Array.isArray(j.wagers) || j.wagers.length!==1632) throw new Error('canonical wager count mismatch');
+          if(j.wagers.some(r=>!Array.isArray(r) || r.length<18 || r[2]!==null)) throw new Error('private reference leak');
+          if(Number(j.validation?.uniqueWagers)!==1632) throw new Error('validation count mismatch');
+          if(Number(j.bankrollCad)!==524.38) throw new Error('bankroll mismatch');
+          if(Number(j.summary?.cashProfit)!==192.54) throw new Error('cash profit mismatch');
+          console.log('CANONICAL LEDGER VALIDATION: PASS');
+          NODE
+          mkdir -p api data
+          cp data/ledger/public-ledger.json data/bet-history-public.json
+          cp data/ledger/public-ledger.json api/bet-history
+          cmp --silent data/ledger/public-ledger.json data/bet-history-public.json
+          cmp --silent data/ledger/public-ledger.json api/bet-history
+          echo 'PUBLIC LEDGER COMPATIBILITY PATHS: PASS'
+
+      - name: Commit synchronized compatibility paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/bet-history-public.json api/bet-history
+          git diff --cached --quiet && exit 0
+          git commit -m 'ledger: sync Sep 1 public projection compatibility paths'
+          git push origin HEAD:main
