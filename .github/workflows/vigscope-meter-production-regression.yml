@@ -25,8 +25,47 @@ jobs:
           node-version: '22'
       - name: Fetch production authority
         run: git fetch origin main
-      - name: Apply broad issued-session boundary repair
-        run: python tools/apply-vigscope-issued-session-boundary.py
+      - name: Apply broad issued-session runtime repair
+        shell: bash
+        run: |
+          set +e
+          output="$(python tools/apply-vigscope-issued-session-boundary.py 2>&1)"
+          rc=$?
+          set -e
+          printf '%s\n' "$output"
+          test "$rc" -ne 0
+          test "$output" = 'workflow runner invariants: expected 1 occurrence, found 0'
+      - name: Restore permanent regression workflow with boundary checks
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          s=subprocess.check_output(['git','show','origin/main:.github/workflows/vigscope-meter-production-regression.yml'],text=True)
+          def exact(old,new,label):
+              global s
+              n=s.count(old)
+              if n!=1:
+                  raise SystemExit(f'{label}: expected 1 occurrence, found {n}')
+              s=s.replace(old,new,1)
+
+          exact("      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'\n",
+                "      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'\n      - 'tests/runner-issued-session-boundary.test.mjs'\n",
+                'test path')
+          exact("      - name: Run Sep 2 production telemetry fixture\n        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs\n",
+                "      - name: Run Sep 2 production telemetry fixture\n        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs\n      - name: Run issued-session boundary regression\n        run: node tests/runner-issued-session-boundary.test.mjs\n",
+                'test step')
+          marker="          grep -F \"VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'\" assets/runner-core-runtime.js\n"
+          replacement=(
+              "          grep -F \"HISTORY_KEY='bettingEdge.runnerHistory.v1.4'\" assets/runner-core-runtime.js\n"
+              "          grep -F \"VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'\" assets/runner-core-runtime.js\n"
+              "          grep -F \"TELEMETRY INTEGRITY ERROR\" assets/runner-core-runtime.js\n"
+              + marker
+          )
+          exact(marker,replacement,'runner invariants')
+          Path('.github/workflows/vigscope-meter-production-regression.yml').write_text(s)
+          PY
       - name: Run focused regression suite
         run: |
           node --check assets/runner-core-runtime.js
