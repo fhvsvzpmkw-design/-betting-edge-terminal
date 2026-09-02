@@ -6,14 +6,16 @@ on:
     paths:
       - data/walters/nfl/active-week.json
       - data/walters/nfl/20*/week-*-current-numbers.json
+      - data/walters/nfl/20*/week-*-research-ledger.json
       - data/walters/nfl/graham-schedule-authority-v1.json
       - tools/graham-schedule-authority.mjs
       - tests/graham-schedule-authority.test.mjs
+      - tests/graham-terminal-automation.test.mjs
       - .github/workflows/graham-schedule-metadata.yml
   workflow_dispatch:
 
 concurrency:
-  group: graham-personnel-production
+  group: graham-schedule-metadata
   cancel-in-progress: false
 
 permissions:
@@ -35,14 +37,14 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate schedule authority and regression
+      - name: Validate schedule authority regression
         run: |
           set -euo pipefail
           node --check tools/graham-schedule-authority.mjs
           node tools/graham-schedule-authority.mjs --manifest
           node tests/graham-schedule-authority.test.mjs
 
-      - name: Synchronize active board schedule metadata
+      - name: Synchronize active board and research-ledger schedule metadata
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
@@ -53,6 +55,8 @@ jobs:
             git reset --hard origin/main
 
             ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+            ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+
             node --input-type=module - "$ACTIVE_NUMBERS" <<'NODE' > /tmp/graham-games-before.json
           import fs from 'node:fs';
           const file=process.argv[2];
@@ -60,8 +64,17 @@ jobs:
           process.stdout.write(JSON.stringify(n.games));
           NODE
 
+            node --input-type=module - "$ACTIVE_RESEARCH" <<'NODE' > /tmp/graham-sweeps-before.json
+          import fs from 'node:fs';
+          const file=process.argv[2];
+          const n=JSON.parse(fs.readFileSync(file,'utf8'));
+          process.stdout.write(JSON.stringify(n.sweeps));
+          NODE
+
             node tools/graham-schedule-authority.mjs --path "$ACTIVE_NUMBERS" --write
+            node tools/graham-schedule-authority.mjs --path "$ACTIVE_RESEARCH" --write
             node tools/graham-schedule-authority.mjs --path "$ACTIVE_NUMBERS"
+            node tools/graham-schedule-authority.mjs --path "$ACTIVE_RESEARCH"
 
             node --input-type=module - "$ACTIVE_NUMBERS" <<'NODE' > /tmp/graham-games-after.json
           import fs from 'node:fs';
@@ -69,10 +82,23 @@ jobs:
           const n=JSON.parse(fs.readFileSync(file,'utf8'));
           process.stdout.write(JSON.stringify(n.games));
           NODE
-            cmp /tmp/graham-games-before.json /tmp/graham-games-after.json
-            echo "GRAHAM SCHEDULE NUMERIC/GAME GUARD: PASS"
 
-            git add -- "$ACTIVE_NUMBERS"
+            node --input-type=module - "$ACTIVE_RESEARCH" <<'NODE' > /tmp/graham-sweeps-after.json
+          import fs from 'node:fs';
+          const file=process.argv[2];
+          const n=JSON.parse(fs.readFileSync(file,'utf8'));
+          process.stdout.write(JSON.stringify(n.sweeps));
+          NODE
+
+            cmp /tmp/graham-games-before.json /tmp/graham-games-after.json
+            cmp /tmp/graham-sweeps-before.json /tmp/graham-sweeps-after.json
+            echo "GRAHAM SCHEDULE GAME/SWEEP GUARD: PASS"
+
+            # This legacy automation test used to contain its own obsolete
+            # 10:30/14:45 cadence. It must now read the controlled authority.
+            node tests/graham-terminal-automation.test.mjs
+
+            git add -- "$ACTIVE_NUMBERS" "$ACTIVE_RESEARCH"
             if git diff --cached --quiet; then
               echo "Graham schedule metadata already synchronized."
               exit 0
@@ -96,9 +122,11 @@ jobs:
             echo "## Graham schedule metadata"
             echo
             echo "- Repository metadata authority: data/walters/nfl/graham-schedule-authority-v1.json"
-            echo "- Trigger coverage: active-week changes and every active/current Graham board publication"
+            echo "- Trigger coverage: active-week changes, active current-number publications, and active research-ledger publications"
             echo "- Timezone: America/Vancouver"
             echo "- Timing mode: exact_schedule"
-            echo "- Legacy researchCadence: generated compatibility projection only"
+            echo "- Board researchCadence: generated compatibility projection only"
+            echo "- Weekly research-ledger scheduledCadence: generated compatibility projection only"
             echo "- Game/fair mutation allowed: no"
+            echo "- Existing research-sweep mutation allowed: no"
           } >> "$GITHUB_STEP_SUMMARY"
