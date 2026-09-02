@@ -148,7 +148,7 @@ The report schedule itself is unchanged by v1.0. The odds-refresh workflow remai
 
 Before final recommendation selection for each scheduled lane, resolve `data/preferences.json` from the same authoritative `main` branch and locate the module with `id: "report_card_target"`.
 
-The module's `current` value is the production **soft target** for the number of recommendation cards in that report. Allowed profiles are `7`, `9`, and `12`. The current repository setting is **9 cards**.
+The module's `current` value is the production **soft target** for the number of recommendation cards in that report. Allowed profiles are `7`, `9`, and `12`. The live production target is the module's `current` value; this contract does not hard-code a second current target.
 
 The target governs report breadth only:
 

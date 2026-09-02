@@ -112,7 +112,7 @@ Walters cannot fabricate price or stake. Include `waltersEvidence` on every reco
 
 Only after the complete major-sport market sweep and serious-candidate research are finished may the report select display cards.
 
-Resolve `data/preferences.json` module `report_card_target`. The current target of nine is **soft**, not a hard ceiling. Fewer cards are valid when the board is thin. A qualifying/tracked/actionable BET, LEAN or WAIT may overflow the target and may not be discarded merely to keep nine cards. PASS cards may be curated after complete evaluation.
+Resolve `data/preferences.json` module `report_card_target`. The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling. Fewer cards are valid when the board is thin. A qualifying/tracked/actionable BET, LEAN or WAIT may overflow the target and may not be discarded merely to keep nine cards. PASS cards may be curated after complete evaluation.
 
 Build the frozen Core 1.4 report for VigScope UI v1.5 with fresh Vancouver `run.ts`, exact `feedGeneratedAt`, current bankroll, correct risk/counts/summary, and no filler. Preserve exact `rec.feed` identity, fair/playTo/status/stake consistency, personnelRequired/personnelEvidence, WAIT qualification, coreAssessment and waltersEvidence.
 
