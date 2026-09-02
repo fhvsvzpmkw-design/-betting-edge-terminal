@@ -59,6 +59,9 @@ const games=(numbers.games||[]).map(game=>{
     espnNeutralHome,
     grahamFairHome,grahamAsOf:game.grahamAsOf||null,numberStatus:game.numberStatus||'PENDING',grahamMove,
     informationStatus:game.informationStatus||'PENDING',researchSummary:game.researchSummary||null,adjustments:Array.isArray(game.adjustments)?game.adjustments:[],
+    proposedWager:game.proposedWager&&typeof game.proposedWager==='object'?game.proposedWager:null,
+    spreadVsMoneyline:game.spreadVsMoneyline&&typeof game.spreadVsMoneyline==='object'?game.spreadVsMoneyline:null,
+    waltersVerdict:game.waltersVerdict||null,
     pinnacleSpreadHome,
     pinnacleObservedAt,pinnacleStatus,pinnacleHomePriceAmerican:livePinnacle?.homePriceAmerican??null,pinnacleAwayPriceAmerican:livePinnacle?.awayPriceAmerican??null,
     pinnacleSelectionMethod:livePinnacle?.selectionMethod??(officialPinnacle!==null?'OFFICIAL_DAILY_SNAPSHOT':null),
@@ -82,6 +85,7 @@ const out={
   sourceScheduleMeta:live?.scheduleMeta||null,
   displayPolicy:{mode:'CURRENT_WEEK_TERMINAL',marketIsolation:true,pinnacleRole:'SHARP_MARKET_BENCHMARK_ONLY',bettingAuthority:false,rawOutput:true},
   moneylinePolicy:{method:'WALTERS_PAGES_270_272_WAGER_FORM_SELECTOR',standaloneGrahamFairMoneyline:false,role:'EXECUTION_FORM_COMPARISON_AFTER_SPREAD_QUALIFICATION',bookExactSpreadPriceAmerican:-110,marketCanChangeGrahamFair:false,autoCreatesBet:false},
+  valueDisplayPolicy:{watchGapPoints:1.5,watchIsDisplayOnly:true,qualifiedRequiresGovernedProposedWager:true,bettingAuthority:false},
   signConvention:{spreadHome:'Negative = home favorite; positive = home underdog.',gap:'Pinnacle home spread minus Graham home fair. Positive = Graham stronger on home; negative = Graham stronger on away.',moneylinePair:'Displayed as away / home American prices.'},
   games,
   ratings:(ratings.teams||[]).map(t=>({abbr:t.abbr,team:t.team,currentRating:t.currentRating,priorRating:t.priorRating,lastDelta:t.lastDelta,lastUpdatedAt:t.lastUpdatedAt,espnFpi:t.externalComparisons?.espnFpi||null}))
