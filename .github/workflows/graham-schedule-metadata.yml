@@ -1,0 +1,101 @@
+name: Graham schedule metadata
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/walters/nfl/graham-schedule-authority-v1.json
+      - tools/graham-schedule-authority.mjs
+      - tests/graham-schedule-authority.test.mjs
+      - .github/workflows/graham-schedule-metadata.yml
+  workflow_dispatch:
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate schedule authority and regression
+        run: |
+          set -euo pipefail
+          node --check tools/graham-schedule-authority.mjs
+          node tools/graham-schedule-authority.mjs --manifest
+          node tests/graham-schedule-authority.test.mjs
+
+      - name: Synchronize active board schedule metadata
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+            node --input-type=module - "$ACTIVE_NUMBERS" <<'NODE' > /tmp/graham-games-before.json
+          import fs from 'node:fs';
+          const file=process.argv[2];
+          const n=JSON.parse(fs.readFileSync(file,'utf8'));
+          process.stdout.write(JSON.stringify(n.games));
+          NODE
+
+            node tools/graham-schedule-authority.mjs --path "$ACTIVE_NUMBERS" --write
+            node tools/graham-schedule-authority.mjs --path "$ACTIVE_NUMBERS"
+
+            node --input-type=module - "$ACTIVE_NUMBERS" <<'NODE' > /tmp/graham-games-after.json
+          import fs from 'node:fs';
+          const file=process.argv[2];
+          const n=JSON.parse(fs.readFileSync(file,'utf8'));
+          process.stdout.write(JSON.stringify(n.games));
+          NODE
+            cmp /tmp/graham-games-before.json /tmp/graham-games-after.json
+            echo "GRAHAM SCHEDULE NUMERIC/GAME GUARD: PASS"
+
+            git add -- "$ACTIVE_NUMBERS"
+            if git diff --cached --quiet; then
+              echo "Graham schedule metadata already synchronized."
+              exit 0
+            fi
+
+            git commit -m "Synchronize Graham schedule metadata"
+            if git push origin HEAD:main; then
+              echo "Graham schedule metadata published on attempt $attempt."
+              exit 0
+            fi
+            echo "Graham schedule metadata publish collision on attempt $attempt; retrying from latest main."
+          done
+
+          echo "Graham schedule metadata could not be published after 4 attempts." >&2
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Graham schedule metadata"
+            echo
+            echo "- Repository metadata authority: data/walters/nfl/graham-schedule-authority-v1.json"
+            echo "- Timezone: America/Vancouver"
+            echo "- Timing mode: exact_schedule"
+            echo "- Legacy researchCadence: generated compatibility projection only"
+            echo "- Game/fair mutation allowed: no"
+          } >> "$GITHUB_STEP_SUMMARY"

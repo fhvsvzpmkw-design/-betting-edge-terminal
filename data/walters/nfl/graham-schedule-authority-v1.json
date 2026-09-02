@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "authorityId": "graham-schedule-metadata-v1",
+  "state": "OPERATIONAL",
+  "metadataAuthority": true,
+  "executionAuthority": "CHATGPT_SCHEDULED_TASKS",
+  "timezone": "America/Vancouver",
+  "timingMode": "exact_schedule",
+  "sourceOfTruth": "This controlled manifest is the sole repository authority for Graham schedule metadata. Repository boards, terminal builders and production workflows must derive cadence labels from this file and must not hard-code alternate times.",
+  "tasks": [
+    {
+      "taskKey": "WEEK_ROLLOVER",
+      "title": "Graham Week Rollover",
+      "days": ["TU"],
+      "time": "04:30",
+      "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=4;BYMINUTE=30;BYSECOND=0",
+      "purpose": "Mechanical completion-gated active-week rollover."
+    },
+    {
+      "taskKey": "TUESDAY_BASELINE",
+      "title": "Graham Tuesday Baseline",
+      "days": ["TU"],
+      "time": "11:00",
+      "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=11;BYMINUTE=0;BYSECOND=0",
+      "purpose": "Full weekly 32-team information baseline after Monday Night Football."
+    },
+    {
+      "taskKey": "DAILY_REVIEW",
+      "title": "Graham Daily Review",
+      "days": ["MO", "WE", "TH", "FR", "SA"],
+      "time": "11:30",
+      "rrule": "FREQ=WEEKLY;BYDAY=MO,WE,TH,FR,SA;BYHOUR=11;BYMINUTE=30;BYSECOND=0",
+      "purpose": "Main information review, including the Saturday review function."
+    },
+    {
+      "taskKey": "DELTA_1645",
+      "title": "Graham 16:45 Delta",
+      "days": ["TU", "WE", "TH", "FR", "SA"],
+      "time": "16:45",
+      "rrule": "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR,SA;BYHOUR=16;BYMINUTE=45;BYSECOND=0",
+      "purpose": "Late-day change-only information delta."
+    },
+    {
+      "taskKey": "SUNDAY_PREGAME",
+      "title": "Graham Sunday Pregame",
+      "days": ["SU"],
+      "time": "07:00",
+      "rrule": "FREQ=WEEKLY;BYDAY=SU;BYHOUR=7;BYMINUTE=0;BYSECOND=0",
+      "purpose": "Sunday pregame information review for active-week games awaiting kickoff."
+    }
+  ],
+  "compatibility": {
+    "researchCadenceProjection": true,
+    "note": "Legacy researchCadence keys remain generated for compatibility; their values are projections of this manifest and are not independent schedule authority."
+  }
+}
