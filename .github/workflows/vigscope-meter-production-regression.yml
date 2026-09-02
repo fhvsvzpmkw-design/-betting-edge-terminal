@@ -1,21 +1,27 @@
-name: VigScope issued-session boundary repair
+name: VigScope meter production regression
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - fix/vigscope-issued-session-boundary
     paths:
+      - 'assets/runner-core-runtime.js'
+      - 'data/vigscope/meter-calibration-production-v1.json'
+      - 'tools/vigscope-meter-production.mjs'
+      - 'tools/vigscope-meter-telemetry.mjs'
+      - 'tools/vigscope-meter-telemetry-gate.mjs'
+      - 'tools/report-publication.mjs'
+      - 'tests/vigscope-meter-production.test.mjs'
+      - 'tests/vigscope-meter-fallback-safety.test.mjs'
+      - 'tests/vigscope-meter-telemetry.test.mjs'
+      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'
+      - 'tests/runner-issued-session-boundary.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
 
-permissions:
-  contents: write
-
 jobs:
-  repair-and-verify:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repair branch with history
+      - name: Check out committed main with history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -23,78 +29,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fetch production authority
-        run: git fetch origin main
-      - name: Apply broad issued-session runtime repair
-        shell: bash
+      - name: Run calibrated meter regression
+        run: node tests/vigscope-meter-production.test.mjs
+      - name: Run fallback meter safety regression
+        run: node tests/vigscope-meter-fallback-safety.test.mjs
+      - name: Run structured publisher telemetry regression
+        run: node tests/vigscope-meter-telemetry.test.mjs
+      - name: Run Sep 2 production telemetry fixture
+        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs
+      - name: Run issued-session boundary regression
+        run: node tests/runner-issued-session-boundary.test.mjs
+      - name: Run durable telemetry gate self-test
+        run: node tools/vigscope-meter-telemetry-gate.mjs self-test
+      - name: Run report publisher self-test
+        run: node tools/report-publication.mjs self-test
+      - name: Verify runner production wiring
         run: |
-          set +e
-          output="$(python tools/apply-vigscope-issued-session-boundary.py 2>&1)"
-          rc=$?
-          set -e
-          printf '%s\n' "$output"
-          test "$rc" -ne 0
-          test "$output" = 'workflow runner invariants: expected 1 occurrence, found 0'
-      - name: Restore permanent regression workflow with boundary checks
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-
-          s=subprocess.check_output(['git','show','origin/main:.github/workflows/vigscope-meter-production-regression.yml'],text=True)
-          def exact(old,new,label):
-              global s
-              n=s.count(old)
-              if n!=1:
-                  raise SystemExit(f'{label}: expected 1 occurrence, found {n}')
-              s=s.replace(old,new,1)
-
-          exact("      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'\n",
-                "      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'\n      - 'tests/runner-issued-session-boundary.test.mjs'\n",
-                'test path')
-          exact("      - name: Run Sep 2 production telemetry fixture\n        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs\n",
-                "      - name: Run Sep 2 production telemetry fixture\n        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs\n      - name: Run issued-session boundary regression\n        run: node tests/runner-issued-session-boundary.test.mjs\n",
-                'test step')
-          marker="          grep -F \"VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'\" assets/runner-core-runtime.js\n"
-          replacement=(
-              "          grep -F \"HISTORY_KEY='bettingEdge.runnerHistory.v1.4'\" assets/runner-core-runtime.js\n"
-              "          grep -F \"VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'\" assets/runner-core-runtime.js\n"
-              "          grep -F \"TELEMETRY INTEGRITY ERROR\" assets/runner-core-runtime.js\n"
-              + marker
-          )
-          exact(marker,replacement,'runner invariants')
-          Path('.github/workflows/vigscope-meter-production-regression.yml').write_text(s)
-          PY
-      - name: Run focused regression suite
-        run: |
-          node --check assets/runner-core-runtime.js
-          node tests/runner-issued-session-boundary.test.mjs
-          node tests/vigscope-meter-sep2-live-fixture.test.mjs
-          node tests/vigscope-meter-production.test.mjs
-          node tests/vigscope-meter-fallback-safety.test.mjs
-          node tests/vigscope-meter-telemetry.test.mjs
-          node tools/vigscope-meter-telemetry-gate.mjs self-test
-          node tools/report-publication.mjs self-test
-      - name: Verify boundary invariants
-        run: |
+          grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
           grep -F "HISTORY_KEY='bettingEdge.runnerHistory.v1.4'" assets/runner-core-runtime.js
-          grep -F "const issuedSessionCatalog=new Map();" assets/runner-core-runtime.js
+          grep -F "VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'" assets/runner-core-runtime.js
           grep -F "TELEMETRY INTEGRITY ERROR" assets/runner-core-runtime.js
-          grep -F "comparison:{checkedAt:now,feedGeneratedAt:feed.generatedAt,schema:feed.schema||1,matched,retained,reasonText,instrumentTelemetry:buildInstrumentTelemetry(recs,feed)}" assets/runner-core-runtime.js
-          ! grep -F "delete out.instrumentTelemetry" assets/runner-core-runtime.js
-          ! grep -E '^\s*instrumentTelemetry:buildInstrumentTelemetry\(recs,feed\),\s*$' assets/runner-core-runtime.js
-      - name: Commit validated runtime to isolated branch
-        shell: bash
-        run: |
-          git fetch origin "$GITHUB_REF_NAME"
-          test "$(git rev-parse origin/$GITHUB_REF_NAME)" = "$GITHUB_SHA"
-          git checkout "$GITHUB_SHA" -- .github/workflows/vigscope-meter-production-regression.yml
-          git rm tools/apply-vigscope-issued-session-boundary.py
-          git config user.name 'vigscope-boundary-bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add assets/runner-core-runtime.js
-          git commit -m 'fix: preserve complete issued runs across VigScope sessions'
-          git push origin HEAD:"$GITHUB_REF_NAME"
-
-# retry-revision: 6
+          grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
+          grep -F "50+50*Math.tanh(fav/0.028)" assets/runner-core-runtime.js
+          grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
+          grep -F "function explicitMovementOddsPairs(v)" assets/runner-core-runtime.js
+          grep -F "MARKET STATE UNMEASURED" assets/runner-core-runtime.js
+          grep -F "PUBLISHER_BOUND_FEED_V1" assets/runner-core-runtime.js
+          grep -F "attachPublisherInstrumentTelemetry" tools/report-publication.mjs
+          grep -F "VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'" tools/vigscope-meter-telemetry-gate.mjs
