@@ -60,24 +60,42 @@ function load(){const rows=[];for(const date of fs.readdirSync(ROOT).sort()){if(
 function bins(values){const out={'0-19':0,'20-39':0,'40-60':0,'61-80':0,'81-100':0};for(const v of values){if(v<20)out['0-19']++;else if(v<40)out['20-39']++;else if(v<=60)out['40-60']++;else if(v<=80)out['61-80']++;else out['81-100']++;}return out;}
 function meterStats(values){const exact50=values.filter(v=>Math.round(v)===50).length,satLow=values.filter(v=>v<=5).length,satHigh=values.filter(v=>v>=95).length;return {summary:summary(values),bins:bins(values),exact50,saturationLow:satLow,saturationHigh:satHigh};}
 function corr(a,b){const ma=mean(a),mb=mean(b);let n=0,da=0,db=0;for(let i=0;i<a.length;i++){const x=a[i]-ma,y=b[i]-mb;n+=x*y;da+=x*x;db+=y*y;}return da&&db?+(n/Math.sqrt(da*db)).toFixed(4):null;}
+function agreementGate(rows,minConfidence,highScore){let unknown=0,low=0,high=0;for(const r of rows){if(r.agreementConfidence<minConfidence){unknown++;continue;}if(r.agreementScore>=highScore)high++;else low++;}return {minConfidence,highScore,unknown,low,high};}
 
 const rows=load();if(!rows.length)throw new Error('No reports');
 const nonzeroMag=rows.map(r=>r.avgMag).filter(v=>v>0),nonzeroFavorAbs=rows.map(r=>Math.abs(r.favor)).filter(v=>v>0);
 const magScale=Math.max(.0025,quantile(nonzeroMag,.75)||.03);
 const pressureScale=Math.max(.0005,quantile(nonzeroFavorAbs,.75)||.01);
 for(const r of rows){
-  const dispersion=(100-r.agreementScore)/100;
+  const dispersion=(100-r.agreementScore)/100,conf=r.agreementConfidence/100;
   r.heatCurrent=clamp((r.avgMag/.03)*40+r.breadth*25+r.threshold*20+(r.agreementConfidence>0?dispersion:0)*15);
-  r.heatCandidate=clamp((r.avgMag/magScale)*40+r.breadth*25+r.threshold*20+dispersion*(r.agreementConfidence/100)*15);
-  r.pressureCurrent=clamp(50+r.favor*1000);
-  r.pressureCandidate=clamp(50+25*(r.favor/pressureScale));
-  r.pressureTanh=clamp(50+50*Math.tanh(r.favor/(2*pressureScale)));
+  r.heatConfidenceOnly=clamp((r.avgMag/.03)*40+r.breadth*25+r.threshold*20+dispersion*conf*15);
+  r.heatMagnitudeOnly=clamp((r.avgMag/magScale)*40+r.breadth*25+r.threshold*20+(r.agreementConfidence>0?dispersion:0)*15);
+  r.heatCombined=clamp((r.avgMag/magScale)*40+r.breadth*25+r.threshold*20+dispersion*conf*15);
+  r.pressure1000=clamp(50+r.favor*1000);
+  r.pressure1500=clamp(50+r.favor*1500);
+  r.pressure2000=clamp(50+r.favor*2000);
+  r.pressure2500=clamp(50+r.favor*2500);
+  r.pressure3000=clamp(50+r.favor*3000);
+  r.pressureRobustTanh=clamp(50+50*Math.tanh(r.favor/(2*pressureScale)));
   r.agreementCurrent=r.agreementScore;
-  r.agreementCandidate=clamp(50+(r.agreementScore-50)*Math.sqrt(r.agreementConfidence/100));
+  r.agreementSqrtConfidence=clamp(50+(r.agreementScore-50)*Math.sqrt(conf));
+  r.agreementLinearConfidence=clamp(50+(r.agreementScore-50)*conf);
 }
 const confidence=rows.map(r=>r.agreementConfidence);
 const zeroConf=rows.filter(r=>r.agreementConfidence===0).length,lowConf=rows.filter(r=>r.agreementConfidence>0&&r.agreementConfidence<25).length,adequateConf=rows.filter(r=>r.agreementConfidence>=25).length;
-const current={heat:meterStats(rows.map(r=>r.heatCurrent)),pressure:meterStats(rows.map(r=>r.pressureCurrent)),agreement:meterStats(rows.map(r=>r.agreementCurrent))};
-const candidate={heat:meterStats(rows.map(r=>r.heatCandidate)),pressureLinear:meterStats(rows.map(r=>r.pressureCandidate)),pressureTanh:meterStats(rows.map(r=>r.pressureTanh)),agreement:meterStats(rows.map(r=>r.agreementCandidate))};
-const output={state:'PASS',mode:'READ_ONLY_METER_CALIBRATION',period:{start:START,end:END,reports:rows.length,dates:new Set(rows.map(r=>r.date)).size},primitiveDistributions:{avgMagnitude:summary(rows.map(r=>r.avgMag)),breadth:summary(rows.map(r=>r.breadth)),thresholdActivity:summary(rows.map(r=>r.threshold)),signedFavor:summary(rows.map(r=>r.favor)),absoluteFavor:summary(rows.map(r=>Math.abs(r.favor))),agreementScore:summary(rows.map(r=>r.agreementScore)),agreementConfidence:summary(confidence)},calibrationScales:{heatMagnitudeP75Nonzero:+magScale.toFixed(6),pressureAbsFavorP75Nonzero:+pressureScale.toFixed(6)},agreementEvidence:{zeroConfidence:zeroConf,lowConfidence:lowConf,adequateConfidence:adequateConf,zeroConfidenceShare:+(zeroConf/rows.length).toFixed(4),sourceCounts:rows.reduce((o,r)=>(o[r.agreementSource]=(o[r.agreementSource]||0)+1,o),{})},current,candidate,correlations:{heat:corr(rows.map(r=>r.heatCurrent),rows.map(r=>r.heatCandidate)),pressureLinear:corr(rows.map(r=>r.pressureCurrent),rows.map(r=>r.pressureCandidate)),pressureTanh:corr(rows.map(r=>r.pressureCurrent),rows.map(r=>r.pressureTanh)),agreement:corr(rows.map(r=>r.agreementCurrent),rows.map(r=>r.agreementCandidate))},candidateDefinitions:{heat:'Magnitude normalized to current-period nonzero p75; breadth and threshold unchanged; disagreement contribution multiplied by agreement confidence.',pressureLinear:'50 +/- 25 points per current-period p75 absolute signed movement, clamped 0-100.',pressureTanh:'Smooth robust alternative centered at 50 using tanh and current-period p75 absolute signed movement.',agreement:'Shrink agreement score toward 50 by sqrt(confidence); zero-confidence evidence becomes exactly neutral 50.'},notes:['Read-only study. No terminal formulas or thresholds are modified.','Current-period scales are diagnostic calibration anchors, not yet proposed as permanently self-updating production parameters.']};
+const pressureVariants={};for(const k of ['pressure1000','pressure1500','pressure2000','pressure2500','pressure3000','pressureRobustTanh'])pressureVariants[k]=meterStats(rows.map(r=>r[k]));
+const heatVariants={};for(const k of ['heatCurrent','heatConfidenceOnly','heatMagnitudeOnly','heatCombined'])heatVariants[k]=meterStats(rows.map(r=>r[k]));
+const agreementVariants={agreementCurrent:meterStats(rows.map(r=>r.agreementCurrent)),agreementSqrtConfidence:meterStats(rows.map(r=>r.agreementSqrtConfidence)),agreementLinearConfidence:meterStats(rows.map(r=>r.agreementLinearConfidence))};
+const agreementGates=[];for(const c of [0,15,25,35])for(const s of [50,55,60])agreementGates.push(agreementGate(rows,c,s));
+const output={
+  state:'PASS',mode:'READ_ONLY_METER_CALIBRATION_ISOLATED',period:{start:START,end:END,reports:rows.length,dates:new Set(rows.map(r=>r.date)).size},
+  primitiveDistributions:{avgMagnitude:summary(rows.map(r=>r.avgMag)),breadth:summary(rows.map(r=>r.breadth)),thresholdActivity:summary(rows.map(r=>r.threshold)),signedFavor:summary(rows.map(r=>r.favor)),absoluteFavor:summary(rows.map(r=>Math.abs(r.favor))),nonzeroAbsoluteFavor:summary(nonzeroFavorAbs),agreementScore:summary(rows.map(r=>r.agreementScore)),agreementConfidence:summary(confidence)},
+  calibrationScales:{heatMagnitudeP75Nonzero:+magScale.toFixed(6),pressureAbsFavorP75Nonzero:+pressureScale.toFixed(6)},
+  agreementEvidence:{zeroConfidence:zeroConf,lowConfidence:lowConf,adequateConfidence:adequateConf,zeroConfidenceShare:+(zeroConf/rows.length).toFixed(4),sourceCounts:rows.reduce((o,r)=>(o[r.agreementSource]=(o[r.agreementSource]||0)+1,o),{})},
+  heatVariants,pressureVariants,agreementVariants,agreementGates,
+  correlations:{heatConfidenceOnly:corr(rows.map(r=>r.heatCurrent),rows.map(r=>r.heatConfidenceOnly)),heatMagnitudeOnly:corr(rows.map(r=>r.heatCurrent),rows.map(r=>r.heatMagnitudeOnly)),pressure1500:corr(rows.map(r=>r.pressure1000),rows.map(r=>r.pressure1500)),pressure2000:corr(rows.map(r=>r.pressure1000),rows.map(r=>r.pressure2000)),pressure2500:corr(rows.map(r=>r.pressure1000),rows.map(r=>r.pressure2500)),pressure3000:corr(rows.map(r=>r.pressure1000),rows.map(r=>r.pressure3000)),agreementSqrt:corr(rows.map(r=>r.agreementCurrent),rows.map(r=>r.agreementSqrtConfidence))},
+  interpretationHints:{heat:'Prefer a variant that reduces unjustified low-confidence disagreement without materially increasing 0/100 saturation.',pressure:'Exact zero signed movement should remain 50. Compare nonzero spread and saturation rather than forcing equal thirds.',agreement:'A score without evidence confidence is not equivalent to measured agreement. Gate/classify confidence separately before choosing final display thresholds.'},
+  notes:['Read-only study. No terminal formula, threshold, VIG graphic, or report output is modified.']
+};
 console.log(JSON.stringify(output,null,2));
