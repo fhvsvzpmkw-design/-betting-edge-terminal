@@ -7,20 +7,26 @@ on:
       - "data/walters/nfl/qb-performance/**"
       - "tools/build-walters-qb-performance-stage3b.py"
       - "tools/build-walters-qb-performance-stage3c.py"
+      - "tools/build-walters-qb-performance-stage3d.py"
       - "tools/validate-walters-qb-performance-stage3.mjs"
       - "tools/validate-walters-qb-performance-stage3c.mjs"
+      - "tools/validate-walters-qb-performance-stage3d.mjs"
       - "tests/walters-qb-performance-stage3.test.mjs"
       - "tests/walters-qb-performance-stage3c.test.mjs"
+      - "tests/walters-qb-performance-stage3d.test.mjs"
       - ".github/workflows/walters-qb-performance-stage3.yml"
   pull_request:
     paths:
       - "data/walters/nfl/qb-performance/**"
       - "tools/build-walters-qb-performance-stage3b.py"
       - "tools/build-walters-qb-performance-stage3c.py"
+      - "tools/build-walters-qb-performance-stage3d.py"
       - "tools/validate-walters-qb-performance-stage3.mjs"
       - "tools/validate-walters-qb-performance-stage3c.mjs"
+      - "tools/validate-walters-qb-performance-stage3d.mjs"
       - "tests/walters-qb-performance-stage3.test.mjs"
       - "tests/walters-qb-performance-stage3c.test.mjs"
+      - "tests/walters-qb-performance-stage3d.test.mjs"
       - ".github/workflows/walters-qb-performance-stage3.yml"
 
 concurrency:
@@ -31,7 +37,7 @@ permissions:
   contents: write
 
 jobs:
-  build-validate-stage3c:
+  build-validate-stage3d:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -87,29 +93,46 @@ jobs:
         continue-on-error: true
         run: node --test tests/walters-qb-performance-stage3c.test.mjs
 
-      - name: Publish Stage 3C evidence or fail-closed diagnostics
-        if: always() && github.event_name != 'pull_request' && steps.stage3b_build.outcome == 'success' && steps.stage3c_build.outcome == 'success'
+      - name: Run Stage 3D deterministic helper tests
+        run: python tools/build-walters-qb-performance-stage3d.py --self-test
+
+      - name: Freeze candidates, review exceptions and issue Stage 3 acceptance
+        id: stage3d_build
+        run: python tools/build-walters-qb-performance-stage3d.py
+
+      - name: Validate Stage 3D freeze, review and Stage 4 handoff
+        id: stage3d_validate
+        continue-on-error: true
+        run: node tools/validate-walters-qb-performance-stage3d.mjs
+
+      - name: Run Stage 3D guardrail tests
+        id: stage3d_tests
+        continue-on-error: true
+        run: node --test tests/walters-qb-performance-stage3d.test.mjs
+
+      - name: Publish Stage 3D evidence or fail-closed diagnostics
+        if: always() && github.event_name != 'pull_request' && steps.stage3b_build.outcome == 'success' && steps.stage3c_build.outcome == 'success' && steps.stage3d_build.outcome == 'success'
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -- data/walters/nfl/qb-performance
           if git diff --cached --quiet; then
-            echo "No Stage 3C output changes to publish."
+            echo "No Stage 3D output changes to publish."
             exit 0
           fi
-          git commit -m "Build Walters QB performance Stage 3C model evidence"
+          git commit -m "Freeze Walters QB Stage 3 candidates and accept Stage 4 shadow entry"
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
               exit 0
             fi
-            echo "Stage 3C push attempt ${attempt} failed; retrying."
+            echo "Stage 3D push attempt ${attempt} failed; retrying."
             sleep $((attempt * 2))
           done
           exit 1
 
-      - name: Enforce Stage 3C acceptance result
+      - name: Enforce Stage 3D acceptance result
         if: always()
         env:
           STAGE3B_BUILD: ${{ steps.stage3b_build.outcome }}
@@ -118,6 +141,9 @@ jobs:
           STAGE3C_BUILD: ${{ steps.stage3c_build.outcome }}
           STAGE3C_VALIDATE: ${{ steps.stage3c_validate.outcome }}
           STAGE3C_TESTS: ${{ steps.stage3c_tests.outcome }}
+          STAGE3D_BUILD: ${{ steps.stage3d_build.outcome }}
+          STAGE3D_VALIDATE: ${{ steps.stage3d_validate.outcome }}
+          STAGE3D_TESTS: ${{ steps.stage3d_tests.outcome }}
         run: |
           set -euo pipefail
           test "$STAGE3B_BUILD" = "success"
@@ -126,3 +152,6 @@ jobs:
           test "$STAGE3C_BUILD" = "success"
           test "$STAGE3C_VALIDATE" = "success"
           test "$STAGE3C_TESTS" = "success"
+          test "$STAGE3D_BUILD" = "success"
+          test "$STAGE3D_VALIDATE" = "success"
+          test "$STAGE3D_TESTS" = "success"
