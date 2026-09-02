@@ -7,8 +7,11 @@ on:
       - 'assets/runner-core-runtime.js'
       - 'data/vigscope/meter-calibration-production-v1.json'
       - 'tools/vigscope-meter-production.mjs'
+      - 'tools/vigscope-meter-telemetry.mjs'
+      - 'tools/report-publication.mjs'
       - 'tests/vigscope-meter-production.test.mjs'
       - 'tests/vigscope-meter-fallback-safety.test.mjs'
+      - 'tests/vigscope-meter-telemetry.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
 
 jobs:
@@ -25,6 +28,10 @@ jobs:
         run: node tests/vigscope-meter-production.test.mjs
       - name: Run fallback meter safety regression
         run: node tests/vigscope-meter-fallback-safety.test.mjs
+      - name: Run structured publisher telemetry regression
+        run: node tests/vigscope-meter-telemetry.test.mjs
+      - name: Run report publisher self-test
+        run: node tools/report-publication.mjs self-test
       - name: Verify runner production wiring
         run: |
           grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
@@ -33,3 +40,5 @@ jobs:
           grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
           grep -F "function explicitMovementOddsPairs(v)" assets/runner-core-runtime.js
           grep -F "MARKET STATE UNMEASURED" assets/runner-core-runtime.js
+          grep -F "PUBLISHER_BOUND_FEED_V1" assets/runner-core-runtime.js
+          grep -F "attachPublisherInstrumentTelemetry" tools/report-publication.mjs
