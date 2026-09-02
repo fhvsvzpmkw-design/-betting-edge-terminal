@@ -122,9 +122,13 @@ function deriveInstrumentReadings(run){
   const movementCoverage=recs.length?signals.filter(x=>x.source!=='NONE').length/recs.length:0;
   const pressureConf=clamp(movementCoverage*100),heatConf=clamp((movementCoverage*.7+(agreementConfidence/100)*.3)*100);
   const agreementQuality=agreementEvidenceQuality(agreementConfidence);
+  const telemetry=run?.instrumentTelemetry,structured=telemetry?.authority==='PUBLISHER_BOUND_FEED_V1'&&telemetry?.calibrationId===VIG_METER_CALIBRATION_ID;
+  const structuredHeat=telemetry?.heat||{},structuredPressure=telemetry?.pressure||{};
+  const structuredHeatValue=clamp(structuredHeat.rawValue??structuredHeat.value??0),structuredHeatConfidence=clamp(structuredHeat.rawConfidence??structuredHeat.confidence??0);
+  const structuredPressureValue=clamp(structuredPressure.rawValue??structuredPressure.value??50),structuredPressureConfidence=clamp(structuredPressure.rawConfidence??structuredPressure.confidence??0);
   return {
-    heat:{value:Math.round(heat),rawValue:heat,label:heatConf?heatLabel(heat):'NO DATA',confidence:Math.round(heatConf)},
-    pressure:{value:Math.round(pressure),rawValue:pressure,label:pressureConf?pressureLabel(pressure):'NO DATA',confidence:Math.round(pressureConf)},
+    heat:structured?{value:Math.round(structuredHeatValue),rawValue:structuredHeatValue,label:structuredHeatConfidence?heatLabel(structuredHeatValue):'NO DATA',confidence:Math.round(structuredHeatConfidence)}:{value:Math.round(heat),rawValue:heat,label:heatConf?heatLabel(heat):'NO DATA',confidence:Math.round(heatConf)},
+    pressure:structured?{value:Math.round(structuredPressureValue),rawValue:structuredPressureValue,label:structuredPressureConfidence?pressureLabel(structuredPressureValue):'NO DATA',confidence:Math.round(structuredPressureConfidence)}:{value:Math.round(pressure),rawValue:pressure,label:pressureConf?pressureLabel(pressure):'NO DATA',confidence:Math.round(pressureConf)},
     agreement:{value:Math.round(agreementScore),rawValue:agreementScore,label:agreementConfidence?agreementLabel(agreementScore):'UNMEASURED',confidence:Math.round(agreementConfidence),rawConfidence:agreementConfidence,evidenceQuality:agreementQuality,pairs:agreement.pairs||0}
   }
 }

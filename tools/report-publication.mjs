@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -363,12 +364,15 @@ function publish(root,reportFile,sidecarFile){
   const report = validateReport(readJson(reportFile));
   const paths = expectedPaths(report);
   const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true});
+  const {file:indexFile,index} = loadIndex(root);
+  const decisionFingerprint=normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs});
+  attachPublisherInstrumentTelemetry({root,index,report,sidecar});
+  assert(normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs})===decisionFingerprint,'VigScope meter telemetry derivation must not mutate betting decisions or recommendation content');
   const reportAbs = path.join(root,paths.reportPath);
   const sidecarAbs = path.join(root,paths.sidecarPath);
   const reportCreated = writeImmutableJson(reportAbs,report,'Issued report');
   const sidecarCreated = writeImmutableJson(sidecarAbs,sidecar,'Research Fit sidecar');
 
-  const {file:indexFile,index} = loadIndex(root);
   const expected = buildIndexEntry(report,sidecar,paths);
   const sameId = index.runs.filter(entry=>entry.id===expected.id);
   assert(sameId.length<=1,`run-history.json contains duplicate ID ${expected.id}`);
