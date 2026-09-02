@@ -5,7 +5,9 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const SEMANTIC_ENFORCEMENT_FROM = Date.parse('2026-09-02T10:40:00-07:00');
+const FINAL_RECHECK_FROM = Date.parse('2026-09-02T11:15:00-07:00');
 const MINUTE = 60 * 1000;
+const FINAL_RECHECK_STAGE2_TOLERANCE_MINUTES = 30;
 
 function die(message){ throw new Error(message); }
 function ensure(condition,message){ if(!condition) die(message); }
@@ -31,6 +33,9 @@ function sourceMatches(source,pattern){ return pattern.test(sourceText(source));
 function semanticShortfall(evidence,concept){
   return nonEmpty(evidence?.sourceShortfall) && concept.evidence.test(evidence.sourceShortfall);
 }
+function finalRecheckShortfall(evidence,concept){
+  return semanticShortfall(evidence,concept) && /\b(official|authoritative|league|team|club|conference)\b/i.test(evidence.sourceShortfall);
+}
 function canonicalSport(value){
   const sport = String(value || '').trim().toUpperCase();
   if(sport === 'MLB') return 'MLB';
@@ -43,8 +48,8 @@ function canonicalSport(value){
 
 const CONCEPTS = Object.freeze({
   MLB: [
-    {key:'lineup', dependency:/\b(lineups?|batting orders?|batting positions?|platoon)\b/i, evidence:/\b(lineups?|batting orders?|batting positions?|platoon)\b/i, fallbackWindow:120, officialRecheckWindow:90},
-    {key:'starter', dependency:/\b(starting pitchers?|probable[- ]pitchers?|probable starters?|listed starters?|opener|bullpen[- ]game)\b/i, evidence:/\b(starting pitchers?|probable[- ]pitchers?|probable starters?|listed starters?|opener|bullpen[- ]game)\b/i, fallbackWindow:120, officialRecheckWindow:90},
+    {key:'lineup', dependency:/\b(lineups?|batting orders?|batting positions?|platoon)\b/i, evidence:/\b(lineups?|batting orders?|batting positions?|platoon)\b/i, fallbackWindow:120},
+    {key:'starter', dependency:/\b(starting pitchers?|probable[- ]pitchers?|probable starters?|listed starters?|opener|bullpen[- ]game)\b/i, evidence:/\b(starting pitchers?|probable[- ]pitchers?|probable starters?|listed starters?|opener|bullpen[- ]game)\b/i, fallbackWindow:120},
     {key:'bullpen', dependency:/\b(bullpens?|relievers?|relief corps|closers?|leverage[- ]bullpen)\b/i, evidence:/\b(bullpens?|relievers?|relief corps|closers?|leverage[- ]bullpen)\b/i, fallbackWindow:120},
     {key:'participation', dependency:/\b(participation|active|inactive|injur(?:y|ies)|scratch(?:es)?|rest days?|resting|role changes?)\b/i, evidence:/\b(participation|active|inactive|injur(?:y|ies)|scratch(?:es)?|rest days?|resting|role changes?)\b/i, fallbackWindow:120}
   ],
@@ -56,22 +61,22 @@ const CONCEPTS = Object.freeze({
     {key:'availability', dependency:/\b(inactive|active|availability|injur(?:y|ies)|questionable|doubtful|suspension|scratch(?:es)?|participation)\b/i, evidence:/\b(inactive|active|availability|injur(?:y|ies)|questionable|doubtful|suspension|scratch(?:es)?|participation)\b/i, fallbackWindow:180}
   ],
   NHL: [
-    {key:'goalie', dependency:/\b(goalies?|goaltenders?|starting goalie|starting goaltender)\b/i, evidence:/\b(goalies?|goaltenders?|starting goalie|starting goaltender)\b/i, fallbackWindow:240, officialRecheckWindow:90},
-    {key:'lineup', dependency:/\b(line combinations?|line rushes?|scratch(?:es)?|lineups?)\b/i, evidence:/\b(line combinations?|line rushes?|scratch(?:es)?|lineups?)\b/i, fallbackWindow:240, officialRecheckWindow:90},
-    {key:'power-play', dependency:/\b(power[- ]play|pp1|pp2|power play unit)\b/i, evidence:/\b(power[- ]play|pp1|pp2|power play unit)\b/i, fallbackWindow:240, officialRecheckWindow:90},
-    {key:'availability', dependency:/\b(participation|injur(?:y|ies)|active|inactive|scratch(?:es)?|rest)\b/i, evidence:/\b(participation|injur(?:y|ies)|active|inactive|scratch(?:es)?|rest)\b/i, fallbackWindow:240, officialRecheckWindow:90}
+    {key:'goalie', dependency:/\b(goalies?|goaltenders?|starting goalie|starting goaltender)\b/i, evidence:/\b(goalies?|goaltenders?|starting goalie|starting goaltender)\b/i, fallbackWindow:240},
+    {key:'lineup', dependency:/\b(line combinations?|line rushes?|scratch(?:es)?|lineups?)\b/i, evidence:/\b(line combinations?|line rushes?|scratch(?:es)?|lineups?)\b/i, fallbackWindow:240},
+    {key:'power-play', dependency:/\b(power[- ]play|pp1|pp2|power play unit)\b/i, evidence:/\b(power[- ]play|pp1|pp2|power play unit)\b/i, fallbackWindow:240},
+    {key:'availability', dependency:/\b(participation|injur(?:y|ies)|active|inactive|scratch(?:es)?|rest)\b/i, evidence:/\b(participation|injur(?:y|ies)|active|inactive|scratch(?:es)?|rest)\b/i, fallbackWindow:240}
   ],
   NBA_WNBA: [
-    {key:'starter', dependency:/\b(expected starters?|starting lineup|starting role|starters?)\b/i, evidence:/\b(expected starters?|starting lineup|starting role|starters?)\b/i, fallbackWindow:180, officialRecheckWindow:90},
-    {key:'minutes', dependency:/\b(minutes?|minutes limit|workload|restriction)\b/i, evidence:/\b(minutes?|minutes limit|workload|restriction)\b/i, fallbackWindow:180, officialRecheckWindow:90},
-    {key:'usage-role', dependency:/\b(usage|role changes?|rotation|bench role)\b/i, evidence:/\b(usage|role changes?|rotation|bench role)\b/i, fallbackWindow:180, officialRecheckWindow:90},
-    {key:'availability', dependency:/\b(active|inactive|availability|injur(?:y|ies)|questionable|doubtful|out|rest|back[- ]to[- ]back)\b/i, evidence:/\b(active|inactive|availability|injur(?:y|ies)|questionable|doubtful|out|rest|back[- ]to[- ]back)\b/i, fallbackWindow:180, officialRecheckWindow:90}
+    {key:'starter', dependency:/\b(expected starters?|starting lineup|starting role|starters?)\b/i, evidence:/\b(expected starters?|starting lineup|starting role|starters?)\b/i, fallbackWindow:180},
+    {key:'minutes', dependency:/\b(minutes?|minutes limit|workload|restriction)\b/i, evidence:/\b(minutes?|minutes limit|workload|restriction)\b/i, fallbackWindow:180},
+    {key:'usage-role', dependency:/\b(usage|role changes?|rotation|bench role)\b/i, evidence:/\b(usage|role changes?|rotation|bench role)\b/i, fallbackWindow:180},
+    {key:'availability', dependency:/\b(active|inactive|availability|injur(?:y|ies)|questionable|doubtful|out|rest|back[- ]to[- ]back)\b/i, evidence:/\b(active|inactive|availability|injur(?:y|ies)|questionable|doubtful|out|rest|back[- ]to[- ]back)\b/i, fallbackWindow:180}
   ],
   SOCCER: [
-    {key:'starting-XI', dependency:/\b(starting xi|confirmed xi|projected xi|lineups?|starting eleven)\b/i, evidence:/\b(starting xi|confirmed xi|projected xi|lineups?|starting eleven)\b/i, fallbackWindow:90, officialRecheckWindow:75},
-    {key:'goalkeeper', dependency:/\b(goalkeepers?|keeper|starting keeper)\b/i, evidence:/\b(goalkeepers?|keeper|starting keeper)\b/i, fallbackWindow:90, officialRecheckWindow:75},
-    {key:'rotation', dependency:/\b(rotation|squad changes?|rest)\b/i, evidence:/\b(rotation|squad changes?|rest)\b/i, fallbackWindow:90, officialRecheckWindow:75},
-    {key:'availability', dependency:/\b(injur(?:y|ies)|suspensions?|absences?|availability|active|inactive)\b/i, evidence:/\b(injur(?:y|ies)|suspensions?|absences?|availability|active|inactive)\b/i, fallbackWindow:90, officialRecheckWindow:75}
+    {key:'starting-XI', dependency:/\b(starting xi|confirmed xi|projected xi|lineups?|starting eleven)\b/i, evidence:/\b(starting xi|confirmed xi|projected xi|lineups?|starting eleven)\b/i, fallbackWindow:90},
+    {key:'goalkeeper', dependency:/\b(goalkeepers?|keeper|starting keeper)\b/i, evidence:/\b(goalkeepers?|keeper|starting keeper)\b/i, fallbackWindow:90},
+    {key:'rotation', dependency:/\b(rotation|squad changes?|rest)\b/i, evidence:/\b(rotation|squad changes?|rest)\b/i, fallbackWindow:90},
+    {key:'availability', dependency:/\b(injur(?:y|ies)|suspensions?|absences?|availability|active|inactive)\b/i, evidence:/\b(injur(?:y|ies)|suspensions?|absences?|availability|active|inactive)\b/i, fallbackWindow:90}
   ]
 });
 
@@ -98,6 +103,18 @@ function timelySources(sources,concept,eventMs,windowMinutes,reportMs){
     const asOf = sourceAsOf(source);
     return asOf !== null && asOf >= floor && asOf <= reportMs + MINUTE;
   });
+}
+function validateMarkedFinalSources(evidence,index,stage2Ms,reportMs){
+  for(const [sourceIndex,source] of (evidence.officialSources || []).entries()){
+    if(source?.finalRecheck !== true) continue;
+    ensure(source && typeof source === 'object' && !Array.isArray(source),`Recommendation ${index+1} official final re-check ${sourceIndex+1} must be an object`);
+    ensure(nonEmpty(source.origin),`Recommendation ${index+1} official final re-check ${sourceIndex+1} requires origin`);
+    ensure(nonEmpty(source.url),`Recommendation ${index+1} official final re-check ${sourceIndex+1} requires url`);
+    ensure(nonEmpty(source.fact),`Recommendation ${index+1} official final re-check ${sourceIndex+1} requires a specific fact/finding`);
+    const asOf = parseTime(source.asOf,`Recommendation ${index+1} official final re-check ${sourceIndex+1} asOf`);
+    ensure(asOf <= reportMs + MINUTE,`Recommendation ${index+1} official final re-check ${sourceIndex+1} cannot be after report.ts`);
+    ensure(asOf >= stage2Ms - FINAL_RECHECK_STAGE2_TOLERANCE_MINUTES * MINUTE,`Recommendation ${index+1} official final re-check ${sourceIndex+1} must occur near Stage 2 close`);
+  }
 }
 
 export function validatePersonnelSemantics(report,sidecar){
@@ -128,12 +145,16 @@ export function validatePersonnelSemantics(report,sidecar){
     const corpus = evidenceCorpus(evidence);
     const unresolved = unresolvedCorpus(evidence);
     const state = String(evidence.personnelState || '').toUpperCase();
+    const noMaterialSensitivity = /\bNO MATERIAL PERSONNEL SENSITIVITY\b/i.test(String(evidence.decisionSensitivity || ''));
     const eventMs = parseTime(rec?.feed?.eventDate,`Recommendation ${index+1} feed.eventDate`);
     const minutesToEvent = (eventMs - reportMs) / MINUTE;
+    const stage2Ms = parseTime(evidence.stage2CheckedAt,`Recommendation ${index+1} personnelEvidence.stage2CheckedAt`);
+    ensure(stage2Ms <= reportMs + MINUTE,`Recommendation ${index+1} personnelEvidence.stage2CheckedAt cannot be after report.ts`);
+    if(reportMs >= FINAL_RECHECK_FROM) validateMarkedFinalSources(evidence,index,stage2Ms,reportMs);
 
     for(const concept of matched){
       ensure(concept.evidence.test(corpus),`Recommendation ${index+1} named ${sport} personnel dependency "${concept.key}" is not addressed by recorded source facts`);
-      const conceptUnresolved = state !== 'CONFIRMED' && (concept.dependency.test(unresolved) || (!nonEmpty(unresolved) && concept.dependency.test(dependency)));
+      const conceptUnresolved = state !== 'CONFIRMED' && !noMaterialSensitivity && (concept.dependency.test(unresolved) || (!nonEmpty(unresolved) && concept.dependency.test(dependency)));
       if(!conceptUnresolved || minutesToEvent < 0) continue;
 
       if(Number.isFinite(concept.fallbackWindow) && minutesToEvent <= concept.fallbackWindow){
@@ -144,13 +165,16 @@ export function validatePersonnelSemantics(report,sidecar){
         }
       }
 
-      if(Number.isFinite(concept.officialRecheckWindow) && minutesToEvent <= concept.officialRecheckWindow){
-        const officialRecheck = timelySources(evidence.officialSources,concept,eventMs,concept.officialRecheckWindow,reportMs);
-        ensure(officialRecheck.length > 0,`Recommendation ${index+1} unresolved ${sport} dependency "${concept.key}" inside ${concept.officialRecheckWindow} minutes requires a timely authoritative semantic re-check`);
+      if(reportMs >= FINAL_RECHECK_FROM){
+        const finalRechecks = matchingSources(evidence.officialSources,concept).filter(source => source?.finalRecheck === true);
+        if(finalRechecks.length === 0){
+          ensure(finalRecheckShortfall(evidence,concept),`Recommendation ${index+1} unresolved ${sport} dependency "${concept.key}" requires one final authoritative re-check before final status`);
+          ensure(['PARTIAL','UNKNOWN'].includes(state),`Recommendation ${index+1} authoritative final-recheck shortfall for "${concept.key}" requires personnelState PARTIAL or UNKNOWN`);
+        }
       }
     }
   }
-  return {enforced:true, checked};
+  return {enforced:true, checked, finalRecheckEnforced:reportMs >= FINAL_RECHECK_FROM};
 }
 
 function parseArgs(argv){
@@ -167,7 +191,7 @@ function parseArgs(argv){
   return args;
 }
 
-function makeSource(origin,fact,asOf){ return {origin,url:'https://example.test/source',fact,asOf}; }
+function makeSource(origin,fact,asOf,finalRecheck=false){ return {origin,url:'https://example.test/source',fact,asOf,...(finalRecheck?{finalRecheck:true}:{})}; }
 function makeAssessment(sport){ return {context:{sport}}; }
 function makeBundle({reportTs,eventDate,sport='MLB',dependencyTarget,dependencyRationale='Material personnel inputs affect the exact wager.',unresolved=[],state='PARTIAL',officialSources=[],fallbackSources=[],sourceShortfall=null,decisionSensitivity='Resolution could require a fresh fair.'}){
   const evidence = {
@@ -226,22 +250,48 @@ function selfTest(){
 
   const goodMlb = structuredClone(badMlb);
   goodMlb.sidecar.recommendations[0].personnelEvidence.officialSources.push(
-    makeSource('MLB starting lineups','Official starting lineup and batting order were re-checked; confirmation remained pending.','2026-09-02T15:15:00-07:00')
+    makeSource('MLB starting lineups and probable pitchers','Official starting lineup, batting order and probable starting pitcher were re-checked; lineup confirmation remained pending.','2026-09-02T15:15:00-07:00',true)
   );
   goodMlb.sidecar.recommendations[0].personnelEvidence.fallbackSources[1] =
-    makeSource('Local team beat report','Projected starting lineup and batting order were reported.','2026-09-02T15:15:00-07:00');
-  assert.equal(validatePersonnelSemantics(goodMlb.report,goodMlb.sidecar).enforced,true,'Dependency-specific MLB lineup evidence should pass');
+    makeSource('Local team beat report','Projected starting lineup and batting order were reported.','2026-09-02T15:12:00-07:00');
+  assert.equal(validatePersonnelSemantics(goodMlb.report,goodMlb.sidecar).finalRecheckEnforced,true,'Dependency-specific MLB evidence with final authoritative re-check should pass');
 
-  const staleOfficial = structuredClone(goodMlb);
-  staleOfficial.sidecar.recommendations[0].personnelEvidence.officialSources[1].asOf='2026-09-02T14:00:00-07:00';
-  expectFailure(()=>validatePersonnelSemantics(staleOfficial.report,staleOfficial.sidecar),/timely authoritative semantic re-check/i,'Inside 90 minutes, stale official lineup check must fail');
+  const unmarkedMlb = structuredClone(goodMlb);
+  delete unmarkedMlb.sidecar.recommendations[0].personnelEvidence.officialSources[1].finalRecheck;
+  expectFailure(()=>validatePersonnelSemantics(unmarkedMlb.report,unmarkedMlb.sidecar),/final authoritative re-check/i,'Dependency-specific official evidence without finalRecheck marker must fail');
 
-  const semanticShortfallBundle = structuredClone(badMlb);
-  semanticShortfallBundle.sidecar.recommendations[0].personnelEvidence.officialSources.push(
-    makeSource('MLB starting lineups','Official starting lineup was re-checked and remained unavailable.','2026-09-02T15:15:00-07:00')
-  );
-  semanticShortfallBundle.sidecar.recommendations[0].personnelEvidence.sourceShortfall='No credible projected lineup or batting-order source was available after the event-specific search.';
-  assert.equal(validatePersonnelSemantics(semanticShortfallBundle.report,semanticShortfallBundle.sidecar).enforced,true,'Semantic sourceShortfall should preserve a genuine PARTIAL state');
+  const staleFinal = structuredClone(goodMlb);
+  staleFinal.sidecar.recommendations[0].personnelEvidence.officialSources[1].asOf='2026-09-02T14:30:00-07:00';
+  expectFailure(()=>validatePersonnelSemantics(staleFinal.report,staleFinal.sidecar),/near Stage 2 close/i,'Final authoritative re-check cannot be stale relative to Stage 2 close');
+
+  const semanticShortfallBundle = structuredClone(goodMlb);
+  semanticShortfallBundle.sidecar.recommendations[0].personnelEvidence.fallbackSources = [
+    makeSource('Baseball Savant probable pitchers','Probable starting pitcher context was reviewed.','2026-09-02T15:10:00-07:00'),
+    makeSource('Reuters matchup report','Current matchup form was reviewed.','2026-09-02T15:09:00-07:00'),
+    makeSource('ESPN injuries','Current injuries were reviewed.','2026-09-02T15:08:00-07:00')
+  ];
+  semanticShortfallBundle.sidecar.recommendations[0].personnelEvidence.fallbackSourceCount=3;
+  semanticShortfallBundle.sidecar.recommendations[0].personnelEvidence.sourceShortfall='No credible projected lineup or batting-order fallback source was available after the event-specific search.';
+  assert.equal(validatePersonnelSemantics(semanticShortfallBundle.report,semanticShortfallBundle.sidecar).enforced,true,'Fallback semantic sourceShortfall should preserve a genuine PARTIAL state when the final official re-check exists');
+
+  const nfl = makeBundle({
+    reportTs:'2026-09-02T15:15:00-07:00',
+    eventDate:'2026-09-03T00:45:00Z',
+    sport:'NFL',
+    dependencyTarget:'starting quarterback availability and backup quarterback expectation',
+    unresolved:['Starting quarterback availability'],
+    officialSources:[makeSource('Official NFL/team injury status','Starting quarterback availability was re-checked and remained unresolved.','2026-09-02T15:14:00-07:00',true)],
+    fallbackSources:[
+      makeSource('Team beat reporter','Quarterback practice and expected status were reported.','2026-09-02T15:12:00-07:00'),
+      makeSource('Local football desk','Quarterback availability was independently reported.','2026-09-02T15:10:00-07:00'),
+      makeSource('National football reporter','Quarterback and backup expectation were checked.','2026-09-02T15:08:00-07:00')
+    ]
+  });
+  assert.equal(validatePersonnelSemantics(nfl.report,nfl.sidecar).enforced,true,'Football quarterback evidence must pass with the universal final authoritative re-check');
+
+  const unmarkedNfl = structuredClone(nfl);
+  delete unmarkedNfl.sidecar.recommendations[0].personnelEvidence.officialSources[0].finalRecheck;
+  expectFailure(()=>validatePersonnelSemantics(unmarkedNfl.report,unmarkedNfl.sidecar),/final authoritative re-check/i,'Football must no longer have a final authoritative re-check enforcement hole');
 
   const nhl = makeBundle({
     reportTs:'2026-09-02T15:15:00-07:00',
@@ -249,26 +299,48 @@ function selfTest(){
     sport:'NHL',
     dependencyTarget:'starting goalie and late scratches',
     unresolved:['Starting goalie confirmation'],
-    officialSources:[makeSource('Official team game notes','Starting goalie remained unconfirmed.','2026-09-02T15:15:00-07:00')],
+    officialSources:[makeSource('Official team game notes','Starting goalie remained unconfirmed after the closing official check.','2026-09-02T15:14:00-07:00',true)],
     fallbackSources:[
       makeSource('Team beat reporter','Starting goalie was strongly projected from morning skate.','2026-09-02T15:12:00-07:00'),
       makeSource('Local hockey desk','Goalie expectation was independently reported.','2026-09-02T15:10:00-07:00'),
       makeSource('Line-combination service','Goalie and scratch context was checked.','2026-09-02T15:08:00-07:00')
     ]
   });
-  assert.equal(validatePersonnelSemantics(nhl.report,nhl.sidecar).enforced,true,'NHL goalie-specific evidence should pass');
+  assert.equal(validatePersonnelSemantics(nhl.report,nhl.sidecar).enforced,true,'NHL goalie-specific evidence should pass under the same universal closing rule');
+
+  const noMaterial = makeBundle({
+    reportTs:'2026-09-02T15:15:00-07:00',
+    eventDate:'2026-09-03T03:30:00Z',
+    sport:'MLB',
+    dependencyTarget:'projected starting lineup and batting order',
+    unresolved:[],
+    state:'STRONG PROJECTION',
+    decisionSensitivity:'NO MATERIAL PERSONNEL SENSITIVITY',
+    officialSources:[makeSource('MLB starting lineups','Projected lineup context was checked.','2026-09-02T14:55:00-07:00')],
+    fallbackSources:[
+      makeSource('Beat source A','Projected lineup was reported.','2026-09-02T14:52:00-07:00'),
+      makeSource('Beat source B','Batting order projection was reported.','2026-09-02T14:50:00-07:00'),
+      makeSource('Lineup service','Projected lineup was reviewed.','2026-09-02T14:48:00-07:00')
+    ]
+  });
+  assert.equal(validatePersonnelSemantics(noMaterial.report,noMaterial.sidecar).enforced,true,'Explicit no-material personnel sensitivity should not force a redundant final re-check');
+
+  const authoritativeShortfall = structuredClone(nfl);
+  authoritativeShortfall.sidecar.recommendations[0].personnelEvidence.officialSources = [makeSource('Official team injury report','Earlier quarterback status was checked.','2026-09-02T14:30:00-07:00')];
+  authoritativeShortfall.sidecar.recommendations[0].personnelEvidence.sourceShortfall='The authoritative team/NFL quarterback availability channel could not be reached for the final re-check; quarterback status remains unresolved.';
+  assert.equal(validatePersonnelSemantics(authoritativeShortfall.report,authoritativeShortfall.sidecar).enforced,true,'Truthful authoritative final-recheck sourceShortfall should fail closed as PARTIAL rather than fabricate a check');
 
   const vague = makeBundle({
     reportTs:'2026-09-02T15:15:00-07:00',
     eventDate:'2026-09-03T02:10:00Z',
     dependencyTarget:'team personnel status',
     unresolved:['Some personnel questions'],
-    officialSources:[makeSource('Official source','Personnel was checked.','2026-09-02T15:15:00-07:00')],
+    officialSources:[makeSource('Official source','Personnel was checked.','2026-09-02T15:15:00-07:00',true)],
     fallbackSources:[makeSource('Beat source','Personnel was reviewed.','2026-09-02T15:15:00-07:00')]
   });
   expectFailure(()=>validatePersonnelSemantics(vague.report,vague.sidecar),/too vague/i,'Known-sport dependency target must identify the actual personnel dependency');
 
-  console.log('PERSONNEL SEMANTIC GATE SELF-TEST OK');
+  console.log('PERSONNEL SEMANTIC GATE SELF-TEST OK — universal final authoritative re-check');
 }
 
 function main(){
@@ -284,7 +356,7 @@ function main(){
     console.log(`PERSONNEL SEMANTIC GATE PRE-CUTOVER ${report.ts}`);
     return;
   }
-  console.log(`PERSONNEL SEMANTIC GATE OK ${report.ts} checked=${result.checked}`);
+  console.log(`PERSONNEL SEMANTIC GATE OK ${report.ts} checked=${result.checked} finalRecheck=${result.finalRecheckEnforced?'required':'pre-cutover'}`);
 }
 
 const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
