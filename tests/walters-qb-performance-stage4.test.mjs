@@ -6,8 +6,6 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const QB_ROOT = path.join(ROOT, 'data', 'walters', 'nfl', 'qb-performance');
-const STAGE4_ROOT = path.join(QB_ROOT, 'stage4');
 
 function read(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
@@ -15,6 +13,26 @@ function read(relativePath) {
 
 function nearlyEqual(left, right, tolerance = 1e-9) {
   return Math.abs(Number(left) - Number(right)) <= tolerance;
+}
+
+function anyTrueKey(value, targetKey) {
+  if (Array.isArray(value)) return value.some((item) => anyTrueKey(item, targetKey));
+  if (value && typeof value === 'object') {
+    for (const [key, item] of Object.entries(value)) {
+      if (key === targetKey && item === true) return true;
+      if (anyTrueKey(item, targetKey)) return true;
+    }
+  }
+  return false;
+}
+
+function containsExactString(value, target) {
+  if (typeof value === 'string') return value === target;
+  if (Array.isArray(value)) return value.some((item) => containsExactString(item, target));
+  if (value && typeof value === 'object') {
+    return Object.values(value).some((item) => containsExactString(item, target));
+  }
+  return false;
 }
 
 const contract = read('data/walters/nfl/qb-performance/stage4-contract-v1.json');
@@ -129,10 +147,14 @@ test('Protected Graham and upstream artifacts are unchanged', () => {
   assert.equal(acceptance.uncertaintyOverlaysRetired, false);
 });
 
-test('Stage 4 generated artifacts contain no market fields or marketViewed true state', () => {
-  const serialized = JSON.stringify({ bindings, board, reconciliation, rollover, regression, acceptance, current });
+test('Stage 4 artifacts remain market-isolated and contain no activated production authority value', () => {
+  const generated = { bindings, board, reconciliation, rollover, regression, acceptance, current };
+  const serialized = JSON.stringify(generated);
   assert.equal(serialized.includes('pinnacleSpreadHome'), false);
   assert.equal(serialized.includes('grahamHomeStrengthGap'), false);
-  assert.equal(serialized.includes('"marketViewed":true'), false);
-  assert.equal(serialized.includes('APPROVED_WALTERS_QB_PERFORMANCE'), false);
+  assert.equal(anyTrueKey(generated, 'marketViewed'), false);
+  assert.equal(anyTrueKey(generated, 'productionAuthority'), false);
+  assert.equal(anyTrueKey(generated, 'grahamWritesAllowed'), false);
+  assert.equal(anyTrueKey(generated, 'uncertaintyOverlaysRetired'), false);
+  assert.equal(containsExactString(generated, 'APPROVED_WALTERS_QB_PERFORMANCE'), false);
 });
