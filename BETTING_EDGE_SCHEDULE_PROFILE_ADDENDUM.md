@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL — SCHEDULING LAYER  
 **Effective:** 2026-08-19  
-**Updated:** 2026-08-29 — football primary-market coverage requirement  
+**Updated:** 2026-09-01 — same-day report-card eligibility  
 **Timezone:** `America/Vancouver`  
 **Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0 + Core v1.4 production manifest  
 **Schedule definitions:** `data/schedule-profiles.json`  
@@ -10,7 +10,7 @@
 
 ## Scope
 
-This addendum governs trigger timing, report-lane clock labels, seasonal pulse placement, History translation, featured VigScope checkpoints and required scheduled-sweep market coverage. It does not change Betting Edge pricing, identity, freshness, fair-value, model-error, decision, staking, risk, Research Fit, Walters authority, immutable-history or delivery rules.
+This addendum governs trigger timing, report-lane clock labels, seasonal pulse placement, History translation, featured VigScope checkpoints, required scheduled-sweep market coverage and report-card event-date eligibility. It does not change Betting Edge pricing, identity, freshness, fair-value, model-error, decision, staking, risk, Research Fit, Walters authority, immutable-history or delivery rules.
 
 The canonical slot keys remain `open`, `main`, `final_morning`, `evening` and `late`, preserving historical compatibility. Production scheduling resolves the active daily profile from `data/schedule-profiles.json` and `data/schedule-state.json` before analysis.
 
@@ -21,6 +21,23 @@ One Vancouver operating day uses one profile. Once that operating day begins, it
 The active profile supplies exactly five primary odds pulses and five report windows. The Odds-API spending target remains five primary pulls per operating day. Every configured primary odds pulse is scheduled 10 minutes before its corresponding report window.
 
 Profile configuration may be prepared for a future operating day. The current Preferences / Operations pane remains display-only for active-day scheduling.
+
+## Same-day report-card eligibility
+
+`data/report-event-eligibility-v1.json` is the controlled authority for event-date eligibility, and `tools/report-event-eligibility.mjs` is its deterministic validator.
+
+For every scheduled Betting Edge report, a recommendation is eligible for the published card board only when all of the following are true:
+
+1. `report.ts` is a valid timestamp;
+2. `rec.feed.eventDate` is a valid event-start timestamp;
+3. the event start is strictly later than `report.ts`; and
+4. the event start and `report.ts`, each converted to `America/Vancouver`, fall on the same Vancouver calendar date.
+
+This is an additional hard subset of the normal active horizon. Whenever a scheduled-task prompt says to consider every supported major-sport market inside the normal active horizon, candidate evaluation for the report card is limited to events that also satisfy this same-day rule. Tomorrow's games may remain in `data/live-odds.json` and may remain available for non-publication research, but they are outside today's report-card candidate pool. Games that have already started are also outside the candidate pool.
+
+Apply the rule before deep candidate research/card selection and again immediately before freeze/staging. Do not backfill an undersized board with next-day events. Nine remains a hard maximum and never a quota; a same-day slate may legitimately produce fewer cards or zero cards.
+
+The staged publisher independently enforces the same rule and fails closed on `EVENT_ALREADY_STARTED`, `EVENT_OUTSIDE_REPORT_DATE` or invalid timestamp state. Historical issued reports remain immutable evidence and are not retroactively rewritten or invalidated.
 
 ## Automatic odds scheduling
 
@@ -132,8 +149,9 @@ When the trigger matches, the report must require:
 - Research Library v1.8 / R3 live read-only;
 - current Walters authority mode and exact provenance;
 - the normal freshness, identity, personnel, model-error, price, stake/risk and immutable-history gates;
+- same-day report-card event eligibility under `data/report-event-eligibility-v1.json`, applied before candidate research and again before staging;
 - for NFL/NCAAF, complete independent spread + moneyline + total primary-market evaluation as specified above.
 
-Scheduled report lanes target up to **nine meaningful cards**. Nine is a presentation/review target, not a quota: reports may contain fewer cards and zero BETs, and weak filler must not be manufactured to reach nine.
+Scheduled report lanes target up to **nine meaningful cards**. Nine is a presentation/review target, not a quota: reports may contain fewer cards and zero BETs, and weak filler or next-day backfill must not be manufactured to reach nine.
 
 Historical report tasks and issued reports remain immutable evidence under the contract/core/research state that governed them at issuance.
