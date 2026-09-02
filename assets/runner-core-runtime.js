@@ -54,6 +54,7 @@ function inheritedFairProb(fair){const text=String(fair||'');if(/RECALC|UNVERIFI
 function clamp(v,min=0,max=100){return Math.max(min,Math.min(max,Number(v)||0))}
 function mean(values){const a=(values||[]).filter(Number.isFinite);return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
 function signedOdds(v){return [...String(v||'').replace(/−/g,'-').matchAll(/([+-]\d{2,4})(?![\d.])/g)].map(m=>Number(m[1])).filter(Number.isFinite)}
+function explicitMovementOddsPairs(v){const text=String(v||'').replace(/−/g,'-'),pairs=[],re=/([+-]\d{2,4})\s*(?:→|->|=>|\bTO\b)\s*([+-]\d{2,4})/gi;for(const m of text.matchAll(re))pairs.push([Number(m[1]),Number(m[2])]);return pairs}
 function recWeight(rec){const s=String(rec?.status||'PASS').toUpperCase();return s==='BET'?1.5:s==='LEAN'?1.2:s==='WAIT'?0.8:0.45}
 function moveSignal(rec){
   const issued=americanFromText(rec?.price),pc=rec?.priceComparison;
@@ -61,12 +62,12 @@ function moveSignal(rec){
     const current=americanFromText(pc.price),a=americanProb(issued),b=americanProb(current);
     if(a!==null&&b!==null)return {favor:a-b,magnitude:Math.abs(a-b),source:'REPRICE'};
   }
-  const nums=signedOdds(rec?.move);
-  if(nums.length>=2){const favors=[],mags=[];for(let i=0;i+1<nums.length;i+=2){const a=americanProb(nums[i]),b=americanProb(nums[i+1]);if(a!==null&&b!==null){favors.push(a-b);mags.push(Math.abs(a-b))}}if(favors.length)return {favor:mean(favors)||0,magnitude:mean(mags)||0,source:'MOVE'}}
+  const pairs=explicitMovementOddsPairs(rec?.move);
+  if(pairs.length){const favors=[],mags=[];for(const [from,to] of pairs){const a=americanProb(from),b=americanProb(to);if(a!==null&&b!==null){favors.push(a-b);mags.push(Math.abs(a-b))}}if(favors.length)return {favor:mean(favors)||0,magnitude:mean(mags)||0,source:'MOVE'}}
   const text=String(rec?.move||'').toUpperCase();
-  if(/UNCHANGED|STABLE|FLAT|NO MOVE|HELD/.test(text))return {favor:0,magnitude:0,source:'TEXT'};
-  if(/IMPROV|DRIFT|BETTER|EASED/.test(text))return {favor:.005,magnitude:.005,source:'TEXT'};
-  if(/WORSEN|SHORTEN|STEAM|EXPENS|AGAINST/.test(text))return {favor:-.005,magnitude:.005,source:'TEXT'};
+  if(/\b(?:PRICE|LINE|MARKET)\s+(?:UNCHANGED|STABLE|FLAT|HELD)\b|\bNO MOVE\b/.test(text))return {favor:0,magnitude:0,source:'TEXT'};
+  if(/\bVALUE IMPROVED\b|\bLINE MOVED IN FAVOR\b|\b(?:PRICE|LINE|MARKET)\s+(?:IMPROVED|DRIFTED|EASED)\b|\bBETTER (?:PRICE|LINE)\b/.test(text))return {favor:.005,magnitude:.005,source:'TEXT'};
+  if(/\bLINE MOVED AGAINST\b|\bPRICE MOVED AGAINST\b|\b(?:PRICE|LINE|MARKET)\s+(?:WORSENED|SHORTENED|STEAMED)\b|\bMORE EXPENSIVE\b/.test(text))return {favor:-.005,magnitude:.005,source:'TEXT'};
   return {favor:0,magnitude:0,source:'NONE'}
 }
 function thresholdActivity(rec){
@@ -408,10 +409,10 @@ function instrumentGauge(d,title,type,reading){
     const a=-72+i*12,[x1,y1]=polar(a,48),[x2,y2]=polar(a,54),tick=d.createElementNS(ns,'line');
     tick.setAttribute('x1',x1);tick.setAttribute('y1',y1);tick.setAttribute('x2',x2);tick.setAttribute('y2',y2);tick.setAttribute('stroke',i%3===0?'#d8d59a':'#718178');tick.setAttribute('stroke-width',i%3===0?'1.4':'.8');svg.appendChild(tick)
   }
-  const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+clamp(reading.value)*1.44}deg)`;
+  const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+clamp(reading.value)*1.44}deg)`;if(Number(reading.confidence)<=0)needle.style.opacity='0';
   const line=d.createElementNS(ns,'line');line.setAttribute('x1','80');line.setAttribute('y1','72');line.setAttribute('x2','80');line.setAttribute('y2','27');line.setAttribute('stroke','#f4fff9');line.setAttribute('stroke-width','2.2');
   const hub=d.createElementNS(ns,'circle');hub.setAttribute('cx','80');hub.setAttribute('cy','72');hub.setAttribute('r','4');hub.setAttribute('fill','#f4fff9');needle.append(line,hub);svg.appendChild(needle);wrap.appendChild(svg);
-  const read=el(d,'div','instrumentRead');read.append(el(d,'b','',`${reading.value}`),d.createTextNode(reading.label));wrap.appendChild(read);
+  const displayValue=Number(reading.confidence)>0?`${reading.value}`:'—';const read=el(d,'div','instrumentRead');read.append(el(d,'b','',displayValue),d.createTextNode(reading.label));wrap.appendChild(read);
   const defs=type==='heat'?[['DORM','g'],['QUIET','g'],['FORM','y'],['ACTIVE','y'],['PRESS','y'],['HOT','r'],['EXTREME','r']]:type==='pressure'?[['AGAINST','r'],['NEUTRAL','y'],['FAVOR','g']]:[['FRAG','r'],['MIXED','y'],['STRONG','g'],['CONSENSUS','g']];
   const band=el(d,'div',`instrumentBand ${type}`);defs.forEach(([label,c])=>band.appendChild(el(d,'span',c,label)));wrap.appendChild(band);
   const evidence=reading.evidenceQuality?` • ${reading.evidenceQuality}`:'';wrap.appendChild(el(d,'div','instrumentConf',`CONF ${reading.confidence}%${evidence}${reading.pairs?` • ${reading.pairs} PAIRS`:''}`));
@@ -422,9 +423,11 @@ function marketState(run){
   const r=deriveInstrumentReadings(run);
   const h=r.heat.rawValue??r.heat.value,p=r.pressure.rawValue??r.pressure.value,a=r.agreement.rawValue??r.agreement.value;
   const agreementConfidence=r.agreement.rawConfidence??r.agreement.confidence;
+  const heatConfidence=Number(r.heat.confidence)||0,pressureConfidence=Number(r.pressure.confidence)||0;
   const heat=h<VIG_HEAT_LOW_MAX?'LOW':h<VIG_HEAT_HIGH_MIN?'MEDIUM':'HIGH';
   const pressure=p<VIG_PRESSURE_ADVERSE_MAX?'ADVERSE':p<VIG_PRESSURE_FAVORABLE_MIN?'NEUTRAL':'FAVORABLE';
   const agreement=agreementConfidence>0?(a<VIG_AGREEMENT_HIGH_MIN?'LOW':'HIGH'):'LOW';
+  if(heatConfidence<=0||pressureConfidence<=0){const label=heatConfidence<=0&&pressureConfidence<=0?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL';return {emoji:'⚪',label,agreementState:agreementConfidence>0?agreement:'UNMEASURED',agreementRender:agreement}}
   const key=[heat,pressure,agreement].join('|');
   const states={
     'HIGH|FAVORABLE|HIGH':['🟢','COORDINATED FAVORABLE'],
