@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3c-contract-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3C",
+  "status": "MODEL_SPECIFICATION_LOCKED_NON_OPERATIONAL",
+  "createdDate": "2026-09-02",
+  "operational": false,
+  "productionAuthority": false,
+  "marketViewed": false,
+  "purpose": "Estimate a transparent, market-isolated quarterback performance model from the Stage 3B evidence, test it on an untouched chronological 2025 holdout, and create only non-operational 2026 shadow candidate values.",
+  "dependsOn": {
+    "stage3AContract": "data/walters/nfl/qb-performance/stage3-contract-v1.json",
+    "stage3BContract": "data/walters/nfl/qb-performance/stage3b-contract-v1.json",
+    "stage3BCurrent": "data/walters/nfl/qb-performance/stage3-current.json",
+    "stage3BAudit": "data/walters/nfl/qb-performance/stage3b-audit-v1.json",
+    "sourceManifest": "data/walters/nfl/qb-performance/source/source-manifest-v1.json",
+    "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+    "weeklyEvidence": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+    "seasonalEvidence": "data/walters/nfl/qb-performance/normalized/qb-seasonal-2021-2025-v1.csv"
+  },
+  "chronology": {
+    "sourceSeasons": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "modelFitSeasonsForTuning": [
+      2022,
+      2023
+    ],
+    "tuningSeason": 2024,
+    "finalFitSeasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "untouchedHoldoutSeason": 2025,
+    "candidateAsOf": "END_OF_2025_REGULAR_SEASON",
+    "candidateForSeason": 2026,
+    "rule": "No 2025 target or metric may influence configuration selection, feature scaling, coefficient estimation or acceptance thresholds."
+  },
+  "eligibleGameEvidence": {
+    "seasonType": "REG",
+    "position": "QB",
+    "minimumAttempts": 10,
+    "minimumDropbacks": 15,
+    "minimumPriorDropbacksForEvaluation": 100,
+    "sameWeekOpponentLeakageAllowed": false,
+    "reliefAndLowVolumeRows": "Retained for source totals and chronological opponent-defense context, but excluded as model targets and rolling qualified games when below the stated thresholds."
+  },
+  "validationTarget": {
+    "id": "NEXT_GAME_OPPONENT_ADJUSTED_TOTAL_QB_EPA_PER_OPPORTUNITY",
+    "rawFormula": "(passing_epa + rushing_epa) / (dropbacks + carries)",
+    "opponentAdjustment": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+    "opponentPriorEquivalentOpportunities": 200,
+    "previousSeasonDefenseCarryoverWeight": 0.35,
+    "targetWinsorBounds": [
+      -0.75,
+      0.75
+    ],
+    "marketOrSpreadTargetAllowed": false,
+    "reason": "EPA supplies an integrated football-points validation criterion while all predictive inputs remain the Walters-named performance families."
+  },
+  "predictiveFeatures": {
+    "families": [
+      {
+        "id": "passer_rating",
+        "direction": "HIGHER_IS_BETTER",
+        "reliabilityDenominator": "attempts"
+      },
+      {
+        "id": "yards_per_attempt",
+        "direction": "HIGHER_IS_BETTER",
+        "reliabilityDenominator": "attempts"
+      },
+      {
+        "id": "interception_rate",
+        "direction": "LOWER_IS_BETTER",
+        "reliabilityDenominator": "attempts"
+      },
+      {
+        "id": "sack_rate",
+        "direction": "LOWER_IS_BETTER",
+        "reliabilityDenominator": "dropbacks"
+      },
+      {
+        "id": "fumble_rate",
+        "direction": "LOWER_IS_BETTER",
+        "reliabilityDenominator": "dropbacks"
+      },
+      {
+        "id": "qb_rushing_value",
+        "definition": "rushing_yards / dropbacks",
+        "direction": "HIGHER_IS_BETTER",
+        "reliabilityDenominator": "dropbacks"
+      }
+    ],
+    "longTermWindowCandidatesCompletedSeasons": [
+      2,
+      3,
+      4
+    ],
+    "shortTermWindowCandidatesQualifiedGames": [
+      4,
+      6,
+      8
+    ],
+    "featurePriorEquivalentDropbackCandidates": [
+      100,
+      250,
+      500
+    ],
+    "featureZScoreClip": 4.0,
+    "attemptsAndDropbacksRole": "RELIABILITY_ONLY",
+    "supportingCastRole": "EXCLUDED_FROM_NUMERIC_MODEL_TO_PREVENT_DOUBLE_COUNTING",
+    "opponentAndScheduleRole": "TARGET_NORMALIZATION_ONLY_NOT_A_SPREAD_ADDEND"
+  },
+  "model": {
+    "family": "NONNEGATIVE_RIDGE_LINEAR_MODEL",
+    "inputs": "Twelve oriented standardized inputs: long-term and short-term versions of the six locked performance families.",
+    "ridgeAlphaCandidates": [
+      0.05,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "solver": "DETERMINISTIC_NONNEGATIVE_COORDINATE_DESCENT",
+    "maximumIterations": 500,
+    "convergenceTolerance": 1e-12,
+    "configurationSelection": "Lowest 2024 RMSE, then lowest MAE, then higher Pearson correlation, then deterministic conservative tie-break favoring more completed seasons, more short-term games, stronger shrinkage and stronger ridge.",
+    "featureSignsMayReverse": false,
+    "candidateModelMayReadEAValue": false,
+    "holdoutMayRefitModel": false,
+    "tuningEligibility": {
+      "minimumPearsonCorrelation": 0.03,
+      "minimumActiveFeatureFamilies": 2,
+      "maximumSingleFeatureFamilyWeightShare": 0.85
+    }
+  },
+  "baselines": {
+    "leagueMean": "Final-fit target mean.",
+    "recentAdjustedEpa": "Prior-only short-window adjusted EPA per opportunity, sample-shrunk toward the applicable fit target mean; used only as a validation comparator and never as a candidate feature."
+  },
+  "candidateCalibration": {
+    "scale": [
+      6.0,
+      9.5
+    ],
+    "anchorDistribution": "Frozen Stage 2 top-67 QB Walters values.",
+    "performanceScaleMethod": "Map the final model score percentile among experienced top-67 quarterbacks onto the sorted frozen top-67 Walters value distribution.",
+    "eaPriorRole": "SHRINKAGE_PRIOR_ONLY",
+    "minimumCandidateEvidenceDropbacks": 100,
+    "maximumPerformanceBlend": 0.65,
+    "maximumAbsoluteMoveFromStage2Prior": 0.75,
+    "candidatePrecision": 0.01,
+    "noCapturedStatsRule": "Retain the Stage 2 prior and emit BLOCKED_INSUFFICIENT_QB_SAMPLE.",
+    "liveAdjustmentFormulaReservedForLaterStages": "approvedStarterValue - embeddedBaselineQbValue",
+    "mayMoveGrahamFair": false,
+    "mayRetireQbUncertainty": false
+  },
+  "acceptance": {
+    "minimumHoldoutSamples": 350,
+    "maximumRmseToLeagueMeanRatio": 1.01,
+    "maximumMaeToLeagueMeanRatio": 1.01,
+    "maximumRmseToRecentAdjustedEpaRatio": 1.05,
+    "minimumPearsonCorrelation": 0.06,
+    "minimumSpearmanCorrelation": 0.06,
+    "minimumTopMinusBottomQuintileTargetGap": 0.025,
+    "minimumDirectionalAccuracy": 0.5,
+    "minimumActiveFeatureFamilies": 2,
+    "maximumSingleFeatureFamilyWeightShare": 0.8,
+    "minimumExperiencedTop67ForCalibration": 45,
+    "candidateMeanRangeTop67": [
+      7.4,
+      8.1
+    ],
+    "requireAllCandidatesWithinScale": true,
+    "requireCandidateMoveCap": true,
+    "requireDeterministicRefit": true,
+    "requireFeatureSignTests": true,
+    "requireMarketViewedFalse": true,
+    "requireProtectedArtifactsUnchanged": true,
+    "passState": "STAGE3C_MODEL_ESTIMATED_HOLDOUT_VALIDATED_NON_OPERATIONAL",
+    "failState": "STAGE3C_FAIL_CLOSED_REVIEW_REQUIRED",
+    "nextSubstageOnPass": "STAGE3D_CANDIDATE_FREEZE_AND_STAGE3_ACCEPTANCE"
+  },
+  "protectedArtifacts": [
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/personnel-production-current.json",
+    "data/walters/nfl/matchup-production-current.json",
+    "data/walters/nfl/active-week.json"
+  ],
+  "writeBoundary": {
+    "allowedPrefixes": [
+      "data/walters/nfl/qb-performance/",
+      "tools/build-walters-qb-performance-stage3c.py",
+      "tools/validate-walters-qb-performance-stage3c.mjs",
+      "tests/walters-qb-performance-stage3c.test.mjs",
+      ".github/workflows/walters-qb-performance-stage3.yml"
+    ],
+    "productionArtifactsAllowed": false,
+    "weekScopedWritesAllowed": false,
+    "grahamFairNumberWritesAllowed": false,
+    "embeddedBaselineWritesAllowed": false,
+    "uncertaintyOverlayRetirementAllowed": false
+  },
+  "outputs": {
+    "model": "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+    "holdoutAudit": "data/walters/nfl/qb-performance/model/stage3c-holdout-audit-v1.json",
+    "candidates": "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+    "current": "data/walters/nfl/qb-performance/stage3-current.json"
+  }
+}
