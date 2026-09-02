@@ -1,0 +1,141 @@
+{
+  "state": "PASS",
+  "step": 4,
+  "name": "COMBINED_VIG_METER_RECALIBRATION",
+  "mode": "READ_ONLY_DECISION_LOCK",
+  "productionChanged": false,
+  "period": {
+    "start": "2026-08-15",
+    "end": "2026-09-01",
+    "reports": 85,
+    "dates": 18
+  },
+  "lockedMeterInputs": {
+    "heat": "HEAT_CONFIDENCE_50_SQRT_50",
+    "pressure": "PRESSURE_TANH_014",
+    "agreement": "AGREEMENT_TWO_AXIS_EVIDENCE_AWARE"
+  },
+  "selectedThresholds": {
+    "heat": {
+      "LOW": "score < 20",
+      "MEDIUM": "20 <= score < 40",
+      "HIGH": "score >= 40"
+    },
+    "pressure": {
+      "ADVERSE": "score < 48",
+      "NEUTRAL": "48 <= score < 52",
+      "FAVORABLE": "score >= 52",
+      "symmetry": "thresholds are symmetric around neutral center 50"
+    },
+    "agreement": {
+      "LOW": "confidence > 0 and score < 45",
+      "HIGH": "confidence > 0 and score >= 45",
+      "UNMEASURED": "confidence == 0",
+      "evidenceQuality": {
+        "UNMEASURED": "confidence == 0",
+        "LIMITED": "0 < confidence < 25",
+        "SUPPORTED": "confidence >= 25"
+      }
+    }
+  },
+  "unmeasuredAgreementTreatment": {
+    "semanticState": "UNMEASURED",
+    "internalCompatibilityScore": 50,
+    "vigGraphicRenderBranch": "LOW",
+    "rule": "The LOW graphic branch is a conservative rendering fallback only. The terminal must visibly identify Agreement as UNMEASURED and must never describe the fallback branch as measured LOW agreement.",
+    "highAllowed": false,
+    "reason": "Preserves the existing 18-graphic architecture while eliminating false HIGH Agreement from zero-confidence fallback scores."
+  },
+  "historicalDistribution": {
+    "heat": {
+      "LOW": 30,
+      "MEDIUM": 30,
+      "HIGH": 25
+    },
+    "pressure": {
+      "ADVERSE": 20,
+      "NEUTRAL": 29,
+      "FAVORABLE": 36
+    },
+    "agreementMeasured": {
+      "LOW": 36,
+      "HIGH": 25
+    },
+    "agreementEvidence": {
+      "UNMEASURED": 24,
+      "LIMITED": 26,
+      "SUPPORTED": 35
+    },
+    "agreementGraphicRender": {
+      "LOW_BRANCH": 60,
+      "HIGH_BRANCH": 25
+    },
+    "highAgreementEvidence": {
+      "LIMITED": 18,
+      "SUPPORTED": 7,
+      "UNMEASURED": 0
+    },
+    "combined18State": {
+      "occupied": 15,
+      "unused": 3,
+      "normalizedEntropy": 0.8429,
+      "rmseFromEqual18WayDistribution": 4.58,
+      "maxSingleStateCount": 17,
+      "maxSingleStateShare": 0.20
+    }
+  },
+  "comparisonToCurrentProductionBaseline": {
+    "currentBaseline": {
+      "heatThresholds": [40, 55],
+      "pressureThresholds": [45, 56],
+      "agreementHighThreshold": 45,
+      "occupied18States": 16,
+      "normalizedEntropy": 0.7159,
+      "rmseFromEqual18WayDistribution": 7.385,
+      "maxSingleStateCount": 26,
+      "maxSingleStateShare": 0.3059
+    },
+    "recalibrated": {
+      "occupied18States": 15,
+      "normalizedEntropy": 0.8429,
+      "rmseFromEqual18WayDistribution": 4.58,
+      "maxSingleStateCount": 17,
+      "maxSingleStateShare": 0.20
+    },
+    "interpretation": "The recalibrated system uses one fewer state in this 85-report sample, but the states that do occur are substantially less concentrated. The purpose is truthful and useful distribution, not forcing all 18 graphics to appear."
+  },
+  "selectionRationale": {
+    "automatedSearchTop": {
+      "heat": [20, 35],
+      "pressure": [48, 52],
+      "agreementHigh": 45,
+      "occupied": 16,
+      "normalizedEntropy": 0.8389,
+      "rmse": 4.874,
+      "heatMarginals": [30, 23, 32]
+    },
+    "finalSelected": {
+      "heat": [20, 40],
+      "pressure": [48, 52],
+      "agreementHigh": 45,
+      "occupied": 15,
+      "normalizedEntropy": 0.8429,
+      "rmse": 4.58,
+      "heatMarginals": [30, 30, 25]
+    },
+    "reason": "20/40 is preferred over the optimizer's 20/35 because it produces a materially cleaner Heat distribution, better entropy and lower distribution error, uses simpler round thresholds, and avoids lowering HIGH merely to populate one additional historically rare combination."
+  },
+  "invariants": {
+    "doNotForceEqual18StateUsage": true,
+    "pressureThresholdSymmetryRequired": true,
+    "unmeasuredAgreementCanNeverBeHigh": true,
+    "agreementScoreFormulaPreserved": true,
+    "evidenceQualityRemainsSeparate": true,
+    "finalThresholdsAreFixedUntilExplicitRecalibration": true
+  },
+  "nextStep": "PRODUCTION_ROLLOUT_AND_VERIFICATION",
+  "notes": [
+    "This locks the Step 4 calibration decision only. The live terminal formulas, thresholds, labels, VIG graphics, and report history remain unchanged until Step 5.",
+    "Step 5 must implement all three locked meter formulas plus these thresholds as one coordinated production change and add regression coverage before the terminal is considered recalibrated."
+  ]
+}
