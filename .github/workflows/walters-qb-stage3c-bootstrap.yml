@@ -1,0 +1,67 @@
+name: Walters QB Stage 3C Bootstrap
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "data/walters/nfl/qb-performance/stage3c-bootstrap-bundle.b64.part*"
+      - ".github/workflows/walters-qb-stage3c-bootstrap.yml"
+
+concurrency:
+  group: walters-qb-stage3c-bootstrap
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  install-stage3c:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install reviewed Stage 3C package
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          parts=(data/walters/nfl/qb-performance/stage3c-bootstrap-bundle.b64.part*)
+          if (( ${#parts[@]} == 0 )); then
+            echo "No Stage 3C bootstrap bundle remains."
+            exit 0
+          fi
+          cat "${parts[@]}" | base64 --decode > /tmp/walters-qb-stage3c-bundle.tar.gz
+          echo "fb3cebc458436e878794785145ba0753cad11033ead758f7fac181e82a0e0e39  /tmp/walters-qb-stage3c-bundle.tar.gz" | sha256sum --check --strict
+          tar -xzf /tmp/walters-qb-stage3c-bundle.tar.gz
+          rm -f "${parts[@]}" .github/workflows/walters-qb-stage3c-bootstrap.yml
+          python -m py_compile tools/build-walters-qb-performance-stage3c.py
+          python tools/build-walters-qb-performance-stage3c.py --self-test
+          node --check tools/validate-walters-qb-performance-stage3c.mjs
+          node --check tests/walters-qb-performance-stage3c.test.mjs
+
+      - name: Commit installed Stage 3C package
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A -- \
+            data/walters/nfl/qb-performance \
+            tools/build-walters-qb-performance-stage3c.py \
+            tools/validate-walters-qb-performance-stage3c.mjs \
+            tests/walters-qb-performance-stage3c.test.mjs \
+            .github/workflows/walters-qb-performance-stage3.yml \
+            .github/workflows/walters-qb-stage3c-bootstrap.yml
+          git commit -m "Install Walters QB performance Stage 3C package"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Stage 3C bootstrap push attempt ${attempt} failed; retrying."
+            sleep $((attempt * 2))
+          done
+          exit 1
