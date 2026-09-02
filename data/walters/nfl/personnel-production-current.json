@@ -48,12 +48,53 @@
     "boardRoundingIncrement": 0.5,
     "duplicateEventIdsAreIdempotent": true
   },
+  "materialPersonnelClosureGate": {
+    "state": "OPERATIONAL",
+    "effectiveAt": "2026-09-01T17:35:00-07:00",
+    "appliesToAvailability": ["OUT", "IR", "SUSPENDED", "COMMISSIONER_EXEMPT"],
+    "purpose": "Prevent a material confirmed absence from being dismissed as an unresolved no-move before the current roster, depth/role replacement and governed Walters values have actually been exhausted.",
+    "requiredBeforeNoNumericMove": [
+      "confirm the material availability transaction/status from current reliable evidence",
+      "inspect the current active roster",
+      "inspect current depth/role evidence for the unavailable player and replacement role",
+      "enumerate every credible current replacement candidate",
+      "look up the locked Walters value of the unavailable player and every credible candidate",
+      "classify the replacement as one-for-one, committee, multirole or unresolved-after-complete-search",
+      "review baseline double-count risk",
+      "review M4 value-invariant committee eligibility where a committee exists"
+    ],
+    "requiredClosureReviewFields": [
+      "availabilityVerified",
+      "rosterChecked",
+      "roleEvidenceChecked",
+      "replacementSearchCompleted",
+      "replacementCandidatesConsidered",
+      "unavailablePlayerValueChecked",
+      "candidateValuesChecked",
+      "replacementClassification",
+      "baselineDoubleCountReviewed",
+      "m4CommitteeEligibilityReviewed",
+      "conclusion"
+    ],
+    "replacementClassifications": ["ONE_FOR_ONE", "COMMITTEE", "MULTIROLE", "UNRESOLVED_AFTER_COMPLETE_SEARCH"],
+    "conclusions": ["RESOLVED_NUMERIC", "MATCHUP_M4_CANDIDATE", "FAIL_CLOSED_AFTER_FULL_REVIEW"],
+    "unresolvedCaseAction": "Every material confirmed absence that remains unresolved after the complete search must still be submitted through personnel-staging.json as a fail-closed case so the personnel ledger and research ledger receive durable evidence.",
+    "taskCompletionRule": "A scheduled Graham research task that discovers a new material confirmed absence may not report the case complete, unchanged, or no numeric move until the governed personnel workflow has durably recorded the case. If the closure search or workflow cannot be completed, report PERSONNEL REVIEW INCOMPLETE or PERSONNEL PRODUCTION BLOCKED instead of a substantive no-move conclusion.",
+    "durableCompletionRequires": [
+      "personnel workflow completed successfully",
+      "active personnel ledger contains the new batch/event",
+      "active research ledger contains the personnel production batch",
+      "active current-numbers read-back reflects the governed result"
+    ],
+    "marketViewed": false
+  },
   "staging": {
     "path": "data/walters/nfl/personnel-staging.json",
     "stateRequired": "READY",
     "workflow": ".github/workflows/graham-personnel-production.yml",
     "calculator": "tools/apply-graham-personnel-staging.mjs",
-    "taskRule": "Scheduled Graham tasks discover and verify personnel facts, then submit a market-isolated staging batch. The repository workflow owns numeric calculation and live-board mutation."
+    "closureValidator": "tools/validate-graham-personnel-closure.mjs",
+    "taskRule": "Scheduled Graham tasks discover and verify personnel facts, complete the material-personnel closure gate for every confirmed material absence, then submit a market-isolated staging batch even when the final result remains fail closed. The repository workflow owns numeric calculation and live-board mutation."
   },
   "durableOutputs": {
     "personnelLedgerPattern": "data/walters/nfl/2026/week-XX-personnel-ledger.json",
