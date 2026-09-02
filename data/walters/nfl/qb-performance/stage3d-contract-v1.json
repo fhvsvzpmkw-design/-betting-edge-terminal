@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3d-contract-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3D",
+  "status": "CANDIDATE_FREEZE_AND_STAGE3_ACCEPTANCE_LOCKED_NON_OPERATIONAL",
+  "createdDate": "2026-09-02",
+  "operational": false,
+  "productionAuthority": false,
+  "marketViewed": false,
+  "purpose": "Freeze the exact Stage 3C model and candidate evidence, perform a complete mechanical review of the current quarterback population and required live case studies, and decide whether Stage 3 may advance only into Stage 4 regression and shadow testing.",
+  "dependsOn": {
+    "stage3AContract": "data/walters/nfl/qb-performance/stage3-contract-v1.json",
+    "stage3BContract": "data/walters/nfl/qb-performance/stage3b-contract-v1.json",
+    "stage3CContract": "data/walters/nfl/qb-performance/stage3c-contract-v1.json",
+    "stage3Current": "data/walters/nfl/qb-performance/stage3-current.json",
+    "sourceManifest": "data/walters/nfl/qb-performance/source/source-manifest-v1.json",
+    "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+    "weeklyEvidence": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+    "seasonalEvidence": "data/walters/nfl/qb-performance/normalized/qb-seasonal-2021-2025-v1.csv",
+    "stage3CModel": "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+    "stage3CHoldoutAudit": "data/walters/nfl/qb-performance/model/stage3c-holdout-audit-v1.json",
+    "stage3CCandidates": "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+  },
+  "freezePolicy": {
+    "immutableInputPaths": [
+      "data/walters/nfl/qb-performance/stage3-contract-v1.json",
+      "data/walters/nfl/qb-performance/stage3b-contract-v1.json",
+      "data/walters/nfl/qb-performance/stage3c-contract-v1.json",
+      "data/walters/nfl/qb-performance/stage3d-contract-v1.json",
+      "data/walters/nfl/qb-performance/source/source-manifest-v1.json",
+      "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+      "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+      "data/walters/nfl/qb-performance/normalized/qb-seasonal-2021-2025-v1.csv",
+      "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+      "data/walters/nfl/qb-performance/model/stage3c-holdout-audit-v1.json",
+      "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+      "tools/build-walters-qb-performance-stage3c.py",
+      "tools/build-walters-qb-performance-stage3d.py",
+      "tools/validate-walters-qb-performance-stage3c.mjs",
+      "tools/validate-walters-qb-performance-stage3d.mjs",
+      "tests/walters-qb-performance-stage3c.test.mjs",
+      "tests/walters-qb-performance-stage3d.test.mjs",
+      ".github/workflows/walters-qb-performance-stage3.yml"
+    ],
+    "hashAlgorithm": "SHA-256",
+    "jsonCanonicalHashRequired": true,
+    "candidateValuesMayBeReestimatedInStage3D": false,
+    "modelWeightsMayBeChangedInStage3D": false,
+    "stage3COutputsMayBeEditedInStage3D": false
+  },
+  "candidateReview": {
+    "expectedCurrentQbCount": 109,
+    "expectedTop67Count": 67,
+    "validStatuses": [
+      "STAGE3_CANDIDATE_NON_OPERATIONAL",
+      "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    ],
+    "requiredCaseStudies": [
+      "Kirk Cousins",
+      "Patrick Mahomes",
+      "Joe Burrow"
+    ],
+    "rules": {
+      "moveCapReachedTolerance": 0.000001,
+      "largeMoveAbsoluteMinimum": 0.5,
+      "elitePriorMinimum": 9.0,
+      "elitePriorDowngradeMaximum": -0.5,
+      "lowerPriorMaximum": 7.5,
+      "lowerPriorUpgradeMinimum": 0.5,
+      "highConfidenceLabel": "HIGH",
+      "performancePriorDivergenceMinimum": 1.0,
+      "rankShiftAbsoluteMinimum": 12,
+      "scaleBoundaryTolerance": 0.000001
+    },
+    "allowedReviewFlags": [
+      "MOVE_CAP_REACHED",
+      "LARGE_MOVE",
+      "ELITE_PRIOR_DOWNGRADE",
+      "LOWER_PRIOR_UPGRADE",
+      "HIGH_CONFIDENCE_LARGE_MOVE",
+      "TOP67_LOW_SAMPLE_BLOCK",
+      "PERFORMANCE_PRIOR_DIVERGENCE",
+      "RANK_SHIFT",
+      "CANDIDATE_AT_SCALE_BOUND"
+    ],
+    "reviewFlagsAreCautionsNotProductionAuthority": true,
+    "allPlayersMustBeAccountedFor": true,
+    "duplicatePlayerIdsAllowed": false,
+    "candidateValueRevisionsAllowed": false
+  },
+  "modelReview": {
+    "cautionThresholds": {
+      "modestPearsonBelow": 0.25,
+      "calibrationSlopeBelow": 0.75,
+      "recentEpaComparatorNotBeatenAboveRatio": 1.0,
+      "zeroFamilyWeightAtOrBelow": 0.0,
+      "lowFamilyWeightShareBelow": 0.01
+    },
+    "allowedCautionFlags": [
+      "MODEST_HOLDOUT_SIGNAL",
+      "CALIBRATION_SLOPE_BELOW_ONE",
+      "RECENT_EPA_COMPARATOR_NOT_BEATEN",
+      "ZERO_WEIGHT_INTERCEPTION_RATE",
+      "LOW_WEIGHT_FUMBLE_RATE"
+    ],
+    "cautionsMayBlockStage4ShadowEntry": false,
+    "cautionsMustBeCarriedIntoStage4": true
+  },
+  "starterAuthority": {
+    "status": "NOT_AVAILABLE_IN_STAGE3_INPUTS",
+    "source": null,
+    "starterInferenceAllowed": false,
+    "teamCandidateLeaderIsStarterAuthority": false,
+    "stage4Requirement": "Bind each shadow matchup to a governed starter identity and embedded baseline quarterback value before calculating any differential.",
+    "caseStudyRule": "Named case studies may be reviewed as candidate records, but Stage 3D cannot assert a live starter map or retire uncertainty overlays."
+  },
+  "acceptance": {
+    "requireStage3CHoldoutPass": true,
+    "requireEveryStage3CAcceptanceCheckPass": true,
+    "requireCompleteCandidatePopulation": true,
+    "requireCompleteTop67Population": true,
+    "requireAllCandidatesWithinScale": true,
+    "requireAllCandidatesWithinMoveCap": true,
+    "requireEveryCandidateReviewed": true,
+    "requireEveryRequiredCaseStudyPresent": true,
+    "requireFreezeManifestComplete": true,
+    "requireDeterministicReview": true,
+    "requireMarketViewedFalse": true,
+    "requireProtectedArtifactsUnchanged": true,
+    "passState": "STAGE3_ACCEPTED_FOR_STAGE4_SHADOW_TESTING_NON_OPERATIONAL",
+    "failState": "STAGE3D_FAIL_CLOSED_REVIEW_REQUIRED",
+    "acceptedFor": "STAGE4_QB_REGRESSION_AND_SHADOW_TESTING_ONLY",
+    "notAcceptedFor": [
+      "PRODUCTION_QB_AUTHORITY",
+      "GRAHAM_FAIR_NUMBER_WRITES",
+      "EMBEDDED_QB_BASELINE_WRITES",
+      "QB_UNCERTAINTY_OVERLAY_RETIREMENT"
+    ],
+    "nextStageOnPass": "STAGE4_QB_REGRESSION_AND_SHADOW_TESTING"
+  },
+  "stage4EntryRequirements": [
+    "Bind governed starter identities without inference.",
+    "Bind the quarterback value already embedded in each team baseline.",
+    "Replay no-change, starter-change, backup, rookie, injury and return scenarios.",
+    "Test uncertainty-overlay reconciliation and double-count protection.",
+    "Test weekly rollover and current-season evidence updates without look-ahead.",
+    "Keep every shadow calculation market-isolated and unable to write Graham production artifacts."
+  ],
+  "protectedArtifacts": [
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/personnel-production-current.json",
+    "data/walters/nfl/matchup-production-current.json",
+    "data/walters/nfl/active-week.json"
+  ],
+  "writeBoundary": {
+    "allowedPrefixes": [
+      "data/walters/nfl/qb-performance/freeze/",
+      "data/walters/nfl/qb-performance/review/",
+      "data/walters/nfl/qb-performance/stage3-acceptance-v1.json",
+      "data/walters/nfl/qb-performance/stage3-current.json",
+      "tools/build-walters-qb-performance-stage3d.py",
+      "tools/validate-walters-qb-performance-stage3d.mjs",
+      "tests/walters-qb-performance-stage3d.test.mjs",
+      ".github/workflows/walters-qb-performance-stage3.yml"
+    ],
+    "productionArtifactsAllowed": false,
+    "weekScopedWritesAllowed": false,
+    "grahamFairNumberWritesAllowed": false,
+    "embeddedBaselineWritesAllowed": false,
+    "uncertaintyOverlayRetirementAllowed": false
+  },
+  "outputs": {
+    "freezeManifest": "data/walters/nfl/qb-performance/freeze/stage3d-freeze-manifest-v1.json",
+    "candidateReview": "data/walters/nfl/qb-performance/review/stage3d-candidate-review-v1.json",
+    "stage3Acceptance": "data/walters/nfl/qb-performance/stage3-acceptance-v1.json",
+    "current": "data/walters/nfl/qb-performance/stage3-current.json"
+  }
+}
