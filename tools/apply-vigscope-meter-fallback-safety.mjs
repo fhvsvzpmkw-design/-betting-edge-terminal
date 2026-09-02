@@ -29,6 +29,13 @@ runtime=replaceOnce(
 
 runtime=replaceOnce(
   runtime,
+  "  if(/UNCHANGED|STABLE|FLAT|NO MOVE|HELD/.test(text))return {favor:0,magnitude:0,source:'TEXT'};\n  if(/IMPROV|DRIFT|BETTER|EASED/.test(text))return {favor:.005,magnitude:.005,source:'TEXT'};\n  if(/WORSEN|SHORTEN|STEAM|EXPENS|AGAINST/.test(text))return {favor:-.005,magnitude:.005,source:'TEXT'};",
+  "  if(/\\b(?:PRICE|LINE|MARKET)\\s+(?:UNCHANGED|STABLE|FLAT|HELD)\\b|\\bNO MOVE\\b/.test(text))return {favor:0,magnitude:0,source:'TEXT'};\n  if(/\\bVALUE IMPROVED\\b|\\bLINE MOVED IN FAVOR\\b|\\b(?:PRICE|LINE|MARKET)\\s+(?:IMPROVED|DRIFTED|EASED)\\b|\\bBETTER (?:PRICE|LINE)\\b/.test(text))return {favor:.005,magnitude:.005,source:'TEXT'};\n  if(/\\bLINE MOVED AGAINST\\b|\\bPRICE MOVED AGAINST\\b|\\b(?:PRICE|LINE|MARKET)\\s+(?:WORSENED|SHORTENED|STEAMED)\\b|\\bMORE EXPENSIVE\\b/.test(text))return {favor:-.005,magnitude:.005,source:'TEXT'};",
+  'tighten qualitative movement language'
+);
+
+runtime=replaceOnce(
+  runtime,
   "  const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+clamp(reading.value)*1.44}deg)`;",
   "  const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+clamp(reading.value)*1.44}deg)`;if(Number(reading.confidence)<=0)needle.style.opacity='0';",
   'hide needle when unmeasured'
