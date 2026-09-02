@@ -7,6 +7,7 @@ const runtimeSource=fs.readFileSync(runtimePath,'utf8');
 const exportMarker='\nactiveRun=payload();';
 assert.ok(runtimeSource.includes(exportMarker),'runtime export injection marker must exist');
 const instrumented=runtimeSource.replace(exportMarker,`\nglobalThis.__runnerBoundary={normalizeRun,withoutComparison,safeHistory,saveCurrentRun,sessionRuns,newestSessionRun,rememberIssuedRun,catalogRuns,telemetryIntegrityState,deriveInstrumentReadings,marketState,sessionKey,recoverCanonicalIssuedRun};${exportMarker}`);
+const assertJsonEqual=(actual,expected,message)=>assert.equal(JSON.stringify(actual),JSON.stringify(expected),message);
 
 const store=new Map();
 const app={addEventListener(){}};
@@ -52,8 +53,8 @@ assert.equal(finalMorning.instrumentTelemetry?.agreement?.score,91);
 const futureField={schema:1,name:'future-issued-field',nested:{kept:true}};
 const futureRun={...JSON.parse(JSON.stringify(finalMorning)),futureIssuedField:futureField};
 const normalized=api.normalizeRun(futureRun);
-assert.deepEqual(normalized.instrumentTelemetry,finalMorning.instrumentTelemetry,'normalization must preserve issued telemetry exactly');
-assert.deepEqual(normalized.futureIssuedField,futureField,'normalization must preserve unknown future issued fields');
+assertJsonEqual(normalized.instrumentTelemetry,finalMorning.instrumentTelemetry,'normalization must preserve issued telemetry exactly');
+assertJsonEqual(normalized.futureIssuedField,futureField,'normalization must preserve unknown future issued fields');
 assert.equal('prior_runs' in normalized,false,'navigation envelope must not be duplicated into individual cached runs');
 
 const repriced={...JSON.parse(JSON.stringify(futureRun)),comparison:{instrumentTelemetry:{authority:'REPRICE_COMPARISON_ONLY',agreement:{score:1}}},refreshDelta:{matched:1},recs:futureRun.recs.map((r,i)=>i?{...r}:{...r,priceComparison:{state:'MATCHED'}})};
@@ -61,8 +62,8 @@ const stripped=api.withoutComparison(repriced);
 assert.equal(stripped.comparison,undefined,'comparison overlay must be stripped');
 assert.equal(stripped.refreshDelta,undefined,'refresh delta must be stripped');
 assert.equal(stripped.recs[0].priceComparison,undefined,'recommendation price comparison must be stripped');
-assert.deepEqual(stripped.instrumentTelemetry,finalMorning.instrumentTelemetry,'issued telemetry must never be stripped with comparison data');
-assert.deepEqual(stripped.futureIssuedField,futureField,'unknown issued fields must survive overlay stripping');
+assertJsonEqual(stripped.instrumentTelemetry,finalMorning.instrumentTelemetry,'issued telemetry must never be stripped with comparison data');
+assertJsonEqual(stripped.futureIssuedField,futureField,'unknown issued fields must survive overlay stripping');
 assert.doesNotMatch(runtimeSource,/^\s*instrumentTelemetry:buildInstrumentTelemetry\(recs,feed\),\s*$/m,'REPRICE must not overwrite root issued telemetry');
 assert.match(runtimeSource,/comparison:\{[^\n]*instrumentTelemetry:buildInstrumentTelemetry\(recs,feed\)/,'comparison telemetry may live only inside the transient comparison overlay');
 
@@ -86,11 +87,11 @@ assert.equal(returned0930.ts,finalMorning.ts);
 assert.equal(returned0930.instrumentTelemetry?.heat?.value,17);
 assert.equal(returned0930.instrumentTelemetry?.pressure?.value,52);
 assert.equal(returned0930.instrumentTelemetry?.agreement?.score,91);
-assert.deepEqual(returned0930.instrumentTelemetry,finalMorning.instrumentTelemetry,'09:30 -> 08:00 -> 06:00 -> 09:30 must restore the exact issued receipt');
+assertJsonEqual(returned0930.instrumentTelemetry,finalMorning.instrumentTelemetry,'09:30 -> 08:00 -> 06:00 -> 09:30 must restore the exact issued receipt');
 
 store.set('bettingEdge.runnerHistory.v1.4',JSON.stringify([contaminated]));
 const catalogWins=api.newestSessionRun(selected0600,'09:30');
-assert.deepEqual(catalogWins.instrumentTelemetry,finalMorning.instrumentTelemetry,'canonical in-memory issued run must outrank a damaged local duplicate');
+assertJsonEqual(catalogWins.instrumentTelemetry,finalMorning.instrumentTelemetry,'canonical in-memory issued run must outrank a damaged local duplicate');
 
 const synthetic=(slot,label,ts,heat,pressure,agreement)=>{
   const run=api.normalizeRun({...futureRun,slot,label,ts});
@@ -104,10 +105,10 @@ api.rememberIssuedRun(run1515);
 api.rememberIssuedRun(run1815);
 const picked1515=api.newestSessionRun(run1815,'15:15');
 assert.equal(picked1515.instrumentTelemetry.heat.value,44,'15:15 must use the same issued-session preservation rule');
-assert.deepEqual(picked1515.futureIssuedField,{slot:'evening',kept:true});
+assertJsonEqual(picked1515.futureIssuedField,{slot:'evening',kept:true},'15:15 unknown issued fields must survive');
 const returned1815=api.newestSessionRun(picked1515,'18:15');
 assert.equal(returned1815.instrumentTelemetry.heat.value,57,'18:15 must use the same issued-session preservation rule');
-assert.deepEqual(returned1815.futureIssuedField,{slot:'late',kept:true});
+assertJsonEqual(returned1815.futureIssuedField,{slot:'late',kept:true},'18:15 unknown issued fields must survive');
 
 assert.equal(api.telemetryIntegrityState(main0800),'LEGACY','08:00 remains exempt before the cutover');
 assert.equal(api.telemetryIntegrityState(finalMorning),'VALID','09:30 publisher-bound receipt must validate');
@@ -121,6 +122,6 @@ assert.equal(api.marketState(contaminated).label,'TELEMETRY INTEGRITY ERROR');
 
 const recovered=await api.recoverCanonicalIssuedRun(contaminated);
 assert.ok(recovered,'damaged post-cutover URL/session payload should recover from the canonical archive when available');
-assert.deepEqual(recovered.instrumentTelemetry,finalMorning.instrumentTelemetry,'archive recovery must restore the exact publisher-bound receipt');
+assertJsonEqual(recovered.instrumentTelemetry,finalMorning.instrumentTelemetry,'archive recovery must restore the exact publisher-bound receipt');
 
 console.log(JSON.stringify({state:'PASS',sequence:'09:30 -> 08:00 -> 06:00 -> 09:30',meters:{heat:returned0930.instrumentTelemetry.heat.value,pressure:returned0930.instrumentTelemetry.pressure.value,agreement:returned0930.instrumentTelemetry.agreement.score},futureSlots:['15:15','18:15'],cache:'v1.4',archiveRecovery:'PASS'},null,2));
