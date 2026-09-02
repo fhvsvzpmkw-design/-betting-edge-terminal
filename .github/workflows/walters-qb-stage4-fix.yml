@@ -32,33 +32,38 @@ jobs:
           path = Path("tools/build-walters-qb-performance-stage4.py")
           text = path.read_text(encoding="utf-8")
 
-          old = '''    if isinstance(value, list):
-              return [canonical_payload(item) for item in value]
-          return value
-          '''
-          new = '''    if isinstance(value, list):
-              return [canonical_payload(item) for item in value]
-          # JavaScript JSON has a single numeric type and serializes integral values
-          # without a trailing decimal. Normalize Python floats the same way so the
-          # independent Node validator reproduces every canonical hash exactly.
-          if isinstance(value, float) and math.isfinite(value) and value.is_integer():
-              return int(value)
-          return value
-          '''
+          old = "\n".join([
+              "    if isinstance(value, list):",
+              "        return [canonical_payload(item) for item in value]",
+              "    return value",
+              "",
+          ])
+          new = "\n".join([
+              "    if isinstance(value, list):",
+              "        return [canonical_payload(item) for item in value]",
+              "    # JavaScript JSON has a single numeric type and serializes integral values",
+              "    # without a trailing decimal. Normalize Python floats the same way so the",
+              "    # independent Node validator reproduces every canonical hash exactly.",
+              "    if isinstance(value, float) and math.isfinite(value) and value.is_integer():",
+              "        return int(value)",
+              "    return value",
+              "",
+          ])
           if old not in text:
               raise SystemExit("Canonicalization patch anchor not found")
           text = text.replace(old, new, 1)
 
           anchor = "def recursive_market_true(value: Any) -> bool:\n"
-          helper = '''def sanitize_shadow_text(value: Any) -> str:
-              """Keep source meaning while preventing future authority tokens from entering evidence outputs."""
-              return str(value or "").replace(
-                  "APPROVED_WALTERS_QB_PERFORMANCE",
-                  "GOVERNED_QB_PERFORMANCE_AUTHORITY",
-              )
-
-
-          '''
+          helper = "\n".join([
+              "def sanitize_shadow_text(value: Any) -> str:",
+              "    \"\"\"Keep source meaning while preventing future authority tokens from entering evidence outputs.\"\"\"",
+              "    return str(value or \"\").replace(",
+              "        \"APPROVED_WALTERS_QB_PERFORMANCE\",",
+              "        \"GOVERNED_QB_PERFORMANCE_AUTHORITY\",",
+              "    )",
+              "",
+              "",
+          ])
           if anchor not in text:
               raise SystemExit("Evidence sanitizer anchor not found")
           text = text.replace(anchor, helper + anchor, 1)
