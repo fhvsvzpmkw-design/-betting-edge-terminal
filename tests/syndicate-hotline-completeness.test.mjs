@@ -12,7 +12,7 @@ const required={
 'eddie-numbers':['MUDDY NUMBERS','LEDGER DESK','ACTUAL CAD DOLLARS','MUDDY LEDGER // LAST 10 TICKETS','<canvas','MUDDY METERS','THE WALK TO THE CAGE','EDDIE:'],
 'bill-weston':['Last-Session Reconciliation','Change Memo','Current Window Entries','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Today's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
-'jesse-bains':['Sports Desk','HOTEL DELPHORIA','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
+'jesse-bains':['Sports Desk','Hotel Delphoria','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
 'lou-vega':['LATE-NIGHT MENU','COUPON BOOK','BEST NUMBER IN TOWN','FLOOR WALK','PROGRESSIVE WATCH','VIDEO POKER CHECK','TWO-SLICE DINNER','TIP THE WAITRESS','PARKING LOT COUPON','LAST STOP']};
 for(const profile of roster){
  const id=profile.characterId;if(!required[id])continue;
