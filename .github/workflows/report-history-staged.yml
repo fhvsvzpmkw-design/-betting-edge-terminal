@@ -54,6 +54,10 @@ jobs:
           fs.writeFileSync('/tmp/report.json', JSON.stringify(bundle.report, null, 2) + '\n');
           fs.writeFileSync('/tmp/sidecar.json', JSON.stringify(bundle.sidecar, null, 2) + '\n');
           NODE
+      - name: Enforce same-day event eligibility
+        run: |
+          node tools/report-event-eligibility.mjs self-test
+          node tools/report-event-eligibility.mjs validate --report /tmp/report.json
       - name: Canonicalize report-derived sidecar fields
         run: |
           node tools/report-sidecar-contract.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
@@ -97,6 +101,7 @@ jobs:
             node tools/report-publication.mjs verify
             node tools/core-v14-publication-gate.mjs verify-history
             node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
+            node tools/report-event-eligibility.mjs validate --report /tmp/report.json
             node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
@@ -126,6 +131,7 @@ jobs:
           git reset --hard origin/main
           node tools/report-publication.mjs verify --ts "$REPORT_TS"
           node tools/core-v14-publication-gate.mjs verify-history
+          node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"
           node tools/pinnacle-benchmark-publication-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
       - name: Publication summary
         env:
@@ -141,6 +147,7 @@ jobs:
             echo "- Sidecar: \`$SIDECAR_PATH\`"
             echo "- Index: \`run-history.json\`"
             echo "- Preflight history: passed"
+            echo "- Same-day event eligibility: passed"
             echo "- Core gate: passed"
             echo "- Pinnacle benchmark gate: passed (official, non-executable)"
             echo "- Read-back: passed"
