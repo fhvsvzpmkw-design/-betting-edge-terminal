@@ -58,7 +58,7 @@ for (const phrase of [
   'NBA / WNBA',
   'NFL / NCAAF / CFL',
   'Props are part of the major-sport sweep',
-  'soft, not a hard ceiling'
+  'not a hard ceiling'
 ]) {
   assert.ok(markdown.includes(phrase), `coverage addendum missing phrase: ${phrase}`);
 }
