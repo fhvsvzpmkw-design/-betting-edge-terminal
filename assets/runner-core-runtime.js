@@ -1,17 +1,20 @@
 (()=>{
 const $=s=>document.querySelector(s);
-const HISTORY_KEY='bettingEdge.runnerHistory.v1.3';
-const LEGACY_HISTORY_KEYS=['bettingEdge.runnerHistory.v1.2.5','bettingEdge.runnerHistory.v1.2.4','bettingEdge.runnerHistory.v1.2.3','bettingEdge.runnerHistory.v1.2.2'];
+const HISTORY_KEY='bettingEdge.runnerHistory.v1.4';
+const LEGACY_HISTORY_KEYS=['bettingEdge.runnerHistory.v1.3','bettingEdge.runnerHistory.v1.2.5','bettingEdge.runnerHistory.v1.2.4','bettingEdge.runnerHistory.v1.2.3','bettingEdge.runnerHistory.v1.2.2'];
 const HISTORY_LIMIT=30;
 const FEED_URL='./data/live-odds.json';
 const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
 const VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1';
+const VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00';
+const RUN_HISTORY_URL='./run-history.json';
 const VIG_HEAT_LOW_MAX=20,VIG_HEAT_HIGH_MIN=40,VIG_PRESSURE_ADVERSE_MAX=48,VIG_PRESSURE_FAVORABLE_MIN=52,VIG_AGREEMENT_HIGH_MIN=45;
 let activeRun=null;
 let originalRun=null;
 let refreshBusy=false;
 let statusFilter='ALL';
+const issuedSessionCatalog=new Map();
 
 function deepClone(v){try{return JSON.parse(JSON.stringify(v))}catch(e){return v}}
 function b64u(v){try{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const bin=atob(v);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}catch(e){return null}}
@@ -27,16 +30,38 @@ function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
 function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
 
-function normalizeRun(run){const c=run&&run.counts||{};return {slot:txt(run&&run.slot,''),label:txt(run&&run.label,''),ts:txt(run&&run.ts,''),bankroll:run&&run.bankroll,risk:run&&run.risk,counts:{bet:Number(c.bet)||0,lean:Number(c.lean)||0,wait:Number(c.wait)||0,pass:Number(c.pass)||0},summary:txt(run&&run.summary,''),feedGeneratedAt:txt(run&&run.feedGeneratedAt,''),repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),recs:Array.isArray(run&&run.recs)?run.recs:[]}}
+function normalizeRun(run){
+  const source=withoutComparison(run)||{},c=source.counts||{},out=deepClone(source)||{};
+  out.slot=txt(source.slot,'');
+  out.label=txt(source.label,'');
+  out.ts=txt(source.ts,'');
+  out.bankroll=source.bankroll;
+  out.risk=source.risk;
+  out.counts={bet:Number(c.bet)||0,lean:Number(c.lean)||0,wait:Number(c.wait)||0,pass:Number(c.pass)||0};
+  out.summary=txt(source.summary,'');
+  out.feedGeneratedAt=txt(source.feedGeneratedAt,'');
+  out.repriceBaseLabel=txt(source.repriceBaseLabel,'');
+  out.recs=Array.isArray(source.recs)?deepClone(source.recs):[];
+  // prior_runs is a navigation envelope, not part of the individual issued report.
+  delete out.prior_runs;
+  return out
+}
 function runKey(run){return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].join('|')}
-function safeHistory(){try{const map=new Map();[HISTORY_KEY,...LEGACY_HISTORY_KEYS].forEach(key=>{const raw=localStorage.getItem(key);const parsed=raw?JSON.parse(raw):[];if(Array.isArray(parsed))parsed.forEach(x=>map.set(runKey(x),x))});return [...map.values()]}catch(e){return []}}
-function saveCurrentRun(run){if(!run||run.__error||!run.ts)return;try{const current=normalizeRun(withoutComparison(run)),key=runKey(current);let h=safeHistory().filter(x=>runKey(x)!==key);h.push(current);h.sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));if(h.length>HISTORY_LIMIT)h=h.slice(-HISTORY_LIMIT);localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(e){console.warn('History save failed',e)}}
+function rememberIssuedRun(run,replace=false){
+  if(!run||run.__error||!run.ts)return null;
+  const issued=normalizeRun(run),key=runKey(issued);
+  if(replace||!issuedSessionCatalog.has(key))issuedSessionCatalog.set(key,issued);
+  return deepClone(issuedSessionCatalog.get(key))
+}
+function catalogRuns(){return [...issuedSessionCatalog.values()].map(deepClone)}
+function safeHistory(){try{const map=new Map();const raw=localStorage.getItem(HISTORY_KEY),parsed=raw?JSON.parse(raw):[];if(Array.isArray(parsed))parsed.forEach(x=>map.set(runKey(x),x));return [...map.values()]}catch(e){return []}}
+function saveCurrentRun(run){if(!run||run.__error||!run.ts)return;try{const current=rememberIssuedRun(run)||normalizeRun(run),key=runKey(current);let h=safeHistory().filter(x=>runKey(x)!==key);h.push(current);h.sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));if(h.length>HISTORY_LIMIT)h=h.slice(-HISTORY_LIMIT);localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(e){console.warn('History save failed',e)}}
 function localDateKey(ts){const m=String(ts||'').match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
 function historyFamilyKey(run){const label=txt(run&&run.repriceBaseLabel||run&&run.label||run&&run.slot,'').replace(/\s*\/\/\s*REPRICE\s+\d{1,2}:\d{2}\s*$/i,'').trim();return [localDateKey(run&&run.ts),txt(run&&run.slot,''),label].join('|')}
 function mergedPriorRuns(run){
   const currentKey=runKey(run),day=localDateKey(run.ts),embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];
   const exact=new Map();
-  [...embedded,...safeHistory()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;exact.set(k,normalizeRun(withoutComparison(x)))});
+  [...embedded,...catalogRuns(),...safeHistory()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;if(!exact.has(k))exact.set(k,normalizeRun(x))});
   const grouped=new Map();
   [...exact.values()].forEach(x=>{const k=historyFamilyKey(x),prior=grouped.get(k);if(!prior){grouped.set(k,{...x,snapshotCount:1});return}const newer=String(x.ts||'')>String(prior.ts||'')?x:prior;grouped.set(k,{...newer,snapshotCount:(prior.snapshotCount||1)+1})});
   return [...grouped.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')))
@@ -102,12 +127,44 @@ function fallbackAgreement(run){
   const score=clamp(50+aligned*14+stable*5-conflicted*20);
   return {score,confidence:clamp((signals/Math.max(1,recs.length))*70),pairs:0,source:'REPORT COHESION'}
 }
+function requiresPublisherTelemetry(run){const t=Date.parse(run?.ts),cut=Date.parse(VIG_METER_TELEMETRY_CUTOVER);return Number.isFinite(t)&&Number.isFinite(cut)&&t>=cut}
+function hasPublisherTelemetry(run){
+  const t=run?.instrumentTelemetry;
+  return Boolean(t&&Number(t.schema)===1&&t.authority==='PUBLISHER_BOUND_FEED_V1'&&t.calibrationId===VIG_METER_CALIBRATION_ID&&t.derivedAt&&t.source?.state==='PINNED'&&t.heat&&t.pressure&&t.agreement)
+}
+function telemetryIntegrityState(run){return requiresPublisherTelemetry(run)?(hasPublisherTelemetry(run)?'VALID':'ERROR'):'LEGACY'}
+async function recoverCanonicalIssuedRun(run){
+  if(telemetryIntegrityState(run)!=='ERROR')return null;
+  try{
+    const indexRes=await fetch(`${RUN_HISTORY_URL}?t=${Date.now()}`,{cache:'no-store'});if(!indexRes.ok)return null;
+    const index=await indexRes.json(),entry=(index?.runs||[]).find(x=>String(x?.ts||'')===String(run?.ts||'')&&String(x?.slot||'')===String(run?.slot||''));
+    if(!entry?.path)return null;
+    const reportRes=await fetch(`./${entry.path}?t=${Date.now()}`,{cache:'no-store'});if(!reportRes.ok)return null;
+    const canonical=await reportRes.json();
+    if(String(canonical?.ts||'')!==String(run?.ts||'')||String(canonical?.slot||'')!==String(run?.slot||''))return null;
+    if(telemetryIntegrityState(canonical)!=='VALID')return null;
+    rememberIssuedRun(canonical,true);
+    return normalizeRun(canonical)
+  }catch(e){return null}
+}
+function recoverActiveRunIfNeeded(){
+  const candidate=activeRun;if(!candidate||telemetryIntegrityState(candidate)!=='ERROR')return;
+  recoverCanonicalIssuedRun(candidate).then(recovered=>{
+    if(!recovered||runKey(activeRun)!==runKey(candidate))return;
+    activeRun=recovered;originalRun=deepClone(recovered);saveCurrentRun(recovered);updateRunnerHash(recovered);
+    try{apply(activeRun)}catch(e){console.warn('Canonical run recovery render failed',e)}
+  }).catch(e=>console.warn('Canonical run recovery failed',e))
+}
 function instrumentAgreement(run){return run?.instrumentTelemetry?.agreement||fallbackAgreement(run)}
 function heatLabel(v){return v<15?'DORMANT':v<28?'QUIET':v<40?'FORMING':v<55?'ACTIVE':v<70?'PRESSURED':v<85?'HOT':'EXTREME'}
 function pressureLabel(v){return v<15?'HEAVY AGAINST':v<30?'AGAINST':v<48?'LEAN AGAINST':v<52?'NEUTRAL':v<71?'LEAN FAVORABLE':v<86?'FAVORABLE':'STRONG FAVORABLE'}
 function agreementLabel(v){return v<15?'FRACTURED':v<30?'WIDE':v<45?'MIXED':v<60?'NORMAL':v<75?'TIGHT':v<90?'STRONG':'LOCKSTEP'}
 function agreementEvidenceQuality(confidence){const c=clamp(confidence);return c===0?'UNMEASURED':c<25?'LIMITED':'SUPPORTED'}
 function deriveInstrumentReadings(run){
+  if(telemetryIntegrityState(run)==='ERROR'){
+    const failure={value:0,rawValue:0,label:'INTEGRITY ERROR',confidence:0};
+    return {heat:{...failure},pressure:{...failure},agreement:{...failure,rawConfidence:0,evidenceQuality:'INTEGRITY ERROR',pairs:0}}
+  }
   const recs=Array.isArray(run?.recs)?run.recs:[],signals=recs.map(r=>({...moveSignal(r),weight:recWeight(r)}));
   const weighted=signals.reduce((n,x)=>n+x.weight,0)||1;
   const fav=signals.reduce((n,x)=>n+x.favor*x.weight,0)/weighted;
@@ -199,7 +256,7 @@ function compareRec(rec,feed,run){
   out.priceComparison={state:'MATCHED',movement,book:q.book,price:americanText(q.dec),updatedAt:q.updatedAt||feed.generatedAt,checkedAt:feed.generatedAt,method:result.method};
   return {rec:out,matched:true,reason:'',retained:false,movement}
 }
-function withoutComparison(run){const out=deepClone(run);if(!out)return out;delete out.comparison;delete out.refreshDelta;delete out.instrumentTelemetry;out.recs=(out.recs||[]).map(r=>{const x={...r};delete x.priceComparison;return x});return out}
+function withoutComparison(run){const out=deepClone(run);if(!out)return out;delete out.comparison;delete out.refreshDelta;out.recs=(out.recs||[]).map(r=>{const x={...r};delete x.priceComparison;return x});return out}
 function feedAgeMinutes(feed){const t=Date.parse(feed?.generatedAt);return Number.isFinite(t)?(Date.now()-t)/60000:Infinity}
 function restoreOriginal(){if(!originalRun)return;activeRun=withoutComparison(originalRun);originalRun=deepClone(activeRun);statusFilter='ALL';updateRunnerHash(activeRun);apply(activeRun)}
 
@@ -240,9 +297,8 @@ async function refreshAndReprice(statusEl,button){
     const now=vancouverIso();
     const reasonText=Object.entries(reasons).map(([k,v])=>`${v} ${k}`).join('; ');
     activeRun={...deepClone(issued),
-      comparison:{checkedAt:now,feedGeneratedAt:feed.generatedAt,schema:feed.schema||1,matched,retained,reasonText},
+      comparison:{checkedAt:now,feedGeneratedAt:feed.generatedAt,schema:feed.schema||1,matched,retained,reasonText,instrumentTelemetry:buildInstrumentTelemetry(recs,feed)},
       refreshDelta:{matched,retained,improved,worsened,unchanged},
-      instrumentTelemetry:buildInstrumentTelemetry(recs,feed),
       recs
     };
     updateRunnerHash(activeRun);
@@ -424,6 +480,7 @@ function instrumentGauge(d,title,type,reading){
 }
 function instrumentCluster(d,run){const r=deriveInstrumentReadings(run),cluster=el(d,'div','instrumentCluster');cluster.append(instrumentGauge(d,'MARKET HEAT','heat',r.heat),instrumentGauge(d,'PRICE PRESSURE','pressure',r.pressure),instrumentGauge(d,'MARKET AGREEMENT','agreement',r.agreement));return cluster}
 function marketState(run){
+  if(telemetryIntegrityState(run)==='ERROR')return {emoji:'🔴',label:'TELEMETRY INTEGRITY ERROR',agreementState:'ERROR',agreementRender:'ERROR'};
   const r=deriveInstrumentReadings(run);
   const h=r.heat.rawValue??r.heat.value,p=r.pressure.rawValue??r.pressure.value,a=r.agreement.rawValue??r.agreement.value;
   const agreementConfidence=r.agreement.rawConfidence??r.agreement.confidence;
@@ -491,12 +548,12 @@ function sessionWindowApplicable(key,day,now=new Date()){
 function sessionRuns(run){
   const day=localDateKey(run?.ts),map=new Map();
   const embedded=Array.isArray(run?.prior_runs)?run.prior_runs:[];
-  [run,...embedded,...safeHistory()].forEach(x=>{
+  [run,...catalogRuns(),...embedded,...safeHistory()].forEach(x=>{
     const key=sessionKey(x);
     if(!x||x.__error||!key)return;
     if(day&&localDateKey(x.ts)!==day)return;
     if(day&&!sessionWindowApplicable(key,day))return;
-    map.set(runKey(x),normalizeRun(withoutComparison(x)))
+    const k=runKey(x);if(!map.has(k))map.set(k,normalizeRun(x))
   });
   return [...map.values()]
 }
@@ -516,11 +573,12 @@ function isLatestSessionRun(run){
 function selectSession(run,key){
   const selected=newestSessionRun(run,key);if(!selected)return;
   saveCurrentRun(activeRun);
-  activeRun=withoutComparison(selected);
+  activeRun=normalizeRun(selected);
   originalRun=deepClone(activeRun);
   statusFilter='ALL';
   updateRunnerHash(activeRun);
-  apply(activeRun)
+  apply(activeRun);
+  recoverActiveRunIfNeeded()
 }
 function sessionStrip(d,run){
   const strip=el(d,'div','sessionStrip');
@@ -732,9 +790,12 @@ function apply(run){
 
 activeRun=payload();
 if(activeRun&&!activeRun.__error){
-  originalRun=withoutComparison(activeRun);
+  rememberIssuedRun(activeRun);
+  (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(x=>rememberIssuedRun(x));
+  originalRun=normalizeRun(activeRun);
   (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(saveCurrentRun);
-  saveCurrentRun(originalRun)
+  saveCurrentRun(originalRun);
+  recoverActiveRunIfNeeded()
 }
 $('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='VigScope runner error: '+e.message;x.style.display='block';console.error(e)}});
 })();
