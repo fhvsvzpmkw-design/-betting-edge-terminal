@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3c-holdout-audit-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3C",
+  "status": "PASS",
+  "generatedFromSourceCapturedAt": "2026-09-02T13:05:41-07:00",
+  "contract": "data/walters/nfl/qb-performance/stage3c-contract-v1.json",
+  "model": "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+  "candidates": "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+  "chronology": {
+    "sourceSeasons": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "modelFitSeasonsForTuning": [
+      2022,
+      2023
+    ],
+    "tuningSeason": 2024,
+    "finalFitSeasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "untouchedHoldoutSeason": 2025,
+    "candidateAsOf": "END_OF_2025_REGULAR_SEASON",
+    "candidateForSeason": 2026,
+    "rule": "No 2025 target or metric may influence configuration selection, feature scaling, coefficient estimation or acceptance thresholds."
+  },
+  "selectedConfiguration": {
+    "longTermCompletedSeasons": 2,
+    "shortTermQualifiedGames": 8,
+    "featurePriorEquivalentDropbacks": 100.0,
+    "ridgeAlpha": 0.05
+  },
+  "holdoutMetrics": {
+    "sampleCount": 501,
+    "mae": 0.22871352,
+    "rmse": 0.29090599,
+    "pearson": 0.1850103,
+    "spearman": 0.19846767,
+    "topQuintileTargetMean": 0.12898656,
+    "bottomQuintileTargetMean": -0.01323194,
+    "topMinusBottomQuintileTargetGap": 0.1422185,
+    "directionalAccuracy": 0.57285429,
+    "calibrationSlope": 0.61326166,
+    "leagueMeanBaseline": {
+      "prediction": 0.04536747,
+      "mae": 0.23147638,
+      "rmse": 0.29408946
+    },
+    "recentAdjustedEpaBaseline": {
+      "mae": 0.22522778,
+      "rmse": 0.28819931
+    },
+    "rmseToLeagueMeanRatio": 0.98917518,
+    "maeToLeagueMeanRatio": 0.98806419,
+    "rmseToRecentAdjustedEpaRatio": 1.00939171
+  },
+  "familyWeights": {
+    "rawByFamily": {
+      "passer_rating": 0.038188849611,
+      "yards_per_attempt": 0.031762414995,
+      "interception_rate": 0.0,
+      "sack_rate": 0.049370177311,
+      "fumble_rate": 0.001423200108,
+      "qb_rushing_value": 0.044880165421
+    },
+    "shareByFamily": {
+      "passer_rating": 0.23057445,
+      "yards_per_attempt": 0.19177329,
+      "interception_rate": 0.0,
+      "sack_rate": 0.29808444,
+      "fumble_rate": 0.00859292,
+      "qb_rushing_value": 0.2709749
+    },
+    "activeFamiliesAtOnePercent": [
+      "passer_rating",
+      "yards_per_attempt",
+      "sack_rate",
+      "qb_rushing_value"
+    ],
+    "activeFamilyCount": 4,
+    "maximumSingleFamilyShare": 0.29808444
+  },
+  "candidateSummary": {
+    "playerCount": 109,
+    "top67Count": 67,
+    "experiencedTop67Count": 53,
+    "statusCounts": {
+      "BLOCKED_INSUFFICIENT_QB_SAMPLE": 54,
+      "STAGE3_CANDIDATE_NON_OPERATIONAL": 55
+    },
+    "top67CandidateMean": 7.64746269,
+    "top67CandidateMinimum": 6.0,
+    "top67CandidateMaximum": 9.5,
+    "maximumAbsoluteCandidateMove": 0.75,
+    "medianAbsoluteCandidateMove": 0.0,
+    "allWithinScale": true,
+    "allWithinMoveCap": true
+  },
+  "checks": [
+    {
+      "id": "QBP3C-HOLDOUT-SAMPLE",
+      "actual": 501,
+      "expectedMinimum": 350,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-RMSE-LEAGUE-NONINFERIOR",
+      "actual": 0.98917518,
+      "expectedMaximum": 1.01,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-MAE-LEAGUE-NONINFERIOR",
+      "actual": 0.98806419,
+      "expectedMaximum": 1.01,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-RMSE-RECENT-EPA-NONINFERIOR",
+      "actual": 1.00939171,
+      "expectedMaximum": 1.05,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-PEARSON",
+      "actual": 0.1850103,
+      "expectedMinimum": 0.06,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-SPEARMAN",
+      "actual": 0.19846767,
+      "expectedMinimum": 0.06,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-QUINTILE-SEPARATION",
+      "actual": 0.1422185,
+      "expectedMinimum": 0.025,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-DIRECTIONAL-ACCURACY",
+      "actual": 0.57285429,
+      "expectedMinimum": 0.5,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-ACTIVE-FAMILIES",
+      "actual": 4,
+      "expectedMinimum": 2,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-FAMILY-CONCENTRATION",
+      "actual": 0.29808444,
+      "expectedMaximum": 0.8,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-EXPERIENCED-TOP67",
+      "actual": 53,
+      "expectedMinimum": 45,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-CANDIDATE-MEAN",
+      "actual": 7.64746269,
+      "expectedRange": [
+        7.4,
+        8.1
+      ],
+      "pass": true
+    },
+    {
+      "id": "QBP3C-CANDIDATE-BOUNDS",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-CANDIDATE-MOVE-CAP",
+      "actual": 0.75,
+      "expectedMaximum": 0.75,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-DETERMINISM",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-FEATURE-SIGNS",
+      "actual": 0.0,
+      "expectedMinimum": 0.0,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-PROTECTED-ARTIFACTS",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3C-MARKET-ISOLATION",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    }
+  ],
+  "protectedArtifactSha256Before": {
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca"
+  },
+  "protectedArtifactSha256After": {
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca"
+  },
+  "protectedArtifactsUnchanged": true,
+  "weightsEstimated": true,
+  "candidateQbValuesCreated": true,
+  "candidateValuesOperational": false,
+  "grahamFairNumbersChanged": false,
+  "embeddedQbBaselinesChanged": false,
+  "uncertaintyOverlaysRetired": false,
+  "productionAuthority": false,
+  "marketViewed": false,
+  "nextSubstage": "STAGE3D_CANDIDATE_FREEZE_AND_STAGE3_ACCEPTANCE",
+  "contentSha256Canonical": "bcee9620a6619ec640da6e29d7fae2d3656cc14afb08ce3bf385f363f82b666e"
+}

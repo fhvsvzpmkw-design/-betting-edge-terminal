@@ -1,0 +1,831 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3c-model-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3C",
+  "status": "HOLDOUT_VALIDATED_NON_OPERATIONAL",
+  "generatedFromSourceCapturedAt": "2026-09-02T13:05:41-07:00",
+  "contract": "data/walters/nfl/qb-performance/stage3c-contract-v1.json",
+  "stage3BAudit": "data/walters/nfl/qb-performance/stage3b-audit-v1.json",
+  "weeklyEvidence": {
+    "path": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+    "sha256": "76298dc3b31bbe70508e94996e51c391648954b5dc9e32dd8a48e8568f899a5c",
+    "rowCount": 3279,
+    "fieldCount": 36
+  },
+  "selectedConfiguration": {
+    "longTermCompletedSeasons": 2,
+    "shortTermQualifiedGames": 8,
+    "featurePriorEquivalentDropbacks": 100.0,
+    "ridgeAlpha": 0.05
+  },
+  "selectionTuningSeason": 2024,
+  "configurationCountEvaluated": 135,
+  "selectedTuningMetrics": {
+    "sampleCount": 524,
+    "mae": 0.22348677,
+    "rmse": 0.2807449,
+    "pearson": 0.35856136,
+    "spearman": 0.33736538,
+    "topQuintileTargetMean": 0.22180288,
+    "bottomQuintileTargetMean": -0.08596656,
+    "topMinusBottomQuintileTargetGap": 0.30776944,
+    "directionalAccuracy": 0.60877863,
+    "calibrationSlope": 1.2341592,
+    "leagueMeanBaseline": {
+      "prediction": 0.0372686,
+      "mae": 0.23516971,
+      "rmse": 0.30034863
+    },
+    "recentAdjustedEpaBaseline": {
+      "mae": 0.22239035,
+      "rmse": 0.28314022
+    },
+    "rmseToLeagueMeanRatio": 0.93473007,
+    "maeToLeagueMeanRatio": 0.95032126,
+    "rmseToRecentAdjustedEpaRatio": 0.99154017
+  },
+  "finalFitSeasons": [
+    2022,
+    2023,
+    2024
+  ],
+  "holdoutSeason": 2025,
+  "fitSampleCount": 1507,
+  "holdoutSampleCount": 501,
+  "featureNames": [
+    "long_passer_rating",
+    "long_yards_per_attempt",
+    "long_interception_rate",
+    "long_sack_rate",
+    "long_fumble_rate",
+    "long_qb_rushing_value",
+    "short_passer_rating",
+    "short_yards_per_attempt",
+    "short_interception_rate",
+    "short_sack_rate",
+    "short_fumble_rate",
+    "short_qb_rushing_value"
+  ],
+  "metricCenters": {
+    "passer_rating": 90.670170134983,
+    "yards_per_attempt": 7.084237907762,
+    "interception_rate": 0.022581552306,
+    "sack_rate": 0.066801380378,
+    "fumble_rate": 0.013895631864,
+    "qb_rushing_value": 0.501200614085
+  },
+  "featureScaler": {
+    "means": [
+      91.655242048386,
+      7.174131869916,
+      0.022285798501,
+      0.065990235785,
+      0.014048246389,
+      0.514876494968,
+      91.375523326669,
+      7.139873717683,
+      0.022006326112,
+      0.06765235653,
+      0.013854242057,
+      0.521174108565
+    ],
+    "scales": [
+      7.270386221078,
+      0.511137417408,
+      0.005187233565,
+      0.015793396435,
+      0.005301673101,
+      0.396738747063,
+      7.981149636805,
+      0.591155983005,
+      0.006728299888,
+      0.016996490226,
+      0.006098771231,
+      0.368325767327
+    ]
+  },
+  "intercept": 0.045367467989,
+  "weights": {
+    "long_passer_rating": 0.013824758557,
+    "long_yards_per_attempt": 0.004277999524,
+    "long_interception_rate": 0.0,
+    "long_sack_rate": 0.035649080626,
+    "long_fumble_rate": 0.0,
+    "long_qb_rushing_value": 0.032172252051,
+    "short_passer_rating": 0.024364091054,
+    "short_yards_per_attempt": 0.027484415471,
+    "short_interception_rate": 0.0,
+    "short_sack_rate": 0.013721096685,
+    "short_fumble_rate": 0.001423200108,
+    "short_qb_rushing_value": 0.012707913371
+  },
+  "familyWeights": {
+    "rawByFamily": {
+      "passer_rating": 0.038188849611,
+      "yards_per_attempt": 0.031762414995,
+      "interception_rate": 0.0,
+      "sack_rate": 0.049370177311,
+      "fumble_rate": 0.001423200108,
+      "qb_rushing_value": 0.044880165421
+    },
+    "shareByFamily": {
+      "passer_rating": 0.23057445,
+      "yards_per_attempt": 0.19177329,
+      "interception_rate": 0.0,
+      "sack_rate": 0.29808444,
+      "fumble_rate": 0.00859292,
+      "qb_rushing_value": 0.2709749
+    },
+    "activeFamiliesAtOnePercent": [
+      "passer_rating",
+      "yards_per_attempt",
+      "sack_rate",
+      "qb_rushing_value"
+    ],
+    "activeFamilyCount": 4,
+    "maximumSingleFamilyShare": 0.29808444
+  },
+  "solver": {
+    "family": "DETERMINISTIC_NONNEGATIVE_COORDINATE_DESCENT",
+    "iterations": 66,
+    "converged": true,
+    "deterministicRefit": true
+  },
+  "holdoutMetrics": {
+    "sampleCount": 501,
+    "mae": 0.22871352,
+    "rmse": 0.29090599,
+    "pearson": 0.1850103,
+    "spearman": 0.19846767,
+    "topQuintileTargetMean": 0.12898656,
+    "bottomQuintileTargetMean": -0.01323194,
+    "topMinusBottomQuintileTargetGap": 0.1422185,
+    "directionalAccuracy": 0.57285429,
+    "calibrationSlope": 0.61326166,
+    "leagueMeanBaseline": {
+      "prediction": 0.04536747,
+      "mae": 0.23147638,
+      "rmse": 0.29408946
+    },
+    "recentAdjustedEpaBaseline": {
+      "mae": 0.22522778,
+      "rmse": 0.28819931
+    },
+    "rmseToLeagueMeanRatio": 0.98917518,
+    "maeToLeagueMeanRatio": 0.98806419,
+    "rmseToRecentAdjustedEpaRatio": 1.00939171
+  },
+  "topTuningConfigurations": [
+    {
+      "rank": 1,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 100.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22348677,
+        "rmse": 0.2807449,
+        "pearson": 0.35856136,
+        "spearman": 0.33736538,
+        "topQuintileTargetMean": 0.22180288,
+        "bottomQuintileTargetMean": -0.08596656,
+        "topMinusBottomQuintileTargetGap": 0.30776944,
+        "directionalAccuracy": 0.60877863,
+        "calibrationSlope": 1.2341592,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93473007,
+        "maeToLeagueMeanRatio": 0.95032126,
+        "rmseToRecentAdjustedEpaRatio": 0.99154017
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.01797286315,
+          "yards_per_attempt": 0.044303292716,
+          "interception_rate": 0.003294169489,
+          "sack_rate": 0.043053853096,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.036835878068
+        },
+        "shareByFamily": {
+          "passer_rating": 0.12355875,
+          "yards_per_attempt": 0.3045736,
+          "interception_rate": 0.02264656,
+          "sack_rate": 0.29598403,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.25323707
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.3045736
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 2,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 100.0,
+        "ridgeAlpha": 0.1
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22345315,
+        "rmse": 0.2808231,
+        "pearson": 0.35990755,
+        "spearman": 0.33864197,
+        "topQuintileTargetMean": 0.22350438,
+        "bottomQuintileTargetMean": -0.08705681,
+        "topMinusBottomQuintileTargetGap": 0.3105612,
+        "directionalAccuracy": 0.61068702,
+        "calibrationSlope": 1.27773123,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93499045,
+        "maeToLeagueMeanRatio": 0.95017826,
+        "rmseToRecentAdjustedEpaRatio": 0.99181636
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.020526373466,
+          "yards_per_attempt": 0.040979601904,
+          "interception_rate": 0.00254339015,
+          "sack_rate": 0.041108011896,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.035346875328
+        },
+        "shareByFamily": {
+          "passer_rating": 0.14609076,
+          "yards_per_attempt": 0.29166094,
+          "interception_rate": 0.01810187,
+          "sack_rate": 0.29257486,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.25157157
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.29257486
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 3,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 250.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22389727,
+        "rmse": 0.28097649,
+        "pearson": 0.35657339,
+        "spearman": 0.33759837,
+        "topQuintileTargetMean": 0.22033445,
+        "bottomQuintileTargetMean": -0.08095054,
+        "topMinusBottomQuintileTargetGap": 0.30128499,
+        "directionalAccuracy": 0.61259542,
+        "calibrationSlope": 1.23198595,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93550114,
+        "maeToLeagueMeanRatio": 0.95206679,
+        "rmseToRecentAdjustedEpaRatio": 0.9923581
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.016750933774,
+          "yards_per_attempt": 0.045055949588,
+          "interception_rate": 0.002991771443,
+          "sack_rate": 0.042815102435,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.036178827801
+        },
+        "shareByFamily": {
+          "passer_rating": 0.11649372,
+          "yards_per_attempt": 0.31333987,
+          "interception_rate": 0.02080616,
+          "sack_rate": 0.29775598,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.25160427
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.31333987
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 4,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 250.0,
+        "ridgeAlpha": 0.1
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22382778,
+        "rmse": 0.28103376,
+        "pearson": 0.35817345,
+        "spearman": 0.33846294,
+        "topQuintileTargetMean": 0.22004431,
+        "bottomQuintileTargetMean": -0.0771672,
+        "topMinusBottomQuintileTargetGap": 0.29721152,
+        "directionalAccuracy": 0.61450382,
+        "calibrationSlope": 1.27807281,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93569185,
+        "maeToLeagueMeanRatio": 0.95177131,
+        "rmseToRecentAdjustedEpaRatio": 0.99256039
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.019682193977,
+          "yards_per_attempt": 0.041484011789,
+          "interception_rate": 0.002303009326,
+          "sack_rate": 0.040751322744,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.034788329384
+        },
+        "shareByFamily": {
+          "passer_rating": 0.14158949,
+          "yards_per_attempt": 0.29842709,
+          "interception_rate": 0.01656736,
+          "sack_rate": 0.29315628,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.25025979
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.29842709
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 5,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 6,
+        "featurePriorEquivalentDropbacks": 100.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22367226,
+        "rmse": 0.28110666,
+        "pearson": 0.35801151,
+        "spearman": 0.33801456,
+        "topQuintileTargetMean": 0.23094829,
+        "bottomQuintileTargetMean": -0.08066778,
+        "topMinusBottomQuintileTargetGap": 0.31161607,
+        "directionalAccuracy": 0.60496183,
+        "calibrationSlope": 1.2777011,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22461127,
+          "rmse": 0.28512994
+        },
+        "rmseToLeagueMeanRatio": 0.93593454,
+        "maeToLeagueMeanRatio": 0.95111001,
+        "rmseToRecentAdjustedEpaRatio": 0.98588967
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.020198427902,
+          "yards_per_attempt": 0.043433886651,
+          "interception_rate": 0.0,
+          "sack_rate": 0.041316064404,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.03788830204
+        },
+        "shareByFamily": {
+          "passer_rating": 0.14140925,
+          "yards_per_attempt": 0.30408076,
+          "interception_rate": 0.0,
+          "sack_rate": 0.28925388,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.26525611
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 4,
+        "maximumSingleFamilyShare": 0.30408076
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 6,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 500.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22414078,
+        "rmse": 0.28112856,
+        "pearson": 0.35521064,
+        "spearman": 0.33807082,
+        "topQuintileTargetMean": 0.21765273,
+        "bottomQuintileTargetMean": -0.08128233,
+        "topMinusBottomQuintileTargetGap": 0.29893506,
+        "directionalAccuracy": 0.61259542,
+        "calibrationSlope": 1.23292932,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93600746,
+        "maeToLeagueMeanRatio": 0.95310226,
+        "rmseToRecentAdjustedEpaRatio": 0.99289519
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.016515681552,
+          "yards_per_attempt": 0.045092146234,
+          "interception_rate": 0.002900571051,
+          "sack_rate": 0.042477945295,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.035605866724
+        },
+        "shareByFamily": {
+          "passer_rating": 0.11582457,
+          "yards_per_attempt": 0.31623148,
+          "interception_rate": 0.02034172,
+          "sack_rate": 0.29789808,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.24970415
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.31623148
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 7,
+      "configuration": {
+        "longTermCompletedSeasons": 2,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 500.0,
+        "ridgeAlpha": 0.1
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22405086,
+        "rmse": 0.28117259,
+        "pearson": 0.35700357,
+        "spearman": 0.33906133,
+        "topQuintileTargetMean": 0.20730498,
+        "bottomQuintileTargetMean": -0.07419511,
+        "topMinusBottomQuintileTargetGap": 0.28150009,
+        "directionalAccuracy": 0.61259542,
+        "calibrationSlope": 1.28071564,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93615405,
+        "maeToLeagueMeanRatio": 0.95271987,
+        "rmseToRecentAdjustedEpaRatio": 0.99305069
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.019599277729,
+          "yards_per_attempt": 0.041422679691,
+          "interception_rate": 0.002234187118,
+          "sack_rate": 0.040373825727,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.034264457653
+        },
+        "shareByFamily": {
+          "passer_rating": 0.14213249,
+          "yards_per_attempt": 0.30039415,
+          "interception_rate": 0.01620216,
+          "sack_rate": 0.29278794,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.24848326
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.30039415
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 8,
+      "configuration": {
+        "longTermCompletedSeasons": 4,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 500.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22403442,
+        "rmse": 0.28122235,
+        "pearson": 0.35296589,
+        "spearman": 0.33380078,
+        "topQuintileTargetMean": 0.19989827,
+        "bottomQuintileTargetMean": -0.06910554,
+        "topMinusBottomQuintileTargetGap": 0.26900381,
+        "directionalAccuracy": 0.62977099,
+        "calibrationSlope": 1.22936584,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93631973,
+        "maeToLeagueMeanRatio": 0.95264997,
+        "rmseToRecentAdjustedEpaRatio": 0.99322644
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.016515681552,
+          "yards_per_attempt": 0.045092146234,
+          "interception_rate": 0.002900571051,
+          "sack_rate": 0.042477945295,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.035605866724
+        },
+        "shareByFamily": {
+          "passer_rating": 0.11582457,
+          "yards_per_attempt": 0.31623148,
+          "interception_rate": 0.02034172,
+          "sack_rate": 0.29789808,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.24970415
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.31623148
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 9,
+      "configuration": {
+        "longTermCompletedSeasons": 3,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 500.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22403442,
+        "rmse": 0.28122235,
+        "pearson": 0.35296589,
+        "spearman": 0.33380078,
+        "topQuintileTargetMean": 0.19989827,
+        "bottomQuintileTargetMean": -0.06910554,
+        "topMinusBottomQuintileTargetGap": 0.26900381,
+        "directionalAccuracy": 0.62977099,
+        "calibrationSlope": 1.22936584,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93631973,
+        "maeToLeagueMeanRatio": 0.95264997,
+        "rmseToRecentAdjustedEpaRatio": 0.99322644
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.016515681552,
+          "yards_per_attempt": 0.045092146234,
+          "interception_rate": 0.002900571051,
+          "sack_rate": 0.042477945295,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.035605866724
+        },
+        "shareByFamily": {
+          "passer_rating": 0.11582457,
+          "yards_per_attempt": 0.31623148,
+          "interception_rate": 0.02034172,
+          "sack_rate": 0.29789808,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.24970415
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.31623148
+      },
+      "tuningEligible": true
+    },
+    {
+      "rank": 10,
+      "configuration": {
+        "longTermCompletedSeasons": 4,
+        "shortTermQualifiedGames": 8,
+        "featurePriorEquivalentDropbacks": 100.0,
+        "ridgeAlpha": 0.05
+      },
+      "fitSampleCount": 983,
+      "tuningSampleCount": 524,
+      "tuningMetrics": {
+        "sampleCount": 524,
+        "mae": 0.22373566,
+        "rmse": 0.28127666,
+        "pearson": 0.3538328,
+        "spearman": 0.33081088,
+        "topQuintileTargetMean": 0.21035907,
+        "bottomQuintileTargetMean": -0.0886963,
+        "topMinusBottomQuintileTargetGap": 0.29905537,
+        "directionalAccuracy": 0.6278626,
+        "calibrationSlope": 1.25030444,
+        "leagueMeanBaseline": {
+          "prediction": 0.0372686,
+          "mae": 0.23516971,
+          "rmse": 0.30034863
+        },
+        "recentAdjustedEpaBaseline": {
+          "mae": 0.22239035,
+          "rmse": 0.28314022
+        },
+        "rmseToLeagueMeanRatio": 0.93650055,
+        "maeToLeagueMeanRatio": 0.95137958,
+        "rmseToRecentAdjustedEpaRatio": 0.99341825
+      },
+      "familyWeights": {
+        "rawByFamily": {
+          "passer_rating": 0.01797286315,
+          "yards_per_attempt": 0.044303292716,
+          "interception_rate": 0.003294169489,
+          "sack_rate": 0.043053853096,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.036835878068
+        },
+        "shareByFamily": {
+          "passer_rating": 0.12355875,
+          "yards_per_attempt": 0.3045736,
+          "interception_rate": 0.02264656,
+          "sack_rate": 0.29598403,
+          "fumble_rate": 0.0,
+          "qb_rushing_value": 0.25323707
+        },
+        "activeFamiliesAtOnePercent": [
+          "passer_rating",
+          "yards_per_attempt",
+          "interception_rate",
+          "sack_rate",
+          "qb_rushing_value"
+        ],
+        "activeFamilyCount": 5,
+        "maximumSingleFamilyShare": 0.3045736
+      },
+      "tuningEligible": true
+    }
+  ],
+  "candidateCalibration": {
+    "scale": [
+      6.0,
+      9.5
+    ],
+    "anchorDistribution": "Frozen Stage 2 top-67 QB Walters values.",
+    "performanceScaleMethod": "Map the final model score percentile among experienced top-67 quarterbacks onto the sorted frozen top-67 Walters value distribution.",
+    "eaPriorRole": "SHRINKAGE_PRIOR_ONLY",
+    "minimumCandidateEvidenceDropbacks": 100,
+    "maximumPerformanceBlend": 0.65,
+    "maximumAbsoluteMoveFromStage2Prior": 0.75,
+    "candidatePrecision": 0.01,
+    "noCapturedStatsRule": "Retain the Stage 2 prior and emit BLOCKED_INSUFFICIENT_QB_SAMPLE.",
+    "liveAdjustmentFormulaReservedForLaterStages": "approvedStarterValue - embeddedBaselineQbValue",
+    "mayMoveGrahamFair": false,
+    "mayRetireQbUncertainty": false
+  },
+  "productionAuthority": false,
+  "grahamWritesAllowed": false,
+  "marketViewed": false,
+  "contentSha256Canonical": "2416eeea94d409ead00203a141b15325fde759b8dbab30497135cb5bc418b326"
+}

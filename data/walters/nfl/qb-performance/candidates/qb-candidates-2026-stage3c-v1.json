@@ -1,0 +1,4849 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3c-candidates-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3C",
+  "status": "NON_OPERATIONAL_SHADOW_CANDIDATES",
+  "asOf": "END_OF_2025_REGULAR_SEASON",
+  "forSeason": 2026,
+  "model": "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+  "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+  "calibration": {
+    "scale": [
+      6.0,
+      9.5
+    ],
+    "anchorDistribution": "Frozen Stage 2 top-67 QB Walters values.",
+    "performanceScaleMethod": "Map the final model score percentile among experienced top-67 quarterbacks onto the sorted frozen top-67 Walters value distribution.",
+    "eaPriorRole": "SHRINKAGE_PRIOR_ONLY",
+    "minimumCandidateEvidenceDropbacks": 100,
+    "maximumPerformanceBlend": 0.65,
+    "maximumAbsoluteMoveFromStage2Prior": 0.75,
+    "candidatePrecision": 0.01,
+    "noCapturedStatsRule": "Retain the Stage 2 prior and emit BLOCKED_INSUFFICIENT_QB_SAMPLE.",
+    "liveAdjustmentFormulaReservedForLaterStages": "approvedStarterValue - embeddedBaselineQbValue",
+    "mayMoveGrahamFair": false,
+    "mayRetireQbUncertainty": false
+  },
+  "summary": {
+    "playerCount": 109,
+    "top67Count": 67,
+    "experiencedTop67Count": 53,
+    "statusCounts": {
+      "BLOCKED_INSUFFICIENT_QB_SAMPLE": 54,
+      "STAGE3_CANDIDATE_NON_OPERATIONAL": 55
+    },
+    "top67CandidateMean": 7.64746269,
+    "top67CandidateMinimum": 6.0,
+    "top67CandidateMaximum": 9.5,
+    "maximumAbsoluteCandidateMove": 0.75,
+    "medianAbsoluteCandidateMove": 0.0,
+    "allWithinScale": true,
+    "allWithinMoveCap": true
+  },
+  "productionAuthority": false,
+  "grahamWritesAllowed": false,
+  "uncertaintyOverlayRetirementAllowed": false,
+  "marketViewed": false,
+  "players": [
+    {
+      "playerId": "13197",
+      "gsisId": "00-0034857",
+      "playerName": "Josh Allen",
+      "team": "BUF",
+      "maddenOvr": 99,
+      "top67DistributionCohort": true,
+      "priorValue": 9.5,
+      "longTermPerformanceScore": 0.09031025,
+      "shortTermPerformanceScore": 0.0356636,
+      "modelScore": 0.17134131,
+      "performancePercentile": 1.0,
+      "performanceImpliedValue": 9.5,
+      "sampleReliability": 0.9088423,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 9.5,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 32,
+          "attempts": 943,
+          "dropbacks": 997
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 237,
+          "dropbacks": 260
+        },
+        "candidateEvidenceDropbacks": 997
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20051",
+      "gsisId": "00-0026498",
+      "playerName": "Matthew Stafford",
+      "team": "LAR",
+      "maddenOvr": 99,
+      "top67DistributionCohort": true,
+      "priorValue": 9.5,
+      "longTermPerformanceScore": 0.03127704,
+      "shortTermPerformanceScore": 0.06484793,
+      "modelScore": 0.14149243,
+      "performancePercentile": 0.90384615,
+      "performanceImpliedValue": 9.25,
+      "sampleReliability": 0.92094862,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.16,
+      "candidateValue": 9.34,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 33,
+          "attempts": 1114,
+          "dropbacks": 1165
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 287,
+          "dropbacks": 296
+        },
+        "candidateEvidenceDropbacks": 1165
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20948",
+      "gsisId": "00-0036442",
+      "playerName": "Joe Burrow",
+      "team": "CIN",
+      "maddenOvr": 97,
+      "top67DistributionCohort": true,
+      "priorValue": 9.5,
+      "longTermPerformanceScore": 0.00527358,
+      "shortTermPerformanceScore": 0.01049311,
+      "modelScore": 0.06113416,
+      "performancePercentile": 0.73076923,
+      "performanceImpliedValue": 8.31,
+      "sampleReliability": 0.9070632,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.75,
+      "candidateValue": 8.75,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 25,
+          "attempts": 911,
+          "dropbacks": 976
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 259,
+          "dropbacks": 276
+        },
+        "candidateEvidenceDropbacks": 976
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "13092",
+      "gsisId": "00-0034796",
+      "playerName": "Lamar Jackson",
+      "team": "BAL",
+      "maddenOvr": 94,
+      "top67DistributionCohort": true,
+      "priorValue": 9.25,
+      "longTermPerformanceScore": 0.10898254,
+      "shortTermPerformanceScore": 0.01533359,
+      "modelScore": 0.16968359,
+      "performancePercentile": 0.96153846,
+      "performanceImpliedValue": 9.37,
+      "sampleReliability": 0.89189189,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.07,
+      "candidateValue": 9.32,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 29,
+          "attempts": 766,
+          "dropbacks": 825
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 197,
+          "dropbacks": 218
+        },
+        "candidateEvidenceDropbacks": 825
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "12635",
+      "gsisId": "00-0033873",
+      "playerName": "Patrick Mahomes",
+      "team": "KC",
+      "maddenOvr": 93,
+      "top67DistributionCohort": true,
+      "priorValue": 9.25,
+      "longTermPerformanceScore": 0.01755686,
+      "shortTermPerformanceScore": -0.01969685,
+      "modelScore": 0.04322748,
+      "performancePercentile": 0.65384615,
+      "performanceImpliedValue": 8.25,
+      "sampleReliability": 0.92019154,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.65,
+      "candidateValue": 8.6,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 30,
+          "attempts": 1083,
+          "dropbacks": 1153
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 289,
+          "dropbacks": 313
+        },
+        "candidateEvidenceDropbacks": 1153
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14501",
+      "gsisId": "00-0039851",
+      "playerName": "Drake Maye",
+      "team": "NE",
+      "maddenOvr": 92,
+      "top67DistributionCohort": true,
+      "priorValue": 9.25,
+      "longTermPerformanceScore": 0.015177,
+      "shortTermPerformanceScore": 0.11063342,
+      "modelScore": 0.17117789,
+      "performancePercentile": 0.98076923,
+      "performanceImpliedValue": 9.5,
+      "sampleReliability": 0.89919355,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.16,
+      "candidateValue": 9.41,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 27,
+          "attempts": 815,
+          "dropbacks": 892
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 237,
+          "dropbacks": 250
+        },
+        "candidateEvidenceDropbacks": 892
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "17567",
+      "gsisId": "00-0033077",
+      "playerName": "Dak Prescott",
+      "team": "DAL",
+      "maddenOvr": 91,
+      "top67DistributionCohort": true,
+      "priorValue": 9.25,
+      "longTermPerformanceScore": 0.00806139,
+      "shortTermPerformanceScore": 0.04307126,
+      "modelScore": 0.09650011,
+      "performancePercentile": 0.82692308,
+      "performanceImpliedValue": 9.0,
+      "sampleReliability": 0.90262902,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.16,
+      "candidateValue": 9.09,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 24,
+          "attempts": 875,
+          "dropbacks": 927
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 299,
+          "dropbacks": 320
+        },
+        "candidateEvidenceDropbacks": 927
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14500",
+      "gsisId": "00-0039918",
+      "playerName": "Caleb Williams",
+      "team": "CHI",
+      "maddenOvr": 90,
+      "top67DistributionCohort": true,
+      "priorValue": 9.25,
+      "longTermPerformanceScore": -0.0135703,
+      "shortTermPerformanceScore": -0.00949692,
+      "modelScore": 0.02230024,
+      "performancePercentile": 0.5,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.92435703,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.75,
+      "candidateValue": 8.5,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 34,
+          "attempts": 1130,
+          "dropbacks": 1222
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 275,
+          "dropbacks": 285
+        },
+        "candidateEvidenceDropbacks": 1222
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21034",
+      "gsisId": "00-0036355",
+      "playerName": "Justin Herbert",
+      "team": "LAC",
+      "maddenOvr": 90,
+      "top67DistributionCohort": true,
+      "priorValue": 9.25,
+      "longTermPerformanceScore": -0.01229176,
+      "shortTermPerformanceScore": -0.02179567,
+      "modelScore": 0.01128004,
+      "performancePercentile": 0.44230769,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.91742362,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.75,
+      "candidateValue": 8.5,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 33,
+          "attempts": 1016,
+          "dropbacks": 1111
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 216,
+          "dropbacks": 248
+        },
+        "candidateEvidenceDropbacks": 1111
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "17540",
+      "gsisId": "00-0033106",
+      "playerName": "Jared Goff",
+      "team": "DET",
+      "maddenOvr": 88,
+      "top67DistributionCohort": true,
+      "priorValue": 9.0,
+      "longTermPerformanceScore": 0.02122165,
+      "shortTermPerformanceScore": 0.01614668,
+      "modelScore": 0.0827358,
+      "performancePercentile": 0.80769231,
+      "performanceImpliedValue": 8.65,
+      "sampleReliability": 0.9222395,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.22,
+      "candidateValue": 8.78,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 34,
+          "attempts": 1117,
+          "dropbacks": 1186
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 305,
+          "dropbacks": 325
+        },
+        "candidateEvidenceDropbacks": 1186
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "13097",
+      "gsisId": "00-0034869",
+      "playerName": "Sam Darnold",
+      "team": "SEA",
+      "maddenOvr": 87,
+      "top67DistributionCohort": true,
+      "priorValue": 9.0,
+      "longTermPerformanceScore": 0.00039894,
+      "shortTermPerformanceScore": -0.02456691,
+      "modelScore": 0.0211995,
+      "performancePercentile": 0.48076923,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.91554054,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.75,
+      "candidateValue": 8.25,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 33,
+          "attempts": 1010,
+          "dropbacks": 1084
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 249,
+          "dropbacks": 266
+        },
+        "candidateEvidenceDropbacks": 1084
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20915",
+      "gsisId": "00-0036264",
+      "playerName": "Jordan Love",
+      "team": "GB",
+      "maddenOvr": 86,
+      "top67DistributionCohort": true,
+      "priorValue": 9.0,
+      "longTermPerformanceScore": 0.05635597,
+      "shortTermPerformanceScore": 0.03356569,
+      "modelScore": 0.13528912,
+      "performancePercentile": 0.88461538,
+      "performanceImpliedValue": 9.25,
+      "sampleReliability": 0.8973306,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.16,
+      "candidateValue": 9.16,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 28,
+          "attempts": 839,
+          "dropbacks": 874
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 250,
+          "dropbacks": 261
+        },
+        "candidateEvidenceDropbacks": 874
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22383",
+      "gsisId": "00-0037834",
+      "playerName": "Brock Purdy",
+      "team": "SF",
+      "maddenOvr": 85,
+      "top67DistributionCohort": true,
+      "priorValue": 9.0,
+      "longTermPerformanceScore": 0.04755682,
+      "shortTermPerformanceScore": 0.05277391,
+      "modelScore": 0.1456982,
+      "performancePercentile": 0.94230769,
+      "performanceImpliedValue": 9.25,
+      "sampleReliability": 0.88649262,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.16,
+      "candidateValue": 9.16,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 24,
+          "attempts": 739,
+          "dropbacks": 781
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 249,
+          "dropbacks": 259
+        },
+        "candidateEvidenceDropbacks": 781
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21553",
+      "gsisId": "00-0036971",
+      "playerName": "Trevor Lawrence",
+      "team": "JAX",
+      "maddenOvr": 84,
+      "top67DistributionCohort": true,
+      "priorValue": 8.5,
+      "longTermPerformanceScore": -0.00235627,
+      "shortTermPerformanceScore": 0.07884069,
+      "modelScore": 0.12185189,
+      "performancePercentile": 0.86538462,
+      "performanceImpliedValue": 9.03,
+      "sampleReliability": 0.89929507,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.34,
+      "candidateValue": 8.84,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 26,
+          "attempts": 834,
+          "dropbacks": 893
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 244,
+          "dropbacks": 259
+        },
+        "candidateEvidenceDropbacks": 893
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "13117",
+      "gsisId": "00-0034855",
+      "playerName": "Baker Mayfield",
+      "team": "TB",
+      "maddenOvr": 83,
+      "top67DistributionCohort": true,
+      "priorValue": 8.5,
+      "longTermPerformanceScore": 0.0271866,
+      "shortTermPerformanceScore": -0.04092852,
+      "modelScore": 0.03162555,
+      "performancePercentile": 0.57692308,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.92242048,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.65,
+      "candidateValue": 7.85,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 34,
+          "attempts": 1113,
+          "dropbacks": 1189
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 231,
+          "dropbacks": 248
+        },
+        "candidateEvidenceDropbacks": 1189
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21033",
+      "gsisId": "00-0036389",
+      "playerName": "Jalen Hurts",
+      "team": "PHI",
+      "maddenOvr": 82,
+      "top67DistributionCohort": true,
+      "priorValue": 8.5,
+      "longTermPerformanceScore": 0.03686317,
+      "shortTermPerformanceScore": -0.00817703,
+      "modelScore": 0.07405361,
+      "performancePercentile": 0.75,
+      "performanceImpliedValue": 8.5,
+      "sampleReliability": 0.8980632,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 8.5,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 30,
+          "attempts": 811,
+          "dropbacks": 881
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 239,
+          "dropbacks": 246
+        },
+        "candidateEvidenceDropbacks": 881
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14609",
+      "gsisId": "00-0039732",
+      "playerName": "Bo Nix",
+      "team": "DEN",
+      "maddenOvr": 81,
+      "top67DistributionCohort": true,
+      "priorValue": 8.5,
+      "longTermPerformanceScore": 0.06139999,
+      "shortTermPerformanceScore": -0.00923984,
+      "modelScore": 0.09752762,
+      "performancePercentile": 0.84615385,
+      "performanceImpliedValue": 9.0,
+      "sampleReliability": 0.9245283,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.32,
+      "candidateValue": 8.82,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 34,
+          "attempts": 1179,
+          "dropbacks": 1225
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 290,
+          "dropbacks": 303
+        },
+        "candidateEvidenceDropbacks": 1225
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14579",
+      "gsisId": "00-0039910",
+      "playerName": "Jayden Daniels",
+      "team": "WAS",
+      "maddenOvr": 80,
+      "top67DistributionCohort": true,
+      "priorValue": 8.5,
+      "longTermPerformanceScore": 0.03509187,
+      "shortTermPerformanceScore": -0.02901234,
+      "modelScore": 0.05144699,
+      "performancePercentile": 0.67307692,
+      "performanceImpliedValue": 8.25,
+      "sampleReliability": 0.87966306,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.16,
+      "candidateValue": 8.34,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 23,
+          "attempts": 666,
+          "dropbacks": 731
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 200,
+          "dropbacks": 222
+        },
+        "candidateEvidenceDropbacks": 731
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "26668",
+      "gsisId": "00-0023459",
+      "playerName": "Aaron Rodgers",
+      "team": "PIT",
+      "maddenOvr": 79,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.01781325,
+      "shortTermPerformanceScore": -0.03559397,
+      "modelScore": -0.00803975,
+      "performancePercentile": 0.32692308,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.92006395,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.75,
+      "candidateValue": 7.5,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 33,
+          "attempts": 1082,
+          "dropbacks": 1151
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 255,
+          "dropbacks": 269
+        },
+        "candidateEvidenceDropbacks": 1151
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20427",
+      "gsisId": "00-0035710",
+      "playerName": "Daniel Jones",
+      "team": "IND",
+      "maddenOvr": 78,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.00021688,
+      "shortTermPerformanceScore": 0.03198283,
+      "modelScore": 0.07713342,
+      "performancePercentile": 0.76923077,
+      "performanceImpliedValue": 8.5,
+      "sampleReliability": 0.8849252,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.16,
+      "candidateValue": 8.41,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 22,
+          "attempts": 718,
+          "dropbacks": 769
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 256,
+          "dropbacks": 274
+        },
+        "candidateEvidenceDropbacks": 769
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22686",
+      "gsisId": "00-0039150",
+      "playerName": "Bryce Young",
+      "team": "CAR",
+      "maddenOvr": 78,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.00785182,
+      "shortTermPerformanceScore": 0.0040416,
+      "modelScore": 0.04155725,
+      "performancePercentile": 0.63461538,
+      "performanceImpliedValue": 8.25,
+      "sampleReliability": 0.90079365,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 8.25,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 28,
+          "attempts": 853,
+          "dropbacks": 908
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 234,
+          "dropbacks": 249
+        },
+        "candidateEvidenceDropbacks": 908
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14788",
+      "gsisId": "00-0040743",
+      "playerName": "Tyler Shough",
+      "team": "NO",
+      "maddenOvr": 77,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.0365876,
+      "shortTermPerformanceScore": 0.01601252,
+      "modelScore": 0.02479238,
+      "performancePercentile": 0.55769231,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.78070175,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.49,
+      "candidateValue": 7.76,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 10,
+          "attempts": 325,
+          "dropbacks": 356
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 271,
+          "dropbacks": 299
+        },
+        "candidateEvidenceDropbacks": 356
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14796",
+      "gsisId": "00-0040691",
+      "playerName": "Jaxson Dart",
+      "team": "NYG",
+      "maddenOvr": 77,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.00296005,
+      "shortTermPerformanceScore": -0.00889259,
+      "modelScore": 0.03351483,
+      "performancePercentile": 0.59615385,
+      "performanceImpliedValue": 7.76,
+      "sampleReliability": 0.78902954,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.32,
+      "candidateValue": 7.93,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 12,
+          "attempts": 339,
+          "dropbacks": 374
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 221,
+          "dropbacks": 244
+        },
+        "candidateEvidenceDropbacks": 374
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22688",
+      "gsisId": "00-0039163",
+      "playerName": "C.J. Stroud",
+      "team": "HOU",
+      "maddenOvr": 76,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.0248873,
+      "shortTermPerformanceScore": 0.00320979,
+      "modelScore": 0.02368996,
+      "performancePercentile": 0.53846154,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.91007194,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.49,
+      "candidateValue": 7.76,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 29,
+          "attempts": 939,
+          "dropbacks": 1012
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 269,
+          "dropbacks": 278
+        },
+        "candidateEvidenceDropbacks": 1012
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14778",
+      "gsisId": "00-0040676",
+      "playerName": "Cam Ward",
+      "team": "TEN",
+      "maddenOvr": 75,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": -0.0998433,
+      "shortTermPerformanceScore": -0.06424019,
+      "modelScore": -0.11871602,
+      "performancePercentile": 0.03846154,
+      "performanceImpliedValue": 6.0,
+      "sampleReliability": 0.85549133,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.75,
+      "candidateValue": 7.5,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 16,
+          "attempts": 537,
+          "dropbacks": 592
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 263,
+          "dropbacks": 284
+        },
+        "candidateEvidenceDropbacks": 592
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20430",
+      "gsisId": "00-0035228",
+      "playerName": "Kyler Murray",
+      "team": "MIN",
+      "maddenOvr": 75,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": 0.04155982,
+      "shortTermPerformanceScore": -0.02642994,
+      "modelScore": 0.06049734,
+      "performancePercentile": 0.71153846,
+      "performanceImpliedValue": 8.25,
+      "sampleReliability": 0.88207547,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 8.25,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 22,
+          "attempts": 702,
+          "dropbacks": 748
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 276,
+          "dropbacks": 299
+        },
+        "candidateEvidenceDropbacks": 748
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21763",
+      "gsisId": "00-0036972",
+      "playerName": "Mac Jones",
+      "team": "SF",
+      "maddenOvr": 75,
+      "top67DistributionCohort": true,
+      "priorValue": 8.25,
+      "longTermPerformanceScore": 0.01052053,
+      "shortTermPerformanceScore": 0.02418088,
+      "modelScore": 0.08006887,
+      "performancePercentile": 0.78846154,
+      "performanceImpliedValue": 8.5,
+      "sampleReliability": 0.85074627,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.16,
+      "candidateValue": 8.41,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 16,
+          "attempts": 542,
+          "dropbacks": 570
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 289,
+          "dropbacks": 305
+        },
+        "candidateEvidenceDropbacks": 570
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "16261",
+      "gsisId": "00-0041562",
+      "playerName": "Fernando Mendoza",
+      "team": "LV",
+      "maddenOvr": 74,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.5,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "20916",
+      "gsisId": "00-0036212",
+      "playerName": "Tua Tagovailoa",
+      "team": "ATL",
+      "maddenOvr": 74,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.01531472,
+      "shortTermPerformanceScore": -0.03021476,
+      "modelScore": -0.00016202,
+      "performancePercentile": 0.40384615,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.89293362,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.5,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 25,
+          "attempts": 783,
+          "dropbacks": 834
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 202,
+          "dropbacks": 219
+        },
+        "candidateEvidenceDropbacks": 834
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22048",
+      "gsisId": "00-0038128",
+      "playerName": "Malik Willis",
+      "team": "MIA",
+      "maddenOvr": 74,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": 0.0444314,
+      "shortTermPerformanceScore": 0.03302323,
+      "modelScore": 0.1228221,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.5,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 3,
+          "attempts": 53,
+          "dropbacks": 60
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 92,
+          "dropbacks": 106
+        },
+        "candidateEvidenceDropbacks": 60
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "11215",
+      "gsisId": "00-0029604",
+      "playerName": "Kirk Cousins",
+      "team": "LV",
+      "maddenOvr": 73,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.02046139,
+      "shortTermPerformanceScore": -0.02989361,
+      "modelScore": -0.00498752,
+      "performancePercentile": 0.34615385,
+      "performanceImpliedValue": 7.42,
+      "sampleReliability": 0.88123515,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.05,
+      "candidateValue": 7.45,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 22,
+          "attempts": 701,
+          "dropbacks": 742
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 248,
+          "dropbacks": 261
+        },
+        "candidateEvidenceDropbacks": 742
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14608",
+      "gsisId": "00-0039917",
+      "playerName": "Michael Penix Jr",
+      "team": "ATL",
+      "maddenOvr": 73,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": 0.01586594,
+      "shortTermPerformanceScore": -0.00438877,
+      "modelScore": 0.05684464,
+      "performancePercentile": 0.69230769,
+      "performanceImpliedValue": 8.25,
+      "sampleReliability": 0.79674797,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.49,
+      "candidateValue": 7.99,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 12,
+          "attempts": 376,
+          "dropbacks": 392
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 234,
+          "dropbacks": 246
+        },
+        "candidateEvidenceDropbacks": 392
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "28329",
+      "gsisId": "00-0026158",
+      "playerName": "Joe Flacco",
+      "team": "CIN",
+      "maddenOvr": 73,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.0226697,
+      "shortTermPerformanceScore": -0.0542232,
+      "modelScore": -0.03152543,
+      "performancePercentile": 0.25,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.87405542,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 17,
+          "attempts": 658,
+          "dropbacks": 694
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 320,
+          "dropbacks": 334
+        },
+        "candidateEvidenceDropbacks": 694
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "112",
+      "gsisId": "00-0030565",
+      "playerName": "Geno Smith",
+      "team": "NYJ",
+      "maddenOvr": 72,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.07326693,
+      "shortTermPerformanceScore": -0.06733053,
+      "modelScore": -0.09522999,
+      "performancePercentile": 0.11538462,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.91876523,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "HIGH",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 32,
+          "attempts": 1026,
+          "dropbacks": 1131
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 246,
+          "dropbacks": 282
+        },
+        "candidateEvidenceDropbacks": 1131
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "17566",
+      "gsisId": "00-0033119",
+      "playerName": "Jacoby Brissett",
+      "team": "ARI",
+      "maddenOvr": 72,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.06354911,
+      "shortTermPerformanceScore": -0.0165121,
+      "modelScore": -0.03469374,
+      "performancePercentile": 0.23076923,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.87562189,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 18,
+          "attempts": 643,
+          "dropbacks": 704
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 329,
+          "dropbacks": 354
+        },
+        "candidateEvidenceDropbacks": 704
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "19983",
+      "gsisId": "00-0032268",
+      "playerName": "Marcus Mariota",
+      "team": "WAS",
+      "maddenOvr": 72,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": 0.06838111,
+      "shortTermPerformanceScore": 0.02939747,
+      "modelScore": 0.14314605,
+      "performancePercentile": 0.92307692,
+      "performanceImpliedValue": 9.25,
+      "sampleReliability": 0.72972973,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.75,
+      "candidateValue": 8.25,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 10,
+          "attempts": 254,
+          "dropbacks": 270
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 213,
+          "dropbacks": 226
+        },
+        "candidateEvidenceDropbacks": 270
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "10439",
+      "gsisId": "00-0027973",
+      "playerName": "Andy Dalton",
+      "team": "PHI",
+      "maddenOvr": 71,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.04521596,
+      "shortTermPerformanceScore": -0.0492058,
+      "modelScore": -0.04905429,
+      "performancePercentile": 0.19230769,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.66329966,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 6,
+          "attempts": 183,
+          "dropbacks": 197
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 266,
+          "dropbacks": 284
+        },
+        "candidateEvidenceDropbacks": 197
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14610",
+      "gsisId": "00-0039923",
+      "playerName": "J.J. McCarthy",
+      "team": "MIN",
+      "maddenOvr": 71,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.07677659,
+      "shortTermPerformanceScore": -0.06089836,
+      "modelScore": -0.09230748,
+      "performancePercentile": 0.15384615,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.72972973,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 10,
+          "attempts": 243,
+          "dropbacks": 270
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 202,
+          "dropbacks": 220
+        },
+        "candidateEvidenceDropbacks": 270
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "16188",
+      "gsisId": "00-0041568",
+      "playerName": "Ty Simpson",
+      "team": "LAR",
+      "maddenOvr": 71,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.5,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "19982",
+      "gsisId": "00-0031503",
+      "playerName": "Jameis Winston",
+      "team": "NYG",
+      "maddenOvr": 71,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.03702539,
+      "shortTermPerformanceScore": -0.03703036,
+      "modelScore": -0.02868829,
+      "performancePercentile": 0.26923077,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.78947368,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 9,
+          "attempts": 349,
+          "dropbacks": 375
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 308,
+          "dropbacks": 332
+        },
+        "candidateEvidenceDropbacks": 375
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14611",
+      "gsisId": "00-0039376",
+      "playerName": "Spencer Rattler",
+      "team": "NO",
+      "maddenOvr": 70,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.04290479,
+      "shortTermPerformanceScore": -0.03965857,
+      "modelScore": -0.03719589,
+      "performancePercentile": 0.21153846,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.83974359,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "MEDIUM",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 15,
+          "attempts": 484,
+          "dropbacks": 524
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 256,
+          "dropbacks": 274
+        },
+        "candidateEvidenceDropbacks": 524
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20347",
+      "gsisId": "00-0035289",
+      "playerName": "Gardner Minshew",
+      "team": "ARI",
+      "maddenOvr": 70,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.07751344,
+      "shortTermPerformanceScore": -0.0748503,
+      "modelScore": -0.10699628,
+      "performancePercentile": 0.09615385,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.77011494,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.33,
+      "candidateValue": 7.17,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 10,
+          "attempts": 306,
+          "dropbacks": 335
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 235,
+          "dropbacks": 255
+        },
+        "candidateEvidenceDropbacks": 335
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21560",
+      "gsisId": "00-0036945",
+      "playerName": "Justin Fields",
+      "team": "KC",
+      "maddenOvr": 70,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": -0.00372461,
+      "shortTermPerformanceScore": -0.01921977,
+      "modelScore": 0.02242309,
+      "performancePercentile": 0.51923077,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.79166667,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.5,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 13,
+          "attempts": 342,
+          "dropbacks": 380
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 206,
+          "dropbacks": 231
+        },
+        "candidateEvidenceDropbacks": 380
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22689",
+      "gsisId": "00-0039164",
+      "playerName": "Anthony Richardson Sr",
+      "team": "IND",
+      "maddenOvr": 70,
+      "top67DistributionCohort": true,
+      "priorValue": 7.5,
+      "longTermPerformanceScore": 0.0369919,
+      "shortTermPerformanceScore": -0.07956544,
+      "modelScore": 0.00279393,
+      "performancePercentile": 0.42307692,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.72375691,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.5,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 9,
+          "attempts": 249,
+          "dropbacks": 262
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 230,
+          "dropbacks": 241
+        },
+        "candidateEvidenceDropbacks": 262
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "10583",
+      "gsisId": "00-0028118",
+      "playerName": "Tyrod Taylor",
+      "team": "GB",
+      "maddenOvr": 69,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.03874066,
+      "shortTermPerformanceScore": -0.00938513,
+      "modelScore": -0.00275831,
+      "performancePercentile": 0.38461538,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.56709957,
+      "performanceBlend": 0.56709957,
+      "candidateDeltaFromPrior": 0.28,
+      "candidateValue": 7.28,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 4,
+          "attempts": 119,
+          "dropbacks": 131
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 237,
+          "dropbacks": 260
+        },
+        "candidateEvidenceDropbacks": 131
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "12561",
+      "gsisId": "00-0033537",
+      "playerName": "Deshaun Watson",
+      "team": "CLE",
+      "maddenOvr": 69,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.1313026,
+      "shortTermPerformanceScore": -0.12063857,
+      "modelScore": -0.2065737,
+      "performancePercentile": 0.0,
+      "performanceImpliedValue": 6.0,
+      "sampleReliability": 0.71346705,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.65,
+      "candidateValue": 6.35,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 7,
+          "attempts": 216,
+          "dropbacks": 249
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 250,
+          "dropbacks": 287
+        },
+        "candidateEvidenceDropbacks": 249
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14614",
+      "gsisId": "00-0039398",
+      "playerName": "Joe Milton",
+      "team": "DAL",
+      "maddenOvr": 69,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": 0.04043099,
+      "shortTermPerformanceScore": 0.03374019,
+      "modelScore": 0.11953865,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 1,
+          "attempts": 29,
+          "dropbacks": 29
+        },
+        "short": {
+          "qualifiedGames": 1,
+          "attempts": 29,
+          "dropbacks": 29
+        },
+        "candidateEvidenceDropbacks": 29
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14770",
+      "gsisId": "00-0040668",
+      "playerName": "Shedeur Sanders",
+      "team": "CLE",
+      "maddenOvr": 69,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.07423284,
+      "shortTermPerformanceScore": -0.07814238,
+      "modelScore": -0.10700775,
+      "performancePercentile": 0.07692308,
+      "performanceImpliedValue": 6.08,
+      "sampleReliability": 0.70149254,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.6,
+      "candidateValue": 6.4,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 8,
+          "attempts": 212,
+          "dropbacks": 235
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 212,
+          "dropbacks": 235
+        },
+        "candidateEvidenceDropbacks": 235
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "16211",
+      "gsisId": "00-0041565",
+      "playerName": "Drew Allar",
+      "team": "PIT",
+      "maddenOvr": 69,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "12708",
+      "gsisId": "00-0033949",
+      "playerName": "Joshua Dobbs",
+      "team": "DET",
+      "maddenOvr": 68,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": 0.00556959,
+      "shortTermPerformanceScore": -0.07009336,
+      "modelScore": -0.0191563,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 1,
+          "attempts": 43,
+          "dropbacks": 45
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 264,
+          "dropbacks": 285
+        },
+        "candidateEvidenceDropbacks": 45
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16161",
+      "gsisId": "00-0041561",
+      "playerName": "Carson Beck",
+      "team": "ARI",
+      "maddenOvr": 68,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "17543",
+      "gsisId": "00-0032950",
+      "playerName": "Carson Wentz",
+      "team": "MIN",
+      "maddenOvr": 68,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.09144665,
+      "shortTermPerformanceScore": -0.06130221,
+      "modelScore": -0.10738139,
+      "performancePercentile": 0.05769231,
+      "performanceImpliedValue": 6.0,
+      "sampleReliability": 0.6763754,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": -0.65,
+      "candidateValue": 6.35,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 6,
+          "attempts": 186,
+          "dropbacks": 209
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 238,
+          "dropbacks": 266
+        },
+        "candidateEvidenceDropbacks": 209
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20329",
+      "gsisId": "00-0035100",
+      "playerName": "Jake Browning",
+      "team": "TB",
+      "maddenOvr": 68,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.04204683,
+      "shortTermPerformanceScore": -0.0551171,
+      "modelScore": -0.05179646,
+      "performancePercentile": 0.17307692,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.57081545,
+      "performanceBlend": 0.57081545,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 4,
+          "attempts": 124,
+          "dropbacks": 133
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 265,
+          "dropbacks": 289
+        },
+        "candidateEvidenceDropbacks": 133
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21029",
+      "gsisId": "00-0035993",
+      "playerName": "Tyler Huntley",
+      "team": "BAL",
+      "maddenOvr": 68,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.02442889,
+      "shortTermPerformanceScore": -0.03902926,
+      "modelScore": -0.01809068,
+      "performancePercentile": 0.28846154,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.67948718,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 8,
+          "attempts": 190,
+          "dropbacks": 212
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 190,
+          "dropbacks": 212
+        },
+        "candidateEvidenceDropbacks": 212
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22687",
+      "gsisId": "00-0039152",
+      "playerName": "Will Levis",
+      "team": "TEN",
+      "maddenOvr": 68,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.10613187,
+      "shortTermPerformanceScore": -0.03289705,
+      "modelScore": -0.09366145,
+      "performancePercentile": 0.13461538,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.76470588,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 10,
+          "attempts": 285,
+          "dropbacks": 325
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 225,
+          "dropbacks": 258
+        },
+        "candidateEvidenceDropbacks": 325
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14795",
+      "gsisId": "00-0040206",
+      "playerName": "Riley Leonard",
+      "team": "IND",
+      "maddenOvr": 67,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": 0.01266937,
+      "shortTermPerformanceScore": -0.01812682,
+      "modelScore": 0.03991002,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 63,
+          "dropbacks": 65
+        },
+        "short": {
+          "qualifiedGames": 2,
+          "attempts": 63,
+          "dropbacks": 65
+        },
+        "candidateEvidenceDropbacks": 65
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16265",
+      "gsisId": "00-0041056",
+      "playerName": "Cade Klubnik",
+      "team": "NYJ",
+      "maddenOvr": 67,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "21559",
+      "gsisId": "00-0037013",
+      "playerName": "Zach Wilson",
+      "team": "NO",
+      "maddenOvr": 67,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.09156371,
+      "modelScore": -0.05176167,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 245,
+          "dropbacks": 281
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22046",
+      "gsisId": "00-0038102",
+      "playerName": "Kenny Pickett",
+      "team": "CAR",
+      "maddenOvr": 67,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.05968147,
+      "shortTermPerformanceScore": -0.07830674,
+      "modelScore": -0.09262074,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 3,
+          "attempts": 64,
+          "dropbacks": 71
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 194,
+          "dropbacks": 208
+        },
+        "candidateEvidenceDropbacks": 71
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22716",
+      "gsisId": "00-0038579",
+      "playerName": "Aidan O'Connell",
+      "team": "LV",
+      "maddenOvr": 67,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": 0.00416758,
+      "shortTermPerformanceScore": -0.03247476,
+      "modelScore": 0.0170603,
+      "performancePercentile": 0.46153846,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.71671388,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.33,
+      "candidateValue": 7.33,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 8,
+          "attempts": 243,
+          "dropbacks": 253
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 243,
+          "dropbacks": 253
+        },
+        "candidateEvidenceDropbacks": 253
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "5000",
+      "gsisId": "00-0040891",
+      "playerName": "Cole Payton",
+      "team": "PHI",
+      "maddenOvr": 67,
+      "top67DistributionCohort": true,
+      "priorValue": 7.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 7.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "13088",
+      "gsisId": "00-0034771",
+      "playerName": "Mason Rudolph",
+      "team": "PIT",
+      "maddenOvr": 66,
+      "top67DistributionCohort": true,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": 0.01264456,
+      "shortTermPerformanceScore": -0.02171369,
+      "modelScore": 0.03629834,
+      "performancePercentile": 0.61538462,
+      "performanceImpliedValue": 8.25,
+      "sampleReliability": 0.73544974,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.75,
+      "candidateValue": 6.75,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 9,
+          "attempts": 266,
+          "dropbacks": 278
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 249,
+          "dropbacks": 260
+        },
+        "candidateEvidenceDropbacks": 278
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14800",
+      "gsisId": "00-0040673",
+      "playerName": "Jalen Milroe",
+      "team": "SEA",
+      "maddenOvr": 66,
+      "top67DistributionCohort": true,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16143",
+      "gsisId": "00-0040704",
+      "playerName": "Dillon Gabriel",
+      "team": "CLE",
+      "maddenOvr": 66,
+      "top67DistributionCohort": true,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.06955199,
+      "shortTermPerformanceScore": -0.10126031,
+      "modelScore": -0.12544483,
+      "performancePercentile": 0.01923077,
+      "performanceImpliedValue": 6.0,
+      "sampleReliability": 0.65156794,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 5,
+          "attempts": 170,
+          "dropbacks": 187
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 170,
+          "dropbacks": 187
+        },
+        "candidateEvidenceDropbacks": 187
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "20328",
+      "gsisId": "00-0035704",
+      "playerName": "Drew Lock",
+      "team": "SEA",
+      "maddenOvr": 66,
+      "top67DistributionCohort": true,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00867173,
+      "shortTermPerformanceScore": -0.04164,
+      "modelScore": -0.00494426,
+      "performancePercentile": 0.36538462,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.64664311,
+      "performanceBlend": 0.64664311,
+      "candidateDeltaFromPrior": 0.75,
+      "candidateValue": 6.75,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 5,
+          "attempts": 172,
+          "dropbacks": 183
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 260,
+          "dropbacks": 278
+        },
+        "candidateEvidenceDropbacks": 183
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "21556",
+      "gsisId": "00-0036898",
+      "playerName": "Davis Mills",
+      "team": "HOU",
+      "maddenOvr": 66,
+      "top67DistributionCohort": true,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00826069,
+      "shortTermPerformanceScore": -0.05275911,
+      "modelScore": -0.01565233,
+      "performancePercentile": 0.30769231,
+      "performanceImpliedValue": 7.0,
+      "sampleReliability": 0.63898917,
+      "performanceBlend": 0.63898917,
+      "candidateDeltaFromPrior": 0.64,
+      "candidateValue": 6.64,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 5,
+          "attempts": 168,
+          "dropbacks": 177
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 278,
+          "dropbacks": 289
+        },
+        "candidateEvidenceDropbacks": 177
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "22712",
+      "gsisId": "00-0038400",
+      "playerName": "Tanner McKee",
+      "team": "PHI",
+      "maddenOvr": 66,
+      "top67DistributionCohort": true,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.02143302,
+      "shortTermPerformanceScore": -0.03154635,
+      "modelScore": -0.0076119,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 81,
+          "dropbacks": 86
+        },
+        "short": {
+          "qualifiedGames": 2,
+          "attempts": 81,
+          "dropbacks": 86
+        },
+        "candidateEvidenceDropbacks": 86
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "12552",
+      "gsisId": "00-0033869",
+      "playerName": "Mitchell Trubisky",
+      "team": "TEN",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": 0.06374193,
+      "shortTermPerformanceScore": -0.0005024,
+      "modelScore": 0.108607,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 50,
+          "dropbacks": 50
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 204,
+          "dropbacks": 213
+        },
+        "candidateEvidenceDropbacks": 50
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "12931",
+      "gsisId": "00-0033662",
+      "playerName": "Cooper Rush",
+      "team": "ATL",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00873144,
+      "shortTermPerformanceScore": -0.02636814,
+      "modelScore": 0.01026789,
+      "performancePercentile": 0.43269231,
+      "performanceImpliedValue": 7.5,
+      "sampleReliability": 0.77628635,
+      "performanceBlend": 0.65,
+      "candidateDeltaFromPrior": 0.75,
+      "candidateValue": 6.75,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 11,
+          "attempts": 333,
+          "dropbacks": 347
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 230,
+          "dropbacks": 238
+        },
+        "candidateEvidenceDropbacks": 347
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14789",
+      "gsisId": "00-0040014",
+      "playerName": "Kyle McCord",
+      "team": "GB",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16248",
+      "gsisId": "00-0041092",
+      "playerName": "Taylen Green",
+      "team": "CLE",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16295",
+      "gsisId": "00-0041453",
+      "playerName": "Luke Altmyer",
+      "team": "DET",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "1876",
+      "gsisId": "00-0041149",
+      "playerName": "Haynes King",
+      "team": "CAR",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22380",
+      "gsisId": "00-0037077",
+      "playerName": "Sam Howell",
+      "team": "DAL",
+      "maddenOvr": 65,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.08719267,
+      "shortTermPerformanceScore": -0.15988492,
+      "modelScore": -0.20171012,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 1,
+          "attempts": 14,
+          "dropbacks": 18
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 229,
+          "dropbacks": 251
+        },
+        "candidateEvidenceDropbacks": 18
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14785",
+      "gsisId": "00-0040203",
+      "playerName": "Will Howard",
+      "team": "PIT",
+      "maddenOvr": 64,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "20381",
+      "gsisId": "00-0035264",
+      "playerName": "Jarrett Stidham",
+      "team": "DEN",
+      "maddenOvr": 64,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": 0.00722562,
+      "modelScore": 0.04702766,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 4,
+          "attempts": 136,
+          "dropbacks": 149
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "21555",
+      "gsisId": "00-0037012",
+      "playerName": "Trey Lance",
+      "team": "LAC",
+      "maddenOvr": 64,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.02087719,
+      "shortTermPerformanceScore": -0.03228416,
+      "modelScore": -0.00779389,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 78,
+          "dropbacks": 84
+        },
+        "short": {
+          "qualifiedGames": 6,
+          "attempts": 176,
+          "dropbacks": 188
+        },
+        "candidateEvidenceDropbacks": 84
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22049",
+      "gsisId": "00-0038108",
+      "playerName": "Bailey Zappe",
+      "team": "NYJ",
+      "maddenOvr": 64,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.01538966,
+      "shortTermPerformanceScore": -0.10139496,
+      "modelScore": -0.07141715,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 1,
+          "attempts": 31,
+          "dropbacks": 32
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 218,
+          "dropbacks": 243
+        },
+        "candidateEvidenceDropbacks": 32
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22385",
+      "gsisId": "00-0037327",
+      "playerName": "Skylar Thompson",
+      "team": "BAL",
+      "maddenOvr": 64,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.0783422,
+      "shortTermPerformanceScore": -0.10140477,
+      "modelScore": -0.1343795,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 33,
+          "dropbacks": 39
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 118,
+          "dropbacks": 128
+        },
+        "candidateEvidenceDropbacks": 39
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22711",
+      "gsisId": "00-0038550",
+      "playerName": "Hendon Hooker",
+      "team": "TEN",
+      "maddenOvr": 64,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "11222",
+      "gsisId": "00-0028986",
+      "playerName": "Case Keenum",
+      "team": "CHI",
+      "maddenOvr": 63,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.06198457,
+      "modelScore": -0.02218253,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 122,
+          "dropbacks": 133
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14784",
+      "gsisId": "00-0040398",
+      "playerName": "Brady Cook",
+      "team": "NYJ",
+      "maddenOvr": 63,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.13091115,
+      "shortTermPerformanceScore": -0.16071441,
+      "modelScore": -0.2462581,
+      "performancePercentile": 0.0,
+      "performanceImpliedValue": 6.0,
+      "sampleReliability": 0.63235294,
+      "performanceBlend": 0.63235294,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 5,
+          "attempts": 153,
+          "dropbacks": 172
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 153,
+          "dropbacks": 172
+        },
+        "candidateEvidenceDropbacks": 172
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "STAGE3_CANDIDATE_NON_OPERATIONAL"
+    },
+    {
+      "playerId": "14799",
+      "gsisId": "00-0040234",
+      "playerName": "Quinn Ewers",
+      "team": "MIA",
+      "maddenOvr": 63,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.02465946,
+      "shortTermPerformanceScore": -0.00754199,
+      "modelScore": 0.01316602,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 3,
+          "attempts": 75,
+          "dropbacks": 81
+        },
+        "short": {
+          "qualifiedGames": 3,
+          "attempts": 75,
+          "dropbacks": 81
+        },
+        "candidateEvidenceDropbacks": 81
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14802",
+      "gsisId": "00-0040589",
+      "playerName": "Kurtis Rourke",
+      "team": "SF",
+      "maddenOvr": 63,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16201",
+      "gsisId": "00-0040906",
+      "playerName": "Garrett Nussmeier",
+      "team": "KC",
+      "maddenOvr": 63,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22714",
+      "gsisId": "00-0039107",
+      "playerName": "Stetson Bennett IV",
+      "team": "LAR",
+      "maddenOvr": 63,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "10201",
+      "gsisId": "00-0041117",
+      "playerName": "Athan Kaliakmanis",
+      "team": "WAS",
+      "maddenOvr": 62,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "20335",
+      "gsisId": "00-0035282",
+      "playerName": "Easton Stick",
+      "team": "IND",
+      "maddenOvr": 62,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.03211891,
+      "modelScore": 0.00768313,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 174,
+          "dropbacks": 188
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "28334",
+      "gsisId": "00-0026300",
+      "playerName": "Josh Johnson",
+      "team": "CIN",
+      "maddenOvr": 62,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": 0.04111268,
+      "shortTermPerformanceScore": 0.03234116,
+      "modelScore": 0.11882131,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 45,
+          "dropbacks": 46
+        },
+        "short": {
+          "qualifiedGames": 4,
+          "attempts": 126,
+          "dropbacks": 130
+        },
+        "candidateEvidenceDropbacks": 46
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "10190",
+      "gsisId": "00-0041203",
+      "playerName": "Joey Aguilar",
+      "team": "JAX",
+      "maddenOvr": 61,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "13834",
+      "gsisId": "00-0033319",
+      "playerName": "Nick Mullens",
+      "team": "JAX",
+      "maddenOvr": 61,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": 0.0187225,
+      "modelScore": 0.05852453,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 165,
+          "dropbacks": 177
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16312",
+      "gsisId": "00-0041251",
+      "playerName": "Jalon Daniels",
+      "team": "TB",
+      "maddenOvr": 61,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "23368",
+      "gsisId": "00-0038476",
+      "playerName": "Tommy DeVito",
+      "team": "NE",
+      "maddenOvr": 61,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.04823759,
+      "shortTermPerformanceScore": -0.07081818,
+      "modelScore": -0.07368831,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 44,
+          "dropbacks": 50
+        },
+        "short": {
+          "qualifiedGames": 8,
+          "attempts": 193,
+          "dropbacks": 227
+        },
+        "candidateEvidenceDropbacks": 50
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "13691",
+      "gsisId": "00-0034577",
+      "playerName": "Kyle Allen",
+      "team": "BUF",
+      "maddenOvr": 60,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.08722749,
+      "modelScore": -0.04742546,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 2,
+          "attempts": 78,
+          "dropbacks": 83
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14803",
+      "gsisId": "00-0040211",
+      "playerName": "Graham Mertz",
+      "team": "HOU",
+      "maddenOvr": 60,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "1805",
+      "gsisId": "00-0041123",
+      "playerName": "Behren Morton",
+      "team": "NE",
+      "maddenOvr": 60,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "4607",
+      "gsisId": "00-0040222",
+      "playerName": "Cam Miller",
+      "team": "MIA",
+      "maddenOvr": 60,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14792",
+      "gsisId": "00-0040494",
+      "playerName": "Max Brosmer",
+      "team": "MIN",
+      "maddenOvr": 59,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.15929827,
+      "shortTermPerformanceScore": -0.1482776,
+      "modelScore": -0.2622084,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 46,
+          "dropbacks": 57
+        },
+        "short": {
+          "qualifiedGames": 2,
+          "attempts": 46,
+          "dropbacks": 57
+        },
+        "candidateEvidenceDropbacks": 57
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "15009",
+      "gsisId": "00-0039534",
+      "playerName": "Carter Bradley",
+      "team": "JAX",
+      "maddenOvr": 59,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "16275",
+      "gsisId": "00-0040981",
+      "playerName": "Joe Fagnano",
+      "team": "BAL",
+      "maddenOvr": 59,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22900",
+      "gsisId": "00-0038416",
+      "playerName": "Tyson Bagent",
+      "team": "CHI",
+      "maddenOvr": 59,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.04803552,
+      "modelScore": -0.00823348,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 5,
+          "attempts": 143,
+          "dropbacks": 148
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "14615",
+      "gsisId": "00-0039677",
+      "playerName": "Sam Hartman",
+      "team": "WAS",
+      "maddenOvr": 58,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22728",
+      "gsisId": "00-0038391",
+      "playerName": "Sean Clifford",
+      "team": "CIN",
+      "maddenOvr": 58,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "20331",
+      "gsisId": "00-0034955",
+      "playerName": "Brett Rypien",
+      "team": "HOU",
+      "maddenOvr": 57,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.09334782,
+      "modelScore": -0.05354579,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 3,
+          "attempts": 100,
+          "dropbacks": 109
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "21554",
+      "gsisId": "00-0036879",
+      "playerName": "Sam Ehlinger",
+      "team": "DEN",
+      "maddenOvr": 57,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.07958525,
+      "modelScore": -0.03978322,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 4,
+          "attempts": 101,
+          "dropbacks": 115
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "4775",
+      "gsisId": "00-0040415",
+      "playerName": "Connor Bazelak",
+      "team": "TB",
+      "maddenOvr": 57,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.00556543,
+      "shortTermPerformanceScore": -0.00475169,
+      "modelScore": 0.03505035,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "short": {
+          "qualifiedGames": 0,
+          "attempts": 0,
+          "dropbacks": 0
+        },
+        "candidateEvidenceDropbacks": 0
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "22480",
+      "gsisId": "00-0037324",
+      "playerName": "Chris Oladokun",
+      "team": "KC",
+      "maddenOvr": 55,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.08106322,
+      "shortTermPerformanceScore": -0.08849364,
+      "modelScore": -0.12418939,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 3,
+          "attempts": 55,
+          "dropbacks": 63
+        },
+        "short": {
+          "qualifiedGames": 3,
+          "attempts": 55,
+          "dropbacks": 63
+        },
+        "candidateEvidenceDropbacks": 63
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "17606",
+      "gsisId": "00-0032434",
+      "playerName": "Brandon Allen",
+      "team": "NYG",
+      "maddenOvr": 54,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.03154371,
+      "shortTermPerformanceScore": -0.10544667,
+      "modelScore": -0.09162291,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 2,
+          "attempts": 59,
+          "dropbacks": 62
+        },
+        "short": {
+          "qualifiedGames": 3,
+          "attempts": 88,
+          "dropbacks": 95
+        },
+        "candidateEvidenceDropbacks": 62
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    },
+    {
+      "playerId": "21710",
+      "gsisId": "00-0036679",
+      "playerName": "Shane Buechele",
+      "team": "BUF",
+      "maddenOvr": 52,
+      "top67DistributionCohort": false,
+      "priorValue": 6.0,
+      "longTermPerformanceScore": -0.08575648,
+      "shortTermPerformanceScore": -0.04347527,
+      "modelScore": -0.08386428,
+      "performancePercentile": null,
+      "performanceImpliedValue": null,
+      "sampleReliability": 0.0,
+      "performanceBlend": 0.0,
+      "candidateDeltaFromPrior": 0.0,
+      "candidateValue": 6.0,
+      "confidence": "LOW",
+      "evidence": {
+        "long": {
+          "qualifiedGames": 1,
+          "attempts": 14,
+          "dropbacks": 19
+        },
+        "short": {
+          "qualifiedGames": 1,
+          "attempts": 14,
+          "dropbacks": 19
+        },
+        "candidateEvidenceDropbacks": 19
+      },
+      "contextNormalization": {
+        "method": "Subtract the opponent defense's prior-only EPA-per-opportunity allowance relative to the prior-only league mean.",
+        "directSpreadAddendAllowed": false
+      },
+      "sourceLineage": {
+        "stage3BWeekly": "data/walters/nfl/qb-performance/normalized/qb-weekly-2021-2025-v1.csv",
+        "identityCrosswalk": "data/walters/nfl/qb-performance/identity-crosswalk-v1.json",
+        "stage2Prior": "data/walters/nfl/player-values/player-values-2026-v1.json"
+      },
+      "marketViewed": false,
+      "operational": false,
+      "status": "BLOCKED_INSUFFICIENT_QB_SAMPLE"
+    }
+  ],
+  "contentSha256Canonical": "f1f3185043ac5e1bfe250e94a81943c21a96a63881a5523d5e84dc5c777ae161",
+  "modelContentSha256Canonical": "2416eeea94d409ead00203a141b15325fde759b8dbab30497135cb5bc418b326",
+  "holdoutAccepted": true
+}
