@@ -1,0 +1,69 @@
+{
+  "state": "PASS",
+  "step": 3,
+  "name": "MARKET_AGREEMENT_CALIBRATION",
+  "mode": "READ_ONLY_DECISION_LOCK",
+  "productionChanged": false,
+  "period": {
+    "start": "2026-08-15",
+    "end": "2026-09-01",
+    "reports": 85,
+    "dates": 18
+  },
+  "problem": "Agreement currently collapses cohesion score and evidence confidence into one LOW/HIGH presentation. The fallback score for no cohesion data is 50, so an unmeasured reading can be displayed as HIGH under the current threshold.",
+  "observedEvidence": {
+    "UNMEASURED": 24,
+    "LIMITED": 26,
+    "SUPPORTED": 35,
+    "unmeasuredShare": 0.2824,
+    "limitedShare": 0.3059,
+    "supportedShare": 0.4118,
+    "sources": {
+      "REPORT_COHESION": 56,
+      "NO_COHESION_DATA": 24,
+      "REPORT_PLUS_BOOKS": 5
+    }
+  },
+  "criticalFinding": {
+    "currentHighThreshold45": {
+      "low": 36,
+      "high": 49,
+      "zeroConfidenceHigh": 24
+    },
+    "meaning": "24 of the 49 current HIGH Agreement readings in this sample were actually zero-confidence fallback 50s rather than measured high agreement."
+  },
+  "selectedArchitecture": {
+    "id": "AGREEMENT_TWO_AXIS_EVIDENCE_AWARE",
+    "preserveRawAgreementScoreFormula": true,
+    "preserveScoreOrdering": true,
+    "scoreMeaning": "measured market/book cohesion strength on the existing 0-100 scale",
+    "confidenceMeaning": "amount of evidence supporting that score on the existing 0-100 confidence scale",
+    "evidenceQualityBands": {
+      "UNMEASURED": "confidence == 0",
+      "LIMITED": "0 < confidence < 25",
+      "SUPPORTED": "confidence >= 25"
+    },
+    "highEligibilityRule": "Agreement may never qualify as HIGH when confidence == 0.",
+    "unmeasuredNumericCompatibility": "Retain neutral score 50 internally where needed for arithmetic compatibility, but expose the reading as UNMEASURED and do not treat the numeric 50 as a measured Agreement observation.",
+    "finalHighScoreThreshold": "DEFERRED_TO_STEP_4",
+    "unmeasuredVigGraphicMapping": "DEFERRED_TO_STEP_4"
+  },
+  "rejectedArchitectures": {
+    "SCORE_SHRINK": "Rejected because confidence-based shrinking compresses measured Agreement around 50 and still represents missing evidence as a numeric observation.",
+    "SCORE_TIMES_CONFIDENCE": "Rejected because blending score and confidence changes the semantic meaning of Agreement and makes evidence quantity indistinguishable from actual cohesion.",
+    "THIRD_VIG_GRAPHIC_STATE_NOW": "Deferred because Step 3 should not expand the existing 18-graphic VIG architecture before combined calibration."
+  },
+  "decisionCriteria": {
+    "eliminateZeroConfidenceHigh": true,
+    "preserveRawScoreFormula": true,
+    "preserveScoreSemantics": true,
+    "avoidArtificialScoreCompression": true,
+    "carryEvidenceQualitySeparately": true,
+    "doNotChange18GraphicArchitectureInStep3": true
+  },
+  "nextStep": "COMBINED_VIG_METER_RECALIBRATION",
+  "notes": [
+    "This locks the Step 3 calibration decision only; the live terminal Agreement behavior remains unchanged until the production rollout step.",
+    "The final LOW/HIGH score threshold and presentation treatment of UNMEASURED are intentionally deferred to Step 4, where Heat, Pressure, and Agreement will be evaluated together."
+  ]
+}
