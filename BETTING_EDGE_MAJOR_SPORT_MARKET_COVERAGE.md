@@ -74,4 +74,23 @@ A scheduled report may claim complete major-sport coverage only when:
 4. final card selection happened only after those evaluations;
 5. no actionable recommendation was suppressed by the presentation target.
 
-This addendum changes **coverage completeness**, not BET threshold or risk tolerance.
+## 7. Durable coverage receipt — mandatory from 08:00 PT September 2, 2026
+
+For report timestamps at or after `2026-09-02T08:00:00-07:00`, the schema-3 sidecar must include the exact top-level `coverageAudit` receipt controlled by `data/major-sport-market-coverage-v1.json`.
+
+The receipt records, for MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL:
+- games in scope and games evaluated;
+- required, evaluated and unavailable primary selections;
+- fresh exact prop selections returned and screened;
+- serious props receiving deeper research;
+- explicit event/market/selection availability limitations;
+- the active soft card target and overflow-protection result;
+- reconciled board-wide totals.
+
+Every in-scope game contributes six required primary selections: two moneyline selections, two primary spread/run-line/puck-line selections and two primary-total selections. Evaluated plus explicitly unavailable selections must reconcile exactly to that requirement. Every returned supported prop must be counted as screened. Every unavailable primary selection must be represented exactly once in `availabilityLimitations`.
+
+The receipt carries the exact current Git blob SHA of the market-coverage authority and the exact report `feedGeneratedAt`. `tools/major-sport-market-coverage-gate.mjs` validates the receipt before permanent History is written. The staged publisher repeats the gate during publication and on remote read-back.
+
+A missing, incomplete, internally inconsistent, stale-authority, hard-nine-card, or suppressed-actionable receipt fails closed. It does not become issued History.
+
+This addendum changes **coverage completeness and auditability**, not BET threshold or risk tolerance.
