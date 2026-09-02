@@ -68,8 +68,8 @@ jobs:
           )
           replace_once(
               '        "recent_team": text_value(source, "recent_team").upper(),',
-              '        "recent_team": text_value(source, "team").upper(),',
-              "team field alias",
+              '        "recent_team": text_value(source, "team" if weekly else "recent_team").upper(),',
+              "weekly and seasonal team aliases",
           )
           replace_once(
               '    for field in SOURCE_INTEGER_FIELDS:\n        result[field] = int_value(source, field)',
@@ -90,13 +90,17 @@ jobs:
 
           contract_path = Path("data/walters/nfl/qb-performance/stage3b-contract-v1.json")
           contract = json.loads(contract_path.read_text(encoding="utf-8"))
-          aliases = {
+          weekly_aliases = {
               "recent_team": "team",
               "interceptions": "passing_interceptions",
               "sack_yards": "sack_yards_lost",
           }
-          contract["weeklyFieldWhitelist"] = [aliases.get(field, field) for field in contract["weeklyFieldWhitelist"]]
-          contract["seasonalFieldWhitelist"] = [aliases.get(field, field) for field in contract["seasonalFieldWhitelist"]]
+          seasonal_aliases = {
+              "interceptions": "passing_interceptions",
+              "sack_yards": "sack_yards_lost",
+          }
+          contract["weeklyFieldWhitelist"] = [weekly_aliases.get(field, field) for field in contract["weeklyFieldWhitelist"]]
+          contract["seasonalFieldWhitelist"] = [seasonal_aliases.get(field, field) for field in contract["seasonalFieldWhitelist"]]
           contract["derivedFields"]["nfl_passer_rating"] = (
               "Official component formula derived only from completions, attempts, passing_yards, passing_tds and source "
               "passing_interceptions (normalized as interceptions); null when attempts are zero."
@@ -105,9 +109,16 @@ jobs:
               "normalized interceptions / attempts; null when attempts are zero."
           )
           contract["sourceToNormalizedFieldMap"] = {
-              "team": "recent_team",
-              "passing_interceptions": "interceptions",
-              "sack_yards_lost": "sack_yards",
+              "weekly": {
+                  "team": "recent_team",
+                  "passing_interceptions": "interceptions",
+                  "sack_yards_lost": "sack_yards",
+              },
+              "seasonal": {
+                  "recent_team": "recent_team",
+                  "passing_interceptions": "interceptions",
+                  "sack_yards_lost": "sack_yards",
+              },
           }
           contract_path.write_text(json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
           PY
