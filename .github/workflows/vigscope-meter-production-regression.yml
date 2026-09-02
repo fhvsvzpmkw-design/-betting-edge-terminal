@@ -1,0 +1,30 @@
+name: VigScope meter production regression
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'assets/runner-core-runtime.js'
+      - 'data/vigscope/meter-calibration-production-v1.json'
+      - 'tools/vigscope-meter-production.mjs'
+      - 'tests/vigscope-meter-production.test.mjs'
+      - '.github/workflows/vigscope-meter-production-regression.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out committed main
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run calibrated meter regression
+        run: node tests/vigscope-meter-production.test.mjs
+      - name: Verify runner production wiring
+        run: |
+          grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
+          grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
+          grep -F "50+50*Math.tanh(fav/0.028)" assets/runner-core-runtime.js
+          grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
