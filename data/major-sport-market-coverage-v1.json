@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "authorityId": "major-sport-market-coverage-v1",
+  "state": "OPERATIONAL",
+  "effectiveDate": "2026-09-02",
+  "timezone": "America/Vancouver",
+  "purpose": "Require complete major-sport market evaluation before recommendation-card selection without lowering any Betting Edge execution, Core 1.4, personnel, price, exposure or staking gate.",
+  "principles": {
+    "evaluationOrder": "EVALUATE_BEFORE_CARD_SELECTION",
+    "preselectedSideAllowed": false,
+    "marketSubstitutionAllowed": false,
+    "sportSubstitutionAllowed": false,
+    "missingPrimaryMarketMustBeRecorded": true,
+    "zeroBetsValid": true
+  },
+  "feedAuthority": {
+    "path": "data/live-odds.json",
+    "primaryEventCollection": "events",
+    "supplementalCollections": [
+      "deepMarkets",
+      "baseballProps"
+    ],
+    "rule": "Inspect fresh exact markets in events first. Supplemental deep collections may improve discovery but their absence does not prove that a prop market is unavailable."
+  },
+  "sports": {
+    "MLB": {
+      "primary": [
+        {
+          "market": "moneyline",
+          "marketDetail": "full_game_moneyline",
+          "requiredSelections": ["home", "away"]
+        },
+        {
+          "market": "spread",
+          "displayName": "run line",
+          "marketDetail": "full_game_primary_run_line",
+          "requiredSelections": ["home", "away"],
+          "primaryLineOnly": true
+        },
+        {
+          "market": "total",
+          "marketDetail": "full_game_primary_total",
+          "requiredSelections": ["over", "under"],
+          "primaryLineOnly": true
+        }
+      ],
+      "props": {
+        "requiredWhenFreshAndAvailable": true,
+        "scope": "ALL_EXACT_SUPPORTED_PLAYER_PROPS_RETURNED_BY_BOUND_FEED",
+        "examples": ["pitcher strikeouts", "hits", "total bases", "home runs", "RBI"]
+      }
+    },
+    "NHL": {
+      "primary": [
+        {
+          "market": "moneyline",
+          "marketDetail": "full_game_moneyline",
+          "requiredSelections": ["home", "away"]
+        },
+        {
+          "market": "spread",
+          "displayName": "puck line",
+          "marketDetail": "full_game_primary_puck_line",
+          "requiredSelections": ["home", "away"],
+          "primaryLineOnly": true
+        },
+        {
+          "market": "total",
+          "marketDetail": "full_game_primary_total",
+          "requiredSelections": ["over", "under"],
+          "primaryLineOnly": true
+        }
+      ],
+      "props": {
+        "requiredWhenFreshAndAvailable": true,
+        "scope": "ALL_EXACT_SUPPORTED_PLAYER_OR_GOALIE_PROPS_RETURNED_BY_BOUND_FEED",
+        "examples": ["shots", "goals", "assists", "points", "goalie saves"]
+      }
+    },
+    "NBA_WNBA": {
+      "primary": [
+        {
+          "market": "moneyline",
+          "marketDetail": "full_game_moneyline",
+          "requiredSelections": ["home", "away"]
+        },
+        {
+          "market": "spread",
+          "marketDetail": "full_game_primary_spread",
+          "requiredSelections": ["home", "away"],
+          "primaryLineOnly": true
+        },
+        {
+          "market": "total",
+          "marketDetail": "full_game_primary_total",
+          "requiredSelections": ["over", "under"],
+          "primaryLineOnly": true
+        }
+      ],
+      "props": {
+        "requiredWhenFreshAndAvailable": true,
+        "scope": "ALL_EXACT_SUPPORTED_PLAYER_PROPS_RETURNED_BY_BOUND_FEED",
+        "examples": ["points", "rebounds", "assists", "three-pointers"]
+      }
+    },
+    "FOOTBALL": {
+      "leagues": ["NFL", "NCAAF", "CFL"],
+      "primary": [
+        {
+          "market": "moneyline",
+          "marketDetail": "full_game_moneyline",
+          "requiredSelections": ["home", "away"]
+        },
+        {
+          "market": "spread",
+          "marketDetail": "full_game_primary_spread",
+          "requiredSelections": ["home", "away"],
+          "primaryLineOnly": true
+        },
+        {
+          "market": "total",
+          "marketDetail": "full_game_primary_total",
+          "requiredSelections": ["over", "under"],
+          "primaryLineOnly": true
+        }
+      ],
+      "props": {
+        "requiredWhenFreshAndAvailable": true,
+        "scope": "ALL_EXACT_SUPPORTED_PLAYER_PROPS_RETURNED_BY_BOUND_FEED",
+        "examples": ["passing yards", "rushing yards", "receiving yards", "receptions", "touchdowns"],
+        "leagueAvailabilityRule": "NFL, NCAAF and CFL props are screened whenever the bound feed supplies fresh exact markets; absence at a league/book is recorded rather than substituted."
+      }
+    }
+  },
+  "propProcess": {
+    "stage1": "Enumerate and screen every fresh exact supported prop selection returned by the bound feed for in-scope major-sport games.",
+    "stage2": "Perform deeper matchup/personnel/model work on serious prop candidates and any prop whose apparent value materially depends on unresolved participation or role assumptions.",
+    "identity": "Every actionable player prop requires exact event, player, market, line, side and executable-book identity under the production contract.",
+    "noFabrication": true
+  },
+  "presentation": {
+    "preferencePath": "data/preferences.json",
+    "preferenceId": "report_card_target",
+    "targetIsSoft": true,
+    "overflowProtectionRequired": true,
+    "rule": "The card target is applied only after complete market evaluation. A qualifying BET, LEAN or WAIT may not be suppressed solely to meet the target. PASS cards may be curated after complete evaluation."
+  },
+  "completion": {
+    "primaryCoverageComplete": "Every in-scope game has every required primary selection evaluated or an explicit exact-market availability limitation recorded.",
+    "propCoverageComplete": "Every fresh exact supported prop returned by the bound feed has been screened, with deeper work completed where the candidate is serious or materially personnel-dependent.",
+    "reportCompletenessClaim": "A report must not claim complete major-sport coverage when a required primary-market evaluation was skipped."
+  }
+}
