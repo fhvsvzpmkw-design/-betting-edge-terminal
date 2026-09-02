@@ -91,8 +91,8 @@ jobs:
         continue-on-error: true
         run: node --test tests/walters-qb-performance-stage4.test.mjs
 
-      - name: Publish Stage 4 evidence or fail closed on concurrent main changes
-        if: always() && github.event_name != 'pull_request' && steps.stage4_build.outcome == 'success'
+      - name: Publish Stage 4 evidence only after all gates pass
+        if: always() && github.event_name != 'pull_request' && steps.stage4_build.outcome == 'success' && steps.stage4_validate.outcome == 'success' && steps.stage4_tests.outcome == 'success'
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
