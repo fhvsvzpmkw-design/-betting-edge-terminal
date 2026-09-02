@@ -1,0 +1,95 @@
+{
+  "state": "PASS",
+  "step": 2,
+  "name": "PRICE_PRESSURE_CALIBRATION",
+  "mode": "READ_ONLY_DECISION_LOCK",
+  "productionChanged": false,
+  "period": {
+    "start": "2026-08-15",
+    "end": "2026-09-01",
+    "reports": 85,
+    "dates": 18
+  },
+  "preservedInputs": {
+    "signedFavorDefinition": "status-weighted mean signed change in implied probability",
+    "trueZeroMeaning": "no net directional price pressure",
+    "neutralCenter": 50,
+    "directionSymmetry": true
+  },
+  "problem": "The current linear scale Pressure = clamp(50 + signedFavor * 1000, 0, 100) compresses most genuine movement near 50 while hard-clipping sufficiently large moves at 0 or 100.",
+  "selectedVariant": {
+    "id": "PRESSURE_TANH_014",
+    "family": "SMOOTH_TANH",
+    "fixedMovementAnchor": 0.014,
+    "formula": "Pressure = 50 + 50 * tanh(signedFavor / 0.028)",
+    "properties": [
+      "signedFavor == 0 maps exactly to 50",
+      "positive and negative movement remain symmetric around 50",
+      "the transform is strictly monotonic and preserves directional ordering",
+      "extreme movement approaches 0 and 100 smoothly rather than hard-clipping"
+    ]
+  },
+  "selectionResults": {
+    "trueZeroReports": 16,
+    "trueZeroReportsRemainingExactly50": 16,
+    "signMismatches": 0,
+    "currentMiddle40to60Count": 64,
+    "selectedMiddle40to60Count": 58,
+    "currentStrongDirectional20or80Count": 9,
+    "selectedStrongDirectional20or80Count": 15,
+    "currentEndpointSaturation": {
+      "lowAtOrBelow5": 1,
+      "highAtOrAbove95": 6,
+      "combined": 7
+    },
+    "selectedEndpointSaturation": {
+      "lowAtOrBelow5": 1,
+      "highAtOrAbove95": 6,
+      "combined": 7
+    },
+    "correlationToCurrent": 0.98199,
+    "meanAbsolutePressureChange": 2.782,
+    "currentUniqueRoundedNonzeroValues": 32,
+    "selectedUniqueRoundedNonzeroValues": 39,
+    "currentQuartiles": {
+      "p25": 49.0944,
+      "median": 50.2701,
+      "p75": 53.4919
+    },
+    "selectedQuartiles": {
+      "p25": 48.3835,
+      "median": 50.4824,
+      "p75": 56.2033
+    }
+  },
+  "calibrationBasis": {
+    "observedNonzeroAbsoluteSignedFavor": {
+      "median": 0.0038,
+      "p75": 0.0139,
+      "p90": 0.04
+    },
+    "anchorChoice": "0.014 is the rounded current-period p75 of nonzero absolute signedFavor and is locked as a fixed calibration anchor for this decision; it is not a self-updating production parameter."
+  },
+  "rejectedOrDeferredVariants": {
+    "LINEAR_1250": "Too little decompression; 61 of 85 remained in 40-60 and endpoint saturation increased to 9 combined.",
+    "LINEAR_1500": "Near the desired spread but endpoint saturation increased to 9 combined.",
+    "LINEAR_1750": "Endpoint saturation increased sharply to 14 combined and correlation fell below the Step-2 preservation target.",
+    "LINEAR_2000": "Over-expansion; 14 combined endpoint saturations and correlation 0.95809.",
+    "TANH_010": "Too aggressive; correlation 0.9569 and 10 combined endpoint saturations.",
+    "TANH_012": "Good spread but correlation 0.97161 missed the 0.975 preservation floor.",
+    "TANH_016": "Qualified and preserved current behavior slightly more closely, but left more observations compressed near 50 than TANH_014."
+  },
+  "decisionCriteria": {
+    "zeroFavorMustRemainExactly50": true,
+    "signMismatchesAllowed": 0,
+    "minimumCorrelationToCurrent": 0.975,
+    "targetMiddle40to60Count": [52, 60],
+    "maximumCombinedEndpointSaturation": 8,
+    "preferSmoothNoHardClipping": true
+  },
+  "nextStep": "AGREEMENT_CALIBRATION",
+  "notes": [
+    "This locks the Step 2 calibration decision only; the live terminal Price Pressure formula remains unchanged until the production rollout step.",
+    "Final ADVERSE/NEUTRAL/FAVORABLE Pressure thresholds remain intentionally undecided until all three meters are calibrated and the combined VIG Meter is recalibrated."
+  ]
+}
