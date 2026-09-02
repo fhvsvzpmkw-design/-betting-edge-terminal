@@ -16,10 +16,18 @@
     "eaNormalizedManifest": "data/walters/nfl/madden27/madden27-current.json"
   },
   "captureWindow": {
-    "seasons": [2021, 2022, 2023, 2024, 2025],
+    "seasons": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
     "gameType": "REG",
     "reason": "2021-2024 supplies a four-season history for a chronological 2025 holdout; 2022-2025 supplies the full four-season history available entering 2026.",
-    "excludedSeasons": [2020],
+    "excludedSeasons": [
+      2020
+    ],
     "excludedSeasonReason": "The structurally abnormal 2020 environment is not needed for either the 2025 holdout or the 2026 four-season candidate window."
   },
   "sourceLock": {
@@ -50,7 +58,7 @@
     "player_id",
     "player_display_name",
     "position",
-    "recent_team",
+    "team",
     "season",
     "week",
     "season_type",
@@ -59,9 +67,9 @@
     "attempts",
     "passing_yards",
     "passing_tds",
-    "interceptions",
+    "passing_interceptions",
     "sacks_suffered",
-    "sack_yards",
+    "sack_yards_lost",
     "sack_fumbles",
     "sack_fumbles_lost",
     "passing_first_downs",
@@ -85,9 +93,9 @@
     "attempts",
     "passing_yards",
     "passing_tds",
-    "interceptions",
+    "passing_interceptions",
     "sacks_suffered",
-    "sack_yards",
+    "sack_yards_lost",
     "sack_fumbles",
     "sack_fumbles_lost",
     "passing_first_downs",
@@ -104,9 +112,9 @@
     "dropbacks": "attempts + sacks_suffered",
     "recorded_qb_fumbles": "sack_fumbles + rushing_fumbles",
     "recorded_qb_fumbles_lost": "sack_fumbles_lost + rushing_fumbles_lost",
-    "nfl_passer_rating": "Official component formula derived only from completions, attempts, passing_yards, passing_tds and interceptions; null when attempts are zero.",
+    "nfl_passer_rating": "Official component formula derived only from completions, attempts, passing_yards, passing_tds and source passing_interceptions (normalized as interceptions); null when attempts are zero.",
     "yards_per_attempt": "passing_yards / attempts; null when attempts are zero.",
-    "interception_rate": "interceptions / attempts; null when attempts are zero.",
+    "interception_rate": "normalized interceptions / attempts; null when attempts are zero.",
     "sack_rate": "sacks_suffered / dropbacks; null when dropbacks are zero.",
     "fumble_rate": "recorded_qb_fumbles / dropbacks; null when dropbacks are zero. Retained as a Stage 3C candidate definition, not an approved weight.",
     "qb_rushing_yards_per_dropback": "rushing_yards / dropbacks; null when dropbacks are zero. Retained as evidence, not a spread addend."
@@ -190,7 +198,13 @@
   },
   "acceptance": {
     "requiredSourceAssets": 11,
-    "requiredSeasons": [2021, 2022, 2023, 2024, 2025],
+    "requiredSeasons": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
     "requireAllAssetHashes": true,
     "requireRawAssetsPresent": true,
     "requireZeroCurrentEaQbIdentityBlocks": true,
@@ -203,5 +217,17 @@
     "passState": "STAGE3B_CAPTURED_IDENTITY_AUDITED_NON_OPERATIONAL",
     "failState": "STAGE3B_FAIL_CLOSED_REVIEW_REQUIRED",
     "nextSubstageOnPass": "STAGE3C_MODEL_ESTIMATION_AND_HOLDOUT_VALIDATION"
+  },
+  "sourceToNormalizedFieldMap": {
+    "weekly": {
+      "team": "recent_team",
+      "passing_interceptions": "interceptions",
+      "sack_yards_lost": "sack_yards"
+    },
+    "seasonal": {
+      "recent_team": "recent_team",
+      "passing_interceptions": "interceptions",
+      "sack_yards_lost": "sack_yards"
+    }
   }
 }

@@ -68,6 +68,10 @@ SOURCE_INTEGER_FIELDS = [
     "rushing_fumbles_lost",
     "rushing_first_downs",
 ]
+SOURCE_INTEGER_FIELD_MAP = {
+    "interceptions": "passing_interceptions",
+    "sack_yards": "sack_yards_lost",
+}
 SOURCE_FLOAT_FIELDS = ["passing_epa", "rushing_epa"]
 DERIVED_FIELDS = [
     "dropbacks",
@@ -415,7 +419,7 @@ def normalized_base_row(source: dict[str, Any], *, weekly: bool) -> dict[str, An
         "player_id": text_value(source, "player_id"),
         "player_display_name": text_value(source, "player_display_name"),
         "position": text_value(source, "position").upper(),
-        "recent_team": text_value(source, "recent_team").upper(),
+        "recent_team": text_value(source, "team" if weekly else "recent_team").upper(),
         "season": int_value(source, "season"),
         "season_type": text_value(source, "season_type", "REG").upper() or "REG",
     }
@@ -423,7 +427,8 @@ def normalized_base_row(source: dict[str, Any], *, weekly: bool) -> dict[str, An
         result["week"] = int_value(source, "week")
         result["opponent_team"] = text_value(source, "opponent_team").upper()
     for field in SOURCE_INTEGER_FIELDS:
-        result[field] = int_value(source, field)
+        source_field = SOURCE_INTEGER_FIELD_MAP.get(field, field)
+        result[field] = int_value(source, source_field)
     for field in SOURCE_FLOAT_FIELDS:
         result[field] = round(float_value(source, field), 8)
     return add_derived(result)
@@ -433,7 +438,7 @@ def normalize_weekly_assets(contract: dict[str, Any], manifest: dict[str, Any]) 
     seasons = [int(value) for value in contract["captureWindow"]["seasons"]]
     rows: list[dict[str, Any]] = []
     headers_by_asset: dict[str, list[str]] = {}
-    required = WEEKLY_ID_FIELDS + SOURCE_INTEGER_FIELDS + SOURCE_FLOAT_FIELDS
+    required = list(contract["weeklyFieldWhitelist"])
     for season in seasons:
         name = f"stats_player_week_{season}.csv.gz"
         record = source_record(manifest, name)
@@ -499,7 +504,7 @@ def normalize_seasonal_assets(contract: dict[str, Any], manifest: dict[str, Any]
     seasons = [int(value) for value in contract["captureWindow"]["seasons"]]
     output: list[dict[str, Any]] = []
     headers_by_asset: dict[str, list[str]] = {}
-    required = [field for field in SEASONAL_ID_FIELDS if field != "season_type"] + SOURCE_INTEGER_FIELDS + SOURCE_FLOAT_FIELDS
+    required = list(contract["seasonalFieldWhitelist"])
     for season in seasons:
         name = f"stats_player_reg_{season}.csv.gz"
         record = source_record(manifest, name)
