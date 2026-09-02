@@ -1,0 +1,134 @@
+name: Walters QB Performance Stage 5
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/walters-qb-performance-stage5.yml"
+      - "data/history/runs/2026-09-02/evening-151830.json"
+      - "data/walters/nfl-power-ratings-ledger.json"
+      - "data/walters/nfl/active-week.json"
+      - "data/walters/nfl/personnel-production-current.json"
+      - "data/walters/nfl/matchup-production-current.json"
+      - "data/walters/nfl/2026/week-01-current-numbers.json"
+      - "data/walters/nfl/2026/week-01-research-ledger.json"
+      - "data/walters/nfl/current-week-terminal.json"
+      - "data/walters/nfl/qb-performance/model/stage3c-model-v1.json"
+      - "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+      - "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
+      - "data/walters/nfl/qb-performance/stage4-contract-v1.json"
+      - "data/walters/nfl/qb-performance/stage4-acceptance-v1.json"
+      - "data/walters/nfl/qb-performance/stage4-current.json"
+      - "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json"
+      - "data/walters/nfl/qb-performance/stage4/shadow-board-v1.json"
+      - "data/walters/nfl/qb-performance/stage4/uncertainty-reconciliation-v1.json"
+      - "data/walters/nfl/qb-performance/stage5-contract-v1.json"
+      - "tools/build-walters-qb-performance-stage5.py"
+      - "tools/validate-walters-qb-performance-stage5.mjs"
+      - "tests/walters-qb-performance-stage5.test.mjs"
+  pull_request:
+    paths:
+      - ".github/workflows/walters-qb-performance-stage5.yml"
+      - "data/history/runs/2026-09-02/evening-151830.json"
+      - "data/walters/nfl-power-ratings-ledger.json"
+      - "data/walters/nfl/active-week.json"
+      - "data/walters/nfl/personnel-production-current.json"
+      - "data/walters/nfl/matchup-production-current.json"
+      - "data/walters/nfl/2026/week-01-current-numbers.json"
+      - "data/walters/nfl/2026/week-01-research-ledger.json"
+      - "data/walters/nfl/current-week-terminal.json"
+      - "data/walters/nfl/qb-performance/model/stage3c-model-v1.json"
+      - "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+      - "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
+      - "data/walters/nfl/qb-performance/stage4-contract-v1.json"
+      - "data/walters/nfl/qb-performance/stage4-acceptance-v1.json"
+      - "data/walters/nfl/qb-performance/stage4-current.json"
+      - "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json"
+      - "data/walters/nfl/qb-performance/stage4/shadow-board-v1.json"
+      - "data/walters/nfl/qb-performance/stage4/uncertainty-reconciliation-v1.json"
+      - "data/walters/nfl/qb-performance/stage5-contract-v1.json"
+      - "tools/build-walters-qb-performance-stage5.py"
+      - "tools/validate-walters-qb-performance-stage5.mjs"
+      - "tests/walters-qb-performance-stage5.test.mjs"
+
+concurrency:
+  group: walters-qb-performance-stage5-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-validate-stage5-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout triggering ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Validate Stage 4 handoff
+        run: node tools/validate-walters-qb-performance-stage4.mjs
+
+      - name: Run Stage 5 deterministic helper tests
+        run: python tools/build-walters-qb-performance-stage5.py --self-test
+
+      - name: Build Stage 5 production-review evidence
+        id: stage5_build
+        run: python tools/build-walters-qb-performance-stage5.py
+
+      - name: Validate Stage 5 review, preservation and activation boundary
+        id: stage5_validate
+        continue-on-error: true
+        run: node tools/validate-walters-qb-performance-stage5.mjs
+
+      - name: Run Stage 5 guardrail tests
+        id: stage5_tests
+        continue-on-error: true
+        run: node --test tests/walters-qb-performance-stage5.test.mjs
+
+      - name: Publish Stage 5 review evidence only after all gates pass on main
+        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.stage5_build.outcome == 'success' && steps.stage5_validate.outcome == 'success' && steps.stage5_tests.outcome == 'success'
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- \
+            data/walters/nfl/qb-performance/stage5/freeze-manifest-v1.json \
+            data/walters/nfl/qb-performance/stage5/production-review-v1.json \
+            data/walters/nfl/qb-performance/stage5/activation-readiness-v1.json \
+            data/walters/nfl/qb-performance/stage5/regression-audit-v1.json \
+            data/walters/nfl/qb-performance/stage5-acceptance-v1.json \
+            data/walters/nfl/qb-performance/stage5-current.json
+          if git diff --cached --quiet; then
+            echo "No Stage 5 output changes to publish."
+            exit 0
+          fi
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          git commit -m "Validate Walters QB performance Stage 5 production review"
+          git push origin HEAD:main
+
+      - name: Enforce Stage 5 review result
+        if: always()
+        env:
+          STAGE5_BUILD: ${{ steps.stage5_build.outcome }}
+          STAGE5_VALIDATE: ${{ steps.stage5_validate.outcome }}
+          STAGE5_TESTS: ${{ steps.stage5_tests.outcome }}
+        run: |
+          set -euo pipefail
+          test "$STAGE5_BUILD" = "success"
+          test "$STAGE5_VALIDATE" = "success"
+          test "$STAGE5_TESTS" = "success"
