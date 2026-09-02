@@ -5,14 +5,10 @@ on:
     branches: [main]
     paths:
       - .github/workflows/graham-terminal-refresh.yml
-      - data/walters/nfl/active-week.json
-      - data/walters/nfl/20*/week-*-current-numbers.json
       - data/walters/nfl/graham-fair-decomposition-policy-v1.json
-      - data/walters/nfl/graham-schedule-authority-v1.json
       - data/walters/nfl-power-ratings-ledger.json
       - tools/graham-active-week.mjs
       - tools/graham-fair-decomposition.mjs
-      - tools/graham-schedule-authority.mjs
       - tools/build-graham-current-week.mjs
       - tools/capture-graham-daily-pinnacle.mjs
   workflow_run:
@@ -116,8 +112,8 @@ jobs:
             ACTIVE_MARKET_LEDGER="$(node tools/graham-active-week.mjs --path dailyMarketLedger)"
             ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
 
-            # The Nineteenth Hole may only rebuild from a board whose schedule
-            # metadata and fair explanation both match their controlled authorities.
+            # The Nineteenth Hole may only rebuild after the schedule-metadata
+            # authority and governed fair explanation both validate exactly.
             node tools/graham-schedule-authority.mjs --path "$ACTIVE_NUMBERS"
             node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
 
@@ -155,7 +151,7 @@ jobs:
           {
             echo "## Graham Mercer // The Nineteenth Hole"
             echo
-            echo "- Trigger: odds refresh or Graham research/personnel/matchup/home-field/active-week/schedule publication"
+            echo "- Trigger: governed odds/research/personnel/matchup/home-field publication, or completed schedule-metadata synchronization"
             echo "- Active week: ${ACTIVE:-unresolved}"
             echo "- Active-week resolver regression: live week + simulated next week checked"
             echo "- Schedule metadata guard: active board must match graham-schedule-metadata-v1"
