@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {matchNflFixture,extractPinnacleHomeSpread,extractPinnacleMoneyline} from './graham-market-utils.mjs';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
+import {loadGrahamScheduleAuthority,validateGrahamBoardScheduleMetadata} from './graham-schedule-authority.mjs';
 
 const ROOT=process.cwd();
 const ACTIVE=resolveGrahamActiveWeek({root:ROOT});
@@ -19,6 +20,8 @@ function roundHalf(v){return Number.isFinite(v)?Math.round(v*2)/2:null}
 function latestSnapshot(game){const rows=Array.isArray(game?.dailySnapshots)?game.dailySnapshots:[];return rows.slice().sort((a,b)=>Number(a.sequence||0)-Number(b.sequence||0)).at(-1)||null}
 
 const numbers=readJson(NUMBERS);
+const scheduleAuthority=loadGrahamScheduleAuthority({root:ROOT});
+validateGrahamBoardScheduleMetadata(numbers,scheduleAuthority);
 const ratings=readJson(RATINGS);
 const market=readJson(MARKET);
 const observer=fs.existsSync(OBSERVER)?readJson(OBSERVER):null;
@@ -82,6 +85,7 @@ const out={
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
   activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
   lastResearchAt:numbers.lastResearchAt||null,marketObservedAt:observer?.generatedAt||null,
+  scheduleAuthority:numbers.scheduleAuthority,
   sourceScheduleMeta:live?.scheduleMeta||null,
   displayPolicy:{mode:'CURRENT_WEEK_TERMINAL',marketIsolation:true,pinnacleRole:'SHARP_MARKET_BENCHMARK_ONLY',bettingAuthority:false,rawOutput:true},
   moneylinePolicy:{method:'WALTERS_PAGES_270_272_WAGER_FORM_SELECTOR',standaloneGrahamFairMoneyline:false,role:'EXECUTION_FORM_COMPARISON_AFTER_SPREAD_QUALIFICATION',bookExactSpreadPriceAmerican:-110,marketCanChangeGrahamFair:false,autoCreatesBet:false},
@@ -94,4 +98,5 @@ fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');
 const verify=JSON.parse(fs.readFileSync(OUT,'utf8'));
 if(Number(verify.season)!==ACTIVE.season||Number(verify.week)!==ACTIVE.week)throw new Error('Graham terminal active-week verification failed');
-console.log(`GRAHAM TERMINAL BUILT // ${ACTIVE.season} WEEK ${ACTIVE.week} // ${games.length} GAMES // ${games.filter(g=>g.grahamFairHome!==null).length} GRAHAM NUMBERS // ${games.filter(g=>g.pinnacleSpreadHome!==null).length} PINNACLE LINES // ${games.filter(g=>g.pinnacleMoneylineStatus==='AVAILABLE').length} PINNACLE MONEYLINES`);
+if(verify.scheduleAuthority?.authorityId!==scheduleAuthority.authorityId||verify.scheduleAuthority?.state!=='SYNCHRONIZED')throw new Error('Graham terminal schedule authority verification failed');
+console.log(`GRAHAM TERMINAL BUILT // ${ACTIVE.season} WEEK ${ACTIVE.week} // ${games.length} GAMES // ${games.filter(g=>g.grahamFairHome!==null).length} GRAHAM NUMBERS // ${games.filter(g=>g.pinnacleSpreadHome!==null).length} PINNACLE LINES // ${games.filter(g=>g.pinnacleMoneylineStatus==='AVAILABLE').length} PINNACLE MONEYLINES // SCHEDULE ${scheduleAuthority.authorityId}`);
