@@ -8,6 +8,7 @@ on:
       - 'data/vigscope/meter-calibration-production-v1.json'
       - 'tools/vigscope-meter-production.mjs'
       - 'tests/vigscope-meter-production.test.mjs'
+      - 'tests/vigscope-meter-fallback-safety.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
 
 jobs:
@@ -22,9 +23,13 @@ jobs:
           node-version: '22'
       - name: Run calibrated meter regression
         run: node tests/vigscope-meter-production.test.mjs
+      - name: Run fallback meter safety regression
+        run: node tests/vigscope-meter-fallback-safety.test.mjs
       - name: Verify runner production wiring
         run: |
           grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
           grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
           grep -F "50+50*Math.tanh(fav/0.028)" assets/runner-core-runtime.js
           grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
+          grep -F "function explicitMovementOddsPairs(v)" assets/runner-core-runtime.js
+          grep -F "MARKET STATE UNMEASURED" assets/runner-core-runtime.js
