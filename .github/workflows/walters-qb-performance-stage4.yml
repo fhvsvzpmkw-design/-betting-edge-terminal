@@ -45,7 +45,7 @@ on:
       - ".github/workflows/walters-qb-performance-stage4.yml"
 
 concurrency:
-  group: walters-qb-performance-stage4
+  group: walters-qb-performance-stage4-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -56,10 +56,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout main
+      - name: Checkout triggering ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -92,8 +92,8 @@ jobs:
         continue-on-error: true
         run: node --test tests/walters-qb-performance-stage4.test.mjs
 
-      - name: Publish Stage 4 evidence or fail closed on concurrent main changes
-        if: always() && github.event_name != 'pull_request' && steps.stage4_build.outcome == 'success'
+      - name: Publish Stage 4 evidence only after all gates pass on main
+        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.stage4_build.outcome == 'success' && steps.stage4_validate.outcome == 'success' && steps.stage4_tests.outcome == 'success'
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
