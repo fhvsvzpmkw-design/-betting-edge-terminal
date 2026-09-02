@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,6 +25,35 @@ const paths = {
   current: path.join(QB_ROOT, 'stage4-current.json'),
 };
 
+const PYTHON_CANONICAL_SCRIPT = String.raw`
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+
+def canonical_payload(value):
+    if isinstance(value, dict):
+        return {
+            key: canonical_payload(item)
+            for key, item in value.items()
+            if key != "contentSha256Canonical"
+        }
+    if isinstance(value, list):
+        return [canonical_payload(item) for item in value]
+    return value
+
+
+value = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+raw = json.dumps(
+    canonical_payload(value),
+    ensure_ascii=False,
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+sys.stdout.write(hashlib.sha256(raw).hexdigest())
+`;
+
 function rel(file) {
   return path.relative(ROOT, file).split(path.sep).join('/');
 }
@@ -41,21 +71,21 @@ function sha256File(file) {
   return sha256Buffer(fs.readFileSync(file));
 }
 
-function canonicalPayload(value) {
-  if (Array.isArray(value)) return value.map(canonicalPayload);
-  if (value && typeof value === 'object') {
-    const output = {};
-    for (const key of Object.keys(value).sort()) {
-      if (key === 'contentSha256Canonical') continue;
-      output[key] = canonicalPayload(value[key]);
-    }
-    return output;
+function canonicalShaFile(file) {
+  const python = process.env.PYTHON || 'python';
+  const result = spawnSync(python, ['-c', PYTHON_CANONICAL_SCRIPT, file], {
+    encoding: 'utf8',
+    maxBuffer: 10 * 1024 * 1024,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    throw new Error(`Python canonical hash failed for ${rel(file)}: ${(result.stderr || '').trim()}`);
   }
-  return value;
-}
-
-function canonicalSha(value) {
-  return sha256Buffer(Buffer.from(JSON.stringify(canonicalPayload(value)), 'utf8'));
+  const digest = (result.stdout || '').trim();
+  if (!/^[0-9a-f]{64}$/.test(digest)) {
+    throw new Error(`Python canonical hash returned an invalid digest for ${rel(file)}.`);
+  }
+  return digest;
 }
 
 function nearlyEqual(left, right, tolerance = 1e-9) {
@@ -79,14 +109,27 @@ function anyTrueKey(value, targetKey) {
   return false;
 }
 
-function assertCanonical(name, value, errors) {
-  if (typeof value.contentSha256Canonical !== 'string') {
-    errors.push(`${name} has no canonical content hash.`);
+function containsExactString(value, target) {
+  if (typeof value === 'string') return value === target;
+  if (Array.isArray(value)) return value.some((item) => containsExactString(item, target));
+  if (value && typeof value === 'object') {
+    return Object.values(value).some((item) => containsExactString(item, target));
+  }
+  return false;
+}
+
+function assertCanonicalFile(name, file, value, errors) {
+  if (typeof value.contentSha256Canonical !== 'string' || !/^[0-9a-f]{64}$/.test(value.contentSha256Canonical)) {
+    errors.push(`${name} has no valid canonical content hash.`);
     return;
   }
-  const actual = canonicalSha(value);
-  if (actual !== value.contentSha256Canonical) {
-    errors.push(`${name} canonical hash mismatch: ${actual} != ${value.contentSha256Canonical}`);
+  try {
+    const actual = canonicalShaFile(file);
+    if (actual !== value.contentSha256Canonical) {
+      errors.push(`${name} canonical hash mismatch: ${actual} != ${value.contentSha256Canonical}`);
+    }
+  } catch (error) {
+    errors.push(error.message);
   }
 }
 
@@ -104,8 +147,17 @@ const acceptance = readJson(paths.acceptance);
 const current = readJson(paths.current);
 const errors = [];
 
-for (const [name, value] of Object.entries({ freeze, bindings, board, reconciliation, rollover, regression, acceptance, current })) {
-  assertCanonical(name, value, errors);
+for (const [name, file, value] of [
+  ['freeze', paths.freeze, freeze],
+  ['bindings', paths.bindings, bindings],
+  ['board', paths.board, board],
+  ['reconciliation', paths.reconciliation, reconciliation],
+  ['rollover', paths.rollover, rollover],
+  ['regression', paths.regression, regression],
+  ['acceptance', paths.acceptance, acceptance],
+  ['current', paths.current, current],
+]) {
+  assertCanonicalFile(name, file, value, errors);
 }
 
 if (contract.stage !== 4 || contract.operational !== false || contract.productionAuthority !== false) {
@@ -129,8 +181,14 @@ for (const entry of freeze.inputs ?? []) {
   const actualRaw = sha256File(file);
   if (actualRaw !== entry.sha256) errors.push(`Frozen input raw hash mismatch: ${entry.path}`);
   if (entry.canonicalJsonSha256) {
-    const parsed = readJson(file);
-    if (canonicalSha(parsed) !== entry.canonicalJsonSha256) errors.push(`Frozen input canonical hash mismatch: ${entry.path}`);
+    try {
+      const actualCanonical = canonicalShaFile(file);
+      if (actualCanonical !== entry.canonicalJsonSha256) {
+        errors.push(`Frozen input canonical hash mismatch: ${entry.path}`);
+      }
+    } catch (error) {
+      errors.push(error.message);
+    }
   }
 }
 
@@ -274,6 +332,10 @@ const hashLinks = [
   [current.stage4Acceptance, current.stage4AcceptanceSha256],
 ];
 for (const [filePath, expectedHash] of hashLinks) {
+  if (typeof filePath !== 'string' || typeof expectedHash !== 'string') {
+    errors.push('A Stage 4 artifact hash link is incomplete.');
+    continue;
+  }
   const file = path.join(ROOT, filePath);
   if (!fs.existsSync(file) || sha256File(file) !== expectedHash) errors.push(`Referenced artifact hash mismatch: ${filePath}`);
 }
@@ -296,9 +358,8 @@ for (const [name, value] of Object.entries(generated)) {
   if (anyTrueKey(value, 'grahamWritesAllowed')) errors.push(`${name} contains grahamWritesAllowed:true.`);
   if (anyTrueKey(value, 'uncertaintyOverlaysRetired')) errors.push(`${name} contains uncertaintyOverlaysRetired:true.`);
 }
-const serializedGenerated = JSON.stringify(generated);
-if (serializedGenerated.includes('APPROVED_WALTERS_QB_PERFORMANCE')) {
-  errors.push('Stage 4 generated artifacts contain a production authority token.');
+if (containsExactString(generated, 'APPROVED_WALTERS_QB_PERFORMANCE')) {
+  errors.push('Stage 4 generated artifacts contain an activated production authority value.');
 }
 
 if (errors.length) {
@@ -318,6 +379,7 @@ console.log(JSON.stringify({
   checks: [
     'stage3-acceptance-handoff',
     'immutable-stage4-input-freeze',
+    'cross-runtime-canonical-integrity',
     'governed-starter-and-baseline-bindings',
     'differential-only-shadow-formula',
     'resolved-overlay-replacement-without-stacking',
