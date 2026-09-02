@@ -14,6 +14,8 @@ on:
       - 'core/tests/walters-interface-v1.4.test.mjs'
       - 'research/research-library.json'
       - 'research/staging/BILLY_WALTERS_SPREAD_BOX_SPEC_2026-08-15.md'
+      - 'BETTING_EDGE_PERSONNEL_SWEEP.md'
+      - 'BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md'
       - 'tools/core-handicap-framework.mjs'
       - 'tools/core-v14-publication-gate.mjs'
       - 'tools/report-sidecar-contract.mjs'
@@ -58,6 +60,8 @@ jobs:
         run: node tools/report-publication.mjs self-test
       - name: Validate personnel semantic enforcement
         run: |
+          grep -q 'finalRecheck: true' BETTING_EDGE_PERSONNEL_SWEEP.md
+          grep -q 'finalRecheck: true' BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
           node tools/personnel-semantic-gate.mjs self-test
           node tools/personnel-semantic-gate.mjs validate --report data/history/runs/2026-09-02/final_morning-093430.json --sidecar data/history/research-fit/2026-09-02/final_morning-093430.json
       - name: Validate production publication gate
