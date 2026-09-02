@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths:
+      - data/walters/nfl/active-week.json
+      - data/walters/nfl/20*/week-*-current-numbers.json
       - data/walters/nfl/graham-schedule-authority-v1.json
       - tools/graham-schedule-authority.mjs
       - tests/graham-schedule-authority.test.mjs
@@ -94,6 +96,7 @@ jobs:
             echo "## Graham schedule metadata"
             echo
             echo "- Repository metadata authority: data/walters/nfl/graham-schedule-authority-v1.json"
+            echo "- Trigger coverage: active-week changes and every active/current Graham board publication"
             echo "- Timezone: America/Vancouver"
             echo "- Timing mode: exact_schedule"
             echo "- Legacy researchCadence: generated compatibility projection only"
