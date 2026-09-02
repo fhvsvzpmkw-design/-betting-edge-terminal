@@ -35,6 +35,7 @@ jobs:
           node --check tools/apply-graham-personnel-staging.mjs
           node --check tools/validate-graham-personnel-closure.mjs
           node --check tools/graham-active-week.mjs
+          node --check tools/graham-fair-decomposition.mjs
           node tools/graham-active-week.mjs
           node - <<'NODE'
           const fs=require('node:fs');
@@ -58,6 +59,13 @@ jobs:
       - name: Apply governed personnel staging batch
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json
 
+      - name: Synchronize governed fair decomposition
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS" --write
+          node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
+
       - name: Verify market isolation and live outputs
         run: |
           node - <<'NODE'
@@ -73,6 +81,7 @@ jobs:
           if(!ledger.processedBatchIds.includes(s.batchId))throw new Error('batch not durable');
           if(research.sweeps.at(-1)?.summary?.marketViewed!==false)throw new Error('research market isolation failed');
           if(numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))throw new Error('invalid fair number');
+          if(numbers.fairDecompositionPolicyId!=='graham-fair-decomposition-v1'||numbers.fairExplanationState!=='SYNCHRONIZED')throw new Error('fair explanation synchronization missing');
           console.log(`GRAHAM PERSONNEL PRODUCTION VERIFY: PASS // ${s.batchId}`);
           NODE
 
