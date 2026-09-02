@@ -11,7 +11,7 @@ const current=JSON.parse(fs.readFileSync(currentPath,'utf8'));
 const sidecar=JSON.parse(fs.readFileSync(sidecarPath,'utf8'));
 const feedBlobSha=sidecar?.provenance?.feedBlobSha;
 assert.match(feedBlobSha,/^[0-9a-f]{40}$/i);
-const feed=JSON.parse(execFileSync('git',['cat-file','blob',feedBlobSha],{encoding:'utf8',maxBuffer:16*1024*1024}));
+const feed=JSON.parse(execFileSync('git',['cat-file','blob',feedBlobSha],{encoding:'utf8',maxBuffer:128*1024*1024}));
 assert.equal(feed.generatedAt,current.feedGeneratedAt);
 
 const telemetry=deriveInstrumentTelemetry({
