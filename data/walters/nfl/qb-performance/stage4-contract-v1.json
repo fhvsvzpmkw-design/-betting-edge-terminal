@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "walters-qb-performance-stage4-contract-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 4,
+  "substage": "QB_REGRESSION_AND_SHADOW_TESTING",
+  "status": "LOCKED_STAGE4_SHADOW_CONTRACT",
+  "purpose": "Bind governed Week 1 starter identities to the frozen Stage 3 quarterback candidates, bind the quarterback identity already represented by each preseason team baseline, and regression-test differential-only shadow integration without writing Graham production artifacts.",
+  "operational": false,
+  "productionAuthority": false,
+  "grahamWritesAllowed": false,
+  "uncertaintyOverlayRetirementAllowed": false,
+  "marketViewed": false,
+  "dependency": {
+    "stage3AcceptancePath": "data/walters/nfl/qb-performance/stage3-acceptance-v1.json",
+    "requiredStage3Status": "PASS",
+    "requiredStage3Decision": "STAGE3_ACCEPTED_FOR_STAGE4_SHADOW_TESTING_NON_OPERATIONAL",
+    "requiredStarterBindingStatus": "DEFERRED_TO_STAGE4_GOVERNED_BINDING"
+  },
+  "activeWeek": {
+    "season": 2026,
+    "week": 1,
+    "expectedGameCount": 16,
+    "activeWeekPath": "data/walters/nfl/active-week.json",
+    "currentNumbersPath": "data/walters/nfl/2026/week-01-current-numbers.json",
+    "researchLedgerPath": "data/walters/nfl/2026/week-01-research-ledger.json"
+  },
+  "bindingPolicy": {
+    "bindingAuthorityPath": "data/walters/nfl/qb-performance/stage4/binding-authority-v1.json",
+    "candidateRegistryPath": "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+    "expectedTeamCount": 32,
+    "expectedResolvedTeamCount": 31,
+    "expectedUnresolvedTeams": [
+      "ATL"
+    ],
+    "starterInferenceAllowed": false,
+    "teamCandidateLeaderIsStarterAuthority": false,
+    "currentStarterEvidenceRequired": true,
+    "embeddedBaselineIdentityRequired": true,
+    "embeddedBaselineValueAuthority": "STAGE2_PRIOR_VALUE_FOR_THE_EXPLICITLY_BOUND_BASELINE_QUARTERBACK",
+    "teamRatingDecompositionReconstructionAllowed": false,
+    "unresolvedBindingAction": "FAIL_CLOSED_PRESERVE_CURRENT_GRAHAM_FAIR",
+    "sampleBlockedCandidateAction": "RETAIN_FROZEN_STAGE2_PRIOR_WITH_ZERO_PERFORMANCE_DELTA"
+  },
+  "shadowFormula": {
+    "teamQbDelta": "approvedShadowStarterCandidateValue - embeddedBaselineQbPriorValue",
+    "homeSpreadQbPoints": "awayTeamQbDelta - homeTeamQbDelta",
+    "conservativeShadowExact": "currentGrahamExactFairHome + homeSpreadQbPoints",
+    "reconciledShadowExact": "currentGrahamExactFairHome - eligibleResolvedStarterIdentityOverlayPoints + homeSpreadQbPoints",
+    "unresolvedGameAction": "PRESERVE_CURRENT_GRAHAM_EXACT_AND_DISPLAYED_FAIR",
+    "boardRoundingIncrement": 0.5,
+    "roundingRule": "ROUND_HALF_AWAY_FROM_ZERO",
+    "writeMode": "SHADOW_ONLY"
+  },
+  "overlayPolicy": {
+    "expectedBindingCount": 4,
+    "starterIdentityClass": "STARTER_IDENTITY",
+    "orthogonalClasses": [
+      "REENTRY_EFFECTIVENESS",
+      "AVAILABILITY_CLEARANCE"
+    ],
+    "resolvedStarterIdentityDisposition": "ELIGIBLE_FOR_STAGE5_REPLACEMENT_NOT_RETIRED_IN_STAGE4",
+    "unresolvedStarterIdentityDisposition": "PRESERVE_FAIL_CLOSED",
+    "orthogonalDisposition": "PRESERVE_SEPARATELY_PENDING_STAGE5_REVIEW",
+    "stackingAllowed": false,
+    "retirementAllowedInStage4": false
+  },
+  "requiredRegressionCases": [
+    "NO_CHANGE_STARTER",
+    "SAME_STARTER_PERFORMANCE_REVALUE",
+    "MOVE_CAP_SENSITIVITY",
+    "STARTER_CHANGE_BACKUP",
+    "LOW_SAMPLE_ROOKIE_OR_BACKUP",
+    "INJURY_UNRESOLVED_REPLACEMENT",
+    "RETURN_WITHOUT_STACKING",
+    "RESOLVED_STARTER_IDENTITY_OVERLAY_RECONCILIATION",
+    "UNRESOLVED_STARTER_IDENTITY_PRESERVATION",
+    "ORTHOGONAL_UNCERTAINTY_PRESERVATION",
+    "WEEKLY_ROLLOVER_NO_LOOKAHEAD",
+    "CURRENT_SEASON_EVIDENCE_NO_LOOKAHEAD",
+    "FAIR_DECOMPOSITION_ARITHMETIC",
+    "MARKET_ISOLATION",
+    "PROTECTED_ARTIFACT_INTEGRITY",
+    "DETERMINISTIC_READBACK"
+  ],
+  "marketIsolation": {
+    "forbiddenInputPaths": [
+      "data/walters/nfl/current-week-terminal.json",
+      "data/walters/nfl/2026/week-01-daily-market-ledger.json"
+    ],
+    "forbiddenGameFields": [
+      "pinnacleSpreadHome",
+      "pinnacleObservedAt",
+      "pinnacleStatus",
+      "pinnacleHomePriceAmerican",
+      "pinnacleAwayPriceAmerican",
+      "pinnacleHomeMoneylineAmerican",
+      "pinnacleAwayMoneylineAmerican",
+      "grahamHomeStrengthGap",
+      "marketObservedAt",
+      "marketSpread",
+      "marketPrice",
+      "odds"
+    ],
+    "marketViewedMustRemain": false
+  },
+  "freezePolicy": {
+    "hashAlgorithm": "SHA-256",
+    "immutableInputPaths": [
+      ".github/workflows/walters-qb-performance-stage4.yml",
+      "core/staging/walters-nfl-seed-dataset-2026.json",
+      "data/walters/nfl-power-ratings-ledger.json",
+      "data/walters/nfl/2026/week-01-current-numbers.json",
+      "data/walters/nfl/2026/week-01-research-ledger.json",
+      "data/walters/nfl/active-week.json",
+      "data/walters/nfl/matchup-production-current.json",
+      "data/walters/nfl/personnel-production-current.json",
+      "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+      "data/walters/nfl/qb-performance/review/stage3d-candidate-review-v1.json",
+      "data/walters/nfl/qb-performance/stage3-acceptance-v1.json",
+      "data/walters/nfl/qb-performance/stage3-current.json",
+      "data/walters/nfl/qb-performance/stage4-contract-v1.json",
+      "data/walters/nfl/qb-performance/stage4/binding-authority-v1.json",
+      "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+      "tests/walters-qb-performance-stage4.test.mjs",
+      "tools/build-walters-qb-performance-stage4.py",
+      "tools/validate-walters-qb-performance-stage4.mjs"
+    ]
+  },
+  "protectedArtifacts": [
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/active-week.json",
+    "data/walters/nfl/personnel-production-current.json",
+    "data/walters/nfl/matchup-production-current.json",
+    "data/walters/nfl/2026/week-01-current-numbers.json",
+    "data/walters/nfl/2026/week-01-research-ledger.json",
+    "data/walters/nfl/current-week-terminal.json",
+    "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
+  ],
+  "acceptance": {
+    "passState": "STAGE4_SHADOW_VALIDATED_FOR_STAGE5_PRODUCTION_REVIEW_NON_OPERATIONAL",
+    "failState": "STAGE4_BLOCKED_FAIL_CLOSED",
+    "acceptedFor": "STAGE5_QB_PRODUCTION_APPROVAL_AND_VERIFICATION_REVIEW_ONLY",
+    "notAcceptedFor": [
+      "PRODUCTION_QB_AUTHORITY",
+      "GRAHAM_FAIR_NUMBER_WRITES",
+      "EMBEDDED_BASELINE_MUTATION",
+      "UNCERTAINTY_OVERLAY_RETIREMENT",
+      "BET_AUTHORITY"
+    ],
+    "nextStageOnPass": "STAGE5_QB_PRODUCTION_APPROVAL_AND_VERIFICATION"
+  },
+  "knownStage4Limitations": [
+    "The team power-rating ledger does not store a separately addressable quarterback component. Stage 4 therefore binds the explicitly documented baseline quarterback identity and uses that player's frozen Stage 2 prior only for differential shadow math.",
+    "Projected QB1 statements are evidence bindings for shadow testing, not final production starter certifications.",
+    "Atlanta remains unresolved and must fail closed until one starter is governed.",
+    "Stage 3 model caution flags remain active and must be reviewed again in Stage 5."
+  ]
+}
