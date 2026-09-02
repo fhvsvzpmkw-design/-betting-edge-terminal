@@ -1,0 +1,95 @@
+name: Graham fair decomposition
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-fair-decomposition.yml
+      - data/walters/nfl/graham-fair-decomposition-policy-v1.json
+      - tools/graham-fair-decomposition.mjs
+      - tests/graham-fair-decomposition.test.mjs
+  workflow_dispatch:
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate decomposition code and regression
+        run: |
+          set -euo pipefail
+          node --check tools/graham-fair-decomposition.mjs
+          node --check tests/graham-fair-decomposition.test.mjs
+          node tests/graham-fair-decomposition.test.mjs
+          node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Snapshot governed fair numbers
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          export ACTIVE_NUMBERS
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=process.env.ACTIVE_NUMBERS;
+          const n=JSON.parse(fs.readFileSync(p,'utf8'));
+          const out=(n.games||[]).map(g=>({gameKey:g.gameKey,grahamExactFairHome:g.grahamExactFairHome,grahamFairHome:g.grahamFairHome}));
+          fs.writeFileSync('/tmp/graham-fairs-before.json',JSON.stringify(out));
+          NODE
+
+      - name: Synchronize active fair explanations
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS" --write
+          node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
+
+      - name: Verify numeric fairs unchanged
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          export ACTIVE_NUMBERS
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const n=JSON.parse(fs.readFileSync(process.env.ACTIVE_NUMBERS,'utf8'));
+          const after=(n.games||[]).map(g=>({gameKey:g.gameKey,grahamExactFairHome:g.grahamExactFairHome,grahamFairHome:g.grahamFairHome}));
+          const before=JSON.parse(fs.readFileSync('/tmp/graham-fairs-before.json','utf8'));
+          if(JSON.stringify(before)!==JSON.stringify(after))throw new Error('GRAHAM_FAIR_DECOMPOSITION_NUMERIC_FAIR_MUTATION');
+          const noDet=n.games.find(g=>g.gameKey==='2026-W01-NO-DET');
+          if(noDet){
+            if(Number(noDet.grahamExactFairHome)!==-5.582||Number(noDet.grahamFairHome)!==-5.5)throw new Error('NO_DET_GOVERNED_FAIR_CHANGED');
+            if(Number(noDet.fairDecomposition?.prePersonnelExactFairHome)!==-6.082||Number(noDet.fairDecomposition?.personnelPointsToHomeSpread)!==0.5)throw new Error('NO_DET_DECOMPOSITION_NOT_SYNCHRONIZED');
+          }
+          console.log(`GRAHAM FAIR NUMERIC GUARD: PASS // ${after.length} GAMES UNCHANGED`);
+          NODE
+
+      - name: Publish synchronized explanations
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          git add -- "$ACTIVE_NUMBERS"
+          if git diff --cached --quiet; then
+            echo "Graham fair explanations already synchronized."
+            exit 0
+          fi
+          git commit -m "Synchronize Graham fair explanations"
+          git push origin HEAD:main
