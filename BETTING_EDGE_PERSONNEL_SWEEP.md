@@ -69,6 +69,23 @@ If fewer than 3 credible current fallback sources can be found after a reasonabl
 
 A Stage 2 record should distinguish **no information exists yet** from **information was not searched deeply enough**. At minimum, material Stage 2 work must retain the official source checked, the fallback sources checked, the check time, the personnel confidence state, the material facts found, and the unresolved facts that remain.
 
+### Universal Stage 2 closing authoritative re-check
+
+For reports issued at or after **2026-09-02 11:15:00 America/Vancouver**, Stage 2 has one universal closing rule across sports:
+
+> **If a personnel-dependent serious candidate still has a material unresolved dependency, re-check the best authoritative source for that exact dependency once near the end of Stage 2 before assigning `BET`, `LEAN`, `WAIT`, or `PASS`.**
+
+The closing re-check is required because release practices differ by sport and league, while the analytical need is the same. The publisher does not need a separate fixed late-game clock for each sport.
+
+- The authoritative source may legitimately still say `TBD`, `unconfirmed`, `questionable`, `lineup not posted`, inactive list not released, or equivalent. The rule requires a real closing check, not forced confirmation.
+- Record the closing check in the existing `officialSources` evidence with a traceable `origin`, `url`, `asOf`, a dependency-specific `fact`, and `finalRecheck: true`.
+- The closing source must actually address the unresolved dependency. A generic league injury page cannot satisfy an unresolved batting-order question merely because it is authoritative.
+- One event/team-level closing check may support several recommendations when it genuinely addresses the same exact dependency; do not repeat identical searches merely because multiple cards share the dependency.
+- If the authoritative source genuinely cannot be reached or no authoritative channel exists for that dependency, record that exact authoritative-source shortfall in the existing `sourceShortfall` field and retain an appropriately uncertain `PARTIAL` or `UNKNOWN` state rather than fabricating a check.
+- If `decisionSensitivity` is explicitly `NO MATERIAL PERSONNEL SENSITIVITY`, a redundant closing re-check is not required for a dependency that is no longer material to the decision.
+
+The sport-specific time windows below remain **research-urgency and fallback-depth guidance**. They help Stage 2 know when projected lineups, inactive information, goalie news, minutes limits or other late facts deserve extra attention. They no longer define separate publisher-specific final-recheck cutoffs; the universal closing rule above governs that final proof step.
+
 ### Stage 2 dependency validation safeguard
 
 Before the deep source hunt, Stage 2 must identify the **actual personnel dependency of the exact wager** and verify that the dependency is oriented to the correct team, opponent, participant and role.
@@ -257,6 +274,7 @@ For new reports, structured Stage 2 evidence belongs in the durable report prove
 - `stage2CheckedAt`;
 - the validated `dependencyTarget` and why it is material to the exact wager;
 - authoritative/official sources checked;
+- the closing authoritative source entry with `finalRecheck: true` when a material dependency remained unresolved at Stage 2 close, or an explicit authoritative `sourceShortfall`;
 - 3 to 5 distinct fallback sources when the official state remained unresolved and credible fallback sources were available;
 - any `sourceShortfall` when fewer than 3 credible fallback sources existed;
 - material `facts` found;
@@ -282,3 +300,7 @@ Stage 2 now requires an event-specific 3-to-5-source fallback sweep when officia
 ## Change note — 2026-08-25 Stage 2 safeguard correction
 
 Stage 2 now validates the causal personnel dependency of the exact wager before deep research, corrects wrong-side or wrong-participant dependencies, treats unresolved material source conflict as a confidence/uncertainty constraint, and records decision sensitivity so later lanes know which personnel outcome could actually change the recommendation.
+
+## Change note — 2026-09-02 universal closing re-check
+
+The prior sport-specific late-source reminders remain useful research timing guidance, but production publication now uses one cross-sport closing rule: every still-material unresolved Stage 2 dependency receives one final dependency-specific authoritative-source re-check before final status, recorded with `finalRecheck: true`, or a truthful authoritative-source shortfall. This closes the football inactive/availability enforcement mismatch without inventing a universal football clock or changing any betting threshold.
