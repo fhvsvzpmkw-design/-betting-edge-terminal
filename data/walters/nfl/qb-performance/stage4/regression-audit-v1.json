@@ -1,0 +1,240 @@
+{
+  "schemaVersion": "walters-qb-performance-stage4-regression-audit-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 4,
+  "status": "PASS",
+  "testedAt": "2026-09-02T13:05:41-07:00",
+  "requiredCaseCount": 16,
+  "executedCaseCount": 16,
+  "missingCases": [],
+  "unexpectedCases": [],
+  "passCount": 16,
+  "failCount": 0,
+  "cases": [
+    {
+      "caseKey": "NO_CHANGE_STARTER",
+      "result": "PASS",
+      "actual": {
+        "team": "BUF",
+        "teamQbDelta": 0.0
+      },
+      "expected": "A resolved unchanged candidate produces zero differential.",
+      "detail": "No-change starter runs must not fabricate a quarterback adjustment."
+    },
+    {
+      "caseKey": "SAME_STARTER_PERFORMANCE_REVALUE",
+      "result": "PASS",
+      "actual": -0.65,
+      "expected": -0.65,
+      "detail": "A resolved same-starter performance candidate is compared once with its embedded Stage 2 baseline prior."
+    },
+    {
+      "caseKey": "MOVE_CAP_SENSITIVITY",
+      "result": "PASS",
+      "actual": 0.75,
+      "expected": 0.75,
+      "detail": "The Joe Burrow case reaches but does not exceed the frozen Stage 3 movement cap."
+    },
+    {
+      "caseKey": "STARTER_CHANGE_BACKUP",
+      "result": "PASS",
+      "actual": {
+        "team": "LV",
+        "playerName": "Aidan O'Connell",
+        "teamQbDelta": -0.17
+      },
+      "expected": "One alternative same-team candidate minus the unchanged embedded baseline prior.",
+      "detail": "Starter-change math uses replacement minus baseline, never replacement plus the current starter value."
+    },
+    {
+      "caseKey": "LOW_SAMPLE_ROOKIE_OR_BACKUP",
+      "result": "PASS",
+      "actual": {
+        "playerName": "Fernando Mendoza",
+        "priorValue": 7.5,
+        "candidateValue": 7.5
+      },
+      "expected": "Candidate equals frozen Stage 2 prior.",
+      "detail": "Insufficient samples fail closed to the prior and cannot invent a performance move."
+    },
+    {
+      "caseKey": "INJURY_UNRESOLVED_REPLACEMENT",
+      "result": "PASS",
+      "actual": null,
+      "expected": null,
+      "detail": "A missing governed replacement identity produces no numeric differential."
+    },
+    {
+      "caseKey": "RETURN_WITHOUT_STACKING",
+      "result": "PASS",
+      "actual": -0.65,
+      "expected": -0.65,
+      "detail": "Replaying the same return/current-starter binding recomputes from the baseline and does not add another delta."
+    },
+    {
+      "caseKey": "RESOLVED_STARTER_IDENTITY_OVERLAY_RECONCILIATION",
+      "result": "PASS",
+      "actual": {
+        "currentExact": -2.582,
+        "overlayReplacementPoints": 0.5,
+        "qbPoints": 0.05,
+        "recommendedExact": -3.032
+      },
+      "expected": "current exact - one resolved identity overlay + one QB differential",
+      "detail": "Las Vegas' resolved identity overlay is marked for Stage 5 replacement, not stacked or retired in Stage 4."
+    },
+    {
+      "caseKey": "UNRESOLVED_STARTER_IDENTITY_PRESERVATION",
+      "result": "PASS",
+      "actual": {
+        "status": "FAIL_CLOSED_GAME_PRESERVED",
+        "recommendedExact": -4.582
+      },
+      "expected": "Current Graham exact fair preserved.",
+      "detail": "Atlanta remains unresolved; the full game fails closed without a one-sided Pittsburgh adjustment."
+    },
+    {
+      "caseKey": "ORTHOGONAL_UNCERTAINTY_PRESERVATION",
+      "result": "PASS",
+      "actual": [
+        {
+          "gameKey": "2026-W01-CLE-JAX",
+          "overlayType": "QB_REENTRY",
+          "disposition": "PRESERVE_ORTHOGONAL_UNCERTAINTY"
+        },
+        {
+          "gameKey": "2026-W01-DEN-KC",
+          "overlayType": "KC_QB_CLEARANCE",
+          "disposition": "PRESERVE_ORTHOGONAL_UNCERTAINTY"
+        }
+      ],
+      "expected": "Two re-entry/clearance overlays preserved.",
+      "detail": "Cleveland re-entry and Kansas City clearance are not starter-identity duplicates and remain separate."
+    },
+    {
+      "caseKey": "WEEKLY_ROLLOVER_NO_LOOKAHEAD",
+      "result": "PASS",
+      "actual": {
+        "activeWeekMutated": false,
+        "week2Exists": false
+      },
+      "expected": {
+        "activeWeekMutated": false,
+        "week2Exists": false
+      },
+      "detail": "Stage 4 simulates the next week without advancing active state or creating Week 2 files."
+    },
+    {
+      "caseKey": "CURRENT_SEASON_EVIDENCE_NO_LOOKAHEAD",
+      "result": "PASS",
+      "actual": [
+        {
+          "scenario": "PRE_KICKOFF_ACTIVE_WEEK",
+          "lastCompletedWeek": 0,
+          "evidenceWeek": 1,
+          "accepted": false,
+          "expected": false
+        },
+        {
+          "scenario": "POST_WEEK1_CURRENT_EVIDENCE",
+          "lastCompletedWeek": 1,
+          "evidenceWeek": 1,
+          "accepted": true,
+          "expected": true
+        },
+        {
+          "scenario": "POST_WEEK1_LOOKAHEAD_BLOCK",
+          "lastCompletedWeek": 1,
+          "evidenceWeek": 2,
+          "accepted": false,
+          "expected": false
+        }
+      ],
+      "expected": "Completed-week evidence accepted; active/future-week evidence rejected.",
+      "detail": "The synthetic evidence gate admits only weeks at or before the last completed week."
+    },
+    {
+      "caseKey": "FAIR_DECOMPOSITION_ARITHMETIC",
+      "result": "PASS",
+      "actual": 16,
+      "expected": 16,
+      "detail": "All current exact and displayed Graham fairs reconcile before shadow adjustments are evaluated."
+    },
+    {
+      "caseKey": "MARKET_ISOLATION",
+      "result": "PASS",
+      "actual": [],
+      "expected": [],
+      "detail": "The shadow package contains no market prices, gaps or marketViewed:true state."
+    },
+    {
+      "caseKey": "PROTECTED_ARTIFACT_INTEGRITY",
+      "result": "PASS",
+      "actual": {
+        "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+        "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+        "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+        "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+        "data/walters/nfl/2026/week-01-current-numbers.json": "280a0d02b9687fa013c7e475dff2561b8bb62c74591f099285dad8a90e1a2976",
+        "data/walters/nfl/2026/week-01-research-ledger.json": "663d224a148c62caec334d5285f4e539aadc2b2e54a60d30209f4a07f64646f2",
+        "data/walters/nfl/current-week-terminal.json": "2da182475b052307c2d723db30bd1b24a6c25bb76dde7a33e547e58c4eaa8b33",
+        "data/walters/nfl/qb-performance/stage3-acceptance-v1.json": "844e4e195199dacb39873299898b4cd12be324e11a341e781c610ebf318d4cd3"
+      },
+      "expected": {
+        "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+        "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+        "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+        "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+        "data/walters/nfl/2026/week-01-current-numbers.json": "280a0d02b9687fa013c7e475dff2561b8bb62c74591f099285dad8a90e1a2976",
+        "data/walters/nfl/2026/week-01-research-ledger.json": "663d224a148c62caec334d5285f4e539aadc2b2e54a60d30209f4a07f64646f2",
+        "data/walters/nfl/current-week-terminal.json": "2da182475b052307c2d723db30bd1b24a6c25bb76dde7a33e547e58c4eaa8b33",
+        "data/walters/nfl/qb-performance/stage3-acceptance-v1.json": "844e4e195199dacb39873299898b4cd12be324e11a341e781c610ebf318d4cd3"
+      },
+      "detail": "Every protected Graham, active-week and upstream Stage 3 artifact retains its exact SHA-256."
+    },
+    {
+      "caseKey": "DETERMINISTIC_READBACK",
+      "result": "PASS",
+      "actual": {
+        "bindings": "e9bed93ceecc3302c4645ef4da5bdac9093374cf45a9cc59a25c82588901aeae",
+        "board": "0906f5c714d4d4578baef39f3f6fcd515791993b453c6aa1acf9f731bcc47d9e",
+        "reconciliation": "cd45ed2028f7834226a45c8ac8f0c0de6883801c0560373e0bd8957b392fc2e8",
+        "rollover": "7ad92d41eab30094d81074ce483ab3ecb9c1f34c25f0a7f3127f3d8264672fb3"
+      },
+      "expected": {
+        "bindings": "e9bed93ceecc3302c4645ef4da5bdac9093374cf45a9cc59a25c82588901aeae",
+        "board": "0906f5c714d4d4578baef39f3f6fcd515791993b453c6aa1acf9f731bcc47d9e",
+        "reconciliation": "cd45ed2028f7834226a45c8ac8f0c0de6883801c0560373e0bd8957b392fc2e8",
+        "rollover": "7ad92d41eab30094d81074ce483ab3ecb9c1f34c25f0a7f3127f3d8264672fb3"
+      },
+      "detail": "Canonical read-back of every core Stage 4 artifact reproduces the same hash."
+    }
+  ],
+  "protectedArtifactSha256Before": {
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "280a0d02b9687fa013c7e475dff2561b8bb62c74591f099285dad8a90e1a2976",
+    "data/walters/nfl/2026/week-01-research-ledger.json": "663d224a148c62caec334d5285f4e539aadc2b2e54a60d30209f4a07f64646f2",
+    "data/walters/nfl/current-week-terminal.json": "2da182475b052307c2d723db30bd1b24a6c25bb76dde7a33e547e58c4eaa8b33",
+    "data/walters/nfl/qb-performance/stage3-acceptance-v1.json": "844e4e195199dacb39873299898b4cd12be324e11a341e781c610ebf318d4cd3"
+  },
+  "protectedArtifactSha256After": {
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "280a0d02b9687fa013c7e475dff2561b8bb62c74591f099285dad8a90e1a2976",
+    "data/walters/nfl/2026/week-01-research-ledger.json": "663d224a148c62caec334d5285f4e539aadc2b2e54a60d30209f4a07f64646f2",
+    "data/walters/nfl/current-week-terminal.json": "2da182475b052307c2d723db30bd1b24a6c25bb76dde7a33e547e58c4eaa8b33",
+    "data/walters/nfl/qb-performance/stage3-acceptance-v1.json": "844e4e195199dacb39873299898b4cd12be324e11a341e781c610ebf318d4cd3"
+  },
+  "protectedArtifactsUnchanged": true,
+  "currentGrahamFairNumbersChanged": false,
+  "uncertaintyOverlaysRetired": false,
+  "productionAuthority": false,
+  "grahamWritesAllowed": false,
+  "marketViewed": false,
+  "contentSha256Canonical": "07e10fb1ed911f43083817b36bd3219158c4a90de9ccaf8007d4635d8f2cc3da"
+}
