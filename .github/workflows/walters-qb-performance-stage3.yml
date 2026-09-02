@@ -1,0 +1,37 @@
+name: Walters QB Performance Stage 3
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "data/walters/nfl/qb-performance/**"
+      - "tools/validate-walters-qb-performance-stage3.mjs"
+      - "tests/walters-qb-performance-stage3.test.mjs"
+      - ".github/workflows/walters-qb-performance-stage3.yml"
+  pull_request:
+    paths:
+      - "data/walters/nfl/qb-performance/**"
+      - "tools/validate-walters-qb-performance-stage3.mjs"
+      - "tests/walters-qb-performance-stage3.test.mjs"
+      - ".github/workflows/walters-qb-performance-stage3.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-stage3a:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate Stage 3A contract and dependencies
+        run: node tools/validate-walters-qb-performance-stage3.mjs
+
+      - name: Run Stage 3A guardrail tests
+        run: node --test tests/walters-qb-performance-stage3.test.mjs

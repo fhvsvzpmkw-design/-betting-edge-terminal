@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3-contract-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3A",
+  "status": "STAGE3A_AUTHORITY_METHOD_SOURCE_LOCK",
+  "createdDate": "2026-09-02",
+  "operational": false,
+  "productionAuthority": false,
+  "marketViewed": false,
+  "authority": {
+    "candidateToken": "WALTERS_QB_PERFORMANCE_STAGE3_CANDIDATE",
+    "eventualProductionToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+    "candidateMayMoveGrahamFair": false,
+    "productionTokenMayBeActivatedBeforeStage5": false
+  },
+  "purpose": "Validate the frozen EA-derived Walters quarterback prior against governed football-performance evidence while preserving market isolation, sample shrinkage, reproducibility, and fail-closed behavior.",
+  "dependencies": {
+    "eaFrozenPrior": "data/walters/nfl/player-values/player-values-2026-v1.json",
+    "stage2State": "data/walters/nfl/player-values/stage2-current.json",
+    "stage2Audit": "data/walters/nfl/player-values/calibration-audit-v1.json",
+    "eaCalibration": "data/walters/nfl/personnel-calibration-v1.json",
+    "eaFreezeState": "data/walters/nfl/madden27/madden27-current.json"
+  },
+  "scale": {
+    "unit": "POINT_SPREAD_EQUIVALENT_POINTS",
+    "minimum": 6.0,
+    "maximum": 9.5,
+    "publishedWaltersMean": 7.74,
+    "stage2PriorMean": 7.75,
+    "valuePrecision": 0.01,
+    "liveAdjustmentFormula": "approvedStarterValue - embeddedBaselineQbValue",
+    "fullQuarterbackValueMayBeAddedToExistingTeamRating": false
+  },
+  "prior": {
+    "name": "EA_MADDEN27_DISTRIBUTION_CALIBRATED_PRIOR",
+    "role": "SHRINKAGE_PRIOR_ONLY",
+    "directLiveUseAllowed": false,
+    "mayResolveQbUncertaintyByItself": false,
+    "mayMoveGrahamFairByItself": false
+  },
+  "evidence": {
+    "performanceFeatures": [
+      {
+        "id": "passer_rating",
+        "sourceFields": [
+          "passing_yards",
+          "passing_tds",
+          "interceptions",
+          "completions",
+          "attempts"
+        ],
+        "direction": "HIGHER_IS_BETTER",
+        "role": "PERFORMANCE"
+      },
+      {
+        "id": "yards_per_attempt",
+        "sourceFields": [
+          "passing_yards",
+          "attempts"
+        ],
+        "direction": "HIGHER_IS_BETTER",
+        "role": "PERFORMANCE"
+      },
+      {
+        "id": "interception_rate",
+        "sourceFields": [
+          "interceptions",
+          "attempts"
+        ],
+        "direction": "LOWER_IS_BETTER",
+        "role": "PERFORMANCE"
+      },
+      {
+        "id": "sack_rate",
+        "sourceFields": [
+          "sacks",
+          "dropbacks"
+        ],
+        "direction": "LOWER_IS_BETTER",
+        "role": "PERFORMANCE"
+      },
+      {
+        "id": "fumble_rate",
+        "sourceFields": [
+          "fumbles",
+          "dropbacks"
+        ],
+        "direction": "LOWER_IS_BETTER",
+        "role": "PERFORMANCE"
+      },
+      {
+        "id": "qb_rushing_value",
+        "sourceFields": [
+          "rushing_yards",
+          "rushing_tds",
+          "rushing_first_downs",
+          "rushing_fumbles"
+        ],
+        "direction": "HIGHER_IS_BETTER",
+        "role": "PERFORMANCE"
+      }
+    ],
+    "reliabilityFeatures": [
+      {
+        "id": "attempts",
+        "role": "RELIABILITY_ONLY",
+        "directPerformancePointsAllowed": false
+      },
+      {
+        "id": "dropbacks",
+        "role": "RELIABILITY_ONLY",
+        "directPerformancePointsAllowed": false
+      },
+      {
+        "id": "qualified_games",
+        "role": "RELIABILITY_ONLY",
+        "directPerformancePointsAllowed": false
+      },
+      {
+        "id": "starts",
+        "role": "RELIABILITY_ONLY",
+        "directPerformancePointsAllowed": false
+      }
+    ],
+    "contextFeatures": [
+      {
+        "id": "opponent_strength",
+        "role": "PERFORMANCE_NORMALIZATION",
+        "directSpreadAddendAllowed": false
+      },
+      {
+        "id": "schedule_strength",
+        "role": "PERFORMANCE_NORMALIZATION",
+        "directSpreadAddendAllowed": false
+      },
+      {
+        "id": "supporting_offense_context",
+        "role": "CONFIDENCE_AND_INTERPRETATION_ONLY",
+        "directSpreadAddendAllowed": false,
+        "doubleCountProtectionRequired": true
+      }
+    ]
+  },
+  "candidateWindowSearchSpace": {
+    "preOutcomeLocked": true,
+    "longTermCompletedSeasons": [
+      2,
+      3,
+      4
+    ],
+    "shortTermQualifiedGames": [
+      4,
+      6,
+      8
+    ],
+    "currentSeasonUpdateCadence": "AFTER_COMPLETED_GAMES_ONLY",
+    "selectionTarget": "OUT_OF_SAMPLE_NEXT_GAME_OPPONENT_ADJUSTED_QB_PERFORMANCE_COMPOSITE",
+    "selectionMayUseMarketOrClosingLine": false
+  },
+  "modelDiscipline": {
+    "weightsStatus": "UNESTIMATED_LOCKED_OFF",
+    "weightEstimationSubstage": "3C",
+    "shrinkageFamily": "EMPIRICAL_BAYES_OR_PARTIAL_POOLING",
+    "exactShrinkageFormStatus": "TO_BE_ESTIMATED_STAGE3C",
+    "rookieAndLowSampleBehavior": "REVIEW_REQUIRED_FAIL_CLOSED",
+    "deterministicRerunRequired": true,
+    "holdoutValidationRequired": true,
+    "featureSignTestsRequired": true,
+    "boundedOutputRequired": true
+  },
+  "sourcePolicy": {
+    "registry": "data/walters/nfl/qb-performance/source-registry-v1.json",
+    "footballPerformanceSourcesOnly": true,
+    "marketSourcesAllowed": false,
+    "prohibitedEvidence": [
+      "PINNACLE",
+      "SPORTSBOOK_ODDS",
+      "CONSENSUS_LINE",
+      "LINE_MOVEMENT",
+      "MARKET_IMPLIED_QB_VALUE",
+      "ATS_RESULT_AS_MODEL_TARGET",
+      "ESPN_FPI_AS_PRODUCTION_AUTHORITY",
+      "AD_HOC_MANUAL_QB_VALUE"
+    ]
+  },
+  "writeBoundary": {
+    "stage3AAllowedWrites": [
+      "data/walters/nfl/qb-performance/",
+      "tools/validate-walters-qb-performance-stage3.mjs",
+      "tests/walters-qb-performance-stage3.test.mjs",
+      ".github/workflows/walters-qb-performance-stage3.yml"
+    ],
+    "grahamWeekFilesAllowed": false,
+    "grahamFairNumberWritesAllowed": false,
+    "personnelProductionWritesAllowed": false,
+    "matchupProductionWritesAllowed": false,
+    "uncertaintyOverlayRetirementAllowed": false
+  },
+  "requiredCandidateAuditFields": [
+    "playerId",
+    "playerName",
+    "team",
+    "priorValue",
+    "longTermPerformanceScore",
+    "shortTermPerformanceScore",
+    "sampleReliability",
+    "contextNormalization",
+    "candidateValue",
+    "confidence",
+    "sourceLineage",
+    "marketViewed",
+    "status"
+  ],
+  "allowedStage3Statuses": [
+    "STAGE3_CANDIDATE_NON_OPERATIONAL",
+    "REVIEW_REQUIRED_QB_PERFORMANCE_VALIDATION",
+    "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+    "BLOCKED_IDENTITY_UNRESOLVED",
+    "BLOCKED_SOURCE_LINEAGE_INCOMPLETE"
+  ],
+  "acceptanceGates": [
+    {
+      "id": "QBP3-SOURCE-LINEAGE",
+      "requirement": "Every performance row is tied to a frozen source asset and hash."
+    },
+    {
+      "id": "QBP3-IDENTITY",
+      "requirement": "EA identity and football-stat identity reconcile without unresolved live candidates."
+    },
+    {
+      "id": "QBP3-FEATURE-SIGNS",
+      "requirement": "All feature directions pass synthetic sign tests."
+    },
+    {
+      "id": "QBP3-SHRINKAGE",
+      "requirement": "Lower samples shrink more strongly toward the frozen prior."
+    },
+    {
+      "id": "QBP3-BOUNDS",
+      "requirement": "All candidate values remain inside 6.00 through 9.50."
+    },
+    {
+      "id": "QBP3-DISTRIBUTION",
+      "requirement": "Candidate distribution remains plausible relative to the Walters anchor and Stage 2 prior."
+    },
+    {
+      "id": "QBP3-MARKET-ISOLATION",
+      "requirement": "No sportsbook, consensus, price, spread, or line-movement data is read."
+    },
+    {
+      "id": "QBP3-DOUBLE-COUNT",
+      "requirement": "Supporting-cast and personnel effects cannot become a second spread addend."
+    },
+    {
+      "id": "QBP3-DETERMINISM",
+      "requirement": "Identical frozen inputs produce byte-stable candidate outputs."
+    },
+    {
+      "id": "QBP3-NO-GRAHAM-WRITE",
+      "requirement": "Stage 3 cannot alter Graham fairs, embedded baselines, or uncertainty overlays."
+    }
+  ],
+  "substagePlan": [
+    {
+      "substage": "3A",
+      "name": "AUTHORITY_METHOD_SOURCE_LOCK",
+      "status": "ACTIVE"
+    },
+    {
+      "substage": "3B",
+      "name": "DATA_CAPTURE_IDENTITY_AUDIT",
+      "status": "NOT_STARTED"
+    },
+    {
+      "substage": "3C",
+      "name": "MODEL_ESTIMATION_AND_HOLDOUT_VALIDATION",
+      "status": "NOT_STARTED"
+    },
+    {
+      "substage": "3D",
+      "name": "CANDIDATE_FREEZE_AND_STAGE3_ACCEPTANCE",
+      "status": "NOT_STARTED"
+    }
+  ]
+}

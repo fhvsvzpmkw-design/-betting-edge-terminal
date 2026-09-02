@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "walters-qb-performance-source-registry-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3A",
+  "createdDate": "2026-09-02",
+  "captureStatus": "PENDING_STAGE3B",
+  "allExternalAssetsHashPinned": false,
+  "marketSourcesAllowed": false,
+  "sources": [
+    {
+      "id": "EA_MADDEN27_FROZEN_QB_PRIOR",
+      "type": "LOCAL_FROZEN_PRIOR",
+      "authorityRole": "SHRINKAGE_PRIOR_ONLY",
+      "paths": [
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "data/walters/nfl/player-values/calibration-audit-v1.json",
+        "data/walters/nfl/player-values/stage2-current.json",
+        "data/walters/nfl/madden27/madden27-current.json"
+      ],
+      "hashPinStatus": "ALREADY_FROZEN_BY_STAGE2",
+      "mayMoveGrahamFairDirectly": false
+    },
+    {
+      "id": "NFLVERSE_WEEKLY_PLAYER_STATS",
+      "type": "OFFICIAL_PUBLIC_FOOTBALL_STATISTICS",
+      "publisher": "nflverse",
+      "repository": "nflverse/nflverse-data",
+      "releaseTag": "stats_player",
+      "logicalAssetFamily": "stats_player_week_{season}",
+      "authorityRole": "PRIMARY_FOOTBALL_PERFORMANCE_EVIDENCE",
+      "captureYears": "TO_BE_LOCKED_STAGE3B",
+      "exactAssets": [],
+      "hashPinStatus": "PENDING_STAGE3B",
+      "marketData": false
+    },
+    {
+      "id": "NFLVERSE_SEASONAL_PLAYER_STATS",
+      "type": "OFFICIAL_PUBLIC_FOOTBALL_STATISTICS",
+      "publisher": "nflverse",
+      "repository": "nflverse/nflverse-data",
+      "releaseTag": "stats_player",
+      "logicalAssetFamily": "stats_player_reg_{season}",
+      "authorityRole": "LONG_TERM_AGGREGATION_CROSSCHECK",
+      "captureYears": "TO_BE_LOCKED_STAGE3B",
+      "exactAssets": [],
+      "hashPinStatus": "PENDING_STAGE3B",
+      "marketData": false
+    },
+    {
+      "id": "NFLVERSE_SCHEDULE_CONTEXT_FROZEN",
+      "type": "LOCAL_FROZEN_SCHEDULE_CONTEXT",
+      "authorityRole": "OPPONENT_AND_SCHEDULE_JOIN_CONTEXT",
+      "paths": [
+        "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv"
+      ],
+      "hashPinStatus": "EXISTING_LOCAL_SNAPSHOT_TO_BE_REHASHED_STAGE3B",
+      "marketData": false,
+      "directSpreadAddendAllowed": false
+    },
+    {
+      "id": "APPROVED_GRAHAM_PERSONNEL_CONTEXT",
+      "type": "LOCAL_GOVERNED_CONTEXT",
+      "authorityRole": "CONFIDENCE_AND_INTERPRETATION_ONLY",
+      "paths": [
+        "data/walters/nfl/personnel-production-current.json"
+      ],
+      "marketData": false,
+      "directQbPerformancePointsAllowed": false,
+      "directSpreadAddendAllowed": false
+    }
+  ],
+  "prohibitedSourceFamilies": [
+    "sportsbook odds feeds",
+    "Pinnacle or consensus prices",
+    "closing lines and line movement",
+    "market-implied quarterback values",
+    "ATS outcome labels",
+    "ESPN FPI as production authority",
+    "unversioned manual quarterback rankings"
+  ],
+  "stage3BRequirements": [
+    "Resolve exact seasons before capture.",
+    "Record exact asset filenames, source URLs, capture time, size, and SHA-256.",
+    "Preserve raw files before normalization.",
+    "Audit player identity joins separately from performance calculations.",
+    "Fail closed on missing or ambiguous quarterback identities."
+  ]
+}
