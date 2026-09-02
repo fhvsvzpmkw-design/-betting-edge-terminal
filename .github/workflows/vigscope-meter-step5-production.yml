@@ -1,0 +1,59 @@
+name: VigScope meter step 5 production
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/vigscope-meter-step5-production.yml'
+      - 'tools/apply-vigscope-meter-step5.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Normalize committed regression token
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/vigscope-meter-production.test.mjs')
+          s=p.read_text()
+          old="const agreement=r.agreement.confidence>0?(a<VIG_AGREEMENT_HIGH_MIN?'LOW':'HIGH'):'LOW';"
+          new="const agreement=agreementConfidence>0?(a<VIG_AGREEMENT_HIGH_MIN?'LOW':'HIGH'):'LOW';"
+          if old in s:
+              s=s.replace(old,new)
+              p.write_text(s)
+          elif new not in s:
+              raise SystemExit('production regression token not found')
+          PY
+      - name: Apply locked meter calibration to runtime
+        run: node tools/apply-vigscope-meter-step5.mjs
+      - name: Run production meter regression before commit
+        run: node tests/vigscope-meter-production.test.mjs
+      - name: Verify runner loads calibrated runtime
+        run: |
+          grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
+          grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
+          grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
+      - name: Commit calibrated runtime
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/runner-core-runtime.js tests/vigscope-meter-production.test.mjs
+          if git diff --cached --quiet; then
+            echo "No production changes required"
+          else
+            git commit -m "Deploy VigScope calibrated market meters"
+            git push origin HEAD:main
+          fi
