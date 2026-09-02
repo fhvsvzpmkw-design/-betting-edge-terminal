@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "policyId": "graham-research-completion-v1",
+  "state": "OPERATIONAL",
+  "effectiveAt": "2026-09-01T17:35:00-07:00",
+  "timezone": "America/Vancouver",
+  "purpose": "Require every scheduled Graham research run to leave a durable active-week research-ledger sweep and prove that exact sweep by remote read-back before the task may report successful completion.",
+  "appliesToTaskKeys": [
+    "TUESDAY_BASELINE",
+    "DAILY_REVIEW",
+    "DELTA_1645",
+    "SUNDAY_PREGAME"
+  ],
+  "taskSlugByKey": {
+    "TUESDAY_BASELINE": "tuesday-baseline",
+    "DAILY_REVIEW": "daily-review",
+    "DELTA_1645": "delta-1645",
+    "SUNDAY_PREGAME": "sunday-pregame"
+  },
+  "researchSweepRule": {
+    "everyRunMustAppendSweep": true,
+    "noMaterialChangeStillRequiresSweep": true,
+    "uniqueRunEventIdRequired": true,
+    "runEventIdExample": "graham-delta-1645-2026-w01-20260901T164500-0700",
+    "requiredAdditiveFields": [
+      "runEventId",
+      "sourceTaskKey",
+      "completionResult"
+    ],
+    "allowedCompletionResults": [
+      "MATERIAL_CHANGE",
+      "NO_MATERIAL_CHANGE",
+      "BLOCKED_WITH_DURABLE_RECORD"
+    ],
+    "requiredExistingFields": [
+      "sequence",
+      "type",
+      "startedAt",
+      "completedAt",
+      "scope",
+      "sourcesChecked",
+      "teamFindings",
+      "ratingChanges",
+      "matchupChanges",
+      "espnFpiCapture",
+      "summary"
+    ],
+    "marketViewedMustBeFalse": true,
+    "appendOnly": true
+  },
+  "completionStaging": {
+    "path": "data/walters/nfl/research-completion-staging.json",
+    "stateRequired": "READY",
+    "requiredFields": [
+      "schema",
+      "state",
+      "policyId",
+      "runEventId",
+      "taskKey",
+      "season",
+      "week",
+      "ledgerPath",
+      "expectedCompletionResult",
+      "submittedAt"
+    ]
+  },
+  "verification": {
+    "workflow": ".github/workflows/graham-research-completion.yml",
+    "validator": "tools/validate-graham-research-completion.mjs",
+    "receiptPath": "data/walters/nfl/research-completion-current.json",
+    "requireActiveWeekMatch": true,
+    "requireExactlyOneRunEventIdMatch": true,
+    "requireRemoteMainReceiptReadBack": true,
+    "taskMayReportSuccessBeforeVerifiedReceipt": false,
+    "successReceiptState": "VERIFIED"
+  },
+  "failureBehavior": {
+    "userFacingStatus": "GRAHAM RESEARCH WRITE/READBACK FAILED",
+    "rule": "If the active research-ledger sweep cannot be committed, the completion workflow fails, or the VERIFIED receipt for the exact runEventId cannot be read back from main, preserve governed numbers and report the failure instead of claiming the Graham review completed successfully."
+  },
+  "boundaries": {
+    "changesHandicapMethod": false,
+    "changesPowerRatings": false,
+    "changesFairArithmetic": false,
+    "changesPersonnelArithmetic": false,
+    "changesHomeField": false,
+    "changesMatchupAuthority": false,
+    "changesMarketIsolation": false
+  }
+}
