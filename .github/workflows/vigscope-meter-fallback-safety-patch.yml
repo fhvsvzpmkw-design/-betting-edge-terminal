@@ -1,0 +1,59 @@
+name: VigScope meter fallback safety patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/apply-vigscope-meter-fallback-safety.mjs'
+      - '.github/workflows/vigscope-meter-fallback-safety-patch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vigscope-meter-fallback-safety-patch
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply fallback safety patch
+        run: node tools/apply-vigscope-meter-fallback-safety.mjs
+      - name: Verify calibrated meter regression
+        run: node tests/vigscope-meter-production.test.mjs
+      - name: Verify 06:00 fallback safety fixture
+        run: node tests/vigscope-meter-fallback-safety.test.mjs
+      - name: Commit production patch
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- assets/runner-core-runtime.js .github/workflows/vigscope-meter-production-regression.yml; then
+            echo 'No patch changes required.'
+            exit 0
+          fi
+          git config user.name 'betting-edge-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add assets/runner-core-runtime.js .github/workflows/vigscope-meter-production-regression.yml
+          git commit -m 'Fix VigScope meter fallback movement parsing'
+          git push origin HEAD:main
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '## VigScope meter fallback safety'
+            echo '- Arbitrary price/playTo pairs are not movement.'
+            echo '- Only explicit movement syntax or structured priceComparison can create numeric movement.'
+            echo '- Zero-confidence gauges render as unmeasured with hidden needles.'
+            echo '- 06:00 Sep 2 fixture is a required regression.'
+          } >> "$GITHUB_STEP_SUMMARY"
