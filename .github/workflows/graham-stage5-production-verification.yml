@@ -1,0 +1,92 @@
+name: Graham Stage 5 production verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-stage5-production-verification.yml
+      - data/walters/nfl/graham-stage5-production-verification-policy-v1.json
+      - data/walters/nfl/graham-stage5-live-task-attestation.json
+      - tests/graham-stage5-production-verification.test.mjs
+      - data/walters/nfl/graham-stage4-regression-current.json
+  workflow_dispatch:
+
+concurrency:
+  group: graham-stage5-production-verification
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run final production verification and publish receipt
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+            ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+            ACTIVE_MARKET="$(node tools/graham-active-week.mjs --path dailyMarketLedger)"
+
+            node --check tests/graham-stage5-production-verification.test.mjs
+            GITHUB_SHA="$(git rev-parse HEAD)" node tests/graham-stage5-production-verification.test.mjs \
+              --receipt-out data/walters/nfl/graham-stage5-production-verification-current.json
+
+            # Stage 5 is verification only. The receipt is the only permitted durable write.
+            git diff --exit-code -- \
+              data/walters/nfl/active-week.json \
+              "$ACTIVE_NUMBERS" \
+              "$ACTIVE_RESEARCH" \
+              "$ACTIVE_MARKET" \
+              data/walters/nfl-power-ratings-ledger.json
+
+            git add -- data/walters/nfl/graham-stage5-production-verification-current.json
+            if git diff --cached --quiet; then
+              echo "Stage 5 receipt already current."
+              exit 0
+            fi
+
+            git commit -m "Verify Graham Stage 5 production state"
+            if git push origin HEAD:main; then
+              echo "Graham Stage 5 verification receipt published on attempt $attempt."
+              exit 0
+            fi
+            echo "Graham Stage 5 publish collision on attempt $attempt; retrying against latest main."
+          done
+
+          echo "Graham Stage 5 verification could not publish after 4 attempts." >&2
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Graham Stage 5 production verification"
+            echo
+            echo "- Prerequisite: Stage 4 six-case regression PASS"
+            echo "- Week 1 production read-back: 16 games, generated explanations and governed arithmetic"
+            echo "- Live Graham research tasks: 4 exact-schedule tasks checked against repository authority"
+            echo "- Future-week rollover: temporary dry-run only"
+            echo "- Live active-week mutation allowed: no"
+            echo "- Durable write allowed: Stage 5 receipt only"
+          } >> "$GITHUB_STEP_SUMMARY"
