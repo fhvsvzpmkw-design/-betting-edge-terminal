@@ -7,8 +7,10 @@ on:
       - data/major-sport-market-coverage-v1.json
       - BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md
       - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+      - tools/odds-refresh-worker-source.yml
       - tests/major-sport-market-coverage.test.mjs
       - tests/scheduled-report-authority.test.mjs
+      - tests/odds-worker-major-sport-retention.test.mjs
       - .github/workflows/major-sport-market-coverage.yml
   workflow_dispatch:
 
@@ -40,6 +42,7 @@ jobs:
           set -euo pipefail
           node tests/major-sport-market-coverage.test.mjs
           node tests/scheduled-report-authority.test.mjs
+          node tests/odds-worker-major-sport-retention.test.mjs
 
       - name: Summary
         if: always()
@@ -48,6 +51,7 @@ jobs:
             echo '## Major sport market coverage'
             echo '- Coverage authority: data/major-sport-market-coverage-v1.json'
             echo '- Scheduled report authority: BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md'
+            echo '- Odds worker: broad multi-event market retention protected; deep prop collections supplemental'
             echo '- Scope: MLB / NHL / NBA-WNBA / NFL-NCAAF-CFL'
             echo '- Primary markets: two-sided ML + main spread/run-line/puck-line + total'
             echo '- Props: fresh exact supported player props'
