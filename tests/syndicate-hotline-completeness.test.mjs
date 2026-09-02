@@ -12,7 +12,7 @@ const required={
 'eddie-numbers':['MUDDY NUMBERS','LEDGER DESK','ACTUAL CAD DOLLARS','MUDDY LEDGER // LAST 10 TICKETS','<canvas','MUDDY METERS','THE WALK TO THE CAGE','EDDIE:'],
 'bill-weston':['Last-Session Reconciliation','Change Memo','Current Window Entries','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Today's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
-'jesse-bains':['SPORTS DESK','HOTEL DELPHORIA','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
+'jesse-bains':['Sports Desk','HOTEL DELPHORIA','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
 'lou-vega':['LATE-NIGHT MENU','COUPON BOOK','BEST NUMBER IN TOWN','FLOOR WALK','PROGRESSIVE WATCH','VIDEO POKER CHECK','TWO-SLICE DINNER','TIP THE WAITRESS','PARKING LOT COUPON','LAST STOP']};
 for(const profile of roster){
  const id=profile.characterId;if(!required[id])continue;
@@ -32,9 +32,13 @@ for(const profile of roster){
   assert(character.authority.source==='data/walters/nfl/current-week-terminal.json',`${id}: Graham terminal authority source mismatch`);
   assert(character.authority.scope==='NFL_ONLY',`${id}: Graham derivative must remain NFL-only`);
   assert(character.authority.bettingAuthority===false,`${id}: Jesse must not become betting authority`);
-  assert(liveText.includes("../../data/walters/nfl/current-week-terminal.json"),`${id}: live desk does not fetch the Graham terminal`);
-  assert(liveText.includes("cache:'no-store'"),`${id}: live desk must bypass stale Graham cache`);
-  assert(liveText.includes('ATTENTION_GAP=1.5'),`${id}: 1.5-point Graham attention guard missing`);
+  assert(character?.guardrails?.attentionGapPoints===1.5,`${id}: character 1.5-point Graham attention guard missing`);
+  assert(liveText.includes('data-update-mode="manual-static"'),`${id}: locked v3 must remain a manual static edition`);
+  assert(liveText.includes('SOURCE AUTHORITY: GRAHAM CURRENT-WEEK NFL TERMINAL SNAPSHOT.'),`${id}: manual v3 must declare Graham snapshot authority`);
+  assert(liveText.includes('data/walters/nfl/current-week-terminal.json'),`${id}: manual v3 must retain Graham terminal source provenance`);
+  assert(liveText.includes('NO RUNTIME FETCH. NO POLLING. NO OBSERVERS. NO TIMER-DRIVEN DOM REBUILD.'),`${id}: manual v3 no-runtime-fetch guard missing`);
+  assert(!liveText.includes('fetch('),`${id}: manual v3 must not restore runtime fetch`);
+  assert(liveText.includes('GRAHAM GAP 1.5'),`${id}: 1.5-point Graham attention presentation missing`);
   continue;
  }
  const last=character?.continuity?.lastReportSeen;assert(last?.timestamp&&last?.label&&last?.slot,`${id}: continuity.lastReportSeen incomplete`);
