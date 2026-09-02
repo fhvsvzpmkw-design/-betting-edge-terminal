@@ -1,0 +1,26 @@
+name: VigScope Agreement step 3 calibration
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/vigscope-agreement-step3-calibration.mjs'
+      - '.github/workflows/vigscope-agreement-step3-calibration.yml'
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Calibrate Market Agreement evidence handling
+        env:
+          CALIBRATION_START: '2026-08-15'
+          CALIBRATION_END: '2026-09-01'
+        run: node tools/vigscope-agreement-step3-calibration.mjs
