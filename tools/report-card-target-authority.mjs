@@ -45,10 +45,15 @@ function normalizeContract(text) {
 }
 
 function normalizeReportAuthority(text) {
-  return text.replace(
-    /The current target of (?:seven|nine|twelve|\d+) is \*\*soft\*\*, not a hard ceiling\./i,
-    'The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling.'
-  );
+  return text
+    .replace(
+      /The current target of (?:seven|nine|twelve|\d+) is \*\*soft\*\*, not a hard ceiling\./i,
+      'The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling.'
+    )
+    .replace(
+      /may not be discarded merely to keep nine cards\./i,
+      'may not be discarded merely to enforce the soft target.'
+    );
 }
 
 function sync() {
@@ -88,6 +93,9 @@ function check() {
   const reportAuthority = read(REPORT_AUTHORITY);
   if (/The current target of (?:seven|nine|twelve|\d+) is \*\*soft\*\*, not a hard ceiling\./i.test(reportAuthority)) {
     fail('scheduled-report authority hard-codes a duplicate current report-card target');
+  }
+  if (/may not be discarded merely to keep nine cards\./i.test(reportAuthority)) {
+    fail('scheduled-report authority still contains stale nine-card enforcement wording');
   }
   if (!reportAuthority.includes('The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling.')) {
     fail('scheduled-report authority is missing repository-controlled target wording');
