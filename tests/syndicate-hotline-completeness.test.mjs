@@ -13,13 +13,20 @@ const required={
 'bill-weston':['Last-Session Reconciliation','Change Memo','Current Window Entries','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Today's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
 'jesse-bains':['Sports Desk','Hotel Delphoria','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
-'lou-vega':['LATE-NIGHT MENU','COUPON BOOK','BEST NUMBER IN TOWN','FLOOR WALK','PROGRESSIVE WATCH','VIDEO POKER CHECK','TWO-SLICE DINNER','TIP THE WAITRESS','PARKING LOT COUPON','LAST STOP']};
+'lou-vega':['VEGAS BY THE SLICE','data-zone="menu-board"','COUPON BOOK','BEST NUMBER IN TOWN','PIZZA BOOK // RUNNING REVIEW','data-zone="floor-walk"','LAST STOP']};
 for(const profile of roster){
  const id=profile.characterId;if(!required[id])continue;
  const character=readJson(repoRel(profile.characterFile));
  const live=repoRel(profile.url);assert(fs.existsSync(live),`${id}: live Hotline missing`);
  const liveText=read(live);assert(liveText.length>=6000,`${id}: latest Hotline appears abbreviated (${liveText.length} chars)`);
  for(const marker of required[id])assert(liveText.includes(marker),`${id}: missing full-edition marker "${marker}"`);
+ if(id==='lou-vega'){
+  assert(character?.hotlineStyle?.shell?.id==='vegas-by-the-slice',`${id}: v3 shell identity mismatch`);
+  assert(character?.hotlineStyle?.shell?.version===3,`${id}: v3 shell version mismatch`);
+  assert(character?.hotlineStyle?.shell?.status==='locked',`${id}: v3 shell must remain locked`);
+  const rotationRule=String(character?.hotlineStyle?.generationEngine?.rule||'');
+  assert(rotationRule.includes('Do not force pizza, a progressive, video poker, a comp, a waitress and parking into the same issue.'),`${id}: rotating route-module safeguard missing`);
+ }
  if(character?.authority?.mode==='ledger-authoritative'){
   assert(character.authority.source==='/api/bet-history',`${id}: ledger authority source mismatch`);
   assert(character.authority.actualDollars===true,`${id}: ledger authority must use actual dollars`);
