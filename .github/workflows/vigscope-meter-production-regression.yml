@@ -1,17 +1,23 @@
 name: VigScope meter production regression
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
     paths:
+      - 'assets/runner-core-runtime.js'
+      - 'data/vigscope/meter-calibration-production-v1.json'
+      - 'tools/vigscope-meter-production.mjs'
+      - 'tools/vigscope-meter-telemetry.mjs'
+      - 'tools/vigscope-meter-telemetry-gate.mjs'
+      - 'tools/report-publication.mjs'
+      - 'tests/vigscope-meter-production.test.mjs'
+      - 'tests/vigscope-meter-fallback-safety.test.mjs'
+      - 'tests/vigscope-meter-telemetry.test.mjs'
+      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
 
-permissions:
-  contents: write
-
 jobs:
-  hotfix-session-telemetry:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Check out committed main with history
@@ -22,96 +28,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Patch issued telemetry persistence
-        shell: bash
+      - name: Run calibrated meter regression
+        run: node tests/vigscope-meter-production.test.mjs
+      - name: Run fallback meter safety regression
+        run: node tests/vigscope-meter-fallback-safety.test.mjs
+      - name: Run structured publisher telemetry regression
+        run: node tests/vigscope-meter-telemetry.test.mjs
+      - name: Run Sep 2 production telemetry fixture
+        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs
+      - name: Run durable telemetry gate self-test
+        run: node tools/vigscope-meter-telemetry-gate.mjs self-test
+      - name: Run report publisher self-test
+        run: node tools/report-publication.mjs self-test
+      - name: Verify runner production wiring
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          runtime_path=Path('assets/runner-core-runtime.js')
-          lines=runtime_path.read_text().splitlines()
-          normalize_hits=without_hits=reprice_hits=0
-          out=[]
-          for line in lines:
-              if line.startswith('function normalizeRun(run){'):
-                  normalize_hits+=1
-                  needle="repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),recs:"
-                  replacement="repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),instrumentTelemetry:run&&run.instrumentTelemetry&&run.instrumentTelemetry.authority==='PUBLISHER_BOUND_FEED_V1'?deepClone(run.instrumentTelemetry):null,recs:"
-                  if needle not in line:
-                      raise SystemExit('normalizeRun insertion point not found')
-                  line=line.replace(needle,replacement,1)
-              if line.startswith('function withoutComparison(run){'):
-                  without_hits+=1
-                  old='delete out.comparison;delete out.refreshDelta;delete out.instrumentTelemetry;'
-                  new="delete out.comparison;delete out.refreshDelta;if(out.instrumentTelemetry?.authority!=='PUBLISHER_BOUND_FEED_V1')delete out.instrumentTelemetry;"
-                  if old not in line:
-                      raise SystemExit('withoutComparison telemetry deletion pattern not found')
-                  line=line.replace(old,new,1)
-              if line.strip()=='instrumentTelemetry:buildInstrumentTelemetry(recs,feed),':
-                  reprice_hits+=1
-                  continue
-              out.append(line)
-          if (normalize_hits,without_hits,reprice_hits)!=(1,1,1):
-              raise SystemExit(f'unexpected patch counts normalize={normalize_hits} without={without_hits} reprice={reprice_hits}')
-          runtime_path.write_text('\n'.join(out)+'\n')
-
-          test_path=Path('tests/vigscope-meter-sep2-live-fixture.test.mjs')
-          source=test_path.read_text()
-          marker="console.log(JSON.stringify({"
-          if marker not in source:
-              raise SystemExit('Sep 2 fixture insertion marker not found')
-          block=r'''
-// Session-switch regression: the 09:30 publisher-bound meter receipt must
-// survive 09:30 -> 08:00 -> 06:00 -> 09:30 navigation. Pre-cutover runs stay
-// unmeasured, and REPRICE comparison telemetry must never replace the issued
-// publisher-bound receipt.
-const finalMorningPath='data/history/runs/2026-09-02/final_morning-093430.json';
-const finalMorning=JSON.parse(fs.readFileSync(finalMorningPath,'utf8'));
-const runtimeSource=fs.readFileSync('assets/runner-core-runtime.js','utf8');
-const normalizeLine=runtimeSource.split(/\r?\n/).find(line=>line.startsWith('function normalizeRun(run){'));
-const withoutComparisonLine=runtimeSource.split(/\r?\n/).find(line=>line.startsWith('function withoutComparison(run){'));
-assert.ok(normalizeLine,'runner normalizeRun must be present');
-assert.ok(withoutComparisonLine,'runner withoutComparison must be present');
-const txtForSessionTest=(v,f='—')=>(v===null||v===undefined||v==='')?f:String(v);
-const deepCloneForSessionTest=v=>JSON.parse(JSON.stringify(v));
-const normalizeRunForTest=new Function('txt','deepClone',`${normalizeLine}; return normalizeRun;`)(txtForSessionTest,deepCloneForSessionTest);
-const withoutComparisonForTest=new Function('deepClone',`${withoutComparisonLine}; return withoutComparison;`)(deepCloneForSessionTest);
-const normalized0800=normalizeRunForTest(withoutComparisonForTest(current));
-const normalized0600=normalizeRunForTest(withoutComparisonForTest(prior));
-assert.equal(normalized0800.instrumentTelemetry,null,'08:00 remains pre-cutover/unmeasured');
-assert.equal(normalized0600.instrumentTelemetry,null,'06:00 remains pre-cutover/unmeasured');
-const returned0930=normalizeRunForTest(withoutComparisonForTest(finalMorning));
-assert.equal(returned0930.instrumentTelemetry?.authority,'PUBLISHER_BOUND_FEED_V1');
-assert.equal(returned0930.instrumentTelemetry?.heat?.value,17);
-assert.equal(returned0930.instrumentTelemetry?.pressure?.value,52);
-assert.equal(returned0930.instrumentTelemetry?.agreement?.score,91);
-assert.deepEqual(returned0930.instrumentTelemetry,finalMorning.instrumentTelemetry,'09:30 telemetry must survive session normalization unchanged');
-const transient=normalizeRunForTest({...finalMorning,instrumentTelemetry:{authority:'REPRICE_COMPARISON_ONLY',heat:{value:99}}});
-assert.equal(transient.instrumentTelemetry,null,'non-publisher comparison telemetry must not become saved issued history');
-assert.doesNotMatch(runtimeSource,/instrumentTelemetry:buildInstrumentTelemetry\(recs,feed\),/,'REPRICE must not overwrite issued report meters');
-'''
-          test_path.write_text(source.replace(marker,block+'\n'+marker,1))
-          PY
-      - name: Run focused meter regressions
-        run: |
-          node tests/vigscope-meter-sep2-live-fixture.test.mjs
-          node tests/vigscope-meter-production.test.mjs
-          node tests/vigscope-meter-fallback-safety.test.mjs
-          node tests/vigscope-meter-telemetry.test.mjs
-          node tools/vigscope-meter-telemetry-gate.mjs self-test
-          node tools/report-publication.mjs self-test
-      - name: Verify exact session hotfix invariants
-        shell: bash
-        run: |
-          grep -F "instrumentTelemetry:run&&run.instrumentTelemetry&&run.instrumentTelemetry.authority==='PUBLISHER_BOUND_FEED_V1'?deepClone(run.instrumentTelemetry):null" assets/runner-core-runtime.js
-          grep -F "if(out.instrumentTelemetry?.authority!=='PUBLISHER_BOUND_FEED_V1')delete out.instrumentTelemetry" assets/runner-core-runtime.js
-          ! grep -F "instrumentTelemetry:buildInstrumentTelemetry(recs,feed)," assets/runner-core-runtime.js
-      - name: Restore permanent workflow and commit validated hotfix
-        shell: bash
-        run: |
-          git show HEAD^:.github/workflows/vigscope-meter-production-regression.yml > .github/workflows/vigscope-meter-production-regression.yml
-          git config user.name 'vigscope-hotfix-bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add assets/runner-core-runtime.js tests/vigscope-meter-sep2-live-fixture.test.mjs .github/workflows/vigscope-meter-production-regression.yml
-          git commit -m 'fix: preserve issued meter telemetry across session switching'
-          git push origin HEAD:main
+          grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
+          grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
+          grep -F "50+50*Math.tanh(fav/0.028)" assets/runner-core-runtime.js
+          grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
+          grep -F "function explicitMovementOddsPairs(v)" assets/runner-core-runtime.js
+          grep -F "MARKET STATE UNMEASURED" assets/runner-core-runtime.js
+          grep -F "PUBLISHER_BOUND_FEED_V1" assets/runner-core-runtime.js
+          grep -F "attachPublisherInstrumentTelemetry" tools/report-publication.mjs
+          grep -F "VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'" tools/vigscope-meter-telemetry-gate.mjs
