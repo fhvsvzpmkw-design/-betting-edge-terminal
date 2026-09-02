@@ -1,5 +1,5 @@
 name: Walters QB Stage 3D Bootstrap
-# Triggered through the authenticated contents API so GitHub Actions registers the new workflow.
+# Installs only non-workflow Stage 3D files. The permanent workflow is updated separately through the authenticated repository API.
 
 on:
   push:
@@ -45,8 +45,9 @@ jobs:
           python tools/build-walters-qb-performance-stage3d.py --self-test
           node --check tools/validate-walters-qb-performance-stage3d.mjs
           node --check tests/walters-qb-performance-stage3d.test.mjs
+          git restore -- .github/workflows/walters-qb-performance-stage3.yml
 
-      - name: Commit package and remove bootstrap assets
+      - name: Commit non-workflow Stage 3D package
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
@@ -55,13 +56,12 @@ jobs:
             data/walters/nfl/qb-performance/stage3d-contract-v1.json \
             tools/build-walters-qb-performance-stage3d.py \
             tools/validate-walters-qb-performance-stage3d.mjs \
-            tests/walters-qb-performance-stage3d.test.mjs \
-            .github/workflows/walters-qb-performance-stage3.yml
-          git rm --ignore-unmatch \
-            .github/workflows/walters-qb-stage3d-bootstrap.yml \
-            .stage3d/walters-qb-stage3d-package.tgz
-          rmdir .stage3d 2>/dev/null || true
-          git commit -m "Install Walters QB performance Stage 3D acceptance package"
+            tests/walters-qb-performance-stage3d.test.mjs
+          if git diff --cached --quiet; then
+            echo "Stage 3D non-workflow package is already installed."
+            exit 0
+          fi
+          git commit -m "Install Walters QB performance Stage 3D non-workflow package"
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
