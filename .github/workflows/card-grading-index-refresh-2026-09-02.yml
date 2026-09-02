@@ -1,0 +1,61 @@
+name: Isolated results-index refresh after Sep 1 grading
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-index-refresh-2026-09-02.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-index-refresh-2026-09-02
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Rebuild downstream results index only
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify grading coverage
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          if(j.coverage?.lastDate!=='2026-09-01') throw Error(`results index lastDate ${j.coverage?.lastDate}`);
+          if((j.coverage?.unresolvedCards||0)!==0) throw Error(`expected 0 unresolved cards, found ${j.coverage?.unresolvedCards}`);
+          console.log(`RESULTS INDEX PASS: ${j.coverage.cards} cards, ${j.coverage.completeCards} complete, ${j.coverage.unresolvedCards} unresolved, through ${j.coverage.lastDate}`);
+          console.log(`PRICE ANALYTICS: ${j.priceAnalytics?.pricedCards} priced cards, ${j.priceAnalytics?.netUnits} units, ${j.priceAnalytics?.roiPct}% ROI`);
+          NODE
+          bad=$(git diff --name-only | grep -v '^data/history/results-index.json$' || true)
+          if [ -n "$bad" ]; then
+            echo "Unexpected downstream changes:"
+            echo "$bad"
+            exit 1
+          fi
+
+      - name: Commit results index only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history/results-index.json
+          if git diff --cached --quiet; then
+            echo "No results index changes to publish."
+            exit 0
+          fi
+          git commit -m "Rebuild Betting Edge results index through Sep 1"
+          git pull --rebase origin main
+          git push
