@@ -6,7 +6,9 @@ on:
     paths:
       - data/major-sport-market-coverage-v1.json
       - BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
       - tests/major-sport-market-coverage.test.mjs
+      - tests/scheduled-report-authority.test.mjs
       - .github/workflows/major-sport-market-coverage.yml
   workflow_dispatch:
 
@@ -37,13 +39,15 @@ jobs:
         run: |
           set -euo pipefail
           node tests/major-sport-market-coverage.test.mjs
+          node tests/scheduled-report-authority.test.mjs
 
       - name: Summary
         if: always()
         run: |
           {
             echo '## Major sport market coverage'
-            echo '- Authority: data/major-sport-market-coverage-v1.json'
+            echo '- Coverage authority: data/major-sport-market-coverage-v1.json'
+            echo '- Scheduled report authority: BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md'
             echo '- Scope: MLB / NHL / NBA-WNBA / NFL-NCAAF-CFL'
             echo '- Primary markets: two-sided ML + main spread/run-line/puck-line + total'
             echo '- Props: fresh exact supported player props'
