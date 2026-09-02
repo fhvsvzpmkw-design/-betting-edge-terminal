@@ -36,13 +36,16 @@ for(const id of ['meter_presentation','syndicate_load','startup_screen','history
   assert(byId[id]?.state==='active',`${id} must be active`);
   assert(byId[id]?.editable===true,`${id} must be editable`);
 }
-assert(byId.report_card_target?.state==='display_only','report card target must remain display-only for now');
-assert(byId.report_card_target?.current===9,'report card target current status must be 9');
-assert(byId.report_card_target?.profiles?.join(',')==='7,9,12','report card target profiles must be 7/9/12');
-assert(byId.report_card_target?.overflowProtection===true,'report card target overflow protection must remain on');
+const cardTarget=byId.report_card_target;
+assert(cardTarget?.state==='display_only','report card target must remain display-only for now');
+assert(Number.isInteger(cardTarget?.current),'report card target current status must be an integer');
+assert(cardTarget?.profiles?.join(',')==='7,9,12','report card target profiles must be 7/9/12');
+assert(cardTarget.profiles.includes(cardTarget.current),'report card target current status must be one of the approved profiles');
+assert(cardTarget?.overflowProtection===true,'report card target overflow protection must remain on');
+assert(cardTarget?.summary?.includes(`CURRENT: ${cardTarget.current} CARDS`),'report card target summary must reflect the repository current value');
 assert(contract.includes('data/preferences.json'),'production contract must resolve repository preferences for report card target');
 assert(contract.includes('id: "report_card_target"'),'production contract must bind the report_card_target module');
-assert(contract.includes('current repository setting is **9 cards**'),'production contract must state the current 9-card operational profile');
+assert(contract.includes('The live production target is the module\'s `current` value; this contract does not hard-code a second current target.'),'production contract must use the repository current value rather than a duplicated hard-coded target');
 assert(contract.includes('Fewer than the target is valid'),'production contract must keep the card target soft rather than a quota');
 assert(byId.terminal_interface?.state==='reserved','terminal interface must remain reserved');
 
@@ -64,4 +67,4 @@ for(const token of [
 assert(bootstrap.includes('bettingEdge.preferences.meterPresentation'),'VigScope bootstrap must honor saved meter preference before renderer load');
 assert(bootstrap.includes('preferences-framework.js?v=3'),'preferences framework cache version must be v3');
 
-console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + REPORT CARD TARGET 9');
+console.log(`F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + REPORT CARD TARGET ${cardTarget.current}`);
