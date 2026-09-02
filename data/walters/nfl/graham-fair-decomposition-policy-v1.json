@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "policyId": "graham-fair-decomposition-v1",
+  "state": "OPERATIONAL",
+  "purpose": "Make every Graham fair explanation a generated view of the governed arithmetic so explanatory text cannot drift from the authoritative exact and displayed fair.",
+  "authority": {
+    "neutralTeamBaseField": "neutralBaseHome",
+    "homeFieldField": "homeFieldPointsToHomeSpread",
+    "personnelField": "personnelOverlayPointsToHomeSpread",
+    "matchupField": "matchupOverlayPointsToHomeSpread",
+    "exactFairField": "grahamExactFairHome",
+    "displayFairField": "grahamFairHome",
+    "adjustmentArrayField": "adjustments"
+  },
+  "adjustmentClassification": {
+    "homeFieldTypes": ["HOME_FIELD", "VENUE"],
+    "personnelTypes": ["PERSONNEL_CALIBRATED_PRODUCTION"],
+    "matchupTypes": ["MATCHUP_CALIBRATED_PRODUCTION"],
+    "otherGovernedRule": "Every numeric pointsToHomeSpread adjustment not classified as home field, personnel, or matchup contributes to otherGovernedPointsToHomeSpread."
+  },
+  "arithmetic": {
+    "formula": "neutralTeamBaseHome + homeFieldPointsToHomeSpread + personnelPointsToHomeSpread + matchupPointsToHomeSpread + otherGovernedPointsToHomeSpread = exactFairHome",
+    "internalPrecisionDecimals": 3,
+    "displayRoundingIncrement": 0.5,
+    "tolerance": 0.0005
+  },
+  "generatedFields": [
+    "fairDecomposition",
+    "researchSummary"
+  ],
+  "productionRule": "Any governed production workflow that changes an active Graham fair must synchronize and validate the fair decomposition before publishing current-numbers.json.",
+  "marketViewed": false
+}
