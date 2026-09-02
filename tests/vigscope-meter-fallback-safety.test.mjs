@@ -74,7 +74,8 @@ function fallbackAgreement(run){
 
 const signals=RUN.recs.map(moveSignal);
 assert.equal(signals.length,8);
-assert.ok(signals.every(s=>s.source==='NONE'), '06:00 PASS price/playTo text must not be treated as market movement');
+assert.ok(signals.every(s=>!['MOVE','REPRICE'].includes(s.source)), '06:00 PASS price/playTo text must not create numeric market movement');
+assert.ok(signals.every(s=>s.magnitude===0), '06:00 PASS fixture must have zero movement magnitude');
 assert.ok(RUN.recs.every(rec=>explicitMovementOddsPairs(rec.move).length===0));
 
 assert.deepEqual(explicitMovementOddsPairs('Bet365 +120 → +130'), [[120,130]]);
