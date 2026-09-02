@@ -1,0 +1,117 @@
+name: One-shot VigScope session telemetry hotfix
+
+on:
+  push:
+    branches:
+      - fix/vigscope-session-telemetry-20260902
+    paths:
+      - '.github/workflows/oneshot-vigscope-session-telemetry-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out hotfix branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/vigscope-session-telemetry-20260902
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Patch session telemetry preservation and regression
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          runtime_path=Path('assets/runner-core-runtime.js')
+          source=runtime_path.read_text()
+          lines=source.splitlines()
+
+          normalize_hits=0
+          without_hits=0
+          reprice_hits=0
+          new_lines=[]
+          for line in lines:
+              if line.startswith('function normalizeRun(run){'):
+                  normalize_hits+=1
+                  needle="repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),recs:"
+                  replacement="repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),instrumentTelemetry:run&&run.instrumentTelemetry&&run.instrumentTelemetry.authority==='PUBLISHER_BOUND_FEED_V1'?deepClone(run.instrumentTelemetry):null,recs:"
+                  if needle not in line:
+                      raise SystemExit('normalizeRun insertion point not found')
+                  line=line.replace(needle,replacement,1)
+              if line.startswith('function withoutComparison(run){'):
+                  without_hits+=1
+                  old='delete out.comparison;delete out.refreshDelta;delete out.instrumentTelemetry;'
+                  new="delete out.comparison;delete out.refreshDelta;if(out.instrumentTelemetry?.authority!=='PUBLISHER_BOUND_FEED_V1')delete out.instrumentTelemetry;"
+                  if old not in line:
+                      raise SystemExit('withoutComparison telemetry deletion pattern not found')
+                  line=line.replace(old,new,1)
+              if line.strip()=='instrumentTelemetry:buildInstrumentTelemetry(recs,feed),':
+                  reprice_hits+=1
+                  continue
+              new_lines.append(line)
+
+          if (normalize_hits,without_hits,reprice_hits)!=(1,1,1):
+              raise SystemExit(f'unexpected patch counts: normalize={normalize_hits}, without={without_hits}, reprice={reprice_hits}')
+          runtime_path.write_text('\n'.join(new_lines)+'\n')
+
+          test_path=Path('tests/vigscope-meter-sep2-live-fixture.test.mjs')
+          test_source=test_path.read_text()
+          marker="console.log(JSON.stringify({"
+          if marker not in test_source:
+              raise SystemExit('Sep 2 fixture insertion marker not found')
+          block=r'''
+// Session-switch regression: the 09:30 publisher-bound meter receipt must
+// survive 09:30 -> 08:00 -> 06:00 -> 09:30 navigation. Pre-cutover runs stay
+// unmeasured, and REPRICE comparison telemetry must never replace the issued
+// publisher-bound receipt.
+const finalMorningPath='data/history/runs/2026-09-02/final_morning-093430.json';
+const finalMorning=JSON.parse(fs.readFileSync(finalMorningPath,'utf8'));
+const runtimeSource=fs.readFileSync('assets/runner-core-runtime.js','utf8');
+const normalizeLine=runtimeSource.split(/\r?\n/).find(line=>line.startsWith('function normalizeRun(run){'));
+const withoutComparisonLine=runtimeSource.split(/\r?\n/).find(line=>line.startsWith('function withoutComparison(run){'));
+assert.ok(normalizeLine,'runner normalizeRun must be present');
+assert.ok(withoutComparisonLine,'runner withoutComparison must be present');
+const txt=(v,f='—')=>(v===null||v===undefined||v==='')?f:String(v);
+const deepClone=v=>JSON.parse(JSON.stringify(v));
+const normalizeRunForTest=new Function('txt','deepClone',`${normalizeLine}; return normalizeRun;`)(txt,deepClone);
+const withoutComparisonForTest=new Function('deepClone',`${withoutComparisonLine}; return withoutComparison;`)(deepClone);
+const normalized0800=normalizeRunForTest(withoutComparisonForTest(current));
+const normalized0600=normalizeRunForTest(withoutComparisonForTest(prior));
+assert.equal(normalized0800.instrumentTelemetry,null,'08:00 remains pre-cutover/unmeasured');
+assert.equal(normalized0600.instrumentTelemetry,null,'06:00 remains pre-cutover/unmeasured');
+const returned0930=normalizeRunForTest(withoutComparisonForTest(finalMorning));
+assert.equal(returned0930.instrumentTelemetry?.authority,'PUBLISHER_BOUND_FEED_V1');
+assert.equal(returned0930.instrumentTelemetry?.heat?.value,17);
+assert.equal(returned0930.instrumentTelemetry?.pressure?.value,52);
+assert.equal(returned0930.instrumentTelemetry?.agreement?.score,91);
+assert.deepEqual(returned0930.instrumentTelemetry,finalMorning.instrumentTelemetry,'09:30 telemetry must survive session normalization unchanged');
+const transient=normalizeRunForTest({...finalMorning,instrumentTelemetry:{authority:'REPRICE_COMPARISON_ONLY',heat:{value:99}}});
+assert.equal(transient.instrumentTelemetry,null,'non-publisher comparison telemetry must not become saved issued history');
+assert.doesNotMatch(runtimeSource,/instrumentTelemetry:buildInstrumentTelemetry\(recs,feed\),/,'REPRICE must not overwrite issued report meters');
+'''
+          test_path.write_text(test_source.replace(marker,block+'\n'+marker,1))
+
+          Path('.github/workflows/oneshot-vigscope-session-telemetry-hotfix.yml').unlink()
+          PY
+      - name: Run focused meter regressions
+        run: |
+          node tests/vigscope-meter-sep2-live-fixture.test.mjs
+          node tests/vigscope-meter-production.test.mjs
+          node tests/vigscope-meter-fallback-safety.test.mjs
+          node tests/vigscope-meter-telemetry.test.mjs
+          node tools/vigscope-meter-telemetry-gate.mjs self-test
+          node tools/report-publication.mjs self-test
+      - name: Commit hotfix to branch
+        run: |
+          git config user.name 'vigscope-hotfix-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add assets/runner-core-runtime.js tests/vigscope-meter-sep2-live-fixture.test.mjs .github/workflows/oneshot-vigscope-session-telemetry-hotfix.yml
+          git commit -m 'fix: preserve issued meter telemetry across session switching'
+          git push origin HEAD:fix/vigscope-session-telemetry-20260902
