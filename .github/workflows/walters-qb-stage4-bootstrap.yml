@@ -1,0 +1,69 @@
+name: Walters QB Stage 4 Bootstrap
+
+on:
+  push:
+    paths:
+      - ".github/workflows/walters-qb-stage4-bootstrap.yml"
+      - ".stage4/walters-qb-stage4-static-package.b64.part*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: walters-qb-stage4-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  install-stage4-static-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Reassemble, install and statically verify Stage 4 package
+        run: |
+          set -euo pipefail
+          cat .stage4/walters-qb-stage4-static-package.b64.part{00..07} \
+            | base64 --decode > /tmp/walters-qb-stage4-static-package.tgz
+          tar -xzf /tmp/walters-qb-stage4-static-package.tgz -C .
+          python -m json.tool data/walters/nfl/qb-performance/stage4-contract-v1.json >/dev/null
+          python -m json.tool data/walters/nfl/qb-performance/stage4/binding-authority-v1.json >/dev/null
+          python -m py_compile tools/build-walters-qb-performance-stage4.py
+          python tools/build-walters-qb-performance-stage4.py --self-test
+          node --check tools/validate-walters-qb-performance-stage4.mjs
+          node --check tests/walters-qb-performance-stage4.test.mjs
+
+      - name: Commit non-workflow Stage 4 package
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- \
+            data/walters/nfl/qb-performance/stage4-contract-v1.json \
+            data/walters/nfl/qb-performance/stage4/binding-authority-v1.json \
+            tools/build-walters-qb-performance-stage4.py \
+            tools/validate-walters-qb-performance-stage4.mjs \
+            tests/walters-qb-performance-stage4.test.mjs
+          if git diff --cached --quiet; then
+            echo "Stage 4 non-workflow package is already installed."
+            exit 0
+          fi
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          git commit -m "Install Walters QB performance Stage 4 shadow package"
+          git push origin HEAD:main
