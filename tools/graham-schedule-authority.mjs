@@ -70,6 +70,45 @@ export function buildResearchCadenceProjection(authority) {
   };
 }
 
+export function buildResearchLedgerCadenceProjection(authority) {
+  const baseline = requireTask(authority, 'TUESDAY_BASELINE');
+  const daily = requireTask(authority, 'DAILY_REVIEW');
+  const delta = requireTask(authority, 'DELTA_1645');
+  const sunday = requireTask(authority, 'SUNDAY_PREGAME');
+  return [
+    {
+      day: 'TUESDAY',
+      timePacific: baseline.time,
+      type: 'FULL_WEEKLY_BASELINE',
+      scope: baseline.purpose
+    },
+    {
+      day: 'MONDAY/WEDNESDAY-FRIDAY',
+      timePacific: daily.time,
+      type: 'MAIN_DAILY_SWEEP',
+      scope: daily.purpose
+    },
+    {
+      day: 'SATURDAY',
+      timePacific: daily.time,
+      type: 'MAIN_WEEKEND_SWEEP',
+      scope: daily.purpose
+    },
+    {
+      day: 'SUNDAY',
+      timePacific: sunday.time,
+      type: 'PREGAME_SWEEP',
+      scope: sunday.purpose
+    },
+    {
+      day: 'TUESDAY-SATURDAY',
+      timePacific: delta.time,
+      type: 'LATE_DAY_DELTA',
+      scope: delta.purpose
+    }
+  ];
+}
+
 export function buildScheduleAuthorityMetadata(authority) {
   return {
     schema: 1,
@@ -101,6 +140,30 @@ export function validateGrahamBoardScheduleMetadata(board, authority) {
   return true;
 }
 
+export function synchronizeGrahamResearchLedgerScheduleMetadata(ledger, authority) {
+  if (!ledger || typeof ledger !== 'object') throw new Error('Graham research ledger object required');
+  const expectedAuthority = buildScheduleAuthorityMetadata(authority);
+  const expectedCadence = buildResearchLedgerCadenceProjection(authority);
+  const changed = !same(ledger.scheduleAuthority, expectedAuthority) || !same(ledger.scheduledCadence, expectedCadence);
+  ledger.scheduleAuthority = expectedAuthority;
+  ledger.scheduledCadence = expectedCadence;
+  return changed;
+}
+
+export function validateGrahamResearchLedgerScheduleMetadata(ledger, authority) {
+  const expectedAuthority = buildScheduleAuthorityMetadata(authority);
+  const expectedCadence = buildResearchLedgerCadenceProjection(authority);
+  if (!same(ledger?.scheduleAuthority, expectedAuthority)) throw new Error('Graham research ledger scheduleAuthority is not synchronized to controlled manifest');
+  if (!same(ledger?.scheduledCadence, expectedCadence)) throw new Error('Graham research ledger scheduledCadence projection is not synchronized to controlled manifest');
+  return true;
+}
+
+function targetKind(document, file) {
+  if (/research-ledger\.json$/i.test(file) || Array.isArray(document?.sweeps)) return 'RESEARCH_LEDGER';
+  if (/current-numbers\.json$/i.test(file) || Array.isArray(document?.games)) return 'CURRENT_NUMBERS';
+  throw new Error(`Unsupported Graham schedule metadata target: ${file}`);
+}
+
 function parseArgs(argv) {
   const args = { write: false, manifestOnly: false, file: null };
   for (let i = 0; i < argv.length; i += 1) {
@@ -124,18 +187,24 @@ function main() {
   const active = resolveGrahamActiveWeek();
   const file = args.file || active.paths.currentNumbers;
   const absolute = path.isAbsolute(file) ? file : path.join(DEFAULT_ROOT, file);
-  const board = readJson(absolute);
-  if (Number(board.season) !== Number(active.season) || Number(board.week) !== Number(active.week)) {
-    throw new Error(`Graham schedule metadata target ${board.season} W${board.week} does not match active ${active.season} W${active.week}`);
+  const document = readJson(absolute);
+  if (Number(document.season) !== Number(active.season) || Number(document.week) !== Number(active.week)) {
+    throw new Error(`Graham schedule metadata target ${document.season} W${document.week} does not match active ${active.season} W${active.week}`);
   }
 
+  const kind = targetKind(document, file);
   if (args.write) {
-    const changed = synchronizeGrahamScheduleMetadata(board, authority);
-    if (changed) fs.writeFileSync(absolute, `${JSON.stringify(board, null, 2)}\n`);
+    const changed = kind === 'RESEARCH_LEDGER'
+      ? synchronizeGrahamResearchLedgerScheduleMetadata(document, authority)
+      : synchronizeGrahamScheduleMetadata(document, authority);
+    if (changed) fs.writeFileSync(absolute, `${JSON.stringify(document, null, 2)}\n`);
   }
 
-  validateGrahamBoardScheduleMetadata(readJson(absolute), authority);
-  console.log(`GRAHAM SCHEDULE METADATA: PASS // ACTIVE ${active.season} W${active.weekToken} // ${authority.authorityId}`);
+  const verified = readJson(absolute);
+  if (kind === 'RESEARCH_LEDGER') validateGrahamResearchLedgerScheduleMetadata(verified, authority);
+  else validateGrahamBoardScheduleMetadata(verified, authority);
+
+  console.log(`GRAHAM SCHEDULE METADATA: PASS // ${kind} // ACTIVE ${active.season} W${active.weekToken} // ${authority.authorityId}`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
