@@ -22,6 +22,7 @@ on:
       - 'tests/selection-availability.test.mjs'
       - 'tools/spread-lineage.mjs'
       - 'tools/report-publication.mjs'
+      - 'tools/personnel-semantic-gate.mjs'
       - '.github/workflows/report-history-staged.yml'
       - '.github/workflows/core-v14-consolidation-validation.yml'
 
@@ -55,6 +56,10 @@ jobs:
         run: node tools/spread-lineage.mjs self-test
       - name: Validate durable report publication contract
         run: node tools/report-publication.mjs self-test
+      - name: Validate personnel semantic enforcement
+        run: |
+          node tools/personnel-semantic-gate.mjs self-test
+          node tools/personnel-semantic-gate.mjs validate --report data/history/runs/2026-09-02/final_morning-093430.json --sidecar data/history/research-fit/2026-09-02/final_morning-093430.json
       - name: Validate production publication gate
         run: node tools/core-v14-publication-gate.mjs self-test
       - name: Verify Core 1.4 scope freeze
