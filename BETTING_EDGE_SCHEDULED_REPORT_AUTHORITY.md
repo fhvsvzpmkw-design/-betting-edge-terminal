@@ -88,6 +88,8 @@ Unavailable/stale/suspended/unmatched/incomplete Pinnacle is `PINNACLE_BENCHMARK
 
 Run Stage 1 broad current-information research before the provisional current handicap/fair-value screen. Run mandatory Stage 2 personnel depth and explicit re-handicap where material, including the Contract's official-source-first and 3-to-5 credible fallback-source completion rules.
 
+For every personnel-dependent serious candidate that still has a material unresolved dependency at the end of Stage 2, perform one **final authoritative-source re-check before assigning `BET`, `LEAN`, `WAIT`, or `PASS`**. Use the best authoritative source appropriate to that sport and dependency; the authoritative source may legitimately still say `TBD`, `unconfirmed`, `questionable`, `lineup not posted`, inactive list not released, or equivalent. Record the closing check in the existing `personnelEvidence.officialSources` array with `origin`, `url`, `asOf`, a dependency-specific `fact`, and `finalRecheck: true`. Do not invent a universal sport clock for this closing check. Existing sport-specific timing windows remain research-urgency and fallback-depth guidance. If the authoritative source genuinely cannot be reached or does not exist, record that explicitly in the existing `sourceShortfall` and preserve an appropriately uncertain personnel state rather than fabricating a check. A single event-level closing check may support multiple recommendations when it genuinely addresses the same exact dependency.
+
 Personnel information may create, remove or materially change value. It must not be treated only as a post-value confirmation check.
 
 `WAIT` requires a current independent signal plus plausible actionability; book/market disagreement alone is not sufficient. Zero BETs is valid.
