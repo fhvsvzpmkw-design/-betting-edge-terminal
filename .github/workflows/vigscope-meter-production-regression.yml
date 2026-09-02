@@ -12,14 +12,17 @@ on:
       - 'tests/vigscope-meter-production.test.mjs'
       - 'tests/vigscope-meter-fallback-safety.test.mjs'
       - 'tests/vigscope-meter-telemetry.test.mjs'
+      - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out committed main
+      - name: Check out committed main with history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -30,6 +33,8 @@ jobs:
         run: node tests/vigscope-meter-fallback-safety.test.mjs
       - name: Run structured publisher telemetry regression
         run: node tests/vigscope-meter-telemetry.test.mjs
+      - name: Run Sep 2 production telemetry fixture
+        run: node tests/vigscope-meter-sep2-live-fixture.test.mjs
       - name: Run report publisher self-test
         run: node tools/report-publication.mjs self-test
       - name: Verify runner production wiring
