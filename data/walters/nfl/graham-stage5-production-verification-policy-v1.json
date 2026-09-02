@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "policyId": "graham-stage5-production-verification-v1",
+  "state": "ACTIVE_VERIFICATION",
+  "purpose": "Final production verification after Stage 4: read back the complete active Week 1 Graham board, verify the four live research tasks against repository authority, and dry-run a future-week rollover without advancing the live active week.",
+  "prerequisites": {
+    "stage4Receipt": "data/walters/nfl/graham-stage4-regression-current.json",
+    "requiredStage4State": "PASS"
+  },
+  "checks": [
+    {
+      "checkKey": "WEEK1_PRODUCTION_READBACK",
+      "requirement": "Active 2026 Week 1 must contain 16 unique games; all exact/displayed fairs, generated decompositions, written summaries, home-field terms, personnel/matchup overlays, schedule metadata and market-isolation fields must validate from durable repository state."
+    },
+    {
+      "checkKey": "FOUR_RESEARCH_TASKS",
+      "requirement": "TUESDAY_BASELINE, DAILY_REVIEW, DELTA_1645 and SUNDAY_PREGAME must be enabled exact-schedule ChatGPT tasks whose RRULEs match graham-schedule-metadata-v1 and whose prompts retain the active-week, Walters source, H4, personnel, M4, market-isolation and completion/read-back gates."
+    },
+    {
+      "checkKey": "FUTURE_WEEK_ROLLOVER_DRY_RUN",
+      "requirement": "Create and resolve the next Graham week only inside a temporary sandbox, carry forward all 32 current team ratings, inherit repository schedule metadata into the simulated next-week board/research ledger, verify required file paths before simulated activation, and prove the live active-week manifest is unchanged afterward."
+    }
+  ],
+  "passRule": "All three production-verification checks must pass against the same repository revision; the live active week must remain unchanged throughout.",
+  "liveMutationAllowed": false,
+  "allowedDurableWrite": "data/walters/nfl/graham-stage5-production-verification-current.json",
+  "marketViewed": false
+}
