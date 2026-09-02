@@ -38,27 +38,36 @@ jobs:
               if ledger_path.exists():
                   ledger = json.loads(ledger_path.read_text())
                   sweeps = ledger.setdefault('sweeps', [])
-                  existing = {
+                  existing_run_ids = {s.get('runEventId') for s in sweeps if s.get('runEventId')}
+                  existing_legacy = {
                       (s.get('sequence'), s.get('type'), s.get('startedAt'))
                       for s in sweeps
                   }
                   appended = 0
                   for event in events:
+                      run_id = event.get('runEventId')
+                      legacy_key = (event.get('sequence'), event.get('type'), event.get('startedAt'))
+                      if (run_id and run_id in existing_run_ids) or (not run_id and legacy_key in existing_legacy):
+                          continue
                       sweep = {
                           k: event[k]
                           for k in (
-                              'sequence','type','startedAt','completedAt','scope','sourcesChecked',
-                              'teamFindings','ratingChanges','matchupChanges','espnFpiCapture','summary'
+                              'sequence','type','runEventId','sourceTaskKey','completionResult',
+                              'startedAt','completedAt','scope','sourcesChecked','teamFindings',
+                              'ratingChanges','matchupChanges','espnFpiCapture','summary'
                           )
                           if k in event
                       }
-                      if 'methodologySource' in event:
-                          sweep['methodologySource'] = event['methodologySource']
-                      key = (sweep.get('sequence'), sweep.get('type'), sweep.get('startedAt'))
-                      if key in existing:
-                          continue
+                      for optional_key in (
+                          'methodologySource','activeWeekAuthority','h4Guard','vsin2Source',
+                          'personnelProduction','matchupProduction'
+                      ):
+                          if optional_key in event:
+                              sweep[optional_key] = event[optional_key]
                       sweeps.append(sweep)
-                      existing.add(key)
+                      if run_id:
+                          existing_run_ids.add(run_id)
+                      existing_legacy.add(legacy_key)
                       appended += 1
                   if appended:
                       sweeps.sort(key=lambda x: (x.get('startedAt') or '', x.get('sequence') or -1))
@@ -79,12 +88,6 @@ jobs:
                       board['updatedAt'] = latest_at
                       board['lastInformationReviewAt'] = latest_at
                       board_changed = True
-                  summary = latest.get('summary') or {}
-                  if summary.get('fairNumberMoves') == 0:
-                      state = 'INFORMATION_REVIEW_CURRENT_FAIR_PRESERVED_PROVISIONAL'
-                      if board.get('state') != state:
-                          board['state'] = state
-                          board_changed = True
                   matchup_by_key = {
                       m.get('gameKey'): m for m in (latest.get('matchupChanges') or []) if m.get('gameKey')
                   }
@@ -92,7 +95,12 @@ jobs:
                       review = matchup_by_key.get(game.get('gameKey'))
                       if not review:
                           continue
-                      status = 'REVIEWED_NO_MATERIAL_CHANGE_SOURCE_LOCKED' if review.get('action') == 'PRESERVE_PRIOR_PROVISIONAL_NUMBER' else game.get('informationStatus')
+                      action = review.get('action') or ''
+                      status = game.get('informationStatus')
+                      if action == 'PRESERVE_PRIOR_PROVISIONAL_NUMBER':
+                          status = 'REVIEWED_NO_MATERIAL_CHANGE_SOURCE_LOCKED'
+                      elif action.startswith('PRESERVE_CURRENT_GOVERNED_FAIR'):
+                          status = 'REVIEWED_GOVERNED_FAIR_PRESERVED'
                       if status and game.get('informationStatus') != status:
                           game['informationStatus'] = status
                           board_changed = True
