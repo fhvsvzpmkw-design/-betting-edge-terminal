@@ -6,15 +6,21 @@ on:
     paths:
       - "data/walters/nfl/qb-performance/**"
       - "tools/build-walters-qb-performance-stage3b.py"
+      - "tools/build-walters-qb-performance-stage3c.py"
       - "tools/validate-walters-qb-performance-stage3.mjs"
-      - "tests/walters-qb-performance-stage3.test.mjs"
+      - "tools/validate-walters-qb-performance-stage3c.mjs"
+      - "tests/walters-qb-performance-stae3.test.mjs"
+      - "tests/walters-qb-performance-stage3c.test.mjs"
       - ".github/workflows/walters-qb-performance-stage3.yml"
   pull_request:
     paths:
       - "data/walters/nfl/qb-performance/**"
       - "tools/build-walters-qb-performance-stage3b.py"
+      - "tools/build-walters-qb-performance-stage3c.py"
       - "tools/validate-walters-qb-performance-stage3.mjs"
+      - "tools/validate-walters-qb-performance-stage3c.mjs"
       - "tests/walters-qb-performance-stage3.test.mjs"
+      - "tests/walters-qb-performance-stage3c.test.mjs"
       - ".github/workflows/walters-qb-performance-stage3.yml"
 
 concurrency:
@@ -25,9 +31,9 @@ permissions:
   contents: write
 
 jobs:
-  build-validate-stage3b:
+  build-validate-stage3c:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -48,52 +54,75 @@ jobs:
       - name: Run Stage 3B deterministic helper tests
         run: python tools/build-walters-qb-performance-stage3b.py --self-test
 
-      - name: Capture, normalize and identity-audit Stage 3B
-        id: build
+      - name: Rebuild and verify the frozen Stage 3B handoff
+        id: stage3b_build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python tools/build-walters-qb-performance-stage3b.py
 
-      - name: Validate Stage 3 contracts, source lock and handoff
-        id: validate
+      - name: Validate Stage 3A and Stage 3B contracts
+        id: stage3b_validate
         continue-on-error: true
         run: node tools/validate-walters-qb-performance-stage3.mjs
 
-      - name: Run Stage 3 guardrail tests
-        id: tests
+      - name: Run Stage 3A and Stage 3B guardrail tests
+        id: stage3b_tests
         continue-on-error: true
         run: node --test tests/walters-qb-performance-stage3.test.mjs
 
-      - name: Publish Stage 3B evidence or fail-closed diagnostics
-        if: always() && github.event_name != 'pull_request' && steps.build.outcome == 'success'
+      - name: Run Stage 3C deterministic helper tests
+        run: python tools/build-walters-qb-performance-stage3c.py --self-test
+
+      - name: Estimate model, evaluate 2025 holdout and build shadow candidates
+        id: stage3c_build
+        run: python tools/build-walters-qb-performance-stage3c.py
+
+      - name: Validate Stage 3C model, holdout and handoff
+        id: stage3c_validate
+        continue-on-error: true
+        run: node tools/validate-walters-qb-performance-stage3c.mjs
+
+      - name: Run Stage 3C guardrail tests
+        id: stage3c_tests
+        continue-on-error: true
+        run: node --test tests/walters-qb-performance-stage3c.test.mjs
+
+      - name: Publish Stage 3C evidence or fail-closed diagnostics
+        if: always() && github.event_name != 'pull_request' && steps.stage3b_build.outcome == 'success' && steps.stage3c_build.outcome == 'success'
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -- data/walters/nfl/qb-performance tools/build-walters-qb-performance-stage3b.py
+          git add -- data/walters/nfl/qb-performance
           if git diff --cached --quiet; then
-            echo "No Stage 3B output changes to publish."
+            echo "No Stage 3C output changes to publish."
             exit 0
           fi
-          git commit -m "Build Walters QB performance Stage 3B evidence"
+          git commit -m "Build Walters QB performance Stage 3C model evidence"
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
               exit 0
             fi
-            echo "Stage 3B push attempt ${attempt} failed; retrying."
+            echo "Stage 3C push attempt ${attempt} failed; retrying."
             sleep $((attempt * 2))
           done
           exit 1
 
-      - name: Enforce Stage 3B acceptance result
+      - name: Enforce Stage 3C acceptance result
         if: always()
         env:
-          VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
-          TEST_OUTCOME: ${{ steps.tests.outcome }}
-          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          STAGE3B_BUILD: ${{ steps.stage3b_build.outcome }}
+          STAGE3B_VALIDATE: ${{ steps.stage3b_validate.outcome }}
+          STAGE3B_TESTS: ${{ steps.stage3b_tests.outcome }}
+          STAGE3C_BUILD: ${{ steps.stage3c_build.outcome }}
+          STAGE3C_VALIDATE: ${{ steps.stage3c_validate.outcome }}
+          STAGE3C_TESTS: ${{ steps.stage3c_tests.outcome }}
         run: |
           set -euo pipefail
-          test "$BUILD_OUTCOME" = "success"
-          test "$VALIDATE_OUTCOME" = "success"
-          test "$TEST_OUTCOME" = "success"
+          test "$STAGE3B_BUILD" = "success"
+          test "$STAGE3B_VALIDATE" = "success"
+          test "$STAGE3B_TESTS" = "success"
+          test "$STAGE3C_BUILD" = "success"
+          test "$STAGE3C_VALIDATE" = "success"
+          test "$STAGE3C_TESTS" = "success"
