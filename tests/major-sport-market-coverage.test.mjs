@@ -47,6 +47,22 @@ assert.equal(policy.presentation.targetIsSoft, true);
 assert.equal(policy.presentation.overflowProtectionRequired, true);
 assert.match(policy.presentation.rule, /BET, LEAN or WAIT/);
 
+assert.equal(policy.coverageAudit.schema, 1);
+assert.equal(policy.coverageAudit.sidecarField, 'coverageAudit');
+assert.equal(policy.coverageAudit.requiredFrom, '2026-09-02T08:00:00-07:00');
+assert.equal(policy.coverageAudit.validatorPath, 'tools/major-sport-market-coverage-gate.mjs');
+assert.deepEqual(policy.coverageAudit.sportKeys, ['MLB', 'NHL', 'NBA_WNBA', 'NFL', 'NCAAF', 'CFL']);
+assert.equal(policy.coverageAudit.primarySelectionsPerGame, 6);
+for (const field of ['schema', 'authorityId', 'authorityPath', 'authorityBlobSha', 'state', 'feedGeneratedAt', 'evaluationOrder', 'sports', 'availabilityLimitations', 'presentation', 'totals', 'complete']) {
+  assert.ok(policy.coverageAudit.fieldContract.topLevel.includes(field), `coverageAudit top-level contract missing ${field}`);
+}
+for (const field of ['returned', 'screened', 'seriousDeepReviewed']) {
+  assert.ok(policy.coverageAudit.fieldContract.props.includes(field), `coverageAudit props contract missing ${field}`);
+}
+assert.ok(policy.coverageAudit.rules.some(rule => /authorityBlobSha/.test(rule)));
+assert.ok(policy.coverageAudit.rules.some(rule => /actionableSuppressedByTarget is zero/.test(rule)));
+assert.ok(policy.coverageAudit.rules.some(rule => /major-sport-market-coverage-gate\.mjs/.test(rule)));
+
 assert.match(policy.completion.primaryCoverageComplete, /every required primary selection/i);
 assert.match(policy.completion.propCoverageComplete, /every fresh exact supported prop/i);
 
@@ -63,4 +79,4 @@ for (const phrase of [
   assert.ok(markdown.includes(phrase), `coverage addendum missing phrase: ${phrase}`);
 }
 
-console.log('MAJOR SPORT MARKET COVERAGE TEST: PASS // TWO-SIDED PRIMARY MARKETS + PROPS + SOFT CARD TARGET');
+console.log('MAJOR SPORT MARKET COVERAGE TEST: PASS // TWO-SIDED PRIMARY MARKETS + PROPS + COVERAGE RECEIPT + SOFT CARD TARGET');
