@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "policyId": "vigscope-meter-calibration-v1",
+  "state": "OPERATIONAL",
+  "productionAuthority": true,
+  "scope": "VIGSCOPE_TERMINAL_MARKET_METERS_AND_18_STATE_GRAPHIC",
+  "sourceDecisions": {
+    "heat": "data/vigscope/heat-calibration-step1-current.json",
+    "pressure": "data/vigscope/pressure-calibration-step2-current.json",
+    "agreement": "data/vigscope/agreement-calibration-step3-current.json",
+    "combined": "data/vigscope/combined-vig-calibration-step4-current.json"
+  },
+  "heat": {
+    "modelId": "HEAT_CONFIDENCE_50_SQRT_50",
+    "magnitudeAnchor": 0.03,
+    "weights": {
+      "magnitude": 40,
+      "breadth": 25,
+      "thresholdActivity": 20,
+      "disagreement": 15
+    },
+    "confidenceFactor": "confidence == 0 ? 0 : 0.50 + 0.50 * sqrt(confidence / 100)",
+    "formula": "clamp((avgMagnitude / 0.03) * 40 + breadth * 25 + thresholdActivity * 20 + disagreementDispersion * 15 * confidenceFactor, 0, 100)",
+    "thresholds": {
+      "LOW": "score < 20",
+      "MEDIUM": "20 <= score < 40",
+      "HIGH": "score >= 40"
+    }
+  },
+  "pressure": {
+    "modelId": "PRESSURE_TANH_014",
+    "neutralCenter": 50,
+    "fixedMovementAnchor": 0.014,
+    "formula": "50 + 50 * tanh(signedFavor / 0.028)",
+    "trueZeroMapsExactlyTo": 50,
+    "thresholds": {
+      "ADVERSE": "score < 48",
+      "NEUTRAL": "48 <= score < 52",
+      "FAVORABLE": "score >= 52"
+    }
+  },
+  "agreement": {
+    "modelId": "AGREEMENT_TWO_AXIS_EVIDENCE_AWARE",
+    "rawScoreFormulaPreserved": true,
+    "scoreMeaning": "market/book cohesion strength",
+    "confidenceMeaning": "amount of evidence supporting the cohesion score",
+    "thresholds": {
+      "LOW": "confidence > 0 and score < 45",
+      "HIGH": "confidence > 0 and score >= 45",
+      "UNMEASURED": "confidence == 0"
+    },
+    "evidenceQuality": {
+      "UNMEASURED": "confidence == 0",
+      "LIMITED": "0 < confidence < 25",
+      "SUPPORTED": "confidence >= 25"
+    },
+    "unmeasured": {
+      "internalCompatibilityScore": 50,
+      "semanticState": "UNMEASURED",
+      "vigGraphicRenderBranch": "LOW",
+      "mayQualifyHigh": false,
+      "displayMustSayUnmeasured": true
+    }
+  },
+  "combined18State": {
+    "dimensions": {
+      "heat": 3,
+      "pressure": 3,
+      "agreementRenderBranch": 2
+    },
+    "maximumStates": 18,
+    "forceEqualUsage": false,
+    "historicalCalibrationPeriod": {
+      "start": "2026-08-15",
+      "end": "2026-09-01",
+      "reports": 85
+    },
+    "expectedHistoricalDistribution": {
+      "heat": {"LOW": 30, "MEDIUM": 30, "HIGH": 25},
+      "pressure": {"ADVERSE": 20, "NEUTRAL": 29, "FAVORABLE": 36},
+      "agreementMeasured": {"LOW": 36, "HIGH": 25},
+      "agreementEvidence": {"UNMEASURED": 24, "LIMITED": 26, "SUPPORTED": 35},
+      "occupiedStates": 15,
+      "unusedStates": 3,
+      "maxSingleStateCount": 17,
+      "maxSingleStateShare": 0.20,
+      "normalizedEntropy": 0.8429,
+      "rmseFromEqual18WayDistribution": 4.58
+    }
+  },
+  "implementation": {
+    "runtime": "assets/runner-core-runtime.js",
+    "referenceModule": "tools/vigscope-meter-production.mjs",
+    "regressionTest": "tests/vigscope-meter-production.test.mjs"
+  },
+  "changeControl": {
+    "thresholdsFixedUntilExplicitRecalibration": true,
+    "historicalIssuedReportsImmutable": true,
+    "repriceComparisonMayNotRewriteIssuedMeters": true
+  }
+}
