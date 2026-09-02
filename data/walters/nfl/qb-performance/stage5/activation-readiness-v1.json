@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "walters-qb-performance-stage5-activation-readiness-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 5,
+  "status": "REVIEW_PASS_ACTIVATION_NOT_AUTHORIZED",
+  "reviewAnchorAt": "2026-09-02T15:18:30.000-07:00",
+  "reviewPassed": true,
+  "activationAuthorized": false,
+  "productionAuthority": false,
+  "grahamWritesAllowed": false,
+  "pendingBlockingGates": [
+    {
+      "gate": "FIRST_NFL_BEARING_PRODUCTION_READBACK",
+      "status": "UNSATISFIED",
+      "blocking": true,
+      "reason": "The September 2 15:15 control had zero NFL games in scope."
+    },
+    {
+      "gate": "EXPLICIT_SCOPED_QB_ACTIVATION_APPROVAL",
+      "status": "UNSATISFIED",
+      "blocking": true,
+      "reason": "Stage 5 review does not itself grant production authority."
+    }
+  ],
+  "mandatoryScopedRestrictions": [
+    {
+      "scope": "ATL",
+      "disposition": "EXCLUDE_AND_FAIL_CLOSED",
+      "reason": "Starter identity and embedded baseline remain unresolved."
+    },
+    {
+      "scope": "2026-W01-MIA-LV",
+      "disposition": "KEEP_LV_MINUS_2_5_AND_RETAIN_PLUS_0_5_IDENTITY_OVERLAY",
+      "reason": "The reconciled -3.032/-3.0 result is a review scenario only."
+    },
+    {
+      "scope": "MODEL_CAUTION_FLAGS",
+      "disposition": "RETAIN_FOR_EXPLICIT_ACCEPTANCE",
+      "flags": [
+        "MODEST_HOLDOUT_SIGNAL",
+        "CALIBRATION_SLOPE_BELOW_ONE",
+        "RECENT_EPA_COMPARATOR_NOT_BEATEN",
+        "ZERO_WEIGHT_INTERCEPTION_RATE",
+        "LOW_WEIGHT_FUMBLE_RATE"
+      ]
+    }
+  ],
+  "currentProductionDisposition": "REMAIN_NON_OPERATIONAL",
+  "acceptedFor": "EXPLICIT_SCOPED_QB_ACTIVATION_DECISION_AFTER_NFL_BEARING_READBACK",
+  "notAcceptedFor": [
+    "PRODUCTION_QB_AUTHORITY",
+    "GRAHAM_FAIR_NUMBER_WRITES",
+    "EMBEDDED_BASELINE_MUTATION",
+    "UNCERTAINTY_OVERLAY_RETIREMENT",
+    "RUNTIME_ADAPTER_MUTATION",
+    "BET_AUTHORITY",
+    "WAGER_OR_STAKING_CHANGES"
+  ],
+  "nextRequiredGate": "FIRST_NFL_BEARING_PRODUCTION_READBACK",
+  "productionReview": "data/walters/nfl/qb-performance/stage5/production-review-v1.json",
+  "productionReviewSha256": "4cc0f4daec1b2fc551aa1abc03234e88f24755e315c30f39c714bc40471d0bcf",
+  "contentSha256Canonical": "2208e0b0a8f11d58acfd467df26d9bad8b6190caf4a0b9df6130d2acdf16f6fd"
+}
