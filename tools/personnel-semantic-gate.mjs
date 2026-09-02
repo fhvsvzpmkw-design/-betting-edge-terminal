@@ -249,7 +249,7 @@ function selfTest(){
     sport:'NHL',
     dependencyTarget:'starting goalie and late scratches',
     unresolved:['Starting goalie confirmation'],
-    officialSources:[makeSource('Official team game notes','Starting goalie remained unconfirmed.','2026-09-02T15:10:00-07:00')],
+    officialSources:[makeSource('Official team game notes','Starting goalie remained unconfirmed.','2026-09-02T15:15:00-07:00')],
     fallbackSources:[
       makeSource('Team beat reporter','Starting goalie was strongly projected from morning skate.','2026-09-02T15:12:00-07:00'),
       makeSource('Local hockey desk','Goalie expectation was independently reported.','2026-09-02T15:10:00-07:00'),
