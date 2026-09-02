@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 const SEMANTIC_ENFORCEMENT_FROM = Date.parse('2026-09-02T10:40:00-07:00');
 const MINUTE = 60 * 1000;
@@ -42,22 +44,22 @@ function canonicalSport(value){
 const CONCEPTS = Object.freeze({
   MLB: [
     {key:'lineup', dependency:/\b(lineups?|batting orders?|batting positions?|platoon)\b/i, evidence:/\b(lineups?|batting orders?|batting positions?|platoon)\b/i, fallbackWindow:120, officialRecheckWindow:90},
-    {key:'starter', dependency:/\b(starting pitchers?|probable pitchers?|probable starters?|starters?|opener|bullpen[- ]game)\b/i, evidence:/\b(starting pitchers?|probable pitchers?|probable starters?|starters?|opener|bullpen[- ]game)\b/i, fallbackWindow:120, officialRecheckWindow:90},
+    {key:'starter', dependency:/\b(starting pitchers?|probable[- ]pitchers?|probable starters?|listed starters?|opener|bullpen[- ]game)\b/i, evidence:/\b(starting pitchers?|probable[- ]pitchers?|probable starters?|listed starters?|opener|bullpen[- ]game)\b/i, fallbackWindow:120, officialRecheckWindow:90},
     {key:'bullpen', dependency:/\b(bullpens?|relievers?|relief corps|closers?|leverage[- ]bullpen)\b/i, evidence:/\b(bullpens?|relievers?|relief corps|closers?|leverage[- ]bullpen)\b/i, fallbackWindow:120},
-    {key:'participation', dependency:/\b(participation|active|inactive|injur(?:y|ies)|scratches?|rest days?|resting|role changes?)\b/i, evidence:/\b(participation|active|inactive|injur(?:y|ies)|scratches?|rest days?|resting|role changes?)\b/i, fallbackWindow:120}
+    {key:'participation', dependency:/\b(participation|active|inactive|injur(?:y|ies)|scratch(?:es)?|rest days?|resting|role changes?)\b/i, evidence:/\b(participation|active|inactive|injur(?:y|ies)|scratch(?:es)?|rest days?|resting|role changes?)\b/i, fallbackWindow:120}
   ],
   FOOTBALL: [
     {key:'quarterback', dependency:/\b(qb|quarterbacks?|backup quarterback)\b/i, evidence:/\b(qb|quarterbacks?|backup quarterback)\b/i, fallbackWindow:180},
     {key:'offensive-line', dependency:/\b(offensive line|o[- ]?line|left tackle|right tackle|guards?|centers?)\b/i, evidence:/\b(offensive line|o[- ]?line|left tackle|right tackle|guards?|centers?)\b/i, fallbackWindow:180},
     {key:'skill-position', dependency:/\b(receiver|wideout|running back|rb\b|tight end|te\b|skill[- ]position|snap share|role)\b/i, evidence:/\b(receiver|wideout|running back|rb\b|tight end|te\b|skill[- ]position|snap share|role)\b/i, fallbackWindow:180},
     {key:'defense', dependency:/\b(secondary|cornerback|safety|defensive front|edge rusher|linebacker|defense)\b/i, evidence:/\b(secondary|cornerback|safety|defensive front|edge rusher|linebacker|defense)\b/i, fallbackWindow:180},
-    {key:'availability', dependency:/\b(inactive|active|availability|injur(?:y|ies)|questionable|doubtful|suspension|scratch|participation)\b/i, evidence:/\b(inactive|active|availability|injur(?:y|ies)|questionable|doubtful|suspension|scratch|participation)\b/i, fallbackWindow:180}
+    {key:'availability', dependency:/\b(inactive|active|availability|injur(?:y|ies)|questionable|doubtful|suspension|scratch(?:es)?|participation)\b/i, evidence:/\b(inactive|active|availability|injur(?:y|ies)|questionable|doubtful|suspension|scratch(?:es)?|participation)\b/i, fallbackWindow:180}
   ],
   NHL: [
     {key:'goalie', dependency:/\b(goalies?|goaltenders?|starting goalie|starting goaltender)\b/i, evidence:/\b(goalies?|goaltenders?|starting goalie|starting goaltender)\b/i, fallbackWindow:240, officialRecheckWindow:90},
-    {key:'lineup', dependency:/\b(line combinations?|line rushes?|scratches?|lineups?)\b/i, evidence:/\b(line combinations?|line rushes?|scratches?|lineups?)\b/i, fallbackWindow:240, officialRecheckWindow:90},
+    {key:'lineup', dependency:/\b(line combinations?|line rushes?|scratch(?:es)?|lineups?)\b/i, evidence:/\b(line combinations?|line rushes?|scratch(?:es)?|lineups?)\b/i, fallbackWindow:240, officialRecheckWindow:90},
     {key:'power-play', dependency:/\b(power[- ]play|pp1|pp2|power play unit)\b/i, evidence:/\b(power[- ]play|pp1|pp2|power play unit)\b/i, fallbackWindow:240, officialRecheckWindow:90},
-    {key:'availability', dependency:/\b(participation|injur(?:y|ies)|active|inactive|scratch|rest)\b/i, evidence:/\b(participation|injur(?:y|ies)|active|inactive|scratch|rest)\b/i, fallbackWindow:240, officialRecheckWindow:90}
+    {key:'availability', dependency:/\b(participation|injur(?:y|ies)|active|inactive|scratch(?:es)?|rest)\b/i, evidence:/\b(participation|injur(?:y|ies)|active|inactive|scratch(?:es)?|rest)\b/i, fallbackWindow:240, officialRecheckWindow:90}
   ],
   NBA_WNBA: [
     {key:'starter', dependency:/\b(expected starters?|starting lineup|starting role|starters?)\b/i, evidence:/\b(expected starters?|starting lineup|starting role|starters?)\b/i, fallbackWindow:180, officialRecheckWindow:90},
@@ -285,4 +287,5 @@ function main(){
   console.log(`PERSONNEL SEMANTIC GATE OK ${report.ts} checked=${result.checked}`);
 }
 
-if(import.meta.url === `file://${process.argv[1]}`) main();
+const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if(isCli) main();
