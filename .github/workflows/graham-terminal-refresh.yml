@@ -7,8 +7,10 @@ on:
       - .github/workflows/graham-terminal-refresh.yml
       - data/walters/nfl/active-week.json
       - data/walters/nfl/20*/week-*-current-numbers.json
+      - data/walters/nfl/graham-fair-decomposition-policy-v1.json
       - data/walters/nfl-power-ratings-ledger.json
       - tools/graham-active-week.mjs
+      - tools/graham-fair-decomposition.mjs
       - tools/build-graham-current-week.mjs
       - tools/capture-graham-daily-pinnacle.mjs
   workflow_run:
@@ -47,6 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check tools/graham-active-week.mjs
+          node --check tools/graham-fair-decomposition.mjs
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           import os from 'node:os';
@@ -109,6 +112,11 @@ jobs:
 
             node tools/graham-active-week.mjs
             ACTIVE_MARKET_LEDGER="$(node tools/graham-active-week.mjs --path dailyMarketLedger)"
+            ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+
+            # The Nineteenth Hole may only rebuild from a board whose explanation
+            # is a validated generated view of the governed exact/display fair.
+            node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
 
             # No external API calls occur here. The terminal always rebuilds from
             # committed Graham and market state. Only a genuine odds-refresh
@@ -150,6 +158,7 @@ jobs:
             echo "- Trigger: odds refresh or Graham research/personnel/matchup/home-field/active-week publication"
             echo "- Active week: ${ACTIVE:-unresolved}"
             echo "- Active-week resolver regression: live week + simulated next week checked"
+            echo "- Fair explanation guard: governed decomposition must match exact/display fair before terminal rebuild"
             echo "- External API calls: none"
             echo "- Live board: repository active NFL week"
             echo "- Graham fair: rebuilt immediately after governed Graham research changes"
