@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "policyId": "betting-edge-report-event-eligibility-v1",
+  "state": "OPERATIONAL",
+  "effectiveAt": "2026-09-01T19:00:00-07:00",
+  "timezone": "America/Vancouver",
+  "scope": "FUTURE_STAGED_REPORT_CANDIDATES_ONLY",
+  "reportDateSource": "REPORT_TS_IN_POLICY_TIMEZONE",
+  "eventDateSource": "REC_FEED_EVENT_DATE",
+  "rules": {
+    "requireValidReportTimestamp": true,
+    "requireValidEventTimestamp": true,
+    "eventMustStartStrictlyAfterReportTimestamp": true,
+    "eventMustShareReportCalendarDate": true,
+    "calendarDateComparisonTimezone": "America/Vancouver",
+    "excludeNextDayEventsFromCards": true,
+    "excludeAlreadyStartedEventsFromCards": true,
+    "allowExcludedEventsToRemainInOddsFeed": true,
+    "allowExcludedEventsForNonPublicationResearch": true,
+    "nineCardsIsMaximumNotQuota": true,
+    "backfillFromNextDayForbidden": true
+  },
+  "failureCodes": {
+    "invalidReportTimestamp": "REPORT_TIMESTAMP_INVALID",
+    "invalidEventTimestamp": "EVENT_DATE_MISSING_OR_INVALID",
+    "alreadyStarted": "EVENT_ALREADY_STARTED",
+    "outsideReportDate": "EVENT_OUTSIDE_REPORT_DATE"
+  },
+  "publication": {
+    "mode": "FAIL_CLOSED",
+    "historicalIssuedReportsRemainImmutable": true,
+    "retroactiveHistoryValidation": false,
+    "validator": "tools/report-event-eligibility.mjs"
+  },
+  "notes": [
+    "The odds snapshot may contain tomorrow's games; that does not make them eligible for today's report cards.",
+    "The report operating date is the America/Vancouver calendar date of report.ts.",
+    "An event exactly at report.ts is treated as already started and is ineligible.",
+    "This policy narrows report-card eligibility only and does not change sport coverage, fair-value, Core, Walters, price, staking or risk rules."
+  ]
+}
