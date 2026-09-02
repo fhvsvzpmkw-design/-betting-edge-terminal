@@ -9,7 +9,7 @@ const manifest=readJson('data/syndicates.json');
 const roster=(manifest.profiles||[]).filter(p=>p?.characterId&&p?.characterFile&&p?.url);
 assert(roster.length>=5,'expected at least five Syndicate profiles');
 const required={
-'eddie-numbers':['MUDDY NUMBERS','LEDGER DESK','ACTUAL CAD DOLLARS','MUDDY LEDGER // LAST 10 TICKETS','<svg','MUDDY METERS','THE WALK TO THE CAGE','EDDIE:'],
+'eddie-numbers':['MUDDY NUMBERS','LEDGER DESK','ACTUAL CAD DOLLARS','MUDDY LEDGER // LAST 10 TICKETS','<canvas','MUDDY METERS','THE WALK TO THE CAGE','EDDIE:'],
 'bill-weston':['Last-Session Reconciliation','Change Memo','Current Window Entries','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Tonight's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
 'jesse-bains':['SPORTS DESK','HOTEL DELPHORIA','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
