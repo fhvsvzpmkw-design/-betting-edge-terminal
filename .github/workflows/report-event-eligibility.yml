@@ -1,0 +1,43 @@
+name: Report event eligibility regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - data/report-event-eligibility-v1.json
+      - tools/report-event-eligibility.mjs
+      - tests/report-event-eligibility.test.mjs
+      - BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
+      - .github/workflows/report-event-eligibility.yml
+      - .github/workflows/report-history-staged.yml
+
+concurrency:
+  group: report-event-eligibility-regression
+  cancel-in-progress: false
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run deterministic self-test
+        run: node tools/report-event-eligibility.mjs self-test
+      - name: Verify current 18:15 regression fixture
+        run: node tests/report-event-eligibility.test.mjs
+      - name: Confirm publisher contains eligibility gate
+        run: |
+          grep -F "node tools/report-event-eligibility.mjs validate --report /tmp/report.json" .github/workflows/report-history-staged.yml
+          grep -F "node tools/report-event-eligibility.mjs validate --report \"$REPORT_PATH\"" .github/workflows/report-history-staged.yml
+      - name: Confirm schedule authority requires same-day policy
+        run: |
+          grep -F "data/report-event-eligibility-v1.json" BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
+          grep -F "Do not backfill an undersized board with next-day events." BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
