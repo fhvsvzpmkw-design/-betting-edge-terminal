@@ -145,6 +145,32 @@
     "overflowProtectionRequired": true,
     "rule": "The card target is applied only after complete market evaluation. A qualifying BET, LEAN or WAIT may not be suppressed solely to meet the target. PASS cards may be curated after complete evaluation."
   },
+  "coverageAudit": {
+    "schema": 1,
+    "sidecarField": "coverageAudit",
+    "requiredFrom": "2026-09-02T08:00:00-07:00",
+    "state": "COMPLETE",
+    "sportKeys": ["MLB", "NHL", "NBA_WNBA", "NFL", "NCAAF", "CFL"],
+    "primarySelectionsPerGame": 6,
+    "availabilityReasonCodes": [
+      "MARKET_NOT_RETURNED",
+      "STALE_EXECUTABLE_QUOTE",
+      "IDENTITY_UNRESOLVED",
+      "PRIMARY_LINE_UNRESOLVED",
+      "INCOMPLETE_TWO_SIDED_MARKET"
+    ],
+    "rules": [
+      "Every sport key is present even when its game count is zero.",
+      "gamesEvaluated equals gamesInScope because checking an unavailable market is still an evaluation.",
+      "primary.required equals gamesInScope multiplied by six.",
+      "primary.evaluated plus primary.unavailable equals primary.required.",
+      "Every unavailable primary selection is represented exactly once in availabilityLimitations.",
+      "props.screened equals props.returned; deeper research is recorded separately as props.seriousDeepReviewed.",
+      "presentation.targetIsSoft and presentation.overflowProtection are true and actionableSuppressedByTarget is zero.",
+      "Totals reconcile exactly with the sum of all sport entries.",
+      "complete is true only after the full sweep precedes card selection."
+    ]
+  },
   "completion": {
     "primaryCoverageComplete": "Every in-scope game has every required primary selection evaluated or an explicit exact-market availability limitation recorded.",
     "propCoverageComplete": "Every fresh exact supported prop returned by the bound feed has been screened, with deeper work completed where the candidate is serious or materially personnel-dependent.",
