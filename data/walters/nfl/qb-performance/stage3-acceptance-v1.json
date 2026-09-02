@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "walters-qb-performance-stage3-acceptance-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "stage": 3,
+  "substage": "3D",
+  "status": "PASS",
+  "decision": "STAGE3_ACCEPTED_FOR_STAGE4_SHADOW_TESTING_NON_OPERATIONAL",
+  "decidedAt": "2026-09-02T13:05:41-07:00",
+  "acceptedFor": "STAGE4_QB_REGRESSION_AND_SHADOW_TESTING_ONLY",
+  "notAcceptedFor": [
+    "PRODUCTION_QB_AUTHORITY",
+    "GRAHAM_FAIR_NUMBER_WRITES",
+    "EMBEDDED_QB_BASELINE_WRITES",
+    "QB_UNCERTAINTY_OVERLAY_RETIREMENT"
+  ],
+  "freezeManifest": "data/walters/nfl/qb-performance/freeze/stage3d-freeze-manifest-v1.json",
+  "freezeManifestSha256": "6f645e1634b19c5bce819a35ff59f4563db931118d6e7c47123007b67af2d4cc",
+  "candidateReview": "data/walters/nfl/qb-performance/review/stage3d-candidate-review-v1.json",
+  "candidateReviewSha256": "1f05694928a283fe05f45e703bae1b25febbb0bf7160989351cc636671716c18",
+  "stage3CModelSha256": "c45e65b6c6ae93e2060824cd759b1cbf09849093b4b4d9d5fd33aa941f2f9a37",
+  "stage3CHoldoutAuditSha256": "3de1ebadf1eca0ccba279b131667d9ed02b232fa82704ef250f94931972bc0a5",
+  "stage3CCandidatesSha256": "93931681d0e335954fa172d0d4ce25636d2fdbaa089a3d351dd04661d5a91a04",
+  "checks": [
+    {
+      "id": "QBP3D-STAGE3C-HOLDOUT",
+      "actual": "PASS",
+      "expected": "PASS",
+      "pass": true
+    },
+    {
+      "id": "QBP3D-STAGE3C-CHECKS",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-FREEZE-COMPLETE",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-CANDIDATE-POPULATION",
+      "actual": 109,
+      "expected": 109,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-TOP67-POPULATION",
+      "actual": 67,
+      "expected": 67,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-CASE-STUDIES",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-CANDIDATE-BOUNDS",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-CANDIDATE-MOVE-CAP",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-DETERMINISTIC-MODEL",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-PROTECTED-ARTIFACTS",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-MARKET-ISOLATION",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-PRODUCTION-BOUNDARY",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "id": "QBP3D-STARTER-INFERENCE",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    }
+  ],
+  "modelCautionFlags": [
+    "MODEST_HOLDOUT_SIGNAL",
+    "CALIBRATION_SLOPE_BELOW_ONE",
+    "RECENT_EPA_COMPARATOR_NOT_BEATEN",
+    "ZERO_WEIGHT_INTERCEPTION_RATE",
+    "LOW_WEIGHT_FUMBLE_RATE"
+  ],
+  "candidateReviewFlagCounts": {
+    "CANDIDATE_AT_SCALE_BOUND": 45,
+    "ELITE_PRIOR_DOWNGRADE": 5,
+    "HIGH_CONFIDENCE_LARGE_MOVE": 6,
+    "LARGE_MOVE": 16,
+    "LOWER_PRIOR_UPGRADE": 5,
+    "MOVE_CAP_REACHED": 10,
+    "PERFORMANCE_PRIOR_DIVERGENCE": 15,
+    "RANK_SHIFT": 9,
+    "TOP67_LOW_SAMPLE_BLOCK": 14
+  },
+  "flaggedPlayerCount": 75,
+  "requiredCaseStudies": [
+    "Kirk Cousins",
+    "Patrick Mahomes",
+    "Joe Burrow"
+  ],
+  "starterBindingStatus": "DEFERRED_TO_STAGE4_GOVERNED_BINDING",
+  "stage4EntryRequirements": [
+    "Bind governed starter identities without inference.",
+    "Bind the quarterback value already embedded in each team baseline.",
+    "Replay no-change, starter-change, backup, rookie, injury and return scenarios.",
+    "Test uncertainty-overlay reconciliation and double-count protection.",
+    "Test weekly rollover and current-season evidence updates without look-ahead.",
+    "Keep every shadow calculation market-isolated and unable to write Graham production artifacts."
+  ],
+  "protectedArtifactSha256Before": {
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca"
+  },
+  "protectedArtifactSha256After": {
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca"
+  },
+  "protectedArtifactsUnchanged": true,
+  "candidateValuesOperational": false,
+  "grahamFairNumbersChanged": false,
+  "embeddedQbBaselinesChanged": false,
+  "uncertaintyOverlaysRetired": false,
+  "productionAuthority": false,
+  "grahamWritesAllowed": false,
+  "marketViewed": false,
+  "nextStage": "STAGE4_QB_REGRESSION_AND_SHADOW_TESTING",
+  "contentSha256Canonical": "9951f3a41a1ced4a6a5dd4f6b2c27ad465de980f7d0bae5769de8b7fff239ba4"
+}
