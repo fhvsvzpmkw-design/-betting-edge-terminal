@@ -1,0 +1,65 @@
+name: Report card target authority
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/preferences.json
+      - BETTING_EDGE_CONTRACT.md
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+      - tools/report-card-target-authority.mjs
+      - .github/workflows/report-card-target-authority.yml
+  workflow_dispatch:
+
+concurrency:
+  group: report-card-target-authority
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Synchronize repository-controlled target wording
+        run: |
+          set -euo pipefail
+          node tools/report-card-target-authority.mjs --sync
+          node tools/report-card-target-authority.mjs --check
+
+      - name: Publish synchronization if needed
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/preferences.json BETTING_EDGE_CONTRACT.md BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+          if git diff --cached --quiet; then
+            echo "Report-card target authority already synchronized."
+            exit 0
+          fi
+          git commit -m "Synchronize report card target authority"
+          git push origin HEAD:main
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '## Report card target authority'
+            echo '- Source: data/preferences.json / report_card_target.current'
+            echo '- Allowed profiles: 7 / 9 / 12'
+            echo '- Overflow protection: required ON'
+            echo '- Operational contract/report authority: synchronized to repository-controlled value'
+          } >> "$GITHUB_STEP_SUMMARY"
