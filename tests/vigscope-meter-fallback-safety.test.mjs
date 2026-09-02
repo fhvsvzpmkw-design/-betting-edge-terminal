@@ -38,9 +38,9 @@ function moveSignal(rec){
     if(favors.length)return {favor:mean(favors)||0,magnitude:mean(mags)||0,source:'MOVE'};
   }
   const text=String(rec?.move||'').toUpperCase();
-  if(/UNCHANGED|STABLE|FLAT|NO MOVE|HELD/.test(text))return {favor:0,magnitude:0,source:'TEXT'};
-  if(/IMPROV|DRIFT|BETTER|EASED/.test(text))return {favor:.005,magnitude:.005,source:'TEXT'};
-  if(/WORSEN|SHORTEN|STEAM|EXPENS|AGAINST/.test(text))return {favor:-.005,magnitude:.005,source:'TEXT'};
+  if(/\b(?:PRICE|LINE|MARKET)\s+(?:UNCHANGED|STABLE|FLAT|HELD)\b|\bNO MOVE\b/.test(text))return {favor:0,magnitude:0,source:'TEXT'};
+  if(/\bVALUE IMPROVED\b|\bLINE MOVED IN FAVOR\b|\b(?:PRICE|LINE|MARKET)\s+(?:IMPROVED|DRIFTED|EASED)\b|\bBETTER (?:PRICE|LINE)\b/.test(text))return {favor:.005,magnitude:.005,source:'TEXT'};
+  if(/\bLINE MOVED AGAINST\b|\bPRICE MOVED AGAINST\b|\b(?:PRICE|LINE|MARKET)\s+(?:WORSENED|SHORTENED|STEAMED)\b|\bMORE EXPENSIVE\b/.test(text))return {favor:-.005,magnitude:.005,source:'TEXT'};
   return {favor:0,magnitude:0,source:'NONE'};
 }
 
@@ -81,6 +81,9 @@ assert.ok(RUN.recs.every(rec=>explicitMovementOddsPairs(rec.move).length===0));
 assert.deepEqual(explicitMovementOddsPairs('Bet365 +120 → +130'), [[120,130]]);
 assert.deepEqual(explicitMovementOddsPairs('price moved from -115 to -105'), [[-115,-105]]);
 assert.deepEqual(explicitMovementOddsPairs('PASS / NO VALUE — +125 is inside fair and below the +180 action boundary.'), []);
+assert.equal(moveSignal({move:'PASS / NO VALUE — +125 is below +180 or better.'}).magnitude,0);
+assert.equal(moveSignal({move:'VALUE IMPROVED'}).magnitude,.005);
+assert.equal(moveSignal({move:'LINE MOVED AGAINST'}).magnitude,.005);
 
 const weighted=signals.reduce((n,x,i)=>n+x.favor*recWeight(RUN.recs[i]),0)/(signals.reduce((n,x,i)=>n+recWeight(RUN.recs[i]),0)||1);
 const agreement=fallbackAgreement(RUN);
@@ -96,10 +99,13 @@ for(const token of [
   'const pairs=explicitMovementOddsPairs(rec?.move);',
   "const displayValue=Number(reading.confidence)>0?`${reading.value}`:'—';",
   "if(Number(reading.confidence)<=0)needle.style.opacity='0';",
-  "'MARKET STATE UNMEASURED'"
+  "'MARKET STATE UNMEASURED'",
+  '\\bVALUE IMPROVED\\b',
+  '\\bLINE MOVED AGAINST\\b'
 ]) assert.ok(RUNTIME.includes(token), `runtime missing fallback-safety token: ${token}`);
 
 assert.ok(!RUNTIME.includes('const nums=signedOdds(rec?.move);'), 'runtime must not generically pair arbitrary odds in rec.move');
+assert.ok(!RUNTIME.includes('/IMPROV|DRIFT|BETTER|EASED/'), 'runtime must not use broad standalone qualitative movement words');
 
 console.log(JSON.stringify({
   state:'PASS',
