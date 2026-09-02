@@ -8,6 +8,7 @@ on:
       - data/walters/nfl/personnel-staging.json
       - data/walters/nfl/personnel-production-current.json
       - tools/apply-graham-personnel-staging.mjs
+      - tools/validate-graham-personnel-closure.mjs
       - tools/graham-active-week.mjs
   workflow_dispatch:
 
@@ -32,6 +33,7 @@ jobs:
       - name: Verify production contract, active week and calculator syntax
         run: |
           node --check tools/apply-graham-personnel-staging.mjs
+          node --check tools/validate-graham-personnel-closure.mjs
           node --check tools/graham-active-week.mjs
           node tools/graham-active-week.mjs
           node - <<'NODE'
@@ -42,12 +44,16 @@ jobs:
           const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
           const staging=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
           if(prod.state!=='OPERATIONAL'||prod.productionAuthority!==true)throw new Error('production contract not operational');
+          if(prod.materialPersonnelClosureGate?.state!=='OPERATIONAL')throw new Error('material personnel closure gate not operational');
           if(s2.auditPass!==true)throw new Error('Stage 2 audit not passed');
           if(s3.acceptancePass!==true)throw new Error('Stage 3 acceptance not passed');
           if(active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER')throw new Error('active Graham week invalid');
           if(Number(staging.season)!==Number(active.season)||Number(staging.week)!==Number(active.week))throw new Error(`personnel staging ${staging.season} W${staging.week} does not match active Graham ${active.season} W${active.week}`);
           console.log(`GRAHAM PERSONNEL PRODUCTION PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')}`);
           NODE
+
+      - name: Enforce material personnel closure review
+        run: node tools/validate-graham-personnel-closure.mjs data/walters/nfl/personnel-staging.json
 
       - name: Apply governed personnel staging batch
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json
