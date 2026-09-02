@@ -37,6 +37,7 @@ jobs:
           node tools/report-publication.mjs verify
           node tools/core-v14-publication-gate.mjs verify-history
           node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
+          node tools/vigscope-meter-telemetry-gate.mjs self-test
       - name: Extract staged candidate bundle
         run: |
           node <<'NODE'
@@ -88,6 +89,11 @@ jobs:
       - name: Validate bundle and derive paths
         id: bundle
         run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Validate derived meter telemetry before commit
+        env:
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
       - name: Commit payload, sidecar and index together
         env:
           REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
@@ -112,6 +118,7 @@ jobs:
             node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
             node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
             git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
             if git diff --cached --quiet; then
               echo "Bundle already exists unchanged."
@@ -139,6 +146,7 @@ jobs:
           node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"
           node tools/major-sport-market-coverage-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/pinnacle-benchmark-publication-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+          node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
       - name: Publication summary
         env:
           SHORT_ID: ${{ steps.bundle.outputs.short_id }}
@@ -157,6 +165,7 @@ jobs:
             echo "- Same-day event eligibility: passed"
             echo "- Core gate: passed"
             echo "- Pinnacle benchmark gate: passed (official, non-executable)"
+            echo "- VigScope meter telemetry gate: passed"
             echo "- Read-back: passed"
             echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
           } >> "$GITHUB_STEP_SUMMARY"
