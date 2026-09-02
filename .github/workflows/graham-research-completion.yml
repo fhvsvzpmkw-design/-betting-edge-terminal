@@ -37,7 +37,17 @@ jobs:
       - name: Validate completion gate and no-change regression
         run: |
           node --check tools/validate-graham-research-completion.mjs
-          node tools/validate-graham-research-completion.mjs --fixture tests/fixtures/graham-research-completion-no-change.json
+          node tools/validate-graham-research-completion.mjs \
+            --fixture tests/fixtures/graham-research-completion-no-change.json \
+            --receipt-out /tmp/graham-no-change-receipt.json
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync('/tmp/graham-no-change-receipt.json','utf8'));
+          if(r.state!=='VERIFIED')throw new Error('fixture receipt not VERIFIED');
+          if(r.runEventId!=='graham-delta-1645-2026-w01-20260901T164500-0700')throw new Error('fixture runEventId mismatch');
+          if(r.taskKey!=='DELTA_1645'||r.completionResult!=='NO_MATERIAL_CHANGE'||r.marketViewed!==false)throw new Error('fixture receipt semantics mismatch');
+          console.log('GRAHAM NO-CHANGE COMPLETION RECEIPT: PASS');
+          NODE
 
       - name: Resolve staging state
         id: staging
