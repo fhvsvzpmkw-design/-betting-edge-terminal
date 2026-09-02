@@ -1,0 +1,51 @@
+name: Major sport market coverage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/major-sport-market-coverage-v1.json
+      - BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md
+      - tests/major-sport-market-coverage.test.mjs
+      - .github/workflows/major-sport-market-coverage.yml
+  workflow_dispatch:
+
+concurrency:
+  group: major-sport-market-coverage
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate major-sport coverage authority
+        run: |
+          set -euo pipefail
+          node tests/major-sport-market-coverage.test.mjs
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '## Major sport market coverage'
+            echo '- Authority: data/major-sport-market-coverage-v1.json'
+            echo '- Scope: MLB / NHL / NBA-WNBA / NFL-NCAAF-CFL'
+            echo '- Primary markets: two-sided ML + main spread/run-line/puck-line + total'
+            echo '- Props: fresh exact supported player props'
+            echo '- Card target: soft with actionable overflow protection'
+          } >> "$GITHUB_STEP_SUMMARY"
