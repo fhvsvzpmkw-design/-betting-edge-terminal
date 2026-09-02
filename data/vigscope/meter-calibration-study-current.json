@@ -1,0 +1,87 @@
+{
+  "state": "READ_ONLY_STUDY_COMPLETE",
+  "productionChanged": false,
+  "period": {
+    "start": "2026-08-15",
+    "end": "2026-09-01",
+    "reports": 85,
+    "dates": 18
+  },
+  "heat": {
+    "current": {
+      "formulaMagnitudeAnchor": 0.03,
+      "median": 28.7359,
+      "p75": 45.774,
+      "p90": 92.0145,
+      "saturationLow": 5,
+      "saturationHigh": 8
+    },
+    "confidenceOnlyVariant": {
+      "description": "Keep the existing 0.03 magnitude anchor and weights, but multiply the disagreement contribution by agreement confidence.",
+      "median": 24.0829,
+      "p75": 42.784,
+      "p90": 85.0973,
+      "saturationLow": 11,
+      "saturationHigh": 6,
+      "correlationToCurrent": 0.9923
+    },
+    "magnitudeRescaleVariant": {
+      "testedMagnitudeAnchor": 0.01739,
+      "median": 33.9997,
+      "p75": 55.4263,
+      "p90": 100,
+      "saturationLow": 5,
+      "saturationHigh": 14
+    },
+    "finding": "Do not broadly rescale Heat magnitude to the current-period p75. The existing 0.03 magnitude anchor is healthier. Any Heat recalibration should be limited to moderating the disagreement contribution when agreement confidence is weak."
+  },
+  "pressure": {
+    "current": {
+      "multiplier": 1000,
+      "median": 50.2701,
+      "p25": 49.0944,
+      "p75": 53.4919,
+      "middle40to60": 64,
+      "exact50": 19,
+      "saturationLow": 1,
+      "saturationHigh": 6
+    },
+    "nonzeroAbsoluteMovement": {
+      "median": 0.0038,
+      "p75": 0.0139
+    },
+    "testedMultipliers": {
+      "1500": {"middle40to60": 60, "saturationLow": 2, "saturationHigh": 7},
+      "2000": {"middle40to60": 55, "saturationLow": 3, "saturationHigh": 11},
+      "2500": {"middle40to60": 52, "saturationLow": 5, "saturationHigh": 11},
+      "3000": {"middle40to60": 48, "saturationLow": 5, "saturationHigh": 12}
+    },
+    "tanhVariant": {"middle40to60": 57, "saturationLow": 1, "saturationHigh": 6},
+    "finding": "Pressure is genuinely center-heavy, but 19 reports have an exact neutral reading and should remain neutral. A modest expansion in the 1500-2000 range or a smooth tanh transform is defensible; forcing equal thirds would create false directional pressure."
+  },
+  "agreement": {
+    "evidence": {
+      "zeroConfidence": 24,
+      "lowConfidenceBelow25": 26,
+      "adequateConfidenceAtLeast25": 35,
+      "zeroConfidenceShare": 0.2824,
+      "sources": {
+        "REPORT_COHESION": 56,
+        "NO_COHESION_DATA": 24,
+        "REPORT_PLUS_BOOKS": 5
+      }
+    },
+    "currentScore": {"median": 50, "p25": 20, "p75": 55, "exact50": 24},
+    "confidenceShrinkVariant": {
+      "description": "Shrink score toward 50 according to evidence confidence.",
+      "result": "Over-compresses the meter around 50 and does not solve the missing-evidence classification problem."
+    },
+    "finding": "Agreement is primarily an evidence-confidence problem, not a scale problem. A raw score of 50 can mean neutral agreement or no cohesion data. Production should not classify no-evidence 50 as HIGH agreement."
+  },
+  "recommendedDirection": {
+    "heat": "KEEP_CORE_FORMULA; TEST_MODERATED_CONFIDENCE_WEIGHT_ONLY",
+    "pressure": "TEST_MODEST_SCALE_EXPANSION; DO_NOT_MOVE_TRUE_ZERO_FROM_50",
+    "agreement": "ADD_CONFIDENCE_AWARE_CLASSIFICATION_OR_UNKNOWN_TREATMENT_BEFORE_THRESHOLD_TUNING",
+    "vigMeterThresholds": "HOLD_CURRENT_UNTIL_METER_RECALIBRATION_DECISION"
+  }
+}
