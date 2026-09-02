@@ -25,20 +25,30 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Install reviewed Stage 3B package
+      - name: Install reviewed Stage 3B non-workflow package
+        id: install
         run: |
           set -euo pipefail
-          cat data/walters/nfl/qb-performance/stage3b-bootstrap-bundle.b64.part* | base64 --decode > /tmp/walters-qb-stage3b-bundle.tar.gz
+          shopt -s nullglob
+          parts=(data/walters/nfl/qb-performance/stage3b-bootstrap-bundle.b64.part*)
+          if (( ${#parts[@]} == 0 )); then
+            echo "has_bundle=false" >> "$GITHUB_OUTPUT"
+            echo "No bootstrap bundle remains; nothing to install."
+            exit 0
+          fi
+          echo "has_bundle=true" >> "$GITHUB_OUTPUT"
+          cat "${parts[@]}" | base64 --decode > /tmp/walters-qb-stage3b-bundle.tar.gz
           echo "1bc0a4d5c871bb4fd0972c95273acda9137683ff6c167f691567805371e70206  /tmp/walters-qb-stage3b-bundle.tar.gz" | sha256sum --check --strict
           tar -xzf /tmp/walters-qb-stage3b-bundle.tar.gz
-          rm -f data/walters/nfl/qb-performance/stage3b-bootstrap-bundle.b64.part*
-          rm -f .github/workflows/walters-qb-stage3b-bootstrap.yml
+          rm -f "${parts[@]}"
+          git restore --source=HEAD -- .github/workflows/walters-qb-performance-stage3.yml
           python -m py_compile tools/build-walters-qb-performance-stage3b.py
           python tools/build-walters-qb-performance-stage3b.py --self-test
           node --check tools/validate-walters-qb-performance-stage3.mjs
           node --check tests/walters-qb-performance-stage3.test.mjs
 
-      - name: Commit installed Stage 3B package
+      - name: Commit installed Stage 3B non-workflow package
+        if: steps.install.outputs.has_bundle == 'true'
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
@@ -47,9 +57,7 @@ jobs:
             data/walters/nfl/qb-performance \
             tools/build-walters-qb-performance-stage3b.py \
             tools/validate-walters-qb-performance-stage3.mjs \
-            tests/walters-qb-performance-stage3.test.mjs \
-            .github/workflows/walters-qb-performance-stage3.yml \
-            .github/workflows/walters-qb-stage3b-bootstrap.yml
-          git commit -m "Install Walters QB performance Stage 3B package"
+            tests/walters-qb-performance-stage3.test.mjs
+          git commit -m "Install Walters QB performance Stage 3B non-workflow package"
           git pull --rebase origin main
           git push origin HEAD:main
