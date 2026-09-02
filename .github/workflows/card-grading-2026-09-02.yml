@@ -1,0 +1,268 @@
+name: Isolated Betting Edge card grading 2026-09-02
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-02.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-2026-09-02
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Grade previous Vancouver day and older unresolved MLB cards
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const TARGET_DATE = '2026-09-01';
+          const VERIFIED_AT = new Date().toISOString();
+          const MLB_API = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${TARGET_DATE}&hydrate=linescore,team`;
+          const SOURCE = {
+            name: `MLB official Stats API schedule — September 1, 2026`,
+            url: MLB_API
+          };
+
+          const resultMethod = {
+            lifecycle: 'ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE',
+            scoreMarkets: ['ml','spread','totals'],
+            grades: ['WIN','LOSS','PUSH','VOID','HALF_WIN','HALF_LOSS'],
+            spreadHdpSemantics: 'raw hdp is the home-side handicap; away selected handicap is the opposite sign',
+            quarterLineSemantics: 'quarter lines split into two equal half-stakes on the adjacent half-goal/half-point lines',
+            unsupportedMarkets: 'remain unresolved unless exact selection verification is supplied',
+            officialOnlyWhenStatus: 'BET',
+            issuedReportMutable: false
+          };
+
+          const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+          const mkdir = p => fs.mkdirSync(p,{recursive:true});
+
+          function parseMatchup(meta) {
+            const m = String(meta || '').match(/^MLB\s*\|\s*(.+?)\s+at\s+(.+?)\s*\|/i);
+            if (!m) return null;
+            return {away:m[1].trim(), home:m[2].trim()};
+          }
+
+          function gradeRec(rec, game) {
+            const feed = rec.feed || {};
+            const key = String(feed.marketKey || feed.market || '').toLowerCase();
+            const side = String(feed.side || '').toLowerCase();
+            const homeScore = Number(game.teams.home.score);
+            const awayScore = Number(game.teams.away.score);
+            if (!Number.isFinite(homeScore) || !Number.isFinite(awayScore)) return null;
+
+            if (key === 'ml') {
+              if (!['home','away'].includes(side)) return null;
+              const selected = side === 'home' ? homeScore : awayScore;
+              const other = side === 'home' ? awayScore : homeScore;
+              return selected > other ? 'WIN' : selected < other ? 'LOSS' : 'PUSH';
+            }
+
+            if (key === 'spread' || key === 'spreads') {
+              const raw = Number(feed.hdp ?? feed.line);
+              if (!Number.isFinite(raw) || !['home','away'].includes(side)) return null;
+              const selectedHandicap = side === 'home' ? raw : -raw;
+              const selected = side === 'home' ? homeScore : awayScore;
+              const other = side === 'home' ? awayScore : homeScore;
+              const v = selected + selectedHandicap - other;
+              return v > 0 ? 'WIN' : v < 0 ? 'LOSS' : 'PUSH';
+            }
+
+            if (key === 'totals' || key === 'total') {
+              const line = Number(feed.hdp ?? feed.line);
+              if (!Number.isFinite(line) || !['over','under'].includes(side)) return null;
+              const total = homeScore + awayScore;
+              if (total === line) return 'PUSH';
+              return side === 'over' ? (total > line ? 'WIN':'LOSS') : (total < line ? 'WIN':'LOSS');
+            }
+            return null;
+          }
+
+          function unresolved(rec, reason, previous) {
+            const old = previous?.completion || {};
+            return {
+              title: rec.title,
+              status: rec.status,
+              selectionKey: rec.feed?.selectionKey || null,
+              commenceTime: rec.feed?.eventDate || null,
+              completion: {
+                state: 'unresolved',
+                reason,
+                firstUnresolvedAt: old.firstUnresolvedAt || VERIFIED_AT,
+                lastVerificationAttemptAt: VERIFIED_AT,
+                verificationAttempts: Number(old.verificationAttempts || 0) + 1,
+                nextRetryTier: 'next_backlog_pass'
+              }
+            };
+          }
+
+          function complete(rec, game, grade, previous) {
+            const old = previous?.completion || {};
+            return {
+              title: rec.title,
+              status: rec.status,
+              selectionKey: rec.feed?.selectionKey || null,
+              commenceTime: rec.feed?.eventDate || null,
+              completion: {
+                state: 'complete',
+                verificationState: 'verified',
+                grade,
+                official: rec.status === 'BET',
+                hypothetical: rec.status !== 'BET',
+                verifiedAt: VERIFIED_AT,
+                eventId: rec.feed?.eventId || null,
+                finalScore: {
+                  home: game.teams.home.team.name,
+                  away: game.teams.away.team.name,
+                  homeScore: Number(game.teams.home.score),
+                  awayScore: Number(game.teams.away.score)
+                },
+                settlementMethod: 'final_score',
+                line: rec.feed?.hdp ?? rec.feed?.line ?? null,
+                basis: null,
+                observedValue: null,
+                settlementComponents: null,
+                source: SOURCE,
+                firstUnresolvedAt: old.firstUnresolvedAt || null,
+                lastVerificationAttemptAt: VERIFIED_AT,
+                verificationAttempts: Number(old.verificationAttempts || 0) + 1,
+                nextRetryTier: null
+              }
+            };
+          }
+
+          (async()=>{
+            const res = await fetch(MLB_API, {headers:{'User-Agent':'Betting-Edge-Result-Grader/1.0'}});
+            if (!res.ok) throw new Error(`MLB official schedule fetch failed ${res.status}`);
+            const sched = await res.json();
+            const games = (sched.dates || []).flatMap(d=>d.games || []);
+            const finals = games.filter(g => /final|game over|completed early/i.test(String(g.status?.detailedState || '')));
+            if (!finals.length) throw new Error('No official MLB final games returned for target date');
+
+            const byMatchup = new Map();
+            for (const g of finals) {
+              const k = `${norm(g.teams.away.team.name)} at ${norm(g.teams.home.team.name)}`;
+              byMatchup.set(k,g);
+            }
+
+            function processRun(runPath, priorObsPath=null) {
+              const run = JSON.parse(fs.readFileSync(runPath,'utf8'));
+              let prior = null;
+              if (priorObsPath && fs.existsSync(priorObsPath)) prior = JSON.parse(fs.readFileSync(priorObsPath,'utf8'));
+              const priorMap = new Map((prior?.recommendations || []).map(x=>[x.selectionKey,x]));
+              const recommendations = (run.recs || []).map(rec => {
+                const old = priorMap.get(rec.feed?.selectionKey);
+                const matchup = parseMatchup(rec.meta);
+                if (!matchup) return unresolved(rec,'unsupported_or_unmatched_market',old);
+                const g = byMatchup.get(`${norm(matchup.away)} at ${norm(matchup.home)}`);
+                if (!g) return unresolved(rec,'official_final_not_matched',old);
+                const grade = gradeRec(rec,g);
+                if (!grade) return unresolved(rec,'unsupported_or_ambiguous_settlement',old);
+                return complete(rec,g,grade,old);
+              });
+              return {
+                schemaVersion: 1,
+                kind: 'issued-card-observations',
+                sourceRun: runPath,
+                runId: run.ts || null,
+                slot: run.slot || path.basename(runPath).split('-')[0],
+                resultMethod,
+                recommendations
+              };
+            }
+
+            const runsDir = `data/history/runs/${TARGET_DATE}`;
+            const outDir = `data/history/observations/${TARGET_DATE}`;
+            mkdir(outDir);
+            const runFiles = fs.readdirSync(runsDir).filter(f=>f.endsWith('.json')).sort();
+            if (!runFiles.length) throw new Error(`No issued runs found for ${TARGET_DATE}`);
+
+            let completed = 0, unresolvedCount = 0;
+            for (const f of runFiles) {
+              const runPath = path.join(runsDir,f);
+              const outPath = path.join(outDir,f);
+              const obs = processRun(runPath, fs.existsSync(outPath)?outPath:null);
+              completed += obs.recommendations.filter(x=>x.completion.state==='complete').length;
+              unresolvedCount += obs.recommendations.filter(x=>x.completion.state==='unresolved').length;
+              fs.writeFileSync(outPath,JSON.stringify(obs,null,2)+'\n');
+            }
+
+            const backlogPath = 'data/history/observations/2026-08-31/late-182230.json';
+            if (fs.existsSync(backlogPath)) {
+              const oldObs = JSON.parse(fs.readFileSync(backlogPath,'utf8'));
+              const sourceRun = oldObs.sourceRun;
+              const run = JSON.parse(fs.readFileSync(sourceRun,'utf8'));
+              const runMap = new Map((run.recs || []).map(r=>[r.feed?.selectionKey,r]));
+              oldObs.recommendations = oldObs.recommendations.map(item=>{
+                if (item.completion?.state !== 'unresolved') return item;
+                const rec = runMap.get(item.selectionKey);
+                if (!rec) return item;
+                const matchup = parseMatchup(rec.meta);
+                if (!matchup) return unresolved(rec,'unsupported_or_unmatched_market',item);
+                const g = byMatchup.get(`${norm(matchup.away)} at ${norm(matchup.home)}`);
+                if (!g) return unresolved(rec,'official_final_not_matched',item);
+                const grade = gradeRec(rec,g);
+                if (!grade) return unresolved(rec,'unsupported_or_ambiguous_settlement',item);
+                return complete(rec,g,grade,item);
+              });
+              fs.writeFileSync(backlogPath,JSON.stringify(oldObs,null,2)+'\n');
+            }
+
+            console.log(`CARD GRADING PASS: ${runFiles.length} Sep 1 issued runs processed; ${completed} cards completed, ${unresolvedCount} left unresolved in new Sep 1 observation records.`);
+            console.log(`Official result source: ${MLB_API}`);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+
+      - name: Verify isolation and observation schema
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const root='data/history/observations/2026-09-01';
+          const files=fs.readdirSync(root).filter(f=>f.endsWith('.json'));
+          if(files.length!==5) throw Error(`expected 5 Sep 1 observation files, found ${files.length}`);
+          for(const f of files){
+            const j=JSON.parse(fs.readFileSync(path.join(root,f),'utf8'));
+            if(j.schemaVersion!==1||j.kind!=='issued-card-observations'||!Array.isArray(j.recommendations)) throw Error(`bad observation schema ${f}`);
+            for(const r of j.recommendations){
+              if(!['complete','unresolved'].includes(r.completion?.state)) throw Error(`bad state ${f} ${r.title}`);
+              if(r.completion.state==='complete'&&!['WIN','LOSS','PUSH','VOID','HALF_WIN','HALF_LOSS'].includes(r.completion.grade)) throw Error(`bad grade ${f} ${r.title}`);
+            }
+          }
+          const backlog=JSON.parse(fs.readFileSync('data/history/observations/2026-08-31/late-182230.json','utf8'));
+          const remain=backlog.recommendations.filter(r=>r.completion?.state==='unresolved');
+          console.log(`OLDER BACKLOG REMAINING: ${remain.length}`);
+          NODE
+          bad=$(git diff --name-only | grep -v '^data/history/observations/' || true)
+          if [ -n "$bad" ]; then
+            echo "Unexpected non-observation changes:"
+            echo "$bad"
+            exit 1
+          fi
+
+      - name: Commit grading observations only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history/observations/2026-09-01 data/history/observations/2026-08-31/late-182230.json
+          if git diff --cached --quiet; then
+            echo "No grading observation changes to publish."
+            exit 0
+          fi
+          git commit -m "Grade Sep 1 Betting Edge cards and close MLB backlog"
+          git pull --rebase origin main
+          git push
