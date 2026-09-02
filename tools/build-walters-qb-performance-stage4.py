@@ -77,6 +77,11 @@ def canonical_payload(value: Any) -> Any:
         }
     if isinstance(value, list):
         return [canonical_payload(item) for item in value]
+    # JavaScript JSON has a single numeric type and serializes integral values
+    # without a trailing decimal. Normalize Python floats the same way so the
+    # independent Node validator reproduces every canonical hash exactly.
+    if isinstance(value, float) and math.isfinite(value) and value.is_integer():
+        return int(value)
     return value
 
 
@@ -121,6 +126,13 @@ def round_to_half(value: float) -> float:
     result = float(rounded)
     return 0.0 if result == 0.0 else result
 
+
+def sanitize_shadow_text(value: Any) -> str:
+    """Keep source meaning while preventing future authority tokens from entering evidence outputs."""
+    return str(value or "").replace(
+        "APPROVED_WALTERS_QB_PERFORMANCE",
+        "GOVERNED_QB_PERFORMANCE_AUTHORITY",
+    )
 
 def recursive_market_true(value: Any) -> bool:
     if isinstance(value, dict):
@@ -343,7 +355,7 @@ def build_bindings(
         except RuntimeError as exc:
             errors.append(str(exc))
             continue
-        summary = str(finding.get("summary") or "")
+        summary = sanitize_shadow_text(finding.get("summary"))
 
         current_name = current.get("playerName")
         baseline_name = baseline.get("playerName")
