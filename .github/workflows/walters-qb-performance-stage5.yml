@@ -79,8 +79,17 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Validate Stage 4 handoff
-        run: node tools/validate-walters-qb-performance-stage4.mjs
+      - name: Validate durable Stage 4 handoff
+        run: |
+          set -euo pipefail
+          STAGE4_DIR="$RUNNER_TEMP/walters-qb-stage4-readback"
+          rm -rf "$STAGE4_DIR"
+          trap 'git worktree remove "$STAGE4_DIR" --force >/dev/null 2>&1 || true' EXIT
+          git worktree add --detach "$STAGE4_DIR" 1a8222a1114e3fcfc806fde718c81aaf2b0bfa7f
+          (
+            cd "$STAGE4_DIR"
+            node tools/validate-walters-qb-performance-stage4.mjs
+          )
 
       - name: Run Stage 5 deterministic helper tests
         run: python tools/build-walters-qb-performance-stage5.py --self-test
