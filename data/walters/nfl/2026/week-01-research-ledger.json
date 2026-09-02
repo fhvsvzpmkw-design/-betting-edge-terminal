@@ -20,33 +20,33 @@
   "scheduledCadence": [
     {
       "day": "TUESDAY",
-      "timePacific": "10:30",
+      "timePacific": "11:00",
       "type": "FULL_WEEKLY_BASELINE",
-      "scope": "Full 32-team post-MNF review, ESPN FPI comparison, personnel/injury/roster/coaching review, and complete independent Week numbers."
+      "scope": "Full weekly 32-team information baseline after Monday Night Football."
     },
     {
-      "day": "WEDNESDAY-FRIDAY",
+      "day": "MONDAY/WEDNESDAY-FRIDAY",
       "timePacific": "11:30",
       "type": "MAIN_DAILY_SWEEP",
-      "scope": "Current injury, practice, roster, QB, OL, defense, coaching and other material team information; move only affected ratings/numbers."
+      "scope": "Main information review, including the Saturday review function."
     },
     {
       "day": "SATURDAY",
-      "timePacific": "10:00",
+      "timePacific": "11:30",
       "type": "MAIN_WEEKEND_SWEEP",
-      "scope": "Weekend confirmation of material personnel and matchup information."
+      "scope": "Main information review, including the Saturday review function."
     },
     {
       "day": "SUNDAY",
-      "timePacific": "07:30",
+      "timePacific": "07:00",
       "type": "PREGAME_SWEEP",
-      "scope": "Early final information check before the 10:00 PT NFL window."
+      "scope": "Sunday pregame information review for active-week games awaiting kickoff."
     },
     {
       "day": "TUESDAY-SATURDAY",
-      "timePacific": "14:45",
-      "type": "PRE_1515_DELTA",
-      "scope": "Change-only check since the most recent main sweep; do not repeat the full investigation unless new information warrants it."
+      "timePacific": "16:45",
+      "type": "LATE_DAY_DELTA",
+      "scope": "Late-day change-only information delta."
     }
   ],
   "requiredSweepFields": [
@@ -2818,5 +2818,74 @@
         "productionId": "walters-personnel-production-v1"
       }
     }
-  ]
+  ],
+  "scheduleAuthority": {
+    "schema": 1,
+    "authorityId": "graham-schedule-metadata-v1",
+    "state": "SYNCHRONIZED",
+    "manifestPath": "data/walters/nfl/graham-schedule-authority-v1.json",
+    "timezone": "America/Vancouver",
+    "timingMode": "exact_schedule",
+    "executionAuthority": "CHATGPT_SCHEDULED_TASKS",
+    "tasks": [
+      {
+        "taskKey": "WEEK_ROLLOVER",
+        "title": "Graham Week Rollover",
+        "days": [
+          "TU"
+        ],
+        "time": "04:30",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=4;BYMINUTE=30;BYSECOND=0",
+        "purpose": "Mechanical completion-gated active-week rollover."
+      },
+      {
+        "taskKey": "TUESDAY_BASELINE",
+        "title": "Graham Tuesday Baseline",
+        "days": [
+          "TU"
+        ],
+        "time": "11:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=11;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Full weekly 32-team information baseline after Monday Night Football."
+      },
+      {
+        "taskKey": "DAILY_REVIEW",
+        "title": "Graham Daily Review",
+        "days": [
+          "MO",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "11:30",
+        "rrule": "FREQ=WEEKLY;BYDAY=MO,WE,TH,FR,SA;BYHOUR=11;BYMINUTE=30;BYSECOND=0",
+        "purpose": "Main information review, including the Saturday review function."
+      },
+      {
+        "taskKey": "DELTA_1645",
+        "title": "Graham 16:45 Delta",
+        "days": [
+          "TU",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "16:45",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR,SA;BYHOUR=16;BYMINUTE=45;BYSECOND=0",
+        "purpose": "Late-day change-only information delta."
+      },
+      {
+        "taskKey": "SUNDAY_PREGAME",
+        "title": "Graham Sunday Pregame",
+        "days": [
+          "SU"
+        ],
+        "time": "07:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=SU;BYHOUR=7;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Sunday pregame information review for active-week games awaiting kickoff."
+      }
+    ]
+  }
 }
