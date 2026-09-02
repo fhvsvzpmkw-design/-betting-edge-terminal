@@ -25,7 +25,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Install reviewed Stage 3C package
+      - name: Install reviewed Stage 3C non-workflow package
         run: |
           set -euo pipefail
           shopt -s nullglob
@@ -37,13 +37,13 @@ jobs:
           cat "${parts[@]}" | base64 --decode > /tmp/walters-qb-stage3c-bundle.tar.gz
           echo "fb3cebc458436e878794785145ba0753cad11033ead758f7fac181e82a0e0e39  /tmp/walters-qb-stage3c-bundle.tar.gz" | sha256sum --check --strict
           tar -xzf /tmp/walters-qb-stage3c-bundle.tar.gz
-          rm -f "${parts[@]}" .github/workflows/walters-qb-stage3c-bootstrap.yml
+          git restore --source=HEAD -- .github/workflows/walters-qb-performance-stage3.yml
           python -m py_compile tools/build-walters-qb-performance-stage3c.py
           python tools/build-walters-qb-performance-stage3c.py --self-test
           node --check tools/validate-walters-qb-performance-stage3c.mjs
           node --check tests/walters-qb-performance-stage3c.test.mjs
 
-      - name: Commit installed Stage 3C package
+      - name: Commit installed Stage 3C non-workflow package
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
@@ -52,10 +52,12 @@ jobs:
             data/walters/nfl/qb-performance \
             tools/build-walters-qb-performance-stage3c.py \
             tools/validate-walters-qb-performance-stage3c.mjs \
-            tests/walters-qb-performance-stage3c.test.mjs \
-            .github/workflows/walters-qb-performance-stage3.yml \
-            .github/workflows/walters-qb-stage3c-bootstrap.yml
-          git commit -m "Install Walters QB performance Stage 3C package"
+            tests/walters-qb-performance-stage3c.test.mjs
+          if git diff --cached --quiet; then
+            echo "Stage 3C non-workflow package is already installed."
+            exit 0
+          fi
+          git commit -m "Install Walters QB performance Stage 3C non-workflow package"
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
