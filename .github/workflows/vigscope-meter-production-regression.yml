@@ -14,6 +14,7 @@ on:
       - 'tests/vigscope-meter-fallback-safety.test.mjs'
       - 'tests/vigscope-meter-telemetry.test.mjs'
       - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'
+      - 'tests/runner-issued-session-boundary.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
 
 jobs:
@@ -36,6 +37,8 @@ jobs:
         run: node tests/vigscope-meter-telemetry.test.mjs
       - name: Run Sep 2 production telemetry fixture
         run: node tests/vigscope-meter-sep2-live-fixture.test.mjs
+      - name: Run issued-session boundary regression
+        run: node tests/runner-issued-session-boundary.test.mjs
       - name: Run durable telemetry gate self-test
         run: node tools/vigscope-meter-telemetry-gate.mjs self-test
       - name: Run report publisher self-test
@@ -43,6 +46,9 @@ jobs:
       - name: Verify runner production wiring
         run: |
           grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
+          grep -F "HISTORY_KEY='bettingEdge.runnerHistory.v1.4'" assets/runner-core-runtime.js
+          grep -F "VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'" assets/runner-core-runtime.js
+          grep -F "TELEMETRY INTEGRITY ERROR" assets/runner-core-runtime.js
           grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
           grep -F "50+50*Math.tanh(fav/0.028)" assets/runner-core-runtime.js
           grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
