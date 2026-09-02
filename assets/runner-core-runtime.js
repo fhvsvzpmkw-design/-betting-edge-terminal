@@ -6,6 +6,8 @@ const HISTORY_LIMIT=30;
 const FEED_URL='./data/live-odds.json';
 const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
+const VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1';
+const VIG_HEAT_LOW_MAX=20,VIG_HEAT_HIGH_MIN=40,VIG_PRESSURE_ADVERSE_MAX=48,VIG_PRESSURE_FAVORABLE_MIN=52,VIG_AGREEMENT_HIGH_MIN=45;
 let activeRun=null;
 let originalRun=null;
 let refreshBusy=false;
@@ -101,8 +103,9 @@ function fallbackAgreement(run){
 }
 function instrumentAgreement(run){return run?.instrumentTelemetry?.agreement||fallbackAgreement(run)}
 function heatLabel(v){return v<15?'DORMANT':v<28?'QUIET':v<40?'FORMING':v<55?'ACTIVE':v<70?'PRESSURED':v<85?'HOT':'EXTREME'}
-function pressureLabel(v){return v<15?'HEAVY AGAINST':v<30?'AGAINST':v<45?'LEAN AGAINST':v<56?'NEUTRAL':v<71?'LEAN FAVORABLE':v<86?'FAVORABLE':'STRONG FAVORABLE'}
+function pressureLabel(v){return v<15?'HEAVY AGAINST':v<30?'AGAINST':v<48?'LEAN AGAINST':v<52?'NEUTRAL':v<71?'LEAN FAVORABLE':v<86?'FAVORABLE':'STRONG FAVORABLE'}
 function agreementLabel(v){return v<15?'FRACTURED':v<30?'WIDE':v<45?'MIXED':v<60?'NORMAL':v<75?'TIGHT':v<90?'STRONG':'LOCKSTEP'}
+function agreementEvidenceQuality(confidence){const c=clamp(confidence);return c===0?'UNMEASURED':c<25?'LIMITED':'SUPPORTED'}
 function deriveInstrumentReadings(run){
   const recs=Array.isArray(run?.recs)?run.recs:[],signals=recs.map(r=>({...moveSignal(r),weight:recWeight(r)}));
   const weighted=signals.reduce((n,x)=>n+x.weight,0)||1;
@@ -110,15 +113,18 @@ function deriveInstrumentReadings(run){
   const mags=signals.map(x=>x.magnitude),avgMag=mean(mags)||0;
   const breadth=recs.length?signals.filter(x=>x.magnitude>=.0025).length/recs.length:0;
   const th=(recs.map(thresholdActivity).filter(x=>x!==null));const threshold=mean(th)||0;
-  const agreement=instrumentAgreement(run),dispersion=agreement.confidence>0?(100-agreement.score)/100:0;
-  const heat=clamp((avgMag/.03)*40+breadth*25+threshold*20+dispersion*15);
-  const pressure=clamp(50+fav*1000);
+  const agreement=instrumentAgreement(run),agreementScore=clamp(agreement?.score??50),agreementConfidence=clamp(agreement?.confidence??0);
+  const dispersion=agreementConfidence>0?(100-agreementScore)/100:0;
+  const confidenceFactor=agreementConfidence===0?0:0.50+0.50*Math.sqrt(agreementConfidence/100);
+  const heat=clamp((avgMag/.03)*40+breadth*25+threshold*20+dispersion*15*confidenceFactor);
+  const pressure=clamp(50+50*Math.tanh(fav/0.028));
   const movementCoverage=recs.length?signals.filter(x=>x.source!=='NONE').length/recs.length:0;
-  const pressureConf=clamp(movementCoverage*100),heatConf=clamp((movementCoverage*.7+(agreement.confidence/100)*.3)*100);
+  const pressureConf=clamp(movementCoverage*100),heatConf=clamp((movementCoverage*.7+(agreementConfidence/100)*.3)*100);
+  const agreementQuality=agreementEvidenceQuality(agreementConfidence);
   return {
-    heat:{value:Math.round(heat),label:heatConf?heatLabel(heat):'NO DATA',confidence:Math.round(heatConf)},
-    pressure:{value:Math.round(pressure),label:pressureConf?pressureLabel(pressure):'NO DATA',confidence:Math.round(pressureConf)},
-    agreement:{value:Math.round(agreement.score),label:agreement.confidence?agreementLabel(agreement.score):'NO DATA',confidence:Math.round(agreement.confidence),pairs:agreement.pairs||0}
+    heat:{value:Math.round(heat),rawValue:heat,label:heatConf?heatLabel(heat):'NO DATA',confidence:Math.round(heatConf)},
+    pressure:{value:Math.round(pressure),rawValue:pressure,label:pressureConf?pressureLabel(pressure):'NO DATA',confidence:Math.round(pressureConf)},
+    agreement:{value:Math.round(agreementScore),rawValue:agreementScore,label:agreementConfidence?agreementLabel(agreementScore):'UNMEASURED',confidence:Math.round(agreementConfidence),rawConfidence:agreementConfidence,evidenceQuality:agreementQuality,pairs:agreement.pairs||0}
   }
 }
 function vancouverIso(date=new Date()){try{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'longOffset'}).formatToParts(date);const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));const hh=o.hour==='24'?'00':o.hour;let off=String(o.timeZoneName||'GMT-07:00').replace('GMT','');if(!/^[+-]\d{2}:\d{2}$/.test(off))off='-07:00';return `${o.year}-${o.month}-${o.day}T${hh}:${o.minute}:${o.second}${off}`}catch(e){return date.toISOString()}}
@@ -408,15 +414,17 @@ function instrumentGauge(d,title,type,reading){
   const read=el(d,'div','instrumentRead');read.append(el(d,'b','',`${reading.value}`),d.createTextNode(reading.label));wrap.appendChild(read);
   const defs=type==='heat'?[['DORM','g'],['QUIET','g'],['FORM','y'],['ACTIVE','y'],['PRESS','y'],['HOT','r'],['EXTREME','r']]:type==='pressure'?[['AGAINST','r'],['NEUTRAL','y'],['FAVOR','g']]:[['FRAG','r'],['MIXED','y'],['STRONG','g'],['CONSENSUS','g']];
   const band=el(d,'div',`instrumentBand ${type}`);defs.forEach(([label,c])=>band.appendChild(el(d,'span',c,label)));wrap.appendChild(band);
-  wrap.appendChild(el(d,'div','instrumentConf',`CONF ${reading.confidence}%${reading.pairs?` • ${reading.pairs} PAIRS`:''}`));
+  const evidence=reading.evidenceQuality?` • ${reading.evidenceQuality}`:'';wrap.appendChild(el(d,'div','instrumentConf',`CONF ${reading.confidence}%${evidence}${reading.pairs?` • ${reading.pairs} PAIRS`:''}`));
   return wrap
 }
 function instrumentCluster(d,run){const r=deriveInstrumentReadings(run),cluster=el(d,'div','instrumentCluster');cluster.append(instrumentGauge(d,'MARKET HEAT','heat',r.heat),instrumentGauge(d,'PRICE PRESSURE','pressure',r.pressure),instrumentGauge(d,'MARKET AGREEMENT','agreement',r.agreement));return cluster}
 function marketState(run){
-  const r=deriveInstrumentReadings(run),h=r.heat.value,p=r.pressure.value,a=r.agreement.value;
-  const heat=h<40?'LOW':h<55?'MEDIUM':'HIGH';
-  const pressure=p<45?'ADVERSE':p<56?'NEUTRAL':'FAVORABLE';
-  const agreement=a<45?'LOW':'HIGH';
+  const r=deriveInstrumentReadings(run);
+  const h=r.heat.rawValue??r.heat.value,p=r.pressure.rawValue??r.pressure.value,a=r.agreement.rawValue??r.agreement.value;
+  const agreementConfidence=r.agreement.rawConfidence??r.agreement.confidence;
+  const heat=h<VIG_HEAT_LOW_MAX?'LOW':h<VIG_HEAT_HIGH_MIN?'MEDIUM':'HIGH';
+  const pressure=p<VIG_PRESSURE_ADVERSE_MAX?'ADVERSE':p<VIG_PRESSURE_FAVORABLE_MIN?'NEUTRAL':'FAVORABLE';
+  const agreement=agreementConfidence>0?(a<VIG_AGREEMENT_HIGH_MIN?'LOW':'HIGH'):'LOW';
   const key=[heat,pressure,agreement].join('|');
   const states={
     'HIGH|FAVORABLE|HIGH':['🟢','COORDINATED FAVORABLE'],
@@ -439,7 +447,7 @@ function marketState(run){
     'LOW|NEUTRAL|LOW':['🔵','FRAGMENTED QUIET']
   };
   const s=states[key]||['⚪','MIXED'];
-  return {emoji:s[0],label:s[1]}
+  return {emoji:s[0],label:s[1],agreementState:agreementConfidence>0?agreement:'UNMEASURED',agreementRender:agreement}
 }
 function setStats(d,run){
   const vals=[...d.querySelectorAll('.stats .stat b')],c=run.counts||{};
@@ -652,7 +660,7 @@ function apply(run){
     const issuedMeterRun=run.comparison?(originalRun||withoutComparison(run)):run,state=marketState(issuedMeterRun);
     const priceStateText=run.comparison?`COMPARED ${vancouverClock(run.comparison.feedGeneratedAt)} • ISSUED SNAPSHOT SAVED`:run.feedGeneratedAt?`ODDS ${vancouverClock(run.feedGeneratedAt)} • ${ageLabel(run.feedGeneratedAt)}`:'SNAPSHOT PRICE STATE';
     const fresh=el(d,'div','runnerFresh');
-    fresh.append(el(d,'span','feedMeta',priceStateText),el(d,'span','marketStateLabel',`${state.emoji} ${state.label}`));
+    fresh.append(el(d,'span','feedMeta',priceStateText),el(d,'span','marketStateLabel',`${state.emoji} ${state.label}${state.agreementState==='UNMEASURED'?' • AGREEMENT UNMEASURED':''}`));
     right.append(instrumentCluster(d,issuedMeterRun),fresh);head.append(left,right);box.appendChild(head);
     box.appendChild(sessionStrip(d,run));
 

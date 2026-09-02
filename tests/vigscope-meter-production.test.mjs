@@ -58,7 +58,7 @@ for(const token of [
   "label:agreementConfidence?agreementLabel(agreementScore):'UNMEASURED'",
   'evidenceQuality:agreementQuality',
   'const h=r.heat.rawValue??r.heat.value,p=r.pressure.rawValue??r.pressure.value,a=r.agreement.rawValue??r.agreement.value;',
-  "const agreement=r.agreement.confidence>0?(a<VIG_AGREEMENT_HIGH_MIN?'LOW':'HIGH'):'LOW';"
+  "const agreement=agreementConfidence>0?(a<VIG_AGREEMENT_HIGH_MIN?'LOW':'HIGH'):'LOW';"
 ]) assert.ok(RUNTIME.includes(token),`runtime missing production token: ${token}`);
 
 for(const forbidden of [
