@@ -5,33 +5,95 @@ on:
   push:
     paths:
       - "data/walters/nfl/qb-performance/**"
+      - "tools/build-walters-qb-performance-stage3b.py"
       - "tools/validate-walters-qb-performance-stage3.mjs"
       - "tests/walters-qb-performance-stage3.test.mjs"
       - ".github/workflows/walters-qb-performance-stage3.yml"
   pull_request:
     paths:
       - "data/walters/nfl/qb-performance/**"
+      - "tools/build-walters-qb-performance-stage3b.py"
       - "tools/validate-walters-qb-performance-stage3.mjs"
       - "tests/walters-qb-performance-stage3.test.mjs"
       - ".github/workflows/walters-qb-performance-stage3.yml"
 
+concurrency:
+  group: walters-qb-performance-stage3
+  cancel-in-progress: false
+
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate-stage3a:
+  build-validate-stage3b:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Validate Stage 3A contract and dependencies
+      - name: Run Stage 3B deterministic helper tests
+        run: python tools/build-walters-qb-performance-stage3b.py --self-test
+
+      - name: Capture, normalize and identity-audit Stage 3B
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/build-walters-qb-performance-stage3b.py
+
+      - name: Validate Stage 3 contracts, source lock and handoff
+        id: validate
+        continue-on-error: true
         run: node tools/validate-walters-qb-performance-stage3.mjs
 
-      - name: Run Stage 3A guardrail tests
+      - name: Run Stage 3 guardrail tests
+        id: tests
+        continue-on-error: true
         run: node --test tests/walters-qb-performance-stage3.test.mjs
+
+      - name: Publish Stage 3B evidence or fail-closed diagnostics
+        if: always() && github.event_name != 'pull_request' && steps.build.outcome == 'success'
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/walters/nfl/qb-performance
+          if git diff --cached --quiet; then
+            echo "No Stage 3B output changes to publish."
+            exit 0
+          fi
+          git commit -m "Build Walters QB performance Stage 3B evidence"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Stage 3B push attempt ${attempt} failed; retrying."
+            sleep $((attempt * 2))
+          done
+          exit 1
+
+      - name: Enforce Stage 3B acceptance result
+        if: always()
+        env:
+          VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+        run: |
+          set -euo pipefail
+          test "$BUILD_OUTCOME" = "success"
+          test "$VALIDATE_OUTCOME" = "success"
+          test "$TEST_OUTCOME" = "success"
