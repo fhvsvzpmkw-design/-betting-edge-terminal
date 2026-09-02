@@ -67,11 +67,90 @@
       "limitation": "strongest caveat, conflict, era issue or research gap",
       "displayText": "the concise History Fit wording placed in the issued report's existing hist field"
     },
-    "stage2GateFields": {"personnelRequired":"boolean required on every new recommendation after the Stage 2 publication-gate cutover; true when Stage 2 personnel work was material to the serious candidate or materially affects the final decision, including a personnel-driven PASS","rule":"personnelRequired is the primary structured trigger for personnelEvidence."},
-    "waitQualification": {"requiredWhen":"For new reports after the WAIT-qualification publication cutover, every recommendation whose final status is WAIT must include this record.","rule":"A sportsbook outlier or market gap does not by itself qualify a recommendation for WAIT; preserve the existing Core 1.4 WAIT rules."},
-    "personnelEvidence": {"requiredWhen":"For new reports, include on a recommendation when personnelRequired=true.","rule":"Preserve the existing Stage 2 personnel evidence requirements and source-quality rules."},
-    "coreAssessment": {"requiredWhen":"Every recommendation in a report at/after the Core 1.4 cutover.","rule":"The production gate recomputes modelErrorState and bet eligibility from context; Pinnacle context cannot bypass or lower these gates."},
-    "waltersEvidence": {"requiredWhen":"Every recommendation in a report at/after the Core 1.4 cutover; non-eligible markets record NOT_APPLICABLE.","rule":"BET_AUTHORITY may originate an eligible NFL spread/moneyline candidate, but the final recommendation must still pass Core 1.4 and all normal hard gates."}
+    "stage2GateFields": {
+      "personnelRequired": "boolean required on every new recommendation after the Stage 2 publication-gate cutover; true when Stage 2 personnel work was material to the serious candidate or materially affects the final decision, including a personnel-driven PASS",
+      "rule": "personnelRequired is the primary structured trigger for personnelEvidence. Recommendation wording that signals lineup, batting order, participation, role, minutes, starter, active/inactive or identity-context dependence is a conservative backstop and may not be used to mark personnelRequired=false to evade Stage 2 evidence."
+    },
+    "waitQualification": {
+      "requiredWhen": "For new reports after the WAIT-qualification publication cutover, every recommendation whose final status is WAIT must include this record.",
+      "fields": {
+        "actionableIfResolved": "must be true; means the candidate has a plausible path to LEAN/BET or materially closer actionability if the named blockers clear under fresh re-handicapping",
+        "blockers": "non-empty array of the specific unresolved gates preventing action now",
+        "independentSignals": "non-empty array of current signals materially separate from the Bet365/DraftKings quote pair or market-derived no-vig calculation; each signal must contain origin and finding",
+        "rationale": "concise explanation of why the candidate merits WAIT rather than PASS despite the unresolved blockers"
+      },
+      "rule": "A sportsbook outlier, cross-book price gap, positive market-derived no-vig residual, stale/missing comparison quote, or unresolved personnel fact does not by itself qualify a recommendation for WAIT. At least one current independent non-market signal must support the underlying handicap, and the recommendation must be plausibly actionable if its blockers clear. Bet365, DraftKings, Odds-API/live-feed rows, a two-book no-vig benchmark, or market consensus may not be recorded as the required independent signal. If these conditions are not met, use PASS with the appropriate fair-value-confidence, price-quality, information or identity reason."
+    },
+    "personnelEvidence": {
+      "requiredWhen": "For new reports, include on a recommendation when personnelRequired=true. This includes Stage 2 personnel work material to a serious candidate or an unresolved personnel assumption materially affecting BET/LEAN/WAIT/PASS status, fair value, uncertainty or playTo. Historical sidecars are not backfilled.",
+      "fields": {
+        "stage2CheckedAt": "timestamp or lane-local date/time showing when the deep personnel sweep was performed",
+        "dependencyTarget": "the exact personnel dependency or dependencies verified as causally relevant to the wager, oriented to the correct team/opponent/participant/role",
+        "dependencyRationale": "concise explanation of why the dependency can materially affect this exact market/selection",
+        "officialSources": "array of authoritative source records checked for the material personnel facts; each record should carry origin, url, asOf and a specific fact/finding, and a Stage 2 closing authoritative check for a still-material unresolved dependency must set finalRecheck=true",
+        "fallbackSources": "array of distinct credible current fallback source records; every record must carry a non-empty canonical origin; when the official state remains unresolved, target 3 to 5 distinct fallback source origins where available",
+        "fallbackSourceCount": "integer count of distinct credible fallback source origins actually used/checked; must equal the fallbackSources array length after origin deduplication",
+        "sourceShortfall": "null or concise explanation when fewer than 3 credible current fallback sources genuinely exist after an event-specific search",
+        "facts": "array of material personnel facts found, with projected facts clearly distinguished from confirmed facts",
+        "personnelState": "CONFIRMED|STRONG PROJECTION|PARTIAL|UNKNOWN",
+        "sourceConflict": "NONE|MINOR|MATERIAL",
+        "conflictSummary": "null or concise description of the material disagreement among credible sources",
+        "conflictResolution": "null or concise rationale explaining why higher-quality, more direct or more current evidence resolves a conflict; required before STRONG PROJECTION when a material conflict had existed",
+        "unresolved": "array of material personnel questions that remain unresolved",
+        "decisionSensitivity": "specific plausible personnel outcome(s) that would materially change fair value, uncertainty, playTo or status; use NO MATERIAL PERSONNEL SENSITIVITY when none remains",
+        "preStage2Fair": "concise pre-sweep fair-value and/or uncertainty state",
+        "postStage2Fair": "concise post-sweep fair-value and/or uncertainty state",
+        "decisionImpact": "concise statement of how Stage 2 changed the decision, or NO MATERIAL CHANGE"
+      },
+      "officialSourceRecordFields": {
+        "origin": "non-empty authoritative source identity",
+        "url": "non-empty authoritative source URL",
+        "asOf": "timestamp for the authoritative source check",
+        "fact": "specific dependency-relevant fact or finding, including an unresolved/not-yet-posted result when that is what the source shows",
+        "finalRecheck": "boolean; true only for the authoritative source check performed near Stage 2 close for a still-material unresolved personnel dependency"
+      },
+      "sourceCountRule": "The 3-to-5 target counts distinct credible source origins, not URLs, mirrors or duplicated syndication. Each fallback source must carry a canonical origin. Duplicate normalized origins are rejected by the publication gate and do not count toward fallbackSourceCount. Do not add weak/stale sources to meet the count. If fewer than 3 exist, record sourceShortfall and preserve PARTIAL/UNKNOWN when appropriate.",
+      "dependencyRule": "Personnel evidence must be tied to the actual causal dependency of the exact wager before it is used. Wrong-team, wrong-opponent or wrong-role dependencies must be corrected and researched again where necessary before final status.",
+      "finalRecheckRule": "When a named personnel dependency remains materially unresolved at Stage 2 close, record a dependency-matching authoritative source check with finalRecheck=true before assigning final status. The authoritative source may still report unresolved, unavailable or not yet posted; the rule proves the closing check occurred and does not require a confirmed outcome.",
+      "conflictRule": "A material unresolved source conflict prevents STRONG PROJECTION. Preserve PARTIAL/UNKNOWN and widen uncertainty unless a clear quality/directness/recency hierarchy resolves the disagreement and the resolution rationale is recorded."
+    },
+    "coreAssessment": {
+      "requiredWhen": "Every recommendation in a report at/after the Core 1.4 cutover.",
+      "fields": {
+        "frameworkId": "must match the operational Core 1.4 framework ID",
+        "context": "structured fairValueBasis, bookDispersion, liquidityRisk, tailRisk, directCalibration, personnelSensitivity, independentCurrentSupport, sport/market/timing, movement flags and automatically applicable graduatedResearchIds",
+        "fairValueBasisRationale": "why the fair is independent, market-anchored, market-derived-only or unavailable",
+        "uncertaintyStatement": "candidate-specific uncertainty/model-error statement",
+        "modelErrorState": "STANDARD|ELEVATED|HIGH|UNQUANTIFIED",
+        "betEligibleByModelError": "boolean recomputed by the production Core 1.4 gate",
+        "effects": "array of framework effects",
+        "appliedRules": "array of applied base/research rules",
+        "reasons": "array of framework reasons",
+        "rationale": "concise decision interpretation"
+      },
+      "rule": "The production gate recomputes modelErrorState and bet eligibility from the context and rejects forged/omitted applicable research rules. A BET may not publish when Core 1.4 recomputation blocks it. Pinnacle context cannot bypass or lower these gates."
+    },
+    "waltersEvidence": {
+      "requiredWhen": "Every recommendation in a report at/after the Core 1.4 cutover; non-eligible markets record NOT_APPLICABLE. Eligible NFL spread/moneyline candidates resolve Walters availability whenever Walters mode is not OFF.",
+      "fields": {
+        "applicable": "boolean",
+        "mode": "OFF|ADVISORY|BET_AUTHORITY",
+        "availability": "AVAILABLE|PARTIAL|UNAVAILABLE|OFF|NOT_APPLICABLE",
+        "originatedCandidate": "boolean",
+        "contribution": "NONE|ADVISORY_ONLY|CORE_FAIR_INPUT|BET_ORIGINATOR",
+        "waltersFair": "number|string|null",
+        "coreFairBeforeWalters": "number|string|null",
+        "coreFairAfterWalters": "number|string|null",
+        "comparisonState": "ALIGNED|MIXED|CONFLICT|NOT_COMPARABLE|UNAVAILABLE|OFF",
+        "reviewImpact": "concise effect on review",
+        "betRationale": "required for Walters-originated candidate",
+        "proposedMarket": "required for Walters-originated candidate",
+        "proposedSelection": "required for Walters-originated candidate",
+        "sourceAsOf": "required timestamp for Walters-originated candidate",
+        "generatedAt": "required timestamp for Walters-originated candidate"
+      },
+      "rule": "BET_AUTHORITY may originate an eligible NFL spread/moneyline candidate, but the final recommendation must still pass Core 1.4 model-error and all normal Betting Edge hard gates. Walters is at most one independent handicap input."
+    }
   },
   "boundaries": {
     "issuedRunnerPayloadChangedForSidecar": false,
