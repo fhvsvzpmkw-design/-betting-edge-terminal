@@ -150,6 +150,7 @@
     "sidecarField": "coverageAudit",
     "requiredFrom": "2026-09-02T08:00:00-07:00",
     "state": "COMPLETE",
+    "validatorPath": "tools/major-sport-market-coverage-gate.mjs",
     "sportKeys": ["MLB", "NHL", "NBA_WNBA", "NFL", "NCAAF", "CFL"],
     "primarySelectionsPerGame": 6,
     "availabilityReasonCodes": [
@@ -159,16 +160,50 @@
       "PRIMARY_LINE_UNRESOLVED",
       "INCOMPLETE_TWO_SIDED_MARKET"
     ],
+    "fieldContract": {
+      "topLevel": [
+        "schema",
+        "authorityId",
+        "authorityPath",
+        "authorityBlobSha",
+        "state",
+        "feedGeneratedAt",
+        "evaluationOrder",
+        "sports",
+        "availabilityLimitations",
+        "presentation",
+        "totals",
+        "complete"
+      ],
+      "sportRow": ["gamesInScope", "gamesEvaluated", "primary", "props"],
+      "primary": ["required", "evaluated", "unavailable"],
+      "props": ["returned", "screened", "seriousDeepReviewed"],
+      "availabilityLimitation": ["eventId", "sport", "marketDetail", "selections", "reason"],
+      "presentation": ["target", "targetIsSoft", "overflowProtection", "actionableSuppressedByTarget"],
+      "totals": [
+        "gamesInScope",
+        "gamesEvaluated",
+        "primaryRequired",
+        "primaryEvaluated",
+        "primaryUnavailable",
+        "propsReturned",
+        "propsScreened",
+        "seriousPropsDeepReviewed"
+      ]
+    },
     "rules": [
+      "Use the current Git blob SHA of this authority file as coverageAudit.authorityBlobSha; never copy an older SHA.",
+      "coverageAudit.feedGeneratedAt must exactly equal report.feedGeneratedAt.",
       "Every sport key is present even when its game count is zero.",
       "gamesEvaluated equals gamesInScope because checking an unavailable market is still an evaluation.",
       "primary.required equals gamesInScope multiplied by six.",
       "primary.evaluated plus primary.unavailable equals primary.required.",
       "Every unavailable primary selection is represented exactly once in availabilityLimitations.",
       "props.screened equals props.returned; deeper research is recorded separately as props.seriousDeepReviewed.",
-      "presentation.targetIsSoft and presentation.overflowProtection are true and actionableSuppressedByTarget is zero.",
+      "presentation.target equals the current repository report_card_target; targetIsSoft and overflowProtection are true and actionableSuppressedByTarget is zero.",
       "Totals reconcile exactly with the sum of all sport entries.",
-      "complete is true only after the full sweep precedes card selection."
+      "complete is true only after the full sweep precedes card selection.",
+      "Before staging, execute or reproduce the exact deterministic checks in tools/major-sport-market-coverage-gate.mjs; do not stage a candidate that would fail them."
     ]
   },
   "completion": {
