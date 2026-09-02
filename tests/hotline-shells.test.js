@@ -6,7 +6,7 @@ const shellManifest=json('data/hotline-shells.json');assert(shellManifest.schema
 const expected={
 'eddie-numbers':['muddy-ledger-desk','syndicates/generated/eddie-numbers/hotline.html','MUDDY NUMBERS',3],
 'bill-weston':['private-sheet','syndicates/downtown-booth/shell.html','BILL WESTON // PRIVATE SHEET',1],
-'larry-lombardo':['lizard-line','syndicates/lock-line/shell-v2.html','THE LIZARD LINE!!!',2],
+'larry-lombardo':['lizard-line','syndicates/lock-line/shell-v2.html','The Lizard Line!!!',2],
 'jesse-bains':['delphoria-nfl-book','syndicates/death-angel/shell-v3.html','NFL BOOK // GRAHAM SHEET',3],
 'lou-vega':['vegas-by-the-slice','syndicates/generated/lou-vega/shell-v3.html','VEGAS BY THE SLICE',3]};
 for(const [characterId,[id,file,fingerprint,version]] of Object.entries(expected)){const shell=shellManifest.shells.find(x=>x.characterId===characterId&&x.id===id&&x.defaultForCharacter===true);assert(shell,`Missing default shell registry entry for ${characterId}`);assert(shell.version===version&&shell.status==='locked',`${characterId} current shell must be locked v${version}`);assert(shell.portable===true&&shell.installable===true,`${characterId} shell must be portable/installable`);assert(fs.existsSync(path.join(ROOT,file)),`Missing ${file}`);assert(read(file).includes(fingerprint),`${characterId} shell fingerprint missing`)}
