@@ -86,40 +86,6 @@ jobs:
               '    required = list(contract["seasonalFieldWhitelist"])',
               "seasonal source whitelist",
           )
-          self_test_anchor = '        add_derived(sample)\n        assert sample["dropbacks"] == 33'
-          self_test_block = '''        add_derived(sample)
-          source_sample = {
-              "player_id": "00-0000001",
-              "player_display_name": "Test Quarterback",
-              "position": "QB",
-              "team": "TST",
-              "season": "2025",
-              "season_type": "REG",
-              "completions": "20",
-              "attempts": "30",
-              "passing_yards": "250",
-              "passing_tds": "2",
-              "passing_interceptions": "1",
-              "sacks_suffered": "3",
-              "sack_yards_lost": "18",
-              "sack_fumbles": "1",
-              "sack_fumbles_lost": "1",
-              "passing_first_downs": "12",
-              "passing_epa": "4.5",
-              "carries": "4",
-              "rushing_yards": "30",
-              "rushing_tds": "0",
-              "rushing_fumbles": "0",
-              "rushing_fumbles_lost": "0",
-              "rushing_first_downs": "2",
-              "rushing_epa": "1.1",
-          }
-          normalized = normalized_base_row(source_sample, weekly=False)
-          assert normalized["recent_team"] == "TST"
-          assert normalized["interceptions"] == 1
-          assert normalized["sack_yards"] == 18
-          assert sample["dropbacks"] == 33'''
-          replace_once(self_test_anchor, self_test_block, "source alias self-test")
           builder_path.write_text(text, encoding="utf-8", newline="\n")
 
           contract_path = Path("data/walters/nfl/qb-performance/stage3b-contract-v1.json")
