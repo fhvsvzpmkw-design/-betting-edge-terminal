@@ -1,0 +1,60 @@
+{
+  "state": "PASS",
+  "step": 1,
+  "name": "HEAT_CALIBRATION",
+  "mode": "READ_ONLY_DECISION_LOCK",
+  "productionChanged": false,
+  "period": {
+    "start": "2026-08-15",
+    "end": "2026-09-01",
+    "reports": 85,
+    "dates": 18
+  },
+  "preservedCoreFormula": {
+    "magnitudeAnchor": 0.03,
+    "magnitudeWeight": 40,
+    "breadthWeight": 25,
+    "thresholdActivityWeight": 20,
+    "disagreementMaxWeight": 15
+  },
+  "problem": "The current Heat formula gives the full disagreement contribution whenever Agreement confidence is merely greater than zero, allowing weak Agreement evidence to add as much as strongly supported Agreement evidence.",
+  "selectedVariant": {
+    "id": "HEAT_CONFIDENCE_50_SQRT_50",
+    "rule": "If Agreement confidence is zero, disagreement Heat contribution is zero. Otherwise multiply the existing disagreement contribution by 0.50 + 0.50 * sqrt(AgreementConfidence / 100).",
+    "formula": "Heat = clamp((avgMagnitude / 0.03) * 40 + breadth * 25 + thresholdActivity * 20 + disagreementDispersion * 15 * confidenceFactor, 0, 100)",
+    "confidenceFactor": "confidence == 0 ? 0 : 0.50 + 0.50 * sqrt(confidence / 100)"
+  },
+  "selectionResults": {
+    "correlationToCurrent": 0.99909,
+    "meanAbsoluteHeatChange": 1.4258,
+    "lowConfidenceReports": 26,
+    "lowConfidenceMeanHeatReduction": 2.0997,
+    "adequateConfidenceReports": 35,
+    "adequateConfidenceMeanHeatReduction": 1.903,
+    "currentHighSaturationCount": 8,
+    "selectedHighSaturationCount": 6,
+    "currentLowSaturationCount": 5,
+    "selectedLowSaturationCount": 6,
+    "classificationChangesUsingCurrent40_55Thresholds": 4,
+    "classificationChangeDirection": "MEDIUM_TO_LOW_ONLY"
+  },
+  "rejectedVariants": {
+    "LINEAR_CONFIDENCE": "Over-corrected; correlation 0.99231 and mean reductions exceeded target.",
+    "SQRT_CONFIDENCE": "Still over-corrected; low-confidence mean reduction 4.1994 and adequate-confidence reduction 3.8059.",
+    "25_FLOOR_75_SQRT": "Low-confidence correction acceptable, but adequate-confidence mean reduction 2.8544 exceeded the 2-point preservation limit.",
+    "50_FLOOR_50_LINEAR": "Adequate-confidence mean reduction 3.1065 exceeded the preservation limit.",
+    "75_FLOOR_25_LINEAR": "Preserved the current formula very closely but low-confidence correction of 1.4297 points was below the calibration target."
+  },
+  "decisionCriteria": {
+    "minimumCorrelationToCurrent": 0.995,
+    "targetLowConfidenceMeanReductionPoints": [1.5, 3.5],
+    "maximumAdequateConfidenceMeanReductionPoints": 2.0,
+    "preferFewThresholdClassChanges": true,
+    "doNotIncreaseHighSaturation": true
+  },
+  "nextStep": "PRESSURE_CALIBRATION",
+  "notes": [
+    "This locks the Step 1 calibration decision only; the live terminal Heat formula remains unchanged until the production rollout step.",
+    "Final Heat LOW/MEDIUM/HIGH thresholds remain intentionally undecided until all three meters are calibrated and the combined VIG Meter is recalibrated."
+  ]
+}
