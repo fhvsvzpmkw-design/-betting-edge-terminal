@@ -35,9 +35,9 @@ jobs:
         run: node tests/report-event-eligibility.test.mjs
       - name: Confirm publisher contains eligibility gate
         run: |
-          grep -F "node tools/report-event-eligibility.mjs validate --report /tmp/report.json" .github/workflows/report-history-staged.yml
-          grep -F "node tools/report-event-eligibility.mjs validate --report \"$REPORT_PATH\"" .github/workflows/report-history-staged.yml
+          grep -F 'node tools/report-event-eligibility.mjs validate --report /tmp/report.json' .github/workflows/report-history-staged.yml
+          grep -F 'node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"' .github/workflows/report-history-staged.yml
       - name: Confirm schedule authority requires same-day policy
         run: |
-          grep -F "data/report-event-eligibility-v1.json" BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
-          grep -F "Do not backfill an undersized board with next-day events." BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
+          grep -F 'data/report-event-eligibility-v1.json' BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
+          grep -F 'Do not backfill an undersized board with next-day events.' BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
