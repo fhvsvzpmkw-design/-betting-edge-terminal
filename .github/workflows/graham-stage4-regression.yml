@@ -1,0 +1,119 @@
+name: Graham Stage 4 regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-stage4-regression.yml
+      - data/walters/nfl/graham-stage4-regression-policy-v1.json
+      - tests/graham-stage4-regression.test.mjs
+      - tests/graham-fair-decomposition.test.mjs
+      - tests/graham-schedule-authority.test.mjs
+      - tests/fixtures/graham-research-completion-no-change.json
+      - tools/validate-graham-research-completion.mjs
+      - tools/apply-graham-personnel-staging.mjs
+      - tools/graham-fair-decomposition.mjs
+      - tools/graham-schedule-authority.mjs
+      - tools/graham-active-week.mjs
+      - tools/capture-graham-daily-pinnacle.mjs
+      - data/walters/nfl/personnel-production-current.json
+      - data/walters/nfl/player-values/stage2-current.json
+      - data/walters/nfl/stage3/stage3-current.json
+      - data/walters/nfl/player-values/player-values-2026-v1.json
+      - data/walters/nfl/personnel-calibration-v1.json
+      - data/walters/nfl/graham-fair-decomposition-policy-v1.json
+      - data/walters/nfl/graham-schedule-authority-v1.json
+  workflow_dispatch:
+
+concurrency:
+  group: graham-stage4-regression
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run six-case gate and publish verified receipt
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            TESTED_SHA="$(git rev-parse HEAD)"
+            node --check tests/graham-stage4-regression.test.mjs
+            node tests/graham-stage4-regression.test.mjs | tee /tmp/graham-stage4.log
+            grep -q 'GRAHAM STAGE 4 REGRESSION: PASS // 6/6' /tmp/graham-stage4.log
+
+            export TESTED_SHA
+            node - <<'NODE'
+          const fs=require('node:fs');
+          const result={
+            schema:1,
+            policyId:'graham-stage4-regression-v1',
+            state:'PASS',
+            testedCommit:process.env.TESTED_SHA,
+            testedAt:new Date().toISOString(),
+            marketViewed:false,
+            cases:[
+              {caseKey:'NO_CHANGE_RUN',result:'PASS'},
+              {caseKey:'PERSONNEL_CHANGE',result:'PASS'},
+              {caseKey:'SUMMARY_ARITHMETIC',result:'PASS'},
+              {caseKey:'SCHEDULE_INHERITANCE',result:'PASS'},
+              {caseKey:'MARKET_ISOLATION',result:'PASS'},
+              {caseKey:'DOUBLE_COUNT_PROTECTION',result:'PASS'}
+            ],
+            nextGate:'STAGE_5_PRODUCTION_VERIFICATION'
+          };
+          fs.writeFileSync('data/walters/nfl/graham-stage4-regression-current.json',JSON.stringify(result,null,2)+'\n');
+          NODE
+
+            git add -- data/walters/nfl/graham-stage4-regression-current.json
+            git commit -m "Verify Graham Stage 4 regression" || true
+            if git diff HEAD^ --quiet -- data/walters/nfl/graham-stage4-regression-current.json 2>/dev/null; then
+              echo "No Stage 4 receipt change to publish."
+              exit 0
+            fi
+            if git push origin HEAD:main; then
+              echo "Graham Stage 4 regression receipt published on attempt $attempt."
+              exit 0
+            fi
+            echo "Stage 4 receipt publish collision on attempt $attempt; rerunning all six tests against latest main."
+          done
+
+          echo "Graham Stage 4 regression could not publish a verified receipt after 4 attempts." >&2
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Graham Stage 4 regression"
+            echo
+            echo "- Required cases: 6"
+            echo "- No-change run: completion/read-back fixture"
+            echo "- Personnel change: real production calculator in isolated temporary repository state"
+            echo "- Summary arithmetic: governed fair-decomposition validation"
+            echo "- Schedule inheritance: board + research-ledger single-manifest validation"
+            echo "- Market isolation: marketViewed rejection + Pinnacle capture write-boundary check"
+            echo "- Double count: stable caseKey recomputation + processed-batch idempotency"
+            echo "- Live Week 1 files mutated by regression test: no"
+          } >> "$GITHUB_STEP_SUMMARY"
