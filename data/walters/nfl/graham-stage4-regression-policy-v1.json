@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "policyId": "graham-stage4-regression-v1",
+  "state": "ACTIVE_REGRESSION",
+  "purpose": "Require a six-case regression gate before Graham production verification may begin.",
+  "cases": [
+    {
+      "caseKey": "NO_CHANGE_RUN",
+      "requirement": "A scheduled Graham run may record NO_MATERIAL_CHANGE, must still leave a durable completion sweep, and must not fabricate rating or matchup movement."
+    },
+    {
+      "caseKey": "PERSONNEL_CHANGE",
+      "requirement": "A resolved governed personnel loss must move only the game-specific personnel overlay and fair through the production calculator, without changing the carried neutral team base."
+    },
+    {
+      "caseKey": "SUMMARY_ARITHMETIC",
+      "requirement": "Generated fair decomposition and researchSummary must exactly reconcile neutral base, home field, personnel, matchup and other governed adjustments to exact and displayed Graham fairs."
+    },
+    {
+      "caseKey": "SCHEDULE_INHERITANCE",
+      "requirement": "The active current-number board and active weekly research ledger must inherit cadence from graham-schedule-metadata-v1 and schedule synchronization must not mutate games or research sweeps."
+    },
+    {
+      "caseKey": "MARKET_ISOLATION",
+      "requirement": "Research/personnel production must reject marketViewed=true and the Pinnacle capture path may write only the market-comparison ledger, never Graham current numbers."
+    },
+    {
+      "caseKey": "DOUBLE_COUNT_PROTECTION",
+      "requirement": "Reprocessing the same personnel case under a new event/batch must recompute the complete current overlay rather than stack the loss, and replaying an already processed batch must be idempotent."
+    }
+  ],
+  "passRule": "All six cases must pass in one repository workflow run against the same main-branch revision.",
+  "nextGate": "STAGE_5_PRODUCTION_VERIFICATION",
+  "marketViewed": false
+}
