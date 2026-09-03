@@ -1,0 +1,446 @@
+{
+  "schemaVersion": "walters-bw6-stage2-model-lock-v1",
+  "module": "WALTERS_KEY_NUMBER_AND_HALF_POINT_VALUE",
+  "stage": "BW6.2",
+  "status": "MODEL_SELECTED_AND_LOCKED_HOLDOUT_UNOPENED_NON_OPERATIONAL",
+  "generatedAt": "2026-09-03T04:19:04Z",
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketViewed": false,
+  "holdoutViewed": false,
+  "holdoutOutcomeFieldsRead": false,
+  "stage1Contract": "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json",
+  "stage1ContractSha256": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f",
+  "sourceSnapshot": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+  "sourceSnapshotSha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+  "builder": "tools/build-walters-bw6-stage2.py",
+  "builderSha256": "f943cda2a77f02cea2cf5e859ddff218113fdbd5c79e74da57d4161be5931339",
+  "orientationMethod": {
+    "method": "ROLLING_RIDGE_PAIRWISE_TEAM_STRENGTH",
+    "marketInputsAllowed": false,
+    "lookbackEligibleSeasons": 2,
+    "currentSeasonPriorGamesIncluded": true,
+    "ridgePenalty": 8,
+    "domesticHomeAdvantagePoints": 2.082,
+    "neutralHomeAdvantagePoints": 0,
+    "excludedOutcomeSeasons": [
+      2020
+    ],
+    "chronology": "For each target week, fit ratings from completed eligible games strictly before that week's first kickoff. Center team ratings to zero, then add the locked location value to obtain predicted home margin.",
+    "orientationRule": {
+      "predictedHomeMarginAboveZero": "HOME_FAVORITE",
+      "predictedHomeMarginBelowZero": "AWAY_FAVORITE",
+      "predictedHomeMarginEqualZero": "SPLIT_ORIENTATION_HALF_WEIGHT_EACH_SIDE"
+    },
+    "observedCategoryRule": "After orientation is sealed, a game enters exact category N only when the independently projected favorite wins by exactly N points. Favorite losses, ties and favorite wins outside 1-18 enter OTHER.",
+    "independenceRule": "Actual target-game scores, future games and every sportsbook field are unavailable when favorite identity is assigned."
+  },
+  "candidateSelection": {
+    "candidates": [
+      {
+        "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+        "folds": [
+          {
+            "validationSeason": 2019,
+            "games": 256,
+            "multiclassLogLoss": 2.052347233,
+            "multiclassBrierScore": 0.713861855,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018
+            ],
+            "trainingGames": 1024,
+            "effectiveTrainingGames": 1024.0
+          },
+          {
+            "validationSeason": 2023,
+            "games": 272,
+            "multiclassLogLoss": 1.89768096,
+            "multiclassBrierScore": 0.682938262,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018,
+              2019,
+              2021,
+              2022
+            ],
+            "trainingGames": 1823,
+            "effectiveTrainingGames": 1823.0
+          },
+          {
+            "validationSeason": 2024,
+            "games": 272,
+            "multiclassLogLoss": 2.014442944,
+            "multiclassBrierScore": 0.716723138,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018,
+              2019,
+              2021,
+              2022,
+              2023
+            ],
+            "trainingGames": 2095,
+            "effectiveTrainingGames": 2095.0
+          }
+        ],
+        "aggregate": {
+          "games": 800.0,
+          "gameWeightedMeanLogLoss": 1.986873242,
+          "gameWeightedMeanBrierScore": 0.704320669
+        }
+      },
+      {
+        "modelId": "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "folds": [
+          {
+            "validationSeason": 2019,
+            "games": 256,
+            "multiclassLogLoss": 2.052347233,
+            "multiclassBrierScore": 0.713861855,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018
+            ],
+            "trainingGames": 1024,
+            "effectiveTrainingGames": 1024.0
+          },
+          {
+            "validationSeason": 2023,
+            "games": 272,
+            "multiclassLogLoss": 1.903173611,
+            "multiclassBrierScore": 0.682998506,
+            "trainingSeasons": [
+              2018,
+              2019,
+              2021,
+              2022
+            ],
+            "trainingGames": 1055,
+            "effectiveTrainingGames": 1055.0
+          },
+          {
+            "validationSeason": 2024,
+            "games": 272,
+            "multiclassLogLoss": 2.006385156,
+            "multiclassBrierScore": 0.716675167,
+            "trainingSeasons": [
+              2019,
+              2021,
+              2022,
+              2023
+            ],
+            "trainingGames": 1071,
+            "effectiveTrainingGames": 1071.0
+          }
+        ],
+        "aggregate": {
+          "games": 800.0,
+          "gameWeightedMeanLogLoss": 1.986001095,
+          "gameWeightedMeanBrierScore": 0.704324842
+        }
+      },
+      {
+        "modelId": "BW6_EXPONENTIAL_SEASON_DECAY_HL4",
+        "folds": [
+          {
+            "validationSeason": 2019,
+            "games": 256,
+            "multiclassLogLoss": 2.055705857,
+            "multiclassBrierScore": 0.714149157,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018
+            ],
+            "trainingGames": 1024,
+            "effectiveTrainingGames": 987.343105
+          },
+          {
+            "validationSeason": 2023,
+            "games": 272,
+            "multiclassLogLoss": 1.900553919,
+            "multiclassBrierScore": 0.683025252,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018,
+              2019,
+              2021,
+              2022
+            ],
+            "trainingGames": 1823,
+            "effectiveTrainingGames": 1548.405397
+          },
+          {
+            "validationSeason": 2024,
+            "games": 272,
+            "multiclassLogLoss": 2.012425272,
+            "multiclassBrierScore": 0.716736236,
+            "trainingSeasons": [
+              2015,
+              2016,
+              2017,
+              2018,
+              2019,
+              2021,
+              2022,
+              2023
+            ],
+            "trainingGames": 2095,
+            "effectiveTrainingGames": 1721.664917
+          }
+        ],
+        "aggregate": {
+          "games": 800.0,
+          "gameWeightedMeanLogLoss": 1.988238799,
+          "gameWeightedMeanBrierScore": 0.704446636
+        }
+      }
+    ],
+    "selectionAudit": {
+      "minimumCandidateBrierScore": 0.704320669,
+      "brierEligibilityTolerance": 0.001,
+      "minimumEligibleLogLoss": 1.986001095,
+      "logLossTieTolerance": 0.002,
+      "brierEligibleModelIds": [
+        "BW6_FULL_DEVELOPMENT_POOL",
+        "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "BW6_EXPONENTIAL_SEASON_DECAY_HL4"
+      ],
+      "logLossTieModelIds": [
+        "BW6_FULL_DEVELOPMENT_POOL",
+        "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS"
+      ],
+      "priorityOrder": [
+        "BW6_FULL_DEVELOPMENT_POOL",
+        "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "BW6_EXPONENTIAL_SEASON_DECAY_HL4"
+      ],
+      "selectedModelId": "BW6_FULL_DEVELOPMENT_POOL"
+    }
+  },
+  "selectedModel": {
+    "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+    "eligibleSeasons": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "seasonWeights": {
+      "2015": 1.0,
+      "2016": 1.0,
+      "2017": 1.0,
+      "2018": 1.0,
+      "2019": 1.0,
+      "2021": 1.0,
+      "2022": 1.0,
+      "2023": 1.0,
+      "2024": 1.0
+    },
+    "rawGames": 2367,
+    "weightedGames": 2367.0,
+    "effectiveGames": 2367.0,
+    "smoothing": {
+      "method": "JEFFREYS_DIRICHLET",
+      "alphaPerCategory": 0.5,
+      "categoryCount": 19,
+      "formula": "probability(category) = (weightedCategoryCount + 0.5) / (weightedEligibleGames + 9.5)"
+    },
+    "frozenCategoryProbabilities": {
+      "1": 0.01956659,
+      "2": 0.021249737,
+      "3": 0.085630128,
+      "4": 0.023353671,
+      "5": 0.024195245,
+      "6": 0.037660425,
+      "7": 0.051967179,
+      "8": 0.030507048,
+      "9": 0.011571639,
+      "10": 0.029665474,
+      "11": 0.011150852,
+      "12": 0.012413213,
+      "13": 0.011150852,
+      "14": 0.032610983,
+      "15": 0.011150852,
+      "16": 0.01956659,
+      "17": 0.022512098,
+      "18": 0.01956659,
+      "OTHER": 0.524510835
+    }
+  },
+  "sourceAudit": {
+    "path": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+    "sha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+    "encounteredRows": 3435,
+    "developmentGames": 2367,
+    "contextGames": 256,
+    "holdoutScoreFieldsRead": false,
+    "marketFieldsPresent": false,
+    "skippedRowsByReason": {
+      "2014_SB": 1,
+      "2015_SB": 1,
+      "2016_SB": 1,
+      "2017_SB": 1,
+      "2018_SB": 1,
+      "2019_SB": 1,
+      "2020_REG": 256,
+      "2020_SB": 1,
+      "2021_SB": 1,
+      "2022_SB": 1,
+      "2023_SB": 1,
+      "2024_SB": 1,
+      "2025_REG": 272,
+      "2025_SB": 1,
+      "2026_REG": 272
+    }
+  },
+  "orientationAudit": {
+    "canonicalTeams": [
+      "ARI",
+      "ATL",
+      "BAL",
+      "BUF",
+      "CAR",
+      "CHI",
+      "CIN",
+      "CLE",
+      "DAL",
+      "DEN",
+      "DET",
+      "GB",
+      "HOU",
+      "IND",
+      "JAX",
+      "KC",
+      "LAC",
+      "LAR",
+      "LV",
+      "MIA",
+      "MIN",
+      "NE",
+      "NO",
+      "NYG",
+      "NYJ",
+      "PHI",
+      "PIT",
+      "SEA",
+      "SF",
+      "TB",
+      "TEN",
+      "WAS"
+    ],
+    "developmentObservations": 2367,
+    "bySeason": {
+      "2015": {
+        "games": 256,
+        "homeFavorite": 161,
+        "awayFavorite": 95,
+        "splitOrientation": 0
+      },
+      "2016": {
+        "games": 256,
+        "homeFavorite": 159,
+        "awayFavorite": 97,
+        "splitOrientation": 0
+      },
+      "2017": {
+        "games": 256,
+        "homeFavorite": 168,
+        "awayFavorite": 88,
+        "splitOrientation": 0
+      },
+      "2018": {
+        "games": 256,
+        "homeFavorite": 172,
+        "awayFavorite": 84,
+        "splitOrientation": 0
+      },
+      "2019": {
+        "games": 256,
+        "homeFavorite": 162,
+        "awayFavorite": 94,
+        "splitOrientation": 0
+      },
+      "2021": {
+        "games": 272,
+        "homeFavorite": 168,
+        "awayFavorite": 104,
+        "splitOrientation": 0
+      },
+      "2022": {
+        "games": 271,
+        "homeFavorite": 172,
+        "awayFavorite": 99,
+        "splitOrientation": 0
+      },
+      "2023": {
+        "games": 272,
+        "homeFavorite": 174,
+        "awayFavorite": 98,
+        "splitOrientation": 0
+      },
+      "2024": {
+        "games": 272,
+        "homeFavorite": 179,
+        "awayFavorite": 93,
+        "splitOrientation": 0
+      }
+    },
+    "targetGameScoresUsedForOrientation": false,
+    "futureGamesUsedForOrientation": false,
+    "marketInputsUsed": false
+  },
+  "protectedArtifactSha256Before": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "1349fc548cf0e8492587e738f6bc571c78bd8a5b16d67e038af5f1cddcdd98d4",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "c847397cdd34459d512bd20cac2e2926a7e1b25a3aae657119948a6f62061ba2",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "protectedArtifactSha256After": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "1349fc548cf0e8492587e738f6bc571c78bd8a5b16d67e038af5f1cddcdd98d4",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "c847397cdd34459d512bd20cac2e2926a7e1b25a3aae657119948a6f62061ba2",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "protectedArtifactsUnchanged": true,
+  "nextStage": "BW6.3_2025_HOLDOUT_EVALUATION_WITHOUT_RESELECTION"
+}
