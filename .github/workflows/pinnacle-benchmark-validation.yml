@@ -8,6 +8,10 @@ on:
       - tools/pinnacle-sharp-benchmark.mjs
       - tools/pinnacle-benchmark-publication-gate.mjs
       - tools/oddspapi-observer.mjs
+      - tools/build-graham-current-week.mjs
+      - syndicates/generated/graham-mercer/hotline.html
+      - tests/oddspapi-retention-horizons.test.mjs
+      - tests/graham-terminal-automation.test.mjs
       - .github/workflows/odds-refresh.yml
       - .github/workflows/report-history-staged.yml
       - .github/workflows/pinnacle-benchmark-validation.yml
@@ -19,6 +23,10 @@ on:
       - tools/pinnacle-sharp-benchmark.mjs
       - tools/pinnacle-benchmark-publication-gate.mjs
       - tools/oddspapi-observer.mjs
+      - tools/build-graham-current-week.mjs
+      - syndicates/generated/graham-mercer/hotline.html
+      - tests/oddspapi-retention-horizons.test.mjs
+      - tests/graham-terminal-automation.test.mjs
       - .github/workflows/odds-refresh.yml
       - .github/workflows/report-history-staged.yml
       - .github/workflows/pinnacle-benchmark-validation.yml
@@ -47,6 +55,8 @@ jobs:
         run: |
           node tools/pinnacle-sharp-benchmark.mjs self-test
           node tools/pinnacle-benchmark-publication-gate.mjs self-test
+          node tests/oddspapi-retention-horizons.test.mjs
+          node tests/graham-terminal-automation.test.mjs
       - name: Validate production JSON
         run: |
           node -e "JSON.parse(require('fs').readFileSync('core/core-v1.4-production.json','utf8'));JSON.parse(require('fs').readFileSync('core/pinnacle-sharp-benchmark-v1.4.json','utf8'));console.log('Production JSON valid')"

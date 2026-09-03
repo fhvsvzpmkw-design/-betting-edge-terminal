@@ -41,21 +41,23 @@ main{max-width:1240px;margin:auto;padding:14px 12px 30px}.shell{border:1px solid
 const FEED='../../../data/walters/nfl/current-week-terminal.json';
 const GRAHAM_ATTENTION_GAP=1.5;
 const $=id=>document.getElementById(id);
-function n(v,d=1){return Number.isFinite(Number(v))?Number(v).toFixed(d).replace(/\.0$/,''):'—'}
-function line(v,away,home){if(!Number.isFinite(Number(v)))return'<span class="pending">PENDING</span>';const x=Number(v);if(Math.abs(x)<.001)return'PICK';return x<0?`${home} -${n(Math.abs(x))}`:`${away} -${n(Math.abs(x))}`}
-function signed(v){if(!Number.isFinite(Number(v)))return'<span class="pending">—</span>';const x=Number(v);return`${x>0?'+':''}${n(x)}`}
-function american(v){if(!Number.isFinite(Number(v)))return null;const x=Math.round(Number(v));return`${x>0?'+':''}${x}`}
-function moneylinePair(g){const away=american(g.pinnacleAwayMoneylineAmerican),home=american(g.pinnacleHomeMoneylineAmerican);if(!away||!home)return'<span class="pending">PENDING</span>';return`${away} / ${home}`}
-function watchSide(g){const gap=Number(g.grahamHomeStrengthGap);if(!Number.isFinite(gap)||Math.abs(gap)<GRAHAM_ATTENTION_GAP)return null;return gap>0?g.home:g.away}
+function finiteNumber(v){if(v===null||v===undefined||v==='')return null;const x=Number(v);return Number.isFinite(x)?x:null}
+function n(v,d=1){const x=finiteNumber(v);return x===null?'—':x.toFixed(d).replace(/\.0$/,'')}
+function line(v,away,home){const x=finiteNumber(v);if(x===null)return'<span class="pending">PENDING</span>';if(Math.abs(x)<.001)return'PICK';return x<0?`${home} -${n(Math.abs(x))}`:`${away} -${n(Math.abs(x))}`}
+function signed(v){const x=finiteNumber(v);if(x===null)return'<span class="pending">—</span>';return`${x>0?'+':''}${n(x)}`}
+function american(v){const n=finiteNumber(v);if(n===null)return null;const x=Math.round(n);return`${x>0?'+':''}${x}`}
+function moneylinePair(g){const away=american(g.pinnacleAwayMoneylineAmerican),home=american(g.pinnacleHomeMoneylineAmerican);if(away===null||home===null)return'<span class="pending">PENDING</span>';return`${away} / ${home}`}
+function watchSide(g){const gap=finiteNumber(g.grahamHomeStrengthGap);if(gap===null||Math.abs(gap)<GRAHAM_ATTENTION_GAP)return null;return gap>0?g.home:g.away}
 function governedCandidate(g){const status=String(g?.proposedWager?.status||'').toUpperCase();return status==='VALUE_CANDIDATE'||status==='BET_CANDIDATE'}
-function valueState(g){if(governedCandidate(g))return'QUALIFIED';const gap=Number(g.grahamHomeStrengthGap);if(Number.isFinite(gap)&&Math.abs(gap)>=GRAHAM_ATTENTION_GAP)return'WATCH';return'—'}
+function valueState(g){if(governedCandidate(g))return'QUALIFIED';const gap=finiteNumber(g.grahamHomeStrengthGap);if(gap!==null&&Math.abs(gap)>=GRAHAM_ATTENTION_GAP)return'WATCH';return'—'}
 function valueCell(g){const state=valueState(g);if(state==='—')return'<span class="quiet">—</span>';if(state==='QUALIFIED'){const exact=String(g?.proposedWager?.selection||'').trim();return`<span class="badge qualified">QUALIFIED${exact?` · ${exact}`:''}</span>`}const side=watchSide(g);return`<span class="badge watch">WATCH${side?` · ${side}`:''}</span>`}
 function preferredForm(g){const state=valueState(g);if(state!=='QUALIFIED')return state==='WATCH'?'<span class="pending">PENDING</span>':'<span class="quiet">—</span>';const svm=g.spreadVsMoneyline||{};const preferred=String(svm.preferredExpression||'').toUpperCase();if(preferred==='SPREAD')return'<span class="badge form-badge">SPREAD</span>';if(preferred==='MONEYLINE')return'<span class="badge form-badge">ML</span>';if(preferred==='NO_PREFERENCE')return'<span class="badge form-badge">NO PREF</span>';if(preferred==='UNAVAILABLE'||String(svm.status||'').toUpperCase()==='SPREAD_VS_ML_UNAVAILABLE')return'<span class="pending">UNAVAILABLE</span>';const market=String(g?.proposedWager?.market||'').toLowerCase();if(market==='spread')return'<span class="badge form-badge">SPREAD</span>';if(market==='moneyline')return'<span class="badge form-badge">ML</span>';return'<span class="pending">PENDING</span>'}
-function gapClass(v){if(!Number.isFinite(Number(v))||Number(v)===0)return'';return Number(v)>0?'positive':'negative'}
+function gapClass(v){const x=finiteNumber(v);if(x===null||x===0)return'';return x>0?'positive':'negative'}
 function stamp(v){if(!v)return'PENDING';const d=new Date(v);if(!Number.isFinite(d.getTime()))return String(v);return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(d)+' PT'}
+function marketStamp(data){const status=String(data.marketStatus||'').toLowerCase();if(status&&status!=='ok')return'UNAVAILABLE';return stamp(data.marketObservedAt)}
 function render(data){
   $('weekTitle').textContent=`NFL WEEK ${data.week} // ${data.games?.length||0} GAMES`;
-  $('status').innerHTML=`<span>FEED <b>${stamp(data.generatedAt)}</b></span><span>INFO <b>${stamp(data.lastResearchAt)}</b></span><span>PINNACLE <b>${stamp(data.marketObservedAt)}</b></span><span>STATE <b>${data.state||'UNKNOWN'}</b></span>`;
+  $('status').innerHTML=`<span>FEED <b>${stamp(data.generatedAt)}</b></span><span>INFO <b>${stamp(data.lastResearchAt)}</b></span><span>PINNACLE <b>${marketStamp(data)}</b></span><span>STATE <b>${data.state||'UNKNOWN'}</b></span>`;
   const rows=(data.games||[]).map(g=>`<div class="row"><div class="game">${g.away} @ ${g.home}</div><div class="power">${n(g.awayRating)} / ${n(g.homeRating)}</div><div class="base">${line(g.neutralBaseHome,g.away,g.home)}</div><div class="graham">${line(g.grahamFairHome,g.away,g.home)}</div><div class="pinnacle">${line(g.pinnacleSpreadHome,g.away,g.home)}</div><div class="gap ${gapClass(g.grahamHomeStrengthGap)}">${signed(g.grahamHomeStrengthGap)}</div><div class="value">${valueCell(g)}</div><div class="moneyline">${moneylinePair(g)}</div><div>${signed(g.pinnacleMove)}</div><div class="form">${preferredForm(g)}</div><div class="info">${g.informationStatus||g.numberStatus||'PENDING'}</div></div>`).join('');
   $('board').innerHTML=`<div class="row head"><div>MATCHUP</div><div>POWER A/H</div><div>NEUTRAL</div><div>GRAHAM</div><div>PINNACLE</div><div>GAP</div><div>VALUE</div><div>PIN ML A/H</div><div>MKT Δ</div><div>FORM</div><div>INFO CHECK</div></div>${rows||'<div class="error">NO WEEKLY GAMES</div>'}`;
   const ratings=(data.ratings||[]).slice().sort((a,b)=>Number(b.currentRating)-Number(a.currentRating)||String(a.abbr).localeCompare(String(b.abbr)));
