@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "walters-bw6-stage3r2-contract-v1",
+  "module": "WALTERS_BW6_POINT_WEIGHT_CALIBRATION",
+  "stage": "BW6.3R2",
+  "status": "BW6_3R2_DEVELOPMENT_ONLY_RECALIBRATION_CONTRACT_LOCKED_NON_OPERATIONAL",
+  "generatedAt": "2026-09-03T14:37:15Z",
+  "prospectiveCutoff": {
+    "lockedAt": "2026-09-03T14:37:15Z",
+    "baseCommit": "d7ac56cb83503ca094d414672941bfe0e5b2c93d",
+    "rule": "Every R2 candidate, fold, metric, threshold, selection rule and BW6.4 cycle requirement is fixed before the R2 builder evaluates the expanded development folds.",
+    "evidenceTimestampRule": "Every deterministic R2 evidence output uses this contract's generatedAt timestamp exactly; wall-clock time and prior output content are not inputs."
+  },
+  "authoredAfter2025HoldoutViewed": true,
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketInputsAllowed": false,
+  "purpose": "Select or retain one development-only point-weight candidate for prospective BW6.4 read-only shadow testing without reusing 2025 for fitting, selection or acceptance.",
+  "outcomeUseBoundary": {
+    "developmentSeasons": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "contextOnlySeasons": [
+      2014
+    ],
+    "excludedOutcomeSeasons": [
+      2020,
+      2025,
+      2026
+    ],
+    "season2020Reason": "COVID-era conditions remain structurally excluded.",
+    "season2025Role": "EXPOSED_DIAGNOSTIC_ONLY_ZERO_OUTCOME_ROWS_PASSED_TO_R2_FIT_OR_SELECTION",
+    "season2026Role": "PROSPECTIVE_ZERO_OUTCOME_ROWS_PASSED_TO_R2_FIT_OR_SELECTION",
+    "holdoutOrProspectiveOutcomeRowsUsedForFit": 0,
+    "holdoutOrProspectiveOutcomeRowsUsedForSelection": 0,
+    "priorHoldoutKnownToDesigners": true,
+    "stage3DispositionMayBeOverridden": false,
+    "originalThreePointGateMayBeWaived": false
+  },
+  "sourceSnapshot": {
+    "path": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+    "sha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+    "marketFieldsAllowed": false
+  },
+  "expandedForwardFolds": [
+    {
+      "validationSeason": 2016,
+      "trainingSeasons": [2015]
+    },
+    {
+      "validationSeason": 2017,
+      "trainingSeasons": [2015, 2016]
+    },
+    {
+      "validationSeason": 2018,
+      "trainingSeasons": [2015, 2016, 2017]
+    },
+    {
+      "validationSeason": 2019,
+      "trainingSeasons": [2015, 2016, 2017, 2018]
+    },
+    {
+      "validationSeason": 2021,
+      "trainingSeasons": [2015, 2016, 2017, 2018, 2019]
+    },
+    {
+      "validationSeason": 2022,
+      "trainingSeasons": [2015, 2016, 2017, 2018, 2019, 2021]
+    },
+    {
+      "validationSeason": 2023,
+      "trainingSeasons": [2015, 2016, 2017, 2018, 2019, 2021, 2022]
+    },
+    {
+      "validationSeason": 2024,
+      "trainingSeasons": [2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023]
+    }
+  ],
+  "candidateSpecification": {
+    "categories": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, "OTHER"],
+    "referenceCandidateId": "R2_FULL_DIRICHLET19",
+    "referenceBinding": {
+      "stage2ModelId": "BW6_FULL_DEVELOPMENT_POOL",
+      "stage2CalibrationPath": "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json",
+      "mustRemainByteEquivalent": true
+    },
+    "seasonWeightFamilies": [
+      {
+        "id": "FULL",
+        "stage2ModelId": "BW6_FULL_DEVELOPMENT_POOL",
+        "rule": "Equal game weight for every eligible training season."
+      },
+      {
+        "id": "ROLLING4",
+        "stage2ModelId": "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "rule": "Equal game weight for the four most recent eligible training seasons."
+      },
+      {
+        "id": "EXP_HL4",
+        "stage2ModelId": "BW6_EXPONENTIAL_SEASON_DECAY_HL4",
+        "rule": "Game weight 0.5^(seasonAge/4) over all eligible training seasons."
+      }
+    ],
+    "smoothingFamilies": [
+      {
+        "id": "DIRICHLET19",
+        "rule": "Original 19-category Jeffreys-Dirichlet estimator with alpha 0.5 per category.",
+        "alphaPerCategory": 0.5
+      },
+      {
+        "id": "BETA_DIRICHLET",
+        "rule": "Estimate P(favorite wins by 1-18) with Jeffreys Beta(0.5,0.5), then estimate the conditional 18-margin mix with Jeffreys-Dirichlet alpha 0.5 per margin.",
+        "aggregateAlpha": 0.5,
+        "otherAlpha": 0.5,
+        "conditionalMarginAlpha": 0.5
+      }
+    ],
+    "candidates": [
+      {"candidateId": "R2_FULL_DIRICHLET19", "seasonWeightFamily": "FULL", "smoothingFamily": "DIRICHLET19"},
+      {"candidateId": "R2_ROLLING4_DIRICHLET19", "seasonWeightFamily": "ROLLING4", "smoothingFamily": "DIRICHLET19"},
+      {"candidateId": "R2_EXP_HL4_DIRICHLET19", "seasonWeightFamily": "EXP_HL4", "smoothingFamily": "DIRICHLET19"},
+      {"candidateId": "R2_FULL_BETA_DIRICHLET", "seasonWeightFamily": "FULL", "smoothingFamily": "BETA_DIRICHLET"},
+      {"candidateId": "R2_ROLLING4_BETA_DIRICHLET", "seasonWeightFamily": "ROLLING4", "smoothingFamily": "BETA_DIRICHLET"},
+      {"candidateId": "R2_EXP_HL4_BETA_DIRICHLET", "seasonWeightFamily": "EXP_HL4", "smoothingFamily": "BETA_DIRICHLET"}
+    ],
+    "fixedPriorityOrder": [
+      "R2_FULL_DIRICHLET19",
+      "R2_FULL_BETA_DIRICHLET",
+      "R2_ROLLING4_DIRICHLET19",
+      "R2_ROLLING4_BETA_DIRICHLET",
+      "R2_EXP_HL4_DIRICHLET19",
+      "R2_EXP_HL4_BETA_DIRICHLET"
+    ]
+  },
+  "evaluation": {
+    "multiclassMetrics": ["meanLogLoss", "meanBrierScore"],
+    "aggregateBinaryMetrics": ["meanLogLoss", "meanBrierScore", "meanAbsoluteErrorPercentagePoints", "pooledSignedErrorPercentagePoints"],
+    "metricAggregationRules": {
+      "scoreMetrics": "Weight each validation game's log-loss and Brier contribution equally, equivalent to weighting fold means by validation-game count.",
+      "aggregateMeanAbsoluteAndRootMeanSquareErrors": "Weight each of the eight validation folds equally after computing that fold's aggregate signed error in percentage points.",
+      "pooledSignedAggregateError": "Sum predicted aggregate events and observed aggregate events across all validation games, divide their difference by total validation games, then multiply by 100."
+    },
+    "calculationPrecisionRules": {
+      "gatesDeltasAndSelection": "Use unrounded binary64 calculation values. Rounded serialized fields must never drive eligibility, materiality, ordering or selection.",
+      "halfPointFairCosts": "Compute from the unrounded selected margin probability; serialize the probability to nine decimal places, percentages to six decimal places and monetary exact costs to six decimal places.",
+      "reportedFoldAndAggregateMetrics": "Serialize probability and score metrics to nine decimal places and percentage-point robustness summaries to six decimal places."
+    },
+    "predictiveCompatibility": {
+      "method": "Candidate aggregate probability must fall inside the validation season's Wilson 95% interval.",
+      "minimumCompatibleFolds": 7,
+      "totalFolds": 8
+    },
+    "seasonBlockRobustness": {
+      "leaveOneEligibleSeasonOut": true,
+      "leaveOneEligibleSeasonOutMethod": "For each of the nine development seasons, remove that season from the full eligible-season list and refit the candidate's declared season-weight family; rolling windows may therefore admit the next-most-recent remaining season.",
+      "bootstrapReplicates": 5000,
+      "bootstrapSeed": 20260903,
+      "bootstrapUnit": "eligible season block",
+      "bootstrapMethod": "Sample nine development-season identities with replacement. Reapply the candidate's declared season-weight family to the unique sampled seasons, then multiply each selected family weight by that season's sampled multiplicity.",
+      "bootstrapInterval": [0.025, 0.975],
+      "bootstrapQuantileMethod": "Sort replicate values and linearly interpolate at zero-based position (replicateCount - 1) * probability.",
+      "maximum95HalfWidthDefinition": "The larger of fullEstimate - lowerEndpoint and upperEndpoint - fullEstimate."
+    },
+    "candidateEligibilityThresholds": {
+      "distributionSumTolerance": 1e-9,
+      "maximumMulticlassLogLossWorseThanReference": 0.002,
+      "maximumMulticlassBrierScoreWorseThanReference": 0.001,
+      "maximumAggregateBinaryLogLossWorseThanReference": 0.002,
+      "maximumAggregateBinaryBrierScoreWorseThanReference": 0.001,
+      "maximumAbsolutePooledAggregateErrorPercentagePoints": 2.0,
+      "maximumLeaveOneSeasonOutAggregateRangePercentagePoints": 2.0,
+      "maximumBootstrap95HalfWidthPercentagePoints": 3.0
+    },
+    "materialReplacementThresholds": {
+      "minimumMulticlassLogLossImprovement": 0.005,
+      "minimumMulticlassBrierScoreImprovement": 0.002,
+      "minimumMeanAbsoluteAggregateErrorImprovementPercentagePoints": 0.25,
+      "rule": "A challenger replaces an eligible reference only if it passes every eligibility gate and improves all three listed measures by at least the locked amounts."
+    },
+    "selectionRule": "If the reference is eligible, retain it unless a challenger satisfies every material-replacement threshold. If multiple challengers qualify, sort by multiclass log loss, multiclass Brier score, aggregate mean absolute error and fixed priority. If the reference is ineligible, select the eligible candidate using that same sort. If no candidate is eligible, fail closed.",
+    "referenceRetentionIsPermitted": true,
+    "replacementIsRequired": false
+  },
+  "bw6Stage4ProspectiveShadowPlan": {
+    "authorizedOnlyIfR2Passes": true,
+    "authorizedStage": "BW6.4_PROSPECTIVE_ACTIVE_WEEK_SHADOW",
+    "minimumConsecutiveCleanCycles": 3,
+    "maximumQualifyingCyclesPerPacificCalendarDate": 1,
+    "minimumScheduledCycles": 2,
+    "distinctImmutableInputSnapshotsRequired": true,
+    "minimumChangedActiveWeekOrCurrentNumbersHashes": 1,
+    "identicalManualRerunsCount": false,
+    "failedOrIncompleteCycleResetsConsecutiveCount": true,
+    "cyclePurpose": "Execution stability only; cycles do not provide statistical calibration or production authority.",
+    "threeCycleState": "BW6_4_THREE_CYCLE_SHADOW_VALIDATED_PROSPECTIVE_OUTCOME_GATE_PENDING_NON_OPERATIONAL",
+    "allowedInput": "Current Graham fair margin solely to identify relevant exact-number rows; no sportsbook or recommendation fields.",
+    "allowedOutput": "Read-only side-by-side BOOK-EXACT, Stage 2 and R2 weights and fair half-point costs.",
+    "prohibitedOutput": [
+      "Graham fair mutation",
+      "QB or embedded baseline mutation",
+      "uncertainty-overlay mutation",
+      "weighted advantage",
+      "cross-zero deduction",
+      "star or play threshold",
+      "market normalization",
+      "BET, LEAN, WAIT or PASS mutation",
+      "stake mutation"
+    ]
+  },
+  "priorArtifactManifest": [
+    {"path": ".github/workflows/walters-bw6-stage1.yml", "sha256": "84d1a85a144878233656cf4ae0fb8eefb9e3ed866249ae67fd78c1bd90d317bb"},
+    {"path": ".github/workflows/walters-bw6-stage2.yml", "sha256": "f74e9a8c48227ee977b0997f1fe46fadc2d6fb3a12f271724f1f985be555c2f9"},
+    {"path": ".github/workflows/walters-bw6-stage3.yml", "sha256": "f49f3bbc50859455449fe08a8109f5d1aa44a8e93693e93196fbf6e3eef6a331"},
+    {"path": ".github/workflows/walters-bw6-stage3r1.yml", "sha256": "ba7e06320bb85bbe14f5db793108d068763aff530eebe45b50248a6ad5e145f6"},
+    {"path": "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json", "sha256": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f"},
+    {"path": "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json", "sha256": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897"},
+    {"path": "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json", "sha256": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151"},
+    {"path": "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json", "sha256": "c9fac3870c15b5ac4c780c5777e26997a267b109335669dd0d14d97b427fd51a"},
+    {"path": "data/walters/nfl/key-numbers/bw6-stage3r1-diagnosis-contract-v1.json", "sha256": "70dd281d5699623f936633521ba70f1837b331143a512c10f0a9405bfb9a100b"},
+    {"path": "data/walters/nfl/key-numbers/bw6-stage3r1-recalibration-diagnosis-v1.json", "sha256": "3adfd753fe13ab38f237f9a4d8876feb25e5bd79bb4fbadfbef13a647e214200"},
+    {"path": "tests/walters-bw6-stage1.test.mjs", "sha256": "09f91582c6c5239bc8be4e9b9ae9ef2f659c6d6c691704ec8107078d1e98689a"},
+    {"path": "tests/walters-bw6-stage2.test.mjs", "sha256": "967a0737ed11f966216e24b35e2eb12c3a54410cf74b694eb9f19fe5c756a66b"},
+    {"path": "tests/walters-bw6-stage3.test.mjs", "sha256": "8a91ce0238e362b1926af285db368c4997230f0574245ef58d36c1d017c1d4a1"},
+    {"path": "tests/walters-bw6-stage3r1.test.mjs", "sha256": "d33abef3da8a51bd6ca7f4ea5bfd3aa71d0af7392e1391df219786d42748cad0"},
+    {"path": "tools/build-walters-bw6-stage2.py", "sha256": "f943cda2a77f02cea2cf5e859ddff218113fdbd5c79e74da57d4161be5931339"},
+    {"path": "tools/build-walters-bw6-stage3.py", "sha256": "72db23e7284956a24b66eca14d5ccf3fb7965fe711c88ec1ea01645dfd510075"},
+    {"path": "tools/build-walters-bw6-stage3r1.py", "sha256": "f91a5ca03a1b1602adacfa89ed15df014fd510ca25cc787add668e0cb6d81d2b"},
+    {"path": "tools/validate-walters-bw6-stage1.mjs", "sha256": "f15bf6c356b76d1f31800406ead67a305ce1be679c6aeddf1b590c2f59da2788"},
+    {"path": "tools/validate-walters-bw6-stage2.mjs", "sha256": "02bc79ce4c0f34e9f115ad29a659329bedb3bbf116d01420ab9c005b8fc4cb8c"},
+    {"path": "tools/validate-walters-bw6-stage3.mjs", "sha256": "78cf1f5d69da7dbd6823c7bb2df78702f645d773cbc2b6f0799dbb305b6e847c"},
+    {"path": "tools/validate-walters-bw6-stage3r1.mjs", "sha256": "849c884c8d0457e09cf9b87d1e86169f4113eab75ed5c3183f1a00b5d0da80fa"}
+  ],
+  "protectedArtifacts": [
+    "core/walters-authority-v1.4.json",
+    "core/walters-intelligence-interface-v1.4.json",
+    "data/live-odds.json",
+    "data/walters/nfl/active-week.json",
+    "data/walters/nfl/2026/week-01-current-numbers.json",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json",
+    "data/walters/nfl/current-week-terminal.json",
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/home-field/home-field-production-current.json",
+    "data/walters/nfl/personnel-production-current.json",
+    "data/walters/nfl/matchup-production-current.json",
+    "data/walters/nfl/qb-production-current.json",
+    "data/walters/nfl/qb-production/production-contract-v1.json"
+  ],
+  "protectedArtifactSha256": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "99b7d6c92db9e7743a7cf5f3b41f96aa18c1859026344d1767bf4ac55c95ff0e",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "e99f73c9d418236caac7defa35b0787a9b874ae55f7eaac01cfde7fd05ca546c",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "outcomeStates": {
+    "pass": "BW6_3R2_CANDIDATE_SELECTED_FOR_BW6_4_PROSPECTIVE_SHADOW_ONLY_NON_OPERATIONAL",
+    "freeze": "BW6_3R2_CANDIDATE_AND_PROSPECTIVE_PLAN_HASH_FROZEN",
+    "fail": "BW6_3R2_FAIL_CLOSED_NO_PROSPECTIVE_SHADOW_CANDIDATE",
+    "nextStageOnPass": "BW6.4_PROSPECTIVE_ACTIVE_WEEK_SHADOW",
+    "blockedRegardlessOfPass": ["BW7", "BW8", "PRODUCTION_AUTHORITY"]
+  },
+  "outputs": {
+    "developmentAudit": "data/walters/nfl/key-numbers/bw6-stage3r2-development-audit-v1.json",
+    "modelFreeze": "data/walters/nfl/key-numbers/bw6-stage3r2-model-freeze-v1.json"
+  }
+}

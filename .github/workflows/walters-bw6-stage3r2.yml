@@ -1,0 +1,222 @@
+name: Walters BW6 Stage 3R2 Development Selection
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/walters-bw6-stage1.yml'
+      - '.github/workflows/walters-bw6-stage2.yml'
+      - '.github/workflows/walters-bw6-stage3.yml'
+      - '.github/workflows/walters-bw6-stage3r1.yml'
+      - 'data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv'
+      - 'data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r1-diagnosis-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r1-recalibration-diagnosis-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r2-development-audit-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r2-model-freeze-v1.json'
+      - 'tools/build-walters-bw6-stage2.py'
+      - 'tools/build-walters-bw6-stage3.py'
+      - 'tools/build-walters-bw6-stage3r1.py'
+      - 'tools/build-walters-bw6-stage3r2.py'
+      - 'tools/validate-walters-bw6-stage1.mjs'
+      - 'tools/validate-walters-bw6-stage2.mjs'
+      - 'tools/validate-walters-bw6-stage3.mjs'
+      - 'tools/validate-walters-bw6-stage3r1.mjs'
+      - 'tools/validate-walters-bw6-stage3r2.mjs'
+      - 'tests/walters-bw6-stage1.test.mjs'
+      - 'tests/walters-bw6-stage2.test.mjs'
+      - 'tests/walters-bw6-stage3.test.mjs'
+      - 'tests/walters-bw6-stage3r1.test.mjs'
+      - 'tests/walters-bw6-stage3r2.test.mjs'
+      - '.github/workflows/walters-bw6-stage3r2.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/walters-bw6-stage1.yml'
+      - '.github/workflows/walters-bw6-stage2.yml'
+      - '.github/workflows/walters-bw6-stage3.yml'
+      - '.github/workflows/walters-bw6-stage3r1.yml'
+      - 'data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv'
+      - 'data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r1-diagnosis-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r1-recalibration-diagnosis-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r2-development-audit-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3r2-model-freeze-v1.json'
+      - 'tools/build-walters-bw6-stage2.py'
+      - 'tools/build-walters-bw6-stage3.py'
+      - 'tools/build-walters-bw6-stage3r1.py'
+      - 'tools/build-walters-bw6-stage3r2.py'
+      - 'tools/validate-walters-bw6-stage1.mjs'
+      - 'tools/validate-walters-bw6-stage2.mjs'
+      - 'tools/validate-walters-bw6-stage3.mjs'
+      - 'tools/validate-walters-bw6-stage3r1.mjs'
+      - 'tools/validate-walters-bw6-stage3r2.mjs'
+      - 'tests/walters-bw6-stage1.test.mjs'
+      - 'tests/walters-bw6-stage2.test.mjs'
+      - 'tests/walters-bw6-stage3.test.mjs'
+      - 'tests/walters-bw6-stage3r1.test.mjs'
+      - 'tests/walters-bw6-stage3r2.test.mjs'
+      - '.github/workflows/walters-bw6-stage3r2.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walters-bw6-stage3r2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  select-development-candidate-for-shadow-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout governed revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify locked cutoff and issuance baseline from Git history
+        run: |
+          node - <<'NODE'
+          const crypto = require('node:crypto');
+          const fs = require('node:fs');
+          const {spawnSync} = require('node:child_process');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json', 'utf8'));
+          const base = contract.prospectiveCutoff.baseCommit;
+          const ancestry = spawnSync('git', ['merge-base', '--is-ancestor', base, 'HEAD']);
+          if (ancestry.status !== 0) throw new Error(`locked cutoff ${base} is not an ancestor of HEAD`);
+          for (const [file, expected] of Object.entries(contract.protectedArtifactSha256)) {
+            const historical = spawnSync('git', ['show', `${base}:${file}`], {
+              maxBuffer: 50 * 1024 * 1024,
+            });
+            if (historical.error) throw historical.error;
+            if (historical.status !== 0) throw new Error(`cannot read ${file} at locked cutoff`);
+            const actual = crypto.createHash('sha256').update(historical.stdout).digest('hex');
+            if (actual !== expected) throw new Error(`issuance-baseline mismatch: ${file}`);
+          }
+          console.log('WALTERS BW6 STAGE 3R2 LOCKED ISSUANCE BASELINE: PASS');
+          NODE
+
+      - name: Validate prior BW6 stages at the locked cutoff
+        run: |
+          set -euo pipefail
+          BASE_COMMIT=$(node -p "require('./data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json').prospectiveCutoff.baseCommit")
+          CUTOFF_WORKTREE=$(mktemp -d)
+          git worktree add --detach "$CUTOFF_WORKTREE" "$BASE_COMMIT"
+          trap 'git worktree remove --force "$CUTOFF_WORKTREE"' EXIT
+          (
+            cd "$CUTOFF_WORKTREE"
+            node tools/validate-walters-bw6-stage1.mjs
+            node tools/validate-walters-bw6-stage2.mjs
+            node tools/validate-walters-bw6-stage3.mjs
+            node tools/validate-walters-bw6-stage3r1.mjs
+          )
+          git worktree remove --force "$CUTOFF_WORKTREE"
+          trap - EXIT
+
+      - name: Snapshot prior, protected, source, contract, and release artifacts
+        run: |
+          set -euo pipefail
+          mapfile -t IMMUTABLE < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json', 'utf8'));
+          const paths = new Set([
+            ...contract.priorArtifactManifest.map(item => item.path),
+            ...contract.protectedArtifacts,
+            contract.sourceSnapshot.path,
+            'data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json',
+            'tools/build-walters-bw6-stage3r2.py',
+            'tools/validate-walters-bw6-stage3r2.mjs',
+            'tests/walters-bw6-stage3r2.test.mjs',
+            '.github/workflows/walters-bw6-stage3r2.yml',
+          ]);
+          for (const file of paths) console.log(file);
+          NODE
+          )
+          sha256sum "${IMMUTABLE[@]}" > /tmp/bw6-stage3r2-before.sha256
+
+      - name: Run R2 deterministic helper self-test
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python tools/build-walters-bw6-stage3r2.py --self-test
+
+      - name: Rebuild development-only audit and model freeze
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python tools/build-walters-bw6-stage3r2.py
+
+      - name: Validate R2 audit and shadow-only freeze
+        run: |
+          node --check tools/validate-walters-bw6-stage3r2.mjs
+          node tools/validate-walters-bw6-stage3r2.mjs
+
+      - name: Run BW6 Stage 3R2 guardrail tests
+        run: node --test tests/walters-bw6-stage3r2.test.mjs
+
+      - name: Require deterministic audit and freeze artifacts
+        run: |
+          git ls-files --error-unmatch \
+            data/walters/nfl/key-numbers/bw6-stage3r2-development-audit-v1.json \
+            data/walters/nfl/key-numbers/bw6-stage3r2-model-freeze-v1.json
+          git diff --exit-code -- \
+            data/walters/nfl/key-numbers/bw6-stage3r2-development-audit-v1.json \
+            data/walters/nfl/key-numbers/bw6-stage3r2-model-freeze-v1.json
+          echo "WALTERS BW6 STAGE 3R2 DETERMINISTIC ARTIFACTS: PASS"
+
+      - name: Verify runtime immutability
+        run: |
+          set -euo pipefail
+          mapfile -t IMMUTABLE < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json', 'utf8'));
+          const paths = new Set([
+            ...contract.priorArtifactManifest.map(item => item.path),
+            ...contract.protectedArtifacts,
+            contract.sourceSnapshot.path,
+            'data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json',
+            'tools/build-walters-bw6-stage3r2.py',
+            'tools/validate-walters-bw6-stage3r2.mjs',
+            'tests/walters-bw6-stage3r2.test.mjs',
+            '.github/workflows/walters-bw6-stage3r2.yml',
+          ]);
+          for (const file of paths) console.log(file);
+          NODE
+          )
+          sha256sum "${IMMUTABLE[@]}" > /tmp/bw6-stage3r2-after.sha256
+          diff -u /tmp/bw6-stage3r2-before.sha256 /tmp/bw6-stage3r2-after.sha256
+          echo "WALTERS BW6 STAGE 3R2 RUNTIME IMMUTABILITY: PASS"
+
+      - name: Enforce R2-only pull-request scope
+        if: github.event_name == 'pull_request'
+        env:
+          COMPARE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mapfile -t CHANGED < <(git diff --name-only "$COMPARE_BASE"...HEAD)
+          ALLOWED='^(data/walters/nfl/key-numbers/bw6-stage3r2-(contract|development-audit|model-freeze)-v1\.json|tools/(build-walters-bw6-stage3r2\.py|validate-walters-bw6-stage3r2\.mjs)|tests/walters-bw6-stage3r2\.test\.mjs|\.github/workflows/walters-bw6-stage3r2\.yml)$'
+          for file in "${CHANGED[@]}"; do
+            if [[ ! "$file" =~ $ALLOWED ]]; then
+              echo "Disallowed BW6 Stage 3R2 PR path: $file" >&2
+              exit 1
+            fi
+          done
+          echo "WALTERS BW6 STAGE 3R2 PR SCOPE: PASS"
