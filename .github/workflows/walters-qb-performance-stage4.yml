@@ -1,129 +1,36 @@
-name: Walters QB Performance Stage 4
-# Integrity read-back synchronized across Python and Node.
+name: Walters QB Performance Stage 4 historical readback
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "data/walters/nfl/qb-performance/stage4-contract-v1.json"
-      - "data/walters/nfl/qb-performance/stage4/binding-authority-v1.json"
-      - "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
-      - "data/walters/nfl/qb-performance/stage3-current.json"
-      - "data/walters/nfl/qb-performance/review/stage3d-candidate-review-v1.json"
-      - "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
-      - "data/walters/nfl/active-week.json"
-      - "data/walters/nfl/2026/week-01-current-numbers.json"
-      - "data/walters/nfl/2026/week-01-research-ledger.json"
-      - "data/walters/nfl-power-ratings-ledger.json"
-      - "data/walters/nfl/personnel-production-current.json"
-      - "data/walters/nfl/matchup-production-current.json"
-      - "core/staging/walters-nfl-seed-dataset-2026.json"
-      - "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-      - "tools/build-walters-qb-performance-stage4.py"
-      - "tools/validate-walters-qb-performance-stage4.mjs"
-      - "tests/walters-qb-performance-stage4.test.mjs"
-      - ".github/workflows/walters-qb-performance-stage4.yml"
-  pull_request:
-    paths:
-      - "data/walters/nfl/qb-performance/stage4-contract-v1.json"
-      - "data/walters/nfl/qb-performance/stage4/binding-authority-v1.json"
-      - "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
-      - "data/walters/nfl/qb-performance/stage3-current.json"
-      - "data/walters/nfl/qb-performance/review/stage3d-candidate-review-v1.json"
-      - "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
-      - "data/walters/nfl/active-week.json"
-      - "data/walters/nfl/2026/week-01-current-numbers.json"
-      - "data/walters/nfl/2026/week-01-research-ledger.json"
-      - "data/walters/nfl-power-ratings-ledger.json"
-      - "data/walters/nfl/personnel-production-current.json"
-      - "data/walters/nfl/matchup-production-current.json"
-      - "core/staging/walters-nfl-seed-dataset-2026.json"
-      - "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-      - "tools/build-walters-qb-performance-stage4.py"
-      - "tools/validate-walters-qb-performance-stage4.mjs"
-      - "tests/walters-qb-performance-stage4.test.mjs"
-      - ".github/workflows/walters-qb-performance-stage4.yml"
-
-concurrency:
-  group: walters-qb-performance-stage4-${{ github.ref }}
-  cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-validate-stage4:
+  validate-frozen-stage4:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      - name: Checkout triggering ref
+      - name: Checkout accepted Stage 4 evidence commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
-          fetch-depth: 0
+          ref: 1a8222a1114e3fcfc806fde718c81aaf2b0bfa7f
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: '22'
 
-      - name: Validate accepted Stage 3D handoff
-        run: node tools/validate-walters-qb-performance-stage3d.mjs
-
-      - name: Run Stage 4 deterministic helper tests
-        run: python tools/build-walters-qb-performance-stage4.py --self-test
-
-      - name: Build governed starter bindings and Week 1 shadow board
-        id: stage4_build
-        run: python tools/build-walters-qb-performance-stage4.py
-
-      - name: Validate Stage 4 freeze, bindings, shadow math and handoff
-        id: stage4_validate
-        continue-on-error: true
-        run: node tools/validate-walters-qb-performance-stage4.mjs
-
-      - name: Run Stage 4 guardrail tests
-        id: stage4_tests
-        continue-on-error: true
-        run: node --test tests/walters-qb-performance-stage4.test.mjs
-
-      - name: Publish Stage 4 evidence only after all gates pass on main
-        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.stage4_build.outcome == 'success' && steps.stage4_validate.outcome == 'success' && steps.stage4_tests.outcome == 'success'
+      - name: Validate frozen Stage 4 evidence without rebuilding it
         run: |
           set -euo pipefail
-          git config user.name "betting-edge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- \
-            data/walters/nfl/qb-performance/stage4/freeze-manifest-v1.json \
-            data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json \
-            data/walters/nfl/qb-performance/stage4/shadow-board-v1.json \
-            data/walters/nfl/qb-performance/stage4/uncertainty-reconciliation-v1.json \
-            data/walters/nfl/qb-performance/stage4/rollover-audit-v1.json \
-            data/walters/nfl/qb-performance/stage4/regression-audit-v1.json \
-            data/walters/nfl/qb-performance/stage4-acceptance-v1.json \
-            data/walters/nfl/qb-performance/stage4-current.json
-          if git diff --cached --quiet; then
-            echo "No Stage 4 output changes to publish."
-            exit 0
-          fi
-          git fetch origin main
-          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
-          git commit -m "Validate Walters QB performance Stage 4 shadow integration"
-          git push origin HEAD:main
-
-      - name: Enforce Stage 4 acceptance result
-        if: always()
-        env:
-          STAGE4_BUILD: ${{ steps.stage4_build.outcome }}
-          STAGE4_VALIDATE: ${{ steps.stage4_validate.outcome }}
-          STAGE4_TESTS: ${{ steps.stage4_tests.outcome }}
-        run: |
-          set -euo pipefail
-          test "$STAGE4_BUILD" = "success"
-          test "$STAGE4_VALIDATE" = "success"
-          test "$STAGE4_TESTS" = "success"
+          python tools/build-walters-qb-performance-stage4.py --self-test
+          node tools/validate-walters-qb-performance-stage4.mjs
+          node --test tests/walters-qb-performance-stage4.test.mjs
+          git diff --exit-code

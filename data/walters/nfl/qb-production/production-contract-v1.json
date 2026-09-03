@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "walters-qb-performance-production-contract-v1",
+  "module": "WALTERS_QB_PERFORMANCE",
+  "productionId": "walters-qb-performance-production-v1",
+  "state": "APPROVED_SCOPED_ACTIVATION",
+  "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+  "approvedAt": "2026-09-02T19:16:51-07:00",
+  "approval": {
+    "source": "USER_EXPLICIT_PROJECT_CONVERSATION",
+    "decision": "ACTIVATE_QB_MODEL_SCOPED",
+    "requestedLanguage": "I'd like to activate the qb model I think",
+    "interpretation": "Activate the validated Walters quarterback-performance model for the resolved production scope while retaining every previously agreed fail-closed and betting-control boundary."
+  },
+  "reviewAuthority": {
+    "stage4Commit": "1a8222a1114e3fcfc806fde718c81aaf2b0bfa7f",
+    "stage5EvidenceCommit": "774df41143140f9c5cdd7d0bb30519c886132f82",
+    "stage5Status": "STAGE5_PRODUCTION_REVIEW_VALIDATED_NON_OPERATIONAL_NFL_READBACK_PENDING",
+    "stage5ReviewCasesPassed": 18,
+    "stage5ReviewCasesFailed": 0,
+    "liveReadbackDisposition": "CONVERT_TO_POST_ACTIVATION_CANARY",
+    "reason": "The model, bindings, formulas, rounding, market isolation and preservation boundaries were validated; the unavailable NFL-bearing Betting Edge readback tests downstream publication integration rather than the accepted Graham calculation."
+  },
+  "sourceAuthority": {
+    "model": {
+      "path": "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+      "sha256": "c45e65b6c6ae93e2060824cd759b1cbf09849093b4b4d9d5fd33aa941f2f9a37"
+    },
+    "candidateRegistry": {
+      "path": "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+      "sha256": "93931681d0e335954fa172d0d4ce25636d2fdbaa089a3d351dd04661d5a91a04"
+    },
+    "starterBaselineBindings": {
+      "path": "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+      "sha256": "e49a410b3c89038c9499abb2da192ca4f5972521ef0a22642a47cdc8230ae3d1"
+    },
+    "shadowBoard": {
+      "path": "data/walters/nfl/qb-performance/stage4/shadow-board-v1.json",
+      "sha256": "65c5ffc241f7ad657b6daaefd515fddb8c8ac59586027b5661cebc88b550d00e"
+    },
+    "uncertaintyReconciliation": {
+      "path": "data/walters/nfl/qb-performance/stage4/uncertainty-reconciliation-v1.json",
+      "sha256": "8402970c2641ba604d6a7f184a03eed75648eb127a40d270ecca5f980a4edaa2"
+    },
+    "stage5Current": {
+      "path": "data/walters/nfl/qb-performance/stage5-current.json",
+      "sha256": "7a63f42f3f82db8ec6aef0d84ff4fb8dbd492993e2d2179a7948c6937b50c66c"
+    },
+    "stage5ProductionReview": {
+      "path": "data/walters/nfl/qb-performance/stage5/production-review-v1.json",
+      "sha256": "4cc0f4daec1b2fc551aa1abc03234e88f24755e315c30f39c714bc40471d0bcf"
+    }
+  },
+  "formula": {
+    "teamQbDelta": "approvedProductionStarterCandidateValue - embeddedBaselineQbPriorValue",
+    "homeSpreadQbPoints": "awayTeamQbDelta - homeTeamQbDelta",
+    "exactFair": "currentGrahamExactFairHome - priorQbPerformancePoints - retiredEligibleStarterIdentityOverlayPoints + homeSpreadQbPoints",
+    "displayRoundingIncrement": 0.5,
+    "supportingCastDoubleCountAllowed": false,
+    "teamRatingDecompositionReconstructionAllowed": false,
+    "marketInputAllowed": false
+  },
+  "productionScope": {
+    "resolvedTeamCount": 31,
+    "excludedTeams": [
+      "ATL"
+    ],
+    "failClosedGameWhenEitherTeamUnresolved": true,
+    "grahamFairWritesAllowed": true,
+    "embeddedBaselineWritesAllowed": false,
+    "carriedTeamRatingWritesAllowed": false,
+    "automaticInSeasonRefitAllowed": false,
+    "starterBindingUpdatesRequireGovernedStaging": true,
+    "candidateOutsideFrozenRegistryAllowed": false
+  },
+  "uncertaintyOverlayReconciliation": {
+    "retireOnlyExplicitlyEligibleStarterIdentityOverlays": true,
+    "preserveOrthogonalAvailabilityAndReentryOverlays": true,
+    "preserveAdjustmentTypes": [
+      "QB_REENTRY",
+      "KC_QB_CLEARANCE"
+    ],
+    "rules": [
+      {
+        "gameKey": "2026-W01-MIA-LV",
+        "team": "LV",
+        "side": "HOME",
+        "adjustmentType": "QB_UNCERTAINTY",
+        "expectedPointsToHomeSpread": 0.5,
+        "disposition": "RETIRE_ON_SCOPED_ACTIVATION"
+      }
+    ]
+  },
+  "marketIsolation": {
+    "marketViewed": false,
+    "marketMaySetOrConfirmQbValue": false,
+    "forbiddenInputs": [
+      "Pinnacle",
+      "Bet365",
+      "DraftKings",
+      "sportsbook consensus",
+      "line movement",
+      "market-implied rating"
+    ]
+  },
+  "bettingBoundary": {
+    "qbLayerMaySetBetStatusDirectly": false,
+    "qbLayerMaySetStake": false,
+    "qbLayerMayBypassCoreGates": false,
+    "existingWaltersAndCoreAuthorityUnchanged": true,
+    "issuedHistoryMayBeRewritten": false
+  },
+  "postActivationCanary": {
+    "required": true,
+    "gate": "FIRST_NFL_BEARING_BETTING_EDGE_READBACK",
+    "initialState": "PENDING",
+    "onMismatch": "FAIL_CLOSED_FOR_AFFECTED_NFL_WALTERS_RECORD_AND_REVIEW_ROLLBACK",
+    "mayDelayGrahamActivation": false
+  },
+  "rollback": {
+    "snapshotRequired": true,
+    "exactPostActivationBoardHashRequiredForAutomaticRollback": true,
+    "laterBoardChangesRequireManualForwardReconciliation": true
+  },
+  "marketViewed": false
+}

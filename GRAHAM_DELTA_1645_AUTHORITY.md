@@ -1,6 +1,6 @@
 # Graham 16:45 Delta Authority
 
-- Authority version: 2.0
+- Authority version: 2.1
 - Status: OPERATIONAL
 - Task key: `DELTA_1645`
 - Timezone: `America/Vancouver`
@@ -42,7 +42,7 @@ Before broad repository loading, Library access, web research, handicapping, per
      "completionResult": null,
      "completionReceipt": null,
      "failure": null,
-     "taskPromptVersion": "graham-delta-1645-v2"
+     "taskPromptVersion": "graham-delta-1645-v2.1"
    }
    ```
 
@@ -102,13 +102,19 @@ Read `data/walters/nfl/matchup-production-current.json`, `data/walters/nfl/match
 
 Exact one-for-one cases remain on the base personnel staging path and may never be duplicated through M4. A verified `VALUE_INVARIANT_COMMITTEE` may use `data/walters/nfl/matchup-production-staging.json` only when at least two included candidates have identical locked values, baseline contributors are explicitly excluded and reviewed, the cluster guard passes, and opponent-specific football review resolves to exactly zero additional matchup points. Require the complete M4 schema and inspect `.github/workflows/graham-matchup-production.yml`; repository code alone owns lookup, arithmetic, unified ledger mutation, overlay recomputation, cluster/double-count checks, rounding, idempotency, and board mutation. Never invent workload shares. Range-only and multi-role committees stay blocked. Every nonzero matchup increment stays blocked until separately shadow-calibrated and accepted. Never copy M2 shadow values into production.
 
-### QB performance layer remains non-operational
+### Operational scoped QB performance production
 
-Read `data/walters/nfl/qb-performance/stage5-current.json` and its activation-readiness manifest before handling a quarterback case. While status remains `STAGE5_PRODUCTION_REVIEW_VALIDATED_NON_OPERATIONAL_NFL_READBACK_PENDING`, `productionAuthority=false`, `grahamWritesAllowed=false`, or `activationAuthorized=false`, the QB performance layer may not change a Graham number, embedded baseline, uncertainty overlay, runtime adapter, wager, or stake. Atlanta remains excluded and fail closed. Las Vegas remains `LV -2.5`, and its `+0.5` starter-identity overlay remains present unless a later explicit governed activation says otherwise. This research task does not itself satisfy the `FIRST_NFL_BEARING_PRODUCTION_READBACK` gate.
+Read `data/walters/nfl/qb-production/production-contract-v1.json`, `data/walters/nfl/qb-production-current.json`, `data/walters/nfl/qb-production-staging.json`, and `.github/workflows/graham-qb-performance-production.yml` before handling a quarterback case. Require production `state=OPERATIONAL_SCOPED`, authority token `APPROVED_WALTERS_QB_PERFORMANCE`, `productionAuthority=true`, `grahamWritesAllowed=true`, and `marketViewed=false`. Require exactly 32 team bindings, no more than 31 currently resolved bindings, and Atlanta permanently excluded and fail closed.
+
+The repository calculator alone owns the production formula: team QB delta equals approved frozen-model starter value minus that team's embedded QB baseline; game points to the home-spread coordinate equal away-team delta minus home-team delta. Never hand-calculate or directly write a QB performance adjustment. Never change embedded QB baselines, carried team ratings, the frozen candidate model, a wager, or a stake. QB production remains market-isolated and cannot bypass Core or Walters betting gates.
+
+Current starter information must be applied when confirmed; the post-activation NFL report canary does not delay Graham maintenance. For a resolved starter already present in the frozen candidate registry, submit a unique schema-1 `READY` QB staging batch with active season/week, team, mutually consistent player ID/name fields, `bindingStatus=RESOLVED_CURRENT_STARTER`, effective timestamp, reason, current non-market source references, and `marketViewed=false`. If the starter becomes unresolved, stage `bindingStatus=FAIL_CLOSED_UNRESOLVED_STARTER`; the workflow preserves the last governed number without guessing until a valid resolution is staged. A player outside the frozen registry remains fail closed. Atlanta cannot be activated through routine staging and requires a later explicit scope amendment even after its starter is named.
+
+Inspect the `Graham QB performance production` workflow for the staging commit/head SHA. After success, re-read the active current-numbers and QB production manifest from remote `main`; require exact active-week identity, the authority token on every eligible game, formula read-back, fair-decomposition synchronization, and `marketViewed=false`. Las Vegas' resolved starter-identity overlay was retired exactly once at activation and its Week 1 activation fair became `LV -3`; do not restore the stale `+0.5` identity term. Preserve orthogonal `QB_REENTRY`, clearance, availability, and other uncertainty terms until their own current evidence and governed authority resolve them. The `FIRST_NFL_BEARING_BETTING_EDGE_READBACK` remains a monitored post-activation publication canary, not a prerequisite for using the current Graham QB calculation.
 
 ## 5. Research record and governed writes
 
-After any successful personnel or M4 publication, re-read the active current-numbers and personnel ledger and use only the durable result. Temporary personnel/matchup overlays never change carried ratings. Preserve `personnelOverlayPointsToHomeSpread`, `personnelBaselineExactFairHome`, H4 fields, and exact-fair decomposition through any separate non-personnel delta.
+After any successful personnel, M4, or QB publication, re-read the active current-numbers and relevant production ledger/manifest and use only the durable result. Temporary personnel/matchup overlays and QB performance differentials never change carried ratings. Preserve `personnelOverlayPointsToHomeSpread`, `personnelBaselineExactFairHome`, H4 fields, QB production fields, and exact-fair decomposition through any separate delta.
 
 Append exactly one scheduled-task delta sweep for this `runEventId` to the active research ledger, even for no material change and even when another production workflow separately appended its own batch sweep. Preserve history for any evidence-backed carried-rating delta. Personnel-driven numeric changes must use their governed workflows. If nothing material changed, preserve every number and record no material change. Read back the active-week authority, H4 manifest, and every changed file; confirm all writes remained in the same active season/week.
 
