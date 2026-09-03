@@ -1,0 +1,2444 @@
+{
+  "schemaVersion": "walters-bw6-stage3r2-development-audit-v1",
+  "module": "WALTERS_BW6_POINT_WEIGHT_CALIBRATION",
+  "stage": "BW6.3R2",
+  "status": "BW6_3R2_CANDIDATE_SELECTED_FOR_BW6_4_PROSPECTIVE_SHADOW_ONLY_NON_OPERATIONAL",
+  "generatedAt": "2026-09-03T14:37:15Z",
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketViewed": false,
+  "weightedAdvantageAllowed": false,
+  "crossZeroDeductionAllowed": false,
+  "marketNormalizationAllowed": false,
+  "r2Contract": "data/walters/nfl/key-numbers/bw6-stage3r2-contract-v1.json",
+  "r2ContractSha256": "8820e1004ff6998e761ea821c37d5612065f2c3f917f2843d138399bef603939",
+  "builder": "tools/build-walters-bw6-stage3r2.py",
+  "builderSha256": "0fb858750d40bdcf01c9909806d89f261cde99e758b09f25f4676eaa0e4bd7eb",
+  "sourceSnapshotSha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+  "priorArtifactSha256": {
+    ".github/workflows/walters-bw6-stage1.yml": "84d1a85a144878233656cf4ae0fb8eefb9e3ed866249ae67fd78c1bd90d317bb",
+    ".github/workflows/walters-bw6-stage2.yml": "f74e9a8c48227ee977b0997f1fe46fadc2d6fb3a12f271724f1f985be555c2f9",
+    ".github/workflows/walters-bw6-stage3.yml": "f49f3bbc50859455449fe08a8109f5d1aa44a8e93693e93196fbf6e3eef6a331",
+    ".github/workflows/walters-bw6-stage3r1.yml": "ba7e06320bb85bbe14f5db793108d068763aff530eebe45b50248a6ad5e145f6",
+    "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f",
+    "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897",
+    "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+    "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json": "c9fac3870c15b5ac4c780c5777e26997a267b109335669dd0d14d97b427fd51a",
+    "data/walters/nfl/key-numbers/bw6-stage3r1-diagnosis-contract-v1.json": "70dd281d5699623f936633521ba70f1837b331143a512c10f0a9405bfb9a100b",
+    "data/walters/nfl/key-numbers/bw6-stage3r1-recalibration-diagnosis-v1.json": "3adfd753fe13ab38f237f9a4d8876feb25e5bd79bb4fbadfbef13a647e214200",
+    "tests/walters-bw6-stage1.test.mjs": "09f91582c6c5239bc8be4e9b9ae9ef2f659c6d6c691704ec8107078d1e98689a",
+    "tests/walters-bw6-stage2.test.mjs": "967a0737ed11f966216e24b35e2eb12c3a54410cf74b694eb9f19fe5c756a66b",
+    "tests/walters-bw6-stage3.test.mjs": "8a91ce0238e362b1926af285db368c4997230f0574245ef58d36c1d017c1d4a1",
+    "tests/walters-bw6-stage3r1.test.mjs": "d33abef3da8a51bd6ca7f4ea5bfd3aa71d0af7392e1391df219786d42748cad0",
+    "tools/build-walters-bw6-stage2.py": "f943cda2a77f02cea2cf5e859ddff218113fdbd5c79e74da57d4161be5931339",
+    "tools/build-walters-bw6-stage3.py": "72db23e7284956a24b66eca14d5ccf3fb7965fe711c88ec1ea01645dfd510075",
+    "tools/build-walters-bw6-stage3r1.py": "f91a5ca03a1b1602adacfa89ed15df014fd510ca25cc787add668e0cb6d81d2b",
+    "tools/validate-walters-bw6-stage1.mjs": "f15bf6c356b76d1f31800406ead67a305ce1be679c6aeddf1b590c2f59da2788",
+    "tools/validate-walters-bw6-stage2.mjs": "02bc79ce4c0f34e9f115ad29a659329bedb3bbf116d01420ab9c005b8fc4cb8c",
+    "tools/validate-walters-bw6-stage3.mjs": "78cf1f5d69da7dbd6823c7bb2df78702f645d773cbc2b6f0799dbb305b6e847c",
+    "tools/validate-walters-bw6-stage3r1.mjs": "849c884c8d0457e09cf9b87d1e86169f4113eab75ed5c3183f1a00b5d0da80fa"
+  },
+  "priorArtifactsUnchanged": true,
+  "outcomeUseAudit": {
+    "developmentSeasonsRead": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "developmentOutcomeRowsRead": 2367,
+    "contextOnlySeasonsUsedForOrientation": [
+      2014
+    ],
+    "season2020OutcomeRowsRead": 0,
+    "season2025OutcomeRowsRead": 0,
+    "season2026OutcomeRowsRead": 0,
+    "holdoutOrProspectiveRowsUsedForFit": 0,
+    "holdoutOrProspectiveRowsUsedForSelection": 0,
+    "priorHoldoutKnownToDesigners": true,
+    "sourceAudit": {
+      "path": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+      "sha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+      "encounteredRows": 3435,
+      "developmentGames": 2367,
+      "contextGames": 256,
+      "holdoutScoreFieldsRead": false,
+      "marketFieldsPresent": false,
+      "skippedRowsByReason": {
+        "2014_SB": 1,
+        "2015_SB": 1,
+        "2016_SB": 1,
+        "2017_SB": 1,
+        "2018_SB": 1,
+        "2019_SB": 1,
+        "2020_REG": 256,
+        "2020_SB": 1,
+        "2021_SB": 1,
+        "2022_SB": 1,
+        "2023_SB": 1,
+        "2024_SB": 1,
+        "2025_REG": 272,
+        "2025_SB": 1,
+        "2026_REG": 272
+      }
+    },
+    "orientationAudit": {
+      "canonicalTeams": [
+        "ARI",
+        "ATL",
+        "BAL",
+        "BUF",
+        "CAR",
+        "CHI",
+        "CIN",
+        "CLE",
+        "DAL",
+        "DEN",
+        "DET",
+        "GB",
+        "HOU",
+        "IND",
+        "JAX",
+        "KC",
+        "LAC",
+        "LAR",
+        "LV",
+        "MIA",
+        "MIN",
+        "NE",
+        "NO",
+        "NYG",
+        "NYJ",
+        "PHI",
+        "PIT",
+        "SEA",
+        "SF",
+        "TB",
+        "TEN",
+        "WAS"
+      ],
+      "developmentObservations": 2367,
+      "bySeason": {
+        "2015": {
+          "games": 256,
+          "homeFavorite": 161,
+          "awayFavorite": 95,
+          "splitOrientation": 0
+        },
+        "2016": {
+          "games": 256,
+          "homeFavorite": 159,
+          "awayFavorite": 97,
+          "splitOrientation": 0
+        },
+        "2017": {
+          "games": 256,
+          "homeFavorite": 168,
+          "awayFavorite": 88,
+          "splitOrientation": 0
+        },
+        "2018": {
+          "games": 256,
+          "homeFavorite": 172,
+          "awayFavorite": 84,
+          "splitOrientation": 0
+        },
+        "2019": {
+          "games": 256,
+          "homeFavorite": 162,
+          "awayFavorite": 94,
+          "splitOrientation": 0
+        },
+        "2021": {
+          "games": 272,
+          "homeFavorite": 168,
+          "awayFavorite": 104,
+          "splitOrientation": 0
+        },
+        "2022": {
+          "games": 271,
+          "homeFavorite": 172,
+          "awayFavorite": 99,
+          "splitOrientation": 0
+        },
+        "2023": {
+          "games": 272,
+          "homeFavorite": 174,
+          "awayFavorite": 98,
+          "splitOrientation": 0
+        },
+        "2024": {
+          "games": 272,
+          "homeFavorite": 179,
+          "awayFavorite": 93,
+          "splitOrientation": 0
+        }
+      },
+      "targetGameScoresUsedForOrientation": false,
+      "futureGamesUsedForOrientation": false,
+      "marketInputsUsed": false
+    }
+  },
+  "orderedDevelopmentObservationSha256": "9e0af3400bc3dcdeee00be2199319e837da22f87375799eefdf3c06aa3594988",
+  "candidateSpecificationSha256": "4becfde18e0dff9ddb70d086d4d3d8506d09f876385c25f22596960ef861aaba",
+  "prospectiveShadowPlanSha256": "e19ad2db934d6e07736b239b3fc313bc75ba05b68bc4051195cbe7d2200ce0ed",
+  "candidateEvaluations": [
+    {
+      "candidateId": "R2_FULL_DIRICHLET19",
+      "seasonWeightFamily": "FULL",
+      "smoothingFamily": "DIRICHLET19",
+      "folds": [
+        {
+          "validationSeason": 2016,
+          "trainingSeasons": [
+            2015
+          ],
+          "games": 256,
+          "observedEvents": 119.0,
+          "aggregatePredictedProbability": 0.497175141,
+          "aggregateObservedProbability": 0.46484375,
+          "aggregateSignedErrorPercentagePoints": 3.233139124,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 40.471729179,
+          "observedWilson95HighPercent": 52.600969811,
+          "multiclassLogLoss": 2.017956465,
+          "multiclassBrierScore": 0.702066675,
+          "aggregateBinaryLogLoss": 0.69276589,
+          "aggregateBinaryBrierScore": 0.249809357
+        },
+        {
+          "validationSeason": 2017,
+          "trainingSeasons": [
+            2015,
+            2016
+          ],
+          "games": 256,
+          "observedEvents": 129.0,
+          "aggregatePredictedProbability": 0.481303931,
+          "aggregateObservedProbability": 0.50390625,
+          "aggregateSignedErrorPercentagePoints": -2.260231903,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 44.305588705,
+          "observedWilson95HighPercent": 56.464111407,
+          "multiclassLogLoss": 2.044960692,
+          "multiclassBrierScore": 0.732114734,
+          "aggregateBinaryLogLoss": 0.694139018,
+          "aggregateBinaryBrierScore": 0.250495606
+        },
+        {
+          "validationSeason": 2018,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017
+          ],
+          "games": 256,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.488745981,
+          "aggregateObservedProbability": 0.48046875,
+          "aggregateSignedErrorPercentagePoints": 0.827723071,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.000876974,
+          "observedWilson95HighPercent": 54.150622465,
+          "multiclassLogLoss": 1.980298491,
+          "multiclassBrierScore": 0.710120101,
+          "aggregateBinaryLogLoss": 0.692521182,
+          "aggregateBinaryBrierScore": 0.249687043
+        },
+        {
+          "validationSeason": 2019,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018
+          ],
+          "games": 256,
+          "observedEvents": 122.0,
+          "aggregatePredictedProbability": 0.486695694,
+          "aggregateObservedProbability": 0.4765625,
+          "aggregateSignedErrorPercentagePoints": 1.013319424,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 41.618039422,
+          "observedWilson95HighPercent": 53.763759905,
+          "multiclassLogLoss": 2.052347233,
+          "multiclassBrierScore": 0.713861855,
+          "aggregateBinaryLogLoss": 0.692253742,
+          "aggregateBinaryBrierScore": 0.249553365
+        },
+        {
+          "validationSeason": 2021,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019
+          ],
+          "games": 272,
+          "observedEvents": 115.0,
+          "aggregatePredictedProbability": 0.484683986,
+          "aggregateObservedProbability": 0.422794118,
+          "aggregateSignedErrorPercentagePoints": 6.188986839,
+          "aggregatePredictionInsideWilson95": false,
+          "observedWilson95LowPercent": 36.556213527,
+          "observedWilson95HighPercent": 48.217648902,
+          "multiclassLogLoss": 1.843542272,
+          "multiclassBrierScore": 0.656599504,
+          "aggregateBinaryLogLoss": 0.688885136,
+          "aggregateBinaryBrierScore": 0.247869608
+        },
+        {
+          "validationSeason": 2022,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021
+          ],
+          "games": 271,
+          "observedEvents": 135.0,
+          "aggregatePredictedProbability": 0.473903298,
+          "aggregateObservedProbability": 0.498154982,
+          "aggregateSignedErrorPercentagePoints": -2.425168344,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 43.906898663,
+          "observedWilson95HighPercent": 55.729255212,
+          "multiclassLogLoss": 2.045801215,
+          "multiclassBrierScore": 0.728217381,
+          "aggregateBinaryLogLoss": 0.694318344,
+          "aggregateBinaryBrierScore": 0.25058474
+        },
+        {
+          "validationSeason": 2023,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022
+          ],
+          "games": 272,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.477489768,
+          "aggregateObservedProbability": 0.452205882,
+          "aggregateSignedErrorPercentagePoints": 2.528388572,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 39.413296016,
+          "observedWilson95HighPercent": 51.160999772,
+          "multiclassLogLoss": 1.89768096,
+          "multiclassBrierScore": 0.682938262,
+          "aggregateBinaryLogLoss": 0.689855292,
+          "aggregateBinaryBrierScore": 0.248354997
+        },
+        {
+          "validationSeason": 2024,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023
+          ],
+          "games": 272,
+          "observedEvents": 132.0,
+          "aggregatePredictedProbability": 0.474221905,
+          "aggregateObservedProbability": 0.485294118,
+          "aggregateSignedErrorPercentagePoints": -1.107221221,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.651915427,
+          "observedWilson95HighPercent": 54.447867893,
+          "multiclassLogLoss": 2.014442944,
+          "multiclassBrierScore": 0.716723138,
+          "aggregateBinaryLogLoss": 0.692960266,
+          "aggregateBinaryBrierScore": 0.249906331
+        }
+      ],
+      "metrics": {
+        "games": 2111,
+        "scoreMetricWeighting": "VALIDATION_GAME_WEIGHTED",
+        "aggregateErrorMetricWeighting": "EQUAL_VALIDATION_FOLD_WEIGHTED",
+        "meanMulticlassLogLoss": 1.985986465,
+        "meanMulticlassBrierScore": 0.705040122,
+        "meanAggregateBinaryLogLoss": 0.692189909,
+        "meanAggregateBinaryBrierScore": 0.249521409,
+        "meanAbsoluteAggregateErrorPercentagePoints": 2.448022312,
+        "rootMeanSquareAggregateErrorPercentagePoints": 2.93848315,
+        "pooledSignedAggregateErrorPercentagePoints": 1.010474868,
+        "maximumAbsoluteAggregateErrorPercentagePoints": 6.188986839,
+        "wilsonCompatibleFolds": 7,
+        "totalFolds": 8
+      },
+      "finalFit": {
+        "eligibleSeasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "seasonWeights": {
+          "2015": 1.0,
+          "2016": 1.0,
+          "2017": 1.0,
+          "2018": 1.0,
+          "2019": 1.0,
+          "2021": 1.0,
+          "2022": 1.0,
+          "2023": 1.0,
+          "2024": 1.0
+        },
+        "rawGames": 2367,
+        "weightedGames": 2367.0,
+        "effectiveGames": 2367.0,
+        "categoryProbabilities": {
+          "1": 0.01956659,
+          "2": 0.021249737,
+          "3": 0.085630128,
+          "4": 0.023353671,
+          "5": 0.024195245,
+          "6": 0.037660425,
+          "7": 0.051967179,
+          "8": 0.030507048,
+          "9": 0.011571639,
+          "10": 0.029665474,
+          "11": 0.011150852,
+          "12": 0.012413213,
+          "13": 0.011150852,
+          "14": 0.032610983,
+          "15": 0.011150852,
+          "16": 0.01956659,
+          "17": 0.022512098,
+          "18": 0.01956659,
+          "OTHER": 0.524510835
+        },
+        "aggregateOneThroughEighteenPercent": 47.548916,
+        "distributionSha256": "4ab2db72d7fb6e5e07d1f127e80a3e654da9cfe79f309ebf4014a521fb2772e0"
+      },
+      "robustness": {
+        "leaveOneEligibleSeasonOut": [
+          {
+            "removedSeason": 2015,
+            "aggregatePercent": 47.4888,
+            "shiftFromFullPercentagePoints": -0.060117
+          },
+          {
+            "removedSeason": 2016,
+            "aggregatePercent": 47.677435,
+            "shiftFromFullPercentagePoints": 0.128518
+          },
+          {
+            "removedSeason": 2017,
+            "aggregatePercent": 47.205848,
+            "shiftFromFullPercentagePoints": -0.343069
+          },
+          {
+            "removedSeason": 2018,
+            "aggregatePercent": 47.4888,
+            "shiftFromFullPercentagePoints": -0.060117
+          },
+          {
+            "removedSeason": 2019,
+            "aggregatePercent": 47.535959,
+            "shiftFromFullPercentagePoints": -0.012958
+          },
+          {
+            "removedSeason": 2021,
+            "aggregatePercent": 48.229983,
+            "shiftFromFullPercentagePoints": 0.681067
+          },
+          {
+            "removedSeason": 2022,
+            "aggregatePercent": 47.257184,
+            "shiftFromFullPercentagePoints": -0.291733
+          },
+          {
+            "removedSeason": 2023,
+            "aggregatePercent": 47.849846,
+            "shiftFromFullPercentagePoints": 0.300929
+          },
+          {
+            "removedSeason": 2024,
+            "aggregatePercent": 47.422191,
+            "shiftFromFullPercentagePoints": -0.126726
+          }
+        ],
+        "leaveOneAggregateMinimumPercent": 47.205848,
+        "leaveOneAggregateMaximumPercent": 48.229983,
+        "leaveOneAggregateRangePercentagePoints": 1.024136,
+        "leaveOneMaximumAbsoluteShiftPercentagePoints": 0.681067,
+        "seasonBlockBootstrap": {
+          "replicates": 5000,
+          "seed": 20260903,
+          "eligibleSeasonBlocks": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "aggregateMeanPercent": 47.57285,
+          "aggregateStandardDeviationPercentagePoints": 0.789434,
+          "aggregate95LowPercent": 45.957436,
+          "aggregate95HighPercent": 48.978732,
+          "maximum95HalfWidthFromFullPercentagePoints": 1.591481
+        }
+      },
+      "eligibilityChecks": [
+        {
+          "id": "DISTRIBUTION",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "POOLED_AGGREGATE_ERROR",
+          "pass": true
+        },
+        {
+          "id": "PREDICTIVE_COMPATIBILITY",
+          "pass": true
+        },
+        {
+          "id": "LEAVE_ONE_SEASON_STABILITY",
+          "pass": true
+        },
+        {
+          "id": "SEASON_BLOCK_BOOTSTRAP_STABILITY",
+          "pass": true
+        }
+      ],
+      "eligible": true,
+      "versusReference": {
+        "multiclassLogLossDelta": 0.0,
+        "multiclassBrierScoreDelta": 0.0,
+        "aggregateMeanAbsoluteErrorDeltaPercentagePoints": 0.0
+      },
+      "materialReplacementChecks": [],
+      "materialReplacementQualified": false
+    },
+    {
+      "candidateId": "R2_ROLLING4_DIRICHLET19",
+      "seasonWeightFamily": "ROLLING4",
+      "smoothingFamily": "DIRICHLET19",
+      "folds": [
+        {
+          "validationSeason": 2016,
+          "trainingSeasons": [
+            2015
+          ],
+          "games": 256,
+          "observedEvents": 119.0,
+          "aggregatePredictedProbability": 0.497175141,
+          "aggregateObservedProbability": 0.46484375,
+          "aggregateSignedErrorPercentagePoints": 3.233139124,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 40.471729179,
+          "observedWilson95HighPercent": 52.600969811,
+          "multiclassLogLoss": 2.017956465,
+          "multiclassBrierScore": 0.702066675,
+          "aggregateBinaryLogLoss": 0.69276589,
+          "aggregateBinaryBrierScore": 0.249809357
+        },
+        {
+          "validationSeason": 2017,
+          "trainingSeasons": [
+            2015,
+            2016
+          ],
+          "games": 256,
+          "observedEvents": 129.0,
+          "aggregatePredictedProbability": 0.481303931,
+          "aggregateObservedProbability": 0.50390625,
+          "aggregateSignedErrorPercentagePoints": -2.260231903,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 44.305588705,
+          "observedWilson95HighPercent": 56.464111407,
+          "multiclassLogLoss": 2.044960692,
+          "multiclassBrierScore": 0.732114734,
+          "aggregateBinaryLogLoss": 0.694139018,
+          "aggregateBinaryBrierScore": 0.250495606
+        },
+        {
+          "validationSeason": 2018,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017
+          ],
+          "games": 256,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.488745981,
+          "aggregateObservedProbability": 0.48046875,
+          "aggregateSignedErrorPercentagePoints": 0.827723071,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.000876974,
+          "observedWilson95HighPercent": 54.150622465,
+          "multiclassLogLoss": 1.980298491,
+          "multiclassBrierScore": 0.710120101,
+          "aggregateBinaryLogLoss": 0.692521182,
+          "aggregateBinaryBrierScore": 0.249687043
+        },
+        {
+          "validationSeason": 2019,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018
+          ],
+          "games": 256,
+          "observedEvents": 122.0,
+          "aggregatePredictedProbability": 0.486695694,
+          "aggregateObservedProbability": 0.4765625,
+          "aggregateSignedErrorPercentagePoints": 1.013319424,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 41.618039422,
+          "observedWilson95HighPercent": 53.763759905,
+          "multiclassLogLoss": 2.052347233,
+          "multiclassBrierScore": 0.713861855,
+          "aggregateBinaryLogLoss": 0.692253742,
+          "aggregateBinaryBrierScore": 0.249553365
+        },
+        {
+          "validationSeason": 2021,
+          "trainingSeasons": [
+            2016,
+            2017,
+            2018,
+            2019
+          ],
+          "games": 272,
+          "observedEvents": 115.0,
+          "aggregatePredictedProbability": 0.485728108,
+          "aggregateObservedProbability": 0.422794118,
+          "aggregateSignedErrorPercentagePoints": 6.293399072,
+          "aggregatePredictionInsideWilson95": false,
+          "observedWilson95LowPercent": 36.556213527,
+          "observedWilson95HighPercent": 48.217648902,
+          "multiclassLogLoss": 1.841019593,
+          "multiclassBrierScore": 0.656641783,
+          "aggregateBinaryLogLoss": 0.689146027,
+          "aggregateBinaryBrierScore": 0.247999939
+        },
+        {
+          "validationSeason": 2022,
+          "trainingSeasons": [
+            2017,
+            2018,
+            2019,
+            2021
+          ],
+          "games": 271,
+          "observedEvents": 135.0,
+          "aggregatePredictedProbability": 0.474511672,
+          "aggregateObservedProbability": 0.498154982,
+          "aggregateSignedErrorPercentagePoints": -2.364330932,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 43.906898663,
+          "observedWilson95HighPercent": 55.729255212,
+          "multiclassLogLoss": 2.044876886,
+          "multiclassBrierScore": 0.728112829,
+          "aggregateBinaryLogLoss": 0.694259912,
+          "aggregateBinaryBrierScore": 0.250555602
+        },
+        {
+          "validationSeason": 2023,
+          "trainingSeasons": [
+            2018,
+            2019,
+            2021,
+            2022
+          ],
+          "games": 272,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.473461719,
+          "aggregateObservedProbability": 0.452205882,
+          "aggregateSignedErrorPercentagePoints": 2.125583676,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 39.413296016,
+          "observedWilson95HighPercent": 51.160999772,
+          "multiclassLogLoss": 1.903173611,
+          "multiclassBrierScore": 0.682998506,
+          "aggregateBinaryLogLoss": 0.689479462,
+          "aggregateBinaryBrierScore": 0.248167533
+        },
+        {
+          "validationSeason": 2024,
+          "trainingSeasons": [
+            2019,
+            2021,
+            2022,
+            2023
+          ],
+          "games": 272,
+          "observedEvents": 132.0,
+          "aggregatePredictedProbability": 0.466450717,
+          "aggregateObservedProbability": 0.485294118,
+          "aggregateSignedErrorPercentagePoints": -1.884340039,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.651915427,
+          "observedWilson95HighPercent": 54.447867893,
+          "multiclassLogLoss": 2.006385156,
+          "multiclassBrierScore": 0.716675167,
+          "aggregateBinaryLogLoss": 0.693426915,
+          "aggregateBinaryBrierScore": 0.250138811
+        }
+      ],
+      "metrics": {
+        "games": 2111,
+        "scoreMetricWeighting": "VALIDATION_GAME_WEIGHTED",
+        "aggregateErrorMetricWeighting": "EQUAL_VALIDATION_FOLD_WEIGHTED",
+        "meanMulticlassLogLoss": 1.985212244,
+        "meanMulticlassBrierScore": 0.705033729,
+        "meanAggregateBinaryLogLoss": 0.692227725,
+        "meanAggregateBinaryBrierScore": 0.249540261,
+        "meanAbsoluteAggregateErrorPercentagePoints": 2.500258405,
+        "rootMeanSquareAggregateErrorPercentagePoints": 2.969418179,
+        "pooledSignedAggregateErrorPercentagePoints": 0.879706424,
+        "maximumAbsoluteAggregateErrorPercentagePoints": 6.293399072,
+        "wilsonCompatibleFolds": 7,
+        "totalFolds": 8
+      },
+      "finalFit": {
+        "eligibleSeasons": [
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "seasonWeights": {
+          "2021": 1.0,
+          "2022": 1.0,
+          "2023": 1.0,
+          "2024": 1.0
+        },
+        "rawGames": 1087,
+        "weightedGames": 1087.0,
+        "effectiveGames": 1087.0,
+        "categoryProbabilities": {
+          "1": 0.01869585,
+          "2": 0.022343821,
+          "3": 0.089831281,
+          "4": 0.023255814,
+          "5": 0.024167807,
+          "6": 0.03875969,
+          "7": 0.045143639,
+          "8": 0.035111719,
+          "9": 0.011399909,
+          "10": 0.02872777,
+          "11": 0.00501596,
+          "12": 0.013223894,
+          "13": 0.013223894,
+          "14": 0.027815777,
+          "15": 0.012311902,
+          "16": 0.016871865,
+          "17": 0.022343821,
+          "18": 0.020519836,
+          "OTHER": 0.53123575
+        },
+        "aggregateOneThroughEighteenPercent": 46.876425,
+        "distributionSha256": "717076980b749e5645f610f2527c5f500af2f402fb3d0e7e917b10925b30bb7a"
+      },
+      "robustness": {
+        "leaveOneEligibleSeasonOut": [
+          {
+            "removedSeason": 2015,
+            "aggregatePercent": 46.876425,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2016,
+            "aggregatePercent": 46.876425,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2017,
+            "aggregatePercent": 46.876425,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2018,
+            "aggregatePercent": 46.876425,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2019,
+            "aggregatePercent": 46.876425,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2021,
+            "aggregatePercent": 48.218417,
+            "shiftFromFullPercentagePoints": 1.341992
+          },
+          {
+            "removedSeason": 2022,
+            "aggregatePercent": 46.324549,
+            "shiftFromFullPercentagePoints": -0.551876
+          },
+          {
+            "removedSeason": 2023,
+            "aggregatePercent": 47.478019,
+            "shiftFromFullPercentagePoints": 0.601594
+          },
+          {
+            "removedSeason": 2024,
+            "aggregatePercent": 46.645072,
+            "shiftFromFullPercentagePoints": -0.231353
+          }
+        ],
+        "leaveOneAggregateMinimumPercent": 46.324549,
+        "leaveOneAggregateMaximumPercent": 48.218417,
+        "leaveOneAggregateRangePercentagePoints": 1.893868,
+        "leaveOneMaximumAbsoluteShiftPercentagePoints": 1.341992,
+        "seasonBlockBootstrap": {
+          "replicates": 5000,
+          "seed": 20260903,
+          "eligibleSeasonBlocks": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "aggregateMeanPercent": 47.347719,
+          "aggregateStandardDeviationPercentagePoints": 1.037753,
+          "aggregate95LowPercent": 45.355701,
+          "aggregate95HighPercent": 49.269051,
+          "maximum95HalfWidthFromFullPercentagePoints": 2.392626
+        }
+      },
+      "eligibilityChecks": [
+        {
+          "id": "DISTRIBUTION",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "POOLED_AGGREGATE_ERROR",
+          "pass": true
+        },
+        {
+          "id": "PREDICTIVE_COMPATIBILITY",
+          "pass": true
+        },
+        {
+          "id": "LEAVE_ONE_SEASON_STABILITY",
+          "pass": true
+        },
+        {
+          "id": "SEASON_BLOCK_BOOTSTRAP_STABILITY",
+          "pass": true
+        }
+      ],
+      "eligible": true,
+      "versusReference": {
+        "multiclassLogLossDelta": -0.00077422,
+        "multiclassBrierScoreDelta": -6.393e-06,
+        "aggregateMeanAbsoluteErrorDeltaPercentagePoints": 0.052236093
+      },
+      "materialReplacementChecks": [
+        {
+          "id": "MATERIAL_LOG_LOSS_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_BRIER_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_AGGREGATE_MAE_IMPROVEMENT",
+          "pass": false
+        }
+      ],
+      "materialReplacementQualified": false
+    },
+    {
+      "candidateId": "R2_EXP_HL4_DIRICHLET19",
+      "seasonWeightFamily": "EXP_HL4",
+      "smoothingFamily": "DIRICHLET19",
+      "folds": [
+        {
+          "validationSeason": 2016,
+          "trainingSeasons": [
+            2015
+          ],
+          "games": 256,
+          "observedEvents": 119.0,
+          "aggregatePredictedProbability": 0.497175141,
+          "aggregateObservedProbability": 0.46484375,
+          "aggregateSignedErrorPercentagePoints": 3.233139124,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 40.471729179,
+          "observedWilson95HighPercent": 52.600969811,
+          "multiclassLogLoss": 2.017956465,
+          "multiclassBrierScore": 0.702066675,
+          "aggregateBinaryLogLoss": 0.69276589,
+          "aggregateBinaryBrierScore": 0.249809357
+        },
+        {
+          "validationSeason": 2017,
+          "trainingSeasons": [
+            2015,
+            2016
+          ],
+          "games": 256,
+          "observedEvents": 129.0,
+          "aggregatePredictedProbability": 0.481374687,
+          "aggregateObservedProbability": 0.50390625,
+          "aggregateSignedErrorPercentagePoints": -2.253156297,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 44.305588705,
+          "observedWilson95HighPercent": 56.464111407,
+          "multiclassLogLoss": 2.048976553,
+          "multiclassBrierScore": 0.732404443,
+          "aggregateBinaryLogLoss": 0.694132622,
+          "aggregateBinaryBrierScore": 0.250492413
+        },
+        {
+          "validationSeason": 2018,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017
+          ],
+          "games": 256,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.49115488,
+          "aggregateObservedProbability": 0.48046875,
+          "aggregateSignedErrorPercentagePoints": 1.06861298,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.000876974,
+          "observedWilson95HighPercent": 54.150622465,
+          "multiclassLogLoss": 1.98172743,
+          "multiclassBrierScore": 0.71022192,
+          "aggregateBinaryLogLoss": 0.69261258,
+          "aggregateBinaryBrierScore": 0.249732724
+        },
+        {
+          "validationSeason": 2019,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018
+          ],
+          "games": 256,
+          "observedEvents": 122.0,
+          "aggregatePredictedProbability": 0.488641279,
+          "aggregateObservedProbability": 0.4765625,
+          "aggregateSignedErrorPercentagePoints": 1.207877868,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 41.618039422,
+          "observedWilson95HighPercent": 53.763759905,
+          "multiclassLogLoss": 2.055705857,
+          "multiclassBrierScore": 0.714149157,
+          "aggregateBinaryLogLoss": 0.692340225,
+          "aggregateBinaryBrierScore": 0.24959658
+        },
+        {
+          "validationSeason": 2021,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019
+          ],
+          "games": 272,
+          "observedEvents": 115.0,
+          "aggregatePredictedProbability": 0.486094793,
+          "aggregateObservedProbability": 0.422794118,
+          "aggregateSignedErrorPercentagePoints": 6.330067492,
+          "aggregatePredictionInsideWilson95": false,
+          "observedWilson95LowPercent": 36.556213527,
+          "observedWilson95HighPercent": 48.217648902,
+          "multiclassLogLoss": 1.843271826,
+          "multiclassBrierScore": 0.656781075,
+          "aggregateBinaryLogLoss": 0.689238677,
+          "aggregateBinaryBrierScore": 0.248046227
+        },
+        {
+          "validationSeason": 2022,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021
+          ],
+          "games": 271,
+          "observedEvents": 135.0,
+          "aggregatePredictedProbability": 0.469159309,
+          "aggregateObservedProbability": 0.498154982,
+          "aggregateSignedErrorPercentagePoints": -2.899567295,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 43.906898663,
+          "observedWilson95HighPercent": 55.729255212,
+          "multiclassLogLoss": 2.046684847,
+          "multiclassBrierScore": 0.728556794,
+          "aggregateBinaryLogLoss": 0.694825209,
+          "aggregateBinaryBrierScore": 0.250837345
+        },
+        {
+          "validationSeason": 2023,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022
+          ],
+          "games": 272,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.477226118,
+          "aggregateObservedProbability": 0.452205882,
+          "aggregateSignedErrorPercentagePoints": 2.502023558,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 39.413296016,
+          "observedWilson95HighPercent": 51.160999772,
+          "multiclassLogLoss": 1.900553919,
+          "multiclassBrierScore": 0.683025252,
+          "aggregateBinaryLogLoss": 0.689828712,
+          "aggregateBinaryBrierScore": 0.248341735
+        },
+        {
+          "validationSeason": 2024,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023
+          ],
+          "games": 272,
+          "observedEvents": 132.0,
+          "aggregatePredictedProbability": 0.472007753,
+          "aggregateObservedProbability": 0.485294118,
+          "aggregateSignedErrorPercentagePoints": -1.328636438,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.651915427,
+          "observedWilson95HighPercent": 54.447867893,
+          "multiclassLogLoss": 2.012425272,
+          "multiclassBrierScore": 0.716736236,
+          "aggregateBinaryLogLoss": 0.693068447,
+          "aggregateBinaryBrierScore": 0.249960265
+        }
+      ],
+      "metrics": {
+        "games": 2111,
+        "scoreMetricWeighting": "VALIDATION_GAME_WEIGHTED",
+        "aggregateErrorMetricWeighting": "EQUAL_VALIDATION_FOLD_WEIGHTED",
+        "meanMulticlassLogLoss": 1.987242844,
+        "meanMulticlassBrierScore": 0.705202307,
+        "meanAggregateBinaryLogLoss": 0.692331841,
+        "meanAggregateBinaryBrierScore": 0.249592228,
+        "meanAbsoluteAggregateErrorPercentagePoints": 2.602885132,
+        "rootMeanSquareAggregateErrorPercentagePoints": 3.054370765,
+        "pooledSignedAggregateErrorPercentagePoints": 0.989490373,
+        "maximumAbsoluteAggregateErrorPercentagePoints": 6.330067492,
+        "wilsonCompatibleFolds": 7,
+        "totalFolds": 8
+      },
+      "finalFit": {
+        "eligibleSeasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "seasonWeights": {
+          "2015": 0.210224104,
+          "2016": 0.25,
+          "2017": 0.297301779,
+          "2018": 0.353553391,
+          "2019": 0.420448208,
+          "2021": 0.594603558,
+          "2022": 0.707106781,
+          "2023": 0.840896415,
+          "2024": 1.0
+        },
+        "rawGames": 2367,
+        "weightedGames": 1246.152965372,
+        "effectiveGames": 1886.42571983,
+        "categoryProbabilities": {
+          "1": 0.019772677,
+          "2": 0.022272058,
+          "3": 0.08627036,
+          "4": 0.023385518,
+          "5": 0.024558215,
+          "6": 0.038328957,
+          "7": 0.050184798,
+          "8": 0.032366155,
+          "9": 0.010882144,
+          "10": 0.029965204,
+          "11": 0.008258855,
+          "12": 0.012892599,
+          "13": 0.012516893,
+          "14": 0.030025828,
+          "15": 0.011008064,
+          "16": 0.018577646,
+          "17": 0.023556087,
+          "18": 0.020636006,
+          "OTHER": 0.524541937
+        },
+        "aggregateOneThroughEighteenPercent": 47.545806,
+        "distributionSha256": "f69601290c69a7818444cd30fd792aaf38f55eb70aeb3e5113978258b6e7f139"
+      },
+      "robustness": {
+        "leaveOneEligibleSeasonOut": [
+          {
+            "removedSeason": 2015,
+            "aggregatePercent": 47.523369,
+            "shiftFromFullPercentagePoints": -0.022438
+          },
+          {
+            "removedSeason": 2016,
+            "aggregatePercent": 47.602812,
+            "shiftFromFullPercentagePoints": 0.057006
+          },
+          {
+            "removedSeason": 2017,
+            "aggregatePercent": 47.362246,
+            "shiftFromFullPercentagePoints": -0.18356
+          },
+          {
+            "removedSeason": 2018,
+            "aggregatePercent": 47.506883,
+            "shiftFromFullPercentagePoints": -0.038924
+          },
+          {
+            "removedSeason": 2019,
+            "aggregatePercent": 47.535451,
+            "shiftFromFullPercentagePoints": -0.010355
+          },
+          {
+            "removedSeason": 2021,
+            "aggregatePercent": 48.324423,
+            "shiftFromFullPercentagePoints": 0.778617
+          },
+          {
+            "removedSeason": 2022,
+            "aggregatePercent": 47.137046,
+            "shiftFromFullPercentagePoints": -0.40876
+          },
+          {
+            "removedSeason": 2023,
+            "aggregatePercent": 48.063693,
+            "shiftFromFullPercentagePoints": 0.517887
+          },
+          {
+            "removedSeason": 2024,
+            "aggregatePercent": 47.200775,
+            "shiftFromFullPercentagePoints": -0.345031
+          }
+        ],
+        "leaveOneAggregateMinimumPercent": 47.137046,
+        "leaveOneAggregateMaximumPercent": 48.324423,
+        "leaveOneAggregateRangePercentagePoints": 1.187377,
+        "leaveOneMaximumAbsoluteShiftPercentagePoints": 0.778617,
+        "seasonBlockBootstrap": {
+          "replicates": 5000,
+          "seed": 20260903,
+          "eligibleSeasonBlocks": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "aggregateMeanPercent": 47.561054,
+          "aggregateStandardDeviationPercentagePoints": 0.921342,
+          "aggregate95LowPercent": 45.66284,
+          "aggregate95HighPercent": 49.246313,
+          "maximum95HalfWidthFromFullPercentagePoints": 1.882966
+        }
+      },
+      "eligibilityChecks": [
+        {
+          "id": "DISTRIBUTION",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "POOLED_AGGREGATE_ERROR",
+          "pass": true
+        },
+        {
+          "id": "PREDICTIVE_COMPATIBILITY",
+          "pass": true
+        },
+        {
+          "id": "LEAVE_ONE_SEASON_STABILITY",
+          "pass": true
+        },
+        {
+          "id": "SEASON_BLOCK_BOOTSTRAP_STABILITY",
+          "pass": true
+        }
+      ],
+      "eligible": true,
+      "versusReference": {
+        "multiclassLogLossDelta": 0.00125638,
+        "multiclassBrierScoreDelta": 0.000162185,
+        "aggregateMeanAbsoluteErrorDeltaPercentagePoints": 0.154862819
+      },
+      "materialReplacementChecks": [
+        {
+          "id": "MATERIAL_LOG_LOSS_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_BRIER_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_AGGREGATE_MAE_IMPROVEMENT",
+          "pass": false
+        }
+      ],
+      "materialReplacementQualified": false
+    },
+    {
+      "candidateId": "R2_FULL_BETA_DIRICHLET",
+      "seasonWeightFamily": "FULL",
+      "smoothingFamily": "BETA_DIRICHLET",
+      "folds": [
+        {
+          "validationSeason": 2016,
+          "trainingSeasons": [
+            2015
+          ],
+          "games": 256,
+          "observedEvents": 119.0,
+          "aggregatePredictedProbability": 0.480544747,
+          "aggregateObservedProbability": 0.46484375,
+          "aggregateSignedErrorPercentagePoints": 1.570099708,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 40.471729179,
+          "observedWilson95HighPercent": 52.600969811,
+          "multiclassLogLoss": 2.016358066,
+          "multiclassBrierScore": 0.701009849,
+          "aggregateBinaryLogLoss": 0.691167491,
+          "aggregateBinaryBrierScore": 0.249010559
+        },
+        {
+          "validationSeason": 2017,
+          "trainingSeasons": [
+            2015,
+            2016
+          ],
+          "games": 256,
+          "observedEvents": 129.0,
+          "aggregatePredictedProbability": 0.472709552,
+          "aggregateObservedProbability": 0.50390625,
+          "aggregateSignedErrorPercentagePoints": -3.119669834,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 44.305588705,
+          "observedWilson95HighPercent": 56.464111407,
+          "multiclassLogLoss": 2.045887452,
+          "multiclassBrierScore": 0.732665897,
+          "aggregateBinaryLogLoss": 0.695065778,
+          "aggregateBinaryBrierScore": 0.250957975
+        },
+        {
+          "validationSeason": 2018,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017
+          ],
+          "games": 256,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.483094928,
+          "aggregateObservedProbability": 0.48046875,
+          "aggregateSignedErrorPercentagePoints": 0.262617848,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.000876974,
+          "observedWilson95HighPercent": 54.150622465,
+          "multiclassLogLoss": 1.980175167,
+          "multiclassBrierScore": 0.710065459,
+          "aggregateBinaryLogLoss": 0.692397858,
+          "aggregateBinaryBrierScore": 0.249625427
+        },
+        {
+          "validationSeason": 2019,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018
+          ],
+          "games": 256,
+          "observedEvents": 122.0,
+          "aggregatePredictedProbability": 0.482439024,
+          "aggregateObservedProbability": 0.4765625,
+          "aggregateSignedErrorPercentagePoints": 0.587652439,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 41.618039422,
+          "observedWilson95HighPercent": 53.763759905,
+          "multiclassLogLoss": 2.052210809,
+          "multiclassBrierScore": 0.713728723,
+          "aggregateBinaryLogLoss": 0.692117318,
+          "aggregateBinaryBrierScore": 0.249485217
+        },
+        {
+          "validationSeason": 2021,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019
+          ],
+          "games": 272,
+          "observedEvents": 115.0,
+          "aggregatePredictedProbability": 0.481264637,
+          "aggregateObservedProbability": 0.422794118,
+          "aggregateSignedErrorPercentagePoints": 5.847051936,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 36.556213527,
+          "observedWilson95HighPercent": 48.217648902,
+          "multiclassLogLoss": 1.842718207,
+          "multiclassBrierScore": 0.656157272,
+          "aggregateBinaryLogLoss": 0.68806107,
+          "aggregateBinaryBrierScore": 0.247458053
+        },
+        {
+          "validationSeason": 2022,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021
+          ],
+          "games": 271,
+          "observedEvents": 135.0,
+          "aggregatePredictedProbability": 0.471023825,
+          "aggregateObservedProbability": 0.498154982,
+          "aggregateSignedErrorPercentagePoints": -2.713115669,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 43.906898663,
+          "observedWilson95HighPercent": 55.729255212,
+          "multiclassLogLoss": 2.046098029,
+          "multiclassBrierScore": 0.728382503,
+          "aggregateBinaryLogLoss": 0.694615158,
+          "aggregateBinaryBrierScore": 0.250732696
+        },
+        {
+          "validationSeason": 2023,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022
+          ],
+          "games": 272,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.475054825,
+          "aggregateObservedProbability": 0.452205882,
+          "aggregateSignedErrorPercentagePoints": 2.284894221,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 39.413296016,
+          "observedWilson95HighPercent": 51.160999772,
+          "multiclassLogLoss": 1.89744603,
+          "multiclassBrierScore": 0.682818391,
+          "aggregateBinaryLogLoss": 0.689620362,
+          "aggregateBinaryBrierScore": 0.248237796
+        },
+        {
+          "validationSeason": 2024,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023
+          ],
+          "games": 272,
+          "observedEvents": 132.0,
+          "aggregatePredictedProbability": 0.472089695,
+          "aggregateObservedProbability": 0.485294118,
+          "aggregateSignedErrorPercentagePoints": -1.320442299,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.651915427,
+          "observedWilson95HighPercent": 54.447867893,
+          "multiclassLogLoss": 2.01454677,
+          "multiclassBrierScore": 0.716776632,
+          "aggregateBinaryLogLoss": 0.693064092,
+          "aggregateBinaryBrierScore": 0.249958094
+        }
+      ],
+      "metrics": {
+        "games": 2111,
+        "scoreMetricWeighting": "VALIDATION_GAME_WEIGHTED",
+        "aggregateErrorMetricWeighting": "EQUAL_VALIDATION_FOLD_WEIGHTED",
+        "meanMulticlassLogLoss": 1.985788547,
+        "meanMulticlassBrierScore": 0.704911693,
+        "meanAggregateBinaryLogLoss": 0.691991991,
+        "meanAggregateBinaryBrierScore": 0.249422408,
+        "meanAbsoluteAggregateErrorPercentagePoints": 2.213192994,
+        "rootMeanSquareAggregateErrorPercentagePoints": 2.764172094,
+        "pooledSignedAggregateErrorPercentagePoints": 0.444554213,
+        "maximumAbsoluteAggregateErrorPercentagePoints": 5.847051936,
+        "wilsonCompatibleFolds": 8,
+        "totalFolds": 8
+      },
+      "finalFit": {
+        "eligibleSeasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "seasonWeights": {
+          "2015": 1.0,
+          "2016": 1.0,
+          "2017": 1.0,
+          "2018": 1.0,
+          "2019": 1.0,
+          "2021": 1.0,
+          "2022": 1.0,
+          "2023": 1.0,
+          "2024": 1.0
+        },
+        "rawGames": 2367,
+        "weightedGames": 2367.0,
+        "effectiveGames": 2367.0,
+        "categoryProbabilities": {
+          "1": 0.019489114,
+          "2": 0.021165597,
+          "3": 0.085291067,
+          "4": 0.0232612,
+          "5": 0.024099442,
+          "6": 0.037511305,
+          "7": 0.05176141,
+          "8": 0.030386253,
+          "9": 0.01152582,
+          "10": 0.029548011,
+          "11": 0.011106699,
+          "12": 0.012364061,
+          "13": 0.011106699,
+          "14": 0.032481856,
+          "15": 0.011106699,
+          "16": 0.019489114,
+          "17": 0.022422959,
+          "18": 0.019489114,
+          "OTHER": 0.526393581
+        },
+        "aggregateOneThroughEighteenPercent": 47.360642,
+        "distributionSha256": "2515d18c958c13a565bd2cdf8fbf0ed8a6d20dbd6272b8a1a363fc759b1fbf00"
+      },
+      "robustness": {
+        "leaveOneEligibleSeasonOut": [
+          {
+            "removedSeason": 2015,
+            "aggregatePercent": 47.277462,
+            "shiftFromFullPercentagePoints": -0.08318
+          },
+          {
+            "removedSeason": 2016,
+            "aggregatePercent": 47.466856,
+            "shiftFromFullPercentagePoints": 0.106214
+          },
+          {
+            "removedSeason": 2017,
+            "aggregatePercent": 46.993371,
+            "shiftFromFullPercentagePoints": -0.367271
+          },
+          {
+            "removedSeason": 2018,
+            "aggregatePercent": 47.277462,
+            "shiftFromFullPercentagePoints": -0.08318
+          },
+          {
+            "removedSeason": 2019,
+            "aggregatePercent": 47.324811,
+            "shiftFromFullPercentagePoints": -0.035831
+          },
+          {
+            "removedSeason": 2021,
+            "aggregatePercent": 48.020038,
+            "shiftFromFullPercentagePoints": 0.659396
+          },
+          {
+            "removedSeason": 2022,
+            "aggregatePercent": 47.043395,
+            "shiftFromFullPercentagePoints": -0.317247
+          },
+          {
+            "removedSeason": 2023,
+            "aggregatePercent": 47.638359,
+            "shiftFromFullPercentagePoints": 0.277717
+          },
+          {
+            "removedSeason": 2024,
+            "aggregatePercent": 47.208969,
+            "shiftFromFullPercentagePoints": -0.151672
+          }
+        ],
+        "leaveOneAggregateMinimumPercent": 46.993371,
+        "leaveOneAggregateMaximumPercent": 48.020038,
+        "leaveOneAggregateRangePercentagePoints": 1.026667,
+        "leaveOneMaximumAbsoluteShiftPercentagePoints": 0.659396,
+        "seasonBlockBootstrap": {
+          "replicates": 5000,
+          "seed": 20260903,
+          "eligibleSeasonBlocks": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "aggregateMeanPercent": 47.384662,
+          "aggregateStandardDeviationPercentagePoints": 0.791573,
+          "aggregate95LowPercent": 45.764863,
+          "aggregate95HighPercent": 48.795435,
+          "maximum95HalfWidthFromFullPercentagePoints": 1.595778
+        }
+      },
+      "eligibilityChecks": [
+        {
+          "id": "DISTRIBUTION",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "POOLED_AGGREGATE_ERROR",
+          "pass": true
+        },
+        {
+          "id": "PREDICTIVE_COMPATIBILITY",
+          "pass": true
+        },
+        {
+          "id": "LEAVE_ONE_SEASON_STABILITY",
+          "pass": true
+        },
+        {
+          "id": "SEASON_BLOCK_BOOTSTRAP_STABILITY",
+          "pass": true
+        }
+      ],
+      "eligible": true,
+      "versusReference": {
+        "multiclassLogLossDelta": -0.000197918,
+        "multiclassBrierScoreDelta": -0.000128429,
+        "aggregateMeanAbsoluteErrorDeltaPercentagePoints": -0.234829318
+      },
+      "materialReplacementChecks": [
+        {
+          "id": "MATERIAL_LOG_LOSS_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_BRIER_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_AGGREGATE_MAE_IMPROVEMENT",
+          "pass": false
+        }
+      ],
+      "materialReplacementQualified": false
+    },
+    {
+      "candidateId": "R2_ROLLING4_BETA_DIRICHLET",
+      "seasonWeightFamily": "ROLLING4",
+      "smoothingFamily": "BETA_DIRICHLET",
+      "folds": [
+        {
+          "validationSeason": 2016,
+          "trainingSeasons": [
+            2015
+          ],
+          "games": 256,
+          "observedEvents": 119.0,
+          "aggregatePredictedProbability": 0.480544747,
+          "aggregateObservedProbability": 0.46484375,
+          "aggregateSignedErrorPercentagePoints": 1.570099708,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 40.471729179,
+          "observedWilson95HighPercent": 52.600969811,
+          "multiclassLogLoss": 2.016358066,
+          "multiclassBrierScore": 0.701009849,
+          "aggregateBinaryLogLoss": 0.691167491,
+          "aggregateBinaryBrierScore": 0.249010559
+        },
+        {
+          "validationSeason": 2017,
+          "trainingSeasons": [
+            2015,
+            2016
+          ],
+          "games": 256,
+          "observedEvents": 129.0,
+          "aggregatePredictedProbability": 0.472709552,
+          "aggregateObservedProbability": 0.50390625,
+          "aggregateSignedErrorPercentagePoints": -3.119669834,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 44.305588705,
+          "observedWilson95HighPercent": 56.464111407,
+          "multiclassLogLoss": 2.045887452,
+          "multiclassBrierScore": 0.732665897,
+          "aggregateBinaryLogLoss": 0.695065778,
+          "aggregateBinaryBrierScore": 0.250957975
+        },
+        {
+          "validationSeason": 2018,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017
+          ],
+          "games": 256,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.483094928,
+          "aggregateObservedProbability": 0.48046875,
+          "aggregateSignedErrorPercentagePoints": 0.262617848,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.000876974,
+          "observedWilson95HighPercent": 54.150622465,
+          "multiclassLogLoss": 1.980175167,
+          "multiclassBrierScore": 0.710065459,
+          "aggregateBinaryLogLoss": 0.692397858,
+          "aggregateBinaryBrierScore": 0.249625427
+        },
+        {
+          "validationSeason": 2019,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018
+          ],
+          "games": 256,
+          "observedEvents": 122.0,
+          "aggregatePredictedProbability": 0.482439024,
+          "aggregateObservedProbability": 0.4765625,
+          "aggregateSignedErrorPercentagePoints": 0.587652439,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 41.618039422,
+          "observedWilson95HighPercent": 53.763759905,
+          "multiclassLogLoss": 2.052210809,
+          "multiclassBrierScore": 0.713728723,
+          "aggregateBinaryLogLoss": 0.692117318,
+          "aggregateBinaryBrierScore": 0.249485217
+        },
+        {
+          "validationSeason": 2021,
+          "trainingSeasons": [
+            2016,
+            2017,
+            2018,
+            2019
+          ],
+          "games": 272,
+          "observedEvents": 115.0,
+          "aggregatePredictedProbability": 0.481463415,
+          "aggregateObservedProbability": 0.422794118,
+          "aggregateSignedErrorPercentagePoints": 5.866929699,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 36.556213527,
+          "observedWilson95HighPercent": 48.217648902,
+          "multiclassLogLoss": 1.839981271,
+          "multiclassBrierScore": 0.65608922,
+          "aggregateBinaryLogLoss": 0.688107705,
+          "aggregateBinaryBrierScore": 0.247481338
+        },
+        {
+          "validationSeason": 2022,
+          "trainingSeasons": [
+            2017,
+            2018,
+            2019,
+            2021
+          ],
+          "games": 271,
+          "observedEvents": 135.0,
+          "aggregatePredictedProbability": 0.470220941,
+          "aggregateObservedProbability": 0.498154982,
+          "aggregateSignedErrorPercentagePoints": -2.793404015,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 43.906898663,
+          "observedWilson95HighPercent": 55.729255212,
+          "multiclassLogLoss": 2.045320859,
+          "multiclassBrierScore": 0.728356977,
+          "aggregateBinaryLogLoss": 0.694703886,
+          "aggregateBinaryBrierScore": 0.250776907
+        },
+        {
+          "validationSeason": 2023,
+          "trainingSeasons": [
+            2018,
+            2019,
+            2021,
+            2022
+          ],
+          "games": 272,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.469223485,
+          "aggregateObservedProbability": 0.452205882,
+          "aggregateSignedErrorPercentagePoints": 1.70176025,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 39.413296016,
+          "observedWilson95HighPercent": 51.160999772,
+          "multiclassLogLoss": 1.902848122,
+          "multiclassBrierScore": 0.682835682,
+          "aggregateBinaryLogLoss": 0.689153973,
+          "aggregateBinaryBrierScore": 0.248005321
+        },
+        {
+          "validationSeason": 2024,
+          "trainingSeasons": [
+            2019,
+            2021,
+            2022,
+            2023
+          ],
+          "games": 272,
+          "observedEvents": 132.0,
+          "aggregatePredictedProbability": 0.462220149,
+          "aggregateObservedProbability": 0.485294118,
+          "aggregateSignedErrorPercentagePoints": -2.307396839,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.651915427,
+          "observedWilson95HighPercent": 54.447867893,
+          "multiclassLogLoss": 2.006741648,
+          "multiclassBrierScore": 0.716869385,
+          "aggregateBinaryLogLoss": 0.693783407,
+          "aggregateBinaryBrierScore": 0.250316145
+        }
+      ],
+      "metrics": {
+        "games": 2111,
+        "scoreMetricWeighting": "VALIDATION_GAME_WEIGHTED",
+        "aggregateErrorMetricWeighting": "EQUAL_VALIDATION_FOLD_WEIGHTED",
+        "meanMulticlassLogLoss": 1.985026499,
+        "meanMulticlassBrierScore": 0.704913827,
+        "meanAggregateBinaryLogLoss": 0.692041979,
+        "meanAggregateBinaryBrierScore": 0.249447264,
+        "meanAbsoluteAggregateErrorPercentagePoints": 2.276191329,
+        "rootMeanSquareAggregateErrorPercentagePoints": 2.807487638,
+        "pooledSignedAggregateErrorPercentagePoints": 0.234504253,
+        "maximumAbsoluteAggregateErrorPercentagePoints": 5.866929699,
+        "wilsonCompatibleFolds": 8,
+        "totalFolds": 8
+      },
+      "finalFit": {
+        "eligibleSeasons": [
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "seasonWeights": {
+          "2021": 1.0,
+          "2022": 1.0,
+          "2023": 1.0,
+          "2024": 1.0
+        },
+        "rawGames": 1087,
+        "weightedGames": 1087.0,
+        "effectiveGames": 1087.0,
+        "categoryProbabilities": {
+          "1": 0.018530324,
+          "2": 0.022145997,
+          "3": 0.089035946,
+          "4": 0.023049915,
+          "5": 0.023953833,
+          "6": 0.038416525,
+          "7": 0.044743952,
+          "8": 0.034800852,
+          "9": 0.011298978,
+          "10": 0.028473424,
+          "11": 0.00497155,
+          "12": 0.013106814,
+          "13": 0.013106814,
+          "14": 0.027569506,
+          "15": 0.012202896,
+          "16": 0.016722487,
+          "17": 0.022145997,
+          "18": 0.02033816,
+          "OTHER": 0.535386029
+        },
+        "aggregateOneThroughEighteenPercent": 46.461397,
+        "distributionSha256": "2da7f9eeb53bad1585caaa7afb3222db5e2d39dff0f5d7c1118a37ed5faa846a"
+      },
+      "robustness": {
+        "leaveOneEligibleSeasonOut": [
+          {
+            "removedSeason": 2015,
+            "aggregatePercent": 46.461397,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2016,
+            "aggregatePercent": 46.461397,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2017,
+            "aggregatePercent": 46.461397,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2018,
+            "aggregatePercent": 46.461397,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2019,
+            "aggregatePercent": 46.461397,
+            "shiftFromFullPercentagePoints": 0.0
+          },
+          {
+            "removedSeason": 2021,
+            "aggregatePercent": 47.807836,
+            "shiftFromFullPercentagePoints": 1.346439
+          },
+          {
+            "removedSeason": 2022,
+            "aggregatePercent": 45.899348,
+            "shiftFromFullPercentagePoints": -0.562049
+          },
+          {
+            "removedSeason": 2023,
+            "aggregatePercent": 47.061567,
+            "shiftFromFullPercentagePoints": 0.60017
+          },
+          {
+            "removedSeason": 2024,
+            "aggregatePercent": 46.222015,
+            "shiftFromFullPercentagePoints": -0.239382
+          }
+        ],
+        "leaveOneAggregateMinimumPercent": 45.899348,
+        "leaveOneAggregateMaximumPercent": 47.807836,
+        "leaveOneAggregateRangePercentagePoints": 1.908488,
+        "leaveOneMaximumAbsoluteShiftPercentagePoints": 1.346439,
+        "seasonBlockBootstrap": {
+          "replicates": 5000,
+          "seed": 20260903,
+          "eligibleSeasonBlocks": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "aggregateMeanPercent": 47.067907,
+          "aggregateStandardDeviationPercentagePoints": 1.049372,
+          "aggregate95LowPercent": 45.089286,
+          "aggregate95HighPercent": 49.02965,
+          "maximum95HalfWidthFromFullPercentagePoints": 2.568253
+        }
+      },
+      "eligibilityChecks": [
+        {
+          "id": "DISTRIBUTION",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "POOLED_AGGREGATE_ERROR",
+          "pass": true
+        },
+        {
+          "id": "PREDICTIVE_COMPATIBILITY",
+          "pass": true
+        },
+        {
+          "id": "LEAVE_ONE_SEASON_STABILITY",
+          "pass": true
+        },
+        {
+          "id": "SEASON_BLOCK_BOOTSTRAP_STABILITY",
+          "pass": true
+        }
+      ],
+      "eligible": true,
+      "versusReference": {
+        "multiclassLogLossDelta": -0.000959966,
+        "multiclassBrierScoreDelta": -0.000126295,
+        "aggregateMeanAbsoluteErrorDeltaPercentagePoints": -0.171830983
+      },
+      "materialReplacementChecks": [
+        {
+          "id": "MATERIAL_LOG_LOSS_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_BRIER_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_AGGREGATE_MAE_IMPROVEMENT",
+          "pass": false
+        }
+      ],
+      "materialReplacementQualified": false
+    },
+    {
+      "candidateId": "R2_EXP_HL4_BETA_DIRICHLET",
+      "seasonWeightFamily": "EXP_HL4",
+      "smoothingFamily": "BETA_DIRICHLET",
+      "folds": [
+        {
+          "validationSeason": 2016,
+          "trainingSeasons": [
+            2015
+          ],
+          "games": 256,
+          "observedEvents": 119.0,
+          "aggregatePredictedProbability": 0.480544747,
+          "aggregateObservedProbability": 0.46484375,
+          "aggregateSignedErrorPercentagePoints": 1.570099708,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 40.471729179,
+          "observedWilson95HighPercent": 52.600969811,
+          "multiclassLogLoss": 2.016358066,
+          "multiclassBrierScore": 0.701009849,
+          "aggregateBinaryLogLoss": 0.691167491,
+          "aggregateBinaryBrierScore": 0.249010559
+        },
+        {
+          "validationSeason": 2017,
+          "trainingSeasons": [
+            2015,
+            2016
+          ],
+          "games": 256,
+          "observedEvents": 129.0,
+          "aggregatePredictedProbability": 0.472040366,
+          "aggregateObservedProbability": 0.50390625,
+          "aggregateSignedErrorPercentagePoints": -3.186588443,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 44.305588705,
+          "observedWilson95HighPercent": 56.464111407,
+          "multiclassLogLoss": 2.049994369,
+          "multiclassBrierScore": 0.733006805,
+          "aggregateBinaryLogLoss": 0.695150438,
+          "aggregateBinaryBrierScore": 0.251000176
+        },
+        {
+          "validationSeason": 2018,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017
+          ],
+          "games": 256,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.48453425,
+          "aggregateObservedProbability": 0.48046875,
+          "aggregateSignedErrorPercentagePoints": 0.406549984,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.000876974,
+          "observedWilson95HighPercent": 54.150622465,
+          "multiclassLogLoss": 1.981531991,
+          "multiclassBrierScore": 0.710127956,
+          "aggregateBinaryLogLoss": 0.692417141,
+          "aggregateBinaryBrierScore": 0.249635059
+        },
+        {
+          "validationSeason": 2019,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018
+          ],
+          "games": 256,
+          "observedEvents": 122.0,
+          "aggregatePredictedProbability": 0.483245239,
+          "aggregateObservedProbability": 0.4765625,
+          "aggregateSignedErrorPercentagePoints": 0.668273947,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 41.618039422,
+          "observedWilson95HighPercent": 53.763759905,
+          "multiclassLogLoss": 2.055503225,
+          "multiclassBrierScore": 0.71396025,
+          "aggregateBinaryLogLoss": 0.692137593,
+          "aggregateBinaryBrierScore": 0.249495343
+        },
+        {
+          "validationSeason": 2021,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019
+          ],
+          "games": 272,
+          "observedEvents": 115.0,
+          "aggregatePredictedProbability": 0.481415457,
+          "aggregateObservedProbability": 0.422794118,
+          "aggregateSignedErrorPercentagePoints": 5.862133912,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 36.556213527,
+          "observedWilson95HighPercent": 48.217648902,
+          "multiclassLogLoss": 1.842129588,
+          "multiclassBrierScore": 0.656170874,
+          "aggregateBinaryLogLoss": 0.688096439,
+          "aggregateBinaryBrierScore": 0.247475713
+        },
+        {
+          "validationSeason": 2022,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021
+          ],
+          "games": 271,
+          "observedEvents": 135.0,
+          "aggregatePredictedProbability": 0.464319935,
+          "aggregateObservedProbability": 0.498154982,
+          "aggregateSignedErrorPercentagePoints": -3.383504634,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 43.906898663,
+          "observedWilson95HighPercent": 55.729255212,
+          "multiclassLogLoss": 2.047295688,
+          "multiclassBrierScore": 0.728895317,
+          "aggregateBinaryLogLoss": 0.69543605,
+          "aggregateBinaryBrierScore": 0.251141406
+        },
+        {
+          "validationSeason": 2023,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022
+          ],
+          "games": 272,
+          "observedEvents": 123.0,
+          "aggregatePredictedProbability": 0.473014978,
+          "aggregateObservedProbability": 0.452205882,
+          "aggregateSignedErrorPercentagePoints": 2.080909566,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 39.413296016,
+          "observedWilson95HighPercent": 51.160999772,
+          "multiclassLogLoss": 1.900166976,
+          "multiclassBrierScore": 0.682827691,
+          "aggregateBinaryLogLoss": 0.68944177,
+          "aggregateBinaryBrierScore": 0.248148741
+        },
+        {
+          "validationSeason": 2024,
+          "trainingSeasons": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023
+          ],
+          "games": 272,
+          "observedEvents": 132.0,
+          "aggregatePredictedProbability": 0.468137075,
+          "aggregateObservedProbability": 0.485294118,
+          "aggregateSignedErrorPercentagePoints": -1.715704279,
+          "aggregatePredictionInsideWilson95": true,
+          "observedWilson95LowPercent": 42.651915427,
+          "observedWilson95HighPercent": 54.447867893,
+          "multiclassLogLoss": 2.012661798,
+          "multiclassBrierScore": 0.716858623,
+          "aggregateBinaryLogLoss": 0.693304974,
+          "aggregateBinaryBrierScore": 0.250078101
+        }
+      ],
+      "metrics": {
+        "games": 2111,
+        "scoreMetricWeighting": "VALIDATION_GAME_WEIGHTED",
+        "aggregateErrorMetricWeighting": "EQUAL_VALIDATION_FOLD_WEIGHTED",
+        "meanMulticlassLogLoss": 1.987036023,
+        "meanMulticlassBrierScore": 0.705068039,
+        "meanAggregateBinaryLogLoss": 0.69212502,
+        "meanAggregateBinaryBrierScore": 0.249488653,
+        "meanAbsoluteAggregateErrorPercentagePoints": 2.359220559,
+        "rootMeanSquareAggregateErrorPercentagePoints": 2.87919206,
+        "pooledSignedAggregateErrorPercentagePoints": 0.302340273,
+        "maximumAbsoluteAggregateErrorPercentagePoints": 5.862133912,
+        "wilsonCompatibleFolds": 8,
+        "totalFolds": 8
+      },
+      "finalFit": {
+        "eligibleSeasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "seasonWeights": {
+          "2015": 0.210224104,
+          "2016": 0.25,
+          "2017": 0.297301779,
+          "2018": 0.353553391,
+          "2019": 0.420448208,
+          "2021": 0.594603558,
+          "2022": 0.707106781,
+          "2023": 0.840896415,
+          "2024": 1.0
+        },
+        "rawGames": 2367,
+        "weightedGames": 1246.152965372,
+        "effectiveGames": 1886.42571983,
+        "categoryProbabilities": {
+          "1": 0.019624004,
+          "2": 0.022104592,
+          "3": 0.085621682,
+          "4": 0.023209679,
+          "5": 0.024373558,
+          "6": 0.038040757,
+          "7": 0.049807453,
+          "8": 0.032122789,
+          "9": 0.01080032,
+          "10": 0.029739892,
+          "11": 0.008196756,
+          "12": 0.012795658,
+          "13": 0.012422777,
+          "14": 0.02980006,
+          "15": 0.010925293,
+          "16": 0.018437959,
+          "17": 0.023378966,
+          "18": 0.020480841,
+          "OTHER": 0.528116965
+        },
+        "aggregateOneThroughEighteenPercent": 47.188303,
+        "distributionSha256": "5820f8801f1384391ff08a44aafe57953dc284e8378eb71511bf9c396b3a5162"
+      },
+      "robustness": {
+        "leaveOneEligibleSeasonOut": [
+          {
+            "removedSeason": 2015,
+            "aggregatePercent": 47.149583,
+            "shiftFromFullPercentagePoints": -0.03872
+          },
+          {
+            "removedSeason": 2016,
+            "aggregatePercent": 47.226381,
+            "shiftFromFullPercentagePoints": 0.038077
+          },
+          {
+            "removedSeason": 2017,
+            "aggregatePercent": 46.980176,
+            "shiftFromFullPercentagePoints": -0.208127
+          },
+          {
+            "removedSeason": 2018,
+            "aggregatePercent": 47.121119,
+            "shiftFromFullPercentagePoints": -0.067185
+          },
+          {
+            "removedSeason": 2019,
+            "aggregatePercent": 47.144103,
+            "shiftFromFullPercentagePoints": -0.044201
+          },
+          {
+            "removedSeason": 2021,
+            "aggregatePercent": 47.919749,
+            "shiftFromFullPercentagePoints": 0.731445
+          },
+          {
+            "removedSeason": 2022,
+            "aggregatePercent": 46.711349,
+            "shiftFromFullPercentagePoints": -0.476955
+          },
+          {
+            "removedSeason": 2023,
+            "aggregatePercent": 47.630223,
+            "shiftFromFullPercentagePoints": 0.441919
+          },
+          {
+            "removedSeason": 2024,
+            "aggregatePercent": 46.813707,
+            "shiftFromFullPercentagePoints": -0.374596
+          }
+        ],
+        "leaveOneAggregateMinimumPercent": 46.711349,
+        "leaveOneAggregateMaximumPercent": 47.919749,
+        "leaveOneAggregateRangePercentagePoints": 1.2084,
+        "leaveOneMaximumAbsoluteShiftPercentagePoints": 0.731445,
+        "seasonBlockBootstrap": {
+          "replicates": 5000,
+          "seed": 20260903,
+          "eligibleSeasonBlocks": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "aggregateMeanPercent": 47.223298,
+          "aggregateStandardDeviationPercentagePoints": 0.91588,
+          "aggregate95LowPercent": 45.34377,
+          "aggregate95HighPercent": 48.882714,
+          "maximum95HalfWidthFromFullPercentagePoints": 1.844534
+        }
+      },
+      "eligibilityChecks": [
+        {
+          "id": "DISTRIBUTION",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "MULTICLASS_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_LOG_LOSS_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "AGGREGATE_BRIER_NONINFERIOR",
+          "pass": true
+        },
+        {
+          "id": "POOLED_AGGREGATE_ERROR",
+          "pass": true
+        },
+        {
+          "id": "PREDICTIVE_COMPATIBILITY",
+          "pass": true
+        },
+        {
+          "id": "LEAVE_ONE_SEASON_STABILITY",
+          "pass": true
+        },
+        {
+          "id": "SEASON_BLOCK_BOOTSTRAP_STABILITY",
+          "pass": true
+        }
+      ],
+      "eligible": true,
+      "versusReference": {
+        "multiclassLogLossDelta": 0.001049558,
+        "multiclassBrierScoreDelta": 2.7917e-05,
+        "aggregateMeanAbsoluteErrorDeltaPercentagePoints": -0.088801753
+      },
+      "materialReplacementChecks": [
+        {
+          "id": "MATERIAL_LOG_LOSS_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_BRIER_IMPROVEMENT",
+          "pass": false
+        },
+        {
+          "id": "MATERIAL_AGGREGATE_MAE_IMPROVEMENT",
+          "pass": false
+        }
+      ],
+      "materialReplacementQualified": false
+    }
+  ],
+  "selection": {
+    "referenceCandidateId": "R2_FULL_DIRICHLET19",
+    "referenceEligible": true,
+    "eligibleCandidateIds": [
+      "R2_FULL_DIRICHLET19",
+      "R2_ROLLING4_DIRICHLET19",
+      "R2_EXP_HL4_DIRICHLET19",
+      "R2_FULL_BETA_DIRICHLET",
+      "R2_ROLLING4_BETA_DIRICHLET",
+      "R2_EXP_HL4_BETA_DIRICHLET"
+    ],
+    "materialReplacementCandidateIds": [],
+    "decision": "RETAIN_EXISTING_FROZEN_REFERENCE",
+    "selectedCandidateId": "R2_FULL_DIRICHLET19",
+    "selectedDistributionSha256": "4ab2db72d7fb6e5e07d1f127e80a3e654da9cfe79f309ebf4014a521fb2772e0",
+    "referenceDistributionByteEquivalentToStage2": true,
+    "holdoutUsedToBreakTie": false,
+    "replacementForced": false
+  },
+  "originalStage3FailureOverridden": false,
+  "originalThreePointGateWaived": false,
+  "protectedArtifactBaselineRole": "HISTORICAL_ISSUANCE_SNAPSHOT_AT_PROSPECTIVE_CUTOFF",
+  "issuanceProtectedArtifactSha256": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "99b7d6c92db9e7743a7cf5f3b41f96aa18c1859026344d1767bf4ac55c95ff0e",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "e99f73c9d418236caac7defa35b0787a9b874ae55f7eaac01cfde7fd05ca546c",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "runtimeProtectedArtifactsUnchanged": true,
+  "modelFreezePath": "data/walters/nfl/key-numbers/bw6-stage3r2-model-freeze-v1.json",
+  "blockedStages": [
+    "BW7",
+    "BW8",
+    "PRODUCTION_AUTHORITY"
+  ],
+  "nextStage": "BW6.4_PROSPECTIVE_ACTIVE_WEEK_SHADOW"
+}
