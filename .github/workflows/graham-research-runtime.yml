@@ -1,0 +1,112 @@
+name: Graham research runtime
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-research-runtime.yml
+      - GRAHAM_DELTA_1645_AUTHORITY.md
+      - data/walters/nfl/graham-research-runtime-policy-v1.json
+      - data/walters/nfl/graham-research-completion-policy-v1.json
+      - data/walters/nfl/graham-schedule-authority-v1.json
+      - data/walters/nfl/player-values/player-values-access-v1.json
+      - data/walters/nfl/qb-performance/stage5-current.json
+      - data/walters/nfl/*/week-*-research-runtime/*.json
+      - tools/validate-graham-research-runtime.mjs
+      - tools/validate-graham-delta-1645-authority.mjs
+      - tools/close-stale-graham-research-runs.mjs
+      - tests/fixtures/graham-research-runtime.json
+      - tests/fixtures/graham-research-runtime-stale.json
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: graham-research-runtime
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate lifecycle regression cases
+        run: |
+          set -euo pipefail
+          node --check tools/validate-graham-research-runtime.mjs
+          node --check tools/close-stale-graham-research-runs.mjs
+          node --check tools/validate-graham-delta-1645-authority.mjs
+          node tools/validate-graham-delta-1645-authority.mjs
+          node tools/validate-graham-research-runtime.mjs \
+            --fixture tests/fixtures/graham-research-runtime.json
+
+          RUNTIME_TEST_DIR="$(mktemp -d)"
+          mkdir -p "$RUNTIME_TEST_DIR/data/walters/nfl/2026/week-01-research-runtime"
+          cp tests/fixtures/graham-research-runtime-stale.json \
+            "$RUNTIME_TEST_DIR/data/walters/nfl/2026/week-01-research-runtime/graham-delta-1645-2026-w01-20260902T164500-0700.json"
+          node tools/close-stale-graham-research-runs.mjs \
+            --events-root "$RUNTIME_TEST_DIR/data/walters/nfl" \
+            --now 2026-09-02T18:00:00-07:00 \
+            --write
+          node tools/validate-graham-research-runtime.mjs \
+            --events-root "$RUNTIME_TEST_DIR/data/walters/nfl"
+          node - <<'NODE' "$RUNTIME_TEST_DIR/data/walters/nfl/2026/week-01-research-runtime/graham-delta-1645-2026-w01-20260902T164500-0700.json"
+          const fs = require('node:fs');
+          const event = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (
+            event.state !== 'BLOCKED_WITH_DURABLE_RECORD' ||
+            event.checkpoint !== 'WATCHDOG_CLOSED' ||
+            event.failure?.code !== 'RUN_EXPIRED_BEFORE_COMPLETION' ||
+            event.failure?.automatic !== true
+          ) {
+            throw new Error('GRAHAM_RESEARCH_RUNTIME_STALE_CLOSE_REGRESSION');
+          }
+          console.log('GRAHAM STALE-RUN CLOSURE: PASS');
+          NODE
+
+      - name: Validate live runtime records
+        run: node tools/validate-graham-research-runtime.mjs
+
+      - name: Close expired runs fail-closed
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/close-stale-graham-research-runs.mjs --write
+            node tools/validate-graham-research-runtime.mjs
+
+            if git diff --quiet -- data/walters/nfl; then
+              echo "GRAHAM RESEARCH RUNTIME WATCHDOG: NO EXPIRED RUNS"
+              exit 0
+            fi
+
+            git add -u -- data/walters/nfl
+            git commit -m "Close stale Graham research run"
+            if git push origin HEAD:main; then
+              echo "Graham runtime watchdog receipt published on attempt $attempt."
+              exit 0
+            fi
+            echo "Graham runtime watchdog publish collision on attempt $attempt; retrying against latest main."
+          done
+
+          echo "Graham runtime watchdog could not publish after four attempts." >&2
+          exit 1

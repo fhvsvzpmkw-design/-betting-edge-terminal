@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "policyId": "graham-research-runtime-v1",
+  "state": "OPERATIONAL",
+  "effectiveAt": "2026-09-03T00:00:00-07:00",
+  "timezone": "America/Vancouver",
+  "purpose": "Give every scheduled Graham research run a unique durable start record before expensive source loading, a verified completed or controlled-failure terminal record, and an automatic fail-closed terminal record when a run disappears before it can finish.",
+  "appliesToTaskKeys": [
+    "TUESDAY_BASELINE",
+    "DAILY_REVIEW",
+    "DELTA_1645",
+    "SUNDAY_PREGAME"
+  ],
+  "taskSlugByKey": {
+    "TUESDAY_BASELINE": "tuesday-baseline",
+    "DAILY_REVIEW": "daily-review",
+    "DELTA_1645": "delta-1645",
+    "SUNDAY_PREGAME": "sunday-pregame"
+  },
+  "eventStorage": {
+    "directoryTemplate": "data/walters/nfl/{season}/week-{weekPadded}-research-runtime",
+    "fileTemplate": "{runEventId}.json",
+    "appendIdentity": "runEventId",
+    "oneFilePerRun": true,
+    "allowOverwriteOnlyForSameRunEventId": true
+  },
+  "lifecycle": {
+    "allowedStates": [
+      "RUN_STARTED",
+      "COMPLETED",
+      "BLOCKED_WITH_DURABLE_RECORD"
+    ],
+    "allowedCheckpoints": [
+      "STARTED",
+      "PREFLIGHT_VERIFIED",
+      "RESEARCH_IN_PROGRESS",
+      "COMPLETION_PENDING",
+      "COMPLETED",
+      "WATCHDOG_CLOSED",
+      "CONTROLLED_FAILURE"
+    ],
+    "defaultLeaseMinutes": 60,
+    "maximumLeaseMinutes": 90,
+    "heartbeatAfterMinutes": 30,
+    "startedMustPrecedeExpensiveSourceLoading": true,
+    "completedRequiresVerifiedCompletionReceipt": true,
+    "controlledFailureRequiresFailureObject": true,
+    "marketViewedMustBeFalse": true
+  },
+  "eventContract": {
+    "commonRequiredFields": [
+      "schema",
+      "policyId",
+      "runEventId",
+      "taskKey",
+      "season",
+      "week",
+      "ledgerPath",
+      "state",
+      "checkpoint",
+      "startedAt",
+      "lastCheckpointAt",
+      "staleAfter",
+      "marketViewed",
+      "ledgerSweepPresent",
+      "completionResult",
+      "completionReceipt",
+      "failure"
+    ],
+    "runStarted": {
+      "state": "RUN_STARTED",
+      "initialCheckpoint": "STARTED",
+      "initialLedgerSweepPresent": false,
+      "terminalFieldsMustBeNull": [
+        "completionResult",
+        "completionReceipt",
+        "failure"
+      ]
+    },
+    "completed": {
+      "state": "COMPLETED",
+      "checkpoint": "COMPLETED",
+      "ledgerSweepPresent": true,
+      "completionReceiptRequired": true,
+      "failureMustBeNull": true
+    },
+    "blocked": {
+      "state": "BLOCKED_WITH_DURABLE_RECORD",
+      "controlledCheckpoint": "CONTROLLED_FAILURE",
+      "watchdogCheckpoint": "WATCHDOG_CLOSED",
+      "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
+      "failureRequired": true
+    }
+  },
+  "completionBinding": {
+    "policyId": "graham-research-completion-v1",
+    "receiptPath": "data/walters/nfl/research-completion-current.json",
+    "receiptState": "VERIFIED",
+    "allowedCompletionResults": [
+      "MATERIAL_CHANGE",
+      "NO_MATERIAL_CHANGE",
+      "BLOCKED_WITH_DURABLE_RECORD"
+    ],
+    "requireExactRunEventId": true,
+    "requireExactTaskKey": true,
+    "requireExactSeasonWeek": true,
+    "requireMarketViewedFalse": true
+  },
+  "watchdog": {
+    "workflow": ".github/workflows/graham-research-runtime.yml",
+    "validator": "tools/validate-graham-research-runtime.mjs",
+    "closer": "tools/close-stale-graham-research-runs.mjs",
+    "scheduleMinutes": 30,
+    "staleTerminalState": "BLOCKED_WITH_DURABLE_RECORD",
+    "staleFailurePhase": "RUNTIME_WATCHDOG",
+    "staleFailureCode": "RUN_EXPIRED_BEFORE_COMPLETION"
+  },
+  "failureBehavior": {
+    "userFacingStatus": "GRAHAM RESEARCH RUNTIME BLOCKED",
+    "rule": "After RUN_STARTED is durable, any controlled failure must update that exact event to BLOCKED_WITH_DURABLE_RECORD. If the task terminates before doing so, the watchdog closes the expired event. Never infer successful completion from task timing alone."
+  },
+  "boundaries": {
+    "changesHandicapMethod": false,
+    "changesPowerRatings": false,
+    "changesFairArithmetic": false,
+    "changesPersonnelArithmetic": false,
+    "changesHomeField": false,
+    "changesMatchupAuthority": false,
+    "changesMarketIsolation": false,
+    "grantsQbProductionAuthority": false
+  }
+}
