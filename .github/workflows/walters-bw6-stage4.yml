@@ -1,0 +1,466 @@
+name: Walters BW6 Stage 4 Prospective Shadow
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '35 2 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/key-numbers/bw6-stage4-shadow-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4-week-*-shadow-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4/attempts/*.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4/snapshots/*.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4/results/*.json'
+      - 'tools/run-walters-bw6-stage4.mjs'
+      - 'tools/validate-walters-bw6-stage4.mjs'
+      - 'tests/walters-bw6-stage4.test.mjs'
+      - '.github/workflows/walters-bw6-stage4.yml'
+  pull_request:
+    paths:
+      - 'data/walters/nfl/key-numbers/bw6-stage4-shadow-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4-week-*-shadow-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4/attempts/*.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4/snapshots/*.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage4/results/*.json'
+      - 'tools/run-walters-bw6-stage4.mjs'
+      - 'tools/validate-walters-bw6-stage4.mjs'
+      - 'tests/walters-bw6-stage4.test.mjs'
+      - '.github/workflows/walters-bw6-stage4.yml'
+
+concurrency:
+  group: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && format('walters-bw6-stage4-capture-{0}', github.repository) || format('walters-bw6-stage4-validation-{0}', github.run_id) }}
+  queue: max
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CONTRACT_PATH: data/walters/nfl/key-numbers/bw6-stage4-shadow-contract-v1.json
+  RUNNER_PATH: tools/run-walters-bw6-stage4.mjs
+  VALIDATOR_PATH: tools/validate-walters-bw6-stage4.mjs
+  TEST_PATH: tests/walters-bw6-stage4.test.mjs
+
+jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout governed revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Reject a manual capture request outside main
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "BW6.4 manual capture is authorized only from refs/heads/main." >&2
+          exit 1
+
+      - name: Validate release without opening a cycle
+        run: |
+          set -euo pipefail
+          node --check "$RUNNER_PATH"
+          node --check "$VALIDATOR_PATH"
+          node "$RUNNER_PATH" validate-only --root .
+          node "$VALIDATOR_PATH" --root .
+          node --test "$TEST_PATH"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          echo "WALTERS BW6.4 VALIDATION-ONLY: PASS // NO CYCLE OPENED"
+
+      - name: Enforce BW6.4-only pull-request scope
+        if: github.event_name == 'pull_request'
+        env:
+          COMPARE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mapfile -t CHANGED < <(git diff --name-only "$COMPARE_BASE"...HEAD)
+          ALLOWED='^(data/walters/nfl/key-numbers/bw6-stage4-(shadow-contract|current)-v1\.json|tools/(run|validate)-walters-bw6-stage4\.mjs|tests/walters-bw6-stage4\.test\.mjs|\.github/workflows/walters-bw6-stage4\.yml)$'
+          for file in "${CHANGED[@]}"; do
+            if [[ ! "$file" =~ $ALLOWED ]]; then
+              echo "Disallowed BW6.4 PR path: $file" >&2
+              exit 1
+            fi
+          done
+          echo "WALTERS BW6.4 PR SCOPE: PASS"
+
+  capture-prospective-cycle:
+    needs: validate-release
+    if: >-
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout exact triggering main revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Bind immutable attempt provenance
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          {
+            echo "BW6_STARTED_AT=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "BW6_SOURCE_COMMIT=$(git rev-parse HEAD)"
+            echo "BW6_EVENT_NAME=${GITHUB_EVENT_NAME}"
+            echo "BW6_RUN_ID=${GITHUB_RUN_ID}"
+            echo "BW6_RUN_ATTEMPT=${GITHUB_RUN_ATTEMPT}"
+          } >> "$GITHUB_ENV"
+
+      - name: Revalidate the exact capture revision
+        run: |
+          set -euo pipefail
+          node "$RUNNER_PATH" validate-only --root .
+          node "$VALIDATOR_PATH" --root .
+
+      - name: Detect a durable incomplete attempt
+        id: recovery-check
+        run: |
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require('node:fs');
+          const current = JSON.parse(fs.readFileSync(
+            'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json',
+            'utf8',
+          ));
+          console.log(`required=${current.activeAttempt ? 'true' : 'false'}`);
+          if (current.activeAttempt) console.log(`cycle_id=${current.activeAttempt.cycleId}`);
+          NODE
+
+      - name: Fail-close the previously incomplete attempt
+        id: recovery-publish
+        if: steps.recovery-check.outputs.required == 'true'
+        env:
+          RECOVERY_CYCLE_ID: ${{ steps.recovery-check.outputs.cycle_id }}
+        run: |
+          set -euo pipefail
+          node "$RUNNER_PATH" fail \
+            --root . \
+            --cycle-id "$RECOVERY_CYCLE_ID" \
+            --completed-at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --failure-code PRIOR_ATTEMPT_INCOMPLETE_RECOVERY \
+            --failure-message "A later authorized run durably closed the prior incomplete START; no new cycle was opened." \
+            --control-out /tmp/bw6-stage4-recovery-control.json
+          node "$VALIDATOR_PATH" --root .
+          mapfile -t RECOVERY_PATHS < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const control = JSON.parse(fs.readFileSync('/tmp/bw6-stage4-recovery-control.json', 'utf8'));
+          const expected = {
+            resultPath: `data/walters/nfl/key-numbers/bw6-stage4/results/${process.env.RECOVERY_CYCLE_ID}-shadow-v1.json`,
+            currentPath: 'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json',
+          };
+          for (const [key, value] of Object.entries(expected)) {
+            if (control[key] !== value) throw new Error(`unexpected recovery ${key}`);
+            console.log(value);
+          }
+          NODE
+          )
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- "${RECOVERY_PATHS[@]}"
+          git diff --quiet
+          test -z "$(git ls-files --others --exclude-standard)"
+          git commit -m "Recover incomplete Walters BW6.4 attempt ${RECOVERY_CYCLE_ID}"
+          RECOVERY_COMMIT="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$BW6_SOURCE_COMMIT"
+          if ! git push --no-force origin HEAD:refs/heads/main; then
+            echo "Recovery publication was not fast-forward; prior START remains incomplete." >&2
+            exit 1
+          fi
+          git fetch origin main
+          git merge-base --is-ancestor "$RECOVERY_COMMIT" origin/main
+          READBACK_ROOT="$(mktemp -d)"
+          git worktree add --detach "$READBACK_ROOT" origin/main
+          trap 'git worktree remove --force "$READBACK_ROOT"' EXIT
+          for file in "${RECOVERY_PATHS[@]}"; do
+            cmp -- "$file" "$READBACK_ROOT/$file"
+          done
+          node "$READBACK_ROOT/$VALIDATOR_PATH" --root "$READBACK_ROOT"
+          echo "WALTERS BW6.4 INCOMPLETE ATTEMPT RECOVERY READBACK: PASS"
+
+      - name: Build durable START receipt
+        id: start-build
+        if: steps.recovery-check.outputs.required != 'true'
+        run: |
+          set -euo pipefail
+          node "$RUNNER_PATH" start \
+            --root . \
+            --started-at "$BW6_STARTED_AT" \
+            --source-commit "$BW6_SOURCE_COMMIT" \
+            --event-name "$BW6_EVENT_NAME" \
+            --run-id "$BW6_RUN_ID" \
+            --run-attempt "$BW6_RUN_ATTEMPT" \
+            --control-out /tmp/bw6-stage4-start-control.json
+          START_ACTION="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/bw6-stage4-start-control.json','utf8')).action")"
+          if [ "$START_ACTION" = "COMPLETE_REQUIRED" ]; then
+            node "$VALIDATOR_PATH" --root . --require-open-live-match
+          else
+            node "$VALIDATOR_PATH" --root .
+          fi
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require('node:fs');
+          const control = JSON.parse(fs.readFileSync('/tmp/bw6-stage4-start-control.json', 'utf8'));
+          if (!['COMPLETE_REQUIRED', 'SKIP_TERMINAL'].includes(control.action)) {
+            throw new Error(`unexpected START action: ${control.action}`);
+          }
+          for (const key of ['cycleId', 'action', 'attemptPath', 'currentPath']) {
+            if (!control[key]) throw new Error(`START control missing ${key}`);
+            console.log(`${key}=${control[key]}`);
+          }
+          const expectedAttempt = `data/walters/nfl/key-numbers/bw6-stage4/attempts/${control.cycleId}-start-v1.json`;
+          if (control.attemptPath !== expectedAttempt) throw new Error('unexpected START attempt path');
+          if (control.currentPath !== 'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json') {
+            throw new Error('unexpected START current path');
+          }
+          NODE
+          BW6_CYCLE_ID="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/bw6-stage4-start-control.json','utf8')).cycleId")"
+          echo "BW6_CYCLE_ID=$BW6_CYCLE_ID" >> "$GITHUB_ENV"
+
+      - name: Publish START with fast-forward only
+        id: start-publish
+        if: steps.recovery-check.outputs.required != 'true'
+        env:
+          START_ATTEMPT_PATH: ${{ steps.start-build.outputs.attemptPath }}
+          START_CURRENT_PATH: ${{ steps.start-build.outputs.currentPath }}
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- "$START_ATTEMPT_PATH" "$START_CURRENT_PATH"
+          mapfile -t STAGED < <(git diff --cached --name-only)
+          test "${#STAGED[@]}" -ge 1
+          for file in "${STAGED[@]}"; do
+            if [[ "$file" != "$START_ATTEMPT_PATH" && "$file" != "$START_CURRENT_PATH" ]]; then
+              echo "Unexpected START path: $file" >&2
+              exit 1
+            fi
+          done
+          git diff --quiet
+          test -z "$(git ls-files --others --exclude-standard)"
+          git commit -m "Open Walters BW6.4 shadow attempt ${BW6_CYCLE_ID}"
+          START_COMMIT="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$BW6_SOURCE_COMMIT"
+          if ! git push --no-force origin HEAD:refs/heads/main; then
+            echo "START publication was not fast-forward; no cycle began." >&2
+            exit 1
+          fi
+          echo "published=true" >> "$GITHUB_OUTPUT"
+          echo "commit=$START_COMMIT" >> "$GITHUB_OUTPUT"
+
+      - name: Read back durable START from remote main
+        if: steps.recovery-check.outputs.required != 'true'
+        env:
+          START_ATTEMPT_PATH: ${{ steps.start-build.outputs.attemptPath }}
+          START_CURRENT_PATH: ${{ steps.start-build.outputs.currentPath }}
+          START_COMMIT: ${{ steps.start-publish.outputs.commit }}
+          START_ACTION: ${{ steps.start-build.outputs.action }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge-base --is-ancestor "$START_COMMIT" origin/main
+          READBACK_ROOT="$(mktemp -d)"
+          git worktree add --detach "$READBACK_ROOT" origin/main
+          trap 'git worktree remove --force "$READBACK_ROOT"' EXIT
+          for file in "$START_ATTEMPT_PATH" "$START_CURRENT_PATH"; do
+            cmp -- "$file" "$READBACK_ROOT/$file"
+          done
+          if [ "$START_ACTION" = "COMPLETE_REQUIRED" ]; then
+            node "$READBACK_ROOT/$VALIDATOR_PATH" --root "$READBACK_ROOT" --require-open-live-match
+          else
+            node "$READBACK_ROOT/$VALIDATOR_PATH" --root "$READBACK_ROOT"
+          fi
+          echo "WALTERS BW6.4 START REMOTE READBACK: PASS"
+
+      - name: Build deterministic shadow completion
+        id: complete-build
+        if: steps.start-build.outputs.action == 'COMPLETE_REQUIRED'
+        run: |
+          set -euo pipefail
+          node "$RUNNER_PATH" complete \
+            --root . \
+            --cycle-id "$BW6_CYCLE_ID" \
+            --started-at "$BW6_STARTED_AT" \
+            --source-commit "$BW6_SOURCE_COMMIT" \
+            --event-name "$BW6_EVENT_NAME" \
+            --run-id "$BW6_RUN_ID" \
+            --run-attempt "$BW6_RUN_ATTEMPT" \
+            --control-out /tmp/bw6-stage4-complete-control.json
+          node "$VALIDATOR_PATH" --root .
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require('node:fs');
+          const control = JSON.parse(fs.readFileSync('/tmp/bw6-stage4-complete-control.json', 'utf8'));
+          const cycleId = process.env.BW6_CYCLE_ID;
+          const expected = {
+            snapshotPath: `data/walters/nfl/key-numbers/bw6-stage4/snapshots/${cycleId}-input-v1.json`,
+            resultPath: `data/walters/nfl/key-numbers/bw6-stage4/results/${cycleId}-shadow-v1.json`,
+            currentPath: 'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json',
+          };
+          for (const [key, value] of Object.entries(expected)) {
+            if (control[key] !== value) throw new Error(`unexpected completion ${key}`);
+          }
+          if (!/^data\/walters\/nfl\/key-numbers\/bw6-stage4-week-[0-9]{2}-shadow-v1\.json$/.test(control.weekResultPath)) {
+            throw new Error('unexpected completion weekResultPath');
+          }
+          const paths = [control.snapshotPath, control.resultPath, control.currentPath, control.weekResultPath];
+          console.log(`paths_json=${JSON.stringify([...new Set(paths)])}`);
+          NODE
+
+      - name: Publish completion with fast-forward only
+        id: complete-publish
+        if: steps.start-build.outputs.action == 'COMPLETE_REQUIRED'
+        env:
+          OUTPUT_PATHS_JSON: ${{ steps.complete-build.outputs.paths_json }}
+        run: |
+          set -euo pipefail
+          mapfile -t OUTPUT_PATHS < <(node -e 'for (const p of JSON.parse(process.env.OUTPUT_PATHS_JSON)) console.log(p)')
+          git add -- "${OUTPUT_PATHS[@]}"
+          mapfile -t STAGED < <(git diff --cached --name-only)
+          test "${#STAGED[@]}" -ge 1
+          node - <<'NODE' "${STAGED[@]}"
+          const cycleId = process.env.BW6_CYCLE_ID.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const allowed = new RegExp(
+            `^(data/walters/nfl/key-numbers/bw6-stage4-current-v1\\.json|` +
+            `data/walters/nfl/key-numbers/bw6-stage4-week-[0-9]{2}-shadow-v1\\.json|` +
+            `data/walters/nfl/key-numbers/bw6-stage4/(snapshots/${cycleId}-input-v1|results/${cycleId}-shadow-v1)\\.json)$`,
+          );
+          for (const file of process.argv.slice(2)) {
+            if (!allowed.test(file)) throw new Error(`unexpected completion path: ${file}`);
+          }
+          NODE
+          git diff --quiet
+          test -z "$(git ls-files --others --exclude-standard)"
+          git commit -m "Record Walters BW6.4 shadow cycle ${BW6_CYCLE_ID}"
+          COMPLETE_COMMIT="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "${{ steps.start-publish.outputs.commit }}"
+          if ! git push --no-force origin HEAD:refs/heads/main; then
+            echo "collision=true" >> "$GITHUB_OUTPUT"
+            echo "Completion publication was not fast-forward; durable START remains incomplete." >&2
+            exit 1
+          fi
+          echo "published=true" >> "$GITHUB_OUTPUT"
+          echo "commit=$COMPLETE_COMMIT" >> "$GITHUB_OUTPUT"
+
+      - name: Read back durable completion from remote main
+        if: steps.start-build.outputs.action == 'COMPLETE_REQUIRED'
+        env:
+          OUTPUT_PATHS_JSON: ${{ steps.complete-build.outputs.paths_json }}
+          COMPLETE_COMMIT: ${{ steps.complete-publish.outputs.commit }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge-base --is-ancestor "$COMPLETE_COMMIT" origin/main
+          READBACK_ROOT="$(mktemp -d)"
+          git worktree add --detach "$READBACK_ROOT" origin/main
+          trap 'git worktree remove --force "$READBACK_ROOT"' EXIT
+          mapfile -t OUTPUT_PATHS < <(node -e 'for (const p of JSON.parse(process.env.OUTPUT_PATHS_JSON)) console.log(p)')
+          for file in "${OUTPUT_PATHS[@]}"; do
+            cmp -- "$file" "$READBACK_ROOT/$file"
+          done
+          node "$READBACK_ROOT/$VALIDATOR_PATH" --root "$READBACK_ROOT"
+          echo "WALTERS BW6.4 COMPLETION REMOTE READBACK: PASS"
+
+      - name: Preserve terminal duplicate or same-date readback
+        if: steps.start-build.outputs.action == 'SKIP_TERMINAL'
+        run: |
+          echo "WALTERS BW6.4 CLEAN NONQUALIFYING ATTEMPT: DURABLE // NO COMPLETION PHASE"
+
+      - name: Fail-close a begun attempt when completion did not publish
+        if: >-
+          failure() &&
+          steps.start-publish.outputs.published == 'true' &&
+          steps.start-build.outputs.action == 'COMPLETE_REQUIRED' &&
+          steps.complete-publish.outputs.published != 'true' &&
+          steps.complete-publish.outputs.collision != 'true'
+        env:
+          START_COMMIT: ${{ steps.start-publish.outputs.commit }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "$START_COMMIT" ]; then
+            echo "Remote main moved after START; leaving the durable START incomplete." >&2
+            exit 1
+          fi
+          FAIL_ROOT="$(mktemp -d)"
+          git worktree add --detach "$FAIL_ROOT" "$START_COMMIT"
+          trap 'git worktree remove --force "$FAIL_ROOT"' EXIT
+          node "$FAIL_ROOT/$RUNNER_PATH" fail \
+            --root "$FAIL_ROOT" \
+            --cycle-id "$BW6_CYCLE_ID" \
+            --started-at "$BW6_STARTED_AT" \
+            --source-commit "$BW6_SOURCE_COMMIT" \
+            --event-name "$BW6_EVENT_NAME" \
+            --run-id "$BW6_RUN_ID" \
+            --run-attempt "$BW6_RUN_ATTEMPT" \
+            --control-out /tmp/bw6-stage4-fail-control.json
+          node "$FAIL_ROOT/$VALIDATOR_PATH" --root "$FAIL_ROOT"
+          mapfile -t FAIL_PATHS < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const control = JSON.parse(fs.readFileSync('/tmp/bw6-stage4-fail-control.json', 'utf8'));
+          const expected = {
+            resultPath: `data/walters/nfl/key-numbers/bw6-stage4/results/${process.env.BW6_CYCLE_ID}-shadow-v1.json`,
+            currentPath: 'data/walters/nfl/key-numbers/bw6-stage4-current-v1.json',
+          };
+          for (const [key, value] of Object.entries(expected)) {
+            if (control[key] !== value) throw new Error(`unexpected failure ${key}`);
+            console.log(value);
+          }
+          NODE
+          )
+          test "${#FAIL_PATHS[@]}" -ge 1
+          (
+            cd "$FAIL_ROOT"
+            git config user.name "betting-edge-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add -- "${FAIL_PATHS[@]}"
+            git diff --quiet
+            test -z "$(git ls-files --others --exclude-standard)"
+            git commit -m "Fail-close Walters BW6.4 attempt ${BW6_CYCLE_ID}"
+            test "$(git rev-parse HEAD^)" = "$START_COMMIT"
+            git push --no-force origin HEAD:refs/heads/main
+          )
+          git fetch origin main
+          FAILURE_COMMIT="$(git -C "$FAIL_ROOT" rev-parse HEAD)"
+          git merge-base --is-ancestor "$FAILURE_COMMIT" origin/main
+          READBACK_ROOT="$(mktemp -d)"
+          git worktree add --detach "$READBACK_ROOT" origin/main
+          trap 'git worktree remove --force "$READBACK_ROOT"; git worktree remove --force "$FAIL_ROOT"' EXIT
+          for file in "${FAIL_PATHS[@]}"; do
+            cmp -- "$FAIL_ROOT/$file" "$READBACK_ROOT/$file"
+          done
+          node "$READBACK_ROOT/$VALIDATOR_PATH" --root "$READBACK_ROOT"
+          echo "WALTERS BW6.4 FAILED ATTEMPT REMOTE READBACK: PASS"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Walters BW6.4 prospective shadow"
+            echo
+            echo "- Event: ${GITHUB_EVENT_NAME}"
+            echo "- Run attempt: ${GITHUB_RUN_ATTEMPT}"
+            echo "- Cycle: ${BW6_CYCLE_ID:-not opened}"
+            echo "- Source commit: ${BW6_SOURCE_COMMIT:-not bound}"
+            echo "- Authority: read-only execution-stability evidence only"
+            echo "- Production, BW7 and BW8 authority: none"
+          } >> "$GITHUB_STEP_SUMMARY"
