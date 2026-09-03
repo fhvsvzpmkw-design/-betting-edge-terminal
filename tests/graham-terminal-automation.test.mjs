@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 import {matchNflFixture,extractPinnacleHomeSpread} from '../tools/graham-market-utils.mjs';
 import {
   buildResearchLedgerCadenceProjection,
@@ -26,11 +27,20 @@ assert.equal(validateGrahamResearchLedgerScheduleMetadata(research,authority),tr
 assert.match(hotline,/current-week-terminal\.json/,'Hotline must load the current-week terminal feed');
 assert.match(hotline,/setInterval\(load,60000\)/,'Hotline must refresh the feed without rewriting the page');
 assert.match(builder,/function numeric\(v\)\{if\(v===null\|\|v===undefined\|\|v===''/,'builder must not coerce pending nulls to zero');
+assert.match(builder,/marketObservedAt:marketStatus==='ok'\?/,'failed market observations must not advertise a successful observation timestamp');
 assert.match(capture,/reportTime!=='15:15'/,'official daily comparison must be tied to the 15:15 report');
 assert.match(observer,/bookmakerOutcomeId:q\?\.bookmakerOutcomeId/,'OddsPapi observer must preserve bookmaker outcome handles for spread parsing');
 assert.doesNotMatch(workflow,/oddspapi\.io|odds-api\.io|fetch\(/i,'Graham post-processing workflow must not call an external odds API');
 assert.match(workflow,/capture-graham-daily-pinnacle\.mjs/);
 assert.match(workflow,/build-graham-current-week\.mjs/);
+
+const helperSource=hotline.slice(hotline.indexOf('function finiteNumber'),hotline.indexOf('function moneylinePair'));
+const helperContext={};
+vm.runInNewContext(helperSource,helperContext);
+assert.match(helperContext.line(null,'AWAY','HOME'),/PENDING/,'a missing Pinnacle spread must display PENDING, never PICK');
+assert.match(helperContext.signed(null),/—/,'a missing gap or market move must display an em dash, never zero');
+assert.equal(helperContext.american(null),null,'a missing Pinnacle moneyline must remain pending, never 0 / 0');
+assert.equal(helperContext.line(0,'AWAY','HOME'),'PICK','a genuine numeric zero spread must still display PICK');
 
 const game={home:'SEA',away:'NE',startTimePacific:'2026-09-09T17:20:00-07:00'};
 const fixture={fixtureId:'x',tournamentId:31,startTime:'2026-09-10T00:20:00.000Z',participant1Name:'Seattle Seahawks',participant2Name:'New England Patriots'};

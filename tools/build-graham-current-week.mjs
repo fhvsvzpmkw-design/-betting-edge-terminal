@@ -28,7 +28,8 @@ const observer=fs.existsSync(OBSERVER)?readJson(OBSERVER):null;
 const live=fs.existsSync(LIVE)?readJson(LIVE):null;
 const ratingByAbbr=new Map((ratings.teams||[]).map(t=>[t.abbr,t]));
 const marketByKey=new Map((market.games||[]).map(g=>[g.gameKey,g]));
-const fixtures=observer?.status==='ok'&&Array.isArray(observer.fixtures)?observer.fixtures:[];
+const marketStatus=String(observer?.status||'unavailable');
+const fixtures=marketStatus==='ok'&&Array.isArray(observer.fixtures)?observer.fixtures:[];
 
 const games=(numbers.games||[]).map(game=>{
   const awayRating=ratingByAbbr.get(game.away)||null;
@@ -84,7 +85,7 @@ const out={
   schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE NINETEENTH HOLE',season:numbers.season,week:numbers.week,
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
   activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
-  lastResearchAt:numbers.lastResearchAt||null,marketObservedAt:observer?.generatedAt||null,
+  lastResearchAt:numbers.lastResearchAt||null,marketStatus,marketObservedAt:marketStatus==='ok'?observer?.generatedAt||null:null,
   scheduleAuthority:numbers.scheduleAuthority,
   sourceScheduleMeta:live?.scheduleMeta||null,
   displayPolicy:{mode:'CURRENT_WEEK_TERMINAL',marketIsolation:true,pinnacleRole:'SHARP_MARKET_BENCHMARK_ONLY',bettingAuthority:false,rawOutput:true},
