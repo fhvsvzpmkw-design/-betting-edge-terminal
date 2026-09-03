@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import {planTournamentBatches} from '../tools/oddspapi-observer.mjs';
+import {ODDS_REQUEST_SPACING_MS,planTournamentBatches} from '../tools/oddspapi-observer.mjs';
 
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 const observer=fs.readFileSync('tools/oddspapi-observer.mjs','utf8');
@@ -19,9 +19,11 @@ const batches=planTournamentBatches(selected);
 assert(batches.length===2,'six selected tournaments must be split into two OddsPapi calls');
 assert(batches.every(batch=>batch.length<=5),'OddsPapi requests must never contain more than five tournament IDs');
 assert(batches.flat().map(t=>t.id).join(',')==='1,2,3,4,5,6','tournament batching must preserve all selected IDs and their order');
+assert(ODDS_REQUEST_SPACING_MS>=750,'batched OddsPapi calls must be spaced beyond the observed 524ms endpoint throttle');
+assert(observer.includes('if(index>0)await pause(ODDS_REQUEST_SPACING_MS)'),'the observer must apply governed pacing between tournament batches');
 assert(observer.includes('estimatedRemainingAfter=remaining===null?null:remaining-batches.length'),'quota projection must account for every planned odds request');
 assert(observer.includes('observation.diagnostics.billableRequestsThisRun++'),'observer diagnostics must count every attempted odds request');
 
 assert(primary.includes('const HORIZON_HOURS = 30;'),'primary Betting Edge odds worker must retain its 30-hour event horizon');
 
-console.log('ODDSPAPI RETENTION HORIZONS: PASS // NFL 384h // BOXING 30h // MAX 5 TOURNAMENT IDS PER REQUEST');
+console.log('ODDSPAPI RETENTION HORIZONS: PASS // NFL 384h // BOXING 30h // MAX 5 IDS // BATCHES PACED');
