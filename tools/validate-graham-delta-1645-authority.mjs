@@ -8,7 +8,7 @@ const readJson = relative => JSON.parse(fs.readFileSync(path.join(ROOT, relative
 const authority = fs.readFileSync(authorityPath, 'utf8');
 
 const requiredMarkers = [
-  '- Authority version: 2.0',
+  '- Authority version: 2.1',
   '- Status: OPERATIONAL',
   '- Task key: `DELTA_1645`',
   'graham-research-runtime-v1',
@@ -19,7 +19,9 @@ const requiredMarkers = [
   'libfile_35cb81caf4c8819195e19455a86d1080',
   'libfile_190d248c9cc88191bf41ecf89ed85d66',
   'libfile_85e50f8df8108191b10aba00d1fc8022',
-  'STAGE5_PRODUCTION_REVIEW_VALIDATED_NON_OPERATIONAL_NFL_READBACK_PENDING',
+  'APPROVED_WALTERS_QB_PERFORMANCE',
+  'Graham QB performance production',
+  'FIRST_NFL_BEARING_BETTING_EDGE_READBACK',
   'marketViewed=false',
   'BLOCKED_WITH_DURABLE_RECORD',
   'receiptBlobSha',
@@ -35,7 +37,10 @@ const requiredPaths = [
   'data/walters/nfl/graham-research-runtime-policy-v1.json',
   'data/walters/nfl/graham-research-completion-policy-v1.json',
   'data/walters/nfl/player-values/player-values-access-v1.json',
-  'data/walters/nfl/qb-performance/stage5-current.json',
+  'data/walters/nfl/qb-production/production-contract-v1.json',
+  'data/walters/nfl/qb-production-current.json',
+  'data/walters/nfl/qb-production-staging.json',
+  '.github/workflows/graham-qb-performance-production.yml',
   '.github/workflows/graham-research-runtime.yml',
   '.github/workflows/graham-research-completion.yml',
 ];
@@ -48,7 +53,8 @@ for (const relative of requiredPaths) {
 const runtime = readJson('data/walters/nfl/graham-research-runtime-policy-v1.json');
 const completion = readJson('data/walters/nfl/graham-research-completion-policy-v1.json');
 const access = readJson('data/walters/nfl/player-values/player-values-access-v1.json');
-const qbStage5 = readJson('data/walters/nfl/qb-performance/stage5-current.json');
+const qbContract = readJson('data/walters/nfl/qb-production/production-contract-v1.json');
+const qbProduction = readJson('data/walters/nfl/qb-production-current.json');
 const schedule = readJson('data/walters/nfl/graham-schedule-authority-v1.json');
 const delta = schedule.tasks?.find(task => task.taskKey === 'DELTA_1645');
 
@@ -71,12 +77,18 @@ if (
   throw new Error('GRAHAM_DELTA_1645_PLAYER_VALUE_ACCESS_INVALID');
 }
 if (
-  qbStage5.status !== 'STAGE5_PRODUCTION_REVIEW_VALIDATED_NON_OPERATIONAL_NFL_READBACK_PENDING' ||
-  qbStage5.productionAuthority !== false ||
-  qbStage5.grahamWritesAllowed !== false ||
-  qbStage5.activationAuthorized !== false
+  qbContract.state !== 'APPROVED_SCOPED_ACTIVATION' ||
+  qbContract.authorityToken !== 'APPROVED_WALTERS_QB_PERFORMANCE' ||
+  qbContract.productionScope?.embeddedBaselineWritesAllowed !== false ||
+  qbContract.productionScope?.carriedTeamRatingWritesAllowed !== false ||
+  qbProduction.state !== 'OPERATIONAL_SCOPED' ||
+  qbProduction.productionAuthority !== true ||
+  qbProduction.grahamWritesAllowed !== true ||
+  qbProduction.marketViewed !== false ||
+  qbProduction.teamBindings?.length !== 32 ||
+  qbProduction.teamBindings?.find(item => item.team === 'ATL')?.bindingStatus === 'APPROVED_WALTERS_QB_PERFORMANCE'
 ) {
-  throw new Error('GRAHAM_DELTA_1645_QB_STAGE5_BOUNDARY_INVALID');
+  throw new Error('GRAHAM_DELTA_1645_QB_PRODUCTION_BOUNDARY_INVALID');
 }
 if (
   delta?.time !== '16:45' ||
@@ -86,5 +98,5 @@ if (
 }
 
 console.log(
-  'GRAHAM DELTA 16:45 AUTHORITY: PASS // V2.0 // RUNTIME CHECKPOINT + 32 PLAYER-VALUE SHARDS + QB NON-OPERATIONAL',
+  'GRAHAM DELTA 16:45 AUTHORITY: PASS // V2.1 // RUNTIME CHECKPOINT + 32 PLAYER-VALUE SHARDS + QB OPERATIONAL SCOPED',
 );

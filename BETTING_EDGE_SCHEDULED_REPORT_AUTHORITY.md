@@ -1,7 +1,7 @@
 # Betting Edge Scheduled Report Authority
 
 **Status:** OPERATIONAL  
-**Authority version:** 1.0  
+**Authority version:** 1.1
 **Effective:** 2026-09-02  
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
@@ -109,6 +109,14 @@ Do not freeze or stage until the complete recommendation set passes. Once frozen
 For eligible NFL spread/moneyline use the current operational Walters interface/authority. In `BET_AUTHORITY`, AVAILABLE/current/arithmetic-verified Walters work may originate a candidate or contribute an independent fair, but it must still pass all Core, identity, freshness, personnel, price-quality, playTo, exposure and staking gates.
 
 Walters cannot fabricate price or stake. Include `waltersEvidence` on every recommendation. Markets/leagues not eligible under the controlled Walters interface use `NOT_APPLICABLE`. Research History Fit remains read-only and cannot create a BET or move fair.
+
+### Walters QB production read-back
+
+Before assessing any NFL spread or moneyline, resolve the active Graham week from `data/walters/nfl/active-week.json` and read the exact active current-numbers board, `data/walters/nfl/qb-production/production-contract-v1.json`, and `data/walters/nfl/qb-production-current.json`. Require QB production `state=OPERATIONAL_SCOPED`, authority token `APPROVED_WALTERS_QB_PERFORMANCE`, `productionAuthority=true`, `grahamWritesAllowed=true`, and `marketViewed=false`.
+
+For a game whose two team bindings are currently resolved, require exactly one matching `QB_PERFORMANCE_PRODUCTION` adjustment on the active board, verify that its home-spread points equal away-team QB delta minus home-team QB delta, and verify the board's exact and displayed fair decomposition before using the Graham fair. Use the durable current board result; never rebuild the QB calculation from memory or market prices. If either team is currently fail closed, record the QB layer as unavailable for that game and do not let Walters originate the candidate; an otherwise valid independent Core review may continue under its own controls. Atlanta remains permanently excluded from routine QB production scope.
+
+The QB layer has no direct BET, status, stake, or gate-bypass authority. The first durably published report containing an NFL evaluation while `postActivationCanary.state=PENDING` is the candidate for `FIRST_NFL_BEARING_BETTING_EDGE_READBACK`. After publication, report its exact history paths and whether each NFL Walters fair matched the same active-board QB production state so the governed canary can be closed. The scheduled report task must not directly edit the QB production manifest, rewrite issued History, or roll back a Graham board.
 
 ## 9. Recommendation-card selection and delivery
 

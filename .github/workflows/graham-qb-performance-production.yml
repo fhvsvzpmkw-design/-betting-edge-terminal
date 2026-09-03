@@ -1,0 +1,133 @@
+name: Graham QB performance production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-qb-performance-production.yml
+      - data/walters/nfl/active-week.json
+      - data/walters/nfl/20*/week-*-current-numbers.json
+      - data/walters/nfl/qb-production-current.json
+      - data/walters/nfl/qb-production-staging.json
+      - data/walters/nfl/qb-production/**
+      - data/walters/nfl/qb-performance/**
+      - tools/apply-walters-qb-performance-production.mjs
+      - tools/validate-walters-qb-performance-production.mjs
+      - tests/walters-qb-performance-production.test.mjs
+  pull_request:
+    paths:
+      - .github/workflows/graham-qb-performance-production.yml
+      - data/walters/nfl/active-week.json
+      - data/walters/nfl/20*/week-*-current-numbers.json
+      - data/walters/nfl/qb-production-current.json
+      - data/walters/nfl/qb-production-staging.json
+      - data/walters/nfl/qb-production/**
+      - data/walters/nfl/qb-performance/**
+      - tools/apply-walters-qb-performance-production.mjs
+      - tools/validate-walters-qb-performance-production.mjs
+      - tests/walters-qb-performance-production.test.mjs
+  workflow_dispatch:
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout triggering ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate activation code syntax
+        run: |
+          set -euo pipefail
+          node --check tools/apply-walters-qb-performance-production.mjs
+          node --check tools/validate-walters-qb-performance-production.mjs
+          node --check tests/walters-qb-performance-production.test.mjs
+
+      - name: Validate proposed governed state
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          node tools/apply-walters-qb-performance-production.mjs --check
+          node tools/validate-walters-qb-performance-production.mjs
+          node --test tests/walters-qb-performance-production.test.mjs
+
+      - name: Reconcile active board and publish on main
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            STAGING_STATE="$(node -e "const s=require('./data/walters/nfl/qb-production-staging.json');process.stdout.write(String(s.state||''))")"
+            if [ "$STAGING_STATE" = "READY" ]; then
+              node tools/apply-walters-qb-performance-production.mjs --staging data/walters/nfl/qb-production-staging.json
+            elif [ "$STAGING_STATE" = "IDLE" ]; then
+              node tools/apply-walters-qb-performance-production.mjs --reconcile
+            else
+              echo "Unsupported QB production staging state: $STAGING_STATE" >&2
+              exit 1
+            fi
+
+            node tools/apply-walters-qb-performance-production.mjs --check
+            node tools/validate-walters-qb-performance-production.mjs
+            node --test tests/walters-qb-performance-production.test.mjs
+
+            ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+            git add -- \
+              "$ACTIVE_NUMBERS" \
+              data/walters/nfl/qb-production-current.json \
+              data/walters/nfl/qb-production/activation-audit-v1.json \
+              data/walters/nfl/qb-production/rollback-week-01-current-numbers-v1.json
+            if git diff --cached --quiet; then
+              echo "Graham QB production already reconciled."
+              exit 0
+            fi
+
+            git commit -m "Reconcile Walters QB performance production"
+            if git push origin HEAD:main; then
+              echo "Graham QB production published on attempt $attempt."
+              exit 0
+            fi
+            echo "Graham QB production publish collision on attempt $attempt; retrying from latest main."
+          done
+
+          echo "Graham QB production could not publish after four attempts." >&2
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f data/walters/nfl/qb-production-current.json ]; then
+            node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync('data/walters/nfl/qb-production-current.json','utf8'));
+          const resolved=(p.teamBindings||[]).filter(item=>item.bindingStatus==='APPROVED_WALTERS_QB_PERFORMANCE').length;
+          const failed=(p.teamBindings||[]).filter(item=>item.bindingStatus!=='APPROVED_WALTERS_QB_PERFORMANCE').map(item=>item.team);
+          console.log('## Walters QB performance production');
+          console.log(`- State: ${p.state}`);
+          console.log(`- Current resolved teams: ${resolved}`);
+          console.log(`- Current fail-closed teams: ${failed.join(', ')}`);
+          console.log(`- Post-activation NFL canary: ${p.postActivationCanary.state}`);
+          console.log('- Direct BET/stake authority: false');
+          console.log('- Market viewed: false');
+          NODE
+          fi

@@ -1,230 +1,43 @@
-name: Walters QB Performance Stage 5
+name: Walters QB Performance Stage 5 historical readback
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/walters-qb-performance-stage5.yml"
-      - "data/history/runs/2026-09-02/evening-151830.json"
-      - "data/walters/nfl-power-ratings-ledger.json"
-      - "data/walters/nfl/active-week.json"
-      - "data/walters/nfl/personnel-production-current.json"
-      - "data/walters/nfl/matchup-production-current.json"
-      - "data/walters/nfl/2026/week-01-current-numbers.json"
-      - "data/walters/nfl/2026/week-01-research-ledger.json"
-      - "data/walters/nfl/current-week-terminal.json"
-      - "data/walters/nfl/qb-performance/model/stage3c-model-v1.json"
-      - "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
-      - "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
-      - "data/walters/nfl/qb-performance/stage4-contract-v1.json"
-      - "data/walters/nfl/qb-performance/stage4-acceptance-v1.json"
-      - "data/walters/nfl/qb-performance/stage4-current.json"
-      - "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json"
-      - "data/walters/nfl/qb-performance/stage4/shadow-board-v1.json"
-      - "data/walters/nfl/qb-performance/stage4/uncertainty-reconciliation-v1.json"
-      - "data/walters/nfl/qb-performance/stage5-contract-v1.json"
-      - "tools/build-walters-qb-performance-stage5.py"
-      - "tools/validate-walters-qb-performance-stage5.mjs"
-      - "tests/walters-qb-performance-stage5.test.mjs"
-  pull_request:
-    paths:
-      - ".github/workflows/walters-qb-performance-stage5.yml"
-      - "data/history/runs/2026-09-02/evening-151830.json"
-      - "data/walters/nfl-power-ratings-ledger.json"
-      - "data/walters/nfl/active-week.json"
-      - "data/walters/nfl/personnel-production-current.json"
-      - "data/walters/nfl/matchup-production-current.json"
-      - "data/walters/nfl/2026/week-01-current-numbers.json"
-      - "data/walters/nfl/2026/week-01-research-ledger.json"
-      - "data/walters/nfl/current-week-terminal.json"
-      - "data/walters/nfl/qb-performance/model/stage3c-model-v1.json"
-      - "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
-      - "data/walters/nfl/qb-performance/stage3-acceptance-v1.json"
-      - "data/walters/nfl/qb-performance/stage4-contract-v1.json"
-      - "data/walters/nfl/qb-performance/stage4-acceptance-v1.json"
-      - "data/walters/nfl/qb-performance/stage4-current.json"
-      - "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json"
-      - "data/walters/nfl/qb-performance/stage4/shadow-board-v1.json"
-      - "data/walters/nfl/qb-performance/stage4/uncertainty-reconciliation-v1.json"
-      - "data/walters/nfl/qb-performance/stage5-contract-v1.json"
-      - "tools/build-walters-qb-performance-stage5.py"
-      - "tools/validate-walters-qb-performance-stage5.mjs"
-      - "tests/walters-qb-performance-stage5.test.mjs"
-
-concurrency:
-  group: walters-qb-performance-stage5-${{ github.ref }}
-  cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-validate-stage5-review:
+  validate-frozen-stage5:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      - name: Checkout triggering ref
+      - name: Checkout accepted Stage 5 evidence commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+          ref: 774df41143140f9c5cdd7d0bb30519c886132f82
+          fetch-depth: 1
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: '22'
 
-      - name: Validate durable Stage 4 handoff
+      - name: Read back frozen Stage 5 acceptance without rebuilding it
         run: |
           set -euo pipefail
-          STAGE4_DIR="$RUNNER_TEMP/walters-qb-stage4-readback"
-          rm -rf "$STAGE4_DIR"
-          trap 'git worktree remove "$STAGE4_DIR" --force >/dev/null 2>&1 || true' EXIT
-          git worktree add --detach "$STAGE4_DIR" 1a8222a1114e3fcfc806fde718c81aaf2b0bfa7f
-          (
-            cd "$STAGE4_DIR"
-            node tools/validate-walters-qb-performance-stage4.mjs
-          )
-
-      - name: Run Stage 5 deterministic helper tests
-        run: python tools/build-walters-qb-performance-stage5.py --self-test
-
-      - name: Build Stage 5 production-review evidence
-        id: stage5_build
-        run: python tools/build-walters-qb-performance-stage5.py
-
-      - name: Validate Stage 5 review, preservation and activation boundary
-        id: stage5_validate
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          VALIDATOR_STDOUT="$RUNNER_TEMP/stage5-validator.stdout"
-          VALIDATOR_STDERR="$RUNNER_TEMP/stage5-validator.stderr"
-          set +e
-          node tools/validate-walters-qb-performance-stage5.mjs >"$VALIDATOR_STDOUT" 2>"$VALIDATOR_STDERR"
-          VALIDATOR_STATUS=$?
-          set -e
-          if [ "$VALIDATOR_STATUS" -eq 0 ]; then
-            cat "$VALIDATOR_STDOUT"
-            exit 0
-          fi
-          cat "$VALIDATOR_STDERR"
-          python - "$VALIDATOR_STDERR" <<'PY'
-          import hashlib
-          import json
-          import re
-          import sys
-          from pathlib import Path
-
-          root = Path.cwd()
-          stderr_path = Path(sys.argv[1])
-          raw_error = stderr_path.read_text(encoding="utf-8")
-          start = raw_error.find("{")
-          if start < 0:
-              raise SystemExit("Stage 5 validator failed without a JSON error payload")
-          error_doc = json.loads(raw_error[start:])
-          errors = error_doc.get("errors") or []
-          allowed = re.compile(r"^(?:[A-Za-z0-9_-]+ canonical hash mismatch:|Frozen input canonical hash mismatch:)")
-          unexpected = [item for item in errors if not allowed.match(str(item))]
-          if unexpected:
-              raise SystemExit("Unexpected Stage 5 validator errors: " + json.dumps(unexpected))
-
-          def canonical_payload(value):
-              if isinstance(value, list):
-                  return [canonical_payload(item) for item in value]
-              if isinstance(value, dict):
-                  return {
-                      key: canonical_payload(value[key])
-                      for key in sorted(value)
-                      if key != "contentSha256Canonical"
-                  }
-              return value
-
-          def canonical_sha(value):
-              encoded = json.dumps(
-                  canonical_payload(value),
-                  sort_keys=True,
-                  separators=(",", ":"),
-                  ensure_ascii=False,
-              ).encode("utf-8")
-              return hashlib.sha256(encoded).hexdigest()
-
-          def read_json(relative_path):
-              return json.loads((root / relative_path).read_text(encoding="utf-8"))
-
-          generated_paths = [
-              "data/walters/nfl/qb-performance/stage5/freeze-manifest-v1.json",
-              "data/walters/nfl/qb-performance/stage5/production-review-v1.json",
-              "data/walters/nfl/qb-performance/stage5/activation-readiness-v1.json",
-              "data/walters/nfl/qb-performance/stage5/regression-audit-v1.json",
-              "data/walters/nfl/qb-performance/stage5-acceptance-v1.json",
-              "data/walters/nfl/qb-performance/stage5-current.json",
-          ]
-          for relative_path in generated_paths:
-              document = read_json(relative_path)
-              actual = canonical_sha(document)
-              expected = document.get("contentSha256Canonical")
-              if actual != expected:
-                  raise SystemExit(f"Python canonical read-back mismatch: {relative_path}: {actual} != {expected}")
-
-          freeze = read_json(generated_paths[0])
-          for entry in freeze.get("inputs") or []:
-              expected = entry.get("canonicalJsonSha256")
-              if not expected:
-                  continue
-              actual = canonical_sha(read_json(entry["path"]))
-              if actual != expected:
-                  raise SystemExit(f"Python frozen-input canonical mismatch: {entry['path']}: {actual} != {expected}")
-
-          print(json.dumps({
-              "schemaVersion": "walters-qb-performance-stage5-cross-runtime-canonical-v1",
-              "status": "PASS",
-              "nodeValidatorNonCanonicalChecks": "PASS",
-              "pythonCanonicalReadback": "PASS",
-              "serializationDifferenceCount": len(errors),
-          }, indent=2))
-          PY
-
-      - name: Run Stage 5 guardrail tests
-        id: stage5_tests
-        continue-on-error: true
-        run: node --test tests/walters-qb-performance-stage5.test.mjs
-
-      - name: Publish Stage 5 review evidence only after all gates pass on main
-        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.stage5_build.outcome == 'success' && steps.stage5_validate.outcome == 'success' && steps.stage5_tests.outcome == 'success'
-        run: |
-          set -euo pipefail
-          git config user.name "betting-edge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- \
-            data/walters/nfl/qb-performance/stage5/freeze-manifest-v1.json \
-            data/walters/nfl/qb-performance/stage5/production-review-v1.json \
-            data/walters/nfl/qb-performance/stage5/activation-readiness-v1.json \
-            data/walters/nfl/qb-performance/stage5/regression-audit-v1.json \
-            data/walters/nfl/qb-performance/stage5-acceptance-v1.json \
-            data/walters/nfl/qb-performance/stage5-current.json
-          if git diff --cached --quiet; then
-            echo "No Stage 5 output changes to publish."
-            exit 0
-          fi
-          git fetch origin main
-          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
-          git commit -m "Validate Walters QB performance Stage 5 production review"
-          git push origin HEAD:main
-
-      - name: Enforce Stage 5 review result
-        if: always()
-        env:
-          STAGE5_BUILD: ${{ steps.stage5_build.outcome }}
-          STAGE5_VALIDATE: ${{ steps.stage5_validate.outcome }}
-          STAGE5_TESTS: ${{ steps.stage5_tests.outcome }}
-        run: |
-          set -euo pipefail
-          test "$STAGE5_BUILD" = "success"
-          test "$STAGE5_VALIDATE" = "success"
-          test "$STAGE5_TESTS" = "success"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+          const review=read('data/walters/nfl/qb-performance/stage5/production-review-v1.json');
+          const readiness=read('data/walters/nfl/qb-performance/stage5/activation-readiness-v1.json');
+          const regression=read('data/walters/nfl/qb-performance/stage5/regression-audit-v1.json');
+          const acceptance=read('data/walters/nfl/qb-performance/stage5-acceptance-v1.json');
+          const current=read('data/walters/nfl/qb-performance/stage5-current.json');
+          if(current.status!=='STAGE5_PRODUCTION_REVIEW_VALIDATED_NON_OPERATIONAL_NFL_READBACK_PENDING')throw new Error('Stage 5 status mismatch');
+          if(regression.passCount!==18||regression.failCount!==0)throw new Error('Stage 5 regression mismatch');
+          if(acceptance.productionAuthority!==false||acceptance.activationAuthorized!==false)throw new Error('Historical Stage 5 boundary changed');
+          if(readiness.activationAuthorized!==false||current.nflPathVerified!==false)throw new Error('Historical Stage 5 readiness changed');
+          if(review.marketBoundary?.marketFieldsUsedByQbFormula!==false)throw new Error('Historical market boundary changed');
+          console.log('WALTERS QB STAGE 5 HISTORICAL READBACK: PASS // 18/18 // NON-OPERATIONAL REVIEW PRESERVED');
+          NODE
+          git diff --exit-code
