@@ -64,6 +64,15 @@
       "submittedAt"
     ]
   },
+  "runtimeCheckpoint": {
+    "policyPath": "data/walters/nfl/graham-research-runtime-policy-v1.json",
+    "policyId": "graham-research-runtime-v1",
+    "eventDirectoryTemplate": "data/walters/nfl/{season}/week-{weekPadded}-research-runtime",
+    "requireDurableRunStartedBeforeExpensiveSourceLoading": true,
+    "requireCompletedEventAfterVerifiedReceipt": true,
+    "requireControlledFailureEventWhenCompletionCannotFinish": true,
+    "staleRunClosureWorkflow": ".github/workflows/graham-research-runtime.yml"
+  },
   "verification": {
     "workflow": ".github/workflows/graham-research-completion.yml",
     "validator": "tools/validate-graham-research-completion.mjs",

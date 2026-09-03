@@ -15,6 +15,9 @@ const padWeek=w=>String(Number(w)).padStart(2,'0');
 
 const policy=read(policyPath);
 if(policy.schema!==1||policy.state!=='OPERATIONAL'||policy.policyId!=='graham-research-completion-v1')throw new Error('GRAHAM_RESEARCH_COMPLETION_POLICY_NOT_OPERATIONAL');
+if(policy.runtimeCheckpoint?.policyId!=='graham-research-runtime-v1'||policy.runtimeCheckpoint?.requireDurableRunStartedBeforeExpensiveSourceLoading!==true||policy.runtimeCheckpoint?.requireCompletedEventAfterVerifiedReceipt!==true||policy.runtimeCheckpoint?.requireControlledFailureEventWhenCompletionCannotFinish!==true)throw new Error('GRAHAM_RESEARCH_COMPLETION_RUNTIME_CHECKPOINT_INVALID');
+const runtimePolicy=read(path.resolve(ROOT,policy.runtimeCheckpoint.policyPath));
+if(runtimePolicy.schema!==1||runtimePolicy.state!=='OPERATIONAL'||runtimePolicy.policyId!==policy.runtimeCheckpoint.policyId)throw new Error('GRAHAM_RESEARCH_COMPLETION_RUNTIME_POLICY_NOT_OPERATIONAL');
 
 let active,staging,ledger,ledgerPathForReceipt;
 if(fixturePath){

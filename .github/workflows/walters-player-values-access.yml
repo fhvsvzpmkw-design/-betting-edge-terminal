@@ -1,0 +1,68 @@
+name: Walters player values access
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/walters-player-values-access.yml
+      - tools/build-walters-player-values-access.mjs
+      - data/walters/nfl/player-values/player-values-2026-v1.json
+      - data/walters/nfl/player-values/stage2-current.json
+      - data/walters/nfl/player-values/player-values-access-v1.json
+      - data/walters/nfl/player-values/by-team-v1/*.json
+  workflow_dispatch:
+
+concurrency:
+  group: walters-player-values-access
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build, validate and publish source-bound access shards
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            node --check tools/build-walters-player-values-access.mjs
+            node tools/build-walters-player-values-access.mjs --write
+            node tools/build-walters-player-values-access.mjs
+
+            git add -- \
+              data/walters/nfl/player-values/player-values-access-v1.json \
+              data/walters/nfl/player-values/by-team-v1
+            if git diff --cached --quiet; then
+              echo "Walters player-value access artifacts already current."
+              exit 0
+            fi
+
+            git commit -m "Refresh Walters player-value access shards"
+            if git push origin HEAD:main; then
+              echo "Walters player-value access artifacts published on attempt $attempt."
+              exit 0
+            fi
+            echo "Walters player-value access publish collision on attempt $attempt; rebuilding against latest main."
+          done
+
+          echo "Walters player-value access artifacts could not publish after four attempts." >&2
+          exit 1
