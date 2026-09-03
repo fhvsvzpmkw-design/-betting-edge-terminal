@@ -1,0 +1,118 @@
+name: Walters BW6 Stage 3 Holdout
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json'
+      - 'tools/build-walters-bw6-stage2.py'
+      - 'tools/build-walters-bw6-stage3.py'
+      - 'tools/validate-walters-bw6-stage3.mjs'
+      - 'tests/walters-bw6-stage3.test.mjs'
+      - '.github/workflows/walters-bw6-stage3.yml'
+  pull_request:
+    paths:
+      - 'data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json'
+      - 'data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json'
+      - 'tools/build-walters-bw6-stage2.py'
+      - 'tools/build-walters-bw6-stage3.py'
+      - 'tools/validate-walters-bw6-stage3.mjs'
+      - 'tests/walters-bw6-stage3.test.mjs'
+      - '.github/workflows/walters-bw6-stage3.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walters-bw6-stage3-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  evaluate-and-enforce-fail-closed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout governed revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate BW6 Stage 1 and Stage 2 evidence
+        run: |
+          node tools/validate-walters-bw6-stage1.mjs
+          node tools/validate-walters-bw6-stage2.mjs
+
+      - name: Snapshot protected and frozen inputs
+        run: |
+          set -euo pipefail
+          mapfile -t PROTECTED < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json', 'utf8'));
+          for (const file of contract.protectedArtifacts) console.log(file);
+          NODE
+          )
+          sha256sum "${PROTECTED[@]}" > /tmp/bw6-stage3-protected-before.sha256
+          sha256sum \
+            data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv \
+            data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json \
+            data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json \
+            > /tmp/bw6-stage3-frozen-before.sha256
+
+      - name: Run deterministic helper tests
+        run: python tools/build-walters-bw6-stage3.py --self-test
+
+      - name: Reproduce the governed holdout rejection
+        run: |
+          set +e
+          python tools/build-walters-bw6-stage3.py
+          code=$?
+          set -e
+          test "$code" -eq 2
+          echo "BW6.3 correctly returned fail-closed exit code 2."
+
+      - name: Validate holdout evidence and blocked handoff
+        run: |
+          node --check tools/validate-walters-bw6-stage3.mjs
+          node tools/validate-walters-bw6-stage3.mjs
+
+      - name: Run BW6 Stage 3 guardrail tests
+        run: node --test tests/walters-bw6-stage3.test.mjs
+
+      - name: Verify reproducible holdout audit
+        run: git diff --exit-code -- data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json
+
+      - name: Verify protected and frozen inputs are unchanged
+        run: |
+          set -euo pipefail
+          mapfile -t PROTECTED < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json', 'utf8'));
+          for (const file of contract.protectedArtifacts) console.log(file);
+          NODE
+          )
+          sha256sum "${PROTECTED[@]}" > /tmp/bw6-stage3-protected-after.sha256
+          sha256sum \
+            data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv \
+            data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json \
+            data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json \
+            > /tmp/bw6-stage3-frozen-after.sha256
+          diff -u /tmp/bw6-stage3-protected-before.sha256 /tmp/bw6-stage3-protected-after.sha256
+          diff -u /tmp/bw6-stage3-frozen-before.sha256 /tmp/bw6-stage3-frozen-after.sha256
+          echo "WALTERS BW6 STAGE 3 FAIL-CLOSED GUARD: PASS"

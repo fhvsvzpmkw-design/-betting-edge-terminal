@@ -1,0 +1,568 @@
+{
+  "schemaVersion": "walters-bw6-stage1-contract-v1",
+  "module": "WALTERS_KEY_NUMBER_AND_HALF_POINT_VALUE",
+  "stage": "BW6.1",
+  "status": "CONTRACT_LOCKED_FOR_BW6_2_CALIBRATION_NON_OPERATIONAL",
+  "createdDate": "2026-09-03",
+  "season": 2026,
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketViewed": false,
+  "purpose": "Re-estimate current NFL exact-margin point weights and the fair cost of buying a half-point while preserving the source-locked Walters method, using only chronologically available football results and an independent pregame favorite orientation.",
+  "scope": {
+    "ownedRules": [
+      "BW-R021",
+      "BW-R022",
+      "BW-R023"
+    ],
+    "ownedOutput": "A versioned, read-only table for exact margins 1 through 18 containing current point-weight probabilities, uncertainty, support status and transparent -110 half-point fair-cost calculations.",
+    "notOwned": {
+      "BW7": {
+        "ruleIds": [
+          "BW-R024",
+          "BW-R025",
+          "BW-R026"
+        ],
+        "boundary": "Weighted-advantage accumulation, the cross-zero deduction and star/play thresholds remain deferred until BW6 survives multiple clean cycles."
+      },
+      "BW8": {
+        "ruleIds": [
+          "BW-R027",
+          "BW-R028"
+        ],
+        "boundary": "Market price-to-spread normalization, including the partial page-269 table and any generalized curve, remains deferred. No interpolation or extrapolation is permitted in BW6."
+      },
+      "other": [
+        "Graham fair-number construction",
+        "team power ratings",
+        "home-field values",
+        "personnel values",
+        "matchup adjustments",
+        "quarterback production values",
+        "market selection",
+        "BET, LEAN, WAIT or PASS classification",
+        "staking"
+      ]
+    }
+  },
+  "sourceAuthority": {
+    "primary": "Billy Walters with Armen Keteyian, Gambler, Chapters 21-22",
+    "documentClosureStatus": "SOURCE_LOCKED_FOUNDATION_DOCUMENT_CLOSED",
+    "documentPages": "232-274",
+    "pagesAccountedFor": 43,
+    "unresolvedTranscriptionChecks": 0,
+    "governedSourceArtifacts": [
+      {
+        "artifact": "walters-rule-registry-v1.0.json",
+        "embeddedVersion": "1.0.1",
+        "sha256": "1e258dc953752fa0a189fc803bf7b6fdc2fa8b4ef2614d3ab3d41554d3f450db",
+        "role": "Source-locked rules, constants, anomaly boundaries and provenance labels."
+      },
+      {
+        "artifact": "walters-page-disposition-ledger-v1.0.json",
+        "sha256": "0a8ff1a513b39aaa0e8dc61b71edd7c6fd21f7bff7cec573d722215821f1b498",
+        "role": "Page-by-page closure evidence for pages 232 through 274."
+      },
+      {
+        "artifact": "walters-lines-calculator-v1.0.mjs",
+        "sha256": "39097ecea5b283fc0d1f787c1694c99613f2efc3d186499537463aefb349287e",
+        "role": "Source-locked BOOK-EXACT calculation behavior."
+      },
+      {
+        "artifact": "walters-lines-calculator-v1.0.test.mjs",
+        "sha256": "32ee9bb2203ac265b0b32575bc5157ce26315f4f8d0ea0f56dcf5d906746167c",
+        "role": "Source-locked regression behavior."
+      }
+    ],
+    "rules": [
+      {
+        "ruleId": "BW-R021",
+        "pages": [
+          263,
+          264,
+          266
+        ],
+        "provenance": "WALTERS EXACT",
+        "rule": "Value a line difference by the probability weight of each exact football margin crossed, not raw point distance."
+      },
+      {
+        "ruleId": "BW-R022",
+        "pages": [
+          264,
+          265,
+          266
+        ],
+        "provenance": "WALTERS CALIBRATED",
+        "rule": "Re-estimate unrounded point weights as scoring rules and behavior change while preserving the Walters calculation method."
+      },
+      {
+        "ruleId": "BW-R023",
+        "pages": [
+          265,
+          266
+        ],
+        "provenance": "WALTERS EXACT",
+        "rule": "Buy a half-point only when incremental price is no greater than the fair cost for that exact number and direction."
+      }
+    ],
+    "sourceBoundary": {
+      "pointWeightPrecision": "The published point weights are rounded percentages and remain BOOK-EXACT reference values only.",
+      "supportedMargins": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "unsupportedBookHalfPointMargins": [
+        21,
+        24
+      ],
+      "bw8BlockingAnomaly": {
+        "anomalyId": "BW-A014",
+        "pages": [
+          269
+        ],
+        "rule": "The partial implicit-spread table permits exact lookup only in BW8. BW6 cannot interpolate, extrapolate or consume it."
+      }
+    }
+  },
+  "bookExactBaseline": {
+    "productionUseAllowedInBW6": false,
+    "pointWeightsPercentPublishedRounded": {
+      "1": 3,
+      "2": 3,
+      "3": 8,
+      "4": 3,
+      "5": 3,
+      "6": 5,
+      "7": 6,
+      "8": 3,
+      "9": 2,
+      "10": 4,
+      "11": 2,
+      "12": 2,
+      "13": 2,
+      "14": 5,
+      "15": 2,
+      "16": 3,
+      "17": 3,
+      "18": 3
+    },
+    "publishedWeightSumPercent": 62,
+    "buyHalfPointFairCostUsdPer100": {
+      "1": 6,
+      "2": 6,
+      "3": {
+        "buyOffPushToWin": 20,
+        "buyOntoLossToPush": 22
+      },
+      "4": 6,
+      "5": 6,
+      "6": 10,
+      "7": 13,
+      "8": 6,
+      "9": 3,
+      "10": 9,
+      "11": 5,
+      "12": 4,
+      "13": 5,
+      "14": 11,
+      "15": 5,
+      "16": 6,
+      "17": 6,
+      "18": 6,
+      "21": null,
+      "24": null
+    },
+    "interpretation": "Each point weight is the published value of the exact signed result number when evaluating a favorite-oriented spread. It is not the full two-sided absolute-margin frequency.",
+    "precisionRule": "Never infer unrounded source probabilities from the rounded printed values. Current estimates must carry WALTERS CALIBRATED provenance and their own uncertainty."
+  },
+  "historicalDataContract": {
+    "sourceSnapshot": {
+      "path": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+      "sha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+      "upstreamOwner": "nflverse",
+      "upstreamDataset": "schedule/results",
+      "snapshotDate": "2026-09-01",
+      "dataRows": 3435,
+      "gameTypesPresent": {
+        "REG": 3423,
+        "SB": 12
+      }
+    },
+    "fieldWhitelist": [
+      "game_id",
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "weekday",
+      "gametime",
+      "away_team",
+      "away_score",
+      "home_team",
+      "home_score",
+      "location",
+      "overtime",
+      "away_rest",
+      "home_rest",
+      "div_game",
+      "roof",
+      "surface",
+      "stadium_id",
+      "stadium"
+    ],
+    "calibrationFieldWhitelist": [
+      "game_id",
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "away_team",
+      "away_score",
+      "home_team",
+      "home_score",
+      "location"
+    ],
+    "teamIdentityAliases": {
+      "OAK": "LV",
+      "SD": "LAC",
+      "STL": "LAR",
+      "LA": "LAR"
+    },
+    "teamIdentityRule": "Apply only these explicit relocation aliases before rolling ratings are fit; no fuzzy matching or inferred franchise mapping is allowed.",
+    "forbiddenFields": [
+      "spread_line",
+      "away_spread_odds",
+      "home_spread_odds",
+      "opening_spread",
+      "closing_spread",
+      "total_line",
+      "away_moneyline",
+      "home_moneyline",
+      "sportsbook",
+      "consensus",
+      "ats_result",
+      "closing_line_value"
+    ],
+    "gameType": "REG",
+    "developmentWindow": {
+      "seasons": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "expectedCompletedGames": 2367,
+      "rule": "All estimator selection, smoothing choices and decision thresholds must be completed inside this window before 2025 outcomes are evaluated."
+    },
+    "currentEraWindow": {
+      "seasons": [
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "expectedCompletedGames": 1087,
+      "role": "Recent-era calibration candidate and era-stability comparison."
+    },
+    "earlyEraWindow": {
+      "seasons": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019
+      ],
+      "expectedCompletedGames": 1280,
+      "role": "Post-2015 scoring-regime stability and partial-pooling support."
+    },
+    "holdoutWindow": {
+      "seasons": [
+        2025
+      ],
+      "expectedCompletedGames": 272,
+      "status": "SEALED_UNTIL_BW6_2_MODEL_SELECTION_IS_RECORDED",
+      "rule": "The selected estimator, parameters and acceptance thresholds cannot be changed after 2025 is evaluated."
+    },
+    "contextOnlySeasons": [
+      2014
+    ],
+    "excludedOutcomeSeasons": [
+      2020,
+      2026
+    ],
+    "excludedSeasonReasons": {
+      "2020": "COVID attendance, scheduling, roster and travel conditions are structurally atypical.",
+      "2026": "The active season has no completed outcomes in the pinned snapshot and cannot enter historical fitting or holdout evaluation."
+    },
+    "postseasonIncluded": false,
+    "neutralSitePolicy": "Neutral-site regular-season games remain eligible for observed margins, but the pregame favorite model applies zero home-location value.",
+    "missingnessPolicy": "A game without a resolvable identity, chronological ordering or final score fails closed and is counted in the audit. No imputation of results or team identity is allowed."
+  },
+  "pregameFavoriteOrientation": {
+    "method": "ROLLING_RIDGE_PAIRWISE_TEAM_STRENGTH",
+    "marketInputsAllowed": false,
+    "lookbackEligibleSeasons": 2,
+    "currentSeasonPriorGamesIncluded": true,
+    "ridgePenalty": 8,
+    "domesticHomeAdvantagePoints": 2.082,
+    "neutralHomeAdvantagePoints": 0,
+    "excludedOutcomeSeasons": [
+      2020
+    ],
+    "chronology": "For each target week, fit ratings from completed eligible games strictly before that week's first kickoff. Center team ratings to zero, then add the locked location value to obtain predicted home margin.",
+    "orientationRule": {
+      "predictedHomeMarginAboveZero": "HOME_FAVORITE",
+      "predictedHomeMarginBelowZero": "AWAY_FAVORITE",
+      "predictedHomeMarginEqualZero": "SPLIT_ORIENTATION_HALF_WEIGHT_EACH_SIDE"
+    },
+    "observedCategoryRule": "After orientation is sealed, a game enters exact category N only when the independently projected favorite wins by exactly N points. Favorite losses, ties and favorite wins outside 1-18 enter OTHER.",
+    "independenceRule": "Actual target-game scores, future games and every sportsbook field are unavailable when favorite identity is assigned."
+  },
+  "calibrationLock": {
+    "categories": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      "OTHER"
+    ],
+    "estimatorCandidates": [
+      {
+        "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+        "trainingRule": "Use every eligible development season with equal game weight."
+      },
+      {
+        "modelId": "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "trainingRule": "Use only the four most recent eligible completed seasons before each fit."
+      },
+      {
+        "modelId": "BW6_EXPONENTIAL_SEASON_DECAY_HL4",
+        "trainingRule": "Use every eligible development season with game weight 0.5^(seasonAge/4)."
+      }
+    ],
+    "internalSelectionFolds": [
+      {
+        "validationSeason": 2019,
+        "eligibleTrainingSeasons": [
+          2015,
+          2016,
+          2017,
+          2018
+        ]
+      },
+      {
+        "validationSeason": 2023,
+        "eligibleTrainingSeasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2021,
+          2022
+        ]
+      },
+      {
+        "validationSeason": 2024,
+        "eligibleTrainingSeasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2021,
+          2022,
+          2023
+        ]
+      }
+    ],
+    "smoothing": {
+      "method": "JEFFREYS_DIRICHLET",
+      "alphaPerCategory": 0.5,
+      "categoryCount": 19,
+      "formula": "probability(category) = (weightedCategoryCount + 0.5) / (weightedEligibleGames + 9.5)"
+    },
+    "selectionMetrics": [
+      "multiclassLogLoss",
+      "multiclassBrierScore"
+    ],
+    "selectionRule": "Choose the candidate with the lowest game-weighted mean internal-fold log loss, provided its Brier score is no more than 0.001 worse than the lowest Brier candidate. If log losses are within 0.002, choose BW6_FULL_DEVELOPMENT_POOL, then BW6_ROLLING_FOUR_ELIGIBLE_SEASONS, then BW6_EXPONENTIAL_SEASON_DECAY_HL4.",
+    "freezeRule": "Write the selected modelId, all fold metrics, all training counts and the SHA-256 of this Stage 1 contract to the BW6.2 model lock before any 2025 holdout metric is calculated."
+  },
+  "uncertaintyAndSupport": {
+    "interval": "95_PERCENT_WILSON_SCORE_INTERVAL",
+    "weightedCountRule": "Use the estimator's effective weighted game count and exact-category weighted event count; disclose both raw and effective counts.",
+    "minimumRawDevelopmentEventsPerMargin": 15,
+    "maximumWilsonHalfWidthPercentagePoints": 2.5,
+    "stabilityWindows": [
+      "2015-2019",
+      "2021-2024"
+    ],
+    "stabilityTolerance": "Absolute early-era/current-era estimate difference must be no greater than max(2.0 percentage points, two pooled standard errors).",
+    "statusRule": "A margin is CURRENT_SUPPORTED only if sample and stability gates pass. Otherwise retain its estimate for audit with SHADOW_ONLY_UNSTABLE or SHADOW_ONLY_INSUFFICIENT_SAMPLE and deny downstream numeric authority."
+  },
+  "halfPointFairCost": {
+    "referenceAmericanPrice": -110,
+    "stakeBasisUsd": 100,
+    "inputProbability": "The selected WALTERS CALIBRATED exact-margin probability as a decimal p, never the rounded BOOK-EXACT point weight.",
+    "conditionalWinFractionAtMinus110": 0.5238095238095238,
+    "buyOntoLossToPush": {
+      "exampleMove": "favorite -3.5 to -3 or underdog +2.5 to +3",
+      "formula": "fairRiskPer100Win = 100*q/(1-q-p); incrementalCost = fairRiskPer100Win-110, where q=110/210",
+      "validity": "Require 0 <= p < 1-q."
+    },
+    "buyOffPushToWin": {
+      "exampleMove": "favorite -3 to -2.5 or underdog +3 to +3.5",
+      "formula": "fairRiskPer100Win = 100*(q*(1-p)+p)/((1-q)*(1-p)); incrementalCost = fairRiskPer100Win-110, where q=110/210",
+      "validity": "Require 0 <= p < 1."
+    },
+    "precision": "Store probabilities and fair costs to at least six decimal places. Round only the display cost to the nearest whole dollar; never use the rounded display value as a later calculation input.",
+    "bookReproductionBoundary": "The source's fair-cost table is preserved exactly but is not reverse-engineered from rounded printed point weights. Differences between transparent current formulas and printed source costs are expected and must be labeled by provenance."
+  },
+  "holdoutAcceptance": {
+    "modelSelectionMayUse2025": false,
+    "comparators": [
+      "BOOK_EXACT_ROUNDED",
+      "BW6_SELECTED_CALIBRATED"
+    ],
+    "numericThresholds": {
+      "distributionSumTolerance": 1e-9,
+      "maximumLogLossWorseThanBook": 0.02,
+      "maximumBrierScoreWorseThanBook": 0.005,
+      "maximumAggregateOneThroughEighteenCalibrationErrorPercentagePoints": 3
+    },
+    "requiredChecks": [
+      "The BW6.2 model lock predates every 2025 metric in the generated audit.",
+      "All 272 scheduled 2025 regular-season games are accounted for as eligible or fail-closed with an explicit reason.",
+      "All category probabilities are finite and strictly between zero and one, and the 19-category distribution sums to one within 1e-9.",
+      "Selected-model 2025 log loss is no more than 0.02 worse than BOOK_EXACT_ROUNDED.",
+      "Selected-model 2025 multiclass Brier score is no more than 0.005 worse than BOOK_EXACT_ROUNDED.",
+      "Absolute error between predicted and observed aggregate probability for favorite wins by 1-18 is no greater than 3.0 percentage points.",
+      "Every margin has raw count, effective count, point estimate, 95% interval and stability status.",
+      "No unsupported margin is silently assigned current numeric authority.",
+      "No current or historical sportsbook field is used to orient, fit, select or validate the model.",
+      "All protected artifacts retain identical before/after SHA-256 hashes."
+    ],
+    "passState": "BW6_3_HOLDOUT_VALIDATED_FOR_ACTIVE_WEEK_SHADOW_NON_OPERATIONAL",
+    "failState": "BW6_3_FAIL_CLOSED_RECALIBRATION_REVIEW_REQUIRED"
+  },
+  "activeWeekShadow": {
+    "stage": "BW6.4",
+    "allowedInput": "The current Graham fair margin may be used only to identify which exact-number half-point rows would be relevant; current sportsbook prices remain outside BW6 until BW8.",
+    "requirements": [
+      "Read back the active season and week through the governed active-week manifest.",
+      "Evaluate all active-week games without changing their Graham exact or displayed fair numbers.",
+      "Show BOOK-EXACT and WALTERS CALIBRATED weights and half-point costs side by side.",
+      "Preserve unsupported and unstable rows as explicit fail-closed statuses.",
+      "Do not produce weighted advantage, stars, playability, recommendation status or stake.",
+      "Retain all protected-artifact hashes before and after the shadow build.",
+      "Complete multiple clean cycles before any downstream BW7 or BW8 entry decision."
+    ],
+    "passState": "BW6_SHADOW_VALIDATED_READ_ONLY_DOWNSTREAM_REVIEW_PENDING",
+    "productionAuthorityOnPass": false
+  },
+  "protectedArtifacts": [
+    "core/walters-authority-v1.4.json",
+    "core/walters-intelligence-interface-v1.4.json",
+    "data/live-odds.json",
+    "data/walters/nfl/active-week.json",
+    "data/walters/nfl/2026/week-01-current-numbers.json",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json",
+    "data/walters/nfl/current-week-terminal.json",
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/home-field/home-field-production-current.json",
+    "data/walters/nfl/personnel-production-current.json",
+    "data/walters/nfl/matchup-production-current.json",
+    "data/walters/nfl/qb-production-current.json",
+    "data/walters/nfl/qb-production/production-contract-v1.json"
+  ],
+  "writeBoundary": {
+    "allowedPrefixes": [
+      "data/walters/nfl/key-numbers/",
+      "tools/build-walters-bw6-",
+      "tools/validate-walters-bw6-",
+      "tests/walters-bw6-",
+      ".github/workflows/walters-bw6-"
+    ],
+    "historicalSourceSnapshotMutationAllowed": false,
+    "weekScopedWritesAllowed": false,
+    "productionArtifactsAllowed": false,
+    "marketArtifactWritesAllowed": false
+  },
+  "outputs": {
+    "stage2ModelLock": "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json",
+    "stage2Calibration": "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json",
+    "stage3HoldoutAudit": "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json",
+    "stage4ActiveWeekShadow": "data/walters/nfl/key-numbers/bw6-stage4-week-01-shadow-v1.json"
+  },
+  "stage1Acceptance": {
+    "required": [
+      "Source-locked rules BW-R021 through BW-R023 are encoded without changing their meaning.",
+      "The complete published 1-18 point-weight and fair-cost tables are preserved.",
+      "BW7 and BW8 responsibilities are explicitly excluded.",
+      "Historical windows, orientation, estimators, smoothing, selection and holdout thresholds are locked before holdout evaluation.",
+      "The pinned score-only source snapshot matches its SHA-256 and whitelist.",
+      "Every production and market mutation authority is false.",
+      "All protected artifacts retain identical before/after hashes."
+    ],
+    "passState": "CONTRACT_LOCKED_FOR_BW6_2_CALIBRATION_NON_OPERATIONAL",
+    "nextStage": "BW6.2_INTERNAL_CALIBRATION_AND_MODEL_LOCK"
+  },
+  "failClosedCodes": [
+    "FAIL_CLOSED_BW6_SOURCE_CLOSURE_MISMATCH",
+    "FAIL_CLOSED_BW6_SOURCE_HASH_MISMATCH",
+    "FAIL_CLOSED_BW6_SOURCE_FIELD_VIOLATION",
+    "FAIL_CLOSED_BW6_MARKET_CONTAMINATION",
+    "FAIL_CLOSED_BW6_HOLDOUT_PEEK",
+    "FAIL_CLOSED_BW6_FAVORITE_ORIENTATION_LOOKAHEAD",
+    "FAIL_CLOSED_BW6_SAMPLE_INSUFFICIENT",
+    "FAIL_CLOSED_BW6_MARGIN_UNSTABLE",
+    "FAIL_CLOSED_BW6_UNSUPPORTED_MARGIN",
+    "FAIL_CLOSED_BW6_BW7_AUTHORITY_LEAK",
+    "FAIL_CLOSED_BW6_BW8_AUTHORITY_LEAK",
+    "FAIL_CLOSED_BW6_GRAHAM_MUTATION",
+    "FAIL_CLOSED_BW6_QB_MUTATION",
+    "FAIL_CLOSED_BW6_BET_STATUS_MUTATION",
+    "FAIL_CLOSED_BW6_STAKE_MUTATION",
+    "FAIL_CLOSED_BW6_PROTECTED_ARTIFACT_MUTATION"
+  ]
+}

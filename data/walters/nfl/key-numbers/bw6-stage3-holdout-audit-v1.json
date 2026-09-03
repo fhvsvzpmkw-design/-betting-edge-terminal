@@ -1,0 +1,4531 @@
+{
+  "schemaVersion": "walters-bw6-stage3-holdout-audit-v1",
+  "module": "WALTERS_KEY_NUMBER_AND_HALF_POINT_VALUE",
+  "stage": "BW6.3",
+  "status": "BW6_3_FAIL_CLOSED_RECALIBRATION_REVIEW_REQUIRED",
+  "generatedAt": "2026-09-03T04:25:38Z",
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketViewed": false,
+  "holdoutViewed": true,
+  "holdoutOutcomeFieldsRead": true,
+  "modelReselectionAllowed": false,
+  "modelReselected": false,
+  "stage1ContractSha256": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f",
+  "stage2ModelLockSha256": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+  "stage2CalibrationSha256": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897",
+  "builder": "tools/build-walters-bw6-stage3.py",
+  "builderSha256": "72db23e7284956a24b66eca14d5ccf3fb7965fe711c88ec1ea01645dfd510075",
+  "selectedModelId": "BW6_FULL_DEVELOPMENT_POOL",
+  "sourceAudit": {
+    "sourceSnapshot": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+    "sourceSnapshotSha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+    "priorSeasonsRead": [
+      2023,
+      2024
+    ],
+    "priorScoreRowsRead": 544,
+    "holdoutSeason": 2025,
+    "holdoutScoreRowsRead": 272,
+    "scoreRowsReadBySeason": {
+      "2023": 272,
+      "2024": 272,
+      "2025": 272
+    },
+    "marketFieldsPresent": false,
+    "marketInputsUsed": false
+  },
+  "orientationAudit": {
+    "games": 272,
+    "homeFavorite": 169,
+    "awayFavorite": 103,
+    "splitOrientation": 0,
+    "targetGameScoresUsedForOrientation": false,
+    "futureGamesUsedForOrientation": false,
+    "marketInputsUsed": false
+  },
+  "distributions": {
+    "selectedCalibrated": {
+      "1": 0.01956659,
+      "2": 0.021249737,
+      "3": 0.085630128,
+      "4": 0.023353671,
+      "5": 0.024195245,
+      "6": 0.037660425,
+      "7": 0.051967179,
+      "8": 0.030507048,
+      "9": 0.011571639,
+      "10": 0.029665474,
+      "11": 0.011150852,
+      "12": 0.012413213,
+      "13": 0.011150852,
+      "14": 0.032610983,
+      "15": 0.011150852,
+      "16": 0.01956659,
+      "17": 0.022512098,
+      "18": 0.01956659,
+      "OTHER": 0.524510835
+    },
+    "bookExactRounded": {
+      "1": 0.03,
+      "2": 0.03,
+      "3": 0.08,
+      "4": 0.03,
+      "5": 0.03,
+      "6": 0.05,
+      "7": 0.06,
+      "8": 0.03,
+      "9": 0.02,
+      "10": 0.04,
+      "11": 0.02,
+      "12": 0.02,
+      "13": 0.02,
+      "14": 0.05,
+      "15": 0.02,
+      "16": 0.03,
+      "17": 0.03,
+      "18": 0.03,
+      "OTHER": 0.38
+    },
+    "observedHoldout": {
+      "1": 0.029411765,
+      "2": 0.033088235,
+      "3": 0.069852941,
+      "4": 0.036764706,
+      "5": 0.014705882,
+      "6": 0.011029412,
+      "7": 0.058823529,
+      "8": 0.025735294,
+      "9": 0.007352941,
+      "10": 0.022058824,
+      "11": 0.014705882,
+      "12": 0.014705882,
+      "13": 0.025735294,
+      "14": 0.014705882,
+      "15": 0.014705882,
+      "16": 0.007352941,
+      "17": 0.029411765,
+      "18": 0.011029412,
+      "OTHER": 0.558823529
+    }
+  },
+  "metrics": {
+    "selectedCalibrated": {
+      "games": 272,
+      "multiclassLogLoss": 1.925322643,
+      "multiclassBrierScore": 0.675577503
+    },
+    "bookExactRounded": {
+      "games": 272,
+      "multiclassLogLoss": 1.990244502,
+      "multiclassBrierScore": 0.708582353
+    },
+    "selectedMinusBook": {
+      "multiclassLogLoss": -0.064921859,
+      "multiclassBrierScore": -0.03300485
+    },
+    "aggregateOneThroughEighteen": {
+      "selectedPredictedPercent": 47.548917,
+      "bookExactPredictedPercent": 62.0,
+      "observedPercent": 44.117647,
+      "selectedAbsoluteErrorPercentagePoints": 3.43127,
+      "samplingDiagnostic": {
+        "holdoutWilson95LowPercent": 38.339477,
+        "holdoutWilson95HighPercent": 50.059656,
+        "selectedPredictionInsideHoldoutWilson95": true,
+        "standardErrorPercentagePointsUnderSelectedModel": 3.02805,
+        "observedMinusSelectedZScore": -1.133161,
+        "diagnosticOnlyNoGateOverride": true
+      }
+    }
+  },
+  "perMargin": [
+    {
+      "margin": 1,
+      "observedEventCount": 8.0,
+      "observedPercent": 2.941176,
+      "selectedPredictedPercent": 1.956659,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": -0.984517,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 2,
+      "observedEventCount": 9.0,
+      "observedPercent": 3.308824,
+      "selectedPredictedPercent": 2.124974,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": -1.18385,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 3,
+      "observedEventCount": 19.0,
+      "observedPercent": 6.985294,
+      "selectedPredictedPercent": 8.563013,
+      "bookExactPredictedPercent": 8.0,
+      "selectedErrorPercentagePoints": 1.577719,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 4,
+      "observedEventCount": 10.0,
+      "observedPercent": 3.676471,
+      "selectedPredictedPercent": 2.335367,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": -1.341103,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 5,
+      "observedEventCount": 4.0,
+      "observedPercent": 1.470588,
+      "selectedPredictedPercent": 2.419525,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": 0.948936,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 6,
+      "observedEventCount": 3.0,
+      "observedPercent": 1.102941,
+      "selectedPredictedPercent": 3.766042,
+      "bookExactPredictedPercent": 5.0,
+      "selectedErrorPercentagePoints": 2.663101,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 7,
+      "observedEventCount": 16.0,
+      "observedPercent": 5.882353,
+      "selectedPredictedPercent": 5.196718,
+      "bookExactPredictedPercent": 6.0,
+      "selectedErrorPercentagePoints": -0.685635,
+      "insideDevelopmentWilson95": true,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 8,
+      "observedEventCount": 7.0,
+      "observedPercent": 2.573529,
+      "selectedPredictedPercent": 3.050705,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": 0.477175,
+      "insideDevelopmentWilson95": true,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 9,
+      "observedEventCount": 2.0,
+      "observedPercent": 0.735294,
+      "selectedPredictedPercent": 1.157164,
+      "bookExactPredictedPercent": 2.0,
+      "selectedErrorPercentagePoints": 0.42187,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 10,
+      "observedEventCount": 6.0,
+      "observedPercent": 2.205882,
+      "selectedPredictedPercent": 2.966547,
+      "bookExactPredictedPercent": 4.0,
+      "selectedErrorPercentagePoints": 0.760665,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 11,
+      "observedEventCount": 4.0,
+      "observedPercent": 1.470588,
+      "selectedPredictedPercent": 1.115085,
+      "bookExactPredictedPercent": 2.0,
+      "selectedErrorPercentagePoints": -0.355503,
+      "insideDevelopmentWilson95": true,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 12,
+      "observedEventCount": 4.0,
+      "observedPercent": 1.470588,
+      "selectedPredictedPercent": 1.241321,
+      "bookExactPredictedPercent": 2.0,
+      "selectedErrorPercentagePoints": -0.229267,
+      "insideDevelopmentWilson95": true,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 13,
+      "observedEventCount": 7.0,
+      "observedPercent": 2.573529,
+      "selectedPredictedPercent": 1.115085,
+      "bookExactPredictedPercent": 2.0,
+      "selectedErrorPercentagePoints": -1.458444,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 14,
+      "observedEventCount": 4.0,
+      "observedPercent": 1.470588,
+      "selectedPredictedPercent": 3.261098,
+      "bookExactPredictedPercent": 5.0,
+      "selectedErrorPercentagePoints": 1.79051,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 15,
+      "observedEventCount": 4.0,
+      "observedPercent": 1.470588,
+      "selectedPredictedPercent": 1.115085,
+      "bookExactPredictedPercent": 2.0,
+      "selectedErrorPercentagePoints": -0.355503,
+      "insideDevelopmentWilson95": true,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 16,
+      "observedEventCount": 2.0,
+      "observedPercent": 0.735294,
+      "selectedPredictedPercent": 1.956659,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": 1.221365,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 17,
+      "observedEventCount": 8.0,
+      "observedPercent": 2.941176,
+      "selectedPredictedPercent": 2.25121,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": -0.689967,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    },
+    {
+      "margin": 18,
+      "observedEventCount": 3.0,
+      "observedPercent": 1.102941,
+      "selectedPredictedPercent": 1.956659,
+      "bookExactPredictedPercent": 3.0,
+      "selectedErrorPercentagePoints": 0.853718,
+      "insideDevelopmentWilson95": false,
+      "developmentSupportStatus": "CURRENT_SUPPORTED"
+    }
+  ],
+  "holdoutGames": [
+    {
+      "gameId": "2025_01_DAL_PHI",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "PHI",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 4.057397,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_KC_LAC",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "LAC",
+      "awayTeam": "KC",
+      "neutralSite": true,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -2.377516,
+      "actualHomeMargin": 6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_ARI_NO",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "NO",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": 3.550785,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_BAL_BUF",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "BUF",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 0.067479,
+      "actualHomeMargin": 1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_CAR_JAX",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "JAX",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "JAX",
+      "predictedHomeMargin": 8.082601,
+      "actualHomeMargin": 16,
+      "observedCategoryWeights": {
+        "16": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_CIN_CLE",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "CLE",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": -1.431573,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_DET_GB",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "GB",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -1.334739,
+      "actualHomeMargin": 14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_HOU_LA",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "LAR",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": 2.746361,
+      "actualHomeMargin": 5,
+      "observedCategoryWeights": {
+        "5": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_LV_NE",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "NE",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LV",
+      "predictedHomeMargin": -1.594039,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_MIA_IND",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "IND",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": -1.807648,
+      "actualHomeMargin": 25,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_NYG_WAS",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "WAS",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "WAS",
+      "predictedHomeMargin": 5.953515,
+      "actualHomeMargin": 15,
+      "observedCategoryWeights": {
+        "15": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_PIT_NYJ",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "NYJ",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": -2.062556,
+      "actualHomeMargin": -2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_SF_SEA",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "SEA",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -2.319258,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_TB_ATL",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "ATL",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": -3.749064,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_TEN_DEN",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "DEN",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 8.899437,
+      "actualHomeMargin": 8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_01_MIN_CHI",
+      "season": 2025,
+      "week": 1,
+      "homeTeam": "CHI",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": -1.855039,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_WAS_GB",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "GB",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": 9.097952,
+      "actualHomeMargin": 9,
+      "observedCategoryWeights": {
+        "9": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_ATL_MIN",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "MIN",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": 7.461144,
+      "actualHomeMargin": -16,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_BUF_NYJ",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "NYJ",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -8.277976,
+      "actualHomeMargin": -20,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_CAR_ARI",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "ARI",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ARI",
+      "predictedHomeMargin": 9.223339,
+      "actualHomeMargin": 5,
+      "observedCategoryWeights": {
+        "5": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_CHI_DET",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "DET",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 10.707945,
+      "actualHomeMargin": 31,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_CLE_BAL",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "BAL",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 13.496806,
+      "actualHomeMargin": 24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_DEN_IND",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "IND",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": -1.413426,
+      "actualHomeMargin": 1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_JAX_CIN",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "CIN",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 5.405443,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_LA_TEN",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "TEN",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": -3.821095,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "14": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_NE_MIA",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "MIA",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 8.968089,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_NYG_DAL",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "DAL",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": 10.330144,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_PHI_KC",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "KC",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 2.311514,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_SEA_PIT",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "PIT",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": 3.104811,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_SF_NO",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "NO",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -2.717015,
+      "actualHomeMargin": -5,
+      "observedCategoryWeights": {
+        "5": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_LAC_LV",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "LV",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": -1.765629,
+      "actualHomeMargin": -11,
+      "observedCategoryWeights": {
+        "11": 1.0
+      }
+    },
+    {
+      "gameId": "2025_02_TB_HOU",
+      "season": 2025,
+      "week": 2,
+      "homeTeam": "HOU",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": -0.901401,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_MIA_BUF",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "BUF",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 8.485406,
+      "actualHomeMargin": 10,
+      "observedCategoryWeights": {
+        "10": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_ARI_SF",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "SF",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 8.003285,
+      "actualHomeMargin": 1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_ATL_CAR",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "CAR",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "ATL",
+      "predictedHomeMargin": -4.529132,
+      "actualHomeMargin": 30,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_CIN_MIN",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "MIN",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": 3.520342,
+      "actualHomeMargin": 38,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_DAL_CHI",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "CHI",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": -1.1158,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_DEN_LAC",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "LAC",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 2.391413,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_GB_CLE",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "CLE",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -5.394247,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_HOU_JAX",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "JAX",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": -0.503263,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_IND_TEN",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "TEN",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": -1.393281,
+      "actualHomeMargin": -21,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_KC_NYG",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "NYG",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -8.07389,
+      "actualHomeMargin": -13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_LA_PHI",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "PHI",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 4.669148,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_LV_WAS",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "WAS",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "WAS",
+      "predictedHomeMargin": 1.977299,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_NO_SEA",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "SEA",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": 2.798191,
+      "actualHomeMargin": 31,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_NYJ_TB",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "TB",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 9.175095,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_PIT_NE",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "NE",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": -3.835478,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_03_DET_BAL",
+      "season": 2025,
+      "week": 3,
+      "homeTeam": "BAL",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 3.272126,
+      "actualHomeMargin": -8,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_SEA_ARI",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "ARI",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": -0.083094,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_BAL_KC",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "KC",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -2.863228,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_CAR_NE",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "NE",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NE",
+      "predictedHomeMargin": 4.418355,
+      "actualHomeMargin": 29,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_CHI_LV",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "LV",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LV",
+      "predictedHomeMargin": 0.623717,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_CLE_DET",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "DET",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 13.041501,
+      "actualHomeMargin": 24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_GB_DAL",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "DAL",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -1.304313,
+      "actualHomeMargin": 0,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_IND_LA",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "LAR",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": 4.606095,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_JAX_SF",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "SF",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 8.50538,
+      "actualHomeMargin": -5,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_LAC_NYG",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "NYG",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": -6.395622,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_MIN_PIT",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "PIT",
+      "awayTeam": "MIN",
+      "neutralSite": true,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": -2.785725,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_NO_BUF",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "BUF",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 10.437162,
+      "actualHomeMargin": 12,
+      "observedCategoryWeights": {
+        "12": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_PHI_TB",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "TB",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 1.350818,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_TEN_HOU",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "HOU",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": 7.68512,
+      "actualHomeMargin": 26,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_WAS_ATL",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "ATL",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ATL",
+      "predictedHomeMargin": 1.385111,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_CIN_DEN",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "DEN",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 3.632862,
+      "actualHomeMargin": 25,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_04_NYJ_MIA",
+      "season": 2025,
+      "week": 4,
+      "homeTeam": "MIA",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 6.380955,
+      "actualHomeMargin": 6,
+      "observedCategoryWeights": {
+        "6": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_SF_LA",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "LAR",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -0.576964,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_DAL_NYJ",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "NYJ",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": -2.686571,
+      "actualHomeMargin": -15,
+      "observedCategoryWeights": {
+        "15": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_DEN_PHI",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "PHI",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 3.917484,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_DET_CIN",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "CIN",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -6.691189,
+      "actualHomeMargin": -13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_HOU_BAL",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "BAL",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 9.974268,
+      "actualHomeMargin": -34,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_LV_IND",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "IND",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": 3.251738,
+      "actualHomeMargin": 34,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_MIA_CAR",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "CAR",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": -7.162415,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_MIN_CLE",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "CLE",
+      "awayTeam": "MIN",
+      "neutralSite": true,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": -6.012654,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_NE_BUF",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "BUF",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 14.41382,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_NYG_NO",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "NO",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": 7.115338,
+      "actualHomeMargin": 12,
+      "observedCategoryWeights": {
+        "12": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_TB_SEA",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "SEA",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": -0.101576,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_TEN_ARI",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "ARI",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ARI",
+      "predictedHomeMargin": 6.448826,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_WAS_LAC",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "LAC",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 6.068279,
+      "actualHomeMargin": -17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_05_KC_JAX",
+      "season": 2025,
+      "week": 5,
+      "homeTeam": "JAX",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -4.156372,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_PHI_NYG",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "NYG",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": -8.169319,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_ARI_IND",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "IND",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": 3.205198,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_CIN_GB",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "GB",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": 7.267445,
+      "actualHomeMargin": 9,
+      "observedCategoryWeights": {
+        "9": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_CLE_PIT",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "PIT",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": 5.473634,
+      "actualHomeMargin": 14,
+      "observedCategoryWeights": {
+        "14": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_DAL_CAR",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "CAR",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": -7.658311,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_DEN_NYJ",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "NYJ",
+      "awayTeam": "DEN",
+      "neutralSite": true,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": -5.981505,
+      "actualHomeMargin": -2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_DET_KC",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "KC",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -2.507968,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_LAC_MIA",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "MIA",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 1.343999,
+      "actualHomeMargin": -2,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_LA_BAL",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "BAL",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 8.267535,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_NE_NO",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "NO",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": 5.773611,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_SEA_JAX",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "JAX",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": -0.267269,
+      "actualHomeMargin": -8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_SF_TB",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "TB",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 1.218768,
+      "actualHomeMargin": 11,
+      "observedCategoryWeights": {
+        "11": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_TEN_LV",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "LV",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LV",
+      "predictedHomeMargin": 4.474655,
+      "actualHomeMargin": 10,
+      "observedCategoryWeights": {
+        "10": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_BUF_ATL",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "ATL",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -7.305783,
+      "actualHomeMargin": 10,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_06_CHI_WAS",
+      "season": 2025,
+      "week": 6,
+      "homeTeam": "WAS",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "WAS",
+      "predictedHomeMargin": 1.350236,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_PIT_CIN",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "CIN",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 1.008781,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_ATL_SF",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "SF",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 8.006763,
+      "actualHomeMargin": 10,
+      "observedCategoryWeights": {
+        "10": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_CAR_NYJ",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "NYJ",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NYJ",
+      "predictedHomeMargin": 6.353899,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_GB_ARI",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "ARI",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -4.288668,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_IND_LAC",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "LAC",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 3.974819,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_LA_JAX",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "JAX",
+      "awayTeam": "LAR",
+      "neutralSite": true,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": -3.467969,
+      "actualHomeMargin": -28,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_LV_KC",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "KC",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 9.382343,
+      "actualHomeMargin": 31,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_MIA_CLE",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "CLE",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": -1.661755,
+      "actualHomeMargin": 25,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_NE_TEN",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "TEN",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TEN",
+      "predictedHomeMargin": 0.948847,
+      "actualHomeMargin": -18,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_NO_CHI",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "CHI",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CHI",
+      "predictedHomeMargin": 2.43145,
+      "actualHomeMargin": 12,
+      "observedCategoryWeights": {
+        "12": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_NYG_DEN",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "DEN",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 10.168428,
+      "actualHomeMargin": 1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_PHI_MIN",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "MIN",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": 1.684393,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_WAS_DAL",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "DAL",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": 5.100963,
+      "actualHomeMargin": 22,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_HOU_SEA",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "SEA",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": 1.536612,
+      "actualHomeMargin": 8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_07_TB_DET",
+      "season": 2025,
+      "week": 7,
+      "homeTeam": "DET",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 7.065137,
+      "actualHomeMargin": 15,
+      "observedCategoryWeights": {
+        "15": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_MIN_LAC",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "LAC",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 0.137215,
+      "actualHomeMargin": 27,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_BUF_CAR",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "CAR",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -12.083285,
+      "actualHomeMargin": -31,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_CHI_BAL",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "BAL",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 9.757119,
+      "actualHomeMargin": 14,
+      "observedCategoryWeights": {
+        "14": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_CLE_NE",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "NE",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NE",
+      "predictedHomeMargin": 0.570382,
+      "actualHomeMargin": 19,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_DAL_DEN",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "DEN",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 2.324436,
+      "actualHomeMargin": 20,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_GB_PIT",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "PIT",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -2.135191,
+      "actualHomeMargin": -10,
+      "observedCategoryWeights": {
+        "10": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_MIA_ATL",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "ATL",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": -0.049759,
+      "actualHomeMargin": -24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_NYG_PHI",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "PHI",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 11.404496,
+      "actualHomeMargin": 18,
+      "observedCategoryWeights": {
+        "18": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_NYJ_CIN",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "CIN",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 5.545797,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_SF_HOU",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "HOU",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -0.602494,
+      "actualHomeMargin": 11,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_TB_NO",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "NO",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": -2.428569,
+      "actualHomeMargin": -20,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_TEN_IND",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "IND",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": 7.941235,
+      "actualHomeMargin": 24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_08_WAS_KC",
+      "season": 2025,
+      "week": 8,
+      "homeTeam": "KC",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 8.667149,
+      "actualHomeMargin": 21,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_BAL_MIA",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "MIA",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -4.483953,
+      "actualHomeMargin": -22,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_ATL_NE",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "NE",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NE",
+      "predictedHomeMargin": 1.062492,
+      "actualHomeMargin": 1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_CAR_GB",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "GB",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": 15.029718,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_CHI_CIN",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "CIN",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 2.273965,
+      "actualHomeMargin": -5,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_DEN_HOU",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "HOU",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": 1.163455,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_IND_PIT",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "PIT",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": 2.347434,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_JAX_LV",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "LV",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LV",
+      "predictedHomeMargin": 1.044474,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_KC_BUF",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "BUF",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 4.076421,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_LAC_TEN",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "TEN",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": -5.832054,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_MIN_DET",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "DET",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 8.179787,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_NO_LA",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "LAR",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": 5.992087,
+      "actualHomeMargin": 24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_SEA_WAS",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "WAS",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": -1.189512,
+      "actualHomeMargin": -24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_SF_NYG",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "NYG",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -7.432175,
+      "actualHomeMargin": -10,
+      "observedCategoryWeights": {
+        "10": 1.0
+      }
+    },
+    {
+      "gameId": "2025_09_ARI_DAL",
+      "season": 2025,
+      "week": 9,
+      "homeTeam": "DAL",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": 5.029894,
+      "actualHomeMargin": -10,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_LV_DEN",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "DEN",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 7.918956,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_ARI_SEA",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "SEA",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": 4.860091,
+      "actualHomeMargin": 22,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_ATL_IND",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "IND",
+      "awayTeam": "ATL",
+      "neutralSite": true,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": 2.786276,
+      "actualHomeMargin": 6,
+      "observedCategoryWeights": {
+        "6": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_BAL_MIN",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "MIN",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -2.819909,
+      "actualHomeMargin": -8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_BUF_MIA",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "MIA",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -4.720151,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_CLE_NYJ",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "NYJ",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NYJ",
+      "predictedHomeMargin": 1.441979,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_DET_WAS",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "WAS",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -8.866599,
+      "actualHomeMargin": -22,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_JAX_HOU",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "HOU",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": 5.753569,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_LA_SF",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "SF",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 3.335742,
+      "actualHomeMargin": -16,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_NE_TB",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "TB",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 9.241459,
+      "actualHomeMargin": -5,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_NO_CAR",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "CAR",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": -3.664291,
+      "actualHomeMargin": -10,
+      "observedCategoryWeights": {
+        "10": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_NYG_CHI",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "CHI",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CHI",
+      "predictedHomeMargin": 7.314237,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_PIT_LAC",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "LAC",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 3.188695,
+      "actualHomeMargin": 15,
+      "observedCategoryWeights": {
+        "15": 1.0
+      }
+    },
+    {
+      "gameId": "2025_10_PHI_GB",
+      "season": 2025,
+      "week": 10,
+      "homeTeam": "GB",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": 2.89724,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_NYJ_NE",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "NE",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NE",
+      "predictedHomeMargin": 2.168853,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_BAL_CLE",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "CLE",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -8.628651,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_CAR_ATL",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "ATL",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ATL",
+      "predictedHomeMargin": 7.174213,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_CHI_MIN",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "MIN",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": 5.331368,
+      "actualHomeMargin": -2,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_CIN_PIT",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "PIT",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": 3.126453,
+      "actualHomeMargin": 22,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_DET_PHI",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "PHI",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -2.609372,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_GB_NYG",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "NYG",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -8.205774,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_HOU_TEN",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "TEN",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": -5.699329,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_KC_DEN",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "DEN",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -0.439693,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_LAC_JAX",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "JAX",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": -2.001011,
+      "actualHomeMargin": 29,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_SEA_LA",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "LAR",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": 3.183648,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_SF_ARI",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "ARI",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -2.944979,
+      "actualHomeMargin": -19,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_TB_BUF",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "BUF",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 5.688584,
+      "actualHomeMargin": 12,
+      "observedCategoryWeights": {
+        "12": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_WAS_MIA",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "MIA",
+      "awayTeam": "WAS",
+      "neutralSite": true,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 3.589775,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_11_DAL_LV",
+      "season": 2025,
+      "week": 11,
+      "homeTeam": "LV",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": -2.159386,
+      "actualHomeMargin": -17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_BUF_HOU",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "HOU",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -3.246874,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_ATL_NO",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "NO",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": 3.151818,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_CLE_LV",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "LV",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LV",
+      "predictedHomeMargin": 1.64241,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_IND_KC",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "KC",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 6.747164,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_JAX_ARI",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "ARI",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ARI",
+      "predictedHomeMargin": 1.921299,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_MIN_GB",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "GB",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": 4.152917,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_NE_CIN",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "CIN",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 4.311657,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_NYG_DET",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "DET",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 16.184417,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_NYJ_BAL",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "BAL",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 13.346236,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_PHI_DAL",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "DAL",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": -0.608425,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_PIT_CHI",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "CHI",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CHI",
+      "predictedHomeMargin": 0.781718,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_SEA_TEN",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "TEN",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": -6.036097,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "6": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_TB_LA",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "LAR",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": 2.029393,
+      "actualHomeMargin": 27,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_12_CAR_SF",
+      "season": 2025,
+      "week": 12,
+      "homeTeam": "SF",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 13.626037,
+      "actualHomeMargin": 11,
+      "observedCategoryWeights": {
+        "11": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_CIN_BAL",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "BAL",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 10.839872,
+      "actualHomeMargin": -18,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_GB_DET",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "DET",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 5.593219,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_KC_DAL",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "DAL",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -1.234248,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_CHI_PHI",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "PHI",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 6.72156,
+      "actualHomeMargin": -9,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_ARI_TB",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "TB",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 6.453153,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_ATL_NYJ",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "NYJ",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NYJ",
+      "predictedHomeMargin": 1.153166,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_BUF_PIT",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "PIT",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -4.015242,
+      "actualHomeMargin": -19,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_DEN_WAS",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "WAS",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": -3.15021,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_HOU_IND",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "IND",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": 0.690823,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_JAX_TEN",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "TEN",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "JAX",
+      "predictedHomeMargin": -2.59028,
+      "actualHomeMargin": -22,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_LA_CAR",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "CAR",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": -9.063958,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_LV_LAC",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "LAC",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 7.112937,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_MIN_SEA",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "SEA",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": 1.924583,
+      "actualHomeMargin": 26,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_NO_MIA",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "MIA",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 5.0307,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_SF_CLE",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "CLE",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -4.504523,
+      "actualHomeMargin": -18,
+      "observedCategoryWeights": {
+        "18": 1.0
+      }
+    },
+    {
+      "gameId": "2025_13_NYG_NE",
+      "season": 2025,
+      "week": 13,
+      "homeTeam": "NE",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NE",
+      "predictedHomeMargin": 4.630115,
+      "actualHomeMargin": 18,
+      "observedCategoryWeights": {
+        "18": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_DAL_DET",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "DET",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 8.494125,
+      "actualHomeMargin": 14,
+      "observedCategoryWeights": {
+        "14": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_CHI_GB",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "GB",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": 7.279458,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_CIN_BUF",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "BUF",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 9.864097,
+      "actualHomeMargin": 5,
+      "observedCategoryWeights": {
+        "5": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_DEN_LV",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "LV",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": -4.249034,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_HOU_KC",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "KC",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 4.984628,
+      "actualHomeMargin": -10,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_IND_JAX",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "JAX",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "JAX",
+      "predictedHomeMargin": 0.738898,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_LA_ARI",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "ARI",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": -2.855335,
+      "actualHomeMargin": -28,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_MIA_NYJ",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "NYJ",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": -2.275967,
+      "actualHomeMargin": -24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_NO_TB",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "TB",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 6.77819,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_PIT_BAL",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "BAL",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 8.74436,
+      "actualHomeMargin": -5,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_SEA_ATL",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "ATL",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": -3.057278,
+      "actualHomeMargin": -28,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_TEN_CLE",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "CLE",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CLE",
+      "predictedHomeMargin": 5.492383,
+      "actualHomeMargin": -2,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_WAS_MIN",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "MIN",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": 6.571433,
+      "actualHomeMargin": 31,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_14_PHI_LAC",
+      "season": 2025,
+      "week": 14,
+      "homeTeam": "LAC",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": -0.25826,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_ATL_TB",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "TB",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 7.597532,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_ARI_HOU",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "HOU",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": 6.175463,
+      "actualHomeMargin": 20,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_BAL_CIN",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "CIN",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -5.391275,
+      "actualHomeMargin": -24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_BUF_NE",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "NE",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -7.667499,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_CAR_NO",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "NO",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": 7.551914,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_CLE_CHI",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "CHI",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CHI",
+      "predictedHomeMargin": 4.895802,
+      "actualHomeMargin": 28,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_DET_LA",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "LAR",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -2.205064,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_GB_DEN",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "DEN",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -0.429659,
+      "actualHomeMargin": 8,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_IND_SEA",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "SEA",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": 4.950434,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_LAC_KC",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "KC",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 5.086733,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_LV_PHI",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "PHI",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 9.727239,
+      "actualHomeMargin": 31,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_MIN_DAL",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "DAL",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": 1.268736,
+      "actualHomeMargin": -8,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_NYJ_JAX",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "JAX",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "JAX",
+      "predictedHomeMargin": 5.228252,
+      "actualHomeMargin": 28,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_TEN_SF",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "SF",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 12.484275,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_WAS_NYG",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "NYG",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "WAS",
+      "predictedHomeMargin": -0.559176,
+      "actualHomeMargin": -8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_15_MIA_PIT",
+      "season": 2025,
+      "week": 15,
+      "homeTeam": "PIT",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": 1.606583,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_LA_SEA",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "SEA",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": 0.99036,
+      "actualHomeMargin": 1,
+      "observedCategoryWeights": {
+        "1": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_GB_CHI",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "CHI",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "GB",
+      "predictedHomeMargin": -2.623184,
+      "actualHomeMargin": 6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_PHI_WAS",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "WAS",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": -5.013131,
+      "actualHomeMargin": -11,
+      "observedCategoryWeights": {
+        "11": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_ATL_ARI",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "ARI",
+      "awayTeam": "ATL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ARI",
+      "predictedHomeMargin": 2.882617,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_BUF_CLE",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "CLE",
+      "awayTeam": "BUF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": -8.311926,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_CIN_MIA",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "MIA",
+      "awayTeam": "CIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 3.849072,
+      "actualHomeMargin": -24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_JAX_DEN",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "DEN",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 4.948196,
+      "actualHomeMargin": -14,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_KC_TEN",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "TEN",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -8.418251,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_LAC_DAL",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "DAL",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": 1.75923,
+      "actualHomeMargin": -17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_LV_HOU",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "HOU",
+      "awayTeam": "LV",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": 8.814051,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_MIN_NYG",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "NYG",
+      "awayTeam": "MIN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": -6.278563,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_NE_BAL",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "BAL",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": 12.002928,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_NYJ_NO",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "NO",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": 4.40441,
+      "actualHomeMargin": 23,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_PIT_DET",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "DET",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": 9.22856,
+      "actualHomeMargin": -5,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_TB_CAR",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "CAR",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": -7.514612,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_16_SF_IND",
+      "season": 2025,
+      "week": 16,
+      "homeTeam": "IND",
+      "awayTeam": "SF",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": -1.954608,
+      "actualHomeMargin": -21,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_DAL_WAS",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "WAS",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": -2.020796,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "7": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_DEN_KC",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "KC",
+      "awayTeam": "DEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": 3.813772,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_DET_MIN",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "MIN",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -3.257293,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_BAL_GB",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "GB",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -0.182421,
+      "actualHomeMargin": -17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_HOU_LAC",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "LAC",
+      "awayTeam": "HOU",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAC",
+      "predictedHomeMargin": 1.619759,
+      "actualHomeMargin": -4,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_ARI_CIN",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "CIN",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 4.014203,
+      "actualHomeMargin": 23,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_CHI_SF",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "SF",
+      "awayTeam": "CHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 6.323521,
+      "actualHomeMargin": 4,
+      "observedCategoryWeights": {
+        "4": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_JAX_IND",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "IND",
+      "awayTeam": "JAX",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "IND",
+      "predictedHomeMargin": 1.981143,
+      "actualHomeMargin": -6,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_NE_NYJ",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "NYJ",
+      "awayTeam": "NE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "NE",
+      "predictedHomeMargin": -0.10656,
+      "actualHomeMargin": -32,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_NO_TEN",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "TEN",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "NO",
+      "predictedHomeMargin": -1.970182,
+      "actualHomeMargin": -8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_NYG_LV",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "LV",
+      "awayTeam": "NYG",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LV",
+      "predictedHomeMargin": 3.758536,
+      "actualHomeMargin": -24,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_PHI_BUF",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "BUF",
+      "awayTeam": "PHI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 4.760764,
+      "actualHomeMargin": -1,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_PIT_CLE",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "CLE",
+      "awayTeam": "PIT",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "PIT",
+      "predictedHomeMargin": -2.379611,
+      "actualHomeMargin": 7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_SEA_CAR",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "CAR",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "SEA",
+      "predictedHomeMargin": -7.950303,
+      "actualHomeMargin": -17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_TB_MIA",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "MIA",
+      "awayTeam": "TB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": 0.355063,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_17_LA_ATL",
+      "season": 2025,
+      "week": 17,
+      "homeTeam": "ATL",
+      "awayTeam": "LAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": -4.717477,
+      "actualHomeMargin": 3,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_CAR_TB",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "TB",
+      "awayTeam": "CAR",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "TB",
+      "predictedHomeMargin": 11.447769,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_SEA_SF",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "SF",
+      "awayTeam": "SEA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "SF",
+      "predictedHomeMargin": 3.519226,
+      "actualHomeMargin": -10,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_ARI_LA",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "LAR",
+      "awayTeam": "ARI",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "LAR",
+      "predictedHomeMargin": 8.557976,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "17": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_BAL_PIT",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "PIT",
+      "awayTeam": "BAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "BAL",
+      "predictedHomeMargin": -4.191459,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_CLE_CIN",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "CIN",
+      "awayTeam": "CLE",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "CIN",
+      "predictedHomeMargin": 5.231864,
+      "actualHomeMargin": -2,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_DAL_NYG",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "NYG",
+      "awayTeam": "DAL",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DAL",
+      "predictedHomeMargin": -4.355412,
+      "actualHomeMargin": 17,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_DET_CHI",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "CHI",
+      "awayTeam": "DET",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "DET",
+      "predictedHomeMargin": -5.073184,
+      "actualHomeMargin": -3,
+      "observedCategoryWeights": {
+        "3": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_GB_MIN",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "MIN",
+      "awayTeam": "GB",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "MIN",
+      "predictedHomeMargin": 0.299281,
+      "actualHomeMargin": 13,
+      "observedCategoryWeights": {
+        "13": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_IND_HOU",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "HOU",
+      "awayTeam": "IND",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "HOU",
+      "predictedHomeMargin": 4.70024,
+      "actualHomeMargin": 8,
+      "observedCategoryWeights": {
+        "8": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_KC_LV",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "LV",
+      "awayTeam": "KC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "KC",
+      "predictedHomeMargin": -6.318363,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_LAC_DEN",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "DEN",
+      "awayTeam": "LAC",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "DEN",
+      "predictedHomeMargin": 2.649449,
+      "actualHomeMargin": 16,
+      "observedCategoryWeights": {
+        "16": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_MIA_NE",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "NE",
+      "awayTeam": "MIA",
+      "neutralSite": false,
+      "pregameFavoriteSide": "AWAY",
+      "pregameFavoriteTeam": "MIA",
+      "predictedHomeMargin": -0.339891,
+      "actualHomeMargin": 28,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_NO_ATL",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "ATL",
+      "awayTeam": "NO",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "ATL",
+      "predictedHomeMargin": 0.943061,
+      "actualHomeMargin": 2,
+      "observedCategoryWeights": {
+        "2": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_NYJ_BUF",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "BUF",
+      "awayTeam": "NYJ",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "BUF",
+      "predictedHomeMargin": 13.928372,
+      "actualHomeMargin": 27,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_TEN_JAX",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "JAX",
+      "awayTeam": "TEN",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "JAX",
+      "predictedHomeMargin": 7.986357,
+      "actualHomeMargin": 34,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    },
+    {
+      "gameId": "2025_18_WAS_PHI",
+      "season": 2025,
+      "week": 18,
+      "homeTeam": "PHI",
+      "awayTeam": "WAS",
+      "neutralSite": false,
+      "pregameFavoriteSide": "HOME",
+      "pregameFavoriteTeam": "PHI",
+      "predictedHomeMargin": 9.514445,
+      "actualHomeMargin": -7,
+      "observedCategoryWeights": {
+        "OTHER": 1.0
+      }
+    }
+  ],
+  "acceptanceChecks": [
+    {
+      "id": "BW6H-MODEL-LOCK-PREEXISTED",
+      "pass": true,
+      "actual": {
+        "modelLockSha256Before": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+        "modelLockSha256After": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+        "calibrationSha256Before": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897",
+        "calibrationSha256After": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897"
+      },
+      "expected": "Frozen Stage 2 inputs remain byte-identical throughout holdout evaluation."
+    },
+    {
+      "id": "BW6H-GAME-ACCOUNTING",
+      "pass": true,
+      "actual": 272,
+      "expected": 272
+    },
+    {
+      "id": "BW6H-DISTRIBUTIONS",
+      "pass": true,
+      "actual": {
+        "selectedSum": 1.000000001,
+        "bookExactSum": 1.0
+      },
+      "expected": 1.0
+    },
+    {
+      "id": "BW6H-LOG-LOSS",
+      "pass": true,
+      "actualDelta": -0.064921859,
+      "maximum": 0.02
+    },
+    {
+      "id": "BW6H-BRIER",
+      "pass": true,
+      "actualDelta": -0.03300485,
+      "maximum": 0.005
+    },
+    {
+      "id": "BW6H-AGGREGATE-CALIBRATION",
+      "pass": false,
+      "actualErrorPercentagePoints": 3.43127,
+      "maximum": 3
+    },
+    {
+      "id": "BW6H-MARGIN-AUDIT",
+      "pass": true,
+      "actual": 18,
+      "expected": 18
+    },
+    {
+      "id": "BW6H-UNSUPPORTED-FAIL-CLOSED",
+      "pass": true,
+      "actual": 18,
+      "expected": 18
+    },
+    {
+      "id": "BW6H-MARKET-ISOLATION",
+      "pass": true,
+      "actual": {
+        "marketFieldsPresent": false,
+        "marketInputsUsed": false
+      },
+      "expected": false
+    },
+    {
+      "id": "BW6H-PROTECTED-ARTIFACTS",
+      "pass": true,
+      "actual": true,
+      "expected": true
+    }
+  ],
+  "summary": {
+    "checks": 10,
+    "passed": 9,
+    "failed": 1,
+    "holdoutPass": false
+  },
+  "protectedArtifactSha256Before": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "1349fc548cf0e8492587e738f6bc571c78bd8a5b16d67e038af5f1cddcdd98d4",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "c847397cdd34459d512bd20cac2e2926a7e1b25a3aae657119948a6f62061ba2",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "protectedArtifactSha256After": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "1349fc548cf0e8492587e738f6bc571c78bd8a5b16d67e038af5f1cddcdd98d4",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "c847397cdd34459d512bd20cac2e2926a7e1b25a3aae657119948a6f62061ba2",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "protectedArtifactsUnchanged": true,
+  "frozenInputSha256Before": {
+    "sourceSnapshot": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+    "stage2ModelLock": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+    "stage2Calibration": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897"
+  },
+  "frozenInputSha256After": {
+    "sourceSnapshot": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+    "stage2ModelLock": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+    "stage2Calibration": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897"
+  },
+  "nextStage": null
+}

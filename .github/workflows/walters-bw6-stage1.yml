@@ -1,0 +1,84 @@
+name: Walters BW6 Stage 1 Contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json'
+      - 'tools/validate-walters-bw6-stage1.mjs'
+      - 'tests/walters-bw6-stage1.test.mjs'
+      - '.github/workflows/walters-bw6-stage1.yml'
+  pull_request:
+    paths:
+      - 'data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json'
+      - 'tools/validate-walters-bw6-stage1.mjs'
+      - 'tests/walters-bw6-stage1.test.mjs'
+      - '.github/workflows/walters-bw6-stage1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walters-bw6-stage1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-contract-lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout governed revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify active Graham week
+        run: node tools/graham-active-week.mjs --json >/dev/null
+
+      - name: Validate BW6 Stage 1 contract and source lock
+        run: |
+          node --check tools/validate-walters-bw6-stage1.mjs
+          node tools/validate-walters-bw6-stage1.mjs
+
+      - name: Run BW6 Stage 1 guardrail tests
+        run: node --test tests/walters-bw6-stage1.test.mjs
+
+      - name: Verify validation did not mutate governed artifacts
+        run: |
+          set -euo pipefail
+          mapfile -t PROTECTED < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json', 'utf8'));
+          for (const file of contract.protectedArtifacts) console.log(file);
+          NODE
+          )
+          git diff --exit-code -- "${PROTECTED[@]}"
+          git diff --exit-code -- data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv
+          echo "WALTERS BW6 STAGE 1 GOVERNED ARTIFACT GUARD: PASS"
+
+      - name: Prevent BW6 changes from carrying protected-file edits
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        env:
+          COMPARE_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ -z "$COMPARE_BASE" ] || [ "$COMPARE_BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "No comparison base is available; runtime hash guard remains authoritative."
+            exit 0
+          fi
+          mapfile -t PROTECTED < <(node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json', 'utf8'));
+          for (const file of contract.protectedArtifacts) console.log(file);
+          NODE
+          )
+          git diff --exit-code "$COMPARE_BASE"...HEAD -- "${PROTECTED[@]}"
+          git diff --exit-code "$COMPARE_BASE"...HEAD -- data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv
+          echo "WALTERS BW6 STAGE 1 CHANGE-SCOPE GUARD: PASS"
