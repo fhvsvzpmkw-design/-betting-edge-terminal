@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "walters-bw6-stage3r1-diagnosis-contract-v1",
+  "module": "WALTERS_BW6_POINT_WEIGHT_CALIBRATION",
+  "stage": "BW6.3R1",
+  "status": "BW6_3R1_DIAGNOSTIC_CONTRACT_LOCKED_NON_OPERATIONAL",
+  "generatedAt": "2026-09-03T14:21:23Z",
+  "authoredAfterHoldoutViewed": true,
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketInputsAllowed": false,
+  "purpose": "Diagnose the single failed BW6.3 aggregate-calibration check without revising the original acceptance decision, fitting to the exposed 2025 holdout, or granting any downstream authority.",
+  "frozenInputs": [
+    {
+      "role": "BW6_STAGE1_CONTRACT",
+      "path": "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json",
+      "sha256": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f"
+    },
+    {
+      "role": "BW6_STAGE2_MODEL_LOCK",
+      "path": "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json",
+      "sha256": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151"
+    },
+    {
+      "role": "BW6_STAGE2_CALIBRATION",
+      "path": "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json",
+      "sha256": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897"
+    },
+    {
+      "role": "BW6_STAGE3_HOLDOUT_AUDIT",
+      "path": "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json",
+      "sha256": "c9fac3870c15b5ac4c780c5777e26997a267b109335669dd0d14d97b427fd51a"
+    },
+    {
+      "role": "BW6_STAGE2_BUILDER",
+      "path": "tools/build-walters-bw6-stage2.py",
+      "sha256": "f943cda2a77f02cea2cf5e859ddff218113fdbd5c79e74da57d4161be5931339"
+    },
+    {
+      "role": "BW6_STAGE3_BUILDER",
+      "path": "tools/build-walters-bw6-stage3.py",
+      "sha256": "72db23e7284956a24b66eca14d5ccf3fb7965fe711c88ec1ea01645dfd510075"
+    },
+    {
+      "role": "PINNED_SOURCE_SNAPSHOT",
+      "path": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+      "sha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc"
+    }
+  ],
+  "exposedHoldoutBoundary": {
+    "season": 2025,
+    "games": 272,
+    "state": "EXPOSED_DIAGNOSTIC_ONLY",
+    "diagnosticArithmeticAllowed": true,
+    "modelFitAllowed": false,
+    "modelSelectionAllowed": false,
+    "thresholdChangeAllowed": false,
+    "holdoutReuseForAcceptanceAllowed": false,
+    "stage3DispositionOverrideAllowed": false,
+    "rule": "The 2025 outcomes may localize and characterize the recorded miss. They may never fit, select, tune or accept a replacement BW6 model."
+  },
+  "diagnosticPlan": {
+    "developmentSeasons": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "lockedInternalValidationSeasons": [
+      2019,
+      2023,
+      2024
+    ],
+    "familyWiseAlpha": 0.05,
+    "aggregateReferenceErrorPercentagePoints": 3.0,
+    "confidenceLevel": 0.95,
+    "requiredMeasures": [
+      "locked-gate distance in percentage points and event counts",
+      "exact two-sided binomial compatibility under the frozen aggregate probability",
+      "probability of exceeding the locked absolute-error ceiling at the holdout sample size",
+      "locked development-fold aggregate errors and pooled error",
+      "early-era versus current-era aggregate comparison",
+      "development-versus-holdout decomposition into favorite wins by 1-18, favorite wins by 19-plus, and favorite losses or ties",
+      "per-margin standardized residuals with a Bonferroni family-wise screen",
+      "approximate sample size required for a 3.0-point 95% normal half-width"
+    ],
+    "interpretationBoundary": "All post-holdout significance and sensitivity measures are diagnostic only. They cannot waive the original gate or authorize a model substitution.",
+    "structuralSignalDefinition": "A descriptive structural signal requires both an exact aggregate compatibility p-value below the family-wise alpha and at least one per-margin residual beyond the Bonferroni critical value. Absence of that conjunction is not proof that the model is correct; it means this holdout does not justify a retroactive refit."
+  },
+  "priorBw6Artifacts": [
+    ".github/workflows/walters-bw6-stage1.yml",
+    ".github/workflows/walters-bw6-stage2.yml",
+    ".github/workflows/walters-bw6-stage3.yml",
+    "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json",
+    "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json",
+    "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json",
+    "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json",
+    "tests/walters-bw6-stage1.test.mjs",
+    "tests/walters-bw6-stage2.test.mjs",
+    "tests/walters-bw6-stage3.test.mjs",
+    "tools/build-walters-bw6-stage2.py",
+    "tools/build-walters-bw6-stage3.py",
+    "tools/validate-walters-bw6-stage1.mjs",
+    "tools/validate-walters-bw6-stage2.mjs",
+    "tools/validate-walters-bw6-stage3.mjs"
+  ],
+  "protectedArtifacts": [
+    "core/walters-authority-v1.4.json",
+    "core/walters-intelligence-interface-v1.4.json",
+    "data/live-odds.json",
+    "data/walters/nfl/active-week.json",
+    "data/walters/nfl/2026/week-01-current-numbers.json",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json",
+    "data/walters/nfl/current-week-terminal.json",
+    "data/walters/nfl-power-ratings-ledger.json",
+    "data/walters/nfl/home-field/home-field-production-current.json",
+    "data/walters/nfl/personnel-production-current.json",
+    "data/walters/nfl/matchup-production-current.json",
+    "data/walters/nfl/qb-production-current.json",
+    "data/walters/nfl/qb-production/production-contract-v1.json"
+  ],
+  "outcomeRules": {
+    "originalBw6Stage3StatusMustRemain": "BW6_3_FAIL_CLOSED_RECALIBRATION_REVIEW_REQUIRED",
+    "diagnosisCompleteState": "BW6_3R1_DIAGNOSIS_COMPLETE_RECALIBRATION_SPEC_REQUIRED_NON_OPERATIONAL",
+    "currentFrozenModelDisposition": "RETAIN_AS_FROZEN_REFERENCE_NON_OPERATIONAL",
+    "replacementModelMayBeSelected": false,
+    "freshValidationRequired": true,
+    "blockedStages": [
+      "BW6.4",
+      "BW7",
+      "BW8"
+    ],
+    "nextStage": "BW6.3R2_DEVELOPMENT_ONLY_RECALIBRATION_CONTRACT"
+  },
+  "output": "data/walters/nfl/key-numbers/bw6-stage3r1-recalibration-diagnosis-v1.json"
+}
