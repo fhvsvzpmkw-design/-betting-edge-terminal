@@ -3,11 +3,17 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
 const PREFERENCES_PATH = 'data/preferences.json';
+const FEED_PATH = 'data/live-odds.json';
 const EXPECTED_AUTHORITY_ID = 'major-sport-market-coverage-v1';
+const BOOKS = Object.freeze(['Bet365', 'DraftKings']);
+const QUOTE_MAX_AGE_MINUTES = 30;
+const PRIMARY_SCORE_EPSILON = 1e-8;
+const FEED_MARKET_KEYS = Object.freeze({ moneyline: 'ml', spread: 'spread', total: 'totals' });
 
 function die(message) { throw new Error(message); }
 function ensure(condition, message) { if (!condition) die(message); }
@@ -15,9 +21,259 @@ function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function isObject(value) { return value && typeof value === 'object' && !Array.isArray(value); }
 function nonEmpty(value) { return typeof value === 'string' && value.trim().length > 0; }
 function int(value, label) { ensure(Number.isInteger(value) && value >= 0, `${label} must be a non-negative integer`); }
+function parseMs(value) { const ms = Date.parse(value || ''); return Number.isFinite(ms) ? ms : null; }
+function ageMinutes(older, newer) { const a = parseMs(older), b = parseMs(newer); return a === null || b === null ? Infinity : Math.max(0, (b - a) / 60000); }
+function quoteFresh(updatedAt, generatedAt) { return ageMinutes(updatedAt, generatedAt) <= QUOTE_MAX_AGE_MINUTES; }
+function decimalOdds(value) { const n = Number(value); return Number.isFinite(n) && n > 1.001 ? n : null; }
+function implied(value) { const odds = decimalOdds(value); return odds ? 1 / odds : null; }
+function marketKey(market) { return String(market?.marketKey || market?.identity?.marketKey || '').toLowerCase(); }
+function eventId(event) { return String(event?.eventId || event?.identity?.eventId || event?.id || '').trim(); }
+function rowLine(row) {
+  for (const key of ['hdp', 'line', 'total', 'points']) {
+    const value = Number(row?.[key]);
+    if (Number.isFinite(value)) return value;
+  }
+  return null;
+}
+function selectionKey(row, side) { return String(row?.selectionKeys?.[side] || row?.identity?.selectionKeys?.[side] || '').trim(); }
+function explicitPrimaryRow(row) { return row?.primary === true || row?.isPrimary === true || row?.main === true || row?.isMain === true || row?.mainLine === true || row?.isMainLine === true; }
 function gitBlobSha(buffer) {
   const header = Buffer.from(`blob ${buffer.length}\0`, 'utf8');
   return crypto.createHash('sha1').update(header).update(buffer).digest('hex');
+}
+
+function localDateKey(timestamp, timeZone) {
+  const date = new Date(timestamp);
+  if (!Number.isFinite(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return values.year && values.month && values.day ? `${values.year}-${values.month}-${values.day}` : null;
+}
+
+function normalizedText(...values) {
+  return values.filter(Boolean).join(' ').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+export function majorSportKey(event) {
+  const sport = normalizedText(event?.sport?.slug || event?.identity?.sportKey || event?.sport?.name);
+  const leagueSlug = normalizedText(event?.league?.slug || event?.identity?.leagueKey);
+  const league = normalizedText(event?.league?.slug, event?.league?.name, event?.identity?.leagueKey);
+
+  if (sport === 'baseball' && (leagueSlug === 'usa mlb' || /\bmlb\b|major league baseball/.test(league))) return 'MLB';
+  if (sport === 'ice hockey' && (leagueSlug === 'usa nhl' || /\bnhl\b|national hockey league/.test(league))) return 'NHL';
+  if (sport === 'basketball' && (['usa nba', 'usa wnba'].includes(leagueSlug) || /\bnba\b|\bwnba\b|national basketball association/.test(league))) return 'NBA_WNBA';
+  if (sport !== 'american football') return null;
+  if (leagueSlug === 'usa nfl' || /\bnfl\b|national football league/.test(league)) return 'NFL';
+  if (['usa college', 'usa ncaaf'].includes(leagueSlug) || /\bncaaf\b|\bncaa\b|college/.test(league)) return 'NCAAF';
+  if (['canada cfl', 'canadian football league'].includes(leagueSlug) || /\bcfl\b|canadian football league/.test(league)) return 'CFL';
+  return null;
+}
+
+function mergedFeedEvents(feed) {
+  const merged = new Map();
+  for (const event of feed?.events || []) {
+    const id = eventId(event);
+    if (id) merged.set(id, { ...event, bookmakers: { ...(event?.bookmakers || {}) } });
+  }
+  for (const collection of [feed?.deepMarkets || [], feed?.baseballProps || []]) {
+    for (const event of collection) {
+      const id = eventId(event);
+      if (!id || !merged.has(id)) continue;
+      const current = merged.get(id);
+      const next = { ...event, ...current, bookmakers: { ...(current?.bookmakers || {}) } };
+      for (const [book, markets] of Object.entries(event?.bookmakers || {})) {
+        next.bookmakers[book] = [...(next.bookmakers[book] || []), ...(Array.isArray(markets) ? markets : [])];
+      }
+      merged.set(id, next);
+    }
+  }
+  return merged;
+}
+
+function latestMarket(event, book, wantedKey) {
+  const markets = Array.isArray(event?.bookmakers?.[book]) ? event.bookmakers[book] : [];
+  return markets
+    .filter(market => marketKey(market) === wantedKey)
+    .sort((a, b) => (parseMs(b?.updatedAt) ?? -Infinity) - (parseMs(a?.updatedAt) ?? -Infinity))[0] || null;
+}
+
+function inspectFixedMarket(market, selections) {
+  const states = {};
+  for (const side of selections) {
+    let pricedWithoutIdentity = false;
+    for (const row of market?.odds || []) {
+      if (!decimalOdds(row?.[side])) continue;
+      if (selectionKey(row, side)) { states[side] = 'AVAILABLE'; break; }
+      pricedWithoutIdentity = true;
+    }
+    if (!states[side]) states[side] = pricedWithoutIdentity ? 'IDENTITY' : 'INCOMPLETE';
+  }
+  return { state: 'RESOLVED', selections: states };
+}
+
+function inspectPrimaryLineMarket(market, selections) {
+  const rows = (market?.odds || []).filter(row => rowLine(row) !== null);
+  if (!rows.length) return { state: 'INCOMPLETE' };
+
+  const marked = rows.filter(explicitPrimaryRow);
+  let candidates;
+  if (marked.length) {
+    candidates = marked;
+  } else {
+    const priced = rows.map(row => {
+      const first = implied(row?.[selections[0]]);
+      const second = implied(row?.[selections[1]]);
+      return first && second ? { row, balance: Math.abs(first - second) } : null;
+    }).filter(Boolean);
+    if (!priced.length) return { state: 'INCOMPLETE' };
+    const minimum = Math.min(...priced.map(item => item.balance));
+    candidates = priced.filter(item => Math.abs(item.balance - minimum) <= PRIMARY_SCORE_EPSILON).map(item => item.row);
+  }
+
+  const lines = [...new Set(candidates.map(rowLine))];
+  if (lines.length !== 1) return { state: 'AMBIGUOUS' };
+  const line = lines[0];
+  const lineRows = rows.filter(row => Math.abs(rowLine(row) - line) <= 0.001);
+  const states = {};
+  for (const side of selections) {
+    const priced = lineRows.filter(row => decimalOdds(row?.[side]));
+    if (priced.some(row => selectionKey(row, side))) states[side] = 'AVAILABLE';
+    else states[side] = priced.length ? 'IDENTITY' : 'INCOMPLETE';
+  }
+  return { state: 'RESOLVED', selections: states };
+}
+
+function inspectBookPrimary(event, book, spec, feedGeneratedAt) {
+  const wantedKey = FEED_MARKET_KEYS[spec.market];
+  const market = latestMarket(event, book, wantedKey);
+  if (!market) return { state: 'MISSING' };
+  if (!quoteFresh(market?.updatedAt, feedGeneratedAt)) return { state: 'STALE' };
+  return spec.primaryLineOnly
+    ? inspectPrimaryLineMarket(market, spec.requiredSelections)
+    : inspectFixedMarket(market, spec.requiredSelections);
+}
+
+function unavailableReason(bookResults, selection) {
+  const resolved = bookResults.filter(result => result.state === 'RESOLVED');
+  if (resolved.some(result => result.selections?.[selection] === 'IDENTITY')) return 'IDENTITY_UNRESOLVED';
+  if (resolved.length) return 'INCOMPLETE_TWO_SIDED_MARKET';
+  if (bookResults.some(result => result.state === 'AMBIGUOUS')) return 'PRIMARY_LINE_UNRESOLVED';
+  if (bookResults.some(result => result.state === 'INCOMPLETE')) return 'INCOMPLETE_TWO_SIDED_MARKET';
+  if (bookResults.some(result => result.state === 'STALE')) return 'STALE_EXECUTABLE_QUOTE';
+  return 'MARKET_NOT_RETURNED';
+}
+
+function primarySpecs(policy, sport) {
+  return sport === 'NFL' || sport === 'NCAAF' || sport === 'CFL'
+    ? policy.sports.FOOTBALL.primary
+    : policy.sports[sport].primary;
+}
+
+function isPlayerPropMarket(market) {
+  const text = normalizedText(marketKey(market), market?.name);
+  if (/\bteam total\b|\bwinning margin\b|\bfirst team\b|\blast team\b/.test(text)) return false;
+  return /\bplayer\b|\bpitcher\b|\bbatter\b|\bstrikeouts?\b|\bruns batted in\b|\brbi\b|\btotal bases?\b|\bhome runs?\b|\bstolen bases?\b|\bhits? o u\b|\bruns? o u\b|\bdoubles? o u\b|\btriples? o u\b|\bdouble double\b|\btriple double\b|\bpoint assist and rebound\b|\btouchdown scor|\bpassing\b|\brushing\b|\breceiving\b|\breceptions?\b|\bgoalie\b|\bshots on goal\b|\bgoalscorer\b|\bthree pointers?\b/.test(text);
+}
+
+function freshPropSelectionKeys(event, feedGeneratedAt) {
+  const keys = new Set();
+  for (const book of BOOKS) {
+    for (const market of event?.bookmakers?.[book] || []) {
+      if (!isPlayerPropMarket(market) || !quoteFresh(market?.updatedAt, feedGeneratedAt)) continue;
+      for (const row of market?.odds || []) {
+        const supplied = { ...(row?.identity?.selectionKeys || {}), ...(row?.selectionKeys || {}) };
+        for (const [side, key] of Object.entries(supplied)) {
+          if (nonEmpty(String(key)) && decimalOdds(row?.[side])) keys.add(String(key));
+        }
+      }
+    }
+  }
+  return keys;
+}
+
+export function deriveBoundCoverage(report, feed, policy) {
+  ensure(isObject(feed), 'Bound odds feed must be an object');
+  ensure(Array.isArray(feed.events), 'Bound odds feed events must be an array');
+  ensure(String(feed.generatedAt || '') === String(report?.feedGeneratedAt || ''), `Bound feed ${feed.generatedAt || 'unknown'} does not match report ${report?.feedGeneratedAt || 'unknown'}`);
+  ensure(parseMs(feed.generatedAt) !== null, 'Bound odds feed generatedAt must be parseable');
+  const reportMs = parseMs(report?.ts);
+  const reportDate = localDateKey(report?.ts, policy.timezone);
+  ensure(reportMs !== null && reportDate, 'Cannot derive coverage from an invalid report timestamp');
+
+  const sportKeys = policy.coverageAudit.sportKeys;
+  const games = Object.fromEntries(sportKeys.map(sport => [sport, new Map()]));
+  for (const event of feed?.events || []) {
+    const sport = majorSportKey(event);
+    if (!sport) continue;
+    const id = eventId(event);
+    const startMs = parseMs(event?.date || event?.identity?.startTime);
+    const eventDate = localDateKey(event?.date || event?.identity?.startTime, policy.timezone);
+    ensure(id, `Bound feed ${sport} event is missing exact event identity`);
+    ensure(startMs !== null && eventDate, `Bound feed ${sport} event ${id} has an invalid start time`);
+    if (startMs <= reportMs || eventDate !== reportDate) continue;
+    games[sport].set(id, event);
+  }
+
+  const merged = mergedFeedEvents(feed);
+  const sports = {};
+  const limitations = new Map();
+  for (const sport of sportKeys) {
+    let evaluated = 0;
+    let unavailable = 0;
+    const propKeys = new Set();
+    for (const [id, primaryEvent] of games[sport]) {
+      const event = merged.get(id) || primaryEvent;
+      for (const spec of primarySpecs(policy, sport)) {
+        const results = BOOKS.map(book => inspectBookPrimary(event, book, spec, feed.generatedAt));
+        for (const selection of spec.requiredSelections) {
+          const available = results.some(result => result.state === 'RESOLVED' && result.selections?.[selection] === 'AVAILABLE');
+          if (available) { evaluated += 1; continue; }
+          unavailable += 1;
+          limitations.set(`${sport}|${id}|${spec.marketDetail}|${selection}`, unavailableReason(results, selection));
+        }
+      }
+      for (const key of freshPropSelectionKeys(event, feed.generatedAt)) propKeys.add(key);
+    }
+    sports[sport] = {
+      eventIds: [...games[sport].keys()].sort(),
+      gamesInScope: games[sport].size,
+      primary: {
+        required: games[sport].size * policy.coverageAudit.primarySelectionsPerGame,
+        evaluated,
+        unavailable
+      },
+      propsReturned: propKeys.size
+    };
+  }
+  return { sports, limitations };
+}
+
+function loadBoundFeed(root, report, sidecar, feedFile = null) {
+  const sha = String(sidecar?.provenance?.feedBlobSha || '');
+  ensure(/^[0-9a-f]{40}$/i.test(sha), 'Sidecar provenance.feedBlobSha must be a Git SHA');
+  let raw = null;
+  if (feedFile) {
+    raw = fs.readFileSync(path.isAbsolute(feedFile) ? feedFile : path.join(root, feedFile));
+  } else {
+    try { raw = execFileSync('git', ['cat-file', 'blob', sha], { cwd: root, maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] }); }
+    catch { /* exact checked working-tree fallback below */ }
+    if (!raw) {
+      const livePath = path.join(root, FEED_PATH);
+      ensure(fs.existsSync(livePath), `Cannot resolve exact bound odds snapshot ${sha}`);
+      raw = fs.readFileSync(livePath);
+    }
+  }
+  ensure(gitBlobSha(raw) === sha, `Resolved odds snapshot does not match provenance.feedBlobSha ${sha}`);
+  let feed;
+  try { feed = JSON.parse(raw.toString('utf8')); }
+  catch { die(`Bound odds snapshot ${sha} is not valid JSON`); }
+  ensure(String(feed?.generatedAt || '') === String(report?.feedGeneratedAt || ''), `Bound feed ${feed?.generatedAt || 'unknown'} does not match report ${report?.feedGeneratedAt || 'unknown'}`);
+  return feed;
 }
 function authority(root = process.cwd()) {
   const file = path.join(root, AUTHORITY_PATH);
@@ -79,7 +335,7 @@ function sumSports(sports, sportKeys) {
   return totals;
 }
 
-export function validateCoverageAudit(report, sidecar, { root = process.cwd(), requireCurrentAuthority = true } = {}) {
+export function validateCoverageAudit(report, sidecar, { root = process.cwd(), requireCurrentAuthority = true, feed = null, feedFile = null } = {}) {
   ensure(isObject(report), 'Coverage gate report must be an object');
   ensure(isObject(sidecar), 'Coverage gate sidecar must be an object');
   const { policy, blobSha } = authority(root);
@@ -98,6 +354,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   if (requireCurrentAuthority) ensure(audit.authorityBlobSha === blobSha, 'coverageAudit authorityBlobSha does not match current operational authority');
   ensure(audit.state === auditPolicy.state, `coverageAudit state must be ${auditPolicy.state}`);
   ensure(audit.feedGeneratedAt === report.feedGeneratedAt, 'coverageAudit feedGeneratedAt must match report.feedGeneratedAt');
+  ensure(/^[0-9a-f]{40}$/i.test(String(sidecar?.provenance?.feedBlobSha || '')), 'Sidecar provenance.feedBlobSha must be a Git SHA');
   ensure(audit.evaluationOrder === policy.principles.evaluationOrder, 'coverageAudit evaluationOrder mismatch');
   ensure(audit.complete === true, 'coverageAudit complete must be true');
 
@@ -122,7 +379,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
 
   ensure(Array.isArray(audit.availabilityLimitations), 'coverageAudit.availabilityLimitations must be an array');
   const allowedReasons = new Set(auditPolicy.availabilityReasonCodes);
-  const unavailableTuples = new Set();
+  const unavailableTuples = new Map();
   let limitationsSelectionCount = 0;
   for (const [index, item] of audit.availabilityLimitations.entries()) {
     ensure(isObject(item), `coverageAudit.availabilityLimitations[${index}] must be an object`);
@@ -136,7 +393,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
       ensure(permittedSelections.has(selection), `coverageAudit.availabilityLimitations[${index}] selection ${selection} is invalid for ${item.marketDetail}`);
       const tuple = `${item.sport}|${item.eventId}|${item.marketDetail}|${selection}`;
       ensure(!unavailableTuples.has(tuple), `coverageAudit availability limitation duplicates ${tuple}`);
-      unavailableTuples.add(tuple);
+      unavailableTuples.set(tuple, item.reason);
       limitationsSelectionCount++;
     }
   }
@@ -157,7 +414,33 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   }
   ensure(limitationsSelectionCount === calculatedTotals.primaryUnavailable, 'coverageAudit availabilityLimitations selection count must equal total primaryUnavailable');
 
-  return { enforced: true, audit, calculatedTotals, authorityBlobSha: blobSha };
+  const boundFeed = feed || loadBoundFeed(root, report, sidecar, feedFile);
+  const bound = deriveBoundCoverage(report, boundFeed, policy);
+  const mismatches = [];
+  for (const sport of sportKeys) {
+    const actual = audit.sports[sport];
+    const expected = bound.sports[sport];
+    if (actual.gamesInScope !== expected.gamesInScope) {
+      mismatches.push(`${sport}.gamesInScope ${actual.gamesInScope} != ${expected.gamesInScope} [${expected.eventIds.join(',') || 'none'}]`);
+    }
+    if (actual.gamesEvaluated !== expected.gamesInScope) mismatches.push(`${sport}.gamesEvaluated ${actual.gamesEvaluated} != ${expected.gamesInScope}`);
+    for (const field of ['required', 'evaluated', 'unavailable']) {
+      if (actual.primary[field] !== expected.primary[field]) mismatches.push(`${sport}.primary.${field} ${actual.primary[field]} != ${expected.primary[field]}`);
+    }
+    if (actual.props.returned !== expected.propsReturned) mismatches.push(`${sport}.props.returned ${actual.props.returned} != ${expected.propsReturned}`);
+    if (actual.props.screened !== expected.propsReturned) mismatches.push(`${sport}.props.screened ${actual.props.screened} != ${expected.propsReturned}`);
+  }
+
+  for (const [tuple, reason] of bound.limitations) {
+    if (!unavailableTuples.has(tuple)) mismatches.push(`missing limitation ${tuple} (${reason})`);
+    else if (unavailableTuples.get(tuple) !== reason) mismatches.push(`limitation ${tuple} reason ${unavailableTuples.get(tuple)} != ${reason}`);
+  }
+  for (const [tuple, reason] of unavailableTuples) {
+    if (!bound.limitations.has(tuple)) mismatches.push(`extra limitation ${tuple} (${reason})`);
+  }
+  ensure(mismatches.length === 0, `coverageAudit does not match exact bound feed: ${mismatches.slice(0, 24).join('; ')}${mismatches.length > 24 ? `; +${mismatches.length - 24} more` : ''}`);
+
+  return { enforced: true, audit, calculatedTotals, boundCoverage: bound, authorityBlobSha: blobSha };
 }
 
 function parseArgs(argv) {
@@ -186,8 +469,34 @@ function makeSport(gamesInScope, evaluated, unavailable, propsReturned, serious 
 function selfTest() {
   const { policy, blobSha } = authority();
   const report = { ts: policy.coverageAudit.requiredFrom, feedGeneratedAt: '2026-09-02T14:55:00.000Z' };
+  const feed = {
+    generatedAt: report.feedGeneratedAt,
+    events: [{
+      id: '63301763',
+      eventId: '63301763',
+      date: '2026-09-02T20:00:00.000Z',
+      sport: { slug: 'baseball' },
+      league: { slug: 'usa-mlb', name: 'USA - MLB' },
+      bookmakers: {
+        Bet365: [
+          {
+            marketKey: 'ml', updatedAt: '2026-09-02T14:50:00.000Z',
+            odds: [{ home: '1.80', away: '2.10', selectionKeys: { home: '63301763|ml|home||', away: '63301763|ml|away||' } }]
+          },
+          {
+            marketKey: 'totals', updatedAt: '2026-09-02T14:50:00.000Z',
+            odds: [{ hdp: 8.5, over: '1.91', under: '1.91', selectionKeys: { over: '63301763|totals|over||8.5', under: '63301763|totals|under||8.5' } }]
+          },
+          {
+            marketKey: 'player-props', name: 'Player Props', updatedAt: '2026-09-02T14:50:00.000Z',
+            odds: [{ label: 'Synthetic Player (Hits)', hdp: 0.5, over: '1.80', under: '2.05', selectionKeys: { over: '63301763|player-props|over|synthetic-player-hits|0.5', under: '63301763|player-props|under|synthetic-player-hits|0.5' } }]
+          }
+        ]
+      }
+    }]
+  };
   const sports = {
-    MLB: makeSport(1, 4, 2, 18, 2),
+    MLB: makeSport(1, 4, 2, 2, 1),
     NHL: makeSport(0, 0, 0, 0),
     NBA_WNBA: makeSport(0, 0, 0, 0),
     NFL: makeSport(0, 0, 0, 0),
@@ -197,6 +506,7 @@ function selfTest() {
   const totals = sumSports(sports, policy.coverageAudit.sportKeys);
   const sidecar = {
     schema: 3,
+    provenance: { feedBlobSha: '0'.repeat(40) },
     coverageAudit: {
       schema: 1,
       authorityId: policy.authorityId,
@@ -223,21 +533,39 @@ function selfTest() {
       complete: true
     }
   };
-  const result = validateCoverageAudit(report, sidecar);
+  const result = validateCoverageAudit(report, sidecar, { feed });
   assert.equal(result.enforced, true);
   assert.equal(result.calculatedTotals.primaryUnavailable, 2);
 
   const badArithmetic = structuredClone(sidecar);
   badArithmetic.coverageAudit.sports.MLB.primary.evaluated = 5;
-  assert.throws(() => validateCoverageAudit(report, badArithmetic), /primary arithmetic/i);
+  assert.throws(() => validateCoverageAudit(report, badArithmetic, { feed }), /primary arithmetic/i);
 
   const missingLimitation = structuredClone(sidecar);
   missingLimitation.coverageAudit.availabilityLimitations = [];
-  assert.throws(() => validateCoverageAudit(report, missingLimitation), /availabilityLimitations selection count/i);
+  assert.throws(() => validateCoverageAudit(report, missingLimitation, { feed }), /availabilityLimitations selection count/i);
 
   const suppressed = structuredClone(sidecar);
   suppressed.coverageAudit.presentation.actionableSuppressedByTarget = 1;
-  assert.throws(() => validateCoverageAudit(report, suppressed), /may not suppress actionable/i);
+  assert.throws(() => validateCoverageAudit(report, suppressed, { feed }), /may not suppress actionable/i);
+
+  const omittedNcaaf = structuredClone(feed);
+  omittedNcaaf.events.push({
+    id: 'ncaaf-1', eventId: 'ncaaf-1', date: '2026-09-02T23:00:00.000Z',
+    sport: { slug: 'american-football' }, league: { slug: 'usa-college', name: 'USA - College' },
+    bookmakers: { Bet365: [{
+      marketKey: 'ml', updatedAt: '2026-09-02T14:50:00.000Z',
+      odds: [{ home: '1.50', away: '2.60', selectionKeys: { home: 'ncaaf-1|ml|home||', away: 'ncaaf-1|ml|away||' } }]
+    }] }
+  });
+  assert.throws(() => validateCoverageAudit(report, sidecar, { feed: omittedNcaaf }), /NCAAF\.gamesInScope 0 != 1/);
+
+  const freshSpread = structuredClone(feed);
+  freshSpread.events[0].bookmakers.Bet365.push({
+    marketKey: 'spread', updatedAt: '2026-09-02T14:35:00.000Z',
+    odds: [{ hdp: -1.5, home: '1.91', away: '1.91', selectionKeys: { home: '63301763|spread|home||-1.5', away: '63301763|spread|away||-1.5' } }]
+  });
+  assert.throws(() => validateCoverageAudit(report, sidecar, { feed: freshSpread }), /MLB\.primary\.evaluated 4 != 6/);
 
   const preCutover = { ts: '2026-09-02T07:59:59-07:00', feedGeneratedAt: report.feedGeneratedAt };
   assert.equal(validateCoverageAudit(preCutover, { schema: 3 }).enforced, false);
@@ -249,11 +577,12 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.command === 'self-test') { selfTest(); return; }
   if (args.command !== 'validate' || !args.report || !args.sidecar) {
-    die('Usage: major-sport-market-coverage-gate.mjs validate --report FILE --sidecar FILE | self-test');
+    die('Usage: major-sport-market-coverage-gate.mjs validate --report FILE --sidecar FILE [--feed FILE] [--root DIR] | self-test');
   }
+  const root = path.resolve(args.root || process.cwd());
   const report = readJson(path.resolve(args.report));
   const sidecar = readJson(path.resolve(args.sidecar));
-  const result = validateCoverageAudit(report, sidecar);
+  const result = validateCoverageAudit(report, sidecar, { root, feedFile: args.feed || null });
   if (!result.enforced) {
     console.log(`MAJOR SPORT COVERAGE GATE PRE-CUTOVER ${report.ts}`);
     return;
