@@ -1,0 +1,754 @@
+{
+  "schemaVersion": "walters-bw6-stage3r1-recalibration-diagnosis-v1",
+  "module": "WALTERS_BW6_POINT_WEIGHT_CALIBRATION",
+  "stage": "BW6.3R1",
+  "status": "BW6_3R1_DIAGNOSIS_COMPLETE_RECALIBRATION_SPEC_REQUIRED_NON_OPERATIONAL",
+  "generatedAt": "2026-09-03T14:21:23Z",
+  "operational": false,
+  "productionAuthority": false,
+  "grahamFairMutationAllowed": false,
+  "liveBoardMutationAllowed": false,
+  "betStatusMutationAllowed": false,
+  "stakeMutationAllowed": false,
+  "marketViewed": false,
+  "holdoutState": "EXPOSED_DIAGNOSTIC_ONLY",
+  "modelFitUsed2025": false,
+  "modelSelectionUsed2025": false,
+  "thresholdChanged": false,
+  "stage3DispositionOverridden": false,
+  "diagnosisContract": "data/walters/nfl/key-numbers/bw6-stage3r1-diagnosis-contract-v1.json",
+  "diagnosisContractSha256": "70dd281d5699623f936633521ba70f1837b331143a512c10f0a9405bfb9a100b",
+  "stage1ContractSha256": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f",
+  "stage2ModelLockSha256": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+  "stage2CalibrationSha256": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897",
+  "stage3HoldoutAuditSha256": "c9fac3870c15b5ac4c780c5777e26997a267b109335669dd0d14d97b427fd51a",
+  "builder": "tools/build-walters-bw6-stage3r1.py",
+  "builderSha256": "f91a5ca03a1b1602adacfa89ed15df014fd510ca25cc787add668e0cb6d81d2b",
+  "originalDecision": {
+    "status": "BW6_3_FAIL_CLOSED_RECALIBRATION_REVIEW_REQUIRED",
+    "summary": {
+      "checks": 10,
+      "passed": 9,
+      "failed": 1,
+      "holdoutPass": false
+    },
+    "failedChecks": [
+      "BW6H-AGGREGATE-CALIBRATION"
+    ],
+    "preserved": true
+  },
+  "lockedGateDiagnosis": {
+    "games": 272,
+    "observedEvents": 120.0,
+    "expectedEvents": 129.333054,
+    "eventShortfall": 9.333054,
+    "selectedPredictedPercent": 47.548917,
+    "observedPercent": 44.117647,
+    "signedModelErrorPercentagePoints": 3.43127,
+    "absoluteErrorPercentagePoints": 3.43127,
+    "lockedMaximumErrorPercentagePoints": 3.0,
+    "distanceBeyondGatePercentagePoints": 0.43127,
+    "maximumAbsoluteEventDifferenceAtGate": 8.16,
+    "exactPassingObservedEventRange": {
+      "minimum": 122,
+      "maximum": 137
+    },
+    "minimumAdditionalExactMarginEventsToPass": 2,
+    "errorWithOneAdditionalEventPercentagePoints": 3.063623,
+    "errorWithTwoAdditionalEventsPercentagePoints": 2.695976,
+    "originalGateWaived": false
+  },
+  "samplingCompatibility": {
+    "standardErrorPercentagePoints": 3.02805,
+    "observedMinusExpectedZScore": -1.133161,
+    "exactTwoSidedBinomialPValue": 0.274602203,
+    "selectedPredictionInsideHoldoutWilson95": true,
+    "holdoutWilson95LowPercent": 38.339477,
+    "holdoutWilson95HighPercent": 50.059656,
+    "probabilityAbsoluteErrorExceedsLockedGateUnderFrozenModel": 0.331521552,
+    "probabilityLockedGatePassesUnderFrozenModel": 0.668478448,
+    "diagnosticOnlyNoGateOverride": true
+  },
+  "developmentEvidence": {
+    "sourceAudit": {
+      "path": "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+      "sha256": "3a21c7ed52214151fb63bce848a594bf04c4e513caa5a26f3bcb83b6fd2b49fc",
+      "encounteredRows": 3435,
+      "developmentGames": 2367,
+      "contextGames": 256,
+      "holdoutScoreFieldsRead": false,
+      "marketFieldsPresent": false,
+      "skippedRowsByReason": {
+        "2014_SB": 1,
+        "2015_SB": 1,
+        "2016_SB": 1,
+        "2017_SB": 1,
+        "2018_SB": 1,
+        "2019_SB": 1,
+        "2020_REG": 256,
+        "2020_SB": 1,
+        "2021_SB": 1,
+        "2022_SB": 1,
+        "2023_SB": 1,
+        "2024_SB": 1,
+        "2025_REG": 272,
+        "2025_SB": 1,
+        "2026_REG": 272
+      }
+    },
+    "orientationAudit": {
+      "canonicalTeams": [
+        "ARI",
+        "ATL",
+        "BAL",
+        "BUF",
+        "CAR",
+        "CHI",
+        "CIN",
+        "CLE",
+        "DAL",
+        "DEN",
+        "DET",
+        "GB",
+        "HOU",
+        "IND",
+        "JAX",
+        "KC",
+        "LAC",
+        "LAR",
+        "LV",
+        "MIA",
+        "MIN",
+        "NE",
+        "NO",
+        "NYG",
+        "NYJ",
+        "PHI",
+        "PIT",
+        "SEA",
+        "SF",
+        "TB",
+        "TEN",
+        "WAS"
+      ],
+      "developmentObservations": 2367,
+      "bySeason": {
+        "2015": {
+          "games": 256,
+          "homeFavorite": 161,
+          "awayFavorite": 95,
+          "splitOrientation": 0
+        },
+        "2016": {
+          "games": 256,
+          "homeFavorite": 159,
+          "awayFavorite": 97,
+          "splitOrientation": 0
+        },
+        "2017": {
+          "games": 256,
+          "homeFavorite": 168,
+          "awayFavorite": 88,
+          "splitOrientation": 0
+        },
+        "2018": {
+          "games": 256,
+          "homeFavorite": 172,
+          "awayFavorite": 84,
+          "splitOrientation": 0
+        },
+        "2019": {
+          "games": 256,
+          "homeFavorite": 162,
+          "awayFavorite": 94,
+          "splitOrientation": 0
+        },
+        "2021": {
+          "games": 272,
+          "homeFavorite": 168,
+          "awayFavorite": 104,
+          "splitOrientation": 0
+        },
+        "2022": {
+          "games": 271,
+          "homeFavorite": 172,
+          "awayFavorite": 99,
+          "splitOrientation": 0
+        },
+        "2023": {
+          "games": 272,
+          "homeFavorite": 174,
+          "awayFavorite": 98,
+          "splitOrientation": 0
+        },
+        "2024": {
+          "games": 272,
+          "homeFavorite": 179,
+          "awayFavorite": 93,
+          "splitOrientation": 0
+        }
+      },
+      "targetGameScoresUsedForOrientation": false,
+      "futureGamesUsedForOrientation": false,
+      "marketInputsUsed": false
+    },
+    "seasonalAggregate": [
+      {
+        "season": 2015,
+        "games": 256,
+        "observedEvents": 123.0,
+        "observedPercent": 48.046875
+      },
+      {
+        "season": 2016,
+        "games": 256,
+        "observedEvents": 119.0,
+        "observedPercent": 46.484375
+      },
+      {
+        "season": 2017,
+        "games": 256,
+        "observedEvents": 129.0,
+        "observedPercent": 50.390625
+      },
+      {
+        "season": 2018,
+        "games": 256,
+        "observedEvents": 123.0,
+        "observedPercent": 48.046875
+      },
+      {
+        "season": 2019,
+        "games": 256,
+        "observedEvents": 122.0,
+        "observedPercent": 47.65625
+      },
+      {
+        "season": 2021,
+        "games": 272,
+        "observedEvents": 115.0,
+        "observedPercent": 42.279412
+      },
+      {
+        "season": 2022,
+        "games": 271,
+        "observedEvents": 135.0,
+        "observedPercent": 49.815498
+      },
+      {
+        "season": 2023,
+        "games": 272,
+        "observedEvents": 123.0,
+        "observedPercent": 45.220588
+      },
+      {
+        "season": 2024,
+        "games": 272,
+        "observedEvents": 132.0,
+        "observedPercent": 48.529412
+      }
+    ],
+    "lockedFoldDiagnostics": [
+      {
+        "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+        "validationSeason": 2019,
+        "games": 256,
+        "observedEvents": 122.0,
+        "predictedPercent": 48.669569,
+        "observedPercent": 47.65625,
+        "signedErrorPercentagePoints": 1.013319
+      },
+      {
+        "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+        "validationSeason": 2023,
+        "games": 272,
+        "observedEvents": 123.0,
+        "predictedPercent": 47.748977,
+        "observedPercent": 45.220588,
+        "signedErrorPercentagePoints": 2.528389
+      },
+      {
+        "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+        "validationSeason": 2024,
+        "games": 272,
+        "observedEvents": 132.0,
+        "predictedPercent": 47.422191,
+        "observedPercent": 48.529412,
+        "signedErrorPercentagePoints": -1.107221
+      },
+      {
+        "modelId": "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "validationSeason": 2019,
+        "games": 256,
+        "observedEvents": 122.0,
+        "predictedPercent": 48.669569,
+        "observedPercent": 47.65625,
+        "signedErrorPercentagePoints": 1.013319
+      },
+      {
+        "modelId": "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "validationSeason": 2023,
+        "games": 272,
+        "observedEvents": 123.0,
+        "predictedPercent": 47.346172,
+        "observedPercent": 45.220588,
+        "signedErrorPercentagePoints": 2.125584
+      },
+      {
+        "modelId": "BW6_ROLLING_FOUR_ELIGIBLE_SEASONS",
+        "validationSeason": 2024,
+        "games": 272,
+        "observedEvents": 132.0,
+        "predictedPercent": 46.645072,
+        "observedPercent": 48.529412,
+        "signedErrorPercentagePoints": -1.88434
+      },
+      {
+        "modelId": "BW6_EXPONENTIAL_SEASON_DECAY_HL4",
+        "validationSeason": 2019,
+        "games": 256,
+        "observedEvents": 122.0,
+        "predictedPercent": 48.864128,
+        "observedPercent": 47.65625,
+        "signedErrorPercentagePoints": 1.207878
+      },
+      {
+        "modelId": "BW6_EXPONENTIAL_SEASON_DECAY_HL4",
+        "validationSeason": 2023,
+        "games": 272,
+        "observedEvents": 123.0,
+        "predictedPercent": 47.722612,
+        "observedPercent": 45.220588,
+        "signedErrorPercentagePoints": 2.502024
+      },
+      {
+        "modelId": "BW6_EXPONENTIAL_SEASON_DECAY_HL4",
+        "validationSeason": 2024,
+        "games": 272,
+        "observedEvents": 132.0,
+        "predictedPercent": 47.200775,
+        "observedPercent": 48.529412,
+        "signedErrorPercentagePoints": -1.328636
+      }
+    ],
+    "selectedModelPooledLockedFolds": {
+      "modelId": "BW6_FULL_DEVELOPMENT_POOL",
+      "games": 800,
+      "expectedEvents": 383.459674,
+      "observedEvents": 377.0,
+      "signedModelErrorPercentagePoints": 0.807459,
+      "maximumAbsoluteSingleFoldErrorPercentagePoints": 2.528389
+    },
+    "eraComparison": {
+      "earlyEra": {
+        "seasons": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019
+        ],
+        "games": 1280,
+        "observedEvents": 616.0,
+        "observedPercent": 48.125
+      },
+      "currentEra": {
+        "seasons": [
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "games": 1087,
+        "observedEvents": 505.0,
+        "observedPercent": 46.458142
+      },
+      "currentMinusEarlyPercentagePoints": -1.666858,
+      "twoProportionZScore": -0.809386,
+      "twoSidedNormalPValue": 0.418293089
+    },
+    "outcomeDecomposition": {
+      "development": {
+        "games": 2367,
+        "counts": {
+          "FAVORITE_WIN_1_TO_18": 1121.0,
+          "FAVORITE_WIN_19_PLUS": 323.0,
+          "FAVORITE_LOSS_OR_TIE": 923.0
+        },
+        "percents": {
+          "FAVORITE_WIN_1_TO_18": 47.359527,
+          "FAVORITE_WIN_19_PLUS": 13.645965,
+          "FAVORITE_LOSS_OR_TIE": 38.994508
+        },
+        "favoriteWinPercent": 61.005492
+      },
+      "holdout": {
+        "games": 272,
+        "counts": {
+          "FAVORITE_WIN_1_TO_18": 120.0,
+          "FAVORITE_WIN_19_PLUS": 48.0,
+          "FAVORITE_LOSS_OR_TIE": 104.0
+        },
+        "percents": {
+          "FAVORITE_WIN_1_TO_18": 44.117647,
+          "FAVORITE_WIN_19_PLUS": 17.647059,
+          "FAVORITE_LOSS_OR_TIE": 38.235294
+        },
+        "favoriteWinPercent": 61.764706
+      },
+      "frozenAggregateMinusRawDevelopmentPercentagePoints": 0.18939,
+      "threeCategoryHomogeneity": {
+        "pearsonChiSquare": 3.359494,
+        "degreesOfFreedom": 2,
+        "pValue": 0.186421105
+      },
+      "favoriteWinRateHomogeneity": {
+        "pearsonChiSquare": 0.059156,
+        "degreesOfFreedom": 1,
+        "pValue": 0.80783485
+      },
+      "oneToEighteenVersusNineteenPlusAmongFavoriteWins": {
+        "pearsonChiSquare": 3.268138,
+        "degreesOfFreedom": 1,
+        "pValue": 0.07063774
+      },
+      "diagnosticCause": "FAVORITE_WIN_RATE_STABLE_MORE_WINS_ABOVE_18_MONITOR_NOT_PROVEN"
+    },
+    "holdoutOutcomesUsedForAnyDevelopmentFit": false
+  },
+  "localization": {
+    "perMargin": [
+      {
+        "margin": 1,
+        "observedEvents": 8.0,
+        "expectedEvents": 5.322112,
+        "predictedPercent": 1.956659,
+        "observedPercent": 2.941176,
+        "signedModelErrorPercentagePoints": -0.984517,
+        "standardizedResidualObservedMinusExpected": 1.172307,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 2,
+        "observedEvents": 9.0,
+        "expectedEvents": 5.779929,
+        "predictedPercent": 2.124974,
+        "observedPercent": 3.308824,
+        "signedModelErrorPercentagePoints": -1.18385,
+        "standardizedResidualObservedMinusExpected": 1.353843,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 3,
+        "observedEvents": 19.0,
+        "expectedEvents": 23.291395,
+        "predictedPercent": 8.563013,
+        "observedPercent": 6.985294,
+        "signedModelErrorPercentagePoints": 1.577719,
+        "standardizedResidualObservedMinusExpected": -0.929908,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 4,
+        "observedEvents": 10.0,
+        "expectedEvents": 6.352198,
+        "predictedPercent": 2.335367,
+        "observedPercent": 3.676471,
+        "signedModelErrorPercentagePoints": -1.341104,
+        "standardizedResidualObservedMinusExpected": 1.464538,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 5,
+        "observedEvents": 4.0,
+        "expectedEvents": 6.581108,
+        "predictedPercent": 2.419525,
+        "observedPercent": 1.470588,
+        "signedModelErrorPercentagePoints": 0.948937,
+        "standardizedResidualObservedMinusExpected": -1.018533,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 6,
+        "observedEvents": 3.0,
+        "expectedEvents": 10.243634,
+        "predictedPercent": 3.766042,
+        "observedPercent": 1.102941,
+        "signedModelErrorPercentagePoints": 2.663101,
+        "standardizedResidualObservedMinusExpected": -2.307094,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 7,
+        "observedEvents": 16.0,
+        "expectedEvents": 14.135073,
+        "predictedPercent": 5.196718,
+        "observedPercent": 5.882353,
+        "signedModelErrorPercentagePoints": -0.685635,
+        "standardizedResidualObservedMinusExpected": 0.509449,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 8,
+        "observedEvents": 7.0,
+        "expectedEvents": 8.297918,
+        "predictedPercent": 3.050705,
+        "observedPercent": 2.573529,
+        "signedModelErrorPercentagePoints": 0.477176,
+        "standardizedResidualObservedMinusExpected": -0.457604,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 9,
+        "observedEvents": 2.0,
+        "expectedEvents": 3.147486,
+        "predictedPercent": 1.157164,
+        "observedPercent": 0.735294,
+        "signedModelErrorPercentagePoints": 0.42187,
+        "standardizedResidualObservedMinusExpected": -0.650568,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 10,
+        "observedEvents": 6.0,
+        "expectedEvents": 8.069008,
+        "predictedPercent": 2.966547,
+        "observedPercent": 2.205882,
+        "signedModelErrorPercentagePoints": 0.760665,
+        "standardizedResidualObservedMinusExpected": -0.73942,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 11,
+        "observedEvents": 4.0,
+        "expectedEvents": 3.033031,
+        "predictedPercent": 1.115085,
+        "observedPercent": 1.470588,
+        "signedModelErrorPercentagePoints": -0.355503,
+        "standardizedResidualObservedMinusExpected": 0.558353,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 12,
+        "observedEvents": 4.0,
+        "expectedEvents": 3.376393,
+        "predictedPercent": 1.241321,
+        "observedPercent": 1.470588,
+        "signedModelErrorPercentagePoints": -0.229267,
+        "standardizedResidualObservedMinusExpected": 0.341505,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 13,
+        "observedEvents": 7.0,
+        "expectedEvents": 3.033031,
+        "predictedPercent": 1.115085,
+        "observedPercent": 2.573529,
+        "signedModelErrorPercentagePoints": -1.458444,
+        "standardizedResidualObservedMinusExpected": 2.290632,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 14,
+        "observedEvents": 4.0,
+        "expectedEvents": 8.870187,
+        "predictedPercent": 3.261098,
+        "observedPercent": 1.470588,
+        "signedModelErrorPercentagePoints": 1.79051,
+        "standardizedResidualObservedMinusExpected": -1.662565,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 15,
+        "observedEvents": 4.0,
+        "expectedEvents": 3.033031,
+        "predictedPercent": 1.115085,
+        "observedPercent": 1.470588,
+        "signedModelErrorPercentagePoints": -0.355503,
+        "standardizedResidualObservedMinusExpected": 0.558353,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 16,
+        "observedEvents": 2.0,
+        "expectedEvents": 5.322112,
+        "predictedPercent": 1.956659,
+        "observedPercent": 0.735294,
+        "signedModelErrorPercentagePoints": 1.221365,
+        "standardizedResidualObservedMinusExpected": -1.454331,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 17,
+        "observedEvents": 8.0,
+        "expectedEvents": 6.123291,
+        "predictedPercent": 2.25121,
+        "observedPercent": 2.941176,
+        "signedModelErrorPercentagePoints": -0.689966,
+        "standardizedResidualObservedMinusExpected": 0.767094,
+        "bonferroniFamilyWiseFlag": false
+      },
+      {
+        "margin": 18,
+        "observedEvents": 3.0,
+        "expectedEvents": 5.322112,
+        "predictedPercent": 1.956659,
+        "observedPercent": 1.102941,
+        "signedModelErrorPercentagePoints": 0.853718,
+        "standardizedResidualObservedMinusExpected": -1.016558,
+        "bonferroniFamilyWiseFlag": false
+      }
+    ],
+    "bonferroniFamilyWiseAlpha": 0.05,
+    "bonferroniTwoSidedCriticalAbsoluteZ": 2.991316,
+    "familyWiseFlaggedMargins": [],
+    "completeNonOverlappingPartitions": [
+      {
+        "id": "MARGINS_1_TO_6",
+        "categories": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "predictedPercent": 21.16558,
+        "observedPercent": 19.485294,
+        "signedModelErrorPercentagePoints": 1.680286
+      },
+      {
+        "id": "MARGINS_7_TO_12",
+        "categories": [
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "predictedPercent": 14.72754,
+        "observedPercent": 14.338235,
+        "signedModelErrorPercentagePoints": 0.389305
+      },
+      {
+        "id": "MARGINS_13_TO_18",
+        "categories": [
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18"
+        ],
+        "predictedPercent": 11.655796,
+        "observedPercent": 10.294118,
+        "signedModelErrorPercentagePoints": 1.361679
+      },
+      {
+        "id": "OTHER",
+        "categories": [
+          "OTHER"
+        ],
+        "predictedPercent": 52.451083,
+        "observedPercent": 55.882353,
+        "signedModelErrorPercentagePoints": -3.431269
+      }
+    ],
+    "keyNumberDiagnostic": {
+      "id": "KEY_NUMBERS_3_AND_7",
+      "categories": [
+        "3",
+        "7"
+      ],
+      "predictedPercent": 13.759731,
+      "observedPercent": 12.867647,
+      "signedModelErrorPercentagePoints": 0.892084
+    },
+    "aggregateSignedModelErrorPercentagePoints": 3.43127,
+    "otherSignedModelErrorPercentagePoints": -3.431269,
+    "aggregateErrorEqualsOppositeOtherError": true
+  },
+  "diagnosticConclusion": {
+    "descriptiveStructuralSignalDetected": false,
+    "samplingVariationRemainsPlausible": true,
+    "interpretation": "NO_HOLDOUT_EVIDENCE_JUSTIFIES_RETROACTIVE_REFIT",
+    "currentFrozenModelDisposition": "RETAIN_AS_FROZEN_REFERENCE_NON_OPERATIONAL",
+    "replacementModelSelected": false,
+    "freshValidationRequired": true,
+    "approximateGamesRequiredForThreePoint95PercentNormalHalfWidth": 1065,
+    "oneSeasonHasMaterialFalseFailRiskAtLockedGate": true
+  },
+  "protectedArtifactSha256Before": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "99b7d6c92db9e7743a7cf5f3b41f96aa18c1859026344d1767bf4ac55c95ff0e",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "e99f73c9d418236caac7defa35b0787a9b874ae55f7eaac01cfde7fd05ca546c",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "protectedArtifactSha256After": {
+    "core/walters-authority-v1.4.json": "e55bb315baf6c5d5501d7419b21ecf81a0b9143e0da07df0b6047effbf7300dc",
+    "core/walters-intelligence-interface-v1.4.json": "3972a55ff3ca039d2098c4e257340ec7d209faf859a76db96d0ce44d80ea6cf9",
+    "data/live-odds.json": "99b7d6c92db9e7743a7cf5f3b41f96aa18c1859026344d1767bf4ac55c95ff0e",
+    "data/walters/nfl/active-week.json": "055530b04c35d53a09f1de4fe1791e6194f4ea35856cf958cef82d79525801ca",
+    "data/walters/nfl/2026/week-01-current-numbers.json": "615588fba2de98f7455927054d8578458f39627ef4915231c8bcd1f23e6bdcff",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json": "422cca9900630e9fd8f1e4305a5026c2594dbc8346f7ea3d93ea970d1032d166",
+    "data/walters/nfl/current-week-terminal.json": "e99f73c9d418236caac7defa35b0787a9b874ae55f7eaac01cfde7fd05ca546c",
+    "data/walters/nfl-power-ratings-ledger.json": "d1d2add2766fbcefe0b614bc1720643ba0d4997da8d6cde8e839e6127ae934ef",
+    "data/walters/nfl/home-field/home-field-production-current.json": "4e06d109d392af0b6c974a34f37ce25f62839aec08473428bd062059f6568e38",
+    "data/walters/nfl/personnel-production-current.json": "f390f80fd921a738d76d2905bfaf63c8be7921600928c160a2d31bf8b55e8641",
+    "data/walters/nfl/matchup-production-current.json": "caeb47aef50520cb02e3e8b5e7911cf02663dacbec40352d3783b3f7f880de91",
+    "data/walters/nfl/qb-production-current.json": "fd477532084da220c61f15f924435836643a5421982f83df372728281e9cc571",
+    "data/walters/nfl/qb-production/production-contract-v1.json": "f969e360922bf7c4751c37c485df4e4671063fca13ea28af1c7ea4b69e366992"
+  },
+  "priorBw6ArtifactSha256Before": {
+    ".github/workflows/walters-bw6-stage1.yml": "84d1a85a144878233656cf4ae0fb8eefb9e3ed866249ae67fd78c1bd90d317bb",
+    ".github/workflows/walters-bw6-stage2.yml": "f74e9a8c48227ee977b0997f1fe46fadc2d6fb3a12f271724f1f985be555c2f9",
+    ".github/workflows/walters-bw6-stage3.yml": "f49f3bbc50859455449fe08a8109f5d1aa44a8e93693e93196fbf6e3eef6a331",
+    "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f",
+    "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897",
+    "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+    "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json": "c9fac3870c15b5ac4c780c5777e26997a267b109335669dd0d14d97b427fd51a",
+    "tests/walters-bw6-stage1.test.mjs": "09f91582c6c5239bc8be4e9b9ae9ef2f659c6d6c691704ec8107078d1e98689a",
+    "tests/walters-bw6-stage2.test.mjs": "967a0737ed11f966216e24b35e2eb12c3a54410cf74b694eb9f19fe5c756a66b",
+    "tests/walters-bw6-stage3.test.mjs": "8a91ce0238e362b1926af285db368c4997230f0574245ef58d36c1d017c1d4a1",
+    "tools/build-walters-bw6-stage2.py": "f943cda2a77f02cea2cf5e859ddff218113fdbd5c79e74da57d4161be5931339",
+    "tools/build-walters-bw6-stage3.py": "72db23e7284956a24b66eca14d5ccf3fb7965fe711c88ec1ea01645dfd510075",
+    "tools/validate-walters-bw6-stage1.mjs": "f15bf6c356b76d1f31800406ead67a305ce1be679c6aeddf1b590c2f59da2788",
+    "tools/validate-walters-bw6-stage2.mjs": "02bc79ce4c0f34e9f115ad29a659329bedb3bbf116d01420ab9c005b8fc4cb8c",
+    "tools/validate-walters-bw6-stage3.mjs": "78cf1f5d69da7dbd6823c7bb2df78702f645d773cbc2b6f0799dbb305b6e847c"
+  },
+  "priorBw6ArtifactSha256After": {
+    ".github/workflows/walters-bw6-stage1.yml": "84d1a85a144878233656cf4ae0fb8eefb9e3ed866249ae67fd78c1bd90d317bb",
+    ".github/workflows/walters-bw6-stage2.yml": "f74e9a8c48227ee977b0997f1fe46fadc2d6fb3a12f271724f1f985be555c2f9",
+    ".github/workflows/walters-bw6-stage3.yml": "f49f3bbc50859455449fe08a8109f5d1aa44a8e93693e93196fbf6e3eef6a331",
+    "data/walters/nfl/key-numbers/bw6-stage1-contract-v1.json": "b8dda9eab7ad92a93db3abec5698f041108d3937cef63d56fc87b1f5fe77146f",
+    "data/walters/nfl/key-numbers/bw6-stage2-calibration-v1.json": "af835e502492fea6489e9687d3fbaa28620455d1e3a3a5beb527343e13e0c897",
+    "data/walters/nfl/key-numbers/bw6-stage2-model-lock-v1.json": "d6b6c40fad6caefb5a6fd0d42d8a81341ac09f319612ed446c99df991e2c7151",
+    "data/walters/nfl/key-numbers/bw6-stage3-holdout-audit-v1.json": "c9fac3870c15b5ac4c780c5777e26997a267b109335669dd0d14d97b427fd51a",
+    "tests/walters-bw6-stage1.test.mjs": "09f91582c6c5239bc8be4e9b9ae9ef2f659c6d6c691704ec8107078d1e98689a",
+    "tests/walters-bw6-stage2.test.mjs": "967a0737ed11f966216e24b35e2eb12c3a54410cf74b694eb9f19fe5c756a66b",
+    "tests/walters-bw6-stage3.test.mjs": "8a91ce0238e362b1926af285db368c4997230f0574245ef58d36c1d017c1d4a1",
+    "tools/build-walters-bw6-stage2.py": "f943cda2a77f02cea2cf5e859ddff218113fdbd5c79e74da57d4161be5931339",
+    "tools/build-walters-bw6-stage3.py": "72db23e7284956a24b66eca14d5ccf3fb7965fe711c88ec1ea01645dfd510075",
+    "tools/validate-walters-bw6-stage1.mjs": "f15bf6c356b76d1f31800406ead67a305ce1be679c6aeddf1b590c2f59da2788",
+    "tools/validate-walters-bw6-stage2.mjs": "02bc79ce4c0f34e9f115ad29a659329bedb3bbf116d01420ab9c005b8fc4cb8c",
+    "tools/validate-walters-bw6-stage3.mjs": "78cf1f5d69da7dbd6823c7bb2df78702f645d773cbc2b6f0799dbb305b6e847c"
+  },
+  "protectedArtifactsUnchanged": true,
+  "priorBw6ArtifactsUnchanged": true,
+  "blockedStages": [
+    "BW6.4",
+    "BW7",
+    "BW8"
+  ],
+  "nextStage": "BW6.3R2_DEVELOPMENT_ONLY_RECALIBRATION_CONTRACT"
+}
