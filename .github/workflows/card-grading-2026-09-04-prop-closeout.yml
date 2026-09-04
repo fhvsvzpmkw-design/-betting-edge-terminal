@@ -1,0 +1,81 @@
+name: Close Sep 3 verified player-prop result
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-04-prop-closeout.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Resolve Lake Bachar strikeout prop from official MLB evidence
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const dir='data/history/observations/2026-09-03';
+          const title='Lake Bachar over 2.5 strikeouts';
+          const now=new Date().toISOString();
+          let closed=0;
+          for(const file of fs.readdirSync(dir).filter(f=>f.endsWith('.json'))){
+            const p=path.join(dir,file),j=JSON.parse(fs.readFileSync(p,'utf8'));
+            let changed=false;
+            j.recommendations=(j.recommendations||[]).map(r=>{
+              if(r.title!==title||r.completion?.state!=='unresolved')return r;
+              const old=r.completion||{};
+              changed=true;closed++;
+              return {...r,completion:{
+                state:'complete',
+                verificationState:'verified',
+                grade:'WIN',
+                official:r.status==='BET',
+                hypothetical:r.status!=='BET',
+                verifiedAt:now,
+                eventId:'63299383',
+                finalScore:{home:'Pittsburgh Pirates',away:'San Francisco Giants',homeScore:5,awayScore:2},
+                settlementMethod:'official_pitching_line',
+                line:2.5,
+                basis:'Lake Bachar pitching strikeouts',
+                observedValue:3,
+                settlementComponents:{side:'over',threshold:2.5,strikeouts:3,inningsPitched:'2.1'},
+                source:{name:'MLB official Player of the Game — September 3, 2026',url:'https://www.mlb.com/stories/player-of-the-game-september-3-2026',evidence:'Lake Bachar: 2.1 IP, 0 ER, 3 K'},
+                firstUnresolvedAt:old.firstUnresolvedAt||null,
+                lastVerificationAttemptAt:now,
+                verificationAttempts:Number(old.verificationAttempts||0)+1,
+                nextRetryTier:null
+              }};
+            });
+            if(changed)fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');
+          }
+          if(closed!==3)throw Error(`expected to close 3 Bachar cards, closed ${closed}`);
+          console.log(`PROP CLOSEOUT: ${closed} cards -> WIN; observed 3 K over 2.5`);
+          NODE
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+      - name: Verify zero unresolved and strict isolation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');const dir='data/history/observations/2026-09-03';let open=[];for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.json'))){const j=JSON.parse(fs.readFileSync(path.join(dir,f),'utf8'));for(const r of j.recommendations||[])if(r.completion?.state==='unresolved')open.push(r.title)}if(open.length)throw Error(`unexpected unresolved: ${JSON.stringify(open)}`);const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));if(idx.coverage?.lastDate!=='2026-09-03')throw Error('wrong lastDate');if(idx.coverage?.unresolvedCards!==0||idx.coverage?.unresolvedSelections!==0||idx.coverage?.unresolvedEvents!==0)throw Error(`index still unresolved ${JSON.stringify(idx.coverage)}`);console.log(`FINAL RESULTS INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents}`);console.log(`PRICE ANALYTICS: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/2026-09-03/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+      - name: Commit historical prop closeout only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations/2026-09-03 data/history/results-index.json
+          git commit -m "Close Sep 3 Bachar prop from official MLB result"
+          git push origin main
