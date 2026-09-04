@@ -1,0 +1,78 @@
+name: Corrected Sep 3 Betting Edge grading repair
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-04-v3.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Correct Sep 3 score-market grading
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const DATE='2026-09-03', NOW=new Date().toISOString();
+          const RUN_DIR=`data/history/runs/${DATE}`, OBS_DIR=`data/history/observations/${DATE}`;
+          const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+          const api=`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${DATE}&hydrate=linescore,team`;
+          const source={name:`MLB official Stats API schedule — ${DATE}`,url:api};
+          const method={lifecycle:'ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE',scoreMarkets:['ml','spread','totals'],grades:['WIN','LOSS','PUSH','VOID','HALF_WIN','HALF_LOSS'],spreadHdpSemantics:'raw hdp is the home-side handicap; away selected handicap is the opposite sign',unsupportedMarkets:'remain unresolved unless exact settlement support exists',officialOnlyWhenStatus:'BET',issuedReportMutable:false};
+          const parseMatchup=meta=>{const m=String(meta||'').match(/^MLB\s*\|\s*(.+?)\s+at\s+(.+?)\s*\|/i);return m?{away:m[1].trim(),home:m[2].trim()}:null};
+          const isFinal=g=>/final|game over|completed early/i.test(String(g.status?.detailedState||''));
+          function matchGame(rec,games){const m=parseMatchup(rec.meta);if(!m)return null;let c=games.filter(g=>norm(g.teams?.away?.team?.name)===norm(m.away)&&norm(g.teams?.home?.team?.name)===norm(m.home));if(!c.length)return null;const t=Date.parse(rec.feed?.eventDate||'');if(c.length>1&&Number.isFinite(t))c.sort((a,b)=>Math.abs(Date.parse(a.gameDate)-t)-Math.abs(Date.parse(b.gameDate)-t));return c[0]}
+          function gradeScoreMarket(rec,g){
+            const f=rec.feed||{},key=String(f.marketKey||f.market||'').toLowerCase(),side=String(f.side||'').toLowerCase();
+            const detail=String(rec.coreAssessment?.context?.marketDetail||'').toLowerCase(),title=String(rec.title||'').toLowerCase();
+            if(/first\s*5|first five|\bf5\b|team total|1st\s*5/.test(`${detail} ${title}`))return null;
+            const hs=Number(g.teams?.home?.score),as=Number(g.teams?.away?.score);if(!Number.isFinite(hs)||!Number.isFinite(as))return null;
+            if(key==='ml'){if(!['home','away'].includes(side))return null;const s=side==='home'?hs:as,o=side==='home'?as:hs;return s>o?'WIN':s<o?'LOSS':'PUSH'}
+            if(key==='spread'||key==='spreads'){const raw=Number(f.hdp??f.line);if(!Number.isFinite(raw)||!['home','away'].includes(side))return null;const h=side==='home'?raw:-raw,s=side==='home'?hs:as,o=side==='home'?as:hs,v=s+h-o;return v>0?'WIN':v<0?'LOSS':'PUSH'}
+            if(key==='totals'||key==='total'){const line=Number(f.hdp??f.line);if(!Number.isFinite(line)||!['over','under'].includes(side))return null;const tot=hs+as;if(tot===line)return'PUSH';return side==='over'?(tot>line?'WIN':'LOSS'):(tot<line?'WIN':'LOSS')}
+            return null;
+          }
+          function unresolved(rec,reason,oldItem){const old=oldItem?.completion||{};return{title:rec.title,status:rec.status,selectionKey:rec.feed?.selectionKey||null,commenceTime:rec.feed?.eventDate||null,completion:{state:'unresolved',reason,firstUnresolvedAt:old.firstUnresolvedAt||NOW,lastVerificationAttemptAt:NOW,verificationAttempts:Number(old.verificationAttempts||0)+1,nextRetryTier:'next_backlog_pass'}}}
+          function settleComplete(rec,g,grade,oldItem){const old=oldItem?.completion||{};return{title:rec.title,status:rec.status,selectionKey:rec.feed?.selectionKey||null,commenceTime:rec.feed?.eventDate||null,completion:{state:'complete',verificationState:'verified',grade,official:rec.status==='BET',hypothetical:rec.status!=='BET',verifiedAt:NOW,eventId:rec.feed?.eventId||null,finalScore:{home:g.teams.home.team.name,away:g.teams.away.team.name,homeScore:Number(g.teams.home.score),awayScore:Number(g.teams.away.score)},settlementMethod:'final_score',line:rec.feed?.hdp??rec.feed?.line??null,basis:null,observedValue:null,settlementComponents:null,source,firstUnresolvedAt:old.firstUnresolvedAt||null,lastVerificationAttemptAt:NOW,verificationAttempts:Number(old.verificationAttempts||0)+1,nextRetryTier:null}}}
+          function american(price){const s=String(price??'').trim(),m=s.match(/^([+-]\d+)$/)||s.match(/\(([+-]\d+)\)\s*$/);return m?Number(m[1]):null}
+          function units(grade,price){const a=american(price);if(!Number.isFinite(a))return null;if(grade==='PUSH'||grade==='VOID')return 0;if(grade==='LOSS')return-1;if(grade==='WIN')return a>0?a/100:100/Math.abs(a);return null}
+          (async()=>{
+            const r=await fetch(api,{headers:{'User-Agent':'Betting-Edge-Result-Grader/1.0'}});if(!r.ok)throw Error(`MLB schedule ${r.status}`);const j=await r.json(),games=(j.dates||[]).flatMap(d=>d.games||[]);
+            const files=fs.readdirSync(RUN_DIR).filter(f=>f.endsWith('.json')).sort();let rows=[];
+            for(const file of files){const rp=path.join(RUN_DIR,file),op=path.join(OBS_DIR,file),run=JSON.parse(fs.readFileSync(rp,'utf8')),prior=fs.existsSync(op)?JSON.parse(fs.readFileSync(op,'utf8')):null,oldMap=new Map((prior?.recommendations||[]).map(x=>[x.selectionKey,x])),out=[];
+              for(const rec of run.recs||[]){const old=oldMap.get(rec.feed?.selectionKey),g=matchGame(rec,games);let item;if(!parseMatchup(rec.meta))item=unresolved(rec,'unsupported_or_unmatched_market',old);else if(!g)item=unresolved(rec,'official_game_not_matched',old);else if(!isFinal(g))item=unresolved(rec,'official_status_not_final',old);else{const gr=gradeScoreMarket(rec,g);item=gr?settleComplete(rec,g,gr,old):unresolved(rec,'unsupported_or_ambiguous_settlement',old)}out.push(item);rows.push({rec,item})}
+              fs.writeFileSync(op,JSON.stringify({schemaVersion:1,kind:'issued-card-observations',sourceRun:rp,runId:run.ts||null,slot:run.slot||file.split('-')[0],resultMethod:method,recommendations:out},null,2)+'\n');
+            }
+            const completedRows=rows.filter(x=>x.item.completion.state==='complete'),unresolvedRows=rows.filter(x=>x.item.completion.state==='unresolved');let wins=0,losses=0,pushes=0,priced=0,net=0;
+            for(const x of completedRows){if(x.item.completion.grade==='WIN')wins++;else if(x.item.completion.grade==='LOSS')losses++;else if(x.item.completion.grade==='PUSH')pushes++;const u=units(x.item.completion.grade,x.rec.price);if(u!==null){priced++;net+=u}}
+            console.log(`CORRECTED TARGET: runs=${files.length} cards=${rows.length} complete=${completedRows.length} unresolved=${unresolvedRows.length} WIN=${wins} LOSS=${losses} PUSH=${pushes} priced=${priced} netUnits=${net.toFixed(2)} roiPct=${(priced?net/priced*100:0).toFixed(1)}`);
+            console.log(`UNRESOLVED TITLES: ${JSON.stringify([...new Set(unresolvedRows.map(x=>x.item.title))])}`);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+      - name: Verify isolation and commit
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');const dir='data/history/observations/2026-09-03',files=fs.readdirSync(dir).filter(f=>f.endsWith('.json'));if(files.length!==3)throw Error(`expected 3 observation files, got ${files.length}`);let unresolved=[];for(const f of files){const j=JSON.parse(fs.readFileSync(path.join(dir,f),'utf8'));for(const r of j.recommendations||[])if(r.completion?.state==='unresolved')unresolved.push(r.title)}const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));if(idx.coverage?.lastDate!=='2026-09-03')throw Error('wrong lastDate');console.log(`RESULTS INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents}`);console.log(`UNRESOLVED: ${JSON.stringify([...new Set(unresolved)])}`);console.log(`PRICE ANALYTICS: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/2026-09-03/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations/2026-09-03 data/history/results-index.json
+          git commit -m "Correct Sep 3 Betting Edge historical grading"
+          git push origin main
