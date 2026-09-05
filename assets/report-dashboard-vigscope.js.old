@@ -94,6 +94,7 @@
       .instrument[data-meter-kind='heat'] .runnerMiniRailTrack{background:linear-gradient(90deg,#00ff78 0%,#a9d92e 28%,#ffd43b 50%,#ff7a2f 72%,#ff334f 100%)}
       .instrument[data-meter-kind='pressure'] .runnerMiniRailTrack,.instrument[data-meter-kind='agreement'] .runnerMiniRailTrack{background:linear-gradient(90deg,#ff334f 0%,#ff7a2f 27%,#ffd43b 50%,#a9d92e 72%,#00ff78 100%)}
       .runnerMiniRailMarker{position:absolute;top:-3px;left:calc(var(--meter-value,50) * 1%);width:2px;height:12px;background:#effff3;box-shadow:0 0 5px rgba(235,255,240,.65);transform:translateX(-1px)}
+      .instrument[data-meter-measured='false'] .runnerMiniRailMarker{display:none}
       .runnerLedBlocks{display:none}
 
       /* SECTION 3 — VIG METER */
@@ -104,6 +105,8 @@
       .runnerVigScopeFallback{display:none;color:var(--yellow);padding:12px;text-align:center;font-size:9px;font-weight:900;letter-spacing:.06em}
       #runnerVigScope.assetError .runnerVigScopeAsset{display:none}
       #runnerVigScope.assetError .runnerVigScopeFallback{display:block}
+      #runnerVigScope.unmeasured .runnerVigScopeAsset{display:none}
+      #runnerVigScope.unmeasured .runnerVigScopeFallback{display:block;color:var(--muted)}
       .runnerVigScopeKey{margin-top:6px;color:#b1d8bc;font-size:8px;font-weight:900;letter-spacing:.11em;text-align:center;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
       /* Default segmented LEDs. */
@@ -173,8 +176,9 @@
 
   function numberFromInstrument(instrument){
     const raw=instrument&&instrument.querySelector('.instrumentRead b')?.textContent;
+    if(raw===null||raw===undefined||String(raw).trim()==='')return null;
     const n=Number(raw);
-    return Number.isFinite(n)?n:0;
+    return Number.isFinite(n)?n:null;
   }
 
   function stateFromCluster(cluster){
@@ -182,6 +186,11 @@
     const heatValue=numberFromInstrument(instruments[0]);
     const pressureValue=numberFromInstrument(instruments[1]);
     const agreementValue=numberFromInstrument(instruments[2]);
+    if([heatValue,pressureValue,agreementValue].some(value=>value===null)){
+      const error=String(cluster.textContent||'').includes('INTEGRITY ERROR');
+      const empty=[heatValue,pressureValue,agreementValue].every(value=>value===null);
+      return {file:null,key:error?'TELEMETRY INTEGRITY ERROR':empty?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL'};
+    }
     const heat=heatValue<40?'low':heatValue<55?'medium':'high';
     const pressure=pressureValue<45?'adverse':pressureValue<56?'neutral':'favorable';
     const agreement=agreementValue<45?'low':'high';
@@ -191,8 +200,10 @@
   function updateContributorMeters(d,cluster){
     const kinds=['heat','pressure','agreement'];
     [...cluster.querySelectorAll('.instrument')].forEach((instrument,index)=>{
-      const value=Math.max(0,Math.min(100,numberFromInstrument(instrument)));
+      const reading=numberFromInstrument(instrument),measured=reading!==null;
+      const value=measured?Math.max(0,Math.min(100,reading)):0;
       instrument.dataset.meterKind=kinds[index]||'agreement';
+      instrument.dataset.meterMeasured=String(measured);
       instrument.style.setProperty('--meter-value',String(value));
 
       let rail=instrument.querySelector('.runnerMiniRail');
@@ -212,7 +223,7 @@
         const conf=instrument.querySelector('.instrumentConf');
         if(conf)instrument.insertBefore(blocks,conf);else instrument.appendChild(blocks);
       }
-      const lit=Math.max(1,Math.ceil(value/10));
+      const lit=measured?Math.max(1,Math.ceil(value/10)):0;
       [...blocks.children].forEach((seg,i)=>seg.classList.toggle('on',i<lit));
     });
   }
@@ -239,6 +250,16 @@
     const state=stateFromCluster(cluster);
     const img=scope.querySelector('.runnerVigScopeAsset');
     const key=scope.querySelector('.runnerVigScopeKey');
+    const fallback=scope.querySelector('.runnerVigScopeFallback');
+    scope.classList.toggle('unmeasured',!state.file);
+    if(!state.file){
+      if(img){img.removeAttribute('src');img.alt='';}
+      if(fallback)fallback.textContent=state.key;
+      if(key)key.textContent='AWAITING MEASURED INPUTS';
+      scope.dataset.vigScopeState='unmeasured';
+      return scope;
+    }
+    if(fallback)fallback.textContent='VIG SCOPE CONDITION ASSET UNAVAILABLE';
     const src=`${ASSET_BASE}/${state.file}`;
     if(img&&img.getAttribute('src')!==src){
       scope.classList.remove('assetError');

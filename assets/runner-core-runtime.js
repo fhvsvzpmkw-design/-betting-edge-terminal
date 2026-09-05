@@ -128,9 +128,23 @@ function fallbackAgreement(run){
   return {score,confidence:clamp((signals/Math.max(1,recs.length))*70),pairs:0,source:'REPORT COHESION'}
 }
 function requiresPublisherTelemetry(run){const t=Date.parse(run?.ts),cut=Date.parse(VIG_METER_TELEMETRY_CUTOVER);return Number.isFinite(t)&&Number.isFinite(cut)&&t>=cut}
+function hasFirstSameDayTelemetry(run){
+  const t=run?.instrumentTelemetry,s=t?.source;
+  if(!s||s.state!=='UNAVAILABLE'||s.reason!=='NO_PRIOR_SAME_DAY_RUN'||s.priorRunTs!==null||s.priorRunPath!==null)return false;
+  if(t.derivedAt!==run.ts||s.feedGeneratedAt!==run.feedGeneratedAt||!Number.isFinite(Date.parse(s.feedGeneratedAt))||!/^[0-9a-f]{40}$/i.test(String(s.feedBlobSha||'')))return false;
+  const matches=(actual,expected)=>actual&&Object.entries(expected).every(([key,value])=>actual[key]===value);
+  // The publisher explicitly emits these unmeasured defaults for the first
+  // same-day run. Missing feeds, fabricated readings and other errors remain blocked.
+  return Boolean(
+    matches(t.movement,{eligibleSelections:Array.isArray(run.recs)?run.recs.length:0,identityEligibleSelections:0,comparableSelections:0,changedSelections:0,sameBookComparisons:0,averageMagnitude:0,breadth:0,weightedFavor:0,confidence:0,rawConfidence:0,state:'UNMEASURED'})&&
+    matches(t.heat,{value:0,rawValue:0,confidence:0,rawConfidence:0,state:'UNMEASURED'})&&
+    matches(t.pressure,{value:50,rawValue:50,confidence:0,rawConfidence:0,state:'UNMEASURED'})&&
+    matches(t.agreement,{score:50,rawScore:50,confidence:0,rawConfidence:0,pairs:0,source:'BOUND_FEED_BET365_DRAFTKINGS',state:'UNMEASURED'})
+  )
+}
 function hasPublisherTelemetry(run){
   const t=run?.instrumentTelemetry;
-  return Boolean(t&&Number(t.schema)===1&&t.authority==='PUBLISHER_BOUND_FEED_V1'&&t.calibrationId===VIG_METER_CALIBRATION_ID&&t.derivedAt&&t.source?.state==='PINNED'&&t.heat&&t.pressure&&t.agreement)
+  return Boolean(t&&Number(t.schema)===1&&t.authority==='PUBLISHER_BOUND_FEED_V1'&&t.calibrationId===VIG_METER_CALIBRATION_ID&&t.derivedAt&&(t.source?.state==='PINNED'||hasFirstSameDayTelemetry(run))&&t.heat&&t.pressure&&t.agreement)
 }
 function telemetryIntegrityState(run){return requiresPublisherTelemetry(run)?(hasPublisherTelemetry(run)?'VALID':'ERROR'):'LEGACY'}
 async function recoverCanonicalIssuedRun(run){

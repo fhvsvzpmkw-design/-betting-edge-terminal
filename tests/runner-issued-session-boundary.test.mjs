@@ -22,10 +22,13 @@ const openPath='data/history/runs/2026-09-02/open-060215.json';
 const finalMorning=JSON.parse(fs.readFileSync(finalMorningPath,'utf8'));
 const main0800=JSON.parse(fs.readFileSync(mainPath,'utf8'));
 const open0600=JSON.parse(fs.readFileSync(openPath,'utf8'));
+const firstSameDayPath='data/history/runs/2026-09-05/final_morning-093653.json';
+const firstSameDay=JSON.parse(fs.readFileSync(firstSameDayPath,'utf8'));
 const fetchStub=async url=>{
   const u=String(url);
-  if(u.startsWith('./run-history.json'))return {ok:true,json:async()=>({runs:[{ts:finalMorning.ts,slot:finalMorning.slot,path:finalMorningPath}]})};
+  if(u.startsWith('./run-history.json'))return {ok:true,json:async()=>({runs:[{ts:finalMorning.ts,slot:finalMorning.slot,path:finalMorningPath},{ts:firstSameDay.ts,slot:firstSameDay.slot,path:firstSameDayPath}]})};
   if(u.startsWith(`./${finalMorningPath}`))return {ok:true,json:async()=>JSON.parse(JSON.stringify(finalMorning))};
+  if(u.startsWith(`./${firstSameDayPath}`))return {ok:true,json:async()=>JSON.parse(JSON.stringify(firstSameDay))};
   return {ok:false,json:async()=>({})};
 };
 const context={
@@ -123,5 +126,49 @@ assert.equal(api.marketState(contaminated).label,'TELEMETRY INTEGRITY ERROR');
 const recovered=await api.recoverCanonicalIssuedRun(contaminated);
 assert.ok(recovered,'damaged post-cutover URL/session payload should recover from the canonical archive when available');
 assertJsonEqual(recovered.instrumentTelemetry,finalMorning.instrumentTelemetry,'archive recovery must restore the exact publisher-bound receipt');
+
+// The real Sep 5 report passed the publisher gate with no earlier same-day
+// report. The browser must accept that receipt while displaying no readings.
+assert.equal(firstSameDay.instrumentTelemetry.source.reason,'NO_PRIOR_SAME_DAY_RUN');
+assert.equal(api.telemetryIntegrityState(firstSameDay),'VALID','first same-day unmeasured receipt is valid');
+const firstReadings=api.deriveInstrumentReadings(firstSameDay);
+assert.equal(firstReadings.heat.label,'NO DATA');
+assert.equal(firstReadings.pressure.label,'NO DATA');
+assert.equal(firstReadings.agreement.label,'UNMEASURED');
+for(const reading of Object.values(firstReadings))assert.equal(reading.confidence,0,'no measurement may be invented');
+assert.equal(api.marketState(firstSameDay).label,'MARKET STATE UNMEASURED');
+for(const mutate of [
+  t=>{t.source.reason='PINNED_FEED_UNAVAILABLE_OR_MISMATCHED'},
+  t=>{t.source.priorRunTs=finalMorning.ts},
+  t=>{t.source.priorRunPath=finalMorningPath},
+  t=>{t.source.feedBlobSha='invalid'},
+  t=>{t.source.feedGeneratedAt=finalMorning.feedGeneratedAt},
+  t=>{t.derivedAt=finalMorning.ts},
+  t=>{t.heat.rawValue=40},
+  t=>{t.pressure.rawValue=99},
+  t=>{t.agreement.confidence=80},
+  t=>{t.movement.comparableSelections=1},
+  t=>{delete t.movement}
+]){
+  const damaged=JSON.parse(JSON.stringify(firstSameDay));mutate(damaged.instrumentTelemetry);
+  assert.equal(api.telemetryIntegrityState(damaged),'ERROR','unsupported or damaged unmeasured receipts remain blocked');
+}
+const damagedFirst=JSON.parse(JSON.stringify(firstSameDay));delete damagedFirst.instrumentTelemetry;
+const recoveredFirst=await api.recoverCanonicalIssuedRun(damagedFirst);
+assert.ok(recoveredFirst,'archive recovery must also accept the valid first same-day receipt');
+assertJsonEqual(recoveredFirst.instrumentTelemetry,firstSameDay.instrumentTelemetry);
+
+// Presentation must not convert the visible no-reading dash into numeric zero
+// and select adverse-market artwork. A measured zero still remains a number.
+const dashboardSource=fs.readFileSync('assets/report-dashboard-vigscope.js.old','utf8');
+const presentationSource=dashboardSource.slice(dashboardSource.indexOf('  function numberFromInstrument('),dashboardSource.indexOf('  function updateContributorMeters('));
+const presentation={};vm.runInNewContext(presentationSource,presentation);
+const cluster=(values,textContent='')=>({textContent,querySelectorAll:()=>values.map(value=>({querySelector:()=>({textContent:value})}))});
+assert.equal(presentation.stateFromCluster(cluster(['—','—','—'])).file,null,'unmeasured inputs must not choose market artwork');
+assert.equal(presentation.stateFromCluster(cluster(['—','—','—'])).key,'MARKET STATE UNMEASURED');
+assert.equal(presentation.stateFromCluster(cluster(['—','—','—'],'INTEGRITY ERROR')).key,'TELEMETRY INTEGRITY ERROR');
+assert.equal(presentation.stateFromCluster(cluster(['17','—','91'])).key,'MARKET STATE PARTIAL');
+assert.equal(presentation.stateFromCluster(cluster(['0','50','91'])).file,'vig-low-neutral-high.jpg','measured zero must not become missing data');
+assert.equal(presentation.stateFromCluster(cluster(['17','52','91'])).file,'vig-low-neutral-high.jpg','existing measured presentation must remain available');
 
 console.log(JSON.stringify({state:'PASS',sequence:'09:30 -> 08:00 -> 06:00 -> 09:30',meters:{heat:returned0930.instrumentTelemetry.heat.value,pressure:returned0930.instrumentTelemetry.pressure.value,agreement:returned0930.instrumentTelemetry.agreement.score},futureSlots:['15:15','18:15'],cache:'v1.4',archiveRecovery:'PASS'},null,2));
