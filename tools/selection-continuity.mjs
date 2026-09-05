@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { activeReportScope, isPlayerPropRecommendation } from './major-sport-market-coverage-gate.mjs';
 
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const RESOLVED = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
@@ -18,9 +19,10 @@ function spreadEventSide(rec) {
 }
 function stakeNumber(value) { return Number(String(value ?? '0').replace(/[$,\s]/g, '')); }
 
-export function auditSelectionContinuity({ previous, report }) {
+export function auditSelectionContinuity({ previous, report, scopePolicy = null }) {
   const reportMs = parseMs(report?.ts);
   if (reportMs === null) die('Report ts is invalid');
+  const scope = scopePolicy ? activeReportScope(report, scopePolicy) : null;
 
   const currentByKey = new Map();
   const currentSpreadByEventSide = new Map();
@@ -42,6 +44,10 @@ export function auditSelectionContinuity({ previous, report }) {
     if (!ACTIVE.has(priorStatus)) continue;
     const key = selectionKey(rec);
     if (!key) continue;
+    if (scope && isPlayerPropRecommendation(rec)) {
+      diagnostics.push({ selectionKey: key, priorStatus, state: 'PAUSED_BY_SCOPE' });
+      continue;
+    }
 
     const current = currentByKey.get(key);
     if (current) {
@@ -166,10 +172,12 @@ function main() {
   const prior = loadPrior(root, report);
   if (!prior) { console.log('SELECTION CONTINUITY OK: no prior same-day report'); return; }
 
-  const result = auditSelectionContinuity({ previous: prior.report, report });
+  const scopePolicy = readJson(path.join(root, 'data/major-sport-market-coverage-v1.json'));
+  const result = auditSelectionContinuity({ previous: prior.report, report, scopePolicy });
   for (const item of result.diagnostics) {
     if (item.state === 'RE_EVALUATED') console.log(`SELECTION CONTINUITY RE-EVALUATED: ${item.selectionKey} ${item.priorStatus} -> ${item.nextStatus}`);
     else if (item.state === 'DEFERRED_TO_SPREAD_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
+    else if (item.state === 'PAUSED_BY_SCOPE') console.log(`SELECTION CONTINUITY PAUSED BY SCOPE: ${item.selectionKey} ${item.priorStatus}; issued history retained`);
   }
   if (!result.ok) {
     die(`a tracked BET/LEAN/WAIT failed continuity before event start. Prior=${prior.entry.path}. ${result.violations.join('; ')}`);

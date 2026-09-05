@@ -16,10 +16,7 @@
   "feedAuthority": {
     "path": "data/live-odds.json",
     "primaryEventCollection": "events",
-    "supplementalCollections": [
-      "deepMarkets",
-      "baseballProps"
-    ],
+    "supplementalCollections": ["deepMarkets", "baseballProps"],
     "rule": "Inspect fresh exact markets in events first. Supplemental deep collections may improve discovery but their absence does not prove that a prop market is unavailable."
   },
   "sports": {
@@ -45,8 +42,8 @@
         }
       ],
       "props": {
-        "requiredWhenFreshAndAvailable": true,
-        "scope": "ALL_EXACT_SUPPORTED_PLAYER_PROPS_RETURNED_BY_BOUND_FEED",
+        "requiredWhenFreshAndAvailable": false,
+        "scope": "PAUSED_BY_SCOPE",
         "examples": ["pitcher strikeouts", "hits", "total bases", "home runs", "RBI"]
       }
     },
@@ -72,8 +69,8 @@
         }
       ],
       "props": {
-        "requiredWhenFreshAndAvailable": true,
-        "scope": "ALL_EXACT_SUPPORTED_PLAYER_OR_GOALIE_PROPS_RETURNED_BY_BOUND_FEED",
+        "requiredWhenFreshAndAvailable": false,
+        "scope": "PAUSED_BY_SCOPE",
         "examples": ["shots", "goals", "assists", "points", "goalie saves"]
       }
     },
@@ -98,8 +95,8 @@
         }
       ],
       "props": {
-        "requiredWhenFreshAndAvailable": true,
-        "scope": "ALL_EXACT_SUPPORTED_PLAYER_PROPS_RETURNED_BY_BOUND_FEED",
+        "requiredWhenFreshAndAvailable": false,
+        "scope": "PAUSED_BY_SCOPE",
         "examples": ["points", "rebounds", "assists", "three-pointers"]
       }
     },
@@ -125,17 +122,18 @@
         }
       ],
       "props": {
-        "requiredWhenFreshAndAvailable": true,
-        "scope": "ALL_EXACT_SUPPORTED_PLAYER_PROPS_RETURNED_BY_BOUND_FEED",
+        "requiredWhenFreshAndAvailable": false,
+        "scope": "PAUSED_BY_SCOPE",
         "examples": ["passing yards", "rushing yards", "receiving yards", "receptions", "touchdowns"],
-        "leagueAvailabilityRule": "NFL, NCAAF and CFL props are screened whenever the bound feed supplies fresh exact markets; absence at a league/book is recorded rather than substituted."
+        "leagueAvailabilityRule": "NFL, NCAAF and CFL player-prop analysis is paused independently of feed availability."
       }
     }
   },
   "propProcess": {
-    "stage1": "Enumerate and screen every fresh exact supported prop selection returned by the bound feed for in-scope major-sport games.",
-    "stage2": "Perform deeper matchup/personnel/model work on serious prop candidates and any prop whose apparent value materially depends on unresolved participation or role assumptions.",
-    "identity": "Every actionable player prop requires exact event, player, market, line, side and executable-book identity under the production contract.",
+    "stage1": "At or after reportScope.effectiveFrom, do not screen player props. Deterministic counting of fresh returned selection keys is inventory only, not handicap research.",
+    "stage2": "No prop matchup/personnel/model research and no new or carried prop BET, LEAN, WAIT or PASS cards while PAUSED_BY_SCOPE.",
+    "identity": "Retain Contract invariant 23 for archived props and any future explicitly activated prop category. This pause does not repair or waive exact identity.",
+    "history": "Before reportScope.effectiveFrom, retain the original full-prop-screening receipt rules. Preserve all issued reports and grading/history.",
     "noFabrication": true
   },
   "presentation": {
@@ -173,11 +171,12 @@
         "availabilityLimitations",
         "presentation",
         "totals",
-        "complete"
+        "complete",
+        "scope"
       ],
       "sportRow": ["gamesInScope", "gamesEvaluated", "primary", "props"],
       "primary": ["required", "evaluated", "unavailable"],
-      "props": ["returned", "screened", "seriousDeepReviewed"],
+      "props": ["returned", "screened", "seriousDeepReviewed", "state", "excludedByScope"],
       "availabilityLimitation": ["eventId", "sport", "marketDetail", "selections", "reason"],
       "presentation": ["target", "targetIsSoft", "overflowProtection", "actionableSuppressedByTarget"],
       "totals": [
@@ -188,8 +187,11 @@
         "primaryUnavailable",
         "propsReturned",
         "propsScreened",
-        "seriousPropsDeepReviewed"
-      ]
+        "seriousPropsDeepReviewed",
+        "propsExcludedByScope"
+      ],
+      "scope": ["id", "effectiveFrom", "playerProps"],
+      "scopeFieldsRequiredFrom": "2026-09-05T13:00:00-07:00"
     },
     "rules": [
       "Use the current Git blob SHA of this authority file as coverageAudit.authorityBlobSha; never copy an older SHA.",
@@ -199,16 +201,26 @@
       "primary.required equals gamesInScope multiplied by six.",
       "primary.evaluated plus primary.unavailable equals primary.required.",
       "Every unavailable primary selection is represented exactly once in availabilityLimitations.",
-      "props.screened equals props.returned; deeper research is recorded separately as props.seriousDeepReviewed.",
+      "Before reportScope.effectiveFrom, props.screened equals props.returned. At/after that cutover, every sport has props.state=PAUSED_BY_SCOPE, screened=0, seriousDeepReviewed=0 and excludedByScope=returned; returned remains exact bound-feed inventory, not claimed analysis.",
       "presentation.target equals the current repository report_card_target; targetIsSoft and overflowProtection are true and actionableSuppressedByTarget is zero.",
       "Totals reconcile exactly with the sum of all sport entries.",
-      "complete is true only after the full sweep precedes card selection.",
-      "Before staging, execute or reproduce the exact deterministic checks in tools/major-sport-market-coverage-gate.mjs; do not stage a candidate that would fail them."
+      "complete is true only after the full active primary-market sweep precedes card selection; paused props do not make active-scope coverage incomplete.",
+      "Before staging, execute or reproduce the exact deterministic checks in tools/major-sport-market-coverage-gate.mjs; do not stage a candidate that would fail them.",
+      "At/after reportScope.effectiveFrom, coverageAudit.scope copies id, effectiveFrom and playerProps from reportScope. Totals include propsExcludedByScope, equal to propsReturned. These additive fields are not required on older reports.",
+      "At/after reportScope.effectiveFrom, every report and sidecar recommendation must identify an allowed sport and full-game primary market. Player-prop cards are forbidden in every status, including carried WAIT/LEAN and PASS."
     ]
   },
   "completion": {
     "primaryCoverageComplete": "Every in-scope game has every required primary selection evaluated or an explicit exact-market availability limitation recorded.",
-    "propCoverageComplete": "Every fresh exact supported prop returned by the bound feed has been screened, with deeper work completed where the candidate is serious or materially personnel-dependent.",
-    "reportCompletenessClaim": "A report must not claim complete major-sport coverage when a required primary-market evaluation was skipped."
+    "propCoverageComplete": "Before the scope cutover, every fresh exact supported prop was required to be screened. At/after the cutover, PAUSED_BY_SCOPE is explicit, zero props are analyzed, and returned inventory is reconciled to excludedByScope.",
+    "reportCompletenessClaim": "Claim complete coverage of the active full-game primary markets only when every required primary selection is evaluated or explicitly unavailable; state player-prop analysis is paused."
+  },
+  "reportScope": {
+    "id": "PRIMARY_FULL_GAME_ONLY",
+    "effectiveFrom": "2026-09-05T13:00:00-07:00",
+    "playerProps": "PAUSED_BY_SCOPE",
+    "enabledPropMarkets": [],
+    "reason": "User-approved focus on full-game moneylines, primary spreads/run lines/puck lines and game totals while prop identity and screening are investigated.",
+    "reactivationRule": "Enable one exact prop category within one sport only after identity, book matching, research, screening and publication validation and an explicit scope amendment."
   }
 }

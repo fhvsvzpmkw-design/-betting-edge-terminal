@@ -310,7 +310,56 @@ function allowedDetailsForSport(sport) {
   return new Set();
 }
 
-function sumSports(sports, sportKeys) {
+export function activeReportScope(report, policy) {
+  const scope = policy?.reportScope;
+  if (!scope) return null; // Historical authority before the scope amendment.
+  ensure(parseMs(scope.effectiveFrom) !== null, 'reportScope.effectiveFrom must be parseable');
+  ensure(parseMs(report?.ts) !== null, 'Cannot resolve report scope without a valid report timestamp');
+  if (parseMs(report.ts) < parseMs(scope.effectiveFrom)) return null;
+  ensure(scope.id === 'PRIMARY_FULL_GAME_ONLY', 'Unsupported report scope');
+  ensure(scope.playerProps === 'PAUSED_BY_SCOPE', 'Player props must remain paused under the current report scope');
+  ensure(Array.isArray(scope.enabledPropMarkets) && scope.enabledPropMarkets.length === 0,
+    'Prop markets require a separately validated scope amendment before activation');
+  return scope;
+}
+
+export function isPlayerPropRecommendation(rec) {
+  const context = rec?.coreAssessment?.context || {};
+  return /player.?props?|pitcher|batter|goalie/i.test(String(context.marketClass || '')) ||
+    isPlayerPropMarket({ marketKey: rec?.feed?.marketKey, name: rec?.feed?.market });
+}
+
+// Scope belongs to the checked-out report code, even when bundle files/cwd are temporary.
+export function validateReportMarketScope(report, { root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), policy = null } = {}) {
+  const selectedPolicy = policy || authority(root).policy;
+  const scope = activeReportScope(report, selectedPolicy);
+  if (!scope) return null;
+  ensure(Array.isArray(report?.recs), 'Scoped report requires a recommendations array');
+  for (const [index, rec] of report.recs.entries()) {
+    const context = rec?.coreAssessment?.context || {};
+    const sport = ['NBA', 'WNBA'].includes(context.sport) ? 'NBA_WNBA' : context.sport;
+    const spec = selectedPolicy.coverageAudit.sportKeys.includes(sport)
+      ? primarySpecs(selectedPolicy, sport).find(item => item.marketDetail === context.marketDetail)
+      : null;
+    ensure(spec && context.marketClass === spec.market && !isPlayerPropRecommendation(rec),
+      `Recommendation ${index + 1} is outside PRIMARY_FULL_GAME_ONLY: ${rec?.title || 'untitled'}; props are PAUSED_BY_SCOPE`);
+    ensure(marketKey(rec?.feed) === FEED_MARKET_KEYS[spec.market] &&
+      spec.requiredSelections.includes(rec?.feed?.side),
+      `Recommendation ${index + 1} feed identity is outside the allowed full-game market/side`);
+    // Some legitimate primary rows carry provider labels (for example a spread label).
+    // Unverified primary PASS cards may lack a selection key; execution identity remains
+    // governed by the existing gates. Scope only cross-checks keys when supplied.
+    if (nonEmpty(rec?.feed?.selectionKey)) {
+      const exactKey = rec.feed.selectionKey.split('|');
+      ensure(exactKey.length === 5 && exactKey[1] === FEED_MARKET_KEYS[spec.market] &&
+        exactKey[2] === rec.feed.side,
+        `Recommendation ${index + 1} selectionKey is outside the allowed full-game market/side`);
+    }
+  }
+  return scope;
+}
+
+function sumSports(sports, sportKeys, propsPaused = false) {
   const totals = {
     gamesInScope: 0,
     gamesEvaluated: 0,
@@ -321,6 +370,7 @@ function sumSports(sports, sportKeys) {
     propsScreened: 0,
     seriousPropsDeepReviewed: 0
   };
+  if (propsPaused) totals.propsExcludedByScope = 0;
   for (const key of sportKeys) {
     const row = sports[key];
     totals.gamesInScope += row.gamesInScope;
@@ -331,6 +381,7 @@ function sumSports(sports, sportKeys) {
     totals.propsReturned += row.props.returned;
     totals.propsScreened += row.props.screened;
     totals.seriousPropsDeepReviewed += row.props.seriousDeepReviewed;
+    if (propsPaused) totals.propsExcludedByScope += row.props.excludedByScope;
   }
   return totals;
 }
@@ -344,6 +395,8 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   const reportMs = Date.parse(report.ts || '');
   ensure(Number.isFinite(reportMs), 'Coverage gate report.ts must be parseable');
   if (reportMs < cutover) return { enforced: false, reason: 'pre-cutover' };
+  const scope = validateReportMarketScope(report, { policy });
+  const propsPaused = Boolean(scope);
 
   const audit = sidecar[auditPolicy.sidecarField];
   ensure(isObject(audit), `Sidecar ${auditPolicy.sidecarField} is required for reports at/after ${auditPolicy.requiredFrom}`);
@@ -357,6 +410,19 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   ensure(/^[0-9a-f]{40}$/i.test(String(sidecar?.provenance?.feedBlobSha || '')), 'Sidecar provenance.feedBlobSha must be a Git SHA');
   ensure(audit.evaluationOrder === policy.principles.evaluationOrder, 'coverageAudit evaluationOrder mismatch');
   ensure(audit.complete === true, 'coverageAudit complete must be true');
+  if (propsPaused) {
+    ensure(audit.scope?.id === scope.id && audit.scope?.effectiveFrom === scope.effectiveFrom &&
+      audit.scope?.playerProps === scope.playerProps, 'coverageAudit.scope must match the active report scope');
+    ensure(Array.isArray(sidecar.recommendations), 'Scoped sidecar requires recommendations');
+    ensure(sidecar.recommendations.length === report.recs.length, 'Scoped report/sidecar recommendation counts must match');
+    for (const [index, item] of sidecar.recommendations.entries()) {
+      const actual = item?.coreAssessment?.context || {};
+      const expected = report.recs[index]?.coreAssessment?.context || {};
+      for (const field of ['sport', 'marketClass', 'marketDetail']) {
+        ensure(actual[field] === expected[field], `Sidecar recommendation ${index + 1} scope context ${field} differs from report`);
+      }
+    }
+  }
 
   ensure(isObject(audit.sports), 'coverageAudit.sports must be an object');
   const sportKeys = auditPolicy.sportKeys;
@@ -373,7 +439,15 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
     ensure(row.primary.evaluated + row.primary.unavailable === row.primary.required, `coverageAudit.sports.${sport} primary arithmetic does not reconcile`);
     ensure(isObject(row.props), `coverageAudit.sports.${sport}.props is required`);
     for (const key of ['returned', 'screened', 'seriousDeepReviewed']) int(row.props[key], `coverageAudit.sports.${sport}.props.${key}`);
-    ensure(row.props.screened === row.props.returned, `coverageAudit.sports.${sport}.props.screened must equal props.returned`);
+    if (propsPaused) {
+      ensure(row.props.state === 'PAUSED_BY_SCOPE', `coverageAudit.sports.${sport}.props.state must be PAUSED_BY_SCOPE`);
+      int(row.props.excludedByScope, `coverageAudit.sports.${sport}.props.excludedByScope`);
+      ensure(row.props.excludedByScope === row.props.returned, `coverageAudit.sports.${sport}.props.excludedByScope must equal props.returned`);
+      ensure(row.props.screened === 0 && row.props.seriousDeepReviewed === 0,
+        `coverageAudit.sports.${sport} props are paused: screening and deeper analysis must be zero`);
+    } else {
+      ensure(row.props.screened === row.props.returned, `coverageAudit.sports.${sport}.props.screened must equal props.returned`);
+    }
     ensure(row.props.seriousDeepReviewed <= row.props.screened, `coverageAudit.sports.${sport}.props.seriousDeepReviewed cannot exceed props.screened`);
   }
 
@@ -407,7 +481,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   ensure(audit.presentation.actionableSuppressedByTarget === 0, 'coverageAudit may not suppress actionable recommendations to meet the card target');
 
   ensure(isObject(audit.totals), 'coverageAudit.totals must be an object');
-  const calculatedTotals = sumSports(audit.sports, sportKeys);
+  const calculatedTotals = sumSports(audit.sports, sportKeys, propsPaused);
   for (const [key, expected] of Object.entries(calculatedTotals)) {
     int(audit.totals[key], `coverageAudit.totals.${key}`);
     ensure(audit.totals[key] === expected, `coverageAudit.totals.${key} does not reconcile with sport rows`);
@@ -428,7 +502,8 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
       if (actual.primary[field] !== expected.primary[field]) mismatches.push(`${sport}.primary.${field} ${actual.primary[field]} != ${expected.primary[field]}`);
     }
     if (actual.props.returned !== expected.propsReturned) mismatches.push(`${sport}.props.returned ${actual.props.returned} != ${expected.propsReturned}`);
-    if (actual.props.screened !== expected.propsReturned) mismatches.push(`${sport}.props.screened ${actual.props.screened} != ${expected.propsReturned}`);
+    const expectedScreened = propsPaused ? 0 : expected.propsReturned;
+    if (actual.props.screened !== expectedScreened) mismatches.push(`${sport}.props.screened ${actual.props.screened} != ${expectedScreened}`);
   }
 
   for (const [tuple, reason] of bound.limitations) {

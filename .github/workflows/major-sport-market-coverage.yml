@@ -9,6 +9,10 @@ on:
       - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
       - tools/major-sport-market-coverage-gate.mjs
       - tools/odds-refresh-worker-source.yml
+      - tests/primary-market-scope.test.mjs
+      - tests/report-bundle-preflight.test.mjs
+      - tools/report-publication.mjs
+      - tools/selection-continuity.mjs
       - tests/major-sport-market-coverage.test.mjs
       - tests/scheduled-report-authority.test.mjs
       - tests/odds-worker-major-sport-retention.test.mjs
@@ -43,6 +47,10 @@ jobs:
         run: |
           set -euo pipefail
           node tests/major-sport-market-coverage.test.mjs
+          node tests/primary-market-scope.test.mjs
+          node tests/report-bundle-preflight.test.mjs
+          node tools/report-publication.mjs self-test
+          node tools/selection-continuity.mjs self-test
           node tests/scheduled-report-authority.test.mjs
           node tests/odds-worker-major-sport-retention.test.mjs
           node tools/major-sport-market-coverage-gate.mjs self-test
@@ -64,6 +72,6 @@ jobs:
             echo '- Odds worker: broad multi-event market retention protected; deep prop collections supplemental'
             echo '- Scope: MLB / NHL / NBA-WNBA / NFL-NCAAF-CFL'
             echo '- Primary markets: two-sided ML + main spread/run-line/puck-line + total'
-            echo '- Props: fresh exact supported player props'
+            echo '- Props: PAUSED_BY_SCOPE from 2026-09-05 13:00 PT; inventory retained, analysis and cards disabled'
             echo '- Card target: soft with actionable overflow protection'
           } >> "$GITHUB_STEP_SUMMARY"

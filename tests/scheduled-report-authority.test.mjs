@@ -12,7 +12,7 @@ for (const phrase of [
   'both moneyline sides',
   'primary run line',
   'primary puck line',
-  'Props are part of the major-sport sweep',
+  'Player props — PAUSED_BY_SCOPE',
   'live-odds.events',
   'Pinnacle official sharp benchmark',
   'pre-freeze trace audit',
@@ -35,4 +35,4 @@ assert.ok(text.includes('MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL'));
 assert.ok(text.includes('node tools/report-publication.mjs validate --report <report.json> --sidecar <sidecar.json>'));
 assert.ok(text.includes('checked=0'));
 
-console.log('SCHEDULED REPORT AUTHORITY TEST: PASS // ONE SHARED AUTHORITY + COMPLETE PRIMARY/PROP COVERAGE + SOFT CARD TARGET');
+console.log('SCHEDULED REPORT AUTHORITY TEST: PASS // ONE SHARED AUTHORITY + COMPLETE PRIMARY COVERAGE + PAUSED PROPS + SOFT CARD TARGET');

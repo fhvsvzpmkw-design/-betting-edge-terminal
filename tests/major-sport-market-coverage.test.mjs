@@ -32,8 +32,8 @@ function assertTwoSidedPrimary(sportKey, spreadDisplayName = null) {
   assert.equal(total?.primaryLineOnly, true);
   if (spreadDisplayName) assert.equal(spread?.displayName, spreadDisplayName);
 
-  assert.equal(sport.props.requiredWhenFreshAndAvailable, true);
-  assert.match(sport.props.scope, /^ALL_EXACT_SUPPORTED_/);
+  assert.equal(sport.props.requiredWhenFreshAndAvailable, false);
+  assert.equal(sport.props.scope, 'PAUSED_BY_SCOPE');
 }
 
 assertTwoSidedPrimary('MLB', 'run line');
@@ -140,7 +140,7 @@ for (const phrase of [
   'NHL',
   'NBA / WNBA',
   'NFL / NCAAF / CFL',
-  'Props are part of the major-sport sweep',
+  'Player props are paused by scope',
   'not a hard ceiling',
   'Durable coverage receipt',
   'major-sport-market-coverage-gate.mjs',
@@ -149,4 +149,4 @@ for (const phrase of [
   assert.ok(markdown.includes(phrase), `coverage addendum missing phrase: ${phrase}`);
 }
 
-console.log('MAJOR SPORT MARKET COVERAGE TEST: PASS // TWO-SIDED PRIMARY MARKETS + PROPS + COVERAGE RECEIPT + SOFT CARD TARGET');
+console.log('MAJOR SPORT MARKET COVERAGE TEST: PASS // TWO-SIDED PRIMARY MARKETS + PAUSED PROPS + COVERAGE RECEIPT + SOFT CARD TARGET');

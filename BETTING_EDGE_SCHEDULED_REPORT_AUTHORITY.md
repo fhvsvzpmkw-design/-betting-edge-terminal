@@ -4,6 +4,7 @@
 **Authority version:** 1.1
 **Effective:** 2026-09-02  
 **Validation clarification:** 2026-09-05
+**Primary-market scope amendment:** 2026-09-05 13:00 America/Vancouver
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -65,15 +66,15 @@ Never preselect an underdog, favorite, home team, away team, over or under as th
 
 If an expected primary market is missing, stale, identity-unsafe or otherwise unusable, retain an explicit availability limitation rather than silently skipping it.
 
-### Props
+### Player props — PAUSED_BY_SCOPE
 
-Props are part of the major-sport sweep. Inspect fresh exact markets in `live-odds.events` first; `deepMarkets` and `baseballProps` are supplemental discovery collections and are not the sole evidence of prop availability.
+For report timestamps at or after `2026-09-05T13:00:00-07:00`, resolve `reportScope` in `data/major-sport-market-coverage-v1.json`. The active scope is `PRIMARY_FULL_GAME_ONLY`: full-game moneylines, primary spreads/run lines/puck lines and game totals, across MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL.
 
-Enumerate and screen all fresh exact supported player props returned by the bound feed for in-scope MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL games. Examples include pitcher strikeouts/hits/total bases/home runs/RBI; NHL shots/goals/assists/points/goalie saves; NBA/WNBA points/rebounds/assists/threes; and football passing/rushing/receiving yards, receptions and touchdowns.
+Do not screen props, estimate prop fairs, perform prop-specific matchup/personnel research, or issue new/carried player-prop BET, LEAN, WAIT or PASS cards. Existing prop lineages are paused by scope rather than converted into analytical PASS decisions. Retain the normal Stage 1 and Stage 2 personnel work for active primary-market candidates.
 
-Broad prop screening happens before card selection. Maximum-depth matchup/personnel research is then concentrated on serious prop candidates and props whose apparent value materially depends on unresolved participation/role assumptions. Every actionable prop must satisfy Contract invariant 23 exact player-prop identity.
+The shared odds feed may still contain props in `live-odds.events`, `deepMarkets` or `baseballProps`. The coverage validator counts fresh returned exact keys as inventory only; it does not require prop analysis. In every sport row set `props.state=PAUSED_BY_SCOPE`, `screened=0`, `seriousDeepReviewed=0` and `excludedByScope=returned`. Preserve the exact returned inventory count. Copy `reportScope.id`, `effectiveFrom` and `playerProps` into `coverageAudit.scope`; include `totals.propsExcludedByScope=totals.propsReturned`.
 
-League/book prop absence is an availability result; never substitute another player, event or league.
+State “Player-prop analysis paused; full-game primary markets covered” in the report summary, subject to the actual primary availability limitations. Never claim paused props were screened, unavailable or rejected on value. Future prop categories require individual validation and an explicit scope amendment; `enabledPropMarkets` is currently empty. Archived reports and their grading remain governed by their original scope and exact identities.
 
 ## 5. Pinnacle official sharp benchmark
 
@@ -123,7 +124,7 @@ The QB layer has no direct BET, status, stake, or gate-bypass authority. The fir
 
 Only after the complete major-sport market sweep and serious-candidate research are finished may the report select display cards.
 
-Resolve `data/preferences.json` module `report_card_target`. The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling. Fewer cards are valid when the board is thin. A qualifying/tracked/actionable BET, LEAN or WAIT may overflow the target and may not be discarded merely to enforce the soft target. PASS cards may be curated after complete evaluation.
+Resolve `data/preferences.json` module `report_card_target`. The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling. Fewer cards are valid when the board is thin. An in-scope qualifying/tracked/actionable BET, LEAN or WAIT may overflow the target and may not be discarded merely to enforce the soft target. PASS cards may be curated after complete evaluation.
 
 Build the frozen Core 1.4 report for VigScope UI v1.5 with fresh Vancouver `run.ts`, exact `feedGeneratedAt`, current bankroll, correct risk/counts/summary, and no filler. Preserve exact `rec.feed` identity, fair/playTo/status/stake consistency, personnelRequired/personnelEvidence, WAIT qualification, coreAssessment and waltersEvidence.
 
@@ -134,6 +135,8 @@ Build the matching schema-3 sidecar with all provenance and Pinnacle information
 Before freezing either payload, run the publisher's read-only bundle validator against the complete report and matching sidecar:
 
 `node tools/report-publication.mjs validate --report <report.json> --sidecar <sidecar.json>`
+
+Also run `node tools/major-sport-market-coverage-gate.mjs validate --report <report.json> --sidecar <sidecar.json>` against the exact bound feed before freeze. Both must pass, including the active market-scope and paused-prop receipt checks.
 
 Require success across the entire recommendation set. This reuses the publisher's report/sidecar checks, including material-personnel text, `personnelRequired`, required evidence, WAIT qualification and exact report paths. It writes no History and confers no issuance authority. It supplements the Core, coverage, personnel-semantic, Pinnacle, continuity, availability and spread-lineage checks; none is replaced.
 
