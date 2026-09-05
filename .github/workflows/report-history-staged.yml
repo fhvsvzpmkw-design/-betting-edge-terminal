@@ -63,6 +63,8 @@ jobs:
         run: |
           node tools/major-sport-market-coverage-gate.mjs self-test
           node tools/major-sport-market-coverage-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Enforce source and fair-value evidence
+        run: node tools/report-evidence-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Enforce same-day event eligibility
         run: |
           node tools/report-event-eligibility.mjs self-test
@@ -121,6 +123,7 @@ jobs:
             node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
             node tools/personnel-semantic-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/major-sport-market-coverage-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/report-evidence-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-event-eligibility.mjs validate --report /tmp/report.json
             node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
@@ -161,6 +164,7 @@ jobs:
           node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"
           node tools/personnel-semantic-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/major-sport-market-coverage-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+          node tools/report-evidence-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/pinnacle-benchmark-publication-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
       - name: Publication summary
@@ -179,6 +183,7 @@ jobs:
             echo "- Preflight history: passed"
             echo "- Personnel semantic evidence: passed"
             echo "- Major-sport coverage receipt: passed"
+            echo "- Source/fair-value evidence: passed under timestamp-specific rules"
             echo "- Same-day event eligibility: passed"
             echo "- Core gate: passed"
             echo "- Pinnacle benchmark gate: passed (official, non-executable)"

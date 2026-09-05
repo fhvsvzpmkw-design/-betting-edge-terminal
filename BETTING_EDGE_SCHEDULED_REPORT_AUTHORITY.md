@@ -5,6 +5,7 @@
 **Effective:** 2026-09-02  
 **Validation clarification:** 2026-09-05
 **Primary-market scope amendment:** 2026-09-05 13:00 America/Vancouver
+**Source and fair-value evidence amendment:** 2026-09-05 17:00 America/Vancouver
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -112,6 +113,18 @@ Unavailable/stale/suspended/unmatched/incomplete Pinnacle is `PINNACLE_BENCHMARK
 
 ## 6. Research and current fair-value process
 
+### Source and fair-value evidence — forward from 17:00 PT September 5
+
+For `run.ts >= 2026-09-05T17:00:00-07:00`, read and apply `docs/REPORT_EVIDENCE_REQUIREMENTS.md` and the additive fields in `data/history/report-provenance-schema.json`. This is shared by all five report lanes. Earlier issued reports remain immutable under their original requirements.
+
+Every displayed card, including PASS, must retain event- and sport-matched `sourceEvidence` with actual URLs, check times and specific findings. Do not copy generic league/source text from another sport. If a source or market genuinely cannot be verified, record the permitted PASS `sourceShortfall` with its decision impact; never invent a source or numeric fair to complete a card.
+
+Every BET/LEAN/WAIT must also retain `fairValueEvidence`: the exact selection, units and orientation, numeric inputs linked to the checked sources, method/calculation, final estimate, numeric uncertainty range, limitations and explicit personnel basis. A quoted forecast or a list of favorable articles is context, not a demonstrated calibrated model. Explain the estimate and uncertainty using the actual existing Core/Walters work. Do not manufacture a formula or set `personnelRequired=false` to evade material Stage 2 work. If an estimate cannot be supported, resolve its analytical availability before freeze under the existing Core rules.
+
+Keep status and execution language consistent: a zero-stake LEAN is not an instruction to wager merely because a directional `playTo` threshold is met. State why BET strength is absent. Record the machine-checkable `benchmarkComparison` for each QUALIFIED Pinnacle card. A better independent handicap may disagree with Pinnacle; an unfavorable benchmark comparison must be described as unfavorable and may not be presented as confirming an execution advantage.
+
+Run `node tools/report-evidence-gate.mjs validate --report <report.json> --sidecar <sidecar.json>` before freeze. The publisher repeats this read-only validation during initial publication, retries and remote read-back. The gate checks evidence structure, identity and numeric consistency; it cannot prove source truth or model quality. The report task remains responsible for reading the sources and doing the handicap.
+
 Run Stage 1 broad current-information research before the provisional current handicap/fair-value screen. Run mandatory Stage 2 personnel depth and explicit re-handicap where material, including the Contract's official-source-first and 3-to-5 credible fallback-source completion rules.
 
 For every personnel-dependent serious candidate that still has a material unresolved dependency at the end of Stage 2, perform one **final authoritative-source re-check before assigning `BET`, `LEAN`, `WAIT`, or `PASS`**. Use the best authoritative source appropriate to that sport and dependency; the authoritative source may legitimately still say `TBD`, `unconfirmed`, `questionable`, `lineup not posted`, inactive list not released, or equivalent. Record the closing check in the existing `personnelEvidence.officialSources` array with `origin`, `url`, `asOf`, a dependency-specific `fact`, and `finalRecheck: true`. Do not invent a universal sport clock for this closing check. Existing sport-specific timing windows remain research-urgency and fallback-depth guidance. If the authoritative source genuinely cannot be reached or does not exist, record that explicitly in the existing `sourceShortfall` and preserve an appropriately uncertain personnel state rather than fabricating a check. A single event-level closing check may support multiple recommendations when it genuinely addresses the same exact dependency.
@@ -151,6 +164,8 @@ Only after the complete major-sport market sweep and serious-candidate research 
 Resolve `data/preferences.json` module `report_card_target`. The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling. Fewer cards are valid when the board is thin. An in-scope qualifying/tracked/actionable BET, LEAN or WAIT may overflow the target and may not be discarded merely to enforce the soft target. PASS cards may be curated after complete evaluation.
 
 Build the frozen Core 1.4 report for VigScope UI v1.5 with fresh Vancouver `run.ts`, exact `feedGeneratedAt`, current bankroll, correct risk/counts/summary, and no filler. Preserve exact `rec.feed` identity, fair/playTo/status/stake consistency, personnelRequired/personnelEvidence, WAIT qualification, coreAssessment and waltersEvidence.
+
+For reports from 17:00 PT September 5, when `coverageAudit.totals.primaryUnavailable > 0`, include this exact clause in the visible summary, substituting the actual counts: `Primary selections: N evaluated; M unavailable.` The coverage gate checks it against the receipt. Distinguish a complete inventory check from usable market coverage. `MARKET_NOT_RETURNED` means no usable retained market in this snapshot; it does not prove the sportsbook never offered that market. Use acquisition diagnostics when present to explain missing, filtered, not-attempted and unsuccessful recovery outcomes. Do not request replacement odds from the report task to improve an unattractive result.
 
 Build the matching schema-3 sidecar with all provenance and Pinnacle information required by the current production contract/publisher. When a recommendation has exact QUALIFIED Pinnacle, preserve the current structured benchmark object and keep executable price separate. When unavailable, record `PINNACLE_BENCHMARK_UNAVAILABLE` rather than inventing a comparison.
 

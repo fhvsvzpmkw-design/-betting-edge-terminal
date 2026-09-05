@@ -40,6 +40,8 @@ A zero-BET report remains valid after a complete sweep.
 
 When an expected primary market is absent, stale, identity-unsafe or otherwise unusable, record the availability limitation instead of silently skipping the market or substituting another line.
 
+When any primary selections are unavailable, the visible report summary states the exact evaluated and unavailable selection counts. Checking an unavailable market completes the inventory audit but does not make that market usable for handicapping. `MARKET_NOT_RETURNED` describes the retained snapshot, not proven sportsbook non-offering; upstream acquisition/retention diagnostics distinguish those causes when available.
+
 ## 3. Player props are paused by scope
 
 At or after `2026-09-05T13:00:00-07:00`, `reportScope` in the JSON authority controls `PRIMARY_FULL_GAME_ONLY`. Player props are `PAUSED_BY_SCOPE` across all covered sports, with `enabledPropMarkets: []`.

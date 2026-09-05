@@ -3,13 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { REPORT_EVIDENCE_FIELDS } from './report-evidence-gate.mjs';
 
 const DERIVED_FIELDS = Object.freeze([
   'coreAssessment',
   'waltersEvidence',
   'personnelRequired',
   'personnelEvidence',
-  'waitQualification'
+  'waitQualification',
+  ...REPORT_EVIDENCE_FIELDS
 ]);
 
 function die(message) { throw new Error(message); }
