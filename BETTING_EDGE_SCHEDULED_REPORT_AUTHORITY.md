@@ -76,6 +76,14 @@ The shared odds feed may still contain props in `live-odds.events`, `deepMarkets
 
 State “Player-prop analysis paused; full-game primary markets covered” in the report summary, subject to the actual primary availability limitations. Never claim paused props were screened, unavailable or rejected on value. Future prop categories require individual validation and an explicit scope amendment; `enabledPropMarkets` is currently empty. Archived reports and their grading remain governed by their original scope and exact identities.
 
+### Full-game total movement across reports
+
+For report timestamps at or after `2026-09-05T13:30:00-07:00`, apply Contract section 6.1a across MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL. Read the latest same-day archived total for each event and Over/Under side. Preserve unstarted tracked BET/LEAN/WAIT candidates as current decisions; PASS cards may be curated. Reconcile the current primary total even if the old exact line still survives as an alternate row. A changed number is a new current selection with independent requalification.
+
+Use the bound snapshot, the coverage gate's primary-line resolver, and the normal feed/quote clocks. One fresh supported book can be sufficient. Preserve book-specific differences with `CONFLICTING SIGNALS` and each book's line/price; never invent a consensus total. A lower total helps a prospective Over and a higher total helps a prospective Under. Record line movement and odds movement separately in `rec.move`, with the prior/current totals and odds, using the Contract labels. Reassess current fair, uncertainty, playTo and decision; information-driven fair changes remain distinct from sportsbook movement. Keep the exact original selection and decision unchanged in History.
+
+Before freeze run `node tools/total-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` using the exact bound feed (or `--feed <snapshot.json>`). Resolve any mismatch from the actual evidence. The check performs no new odds requests or analytical writes. If the current total cannot be verified, preserve the tracked candidate as an explicit zero-stake unavailable/unverified decision rather than silently dropping it or repricing the original ticket at a different number.
+
 ## 5. Pinnacle official sharp benchmark
 
 Read the current production manifest sharp-market block, its pinned Pinnacle policy and `data/oddspapi-observer.json` when present.
@@ -138,7 +146,7 @@ Before freezing either payload, run the publisher's read-only bundle validator a
 
 Also run `node tools/major-sport-market-coverage-gate.mjs validate --report <report.json> --sidecar <sidecar.json>` against the exact bound feed before freeze. Both must pass, including the active market-scope and paused-prop receipt checks.
 
-Require success across the entire recommendation set. This reuses the publisher's report/sidecar checks, including material-personnel text, `personnelRequired`, required evidence, WAIT qualification and exact report paths. It writes no History and confers no issuance authority. It supplements the Core, coverage, personnel-semantic, Pinnacle, continuity, availability and spread-lineage checks; none is replaced.
+Require success across the entire recommendation set. This reuses the publisher's report/sidecar checks, including material-personnel text, `personnelRequired`, required evidence, WAIT qualification and exact report paths. It writes no History and confers no issuance authority. It supplements the Core, coverage, personnel-semantic, Pinnacle, continuity, availability, spread-lineage and total-lineage checks; none is replaced.
 
 If the earlier personnel-semantic check reports `checked=0`, that means no card was marked `personnelRequired=true`; it does not establish that the report text and those flags are consistent. Resolve all reported contradictions from the actual research before freeze. Record real material dependencies and their required evidence. Do not remove a genuine dependency, invent evidence, or alter analytical context to obtain a passing result. General risk prose must accurately describe the recorded decision and must not claim unsupported personnel conclusions.
 

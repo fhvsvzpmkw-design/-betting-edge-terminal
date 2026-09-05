@@ -74,7 +74,7 @@ export function majorSportKey(event) {
   return null;
 }
 
-function mergedFeedEvents(feed) {
+export function mergedFeedEvents(feed) {
   const merged = new Map();
   for (const event of feed?.events || []) {
     const id = eventId(event);
@@ -116,7 +116,7 @@ function inspectFixedMarket(market, selections) {
   return { state: 'RESOLVED', selections: states };
 }
 
-function inspectPrimaryLineMarket(market, selections) {
+export function inspectPrimaryLineMarket(market, selections) {
   const rows = (market?.odds || []).filter(row => rowLine(row) !== null);
   if (!rows.length) return { state: 'INCOMPLETE' };
 
@@ -145,7 +145,7 @@ function inspectPrimaryLineMarket(market, selections) {
     if (priced.some(row => selectionKey(row, side))) states[side] = 'AVAILABLE';
     else states[side] = priced.length ? 'IDENTITY' : 'INCOMPLETE';
   }
-  return { state: 'RESOLVED', selections: states };
+  return { state: 'RESOLVED', selections: states, line, method: marked.length ? 'PROVIDER_PRIMARY' : 'MARKET_CENTER' };
 }
 
 function inspectBookPrimary(event, book, spec, feedGeneratedAt) {

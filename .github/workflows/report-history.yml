@@ -37,6 +37,10 @@ on:
       - tools/core-v14-publication-gate.mjs
       - tools/report-publication.mjs
       - tests/report-bundle-preflight.test.mjs
+      - tools/total-lineage.mjs
+      - tools/selection-continuity.mjs
+      - tools/major-sport-market-coverage-gate.mjs
+      - tests/total-lineage.test.mjs
       - tools/spread-lineage.mjs
       - tools/selection-availability.mjs
       - tests/selection-availability.test.mjs
@@ -59,6 +63,10 @@ on:
       - tools/core-v14-publication-gate.mjs
       - tools/report-publication.mjs
       - tests/report-bundle-preflight.test.mjs
+      - tools/total-lineage.mjs
+      - tools/selection-continuity.mjs
+      - tools/major-sport-market-coverage-gate.mjs
+      - tests/total-lineage.test.mjs
       - tools/spread-lineage.mjs
       - tools/selection-availability.mjs
       - tests/selection-availability.test.mjs
@@ -95,6 +103,8 @@ jobs:
         run: node tests/report-bundle-preflight.test.mjs
       - name: Exercise tracked selection availability
         run: node tests/selection-availability.test.mjs
+      - name: Exercise seven-sport total movement and continuity
+        run: node tests/total-lineage.test.mjs
       - name: Exercise spread-lineage path
         run: node tests/spread-lineage-reconciliation.test.js
       - name: Exercise spread primary-line fixtures
@@ -164,74 +174,13 @@ jobs:
       - name: Enforce Core 1.4 production handicap and Walters authority
         run: node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Guard tracked selection continuity
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const report = JSON.parse(fs.readFileSync('/tmp/report.json', 'utf8'));
-          const index = JSON.parse(fs.readFileSync('run-history.json', 'utf8'));
-          const reportMs = Date.parse(report.ts);
-          const day = String(report.ts || '').slice(0, 10);
-          const prior = (index.runs || [])
-            .filter(entry => String(entry.ts || '').slice(0, 10) === day && Date.parse(entry.ts) < reportMs && entry.path)
-            .sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0];
-          if (!prior) {
-            console.log('SELECTION CONTINUITY OK: no prior same-day report');
-            process.exit(0);
-          }
-          const previous = JSON.parse(fs.readFileSync(prior.path, 'utf8'));
-          const currentByKey = new Map((report.recs || []).map(rec => [String(rec?.feed?.selectionKey || '').trim(), rec]).filter(([key]) => key));
-          const currentSpreadByEventSide = new Map((report.recs || [])
-            .filter(rec => String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() === 'spread' && rec?.feed?.eventId && rec?.feed?.side)
-            .map(rec => [`${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`, rec]));
-          const active = new Set(['BET', 'LEAN', 'WAIT']);
-          const resolved = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
-          const missing = [];
-          for (const rec of previous.recs || []) {
-            const priorStatus = String(rec?.status || '').toUpperCase();
-            if (!active.has(priorStatus)) continue;
-            const key = String(rec?.feed?.selectionKey || '').trim();
-            if (!key) continue;
-            const current = currentByKey.get(key);
-            if (current) {
-              const nextStatus = String(current?.status || '').toUpperCase();
-              if (!resolved.has(nextStatus)) {
-                throw new Error(`SELECTION CONTINUITY VIOLATION: tracked selection ${key} must receive a fresh BET/LEAN/WAIT/PASS decision; got ${current?.status}`);
-              }
-              const stake = Number(String(current?.stake ?? '0').replace(/[$,\s]/g, ''));
-              if (nextStatus === 'BET') {
-                if (!(Number.isFinite(stake) && stake > 0)) throw new Error(`SELECTION CONTINUITY VIOLATION: ${key} resolved to BET without positive stake`);
-                if (!String(current?.price || '').trim() || !String(current?.fair || '').trim() || !String(current?.playTo || '').trim()) {
-                  throw new Error(`SELECTION CONTINUITY VIOLATION: ${key} resolved to BET without current price, fair value and playTo`);
-                }
-              } else if (Number.isFinite(stake) && stake !== 0) {
-                throw new Error(`SELECTION CONTINUITY VIOLATION: ${key} resolved to ${nextStatus} with non-zero stake`);
-              }
-              console.log(`SELECTION CONTINUITY RE-EVALUATED: ${key} ${priorStatus} -> ${nextStatus}`);
-              continue;
-            }
-            const eventDate = String(rec?.feed?.eventDate || '').trim();
-            const eventMs = Date.parse(eventDate);
-            if (Number.isFinite(eventMs) && reportMs >= eventMs) continue;
-            const marketKey = String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase();
-            if (marketKey === 'spread' && rec?.feed?.eventId && rec?.feed?.side) {
-              const lineageKey = `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`;
-              const movedSpread = currentSpreadByEventSide.get(lineageKey);
-              if (movedSpread) {
-                console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${key} -> ${String(movedSpread?.feed?.selectionKey || 'NEW LINE')}`);
-                continue;
-              }
-            }
-            missing.push(`${rec.status} ${rec.title} [${key}] event=${eventDate || 'UNKNOWN'}`);
-          }
-          if (missing.length) {
-            throw new Error(`SELECTION CONTINUITY VIOLATION: a tracked BET/LEAN/WAIT vanished before event start. Carry it forward and freshly re-evaluate it as BET/LEAN/WAIT/PASS on the current snapshot; prior status is not sticky and BET is allowed when all current gates pass. A sportsbook dropping the market does not authorize silent omission. Prior=${prior.path}. Missing: ${missing.join('; ')}`);
-          }
-          console.log(`SELECTION CONTINUITY OK: ${prior.path}`);
-          NODE
+        run: node tools/selection-continuity.mjs audit --report /tmp/report.json
       - name: Verify tracked non-spread book availability
         run: node tools/selection-availability.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Reconcile tracked spread lineage
         run: node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Reconcile tracked full-game total lineage
+        run: node tools/total-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Validate bundle and derive paths
         id: bundle
         run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
@@ -251,6 +200,7 @@ jobs:
             node tools/report-publication.mjs verify
             node tools/core-v14-publication-gate.mjs verify-history
             node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/total-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
             git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
             if git diff --cached --quiet; then
@@ -269,10 +219,13 @@ jobs:
       - name: Remote read-back gate
         env:
           REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
         run: |
           git fetch origin main
           git reset --hard origin/main
           node tools/report-publication.mjs verify --ts "$REPORT_TS"
+          node tools/total-lineage.mjs audit --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/core-v14-publication-gate.mjs verify-history
       - name: Publication summary
         env:

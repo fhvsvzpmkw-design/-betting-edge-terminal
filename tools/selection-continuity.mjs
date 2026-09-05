@@ -4,6 +4,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { activeReportScope, isPlayerPropRecommendation } from './major-sport-market-coverage-gate.mjs';
+import { totalEventSide, totalLineageApplies } from './total-lineage.mjs';
 
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const RESOLVED = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
@@ -26,6 +27,7 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
 
   const currentByKey = new Map();
   const currentSpreadByEventSide = new Map();
+  const currentTotalByEventSide = new Map();
   const violations = [];
   const diagnostics = [];
 
@@ -37,6 +39,8 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
     }
     const spreadKey = spreadEventSide(rec);
     if (spreadKey) currentSpreadByEventSide.set(spreadKey, rec);
+    const totalKey = totalEventSide(rec);
+    if (totalKey) currentTotalByEventSide.set(totalKey, rec);
   }
 
   for (const rec of previous?.recs || []) {
@@ -90,6 +94,13 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
       }
     }
 
+    const totalKey = totalLineageApplies(report) ? totalEventSide(rec) : null;
+    const movedTotal = totalKey ? currentTotalByEventSide.get(totalKey) : null;
+    if (movedTotal) {
+      diagnostics.push({ selectionKey: key, priorStatus, state: 'DEFERRED_TO_TOTAL_LINEAGE',
+        currentSelectionKey: selectionKey(movedTotal) || null });
+      continue;
+    }
     violations.push(`${rec.status} ${rec.title} [${key}] event=${eventDate || 'UNKNOWN'} vanished before event start`);
   }
 
@@ -177,6 +188,7 @@ function main() {
   for (const item of result.diagnostics) {
     if (item.state === 'RE_EVALUATED') console.log(`SELECTION CONTINUITY RE-EVALUATED: ${item.selectionKey} ${item.priorStatus} -> ${item.nextStatus}`);
     else if (item.state === 'DEFERRED_TO_SPREAD_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
+    else if (item.state === 'DEFERRED_TO_TOTAL_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO TOTAL LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
     else if (item.state === 'PAUSED_BY_SCOPE') console.log(`SELECTION CONTINUITY PAUSED BY SCOPE: ${item.selectionKey} ${item.priorStatus}; issued history retained`);
   }
   if (!result.ok) {
