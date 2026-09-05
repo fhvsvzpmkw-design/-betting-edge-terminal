@@ -76,14 +76,29 @@
       "reports": 85
     },
     "expectedHistoricalDistribution": {
-      "heat": {"LOW": 30, "MEDIUM": 30, "HIGH": 25},
-      "pressure": {"ADVERSE": 20, "NEUTRAL": 29, "FAVORABLE": 36},
-      "agreementMeasured": {"LOW": 36, "HIGH": 25},
-      "agreementEvidence": {"UNMEASURED": 24, "LIMITED": 26, "SUPPORTED": 35},
+      "heat": {
+        "LOW": 30,
+        "MEDIUM": 30,
+        "HIGH": 25
+      },
+      "pressure": {
+        "ADVERSE": 20,
+        "NEUTRAL": 29,
+        "FAVORABLE": 36
+      },
+      "agreementMeasured": {
+        "LOW": 36,
+        "HIGH": 25
+      },
+      "agreementEvidence": {
+        "UNMEASURED": 24,
+        "LIMITED": 26,
+        "SUPPORTED": 35
+      },
       "occupiedStates": 15,
       "unusedStates": 3,
       "maxSingleStateCount": 17,
-      "maxSingleStateShare": 0.20,
+      "maxSingleStateShare": 0.2,
       "normalizedEntropy": 0.8429,
       "rmseFromEqual18WayDistribution": 4.58
     }
@@ -97,5 +112,17 @@
     "thresholdsFixedUntilExplicitRecalibration": true,
     "historicalIssuedReportsImmutable": true,
     "repriceComparisonMayNotRewriteIssuedMeters": true
+  },
+  "telemetry": {
+    "calculationVersion": 2,
+    "effectiveAt": "2026-09-05T11:00:00-07:00",
+    "documentation": "docs/VIGSCOPE_METER_BASELINES.md",
+    "module": "tools/vigscope-meter-telemetry.mjs",
+    "gate": "tools/vigscope-meter-telemetry-gate.mjs",
+    "baselinePolicy": "LATEST_REPORT_THEN_ODDS_24H",
+    "maxBaselineAgeHours": 24,
+    "maxCandidateSnapshots": 12,
+    "agreementRequiresPriorReport": false,
+    "historicalCalculationsPreserved": true
   }
 }

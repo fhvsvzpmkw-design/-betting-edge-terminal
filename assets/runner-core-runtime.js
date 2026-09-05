@@ -8,6 +8,7 @@ const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
 const VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1';
 const VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00';
+const VIG_METER_RESILIENT_CUTOVER='2026-09-05T11:00:00-07:00';
 const RUN_HISTORY_URL='./run-history.json';
 const VIG_HEAT_LOW_MAX=20,VIG_HEAT_HIGH_MIN=40,VIG_PRESSURE_ADVERSE_MAX=48,VIG_PRESSURE_FAVORABLE_MIN=52,VIG_AGREEMENT_HIGH_MIN=45;
 let activeRun=null;
@@ -144,7 +145,26 @@ function hasFirstSameDayTelemetry(run){
 }
 function hasPublisherTelemetry(run){
   const t=run?.instrumentTelemetry;
+  if(Date.parse(run?.ts)>=Date.parse(VIG_METER_RESILIENT_CUTOVER)&&!hasResilientMeterTelemetry(run))return false;
   return Boolean(t&&Number(t.schema)===1&&t.authority==='PUBLISHER_BOUND_FEED_V1'&&t.calibrationId===VIG_METER_CALIBRATION_ID&&t.derivedAt&&(t.source?.state==='PINNED'||hasFirstSameDayTelemetry(run))&&t.heat&&t.pressure&&t.agreement)
+}
+function hasResilientMeterTelemetry(run){
+  const t=run?.instrumentTelemetry,s=t?.source,m=t?.movement;
+  const sha=v=>/^[0-9a-f]{40}$/i.test(String(v||'')),score=v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100;
+  return Boolean(t?.calculationVersion===2&&s?.state==='PINNED'&&s.baselinePolicy==='LATEST_REPORT_THEN_ODDS_24H'&&s.maxBaselineAgeHours===24&&sha(s.feedBlobSha)&&s.feedGeneratedAt===run.feedGeneratedAt&&t.derivedAt===run.ts&&
+    (s.oddsIndexBlobSha===null||sha(s.oddsIndexBlobSha))&&(s.priorRunBlobSha===null||sha(s.priorRunBlobSha))&&
+    m&&Array.isArray(m.comparisons)&&m.comparisons.length===m.comparableSelections&&m.comparableSelections<=(run.recs||[]).length&&m.reportComparisons+m.snapshotComparisons===m.comparableSelections&&score(m.rawConfidence)&&
+    m.comparisons.every(c=>['PRIOR_REPORT','ODDS_SNAPSHOT'].includes(c.basis)&&BOOK_PRIORITY.includes(c.book)&&Number.isFinite(Date.parse(c.baselineTs))&&Date.parse(c.baselineTs)<Date.parse(run.ts)&&(c.basis!=='ODDS_SNAPSHOT'||sha(c.baselineFeedBlobSha)))&&
+    [t.heat,t.pressure,t.agreement].every(r=>r&&score(r.rawConfidence)&&['MEASURED','PARTIAL','UNMEASURED'].includes(r.state))&&score(t.heat.rawValue)&&score(t.pressure.rawValue)&&score(t.agreement.rawScore))
+}
+function meterBaselineText(run){
+  if(telemetryIntegrityState(run)!=='VALID'||run?.instrumentTelemetry?.calculationVersion!==2)return '';
+  const m=run.instrumentTelemetry.movement;
+  if(!m.comparableSelections)return 'METERS: CURRENT QUOTES ONLY • MOVEMENT UNAVAILABLE';
+  const times=m.comparisons.map(c=>c.baselineTs).sort((a,b)=>Date.parse(a)-Date.parse(b));
+  const clock=ts=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(ts));
+  const range=times[0]===times[times.length-1]?clock(times[0]):`${clock(times[0])} – ${clock(times[times.length-1])}`;
+  return `METER BASELINE: ${m.reportComparisons} REPORT / ${m.snapshotComparisons} SAVED ODDS • ${range} PT`;
 }
 function telemetryIntegrityState(run){return requiresPublisherTelemetry(run)?(hasPublisherTelemetry(run)?'VALID':'ERROR'):'LEGACY'}
 async function recoverCanonicalIssuedRun(run){
@@ -198,7 +218,7 @@ function deriveInstrumentReadings(run){
   const structuredHeatValue=clamp(structuredHeat.rawValue??structuredHeat.value??0),structuredHeatConfidence=clamp(structuredHeat.rawConfidence??structuredHeat.confidence??0);
   const structuredPressureValue=clamp(structuredPressure.rawValue??structuredPressure.value??50),structuredPressureConfidence=clamp(structuredPressure.rawConfidence??structuredPressure.confidence??0);
   return {
-    heat:structured?{value:Math.round(structuredHeatValue),rawValue:structuredHeatValue,label:structuredHeatConfidence?heatLabel(structuredHeatValue):'NO DATA',confidence:Math.round(structuredHeatConfidence)}:{value:Math.round(heat),rawValue:heat,label:heatConf?heatLabel(heat):'NO DATA',confidence:Math.round(heatConf)},
+    heat:structured?{value:Math.round(structuredHeatValue),rawValue:structuredHeatValue,label:structuredHeatConfidence?(structuredHeat.state==='PARTIAL'?'PARTIAL':heatLabel(structuredHeatValue)):'NO DATA',confidence:Math.round(structuredHeatConfidence)}:{value:Math.round(heat),rawValue:heat,label:heatConf?heatLabel(heat):'NO DATA',confidence:Math.round(heatConf)},
     pressure:structured?{value:Math.round(structuredPressureValue),rawValue:structuredPressureValue,label:structuredPressureConfidence?pressureLabel(structuredPressureValue):'NO DATA',confidence:Math.round(structuredPressureConfidence)}:{value:Math.round(pressure),rawValue:pressure,label:pressureConf?pressureLabel(pressure):'NO DATA',confidence:Math.round(pressureConf)},
     agreement:{value:Math.round(agreementScore),rawValue:agreementScore,label:agreementConfidence?agreementLabel(agreementScore):'UNMEASURED',confidence:Math.round(agreementConfidence),rawConfidence:agreementConfidence,evidenceQuality:agreementQuality,pairs:agreement.pairs||0}
   }
@@ -740,6 +760,8 @@ function apply(run){
     const priceStateText=run.comparison?`COMPARED ${vancouverClock(run.comparison.feedGeneratedAt)} • ISSUED SNAPSHOT SAVED`:run.feedGeneratedAt?`ODDS ${vancouverClock(run.feedGeneratedAt)} • ${ageLabel(run.feedGeneratedAt)}`:'SNAPSHOT PRICE STATE';
     const fresh=el(d,'div','runnerFresh');
     fresh.append(el(d,'span','feedMeta',priceStateText),el(d,'span','marketStateLabel',`${state.emoji} ${state.label}${state.agreementState==='UNMEASURED'?' • AGREEMENT UNMEASURED':''}`));
+    const baselineText=meterBaselineText(issuedMeterRun);
+    if(baselineText){const baseline=el(d,'span','feedMeta meterBaseline',baselineText);baseline.style.cssText='flex-basis:100%;white-space:normal;font-size:10px;line-height:1.3';fresh.append(baseline);}
     right.append(instrumentCluster(d,issuedMeterRun),fresh);head.append(left,right);box.appendChild(head);
     box.appendChild(sessionStrip(d,run));
 

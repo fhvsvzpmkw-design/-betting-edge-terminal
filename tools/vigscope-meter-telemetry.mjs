@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {
   VIG_METER_CALIBRATION_ID,
   calibratedHeat,
@@ -13,6 +14,10 @@ export const VIG_METER_TELEMETRY_SCHEMA=1;
 export const VIG_METER_TELEMETRY_AUTHORITY='PUBLISHER_BOUND_FEED_V1';
 export const EXECUTION_BOOKS=Object.freeze(['Bet365','DraftKings']);
 export const QUOTE_MAX_AGE_MINUTES=30;
+export const RESILIENT_METER_CUTOVER='2026-09-05T11:00:00-07:00';
+export const METER_BASELINE_MAX_HOURS=24;
+const ODDS_INDEX_PATH='data/history/odds-index.json';
+export function usesResilientMeterTelemetry(report){return Date.parse(report?.ts)>=Date.parse(RESILIENT_METER_CUTOVER);}
 
 function round(value,digits=6){
   const n=Number(value);
@@ -268,8 +273,114 @@ export function latestPriorSameDay(index,report,root){
   }
   return null;
 }
-export function attachPublisherInstrumentTelemetry({root,index,report,sidecar}={}){
+function blobSha(text){return createHash('sha1').update(`blob ${Buffer.byteLength(text)}\0`).update(text).digest('hex');}
+function readGitJson(root,sha){
+  if(!/^[0-9a-f]{40}$/i.test(String(sha||'')))throw new Error('Meter source requires a Git blob SHA');
+  const raw=execFileSync('git',['cat-file','blob',sha],{cwd:root,encoding:'utf8',maxBuffer:128*1024*1024,stdio:['ignore','pipe','ignore']});
+  if(blobSha(raw)!==sha)throw new Error('Meter source blob hash mismatch');
+  return JSON.parse(raw);
+}
+function readSourceFile(root,file){
+  const raw=fs.readFileSync(path.join(root,file),'utf8');
+  return {data:JSON.parse(raw),sha:blobSha(raw)};
+}
+function earlierBaseline(ts,currentTs){
+  const age=Date.parse(currentTs)-Date.parse(ts);
+  return Number.isFinite(age)&&age>0&&age<=METER_BASELINE_MAX_HOURS*3600000;
+}
+function eligibleSnapshotEntries(oddsIndex,report){
+  return (Array.isArray(oddsIndex?.entries)?oddsIndex.entries:[])
+    .filter(e=>earlierBaseline(e.generatedAt,report.feedGeneratedAt)&&/^[0-9a-f]{40}$/i.test(String(e.snapshotBlobSha||''))&&Date.parse(e.indexedAtUtc)<=Date.parse(report.ts))
+    .sort((a,b)=>Date.parse(b.generatedAt)-Date.parse(a.generatedAt)||a.snapshotBlobSha.localeCompare(b.snapshotBlobSha))
+    .filter((e,i,all)=>all.findIndex(x=>x.snapshotBlobSha===e.snapshotBlobSha)===i).slice(0,12);
+}
+
+// Forward-only calculation. Agreement is independent of movement history;
+// unavailable report comparisons may use a real, exact same-book odds baseline.
+export function deriveResilientInstrumentTelemetry({report,feed,feedBlobSha,priorReport=null,priorRunPath=null,priorRunBlobSha=null,oddsIndexBlobSha=null,oddsSnapshots=[]}={}){
+  if(!Array.isArray(report?.recs)||feed?.generatedAt!==report.feedGeneratedAt)throw new Error('Resilient meters require the exact bound current feed');
+  const priorByKey=new Map((priorReport?.recs||[]).map(r=>[r.feed?.selectionKey,r]));
+  const snapshots=oddsSnapshots.filter(s=>earlierBaseline(s.feed?.generatedAt,feed.generatedAt)).sort((a,b)=>Date.parse(b.feed.generatedAt)-Date.parse(a.feed.generatedAt));
+  const comparisons=[];
+  for(const rec of report.recs){
+    const key=rec?.feed?.selectionKey;if(!nonEmpty(key))continue;
+    const prior=priorByKey.get(key);let comparison=null;
+    if(prior&&EXECUTION_BOOKS.includes(prior.book)&&earlierBaseline(priorReport.feedGeneratedAt,feed.generatedAt)){
+      const baselineAmerican=americanNumber(prior.price),p=americanProbability(baselineAmerican),q=exactSelectionQuote(feed,prior.book,key);
+      if(p!==null&&q)comparison={basis:'PRIOR_REPORT',book:prior.book,baselineTs:priorReport.ts,baselineAmerican,baselineProbability:p,currentProbability:q.probability,currentQuoteUpdatedAt:q.updatedAt};
+    }
+    if(!comparison){
+      const books=[...new Set([rec.book,...EXECUTION_BOOKS])].filter(b=>EXECUTION_BOOKS.includes(b));
+      for(const snapshot of snapshots){
+        for(const book of books){
+          const before=exactSelectionQuote(snapshot.feed,book,key),after=exactSelectionQuote(feed,book,key);
+          if(!before||!after)continue;
+          comparison={basis:'ODDS_SNAPSHOT',book,baselineTs:snapshot.feed.generatedAt,baselineFeedBlobSha:snapshot.blobSha,baselineDecimal:before.decimal,baselineProbability:before.probability,baselineQuoteUpdatedAt:before.updatedAt,currentProbability:after.probability,currentQuoteUpdatedAt:after.updatedAt};
+          break;
+        }
+        if(comparison)break;
+      }
+    }
+    if(comparison){
+      const favor=comparison.baselineProbability-comparison.currentProbability;
+      comparisons.push({selectionKey:key,...comparison,favor,magnitude:Math.abs(favor),weight:recWeight(rec)});
+    }
+  }
+  const count=comparisons.length,total=report.recs.length,changed=comparisons.filter(c=>c.magnitude>=0.0025).length;
+  const denominator=comparisons.reduce((n,c)=>n+c.weight,0)||1;
+  const movement={eligibleSelections:total,identityEligibleSelections:report.recs.filter(r=>nonEmpty(r?.feed?.selectionKey)).length,comparableSelections:count,changedSelections:changed,sameBookComparisons:count,
+    averageMagnitude:round(count?comparisons.reduce((n,c)=>n+c.magnitude,0)/count:0),breadth:round(total?changed/total:0),weightedFavor:round(comparisons.reduce((n,c)=>n+c.favor*c.weight,0)/denominator),
+    confidence:Math.round(total?count/total*100:0),rawConfidence:round(total?count/total*100:0),state:count?'MEASURED':'UNMEASURED',
+    reportComparisons:comparisons.filter(c=>c.basis==='PRIOR_REPORT').length,snapshotComparisons:comparisons.filter(c=>c.basis==='ODDS_SNAPSHOT').length,comparisons};
+  const agreement=agreementFromFeed(report,feed);agreement.rawConfidence??=0;
+  const thresholds=report.recs.map(thresholdActivity).filter(v=>v!==null);
+  const heatRaw=calibratedHeat({avgMagnitude:movement.averageMagnitude,breadth:movement.breadth,thresholdActivity:thresholds.length?thresholds.reduce((a,b)=>a+b,0)/thresholds.length:0,agreementScore:agreement.rawScore,agreementConfidence:agreement.rawConfidence});
+  const heatConfidence=clamp(movement.rawConfidence*.7+agreement.rawConfidence*.3),pressureRaw=calibratedPressure(movement.weightedFavor);
+  return {schema:VIG_METER_TELEMETRY_SCHEMA,calculationVersion:2,calibrationId:VIG_METER_CALIBRATION_ID,authority:VIG_METER_TELEMETRY_AUTHORITY,derivedAt:report.ts,
+    source:{feedBlobSha,feedGeneratedAt:report.feedGeneratedAt,priorRunTs:priorReport?.ts||null,priorRunPath,priorRunBlobSha,oddsIndexBlobSha,baselinePolicy:'LATEST_REPORT_THEN_ODDS_24H',maxBaselineAgeHours:METER_BASELINE_MAX_HOURS,state:'PINNED'},movement,
+    heat:{value:Math.round(heatRaw),rawValue:round(heatRaw),confidence:Math.round(heatConfidence),rawConfidence:round(heatConfidence),state:heatConfidence>0?(count?'MEASURED':'PARTIAL'):'UNMEASURED'},
+    pressure:{value:Math.round(pressureRaw),rawValue:round(pressureRaw),confidence:movement.confidence,rawConfidence:movement.rawConfidence,state:count?'MEASURED':'UNMEASURED'},agreement};
+}
+function attachResilientTelemetry({root,index,report,sidecar,replaySource}){
+  const feedBlobSha=sidecar?.provenance?.feedBlobSha,feed=readGitJson(root,feedBlobSha);
+  let prior=null,priorRunBlobSha=null,oddsIndex=null,oddsIndexBlobSha=null;
+  if(replaySource){
+    if(replaySource.priorRunPath){
+      const entry=index.runs.find(e=>e.path===replaySource.priorRunPath&&e.ts===replaySource.priorRunTs);
+      if(!entry||entry.date!==report.ts.slice(0,10)||Date.parse(entry.ts)>=Date.parse(report.ts))throw new Error('Invalid pinned meter prior report');
+      priorRunBlobSha=replaySource.priorRunBlobSha;
+      const data=readGitJson(root,priorRunBlobSha);
+      if(data.ts!==entry.ts)throw new Error('Meter prior report timestamp mismatch');
+      prior={entry,report:data};
+    }
+    oddsIndexBlobSha=replaySource.oddsIndexBlobSha;
+    if(oddsIndexBlobSha)oddsIndex=readGitJson(root,oddsIndexBlobSha);
+  }else{
+    prior=latestPriorSameDay(index,report,root);
+    if(prior)priorRunBlobSha=readSourceFile(root,prior.entry.path).sha;
+    if(fs.existsSync(path.join(root,ODDS_INDEX_PATH))){const source=readSourceFile(root,ODDS_INDEX_PATH);oddsIndex=source.data;oddsIndexBlobSha=source.sha;}
+  }
+  const oddsSnapshots=eligibleSnapshotEntries(oddsIndex,report).map(entry=>{
+    const snapshot=readGitJson(root,entry.snapshotBlobSha);
+    if(snapshot.generatedAt!==entry.generatedAt)throw new Error('Meter odds index timestamp mismatch');
+    return {blobSha:entry.snapshotBlobSha,feed:snapshot};
+  });
+  return deriveResilientInstrumentTelemetry({report,feed,feedBlobSha,priorReport:prior?.report||null,priorRunPath:prior?.entry?.path||null,priorRunBlobSha,oddsIndexBlobSha,oddsSnapshots});
+}
+export function attachPublisherInstrumentTelemetry({root,index,report,sidecar,replaySource=null}={}){
   if(!root||!index||!report||!sidecar) throw new Error('attachPublisherInstrumentTelemetry requires root, index, report and sidecar');
+  if(usesResilientMeterTelemetry(report)){
+    // Replaying an already issued run must use its original source manifest,
+    // even after the live odds index has gained later snapshots.
+    const issued=index.runs.find(e=>e.ts===report.ts&&e.slot===report.slot);
+    if(!replaySource&&issued?.path){
+      const stored=readSourceFile(root,issued.path).data;
+      if(stored.instrumentTelemetry?.calculationVersion!==2)throw new Error('Issued resilient meter receipt is missing');
+      replaySource=stored.instrumentTelemetry.source;
+    }
+    report.instrumentTelemetry=attachResilientTelemetry({root,index,report,sidecar,replaySource});
+    return report.instrumentTelemetry;
+  }
   const feedBlobSha=sidecar?.provenance?.feedBlobSha||null;
   const prior=latestPriorSameDay(index,report,root);
   let feed=loadFeedFromGit(root,feedBlobSha);

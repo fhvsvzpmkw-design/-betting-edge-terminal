@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import {
   attachPublisherInstrumentTelemetry,
   latestPriorSameDay,
+  usesResilientMeterTelemetry,
   VIG_METER_TELEMETRY_AUTHORITY,
   VIG_METER_TELEMETRY_SCHEMA
 } from './vigscope-meter-telemetry.mjs';
@@ -66,16 +67,18 @@ export function validateStoredInstrumentTelemetry({root,report,sidecar,index=nul
   const prior=latestPriorSameDay(historyIndex,report,root);
   const expectedReport=structuredClone(report);
   delete expectedReport.instrumentTelemetry;
-  const expected=attachPublisherInstrumentTelemetry({root,index:historyIndex,report:expectedReport,sidecar});
+  const resilient=usesResilientMeterTelemetry(report);
+  if(resilient&&report.instrumentTelemetry.calculationVersion!==2)die('Future report requires resilient meter calculation version 2');
+  const expected=attachPublisherInstrumentTelemetry({root,index:historyIndex,report:expectedReport,sidecar,replaySource:resilient?report.instrumentTelemetry.source:null});
 
-  if(prior&&expected?.source?.state!=='PINNED'){
+  if((prior||resilient)&&expected?.source?.state!=='PINNED'){
     die(`Post-cutover report ${report.ts} has a prior same-day run but pinned meter telemetry could not be reconstructed (${expected?.source?.reason||'UNKNOWN'})`);
   }
-  if(!prior&&expected?.source?.reason!=='NO_PRIOR_SAME_DAY_RUN'){
+  if(!resilient&&!prior&&expected?.source?.reason!=='NO_PRIOR_SAME_DAY_RUN'){
     die(`First same-day post-cutover report ${report.ts} must be explicitly unmeasured for NO_PRIOR_SAME_DAY_RUN`);
   }
   if(!sameJson(report.instrumentTelemetry,expectedReport.instrumentTelemetry)){
-    die(`Post-cutover report ${report.ts} instrumentTelemetry does not reproduce from the pinned feed and prior same-day issued run`);
+    die(`Post-cutover report ${report.ts} instrumentTelemetry does not reproduce from its pinned sources`);
   }
 
   return {

@@ -14,6 +14,7 @@ on:
       - 'tests/vigscope-meter-production.test.mjs'
       - 'tests/vigscope-meter-fallback-safety.test.mjs'
       - 'tests/vigscope-meter-telemetry.test.mjs'
+      - 'tests/vigscope-meter-resilient.test.mjs'
       - 'tests/vigscope-meter-sep2-live-fixture.test.mjs'
       - 'tests/runner-issued-session-boundary.test.mjs'
       - '.github/workflows/vigscope-meter-production-regression.yml'
@@ -36,6 +37,8 @@ jobs:
         run: node tests/vigscope-meter-fallback-safety.test.mjs
       - name: Run structured publisher telemetry regression
         run: node tests/vigscope-meter-telemetry.test.mjs
+      - name: Run resilient odds-baseline telemetry regression
+        run: node tests/vigscope-meter-resilient.test.mjs
       - name: Run Sep 2 production telemetry fixture
         run: node tests/vigscope-meter-sep2-live-fixture.test.mjs
       - name: Run issued-session boundary regression

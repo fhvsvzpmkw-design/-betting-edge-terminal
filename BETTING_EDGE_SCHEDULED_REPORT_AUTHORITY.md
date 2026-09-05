@@ -141,6 +141,8 @@ If the earlier personnel-semantic check reports `checked=0`, that means no card 
 
 Read the current bankroll from the authoritative ledger projection for the report, retaining its source path and blob SHA. Do not carry forward an older report's bankroll merely because no new risk is recommended.
 
+Meter telemetry remains publisher-owned. For reports from 2026-09-05 11:00 America/Vancouver onward, the publisher measures current book agreement independently and uses the governed saved-odds fallback when an earlier report comparison is unavailable. Follow `docs/VIGSCOPE_METER_BASELINES.md`; do not estimate meter values in the scheduled task or run extra odds pulls to fill them. A missed earlier report alone must not block the new report.
+
 ## 10. Publisher ownership — fail closed
 
 The scheduled task is a **candidate producer only**.
