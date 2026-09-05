@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { activeReportScope, isPlayerPropRecommendation } from './major-sport-market-coverage-gate.mjs';
 import { totalEventSide, totalLineageApplies } from './total-lineage.mjs';
+import { moneylineEventSide, moneylineApplies } from './moneyline-lineage.mjs';
 
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const RESOLVED = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
@@ -28,6 +29,7 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
   const currentByKey = new Map();
   const currentSpreadByEventSide = new Map();
   const currentTotalByEventSide = new Map();
+  const currentMoneylineByEventSide = new Map();
   const violations = [];
   const diagnostics = [];
 
@@ -41,6 +43,8 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
     if (spreadKey) currentSpreadByEventSide.set(spreadKey, rec);
     const totalKey = totalEventSide(rec);
     if (totalKey) currentTotalByEventSide.set(totalKey, rec);
+    const mlKey = moneylineEventSide(rec);
+    if (mlKey) currentMoneylineByEventSide.set(mlKey, rec);
   }
 
   for (const rec of previous?.recs || []) {
@@ -99,6 +103,13 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
     if (movedTotal) {
       diagnostics.push({ selectionKey: key, priorStatus, state: 'DEFERRED_TO_TOTAL_LINEAGE',
         currentSelectionKey: selectionKey(movedTotal) || null });
+      continue;
+    }
+    const mlKey = moneylineApplies(report) ? moneylineEventSide(rec) : null;
+    const currentMoneyline = mlKey ? currentMoneylineByEventSide.get(mlKey) : null;
+    if (currentMoneyline) {
+      diagnostics.push({ selectionKey: key, priorStatus, state: 'DEFERRED_TO_MONEYLINE_LINEAGE',
+        currentSelectionKey: selectionKey(currentMoneyline) || null });
       continue;
     }
     violations.push(`${rec.status} ${rec.title} [${key}] event=${eventDate || 'UNKNOWN'} vanished before event start`);
@@ -189,6 +200,7 @@ function main() {
     if (item.state === 'RE_EVALUATED') console.log(`SELECTION CONTINUITY RE-EVALUATED: ${item.selectionKey} ${item.priorStatus} -> ${item.nextStatus}`);
     else if (item.state === 'DEFERRED_TO_SPREAD_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
     else if (item.state === 'DEFERRED_TO_TOTAL_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO TOTAL LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
+    else if (item.state === 'DEFERRED_TO_MONEYLINE_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO MONEYLINE LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'UNVERIFIED'}`);
     else if (item.state === 'PAUSED_BY_SCOPE') console.log(`SELECTION CONTINUITY PAUSED BY SCOPE: ${item.selectionKey} ${item.priorStatus}; issued history retained`);
   }
   if (!result.ok) {

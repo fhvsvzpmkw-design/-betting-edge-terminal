@@ -91,7 +91,8 @@ export function primaryLineQuote(event, book, side, generatedAt, wantedMarket) {
     priceDecimal: Number(row[side]), updatedAt: market.updatedAt, method: result.method };
 }
 
-function priorSelections(root, report, market) {
+export function priorSelections(root, report, market) {
+  const keyFor = typeof market === 'function' ? market : rec => lineageEventSide(rec, market);
   const file = path.join(root, 'run-history.json');
   if (!fs.existsSync(file)) return [];
   const entries = (readJson(file).runs || []).filter(entry => ms(entry.ts) !== null &&
@@ -103,7 +104,7 @@ function priorSelections(root, report, market) {
     ensure(fs.existsSync(source), 'Indexed same-day report is missing: ' + entry.path);
     const issued = readJson(source);
     for (const rec of issued.recs || []) {
-      const key = lineageEventSide(rec, market);
+      const key = keyFor(rec);
       if (key) latest.set(key, { rec, sourceTs: issued.ts, sourcePath: entry.path });
     }
   }
@@ -216,3 +217,6 @@ export function auditPrimaryLineage({ root = process.cwd(), report, sidecar = nu
   return { ok: violations.length === 0, enforced: true, diagnostics, violations };
 }
 
+// Shared read-only primitives for fixed-price moneyline validation.
+export { ms as timestampMs, age as ageMinutes, americanToken, priceDecimal,
+  canonicalBook, hasNumber, loadFeed as loadBoundFeed, decisionProblems };

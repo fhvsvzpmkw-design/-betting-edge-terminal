@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { moneylineApplies } from './moneyline-lineage.mjs';
 
 const BOOKS = ['Bet365', 'DraftKings'];
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
@@ -113,6 +114,10 @@ export function auditTrackedAvailability({ previous, report, feed }) {
 
   for (const prior of previous?.recs || []) {
     if (!ACTIVE.has(String(prior?.status || '').toUpperCase()) || isSpread(prior)) continue;
+    if (moneylineApplies(report) && String(prior?.feed?.marketKey || prior?.feed?.market || '').toLowerCase() === 'ml') {
+      diagnostics.push({ selectionKey: prior?.feed?.selectionKey || null, state: 'DEFERRED_TO_MONEYLINE_LINEAGE' });
+      continue;
+    }
     const key = String(prior?.feed?.selectionKey || '').trim();
     if (!key) continue;
     const eventMs = parseMs(prior?.feed?.eventDate);
@@ -215,7 +220,8 @@ function main() {
   if (String(feed?.generatedAt || '') !== String(report?.feedGeneratedAt || '')) die(`Bound feed ${feed?.generatedAt || 'unknown'} does not match report ${report?.feedGeneratedAt || 'unknown'}`);
   const result = auditTrackedAvailability({ previous, report, feed });
   if (!result.ok) die(`SELECTION AVAILABILITY VIOLATION: ${result.violations.join('; ')}`);
-  console.log(`SELECTION AVAILABILITY OK: ${result.diagnostics.length} carried non-spread selections checked`);
+  const deferred = result.diagnostics.filter(item => item.state === 'DEFERRED_TO_MONEYLINE_LINEAGE').length;
+  console.log(`SELECTION AVAILABILITY OK: ${result.diagnostics.length - deferred} carried non-spread selections checked${deferred ? `; ${deferred} moneylines handled by the complete moneyline gate` : ''}`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -92,6 +92,14 @@ Use the exact provider selectionKey and hdp orientation: home displays raw hdp; 
 
 Reassess the current fair, uncertainty, playTo and decision; keep original selections immutable. Unstarted tracked BET/LEAN/WAIT candidates must receive a current decision or explicit zero-stake unavailable/unverified resolution. Latest PASS cards may be curated. Before freeze run `node tools/spread-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` with the exact bound feed (or `--feed <snapshot.json>`), as well as the existing totals check. This shared instruction applies to all five Betting Edge report tasks; their schedules and paused-prop scope continue unchanged.
 
+### Full-game moneylines — all displayed quotes and price movement
+
+For report timestamps at or after `2026-09-05T14:15:00-07:00`, apply Contract section 6.1c across all seven supported sports. Verify every displayed moneyline, including new selections and previously marked PASS cards. Use each book's newest canonical marketKey=ml entry only; do not recover a missing/suspended/unverified selection from an older entry. A fresh valid supported second book can be used, and one valid book remains sufficient for quote availability under the ordinary Core gates.
+
+Bind the exact full-game event, home/away team, selectionKey, selected book and executable price. Compare against that team's latest same-day archived moneyline decision, including PASS, and show prior/current odds plus PRICE IMPROVED/WORSENED/UNCHANGED. MOVEMENT UNCHANGED requires identical odds. Use PRICE COMPARISON UNAVAILABLE when the prior price is unverified; NEW SELECTION, FIRST LOOK or PRICE COMPARISON UNAVAILABLE with current odds is appropriate when no same-day reference exists. Never invent movement. Reassess current fair, uncertainty, playTo and decision, with the existing personnel process. Preserve original issued selections.
+
+Before freeze run `node tools/moneyline-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` with the exact bound snapshot (or `--feed <snapshot.json>`). Resolve every displayed quote error, including PASS/new cards. When no current quote can be verified, preserve the identified candidate as a zero-stake unavailable/unverified decision with matching price and movement text. The older availability gate delegates future moneylines to this complete check. Publication repeats it on retries and remote read-back. This instruction is shared by the 06:00, 08:00, 09:30, 15:15 and 18:15 Pacific report tasks.
+
 ## 5. Pinnacle official sharp benchmark
 
 Read the current production manifest sharp-market block, its pinned Pinnacle policy and `data/oddspapi-observer.json` when present.
@@ -154,7 +162,7 @@ Before freezing either payload, run the publisher's read-only bundle validator a
 
 Also run `node tools/major-sport-market-coverage-gate.mjs validate --report <report.json> --sidecar <sidecar.json>` against the exact bound feed before freeze. Both must pass, including the active market-scope and paused-prop receipt checks.
 
-Require success across the entire recommendation set. This reuses the publisher's report/sidecar checks, including material-personnel text, `personnelRequired`, required evidence, WAIT qualification and exact report paths. It writes no History and confers no issuance authority. It supplements the Core, coverage, personnel-semantic, Pinnacle, continuity, availability, spread-lineage and total-lineage checks; none is replaced.
+Require success across the entire recommendation set. This reuses the publisher's report/sidecar checks, including material-personnel text, `personnelRequired`, required evidence, WAIT qualification and exact report paths. It writes no History and confers no issuance authority. It supplements the Core, coverage, personnel-semantic, Pinnacle, continuity, availability, moneyline-lineage, spread-lineage and total-lineage checks; the dedicated moneyline gate owns future moneyline quote validation.
 
 If the earlier personnel-semantic check reports `checked=0`, that means no card was marked `personnelRequired=true`; it does not establish that the report text and those flags are consistent. Resolve all reported contradictions from the actual research before freeze. Record real material dependencies and their required evidence. Do not remove a genuine dependency, invent evidence, or alter analytical context to obtain a passing result. General risk prose must accurately describe the recorded decision and must not claim unsupported personnel conclusions.
 
