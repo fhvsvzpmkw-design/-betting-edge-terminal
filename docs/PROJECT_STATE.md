@@ -6,6 +6,12 @@
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
 
+## September 5 primary-market and evidence follow-up
+
+The later dated authorities supersede older scope/card-count summaries below: active Betting Edge analysis is full-game primary markets only, player props are paused, and the soft card target is resolved from `data/preferences.json`. The September 5 15:15 report used 12 cards.
+
+`docs/CORE_MARKET_RECOVERY_2026-09-05.md` records the exact missing/stale-market diagnosis and the bounded supplemental-request correction. `docs/REPORT_EVIDENCE_REQUIREMENTS.md` governs source and numerical fair evidence from 17:00 PT September 5, shared by all five report lanes. Existing histories, Core thresholds, staking and schedules remain unchanged. The next normal feed/report is required to measure live recovery; the 15:15 manual feed did not establish automatic scheduler reliability.
+
 ## Current production boundary
 
 - **Governance:** `BETTING_EDGE_CONTRACT.md` — **v1.0 OPERATIONAL**.

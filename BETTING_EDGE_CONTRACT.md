@@ -303,6 +303,14 @@ The addendum is operational report-generation policy and is subordinate to this 
 
 The two-stage personnel process is current-information research, not Research Library evidence. It may create, remove, strengthen or weaken apparent value but may not override event/market/selection identity, executable-price freshness, supported-book, fair-value, exposure, staking or other hard gates. It must not trigger an additional Odds-API request or alter the production refresh budget.
 
+## 6.4 Source and fair-value audit evidence
+
+Effective for report timestamps at or after **2026-09-05T17:00:00-07:00**, apply `docs/REPORT_EVIDENCE_REQUIREMENTS.md` and the additive schema-3 recommendation evidence fields. Every displayed card must have traceable exact-event/sport sources or an explicit permitted zero-stake PASS source shortfall. BET/LEAN/WAIT candidates additionally require the numerical basis, units/orientation, source-linked inputs, calculation, final estimate, uncertainty range, limitations and personnel rationale supporting their fair value. The work must be real current Core/Walters analysis; filling a schema does not create an independent signal, justify a confidence grade or validate a model.
+
+A LEAN remains a zero-stake directional opinion. Its playTo wording cannot imply that meeting a price alone authorizes a wager. QUALIFIED Pinnacle comparisons must retain the actual executable implied probability, benchmark no-vig probability and signed comparison direction. An unfavorable sharp benchmark cannot be described as a favorable execution premium; disagreement may remain when the independent fair and normal Core gates support it.
+
+`tools/report-evidence-gate.mjs` validates these fields in the complete bundle before freeze and in publisher/retry/read-back paths. It checks consistency without reading live web pages, changing analytical results, promoting status, setting stake or creating odds requests. A failed gate blocks the candidate; it does not authorize invented sources, retrospective evidence or mutation of frozen/issued history. Earlier reports remain governed by their original timestamp-specific requirements.
+
 ---
 
 # 7. Research Library — production R3 behavior

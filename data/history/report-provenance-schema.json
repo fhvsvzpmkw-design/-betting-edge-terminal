@@ -5,7 +5,7 @@
   "compatibility": {
     "historicalSchema2Valid": true,
     "historicalSchema3Valid": true,
-    "rule": "Schema-2 and previously issued schema-3 sidecars remain valid immutable historical evidence. Stage 2, WAIT qualification, Core 1.4 coreAssessment, waltersEvidence and Pinnacle observer provenance are additive forward-only extensions and do not require rewriting historical sidecars."
+    "rule": "Schema-2 and previously issued schema-3 sidecars remain valid immutable historical evidence. Stage 2, WAIT qualification, Core 1.4 coreAssessment, waltersEvidence and Pinnacle observer provenance are additive forward-only extensions and do not require rewriting historical sidecars. Source/fair-value evidence is a forward-only additive extension from 2026-09-05T17:00:00-07:00; prior reports are not backfilled."
   },
   "reportReference": {
     "fields": {
@@ -150,6 +150,107 @@
         "generatedAt": "required timestamp for Walters-originated candidate"
       },
       "rule": "BET_AUTHORITY may originate an eligible NFL spread/moneyline candidate, but the final recommendation must still pass Core 1.4 model-error and all normal Betting Edge hard gates. Walters is at most one independent handicap input."
+    },
+    "sourceAndFairEvidence": {
+      "effectiveFrom": "2026-09-05T17:00:00-07:00",
+      "documentationPath": "docs/REPORT_EVIDENCE_REQUIREMENTS.md",
+      "validatorPath": "tools/report-evidence-gate.mjs",
+      "mirroredFields": [
+        "sourceEvidence",
+        "sourceShortfall",
+        "fairValueEvidence",
+        "benchmarkComparison"
+      ],
+      "sourceEvidence": {
+        "requiredWhen": "Every displayed card, including PASS; only a permitted explicit zero-stake PASS shortfall may use an empty array.",
+        "recordFields": [
+          "id",
+          "url",
+          "title",
+          "sport",
+          "eventId",
+          "checkedAt",
+          "finding",
+          "kind"
+        ],
+        "kinds": [
+          "OFFICIAL",
+          "REPORTING",
+          "MODEL",
+          "MARKET"
+        ],
+        "rule": "Actual checked sources and findings bound to exact sport/event. Serious candidates require non-market evidence."
+      },
+      "sourceShortfall": {
+        "requiredWhen": "PASS with empty sourceEvidence; not available to BET/LEAN/WAIT.",
+        "recordFields": [
+          "reason",
+          "missing",
+          "impact"
+        ],
+        "reasons": [
+          "SOURCE_UNAVAILABLE",
+          "MARKET_UNAVAILABLE",
+          "QUOTE_STALE",
+          "IDENTITY_UNRESOLVED",
+          "EVENT_INELIGIBLE"
+        ],
+        "rule": "Explain real missing evidence and its effect; never fabricate a fair or unsupported value conclusion."
+      },
+      "fairValueEvidence": {
+        "requiredWhen": "Every BET, LEAN or WAIT.",
+        "fields": [
+          "selectionKey",
+          "unit",
+          "estimate",
+          "displayValue",
+          "range",
+          "method",
+          "calculation",
+          "inputs",
+          "result",
+          "limitations",
+          "personnelBasis"
+        ],
+        "units": [
+          "selection_spread_points",
+          "home_spread_points",
+          "total_points",
+          "selection_probability",
+          "selection_american_odds"
+        ],
+        "rangeFields": [
+          "low",
+          "high"
+        ],
+        "inputFields": [
+          "name",
+          "value",
+          "unit",
+          "sourceIds"
+        ],
+        "personnelBasisFields": [
+          "sensitive",
+          "rationale"
+        ],
+        "rule": "Preserve actual numerical method and source-linked inputs. Estimate/result/display and range must agree in stated units/orientation. No new model or threshold is introduced. Material personnel retains the existing Stage 2 evidence."
+      },
+      "benchmarkComparison": {
+        "requiredWhen": "Every QUALIFIED Pinnacle recommendation.",
+        "fields": [
+          "executableImpliedProbability",
+          "benchmarkNoVigProbability",
+          "edgeProbabilityPoints",
+          "direction"
+        ],
+        "directions": [
+          "FAVORABLE",
+          "UNFAVORABLE",
+          "NEUTRAL"
+        ],
+        "rule": "edgeProbabilityPoints = 100 * (benchmarkNoVigProbability - executableImpliedProbability). This is benchmark comparison, not independent Core edge or BET authority."
+      },
+      "validationLimit": "Checks structure, identities and numeric consistency without fetching sources or proving source truth/model quality; author remains responsible for the actual research."
     }
   },
   "boundaries": {
@@ -176,6 +277,6 @@
   "failureBehavior": {
     "researchUnavailable": "Use HISTORY LIBRARY UNAVAILABLE in the issued hist field as appropriate and do not fabricate prior IDs.",
     "pinnacleUnavailable": "Continue with the normal Bet365/DraftKings/Core process; record Pinnacle as unavailable/not used and do not fabricate sharp context.",
-    "sidecarSaveFailure": "Deliver the already-validated issued report and surface HISTORY SAVE FAILED — REPORT VALID; do not rebuild or mutate the report solely for sidecar storage."
+    "sidecarSaveFailure": "Deliver the already-validated issued report and surface HISTORY SAVE FAILED \u2014 REPORT VALID; do not rebuild or mutate the report solely for sidecar storage."
   }
 }

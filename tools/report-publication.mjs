@@ -4,6 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs';
 import {validateReportMarketScope} from './major-sport-market-coverage-gate.mjs';
+import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -292,6 +293,7 @@ function validateSidecar(sidecar,report,reportPath,{strict=false,collectRecommen
         assert(Array.isArray(item.priorIds),`Sidecar recommendation ${i+1} priorIds must be an array`);
         assert(Array.isArray(item.synthesisIds),`Sidecar recommendation ${i+1} synthesisIds must be an array`);
         assert(Array.isArray(item.clusterIds),`Sidecar recommendation ${i+1} clusterIds must be an array`);
+        validateRecommendationEvidence(report,rec,item,i);
         if(stage2Enforced){
           assert(typeof item.personnelRequired==='boolean',`Sidecar recommendation ${i+1} personnelRequired must be an explicit boolean after the Stage 2 publication-gate cutover`);
           const textSignal=materialPersonnelSignal(rec);

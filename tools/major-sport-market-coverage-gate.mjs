@@ -386,6 +386,18 @@ function sumSports(sports, sportKeys, propsPaused = false) {
   return totals;
 }
 
+export function validateVisibleCoverageSummary(report, audit) {
+  if (Date.parse(report?.ts || '') < Date.parse('2026-09-05T17:00:00-07:00')) return;
+  const evaluated = audit?.totals?.primaryEvaluated;
+  const unavailable = audit?.totals?.primaryUnavailable;
+  int(evaluated, 'coverage summary evaluated count');
+  int(unavailable, 'coverage summary unavailable count');
+  if (!unavailable) return;
+  const required = `Primary selections: ${evaluated} evaluated; ${unavailable} unavailable.`;
+  ensure(String(report?.summary || '').includes(required),
+    `Visible report summary must disclose its actual coverage limitation: ${required}`);
+}
+
 export function validateCoverageAudit(report, sidecar, { root = process.cwd(), requireCurrentAuthority = true, feed = null, feedFile = null } = {}) {
   ensure(isObject(report), 'Coverage gate report must be an object');
   ensure(isObject(sidecar), 'Coverage gate sidecar must be an object');
@@ -486,6 +498,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
     int(audit.totals[key], `coverageAudit.totals.${key}`);
     ensure(audit.totals[key] === expected, `coverageAudit.totals.${key} does not reconcile with sport rows`);
   }
+  validateVisibleCoverageSummary(report, audit);
   ensure(limitationsSelectionCount === calculatedTotals.primaryUnavailable, 'coverageAudit availabilityLimitations selection count must equal total primaryUnavailable');
 
   const boundFeed = feed || loadBoundFeed(root, report, sidecar, feedFile);
