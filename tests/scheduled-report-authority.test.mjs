@@ -32,5 +32,7 @@ assert.ok(text.includes('data/major-sport-market-coverage-v1.json'));
 assert.ok(text.includes('BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md'));
 assert.ok(text.includes('NFL, NCAAF and CFL'));
 assert.ok(text.includes('MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL'));
+assert.ok(text.includes('node tools/report-publication.mjs validate --report <report.json> --sidecar <sidecar.json>'));
+assert.ok(text.includes('checked=0'));
 
 console.log('SCHEDULED REPORT AUTHORITY TEST: PASS // ONE SHARED AUTHORITY + COMPLETE PRIMARY/PROP COVERAGE + SOFT CARD TARGET');

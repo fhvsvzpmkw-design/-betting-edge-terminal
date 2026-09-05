@@ -360,10 +360,14 @@ function loadIndex(root){
   assert(index && typeof index==='object' && Array.isArray(index.runs),'run-history.json must contain a runs array');
   return {file,index};
 }
-function publish(root,reportFile,sidecarFile){
+function readPublicationBundle(reportFile,sidecarFile,{collectRecommendationErrors=false}={}){
   const report = validateReport(readJson(reportFile));
   const paths = expectedPaths(report);
-  const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true});
+  const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true,collectRecommendationErrors});
+  return {report,paths,sidecar};
+}
+function publish(root,reportFile,sidecarFile){
+  const {report,paths,sidecar} = readPublicationBundle(reportFile,sidecarFile);
   const {file:indexFile,index} = loadIndex(root);
   const decisionFingerprint=normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs});
   attachPublisherInstrumentTelemetry({root,index,report,sidecar});
@@ -806,7 +810,12 @@ function emitOutputs(values){
 function main(){
   const args=parseArgs(process.argv.slice(2));
   const root=path.resolve(args.root||process.cwd());
-  if(args.command==='publish'){
+  if(args.command==='validate'){
+    assert(typeof args.report==='string','validate requires --report <file>');
+    assert(typeof args.sidecar==='string','validate requires --sidecar <file>');
+    const {report,paths} = readPublicationBundle(path.resolve(args.report),path.resolve(args.sidecar),{collectRecommendationErrors:true});
+    console.log(`REPORT BUNDLE VALIDATION OK ${shortId(report)} ${paths.reportPath} — READ ONLY; NOT ISSUED`);
+  }else if(args.command==='publish'){
     assert(typeof args.report==='string','publish requires --report <file>');
     assert(typeof args.sidecar==='string','publish requires --sidecar <file>');
     publish(root,path.resolve(args.report),path.resolve(args.sidecar));
@@ -815,7 +824,7 @@ function main(){
   }else if(args.command==='self-test'){
     selfTest();
   }else{
-    die('Usage: report-publication.mjs publish --report FILE --sidecar FILE [--root DIR] | verify [--ts ISO] [--root DIR] | self-test');
+    die('Usage: report-publication.mjs validate --report FILE --sidecar FILE | publish --report FILE --sidecar FILE [--root DIR] | verify [--ts ISO] [--root DIR] | self-test');
   }
 }
 try{main();}
