@@ -124,6 +124,7 @@ jobs:
             node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
             node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/total-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
@@ -150,6 +151,7 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           node tools/report-publication.mjs verify --ts "$REPORT_TS"
+          node tools/spread-lineage.mjs audit --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/total-lineage.mjs audit --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
           node tools/core-v14-publication-gate.mjs verify-history
           node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"

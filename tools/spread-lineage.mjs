@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { lineageApplies, auditPrimaryLineage } from './primary-lineage.mjs';
 
 const BOOKS = ['Bet365', 'DraftKings'];
 const FEED_MAX_AGE_MINUTES = 75;
@@ -447,8 +448,10 @@ function main() {
   const report = readJson(path.resolve(args.report));
   const sidecar = args.sidecar ? readJson(path.resolve(args.sidecar)) : null;
   const feed = args.feed ? readJson(path.resolve(args.feed)) : loadFeed(root, report, sidecar, null);
-  const result = auditLineage({ root, report, sidecar, feed });
+  const modern = lineageApplies(report, 'spread');
+  const result = modern ? auditPrimaryLineage({ root, report, sidecar, feed }, 'spread') : auditLineage({ root, report, sidecar, feed });
   for (const item of result.diagnostics) {
+    if (modern) { console.log('SPREAD LINEAGE ' + JSON.stringify(item)); continue; }
     const primary = (item.primary || []).map((x) => `${x.book} ${lineText(x.displayLine)} ${x.priceAmerican || ''}`).join(' / ');
     console.log(`SPREAD LINEAGE ${item.eventId} ${item.side} ${item.priorLineText || ''} // ${item.state}${primary ? ` // ${primary}` : ''}`);
   }

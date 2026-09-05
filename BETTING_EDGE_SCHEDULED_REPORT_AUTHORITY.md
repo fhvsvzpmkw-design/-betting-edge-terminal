@@ -84,6 +84,14 @@ Use the bound snapshot, the coverage gate's primary-line resolver, and the norma
 
 Before freeze run `node tools/total-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` using the exact bound feed (or `--feed <snapshot.json>`). Resolve any mismatch from the actual evidence. The check performs no new odds requests or analytical writes. If the current total cannot be verified, preserve the tracked candidate as an explicit zero-stake unavailable/unverified decision rather than silently dropping it or repricing the original ticket at a different number.
 
+### Primary spreads, run lines and puck lines across reports
+
+For report timestamps at or after `2026-09-05T14:00:00-07:00`, apply Contract section 6.1b to MLB run lines, NHL puck lines, and NBA/WNBA/NFL/NCAAF/CFL spreads. This is the forward replacement for the older disappearance-only spread check. Read the latest same-day exact event/team decision, follow the current primary handicap even when the old line survives as an alternate, and compare price changes even when the handicap is unchanged.
+
+Use the exact provider selectionKey and hdp orientation: home displays raw hdp; away displays its negative. Archived cards with no separate hdp still qualify for tracking when the exact selectionKey supplies it. Show prior/current signed handicaps and odds in rec.move with separate LINE MOVED IN FAVOR/AGAINST/LINE UNCHANGED and PRICE IMPROVED/WORSENED/UNCHANGED/COMPARISON UNAVAILABLE labels as defined in the Contract. Preserve book-specific disagreement and verify the selected book's exact line/price. One fresh supported book remains sufficient for quote availability under the normal Core gates.
+
+Reassess the current fair, uncertainty, playTo and decision; keep original selections immutable. Unstarted tracked BET/LEAN/WAIT candidates must receive a current decision or explicit zero-stake unavailable/unverified resolution. Latest PASS cards may be curated. Before freeze run `node tools/spread-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` with the exact bound feed (or `--feed <snapshot.json>`), as well as the existing totals check. This shared instruction applies to all five Betting Edge report tasks; their schedules and paused-prop scope continue unchanged.
+
 ## 5. Pinnacle official sharp benchmark
 
 Read the current production manifest sharp-market block, its pinned Pinnacle policy and `data/oddspapi-observer.json` when present.
