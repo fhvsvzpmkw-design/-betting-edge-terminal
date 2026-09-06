@@ -53,22 +53,25 @@ function evaluated(selection, p = 0.5) {
   return {selectionId: selection.selectionId, quote: clone(quote), state: 'EVALUATED', checkedAt: report.ts, decision, evidence: clone(decision)};
 }
 const reviewed = {primaryAnalysis: {...sidecar.primaryAnalysis, receipts: inventory.selections.map(s => evaluated(s))}};
-assert.equal(validate(reviewed).primaryEvaluated, 2, 'documented hidden PASS decisions count even without cards');
-assert.equal(validate(reviewed).outcomeCounts.PASS, 2);
+const reviewedReport = {...clone(report), recs: reviewed.primaryAnalysis.receipts.map(receipt => clone(receipt.decision))};
+assert.equal(validate(reviewed, reviewedReport).primaryEvaluated, 2, 'every documented PASS decision is published as a card');
+assert.equal(validate(reviewed, reviewedReport).outcomeCounts.PASS, 2);
+assert.throws(() => validate(reviewed), /must match its published card/, 'evaluated PASS may not be concealed');
 const incoherent = clone(reviewed); incoherent.primaryAnalysis.receipts[0] = evaluated(inventory.selections[0], 0.6);
-assert.throws(() => validate(incoherent), /incoherent shared market fair/);
+const incoherentReport = {...clone(report), recs: incoherent.primaryAnalysis.receipts.map(receipt => clone(receipt.decision))};
+assert.throws(() => validate(incoherent, incoherentReport), /incoherent shared market fair/);
 for (const [field, value] of Object.entries({eventDate: '2040-01-01T00:00:00Z', line: 999, hdp: 999, quoteUpdatedAt: '1970-01-01T00:00:00Z', priceDecimal: 9})) {
   const altered = clone(reviewed); altered.primaryAnalysis.receipts[0].decision.feed[field] = value; altered.primaryAnalysis.receipts[0].evidence = clone(altered.primaryAnalysis.receipts[0].decision);
-  assert.throws(() => validate(altered), /differs from inventory/, `hidden PASS ${field} remains bound to actual quote`);
+  assert.throws(() => validate(altered, reviewedReport), /differs from inventory/, `published PASS ${field} remains bound to actual quote`);
 }
 const marketOnly = clone(reviewed); marketOnly.primaryAnalysis.receipts[0].decision.sourceEvidence[0].kind = 'MARKET'; marketOnly.primaryAnalysis.receipts[0].evidence = clone(marketOnly.primaryAnalysis.receipts[0].decision);
-assert.throws(() => validate(marketOnly), /non-market source-linked inputs/);
+assert.throws(() => validate(marketOnly, reviewedReport), /non-market source-linked inputs/);
 const noFair = clone(reviewed); delete noFair.primaryAnalysis.receipts[0].decision.fairValueEvidence; delete noFair.primaryAnalysis.receipts[0].evidence.fairValueEvidence;
-assert.throws(() => validate(noFair), /requires a numeric documented fair/);
+assert.throws(() => validate(noFair, reviewedReport), /requires a numeric documented fair/);
 const fakeCore = clone(reviewed); fakeCore.primaryAnalysis.receipts[0].decision.coreAssessment.modelErrorState = 'HIGH'; fakeCore.primaryAnalysis.receipts[0].evidence = clone(fakeCore.primaryAnalysis.receipts[0].decision);
-assert.throws(() => validate(fakeCore), /does not recompute/);
+assert.throws(() => validate(fakeCore, reviewedReport), /does not recompute/);
 const concealed = clone(reviewed); concealed.primaryAnalysis.receipts[0].decision.status = 'BET'; concealed.primaryAnalysis.receipts[0].evidence.status = 'BET';
-assert.throws(() => validate(concealed), /must match its published card/);
+assert.throws(() => validate(concealed, reviewedReport), /must match its published card/);
 for (const change of [m => m.updatedAt = '2026-09-06T17:00:01Z', m => m.updatedAt = '2026-09-06T16:29:59Z', m => m.suspended = true, m => m.odds[0].suspended = true, m => m.odds[0].selectionKeys = {home: 'fake|ml|home||', away: 'fake|ml|away||'}]) {
   const altered = clone(feed); change(altered.events[0].bookmakers.Bet365[0]);
   assert.equal(derivePrimarySelectionInventory(report, altered, policy).selections.length, 0, 'invalid current quotes excluded');
@@ -101,11 +104,10 @@ if (archivedFeed.generatedAt === archived.feedGeneratedAt) {
 // Integrated coverage gate refuses to turn counts into analysis evidence.
 const policyRaw = fs.readFileSync(new URL('../data/major-sport-market-coverage-v1.json', import.meta.url));
 const authoritySha = crypto.createHash('sha1').update(Buffer.from(`blob ${policyRaw.length}\0`)).update(policyRaw).digest('hex');
-const target = read('data/preferences.json').modules.find(m => m.id === 'report_card_target').current;
 const sports = Object.fromEntries(Object.entries(inventory.sports).map(([sport, row]) => [sport, {gamesInScope: row.gamesInScope, gamesEvaluated: row.gamesInScope, primary: {...row.primary, evaluated: 0, blocked: row.primary.available}, props: {state: 'PAUSED_BY_SCOPE', returned: row.propsReturned, screened: 0, seriousDeepReviewed: 0, excludedByScope: row.propsReturned}}]));
 const integrated = {...clone(sidecar), recommendations: [], provenance: {feedBlobSha: '0'.repeat(40)}, coverageAudit: {schema: policy.coverageAudit.schema, authorityId: policy.authorityId, authorityPath: 'data/major-sport-market-coverage-v1.json', authorityBlobSha: authoritySha, state: policy.coverageAudit.state, feedGeneratedAt: report.feedGeneratedAt, evaluationOrder: policy.principles.evaluationOrder, complete: true, scope: {id: policy.reportScope.id, effectiveFrom: policy.reportScope.effectiveFrom, playerProps: policy.reportScope.playerProps}, sports,
   availabilityLimitations: [...inventory.limitations].map(([key, reason]) => {const [sport, eventId, marketDetail, selection] = key.split('|'); return {sport, eventId, marketDetail, selections: [selection], reason};}),
-  presentation: {target, targetIsSoft: true, overflowProtection: true, actionableSuppressedByTarget: 0}, totals: {gamesInScope: 1, gamesEvaluated: 1, primaryRequired: 6, primaryAvailable: 2, primaryEvaluated: 0, primaryBlocked: 2, primaryUnavailable: 4, propsReturned: 0, propsScreened: 0, seriousPropsDeepReviewed: 0, propsExcludedByScope: 0}}};
+  presentation: {mode: 'UNBOUNDED_ANALYSIS_OUTPUT', allEvaluatedPublished: true, fillerAdded: 0}, totals: {gamesInScope: 1, gamesEvaluated: 1, primaryRequired: 6, primaryAvailable: 2, primaryEvaluated: 0, primaryBlocked: 2, primaryUnavailable: 4, propsReturned: 0, propsScreened: 0, seriousPropsDeepReviewed: 0, propsExcludedByScope: 0}}};
 const visible = {...report, summary: 'Primary selections: 2 available; 0 evaluated; 2 evidence-blocked; 4 unavailable.'};
 assert.equal(validateCoverageAudit(visible, integrated, {feed}).calculatedTotals.primaryEvaluated, 0);
 const noReceipts = clone(integrated); noReceipts.primaryAnalysis.receipts = [];
@@ -119,20 +121,19 @@ const replayRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'primary-receipt-replay
 try {
   fs.mkdirSync(path.join(replayRoot, 'core')); fs.mkdirSync(path.join(replayRoot, 'data'));
   fs.writeFileSync(path.join(replayRoot, 'data/major-sport-market-coverage-v1.json'), policyRaw);
-  fs.copyFileSync(new URL('../data/preferences.json', import.meta.url), path.join(replayRoot, 'data/preferences.json'));
   execFileSync('git', ['init', '-q'], {cwd: replayRoot});
   const frameworkRaw = fs.readFileSync(new URL('../core/core-handicap-framework-v1.4.json', import.meta.url));
   const frameworkSha = execFileSync('git', ['hash-object', '-w', '--stdin'], {cwd: replayRoot, input: frameworkRaw, encoding: 'utf8'}).trim();
   fs.writeFileSync(path.join(replayRoot, 'core/core-handicap-framework-v1.4.json'), frameworkRaw);
-  const replay = clone(integrated); replay.primaryAnalysis = reviewed.primaryAnalysis;
+  const replay = clone(integrated); replay.primaryAnalysis = reviewed.primaryAnalysis; replay.recommendations = reviewed.primaryAnalysis.receipts.map(receipt => clone(receipt.evidence));
   replay.coverageAudit.sports.MLB.primary.evaluated = 2; replay.coverageAudit.sports.MLB.primary.blocked = 0;
   replay.coverageAudit.totals.primaryEvaluated = 2; replay.coverageAudit.totals.primaryBlocked = 0;
   replay.provenance.coreFrameworkPath = 'core/core-handicap-framework-v1.4.json'; replay.provenance.coreFrameworkBlobSha = frameworkSha;
-  const replayReport = {...report, summary: 'Primary selections: 2 available; 2 evaluated; 0 evidence-blocked; 4 unavailable.'};
+  const replayReport = {...clone(report), recs: reviewed.primaryAnalysis.receipts.map(receipt => clone(receipt.decision)), summary: 'Primary selections: 2 available; 2 evaluated; 0 evidence-blocked; 4 unavailable.'};
   assert.equal(validateCoverageAudit(replayReport, replay, {feed, root: replayRoot}).primaryAnalysis.primaryEvaluated, 2);
   const laterFramework = clone(framework); laterFramework.baseRules.unshift({id: 'later-change', when: {sport: ['MLB']}, floor: 'HIGH', reason: 'Synthetic future policy change'});
   fs.writeFileSync(path.join(replayRoot, 'core/core-handicap-framework-v1.4.json'), JSON.stringify(laterFramework));
   assert.equal(validateCoverageAudit(replayReport, replay, {feed, root: replayRoot, requireCurrentAuthority: false}).primaryAnalysis.primaryEvaluated, 2, 'historic replay uses original pinned framework');
   assert.throws(() => validateCoverageAudit(replayReport, replay, {feed, root: replayRoot}), /differs from current operational framework/);
 } finally { fs.rmSync(replayRoot, {recursive: true, force: true}); }
-console.log('Primary analysis receipt regression: exact inventory, verified decisions, explicit blockers, coherent fair, truthful counts and Sep 5 history passed.');
+console.log('Primary analysis receipt regression: exact inventory, published verified decisions, explicit blockers, coherent fair, truthful counts and Sep 5 history passed.');
