@@ -16,6 +16,8 @@ Do not preselect an underdog, favorite, home side, away side, over or under as t
 
 A zero-BET report remains valid after a complete sweep.
 
+From `2026-09-06T00:00:00-07:00`, each available primary side requires an EVALUATED decision with source/fair/Core evidence or an explicit BLOCKED receipt with actual checks and a specific limitation. The existing coverage validator reconciles these receipts independently of card curation; see `docs/REPORT_EVIDENCE_REQUIREMENTS.md` for the exact shape. Do not convert missing research into a value-based PASS.
+
 ## 2. Required primary-market sweep
 
 ### MLB
@@ -40,7 +42,7 @@ A zero-BET report remains valid after a complete sweep.
 
 When an expected primary market is absent, stale, identity-unsafe or otherwise unusable, record the availability limitation instead of silently skipping the market or substituting another line.
 
-When any primary selections are unavailable, the visible report summary states the exact evaluated and unavailable selection counts. Checking an unavailable market completes the inventory audit but does not make that market usable for handicapping. `MARKET_NOT_RETURNED` describes the retained snapshot, not proven sportsbook non-offering; upstream acquisition/retention diagnostics distinguish those causes when available.
+Before September 6, the visible report summary states the timestamp-appropriate evaluated/unavailable counts. From September 6, always state available, actually evaluated, evidence-blocked and unavailable counts separately. Checking an unavailable market completes inventory accounting but not a handicap. `MARKET_NOT_RETURNED` describes the retained snapshot, not proven sportsbook non-offering; publisher coverage diagnostics distinguish stale quotes removed by retention from genuinely absent markets when bound acquisition evidence supports that distinction.
 
 ## 3. Player props are paused by scope
 
@@ -65,6 +67,8 @@ Reports before the scope amendment retain the original requirement that every fr
 Complete market evaluation happens before card curation. A qualifying BET, LEAN or WAIT may not be discarded solely to keep the report at nine cards. PASS cards may be curated after the complete sweep. Existing tracked/actionable overflow protection remains mandatory.
 
 ## 6. Completion standard
+
+From September 6, `complete` means every returned primary selection is accounted for. It must not imply completed handicapping when any selection is evidence-blocked. The public coverage panel distinguishes documented analysis and known acquisition omissions; its universe is retained same-day pregame events.
 
 A scheduled report may claim complete coverage of its active full-game primary markets only when:
 1. every in-scope game had all required primary selections evaluated or explicitly recorded as unavailable/unverifiable;

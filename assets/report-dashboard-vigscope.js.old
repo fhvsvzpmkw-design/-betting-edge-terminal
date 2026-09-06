@@ -107,6 +107,10 @@
       #runnerVigScope.assetError .runnerVigScopeFallback{display:block}
       #runnerVigScope.unmeasured .runnerVigScopeAsset{display:none}
       #runnerVigScope.unmeasured .runnerVigScopeFallback{display:block;color:var(--muted)}
+      #runnerVigScope.unmeasured .runnerVigScopeKey{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45;letter-spacing:.025em}
+      #runnerLive>.runnerCoverage{position:relative;z-index:1}
+      #runnerVigScope.noDirection .runnerVigScopeFrame{min-height:72px!important;aspect-ratio:auto!important}
+      #runnerVigScope.noDirection .runnerVigScopeFallback{line-height:1.5}
       .runnerVigScopeKey{margin-top:6px;color:#b1d8bc;font-size:8px;font-weight:900;letter-spacing:.11em;text-align:center;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
       /* Default segmented LEDs. */
@@ -189,7 +193,9 @@
     if([heatValue,pressureValue,agreementValue].some(value=>value===null)){
       const error=String(cluster.textContent||'').includes('INTEGRITY ERROR');
       const empty=[heatValue,pressureValue,agreementValue].every(value=>value===null);
-      return {file:null,key:error?'TELEMETRY INTEGRITY ERROR':empty?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL'};
+      const reason=instruments[1]?.dataset?.meterReason;
+      const noDirection=reason==='NO_DIRECTIONAL_REFERENCE';
+      return {file:null,noDirection,key:error?'TELEMETRY INTEGRITY ERROR':noDirection?'COMBINED STATE UNMEASURED':empty?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL',detail:noDirection?'No BET, LEAN or WAIT direction. Heat and agreement describe available primary markets.':reason?instruments[1].title:'ISSUED INPUTS INCOMPLETE'};
     }
     const heat=heatValue<40?'low':heatValue<55?'medium':'high';
     const pressure=pressureValue<45?'adverse':pressureValue<56?'neutral':'favorable';
@@ -252,10 +258,11 @@
     const key=scope.querySelector('.runnerVigScopeKey');
     const fallback=scope.querySelector('.runnerVigScopeFallback');
     scope.classList.toggle('unmeasured',!state.file);
+    scope.classList.toggle('noDirection',Boolean(state.noDirection));
     if(!state.file){
       if(img){img.removeAttribute('src');img.alt='';}
       if(fallback)fallback.textContent=state.key;
-      if(key)key.textContent='AWAITING MEASURED INPUTS';
+      if(key)key.textContent=state.detail||'ISSUED INPUTS INCOMPLETE';
       scope.dataset.vigScopeState='unmeasured';
       return scope;
     }
@@ -295,7 +302,7 @@
     let wrap=d.getElementById('runnerVigPicks');
     if(!wrap){
       wrap=d.createElement('section');wrap.id='runnerVigPicks';wrap.className='runnerVigSection';wrap.setAttribute('aria-label','VIG Scope picks');
-      const title=d.createElement('div');title.className='runnerVigSectionTitle';title.textContent='PICKS';wrap.appendChild(title);
+      const title=d.createElement('div');title.className='runnerVigSectionTitle';title.textContent='PUBLISHED CARDS';wrap.appendChild(title);
     }else wrap.classList.add('runnerVigSection');
     if(counts.parentElement!==wrap)wrap.appendChild(counts);
     return wrap;
@@ -312,6 +319,7 @@
     const counts=live.querySelector('.runnerCounts');
     const cluster=live.querySelector('.instrumentCluster');
     const summary=live.querySelector('.runnerSummary.edgeReadout')||live.querySelector(':scope > .runnerSummary');
+    const coverage=live.querySelector('#runnerCoverage');
     if(!head||!cluster||!counts)return;
 
     const meterVariant=selectedMeterVariant();
@@ -347,8 +355,12 @@
     if(summary&&summary.parentElement!==intel)intel.appendChild(summary);
     if(summary&&row.nextElementSibling!==summary)row.insertAdjacentElement('afterend',summary);
 
-    if(intel.parentElement!==live){
-      head.insertAdjacentElement('afterend',intel);
+    // Coverage stays immediately after the report heading; the instrument
+    // moves after it even when a summary is moved into the instrument footer.
+    if(coverage&&head.nextElementSibling!==coverage)head.insertAdjacentElement('afterend',coverage);
+    const reportAnchor=coverage||head;
+    if(intel.parentElement!==live||reportAnchor.nextElementSibling!==intel){
+      reportAnchor.insertAdjacentElement('afterend',intel);
     }
 
     const refresh=live.querySelector('.runnerRefresh');

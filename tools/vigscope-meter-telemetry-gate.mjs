@@ -7,6 +7,7 @@ import {
   attachPublisherInstrumentTelemetry,
   latestPriorSameDay,
   usesResilientMeterTelemetry,
+  usesPrimaryMarketTelemetry,
   VIG_METER_TELEMETRY_AUTHORITY,
   VIG_METER_TELEMETRY_SCHEMA
 } from './vigscope-meter-telemetry.mjs';
@@ -68,7 +69,9 @@ export function validateStoredInstrumentTelemetry({root,report,sidecar,index=nul
   const expectedReport=structuredClone(report);
   delete expectedReport.instrumentTelemetry;
   const resilient=usesResilientMeterTelemetry(report);
-  if(resilient&&report.instrumentTelemetry.calculationVersion!==2)die('Future report requires resilient meter calculation version 2');
+  const primaryMarket=usesPrimaryMarketTelemetry(report);
+  const calculationVersion=primaryMarket?3:2;
+  if(resilient&&report.instrumentTelemetry.calculationVersion!==calculationVersion)die(`Future report requires meter calculation version ${calculationVersion}`);
   const expected=attachPublisherInstrumentTelemetry({root,index:historyIndex,report:expectedReport,sidecar,replaySource:resilient?report.instrumentTelemetry.source:null});
 
   if((prior||resilient)&&expected?.source?.state!=='PINNED'){

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
+import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
 import {
   VIG_METER_CALIBRATION_ID,
   calibratedHeat,
@@ -15,9 +16,11 @@ export const VIG_METER_TELEMETRY_AUTHORITY='PUBLISHER_BOUND_FEED_V1';
 export const EXECUTION_BOOKS=Object.freeze(['Bet365','DraftKings']);
 export const QUOTE_MAX_AGE_MINUTES=30;
 export const RESILIENT_METER_CUTOVER='2026-09-05T11:00:00-07:00';
+export const PRIMARY_MARKET_METER_CUTOVER='2026-09-06T00:00:00-07:00';
 export const METER_BASELINE_MAX_HOURS=24;
 const ODDS_INDEX_PATH='data/history/odds-index.json';
 export function usesResilientMeterTelemetry(report){return Date.parse(report?.ts)>=Date.parse(RESILIENT_METER_CUTOVER);}
+export function usesPrimaryMarketTelemetry(report){return Date.parse(report?.ts)>=Date.parse(PRIMARY_MARKET_METER_CUTOVER);}
 
 function round(value,digits=6){
   const n=Number(value);
@@ -341,6 +344,121 @@ export function deriveResilientInstrumentTelemetry({report,feed,feedBlobSha,prio
     heat:{value:Math.round(heatRaw),rawValue:round(heatRaw),confidence:Math.round(heatConfidence),rawConfidence:round(heatConfidence),state:heatConfidence>0?(count?'MEASURED':'PARTIAL'):'UNMEASURED'},
     pressure:{value:Math.round(pressureRaw),rawValue:round(pressureRaw),confidence:movement.confidence,rawConfidence:movement.rawConfidence,state:count?'MEASURED':'UNMEASURED'},agreement};
 }
+
+// Version 3 samples primary markets before card selection. Both opposing sides
+// contribute unsigned movement magnitude; only an actual BET/LEAN/WAIT stance
+// can supply direction for the separate recommendation-price pressure meter.
+// The v1/v2 derivations above remain untouched for exact historical replay.
+export function derivePrimaryMarketInstrumentTelemetry({report,feed,policy,feedBlobSha,coverageAuthorityBlobSha=null,oddsIndexBlobSha=null,oddsSnapshots=[]}={}){
+  if(!Array.isArray(report?.recs)||feed?.generatedAt!==report.feedGeneratedAt)throw new Error('Primary market meters require the exact bound current feed');
+  const inventory=derivePrimarySelectionInventory(report,feed,policy);
+  const selections=inventory.selections.filter(s=>s.quotes.length);
+  const byId=new Map(selections.map(s=>[s.selectionId,s]));
+  const snapshots=oddsSnapshots.filter(s=>earlierBaseline(s.feed?.generatedAt,feed.generatedAt))
+    .sort((a,b)=>Date.parse(b.feed.generatedAt)-Date.parse(a.feed.generatedAt)||String(a.blobSha).localeCompare(String(b.blobSha)))
+    .filter((s,i,all)=>all.findIndex(x=>x.blobSha===s.blobSha)===i).slice(0,12)
+    .map(s=>({...s,selections:new Map(derivePrimarySelectionInventory({...report,feedGeneratedAt:s.feed.generatedAt},s.feed,policy).selections.map(row=>[row.selectionId,row]))}));
+  function comparisonFor(selection,{book=null,selectionKey=null}={}){
+    for(const snapshot of snapshots){
+      const before=snapshot.selections.get(selection.selectionId);
+      if(!before)continue;
+      for(const fixedBook of book?[book]:EXECUTION_BOOKS){
+        const after=selection.quotes.find(q=>q.book===fixedBook&&(!selectionKey||q.selectionKey===selectionKey));
+        if(!after)continue;
+        const previous=before.quotes.find(q=>q.book===fixedBook&&q.selectionKey===after.selectionKey);
+        if(!previous)continue;
+        const baselineProbability=1/previous.priceDecimal,currentProbability=1/after.priceDecimal;
+        const favor=baselineProbability-currentProbability;
+        return {selectionId:selection.selectionId,selectionKey:after.selectionKey,basis:'ODDS_SNAPSHOT',book:fixedBook,
+          baselineTs:snapshot.feed.generatedAt,baselineFeedBlobSha:snapshot.blobSha,baselineDecimal:previous.priceDecimal,
+          baselineProbability,baselineQuoteUpdatedAt:previous.quoteUpdatedAt,currentDecimal:after.priceDecimal,currentProbability,
+          currentQuoteUpdatedAt:after.quoteUpdatedAt,favor,magnitude:Math.abs(favor),weight:1};
+      }
+    }
+    return null;
+  }
+  const comparisons=selections.map(s=>comparisonFor(s)).filter(Boolean);
+  const count=comparisons.length,total=selections.length,changed=comparisons.filter(c=>c.magnitude>=0.0025).length;
+  const movementConfidence=total?count/total*100:0;
+  const movement={eligibleSelections:total,identityEligibleSelections:total,comparableSelections:count,changedSelections:changed,sameBookComparisons:count,
+    averageMagnitude:round(count?comparisons.reduce((n,c)=>n+c.magnitude,0)/count:0),breadth:round(total?changed/total:0),
+    confidence:Math.round(movementConfidence),rawConfidence:round(movementConfidence),state:count?'MEASURED':'UNMEASURED',
+    reason:count?null:total?'NO_EXACT_PRIMARY_SAME_BOOK_BASELINE':'NO_VERIFIED_PRIMARY_QUOTES',
+    reportComparisons:0,snapshotComparisons:count,comparisons};
+  const pairs=[];
+  for(const selection of selections){
+    const first=selection.quotes.find(q=>q.book==='Bet365'),second=selection.quotes.find(q=>q.book==='DraftKings');
+    if(!first||!second||first.selectionKey!==second.selectionKey)continue;
+    pairs.push({selectionId:selection.selectionId,selectionKey:first.selectionKey,bet365Decimal:first.priceDecimal,draftKingsDecimal:second.priceDecimal,
+      bet365QuoteUpdatedAt:first.quoteUpdatedAt,draftKingsQuoteUpdatedAt:second.quoteUpdatedAt,gap:Math.abs(1/first.priceDecimal-1/second.priceDecimal)});
+  }
+  const avgDiff=pairs.length?pairs.reduce((n,p)=>n+p.gap,0)/pairs.length:0;
+  const agreementScore=pairs.length?clamp(100-avgDiff/0.10*100):50;
+  const agreementConfidence=total?pairs.length/total*100:0;
+  const agreement={score:Math.round(agreementScore),rawScore:round(agreementScore),confidence:Math.round(agreementConfidence),rawConfidence:round(agreementConfidence),
+    pairs:pairs.length,identityEligible:total,averageImpliedProbabilityGap:pairs.length?round(avgDiff):null,
+    source:'BOUND_PRIMARY_FEED_BET365_DRAFTKINGS',state:pairs.length?'MEASURED':'UNMEASURED',
+    reason:pairs.length?null:total?'NO_EXACT_CROSS_BOOK_PRIMARY_PAIR':'NO_VERIFIED_PRIMARY_QUOTES',comparisons:pairs};
+
+  const referents=new Map();let unverifiedReferences=0;
+  for(const rec of report.recs){
+    if(!['BET','LEAN','WAIT'].includes(String(rec?.status||'').toUpperCase()))continue;
+    const key=rec?.feed?.selectionKey,book=rec?.book;
+    const selection=selections.find(s=>s.quotes.some(q=>q.book===book&&q.selectionKey===key));
+    if(!selection){unverifiedReferences++;continue;}
+    // A repeated card/book cannot add weight to a stance. Fixed book priority
+    // makes direction deterministic even if card order changes.
+    const old=referents.get(selection.selectionId);
+    if(!old||EXECUTION_BOOKS.indexOf(book)<EXECUTION_BOOKS.indexOf(old.book))referents.set(selection.selectionId,{selectionId:selection.selectionId,selectionKey:key,book});
+  }
+  const groups=new Map();
+  for(const ref of referents.values()){
+    const selection=byId.get(ref.selectionId),group=[selection.sport,selection.eventId,selection.marketDetail].join('|');
+    if(!groups.has(group))groups.set(group,[]);
+    groups.get(group).push(ref);
+  }
+  const conflicted=new Set([...groups.values()].filter(refs=>refs.length>1).flat().map(ref=>ref.selectionId));
+  const directional=[...referents.values()].filter(ref=>!conflicted.has(ref.selectionId)).sort((a,b)=>a.selectionId.localeCompare(b.selectionId));
+  const directionalComparisons=directional.map(ref=>comparisonFor(byId.get(ref.selectionId),ref)).filter(Boolean);
+  const signedFavor=directionalComparisons.length?directionalComparisons.reduce((n,c)=>n+c.favor,0)/directionalComparisons.length:0;
+  const pressureRaw=calibratedPressure(signedFavor),pressureConfidence=directional.length?directionalComparisons.length/directional.length*100:0;
+  const pressure={value:Math.round(pressureRaw),rawValue:round(pressureRaw),confidence:Math.round(pressureConfidence),rawConfidence:round(pressureConfidence),
+    state:directionalComparisons.length?'MEASURED':'UNMEASURED',basis:'VERIFIED_BET_LEAN_WAIT_REFERENTS',
+    reason:directionalComparisons.length?null:directional.length?'NO_EXACT_DIRECTIONAL_SAME_BOOK_BASELINE':conflicted.size?'CONFLICTING_DIRECTIONAL_REFERENCES':unverifiedReferences?'UNVERIFIED_DIRECTIONAL_REFERENCES':'NO_DIRECTIONAL_REFERENCE',
+    directionalSelections:directional.length,comparableSelections:directionalComparisons.length,conflictingSelections:conflicted.size,unverifiedReferences,
+    weightedFavor:round(signedFavor),comparisons:directionalComparisons};
+  const heatRaw=calibratedHeat({avgMagnitude:movement.averageMagnitude,breadth:movement.breadth,thresholdActivity:0,agreementScore:agreement.rawScore,agreementConfidence:agreement.rawConfidence});
+  const heatConfidence=clamp(movement.rawConfidence*.7+agreement.rawConfidence*.3);
+  const requiredSelections=Object.values(inventory.sports).reduce((n,s)=>n+s.primary.required,0);
+  return {schema:VIG_METER_TELEMETRY_SCHEMA,calculationVersion:3,calibrationId:VIG_METER_CALIBRATION_ID,authority:VIG_METER_TELEMETRY_AUTHORITY,derivedAt:report.ts,
+    source:{feedBlobSha,feedGeneratedAt:report.feedGeneratedAt,coverageAuthorityBlobSha,oddsIndexBlobSha,priorRunTs:null,priorRunPath:null,priorRunBlobSha:null,
+      baselinePolicy:'LATEST_EXACT_PRIMARY_ODDS_24H',maxBaselineAgeHours:METER_BASELINE_MAX_HOURS,maxBaselineSnapshots:12,state:'PINNED'},
+    sample:{scope:'PRIMARY_FULL_GAME_ONLY',basis:'VERIFIED_PRIMARY_MARKET_QUOTES',requiredSelections,availableSelections:total,unavailableSelections:requiredSelections-total,
+      quoteCount:selections.reduce((n,s)=>n+s.quotes.length,0),gamesWithQuotes:new Set(selections.map(s=>`${s.sport}|${s.eventId}`)).size,
+      selectionIds:selections.map(s=>s.selectionId),weighting:'EQUAL_LOGICAL_SELECTION',thresholdActivityIncluded:false},movement,
+    heat:{value:Math.round(heatRaw),rawValue:round(heatRaw),confidence:Math.round(heatConfidence),rawConfidence:round(heatConfidence),state:heatConfidence>0?(count?'MEASURED':'PARTIAL'):'UNMEASURED',
+      basis:'PRIMARY_PRICE_MOVEMENT_AND_DISPERSION',reason:heatConfidence>0?(count?null:'CURRENT_AGREEMENT_ONLY'):'NO_MEASURABLE_PRIMARY_INPUTS'},pressure,agreement};
+}
+
+function attachPrimaryMarketTelemetry({root,report,sidecar,replaySource}){
+  const feedBlobSha=sidecar?.provenance?.feedBlobSha,feed=readGitJson(root,feedBlobSha);
+  const coverageAuthorityBlobSha=replaySource?.coverageAuthorityBlobSha||sidecar?.coverageAudit?.authorityBlobSha;
+  if(coverageAuthorityBlobSha!==sidecar?.coverageAudit?.authorityBlobSha)throw new Error('Meter coverage authority does not match the bound analysis authority');
+  const policy=readGitJson(root,coverageAuthorityBlobSha);
+  let oddsIndex=null,oddsIndexBlobSha=null;
+  if(replaySource){
+    oddsIndexBlobSha=replaySource.oddsIndexBlobSha;
+    if(oddsIndexBlobSha)oddsIndex=readGitJson(root,oddsIndexBlobSha);
+  }else if(fs.existsSync(path.join(root,ODDS_INDEX_PATH))){
+    const source=readSourceFile(root,ODDS_INDEX_PATH);oddsIndex=source.data;oddsIndexBlobSha=source.sha;
+  }
+  const oddsSnapshots=eligibleSnapshotEntries(oddsIndex,report).map(entry=>{
+    const snapshot=readGitJson(root,entry.snapshotBlobSha);
+    if(snapshot.generatedAt!==entry.generatedAt)throw new Error('Meter odds index timestamp mismatch');
+    return {blobSha:entry.snapshotBlobSha,feed:snapshot};
+  });
+  return derivePrimaryMarketInstrumentTelemetry({report,feed,policy,feedBlobSha,coverageAuthorityBlobSha,oddsIndexBlobSha,oddsSnapshots});
+}
 function attachResilientTelemetry({root,index,report,sidecar,replaySource}){
   const feedBlobSha=sidecar?.provenance?.feedBlobSha,feed=readGitJson(root,feedBlobSha);
   let prior=null,priorRunBlobSha=null,oddsIndex=null,oddsIndexBlobSha=null;
@@ -375,10 +493,11 @@ export function attachPublisherInstrumentTelemetry({root,index,report,sidecar,re
     const issued=index.runs.find(e=>e.ts===report.ts&&e.slot===report.slot);
     if(!replaySource&&issued?.path){
       const stored=readSourceFile(root,issued.path).data;
-      if(stored.instrumentTelemetry?.calculationVersion!==2)throw new Error('Issued resilient meter receipt is missing');
+      const expectedVersion=usesPrimaryMarketTelemetry(report)?3:2;
+      if(stored.instrumentTelemetry?.calculationVersion!==expectedVersion)throw new Error('Issued meter receipt has an invalid calculation version');
       replaySource=stored.instrumentTelemetry.source;
     }
-    report.instrumentTelemetry=attachResilientTelemetry({root,index,report,sidecar,replaySource});
+    report.instrumentTelemetry=usesPrimaryMarketTelemetry(report)?attachPrimaryMarketTelemetry({root,report,sidecar,replaySource}):attachResilientTelemetry({root,index,report,sidecar,replaySource});
     return report.instrumentTelemetry;
   }
   const feedBlobSha=sidecar?.provenance?.feedBlobSha||null;

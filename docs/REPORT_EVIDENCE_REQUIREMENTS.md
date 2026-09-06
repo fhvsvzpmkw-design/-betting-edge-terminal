@@ -8,6 +8,21 @@
 
 The September 5 15:15 review found five college-football PASS cards citing generic MLB sources, and a LEAN whose exact fair, uncertainty range and confidence were insufficiently traceable. The LEAN also used ambiguous wager and Pinnacle-comparison language. The issued report remains immutable. These requirements prevent those defects in new reports; they do not retrospectively certify or change the earlier opinion.
 
+## Primary evaluation receipts — from September 6
+
+**Effective report timestamp:** `2026-09-06T00:00:00-07:00`. This extends the existing coverage/evidence gates; it does not change handicapping methods or execution standards. Earlier issued reports retain their original payloads and validation.
+
+The coverage gate's `derivePrimarySelectionInventory(report, feed, policy)` returns each available logical side and its exact supported-book quotes. The sidecar must retain `primaryAnalysis: {schema: 1, feedGeneratedAt, receipts: [...]}` with one receipt per available `selectionId` (`sport|eventId|marketDetail|side`). Copy one actual inventory `quote` exactly, including book, event, market, side, line, selection key, decimal price and quote timestamp.
+
+- **EVALUATED:** `{selectionId, quote, state: 'EVALUATED', checkedAt, decision, evidence}`. `decision` uses the existing full recommendation structure; `evidence` uses its matching sidecar recommendation structure. Include actual source evidence, numeric fair derivation/range even for a value-based PASS, matching Core assessment and personnel evidence when material. Opposing sides of the same exact market must share a coherent fair/range. A documented model limitation is not permission to fabricate a numeric estimate. Every BET/LEAN/WAIT must also appear unchanged in the published cards; PASS cards may be curated while these receipts remain durable.
+- **BLOCKED:** `{selectionId, quote, state: 'BLOCKED', blocker: {reason, missing, impact, checkedAt, attempts}}`. Reasons: `SOURCE_UNAVAILABLE`, `FAIR_MODEL_UNAVAILABLE`, `PERSONNEL_UNRESOLVED`, `CALIBRATION_UNAVAILABLE`, `CONFLICTING_EVIDENCE`, `RESEARCH_INCOMPLETE`. Each actual attempt records `{eventId, checkedAt, url, finding}`. Record the decision review within the report cycle; source checks can predate the feed where genuinely reused. No betting decision or fair may be invented for a blocked receipt.
+
+Receipts are authored from the research, never generated from quote availability. The validator checks exact binding, evidence structure, arithmetic and Core consistency; it cannot establish source truth or model quality. Existing unavailable zero-stake continuity PASS resolutions stay governed by their original evidence/lineage rules and receive no evaluation credit.
+
+For each sport record `primary.available`, `primary.evaluated`, `primary.blocked`, `primary.unavailable`, and `primary.required`. Require `evaluated + blocked = available` and `available + unavailable = required`; board totals have corresponding `primaryAvailable`, `primaryEvaluated`, `primaryBlocked`, `primaryUnavailable`, `primaryRequired`. Existing `gamesEvaluated` is inventory bookkeeping only, not proof of completed handicapping.
+
+Always include `Primary selections: N available; N evaluated; N evidence-blocked; N unavailable.` using the actual four counts. Do not describe blocked research as a completed handicap or a PASS. The publisher derives the visible `coverageSummary` from verified receipts and the bound feed, including actual decision counts, blockers and acquisition causes. The displayed BET/LEAN/WAIT/PASS counters still count published cards. Publisher retries and stored read-back validate the same receipt and derived summary.
+
 ## Checked sources on every displayed card
 
 Retain `sourceEvidence` in the recommendation and its matching sidecar record. Each source has:

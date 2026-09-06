@@ -16,6 +16,28 @@ on:
       - tools/report-sidecar-contract.mjs
       - tests/report-evidence-gate.test.mjs
       - tests/coverage-summary.test.mjs
+      - tests/primary-analysis-receipt.test.mjs
+      - tests/vigscope-primary-market-sample.test.mjs
+      - tests/primary-report-dashboard.test.mjs
+      - tests/report-coverage-summary.test.mjs
+      - tests/primary-report-publication.test.mjs
+      - tools/report-coverage-summary.mjs
+      - tools/vigscope-meter-telemetry.mjs
+      - tools/vigscope-meter-telemetry-gate.mjs
+      - tools/vigscope-meter-production.mjs
+      - tools/core-handicap-framework.mjs
+      - tools/personnel-semantic-gate.mjs
+      - assets/report-dashboard-vigscope.js
+      - assets/report-dashboard-vigscope.js.old
+      - assets/runner-core-runtime.js
+      - r.html
+      - tests/vigscope-meter-telemetry.test.mjs
+      - tests/vigscope-meter-resilient.test.mjs
+      - tests/vigscope-meter-fallback-safety.test.mjs
+      - tests/vigscope-meter-sep2-live-fixture.test.mjs
+      - data/vigscope/meter-calibration-production-v1.json
+      - docs/VIGSCOPE_METER_BASELINES.md
+      - docs/CORE_MARKET_RECOVERY_2026-09-05.md
       - tests/odds-worker-primary-recovery.test.mjs
       - docs/REPORT_EVIDENCE_REQUIREMENTS.md
       - data/history/report-provenance-schema.json
@@ -44,7 +66,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -59,6 +81,16 @@ jobs:
           node tests/report-bundle-preflight.test.mjs
           node tests/report-evidence-gate.test.mjs
           node tests/coverage-summary.test.mjs
+          node tests/primary-analysis-receipt.test.mjs
+          node tests/vigscope-primary-market-sample.test.mjs
+          node tests/primary-report-dashboard.test.mjs
+          node tests/report-coverage-summary.test.mjs
+          node tests/primary-report-publication.test.mjs
+          node tests/vigscope-meter-telemetry.test.mjs
+          node tests/vigscope-meter-resilient.test.mjs
+          node tests/vigscope-meter-fallback-safety.test.mjs
+          node tests/vigscope-meter-sep2-live-fixture.test.mjs
+          node tools/vigscope-meter-telemetry-gate.mjs self-test
           node tests/odds-worker-primary-recovery.test.mjs
           node tools/report-publication.mjs self-test
           node tools/selection-continuity.mjs self-test
@@ -85,4 +117,6 @@ jobs:
             echo '- Primary markets: two-sided ML + main spread/run-line/puck-line + total'
             echo '- Props: PAUSED_BY_SCOPE from 2026-09-05 13:00 PT; inventory retained, analysis and cards disabled'
             echo '- Card target: soft with actionable overflow protection'
+            echo '- From 2026-09-06 00:00 PT: available primary selections require verified decisions or evidence blockers'
+            echo '- Market meters: exact primary quote inventory independent of displayed cards; pinned replay and v1/v2 history protected'
           } >> "$GITHUB_STEP_SUMMARY"

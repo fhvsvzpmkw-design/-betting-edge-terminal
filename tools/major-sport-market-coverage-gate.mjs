@@ -5,6 +5,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { validateRecommendationEvidence } from './report-evidence-gate.mjs';
+import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
+import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
 const PREFERENCES_PATH = 'data/preferences.json';
@@ -253,6 +256,222 @@ export function deriveBoundCoverage(report, feed, policy) {
   return { sports, limitations };
 }
 
+// Forward-only: availability is an exact quote inventory, never an analysis verdict.
+export const PRIMARY_ANALYSIS_FROM = '2026-09-06T00:00:00-07:00';
+export function primaryAnalysisRequired(report) { return parseMs(report?.ts) >= Date.parse(PRIMARY_ANALYSIS_FROM); }
+function quoteClosed(value) {
+  return value?.suspended === true || value?.isSuspended === true || value?.active === false || value?.isActive === false ||
+    /^(suspended|closed|settled|cancelled|canceled|unavailable|disabled)$/i.test(String(value?.status || value?.state || ''));
+}
+function exactSelectionIdentity(key, id, wantedMarket, side, line) {
+  const parts = String(key || '').split('|');
+  if (parts.length !== 5 || parts[0] !== id || parts[1] !== wantedMarket || parts[2] !== side) return false;
+  // The optional fourth component is the provider's row label. The fifth stores
+  // the feed's HOME spread line for BOTH sides, not an away-oriented handicap.
+  return line === null ? parts[4] === '' : parts[4] !== '' && Number.isFinite(Number(parts[4])) && Math.abs(Number(parts[4]) - line) < 1e-8;
+}
+function inspectExactPrimary(event, book, spec, feedGeneratedAt) {
+  const candidates = (event?.bookmakers?.[book] || []).filter(market => marketKey(market) === FEED_MARKET_KEYS[spec.market]);
+  const market = latestMarket(event, book, FEED_MARKET_KEYS[spec.market]);
+  if (!market) return { state: 'MISSING', quotes: {} };
+  const newest = candidates.filter(candidate => parseMs(candidate.updatedAt) === parseMs(market.updatedAt));
+  const stable = value => Array.isArray(value) ? value.map(stable) : isObject(value) ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;
+  if (new Set(newest.map(candidate => JSON.stringify(stable(candidate)))).size > 1) return { state: 'INCOMPLETE', quotes: {} };
+  const period = market.period ?? market.periodKey ?? market.periodName ?? market.identity?.period;
+  const partialLabel = /\b(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:half|quarter|period|[1-9]\s+innings?)\b|\b(?:half[- ]time|[1-9]\s+innings?|quarter|period)\b/i.test(String(market.name || ''));
+  if (partialLabel || (period != null && !['0', 'full', 'full_game', 'full game', 'game', 'match', 'ft'].includes(String(period).toLowerCase()))) return { state: 'INCOMPLETE', quotes: {} };
+  const updatedMs = parseMs(market.updatedAt), feedMs = parseMs(feedGeneratedAt);
+  if (updatedMs === null || updatedMs > feedMs || !quoteFresh(market.updatedAt, feedGeneratedAt)) return { state: 'STALE', quotes: {} };
+  if (quoteClosed(event) || quoteClosed(market)) return { state: 'INCOMPLETE', quotes: {} };
+  const inspected = spec.primaryLineOnly ? inspectPrimaryLineMarket(market, spec.requiredSelections) : inspectFixedMarket(market, spec.requiredSelections);
+  if (inspected.state !== 'RESOLVED') return { ...inspected, quotes: {} };
+  const id = eventId(event), wantedMarket = FEED_MARKET_KEYS[spec.market];
+  const line = spec.primaryLineOnly ? inspected.line : null;
+  const states = {}, quotes = {};
+  for (const side of spec.requiredSelections) {
+    const rows = (market.odds || []).filter(row => !spec.primaryLineOnly || Math.abs(rowLine(row) - line) < 1e-8);
+    const priced = rows.filter(row => !quoteClosed(row) && decimalOdds(row[side]));
+    const exact = priced.filter(row => exactSelectionIdentity(selectionKey(row, side), id, wantedMarket, side, line));
+    // Conflicting prices/identities at the same newest market timestamp are not
+    // silently resolved by array order or by rescuing an older quote.
+    const unique = new Map(exact.map(row => [JSON.stringify([selectionKey(row, side), decimalOdds(row[side])]), row]));
+    if (unique.size !== 1) { states[side] = priced.length ? 'IDENTITY' : 'INCOMPLETE'; continue; }
+    const row = [...unique.values()][0];
+    states[side] = 'AVAILABLE';
+    quotes[side] = { book, eventId: id, marketKey: wantedMarket, side, line, selectionKey: selectionKey(row, side), priceDecimal: decimalOdds(row[side]), quoteUpdatedAt: market.updatedAt };
+  }
+  return { ...inspected, selections: states, quotes };
+}
+
+export function derivePrimarySelectionInventory(report, feed, policy) {
+  const bound = deriveBoundCoverage(report, feed, policy); // Retain exact scope/clock checks.
+  const merged = mergedFeedEvents(feed), selections = [], limitations = new Map(), sports = {};
+  for (const sport of policy.coverageAudit.sportKeys) {
+    const expected = bound.sports[sport];
+    let available = 0, unavailable = 0;
+    for (const id of expected.eventIds) {
+      const event = merged.get(id);
+      for (const spec of primarySpecs(policy, sport)) {
+        const results = BOOKS.map(book => inspectExactPrimary(event, book, spec, feed.generatedAt));
+        for (const side of spec.requiredSelections) {
+          const selectionId = `${sport}|${id}|${spec.marketDetail}|${side}`;
+          const quotes = results.map(result => result.quotes?.[side]).filter(Boolean);
+          if (!quotes.length) { unavailable++; limitations.set(selectionId, unavailableReason(results, side)); continue; }
+          available++;
+          selections.push({ selectionId, sport, eventId: id, eventDate: event.date || event.identity?.startTime, marketClass: spec.market, marketDetail: spec.marketDetail, side, quotes });
+        }
+      }
+    }
+    sports[sport] = { ...expected, primary: { required: expected.primary.required, available, unavailable } };
+  }
+  selections.sort((a, b) => a.selectionId.localeCompare(b.selectionId));
+  return { selections, sports, limitations };
+}
+
+const PRIMARY_BLOCKER_REASONS = new Set(['SOURCE_UNAVAILABLE', 'FAIR_MODEL_UNAVAILABLE', 'PERSONNEL_UNRESOLVED', 'CALIBRATION_UNAVAILABLE', 'CONFLICTING_EVIDENCE', 'RESEARCH_INCOMPLETE']);
+function exactObject(left, right) { return JSON.stringify(left) === JSON.stringify(right); }
+function closeNumber(left, right) { return Number.isFinite(left) && Number.isFinite(right) && Math.abs(left - right) < 1e-8; }
+function sameQuote(left, right) { return isObject(left) && Object.keys(right).every(key => left[key] === right[key]) && Object.keys(left).length === Object.keys(right).length; }
+function receiptTime(value, report, label) {
+  const ms = parseMs(value);
+  ensure(ms !== null && ms >= parseMs(report.feedGeneratedAt) && ms <= parseMs(report.ts), `${label} must be at/after this feed and no later than report issuance`);
+  return ms;
+}
+function validatePrimaryBlocker(report, receipt, selection) {
+  const label = `Primary receipt ${selection.selectionId}`, blocker = receipt.blocker;
+  ensure(isObject(blocker) && PRIMARY_BLOCKER_REASONS.has(blocker.reason), `${label} requires a controlled evidence blocker reason`);
+  ensure(nonEmpty(blocker.missing) && nonEmpty(blocker.impact), `${label} requires concrete missing evidence and decision impact`);
+  const checkedMs = receiptTime(blocker.checkedAt, report, `${label} blocker.checkedAt`);
+  ensure(Array.isArray(blocker.attempts) && blocker.attempts.length > 0, `${label} requires recorded event-specific source/check attempts`);
+  for (const attempt of blocker.attempts) {
+    ensure(isObject(attempt) && String(attempt.eventId) === selection.eventId && nonEmpty(attempt.finding), `${label} blocker attempt requires exact eventId and finding`);
+    const attemptedMs = parseMs(attempt.checkedAt);
+    ensure(attemptedMs !== null && attemptedMs <= checkedMs, `${label} source attempt checkedAt cannot follow blocker review`);
+    let url; try { url = new URL(attempt.url); } catch { die(`${label} source attempt requires a specific URL`); }
+    ensure(['https:', 'http:'].includes(url.protocol) && !url.username && !url.password && (url.pathname !== '/' || url.search), `${label} source attempt requires a specific HTTP(S) page or artifact`);
+  }
+  for (const field of ['decision', 'evidence', 'fairValueEvidence', 'fair', 'status', 'marketFair']) ensure(receipt[field] == null, `${label} BLOCKED cannot carry a fabricated decision or fair`);
+}
+function receiptCore(decision, evidence, framework, label) {
+  const assessment = decision.coreAssessment, context = assessment?.context;
+  ensure(isObject(assessment) && isObject(context) && exactObject(assessment, evidence.coreAssessment), `${label} requires identical recorded Core assessment in decision and evidence`);
+  ensure(assessment.frameworkId === framework.frameworkId, `${label} Core framework identity mismatch`);
+  validateContext(framework, context, label);
+  ensure(['INDEPENDENT_MODEL', 'MARKET_ANCHORED_MODEL'].includes(context.fairValueBasis), `${label} market-only/unavailable fair must be BLOCKED, not an evaluated value decision`);
+  ensure(['MODERATE', 'STRONG'].includes(context.independentCurrentSupport), `${label} evaluated value decision requires independent current support`);
+  const researchIds = [...new Set((framework.graduatedResearchRules || []).filter(rule => matchCondition(rule.when, context)).map(rule => rule.priorId))].sort();
+  ensure(exactObject([...context.graduatedResearchIds].sort(), researchIds), `${label} Core graduated research allowlist mismatch`);
+  const actual = evaluateCore(framework, context);
+  for (const field of ['modelErrorState', 'betEligibleByModelError']) ensure(assessment[field] === actual[field], `${label} Core ${field} does not recompute`);
+  for (const field of ['effects', 'appliedRules']) ensure(Array.isArray(assessment[field]) && exactObject([...assessment[field]].sort(), [...actual[field]].sort()), `${label} Core ${field} does not recompute`);
+  for (const field of ['fairValueBasisRationale', 'uncertaintyStatement', 'rationale']) ensure(nonEmpty(assessment[field]), `${label} Core ${field} is required`);
+  if (decision.status === 'BET') ensure(actual.betEligibleByModelError, `${label} BET blocked by Core model error`);
+}
+function canonicalReceiptFair(selection, quote, fair) {
+  const referenceSide = selection.marketClass === 'total' ? 'over' : 'home';
+  const reverse = selection.side !== referenceSide;
+  let unit = fair.unit, estimate = fair.estimate, low = fair.range.low, high = fair.range.high;
+  const probability = value => value > 0 ? 100 / (value + 100) : -value / (-value + 100);
+  if (unit === 'selection_american_odds') {
+    unit = 'selection_probability';
+    estimate = probability(estimate);
+    [low, high] = [probability(low), probability(high)].sort((a, b) => a - b);
+  }
+  if (unit === 'selection_probability') {
+    if (reverse) [estimate, low, high] = [1 - estimate, 1 - high, 1 - low];
+  } else if (unit === 'selection_spread_points' || unit === 'home_spread_points') {
+    unit = 'home_spread_points';
+    if (reverse) [estimate, low, high] = [-estimate, -high, -low];
+  }
+  // Probability at different primary spread/total lines is a different contract.
+  const line = unit === 'selection_probability' ? quote.line : null;
+  return { key: `${selection.sport}|${selection.eventId}|${selection.marketDetail}|${unit}|${line ?? ''}`, unit, estimate, low, high };
+}
+
+export function summarizePrimaryAnalysis(receipts) {
+  const outcomeCounts = { BET: 0, LEAN: 0, WAIT: 0, PASS: 0 };
+  let primaryEvaluated = 0, primaryBlocked = 0;
+  for (const receipt of receipts || []) {
+    if (receipt.state === 'BLOCKED') primaryBlocked++;
+    else if (receipt.state === 'EVALUATED') { primaryEvaluated++; outcomeCounts[receipt.decision.status]++; }
+  }
+  return { primaryAvailable: primaryEvaluated + primaryBlocked, primaryEvaluated, primaryBlocked, outcomeCounts };
+}
+
+export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy = null, inventory = null, framework = null } = {}) {
+  if (!primaryAnalysisRequired(report)) return { enforced: false, reason: 'pre-cutover' };
+  ensure(inventory || (feed && policy), 'Primary analysis validation requires the exact bound feed and coverage policy');
+  const bound = inventory || derivePrimarySelectionInventory(report, feed, policy), analysis = sidecar?.primaryAnalysis;
+  ensure(isObject(analysis) && analysis.schema === 1 && analysis.feedGeneratedAt === report.feedGeneratedAt && Array.isArray(analysis.receipts), 'primaryAnalysis schema 1, bound feedGeneratedAt and complete receipts are required');
+  const required = new Map(bound.selections.map(selection => [selection.selectionId, selection])), seen = new Set(), fairGroups = new Map(), fairBases = new Map();
+  let runtime = framework;
+  const sports = Object.fromEntries(Object.entries(bound.sports).map(([sport, row]) => [sport, { available: row.primary.available, evaluated: 0, blocked: 0 }]));
+  for (const [index, receipt] of analysis.receipts.entries()) {
+    const selection = required.get(receipt?.selectionId), label = `Primary receipt ${receipt?.selectionId || index}`;
+    ensure(selection && !seen.has(receipt.selectionId), `${label} is missing from available inventory or duplicated`);
+    seen.add(receipt.selectionId);
+    ensure(selection.quotes.some(quote => sameQuote(receipt.quote, quote)), `${label} quote identity/book/line/price/time differs from exact bound feed`);
+    ensure(['EVALUATED', 'BLOCKED'].includes(receipt.state), `${label} requires EVALUATED or BLOCKED`);
+    if (receipt.state === 'BLOCKED') { validatePrimaryBlocker(report, receipt, selection); sports[selection.sport].blocked++; continue; }
+    receiptTime(receipt.checkedAt, report, `${label} checkedAt`);
+    ensure(receipt.blocker == null, `${label} EVALUATED cannot also carry a blocker`);
+    const decision = receipt.decision, evidence = receipt.evidence, quote = receipt.quote;
+    ensure(isObject(decision) && isObject(evidence) && ['BET', 'LEAN', 'WAIT', 'PASS'].includes(decision.status), `${label} requires a recorded decision and matching evidence`);
+    ensure(evidence.status === decision.status, `${label} decision/evidence status mismatch`);
+    const context = decision.coreAssessment?.context || {};
+    const canonicalSport = ['NBA', 'WNBA', 'NBA/WNBA'].includes(context.sport) ? 'NBA_WNBA' : context.sport;
+    ensure(canonicalSport === selection.sport && context.marketClass === selection.marketClass && context.marketDetail === selection.marketDetail, `${label} decision Core context differs from exact inventory`);
+    for (const field of ['eventId', 'marketKey', 'side', 'selectionKey']) ensure(String(decision.feed?.[field]) === String(quote[field]), `${label} decision ${field} differs from inventory`);
+    ensure(parseMs(decision.feed?.eventDate) !== null && parseMs(decision.feed.eventDate) === parseMs(selection.eventDate), `${label} decision eventDate differs from inventory`);
+    for (const [kind, binding] of [['decision', decision.feed], ['evidence', evidence.feed]]) {
+      if (binding == null) continue;
+      ensure(isObject(binding), `${label} ${kind} feed must be an object`);
+      for (const field of ['eventId', 'marketKey', 'side', 'selectionKey', 'book']) if (Object.hasOwn(binding, field)) ensure(String(binding[field]) === String(quote[field]), `${label} ${kind} feed ${field} differs from inventory`);
+      if (Object.hasOwn(binding, 'eventDate')) ensure(parseMs(binding.eventDate) === parseMs(selection.eventDate), `${label} ${kind} feed eventDate differs from inventory`);
+      for (const field of ['line', 'hdp', 'total', 'points']) if (Object.hasOwn(binding, field)) ensure(quote.line === null ? binding[field] === null : binding[field] != null && closeNumber(Number(binding[field]), quote.line), `${label} ${kind} feed ${field} differs from inventory line`);
+      if (Object.hasOwn(binding, 'quoteUpdatedAt')) ensure(binding.quoteUpdatedAt === quote.quoteUpdatedAt, `${label} ${kind} feed quoteUpdatedAt differs from inventory`);
+      if (Object.hasOwn(binding, 'priceDecimal')) ensure(closeNumber(Number(binding.priceDecimal), quote.priceDecimal), `${label} ${kind} feed priceDecimal differs from inventory`);
+    }
+    ensure(decision.book === quote.book, `${label} decision book differs from receipt quote`);
+    const american = quote.priceDecimal >= 2 ? Math.round((quote.priceDecimal - 1) * 100) : Math.round(-100 / (quote.priceDecimal - 1));
+    ensure(Number(String(decision.price).replace('−', '-')) === american, `${label} decision price differs from exact executable quote`);
+    ensure(nonEmpty(decision.analysis), `${label} requires event-specific analysis and decision rationale`);
+    if (decision.status !== 'BET') ensure(/^\$?0(?:\.0+)?$/.test(String(decision.stake)), `${label} non-BET decision must carry zero stake`);
+    validateRecommendationEvidence(report, decision, evidence, index);
+    ensure(isObject(decision.fairValueEvidence), `${label} evaluated PASS requires a numeric documented fair; use BLOCKED when fair cannot be established`);
+    const sourceKinds = new Map((decision.sourceEvidence || []).map(source => [source.id, source.kind]));
+    ensure(decision.fairValueEvidence.inputs.some(input => input.sourceIds.some(id => sourceKinds.get(id) !== 'MARKET' && sourceKinds.has(id))), `${label} numeric fair requires non-market source-linked inputs`);
+    runtime ||= loadProductionFramework();
+    receiptCore(decision, evidence, runtime, label);
+    validatePersonnelSemantics({ ...report, recs: [decision] }, { ...sidecar, recommendations: [evidence] });
+    const fair = canonicalReceiptFair(selection, quote, decision.fairValueEvidence), prior = fairGroups.get(fair.key);
+    const contractKey = `${selection.sport}|${selection.eventId}|${selection.marketDetail}|${quote.line ?? ''}`;
+    ensure(!fairBases.has(contractKey) || fairBases.get(contractKey) === fair.unit, `${label} opposing selections must share a coherent fair unit/basis`);
+    fairBases.set(contractKey, fair.unit);
+    if (prior) for (const field of ['estimate', 'low', 'high']) ensure(closeNumber(fair[field], prior[field]), `${label} opposing selections have incoherent shared market fair ${field}`);
+    else fairGroups.set(fair.key, fair);
+    const matchingCard = (report.recs || []).find(card => card.feed?.selectionKey === quote.selectionKey && String(card.feed?.eventId) === quote.eventId && card.book === quote.book);
+    if (decision.status !== 'PASS' || matchingCard) ensure(matchingCard && exactObject(matchingCard, decision), `${label} actionable decision must match its published card and existing execution gates`);
+    sports[selection.sport].evaluated++;
+  }
+  const missing = [...required.keys()].filter(key => !seen.has(key));
+  ensure(!missing.length, `Primary analysis missing ${missing.length} required receipt(s): ${missing.slice(0, 8).join(', ')}`);
+  // Every primary card also needs the matching independently recorded receipt.
+  for (const [index, card] of (report.recs || []).entries()) {
+    const receipt = analysis.receipts.find(item => item.state === 'EVALUATED' && exactObject(item.decision, card));
+    if (receipt) continue;
+    // A required continuity card can explain a now-unavailable quote. It is
+    // neither an available selection nor a newly evaluated value decision.
+    const context = card.coreAssessment?.context || {};
+    const sport = ['NBA', 'WNBA', 'NBA/WNBA'].includes(context.sport) ? 'NBA_WNBA' : context.sport;
+    const tuple = `${sport}|${card.feed?.eventId}|${context.marketDetail}|${card.feed?.side}`;
+    const unavailablePass = bound.limitations.has(tuple) && card.status === 'PASS' && isObject(card.sourceShortfall) && card.fairValueEvidence == null && /^\$?0(?:\.0+)?$/.test(String(card.stake)) && /\b(?:unavailable|unverified|not rated|not assessed|not established|not calculated|withheld|no fair|n\/a)\b/i.test(String(card.fair || '')) && !/[+\-−]?\d+(?:\.\d+)?/.test(String(card.fair || ''));
+    ensure(unavailablePass, `Published primary card ${card.title || card.feed?.selectionKey || 'unknown'} has no matching evaluated receipt`);
+    validateRecommendationEvidence(report, card, sidecar.recommendations?.[index], index);
+  }
+  return { enforced: true, inventory: bound, sports, ...summarizePrimaryAnalysis(analysis.receipts) };
+}
+
 function loadBoundFeed(root, report, sidecar, feedFile = null) {
   const sha = String(sidecar?.provenance?.feedBlobSha || '');
   ensure(/^[0-9a-f]{40}$/i.test(sha), 'Sidecar provenance.feedBlobSha must be a Git SHA');
@@ -275,9 +494,37 @@ function loadBoundFeed(root, report, sidecar, feedFile = null) {
   ensure(String(feed?.generatedAt || '') === String(report?.feedGeneratedAt || ''), `Bound feed ${feed?.generatedAt || 'unknown'} does not match report ${report?.feedGeneratedAt || 'unknown'}`);
   return feed;
 }
-function authority(root = process.cwd()) {
+function loadBoundCoreFramework(root, sidecar, requireCurrentAuthority) {
+  const relativePath = 'core/core-handicap-framework-v1.4.json';
+  ensure(sidecar?.provenance?.coreFrameworkPath === relativePath, 'Primary analysis requires the controlled Core framework provenance path');
+  const sha = String(sidecar?.provenance?.coreFrameworkBlobSha || '');
+  ensure(/^[0-9a-f]{40}$/i.test(sha), 'Primary analysis requires a pinned Core framework blob SHA');
+  const currentPath = path.join(root, relativePath);
+  let raw;
+  try { raw = execFileSync('git', ['cat-file', 'blob', sha], {cwd: root, maxBuffer: 8 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore']}); } catch { /* hash-checked fallback below */ }
+  if (!raw) {
+    ensure(fs.existsSync(currentPath), `Cannot resolve pinned Core framework ${sha}`);
+    raw = fs.readFileSync(currentPath);
+  }
+  ensure(gitBlobSha(raw) === sha, `Resolved Core framework does not match pinned blob ${sha}`);
+  if (requireCurrentAuthority) ensure(fs.existsSync(currentPath) && gitBlobSha(fs.readFileSync(currentPath)) === sha, 'Primary analysis Core framework differs from current operational framework');
+  return JSON.parse(raw.toString('utf8'));
+}
+
+function authority(root = process.cwd(), pinnedSha = null) {
   const file = path.join(root, AUTHORITY_PATH);
-  const raw = fs.readFileSync(file);
+  let raw;
+  if (pinnedSha !== null) {
+    ensure(/^[0-9a-f]{40}$/i.test(pinnedSha), 'Historical coverage requires a pinned authority blob SHA');
+    try { raw = execFileSync('git', ['cat-file', 'blob', pinnedSha], {cwd: root, maxBuffer: 8 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore']}); } catch { /* hash-checked fallback below */ }
+    if (!raw) {
+      ensure(fs.existsSync(file), `Cannot resolve pinned coverage authority ${pinnedSha}`);
+      raw = fs.readFileSync(file);
+    }
+    ensure(gitBlobSha(raw) === pinnedSha, `Resolved coverage authority does not match pinned blob ${pinnedSha}`);
+  } else {
+    raw = fs.readFileSync(file);
+  }
   const policy = JSON.parse(raw.toString('utf8'));
   ensure(policy.schema === 1, 'Major-sport coverage authority schema must be 1');
   ensure(policy.authorityId === EXPECTED_AUTHORITY_ID, 'Major-sport coverage authority id mismatch');
@@ -359,7 +606,7 @@ export function validateReportMarketScope(report, { root = path.resolve(path.dir
   return scope;
 }
 
-function sumSports(sports, sportKeys, propsPaused = false) {
+function sumSports(sports, sportKeys, propsPaused = false, receiptRequired = false) {
   const totals = {
     gamesInScope: 0,
     gamesEvaluated: 0,
@@ -371,12 +618,14 @@ function sumSports(sports, sportKeys, propsPaused = false) {
     seriousPropsDeepReviewed: 0
   };
   if (propsPaused) totals.propsExcludedByScope = 0;
+  if (receiptRequired) { totals.primaryAvailable = 0; totals.primaryBlocked = 0; }
   for (const key of sportKeys) {
     const row = sports[key];
     totals.gamesInScope += row.gamesInScope;
     totals.gamesEvaluated += row.gamesEvaluated;
     totals.primaryRequired += row.primary.required;
     totals.primaryEvaluated += row.primary.evaluated;
+    if (receiptRequired) { totals.primaryAvailable += row.primary.available; totals.primaryBlocked += row.primary.blocked; }
     totals.primaryUnavailable += row.primary.unavailable;
     totals.propsReturned += row.props.returned;
     totals.propsScreened += row.props.screened;
@@ -392,6 +641,13 @@ export function validateVisibleCoverageSummary(report, audit) {
   const unavailable = audit?.totals?.primaryUnavailable;
   int(evaluated, 'coverage summary evaluated count');
   int(unavailable, 'coverage summary unavailable count');
+  if (primaryAnalysisRequired(report)) {
+    int(audit?.totals?.primaryAvailable, 'coverage summary available count');
+    int(audit?.totals?.primaryBlocked, 'coverage summary blocked count');
+    const required = `Primary selections: ${audit.totals.primaryAvailable} available; ${evaluated} evaluated; ${audit.totals.primaryBlocked} evidence-blocked; ${unavailable} unavailable.`;
+    ensure(String(report?.summary || '').includes(required), `Visible report summary must disclose its actual coverage limitation: ${required}`);
+    return;
+  }
   if (!unavailable) return;
   const required = `Primary selections: ${evaluated} evaluated; ${unavailable} unavailable.`;
   ensure(String(report?.summary || '').includes(required),
@@ -401,7 +657,7 @@ export function validateVisibleCoverageSummary(report, audit) {
 export function validateCoverageAudit(report, sidecar, { root = process.cwd(), requireCurrentAuthority = true, feed = null, feedFile = null } = {}) {
   ensure(isObject(report), 'Coverage gate report must be an object');
   ensure(isObject(sidecar), 'Coverage gate sidecar must be an object');
-  const { policy, blobSha } = authority(root);
+  const { policy, blobSha } = authority(root, requireCurrentAuthority ? null : String(sidecar?.coverageAudit?.authorityBlobSha || ''));
   const auditPolicy = policy.coverageAudit;
   const cutover = Date.parse(auditPolicy.requiredFrom);
   const reportMs = Date.parse(report.ts || '');
@@ -409,6 +665,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   if (reportMs < cutover) return { enforced: false, reason: 'pre-cutover' };
   const scope = validateReportMarketScope(report, { policy });
   const propsPaused = Boolean(scope);
+  const receiptRequired = primaryAnalysisRequired(report);
 
   const audit = sidecar[auditPolicy.sidecarField];
   ensure(isObject(audit), `Sidecar ${auditPolicy.sidecarField} is required for reports at/after ${auditPolicy.requiredFrom}`);
@@ -448,7 +705,14 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
     ensure(isObject(row.primary), `coverageAudit.sports.${sport}.primary is required`);
     for (const key of ['required', 'evaluated', 'unavailable']) int(row.primary[key], `coverageAudit.sports.${sport}.primary.${key}`);
     ensure(row.primary.required === row.gamesInScope * auditPolicy.primarySelectionsPerGame, `coverageAudit.sports.${sport}.primary.required must equal gamesInScope * ${auditPolicy.primarySelectionsPerGame}`);
-    ensure(row.primary.evaluated + row.primary.unavailable === row.primary.required, `coverageAudit.sports.${sport} primary arithmetic does not reconcile`);
+    if (receiptRequired) {
+      int(row.primary.available, `coverageAudit.sports.${sport}.primary.available`);
+      int(row.primary.blocked, `coverageAudit.sports.${sport}.primary.blocked`);
+      ensure(row.primary.evaluated + row.primary.blocked === row.primary.available, `coverageAudit.sports.${sport} evaluated + blocked must equal available`);
+      ensure(row.primary.available + row.primary.unavailable === row.primary.required, `coverageAudit.sports.${sport} available + unavailable must equal required`);
+    } else {
+      ensure(row.primary.evaluated + row.primary.unavailable === row.primary.required, `coverageAudit.sports.${sport} primary arithmetic does not reconcile`);
+    }
     ensure(isObject(row.props), `coverageAudit.sports.${sport}.props is required`);
     for (const key of ['returned', 'screened', 'seriousDeepReviewed']) int(row.props[key], `coverageAudit.sports.${sport}.props.${key}`);
     if (propsPaused) {
@@ -486,14 +750,16 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
 
   ensure(isObject(audit.presentation), 'coverageAudit.presentation must be an object');
   int(audit.presentation.target, 'coverageAudit.presentation.target');
-  ensure(audit.presentation.target === cardTarget(root), 'coverageAudit.presentation.target does not match repository report_card_target');
+  // New publication binds the active preference. Historical verification keeps
+  // the issued, validated soft target while retaining its safety invariants.
+  if (requireCurrentAuthority) ensure(audit.presentation.target === cardTarget(root), 'coverageAudit.presentation.target does not match repository report_card_target');
   ensure(audit.presentation.targetIsSoft === true, 'coverageAudit.presentation.targetIsSoft must be true');
   ensure(audit.presentation.overflowProtection === true, 'coverageAudit.presentation.overflowProtection must be true');
   int(audit.presentation.actionableSuppressedByTarget, 'coverageAudit.presentation.actionableSuppressedByTarget');
   ensure(audit.presentation.actionableSuppressedByTarget === 0, 'coverageAudit may not suppress actionable recommendations to meet the card target');
 
   ensure(isObject(audit.totals), 'coverageAudit.totals must be an object');
-  const calculatedTotals = sumSports(audit.sports, sportKeys, propsPaused);
+  const calculatedTotals = sumSports(audit.sports, sportKeys, propsPaused, receiptRequired);
   for (const [key, expected] of Object.entries(calculatedTotals)) {
     int(audit.totals[key], `coverageAudit.totals.${key}`);
     ensure(audit.totals[key] === expected, `coverageAudit.totals.${key} does not reconcile with sport rows`);
@@ -502,7 +768,9 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   ensure(limitationsSelectionCount === calculatedTotals.primaryUnavailable, 'coverageAudit availabilityLimitations selection count must equal total primaryUnavailable');
 
   const boundFeed = feed || loadBoundFeed(root, report, sidecar, feedFile);
-  const bound = deriveBoundCoverage(report, boundFeed, policy);
+  const bound = receiptRequired ? derivePrimarySelectionInventory(report, boundFeed, policy) : deriveBoundCoverage(report, boundFeed, policy);
+  const framework = receiptRequired && sidecar?.primaryAnalysis?.receipts?.some(receipt => receipt.state === 'EVALUATED') ? loadBoundCoreFramework(root, sidecar, requireCurrentAuthority) : null;
+  const primaryAnalysis = receiptRequired ? validatePrimaryAnalysis(report, sidecar, { inventory: bound, framework }) : null;
   const mismatches = [];
   for (const sport of sportKeys) {
     const actual = audit.sports[sport];
@@ -511,8 +779,9 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
       mismatches.push(`${sport}.gamesInScope ${actual.gamesInScope} != ${expected.gamesInScope} [${expected.eventIds.join(',') || 'none'}]`);
     }
     if (actual.gamesEvaluated !== expected.gamesInScope) mismatches.push(`${sport}.gamesEvaluated ${actual.gamesEvaluated} != ${expected.gamesInScope}`);
-    for (const field of ['required', 'evaluated', 'unavailable']) {
-      if (actual.primary[field] !== expected.primary[field]) mismatches.push(`${sport}.primary.${field} ${actual.primary[field]} != ${expected.primary[field]}`);
+    const expectedPrimary = receiptRequired ? { ...expected.primary, evaluated: primaryAnalysis.sports[sport].evaluated, blocked: primaryAnalysis.sports[sport].blocked } : expected.primary;
+    for (const [field, value] of Object.entries(expectedPrimary)) {
+      if (actual.primary[field] !== value) mismatches.push(`${sport}.primary.${field} ${actual.primary[field]} != ${value}`);
     }
     if (actual.props.returned !== expected.propsReturned) mismatches.push(`${sport}.props.returned ${actual.props.returned} != ${expected.propsReturned}`);
     const expectedScreened = propsPaused ? 0 : expected.propsReturned;
@@ -528,7 +797,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   }
   ensure(mismatches.length === 0, `coverageAudit does not match exact bound feed: ${mismatches.slice(0, 24).join('; ')}${mismatches.length > 24 ? `; +${mismatches.length - 24} more` : ''}`);
 
-  return { enforced: true, audit, calculatedTotals, boundCoverage: bound, authorityBlobSha: blobSha };
+  return { enforced: true, audit, calculatedTotals, boundCoverage: bound, primaryAnalysis, authorityBlobSha: blobSha };
 }
 
 function parseArgs(argv) {

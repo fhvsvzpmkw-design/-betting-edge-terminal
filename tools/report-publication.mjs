@@ -5,6 +5,7 @@ import os from 'node:os';
 import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs';
 import {validateReportMarketScope} from './major-sport-market-coverage-gate.mjs';
 import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
+import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -363,17 +364,19 @@ function loadIndex(root){
   assert(index && typeof index==='object' && Array.isArray(index.runs),'run-history.json must contain a runs array');
   return {file,index};
 }
-function readPublicationBundle(reportFile,sidecarFile,{collectRecommendationErrors=false}={}){
+function readPublicationBundle(reportFile,sidecarFile,{root=process.cwd(),collectRecommendationErrors=false}={}){
   const report = validateReport(readJson(reportFile));
   validateReportMarketScope(report);
   const paths = expectedPaths(report);
   const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true,collectRecommendationErrors});
+  validateReportCoverageSummary({root,report,sidecar});
   return {report,paths,sidecar};
 }
 function publish(root,reportFile,sidecarFile){
-  const {report,paths,sidecar} = readPublicationBundle(reportFile,sidecarFile);
+  const {report,paths,sidecar} = readPublicationBundle(reportFile,sidecarFile,{root});
   const {file:indexFile,index} = loadIndex(root);
   const decisionFingerprint=normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs});
+  attachPublisherCoverageSummary({root,report,sidecar});
   attachPublisherInstrumentTelemetry({root,index,report,sidecar});
   assert(normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs})===decisionFingerprint,'VigScope meter telemetry derivation must not mutate betting decisions or recommendation content');
   const reportAbs = path.join(root,paths.reportPath);
@@ -460,6 +463,7 @@ function verifyIndex(root,{targetTs}={}){
         const sidecarAbs=path.join(root,entry.researchFitPath);
         assert(fs.existsSync(sidecarAbs),`Indexed sidecar is missing: ${entry.researchFitPath}`);
         const sidecar=validateSidecar(readJson(sidecarAbs),report,entry.path,{strict,collectRecommendationErrors:true});
+        validateReportCoverageSummary({root,report,sidecar,required:true});
         if(sidecar.provenance?.feedBlobSha && entry.feedBlobSha){
           assert(entry.feedBlobSha===sidecar.provenance.feedBlobSha,`Index feedBlobSha does not match sidecar: ${entry.id}`);
         }
@@ -817,7 +821,7 @@ function main(){
   if(args.command==='validate'){
     assert(typeof args.report==='string','validate requires --report <file>');
     assert(typeof args.sidecar==='string','validate requires --sidecar <file>');
-    const {report,paths} = readPublicationBundle(path.resolve(args.report),path.resolve(args.sidecar),{collectRecommendationErrors:true});
+    const {report,paths} = readPublicationBundle(path.resolve(args.report),path.resolve(args.sidecar),{root,collectRecommendationErrors:true});
     console.log(`REPORT BUNDLE VALIDATION OK ${shortId(report)} ${paths.reportPath} — READ ONLY; NOT ISSUED`);
   }else if(args.command==='publish'){
     assert(typeof args.report==='string','publish requires --report <file>');

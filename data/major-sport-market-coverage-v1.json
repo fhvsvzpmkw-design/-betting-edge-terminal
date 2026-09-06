@@ -197,9 +197,9 @@
       "Use the current Git blob SHA of this authority file as coverageAudit.authorityBlobSha; never copy an older SHA.",
       "coverageAudit.feedGeneratedAt must exactly equal report.feedGeneratedAt.",
       "Every sport key is present even when its game count is zero.",
-      "gamesEvaluated equals gamesInScope because checking an unavailable market is still an evaluation.",
+      "gamesEvaluated equals gamesInScope as legacy inventory accounting; it does not certify a completed handicap. From primaryAnalysis.requiredFrom use the explicit primary evaluated/blocked counts for analytical claims.",
       "primary.required equals gamesInScope multiplied by six.",
-      "primary.evaluated plus primary.unavailable equals primary.required.",
+      "Before primaryAnalysis.requiredFrom, primary.evaluated plus primary.unavailable equals primary.required. From that cutoff, primary.available plus primary.unavailable equals primary.required; primary.evaluated plus primary.blocked equals primary.available, backed by exact primaryAnalysis receipts.",
       "Every unavailable primary selection is represented exactly once in availabilityLimitations.",
       "Before reportScope.effectiveFrom, props.screened equals props.returned. At/after that cutover, every sport has props.state=PAUSED_BY_SCOPE, screened=0, seriousDeepReviewed=0 and excludedByScope=returned; returned remains exact bound-feed inventory, not claimed analysis.",
       "presentation.target equals the current repository report_card_target; targetIsSoft and overflowProtection are true and actionableSuppressedByTarget is zero.",
@@ -211,9 +211,18 @@
     ]
   },
   "completion": {
-    "primaryCoverageComplete": "Every in-scope game has every required primary selection evaluated or an explicit exact-market availability limitation recorded.",
+    "primaryCoverageComplete": "Every retained in-scope game has every required primary selection accounted for. From primaryAnalysis.requiredFrom each available side has a documented evaluation or explicit evidence blocker; each unavailable side has an exact-market availability limitation. Complete accounting does not certify completed analysis.",
     "propCoverageComplete": "Before the scope cutover, every fresh exact supported prop was required to be screened. At/after the cutover, PAUSED_BY_SCOPE is explicit, zero props are analyzed, and returned inventory is reconciled to excludedByScope.",
-    "reportCompletenessClaim": "Claim complete coverage of the active full-game primary markets only when every required primary selection is evaluated or explicitly unavailable; state player-prop analysis is paused."
+    "reportCompletenessClaim": "Coverage describes returned same-day pregame events, not every discovered fixture. From primaryAnalysis.requiredFrom distinguish actual documented evaluations, evidence-blocked selections and unavailable quotes; disclose discovery omissions separately. State player-prop analysis is paused."
+  },
+  "primaryAnalysis": {
+    "requiredFrom": "2026-09-06T00:00:00-07:00",
+    "schema": 1,
+    "sidecarField": "primaryAnalysis",
+    "inventoryFunction": "tools/major-sport-market-coverage-gate.mjs derivePrimarySelectionInventory",
+    "rule": "Each available logical primary side has one exact-quote EVALUATED decision/evidence receipt or an explicit BLOCKED research receipt. Availability alone is not evaluation. Do not generate opinions from inventory. Every actionable decision must appear in the published cards; curated PASS decisions retain evidence in the sidecar. Unavailable continuity PASS resolutions retain existing gates and do not count as evaluated.",
+    "summaryClause": "Primary selections: N available; N evaluated; N evidence-blocked; N unavailable.",
+    "historicalRule": "Do not backfill, retimestamp, regenerate or reclassify issued reports before this cutoff."
   },
   "reportScope": {
     "id": "PRIMARY_FULL_GAME_ONLY",

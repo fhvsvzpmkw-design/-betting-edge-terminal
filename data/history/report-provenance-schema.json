@@ -5,7 +5,7 @@
   "compatibility": {
     "historicalSchema2Valid": true,
     "historicalSchema3Valid": true,
-    "rule": "Schema-2 and previously issued schema-3 sidecars remain valid immutable historical evidence. Stage 2, WAIT qualification, Core 1.4 coreAssessment, waltersEvidence and Pinnacle observer provenance are additive forward-only extensions and do not require rewriting historical sidecars. Source/fair-value evidence is a forward-only additive extension from 2026-09-05T17:00:00-07:00; prior reports are not backfilled."
+    "rule": "Schema-2 and previously issued schema-3 sidecars remain valid immutable historical evidence. Stage 2, WAIT qualification, Core 1.4 coreAssessment, waltersEvidence and Pinnacle observer provenance are additive forward-only extensions and do not require rewriting historical sidecars. Source/fair-value evidence is a forward-only additive extension from 2026-09-05T17:00:00-07:00; prior reports are not backfilled. Primary-analysis receipts and publisher coverage summaries apply from 2026-09-06T00:00:00-07:00; earlier issued records are not backfilled."
   },
   "reportReference": {
     "fields": {
@@ -278,5 +278,27 @@
     "researchUnavailable": "Use HISTORY LIBRARY UNAVAILABLE in the issued hist field as appropriate and do not fabricate prior IDs.",
     "pinnacleUnavailable": "Continue with the normal Bet365/DraftKings/Core process; record Pinnacle as unavailable/not used and do not fabricate sharp context.",
     "sidecarSaveFailure": "Deliver the already-validated issued report and surface HISTORY SAVE FAILED \u2014 REPORT VALID; do not rebuild or mutate the report solely for sidecar storage."
+  },
+  "primaryAnalysis": {
+    "requiredFrom": "2026-09-06T00:00:00-07:00",
+    "schema": 1,
+    "fields": {
+      "feedGeneratedAt": "exact report-bound feed timestamp",
+      "receipts": "one exact-quote receipt for every available logical primary selection"
+    },
+    "selectionId": "sport|eventId|marketDetail|side",
+    "quote": "exact inventory quote: book,eventId,marketKey,side,line,selectionKey,priceDecimal,quoteUpdatedAt",
+    "evaluated": "state=EVALUATED, checkedAt, decision using full existing recommendation fields, evidence using matching sidecar fields; actual sources, numeric fair/range including PASS, recomputed Core assessment and required personnel evidence",
+    "blocked": "state=BLOCKED, blocker with controlled reason, concrete missing evidence, impact, checkedAt and actual event-specific attempts (eventId,checkedAt,url,finding); no decision or invented fair",
+    "arithmetic": "primary.evaluated + primary.blocked = primary.available; primary.available + primary.unavailable = primary.required. Totals add primaryAvailable and primaryBlocked. gamesEvaluated remains legacy inventory accounting.",
+    "curation": "All actionable decisions match published cards. Curated PASS decisions remain in receipts. Unavailable continuity PASS resolutions retain existing gates and do not receive evaluation credit.",
+    "authority": "Existing coverage and bundle gates validate receipts and pinned Core framework; structured checks cannot prove source truth or handicap quality."
+  },
+  "publisherCoverageSummary": {
+    "requiredFrom": "2026-09-06T00:00:00-07:00",
+    "reportField": "coverageSummary",
+    "schema": 1,
+    "scope": "RETAINED_SAME_DAY_PREGAME_EVENTS",
+    "rule": "Publisher derives and verifies exact available/evaluated/blocked/unavailable counts, actual decision counts, research blockers, bound acquisition explanations and separately identified discovery omissions. Card counters remain published-card counts. Historical payloads remain immutable."
   }
 }

@@ -6,6 +6,7 @@
 **Validation clarification:** 2026-09-05
 **Primary-market scope amendment:** 2026-09-05 13:00 America/Vancouver
 **Source and fair-value evidence amendment:** 2026-09-05 17:00 America/Vancouver
+**Documented primary evaluation amendment:** 2026-09-06 00:00 America/Vancouver
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -66,6 +67,16 @@ Build one internally coherent fair for each exact primary market, then grade bot
 Never preselect an underdog, favorite, home team, away team, over or under as the only candidate side. One market never substitutes for another. One league never substitutes for another.
 
 If an expected primary market is missing, stale, identity-unsafe or otherwise unusable, retain an explicit availability limitation rather than silently skipping it.
+
+### Documented evaluation — from September 6
+
+For report timestamps at/after `2026-09-06T00:00:00-07:00`, read the primary-analysis section of `docs/REPORT_EVIDENCE_REQUIREMENTS.md`. Use `derivePrimarySelectionInventory(report, feed, policy)` from the existing coverage gate to establish exact available primary sides. Availability is not a completed evaluation. For **each available side**, retain one `sidecar.primaryAnalysis.receipts` entry with either the actual EVALUATED decision and evidence or a BLOCKED record explaining the specific research/fair/personnel/calibration shortfall and actual event-specific checks. Never bulk-label available odds as PASS or invent fair values to satisfy this receipt.
+
+Keep both sides of the same market on a coherent fair and uncertainty range. Record all evaluated PASS decisions even when their cards are curated out. Every qualifying BET/LEAN/WAIT still belongs in the published card set under existing overflow/continuity rules. An explicit unavailable continuity PASS remains a non-evaluated resolution.
+
+Reconcile `primary.available = primary.evaluated + primary.blocked` and `primary.required = primary.available + primary.unavailable` for every sport and in totals. Include the exact visible clause `Primary selections: N available; N evaluated; N evidence-blocked; N unavailable.` with the four actual counts. Evidence-blocked is not an analytical PASS; zero completed evaluations must be disclosed as such. Coverage describes retained same-day pregame events; publisher diagnostics disclose known acquisition omissions separately. Complete inventory accounting must not be described as complete handicapping when research is blocked.
+
+The existing coverage and bundle validators enforce this before freeze and again at publication/read-back. The publisher derives `coverageSummary` and version-3 meter telemetry; tasks must not supply invented display counts or meter readings. Heat and agreement use verified primary quotes independently of cards. Price pressure needs an actual BET/LEAN/WAIT directional reference; absent references remain explicitly unmeasured. All five standard tasks inherit this change through this shared file; no new task or schedule is added.
 
 ### Player props — PAUSED_BY_SCOPE
 

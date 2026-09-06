@@ -40,3 +40,17 @@ The correction cannot recreate missing quotes in the archived snapshot. The next
 The 15:15 cycle used a manual odds refresh. It proved report publication and meter fallback, but did not prove the automatic Cloudflare odds-dispatch path. This follow-up changes acquisition/evidence behavior, not the scheduler. No extra automatic checker or backstop is added.
 
 Source and numeric-fair safeguards are specified separately in `REPORT_EVIDENCE_REQUIREMENTS.md`, effective for reports from 17:00 PT onward. Regression results and the published change are recorded in Git history and the major-sport coverage validation workflow.
+
+## 18:15 acceptance result and coordinated closeout
+
+Exact report: `data/history/runs/2026-09-05/late-182130.json`; feed blob `1d0fa8a4a4af89d9bfdc4d722991c81b3f17f25c`, generated 18:08:53 PT. Its ten retained same-day pregame events account for 60 primary sides: 26 usable and 34 unavailable. This issued report and its all-zero card/meter receipt remain unchanged.
+
+The 34 exclusions reconcile to six sides with quotes 30–90 minutes old, 22 with provider quotes older than the 90-minute retention limit, and six with genuinely absent moneylines. The old coverage reason `MARKET_NOT_RETURNED` combines the last two groups. The new publisher coverage explanation distinguishes them using timestamps already retained in the bound acquisition diagnostics; it does not make those quotes executable.
+
+The refresh used 83/90 requests. Six supplemental responses merged with identical before/after timestamps and availability, recovering zero primary pairs. Three other affected events had initial requests but fell outside the six-event supplemental cap. No fresh-quote resolver defect, API error, retry or identity rejection was found. **No additional collector, budget, scheduler, retention or freshness change is justified by this run.** The feed records a manual refresh; this is not acceptance of the automatic Cloudflare dispatch path.
+
+One additional discovered event, `72854572`, returned no event from either book and is absent from `feed.events`. It is disclosed as an acquisition omission, outside the ten-event/60-side retained-feed count. Inventory completeness must not imply discovery-wide coverage.
+
+The report's `26 evaluated` was an availability reconciliation, not proof of 26 documented handicaps; its source evidence gate checked zero displayed cards. From September 6, the existing coverage/bundle gates require per-available-side EVALUATED or BLOCKED receipts and derive a separate coverage display. Version-3 meters measure the verified primary market independently of card curation, with directional pressure explicitly unavailable when no stance exists. These changes are documented in the existing evidence and meter references; no new task, forced card or looser evidence rule is introduced.
+
+The diagnostic version-3 replay used the original report timestamp, feed, coverage policy and all four eligible pinned snapshots. It found 30 verified quotes across eight games, ten comparable selections and two changed selections. Heat was 10/100 at 29% confidence; agreement was 59/100 from two pairs at 8% confidence. Pressure was unmeasured with `NO_DIRECTIONAL_REFERENCE`. The original version-2 telemetry reproduced exactly; archived report blob `e541958e5508521e4f7dc8961bbfbc9e7c3e1458` remained unchanged. These are diagnostic results, not a replacement historical report.
