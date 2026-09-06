@@ -88,7 +88,8 @@
       #runnerVigContributors .instrumentScale,#runnerVigContributors .instrument svg,#runnerVigContributors .instrumentBand{display:none!important}
       #runnerVigContributors .instrumentRead{grid-area:read!important;display:flex!important;justify-content:flex-end!important;align-items:baseline!important;gap:5px!important;min-height:0!important;margin:0!important;padding:0!important;font-size:9px!important;white-space:nowrap!important;text-align:right!important}
       #runnerVigContributors .instrumentRead b{font-size:27px!important;line-height:.95!important;color:var(--cyan)!important}
-      #runnerVigContributors .instrumentConf{grid-area:conf!important;font-size:6px!important;margin:0!important;text-align:right!important;color:#789487!important}
+      #runnerVigContributors .instrumentConf{grid-area:conf!important;font-size:6px!important;margin:0!important;text-align:right!important;color:#789487!important;white-space:normal!important;overflow-wrap:anywhere;line-height:1.35!important}
+      #runnerVigContributors .instrument,#runnerVigContributors .instrument>*{min-width:0!important;max-width:100%;box-sizing:border-box}
       .runnerMiniRail{grid-area:rail;position:relative;height:8px;margin-top:3px;border:1px solid #274b33;background:#061109;overflow:visible}
       .runnerMiniRailTrack{position:absolute;inset:0;opacity:.95}
       .instrument[data-meter-kind='heat'] .runnerMiniRailTrack{background:linear-gradient(90deg,#00ff78 0%,#a9d92e 28%,#ffd43b 50%,#ff7a2f 72%,#ff334f 100%)}
@@ -109,8 +110,9 @@
       #runnerVigScope.unmeasured .runnerVigScopeFallback{display:block;color:var(--muted)}
       #runnerVigScope.unmeasured .runnerVigScopeKey{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45;letter-spacing:.025em}
       #runnerLive>.runnerCoverage{position:relative;z-index:1}
-      #runnerVigScope.noDirection .runnerVigScopeFrame{min-height:72px!important;aspect-ratio:auto!important}
-      #runnerVigScope.noDirection .runnerVigScopeFallback{line-height:1.5}
+      #runnerVigScope.unmeasured{align-self:start;grid-template-rows:auto auto auto!important}
+      #runnerVigScope.unmeasured .runnerVigScopeFrame{height:auto!important;min-height:72px!important;aspect-ratio:auto!important}
+      #runnerVigScope.unmeasured .runnerVigScopeFallback{white-space:pre-line;line-height:1.7}
       .runnerVigScopeKey{margin-top:6px;color:#b1d8bc;font-size:8px;font-weight:900;letter-spacing:.11em;text-align:center;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
       /* Default segmented LEDs. */
@@ -171,6 +173,8 @@
         #runnerVigContributors .instrument:first-child{border-left:0!important}
         #runnerVigContributors .instrumentLabel,#runnerVigContributors .instrumentConf{text-align:center!important}
         #runnerVigContributors .instrumentRead{justify-content:center!important}
+        #runnerVigContributors .instrumentLabel{white-space:normal!important;line-height:1.25!important}
+        #runnerVigContributors .instrumentRead{flex-wrap:wrap!important;white-space:normal!important;line-height:1.2!important}
         #runnerMarketIntel[data-meter-variant='blocks'] #runnerVigContributors .instrument{grid-template-columns:1fr!important;grid-template-areas:'label' 'read' 'blocks' 'conf'!important}
         .runnerVigScopeFrame{min-height:200px;height:200px}
       }
@@ -195,7 +199,8 @@
       const empty=[heatValue,pressureValue,agreementValue].every(value=>value===null);
       const reason=instruments[1]?.dataset?.meterReason;
       const noDirection=reason==='NO_DIRECTIONAL_REFERENCE';
-      return {file:null,noDirection,key:error?'TELEMETRY INTEGRITY ERROR':noDirection?'COMBINED STATE UNMEASURED':empty?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL',detail:noDirection?'No BET, LEAN or WAIT direction. Heat and agreement describe available primary markets.':reason?instruments[1].title:'ISSUED INPUTS INCOMPLETE'};
+      const summary=error||empty?'':`HEAT ${heatValue??'—'} • PRESSURE ${pressureValue??'—'} • AGREEMENT ${agreementValue??'—'}`;
+      return {file:null,noDirection,summary,key:error?'TELEMETRY INTEGRITY ERROR':noDirection?'NO PICK DIRECTION':empty?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL',detail:noDirection?'No BET, LEAN or WAIT direction. Heat and agreement describe available primary markets.':reason?instruments[1].title:'ISSUED INPUTS INCOMPLETE'};
     }
     const heat=heatValue<40?'low':heatValue<55?'medium':'high';
     const pressure=pressureValue<45?'adverse':pressureValue<56?'neutral':'favorable';
@@ -261,8 +266,10 @@
     scope.classList.toggle('noDirection',Boolean(state.noDirection));
     if(!state.file){
       if(img){img.removeAttribute('src');img.alt='';}
-      if(fallback)fallback.textContent=state.key;
-      if(key)key.textContent=state.detail||'ISSUED INPUTS INCOMPLETE';
+      const fallbackText=[state.key,state.summary].filter(Boolean).join('\n');
+      if(fallback&&fallback.textContent!==fallbackText)fallback.textContent=fallbackText;
+      const detail=state.detail||'ISSUED INPUTS INCOMPLETE';
+      if(key&&key.textContent!==detail)key.textContent=detail;
       scope.dataset.vigScopeState='unmeasured';
       return scope;
     }
