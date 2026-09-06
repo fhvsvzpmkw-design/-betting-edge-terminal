@@ -341,6 +341,61 @@ export function derivePrimarySelectionInventory(report, feed, policy) {
 }
 
 const PRIMARY_BLOCKER_REASONS = new Set(['SOURCE_UNAVAILABLE', 'FAIR_MODEL_UNAVAILABLE', 'PERSONNEL_UNRESOLVED', 'CALIBRATION_UNAVAILABLE', 'CONFLICTING_EVIDENCE', 'RESEARCH_INCOMPLETE']);
+export const RESEARCH_COMPLETION_FROM = '2026-09-06T18:15:00-07:00';
+
+// A working queue derived from the existing inventory and draft receipts. It
+// neither creates research evidence nor certifies the recorded decisions.
+export function buildPrimaryResearchPlan(report, sidecar, inventory) {
+  const receipts = sidecar?.primaryAnalysis?.receipts || [];
+  const analysisBound = sidecar?.primaryAnalysis?.feedGeneratedAt === report.feedGeneratedAt;
+  const events = new Map();
+  const counts = { available: inventory.selections.length, pending: 0, evaluatedRecorded: 0, blockersRecorded: 0 };
+  for (const selection of inventory.selections) {
+    const matches = receipts.filter(receipt => receipt?.selectionId === selection.selectionId);
+    const receipt = matches.length === 1 ? matches[0] : null;
+    const bound = analysisBound && receipt && selection.quotes.some(quote => sameQuote(receipt.quote, quote));
+    let state = 'RESEARCH_PENDING', nextAction = 'START_STAGE_1';
+    if (matches.length > 1 || (receipt && !bound)) nextAction = 'RECONCILE_EXACT_RECEIPT';
+    else if (bound && receipt.state === 'EVALUATED') state = 'EVALUATED_RECORDED';
+    else if (bound && receipt.state === 'BLOCKED' && PRIMARY_BLOCKER_REASONS.has(receipt.blocker?.reason)) {
+      if (receipt.blocker.reason === 'RESEARCH_INCOMPLETE') nextAction = 'RESUME_RESEARCH';
+      else state = 'BLOCKER_RECORDED';
+    }
+    if (state === 'RESEARCH_PENDING') counts.pending++;
+    else if (state === 'EVALUATED_RECORDED') counts.evaluatedRecorded++;
+    else counts.blockersRecorded++;
+    const eventKey = `${selection.sport}|${selection.eventId}`;
+    if (!events.has(eventKey)) events.set(eventKey, {sport: selection.sport, eventId: selection.eventId, eventDate: selection.eventDate, markets: new Map()});
+    const event = events.get(eventKey);
+    if (!event.markets.has(selection.marketDetail)) event.markets.set(selection.marketDetail, {marketDetail: selection.marketDetail, selections: []});
+    event.markets.get(selection.marketDetail).selections.push({
+      selectionId: selection.selectionId, side: selection.side, quotes: selection.quotes, state,
+      nextAction: state === 'RESEARCH_PENDING' ? nextAction : 'VALIDATE_RECORDED_OUTCOME',
+      ...(bound && receipt.blocker ? {missing: receipt.blocker.missing, impact: receipt.blocker.impact, attempts: receipt.blocker.attempts} : {})
+    });
+  }
+  return {
+    feedGeneratedAt: report.feedGeneratedAt,
+    state: counts.pending ? 'RESEARCH_PENDING' : 'READY_FOR_VALIDATION',
+    counts,
+    workflow: [
+      'Stage 1: research current performance, matchup, material personnel and conditions; share relevant event facts.',
+      'Construct a supported provisional fair and range for each exact market; use applicable governed work or explain a defensible market-anchored derivation.',
+      'Resolve material unknowns with targeted fallback research, including Stage 2 source depth and closing recheck when required; re-handicap.',
+      'Grade both opposing selections coherently. Record actual evidence and decision, or a genuine terminal limitation after attempted alternatives.',
+      'Continue pending work before freeze. A recorded outcome still requires the complete evidence/Core/coverage/bundle validators.'
+    ],
+    events: [...events.values()].sort((a, b) => Date.parse(a.eventDate) - Date.parse(b.eventDate) || a.eventId.localeCompare(b.eventId)).map(event => ({...event, markets: [...event.markets.values()]}))
+  };
+}
+
+export function validateResearchCompletion(report, sidecar) {
+  if (parseMs(report.ts) < Date.parse(RESEARCH_COMPLETION_FROM)) return {enforced: false};
+  const pending = (sidecar?.primaryAnalysis?.receipts || []).filter(receipt => receipt?.state === 'BLOCKED' && receipt.blocker?.reason === 'RESEARCH_INCOMPLETE');
+  const events = [...new Set(pending.map(receipt => receipt.quote?.eventId || receipt.selectionId))];
+  ensure(!pending.length, `RESEARCH_PENDING: ${pending.length} primary selection(s) across ${events.length} event(s) still need research [${events.join(', ')}]. RESEARCH_INCOMPLETE is a working state, not a terminal evidence limitation. Run research-plan, continue the recorded missing work and fallbacks before freeze; if execution cannot continue, report ANALYSIS INCOMPLETE and do not stage READY. Do not relabel unfinished work as model/calibration/source unavailable.`);
+  return {enforced: true};
+}
 function exactObject(left, right) { return JSON.stringify(left) === JSON.stringify(right); }
 function closeNumber(left, right) { return Number.isFinite(left) && Number.isFinite(right) && Math.abs(left - right) < 1e-8; }
 function sameQuote(left, right) { return isObject(left) && Object.keys(right).every(key => left[key] === right[key]) && Object.keys(left).length === Object.keys(right).length; }
@@ -415,6 +470,7 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
   ensure(inventory || (feed && policy), 'Primary analysis validation requires the exact bound feed and coverage policy');
   const bound = inventory || derivePrimarySelectionInventory(report, feed, policy), analysis = sidecar?.primaryAnalysis;
   ensure(isObject(analysis) && analysis.schema === 1 && analysis.feedGeneratedAt === report.feedGeneratedAt && Array.isArray(analysis.receipts), 'primaryAnalysis schema 1, bound feedGeneratedAt and complete receipts are required');
+  validateResearchCompletion(report, sidecar);
   const required = new Map(bound.selections.map(selection => [selection.selectionId, selection])), seen = new Set(), fairGroups = new Map(), fairBases = new Map();
   let runtime = framework;
   const sports = Object.fromEntries(Object.entries(bound.sports).map(([sport, row]) => [sport, { available: row.primary.available, evaluated: 0, blocked: 0 }]));
@@ -955,12 +1011,19 @@ function selfTest() {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.command === 'self-test') { selfTest(); return; }
-  if (args.command !== 'validate' || !args.report || !args.sidecar) {
-    die('Usage: major-sport-market-coverage-gate.mjs validate --report FILE --sidecar FILE [--feed FILE] [--root DIR] | self-test');
+  if (!['validate', 'research-plan'].includes(args.command) || !args.report || !args.sidecar) {
+    die('Usage: major-sport-market-coverage-gate.mjs validate|research-plan --report FILE --sidecar FILE [--feed FILE] [--root DIR] | self-test');
   }
   const root = path.resolve(args.root || process.cwd());
   const report = readJson(path.resolve(args.report));
   const sidecar = readJson(path.resolve(args.sidecar));
+  if (args.command === 'research-plan') {
+    const feed = loadBoundFeed(root, report, sidecar, args.feed || null);
+    const {policy} = authority(root);
+    const inventory = derivePrimarySelectionInventory(report, feed, policy);
+    console.log(JSON.stringify(buildPrimaryResearchPlan(report, sidecar, inventory), null, 2));
+    return;
+  }
   const result = validateCoverageAudit(report, sidecar, { root, feedFile: args.feed || null });
   if (!result.enforced) {
     console.log(`MAJOR SPORT COVERAGE GATE PRE-CUTOVER ${report.ts}`);

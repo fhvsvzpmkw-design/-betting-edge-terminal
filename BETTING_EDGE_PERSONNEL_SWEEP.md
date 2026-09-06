@@ -33,6 +33,8 @@ The Stage 1 scan is deliberately broad and efficient:
 
 Stage 1 is **not** an exhaustive source hunt and does not itself authorize a BET. Its purpose is to prevent the provisional fair-value screen from being built on an obviously incomplete personnel baseline.
 
+If a material personnel unknown prevents even a provisional fair, pursue the targeted official/fallback research needed to bound it before screening out the market. The serious-candidate sequence is not a requirement to demonstrate an edge before researching the facts needed to calculate one. An official-page access error initiates the fallback process; it does not establish that the information is unavailable everywhere. Retain actual attempts in the existing working receipts/evidence.
+
 A market or selection that looked weak before Stage 1 must be admitted into the serious-candidate pool when newly identified personnel information plausibly creates or materially improves value. Betting Edge must not require a candidate to survive a pre-information value screen before personnel information is allowed to influence fair value.
 
 ## Stage 2 — Deep Personnel Sweep
@@ -245,7 +247,7 @@ Projected information must never be presented as confirmed.
 ## Decision use
 
 1. Material unresolved starter, participant, role or lineup questions widen the uncertainty/model-error margin.
-2. A nominal edge that does not comfortably clear this added uncertainty remains `WAIT` or `PASS` with zero stake.
+2. When a supported fair and bounded uncertainty exist, a nominal edge that does not comfortably clear the added uncertainty may resolve to zero-stake `PASS`, or `WAIT` only with its required independent signal and plausible actionability. If the fair/range cannot be supported after the required work, record a terminal evidence blocker. Unfinished work remains `RESEARCH_INCOMPLETE` in the working draft and must continue under shared scheduled authority section 6; it is not an analytical PASS.
 3. A `STRONG PROJECTION` may keep a candidate alive for later review but does not satisfy a hard rule that explicitly requires official confirmation.
 4. When official confirmation is a condition in `playTo` or player-prop participation/identity rules, the recommendation cannot become `BET` until confirmation exists and the executable price still passes all ordinary gates.
 5. Personnel information may create, remove, strengthen or weaken apparent value, but may not override identity, freshness, exposure, staking or other hard gates.

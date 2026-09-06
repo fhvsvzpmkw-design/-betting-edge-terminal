@@ -40,9 +40,9 @@ Authoritative Core files include:
 
 Core v1.4 adds explicit fair-value basis/model-error states, Research v1.8 uncertainty graduation, stronger personnel handling, tighter WAIT qualification and switchable Walters authority while preserving the existing execution/freshness/staking boundaries.
 
-## Report-card target
+## Report decisions
 
-Scheduled report lanes target **up to nine meaningful cards**. Nine is a review/presentation target, not a bet quota. Fewer cards and zero BETs are valid; weak filler must not be created merely to fill the board.
+From September 6, every EVALUATED primary decision is published, including PASS. There is no numeric card target or maximum. Research follows the shared scheduled authority's qualified-odds → current-research → fair-value → decision process. From the 18:15 September 6 completion amendment, unfinished research must continue in the working draft and cannot be staged as READY. Genuine terminal evidence limitations and zero BETs remain valid; neither availability nor unfinished work is a completed value decision.
 
 Pizza Plays remains downstream of VigScope. If there is no suitable qualifying play, no Pizza selection is preferable to forcing a weak or extreme longshot.
 
