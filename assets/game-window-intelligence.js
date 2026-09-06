@@ -6,36 +6,15 @@
 
   const STYLE_ID='vigScopeGameWindowIntelligenceStyle';
   const LIVE_TIMER_MS=30000;
-  const CFG_URL='./data/schedule-profiles.json';
-  const STATE_URL='./data/schedule-state.json';
-  const FALLBACK_CFG={
-    legacyProfileId:'mlb',
-    profiles:{
-      mlb:{id:'mlb',slots:[
-        {slot:'open',pulseTime:'05:45'},
-        {slot:'main',pulseTime:'07:45'},
-        {slot:'final_morning',pulseTime:'09:15'},
-        {slot:'evening',pulseTime:'14:55'},
-        {slot:'late',pulseTime:'17:55'}
-      ]},
-      nfl:{id:'nfl',slots:[
-        {slot:'open',pulseTime:'05:45'},
-        {slot:'main',pulseTime:'07:45'},
-        {slot:'final_morning',pulseTime:'08:45'},
-        {slot:'evening',pulseTime:'12:00'},
-        {slot:'late',pulseTime:'16:45'}
-      ]},
-      nba_nhl:{id:'nba_nhl',slots:[
-        {slot:'open',pulseTime:'05:45'},
-        {slot:'main',pulseTime:'10:45'},
-        {slot:'final_morning',pulseTime:'13:45'},
-        {slot:'evening',pulseTime:'15:45'},
-        {slot:'late',pulseTime:'17:45'}
-      ]}
-    }
-  };
-  let scheduleCfg=FALLBACK_CFG;
-  let scheduleState={defaultProfileId:'mlb',selections:[]};
+  const SCHEDULE_URL='./data/main-schedule.json';
+  const FALLBACK_SCHEDULE={id:'main',slots:[
+    {slot:'open',pulseTime:'05:50'},
+    {slot:'main',pulseTime:'07:50'},
+    {slot:'final_morning',pulseTime:'09:20'},
+    {slot:'evening',pulseTime:'15:05'},
+    {slot:'late',pulseTime:'18:05'}
+  ]};
+  let mainSchedule=FALLBACK_SCHEDULE;
 
   function currentVancouverDay(now=new Date()){
     try{
@@ -96,21 +75,8 @@
     return `${prefix}STARTED ${durationLabel(deltaMinutes)} AGO`
   }
 
-  function resolveProfile(run){
-    const day=runDay(run);
-    let id=String(run?.scheduleProfileId||scheduleState?.defaultProfileId||scheduleCfg?.legacyProfileId||'mlb');
-    const selections=[...(scheduleState?.selections||[])].sort((a,b)=>
-      String(a?.effectiveOperatingDate||'').localeCompare(String(b?.effectiveOperatingDate||''))||
-      String(a?.selectedAt||'').localeCompare(String(b?.selectedAt||''))
-    );
-    selections.forEach(s=>{
-      if(day&&s?.effectiveOperatingDate<=day&&scheduleCfg?.profiles?.[s.profileId])id=s.profileId
-    });
-    return scheduleCfg?.profiles?.[id]||FALLBACK_CFG.profiles.mlb
-  }
-
   function nextPullFor(run){
-    const profile=resolveProfile(run),slots=Array.isArray(profile?.slots)?profile.slots:[];
+    const slots=Array.isArray(mainSchedule?.slots)?mainSchedule.slots:[];
     const currentSlot=String(run?.slot||'');
     const i=slots.findIndex(x=>String(x?.slot||'')===currentSlot);
     if(i<0||i>=slots.length-1)return null;
@@ -119,7 +85,7 @@
     const offset=String(run?.ts||'').match(/([+-]\d{2}:\d{2}|Z)$/)?.[1]||'-07:00';
     const time=Date.parse(`${day}T${pulse}:00${offset}`);
     if(!Number.isFinite(time))return null;
-    return {time,pulseTime:pulse,slot:String(next?.slot||''),profileId:String(profile?.id||'')}
+    return {time,pulseTime:pulse,slot:String(next?.slot||''),scheduleId:String(mainSchedule?.id||'main')}
   }
 
   function watchTerms(rec){
@@ -350,16 +316,12 @@
   async function loadScheduleAuthority(){
     try{
       const bust=`v=${Date.now()}`;
-      const [cfg,state]=await Promise.all([
-        fetch(`${CFG_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`profiles ${r.status}`);return r.json()}),
-        fetch(`${STATE_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`state ${r.status}`);return r.json()})
-      ]);
-      if(cfg?.profiles)scheduleCfg=cfg;
-      if(state?.defaultProfileId)scheduleState=state;
+      const schedule=await fetch(`${SCHEDULE_URL}?${bust}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`schedule ${r.status}`);return r.json()});
+      if(schedule?.id==='main'&&Array.isArray(schedule?.slots)&&schedule.slots.length===5)mainSchedule=schedule;
       rerender();
       setTimeout(bindRunnerUtilityLayout,0);
       setTimeout(compactRunnerUtilityLayout,80)
-    }catch(e){console.warn('VigScope watch-market schedule authority fallback active',e)}
+    }catch(e){console.warn('VigScope watch-market Main schedule fallback active',e)}
   }
 
   function install(){

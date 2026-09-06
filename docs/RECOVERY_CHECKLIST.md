@@ -7,7 +7,7 @@ A recovery is not complete when the odds pull finishes or when the analysis has 
 ## Recovery sequence
 
 1. Confirm the scheduled report lane failed to produce a usable issued report and recovery still has practical betting value.
-2. Resolve the active schedule profile, then resolve **Contract v1.0 OPERATIONAL**, VigScope UI v1.5 and Betting Edge core v1.3 before handicapping.
+2. Resolve the permanent Main Betting Edge slot, then resolve **Contract v1.0 OPERATIONAL**, VigScope UI v1.5 and Betting Edge core v1.3 before handicapping.
 3. Use the newest valid odds feed. Run a manual odds refresh only when production freshness/executable-price gates require it.
 4. Handicap the remaining relevant window under normal production rules. Never relax value, identity, freshness, stake, risk, or Research Fit gates because the lane is a recovery.
 5. Preserve the canonical lane and append `— RECOVERY` to the display label. Use the actual recovery issuance time in `America/Vancouver`; never backdate to the scheduled time.

@@ -5,8 +5,8 @@ const text = fs.readFileSync('BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md', 'utf8
 
 for (const phrase of [
   'Status:** OPERATIONAL',
-  'Authority version:** 1.1',
-  'Schedule profile gate',
+  'Authority version:** 1.2',
+  'Main schedule gate',
   'Core 1.4 production preflight',
   'Major-sport market coverage',
   'both moneyline sides',

@@ -48,7 +48,7 @@ jobs:
           console.log(`Cloudflare dispatch envelope OK // scheduled_at=${raw} // age=${ageMinutes.toFixed(1)}m`);
           NODE
 
-      - name: Resolve active Vancouver schedule profile
+      - name: Resolve permanent Main Betting Edge schedule
         id: schedule
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
@@ -59,16 +59,16 @@ jobs:
           else
             export EVENT_NAME="${GITHUB_EVENT_NAME}"
           fi
-          node tools/schedule-profile.mjs resolve-workflow >> "$GITHUB_OUTPUT"
+          node tools/main-schedule.mjs resolve-workflow >> "$GITHUB_OUTPUT"
 
-      - name: Gate duplicate profile slot
+      - name: Gate duplicate Main schedule slot
         id: gate
         if: steps.schedule.outputs.should_run == 'true'
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
           OPERATING_DATE: ${{ steps.schedule.outputs.operating_date }}
-          PROFILE_ID: ${{ steps.schedule.outputs.profile_id }}
+          SCHEDULE_ID: ${{ steps.schedule.outputs.schedule_id }}
           CANONICAL_SLOT: ${{ steps.schedule.outputs.canonical_slot }}
           TARGET_MINUTES: ${{ steps.schedule.outputs.target_minutes }}
         run: |
@@ -83,13 +83,13 @@ jobs:
             process.exit(0);
           }
           const expectedDate=process.env.OPERATING_DATE||'';
-          const expectedProfile=process.env.PROFILE_ID||'';
+          const expectedSchedule=process.env.SCHEDULE_ID||'';
           const expectedSlot=Number(process.env.CANONICAL_SLOT||0);
           const target=Number(process.env.TARGET_MINUTES||NaN);
           let existing=null;
           try{existing=JSON.parse(fs.readFileSync('data/live-odds.json','utf8'))}catch{}
           const meta=existing?.scheduleMeta||{};
-          if(meta.operatingDate===expectedDate&&meta.profileId===expectedProfile&&Number(meta.canonicalSlot)===expectedSlot){
+          if(meta.operatingDate===expectedDate&&meta.profileId===expectedSchedule&&Number(meta.canonicalSlot)===expectedSlot){
             console.log('execute=false');
             console.log('reason=slot-already-published');
             process.exit(0);
@@ -110,7 +110,7 @@ jobs:
             }
           }
           console.log('execute=true');
-          console.log('reason=profile-slot-due');
+          console.log('reason=main-slot-due');
           NODE
 
       - name: Extract known-good odds worker
@@ -140,9 +140,9 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           # The preserved worker treats workflow_dispatch as an intentional
-          # accepted run. Seasonal timing/duplicate rejection happened above.
+          # accepted run. Main-schedule timing/duplicate rejection happened above.
           EVENT_NAME: workflow_dispatch
-          EVENT_SCHEDULE: seasonal-profile
+          EVENT_SCHEDULE: main-betting-edge
         run: node /tmp/betting-edge-odds-worker.js
 
       - name: Refresh official Pinnacle sharp benchmark
@@ -160,8 +160,8 @@ jobs:
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
           OPERATING_DATE: ${{ steps.schedule.outputs.operating_date }}
-          PROFILE_ID: ${{ steps.schedule.outputs.profile_id }}
-          PROFILE_LABEL: ${{ steps.schedule.outputs.profile_label }}
+          SCHEDULE_ID: ${{ steps.schedule.outputs.schedule_id }}
+          SCHEDULE_LABEL: ${{ steps.schedule.outputs.schedule_label }}
           CANONICAL_SLOT: ${{ steps.schedule.outputs.canonical_slot }}
           SLOT_NAME: ${{ steps.schedule.outputs.slot_name }}
           PLANNED_PULSE: ${{ steps.schedule.outputs.planned_pulse_time }}
@@ -180,8 +180,9 @@ jobs:
           j.scheduleMeta={
             schema:1,
             operatingDate:process.env.OPERATING_DATE||null,
-            profileId:process.env.PROFILE_ID||null,
-            profileLabel:process.env.PROFILE_LABEL||null,
+            // Retain these established field names for report/history compatibility.
+            profileId:process.env.SCHEDULE_ID||null,
+            profileLabel:process.env.SCHEDULE_LABEL||null,
             canonicalSlot:canonicalRaw?Number(canonicalRaw):null,
             slot:process.env.SLOT_NAME||null,
             plannedPulseTime:process.env.PLANNED_PULSE||null,
@@ -237,7 +238,7 @@ jobs:
             fi
             git commit -m "Refresh Betting Edge live odds"
             if git push origin HEAD:main; then
-              echo "Validated seasonal-profile odds snapshot published on attempt $attempt."
+              echo "Validated Main Betting Edge odds snapshot published on attempt $attempt."
               exit 0
             fi
             echo "Publish collision on attempt $attempt; retrying the same validated snapshots."
@@ -259,7 +260,7 @@ jobs:
             echo "## Betting Edge odds scheduler"
             echo
             echo "- Trigger: \`${trigger_source}\`"
-            echo "- Profile: \`${{ steps.schedule.outputs.profile_label }}\`"
+            echo "- Schedule: \`${{ steps.schedule.outputs.schedule_label }}\`"
             echo "- Operating day: \`${{ steps.schedule.outputs.operating_date }}\`"
             echo "- Canonical slot: \`${{ steps.schedule.outputs.canonical_slot }}\`"
             echo "- Planned pulse: \`${{ steps.schedule.outputs.planned_pulse_time }} PT\`"

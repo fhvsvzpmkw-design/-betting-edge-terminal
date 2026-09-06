@@ -10,7 +10,7 @@ MLB, NHL, NBA, WNBA, NFL, NCAAF and CFL retain both moneyline sides, both primar
 
 Player-prop screening, prop-specific research, fair estimation and every new or carried prop BET/LEAN/WAIT/PASS card are paused. Broad odds acquisition and archived reports/results remain available. The report summary identifies the pause.
 
-The authoritative scope is in data/major-sport-market-coverage-v1.json. All five standard tasks inherit BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md (authority interface version 1.1). Their prompt descriptions reflect the pause; task schedules and enabled states are preserved.
+The authoritative scope is in data/major-sport-market-coverage-v1.json. All five standard tasks inherit BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md (authority interface version 1.2). Their prompt descriptions reflect the pause; task schedules and enabled states are preserved.
 
 ## Receipt and publication
 

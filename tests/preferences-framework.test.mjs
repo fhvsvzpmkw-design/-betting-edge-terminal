@@ -29,9 +29,8 @@ for(const module of prefs.modules){
 }
 
 const byId=Object.fromEntries(prefs.modules.map(m=>[m.id,m]));
-assert(byId.schedule_profile?.state==='display_only','schedule profile must remain display-only');
-assert(byId.history_translation?.state==='active','history translation must remain active');
-assert(byId.history_translation?.editable===false,'history translation must not expose an edit control');
+assert(!byId.schedule_profile,'retired seasonal schedule selector must not return to preferences');
+assert(!byId.history_translation,'retired cross-profile history translation must not return to preferences');
 for(const id of ['meter_presentation','syndicate_load','startup_screen','history_landing','recommendation_detail']){
   assert(byId[id]?.state==='active',`${id} must be active`);
   assert(byId[id]?.editable===true,`${id} must be editable`);
@@ -59,5 +58,8 @@ for(const token of [
 
 assert(bootstrap.includes('bettingEdge.preferences.meterPresentation'),'VigScope bootstrap must honor saved meter preference before renderer load');
 assert(bootstrap.includes('preferences-framework.js?v=3'),'preferences framework cache version must be v3');
+assert(!bootstrap.includes('schedule-profile-ui.js'),'retired seasonal schedule UI must not load');
+assert(framework.includes("const BUTTON_ID='runnerPreferencesF6'"),'preferences framework must own its menu button');
+assert(framework.includes("const PANEL_ID='runnerPreferencesPanel'"),'preferences framework must own its panel');
 
 console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + UNBOUNDED EVALUATED CARD OUTPUT');

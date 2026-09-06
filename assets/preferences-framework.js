@@ -5,6 +5,8 @@ const DATA_URL='./data/preferences.json';
 const SYNDICATES_URL='./data/syndicates.json';
 const HOTLINE_SHELLS_URL='./data/hotline-shells.json';
 const OVERVIEW_ID='runnerPreferenceModuleOverview';
+const PANEL_ID='runnerPreferencesPanel';
+const BUTTON_ID='runnerPreferencesF6';
 const STYLE_ID='runnerPreferenceFrameworkStyle';
 
 const LAST_VIEW_KEY='bettingEdge.preferences.lastView';
@@ -121,11 +123,55 @@ function moduleCard(module){
     <div class="prefModulePolicy">${esc(module.controlPolicy||state.meaning)}</div>
   </article>`;
 }
+function ensureShell(d){
+  const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');
+  if(!tabs)return false;
+  let button=d.getElementById(BUTTON_ID);
+  if(!button){
+    button=d.createElement('button');
+    button.type='button';
+    button.className='btn';
+    button.id=BUTTON_ID;
+    button.innerHTML='<span class="canonicalMenuMain"><b>[TAB]</b>&nbsp; ⚙ PREFERENCES</span><span class="canonicalMenuMessage">OPERATIONS + DISPLAY&nbsp;&nbsp; // &nbsp;&nbsp;PRESS TO OPEN</span>';
+    tabs.appendChild(button);
+  }
+  let panel=d.getElementById(PANEL_ID);
+  if(!panel){
+    panel=d.createElement('section');
+    panel.id=PANEL_ID;
+    const nav=d.querySelector('.runnerNavPad');
+    nav?nav.insertAdjacentElement('afterend',panel):d.body.prepend(panel);
+  }
+  if(button.dataset.preferencesBound!=='1'){
+    button.dataset.preferencesBound='1';
+    button.addEventListener('click',()=>{
+      const open=!d.body.classList.contains('runnerPreferencesLoaded');
+      d.body.classList.remove('runnerSyndicateLoaded');
+      d.body.classList.toggle('runnerPreferencesLoaded',open);
+      button.classList.toggle('active',open);
+      if(open)render(d);
+    });
+  }
+  if(tabs.dataset.preferencesCloseBound!=='1'){
+    tabs.dataset.preferencesCloseBound='1';
+    tabs.addEventListener('click',event=>{
+      const selected=event.target.closest('.btn');
+      const current=d.getElementById(BUTTON_ID);
+      if(selected&&current&&selected!==current&&!selected.matches('#runnerSyndicateF5')){
+        d.body.classList.remove('runnerPreferencesLoaded');
+        current.classList.remove('active');
+      }
+    });
+  }
+  return true;
+}
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
   const s=d.createElement('style');
   s.id=STYLE_ID;
   s.textContent=`
+    #${PANEL_ID}{display:none;margin:0 12px 14px;padding:0;border:0;background:transparent}
+    body.runnerPreferencesLoaded #${PANEL_ID}{display:block}
     #${OVERVIEW_ID}{margin:12px 0;border:1px solid #2d566b;background:linear-gradient(180deg,#020b12,#01070b);padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
     .prefFrameworkHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:11px}
     .prefFrameworkHead b{color:#9feaff;font-size:14px;font-weight:900;letter-spacing:.08em}.prefFrameworkHead span{color:#8ba5b1;font-size:10.5px;line-height:1.5;max-width:680px;text-align:right}
@@ -272,7 +318,8 @@ function bindControls(d){
 }
 function render(d,force=false){
   if(!prefs||!d?.body)return false;
-  const panel=d.getElementById('runnerSchedulePreferences');
+  if(!ensureShell(d))return false;
+  const panel=d.getElementById(PANEL_ID);
   if(!panel)return false;
   ensureStyle(d);
   let box=d.getElementById(OVERVIEW_ID);
@@ -296,7 +343,7 @@ function render(d,force=false){
       <div class="prefStateCount reserved"><small>RESERVED</small><b>${c.reserved}</b></div>
     </div>
     <div class="prefModuleGrid">${(prefs.modules||[]).map(moduleCard).join('')}</div>
-    <div class="prefFrameworkRule"><b>F6 ARCHITECTURE RULE:</b> UI preferences may change presentation or landing behavior only. Pricing, identity, freshness, staking, the five-pull budget and the active daily schedule are not preference controls.</div>
+    <div class="prefFrameworkRule"><b>PREFERENCES RULE:</b> UI preferences may change presentation or landing behavior only. Pricing, identity, freshness, staking, the five-pull budget and the permanent Main Betting Edge schedule are not preference controls.</div>
   `;
   bindControls(d);
   return true;
@@ -304,6 +351,7 @@ function render(d,force=false){
 function attach(){
   const d=appDoc();
   if(!d?.body)return false;
+  if(!ensureShell(d))return false;
   if(d!==lastDoc){
     lastDoc=d;
     if(observer)observer.disconnect();
@@ -312,7 +360,7 @@ function attach(){
       render(d);
       applyDetailDefaults(d);
     }));
-    const panel=d.getElementById('runnerSchedulePreferences'),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');
+    const panel=d.getElementById(PANEL_ID),live=d.getElementById('runnerLive'),term=d.querySelector('main.term');
     if(panel)observer.observe(panel,{subtree:true,childList:true});
     if(live)observer.observe(live,{subtree:true,childList:true});
     if(term)observer.observe(term,{childList:true});

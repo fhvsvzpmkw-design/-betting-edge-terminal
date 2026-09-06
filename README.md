@@ -21,7 +21,7 @@ Current operating references:
 - [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — practical current production state and open operational items.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — report/odds schedule, recovery, Core 1.4 gate order, Result Closure, Crypto Specials and downstream boundaries.
 - [`docs/PUBLIC_LEDGER_OPERATIONS.md`](docs/PUBLIC_LEDGER_OPERATIONS.md) — canonical public-ledger path, privacy boundary, upload/replacement procedure, compatibility sync and recovery.
-- [`BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`](BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md) — seasonal profile timing and scheduler behavior.
+- [`BETTING_EDGE_MAIN_SCHEDULE.md`](BETTING_EDGE_MAIN_SCHEDULE.md) — permanent Main Betting Edge timing and scheduler behavior.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — post-Core-1.4 observation and future work.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable historical architectural decisions. Dated entries record the state when they were made; current production authority is the boundary above plus `docs/PROJECT_STATE.md`.
 - [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md) — authoritative production governance contract.
@@ -46,19 +46,17 @@ Scheduled report lanes target **up to nine meaningful cards**. Nine is a review/
 
 Pizza Plays remains downstream of VigScope. If there is no suitable qualifying play, no Pizza selection is preferable to forcing a weak or extreme longshot.
 
-## Current schedule profiles
+## Permanent Main Betting Edge schedule
 
 Canonical slots remain `open`, `main`, `final_morning`, `evening`, `late`.
 
-Current Vancouver pulse → report pairs:
+Vancouver pulse → report pairs:
 
-| Profile | Pulse → report pairs |
+| Schedule | Pulse → report pairs |
 |---|---|
-| MLB / SUMMER | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
-| NFL / FOOTBALL | 05:50→06:00, 07:50→08:00, 08:50→09:00, 12:05→12:15, 16:50→17:00 |
-| NBA + NHL / WINTER | 05:50→06:00, 10:50→11:00, 13:50→14:00, 15:50→16:00, 17:50→18:00 |
+| MAIN BETTING EDGE | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
 
-The active-day profile and five-primary-pull cap are controlled by `data/schedule-state.json` and `data/schedule-profiles.json`.
+`data/main-schedule.json` is the single schedule authority. The five-primary-pull cap is unchanged.
 
 ## Odds scheduler
 
@@ -66,7 +64,7 @@ Cloudflare Worker Cron is the **single automatic odds scheduler**.
 
 The temporary GitHub Actions two-minute scheduler backstop was removed on 2026-08-26. Scheduled odds pulls are now intentionally simple: Cloudflare dispatches the protected `odds-refresh.yml`; if a scheduled dispatch is missed, recovery is manual rather than a second automatic scheduler.
 
-The odds workflow retains active-profile validation, serialization, duplicate protection and the five-primary-pull cap. Manual workflow dispatch remains the explicit recovery path.
+The odds workflow retains Main-schedule validation, serialization, duplicate protection and the five-primary-pull cap. Manual workflow dispatch remains the explicit recovery path.
 
 The underlying Cloudflare dispatch path should continue to be observed for reliability; that is infrastructure work, not a Core v1.4 methodology change.
 
