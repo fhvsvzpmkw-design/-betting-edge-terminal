@@ -10,7 +10,6 @@ import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
 import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
-const PREFERENCES_PATH = 'data/preferences.json';
 const FEED_PATH = 'data/live-odds.json';
 const EXPECTED_AUTHORITY_ID = 'major-sport-market-coverage-v1';
 const BOOKS = Object.freeze(['Bet365', 'DraftKings']);
@@ -258,7 +257,9 @@ export function deriveBoundCoverage(report, feed, policy) {
 
 // Forward-only: availability is an exact quote inventory, never an analysis verdict.
 export const PRIMARY_ANALYSIS_FROM = '2026-09-06T00:00:00-07:00';
+export const UNBOUNDED_PRESENTATION_FROM = PRIMARY_ANALYSIS_FROM;
 export function primaryAnalysisRequired(report) { return parseMs(report?.ts) >= Date.parse(PRIMARY_ANALYSIS_FROM); }
+export function unboundedPresentationRequired(report) { return parseMs(report?.ts) >= Date.parse(UNBOUNDED_PRESENTATION_FROM); }
 function quoteClosed(value) {
   return value?.suspended === true || value?.isSuspended === true || value?.active === false || value?.isActive === false ||
     /^(suspended|closed|settled|cancelled|canceled|unavailable|disabled)$/i.test(String(value?.status || value?.state || ''));
@@ -451,7 +452,7 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
     if (prior) for (const field of ['estimate', 'low', 'high']) ensure(closeNumber(fair[field], prior[field]), `${label} opposing selections have incoherent shared market fair ${field}`);
     else fairGroups.set(fair.key, fair);
     const matchingCard = (report.recs || []).find(card => card.feed?.selectionKey === quote.selectionKey && String(card.feed?.eventId) === quote.eventId && card.book === quote.book);
-    if (decision.status !== 'PASS' || matchingCard) ensure(matchingCard && exactObject(matchingCard, decision), `${label} actionable decision must match its published card and existing execution gates`);
+    ensure(matchingCard && exactObject(matchingCard, decision), `${label} evaluated decision must match its published card; card-count curation is not permitted`);
     sports[selection.sport].evaluated++;
   }
   const missing = [...required.keys()].filter(key => !seen.has(key));
@@ -531,14 +532,6 @@ function authority(root = process.cwd(), pinnedSha = null) {
   ensure(policy.state === 'OPERATIONAL', 'Major-sport coverage authority must be OPERATIONAL');
   ensure(isObject(policy.coverageAudit), 'Major-sport coverage authority is missing coverageAudit policy');
   return { policy, blobSha: gitBlobSha(raw) };
-}
-function cardTarget(root = process.cwd()) {
-  const preferences = readJson(path.join(root, PREFERENCES_PATH));
-  const module = (preferences.modules || []).find(item => item?.id === 'report_card_target');
-  ensure(module, 'report_card_target preference is missing');
-  int(module.current, 'report_card_target.current');
-  ensure(module.overflowProtection === true, 'report_card_target overflowProtection must be true');
-  return module.current;
 }
 
 const SELECTIONS_BY_DETAIL = Object.freeze({
@@ -654,6 +647,26 @@ export function validateVisibleCoverageSummary(report, audit) {
     `Visible report summary must disclose its actual coverage limitation: ${required}`);
 }
 
+export function validatePresentationAudit(report, presentation) {
+  ensure(isObject(presentation), 'coverageAudit.presentation must be an object');
+  if (unboundedPresentationRequired(report)) {
+    ensure(presentation.mode === 'UNBOUNDED_ANALYSIS_OUTPUT', 'coverageAudit.presentation.mode must be UNBOUNDED_ANALYSIS_OUTPUT');
+    ensure(presentation.allEvaluatedPublished === true, 'coverageAudit.presentation.allEvaluatedPublished must be true');
+    int(presentation.fillerAdded, 'coverageAudit.presentation.fillerAdded');
+    ensure(presentation.fillerAdded === 0, 'coverageAudit.presentation.fillerAdded must be zero');
+    for (const field of ['target', 'targetIsSoft', 'overflowProtection', 'actionableSuppressedByTarget']) {
+      ensure(presentation[field] == null, `coverageAudit.presentation.${field} is retired at/after ${UNBOUNDED_PRESENTATION_FROM}`);
+    }
+    return 'UNBOUNDED_ANALYSIS_OUTPUT';
+  }
+  int(presentation.target, 'coverageAudit.presentation.target');
+  ensure(presentation.targetIsSoft === true, 'coverageAudit.presentation.targetIsSoft must be true');
+  ensure(presentation.overflowProtection === true, 'coverageAudit.presentation.overflowProtection must be true');
+  int(presentation.actionableSuppressedByTarget, 'coverageAudit.presentation.actionableSuppressedByTarget');
+  ensure(presentation.actionableSuppressedByTarget === 0, 'coverageAudit may not suppress actionable recommendations to meet the historical card target');
+  return 'LEGACY_SOFT_TARGET';
+}
+
 export function validateCoverageAudit(report, sidecar, { root = process.cwd(), requireCurrentAuthority = true, feed = null, feedFile = null } = {}) {
   ensure(isObject(report), 'Coverage gate report must be an object');
   ensure(isObject(sidecar), 'Coverage gate sidecar must be an object');
@@ -748,15 +761,7 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
     }
   }
 
-  ensure(isObject(audit.presentation), 'coverageAudit.presentation must be an object');
-  int(audit.presentation.target, 'coverageAudit.presentation.target');
-  // New publication binds the active preference. Historical verification keeps
-  // the issued, validated soft target while retaining its safety invariants.
-  if (requireCurrentAuthority) ensure(audit.presentation.target === cardTarget(root), 'coverageAudit.presentation.target does not match repository report_card_target');
-  ensure(audit.presentation.targetIsSoft === true, 'coverageAudit.presentation.targetIsSoft must be true');
-  ensure(audit.presentation.overflowProtection === true, 'coverageAudit.presentation.overflowProtection must be true');
-  int(audit.presentation.actionableSuppressedByTarget, 'coverageAudit.presentation.actionableSuppressedByTarget');
-  ensure(audit.presentation.actionableSuppressedByTarget === 0, 'coverageAudit may not suppress actionable recommendations to meet the card target');
+  validatePresentationAudit(report, audit.presentation);
 
   ensure(isObject(audit.totals), 'coverageAudit.totals must be an object');
   const calculatedTotals = sumSports(audit.sports, sportKeys, propsPaused, receiptRequired);
@@ -881,7 +886,7 @@ function selfTest() {
         reason: 'MARKET_NOT_RETURNED'
       }],
       presentation: {
-        target: cardTarget(),
+        target: 12,
         targetIsSoft: true,
         overflowProtection: true,
         actionableSuppressedByTarget: 0
@@ -905,6 +910,11 @@ function selfTest() {
   const suppressed = structuredClone(sidecar);
   suppressed.coverageAudit.presentation.actionableSuppressedByTarget = 1;
   assert.throws(() => validateCoverageAudit(report, suppressed, { feed }), /may not suppress actionable/i);
+
+  const unboundedReport = { ts: UNBOUNDED_PRESENTATION_FROM };
+  assert.equal(validatePresentationAudit(unboundedReport, { mode: 'UNBOUNDED_ANALYSIS_OUTPUT', allEvaluatedPublished: true, fillerAdded: 0 }), 'UNBOUNDED_ANALYSIS_OUTPUT');
+  assert.throws(() => validatePresentationAudit(unboundedReport, { mode: 'UNBOUNDED_ANALYSIS_OUTPUT', allEvaluatedPublished: true, fillerAdded: 0, target: 12 }), /retired/i);
+  assert.throws(() => validatePresentationAudit(unboundedReport, { mode: 'UNBOUNDED_ANALYSIS_OUTPUT', allEvaluatedPublished: false, fillerAdded: 0 }), /allEvaluatedPublished/i);
 
   const omittedNcaaf = structuredClone(feed);
   omittedNcaaf.events.push({
