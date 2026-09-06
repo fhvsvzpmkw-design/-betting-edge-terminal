@@ -11,6 +11,7 @@
 **Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.4  
 **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`
 **Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  
+**Operational amendment:** 2026-09-06 — numeric report-card targets retired; unbounded evaluated-decision publication  
 
 > **THIS FILE IS OPERATIONAL.**
 >
@@ -20,7 +21,7 @@
 
 # 1. Contract composition and precedence
 
-v1.0 is the deliberate production consolidation of the final operational v0.9 contract. It preserves the validated v0.8 execution baseline, the v0.9 durable-history/provenance delta, the v0.9 player-prop identity delta, and the production clarifications already operating before this promotion, including fair-value benchmark confidence labeling, spread-lineage reconciliation, PRICE WATCH informational metadata and the repository-controlled report-card target.
+v1.0 is the deliberate production consolidation of the final operational v0.9 contract. It preserves the validated v0.8 execution baseline, the v0.9 durable-history/provenance delta, the v0.9 player-prop identity delta, and the production clarifications already operating before this promotion, including fair-value benchmark confidence labeling, spread-lineage reconciliation, PRICE WATCH informational metadata and the current forward-only evaluated-decision publication policy.
 
 The following exact historical design artifacts remain incorporated into this production contract by reference:
 
@@ -144,20 +145,20 @@ Standard production report lanes remain:
 
 The report schedule itself is unchanged by v1.0. The odds-refresh workflow remains operationally separate from this contract promotion. v1.0 does not increase Odds-API request volume or alter the production refresh budget.
 
-## 5.1 Repository-controlled recommendation-card target
+## 5.1 Unbounded evaluated-decision publication
 
-Before final recommendation selection for each scheduled lane, resolve `data/preferences.json` from the same authoritative `main` branch and locate the module with `id: "report_card_target"`.
+**Operational for report timestamps at or after 2026-09-06T00:00:00-07:00 (America/Vancouver).** This section supersedes the former repository-controlled 7 / 9 / 12 report-card target for new reports. Reports validly issued before this cutoff retain their original card-target receipt and presentation as immutable historical evidence.
 
-The module's `current` value is the production **soft target** for the number of recommendation cards in that report. Allowed profiles are `7`, `9`, and `12`. The live production target is the module's `current` value; this contract does not hard-code a second current target.
+For new reports there is no numeric card minimum, target, profile, fallback target or maximum. `data/preferences.json` no longer supplies a report-card-count control.
 
-The target governs report breadth only:
+1. Complete the governed major-sport market sweep and required research before publication decisions are finalized.
+2. Every primary selection with an `EVALUATED` decision must be published unchanged as a recommendation card, including `BET`, `LEAN`, `WAIT`, and `PASS`.
+3. An evaluated `PASS` may not be hidden or discarded for presentation breadth. The final card count is an output of completed analysis, not an input to it.
+4. Do not add filler or create a weak decision merely to produce a particular number of cards.
+5. A `BLOCKED` primary-analysis receipt is an evidence/research limitation rather than a betting decision and is not converted into a card merely to increase card count. Separately governed unavailable continuity resolutions retain their existing rules.
+6. This publication change does not alter identity, freshness, fair-value, information, uncertainty, status, Core 1.4, Walters, Pinnacle, staking, exposure, odds-refresh/API or historical-immutability rules.
 
-1. Do **not** pad the report with weak, redundant or unqualified recommendations merely to reach the target. Fewer than the target is valid when the board does not support more useful cards.
-2. `overflowProtection` must remain `true`. A tracked or actionable `BET`, `LEAN`, or `WAIT` may not be dropped merely to enforce the target. A current qualifying `BET` may never be suppressed by the card target. The report may therefore exceed the target.
-3. All ordinary identity, freshness, fair-value, information, uncertainty, status and staking gates remain unchanged. Raising the target does not lower recommendation quality or BET standards.
-4. The target does not increase odds-refresh/API usage and does not require additional feed pulls.
-5. F6 may display this repository-controlled value while remaining non-editable until user-selectable report-card profiles are deliberately activated.
-6. If `data/preferences.json` or the module is temporarily unreadable or invalid, use **9** as the fallback soft target for this contract version and continue the report; this presentation/breadth setting is not a betting-safety preflight blocker.
+The current machine authority and coverage validator define the forward receipt as `coverageAudit.presentation = { mode: "UNBOUNDED_ANALYSIS_OUTPUT", allEvaluatedPublished: true, fillerAdded: 0 }` and fail closed if a new report reintroduces legacy target fields or omits an evaluated decision.
 
 ---
 
@@ -212,7 +213,7 @@ When a later scheduled lane has a same-day tracked spread from an archived Betti
 **Operational for report timestamps at or after 2026-09-05T13:30:00-07:00 (America/Vancouver).** This adds total-line continuity for MLB, NHL, NBA, WNBA, NFL, NCAAF and CFL. Earlier issued reports retain their original rules and immutable payloads.
 
 1. Track the **same exact event, canonical full-game total and Over/Under side** across same-day reports. Keep the latest archived selection, line, odds, book, status, fair and playTo as the historical reference. A changed total has a new current selectionKey; it is never an exact reprice of the original wager. Do not connect Over to Under, different games, team totals, alternate-total markets, or half/quarter/period totals.
-2. Keep an unstarted prior BET/LEAN/WAIT total in the current report until it receives a fresh decision or an explicit unavailable/unverified resolution. Resolved PASS cards may be curated; when a same-side total is displayed again, report its movement from the latest same-day decision. Market movement does not automatically transfer a prior status, fair, playTo or stake.
+2. Keep an unstarted prior BET/LEAN/WAIT total in the current report until it receives a fresh decision or an explicit unavailable/unverified resolution. Before the September 6 unbounded-publication cutoff, resolved PASS cards could be curated; from that cutoff, every EVALUATED current PASS is published like every other evaluated decision. When a same-side total is displayed again, report its movement from the latest same-day decision. Market movement does not automatically transfer a prior status, fair, playTo or stake.
 3. Use only the exact already-fetched bound snapshot. Preserve the 75-minute feed gate and the executable-quote clock of feed.generatedAt minus market.updatedAt, capped at 30 minutes. Do not request an extra odds refresh for reconciliation. A single fresh supported book can supply a valid current primary total.
 4. Resolve each supported book's newest canonical marketKey=totals using the same primary-line resolver as the major-sport coverage gate: unique explicit main/primary row first, otherwise the unique line at the smallest Over/Under implied-probability difference. Tied primary lines, missing identity or unresolved data are explicit limitations. Do not retain an old alternate row as the current primary merely because its selectionKey still exists.
 5. Record the current executable book, exact main total, side, selectionKey and odds. Different Bet365/DraftKings primary totals must remain book-specific, with both lines/prices and CONFLICTING SIGNALS in movement text. A valid one-book quote is not automatically blocked by another book being absent or stale. Ordinary Core uncertainty and price-quality rules govern any resulting decision.
@@ -225,7 +226,7 @@ When a later scheduled lane has a same-day tracked spread from an archived Betti
 
 **Operational for report timestamps at or after 2026-09-05T14:00:00-07:00 (America/Vancouver).** MLB run lines, NHL puck lines, and NBA, WNBA, NFL, NCAAF and CFL spreads use the same separate line/odds assessment as section 6.1a totals. For these future reports this section supersedes section 6.1's disappearance-only movement procedure. Historical payloads, decisions and grading remain immutable.
 
-1. Track the latest same-day archived recommendation for the exact event and home/away team under canonical marketKey=spread. Include unstarted BET/LEAN/WAIT candidates even when their old exact handicap still has a fresh quote. A latest PASS may be curated; when displayed again, compare against that latest same-day decision. Never substitute the opposing team, another game, an alternate-spread market, or a half/quarter/period market.
+1. Track the latest same-day archived recommendation for the exact event and home/away team under canonical marketKey=spread. Include unstarted BET/LEAN/WAIT candidates even when their old exact handicap still has a fresh quote. Before the September 6 unbounded-publication cutoff, a latest PASS could be curated; from that cutoff, every EVALUATED current PASS is published. When displayed again, compare against that latest same-day decision. Never substitute the opposing team, another game, an alternate-spread market, or a half/quarter/period market.
 2. Resolve each book's current primary handicap on the bound snapshot using the coverage gate's unique provider-main or market-center resolver. Do not let an old line surviving as an alternate suppress reconciliation of the new primary. Preserve the 75-minute feed and 30-minute quote-at-feed clocks; reconciliation makes no additional odds requests.
 3. Bind the current book, side, selectionKey and exact executable price to that book's resolved primary row. The selectionKey stores the provider's raw home-oriented handicap. Apply Section 4's home/away orientation once to obtain the bettor-facing handicap: home uses raw hdp, away uses its negative. Historical cards without a separate hdp remain trackable from an exact event/market/side-matching selectionKey; never infer a handicap from prose. When hdp is supplied it must agree with the exact key.
 4. Compare bettor-facing handicaps separately from odds. A numerically greater handicap is LINE MOVED IN FAVOR (for example -1.5 to -1, or +1.5 to +2.5); a smaller handicap is LINE MOVED AGAINST; equality is LINE UNCHANGED. Show the prior and current signed handicaps in rec.move.
@@ -238,11 +239,11 @@ When a later scheduled lane has a same-day tracked spread from an archived Betti
 
 **Operational for report timestamps at or after 2026-09-05T14:15:00-07:00 (America/Vancouver).** This applies to MLB, NHL, NBA, WNBA, NFL, NCAAF and CFL. Earlier issued reports retain their historical validation rules and immutable payloads.
 
-1. Verify every displayed full-game moneyline's current quote, regardless of current/prior BET, LEAN, WAIT or PASS status, including a new selection with no earlier report appearance. This is quote validation; both moneyline sides continue to receive fresh coverage before card curation. Require exact event, canonical marketKey=ml and home/away side. A current executable selectionKey must equal the chosen book's exact key, with matching event/market/side and no handicap. Preserve provider labels when supplied; do not guess identity or substitute a period or three-way/draw market.
+1. Verify every displayed full-game moneyline's current quote, regardless of current/prior BET, LEAN, WAIT or PASS status, including a new selection with no earlier report appearance. This is quote validation; both moneyline sides continue to receive fresh coverage before decision publication. Require exact event, canonical marketKey=ml and home/away side. A current executable selectionKey must equal the chosen book's exact key, with matching event/market/side and no handicap. Preserve provider labels when supplied; do not guess identity or substitute a period or three-way/draw market.
 2. At each supported book, inspect only its newest canonical moneyline market entry in the bound snapshot. If that entry lacks this side, is stale, suspended, identity-unresolved or internally contradictory, do not reuse an older still-fresh quote. Identical equal-time copies may be deduplicated; conflicting equal-time copies are unresolved. Use another valid supported book or explicitly mark the price unverified. Preserve the 75-minute feed and 30-minute quote-at-feed clocks. No extra odds request is authorized by this check.
 3. Bind structured current book, price and selectionKey to the selected newest-entry quote. One fresh supported book remains sufficient for quote availability. An absent or unusable second book does not automatically veto it. Preserve book-specific prices in the audit; normal Core book-dispersion, uncertainty and price-quality rules govern value. If no current quote is verifiable, require an explicit zero-stake unavailable/unverified decision, no executable numeric price, and a matching explanation in rec.move. MARKET UNAVAILABLE describes an actually absent canonical market; missing-side, stale or unresolved entries use PRICE NOT VERIFIED. An unavailable current selectionKey may be omitted only on an explicitly unverified card whose game and side remain identified.
 4. For each displayed selection, compare with the latest same-day archived decision for that exact full-game event/team, including a prior PASS. Show old/new odds and PRICE IMPROVED, PRICE WORSENED or PRICE UNCHANGED in rec.move using decimal-payout ordering. MOVEMENT UNCHANGED is allowed only when the odds are unchanged. If the old price is not parseable, show PRICE COMPARISON UNAVAILABLE and the current odds. For a new selection use NEW SELECTION, FIRST LOOK or PRICE COMPARISON UNAVAILABLE with the current odds; never invent a historical movement claim. Keep information-driven FAIR VALUE CHANGED and the current Core decision distinct from payout movement.
-5. Retain unstarted tracked BET/LEAN/WAIT moneylines until they receive a fresh current decision or explicit unavailable/unverified resolution. Read latest same-day History using America/Vancouver dates, not only the immediately preceding report. A latest PASS can be curated out after complete fresh coverage. Preserve archived exact prices, books, fairs, playTo, statuses and stakes. Every current card requires fresh fair/playTo and a consistent current decision/stake under the existing Core, personnel and staking gates; improved odds alone create no BET.
+5. Retain unstarted tracked BET/LEAN/WAIT moneylines until they receive a fresh current decision or explicit unavailable/unverified resolution. Read latest same-day History using America/Vancouver dates, not only the immediately preceding report. Before the September 6 unbounded-publication cutoff, a latest PASS could be curated after complete fresh coverage; from that cutoff, every EVALUATED current PASS is published. Preserve archived exact prices, books, fairs, playTo, statuses and stakes. Every current card requires fresh fair/playTo and a consistent current decision/stake under the existing Core, personnel and staking gates; improved odds alone create no BET.
 6. Run tools/moneyline-lineage.mjs audit before freeze using the exact report, sidecar and bound snapshot (or an explicit --feed file). Both publication workflows enforce it initially, after rebasing during retries, and at remote read-back. For future reports the older tracked non-spread availability check defers moneylines to this complete gate, preventing its older-row fallback from contradicting the newest-entry rule. Moneyline, spread and total checks share the existing read-only history, price-comparison and feed-binding primitives. All five scheduled Betting Edge tasks inherit this authority; schedules, thresholds, stake methodology and paused-prop scope are unchanged.
 
 ## 6.2 PRICE WATCH — informational PASS metadata
@@ -576,6 +577,14 @@ The current v1.0 promotion is recorded in `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-
 
 **Intentionally unchanged:** Bet365/DraftKings execution boundary; 75-minute feed freshness; 30-minute executable-quote freshness; staking/exposure methodology; scheduled report lanes; odds/API request budget; issued-report immutability.
 
+### Operational change record — 2026-09-06 — unbounded evaluated-decision publication
+
+**Issue:** The repository-controlled 7 / 9 / 12 card-target layer could suppress completed PASS decisions from the visible report and made presentation breadth an unnecessary second decision after the board had already been handicapped.
+
+**Decision:** Retire numeric card minimums, targets, profiles, fallback targets and maximums for new reports. From `2026-09-06T00:00:00-07:00`, every primary `EVALUATED` BET/LEAN/WAIT/PASS decision is published unchanged; BLOCKED remains an evidence limitation; no filler is added. The exact forward presentation receipt is governed by `data/major-sport-market-coverage-v1.json` and enforced by `tools/major-sport-market-coverage-gate.mjs`.
+
+**Intentionally unchanged:** full-board primary coverage; props pause; Bet365/DraftKings execution; Pinnacle benchmark authority; 75-minute feed and 30-minute quote freshness; Core 1.4; Walters; personnel/evidence rules; line/price movement; BET/LEAN/WAIT/PASS definitions; staking/exposure; report schedules; odds/API budget; issued-history immutability.
+
 Git history is the authoritative rollback system. Existing issued reports and sidecars are append-only historical evidence.
 
 Do not bundle unrelated UI feature development, Shadow History activation, new staking methodology, new books, Research Library promotion, or odds-refresh budget changes into this contract activation. The VigScope v1.5 runner remains the presentation shell. Core 1.4 is the operational report-engine/handicap version for post-cutover reports and is versioned independently from the runner and Governance Contract.
@@ -588,7 +597,7 @@ Any future contract version requires explicit change control, regression/equival
 
 Betting Edge governance version **1.0 is operational** on the authoritative `main` branch.
 
-This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, the repository-controlled report-card target and the operational two-stage personnel-information process—including sport-wide Stage 2 source depth, exact-wager dependency validation, source-conflict handling, decision sensitivity and explicit re-handicapping—remain governed behavior.
+This promotion formalizes the final proven v0.9 operating state as the first 1.x production contract. It changes governance/version identity and provenance requirements for new reports, while preserving the inherited pricing, freshness, identity, fair-value, status, staking, risk, payload, five-lane schedule and odds-budget safeguards. Durable issued-report history, source-backed same-day lineage, compact archive-backed sharing, exact player-prop identity, fair-value confidence labeling, spread-lineage reconciliation, PRICE WATCH, unbounded evaluated-decision publication and the operational two-stage personnel-information process—including sport-wide Stage 2 source depth, exact-wager dependency validation, source-conflict handling, decision sensitivity and explicit re-handicapping—remain governed behavior.
 
 ---
 
