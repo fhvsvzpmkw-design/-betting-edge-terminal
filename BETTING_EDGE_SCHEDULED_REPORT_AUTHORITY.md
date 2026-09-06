@@ -11,6 +11,7 @@
 **Fair-construction workflow clarification:** 2026-09-06, following the 06:00 review
 **Quote observation amendment:** 2026-09-06, forward-only for feeds declaring `quoteObservationVersion: 1`
 **Schedule simplification:** 2026-09-06 — one permanent Main Betting Edge schedule
+**Research completion amendment:** forward from `2026-09-06T18:15:00-07:00`
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -45,6 +46,8 @@ Require the market-coverage authority to have schema 1, authorityId `major-sport
 
 Any authority conflict is `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
 
+Apply the dated amendments to their stated scope. The Contract's market-derived benchmark allowance is an input to screening; the September 6 primary-receipt rule governs final evaluated decisions, including PASS. Research Library restrictions govern historical priors, not current matchup/personnel research. Neither distinction is an authority conflict or a reason to skip the current handicap.
+
 ## 3. Bind the exact odds snapshot
 
 Bind the exact `data/live-odds.json` snapshot for this lane. Enforce all Contract gates, including:
@@ -77,6 +80,8 @@ If an expected primary market is missing, stale, identity-unsafe or otherwise un
 ### Documented evaluation — from September 6
 
 For report timestamps at/after `2026-09-06T00:00:00-07:00`, read the primary-analysis section of `docs/REPORT_EVIDENCE_REQUIREMENTS.md`. Use `derivePrimarySelectionInventory(report, feed, policy)` from the existing coverage gate to establish exact available primary sides. Availability is not a completed evaluation. For **each available side**, retain one `sidecar.primaryAnalysis.receipts` entry with either the actual EVALUATED decision and evidence or a BLOCKED record explaining the specific research/fair/personnel/calibration shortfall and actual event-specific checks. Never bulk-label available odds as PASS or invent fair values to satisfy this receipt.
+
+From the research completion amendment, `RESEARCH_INCOMPLETE` belongs in the working draft only. It sends the producer back to section 6 and fails pre-freeze/publication validation. A terminal BLOCKED receipt means the applicable work and alternatives were attempted but a specific evidential limitation remains. Complete accounting alone does not make a candidate READY.
 
 Keep both sides of the same market on a coherent fair and uncertainty range. Every EVALUATED decision must appear unchanged in the published card set, including BET, LEAN, WAIT and PASS. There is no card-count minimum, target, profile or maximum, and no evaluated PASS may be hidden by presentation curation. An explicit unavailable continuity PASS remains a non-evaluated resolution under its existing gates. BLOCKED is an evidence limitation, not a betting decision or a substitute PASS.
 
@@ -130,14 +135,38 @@ Unavailable/stale/suspended/unmatched/incomplete Pinnacle is `PINNACLE_BENCHMARK
 
 ## 6. Research and current fair-value process
 
-### Complete the handicap before assigning an evidence blocker
+### Execute qualified odds → research → fair value → decision
+
+Start this process immediately after binding the qualified inventory; do not build a finished all-blocked report first. Work event by event, in start-time order, sharing relevant facts across its markets. Complete each supportable market through both decisions as the work progresses; an unresolved total must not halt an independently supportable moneyline or another event. Cover the whole eligible slate without a card quota.
+
+Use the existing report/sidecar working files, with an empty `primaryAnalysis.receipts` array initially. Retain the exact feed SHA and timestamp. Run this read-only command at the start and again when research stalls or before closing the research pass:
+
+`node tools/major-sport-market-coverage-gate.mjs research-plan --report <report.json> --sidecar <sidecar.json>`
+
+The command groups exact available selections by event and market, identifies missing or unfinished receipts, and returns the recorded missing work and actual attempts. It creates no sources, fairs, decisions, history or per-game archive. `READY_FOR_VALIDATION` means only that every selection has a recorded outcome; the complete validators still apply.
+
+1. **Current evidence first.** Complete the broad Stage 1 scan of team performance, matchup, material personnel and conditions. Read the actual event/team sources and extract the facts needed by each market. A probable-pitcher page alone is not a completed MLB matchup/lineup/bullpen assessment. A game preview alone is not a completed football personnel and fair-value assessment.
+2. **Attempt the numerical handicap.** Use the governed model when applicable, otherwise the supported market-anchored route below. Identify the exact market baseline, source-linked inputs, transformation/adjustment, resulting fair and uncertainty. Source pages are inputs; do the calculation rather than searching indefinitely for a page that supplies a ready-made fair. Keep moneyline, spread/run-line/puck-line and total derivations distinct. Do not invent universal blend weights, personnel point values or uncertainty margins.
+3. **Follow unresolved dependencies.** If a material unknown prevents even a provisional fair, research that dependency now; a candidate need not already have a numerical edge to justify the work needed to establish one. Use the fallback process below. After the provisional screen, complete material Stage 2 work for serious candidates, perform the required closing authoritative check, and apply the findings back to the fair/range. Record any justified no-change result.
+4. **Decide and retain progress.** Compare the coherent fair/range with each side's exact executable price and apply Core, personnel, WAIT, playTo and staking rules. Retain completed decisions and evidence in the existing draft receipts as each market finishes. If there is still no supportable fair/range after the applicable work, record the exact terminal limitation and attempted alternatives. A supported low-value result is PASS; an unsupported fair is BLOCKED.
+5. **Close the working queue.** Re-run `research-plan`. Continue every missing receipt or `RESEARCH_INCOMPLETE` item from its last actual finding. Do not restart completed research without a material reason, batch-fill the remainder with blockers to reach publication, or rename unfinished work to `FAIR_MODEL_UNAVAILABLE`/`CALIBRATION_UNAVAILABLE`/`SOURCE_UNAVAILABLE`. Once the queue is clear, run all pre-freeze gates and then stage the complete frozen bundle.
+
+### Fallback and execution failure
+
+- **A page fails or lacks the needed fact:** try another relevant official channel, then event/team/participant-specific credible current reporting or established statistics/lineup sources. Retain the failed check as an attempt and pursue the missing fact. Checking the local odds artifact verifies the price; it is not an independent research fallback.
+- **Material personnel remains unresolved:** apply the sport-wide Stage 2 3-to-5-source completion rule where applicable, record genuine source shortfalls, conflicts, sensitivity and the closing authoritative check. Unconfirmed personnel may support a bounded scenario analysis; it does not force either a fabricated confirmation or an automatic whole-event block.
+- **The method or uncertainty remains unsupported:** attempt the applicable governed or permitted market-anchored construction using the collected facts. Name the specific unsupported input, translation or range and why the attempted alternative cannot establish it. No maintained model and `directCalibration=GAP` alone are insufficient stopping reasons. Current research can move a current fair; historical Research Library material cannot directly set it.
+- **Work has not been done:** retain `RESEARCH_INCOMPLETE` only in the working draft and continue. If an actual tool/runtime/access failure prevents further work, deliver `ANALYSIS INCOMPLETE — NOT PUBLISHED`, identify the observed failure, completed/pending counts and next missing step. Do not claim a timeout or usage limit without evidence. Do not stage READY, silently reuse an older report as current, or call this a successful no-value report. Draft progress uses existing run files; this amendment adds no automatic retries, odds pulls, scheduled tasks or durable research store.
+
+The normal feed and event clocks continue to apply throughout. If the bound feed expires or the event starts before a valid final candidate can be completed, disclose the failure under the existing gates; never restamp the odds or loosen the freshness limits.
+
+### Fair construction and terminal evidence limitations
 
 For every available primary market, perform the current Core handicapping work. A maintained model is useful when applicable, but it is not a universal prerequisite. Source pages normally supply facts and inputs, not finished probability distributions. The absence of a prebuilt model, or of a probability on a schedule, scoreboard or personnel page, is not by itself a reason to stop.
 
-1. Research the event once across its relevant primary markets: current team performance, matchup, material personnel and conditions. Reuse a checked fact across sides or markets only where it actually applies. Identify what each market still needs; a moneyline estimate does not establish a run-line, puck-line, spread or total fair.
-2. Use applicable governed model work where available. Otherwise attempt the permitted `MARKET_ANCHORED_MODEL` route under Contract section 4.1: combine an explicitly identified current market baseline with substantive independent current matchup/personnel analysis. Explain the actual numerical derivation, any judgmental adjustment and its basis, and the uncertainty range. Do not relabel a no-vig quote plus narrative as an independent model, invent fixed blend weights or uncertainty margins, or treat Pinnacle as the fair-setting authority.
-3. Complete material Stage 2 work and re-handicap. Classify calibration honestly using the current Core framework: `directCalibration=GAP` raises the floor to `ELEVATED`; it does not automatically prohibit evaluation. Apply all other matching rules and the actual independent-support requirement. Core error categories do not supply a universal numerical uncertainty margin. Grade both opposing selections from one coherent supported fair/range against their exact prices.
-4. If the work still cannot support a numerical fair or bounded uncertainty, record the concrete unresolved input or method limitation and what was attempted. Use `RESEARCH_INCOMPLETE` when the work was not completed, rather than asserting that a model or calibration is unavailable. Never manufacture an estimate or a PASS to fill the inventory.
+The permitted `MARKET_ANCHORED_MODEL` route under Contract section 4.1 combines an explicitly identified current market baseline with substantive independent current matchup/personnel analysis. Explain the actual numerical derivation, any judgmental adjustment and its basis, and the uncertainty range. Do not relabel a no-vig quote plus narrative as an independent model, invent fixed blend weights or uncertainty margins, or treat Pinnacle as the fair-setting authority. A moneyline estimate does not establish a run-line, puck-line, spread or total fair.
+
+Classify calibration honestly using the current Core framework: `directCalibration=GAP` raises the floor to `ELEVATED`; it does not automatically prohibit evaluation. Apply all other matching rules and the actual independent-support requirement. Core error categories do not supply a universal numerical uncertainty margin. Grade both opposing selections from one coherent supported fair/range against their exact prices.
 
 ### Source and fair-value evidence — forward from 17:00 PT September 5
 

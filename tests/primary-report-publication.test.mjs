@@ -43,6 +43,18 @@ try{
   const inputBefore=fs.readFileSync(path.join(root,'input-report.json'),'utf8');
   assert.deepEqual(read(path.join(root,'input-sidecar.json')).primaryAnalysis.receipts,sidecar.primaryAnalysis.receipts,'candidate JSON staging preserves both quote clocks and receipt identities');
   let result=call('validate');assert.equal(result.status,0,result.stderr);assert.equal(fs.readFileSync(path.join(root,'input-report.json'),'utf8'),inputBefore);
+  const terminalReceipts=structuredClone(sidecar.primaryAnalysis.receipts);
+  for(const receipt of sidecar.primaryAnalysis.receipts) receipt.blocker.reason='RESEARCH_INCOMPLETE';
+  save();
+  const pendingBytes=fs.readFileSync(path.join(root,'input-sidecar.json'),'utf8');
+  for(const command of ['validate','publish']) {
+    result=call(command);assert.notEqual(result.status,0);
+    assert.match(result.stderr,/RESEARCH_PENDING: 6 primary selection/,'unfinished work cannot be staged or published even with fully reconciled coverage');
+    assert.equal(fs.readFileSync(path.join(root,'input-sidecar.json'),'utf8'),pendingBytes,'rejected publication preserves working research');
+  }
+  assert.ok(!fs.existsSync(path.join(root,'data/history/runs')),'unfinished work cannot write issued history');
+  assert.equal(read(path.join(root,'run-history.json')).runs.length,0,'unfinished work cannot enter index');
+  sidecar.primaryAnalysis.receipts=terminalReceipts;save();
   if(observedMode){
     const observedBefore=sidecar.primaryAnalysis.receipts[0].quote.quoteObservedAt;
     sidecar.primaryAnalysis.receipts[0].quote.quoteObservedAt=sidecar.primaryAnalysis.receipts[0].quote.quoteUpdatedAt;save();
@@ -92,6 +104,10 @@ try{
   result=call('publish');assert.notEqual(result.status,0);assert.match(result.stderr,/authorityBlobSha does not match current operational authority/,'new publication cannot substitute its old authority');
   const storedSidecarPath=path.join(root,'data/history/research-fit/2026-09-06/late-182130.json');
   const storedSidecar=read(storedSidecarPath),unresolvable=structuredClone(storedSidecar);
+  const pendingTamper=structuredClone(storedSidecar);pendingTamper.primaryAnalysis.receipts[0].blocker.reason='RESEARCH_INCOMPLETE';
+  write(path.relative(root,storedSidecarPath),pendingTamper);result=call('verify');
+  assert.notEqual(result.status,0);assert.match(result.stderr,/RESEARCH_PENDING/,'read-back enforces the same completion rule');
+  write(path.relative(root,storedSidecarPath),storedSidecar);
   if(observedMode){
     const wrongObservation=structuredClone(storedSidecar);
     wrongObservation.primaryAnalysis.receipts[0].quote.quoteObservedAt=wrongObservation.primaryAnalysis.receipts[0].quote.quoteUpdatedAt;

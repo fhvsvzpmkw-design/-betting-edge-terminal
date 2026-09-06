@@ -145,6 +145,10 @@ Fair value must distinguish the source and strength of the estimate rather than 
 8. On thin or weakly calibrated competitions, a small positive market-derived edge is not a near-BET by default. It must still clear uncertainty, model-error, identity, freshness and multiple-independent-signal requirements.
 9. These rules clarify confidence and presentation only. They do not loosen existing BET thresholds, freshness requirements, `playTo`, staking, or risk controls.
 
+**September 6 primary-decision clarification:** point 6 permits a no-vig benchmark as an analytical input, not a completed value decision by itself. From `2026-09-06T00:00:00-07:00`, the primary-receipt requirement governs every EVALUATED primary decision, including PASS: retain a supported independent or market-anchored numerical fair, uncertainty range and substantive current support. A market-only benchmark cannot be counted as an evaluated PASS or qualify WAIT without its independent signal and plausible actionability. Current matchup/personnel research may establish or change this fair; the separate Research Library restrictions apply to historical priors. If material missing facts prevent a provisional fair, pursue them before screening out the market.
+
+**Research completion from `2026-09-06T18:15:00-07:00`:** follow the executable working sequence and fallback process in shared scheduled authority section 6. `RESEARCH_INCOMPLETE` is a draft state that requires continued work, not a terminal publishable evidence limitation. A genuine source/personnel/method/calibration/conflict blocker remains permissible after the applicable work and alternatives have been attempted. If execution cannot complete, disclose `ANALYSIS INCOMPLETE — NOT PUBLISHED`; do not stage a READY candidate. Preserve completed work in the existing draft rather than inventing fairs, changing blocker labels to pass validation or starting a new research archive. Earlier issued reports remain immutable under their timestamp-specific rules.
+
 ---
 
 # 5. Report lanes and live-feed schedule boundary

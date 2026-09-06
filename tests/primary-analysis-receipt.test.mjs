@@ -56,6 +56,7 @@ const reviewed = {primaryAnalysis: {...sidecar.primaryAnalysis, receipts: invent
 const reviewedReport = {...clone(report), recs: reviewed.primaryAnalysis.receipts.map(receipt => clone(receipt.decision))};
 assert.equal(validate(reviewed, reviewedReport).primaryEvaluated, 2, 'every documented PASS decision is published as a card');
 assert.equal(validate(reviewed, reviewedReport).outcomeCounts.PASS, 2);
+assert.equal(validatePrimaryAnalysis({...reviewedReport, ts: '2026-09-06T18:15:00-07:00'}, reviewed, {inventory, framework}).primaryEvaluated, 2, 'completion amendment still accepts supported coherent zero-BET evaluations in the receipt validator');
 assert.throws(() => validate(reviewed), /must match its published card/, 'evaluated PASS may not be concealed');
 const incoherent = clone(reviewed); incoherent.primaryAnalysis.receipts[0] = evaluated(inventory.selections[0], 0.6);
 const incoherentReport = {...clone(report), recs: incoherent.primaryAnalysis.receipts.map(receipt => clone(receipt.decision))};
