@@ -7,6 +7,7 @@
 **Primary-market scope amendment:** 2026-09-05 13:00 America/Vancouver
 **Source and fair-value evidence amendment:** 2026-09-05 17:00 America/Vancouver
 **Documented primary evaluation amendment:** 2026-09-06 00:00 America/Vancouver
+**Unbounded card-output amendment:** 2026-09-06 00:00 America/Vancouver
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -52,11 +53,11 @@ Bind the exact `data/live-odds.json` snapshot for this lane. Enforce all Contrac
 
 Do not pull replacement odds merely because a market or candidate is unattractive.
 
-## 4. Major-sport market coverage — evaluate first, select cards second
+## 4. Major-sport market coverage — evaluate first, publish decisions second
 
 Apply `data/major-sport-market-coverage-v1.json` exactly.
 
-For every in-scope game in MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL, evaluate every fresh supported required primary selection before recommendation-card selection:
+For every in-scope game in MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL, evaluate every fresh supported required primary selection before recommendation-card publication:
 - MLB: both moneyline sides, both sides of the primary run line, primary total over and under;
 - NHL: both moneyline sides, both sides of the primary puck line, primary total over and under;
 - NBA/WNBA: both moneyline sides, both sides of the primary spread, primary total over and under;
@@ -72,7 +73,7 @@ If an expected primary market is missing, stale, identity-unsafe or otherwise un
 
 For report timestamps at/after `2026-09-06T00:00:00-07:00`, read the primary-analysis section of `docs/REPORT_EVIDENCE_REQUIREMENTS.md`. Use `derivePrimarySelectionInventory(report, feed, policy)` from the existing coverage gate to establish exact available primary sides. Availability is not a completed evaluation. For **each available side**, retain one `sidecar.primaryAnalysis.receipts` entry with either the actual EVALUATED decision and evidence or a BLOCKED record explaining the specific research/fair/personnel/calibration shortfall and actual event-specific checks. Never bulk-label available odds as PASS or invent fair values to satisfy this receipt.
 
-Keep both sides of the same market on a coherent fair and uncertainty range. Record all evaluated PASS decisions even when their cards are curated out. Every qualifying BET/LEAN/WAIT still belongs in the published card set under existing overflow/continuity rules. An explicit unavailable continuity PASS remains a non-evaluated resolution.
+Keep both sides of the same market on a coherent fair and uncertainty range. Every EVALUATED decision must appear unchanged in the published card set, including BET, LEAN, WAIT and PASS. There is no card-count minimum, target, profile or maximum, and no evaluated PASS may be hidden by presentation curation. An explicit unavailable continuity PASS remains a non-evaluated resolution under its existing gates. BLOCKED is an evidence limitation, not a betting decision or a substitute PASS.
 
 Reconcile `primary.available = primary.evaluated + primary.blocked` and `primary.required = primary.available + primary.unavailable` for every sport and in totals. Include the exact visible clause `Primary selections: N available; N evaluated; N evidence-blocked; N unavailable.` with the four actual counts. Evidence-blocked is not an analytical PASS; zero completed evaluations must be disclosed as such. Coverage describes retained same-day pregame events; publisher diagnostics disclose known acquisition omissions separately. Complete inventory accounting must not be described as complete handicapping when research is blocked.
 
@@ -90,7 +91,7 @@ State “Player-prop analysis paused; full-game primary markets covered” in th
 
 ### Full-game total movement across reports
 
-For report timestamps at or after `2026-09-05T13:30:00-07:00`, apply Contract section 6.1a across MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL. Read the latest same-day archived total for each event and Over/Under side. Preserve unstarted tracked BET/LEAN/WAIT candidates as current decisions; PASS cards may be curated. Reconcile the current primary total even if the old exact line still survives as an alternate row. A changed number is a new current selection with independent requalification.
+For report timestamps at or after `2026-09-05T13:30:00-07:00`, apply Contract section 6.1a across MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL. Read the latest same-day archived total for each event and Over/Under side. Preserve unstarted tracked BET/LEAN/WAIT candidates as current decisions. Reconcile the current primary total even if the old exact line still survives as an alternate row. A changed number is a new current selection with independent requalification. From the September 6 documented-evaluation cutover, an evaluated current PASS is published like every other evaluated decision.
 
 Use the bound snapshot, the coverage gate's primary-line resolver, and the normal feed/quote clocks. One fresh supported book can be sufficient. Preserve book-specific differences with `CONFLICTING SIGNALS` and each book's line/price; never invent a consensus total. A lower total helps a prospective Over and a higher total helps a prospective Under. Record line movement and odds movement separately in `rec.move`, with the prior/current totals and odds, using the Contract labels. Reassess current fair, uncertainty, playTo and decision; information-driven fair changes remain distinct from sportsbook movement. Keep the exact original selection and decision unchanged in History.
 
@@ -102,7 +103,7 @@ For report timestamps at or after `2026-09-05T14:00:00-07:00`, apply Contract se
 
 Use the exact provider selectionKey and hdp orientation: home displays raw hdp; away displays its negative. Archived cards with no separate hdp still qualify for tracking when the exact selectionKey supplies it. Show prior/current signed handicaps and odds in rec.move with separate LINE MOVED IN FAVOR/AGAINST/LINE UNCHANGED and PRICE IMPROVED/WORSENED/UNCHANGED/COMPARISON UNAVAILABLE labels as defined in the Contract. Preserve book-specific disagreement and verify the selected book's exact line/price. One fresh supported book remains sufficient for quote availability under the normal Core gates.
 
-Reassess the current fair, uncertainty, playTo and decision; keep original selections immutable. Unstarted tracked BET/LEAN/WAIT candidates must receive a current decision or explicit zero-stake unavailable/unverified resolution. Latest PASS cards may be curated. Before freeze run `node tools/spread-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` with the exact bound feed (or `--feed <snapshot.json>`), as well as the existing totals check. This shared instruction applies to all five Betting Edge report tasks; their schedules and paused-prop scope continue unchanged.
+Reassess the current fair, uncertainty, playTo and decision; keep original selections immutable. Unstarted tracked BET/LEAN/WAIT candidates must receive a current decision or explicit zero-stake unavailable/unverified resolution. From the September 6 documented-evaluation cutover, every evaluated current PASS is also published. Before freeze run `node tools/spread-lineage.mjs audit --report <report.json> --sidecar <sidecar.json>` with the exact bound feed (or `--feed <snapshot.json>`), as well as the existing totals check. This shared instruction applies to all five Betting Edge report tasks; their schedules and paused-prop scope continue unchanged.
 
 ### Full-game moneylines — all displayed quotes and price movement
 
@@ -168,15 +169,17 @@ For a game whose two team bindings are currently resolved, require exactly one m
 
 The QB layer has no direct BET, status, stake, or gate-bypass authority. The first durably published report containing an NFL evaluation while `postActivationCanary.state=PENDING` is the candidate for `FIRST_NFL_BEARING_BETTING_EDGE_READBACK`. After publication, report its exact history paths and whether each NFL Walters fair matched the same active-board QB production state so the governed canary can be closed. The scheduled report task must not directly edit the QB production manifest, rewrite issued History, or roll back a Graham board.
 
-## 9. Recommendation-card selection and delivery
+## 9. Recommendation-card publication and delivery
 
-Only after the complete major-sport market sweep and serious-candidate research are finished may the report select display cards.
+Only after the complete major-sport market sweep and required candidate research are finished may the report publish decision cards.
 
-Resolve `data/preferences.json` module `report_card_target`. The repository-selected `report_card_target.current` value is **soft**, not a hard ceiling. Fewer cards are valid when the board is thin. An in-scope qualifying/tracked/actionable BET, LEAN or WAIT may overflow the target and may not be discarded merely to enforce the soft target. PASS cards may be curated after complete evaluation.
+For report timestamps at/after `2026-09-06T00:00:00-07:00`, there is **no numeric card minimum, target, profile or maximum**. Do not resolve a card-count preference and do not curate completed decisions toward a number. Publish every EVALUATED primary decision unchanged, including BET, LEAN, WAIT and PASS. The final card count is therefore an output of the completed analysis. Do not add filler. BLOCKED receipts remain evidence limitations rather than cards, except that separately governed unavailable continuity resolutions retain their existing behavior. Reports issued before this cutover remain immutable under their original presentation receipts.
+
+For new receipts use `coverageAudit.presentation = { mode: "UNBOUNDED_ANALYSIS_OUTPUT", allEvaluatedPublished: true, fillerAdded: 0 }`. Legacy target fields are retired for new reports. The coverage validator verifies this presentation mode and independently checks that every EVALUATED primary receipt has an exact matching published card.
 
 Build the frozen Core 1.4 report for VigScope UI v1.5 with fresh Vancouver `run.ts`, exact `feedGeneratedAt`, current bankroll, correct risk/counts/summary, and no filler. Preserve exact `rec.feed` identity, fair/playTo/status/stake consistency, personnelRequired/personnelEvidence, WAIT qualification, coreAssessment and waltersEvidence.
 
-For reports from 17:00 PT September 5, when `coverageAudit.totals.primaryUnavailable > 0`, include this exact clause in the visible summary, substituting the actual counts: `Primary selections: N evaluated; M unavailable.` The coverage gate checks it against the receipt. Distinguish a complete inventory check from usable market coverage. `MARKET_NOT_RETURNED` means no usable retained market in this snapshot; it does not prove the sportsbook never offered that market. Use acquisition diagnostics when present to explain missing, filtered, not-attempted and unsuccessful recovery outcomes. Do not request replacement odds from the report task to improve an unattractive result.
+For reports from 17:00 PT September 5, when `coverageAudit.totals.primaryUnavailable > 0`, include this exact clause in the visible summary, substituting the actual counts: `Primary selections: N evaluated; M unavailable.` From the September 6 documented-evaluation cutover, use the four-count clause required above. The coverage gate checks it against the receipt. Distinguish a complete inventory check from usable market coverage. `MARKET_NOT_RETURNED` means no usable retained market in this snapshot; it does not prove the sportsbook never offered that market. Use acquisition diagnostics when present to explain missing, filtered, not-attempted and unsuccessful recovery outcomes. Do not request replacement odds from the report task to improve an unattractive result.
 
 Build the matching schema-3 sidecar with all provenance and Pinnacle information required by the current production contract/publisher. When a recommendation has exact QUALIFIED Pinnacle, preserve the current structured benchmark object and keep executable price separate. When unavailable, record `PINNACLE_BENCHMARK_UNAVAILABLE` rather than inventing a comparison.
 
