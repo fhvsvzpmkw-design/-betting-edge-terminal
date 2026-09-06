@@ -16,7 +16,6 @@ try{
   execFileSync('git',['init','-q',root]);
   const policyRaw=fs.readFileSync('data/major-sport-market-coverage-v1.json','utf8');
   write('data/major-sport-market-coverage-v1.json',policyRaw);
-  write('data/preferences.json',fs.readFileSync('data/preferences.json','utf8'));
   const authoritySha=hash(policyRaw);
   const report={ts:'2026-09-06T18:21:30-07:00',feedGeneratedAt:'2026-09-07T01:08:00Z',slot:'late',label:'Synthetic publication fixture',bankroll:100,risk:0,counts:{bet:0,lean:0,wait:0,pass:0},recs:[],summary:'Primary selections: 6 available; 0 evaluated; 6 evidence-blocked; 0 unavailable. Player-prop analysis paused.'};
   const makeFeed=(ts,home=2.2)=>({generatedAt:ts,events:[{id:'fixture',home:'Fixture Home',away:'Fixture Away',date:'2026-09-07T02:00:00Z',sport:{slug:'baseball'},league:{slug:'usa-mlb'},bookmakers:Object.fromEntries(['Bet365','DraftKings'].map(book=>[book,['ml','spread','totals'].map(marketKey=>{
@@ -37,6 +36,7 @@ try{
   const audit=sidecar.coverageAudit;audit.feedGeneratedAt=feed.generatedAt;audit.authorityBlobSha=authoritySha;
   audit.sports=Object.fromEntries(Object.entries(inventory.sports).map(([sport,row])=>[sport,{gamesInScope:row.gamesInScope,gamesEvaluated:row.gamesInScope,primary:{...row.primary,evaluated:0,blocked:row.primary.available},props:{state:'PAUSED_BY_SCOPE',returned:0,screened:0,seriousDeepReviewed:0,excludedByScope:0}}]));
   audit.availabilityLimitations=[];audit.totals={gamesInScope:1,gamesEvaluated:1,primaryRequired:6,primaryAvailable:6,primaryEvaluated:0,primaryBlocked:6,primaryUnavailable:0,propsReturned:0,propsScreened:0,seriousPropsDeepReviewed:0,propsExcludedByScope:0};
+  audit.presentation={mode:'UNBOUNDED_ANALYSIS_OUTPUT',allEvaluatedPublished:true,fillerAdded:0};
   const save=()=>{write('input-report.json',report);write('input-sidecar.json',sidecar);};save();
   const inputBefore=fs.readFileSync(path.join(root,'input-report.json'),'utf8');
   let result=call('validate');assert.equal(result.status,0,result.stderr);assert.equal(fs.readFileSync(path.join(root,'input-report.json'),'utf8'),inputBefore);
@@ -51,12 +51,11 @@ try{
   assert.deepEqual(stored.counts,{bet:0,lean:0,wait:0,pass:0});assert.equal(stored.instrumentTelemetry.calculationVersion,3);
   assert.equal(stored.instrumentTelemetry.movement.comparableSelections,6);assert.equal(stored.instrumentTelemetry.pressure.reason,'NO_DIRECTIONAL_REFERENCE');
   result=call('publish');assert.equal(result.status,0,result.stderr);assert.equal(fs.readFileSync(storedPath,'utf8'),storedBefore,'repeat publication keeps original report');
-  const preferences=read(path.join(root,'data/preferences.json'));
-  preferences.modules.find(module=>module.id==='report_card_target').current=audit.presentation.target+1;
-  write('data/preferences.json',preferences);
+  const legacyTarget=structuredClone(sidecar);legacyTarget.coverageAudit.presentation={target:12,targetIsSoft:true,overflowProtection:true,actionableSuppressedByTarget:0};write('input-sidecar.json',legacyTarget);
+  result=call('publish');assert.notEqual(result.status,0);assert.match(result.stderr,/UNBOUNDED_ANALYSIS_OUTPUT|retired/,'new publication rejects retired target presentation receipts');
+  save();
   result=call('verify');assert.equal(result.status,0,result.stderr);
-  assert.equal(fs.readFileSync(storedPath,'utf8'),storedBefore,'later target preference cannot reinterpret an issued report');
-  result=call('publish');assert.notEqual(result.status,0);assert.match(result.stderr,/target does not match repository/,'new publication still requires the current target');
+  assert.equal(fs.readFileSync(storedPath,'utf8'),storedBefore,'issued unbounded report remains immutable under read-back verification');
   const laterPolicy=structuredClone(policy);laterPolicy.principles.evaluationOrder='SYNTHETIC_FUTURE_POLICY';
   write('data/major-sport-market-coverage-v1.json',laterPolicy);
   result=call('verify');assert.equal(result.status,0,result.stderr);
@@ -70,5 +69,5 @@ try{
   stored.coverageSummary.selections.evaluated=6;write(sidecar.reportReference.reportPath,stored);
   result=call('verify');assert.notEqual(result.status,0);assert.match(result.stderr,/coverage summary does not reproduce/,'read-back catches misleading evaluated count');
   if(process.env.PRIMARY_REPORT_PREVIEW){write(sidecar.reportReference.reportPath,JSON.parse(storedBefore));fs.copyFileSync(storedPath,process.env.PRIMARY_REPORT_PREVIEW);}
-  console.log('PRIMARY REPORT PUBLICATION: preflight/publish bypass rejected; zero-card researched blockers publish truthful coverage and real meters; immutable retry, pinned policy/target replay, and read-back tamper checks pass.');
+  console.log('PRIMARY REPORT PUBLICATION: preflight/publish bypass rejected; zero-card researched blockers publish truthful coverage and real meters; unbounded presentation enforced; immutable retry, pinned policy replay, and read-back tamper checks pass.');
 }finally{fs.rmSync(root,{recursive:true,force:true});}
