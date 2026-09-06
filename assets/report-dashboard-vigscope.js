@@ -37,15 +37,8 @@
   legacy.async=false;
   document.head.appendChild(legacy);
 
-  // The schedule module owns the detailed schedule/history/VigScope display.
-  const schedule=document.createElement('script');
-  schedule.id='scheduleProfileUiLoader';
-  schedule.src=`./assets/schedule-profile-ui.js?v=3&b=${UI_CACHE_BUST}`;
-  schedule.async=false;
-  document.head.appendChild(schedule);
-
-  // The framework adds the permanent Preferences module registry and safe local
-  // UI controls above the detailed schedule module.
+  // The framework owns the permanent Preferences shell, module registry and
+  // safe local UI controls.
   const preferences=document.createElement('script');
   preferences.id='preferencesFrameworkLoader';
   preferences.src=`./assets/preferences-framework.js?v=3&b=${UI_CACHE_BUST}`;
@@ -192,8 +185,8 @@
       body.runnerPreferencesLoaded .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
       body.runnerPreferencesLoaded .runnerNavPad .tabs>.btn:not(#runnerPreferencesF6){display:none!important}
       body.runnerPreferencesLoaded #runnerPreferencesF6{grid-column:1/-1!important;display:grid!important;place-items:center!important}
-      body.runnerPreferencesLoaded #runnerSchedulePreferences{display:block!important;margin-top:0!important}
-      body.runnerPreferencesLoaded #runnerSchedulePreferences~*{display:none!important}
+      body.runnerPreferencesLoaded #runnerPreferencesPanel{display:block!important;margin-top:0!important}
+      body.runnerPreferencesLoaded #runnerPreferencesPanel~*{display:none!important}
 
       /* Pizza Plays is a ticket view, not a second analysis dashboard. */
       body.runnerPizzaLoaded #runnerPizzaWorkspace .deskSectionBar{display:none!important}

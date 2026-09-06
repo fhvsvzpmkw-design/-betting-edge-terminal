@@ -1,7 +1,7 @@
 # Betting Edge Scheduled Report Authority
 
 **Status:** OPERATIONAL  
-**Authority version:** 1.1
+**Authority version:** 1.2
 **Effective:** 2026-09-02  
 **Validation clarification:** 2026-09-05
 **Primary-market scope amendment:** 2026-09-05 13:00 America/Vancouver
@@ -10,21 +10,22 @@
 **Unbounded card-output amendment:** 2026-09-06 00:00 America/Vancouver
 **Fair-construction workflow clarification:** 2026-09-06, following the 06:00 review
 **Quote observation amendment:** 2026-09-06, forward-only for feeds declaring `quoteObservationVersion: 1`
+**Schedule simplification:** 2026-09-06 — one permanent Main Betting Edge schedule
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
 This file is the shared operating instruction for all standard Betting Edge scheduled report tasks. A task supplies only its expected Vancouver report time. All five standard lanes must inherit this file rather than carrying independent market-coverage logic.
 
-## 1. Schedule profile gate — mandatory first step
+## 1. Main schedule gate — mandatory first step
 
 Given `EXPECTED_REPORT_TIME` in America/Vancouver:
 
-1. Read `BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`, `data/schedule-profiles.json` and `data/schedule-state.json` from authoritative `main`.
-2. Resolve the active Vancouver schedule profile and exact slot whose `reportTime` equals `EXPECTED_REPORT_TIME`.
-3. Retain profile id/name, canonicalSlot, slot, pulseTime, reportTime, label and featuredVigScope.
-4. If no exact active slot matches, do not notify, handicap, stage a candidate or write History.
+1. Read `BETTING_EDGE_MAIN_SCHEDULE.md` and `data/main-schedule.json` from authoritative `main`.
+2. Resolve the exact permanent Main Betting Edge slot whose `reportTime` equals `EXPECTED_REPORT_TIME`.
+3. Retain schedule id/name, canonicalSlot, slot, pulseTime, reportTime, label and featuredVigScope.
+4. If no exact slot matches, do not notify, handicap, stage a candidate or write History.
 
-The schedule profile controls timing only. It never excludes a major sport or market from otherwise valid evaluation.
+The Main Betting Edge schedule controls timing only. It never excludes a major sport or market from otherwise valid evaluation.
 
 ## 2. Core 1.4 production preflight
 
@@ -49,7 +50,7 @@ Any authority conflict is `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
 Bind the exact `data/live-odds.json` snapshot for this lane. Enforce all Contract gates, including:
 - maximum 75-minute feed freshness;
 - maximum 30-minute executable quote age at feed generation: use `market.observedAt` for `quoteObservationVersion: 1`, and the original `market.updatedAt` rule only for legacy feeds;
-- scheduleMeta compatibility with the resolved active profile/slot;
+- scheduleMeta compatibility with the permanent Main Betting Edge slot;
 - exact event, market, line, side and selection identity;
 - Bet365 and DraftKings as supported executable books.
 

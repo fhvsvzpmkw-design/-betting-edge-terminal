@@ -1,6 +1,6 @@
 # Betting Edge — Operations
 
-**Last updated:** 2026-09-06 — quote observation freshness correction
+**Last updated:** 2026-09-06 — quote observation freshness correction and permanent Main schedule
 
 This is the practical operating runbook. The authoritative betting-governance file is `BETTING_EDGE_CONTRACT.md` **v1.0 OPERATIONAL**. Core methodology authority is `core/core-v1.4-production.json` **Core v1.4 OPERATIONAL**.
 
@@ -29,9 +29,9 @@ At the next ordinary refresh/report, verify the versioned timestamps, exact-mark
 
 ## Scheduled report gate order
 
-Every possible seasonal report trigger performs these steps in order:
+Every standard report trigger performs these steps in order:
 
-1. **Schedule profile gate.** Read `BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`, `data/schedule-profiles.json` and `data/schedule-state.json`. If the trigger is not an active report time for the selected profile, exit before analysis/history.
+1. **Main schedule gate.** Read `BETTING_EDGE_MAIN_SCHEDULE.md` and `data/main-schedule.json`. If the trigger is not one of the five permanent report times, exit before analysis/history.
 2. **Contract/Core preflight.** Require Contract v1.0 OPERATIONAL and `core/core-v1.4-production.json` Core v1.4 OPERATIONAL. Resolve exact current Core framework and provenance identities.
 3. **Research/Walters/personnel authority.** Resolve Research v1.8, `BETTING_EDGE_PERSONNEL_SWEEP.md`, Walters interface and current Walters authority mode.
 4. **Live-feed validation.** Bind the exact `data/live-odds.json` snapshot and enforce scheduleMeta, feed/quote freshness and exact Bet365/DraftKings identity.
@@ -71,17 +71,15 @@ This is not a quota. Do not:
 
 Fewer than nine cards and zero BETs are normal valid outcomes.
 
-## Seasonal profile times
+## Permanent Main Betting Edge times
 
 Canonical slots remain `open`, `main`, `final_morning`, `evening`, `late`.
 
-| Profile | Vancouver pulse → report pairs |
+| Schedule | Vancouver pulse → report pairs |
 |---|---|
-| MLB / SUMMER | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
-| NFL / FOOTBALL | 05:50→06:00, 07:50→08:00, 08:50→09:00, 12:05→12:15, 16:50→17:00 |
-| NBA + NHL / WINTER | 05:50→06:00, 10:50→11:00, 13:50→14:00, 15:50→16:00, 17:50→18:00 |
+| MAIN BETTING EDGE | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
 
-The active day is immutable once underway. Alternate trigger tasks exist so each seasonal clock can be represented, but inactive clocks exit at the profile gate.
+There are no seasonal alternatives or queued schedule state. The schedule is repository-controlled and is not a Preferences option.
 
 ## Odds scheduling
 
@@ -89,26 +87,9 @@ Primary odds workflow: `.github/workflows/odds-refresh.yml`.
 
 ### Primary path
 
-Cloudflare Worker Cron is the primary automatic clock. It resolves the active Vancouver profile and dispatches the existing odds workflow only when the configured pulse is due.
+Cloudflare Worker Cron is the single automatic clock. It reads the permanent Vancouver schedule and dispatches the existing odds workflow only when a configured pulse is due.
 
-### Two-minute GitHub backstop
-
-`.github/workflows/odds-refresh-backstop.yml` is the current dispatch-recovery layer. It wakes two minutes after currently configured possible seasonal pulses, resolves the active profile and checks the canonical slot in `data/live-odds.json.scheduleMeta`.
-
-- Slot already published → do nothing.
-- Slot missing → dispatch the existing protected odds workflow.
-
-The target workflow retains serialization, schedule/profile validation, duplicate protection and the five-primary-pull cap. The backstop is designed to recover a missed dispatch, not create a second successful API pull.
-
-The backstop was added after the Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25. The first live proof remains pending the next due slot.
-
-### Known provenance limitation
-
-The backstop currently dispatches the target using the scheduled mode. Therefore a snapshot recovered by the GitHub backstop may still record `triggerSource: cloudflare-cron`. Until a distinct fallback source is added, do not use that field alone to prove which scheduler path dispatched the pull.
-
-### Cloudflare follow-up
-
-Cloudflare remains primary. The native Worker→GitHub Actions credential/dispatch path should be repaired and then observed over multiple slots before considering removal of the backstop.
+The target workflow retains serialization, fixed-schedule validation, duplicate protection and the five-primary-pull cap. There is no second automatic scheduler.
 
 ## Manual odds recovery
 
@@ -118,10 +99,10 @@ Use it only when:
 
 1. the scheduled pulse should have occurred;
 2. there is no usable fresh snapshot for that canonical slot;
-3. neither a primary refresh nor a backstop-dispatched refresh is still running;
+3. no scheduled refresh for that slot is still running;
 4. a fresh pull remains useful before the report.
 
-For the current 05:50→06:00 lane, a practical human fallback check is around **05:55** rather than immediately at 05:50, allowing the primary path and 05:52 backstop time to act first.
+For the 05:50→06:00 lane, a practical human fallback check is around **05:55**, allowing the primary path time to act first.
 
 Never change Core or Contract merely to recover an odds pulse.
 

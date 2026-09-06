@@ -39,13 +39,11 @@ Scheduled report lanes now target **up to nine meaningful cards**. Nine is not a
 
 Pizza Plays remains downstream: no qualifying VigScope play means no forced Pizza selection.
 
-### Scheduling profiles
+### Permanent Main Betting Edge schedule
 
-Current seasonal profiles are operational with five primary odds pulls per Vancouver operating day:
+One permanent schedule is operational with five primary odds pulls per Vancouver operating day:
 
-- MLB/Summer: 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15.
-- NFL/Football: 05:50→06:00, 07:50→08:00, 08:50→09:00, 12:05→12:15, 16:50→17:00.
-- NBA/NHL Winter: 05:50→06:00, 10:50→11:00, 13:50→14:00, 15:50→16:00, 17:50→18:00.
+- Main Betting Edge: 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15.
 
 Canonical lanes remain `open`, `main`, `final_morning`, `evening`, `late`.
 
@@ -135,7 +133,7 @@ Add a distinct fallback source/mode later so history can differentiate:
 - GitHub cron backstop;
 - intentional manual dispatch.
 
-Do not change this in a way that bypasses the existing duplicate/profile gates.
+Do not change this in a way that bypasses the existing duplicate/Main-schedule gates.
 
 ### P0.5 — Observe Stage 2 personnel on a real material candidate
 

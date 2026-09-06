@@ -90,25 +90,22 @@ Nine is a presentation/review target only:
 
 Pizza Plays remains downstream of VigScope and should publish no play when the qualifying board offers no suitable choice rather than forcing a weak or extreme longshot.
 
-## Seasonal schedule profiles
+## Permanent Main Betting Edge schedule
 
 Scheduling is controlled by:
 
-- `BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`
-- `data/schedule-profiles.json`
-- `data/schedule-state.json`
+- `BETTING_EDGE_MAIN_SCHEDULE.md`
+- `data/main-schedule.json`
 
 Canonical lane identity remains `open`, `main`, `final_morning`, `evening`, `late`.
 
 Current configured Vancouver pulse → report pairs:
 
-| Profile | Pulse → report pairs |
+| Schedule | Pulse → report pairs |
 |---|---|
-| MLB / SUMMER | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
-| NFL / FOOTBALL | 05:50→06:00, 07:50→08:00, 08:50→09:00, 12:05→12:15, 16:50→17:00 |
-| NBA + NHL / WINTER | 05:50→06:00, 10:50→11:00, 13:50→14:00, 15:50→16:00, 17:50→18:00 |
+| MAIN BETTING EDGE | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
 
-`data/schedule-state.json` defaults to `mlb`, has no queued selection, and preserves the five-primary-pull daily cap.
+There are no seasonal alternatives, queued state or Preferences selector. The five-primary-pull daily cap is unchanged.
 
 ## Odds scheduler and recovery
 
@@ -130,9 +127,9 @@ Cloudflare authentication/dispatch reliability remains an infrastructure item to
 
 ## Report automation boundary
 
-Every active seasonal report task now requires:
+Every standard Betting Edge report task now requires:
 
-- schedule-profile gate first;
+- Main schedule gate first;
 - Contract v1.0 OPERATIONAL;
 - Core v1.4 OPERATIONAL production manifest/framework;
 - Research v1.8 / R3 live read-only;

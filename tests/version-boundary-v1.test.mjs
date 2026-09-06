@@ -7,7 +7,7 @@ const manifest=JSON.parse(fs.readFileSync('research/manifest.json','utf8'));
 const policy=JSON.parse(fs.readFileSync('research/history-fit-policy.json','utf8'));
 const provenance=JSON.parse(fs.readFileSync('data/history/report-provenance-schema.json','utf8'));
 const acceptance=fs.readFileSync('BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md','utf8');
-const schedule=fs.readFileSync('BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md','utf8');
+const schedule=fs.readFileSync('BETTING_EDGE_MAIN_SCHEDULE.md','utf8');
 const operations=fs.readFileSync('docs/OPERATIONS.md','utf8');
 const state=fs.readFileSync('docs/PROJECT_STATE.md','utf8');
 
@@ -25,7 +25,7 @@ if(provenance.schema!==3) throw new Error('Provenance schema changed unexpectedl
 if(!provenance.provenance?.fields?.productionContractVersion?.includes('currently 1.0')) throw new Error('Provenance current contract mismatch');
 if(!acceptance.includes('9de8bf2b5a6e95dc2545fa8011f493d46aedc93f')) throw new Error('Rollback main commit missing');
 if(!acceptance.includes('59d8dda8d8e491255d5792329a9446eb01960a34')) throw new Error('Final v0.9 rollback blob missing');
-if(!schedule.includes('Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0')) throw new Error('Schedule addendum not on Contract v1.0');
+if(!schedule.includes('Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0')) throw new Error('Main schedule authority not on Contract v1.0');
 if(!operations.includes('VigScope Terminal UI v1.5')||!operations.includes('v1.0 OPERATIONAL')) throw new Error('Operations runbook version boundary mismatch');
 if(!state.includes('**v1.0 OPERATIONAL**')||!state.includes('**Terminal UI v1.5**')) throw new Error('Project state version boundary mismatch');
 if(!fs.existsSync('BETTING_EDGE_V0.9_ACCEPTANCE_2026-08-15.md')) throw new Error('Historical v0.9 acceptance missing');

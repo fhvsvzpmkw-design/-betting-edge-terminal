@@ -8,7 +8,7 @@ on:
       - data/report-event-eligibility-v1.json
       - tools/report-event-eligibility.mjs
       - tests/report-event-eligibility.test.mjs
-      - BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
+      - BETTING_EDGE_MAIN_SCHEDULE.md
       - .github/workflows/report-event-eligibility.yml
       - .github/workflows/report-history-staged.yml
 
@@ -39,5 +39,5 @@ jobs:
           grep -F 'node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"' .github/workflows/report-history-staged.yml
       - name: Confirm schedule authority requires same-day policy
         run: |
-          grep -F 'data/report-event-eligibility-v1.json' BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
-          grep -F 'Do not backfill an undersized board with next-day events.' BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md
+          grep -F 'data/report-event-eligibility-v1.json' BETTING_EDGE_MAIN_SCHEDULE.md
+          grep -F 'Do not backfill an undersized board with next-day events.' BETTING_EDGE_MAIN_SCHEDULE.md

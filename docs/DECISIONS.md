@@ -58,7 +58,7 @@ Betting Edge is being developed around sources that do not require adding a recu
 
 This decision records the 2026-08-18 state in which each important odds window used one scheduled trigger and manual `workflow_dispatch` was the explicit recovery path. At that time the active MLB refresh slots were 05:45, 07:45, 09:15, 14:55 and 17:55 Vancouver.
 
-The current scheduler architecture is documented in D-031 and `BETTING_EDGE_SCHEDULE_PROFILE_ADDENDUM.md`.
+The scheduler history is documented in D-031; current timing authority is `BETTING_EDGE_MAIN_SCHEDULE.md`.
 
 **Reason:** The historical single-trigger design simplified quota control and removed paired automatic attempts. The later Cloudflare-primary/two-minute-backstop architecture preserves the same duplicate/quota discipline while adding dispatch recovery.
 
@@ -336,6 +336,18 @@ It does not run Core v1.4 model-error, Walters authority, VigScope publication, 
 The 10:30 schedule avoids the NBA/NHL 11:00 seasonal report-time collision.
 
 **Reason:** Preserve the value of the Crypto Specials workflow without contaminating Core production governance or creating unnecessary schedule contention.
+
+## D-035 — One permanent Main Betting Edge schedule replaces seasonal profiles
+
+**Status:** Active as of 2026-09-06
+
+Betting Edge permanently uses the former MLB/Summer clock as its Main schedule: 06:00, 08:00, 09:30, 15:15 and 18:15 report runs in `America/Vancouver`, with their existing ten-minute-prior odds pulses.
+
+The unused NFL and NBA/NHL seasonal clocks, daily profile state, profile-switch workflow and Preferences schedule module are removed. Canonical lane names and established schedule compatibility metadata remain so current report generation and immutable History do not require migration.
+
+Cloudflare remains the single automatic odds scheduler, the protected odds workflow remains serialized and duplicate-gated, and the five-primary-pull daily cap is unchanged. This decision does not change pricing, odds collection, report analysis, publication, Graham/Walters tasks, Crypto Specials or any canary.
+
+**Reason:** Remove unused choice and resolution layers while preserving the schedule and operational boundaries already in use.
 
 ---
 
