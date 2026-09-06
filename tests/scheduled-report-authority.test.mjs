@@ -20,13 +20,18 @@ for (const phrase of [
   'Walters QB production read-back',
   'APPROVED_WALTERS_QB_PERFORMANCE',
   'FIRST_NFL_BEARING_BETTING_EDGE_READBACK',
-  'soft**, not a hard ceiling',
+  'Unbounded card-output amendment',
+  'no numeric card minimum, target, profile or maximum',
+  'Publish every EVALUATED primary decision unchanged',
+  'UNBOUNDED_ANALYSIS_OUTPUT',
   'Publisher ownership'
 ]) {
   assert.ok(text.includes(phrase), `scheduled report authority missing phrase: ${phrase}`);
 }
 
 assert.ok(!/hard maximum 9/i.test(text), 'scheduled report authority must not restore a hard nine-card ceiling');
+assert.ok(!/report_card_target/.test(text), 'scheduled report authority must not resolve the retired report_card_target preference');
+assert.ok(!/PASS cards may be curated/i.test(text), 'evaluated PASS decisions must not be hidden by card curation');
 assert.ok(!/preselect an underdog/i.test(text) || text.includes('Never preselect an underdog'), 'underdog preselection must be prohibited');
 assert.ok(text.includes('data/major-sport-market-coverage-v1.json'));
 assert.ok(text.includes('BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md'));
@@ -35,4 +40,4 @@ assert.ok(text.includes('MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL'));
 assert.ok(text.includes('node tools/report-publication.mjs validate --report <report.json> --sidecar <sidecar.json>'));
 assert.ok(text.includes('checked=0'));
 
-console.log('SCHEDULED REPORT AUTHORITY TEST: PASS // ONE SHARED AUTHORITY + COMPLETE PRIMARY COVERAGE + PAUSED PROPS + SOFT CARD TARGET');
+console.log('SCHEDULED REPORT AUTHORITY TEST: PASS // ONE SHARED AUTHORITY + COMPLETE PRIMARY COVERAGE + PAUSED PROPS + UNBOUNDED CARD OUTPUT');
