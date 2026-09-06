@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - data/major-sport-market-coverage-v1.json
+      - data/preferences.json
       - BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md
       - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
       - tools/major-sport-market-coverage-gate.mjs
@@ -116,7 +117,7 @@ jobs:
             echo '- Scope: MLB / NHL / NBA-WNBA / NFL-NCAAF-CFL'
             echo '- Primary markets: two-sided ML + main spread/run-line/puck-line + total'
             echo '- Props: PAUSED_BY_SCOPE from 2026-09-05 13:00 PT; inventory retained, analysis and cards disabled'
-            echo '- Card target: soft with actionable overflow protection'
+            echo '- Cards from 2026-09-06 00:00 PT: unbounded analysis output; every EVALUATED decision is published; no filler'
             echo '- From 2026-09-06 00:00 PT: available primary selections require verified decisions or evidence blockers'
             echo '- Market meters: exact primary quote inventory independent of displayed cards; pinned replay and v1/v2 history protected'
           } >> "$GITHUB_STEP_SUMMARY"
