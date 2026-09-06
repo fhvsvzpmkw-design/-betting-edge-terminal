@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { deriveBoundCoverage, majorSportKey } from '../tools/major-sport-market-coverage-gate.mjs';
+import { deriveBoundCoverage, majorSportKey, validatePresentationAudit } from '../tools/major-sport-market-coverage-gate.mjs';
 
 const policy = JSON.parse(fs.readFileSync('data/major-sport-market-coverage-v1.json', 'utf8'));
 
@@ -42,11 +42,21 @@ assertTwoSidedPrimary('NBA_WNBA');
 assertTwoSidedPrimary('FOOTBALL');
 assert.deepEqual(policy.sports.FOOTBALL.leagues, ['NFL', 'NCAAF', 'CFL']);
 
-assert.equal(policy.presentation.preferencePath, 'data/preferences.json');
-assert.equal(policy.presentation.preferenceId, 'report_card_target');
-assert.equal(policy.presentation.targetIsSoft, true);
-assert.equal(policy.presentation.overflowProtectionRequired, true);
-assert.match(policy.presentation.rule, /BET, LEAN or WAIT/);
+assert.equal(policy.presentation.effectiveFrom, '2026-09-06T00:00:00-07:00');
+assert.equal(policy.presentation.mode, 'UNBOUNDED_ANALYSIS_OUTPUT');
+assert.equal(policy.presentation.publishAllEvaluatedDecisions, true);
+assert.equal(policy.presentation.numericCardTarget, false);
+assert.equal(policy.presentation.numericCardMaximum, false);
+assert.equal(policy.presentation.noFiller, true);
+assert.match(policy.presentation.rule, /including PASS/i);
+assert.equal(validatePresentationAudit(
+  { ts: policy.presentation.effectiveFrom },
+  { mode: 'UNBOUNDED_ANALYSIS_OUTPUT', allEvaluatedPublished: true, fillerAdded: 0 }
+), 'UNBOUNDED_ANALYSIS_OUTPUT');
+assert.throws(() => validatePresentationAudit(
+  { ts: policy.presentation.effectiveFrom },
+  { mode: 'UNBOUNDED_ANALYSIS_OUTPUT', allEvaluatedPublished: true, fillerAdded: 0, target: 12 }
+), /retired/i);
 
 assert.equal(policy.coverageAudit.schema, 1);
 assert.equal(policy.coverageAudit.sidecarField, 'coverageAudit');
@@ -60,8 +70,12 @@ for (const field of ['schema', 'authorityId', 'authorityPath', 'authorityBlobSha
 for (const field of ['returned', 'screened', 'seriousDeepReviewed']) {
   assert.ok(policy.coverageAudit.fieldContract.props.includes(field), `coverageAudit props contract missing ${field}`);
 }
+for (const field of ['mode', 'allEvaluatedPublished', 'fillerAdded']) {
+  assert.ok(policy.coverageAudit.fieldContract.presentation.includes(field), `coverageAudit presentation contract missing ${field}`);
+}
 assert.ok(policy.coverageAudit.rules.some(rule => /authorityBlobSha/.test(rule)));
-assert.ok(policy.coverageAudit.rules.some(rule => /actionableSuppressedByTarget is zero/.test(rule)));
+assert.ok(policy.coverageAudit.rules.some(rule => /UNBOUNDED_ANALYSIS_OUTPUT/.test(rule)));
+assert.ok(policy.coverageAudit.rules.some(rule => /every EVALUATED primary receipt/i.test(rule)));
 assert.ok(policy.coverageAudit.rules.some(rule => /major-sport-market-coverage-gate\.mjs/.test(rule)));
 
 assert.match(policy.completion.primaryCoverageComplete, /every required primary selection/i);
@@ -135,13 +149,14 @@ assert.equal(reconciled.sports.MLB.primary.evaluated, 6, 'a 20-minute-old exact 
 
 const markdown = fs.readFileSync('BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md', 'utf8');
 for (const phrase of [
-  'Evaluate first, select cards second',
+  'Evaluate first, publish decisions second',
   'MLB',
   'NHL',
   'NBA / WNBA',
   'NFL / NCAAF / CFL',
   'Player props are paused by scope',
-  'not a hard ceiling',
+  'Unbounded card output',
+  'no report-card minimum, target, status profile or maximum',
   'Durable coverage receipt',
   'major-sport-market-coverage-gate.mjs',
   'fails closed'
@@ -149,4 +164,7 @@ for (const phrase of [
   assert.ok(markdown.includes(phrase), `coverage addendum missing phrase: ${phrase}`);
 }
 
-console.log('MAJOR SPORT MARKET COVERAGE TEST: PASS // TWO-SIDED PRIMARY MARKETS + PAUSED PROPS + COVERAGE RECEIPT + SOFT CARD TARGET');
+const preferences = JSON.parse(fs.readFileSync('data/preferences.json', 'utf8'));
+assert.equal(preferences.modules.some(module => module.id === 'report_card_target'), false, 'report_card_target preference must be retired');
+
+console.log('MAJOR SPORT MARKET COVERAGE TEST: PASS // TWO-SIDED PRIMARY MARKETS + PAUSED PROPS + UNBOUNDED CARD OUTPUT');
