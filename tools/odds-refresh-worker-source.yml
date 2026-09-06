@@ -83,6 +83,7 @@ jobs:
           const MAX_EVENT_PAGES = 4;
           const MAX_MARKET_AGE_MINUTES = 90;
           // Retention is historical context; executable coverage remains <=30m.
+          // Age is the last successful observation, not the last price change.
           const CORE_QUOTE_MAX_AGE_MINUTES = 30;
           const CORE_RECOVERY_CATEGORIES = new Set(['MLB', 'NHL', 'NBA', 'WNBA', 'NFL', 'NCAAF', 'CFL']);
 
@@ -182,7 +183,8 @@ jobs:
             const {
               attempts = 2,
               optional = false,
-              stage = 'api'
+              stage = 'api',
+              observation = false
             } = options;
 
             let lastError;
@@ -214,7 +216,14 @@ jobs:
                   }
                 });
 
-                if (response.ok) return await response.json();
+                if (response.ok) {
+                  const payload = await response.json();
+                  // Receipt after the full body is parsed. Only exact returned
+                  // markets are stamped later, after their identity is checked.
+                  return observation
+                    ? { payload, observedAt: new Date().toISOString() }
+                    : payload;
+                }
 
                 const body = await response.text();
                 const error = new Error(
@@ -406,9 +415,9 @@ jobs:
           }
 
           function marketAgeMinutes(market, now) {
-            const timestamp = Date.parse(market?.updatedAt);
-            if (!Number.isFinite(timestamp)) return Infinity;
-            return Math.max(0, (now.getTime() - timestamp) / 60000);
+            const timestamp = Date.parse(market?.observedAt);
+            if (!Number.isFinite(timestamp) || timestamp > now.getTime()) return Infinity;
+            return (now.getTime() - timestamp) / 60000;
           }
 
           function filterFreshMarketsFromEvent(event, now, diagnostics) {
@@ -426,7 +435,18 @@ jobs:
                 const okay =
                   marketAgeMinutes(market, now) <= MAX_MARKET_AGE_MINUTES;
 
-                if (!okay) diagnostics.staleMarketsRemoved++;
+                if (!okay) {
+                  diagnostics.staleMarketsRemoved++;
+                  diagnostics.removedMarkets ||= [];
+                  diagnostics.removedMarkets.push({
+                    eventId: String(event.id || ''), bookmaker,
+                    marketKey: canonicalMarketKey(market?.name || market?.marketKey || ''),
+                    observedAt: market?.observedAt || null,
+                    updatedAt: market?.updatedAt || null,
+                    reason: Number.isFinite(marketAgeMinutes(market, now))
+                      ? 'STALE_BEYOND_RETENTION' : 'INVALID_OBSERVATION_TIMESTAMP'
+                  });
+                }
                 return okay;
               });
 
@@ -463,7 +483,35 @@ jobs:
 
           function primaryMarketSuspended(market) {
             return market?.suspended === true || market?.isSuspended === true ||
-              /^(suspended|closed|settled|inactive)$/i.test(String(market?.status || ''));
+              market?.active === false || market?.isActive === false ||
+              /^(suspended|closed|settled|inactive|canceled|cancelled|unavailable|disabled)$/i
+                .test(String(market?.status || market?.state || ''));
+          }
+
+          function completeOddsResponse(event) {
+            return event?.complete !== false && event?.partial !== true &&
+              event?.isPartial !== true && event?.truncated !== true;
+          }
+
+          function observeReturnedEvent(event, observedAt, requestedBooks) {
+            const bookmakers = {};
+            for (const book of requestedBooks) {
+              const markets = event?.bookmakers?.[book];
+              if (!Array.isArray(markets)) continue;
+              bookmakers[book] = markets.filter(market => market && typeof market === 'object')
+                .map(market => ({
+                  ...market,
+                  observedAt,
+                  ...(primaryMarketSuspended(event) || primaryMarketSuspended(market)
+                    ? { suspended: true, odds: [] } : {})
+                }));
+            }
+            return {
+              ...event,
+              bookmakers,
+              bookmakerObservedAt: completeOddsResponse(event)
+                ? Object.fromEntries(requestedBooks.map(book => [book, observedAt])) : {}
+            };
           }
 
           function mergeMarketSnapshots(current = [], incoming = []) {
@@ -473,8 +521,8 @@ jobs:
               const key = canonicalMarketKey(market?.name || market?.marketKey || '');
               if (!primaryKeys.has(key)) continue;
               const previous = merged.get(key);
-              const stamp = Date.parse(market?.updatedAt);
-              const previousStamp = Date.parse(previous?.updatedAt);
+              const stamp = Date.parse(market?.observedAt);
+              const previousStamp = Date.parse(previous?.observedAt);
               // Replace the whole primary snapshot, never union alternate lines
               // or resurrect an older priced side after a newer incomplete one.
               if (!previous || !Number.isFinite(stamp) ||
@@ -496,11 +544,14 @@ jobs:
             return [...merged.values(), ...other];
           }
 
-          function mergeCoreEvent(map, candidate, incoming) {
+          function mergeCoreEvent(map, candidate, incoming, options = {}) {
             if (!incoming?.id || !sameEventIdentity(candidate, incoming)) return false;
             const key = String(incoming.id);
             const current = map.get(key) || {};
             const bookmakers = { ...(current.bookmakers || {}) };
+            // A successful full response is authoritative for requested books.
+            // Absent books/markets must not reappear from the earlier core pull.
+            for (const book of options.replaceBooks || []) delete bookmakers[book];
             for (const [book, markets] of Object.entries(incoming.bookmakers || {})) {
               if (!Array.isArray(markets)) continue;
               bookmakers[book] = mergeMarketSnapshots(bookmakers[book] || [], markets);
@@ -508,6 +559,9 @@ jobs:
             map.set(key, {
               ...current,
               ...incoming,
+              bookmakerObservedAt: {
+                ...(current.bookmakerObservedAt || {}), ...(incoming.bookmakerObservedAt || {})
+              },
               urls: { ...(current.urls || {}), ...(incoming.urls || {}) },
               bookmakerIds: { ...(current.bookmakerIds || {}), ...(incoming.bookmakerIds || {}) },
               bookmakers
@@ -517,7 +571,8 @@ jobs:
 
           function corePrimaryMarketState(market, key, sides) {
             const priced = (row, side) => Number(row?.[side]) > 1.001 && Number.isFinite(Number(row?.[side]));
-            let rows = market.odds || [];
+            let rows = (Array.isArray(market.odds) ? market.odds : [])
+              .filter(row => !primaryMarketSuspended(row));
             if (key !== 'ml') {
               rows = rows.filter(row => identityRowLine(row) !== null);
               const marked = rows.filter(row => ['primary', 'isPrimary', 'main', 'isMain', 'mainLine', 'isMainLine'].some(flag => row?.[flag] === true));
@@ -543,20 +598,22 @@ jobs:
               const sides = key === 'totals' ? ['over', 'under'] : ['home', 'away'];
               const books = {};
               const updatedAtByBook = {};
+              const observedAtByBook = {};
               for (const book of BOOKMAKERS) {
                 const market = (event?.bookmakers?.[book] || [])
                   .filter(item => canonicalMarketKey(item?.name || item?.marketKey || '') === key)
-                  .sort((a, b) => (Date.parse(b.updatedAt) || 0) - (Date.parse(a.updatedAt) || 0))[0];
+                  .sort((a, b) => (Date.parse(b.observedAt) || 0) - (Date.parse(a.observedAt) || 0))[0];
                 const age = marketAgeMinutes(market, now);
                 updatedAtByBook[book] = market?.updatedAt || null;
+                observedAtByBook[book] = market?.observedAt || null;
                 if (!market) books[book] = 'NOT_RETURNED';
-                else if (!Number.isFinite(age)) books[book] = 'INVALID_TIMESTAMP';
+                else if (!Number.isFinite(age)) books[book] = 'INVALID_OBSERVATION_TIMESTAMP';
                 else if (age > MAX_MARKET_AGE_MINUTES) books[book] = 'STALE_BEYOND_RETENTION';
                 else if (age > CORE_QUOTE_MAX_AGE_MINUTES) books[book] = 'STALE_RETAINED';
                 else if (primaryMarketSuspended(market)) books[book] = 'SUSPENDED';
                 else books[book] = corePrimaryMarketState(market, key, sides);
               }
-              output[key] = { available: Object.values(books).includes('AVAILABLE'), books, updatedAtByBook };
+              output[key] = { available: Object.values(books).includes('AVAILABLE'), books, updatedAtByBook, observedAtByBook };
             }
             return output;
           }
@@ -957,8 +1014,10 @@ jobs:
             const snapshot = {
               schema: 5,
               identitySchema: 1,
-              generatedAt: now.toISOString(),
-              generatedAtVancouver: clock.label,
+              quoteObservationVersion: 1,
+              collectionStartedAt: now.toISOString(),
+              generatedAt: null,
+              generatedAtVancouver: null,
               source: 'Odds-API.io v3',
               bookmakers: BOOKMAKERS,
               horizonHours: HORIZON_HOURS,
@@ -1003,6 +1062,7 @@ jobs:
                 deepEventsSkippedHorizon: 0,
 
                 staleMarketsRemoved: 0,
+                removedMarkets: [],
                 identityRejects: 0,
                 duplicateDeepRejects: 0,
                 previousGoodEventCount: existingCount,
@@ -1103,9 +1163,9 @@ jobs:
                 for (const event of batch) coreAcquisition.get(String(event.id))[bookmaker] = 'REQUEST_FAILED';
                 const requestStart = requestsUsed;
                 try {
-                  const odds = await fetchJson(
+                  const { payload: odds, observedAt } = await fetchJson(
                     apiUrl('/odds/multi', { eventIds, bookmakers: bookmaker }),
-                    { attempts: 3, stage: `odds-multi:${bookmaker}` }
+                    { attempts: 3, stage: `odds-multi:${bookmaker}`, observation: true }
                   );
 
                   const callsUsed = requestsUsed - requestStart;
@@ -1118,14 +1178,28 @@ jobs:
                     snapshot.diagnostics.draftKingsRetries += retries;
                   }
 
-                  for (const event of batch) coreAcquisition.get(String(event.id))[bookmaker] = 'EVENT_NOT_RETURNED';
+                  for (const event of batch) coreAcquisition.get(String(event.id))[bookmaker] = 'INVALID_RESPONSE';
                   if (Array.isArray(odds)) {
+                    const returnedIds = new Set(odds.map(event => String(event?.id || '')));
+                    for (const candidate of batch) {
+                      coreAcquisition.get(String(candidate.id))[bookmaker] = 'EVENT_NOT_RETURNED';
+                      if (!returnedIds.has(String(candidate.id))) {
+                        // An exact requested event omitted from a valid full
+                        // multi response closes only that requested book scope.
+                        const absent = observeReturnedEvent({ ...candidate, bookmakers: {} }, observedAt, [bookmaker]);
+                        mergeCoreEvent(coreEventMap, candidate, absent, { replaceBooks: [bookmaker] });
+                      }
+                    }
                     for (const event of odds) {
                       const candidate = candidatesById.get(String(event?.id || ''));
-                      if (!candidate || !mergeCoreEvent(coreEventMap, candidate, event)) {
+                      if (!candidate || !sameEventIdentity(candidate, event)) {
                         snapshot.diagnostics.identityRejects++;
                         if (candidate) coreAcquisition.get(String(candidate.id))[bookmaker] = 'IDENTITY_REJECTED';
                       } else {
+                        const observed = observeReturnedEvent(event, observedAt, [bookmaker]);
+                        mergeCoreEvent(coreEventMap, candidate, observed, {
+                          replaceBooks: completeOddsResponse(event) ? [bookmaker] : []
+                        });
                         coreAcquisition.get(String(candidate.id))[bookmaker] = 'EVENT_RETURNED';
                       }
                     }
@@ -1184,7 +1258,7 @@ jobs:
                 event,
                 score: deepPriorityScore(event, now) + (
                   CORE_RECOVERY_CATEGORIES.has(categoryKey(event)) &&
-                  coreGapCount(coreEventMap.get(String(event.id)), now) > 0 ? 500 : 0
+                  coreGapCount(coreEventMap.get(String(event.id)), new Date()) > 0 ? 500 : 0
                 )
               }))
               .sort(
@@ -1216,7 +1290,7 @@ jobs:
               snapshot.diagnostics.deepEventsChecked++;
               const recoverCore = CORE_RECOVERY_CATEGORIES.has(categoryKey(event));
               const before = recoverCore
-                ? coreMarketAvailability(coreEventMap.get(String(event.id)), now) : null;
+                ? coreMarketAvailability(coreEventMap.get(String(event.id)), new Date()) : null;
               const recoveryResult = recoverCore ? {
                 eventId: String(event.id), outcome: 'REQUEST_FAILED', recovered: [], before
               } : null;
@@ -1226,7 +1300,7 @@ jobs:
               }
 
               try {
-                const raw = await fetchJson(
+                const { payload: responseEvent, observedAt } = await fetchJson(
                   apiUrl('/odds', {
                     eventId: event.id,
                     bookmakers: BOOKMAKERS.join(',')
@@ -1234,23 +1308,24 @@ jobs:
                   {
                     optional: true,
                     attempts: 1,
-                    stage: `deep:${sportSlug(event) || 'sport'}`
+                    stage: `deep:${sportSlug(event) || 'sport'}`,
+                    observation: true
                   }
                 );
 
-                if (!raw || typeof raw !== 'object') {
+                if (!responseEvent || typeof responseEvent !== 'object' || Array.isArray(responseEvent)) {
                   if (recoveryResult) recoveryResult.outcome = 'EVENT_NOT_RETURNED';
                   continue;
                 }
 
-                if (!sameEventIdentity(event, raw)) {
+                if (!sameEventIdentity(event, responseEvent)) {
                   if (recoveryResult) recoveryResult.outcome = 'IDENTITY_REJECTED';
                   snapshot.diagnostics.identityRejects++;
 
                   snapshot.errors.push({
                     stage: 'deep-identity',
                     requestedEventId: event.id,
-                    returnedEventId: raw.id,
+                    returnedEventId: responseEvent.id,
                     message:
                       'Rejected deep-market response because event identity did not match.'
                   });
@@ -1258,9 +1333,10 @@ jobs:
                   continue;
                 }
 
-                // Preserve whole primary snapshots, including stale/missing
-                // evidence. Supplemental props must still pass the fingerprint
-                // quarantine below before any collection can expose them.
+                const raw = observeReturnedEvent(responseEvent, observedAt, BOOKMAKERS);
+                // Full requested-book responses replace prior primary scope,
+                // including omitted markets. Supplemental props still pass the
+                // fingerprint quarantine before any collection exposes them.
                 const primaryOnly = { ...raw, bookmakers: {} };
                 for (const [book, markets] of Object.entries(raw.bookmakers || {})) {
                   if (!Array.isArray(markets)) continue;
@@ -1268,9 +1344,11 @@ jobs:
                     ['ml', 'spread', 'totals'].includes(canonicalMarketKey(market?.name || market?.marketKey || ''))
                   );
                 }
-                mergeCoreEvent(coreEventMap, event, primaryOnly);
+                mergeCoreEvent(coreEventMap, event, primaryOnly, {
+                  replaceBooks: completeOddsResponse(responseEvent) ? BOOKMAKERS : []
+                });
                 if (recoverCore) {
-                  const after = coreMarketAvailability(coreEventMap.get(String(event.id)), now);
+                  const after = coreMarketAvailability(coreEventMap.get(String(event.id)), new Date());
                   const recovered = Object.keys(after).filter(key => !before[key].available && after[key].available);
                   snapshot.diagnostics.coreRecovery.recoveredMarketPairs += recovered.length;
                   Object.assign(recoveryResult, { outcome: 'MERGED', recovered, after });
@@ -1278,7 +1356,7 @@ jobs:
 
                 const fresh = filterFreshMarketsFromEvent(
                   raw,
-                  now,
+                  new Date(),
                   snapshot.diagnostics
                 );
 
@@ -1300,6 +1378,7 @@ jobs:
                   league: fresh.league,
                   urls: fresh.urls || {},
                   bookmakerIds: fresh.bookmakerIds || {},
+                  bookmakerObservedAt: fresh.bookmakerObservedAt || {},
                   bookmakers: markets,
                   priorityScore: score,
                   _fingerprint: fingerprint(markets),
@@ -1364,6 +1443,10 @@ jobs:
               }
             }
 
+            const completedAt = new Date();
+            snapshot.generatedAt = completedAt.toISOString();
+            snapshot.generatedAtVancouver = vancouverClock(completedAt).label;
+
             // Record why a primary quote is absent BEFORE the 90m retention
             // filter removes it. Missing upstream and removed-stale are distinct.
             snapshot.diagnostics.coreMarketAvailability = coreSelected
@@ -1373,7 +1456,7 @@ jobs:
                 category: categoryKey(event),
                 startTime: event.date,
                 acquisition: coreAcquisition.get(String(event.id)),
-                markets: coreMarketAvailability(coreEventMap.get(String(event.id)), now)
+                markets: coreMarketAvailability(coreEventMap.get(String(event.id)), completedAt)
               }));
 
             snapshot.events = [...coreEventMap.values()];
@@ -1385,19 +1468,19 @@ jobs:
                     String(event.id),
                     filterFreshMarketsFromEvent(
                       event,
-                      now,
+                      completedAt,
                       snapshot.diagnostics
                     )
                   ])
               ).values()
             ]
-              .filter(event => marketCount(event) > 0)
+              .filter(event => marketCount(event) > 0 || Object.keys(event.bookmakerObservedAt || {}).length > 0)
               .sort(
                 (a, b) =>
                   String(a.date || '').localeCompare(String(b.date || ''))
               );
 
-            snapshot.diagnostics.mainOddsEvents = snapshot.events.length;
+            snapshot.diagnostics.mainOddsEvents = snapshot.events.filter(event => marketCount(event) > 0).length;
 
             snapshot.diagnostics.mainOddsMarkets =
               snapshot.events.reduce(
@@ -1486,6 +1569,9 @@ jobs:
               maxDeepEvents: MAX_DEEP_EVENTS,
               propHorizonHours: PROP_HORIZON_HOURS,
               coreQuoteMaxAgeMinutes: CORE_QUOTE_MAX_AGE_MINUTES,
+              quoteAgeBasis: 'observedAt',
+              providerChangeTimestamp: 'updatedAt',
+              fullBookScopeTimestamp: 'bookmakerObservedAt',
               supplementalPriority: 'Crypto exact fight watch; major-sport missing/stale primary recovery; ordinary deep markets',
               supplementalPrimarySnapshotsMerged: true,
               strategy:
@@ -1568,6 +1654,20 @@ jobs:
               !verify.bookmakers.includes('DraftKings') ||
               typeof verify?.diagnostics?.draftKingsEvents !== 'number' ||
               Number(verify.identitySchema) !== 1 ||
+              Number(verify.quoteObservationVersion) !== 1 ||
+              !Number.isFinite(Date.parse(verify.collectionStartedAt)) ||
+              Date.parse(verify.collectionStartedAt) > Date.parse(verify.generatedAt) ||
+              ![...verify.events, ...verify.deepMarkets, ...verify.baseballProps].every(event =>
+                Object.values(event.bookmakerObservedAt || {}).every(observedAt =>
+                  Number.isFinite(Date.parse(observedAt)) &&
+                  Date.parse(observedAt) >= Date.parse(verify.collectionStartedAt) &&
+                  Date.parse(observedAt) <= Date.parse(verify.generatedAt)
+                ) && Object.values(event.bookmakers || {}).every(markets =>
+                  markets.every(market => Number.isFinite(Date.parse(market.observedAt)) &&
+                    Date.parse(market.observedAt) >= Date.parse(verify.collectionStartedAt) &&
+                    Date.parse(market.observedAt) <= Date.parse(verify.generatedAt))
+                )
+              ) ||
               !verify.events.every(event =>
                 String(event?.eventId || '') === String(event?.id || '') &&
                 typeof event?.identity?.eventKey === 'string'

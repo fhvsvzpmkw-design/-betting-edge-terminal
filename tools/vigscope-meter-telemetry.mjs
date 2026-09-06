@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
+import QuoteObservation from '../assets/quote-observation.js';
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
 import {
   VIG_METER_CALIBRATION_ID,
@@ -55,7 +56,9 @@ function thresholdActivity(rec){
   if(p===null||c===null) return null;
   return clamp(1-Math.abs(c-p)/0.03,0,1);
 }
+function stableQuoteValue(value){return Array.isArray(value)?value.map(stableQuoteValue):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,stableQuoteValue(value[key])])):value}
 function eventCollections(feed){
+  if(QuoteObservation.requiresObservation(feed))return QuoteObservation.mergeObservedEvents(feed);
   return [feed?.events,feed?.deepMarkets,feed?.baseballProps]
     .filter(Array.isArray)
     .flat();
@@ -70,8 +73,9 @@ function rowSelectionKeys(row){
   if(nonEmpty(row?.identity?.selectionKey)) keys.selection=String(row.identity.selectionKey);
   return keys;
 }
-function quoteFresh(updatedAt,feedGeneratedAt,maxAgeMinutes=QUOTE_MAX_AGE_MINUTES){
-  const quoteMs=Date.parse(updatedAt),feedMs=Date.parse(feedGeneratedAt);
+function quoteFresh(market,feed,maxAgeMinutes=QUOTE_MAX_AGE_MINUTES){
+  if(QuoteObservation.requiresObservation(feed))return QuoteObservation.quoteIsFresh(market,feed,maxAgeMinutes);
+  const quoteMs=Date.parse(market?.updatedAt),feedMs=Date.parse(feed?.generatedAt);
   if(!Number.isFinite(quoteMs)||!Number.isFinite(feedMs)) return false;
   const ageMinutes=(feedMs-quoteMs)/60000;
   return ageMinutes>=0&&ageMinutes<=maxAgeMinutes;
@@ -80,18 +84,34 @@ export function exactSelectionQuote(feed,book,selectionKey,{requireFresh=true,ma
   if(!feed||!EXECUTION_BOOKS.includes(book)||!nonEmpty(selectionKey)) return null;
   let best=null;
   for(const event of eventCollections(feed)){
-    const markets=event?.bookmakers?.[book];
+    let markets=event?.bookmakers?.[book];
     if(!Array.isArray(markets)) continue;
+    if(QuoteObservation.requiresObservation(feed)){
+      const groups=new Map();
+      for(const market of markets){
+        const key=String(market?.marketKey||market?.identity?.marketKey||market?.name||'');
+        if(!groups.has(key))groups.set(key,[]);
+        groups.get(key).push(market);
+      }
+      markets=[...groups.values()].map(copies=>{
+        const sorted=[...copies].sort((a,b)=>QuoteObservation.compareMarketRecency(a,b,feed)),newest=sorted[0];
+        const time=QuoteObservation.quoteTimeMs(newest,feed);
+        const simultaneous=sorted.filter(market=>QuoteObservation.quoteTimeMs(market,feed)===time);
+        return new Set(simultaneous.map(market=>JSON.stringify(stableQuoteValue(market)))).size>1?null:newest;
+      }).filter(Boolean);
+    }
     for(const market of markets){
       if(!Array.isArray(market?.odds)) continue;
+      if(QuoteObservation.requiresObservation(feed)&&(QuoteObservation.isSuspended(event)||QuoteObservation.isSuspended(market)))continue;
       for(const row of market.odds){
+        if(QuoteObservation.requiresObservation(feed)&&QuoteObservation.isSuspended(row))continue;
         const keys=rowSelectionKeys(row);
         for(const [side,key] of Object.entries(keys)){
           if(key!==selectionKey) continue;
           const decimal=Number(row?.[side]);
           if(!Number.isFinite(decimal)||decimal<=1) continue;
           const updatedAt=String(market?.updatedAt||'');
-          if(requireFresh&&!quoteFresh(updatedAt,feed.generatedAt,maxAgeMinutes)) continue;
+          if(requireFresh&&!quoteFresh(market,feed,maxAgeMinutes)) continue;
           const candidate={
             book,
             selectionKey,
@@ -99,10 +119,11 @@ export function exactSelectionQuote(feed,book,selectionKey,{requireFresh=true,ma
             decimal,
             probability:1/decimal,
             updatedAt,
+            ...(QuoteObservation.requiresObservation(feed)?{observedAt:market.observedAt}:{}),
             eventId:String(event?.id??''),
             marketKey:String(market?.marketKey||market?.identity?.marketKey||market?.name||'')
           };
-          if(!best||Date.parse(candidate.updatedAt)>Date.parse(best.updatedAt)) best=candidate;
+          if(!best||(QuoteObservation.requiresObservation(feed)?QuoteObservation.compareMarketRecency(candidate,best,feed)<0:Date.parse(candidate.updatedAt)>Date.parse(best.updatedAt))) best=candidate;
         }
       }
     }
@@ -310,7 +331,7 @@ export function deriveResilientInstrumentTelemetry({report,feed,feedBlobSha,prio
     const prior=priorByKey.get(key);let comparison=null;
     if(prior&&EXECUTION_BOOKS.includes(prior.book)&&earlierBaseline(priorReport.feedGeneratedAt,feed.generatedAt)){
       const baselineAmerican=americanNumber(prior.price),p=americanProbability(baselineAmerican),q=exactSelectionQuote(feed,prior.book,key);
-      if(p!==null&&q)comparison={basis:'PRIOR_REPORT',book:prior.book,baselineTs:priorReport.ts,baselineAmerican,baselineProbability:p,currentProbability:q.probability,currentQuoteUpdatedAt:q.updatedAt};
+      if(p!==null&&q)comparison={basis:'PRIOR_REPORT',book:prior.book,baselineTs:priorReport.ts,baselineAmerican,baselineProbability:p,currentProbability:q.probability,currentQuoteUpdatedAt:q.updatedAt,...(QuoteObservation.requiresObservation(feed)?{currentQuoteObservedAt:q.observedAt}:{})};
     }
     if(!comparison){
       const books=[...new Set([rec.book,...EXECUTION_BOOKS])].filter(b=>EXECUTION_BOOKS.includes(b));
@@ -318,7 +339,7 @@ export function deriveResilientInstrumentTelemetry({report,feed,feedBlobSha,prio
         for(const book of books){
           const before=exactSelectionQuote(snapshot.feed,book,key),after=exactSelectionQuote(feed,book,key);
           if(!before||!after)continue;
-          comparison={basis:'ODDS_SNAPSHOT',book,baselineTs:snapshot.feed.generatedAt,baselineFeedBlobSha:snapshot.blobSha,baselineDecimal:before.decimal,baselineProbability:before.probability,baselineQuoteUpdatedAt:before.updatedAt,currentProbability:after.probability,currentQuoteUpdatedAt:after.updatedAt};
+          comparison={basis:'ODDS_SNAPSHOT',book,baselineTs:snapshot.feed.generatedAt,baselineFeedBlobSha:snapshot.blobSha,baselineDecimal:before.decimal,baselineProbability:before.probability,baselineQuoteUpdatedAt:before.updatedAt,currentProbability:after.probability,currentQuoteUpdatedAt:after.updatedAt,...(QuoteObservation.requiresObservation(feed)?{currentQuoteObservedAt:after.observedAt}:{}),...(QuoteObservation.requiresObservation(snapshot.feed)?{baselineQuoteObservedAt:before.observedAt}:{})};
           break;
         }
         if(comparison)break;
@@ -372,7 +393,7 @@ export function derivePrimaryMarketInstrumentTelemetry({report,feed,policy,feedB
         return {selectionId:selection.selectionId,selectionKey:after.selectionKey,basis:'ODDS_SNAPSHOT',book:fixedBook,
           baselineTs:snapshot.feed.generatedAt,baselineFeedBlobSha:snapshot.blobSha,baselineDecimal:previous.priceDecimal,
           baselineProbability,baselineQuoteUpdatedAt:previous.quoteUpdatedAt,currentDecimal:after.priceDecimal,currentProbability,
-          currentQuoteUpdatedAt:after.quoteUpdatedAt,favor,magnitude:Math.abs(favor),weight:1};
+          currentQuoteUpdatedAt:after.quoteUpdatedAt,...(QuoteObservation.requiresObservation(feed)?{currentQuoteObservedAt:after.quoteObservedAt}:{}),...(QuoteObservation.requiresObservation(snapshot.feed)?{baselineQuoteObservedAt:previous.quoteObservedAt}:{}),favor,magnitude:Math.abs(favor),weight:1};
       }
     }
     return null;
@@ -390,7 +411,7 @@ export function derivePrimaryMarketInstrumentTelemetry({report,feed,policy,feedB
     const first=selection.quotes.find(q=>q.book==='Bet365'),second=selection.quotes.find(q=>q.book==='DraftKings');
     if(!first||!second||first.selectionKey!==second.selectionKey)continue;
     pairs.push({selectionId:selection.selectionId,selectionKey:first.selectionKey,bet365Decimal:first.priceDecimal,draftKingsDecimal:second.priceDecimal,
-      bet365QuoteUpdatedAt:first.quoteUpdatedAt,draftKingsQuoteUpdatedAt:second.quoteUpdatedAt,gap:Math.abs(1/first.priceDecimal-1/second.priceDecimal)});
+      bet365QuoteUpdatedAt:first.quoteUpdatedAt,draftKingsQuoteUpdatedAt:second.quoteUpdatedAt,...(QuoteObservation.requiresObservation(feed)?{bet365QuoteObservedAt:first.quoteObservedAt,draftKingsQuoteObservedAt:second.quoteObservedAt}:{}),gap:Math.abs(1/first.priceDecimal-1/second.priceDecimal)});
   }
   const avgDiff=pairs.length?pairs.reduce((n,p)=>n+p.gap,0)/pairs.length:0;
   const agreementScore=pairs.length?clamp(100-avgDiff/0.10*100):50;

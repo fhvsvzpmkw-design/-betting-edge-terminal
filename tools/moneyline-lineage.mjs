@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mergedFeedEvents, majorSportKey } from './major-sport-market-coverage-gate.mjs';
+import quoteObservation from '../assets/quote-observation.js';
+import { latestMarket, mergedFeedEvents, majorSportKey } from './major-sport-market-coverage-gate.mjs';
 import { timestampMs, ageMinutes, americanToken, canonicalBook, hasNumber, priceMovement,
   loadBoundFeed, priorSelections, decisionProblems } from './primary-lineage.mjs';
 
@@ -32,13 +33,14 @@ function exactKey(key, id, side) {
   const parts = key.split('|');
   return parts.length === 5 && parts[0] === id && parts[1] === 'ml' && parts[2] === side && parts[4] === '';
 }
-function quoteFromMarket(market, id, side) {
-  if (paused(market)) return { state: 'SUSPENDED' };
+function quoteFromMarket(market, id, side, feed) {
+  const closed = quoteObservation.requiresObservation(feed) ? quoteObservation.isSuspended : paused;
+  if (closed(market)) return { state: 'SUSPENDED' };
   const rows = Array.isArray(market.odds) ? market.odds : [];
   if (rows.some(row => odds(row.draw))) return { state: 'MARKET_VARIANT_UNVERIFIED' };
   const priced = rows.filter(row => odds(row[side]));
   if (!priced.length) return { state: 'SIDE_UNAVAILABLE' };
-  if (priced.some(paused)) return { state: 'SUSPENDED' };
+  if (priced.some(closed)) return { state: 'SUSPENDED' };
   if (priced.some(row => !exactKey(rowKey(row, side), id, side))) return { state: 'IDENTITY' };
   const values = new Map(priced.map(row => {
     const selectionKey = rowKey(row, side), priceDecimal = odds(row[side]);
@@ -48,18 +50,23 @@ function quoteFromMarket(market, id, side) {
   return { state: 'OK', ...values.values().next().value };
 }
 
+// Pass the full feed for observation-version enforcement; timestamp-only calls retain legacy semantics.
 export function newestMoneylineQuote(event, book, side, generatedAt) {
-  const markets = (event?.bookmakers?.[book] || []).filter(market => keyOf(market) === 'ml')
-    .sort((a, b) => (timestampMs(b.updatedAt) ?? -Infinity) - (timestampMs(a.updatedAt) ?? -Infinity));
-  if (!markets.length) return { book, state: 'MISSING' };
-  const updatedAt = markets[0].updatedAt;
-  if (ageMinutes(updatedAt, generatedAt) > 30) return { book, state: 'STALE', updatedAt };
+  generatedAt = typeof generatedAt === 'string' ? { generatedAt } : generatedAt;
+  const markets = (event?.bookmakers?.[book] || []).filter(market => keyOf(market) === 'ml');
+  const newest = quoteObservation.requiresObservation(generatedAt) ? latestMarket(event, book, 'ml', generatedAt) :
+    markets.sort((a, b) => (timestampMs(b.updatedAt) ?? -Infinity) - (timestampMs(a.updatedAt) ?? -Infinity))[0];
+  if (!newest) return { book, state: 'MISSING' };
+  const updatedAt = newest.updatedAt;
+  const clock = quoteObservation.requiresObservation(generatedAt) ? { observedAt: newest.observedAt } : {};
+  if ((quoteObservation.requiresObservation(generatedAt) ? quoteObservation.quoteAgeMinutes(newest, generatedAt) : ageMinutes(newest.updatedAt, generatedAt?.generatedAt || generatedAt)) > 30) return { book, state: 'STALE', updatedAt, ...clock };
+  if (quoteObservation.requiresObservation(generatedAt) && quoteObservation.isSuspended(event)) return { book, state: 'SUSPENDED', updatedAt, ...clock };
   // Only the newest entry is authoritative. Equal-time copies must agree.
-  const latest = markets.filter(market => timestampMs(market.updatedAt) === timestampMs(updatedAt));
-  const results = latest.map(market => quoteFromMarket(market, eventId(event), side));
+  const latest = markets.filter(market => quoteObservation.quoteTimeMs(market, generatedAt) === quoteObservation.quoteTimeMs(newest, generatedAt));
+  const results = latest.map(market => quoteFromMarket(market, eventId(event), side, generatedAt));
   const distinct = new Set(results.map(result => JSON.stringify(result)));
-  if (distinct.size !== 1) return { book, state: 'AMBIGUOUS', updatedAt };
-  return { book, updatedAt, ...results[0] };
+  if (distinct.size !== 1) return { book, state: 'AMBIGUOUS', updatedAt, ...clock };
+  return { book, updatedAt, ...clock, ...results[0] };
 }
 
 function movementProblems(rec, prior, diagnostic) {
@@ -118,7 +125,7 @@ export function auditMoneylineLineage({ root = process.cwd(), report, sidecar = 
       priorFair: prior?.rec?.fair || null, priorPlayTo: prior?.rec?.playTo || null };
     const problems = decisionProblems(current);
     if (current.feed.selectionKey && !exactKey(current.feed.selectionKey, String(current.feed.eventId), current.feed.side)) problems.push('current selectionKey does not match the exact moneyline event/market/side');
-    const books = BOOKS.map(book => newestMoneylineQuote(event, book, current.feed.side, feed.generatedAt));
+    const books = BOOKS.map(book => newestMoneylineQuote(event, book, current.feed.side, feed));
     diagnostic.books = books;
     const usable = books.filter(book => book.state === 'OK');
     if (!usable.length) {

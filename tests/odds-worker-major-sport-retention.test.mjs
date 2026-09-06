@@ -12,6 +12,10 @@ assert.ok(source.includes("apiUrl('/odds/multi', { eventIds, bookmakers: bookmak
 assert.ok(source.includes('function filterFreshMarketsFromEvent(event, now, diagnostics)'), 'missing fresh-market event filter');
 assert.ok(source.includes('const fresh = markets.filter(market => {'), 'primary event filter must iterate all markets');
 assert.ok(source.includes('marketAgeMinutes(market, now) <= MAX_MARKET_AGE_MINUTES'), 'primary event market filter must be freshness based');
+assert.ok(source.includes('Date.parse(market?.observedAt)'), 'market retention must measure successful observation age');
+assert.ok(source.includes('quoteObservationVersion: 1'), 'new feeds must declare observation provenance');
+assert.ok(source.includes('collectionStartedAt: now.toISOString()'), 'collector must preserve collection start separately from completion');
+assert.ok(source.includes('snapshot.generatedAt = completedAt.toISOString()'), 'snapshot date must represent completed collection');
 
 // Canonical identity must be applied to the complete primary event collection.
 assert.ok(source.includes('snapshot.events = snapshot.events.map(enrichIdentity);'), 'primary events must receive canonical identity');

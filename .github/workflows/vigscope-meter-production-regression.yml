@@ -5,6 +5,11 @@ on:
   push:
     paths:
       - 'assets/runner-core-runtime.js'
+      - 'assets/quote-observation.js'
+      - 'runner.html'
+      - 'runner-app.html'
+      - 'runner-core.html'
+      - 'tests/runner-quote-observation.test.mjs'
       - 'assets/report-dashboard-vigscope.js.old'
       - 'data/vigscope/meter-calibration-production-v1.json'
       - 'tools/vigscope-meter-production.mjs'
@@ -35,6 +40,8 @@ jobs:
         run: node tests/vigscope-meter-production.test.mjs
       - name: Run fallback meter safety regression
         run: node tests/vigscope-meter-fallback-safety.test.mjs
+      - name: Run observed quote and movement regression
+        run: node tests/runner-quote-observation.test.mjs
       - name: Run structured publisher telemetry regression
         run: node tests/vigscope-meter-telemetry.test.mjs
       - name: Run resilient odds-baseline telemetry regression
@@ -49,6 +56,7 @@ jobs:
         run: node tools/report-publication.mjs self-test
       - name: Verify runner production wiring
         run: |
+          grep -F '<script src="./assets/quote-observation.js"></script>' runner.html runner-app.html runner-core.html
           grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
           grep -F "HISTORY_KEY='bettingEdge.runnerHistory.v1.4'" assets/runner-core-runtime.js
           grep -F "VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00'" assets/runner-core-runtime.js

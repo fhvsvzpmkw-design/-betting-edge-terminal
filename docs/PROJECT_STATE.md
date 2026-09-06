@@ -1,10 +1,16 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-09-06 — primary evaluation workflow and retired card-target cleanup
+**Last updated:** 2026-09-06 — quote observation freshness correction
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
+
+## September 6 quote freshness correction
+
+The provider's `updatedAt` records last market change, so using it as last observation incorrectly excluded unchanged prices returned by a fresh pull. The forward-only correction uses `quoteObservationVersion: 1`, market `observedAt`, collector `collectionStartedAt` and a completed-snapshot `generatedAt`. The existing 30-minute executable and 90-minute retention limits use observation age; the 75-minute whole-feed limit remains. Original `updatedAt` values stay available for movement provenance, and unchanged re-observations do not count as movement. Missing/suspended prices and invalid observations stay unavailable.
+
+Contract section 4.0a, the shared scheduled authority and `docs/ODDS_OBSERVATION_FRESHNESS.md` describe the coordinated collector/validator/lineage/meter/runner correction for all five report tasks. No schedules, API budget, props scope, decision rules or issued history change. Older feeds retain their original clock and cannot be backfilled. The next ordinary refreshed feed/report must establish live recovery and successful publication; no recovered-selection count or new betting outcome is assumed.
 
 ## September 6 primary-market and evidence follow-up
 
@@ -111,8 +117,9 @@ Current configured Vancouver pulse → report pairs:
 - **Automatic GitHub scheduler backstop:** removed 2026-08-26.
 - **Manual recovery:** explicit `odds-refresh.yml` workflow dispatch when a scheduled Cloudflare handoff is missed.
 - **Books:** Bet365 + DraftKings.
-- **Feed freshness:** 75 minutes.
-- **Executable quote freshness:** 30 minutes.
+- **Feed freshness:** 75 minutes from completed snapshot to report.
+- **Executable quote freshness:** 30 minutes from exact market observation to completed snapshot for version-1 feeds; legacy feeds retain their original clock.
+- **Market retention:** 90 minutes on the same versioned quote clock.
 - **Daily primary-pull cap:** five.
 
 The Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25. A manual pull around 18:08 supplied the valid snapshot used by the first Core v1.4 18:15 report.
@@ -130,7 +137,7 @@ Every active seasonal report task now requires:
 - Core v1.4 OPERATIONAL production manifest/framework;
 - Research v1.8 / R3 live read-only;
 - current Walters authority mode and exact SHA;
-- 75-minute feed / 30-minute executable quote limits;
+- 75-minute feed / 30-minute executable quote limits with Contract section 4.0a observation semantics;
 - exact Bet365/DraftKings identity;
 - Stage 1 current research + Stage 2 personnel where material;
 - current WAIT qualification;

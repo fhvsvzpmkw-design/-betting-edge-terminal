@@ -35,7 +35,7 @@ const document=new Document();const app=document.createElement('iframe');app.id=
 const context={console,document,location:{hash:'',search:''},localStorage:{getItem:()=>null},Intl,URLSearchParams,Date,setTimeout,clearTimeout};context.window={top:null};
 let source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
 const marker='\nactiveRun=payload();';
-vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster};'+marker),context);
+vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster,card};'+marker),context);
 const api=context.api;
 source=fs.readFileSync('assets/report-dashboard-vigscope.js.old','utf8');
 const tail=source.lastIndexOf("  const core=document.getElementById('core');");
@@ -59,6 +59,12 @@ assert.match(api.noPublishedCardsText(report),/0 documented decisions; 2 selecti
 const panel=api.coveragePanel(document,report);
 assert.match(panel.textContent,/ODDS AVAILABLE.*DOCUMENTED REVIEWS.*EVIDENCE BLOCKED.*ODDS UNAVAILABLE/);
 assert.match(panel.textContent,/older than 30m/);assert.match(panel.textContent,/older than 90m/);
+const observedReport=structuredClone(report);observedReport.coverageSummary.source.quoteObservationVersion=1;
+const observedPanel=api.coveragePanel(document,observedReport);
+assert.match(observedPanel.textContent,/Observation older than 30m or observation timestamp invalid/);
+assert.match(observedPanel.textContent,/Observation older than 90m retention/);
+const observedCard=api.card(document,{status:'PASS',title:'Hosts ML',book:'Bet365',price:'+100',priceComparison:{state:'MATCHED',movement:'UNCHANGED',book:'Bet365',price:'+100',quoteObservationVersion:1,observedAt:'2026-09-06T23:00:00Z',updatedAt:'2026-09-06T20:00:00Z'}});
+assert.match(observedCard.textContent,/LAST OBSERVED.*Sep 6, 4:00 p.m..*LAST PRICE CHANGE.*Sep 6, 1:00 p.m./);
 assert.match(panel.textContent,/1 additional discovered game was not retained/);
 assert.match(panel.textContent,/Independent current support/);
 assert.equal(panel.querySelectorAll('.runnerCoverageFact b').map(n=>n.textContent).join(','),'2,0,2,4');
@@ -74,7 +80,7 @@ context.dashboardApi.patchDashboard(document);context.dashboardApi.patchDashboar
 assert.equal(head.nextElementSibling,panel);assert.equal(panel.nextElementSibling.id,'runnerMarketIntel');
 assert.equal(document.getElementById('runnerMarketIntel').querySelector('.runnerSummary'),summary);
 assert.equal(document.getElementById('runnerVigPicks').querySelector('.runnerVigSectionTitle').textContent,'PUBLISHED CARDS');
-assert.match(document.getElementById('runnerVigScope').textContent,/COMBINED STATE UNMEASURED.*No BET, LEAN or WAIT direction/);
+assert.match(document.getElementById('runnerVigScope').textContent,/NO PICK DIRECTION[\s\S]*No BET, LEAN or WAIT direction/);
 assert.equal(cluster.querySelectorAll('.instrument')[1].querySelector('.instrumentRead b').textContent,'—','no neutral 50 may be shown as measured pressure');
 assert.equal(counts.textContent,'0000','no PASS cards may be synthesized');
 assert.equal(JSON.stringify(report),immutable,'rendering may never rewrite the report');

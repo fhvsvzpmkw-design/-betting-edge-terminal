@@ -76,6 +76,7 @@ app = f'''<!doctype html>
 }})();
 </script>
 {base_runtime}
+<script src="./assets/quote-observation.js"></script>
 <script src="./assets/runner-core-runtime.js"></script>
 <script>
 (()=>{{

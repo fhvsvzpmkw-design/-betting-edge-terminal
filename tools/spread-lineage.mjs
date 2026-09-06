@@ -5,6 +5,8 @@ import path from 'node:path';
 import os from 'node:os';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import quoteObservation from '../assets/quote-observation.js';
+import { latestMarket } from './major-sport-market-coverage-gate.mjs';
 import { lineageApplies, auditPrimaryLineage } from './primary-lineage.mjs';
 
 const BOOKS = ['Bet365', 'DraftKings'];
@@ -25,7 +27,7 @@ function americanOdds(value) { const d = decimalOdds(value); if (!d) return null
 function implied(value) { const d = decimalOdds(value); return d ? 1 / d : null; }
 function ageMinutes(older, newer) { const a = parseMs(older), b = parseMs(newer); if (a === null || b === null) return Infinity; return Math.max(0, (b - a) / 60000); }
 function feedFresh(feedGeneratedAt, reportTs) { return ageMinutes(feedGeneratedAt, reportTs) <= FEED_MAX_AGE_MINUTES; }
-function quoteFresh(marketUpdatedAt, feedGeneratedAt) { return ageMinutes(marketUpdatedAt, feedGeneratedAt) <= QUOTE_MAX_AGE_MINUTES; }
+function quoteFresh(market, feed) { return (quoteObservation.requiresObservation(feed) ? quoteObservation.quoteAgeMinutes(market, feed) : ageMinutes(market?.updatedAt, feed?.generatedAt || feed)) <= QUOTE_MAX_AGE_MINUTES; }
 function recKey(rec) { return `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`; }
 function combinedText(rec) { return [rec?.title, rec?.move, rec?.analysis, rec?.price, rec?.source].filter(Boolean).join(' // ').toUpperCase(); }
 function unavailableText(text) { return /(MARKET UNAVAILABLE|PRICE NOT VERIFIED|FEED STALE|IDENTITY MISMATCH)/.test(text); }
@@ -68,6 +70,7 @@ function loadFeed(root, report, sidecar, feedFile) {
 }
 
 function allEvents(feed) {
+  if (quoteObservation.requiresObservation(feed)) return new Map(quoteObservation.mergeObservedEvents(feed).map(event => [String(event?.eventId || event?.identity?.eventId || event?.id || ''), event]));
   const map = new Map();
   for (const event of [...(feed?.events || []), ...(feed?.deepMarkets || []), ...(feed?.baseballProps || [])]) {
     const id = String(event?.eventId || event?.identity?.eventId || event?.id || '');
@@ -87,7 +90,8 @@ function allEvents(feed) {
   return map;
 }
 
-function latestCanonicalSpreadMarket(event, book) {
+function latestCanonicalSpreadMarket(event, book, feed) {
+  if (quoteObservation.requiresObservation(feed)) return latestMarket(event, book, 'spread', feed);
   const markets = event?.bookmakers?.[book];
   if (!Array.isArray(markets)) return null;
   return markets
@@ -96,11 +100,13 @@ function latestCanonicalSpreadMarket(event, book) {
 }
 
 function primarySpread(event, book, side, feedGeneratedAt) {
-  const market = latestCanonicalSpreadMarket(event, book);
+  const market = latestCanonicalSpreadMarket(event, book, feedGeneratedAt);
   if (!market) return { state: 'MISSING', book };
-  if (!quoteFresh(market.updatedAt, feedGeneratedAt)) return { state: 'STALE', book, updatedAt: market.updatedAt || null };
+  if (!quoteFresh(market, feedGeneratedAt)) return { state: 'STALE', book, updatedAt: market.updatedAt || null };
 
+  if (quoteObservation.requiresObservation(feedGeneratedAt) && (quoteObservation.isSuspended(event) || quoteObservation.isSuspended(market))) return { state: 'SUSPENDED', book };
   const rows = (market.odds || []).map((row) => {
+    if (quoteObservation.requiresObservation(feedGeneratedAt) && quoteObservation.isSuspended(row)) return null;
     const home = decimalOdds(row?.home), away = decimalOdds(row?.away), raw = Number(row?.hdp);
     if (!home || !away || !Number.isFinite(raw)) return null;
     const ph = implied(home), pa = implied(away);
@@ -154,9 +160,11 @@ function exactFreshQuotes(event, priorRec, feedGeneratedAt) {
   const selectionKey = String(priorRec.feed.selectionKey || '');
   const rawHdp = Number(priorRec.feed.hdp);
   for (const book of BOOKS) {
-    const market = latestCanonicalSpreadMarket(event, book);
-    if (!market || !quoteFresh(market.updatedAt, feedGeneratedAt)) continue;
+    const market = latestCanonicalSpreadMarket(event, book, feedGeneratedAt);
+    if (!market || !quoteFresh(market, feedGeneratedAt)) continue;
+    if (quoteObservation.requiresObservation(feedGeneratedAt) && (quoteObservation.isSuspended(event) || quoteObservation.isSuspended(market))) continue;
     for (const row of market.odds || []) {
+      if (quoteObservation.requiresObservation(feedGeneratedAt) && quoteObservation.isSuspended(row)) continue;
       const raw = Number(row?.hdp);
       if (!Number.isFinite(raw) || Math.abs(raw - rawHdp) > 0.001) continue;
       const keys = row?.selectionKeys || row?.identity?.selectionKeys || {};
@@ -227,10 +235,10 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
       continue;
     }
 
-    const exact = exactFreshQuotes(event, prior, feed.generatedAt);
+    const exact = exactFreshQuotes(event, prior, feed);
     if (exact.length) continue;
 
-    const primaryResults = BOOKS.map((book) => primarySpread(event, book, String(prior.feed.side).toLowerCase(), feed.generatedAt));
+    const primaryResults = BOOKS.map((book) => primarySpread(event, book, String(prior.feed.side).toLowerCase(), feed));
     const primaries = primaryResults.filter((item) => item.state === 'OK');
     const ambiguous = primaryResults.filter((item) => item.state === 'AMBIGUOUS');
     const diagnostic = {

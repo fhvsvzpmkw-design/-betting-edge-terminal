@@ -1,5 +1,11 @@
 # Core market availability — September 5 follow-up
 
+## September 6 correction to timestamp interpretation
+
+The historical findings below reproduce the then-current `updatedAt` age rule. Odds-API.io subsequently clarified that this field records last market change, not last observation. Therefore the earlier statements that age-based exclusions proved stale quotes, and that no clock correction was justified, are superseded by Contract section 4.0a and `docs/ODDS_OBSERVATION_FRESHNESS.md`. The archived numerical receipts remain unchanged and must not be reclassified using invented observations.
+
+New feeds declaring `quoteObservationVersion: 1` measure the existing 30-minute eligibility and 90-minute retention horizons from exact response `observedAt`, preserve provider `updatedAt` and finalize `generatedAt` after collection. Missing/suspended responses still invalidate older prices within their requested scope. The next normal pull determines the actual recovery; neither the September 5 nor September 6 09:30 saved feed proves a recovered-selection count under the new semantics.
+
 ## Observed 15:15 baseline
 
 Exact report: `data/history/runs/2026-09-05/evening-152600.json`.  

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import quoteObservation from '../assets/quote-observation.js';
 import { validateRecommendationEvidence } from './report-evidence-gate.mjs';
 import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
 import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
@@ -25,7 +26,7 @@ function nonEmpty(value) { return typeof value === 'string' && value.trim().leng
 function int(value, label) { ensure(Number.isInteger(value) && value >= 0, `${label} must be a non-negative integer`); }
 function parseMs(value) { const ms = Date.parse(value || ''); return Number.isFinite(ms) ? ms : null; }
 function ageMinutes(older, newer) { const a = parseMs(older), b = parseMs(newer); return a === null || b === null ? Infinity : Math.max(0, (b - a) / 60000); }
-function quoteFresh(updatedAt, generatedAt) { return ageMinutes(updatedAt, generatedAt) <= QUOTE_MAX_AGE_MINUTES; }
+function quoteFresh(market, feed) { return (quoteObservation.requiresObservation(feed) ? quoteObservation.quoteAgeMinutes(market, feed) : ageMinutes(market?.updatedAt, feed?.generatedAt || feed)) <= QUOTE_MAX_AGE_MINUTES; }
 function decimalOdds(value) { const n = Number(value); return Number.isFinite(n) && n > 1.001 ? n : null; }
 function implied(value) { const odds = decimalOdds(value); return odds ? 1 / odds : null; }
 function marketKey(market) { return String(market?.marketKey || market?.identity?.marketKey || '').toLowerCase(); }
@@ -77,6 +78,10 @@ export function majorSportKey(event) {
 }
 
 export function mergedFeedEvents(feed) {
+  if (quoteObservation.requiresObservation(feed)) {
+    const retained = new Set((feed.events || []).map(eventId));
+    return new Map(quoteObservation.mergeObservedEvents(feed).filter(event => retained.has(eventId(event))).map(event => [eventId(event), event]));
+  }
   const merged = new Map();
   for (const event of feed?.events || []) {
     const id = eventId(event);
@@ -97,11 +102,15 @@ export function mergedFeedEvents(feed) {
   return merged;
 }
 
-function latestMarket(event, book, wantedKey) {
+export function latestMarket(event, book, wantedKey, feed) {
   const markets = Array.isArray(event?.bookmakers?.[book]) ? event.bookmakers[book] : [];
-  return markets
-    .filter(market => marketKey(market) === wantedKey)
-    .sort((a, b) => (parseMs(b?.updatedAt) ?? -Infinity) - (parseMs(a?.updatedAt) ?? -Infinity))[0] || null;
+  const candidates = markets.filter(market => marketKey(market) === wantedKey);
+  // An unobserved v1 copy cannot silently lose to an older valid quote.
+  if (quoteObservation.requiresObservation(feed)) {
+    const invalid = candidates.find(market => !Number.isFinite(quoteObservation.quoteAgeMinutes(market, feed)));
+    if (invalid) return invalid;
+  }
+  return candidates.sort((a, b) => quoteObservation.requiresObservation(feed) ? quoteObservation.compareMarketRecency(a, b, feed) : (parseMs(b?.updatedAt) ?? -Infinity) - (parseMs(a?.updatedAt) ?? -Infinity))[0] || null;
 }
 
 function inspectFixedMarket(market, selections) {
@@ -152,9 +161,10 @@ export function inspectPrimaryLineMarket(market, selections) {
 
 function inspectBookPrimary(event, book, spec, feedGeneratedAt) {
   const wantedKey = FEED_MARKET_KEYS[spec.market];
-  const market = latestMarket(event, book, wantedKey);
+  const market = latestMarket(event, book, wantedKey, feedGeneratedAt);
   if (!market) return { state: 'MISSING' };
-  if (!quoteFresh(market?.updatedAt, feedGeneratedAt)) return { state: 'STALE' };
+  if (!quoteFresh(market, feedGeneratedAt)) return { state: 'STALE' };
+  if (quoteObservation.requiresObservation(feedGeneratedAt) && (quoteObservation.isSuspended(event) || quoteObservation.isSuspended(market))) return { state: 'INCOMPLETE' };
   return spec.primaryLineOnly
     ? inspectPrimaryLineMarket(market, spec.requiredSelections)
     : inspectFixedMarket(market, spec.requiredSelections);
@@ -186,7 +196,7 @@ function freshPropSelectionKeys(event, feedGeneratedAt) {
   const keys = new Set();
   for (const book of BOOKS) {
     for (const market of event?.bookmakers?.[book] || []) {
-      if (!isPlayerPropMarket(market) || !quoteFresh(market?.updatedAt, feedGeneratedAt)) continue;
+      if (!isPlayerPropMarket(market) || !quoteFresh(market, feedGeneratedAt)) continue;
       for (const row of market?.odds || []) {
         const supplied = { ...(row?.identity?.selectionKeys || {}), ...(row?.selectionKeys || {}) };
         for (const [side, key] of Object.entries(supplied)) {
@@ -231,7 +241,7 @@ export function deriveBoundCoverage(report, feed, policy) {
     for (const [id, primaryEvent] of games[sport]) {
       const event = merged.get(id) || primaryEvent;
       for (const spec of primarySpecs(policy, sport)) {
-        const results = BOOKS.map(book => inspectBookPrimary(event, book, spec, feed.generatedAt));
+        const results = BOOKS.map(book => inspectBookPrimary(event, book, spec, feed));
         for (const selection of spec.requiredSelections) {
           const available = results.some(result => result.state === 'RESOLVED' && result.selections?.[selection] === 'AVAILABLE');
           if (available) { evaluated += 1; continue; }
@@ -239,7 +249,7 @@ export function deriveBoundCoverage(report, feed, policy) {
           limitations.set(`${sport}|${id}|${spec.marketDetail}|${selection}`, unavailableReason(results, selection));
         }
       }
-      for (const key of freshPropSelectionKeys(event, feed.generatedAt)) propKeys.add(key);
+      for (const key of freshPropSelectionKeys(event, feed)) propKeys.add(key);
     }
     sports[sport] = {
       eventIds: [...games[sport].keys()].sort(),
@@ -272,18 +282,19 @@ function exactSelectionIdentity(key, id, wantedMarket, side, line) {
   return line === null ? parts[4] === '' : parts[4] !== '' && Number.isFinite(Number(parts[4])) && Math.abs(Number(parts[4]) - line) < 1e-8;
 }
 function inspectExactPrimary(event, book, spec, feedGeneratedAt) {
+  const closed = quoteObservation.requiresObservation(feedGeneratedAt) ? quoteObservation.isSuspended : quoteClosed;
   const candidates = (event?.bookmakers?.[book] || []).filter(market => marketKey(market) === FEED_MARKET_KEYS[spec.market]);
-  const market = latestMarket(event, book, FEED_MARKET_KEYS[spec.market]);
+  const market = latestMarket(event, book, FEED_MARKET_KEYS[spec.market], feedGeneratedAt);
   if (!market) return { state: 'MISSING', quotes: {} };
-  const newest = candidates.filter(candidate => parseMs(candidate.updatedAt) === parseMs(market.updatedAt));
+  const newest = candidates.filter(candidate => quoteObservation.quoteTimeMs(candidate, feedGeneratedAt) === quoteObservation.quoteTimeMs(market, feedGeneratedAt));
   const stable = value => Array.isArray(value) ? value.map(stable) : isObject(value) ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;
   if (new Set(newest.map(candidate => JSON.stringify(stable(candidate)))).size > 1) return { state: 'INCOMPLETE', quotes: {} };
   const period = market.period ?? market.periodKey ?? market.periodName ?? market.identity?.period;
   const partialLabel = /\b(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:half|quarter|period|[1-9]\s+innings?)\b|\b(?:half[- ]time|[1-9]\s+innings?|quarter|period)\b/i.test(String(market.name || ''));
   if (partialLabel || (period != null && !['0', 'full', 'full_game', 'full game', 'game', 'match', 'ft'].includes(String(period).toLowerCase()))) return { state: 'INCOMPLETE', quotes: {} };
-  const updatedMs = parseMs(market.updatedAt), feedMs = parseMs(feedGeneratedAt);
-  if (updatedMs === null || updatedMs > feedMs || !quoteFresh(market.updatedAt, feedGeneratedAt)) return { state: 'STALE', quotes: {} };
-  if (quoteClosed(event) || quoteClosed(market)) return { state: 'INCOMPLETE', quotes: {} };
+  const updatedMs = quoteObservation.quoteTimeMs(market, feedGeneratedAt), feedMs = parseMs(feedGeneratedAt?.generatedAt || feedGeneratedAt);
+  if (updatedMs === null || updatedMs > feedMs || !quoteFresh(market, feedGeneratedAt)) return { state: 'STALE', quotes: {} };
+  if (closed(event) || closed(market)) return { state: 'INCOMPLETE', quotes: {} };
   const inspected = spec.primaryLineOnly ? inspectPrimaryLineMarket(market, spec.requiredSelections) : inspectFixedMarket(market, spec.requiredSelections);
   if (inspected.state !== 'RESOLVED') return { ...inspected, quotes: {} };
   const id = eventId(event), wantedMarket = FEED_MARKET_KEYS[spec.market];
@@ -291,7 +302,7 @@ function inspectExactPrimary(event, book, spec, feedGeneratedAt) {
   const states = {}, quotes = {};
   for (const side of spec.requiredSelections) {
     const rows = (market.odds || []).filter(row => !spec.primaryLineOnly || Math.abs(rowLine(row) - line) < 1e-8);
-    const priced = rows.filter(row => !quoteClosed(row) && decimalOdds(row[side]));
+    const priced = rows.filter(row => !closed(row) && decimalOdds(row[side]));
     const exact = priced.filter(row => exactSelectionIdentity(selectionKey(row, side), id, wantedMarket, side, line));
     // Conflicting prices/identities at the same newest market timestamp are not
     // silently resolved by array order or by rescuing an older quote.
@@ -299,7 +310,7 @@ function inspectExactPrimary(event, book, spec, feedGeneratedAt) {
     if (unique.size !== 1) { states[side] = priced.length ? 'IDENTITY' : 'INCOMPLETE'; continue; }
     const row = [...unique.values()][0];
     states[side] = 'AVAILABLE';
-    quotes[side] = { book, eventId: id, marketKey: wantedMarket, side, line, selectionKey: selectionKey(row, side), priceDecimal: decimalOdds(row[side]), quoteUpdatedAt: market.updatedAt };
+    quotes[side] = { book, eventId: id, marketKey: wantedMarket, side, line, selectionKey: selectionKey(row, side), priceDecimal: decimalOdds(row[side]), quoteUpdatedAt: quoteObservation.requiresObservation(feedGeneratedAt) ? market.updatedAt ?? null : market.updatedAt, ...(quoteObservation.requiresObservation(feedGeneratedAt) ? { quoteObservedAt: market.observedAt } : {}) };
   }
   return { ...inspected, selections: states, quotes };
 }
@@ -313,7 +324,7 @@ export function derivePrimarySelectionInventory(report, feed, policy) {
     for (const id of expected.eventIds) {
       const event = merged.get(id);
       for (const spec of primarySpecs(policy, sport)) {
-        const results = BOOKS.map(book => inspectExactPrimary(event, book, spec, feed.generatedAt));
+        const results = BOOKS.map(book => inspectExactPrimary(event, book, spec, feed));
         for (const side of spec.requiredSelections) {
           const selectionId = `${sport}|${id}|${spec.marketDetail}|${side}`;
           const quotes = results.map(result => result.quotes?.[side]).filter(Boolean);
@@ -431,6 +442,7 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
       if (Object.hasOwn(binding, 'eventDate')) ensure(parseMs(binding.eventDate) === parseMs(selection.eventDate), `${label} ${kind} feed eventDate differs from inventory`);
       for (const field of ['line', 'hdp', 'total', 'points']) if (Object.hasOwn(binding, field)) ensure(quote.line === null ? binding[field] === null : binding[field] != null && closeNumber(Number(binding[field]), quote.line), `${label} ${kind} feed ${field} differs from inventory line`);
       if (Object.hasOwn(binding, 'quoteUpdatedAt')) ensure(binding.quoteUpdatedAt === quote.quoteUpdatedAt, `${label} ${kind} feed quoteUpdatedAt differs from inventory`);
+      if (Object.hasOwn(quote, 'quoteObservedAt') && Object.hasOwn(binding, 'quoteObservedAt')) ensure(binding.quoteObservedAt === quote.quoteObservedAt, `${label} ${kind} feed quoteObservedAt differs from inventory`);
       if (Object.hasOwn(binding, 'priceDecimal')) ensure(closeNumber(Number(binding.priceDecimal), quote.priceDecimal), `${label} ${kind} feed priceDecimal differs from inventory`);
     }
     ensure(decision.book === quote.book, `${label} decision book differs from receipt quote`);

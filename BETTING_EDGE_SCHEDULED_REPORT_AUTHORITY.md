@@ -9,6 +9,7 @@
 **Documented primary evaluation amendment:** 2026-09-06 00:00 America/Vancouver
 **Unbounded card-output amendment:** 2026-09-06 00:00 America/Vancouver
 **Fair-construction workflow clarification:** 2026-09-06, following the 06:00 review
+**Quote observation amendment:** 2026-09-06, forward-only for feeds declaring `quoteObservationVersion: 1`
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -47,10 +48,12 @@ Any authority conflict is `PREFLIGHT BLOCK — ANALYSIS NOT STARTED`.
 
 Bind the exact `data/live-odds.json` snapshot for this lane. Enforce all Contract gates, including:
 - maximum 75-minute feed freshness;
-- maximum 30-minute executable quote age using the Contract's feed-generated-at measurement rule;
+- maximum 30-minute executable quote age at feed generation: use `market.observedAt` for `quoteObservationVersion: 1`, and the original `market.updatedAt` rule only for legacy feeds;
 - scheduleMeta compatibility with the resolved active profile/slot;
 - exact event, market, line, side and selection identity;
 - Bet365 and DraftKings as supported executable books.
+
+Apply Contract section 4.0a and `docs/ODDS_OBSERVATION_FRESHNESS.md`. A new-format feed has `collectionStartedAt`, a completed-snapshot `generatedAt`, and market-level `observedAt` recorded from each successful exact response. Preserve the provider's `updatedAt` as last-change provenance. Missing, invalid or future observations cannot be replaced with another timestamp. The existing 90-minute retention horizon uses observation age. Missing/suspended quotes in the latest successful requested scope remain unavailable; older copies cannot supply them. Do not manually restamp feed data or count an unchanged re-observation as movement. Validation, coverage explanations, meters and lineage must agree on the bound feed's clock; legacy issued snapshots retain their original interpretation.
 
 Do not pull replacement odds merely because a market or candidate is unattractive.
 

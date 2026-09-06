@@ -1,3 +1,4 @@
+import quoteObservation from '../assets/quote-observation.js';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
@@ -26,7 +27,7 @@ export function explainUnavailableSelections(report, audit, feed) {
       const states = BOOKS.map(book => market.books?.[book]);
       const old = BOOKS.filter(book => market.books?.[book] === 'STALE_BEYOND_RETENTION');
       const staleEvidence = old.length > 0 && old.every(book => {
-        const age = (Date.parse(feed.generatedAt) - Date.parse(market.updatedAtByBook?.[book])) / 60000;
+        const age = (Date.parse(feed.generatedAt) - Date.parse(quoteObservation.requiresObservation(feed) ? market.observedAtByBook?.[book] : market.updatedAtByBook?.[book])) / 60000;
         return Number.isFinite(age) && age > (feed.maxMarketAgeMinutes || 90);
       });
       if (staleEvidence && states.every(state => ['STALE_BEYOND_RETENTION', 'NOT_RETURNED'].includes(state))) reason = 'STALE_BEYOND_RETENTION';
@@ -58,7 +59,7 @@ export function deriveReportCoverageSummary(report, sidecar, feed) {
     return {selectionId:receipt.selectionId, sport, eventId, label:eventLabel(feed,eventId), marketDetail, side,
       reason:receipt.blocker.reason, missing:receipt.blocker.missing, impact:receipt.blocker.impact};
   });
-  return {schema:1, source:{feedBlobSha:sidecar.provenance.feedBlobSha, feedGeneratedAt:feed.generatedAt, maxMarketAgeMinutes:feed.maxMarketAgeMinutes || 90},
+  return {schema:1, source:{feedBlobSha:sidecar.provenance.feedBlobSha, feedGeneratedAt:feed.generatedAt, maxMarketAgeMinutes:feed.maxMarketAgeMinutes || 90, ...(quoteObservation.requiresObservation(feed) ? {quoteObservationVersion:1, quoteFreshnessClock:'observedAt', quoteMaxAgeMinutes:30} : {})},
     scope:'RETAINED_SAME_DAY_PREGAME_EVENTS', games:totals.gamesInScope,
     selections:{required:totals.primaryRequired, available:totals.primaryAvailable, evaluated:totals.primaryEvaluated,
       blocked:totals.primaryBlocked, unavailable:totals.primaryUnavailable},

@@ -23,6 +23,10 @@ on:
       - tests/report-coverage-summary.test.mjs
       - tests/primary-report-publication.test.mjs
       - tools/report-coverage-summary.mjs
+      - tools/observe-issued-prices.mjs
+      - tools/build-results-index.mjs
+      - tests/issued-price-observation.test.mjs
+      - tests/results-index-quote-observation.test.mjs
       - tools/vigscope-meter-telemetry.mjs
       - tools/vigscope-meter-telemetry-gate.mjs
       - tools/vigscope-meter-production.mjs
@@ -31,6 +35,13 @@ on:
       - assets/report-dashboard-vigscope.js
       - assets/report-dashboard-vigscope.js.old
       - assets/runner-core-runtime.js
+      - assets/quote-observation.js
+      - runner.html
+      - runner-app.html
+      - runner-core.html
+      - tests/quote-observation.test.mjs
+      - tests/server-quote-observation.test.mjs
+      - tests/runner-quote-observation.test.mjs
       - r.html
       - tests/vigscope-meter-telemetry.test.mjs
       - tests/vigscope-meter-resilient.test.mjs
@@ -77,6 +88,11 @@ jobs:
       - name: Validate major-sport coverage authority
         run: |
           set -euo pipefail
+          node tests/quote-observation.test.mjs
+          node tests/server-quote-observation.test.mjs
+          node tests/runner-quote-observation.test.mjs
+          node tests/issued-price-observation.test.mjs
+          node tests/results-index-quote-observation.test.mjs
           node tests/major-sport-market-coverage.test.mjs
           node tests/primary-market-scope.test.mjs
           node tests/report-bundle-preflight.test.mjs

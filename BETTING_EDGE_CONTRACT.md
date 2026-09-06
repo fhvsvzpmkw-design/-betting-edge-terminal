@@ -12,6 +12,7 @@
 **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`
 **Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  
 **Operational amendment:** 2026-09-06 — numeric report-card targets retired; unbounded evaluated-decision publication  
+**Operational amendment:** 2026-09-06 — provider observation time separated from market-change time
 
 > **THIS FILE IS OPERATIONAL.**
 >
@@ -98,7 +99,7 @@ The full incorporated v0.8 baseline remains operational. The following high-valu
 
 - Live odds source: `data/live-odds.json` from the authoritative repository path, with an approved fallback route only when the primary read fails.
 - Feed freshness: maximum **75 minutes**, measured as `run.ts - feed.generatedAt`.
-- Exact executable sportsbook quote freshness: maximum **30 minutes**, measured as `feed.generatedAt - market.updatedAt`. Do **not** substitute report issuance time (`run.ts`) for `feed.generatedAt` when evaluating the 30-minute quote-age gate.
+- Exact executable sportsbook quote freshness: maximum **30 minutes**, measured as `feed.generatedAt - market.observedAt` for feeds declaring `quoteObservationVersion: 1`. The provider's original `market.updatedAt` records its last market change and remains unchanged for movement provenance. Legacy feeds without the observation-version declaration retain their original `feed.generatedAt - market.updatedAt` evaluation; never synthesize historical observations. Do **not** substitute report issuance time (`run.ts`) for `feed.generatedAt` when evaluating the 30-minute quote-age gate.
 - A report-generation or lineage check must use the exact odds snapshot bound to that report. Prefer the report provenance `feedBlobSha` when available; `data/live-odds.json` is valid for the check only when its `generatedAt` exactly matches the report's `feedGeneratedAt`.
 - Primary supported user pricing books: **Bet365** and **DraftKings**.
 - Exact event, market and selection identity precedes price use. When an archived recommendation carries `selectionKey`, a current row is the same exact selection only when the same event, market, side and `selectionKey` all match; a matching numeric handicap without the archived `selectionKey` is not sufficient to bypass lineage reconciliation.
@@ -116,6 +117,19 @@ The full incorporated v0.8 baseline remains operational. The following high-valu
 - A failed hard gate cannot be overridden by matchup confidence, market narrative, expert opinion, historical fit or user-history fit.
 
 Equal-price deterministic sportsbook behavior and all inherited `playTo`, risk and fair-value rules remain unchanged.
+
+## 4.0a Observation freshness — September 6 correction
+
+This amendment applies to newly collected feeds declaring `quoteObservationVersion: 1`. It corrects the clock used by the existing 30-minute eligibility and 90-minute retention limits; it does not extend either limit. Odds-API.io describes `updatedAt` as the last price-change time, not the last fetch time. [Provider explanation](https://odds-api.io/blog/compare-odds-multiple-bookmakers-api#keeping-the-table-fresh)
+
+- The collector sets `collectionStartedAt` when collection begins and `generatedAt` when the completed snapshot is finalized. The 75-minute whole-feed limit remains `run.ts - feed.generatedAt`.
+- Only an exact market received in a successful, identity-checked provider response receives the local response-receipt timestamp `observedAt`. A new snapshot timestamp, a copied market, a failed request or an identity mismatch cannot refresh a quote's observation.
+- A version-1 market with missing, invalid or future observation time is unusable. Do not fall back to `updatedAt`, `collectionStartedAt` or `generatedAt` as its observation. Apply the 90-minute retention horizon to the actual observation age as well.
+- Respect the latest successfully observed requested scope. An absent book, missing market, removed side or suspended quote cannot be recovered from an earlier copy in that scope. A request failure establishes no new observation.
+- Re-observing an unchanged price updates freshness only. Record movement from exact matching price/line comparisons and retain each provider `updatedAt`; the later observation itself is not movement.
+- Collection, report validation, lineage, meters and repricing must use the same versioned clock. Historical feeds and issued reports remain unchanged under their original semantics. Pinnacle/OddsPapi remains governed by its separate benchmark policy.
+
+The field definitions and regression expectations are in `docs/ODDS_OBSERVATION_FRESHNESS.md`. All five standard tasks inherit this correction through the shared scheduled authority. Books, primary-market scope, props pause, Core decision rules, staking, schedules and odds-request budget remain unchanged.
 
 ## 4.1 Fair-value benchmark confidence and labeling
 

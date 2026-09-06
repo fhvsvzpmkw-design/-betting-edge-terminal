@@ -1,6 +1,6 @@
 # Betting Edge — Operations
 
-**Last updated:** 2026-08-25 — Core 1.4 production closeout / scheduler backstop
+**Last updated:** 2026-09-06 — quote observation freshness correction
 
 This is the practical operating runbook. The authoritative betting-governance file is `BETTING_EDGE_CONTRACT.md` **v1.0 OPERATIONAL**. Core methodology authority is `core/core-v1.4-production.json` **Core v1.4 OPERATIONAL**.
 
@@ -14,11 +14,18 @@ This is the practical operating runbook. The authoritative betting-governance fi
 - **Report provenance:** schema 3.
 - **Timezone:** `America/Vancouver`.
 - **Books:** Bet365 + DraftKings.
-- **Feed freshness:** 75 minutes.
-- **Executable quote freshness:** 30 minutes.
+- **Feed freshness:** 75 minutes from completed snapshot to report.
+- **Executable quote freshness:** 30 minutes from exact market observation to completed snapshot for `quoteObservationVersion: 1`; legacy feeds retain their original clock.
+- **Market retention:** 90 minutes on that same versioned quote clock.
 - **Primary Odds-API pull cap:** five per Vancouver operating day.
 
 The version tracks are independent. UI, Core, Contract, Research and character/hotline versions do not automatically promote one another.
+
+## Exact market observation and price movement
+
+New odds snapshots declare `quoteObservationVersion: 1`, record `collectionStartedAt` before fetching and `generatedAt` after collection completes. Each exact successfully returned and identity-checked market receives `observedAt` at response receipt; its provider `updatedAt` is preserved as last-change time. An unchanged price can therefore qualify as current without inventing movement. Missing/suspended prices are not restored from older copies, failed requests do not refresh data, and version-1 markets with missing/invalid/future observations fail closed. The 30/90-minute limits are unchanged; historical snapshots are not backfilled. See Contract section 4.0a and [the field and regression reference](ODDS_OBSERVATION_FRESHNESS.md).
+
+At the next ordinary refresh/report, verify the versioned timestamps, exact-market availability receipt, meter freshness and successful publication. Record the actual number of recovered selections; do not predict a BET or fabricate a replay observation from the September 6 09:30 feed. This check uses the existing run and creates no additional scheduler or API request.
 
 ## Scheduled report gate order
 

@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { inspectPrimaryLineMarket, mergedFeedEvents, majorSportKey } from './major-sport-market-coverage-gate.mjs';
+import quoteObservation from '../assets/quote-observation.js';
+import { latestMarket, inspectPrimaryLineMarket, mergedFeedEvents, majorSportKey } from './major-sport-market-coverage-gate.mjs';
 
 export const TOTAL_LINEAGE_FROM = '2026-09-05T13:30:00-07:00';
 export const SPREAD_MOVEMENT_FROM = '2026-09-05T14:00:00-07:00';
@@ -71,24 +72,32 @@ export function priceMovement(priorPrice, currentPrice) {
   return newDecimal > oldDecimal ? 'PRICE IMPROVED' : 'PRICE WORSENED';
 }
 
+// Pass the full feed for observation-version enforcement; timestamp-only calls retain legacy semantics.
 export function primaryLineQuote(event, book, side, generatedAt, wantedMarket) {
-  const market = (event?.bookmakers?.[book] || []).filter(item => marketKey(item) === wantedMarket)
-    .sort((a, b) => (ms(b.updatedAt) ?? -Infinity) - (ms(a.updatedAt) ?? -Infinity))[0];
+  generatedAt = typeof generatedAt === 'string' ? { generatedAt } : generatedAt;
+  const market = quoteObservation.requiresObservation(generatedAt) ? latestMarket(event, book, wantedMarket, generatedAt) :
+    (event?.bookmakers?.[book] || []).filter(item => marketKey(item) === wantedMarket).sort((a, b) => (ms(b.updatedAt) ?? -Infinity) - (ms(a.updatedAt) ?? -Infinity))[0];
   if (!market) return { book, state: 'MISSING' };
-  if (age(market.updatedAt, generatedAt) > 30) return { book, state: 'STALE', updatedAt: market.updatedAt };
+  if ((quoteObservation.requiresObservation(generatedAt) ? quoteObservation.quoteAgeMinutes(market, generatedAt) : age(market.updatedAt, generatedAt?.generatedAt || generatedAt)) > 30) return { book, state: 'STALE', updatedAt: market.updatedAt };
+  if (quoteObservation.requiresObservation(generatedAt) && (quoteObservation.isSuspended(event) || quoteObservation.isSuspended(market))) return { book, state: 'SUSPENDED', updatedAt: market.updatedAt, observedAt: market.observedAt };
+  if (quoteObservation.requiresObservation(generatedAt)) {
+    const copies = (event?.bookmakers?.[book] || []).filter(item => marketKey(item) === wantedMarket && quoteObservation.quoteTimeMs(item, generatedAt) === quoteObservation.quoteTimeMs(market, generatedAt));
+    const stable = value => Array.isArray(value) ? value.map(stable) : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;
+    if (new Set(copies.map(item => JSON.stringify(stable(item)))).size > 1) return { book, state: 'AMBIGUOUS', updatedAt: market.updatedAt, observedAt: market.observedAt };
+  }
   // Use exactly the same primary-line resolver as the major-sport coverage gate.
   const result = inspectPrimaryLineMarket(market, SPECS[wantedMarket].sides);
   if (result.state !== 'RESOLVED') return { book, state: result.state, updatedAt: market.updatedAt };
   if (result.selections[side] !== 'AVAILABLE') return { book, state: result.selections[side], updatedAt: market.updatedAt };
   const rows = (market.odds || []).filter(row => lineOf(row) !== null &&
-    Math.abs(lineOf(row) - result.line) <= EPSILON && decimal(row[side]) && selectionKey(row, side));
+    Math.abs(lineOf(row) - result.line) <= EPSILON && decimal(row[side]) && selectionKey(row, side) && (!quoteObservation.requiresObservation(generatedAt) || !quoteObservation.isSuspended(row)));
   const row = rows.sort((a, b) => Number(b[side]) - Number(a[side]))[0];
   if (!row) return { book, state: 'IDENTITY', updatedAt: market.updatedAt };
   const key = selectionKey(row, side), parts = key.split('|');
   if (parts.length !== 5 || parts[0] !== eventId(event) || parts[1] !== wantedMarket ||
     parts[2] !== side || number(parts[4]) !== result.line) return { book, state: 'IDENTITY', updatedAt: market.updatedAt };
   return { book, state: 'OK', line: displayLine(result.line, side, wantedMarket), rawLine: result.line, selectionKey: key, priceAmerican: american(Number(row[side])),
-    priceDecimal: Number(row[side]), updatedAt: market.updatedAt, method: result.method };
+    priceDecimal: Number(row[side]), updatedAt: market.updatedAt, ...(quoteObservation.requiresObservation(generatedAt) ? { observedAt: market.observedAt } : {}), method: result.method };
 }
 
 export function priorSelections(root, report, market) {
@@ -173,7 +182,7 @@ export function auditPrimaryLineage({ root = process.cwd(), report, sidecar = nu
     }
     problems.push(...decisionProblems(current));
     const text = String(current.move || '').toUpperCase();
-    const primary = BOOKS.map(book => primaryLineQuote(event, book, old.feed.side, feed.generatedAt, market));
+    const primary = BOOKS.map(book => primaryLineQuote(event, book, old.feed.side, feed, market));
     diagnostic.primary = primary;
     const usable = primary.filter(item => item.state === 'OK');
     if (!usable.length) {

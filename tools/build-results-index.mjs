@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import QuoteObservation from '../assets/quote-observation.js';
 
 const ROOT = process.cwd();
 const OBS_ROOT = path.join(ROOT, 'data/history/observations');
@@ -117,6 +118,7 @@ function exactAnalysisPrice(run, rec, obsRec) {
       book: issued.analysisBook || null,
       bookKey: issued.analysisBookKey || null,
       quoteUpdatedAt: issued.analysisQuoteUpdatedAt || null,
+      ...(issued.analysisQuoteObservedAt !== undefined ? { quoteObservedAt: issued.analysisQuoteObservedAt } : {}),
       snapshotBlobSha: issued.analysisSnapshotBlobSha || null,
       source: 'sidecar-normalized'
     };
@@ -129,8 +131,11 @@ function exactAnalysisPrice(run, rec, obsRec) {
 
   const eventId = String(rec?.feed?.eventId || '');
   const selectionKey = rec?.feed?.selectionKey;
-  const event = (snapshot.events || []).find(x => String(x?.id) === eventId);
+  const observed = QuoteObservation.requiresObservation(snapshot);
+  const events = observed ? QuoteObservation.mergeObservedEvents(snapshot) : (snapshot.events || []);
+  const event = events.find(x => String(observed ? (x?.eventId || x?.identity?.eventId || x?.id) : x?.id) === eventId);
   if (!event || !selectionKey) return { state: 'unavailable', reason: 'issued_identity_missing' };
+  if (observed && QuoteObservation.isSuspended(event)) return { state: 'unavailable', reason: 'no_fresh_exact_issued_quote' };
 
   const allowed = new Set(bookNames(rec?.book));
   if (!allowed.size) return { state: 'unavailable', reason: 'issued_book_not_resolved' };
@@ -140,17 +145,34 @@ function exactAnalysisPrice(run, rec, obsRec) {
   for (const [bookName, markets] of Object.entries(event.bookmakers || {})) {
     const bookKey = normBook(bookName);
     if (!allowed.has(bookKey)) continue;
-    for (const market of markets || []) {
-      const quoteMs = parseTime(market?.updatedAt);
-      const age = feedMs !== null && quoteMs !== null ? (feedMs - quoteMs) / 60000 : null;
-      if (age === null || age < 0 || age > 30) continue;
+    let currentMarkets = markets || [];
+    if (observed) {
+      // Resolve the current canonical market before looking for a selection.
+      // A removed side or malformed latest observation must not revive an older price.
+      const wantedMarket = cleanText(rec?.feed?.marketKey || selectionKey.split('|')[1]).toLowerCase();
+      const matches = currentMarkets.filter(market => cleanText(market?.marketKey || market?.identity?.marketKey).toLowerCase() === wantedMarket)
+        .sort((a, b) => QuoteObservation.compareMarketRecency(a, b, snapshot));
+      const latest = matches[0];
+      const tied = latest && matches.filter(market => QuoteObservation.compareMarketRecency(latest, market, snapshot) === 0);
+      currentMarkets = latest && new Set(tied.map(market => JSON.stringify(market))).size === 1 ? [latest] : [];
+    }
+    for (const market of currentMarkets) {
+      if (observed) {
+        if (!QuoteObservation.quoteIsFresh(market, snapshot, 30)) continue;
+      } else {
+        const quoteMs = parseTime(market?.updatedAt);
+        const age = feedMs !== null && quoteMs !== null ? (feedMs - quoteMs) / 60000 : null;
+        if (age === null || age < 0 || age > 30) continue;
+      }
       for (const row of market?.odds || []) {
+        if (observed && QuoteObservation.isSuspended(row)) continue;
         const keys = row?.selectionKeys || row?.identity?.selectionKeys || {};
         for (const [field, key] of Object.entries(keys)) {
           if (key !== selectionKey) continue;
           const decimal = Number(row?.[field]);
           if (Number.isFinite(decimal) && decimal > 1) {
-            candidates.push({ decimal, book: bookName, bookKey, quoteUpdatedAt: market.updatedAt || null });
+            candidates.push({ decimal, book: bookName, bookKey, quoteUpdatedAt: market.updatedAt || null,
+              ...(observed ? { quoteObservedAt: market.observedAt } : {}) });
           }
         }
       }
@@ -167,6 +189,7 @@ function exactAnalysisPrice(run, rec, obsRec) {
     book: best.book,
     bookKey: best.bookKey,
     quoteUpdatedAt: best.quoteUpdatedAt,
+    ...(observed ? { quoteObservedAt: best.quoteObservedAt } : {}),
     snapshotBlobSha: entry.snapshotBlobSha,
     source: 'immutable-issued-snapshot'
   };

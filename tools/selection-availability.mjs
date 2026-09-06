@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import quoteObservation from '../assets/quote-observation.js';
+import { latestMarket } from './major-sport-market-coverage-gate.mjs';
 import { moneylineApplies } from './moneyline-lineage.mjs';
 
 const BOOKS = ['Bet365', 'DraftKings'];
@@ -13,7 +15,7 @@ function die(message) { throw new Error(message); }
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function parseMs(value) { const ms = Date.parse(value || ''); return Number.isFinite(ms) ? ms : null; }
 function ageMinutes(older, newer) { const a = parseMs(older), b = parseMs(newer); if (a === null || b === null) return Infinity; return Math.max(0, (b - a) / 60000); }
-function quoteFresh(updatedAt, generatedAt) { return ageMinutes(updatedAt, generatedAt) <= QUOTE_MAX_AGE_MINUTES; }
+function quoteFresh(market, feed) { return (quoteObservation.requiresObservation(feed) ? quoteObservation.quoteAgeMinutes(market, feed) : ageMinutes(market?.updatedAt, feed?.generatedAt || feed)) <= QUOTE_MAX_AGE_MINUTES; }
 function eventIdentity(event) { return String(event?.eventId || event?.identity?.eventId || event?.id || ''); }
 function marketIdentity(market) { return String(market?.marketKey || market?.identity?.marketKey || '').toLowerCase(); }
 function rowLabel(row) { return String(row?.label || row?.player || row?.participant || row?.name || row?.selection || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
@@ -58,6 +60,7 @@ function anyNumericBookPrice(text, book) {
 }
 
 function allEvents(feed) {
+  if (quoteObservation.requiresObservation(feed)) return new Map(quoteObservation.mergeObservedEvents(feed).map(event => [String(event?.eventId || event?.identity?.eventId || event?.id || ''), event]));
   const merged = new Map();
   for (const event of [...(feed?.events || []), ...(feed?.deepMarkets || []), ...(feed?.baseballProps || [])]) {
     const id = eventIdentity(event);
@@ -81,17 +84,31 @@ export function exactBookQuotes(feed, rec) {
   const quotes = [];
   for (const book of BOOKS) {
     let best = null;
-    for (const market of event?.bookmakers?.[book] || []) {
-      if (marketIdentity(market) !== wantedMarket || !quoteFresh(market?.updatedAt, feed?.generatedAt)) continue;
+    const observed = quoteObservation.requiresObservation(feed);
+    if (observed && quoteObservation.isSuspended(event)) continue;
+    const newest = observed ? latestMarket(event, book, wantedMarket, feed) : null;
+    const markets = observed ? (event?.bookmakers?.[book] || []).filter(market => marketIdentity(market) === wantedMarket && quoteObservation.quoteTimeMs(market, feed) === quoteObservation.quoteTimeMs(newest, feed)) : event?.bookmakers?.[book] || [];
+    if (observed && (!newest || !quoteFresh(newest, feed))) continue;
+    const currentQuotes = [];
+    let unavailable = false;
+    for (const market of markets) {
+      if (marketIdentity(market) !== wantedMarket || !quoteFresh(market, feed)) continue;
+      if (observed && quoteObservation.isSuspended(market)) { unavailable = true; continue; }
+      let matched = false;
       for (const row of market?.odds || []) {
         if (selectionIdentity(row, side, event, market) !== wantedSelection) continue;
         const dec = decimalOdds(row?.[side]);
-        if (!dec) continue;
-        const quote = { book, american: americanOdds(dec), updatedAt: market.updatedAt };
+        if (!dec || observed && quoteObservation.isSuspended(row)) continue;
+        matched = true;
+        const quote = { book, american: americanOdds(dec), updatedAt: market.updatedAt, ...(observed ? { observedAt: market.observedAt } : {}) };
+        currentQuotes.push(quote);
         if (!best || (parseMs(quote.updatedAt) ?? 0) > (parseMs(best.updatedAt) ?? 0)) best = quote;
       }
+      if (observed && !matched) unavailable = true;
     }
-    if (best) quotes.push(best);
+    if (observed) {
+      if (!unavailable && new Set(currentQuotes.map(quote => quote.american)).size === 1) quotes.push(currentQuotes[0]);
+    } else if (best) quotes.push(best);
   }
   return quotes;
 }

@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import quoteObservation from '../assets/quote-observation.js';
 
 const ROOT = process.cwd();
 const ODDS_INDEX = path.join(ROOT, 'data/history/odds-index.json');
@@ -158,16 +159,38 @@ function findExactQuote(snapshot, rec, wantedBookKey) {
   const eventId = String(rec?.feed?.eventId || '');
   if (!selectionKey || !eventId || !wantedBookKey) return null;
 
-  const event = (snapshot?.events || []).find((candidate) => String(candidate?.id) === eventId);
+  const observed = quoteObservation.requiresObservation(snapshot);
+  const events = observed ? quoteObservation.mergeObservedEvents(snapshot) : snapshot?.events || [];
+  const event = events.find((candidate) => String(observed ? candidate?.eventId || candidate?.identity?.eventId || candidate?.id : candidate?.id) === eventId);
   if (!event) return null;
+  if (observed && quoteObservation.isSuspended(event)) return null;
 
   const bookmakerEntry = Object.entries(event?.bookmakers || {})
     .find(([bookName]) => normalizeBook(bookName) === wantedBookKey);
   if (!bookmakerEntry) return null;
 
-  const [bookName, markets] = bookmakerEntry;
+  const [bookName, sourceMarkets] = bookmakerEntry;
+  let markets = sourceMarkets;
+  if (observed) {
+    // Resolve current market state before searching for the exact historical
+    // selection. A removed line/side must not fall back to an older copy.
+    const latest = new Map();
+    for (const market of [...(sourceMarkets || [])].sort((a, b) => quoteObservation.compareMarketRecency(a, b, snapshot))) {
+      const key = normalizeMarket(market?.marketKey || market?.identity?.marketKey || market?.name);
+      if (!latest.has(key)) latest.set(key, market);
+    }
+    const stable = value => Array.isArray(value) ? value.map(stable) : value && typeof value === 'object'
+      ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;
+    markets = [...latest.entries()].filter(([key, market]) => {
+      const copies = (sourceMarkets || []).filter(candidate =>
+        normalizeMarket(candidate?.marketKey || candidate?.identity?.marketKey || candidate?.name) === key &&
+        quoteObservation.quoteTimeMs(candidate, snapshot) === quoteObservation.quoteTimeMs(market, snapshot));
+      return quoteObservation.quoteIsFresh(market, snapshot) && new Set(copies.map(copy => JSON.stringify(stable(copy)))).size === 1;
+    }).map(([, market]) => market);
+  }
   for (const market of markets || []) {
     for (const row of market?.odds || []) {
+      if (observed && quoteObservation.isSuspended(row)) continue;
       const keys = row?.selectionKeys || row?.identity?.selectionKeys || {};
       for (const [field, key] of Object.entries(keys)) {
         if (key !== selectionKey) continue;
@@ -178,6 +201,7 @@ function findExactQuote(snapshot, rec, wantedBookKey) {
           bookKey: normalizeBook(bookName),
           marketKey: market?.marketKey || market?.identity?.marketKey || null,
           quoteUpdatedAt: market?.updatedAt || null,
+          ...(observed ? {quoteObservedAt: market.observedAt} : {}),
           decimal
         };
       }
@@ -226,7 +250,7 @@ function resolveIssuedAnalytics(rec, issuedSnapshotEntry, issuedSnapshot, feedGe
   for (const candidate of candidates) {
     const quote = findExactQuote(issuedSnapshot, rec, candidate.key);
     if (!quote) continue;
-    if (!isFreshExecutableQuote(feedGeneratedAt, quote.quoteUpdatedAt)) continue;
+    if (!quoteObservation.requiresObservation(issuedSnapshot) && !isFreshExecutableQuote(feedGeneratedAt, quote.quoteUpdatedAt)) continue;
     quotes.push(quote);
   }
 
@@ -244,6 +268,7 @@ function resolveIssuedAnalytics(rec, issuedSnapshotEntry, issuedSnapshot, feedGe
     analysisBook: best.book,
     analysisBookKey: best.bookKey,
     analysisQuoteUpdatedAt: best.quoteUpdatedAt,
+    ...(quoteObservation.requiresObservation(issuedSnapshot) ? {analysisQuoteObservedAt: best.quoteObservedAt} : {}),
     analysisSnapshotBlobSha: issuedSnapshotEntry.snapshotBlobSha || null,
     marketKey: normalizeMarket(rec?.feed?.marketKey || rec?.feed?.market) || best.marketKey || null,
     side: normalizeSide(rec?.feed?.side) || null,
@@ -371,6 +396,7 @@ const recommendations = (issued?.recs || []).map((rec, index) => {
       snapshotBlobSha: snapshotEntry.snapshotBlobSha,
       snapshotCommitSha: snapshotEntry.snapshotCommitSha || null,
       quoteUpdatedAt: quote.quoteUpdatedAt,
+      ...(quoteObservation.requiresObservation(snapshot) ? {quoteObservedAt: quote.quoteObservedAt} : {}),
       marketKey: quote.marketKey,
       priceDecimal: quote.decimal,
       priceAmerican: observedAmerican,
@@ -390,7 +416,9 @@ const result = {
     ...(existingResult?.method || {}),
     identity: 'exact rec.feed.selectionKey',
     issuedPrice: 'best fresh exact quote among the books named on the issued card, resolved from the immutable snapshot whose generatedAt exactly matches source feedGeneratedAt',
-    issuedPriceFreshness: 'quoteUpdatedAt must be no more than 30 minutes before source feedGeneratedAt',
+    issuedPriceFreshness: quoteObservation.requiresObservation(issuedSnapshot)
+      ? 'quoteObservedAt must be no more than 30 minutes before source feedGeneratedAt; quoteUpdatedAt preserves the provider price-change timestamp'
+      : 'quoteUpdatedAt must be no more than 30 minutes before source feedGeneratedAt',
     comparisonBook: 'same normalized sportsbook selected for analysisPrice at issuance',
     window: 'comparison snapshot generated after source feedGeneratedAt and before recommendation commenceTime',
     snapshotSource: 'data/history/odds-index.json + immutable Git blob SHA',

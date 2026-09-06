@@ -179,6 +179,7 @@ function init(){setLedgerText();renderHistoryStats();render()}
 $('prev').onclick=()=>{page--;render()};$('next').onclick=()=>{page++;render()};$('goPage').onclick=()=>{const d=filtered(),pages=Math.max(1,Math.ceil(d.length/ROWS));const n=parseInt($('pageJump').value,10);if(Number.isFinite(n)){page=Math.max(0,Math.min(n-1,pages-1));render()}};["search","result"].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{page=0;render()}));loadLedger().then(()=>{init()}).catch(error=>{$('qaCount').textContent='LEDGER: LOAD FAILED';$('qaCount').className='tag r';$('ledgerStatus').textContent='LEDGER LOAD FAILED // '+error.message;console.error(error)});
 
 </script>
+<script src="./assets/quote-observation.js"></script>
 <script src="./assets/runner-core-runtime.js"></script>
 <script>
 (()=>{
