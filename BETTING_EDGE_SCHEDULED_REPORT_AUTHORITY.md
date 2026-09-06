@@ -8,6 +8,7 @@
 **Source and fair-value evidence amendment:** 2026-09-05 17:00 America/Vancouver
 **Documented primary evaluation amendment:** 2026-09-06 00:00 America/Vancouver
 **Unbounded card-output amendment:** 2026-09-06 00:00 America/Vancouver
+**Fair-construction workflow clarification:** 2026-09-06, following the 06:00 review
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -125,13 +126,22 @@ Unavailable/stale/suspended/unmatched/incomplete Pinnacle is `PINNACLE_BENCHMARK
 
 ## 6. Research and current fair-value process
 
+### Complete the handicap before assigning an evidence blocker
+
+For every available primary market, perform the current Core handicapping work. A maintained model is useful when applicable, but it is not a universal prerequisite. Source pages normally supply facts and inputs, not finished probability distributions. The absence of a prebuilt model, or of a probability on a schedule, scoreboard or personnel page, is not by itself a reason to stop.
+
+1. Research the event once across its relevant primary markets: current team performance, matchup, material personnel and conditions. Reuse a checked fact across sides or markets only where it actually applies. Identify what each market still needs; a moneyline estimate does not establish a run-line, puck-line, spread or total fair.
+2. Use applicable governed model work where available. Otherwise attempt the permitted `MARKET_ANCHORED_MODEL` route under Contract section 4.1: combine an explicitly identified current market baseline with substantive independent current matchup/personnel analysis. Explain the actual numerical derivation, any judgmental adjustment and its basis, and the uncertainty range. Do not relabel a no-vig quote plus narrative as an independent model, invent fixed blend weights or uncertainty margins, or treat Pinnacle as the fair-setting authority.
+3. Complete material Stage 2 work and re-handicap. Classify calibration honestly using the current Core framework: `directCalibration=GAP` raises the floor to `ELEVATED`; it does not automatically prohibit evaluation. Apply all other matching rules and the actual independent-support requirement. Core error categories do not supply a universal numerical uncertainty margin. Grade both opposing selections from one coherent supported fair/range against their exact prices.
+4. If the work still cannot support a numerical fair or bounded uncertainty, record the concrete unresolved input or method limitation and what was attempted. Use `RESEARCH_INCOMPLETE` when the work was not completed, rather than asserting that a model or calibration is unavailable. Never manufacture an estimate or a PASS to fill the inventory.
+
 ### Source and fair-value evidence — forward from 17:00 PT September 5
 
 For `run.ts >= 2026-09-05T17:00:00-07:00`, read and apply `docs/REPORT_EVIDENCE_REQUIREMENTS.md` and the additive fields in `data/history/report-provenance-schema.json`. This is shared by all five report lanes. Earlier issued reports remain immutable under their original requirements.
 
 Every displayed card, including PASS, must retain event- and sport-matched `sourceEvidence` with actual URLs, check times and specific findings. Do not copy generic league/source text from another sport. If a source or market genuinely cannot be verified, record the permitted PASS `sourceShortfall` with its decision impact; never invent a source or numeric fair to complete a card.
 
-Every BET/LEAN/WAIT must also retain `fairValueEvidence`: the exact selection, units and orientation, numeric inputs linked to the checked sources, method/calculation, final estimate, numeric uncertainty range, limitations and explicit personnel basis. A quoted forecast or a list of favorable articles is context, not a demonstrated calibrated model. Explain the estimate and uncertainty using the actual existing Core/Walters work. Do not manufacture a formula or set `personnelRequired=false` to evade material Stage 2 work. If an estimate cannot be supported, resolve its analytical availability before freeze under the existing Core rules.
+Every BET/LEAN/WAIT must also retain `fairValueEvidence`: the exact selection, units and orientation, numeric inputs linked to the checked sources, method/calculation, final estimate, numeric uncertainty range, limitations and explicit personnel basis. A quoted forecast or a list of favorable articles does not by itself establish a supported numerical fair or uncertainty range. Explain the estimate and uncertainty using the actual Core/Walters handicapping work, including the permitted market-anchored process above. Do not manufacture a formula or set `personnelRequired=false` to evade material Stage 2 work. If an estimate cannot be supported, resolve its analytical availability before freeze under the existing Core rules.
 
 Keep status and execution language consistent: a zero-stake LEAN is not an instruction to wager merely because a directional `playTo` threshold is met. State why BET strength is absent. Record the machine-checkable `benchmarkComparison` for each QUALIFIED Pinnacle card. A better independent handicap may disagree with Pinnacle; an unfavorable benchmark comparison must be described as unfavorable and may not be presented as confirming an execution advantage.
 

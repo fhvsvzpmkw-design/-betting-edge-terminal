@@ -68,6 +68,75 @@ const marketOnly = clone(reviewed); marketOnly.primaryAnalysis.receipts[0].decis
 assert.throws(() => validate(marketOnly, reviewedReport), /non-market source-linked inputs/);
 const noFair = clone(reviewed); delete noFair.primaryAnalysis.receipts[0].decision.fairValueEvidence; delete noFair.primaryAnalysis.receipts[0].evidence.fairValueEvidence;
 assert.throws(() => validate(noFair, reviewedReport), /requires a numeric documented fair/);
+
+// Synthetic receipt fixtures for the four market groups blocked on September 6.
+// These supplied scenario probabilities exercise policy, not a live handicap or
+// a production model. A calibration GAP must preserve ELEVATED uncertainty
+// without demanding a prebuilt model or preventing a supported PASS review.
+const calibrationGapCases = [
+  {id: 'synthetic-mlb-run-line', sport: 'MLB', slug: 'baseball', league: 'usa-mlb', marketKey: 'spread', marketClass: 'spread', marketDetail: 'full_game_primary_run_line', line: -1.5},
+  {id: 'synthetic-mlb-total', sport: 'MLB', slug: 'baseball', league: 'usa-mlb', marketKey: 'totals', marketClass: 'total', marketDetail: 'full_game_primary_total', line: 8.5},
+  {id: 'synthetic-ncaaf-moneyline', sport: 'NCAAF', slug: 'american-football', league: 'usa-college', marketKey: 'ml', marketClass: 'moneyline', marketDetail: 'full_game_moneyline', line: null},
+  {id: 'synthetic-cfl-moneyline', sport: 'CFL', slug: 'american-football', league: 'canada-cfl', marketKey: 'ml', marketClass: 'moneyline', marketDetail: 'full_game_moneyline', line: null}
+];
+for (const scenario of calibrationGapCases) {
+  const sides = scenario.marketKey === 'totals' ? ['over', 'under'] : ['home', 'away'];
+  const row = {primary: true, selectionKeys: {}};
+  if (scenario.line !== null) row.hdp = scenario.line;
+  for (const side of sides) {
+    row[side] = '1.9';
+    row.selectionKeys[side] = `${scenario.id}|${scenario.marketKey}|${side}||${scenario.line ?? ''}`;
+  }
+  const scenarioFeed = {generatedAt: report.feedGeneratedAt, events: [{eventId: scenario.id, date: feed.events[0].date, sport: {slug: scenario.slug}, league: {slug: scenario.league}, bookmakers: {Bet365: [{marketKey: scenario.marketKey, updatedAt: report.feedGeneratedAt, odds: [row]}]}}]};
+  const scenarioInventory = derivePrimarySelectionInventory(report, scenarioFeed, policy);
+  assert.equal(scenarioInventory.selections.length, 2, `${scenario.id}: two exact available opposing sides`);
+  assert.deepEqual(scenarioInventory.sports[scenario.sport].primary, {required: 6, available: 2, unavailable: 4});
+  const receipts = scenarioInventory.selections.map(selection => {
+    assert.equal(selection.marketDetail, scenario.marketDetail);
+    const receipt = evaluated(selection);
+    const decision = receipt.decision, reference = selection.side === sides[0];
+    const p = reference ? 0.49 : 0.51, adjustment = reference ? -0.01 : 0.01;
+    const context = {...decision.coreAssessment.context, sport: scenario.sport, marketClass: scenario.marketClass, marketDetail: scenario.marketDetail, fairValueBasis: 'MARKET_ANCHORED_MODEL', directCalibration: 'GAP', independentCurrentSupport: 'MODERATE'};
+    context.graduatedResearchIds = [...new Set(framework.graduatedResearchRules.filter(rule => matchCondition(rule.when, context)).map(rule => rule.priorId))];
+    decision.coreAssessment = {...decision.coreAssessment, context, fairValueBasisRationale: 'Synthetic paired-market anchor plus separately supplied matchup scenario adjustment.', uncertaintyStatement: 'Synthetic five-probability-point range retains the calibration gap.', ...evaluate(framework, context)};
+    assert.equal(decision.coreAssessment.modelErrorState, 'ELEVATED', `${scenario.id}: calibration gap raises uncertainty`);
+    assert.ok(decision.coreAssessment.appliedRules.includes('base:calibration-gap'));
+    if (scenario.sport === 'CFL') assert.ok(context.graduatedResearchIds.includes('gr_cfl_pregame'), 'CFL-specific caution still applies');
+    decision.title = `Synthetic ${scenario.id} ${selection.side}`;
+    decision.fair = String(p);
+    decision.playTo = 'NO BET';
+    decision.analysis = `Synthetic ${scenario.marketDetail} ${selection.side}: the supplied fair ${p} and conservative range do not clear the 1.9 execution price.`;
+    decision.sourceEvidence = [
+      {id: 'pair', kind: 'MARKET', sport: scenario.sport, eventId: scenario.id, checkedAt: report.feedGeneratedAt, url: `https://example.org/fixtures/${scenario.id}/paired-quotes`, title: `Synthetic ${scenario.id} paired quotes`, finding: 'Both exact selections are 1.9 decimal; paired no-vig anchor is 0.5.'},
+      {id: 'scenario', kind: 'MODEL', sport: scenario.sport, eventId: scenario.id, checkedAt: report.feedGeneratedAt, url: `https://example.org/fixtures/${scenario.id}/matchup-scenario`, title: `Synthetic ${scenario.id} matchup scenario`, finding: `Test-supplied change in ${selection.side} selection probability is ${adjustment}; this is a fixture, not a calibrated production forecast.`}
+    ];
+    decision.fairValueEvidence = {...decision.fairValueEvidence, estimate: p, result: p, displayValue: String(p), range: reference ? {low: 0.44, high: 0.54} : {low: 0.46, high: 0.56}, method: 'Synthetic market-anchored receipt scenario', calculation: `Paired anchor (1 / 1.9) / (2 / 1.9) = 0.5; 0.5 + (${adjustment}) = ${p}. Opposing probability and bounds are complementary.`, limitations: 'Synthetic receipt only; no direct calibration. Retain GAP and ELEVATED error with a five-probability-point uncertainty range.', inputs: [
+      {name: 'Paired no-vig anchor', value: 0.5, unit: 'probability', sourceIds: ['pair']},
+      {name: 'Supplied matchup scenario adjustment', value: adjustment, unit: 'probability', sourceIds: ['scenario']}
+    ]};
+    receipt.evidence = clone(decision);
+    return receipt;
+  });
+  const scenarioSidecar = {primaryAnalysis: {schema: 1, feedGeneratedAt: report.feedGeneratedAt, receipts}};
+  const checkScenario = candidate => validatePrimaryAnalysis({...report, recs: candidate.primaryAnalysis.receipts.map(receipt => clone(receipt.decision))}, candidate, {feed: scenarioFeed, policy, framework});
+  const scenarioResult = checkScenario(scenarioSidecar);
+  assert.equal(scenarioResult.primaryEvaluated, 2, `${scenario.id}: supported calibration-gap reviews are accepted`);
+  assert.equal(scenarioResult.primaryBlocked, 0);
+  assert.deepEqual(scenarioResult.outcomeCounts, {BET: 0, LEAN: 0, WAIT: 0, PASS: 2});
+  for (const [field, value, error] of [
+    ['independentCurrentSupport', 'WEAK', /requires independent current support/],
+    ['fairValueBasis', 'MARKET_DERIVED_ONLY', /market-only\/unavailable fair must be BLOCKED/]
+  ]) {
+    const unsupported = clone(scenarioSidecar), receipt = unsupported.primaryAnalysis.receipts[0];
+    receipt.decision.coreAssessment.context[field] = value;
+    Object.assign(receipt.decision.coreAssessment, evaluate(framework, receipt.decision.coreAssessment.context));
+    receipt.evidence = clone(receipt.decision);
+    assert.throws(() => checkScenario(unsupported), error, `${scenario.id}: ${field} cannot manufacture an evaluated PASS`);
+  }
+  const marketSourcesOnly = clone(scenarioSidecar), marketReceipt = marketSourcesOnly.primaryAnalysis.receipts[0];
+  marketReceipt.decision.sourceEvidence[1].kind = 'MARKET'; marketReceipt.evidence = clone(marketReceipt.decision);
+  assert.throws(() => checkScenario(marketSourcesOnly), /non-market source-linked inputs/, `${scenario.id}: labels alone cannot supply independent inputs`);
+}
 const fakeCore = clone(reviewed); fakeCore.primaryAnalysis.receipts[0].decision.coreAssessment.modelErrorState = 'HIGH'; fakeCore.primaryAnalysis.receipts[0].evidence = clone(fakeCore.primaryAnalysis.receipts[0].decision);
 assert.throws(() => validate(fakeCore, reviewedReport), /does not recompute/);
 const concealed = clone(reviewed); concealed.primaryAnalysis.receipts[0].decision.status = 'BET'; concealed.primaryAnalysis.receipts[0].evidence.status = 'BET';
