@@ -8,8 +8,6 @@ import { activeReportScope, deriveBoundCoverage, validateCoverageAudit, validate
 import { auditSelectionContinuity } from '../tools/selection-continuity.mjs';
 
 const policy = JSON.parse(fs.readFileSync('data/major-sport-market-coverage-v1.json', 'utf8'));
-const preferences = JSON.parse(fs.readFileSync('data/preferences.json', 'utf8'));
-const target = preferences.modules.find(item => item.id === 'report_card_target').current;
 const cutover = policy.reportScope.effectiveFrom;
 assert.equal(cutover, '2026-09-05T13:00:00-07:00');
 assert.deepEqual(policy.reportScope.enabledPropMarkets, []);
@@ -17,7 +15,6 @@ const root = fs.mkdtempSync(path.join(os.tmpdir(), 'primary-market-scope-'));
 fs.mkdirSync(path.join(root, 'data'));
 const rawPolicy = fs.readFileSync('data/major-sport-market-coverage-v1.json');
 fs.writeFileSync(path.join(root, 'data/major-sport-market-coverage-v1.json'), rawPolicy);
-fs.writeFileSync(path.join(root, 'data/preferences.json'), JSON.stringify(preferences));
 const authoritySha = crypto.createHash('sha1').update(Buffer.from('blob ' + rawPolicy.length + '\0')).update(rawPolicy).digest('hex');
 
 const sports = [
@@ -85,7 +82,8 @@ function receipt(currentReport = report, currentFeed = feed) {
       authorityBlobSha: authoritySha, state: 'COMPLETE', feedGeneratedAt: currentReport.feedGeneratedAt,
       evaluationOrder: policy.principles.evaluationOrder, complete: true, sports: rows, totals,
       ...(scope ? { scope: { id: scope.id, effectiveFrom: scope.effectiveFrom, playerProps: scope.playerProps } } : {}),
-      availabilityLimitations: limitations, presentation: { target, targetIsSoft: true, overflowProtection: true, actionableSuppressedByTarget: 0 } } };
+      availabilityLimitations: limitations,
+      presentation: { target: 12, targetIsSoft: true, overflowProtection: true, actionableSuppressedByTarget: 0 } } };
 }
 function validate(sidecar, currentReport = report, currentFeed = feed) {
   return validateCoverageAudit(currentReport, sidecar, { root, feed: currentFeed });
