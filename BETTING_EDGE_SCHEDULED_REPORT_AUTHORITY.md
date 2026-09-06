@@ -220,9 +220,13 @@ Never directly create, update, delete, repair or index:
 
 After the complete report and schema-3 sidecar pass all pre-freeze gates, update only `data/history/staging/report-bundle.json` with the current schema-1 READY bundle using candidateId `<report.ts>|<canonicalSlot>` and the exact frozen report/sidecar.
 
+Serialize the complete validated bundle to a local file and parse that file's exact serialized bytes before staging. Commit and push the file directly with authenticated Git. The connected GitHub Git-data API is also permitted when populated programmatically from complete, length-checked file bytes and its returned blob SHA matches local `git hash-object` before updating the branch. Never reconstruct the payload from displayed command output, chat text, previews or truncated tool responses. Preserve the exact frozen local file until durable publication and read-back finish; a transfer retry must use those same bytes and must not change the candidate's report, sidecar, identity or analytical decisions.
+
+After pushing, fetch authoritative main and confirm it contains the staging commit. Compare `git hash-object <frozen-bundle-file>` with `git rev-parse <staging-commit>:data/history/staging/report-bundle.json` to verify that the committed blob is identical to the preserved local bytes. A parse failure, incomplete transfer or blob mismatch remains `PUBLICATION BLOCKED — CANDIDATE NOT STORED`; do not repair analytical content or bypass publisher checks to recover a transfer failure.
+
 The repository-controlled `.github/workflows/report-history-staged.yml` owns clean-history preflight, Core trace validation, Core validation, official Pinnacle provenance/authority validation, selection continuity, non-spread availability, spread lineage, atomic durable publication and remote read-back.
 
-Inspect the workflow run for the staging commit/head SHA. Never bypass publication with direct History writes.
+After verifying the committed bytes, inspect the workflow run for the staging commit/head SHA. Never bypass publication with direct History writes.
 
 If publication fails: `PUBLICATION BLOCKED — CANDIDATE NOT STORED` plus the failing gate, with no short link.
 
