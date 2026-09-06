@@ -4,19 +4,20 @@
 **Authority:** `data/major-sport-market-coverage-v1.json`  
 **Effective:** 2026-09-02
 **Primary-market scope amendment:** 2026-09-05 13:00 America/Vancouver  
+**Unbounded card-output amendment:** 2026-09-06 00:00 America/Vancouver  
 **Scope:** MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL scheduled Betting Edge reports.
 
 This addendum governs **coverage breadth and evaluation order only**. It does not loosen Contract v1.0, Core 1.4, exact identity, freshness, personnel, Pinnacle, exposure, staking or publication gates.
 
-## 1. Evaluate first, select cards second
+## 1. Evaluate first, publish decisions second
 
-For every in-scope major-sport game present in the bound fresh odds snapshot, complete the required market evaluation before choosing which recommendations deserve report cards.
+For every in-scope major-sport game present in the bound fresh odds snapshot, complete the required market evaluation before publishing recommendation cards.
 
 Do not preselect an underdog, favorite, home side, away side, over or under as the candidate merely because it looks interesting. Do not use one market as a substitute for another and do not use one league as a substitute for another.
 
 A zero-BET report remains valid after a complete sweep.
 
-From `2026-09-06T00:00:00-07:00`, each available primary side requires an EVALUATED decision with source/fair/Core evidence or an explicit BLOCKED receipt with actual checks and a specific limitation. The existing coverage validator reconciles these receipts independently of card curation; see `docs/REPORT_EVIDENCE_REQUIREMENTS.md` for the exact shape. Do not convert missing research into a value-based PASS.
+From `2026-09-06T00:00:00-07:00`, each available primary side requires an EVALUATED decision with source/fair/Core evidence or an explicit BLOCKED receipt with actual checks and a specific limitation. The existing coverage validator reconciles these receipts independently of presentation; see `docs/REPORT_EVIDENCE_REQUIREMENTS.md` for the exact shape. Do not convert missing research into a value-based PASS.
 
 ## 2. Required primary-market sweep
 
@@ -60,11 +61,11 @@ Fresh returned prop keys are counted mechanically as feed inventory. Counting is
 
 Reports before the scope amendment retain the original requirement that every fresh returned prop be screened, with deeper work where serious or materially personnel-dependent. Their stored payloads and grading remain unchanged.
 
-## 5. Card target and overflow
+## 5. Unbounded card output
 
-`data/preferences.json` module `report_card_target` remains the presentation authority. The current target of nine is **soft**, not a hard ceiling.
+From `2026-09-06T00:00:00-07:00`, there is no report-card minimum, target, status profile or maximum. The old 7 / 9 / 12 presentation-target machinery is retired for new reports.
 
-Complete market evaluation happens before card curation. A qualifying BET, LEAN or WAIT may not be discarded solely to keep the report at nine cards. PASS cards may be curated after the complete sweep. Existing tracked/actionable overflow protection remains mandatory.
+Complete market evaluation happens first. Every EVALUATED primary decision is then published unchanged as a card, including BET, LEAN, WAIT and PASS. The card count is an output of the completed analysis rather than an input to it. Do not add filler and do not hide an evaluated PASS because of presentation size. BLOCKED receipts remain evidence limitations rather than betting decisions. Required unavailable continuity resolutions retain their existing rules. Reports issued before this cutover remain immutable under their original validated presentation receipts.
 
 ## 6. Completion standard
 
@@ -74,8 +75,8 @@ A scheduled report may claim complete coverage of its active full-game primary m
 1. every in-scope game had all required primary selections evaluated or explicitly recorded as unavailable/unverifiable;
 2. the report applies its timestamp-appropriate scope: original prop screening before the amendment, or an explicit paused-prop inventory receipt at/after it;
 3. serious/personnel-sensitive candidates received the required deeper research and re-handicap;
-4. final card selection happened only after those evaluations;
-5. no actionable recommendation was suppressed by the presentation target.
+4. publication happens only after those evaluations;
+5. every EVALUATED primary decision is represented by an exact matching published card at/after the September 6 cutover.
 
 ## 7. Durable coverage receipt — mandatory from 08:00 PT September 2, 2026
 
@@ -87,14 +88,16 @@ The receipt records, for MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL:
 - fresh exact prop selections returned, screened and excluded by scope;
 - serious props receiving deeper research;
 - explicit event/market/selection availability limitations;
-- the active soft card target and overflow-protection result;
+- the timestamp-appropriate presentation receipt;
 - reconciled board-wide totals.
 
-Every in-scope game contributes six required primary selections: two moneyline selections, two primary spread/run-line/puck-line selections and two primary-total selections. Evaluated plus explicitly unavailable selections must reconcile exactly to that requirement. Before the scope amendment, every returned supported prop must be counted as screened. At/after the amendment, every sport has `props.state=PAUSED_BY_SCOPE`, zero screened/deep-reviewed props and `excludedByScope=returned`. The additive `coverageAudit.scope` records the authority's id, effectiveFrom and playerProps values; `totals.propsExcludedByScope` reconciles to all returned props. Older receipts do not require these additive fields. Every unavailable primary selection must be represented exactly once in `availabilityLimitations`.
+Every in-scope game contributes six required primary selections: two moneyline selections, two primary spread/run-line/puck-line selections and two primary-total selections. Evaluated plus explicitly unavailable selections must reconcile exactly to that requirement before the documented-evaluation cutover; from September 6 use available/evaluated/blocked/unavailable arithmetic backed by exact primary-analysis receipts. Before the scope amendment, every returned supported prop must be counted as screened. At/after the amendment, every sport has `props.state=PAUSED_BY_SCOPE`, zero screened/deep-reviewed props and `excludedByScope=returned`. The additive `coverageAudit.scope` records the authority's id, effectiveFrom and playerProps values; `totals.propsExcludedByScope` reconciles to all returned props. Older receipts do not require these additive fields. Every unavailable primary selection must be represented exactly once in `availabilityLimitations`.
+
+From September 6, `coverageAudit.presentation` is `{ mode: "UNBOUNDED_ANALYSIS_OUTPUT", allEvaluatedPublished: true, fillerAdded: 0 }`. New receipts contain no target, target profile, overflow or target-suppression fields. Older issued reports retain their original soft-target receipts solely for historical validation.
 
 The receipt carries the exact current Git blob SHA of the market-coverage authority and the exact report `feedGeneratedAt`. `tools/major-sport-market-coverage-gate.mjs` validates the receipt before permanent History is written. The staged publisher repeats the gate during publication and on remote read-back.
 
-A missing, incomplete, internally inconsistent, stale-authority, hard-nine-card, or suppressed-actionable receipt fails closed. It does not become issued History.
+A missing, incomplete, internally inconsistent, count-targeted new receipt, omitted evaluated decision, or filler-bearing receipt fails closed. It does not become issued History.
 
 This addendum changes **coverage completeness and auditability**, not BET threshold or risk tolerance.
 
