@@ -2,7 +2,7 @@ import quoteObservation from '../assets/quote-observation.js';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
-import {primaryAnalysisRequired, validateCoverageAudit} from './major-sport-market-coverage-gate.mjs';
+import {primaryAnalysisRequired, validateCoverageAudit, describeResearchCompletion} from './major-sport-market-coverage-gate.mjs';
 
 const BOOKS = ['Bet365', 'DraftKings'];
 const SPORTS = new Set(['MLB', 'NHL', 'NBA', 'WNBA', 'NBA_WNBA', 'NFL', 'NCAAF', 'CFL']);
@@ -52,6 +52,7 @@ export function deriveReportCoverageSummary(report, sidecar, feed) {
   if (!primaryAnalysisRequired(report)) return null;
   const audit = sidecar.coverageAudit, totals = audit.totals;
   const receipts = sidecar.primaryAnalysis.receipts;
+  const researchCompletion = describeResearchCompletion(report, sidecar);
   const decisions = {bet:0, lean:0, wait:0, pass:0};
   for (const receipt of receipts) if (receipt.state === 'EVALUATED') decisions[receipt.decision.status.toLowerCase()]++;
   const blockers = receipts.filter(receipt => receipt.state === 'BLOCKED').map(receipt => {
@@ -63,7 +64,7 @@ export function deriveReportCoverageSummary(report, sidecar, feed) {
     scope:'RETAINED_SAME_DAY_PREGAME_EVENTS', games:totals.gamesInScope,
     selections:{required:totals.primaryRequired, available:totals.primaryAvailable, evaluated:totals.primaryEvaluated,
       blocked:totals.primaryBlocked, unavailable:totals.primaryUnavailable},
-    decisions, blockers, ...explainUnavailableSelections(report, audit, feed)};
+    decisions, blockers, ...(researchCompletion ? {researchCompletion} : {}), ...explainUnavailableSelections(report, audit, feed)};
 }
 
 function boundFeed(root, sidecar) {
@@ -83,11 +84,21 @@ export function validateReportCoverageSummary({root, report, sidecar, required=f
   if ((required || report.coverageSummary !== undefined) && !isDeepStrictEqual(report.coverageSummary, expected)) {
     throw new Error('Report coverage summary does not reproduce from the verified analysis and bound feed');
   }
+  if (required && expected.researchCompletion?.notice && !String(report.summary || '').startsWith(expected.researchCompletion.notice)) {
+    throw new Error('Issued report must disclose its derived partial/incomplete research notice');
+  }
   return expected;
 }
 
 export function attachPublisherCoverageSummary({root, report, sidecar}) {
   const expected = validateReportCoverageSummary({root, report, sidecar});
-  if (expected) report.coverageSummary = expected;
+  if (expected) {
+    report.coverageSummary = expected;
+    if (expected.researchCompletion) {
+      // Deterministic display metadata only: preserve every decision and receipt.
+      const summary = String(report.summary || '').replace(/^(?:PARTIAL REPORT|ANALYSIS INCOMPLETE): \d+ evaluated; \d+ unfinished\.\s*/, '');
+      report.summary = [expected.researchCompletion.notice, summary].filter(Boolean).join(' ');
+    }
+  }
   return expected;
 }

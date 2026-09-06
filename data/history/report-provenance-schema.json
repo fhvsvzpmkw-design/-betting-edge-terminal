@@ -289,8 +289,8 @@
     "selectionId": "sport|eventId|marketDetail|side",
     "quote": "exact inventory quote: book,eventId,marketKey,side,line,selectionKey,priceDecimal,quoteUpdatedAt",
     "evaluated": "state=EVALUATED, checkedAt, decision using full existing recommendation fields, evidence using matching sidecar fields; actual sources, numeric fair/range including PASS, recomputed Core assessment and required personnel evidence",
-    "blocked": "state=BLOCKED, blocker with controlled reason, concrete missing evidence, impact, checkedAt and actual event-specific attempts (eventId,checkedAt,url,finding); no decision or invented fair. From researchCompletionFrom, RESEARCH_INCOMPLETE is permitted only in the working draft and rejected by pre-freeze/publication validation; terminal blockers require actual applicable research and attempted alternatives.",
-    "researchCompletionFrom": "2026-09-06T18:15:00-07:00",
+    "blocked": "state=BLOCKED, blocker with controlled reason, concrete missing evidence, impact, checkedAt and actual event-specific attempts (eventId,checkedAt,url,finding); no decision or invented fair. RESEARCH_INCOMPLETE identifies unfinished selection-level work and never vetoes other validated decisions. Continue it before delivery; retain the actual stopping reason and next step if still unfinished. Terminal blockers require actual applicable research and attempted alternatives.",
+    "partialResearchPublicationFrom": "2026-09-06T18:15:00-07:00",
     "arithmetic": "primary.evaluated + primary.blocked = primary.available; primary.available + primary.unavailable = primary.required. Totals add primaryAvailable and primaryBlocked. gamesEvaluated remains legacy inventory accounting.",
     "curation": "Every EVALUATED decision matches its published card, including PASS; no numeric card target, maximum or PASS curation. Unavailable continuity PASS resolutions retain existing gates and do not receive evaluation credit.",
     "authority": "Existing coverage and bundle gates validate receipts and pinned Core framework; structured checks cannot prove source truth or handicap quality."
@@ -300,6 +300,6 @@
     "reportField": "coverageSummary",
     "schema": 1,
     "scope": "RETAINED_SAME_DAY_PREGAME_EVENTS",
-    "rule": "Publisher derives and verifies exact available/evaluated/blocked/unavailable counts, actual decision counts, research blockers, bound acquisition explanations and separately identified discovery omissions. Card counters remain published-card counts. Historical payloads remain immutable."
+    "rule": "Publisher derives and verifies exact available/evaluated/blocked/unavailable counts, actual decision counts, research blockers, bound acquisition explanations and separately identified discovery omissions. From partialResearchPublicationFrom, researchCompletion records state COMPLETE/PARTIAL/INCOMPLETE, evaluated, unfinished and notice. Any unfinished research produces a leading PARTIAL REPORT notice in report.summary, or ANALYSIS INCOMPLETE when none were evaluated. COMPLETE here means no unfinished-research receipts, not that every available selection has a supported fair. This display metadata never alters decisions or evidence. Card counters remain published-card counts. Historical payloads remain immutable."
   }
 }
