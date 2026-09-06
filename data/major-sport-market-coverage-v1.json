@@ -4,7 +4,7 @@
   "state": "OPERATIONAL",
   "effectiveDate": "2026-09-02",
   "timezone": "America/Vancouver",
-  "purpose": "Require complete major-sport market evaluation before recommendation-card selection without lowering any Betting Edge execution, Core 1.4, personnel, price, exposure or staking gate.",
+  "purpose": "Require complete major-sport market evaluation before recommendation-card publication without lowering any Betting Edge execution, Core 1.4, personnel, price, exposure or staking gate.",
   "principles": {
     "evaluationOrder": "EVALUATE_BEFORE_CARD_SELECTION",
     "preselectedSideAllowed": false,
@@ -137,11 +137,14 @@
     "noFabrication": true
   },
   "presentation": {
-    "preferencePath": "data/preferences.json",
-    "preferenceId": "report_card_target",
-    "targetIsSoft": true,
-    "overflowProtectionRequired": true,
-    "rule": "The card target is applied only after complete market evaluation. A qualifying BET, LEAN or WAIT may not be suppressed solely to meet the target. PASS cards may be curated after complete evaluation."
+    "effectiveFrom": "2026-09-06T00:00:00-07:00",
+    "mode": "UNBOUNDED_ANALYSIS_OUTPUT",
+    "publishAllEvaluatedDecisions": true,
+    "numericCardTarget": false,
+    "numericCardMaximum": false,
+    "noFiller": true,
+    "rule": "At or after effectiveFrom, every EVALUATED primary decision is published as a card, including PASS. There is no numeric minimum, target, profile or maximum. BLOCKED receipts are evidence limitations rather than betting decisions; required unavailable continuity resolutions remain governed by their existing rules.",
+    "historicalRule": "Issued reports before effectiveFrom keep their original validated soft-target presentation receipts and are not regenerated, retimestamped or reclassified."
   },
   "coverageAudit": {
     "schema": 1,
@@ -178,7 +181,8 @@
       "primary": ["required", "evaluated", "unavailable"],
       "props": ["returned", "screened", "seriousDeepReviewed", "state", "excludedByScope"],
       "availabilityLimitation": ["eventId", "sport", "marketDetail", "selections", "reason"],
-      "presentation": ["target", "targetIsSoft", "overflowProtection", "actionableSuppressedByTarget"],
+      "presentation": ["mode", "allEvaluatedPublished", "fillerAdded"],
+      "legacyPresentationBefore": "2026-09-06T00:00:00-07:00: target, targetIsSoft, overflowProtection, actionableSuppressedByTarget",
       "totals": [
         "gamesInScope",
         "gamesEvaluated",
@@ -202,12 +206,13 @@
       "Before primaryAnalysis.requiredFrom, primary.evaluated plus primary.unavailable equals primary.required. From that cutoff, primary.available plus primary.unavailable equals primary.required; primary.evaluated plus primary.blocked equals primary.available, backed by exact primaryAnalysis receipts.",
       "Every unavailable primary selection is represented exactly once in availabilityLimitations.",
       "Before reportScope.effectiveFrom, props.screened equals props.returned. At/after that cutover, every sport has props.state=PAUSED_BY_SCOPE, screened=0, seriousDeepReviewed=0 and excludedByScope=returned; returned remains exact bound-feed inventory, not claimed analysis.",
-      "presentation.target equals the current repository report_card_target; targetIsSoft and overflowProtection are true and actionableSuppressedByTarget is zero.",
+      "At/after presentation.effectiveFrom, coverageAudit.presentation uses mode=UNBOUNDED_ANALYSIS_OUTPUT, allEvaluatedPublished=true and fillerAdded=0. Legacy target fields are retired for new reports.",
       "Totals reconcile exactly with the sum of all sport entries.",
-      "complete is true only after the full active primary-market sweep precedes card selection; paused props do not make active-scope coverage incomplete.",
+      "complete is true only after the full active primary-market sweep precedes publication; paused props do not make active-scope coverage incomplete.",
       "Before staging, execute or reproduce the exact deterministic checks in tools/major-sport-market-coverage-gate.mjs; do not stage a candidate that would fail them.",
       "At/after reportScope.effectiveFrom, coverageAudit.scope copies id, effectiveFrom and playerProps from reportScope. Totals include propsExcludedByScope, equal to propsReturned. These additive fields are not required on older reports.",
-      "At/after reportScope.effectiveFrom, every report and sidecar recommendation must identify an allowed sport and full-game primary market. Player-prop cards are forbidden in every status, including carried WAIT/LEAN and PASS."
+      "At/after reportScope.effectiveFrom, every report and sidecar recommendation must identify an allowed sport and full-game primary market. Player-prop cards are forbidden in every status, including carried WAIT/LEAN and PASS.",
+      "At/after presentation.effectiveFrom, every EVALUATED primary receipt must have an exact matching published card; no evaluated PASS may be hidden by presentation curation."
     ]
   },
   "completion": {
@@ -220,7 +225,7 @@
     "schema": 1,
     "sidecarField": "primaryAnalysis",
     "inventoryFunction": "tools/major-sport-market-coverage-gate.mjs derivePrimarySelectionInventory",
-    "rule": "Each available logical primary side has one exact-quote EVALUATED decision/evidence receipt or an explicit BLOCKED research receipt. Availability alone is not evaluation. Do not generate opinions from inventory. Every actionable decision must appear in the published cards; curated PASS decisions retain evidence in the sidecar. Unavailable continuity PASS resolutions retain existing gates and do not count as evaluated.",
+    "rule": "Each available logical primary side has one exact-quote EVALUATED decision/evidence receipt or an explicit BLOCKED research receipt. Availability alone is not evaluation. Do not generate opinions from inventory. Every EVALUATED decision, including PASS, must appear unchanged in the published cards. BLOCKED receipts remain explicit evidence limitations, not fabricated betting decisions. Unavailable continuity PASS resolutions retain existing gates and do not count as evaluated.",
     "summaryClause": "Primary selections: N available; N evaluated; N evidence-blocked; N unavailable.",
     "historicalRule": "Do not backfill, retimestamp, regenerate or reclassify issued reports before this cutoff."
   },
