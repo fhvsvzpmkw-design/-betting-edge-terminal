@@ -1,0 +1,268 @@
+name: Isolated Betting Edge card grading 2026-09-06
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-06.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-2026-09-06
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Grade Sep 5 issued cards and retry older unresolved cards
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'), path=require('path');
+          const TARGET_DATE='2026-09-05';
+          const VERIFIED_AT=new Date().toISOString();
+          const OBS_ROOT='data/history/observations';
+          const RUN_ROOT='data/history/runs';
+          const mkdir=p=>fs.mkdirSync(p,{recursive:true});
+          const norm=s=>String(s||'')
+            .normalize('NFKD')
+            .replace(/[’'`´]/g,'')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g,' ')
+            .trim();
+          const resultMethod={
+            lifecycle:'ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE',
+            scoreMarkets:['ml','spread','totals'],
+            grades:['WIN','LOSS','PUSH','VOID','HALF_WIN','HALF_LOSS'],
+            spreadHdpSemantics:'raw hdp is the home-side handicap; away selected handicap is the opposite sign',
+            sourceIsolation:'historical result providers only; no live odds or report-production inputs',
+            unsupportedMarkets:'remain unresolved unless exact settlement support exists',
+            officialOnlyWhenStatus:'BET',
+            issuedReportMutable:false
+          };
+
+          function parseMatchup(meta){
+            const m=String(meta||'').match(/^(MLB|NCAAF)\s*\|\s*(.+?)\s+at\s+(.+?)\s*\|/i);
+            return m?{sport:m[1].toUpperCase(),away:m[2].trim(),home:m[3].trim()}:null;
+          }
+          function sourceDateFromRun(p){
+            const m=String(p||'').match(/data\/history\/runs\/(\d{4}-\d{2}-\d{2})\//);
+            return m?m[1]:null;
+          }
+          function sourceFor(sport,date){
+            if(sport==='MLB') return {name:`MLB official Stats API schedule — ${date}`,url:`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${date}&hydrate=linescore,team`};
+            if(sport==='NCAAF') return {name:`ESPN college football scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};
+            return null;
+          }
+          function lineValue(rec){
+            const f=rec.feed||{};
+            for(const v of [f.hdp,f.line]) if(Number.isFinite(Number(v))) return Number(v);
+            const parts=String(f.selectionKey||'').split('|');
+            const tail=parts.length>=5?parts[4]:null;
+            return tail!==null&&tail!==''&&Number.isFinite(Number(tail))?Number(tail):null;
+          }
+          function teamEq(a,b){
+            const x=norm(a),y=norm(b);
+            if(!x||!y) return false;
+            if(x===y) return true;
+            return x.length>=8&&y.length>=8&&(x.includes(y)||y.includes(x));
+          }
+
+          const cache=new Map();
+          async function providerGames(date,sport){
+            const ck=`${sport}:${date}`;
+            if(cache.has(ck)) return cache.get(ck);
+            if(sport==='MLB'){
+              const u=sourceFor(sport,date).url;
+              const r=await fetch(u,{headers:{'User-Agent':'Betting-Edge-Result-Grader/2.0'}});
+              if(!r.ok) throw Error(`MLB official schedule fetch failed ${r.status} for ${date}`);
+              const j=await r.json();
+              const out=(j.dates||[]).flatMap(d=>d.games||[]).map(g=>({
+                sport:'MLB',id:String(g.gamePk||''),date:g.gameDate,
+                completed:/final|game over|completed early/i.test(String(g.status?.detailedState||'')),
+                status:String(g.status?.detailedState||''),
+                away:{name:g.teams?.away?.team?.name,score:Number(g.teams?.away?.score)},
+                home:{name:g.teams?.home?.team?.name,score:Number(g.teams?.home?.score)}
+              }));
+              cache.set(ck,out); return out;
+            }
+            if(sport==='NCAAF'){
+              const u=sourceFor(sport,date).url;
+              const r=await fetch(u,{headers:{'User-Agent':'Betting-Edge-Result-Grader/2.0'}});
+              if(!r.ok) throw Error(`ESPN college football scoreboard fetch failed ${r.status} for ${date}`);
+              const j=await r.json(),out=[];
+              for(const e of j.events||[]){
+                const c=e.competitions?.[0], comps=c?.competitors||[];
+                const h=comps.find(x=>x.homeAway==='home'),a=comps.find(x=>x.homeAway==='away');
+                if(!h||!a) continue;
+                out.push({sport:'NCAAF',id:String(e.id||''),date:e.date,
+                  completed:!!e.status?.type?.completed||String(e.status?.type?.state||'').toLowerCase()==='post',
+                  status:String(e.status?.type?.detail||e.status?.type?.description||e.status?.type?.state||''),
+                  away:{name:a.team?.displayName||a.team?.shortDisplayName,score:Number(a.score)},
+                  home:{name:h.team?.displayName||h.team?.shortDisplayName,score:Number(h.score)}});
+              }
+              cache.set(ck,out); return out;
+            }
+            return [];
+          }
+          function matchGame(rec,games){
+            const m=parseMatchup(rec.meta); if(!m) return null;
+            let c=games.filter(g=>teamEq(g.away?.name,m.away)&&teamEq(g.home?.name,m.home));
+            if(!c.length) return null;
+            const t=Date.parse(rec.feed?.eventDate||'');
+            if(c.length>1&&Number.isFinite(t)) c.sort((a,b)=>Math.abs(Date.parse(a.date)-t)-Math.abs(Date.parse(b.date)-t));
+            return c[0];
+          }
+          function gradeRec(rec,g){
+            const f=rec.feed||{}, key=String(f.marketKey||f.market||'').toLowerCase(), side=String(f.side||'').toLowerCase();
+            const detail=String(rec.coreAssessment?.context?.marketDetail||'').toLowerCase();
+            const title=String(rec.title||'').toLowerCase();
+            if(/first\s*5|first five|\bf5\b|team total|1st\s*5|strikeout|hits?|home run|runs? batted|\brbi\b|bases?/.test(`${detail} ${title}`)) return null;
+            const hs=Number(g.home?.score),as=Number(g.away?.score);
+            if(!Number.isFinite(hs)||!Number.isFinite(as)) return null;
+            if(key==='ml'){
+              if(!['home','away'].includes(side)) return null;
+              const s=side==='home'?hs:as,o=side==='home'?as:hs;
+              return s>o?'WIN':s<o?'LOSS':'PUSH';
+            }
+            if(key==='spread'||key==='spreads'){
+              const raw=lineValue(rec); if(!Number.isFinite(raw)||!['home','away'].includes(side)) return null;
+              const selectedHdp=side==='home'?raw:-raw;
+              const s=side==='home'?hs:as,o=side==='home'?as:hs,v=s+selectedHdp-o;
+              return v>0?'WIN':v<0?'LOSS':'PUSH';
+            }
+            if(key==='totals'||key==='total'){
+              const line=lineValue(rec); if(!Number.isFinite(line)||!['over','under'].includes(side)) return null;
+              const tot=hs+as; if(tot===line) return 'PUSH';
+              return side==='over'?(tot>line?'WIN':'LOSS'):(tot<line?'WIN':'LOSS');
+            }
+            return null;
+          }
+          function unresolved(rec,reason,oldItem){
+            const old=oldItem?.completion||{};
+            return {title:rec.title,status:rec.status,selectionKey:rec.feed?.selectionKey||null,commenceTime:rec.feed?.eventDate||null,completion:{state:'unresolved',reason,firstUnresolvedAt:old.firstUnresolvedAt||VERIFIED_AT,lastVerificationAttemptAt:VERIFIED_AT,verificationAttempts:Number(old.verificationAttempts||0)+1,nextRetryTier:'next_backlog_pass'}};
+          }
+          function complete(rec,g,grade,date,sport,oldItem){
+            const old=oldItem?.completion||{};
+            return {title:rec.title,status:rec.status,selectionKey:rec.feed?.selectionKey||null,commenceTime:rec.feed?.eventDate||null,completion:{state:'complete',verificationState:'verified',grade,official:rec.status==='BET',hypothetical:rec.status!=='BET',verifiedAt:VERIFIED_AT,eventId:rec.feed?.eventId||g.id||null,finalScore:{home:g.home.name,away:g.away.name,homeScore:Number(g.home.score),awayScore:Number(g.away.score)},settlementMethod:'final_score',line:lineValue(rec),basis:null,observedValue:null,settlementComponents:null,source:sourceFor(sport,date),firstUnresolvedAt:old.firstUnresolvedAt||null,lastVerificationAttemptAt:VERIFIED_AT,verificationAttempts:Number(old.verificationAttempts||0)+1,nextRetryTier:null}};
+          }
+          function american(price){const s=String(price??'').trim(),m=s.match(/^([+-]\d+)$/)||s.match(/\(([+-]\d+)\)\s*$/);return m?Number(m[1]):null;}
+          function units(grade,price){const a=american(price);if(!Number.isFinite(a))return null;if(grade==='PUSH'||grade==='VOID')return 0;if(grade==='LOSS')return-1;if(grade==='WIN')return a>0?a/100:100/Math.abs(a);return null;}
+
+          async function settleOne(rec,date,old){
+            const m=parseMatchup(rec.meta);
+            if(!m) return unresolved(rec,'unsupported_or_unmatched_market',old);
+            let games;
+            try{games=await providerGames(date,m.sport);}catch(e){return unresolved(rec,`verification_provider_error_${m.sport.toLowerCase()}`,old);}
+            const g=matchGame(rec,games);
+            if(!g) return unresolved(rec,'verified_scoreboard_game_not_matched',old);
+            if(!g.completed) return unresolved(rec,`verified_status_${String(g.status||'not_final').replace(/\s+/g,'_').toLowerCase()}`,old);
+            const gr=gradeRec(rec,g);
+            return gr?complete(rec,g,gr,date,m.sport,old):unresolved(rec,'unsupported_or_ambiguous_settlement',old);
+          }
+
+          (async()=>{
+            const runsDir=path.join(RUN_ROOT,TARGET_DATE),outDir=path.join(OBS_ROOT,TARGET_DATE);mkdir(outDir);
+            const runFiles=fs.readdirSync(runsDir).filter(f=>f.endsWith('.json')).sort();
+            if(!runFiles.length) throw Error(`No issued runs found for ${TARGET_DATE}`);
+            const target=[];
+            for(const f of runFiles){
+              const rp=path.join(runsDir,f),op=path.join(outDir,f),run=JSON.parse(fs.readFileSync(rp,'utf8'));
+              const prior=fs.existsSync(op)?JSON.parse(fs.readFileSync(op,'utf8')):null;
+              const pm=new Map((prior?.recommendations||[]).map(x=>[x.selectionKey,x]));
+              const recs=[];
+              for(const rec of run.recs||[]){
+                const old=pm.get(rec.feed?.selectionKey),item=await settleOne(rec,TARGET_DATE,old);
+                recs.push(item);target.push({rec,item,run:f});
+                if(item.completion.state==='complete') console.log(`SETTLED ${f}: ${rec.title} -> ${item.completion.grade} | ${item.completion.finalScore.away} ${item.completion.finalScore.awayScore}, ${item.completion.finalScore.home} ${item.completion.finalScore.homeScore}`);
+                else console.log(`UNRESOLVED ${f}: ${rec.title} -> ${item.completion.reason}`);
+              }
+              fs.writeFileSync(op,JSON.stringify({schemaVersion:1,kind:'issued-card-observations',sourceRun:rp,runId:run.ts||null,slot:run.slot||path.basename(rp).split('-')[0],resultMethod,recommendations:recs},null,2)+'\n');
+            }
+
+            let olderStart=0,olderClosed=0,olderRemain=0;
+            for(const d of fs.readdirSync(OBS_ROOT).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)&&x<TARGET_DATE).sort()){
+              const dir=path.join(OBS_ROOT,d);
+              for(const f of fs.readdirSync(dir).filter(x=>x.endsWith('.json'))){
+                const op=path.join(dir,f),obs=JSON.parse(fs.readFileSync(op,'utf8'));
+                const unresolvedItems=(obs.recommendations||[]).filter(x=>x.completion?.state==='unresolved');
+                if(!unresolvedItems.length) continue;
+                olderStart+=unresolvedItems.length;
+                const rp=obs.sourceRun;
+                if(!rp||!fs.existsSync(rp)){olderRemain+=unresolvedItems.length;continue;}
+                const run=JSON.parse(fs.readFileSync(rp,'utf8')),rm=new Map((run.recs||[]).map(r=>[r.feed?.selectionKey,r]));
+                const date=sourceDateFromRun(rp)||d;
+                let changed=false;
+                for(let i=0;i<(obs.recommendations||[]).length;i++){
+                  const item=obs.recommendations[i]; if(item.completion?.state!=='unresolved') continue;
+                  const rec=rm.get(item.selectionKey); if(!rec){olderRemain++;continue;}
+                  const next=await settleOne(rec,date,item);
+                  if(next.completion.state==='complete'){obs.recommendations[i]=next;olderClosed++;changed=true;}
+                  else olderRemain++;
+                }
+                if(changed) fs.writeFileSync(op,JSON.stringify(obs,null,2)+'\n');
+              }
+            }
+
+            const completeT=target.filter(x=>x.item.completion.state==='complete'),unresolvedT=target.filter(x=>x.item.completion.state==='unresolved');
+            const grades={WIN:0,LOSS:0,PUSH:0,VOID:0,HALF_WIN:0,HALF_LOSS:0};let priced=0,net=0;
+            for(const x of completeT){grades[x.item.completion.grade]=(grades[x.item.completion.grade]||0)+1;const u=units(x.item.completion.grade,x.rec.price);if(u!==null){priced++;net+=u;}}
+            const statuses=target.reduce((m,x)=>(m[x.rec.status]=(m[x.rec.status]||0)+1,m),{});
+            console.log(`TARGET SUMMARY: date=${TARGET_DATE} runs=${runFiles.length} cards=${target.length} complete=${completeT.length} unresolved=${unresolvedT.length} WIN=${grades.WIN} LOSS=${grades.LOSS} PUSH=${grades.PUSH} priced=${priced} netUnits=${net.toFixed(2)} roiPct=${(priced?net/priced*100:0).toFixed(1)} statuses=${JSON.stringify(statuses)}`);
+            console.log(`UNRESOLVED TITLES: ${JSON.stringify([...new Set(unresolvedT.map(x=>x.item.title))])}`);
+            console.log(`OLDER BACKLOG: start=${olderStart} closed=${olderClosed} remaining=${olderRemain}`);
+            console.log(`MLB SOURCE: ${sourceFor('MLB',TARGET_DATE).url}`);
+            console.log(`NCAAF SOURCE: ${sourceFor('NCAAF',TARGET_DATE).url}`);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify schema, coverage and strict isolation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const root='data/history/observations/2026-09-05';
+          const files=fs.readdirSync(root).filter(f=>f.endsWith('.json')).sort();
+          if(files.length!==3) throw Error(`expected 3 Sep 5 observation files, found ${files.length}`);
+          let cards=0,complete=0,unresolved=0;
+          for(const f of files){
+            const j=JSON.parse(fs.readFileSync(path.join(root,f),'utf8'));
+            if(j.schemaVersion!==1||j.kind!=='issued-card-observations'||!Array.isArray(j.recommendations)) throw Error(`bad observation schema ${f}`);
+            for(const r of j.recommendations){cards++;if(r.completion?.state==='complete')complete++;else if(r.completion?.state==='unresolved')unresolved++;else throw Error(`bad state ${f}`);}
+          }
+          const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          if(idx.coverage?.lastDate!=='2026-09-05') throw Error(`results index lastDate ${idx.coverage?.lastDate}`);
+          console.log(`OBSERVATIONS: cards=${cards} complete=${complete} unresolved=${unresolved}`);
+          console.log(`RESULTS INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents} lastDate=${idx.coverage?.lastDate}`);
+          console.log(`PRICE ANALYTICS: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit historical grading outputs only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations data/history/results-index.json
+          if git diff --cached --quiet; then
+            echo "No historical grading changes to commit"
+            exit 0
+          fi
+          git commit -m "Grade Sep 5 Betting Edge cards and refresh results index"
+          git pull --rebase origin main
+          git push origin main
