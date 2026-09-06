@@ -1,14 +1,16 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-08-26 — Cloudflare-only automatic scheduling; canonical public ledger boundary established  
+**Last updated:** 2026-09-06 — primary evaluation workflow and retired card-target cleanup
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
 
-## September 5 primary-market and evidence follow-up
+## September 6 primary-market and evidence follow-up
 
-The later dated authorities supersede older scope/card-count summaries below: active Betting Edge analysis is full-game primary markets only, player props are paused, and the soft card target is resolved from `data/preferences.json`. The September 5 15:15 report used 12 cards.
+The later dated authorities supersede older scope/card-count summaries below: active Betting Edge analysis is full-game primary markets only and player props are paused. From September 6, all EVALUATED primary decisions are published, including PASS; there is no numeric card target. The former preference and its synchronization workflow are retired. The September 5 15:15 report's 12 cards remain historical evidence under the former policy.
+
+The September 6 06:00 report recorded 28 MLB moneyline reviews and 36 `CALIBRATION_UNAVAILABLE` blockers. Its repeated absence-of-a-prebuilt-model explanation did not establish why the permitted handicapping work could not be completed. Shared scheduled authority section 6 now explicitly requires attempting a supported independent or market-anchored fair before assigning a specific blocker, with unfinished work labelled `RESEARCH_INCOMPLETE`. Calibration gaps retain the existing Core uncertainty floor; numerical evidence and independent-support requirements remain in force. All five standard tasks read this shared authority. Synthetic policy regressions pass for the four affected market groups; a fresh report is still needed to establish improved research completion. The 06:00 issued artifacts remain unchanged.
 
 `docs/CORE_MARKET_RECOVERY_2026-09-05.md` records the exact missing/stale-market diagnosis and the bounded supplemental-request correction. `docs/REPORT_EVIDENCE_REQUIREMENTS.md` governs source and numerical fair evidence from 17:00 PT September 5, shared by all five report lanes. Existing histories, Core thresholds, staking and schedules remain unchanged. The next normal feed/report is required to measure live recovery; the 15:15 manual feed did not establish automatic scheduler reliability.
 
