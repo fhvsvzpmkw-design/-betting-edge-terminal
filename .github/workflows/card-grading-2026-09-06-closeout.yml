@@ -1,0 +1,92 @@
+name: Sep 5 Betting Edge grading verified closeout
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-06-closeout.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Close verified Sep 5 NCAAF results
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const DATE='2026-09-05',NOW=new Date().toISOString();
+          const RUN_DIR=`data/history/runs/${DATE}`,OBS_DIR=`data/history/observations/${DATE}`;
+          const finals=new Map([
+            ['70898478',[18,34,'https://nusports.com/news/2026/09/5/northwestern-takes-down-south-dakota-state-34-18-in-season-opener','Northwestern official athletics — South Dakota State 18, Northwestern 34']],
+            ['70900756',[24,42,'https://www.cbssports.com/college-football/gametracker/boxscore/NCAAF_20260905_ARKST%40MEMP/','CBS Sports/AP final — Arkansas State 24, Memphis 42']],
+            ['70918746',[9,28,'https://www.cbssports.games.cbssports.com/college-football/gametracker/recap/NCAAF_20260905_AP%40VANDY/','CBS Sports/AP final — Austin Peay 9, Vanderbilt 28; game declared final after lightning delay']],
+            ['70972806',[29,17,'https://utahstateaggies.com/news/2026/9/5/utah-state-football-drops-season-opener-to-idaho-state-29-17.aspx','Utah State official athletics — Idaho State 29, Utah State 17']],
+            ['70898498',[21,6,'https://hawaiiathletics.com/news/2026/9/5/football-warriors-fall-to-unlv-in-mountain-west-opener.aspx','Hawaii official athletics — UNLV 21, Hawaii 6']],
+            ['70898466',[45,24,'https://uclabruins.com/boxscore/1980','UCLA official box score — UCLA 45, California 24']],
+            ['70898470',[10,38,'https://cyclones.com/news/2026/9/5/football-cyclones-open-season-with-38-10-win-over-southeast-missouri','Iowa State official athletics — Southeast Missouri 10, Iowa State 38']],
+            ['70900768',[0,34,'https://goairforcefalcons.com/sports/football/stats/2026/duquesne/boxscore/24308','Air Force official box score — Duquesne 0, Air Force 34']],
+            ['70923654',[10,35,'https://goholycross.com/news/2026/9/5/football-falls-at-colgate.aspx','Holy Cross official athletics — Holy Cross 10, Colgate 35']],
+            ['70923664',[13,17,'https://woffordterriers.com/news/2026/9/5/football-downs-gardner-webb-17-13.aspx','Wofford official athletics — Gardner-Webb 13, Wofford 17']],
+            ['70923638',[24,31,'https://monmouthhawks.com/news/2026/9/5/monmouth-football-defeats-sacred-heart-in-home-opener-31-24.aspx','Monmouth official athletics — Sacred Heart 24, Monmouth 31']],
+            ['70898456',[14,38,'https://secure-www.cbssports.com/college-football/gametracker/boxscore/NCAAF_20260905_RI%40TEMPLE/','CBS Sports/AP final — Rhode Island 14, Temple 38']]
+          ]);
+          function lineValue(rec){const f=rec.feed||{};for(const v of [f.hdp,f.line])if(Number.isFinite(Number(v)))return Number(v);const p=String(f.selectionKey||'').split('|'),v=p[4];return v!==''&&Number.isFinite(Number(v))?Number(v):null;}
+          function grade(rec,away,home){const f=rec.feed||{},k=String(f.marketKey||f.market||'').toLowerCase(),s=String(f.side||'').toLowerCase();if(k==='ml'){const a=s==='away'?away:home,o=s==='away'?home:away;return a>o?'WIN':a<o?'LOSS':'PUSH';}if(k==='spread'||k==='spreads'){const raw=lineValue(rec);if(!Number.isFinite(raw))return null;const h=s==='home'?raw:-raw,a=s==='home'?home:away,o=s==='home'?away:home,v=a+h-o;return v>0?'WIN':v<0?'LOSS':'PUSH';}if(k==='total'||k==='totals'){const l=lineValue(rec),t=away+home;if(!Number.isFinite(l))return null;if(t===l)return'PUSH';return s==='over'?(t>l?'WIN':'LOSS'):(t<l?'WIN':'LOSS');}return null;}
+          let closed=0;
+          for(const file of fs.readdirSync(OBS_DIR).filter(f=>f.endsWith('.json'))){
+            const op=path.join(OBS_DIR,file),obs=JSON.parse(fs.readFileSync(op,'utf8')),rp=obs.sourceRun,run=JSON.parse(fs.readFileSync(rp,'utf8')),rm=new Map((run.recs||[]).map(r=>[String(r.feed?.selectionKey||''),r]));let changed=false;
+            obs.recommendations=obs.recommendations.map(item=>{
+              if(item.completion?.state!=='unresolved')return item;
+              const rec=rm.get(String(item.selectionKey||''));if(!rec)return item;
+              const id=String(rec.feed?.eventId||'');const v=finals.get(id);if(!v)return item;
+              const [away,home,url,name]=v,gr=grade(rec,away,home);if(!gr)return item;
+              const meta=String(rec.meta||''),m=meta.match(/^(?:NCAAF)\s*\|\s*(.+?)\s+at\s+(.+?)\s*\|/i);if(!m)return item;
+              const old=item.completion||{};closed++;changed=true;
+              return {title:rec.title,status:rec.status,selectionKey:rec.feed?.selectionKey||null,commenceTime:rec.feed?.eventDate||null,completion:{state:'complete',verificationState:'verified',grade:gr,official:rec.status==='BET',hypothetical:rec.status!=='BET',verifiedAt:NOW,eventId:id,finalScore:{away:m[1].trim(),home:m[2].trim(),awayScore:away,homeScore:home},settlementMethod:'final_score',line:lineValue(rec),basis:null,observedValue:null,settlementComponents:null,source:{name,url},firstUnresolvedAt:old.firstUnresolvedAt||null,lastVerificationAttemptAt:NOW,verificationAttempts:Number(old.verificationAttempts||0)+1,nextRetryTier:null}};
+            });
+            if(changed)fs.writeFileSync(op,JSON.stringify(obs,null,2)+'\n');
+          }
+          console.log(`VERIFIED CLOSEOUT: closed=${closed}`);
+          if(closed!==12)throw Error(`expected to close 12 Sep 5 unresolved cards, closed ${closed}`);
+          NODE
+
+      - name: Rebuild results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify complete Sep 5 and isolation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path'),dir='data/history/observations/2026-09-05';
+          let cards=0,w=0,l=0,p=0,u=0;
+          for(const f of fs.readdirSync(dir).filter(x=>x.endsWith('.json'))){const j=JSON.parse(fs.readFileSync(path.join(dir,f),'utf8'));for(const r of j.recommendations||[]){cards++;if(r.completion?.state!=='complete')u++;else if(r.completion.grade==='WIN')w++;else if(r.completion.grade==='LOSS')l++;else if(r.completion.grade==='PUSH')p++;}}
+          if(cards!==24||u!==0)throw Error(`Sep 5 incomplete cards=${cards} unresolved=${u}`);
+          const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          if(idx.coverage?.lastDate!=='2026-09-05'||idx.coverage?.unresolvedCards!==0)throw Error(`index coverage mismatch ${JSON.stringify(idx.coverage)}`);
+          console.log(`SEP5 FINAL: cards=${cards} WIN=${w} LOSS=${l} PUSH=${p} unresolved=${u}`);
+          console.log(`RESULTS INDEX: cards=${idx.coverage.cards} complete=${idx.coverage.completeCards} unresolved=${idx.coverage.unresolvedCards} unresolvedSelections=${idx.coverage.unresolvedSelections} unresolvedEvents=${idx.coverage.unresolvedEvents} lastDate=${idx.coverage.lastDate}`);
+          console.log(`PRICE ANALYTICS: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/2026-09-05/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit closeout
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations/2026-09-05 data/history/results-index.json
+          git commit -m "Close Sep 5 NCAAF Betting Edge grading"
+          git pull --rebase origin main
+          git push origin main
