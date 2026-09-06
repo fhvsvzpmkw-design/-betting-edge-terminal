@@ -341,7 +341,7 @@ export function derivePrimarySelectionInventory(report, feed, policy) {
 }
 
 const PRIMARY_BLOCKER_REASONS = new Set(['SOURCE_UNAVAILABLE', 'FAIR_MODEL_UNAVAILABLE', 'PERSONNEL_UNRESOLVED', 'CALIBRATION_UNAVAILABLE', 'CONFLICTING_EVIDENCE', 'RESEARCH_INCOMPLETE']);
-export const RESEARCH_COMPLETION_FROM = '2026-09-06T18:15:00-07:00';
+export const PARTIAL_RESEARCH_FROM = '2026-09-06T18:15:00-07:00';
 
 // A working queue derived from the existing inventory and draft receipts. It
 // neither creates research evidence nor certifies the recorded decisions.
@@ -383,18 +383,22 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory) {
       'Construct a supported provisional fair and range for each exact market; use applicable governed work or explain a defensible market-anchored derivation.',
       'Resolve material unknowns with targeted fallback research, including Stage 2 source depth and closing recheck when required; re-handicap.',
       'Grade both opposing selections coherently. Record actual evidence and decision, or a genuine terminal limitation after attempted alternatives.',
-      'Continue pending work before freeze. A recorded outcome still requires the complete evidence/Core/coverage/bundle validators.'
+      'Continue pending work; publish validated decisions with explicit unfinished-selection accounting if work remains at delivery. All decision evidence/Core/coverage/bundle validators still apply.'
     ],
     events: [...events.values()].sort((a, b) => Date.parse(a.eventDate) - Date.parse(b.eventDate) || a.eventId.localeCompare(b.eventId)).map(event => ({...event, markets: [...event.markets.values()]}))
   };
 }
 
-export function validateResearchCompletion(report, sidecar) {
-  if (parseMs(report.ts) < Date.parse(RESEARCH_COMPLETION_FROM)) return {enforced: false};
-  const pending = (sidecar?.primaryAnalysis?.receipts || []).filter(receipt => receipt?.state === 'BLOCKED' && receipt.blocker?.reason === 'RESEARCH_INCOMPLETE');
-  const events = [...new Set(pending.map(receipt => receipt.quote?.eventId || receipt.selectionId))];
-  ensure(!pending.length, `RESEARCH_PENDING: ${pending.length} primary selection(s) across ${events.length} event(s) still need research [${events.join(', ')}]. RESEARCH_INCOMPLETE is a working state, not a terminal evidence limitation. Run research-plan, continue the recorded missing work and fallbacks before freeze; if execution cannot continue, report ANALYSIS INCOMPLETE and do not stage READY. Do not relabel unfinished work as model/calibration/source unavailable.`);
-  return {enforced: true};
+// Incomplete research limits that selection. It does not veto other decisions.
+// Callers validate the receipts before using this publisher-owned disclosure.
+export function describeResearchCompletion(report, sidecar) {
+  if (parseMs(report.ts) < Date.parse(PARTIAL_RESEARCH_FROM)) return null;
+  const receipts = sidecar?.primaryAnalysis?.receipts || [];
+  const unfinished = receipts.filter(receipt => receipt?.state === 'BLOCKED' && receipt.blocker?.reason === 'RESEARCH_INCOMPLETE').length;
+  const evaluated = receipts.filter(receipt => receipt?.state === 'EVALUATED').length;
+  const state = !unfinished ? 'COMPLETE' : evaluated ? 'PARTIAL' : 'INCOMPLETE';
+  const notice = unfinished ? `${evaluated ? 'PARTIAL REPORT' : 'ANALYSIS INCOMPLETE'}: ${evaluated} evaluated; ${unfinished} unfinished.` : null;
+  return {state, evaluated, unfinished, notice};
 }
 function exactObject(left, right) { return JSON.stringify(left) === JSON.stringify(right); }
 function closeNumber(left, right) { return Number.isFinite(left) && Number.isFinite(right) && Math.abs(left - right) < 1e-8; }
@@ -470,7 +474,6 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
   ensure(inventory || (feed && policy), 'Primary analysis validation requires the exact bound feed and coverage policy');
   const bound = inventory || derivePrimarySelectionInventory(report, feed, policy), analysis = sidecar?.primaryAnalysis;
   ensure(isObject(analysis) && analysis.schema === 1 && analysis.feedGeneratedAt === report.feedGeneratedAt && Array.isArray(analysis.receipts), 'primaryAnalysis schema 1, bound feedGeneratedAt and complete receipts are required');
-  validateResearchCompletion(report, sidecar);
   const required = new Map(bound.selections.map(selection => [selection.selectionId, selection])), seen = new Set(), fairGroups = new Map(), fairBases = new Map();
   let runtime = framework;
   const sports = Object.fromEntries(Object.entries(bound.sports).map(([sport, row]) => [sport, { available: row.primary.available, evaluated: 0, blocked: 0 }]));

@@ -47,13 +47,8 @@ try{
   for(const receipt of sidecar.primaryAnalysis.receipts) receipt.blocker.reason='RESEARCH_INCOMPLETE';
   save();
   const pendingBytes=fs.readFileSync(path.join(root,'input-sidecar.json'),'utf8');
-  for(const command of ['validate','publish']) {
-    result=call(command);assert.notEqual(result.status,0);
-    assert.match(result.stderr,/RESEARCH_PENDING: 6 primary selection/,'unfinished work cannot be staged or published even with fully reconciled coverage');
-    assert.equal(fs.readFileSync(path.join(root,'input-sidecar.json'),'utf8'),pendingBytes,'rejected publication preserves working research');
-  }
-  assert.ok(!fs.existsSync(path.join(root,'data/history/runs')),'unfinished work cannot write issued history');
-  assert.equal(read(path.join(root,'run-history.json')).runs.length,0,'unfinished work cannot enter index');
+  result=call('validate');assert.equal(result.status,0,result.stderr);
+  assert.equal(fs.readFileSync(path.join(root,'input-sidecar.json'),'utf8'),pendingBytes,'preflight permits incomplete research without manufacturing evidence');
   sidecar.primaryAnalysis.receipts=terminalReceipts;save();
   if(observedMode){
     const observedBefore=sidecar.primaryAnalysis.receipts[0].quote.quoteObservedAt;
@@ -106,7 +101,7 @@ try{
   const storedSidecar=read(storedSidecarPath),unresolvable=structuredClone(storedSidecar);
   const pendingTamper=structuredClone(storedSidecar);pendingTamper.primaryAnalysis.receipts[0].blocker.reason='RESEARCH_INCOMPLETE';
   write(path.relative(root,storedSidecarPath),pendingTamper);result=call('verify');
-  assert.notEqual(result.status,0);assert.match(result.stderr,/RESEARCH_PENDING/,'read-back enforces the same completion rule');
+  assert.notEqual(result.status,0);assert.match(result.stderr,/coverage summary does not reproduce/,'read-back catches a changed unfinished count');
   write(path.relative(root,storedSidecarPath),storedSidecar);
   if(observedMode){
     const wrongObservation=structuredClone(storedSidecar);

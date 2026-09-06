@@ -42,7 +42,7 @@ Core v1.4 adds explicit fair-value basis/model-error states, Research v1.8 uncer
 
 ## Report decisions
 
-From September 6, every EVALUATED primary decision is published, including PASS. There is no numeric card target or maximum. Research follows the shared scheduled authority's qualified-odds → current-research → fair-value → decision process. From the 18:15 September 6 completion amendment, unfinished research must continue in the working draft and cannot be staged as READY. Genuine terminal evidence limitations and zero BETs remain valid; neither availability nor unfinished work is a completed value decision.
+From September 6, every EVALUATED primary decision is published, including PASS. There is no numeric card target or maximum. Research follows the shared scheduled authority's qualified-odds → current-research → fair-value → decision process. Continue unfinished work, but publish completed, validated decisions even when other selections remain unfinished. From 18:15 September 6 the publisher adds a PARTIAL REPORT notice with exact counts, or ANALYSIS INCOMPLETE when no selections were evaluated. Genuine terminal limitations remain distinct; unfinished selections receive no fabricated fair, decision or stake.
 
 Pizza Plays remains downstream of VigScope. If there is no suitable qualifying play, no Pizza selection is preferable to forcing a weak or extreme longshot.
 

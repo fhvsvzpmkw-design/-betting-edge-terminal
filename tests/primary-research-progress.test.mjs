@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {
   buildPrimaryResearchPlan, derivePrimarySelectionInventory,
-  RESEARCH_COMPLETION_FROM, validatePrimaryAnalysis, validateResearchCompletion
+  PARTIAL_RESEARCH_FROM, validatePrimaryAnalysis, describeResearchCompletion
 } from '../tools/major-sport-market-coverage-gate.mjs';
 
 const reportPath = 'data/history/runs/2026-09-06/evening-151930.json';
@@ -12,7 +12,7 @@ const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const report = read(reportPath), sidecar = read(sidecarPath);
 const policy = read('data/major-sport-market-coverage-v1.json');
 const provenance = read('data/history/report-provenance-schema.json');
-assert.equal(provenance.primaryAnalysis.researchCompletionFrom, RESEARCH_COMPLETION_FROM);
+assert.equal(provenance.primaryAnalysis.partialResearchPublicationFrom, PARTIAL_RESEARCH_FROM);
 
 // Reconstruct only the inventory binding from the immutable failed receipts.
 // The CLI below independently derives availability from the pinned odds blob.
@@ -33,10 +33,10 @@ assert.ok(plan.events.flatMap(event => event.markets).flatMap(market => market.s
 assert.equal(JSON.stringify({report, sidecar}), before, 'planning must not generate evidence or alter the failed run');
 
 assert.equal(validatePrimaryAnalysis(report, sidecar, {inventory}).primaryBlocked, 30, 'issued 15:15 history retains original validation');
-assert.equal(validateResearchCompletion({ts: '2026-09-06T18:14:59-07:00'}, sidecar).enforced, false);
-const forwardReport = {...report, ts: RESEARCH_COMPLETION_FROM};
-assert.throws(() => validatePrimaryAnalysis(forwardReport, sidecar, {inventory}), /RESEARCH_PENDING: 30 primary selection\(s\) across 5 event\(s\)/, 'identical unfinished work cannot close after the amendment');
-assert.throws(() => validateResearchCompletion(forwardReport, sidecar), /do not stage READY/);
+assert.equal(describeResearchCompletion({ts: '2026-09-06T18:14:59-07:00'}, sidecar), null);
+const forwardReport = {...report, ts: PARTIAL_RESEARCH_FROM};
+assert.equal(validatePrimaryAnalysis(forwardReport, sidecar, {inventory}).primaryBlocked, 30, 'unfinished research remains selection-level and permits honest publication');
+assert.deepEqual(describeResearchCompletion(forwardReport, sidecar), {state: 'INCOMPLETE', evaluated: 0, unfinished: 30, notice: 'ANALYSIS INCOMPLETE: 0 evaluated; 30 unfinished.'});
 
 const draft = structuredClone(sidecar);
 draft.primaryAnalysis.receipts = [];
@@ -74,5 +74,5 @@ for (const change of [m => delete m.observedAt, m => m.observedAt = '2026-09-07T
   const bad = structuredClone(feed); change(bad.events[0].bookmakers.Bet365[0]);
   assert.equal(buildPrimaryResearchPlan(clockReport, {}, derivePrimarySelectionInventory(clockReport, bad, policy)).counts.available, 0, 'missing/stale/suspended observations cannot enter research');
 }
-assert.equal(validateResearchCompletion(clockReport, {primaryAnalysis: {receipts: []}}).enforced, true);
-console.log('PRIMARY RESEARCH PROGRESS: 15:15 replay = 30 pending / 5 events; forward completion rejected; historical validation, read-only planning and observation freshness preserved.');
+assert.equal(describeResearchCompletion(clockReport, {primaryAnalysis: {receipts: []}}).state, 'COMPLETE');
+console.log('PRIMARY RESEARCH PROGRESS: 15:15 replay = 30 pending / 5 events; unfinished receipts remain publishable without invented evaluations; historical validation, read-only planning and observation freshness preserved.');
