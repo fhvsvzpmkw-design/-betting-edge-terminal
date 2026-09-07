@@ -113,7 +113,7 @@ jobs:
             ACTIVE_MARKET_LEDGER="$(node tools/graham-active-week.mjs --path dailyMarketLedger)"
             ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
 
-            # The Nineteenth Hole may only rebuild after the schedule-metadata
+            # The Private Line may only rebuild after the schedule-metadata
             # authority, fair explanation and QB reconciliation validate exactly.
             node tools/graham-schedule-authority.mjs --path "$ACTIVE_NUMBERS"
             node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
@@ -161,7 +161,7 @@ jobs:
         run: |
           ACTIVE="$(node tools/graham-active-week.mjs 2>/dev/null || true)"
           {
-            echo "## Graham Mercer // The Nineteenth Hole"
+            echo "## Graham Mercer // The Private Line"
             echo
             echo "- Trigger: successful main QB reconciliation after football publication, odds refresh, or research/schedule metadata synchronization"
             echo "- Active week: ${ACTIVE:-unresolved}"

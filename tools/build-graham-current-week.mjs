@@ -82,7 +82,7 @@ const games=(numbers.games||[]).map(game=>{
 });
 
 const out={
-  schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE NINETEENTH HOLE',season:numbers.season,week:numbers.week,
+  schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE PRIVATE LINE',season:numbers.season,week:numbers.week,
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
   activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
   lastResearchAt:numbers.lastResearchAt||null,marketStatus,marketObservedAt:marketStatus==='ok'?observer?.generatedAt||null:null,

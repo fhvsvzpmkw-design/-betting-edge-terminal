@@ -24,7 +24,7 @@ The v1/v2 Jesse guides and archived editions remain historical. Any older instru
 
 The page should feel like an underground football sheet being carried through the Hotel Delphoria: the full board at the public counter, a smaller stack of interesting Graham slips upstairs, telephone messages, line changes, poker-room traffic and Jesse's terse reaction.
 
-It must not become a duplicate of The Nineteenth Hole. Graham is the handicapper; Jesse is the gambler reading Graham's finished football sheet.
+It must not become a duplicate of The Private Line. Graham is the handicapper; Jesse is the gambler reading Graham's finished football sheet.
 
 ## What gets carried upstairs
 
@@ -133,7 +133,7 @@ Keep the v3 shell shabby and low-rent:
 - Hotel Delphoria hero and house/phone props;
 - public counter in front, dangerous authority behind it.
 
-Do not make it a polished modern sportsbook dashboard, elegant hotel paper or a second Nineteenth Hole terminal.
+Do not make it a polished modern sportsbook dashboard, elegant hotel paper or a second Private Line terminal.
 
 ## Historical boundary
 
