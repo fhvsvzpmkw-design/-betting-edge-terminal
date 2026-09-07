@@ -35,6 +35,14 @@ With no push, `EV = p_win × D − 1` and the zero-EV probability is `1 / D`. Wi
 
 **Source correction:** In chapter 4's “Example Calculating Expected Ticket Price,” an intermediate line treats `0.10 × $110` as `$110`; it should be `$11`. Recalculation gives a $126.50 expected ticket value and $16.50 expected profit on $110 risked. The final total in the book is correct. Recompute examples instead of importing them unchecked.
 
+## Corrections from the full review
+
+- Calculate exact significance tails against the appropriate price-dependent null. Thirty of Table 4's 138 thresholds are too lenient; its 50% null also differs from the no-profit null at -110.
+- Preserve every settlement state. The chapter-11 Big 12 example incorrectly creates a push at a half-integer total and reverses the model's EV sign. Half-point value depends on the gained payoff and any changed odds.
+- Use an appropriate joint distribution. Table 7 cannot price a count comparison from the mean difference alone. Shifting a Poisson mean is not equivalent to applying a score handicap. A regulation score calculation is not automatically a full-game MLB total or run line.
+- Recompute offered products and payout rules. The book has a parlay multiplication error and a teaser profitability claim contradicted by its own cover rates.
+- Use full precision. Twenty appendix values differ from exact nearest-integer rounding; printed 0% and 100% do not establish impossibility or certainty. The full review records the locations and further historical inconsistencies.
+
 ## Scope and validation
 
 Chapter 7 requires a defined hypothesis and separate testing data, and discusses the false positives produced by trying many systems. For Betting Edge, validate any new numerical method on data not used to tune it, preserve forecast versions and timing, and assess returns at actual prices as well as probability quality. Related selections from one game are not independent observations. A significance result does not guarantee future profit.
@@ -58,4 +66,4 @@ Locators are relative to `OEBPS/` inside the supplied EPUB; pagination varies by
 | Spread/moneyline relationships | `html/21_chap14.html#c14a`, `#c14b`, `#c14f` |
 | Pushes on totals | `html/22_chap15.html#c15b` |
 
-The focused reading covered these methods and selected supporting discussion, not a full audit of every chapter/table. The [Angels–Red Sox application](../SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md) reproduces both moneylines and identifies the remaining numerical dependency. It is historical research, not an issued recommendation.
+The [full review and quantitative audit](../SHARP_SPORTS_BETTING_FULL_REVIEW_2026-09-07.md) supersedes the first pass: all 17 chapters and appendices were reviewed, all 138 Table 4 thresholds compared, all 10,280 displayed appendix probability positions audited, and chapter 17's printed game grades checked. The review distinguishes confirmed mathematical corrections from historical claims that remain externally unverified. [Reproducible calculations and optional EPUB audit](../../tools/audit-sharp-sports-betting.py) accompany the [results](../../research/audits/sharp-sports-betting-2026-09-07.json). The [Angels–Red Sox application](../SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md) reproduces both moneylines and identifies the remaining numerical dependency. It is historical research, not an issued recommendation.
