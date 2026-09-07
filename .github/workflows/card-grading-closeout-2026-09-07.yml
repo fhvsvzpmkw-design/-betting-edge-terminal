@@ -1,0 +1,103 @@
+name: Betting Edge card grading closeout 2026-09-07
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-closeout-2026-09-07.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-closeout-2026-09-07
+  cancel-in-progress: false
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Close only independently verified Sep 6 unresolved score markets
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'), path=require('path');
+          const dir='data/history/observations/2026-09-06';
+          const now=new Date().toISOString();
+          const verified={
+            '70923684|ml|away||': {grade:'LOSS', eventId:'70923684', home:'Prairie View A&M Panthers', away:'Texas Southern Tigers', homeScore:52, awayScore:14, sourceName:'Prairie View A&M Athletics — Texas Southern at Prairie View, Sep 6 2026', sourceUrl:'https://pvpanthers.com/news/2026/9/6/football-5-different-players-score-touchdowns-in-panthers-52-14-win-over-texas-southern.aspx'},
+            '70923684|ml|home||': {grade:'WIN', eventId:'70923684', home:'Prairie View A&M Panthers', away:'Texas Southern Tigers', homeScore:52, awayScore:14, sourceName:'Prairie View A&M Athletics — Texas Southern at Prairie View, Sep 6 2026', sourceUrl:'https://pvpanthers.com/news/2026/9/6/football-5-different-players-score-touchdowns-in-panthers-52-14-win-over-texas-southern.aspx'},
+            '63303275|ml|home||': {grade:'WIN', eventId:'63303275', home:'Chicago White Sox', away:'Minnesota Twins', homeScore:10, awayScore:1, sourceName:'MLB.com — Twins at White Sox, Sep 6 2026', sourceUrl:'https://www.mlb.com/whitesox/video/kyle-teel-sam-antonacci-fuel-the-white-sox-10-1-win'},
+            '68385830|ml|away||': {grade:'LOSS', eventId:'68385830', home:'Saskatchewan Roughriders', away:'Winnipeg Blue Bombers', homeScore:32, awayScore:26, sourceName:'CFL.ca — Winnipeg at Saskatchewan, Sep 6 2026', sourceUrl:'https://cfl.ca/article/riders-survive-ot-thriller-in-ok-tire-labour-day-weekend-win-over-bombers'},
+            '68385830|ml|home||': {grade:'WIN', eventId:'68385830', home:'Saskatchewan Roughriders', away:'Winnipeg Blue Bombers', homeScore:32, awayScore:26, sourceName:'CFL.ca — Winnipeg at Saskatchewan, Sep 6 2026', sourceUrl:'https://cfl.ca/article/riders-survive-ot-thriller-in-ok-tire-labour-day-weekend-win-over-bombers'}
+          };
+          let changed=0, still=0;
+          for(const f of fs.readdirSync(dir).filter(x=>x.endsWith('.json'))){
+            const p=path.join(dir,f), j=JSON.parse(fs.readFileSync(p,'utf8'));
+            let dirty=false;
+            for(const r of j.recommendations||[]){
+              if(r.completion?.state!=='unresolved') continue;
+              const v=verified[r.selectionKey];
+              if(!v){still++; continue;}
+              const prev=r.completion||{};
+              r.completion={
+                state:'complete', verificationState:'verified', grade:v.grade,
+                official:true, hypothetical:String(r.status||'').toUpperCase()!=='BET',
+                verifiedAt:now, eventId:v.eventId,
+                finalScore:{home:v.home,away:v.away,homeScore:v.homeScore,awayScore:v.awayScore},
+                settlementMethod:'final_score', line:0, basis:null, observedValue:null, settlementComponents:null,
+                source:{name:v.sourceName,url:v.sourceUrl},
+                firstUnresolvedAt:prev.firstUnresolvedAt||null,
+                lastVerificationAttemptAt:now,
+                verificationAttempts:Number(prev.verificationAttempts||0)+1,
+                nextRetryTier:null
+              };
+              dirty=true; changed++;
+            }
+            if(dirty) fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');
+          }
+          console.log(`VERIFIED CLOSEOUT: changed=${changed} unsupportedStillUnresolved=${still}`);
+          if(changed!==6) throw Error(`expected exactly 6 verified Sep 6 card instances, changed ${changed}`);
+          NODE
+
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify all Sep 6 cards and isolation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const dir='data/history/observations/2026-09-06';
+          let cards=0,complete=0,unresolved=0,w=0,l=0,push=0;
+          for(const f of fs.readdirSync(dir).filter(x=>x.endsWith('.json'))){
+            const j=JSON.parse(fs.readFileSync(path.join(dir,f),'utf8'));
+            for(const r of j.recommendations||[]){cards++; if(r.completion?.state==='complete'){complete++; const g=r.completion.grade;if(g==='WIN')w++;else if(g==='LOSS')l++;else if(g==='PUSH')push++;} else unresolved++;}
+          }
+          if(cards!==162||complete!==162||unresolved!==0) throw Error(`Sep6 coverage cards=${cards} complete=${complete} unresolved=${unresolved}`);
+          const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          console.log(`SEP6: cards=${cards} complete=${complete} W=${w} L=${l} PUSH=${push} unresolved=${unresolved}`);
+          console.log(`INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents} lastDate=${idx.coverage?.lastDate}`);
+          console.log(`PRICE: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
+          if(idx.coverage?.lastDate!=='2026-09-06') throw Error('results index lastDate mismatch');
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/2026-09-06/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit verified historical closeout only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations/2026-09-06 data/history/results-index.json
+          git commit -m "Close verified Sep 6 card settlements"
+          git pull --rebase origin main
+          git push origin main
