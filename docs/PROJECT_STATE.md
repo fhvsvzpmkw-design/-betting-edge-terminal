@@ -1,10 +1,16 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-09-07 — Atlanta QB baseline scope amendment
+**Last updated:** 2026-09-07 — Graham publication/QB reconciliation handoff
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
+
+## September 7 automatic Graham publication handoff
+
+Numeric personnel and matchup publications can change the non-QB base beneath an unchanged QB term. Their bot-authored commits do not trigger another push-based Actions workflow, so QB validation metadata could previously remain stale even when the new fair was correct. Successful main-branch completion of the existing personnel, M4 matchup, M5 catch-up, H4 activation and research-input publishers now triggers the existing QB production workflow. Only its successful completion hands those numeric updates to terminal refresh. Failed, cancelled and non-main upstream runs do not authorize the handoff.
+
+Every terminal publication also checks the current QB production arithmetic before market capture or feed construction. If another refresh overlaps reconciliation, the existing four-attempt publication loop waits 30 seconds between attempts and reloads main; this retains the original trigger's odds-capture behavior. Validation must succeed before publication. The existing calculator preserves the approved football change, refreshes the QB base without adding the term again, and remains byte-idempotent on replay. Odds observation and research/schedule metadata refresh paths retain their existing roles; no schedule, player value, betting gate or issued history is changed.
 
 ## September 7 Atlanta QB baseline resolution
 
