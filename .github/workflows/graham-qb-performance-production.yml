@@ -18,6 +18,12 @@ on:
   pull_request:
     paths:
       - .github/workflows/graham-qb-performance-production.yml
+      - .github/workflows/graham-terminal-refresh.yml
+      - .github/workflows/graham-personnel-production.yml
+      - .github/workflows/graham-matchup-production.yml
+      - .github/workflows/walters-matchup-m5-catchup.yml
+      - .github/workflows/walters-home-field-h4.yml
+      - .github/workflows/graham-research-input.yml
       - data/walters/nfl/active-week.json
       - data/walters/nfl/20*/week-*-current-numbers.json
       - data/walters/nfl/qb-production-current.json
@@ -28,6 +34,17 @@ on:
       - tools/validate-walters-qb-performance-production.mjs
       - tools/walters-qb-production-scope.mjs
       - tests/walters-qb-performance-production.test.mjs
+  # Bot-authored board commits do not fire downstream push workflows.
+  # Every numeric football publisher must finish QB reconciliation before refresh.
+  workflow_run:
+    workflows:
+      - Graham personnel production
+      - Graham matchup production
+      - Walters Matchup M5 Catch-up
+      - Walters Home Field H4 Activation
+      - Apply Graham research input
+    branches: [main]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -39,6 +56,7 @@ permissions:
 
 jobs:
   validate:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -131,6 +149,7 @@ jobs:
           console.log(`- State: ${p.state}`);
           console.log(`- Current resolved teams: ${resolved}`);
           console.log(`- Current fail-closed teams: ${failed.join(', ')}`);
+          console.log('- Successful main publication triggers the Graham terminal refresh after QB validation.');
           console.log(`- Post-activation NFL canary: ${p.postActivationCanary.state}`);
           console.log('- Direct BET/stake authority: false');
           console.log('- Market viewed: false');

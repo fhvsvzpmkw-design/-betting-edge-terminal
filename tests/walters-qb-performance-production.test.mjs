@@ -27,6 +27,7 @@ const activePaths = {
   personnel: `data/walters/nfl/${active.season}/week-${activeToken}-personnel-ledger.json`,
 };
 const board = readJson(ROOT, activePaths.board);
+const readText = relative => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 
 function copy(root, relative) {
   const source = path.join(ROOT, relative);
@@ -56,6 +57,13 @@ function sandbox() {
     'data/walters/nfl/qb-production/rollback-week-01-current-numbers-v1.json',
     'data/walters/nfl/qb-production-current.json',
     'data/walters/nfl/qb-production-staging.json',
+    'data/walters/nfl/current-week-terminal.json',
+    'data/walters/nfl/graham-schedule-authority-v1.json',
+    'data/walters/nfl/player-values/stage2-current.json',
+    'data/walters/nfl/stage3/stage3-current.json',
+    'data/walters/nfl/player-values/player-values-2026-v1.json',
+    'data/walters/nfl/personnel-calibration-v1.json',
+    'data/walters/nfl/matchup-stage3/stage3-current.json',
     ...Object.values(contract.sourceAuthority).map(item => item.path),
     ...Object.keys(audit.protectedArtifactSha256After),
   ];
@@ -189,6 +197,113 @@ test('null Atlanta baseline cannot silently become zero', () => {
     manifest.teamBindings.find(item => item.team === 'ATL').embeddedBaselineQbValue = null;
     writeJson(root, PRODUCTION_PATH, manifest);
     assert.match(run(root, ['--check'], 1).stderr, /ATLANTA_BASELINE_BINDING_INVALID/);
+  } finally { fs.rmSync(root, {recursive: true, force: true}); }
+});
+
+test('numeric publisher completion routes through QB reconciliation before terminal refresh', () => {
+  const qb = readText('.github/workflows/graham-qb-performance-production.yml');
+  const terminal = readText('.github/workflows/graham-terminal-refresh.yml');
+  const followers = workflow => workflow.match(/  workflow_run:\n    workflows:\n([\s\S]*?)    branches:/)?.[1]
+    .split('\n').map(line => line.trim().replace(/^- /, '')).filter(Boolean);
+  const publishers = ['graham-personnel-production', 'graham-matchup-production', 'walters-matchup-m5-catchup', 'walters-home-field-h4', 'graham-research-input'];
+  for (const file of publishers) {
+    const name = readText(`.github/workflows/${file}.yml`).match(/^name: (.+)$/m)[1];
+    assert.ok(followers(qb).includes(name), `${name} must trigger QB reconciliation`);
+    assert.ok(!followers(terminal).includes(name), `${name} must not bypass QB reconciliation`);
+  }
+  assert.ok(followers(terminal).includes('Graham QB performance production'));
+  assert.ok(followers(terminal).includes('Refresh Betting Edge odds'));
+  assert.ok(!followers(qb).includes('Refresh Graham NFL terminal'), 'the chain must not loop');
+  for (const workflow of [qb, terminal]) {
+    assert.match(workflow, /workflow_run:[\s\S]*?branches: \[main\]/);
+    assert.match(workflow, /if:.*workflow_run\.conclusion == 'success'.*workflow_run\.head_branch == 'main'.*workflow_run\.head_repository\.full_name == github\.repository/);
+  }
+  const publishing = terminal.slice(terminal.indexOf('          for attempt'));
+  const gate = publishing.indexOf('node tools/validate-walters-qb-performance-production.mjs');
+  assert.ok(gate > publishing.indexOf('git reset --hard origin/main'), 'validate the refreshed main checkout');
+  assert.ok(gate < publishing.indexOf('node tools/capture-graham-daily-pinnacle.mjs'), 'QB validation must precede market capture');
+  assert.ok(gate < publishing.indexOf('node tools/build-graham-current-week.mjs'), 'QB validation must precede terminal construction');
+  assert.match(publishing, /if ! node tools\/validate-walters-qb-performance-production\.mjs; then[\s\S]*?sleep 30\n\s+continue[\s\S]*?exit 1\n\s+fi/, 'retry pending reconciliation and stop publication if validation never succeeds');
+  assert.match(publishing, /git push origin HEAD:main/);
+});
+
+for (const kind of ['personnel', 'matchup']) test(`${kind} change keeps its fair through QB reconciliation and terminal publication`, () => {
+  const root = sandbox();
+  const invoke = (name, args = [], expectedStatus = 0) => {
+    const result = spawnSync(process.execPath, [path.join(ROOT, 'tools', name), ...args], {cwd: root, encoding: 'utf8'});
+    assert.equal(result.status, expectedStatus, `${result.stdout}\n${result.stderr}`);
+    return result;
+  };
+  const boardPath = WEEK_ONE_BOARD;
+  const terminalPath = 'data/walters/nfl/current-week-terminal.json';
+  const bytes = relative => fs.readFileSync(path.join(root, relative), 'utf8');
+  const getGame = key => readJson(root, boardPath).games.find(game => game.gameKey === key);
+  const sync = () => invoke('graham-fair-decomposition.mjs', ['--path', boardPath, '--write']);
+  const activeReturn = (player, team, side, gameKey) => {
+    writeJson(root, 'test-personnel.json', {
+      schema: 1, state: 'READY', batchId: `test-${kind}-return`, effectiveAt: '2026-09-08T09:00:00-07:00',
+      sourceTask: 'SYNTHETIC_REGRESSION_ONLY', season: 2026, week: 1, marketViewed: false,
+      cases: [{personnelEventId: `test-${kind}-return-event`, caseKey: `2026-W01-${team}-${player.replaceAll(' ', '-')}`,
+        gameKey, team, side, player, availabilityStatus: 'ACTIVE_FULL', resolutionStatus: 'RESOLVED_ACTIVE',
+        reason: 'Synthetic fixture, not a real availability assertion.', sourceRefs: ['https://example.com/fixture']}],
+    });
+    invoke('apply-graham-personnel-staging.mjs', ['test-personnel.json']);
+    sync();
+  };
+  try {
+    // Fixed historical fixture keeps this regression valid after active-week rollover.
+    activateLegacy(root);
+    writeJson(root, CONTRACT_PATH, contract);
+    stageAtlanta(root, `handoff-${kind}`, {bindingStatus: 'RESOLVED_CURRENT_STARTER', playerId: '20916'});
+    invoke('graham-schedule-authority.mjs', ['--path', boardPath, '--write']);
+    const gameKey = kind === 'personnel' ? '2026-W01-NO-DET' : '2026-W01-SF-LAR';
+    if (kind === 'matchup') {
+      activeReturn('Ricky Pearsall', 'SF', 'AWAY', gameKey);
+      run(root, ['--reconcile']);
+    }
+    invoke('validate-walters-qb-performance-production.mjs');
+    invoke('build-graham-current-week.mjs');
+    const publishedBefore = bytes(terminalPath);
+    const before = getGame(gameKey);
+    if (kind === 'personnel') activeReturn('Isiah Pacheco', 'DET', 'HOME', gameKey);
+    else {
+      // Freeze the accepted Week 1 committee fixture independently of later batches.
+      const historicalCase = readJson(root, 'data/walters/nfl/2026/week-01-personnel-ledger.json').events
+        .find(item => item.caseKey === '2026-W01-SF-Ricky-Pearsall' && item.resolutionStatus === 'RESOLVED_VALUE_INVARIANT_COMMITTEE');
+      assert.ok(historicalCase, 'accepted committee fixture must exist');
+      writeJson(root, 'test-matchup.json', {schema: 1, state: 'READY', marketViewed: false, season: 2026, week: 1, batchId: 'test-matchup-handoff',
+        effectiveAt: '2026-09-08T10:00:00-07:00', sourceTask: 'SYNTHETIC_REGRESSION_ONLY',
+        cases: [{...historicalCase, matchupEventId: 'test-matchup-handoff-event', personnelEventId: 'test-matchup-handoff-event',
+          productionClass: 'VALUE_INVARIANT_COMMITTEE',
+          committeeCandidates: historicalCase.committee.map(({player, eaPlayerId}) => ({player, eaPlayerId})),
+          reason: 'Synthetic replay of the accepted committee, not new research.'}],
+      });
+      invoke('apply-graham-matchup-production.mjs', ['test-matchup.json']);
+      sync();
+    }
+    const changed = getGame(gameKey);
+    assert.notEqual(changed.grahamExactFairHome, before.grahamExactFairHome, 'fixture must exercise a numeric change');
+    assert.equal(changed.qbPerformancePointsToHomeSpread, before.qbPerformancePointsToHomeSpread);
+    // Execute the same gate-then-build order as the terminal workflow.
+    const blocked = invoke('validate-walters-qb-performance-production.mjs', [], 1);
+    assert.match(blocked.stderr, new RegExp(`QB_TERM_ARITHMETIC_INVALID:${gameKey}`));
+    assert.equal(bytes(terminalPath), publishedBefore, 'stale QB state must leave the published feed intact');
+    const preservedPaths = ['data/walters/nfl/2026/week-01-personnel-ledger.json', 'data/walters/nfl/2026/week-01-research-ledger.json',
+      'data/walters/nfl/2026/week-01-daily-market-ledger.json', 'data/walters/nfl-power-ratings-ledger.json', PRODUCTION_PATH];
+    const preserved = preservedPaths.map(bytes);
+    run(root, ['--reconcile']);
+    invoke('validate-walters-qb-performance-production.mjs');
+    const reconciled = getGame(gameKey);
+    assert.equal(reconciled.grahamExactFairHome, changed.grahamExactFairHome);
+    assert.equal(reconciled.grahamFairHome, changed.grahamFairHome);
+    assert.ok(close(reconciled.qbPerformanceBaseExactFairHome + reconciled.qbPerformancePointsToHomeSpread, reconciled.grahamExactFairHome));
+    assert.equal(reconciled.adjustments.filter(item => item.type === 'QB_PERFORMANCE_PRODUCTION').length, 1);
+    assert.deepEqual(preservedPaths.map(bytes), preserved, 'reconciliation must preserve football evidence, market snapshots and fixed bindings');
+    invoke('build-graham-current-week.mjs');
+    assert.equal(readJson(root, terminalPath).games.find(game => game.gameKey === gameKey).grahamFairHome, changed.grahamFairHome);
+    const reconciledBytes = bytes(boardPath);
+    run(root, ['--reconcile']);
+    assert.equal(bytes(boardPath), reconciledBytes, 'duplicate completion must not add QB points again');
   } finally { fs.rmSync(root, {recursive: true, force: true}); }
 });
 
