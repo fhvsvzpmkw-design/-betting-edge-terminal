@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-03T11:38:00-07:00",
+  "lastAppliedAt": "2026-09-07T19:51:53+00:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -57,10 +57,8 @@
     "marketInputAllowed": false
   },
   "scope": {
-    "resolvedTeamCount": 31,
-    "excludedTeams": [
-      "ATL"
-    ],
+    "resolvedTeamCount": 32,
+    "excludedTeams": [],
     "failClosedGameWhenEitherTeamUnresolved": true
   },
   "teamBindings": [
@@ -108,29 +106,50 @@
     {
       "team": "ATL",
       "teamName": "Atlanta",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER_AND_BASELINE",
-      "currentStarterStatus": "UNRESOLVED_COMPETITION",
-      "currentStarterPlayer": null,
-      "embeddedBaselineStatus": "UNRESOLVED_COMPOSITE",
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "20916",
+        "gsisId": "00-0036212",
+        "playerName": "Tua Tagovailoa",
+        "candidateValue": 7.5,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "MEDIUM",
+        "evidenceDropbacks": 834
+      },
+      "embeddedBaselineStatus": "RESOLVED_VALUE_INVARIANT_COMPOSITE",
       "embeddedBaselinePlayer": null,
-      "approvedProductionStarterValue": null,
-      "embeddedBaselineQbValue": null,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
-      "failClosedCode": "UNRESOLVED_STARTER_OR_COMPOSITE_BASELINE",
+      "approvedProductionStarterValue": 7.5,
+      "embeddedBaselineQbValue": 7.5,
+      "teamQbDelta": 0,
+      "gameContributionEligible": true,
+      "failClosedCode": null,
       "evidence": {
-        "researchSweepSequence": 0,
-        "researchFinding": "Michael Penix Jr. is fully cleared, but Kevin Stefanski has kept the Week 1 QB competition with Tua Tagovailoa open. James Pearce Jr. is suspended into midseason and Jalon Walker is on IR with an ACL injury. The defensive-front losses justify a modest carried downgrade; QB uncertainty is kept matchup-specific.",
+        "researchFinding": "Official Atlanta reporting confirms Tagovailoa as the Week 1 starter, Rush as backup and Penix inactive. Apply the frozen candidate against the explicitly approved equal-prior composite baseline and retire only the resolved starter-identity penalty. Penix is not assumed fully healthy and no new health penalty is invented.",
         "sourceRefs": [
-          "data/walters/nfl/2026/week-01-research-ledger.json",
-          "core/staging/walters-nfl-seed-dataset-2026.json",
-          "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-          "data/walters/nfl/2026/week-01-research-ledger.json"
+          "https://www.atlantafalcons.com/news/kevin-stefanski-details-plan-for-quarterback-position-michael-penix-tua-tagovailoa",
+          "data/walters/nfl/qb-production/production-contract-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-02T19:16:51-07:00",
-      "marketViewed": false
+      "lastUpdatedAt": "2026-09-07T19:51:53+00:00",
+      "marketViewed": false,
+      "embeddedBaselineCandidates": [
+        {
+          "playerId": "14608",
+          "gsisId": "00-0039917",
+          "playerName": "Michael Penix Jr",
+          "priorValue": 7.5
+        },
+        {
+          "playerId": "20916",
+          "gsisId": "00-0036212",
+          "playerName": "Tua Tagovailoa",
+          "priorValue": 7.5
+        }
+      ],
+      "baselineScopeAmendmentId": "atlanta-qb-baseline-2026-09-07-v1",
+      "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
     },
     {
       "team": "BAL",
@@ -1374,10 +1393,27 @@
         "https://www.reuters.com/sports/raiders-coach-not-ready-name-starting-quarterback--flm-2026-08-28/"
       ],
       "marketViewed": false
+    },
+    {
+      "gameKey": "2026-W01-ATL-PIT",
+      "team": "ATL",
+      "side": "AWAY",
+      "adjustmentType": "QB_UNCERTAINTY",
+      "expectedPointsToHomeSpread": -0.5,
+      "disposition": "RETIRE_ON_CONFIRMED_STARTER",
+      "requiredStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "scopeAmendmentId": "atlanta-qb-baseline-2026-09-07-v1",
+      "retiredAt": "2026-09-07T19:51:53+00:00",
+      "retiredPointsToHomeSpread": -0.5,
+      "sourceRefs": [
+        "https://www.reuters.com/sports/falcons-qb1-battle-open-despite-michael-penix-jr-sitting-out-preseason--flm-2026-08-26/"
+      ],
+      "marketViewed": false
     }
   ],
   "processedBatchIds": [
-    "graham-daily-review-ind-starter-2026-w01-20260903T113800-0700"
+    "graham-daily-review-ind-starter-2026-w01-20260903T113800-0700",
+    "atlanta-qb-starter-2026-09-07-v1"
   ],
   "bindingUpdates": [
     {
@@ -1387,6 +1423,15 @@
         "IND"
       ],
       "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false
+    },
+    {
+      "batchId": "atlanta-qb-starter-2026-09-07-v1",
+      "effectiveAt": "2026-09-07T19:51:53+00:00",
+      "teams": [
+        "ATL"
+      ],
+      "sourceTask": "USER_APPROVED_ATLANTA_SCOPE_RECONCILIATION",
       "marketViewed": false
     }
   ],
@@ -1410,5 +1455,16 @@
     "automaticRollbackRequiresExactPostActivationBoardHash": true
   },
   "activationContract": "data/walters/nfl/qb-production/production-contract-v1.json",
-  "activationAudit": "data/walters/nfl/qb-production/activation-audit-v1.json"
+  "activationAudit": "data/walters/nfl/qb-production/activation-audit-v1.json",
+  "appliedScopeAmendments": [
+    {
+      "id": "atlanta-qb-baseline-2026-09-07-v1",
+      "effectiveAt": "2026-09-07T19:51:53+00:00",
+      "team": "ATL",
+      "baselineValue": 7.5,
+      "historicalStarterSelected": false,
+      "teamRatingReconstructed": false,
+      "marketViewed": false
+    }
+  ]
 }

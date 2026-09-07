@@ -7,7 +7,7 @@
   "week": 1,
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PRESERVED_PROVISIONAL",
-  "updatedAt": "2026-09-03T11:38:00-07:00",
+  "updatedAt": "2026-09-07T19:51:53+00:00",
   "lastResearchAt": "2026-09-02T18:49:44-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-01-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -514,9 +514,9 @@
       "away": "ATL",
       "home": "PIT",
       "startTimePacific": "2026-09-13T10:00:00-07:00",
-      "priorGrahamFairHome": -4,
-      "grahamFairHome": -4.5,
-      "grahamAsOf": "2026-09-01T22:35:38.520Z",
+      "priorGrahamFairHome": -4.5,
+      "grahamFairHome": -3.5,
+      "grahamAsOf": "2026-09-07T19:51:53+00:00",
       "numberStatus": "READY_PROVISIONAL_CUTDOWN_DELTA_REQUIRED",
       "informationStatus": "REVIEWED_GOVERNED_FAIR_PRESERVED",
       "adjustments": [
@@ -537,15 +537,31 @@
           "effectiveAt": "2026-09-01T22:35:38.520Z"
         },
         {
-          "type": "QB_UNCERTAINTY",
-          "pointsToHomeSpread": -0.5,
-          "reason": "Atlanta's Week 1 starter remains unresolved between Tua Tagovailoa and the recently cleared Michael Penix Jr.; charge the away side a half-point until the starter is named.",
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "ATL",
+          "homeTeam": "PIT",
+          "awayStarter": "Tua Tagovailoa",
+          "homeStarter": "Aaron Rodgers",
+          "awayTeamQbDelta": 0,
+          "homeTeamQbDelta": -0.75,
+          "pointsToHomeSpread": 0.75,
+          "reason": "Approved Walters QB performance differential: ATL 0.00 minus PIT -0.75 equals +0.75 points to the home-spread coordinate. Explicit resolved starter-identity uncertainty totaling -0.500 was retired once.",
           "sourceRefs": [
-            "https://www.reuters.com/sports/falcons-qb1-battle-open-despite-michael-penix-jr-sitting-out-preseason--flm-2026-08-26/"
-          ]
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "https://www.atlantafalcons.com/news/kevin-stefanski-details-plan-for-quarterback-position-michael-penix-tua-tagovailoa",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-09-07T19:51:53+00:00",
+          "marketViewed": false
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base -2.000; home field -2.082; other governed -0.500; pre-personnel exact -4.582; personnel +0.000; matchup +0.000; exact Graham home fair -4.582; displayed -4.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -2.000; home field -2.082; other governed +0.750; pre-personnel exact -3.332; personnel +0.000; matchup +0.000; exact Graham home fair -3.332; displayed -3.5.",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "https://www.reuters.com/sports/falcons-qb1-battle-open-despite-michael-penix-jr-sitting-out-preseason--flm-2026-08-26/",
@@ -557,12 +573,18 @@
         "https://www.atlantafalcons.com/news/atlanta-falcons-2026-roster",
         "data/walters/nfl/home-field/home-field-release-2026-v1.json",
         "data/walters/nfl/home-field/h3-week-01-shadow-result.json",
-        "data/walters/nfl/home-field/h3v-selective-venue-result-v1.json"
+        "data/walters/nfl/home-field/h3v-selective-venue-result-v1.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "https://www.atlantafalcons.com/news/kevin-stefanski-details-plan-for-quarterback-position-michael-penix-tua-tagovailoa",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "neutralBaseHome": -2,
       "espnFpiNeutralHome": -0.6,
       "lastInformationReviewAt": "2026-09-02T11:40:30-07:00",
-      "grahamExactFairHome": -4.582,
+      "grahamExactFairHome": -3.332,
       "personnelBaselineExactFairHome": -4.582,
       "personnelOverlayPointsToHomeSpread": 0,
       "personnelProductionId": "walters-personnel-production-v1",
@@ -589,18 +611,24 @@
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -2,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": -0.5,
-        "prePersonnelExactFairHome": -4.582,
+        "otherGovernedPointsToHomeSpread": 0.75,
+        "prePersonnelExactFairHome": -3.332,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -4.582,
-        "displayedFairHome": -4.5,
+        "exactFairHome": -3.332,
+        "displayedFairHome": -3.5,
         "arithmeticVerified": true
       },
-      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
-      "qbPerformanceFailClosedTeams": [
-        "ATL"
-      ]
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -4.082,
+      "qbPerformancePointsToHomeSpread": 0.75,
+      "qbPerformanceAwayTeamDelta": 0,
+      "qbPerformanceHomeTeamDelta": -0.75,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": -0.5,
+      "qbPerformanceLastAppliedAt": "2026-09-07T19:51:53+00:00"
     },
     {
       "gameKey": "2026-W01-CLE-JAX",
@@ -1996,16 +2024,12 @@
     "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
     "productionAuthority": true,
     "grahamWritesAllowed": true,
-    "approvedTeamCount": 31,
-    "currentResolvedTeamCount": 31,
-    "permanentlyExcludedTeams": [
-      "ATL"
-    ],
-    "currentFailClosedTeams": [
-      "ATL"
-    ],
-    "failClosedGameCount": 1,
-    "lastAppliedAt": "2026-09-03T11:38:00-07:00",
+    "approvedTeamCount": 32,
+    "currentResolvedTeamCount": 32,
+    "permanentlyExcludedTeams": [],
+    "currentFailClosedTeams": [],
+    "failClosedGameCount": 0,
+    "lastAppliedAt": "2026-09-07T19:51:53+00:00",
     "marketViewed": false,
     "postActivationCanaryState": "PENDING"
   }

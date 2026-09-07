@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
+import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
 
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/walters/nfl/qb-production/production-contract-v1.json';
@@ -30,7 +31,7 @@ const serialized = value => `${JSON.stringify(value, null, 2)}\n`;
 const sha256Buffer = value => crypto.createHash('sha256').update(value).digest('hex');
 const sha256File = file => sha256Buffer(fs.readFileSync(file));
 const round = (value, decimals = 3) => Number(Number(value).toFixed(decimals));
-const finite = value => Number.isFinite(Number(value));
+const finite = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
 const close = (left, right) => Math.abs(Number(left) - Number(right)) <= TOLERANCE;
 const unique = values => [...new Set(values.filter(Boolean))];
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -80,8 +81,6 @@ function validateContract() {
     contract.marketViewed !== false
   ) fail('CONTRACT_INVALID');
   if (
-    contract.productionScope?.resolvedTeamCount !== 31 ||
-    JSON.stringify(contract.productionScope?.excludedTeams) !== JSON.stringify(['ATL']) ||
     contract.productionScope?.failClosedGameWhenEitherTeamUnresolved !== true ||
     contract.productionScope?.grahamFairWritesAllowed !== true ||
     contract.productionScope?.embeddedBaselineWritesAllowed !== false ||
@@ -129,6 +128,7 @@ function validateContract() {
     reconciliation.summary?.eligibleForStage5ReplacementCount !== 1 ||
     reconciliation.summary?.preservedFailClosedCount !== 1
   ) fail('STAGE4_RECONCILIATION_HANDOFF_INVALID');
+  productionQbScope(contract, ROOT);
   return {contract, bindings, reconciliation};
 }
 
@@ -235,7 +235,7 @@ function buildInitialProduction(contract, bindings, active) {
   };
 }
 
-function validateProduction(production) {
+function validateProduction(production, contract) {
   if (
     production.schemaVersion !== 'walters-qb-performance-production-current-v1' ||
     production.module !== 'WALTERS_QB_PERFORMANCE' ||
@@ -251,18 +251,7 @@ function validateProduction(production) {
   ) fail('PRODUCTION_MANIFEST_INVALID');
   const bindings = production.teamBindings || [];
   const resolved = bindings.filter(binding => binding.bindingStatus === AUTHORITY_TOKEN);
-  const failClosed = bindings.filter(binding => binding.bindingStatus !== AUTHORITY_TOKEN);
-  const atlanta = bindings.find(binding => binding.team === 'ATL');
-  if (
-    bindings.length !== 32 ||
-    new Set(bindings.map(binding => binding.team)).size !== 32 ||
-    resolved.length > 31 ||
-    !atlanta ||
-    atlanta.bindingStatus === AUTHORITY_TOKEN ||
-    failClosed.length < 1
-  ) {
-    fail(`PRODUCTION_BINDING_SCOPE_INVALID:${bindings.length}:${resolved.length}:${failClosed.map(item => item.team).join(',')}`);
-  }
+  validateProductionQbScope(production, productionQbScope(contract, ROOT));
   for (const binding of resolved) {
     if (
       !finite(binding.approvedProductionStarterValue) ||
@@ -275,6 +264,29 @@ function validateProduction(production) {
     ) fail(`PRODUCTION_BINDING_ARITHMETIC_INVALID:${binding.team}`);
   }
   validateNoMarketTrue(production, 'production');
+}
+
+function applyScopeAmendments(production, contract, active) {
+  const scope = productionQbScope(contract, ROOT);
+  const amendment = scope.amendment;
+  if (!amendment || (production.appliedScopeAmendments || []).some(item => item.id === amendment.id)) return;
+  if (active.season !== 2026 || active.week !== 1) fail('ATLANTA_INITIAL_ADMISSION_REQUIRES_2026_WEEK1');
+  const atlanta = production.teamBindings.find(item => item.team === 'ATL');
+  if (!atlanta || atlanta.embeddedBaselineStatus !== 'UNRESOLVED_COMPOSITE' ||
+      atlanta.embeddedBaselineQbValue !== null || atlanta.embeddedBaselinePlayer !== null) {
+    fail('ATLANTA_AMENDMENT_PRIOR_STATE_INVALID');
+  }
+  Object.assign(atlanta, {
+    embeddedBaselineStatus: 'RESOLVED_VALUE_INVARIANT_COMPOSITE',
+    embeddedBaselineCandidates: scope.baselineCandidates,
+    embeddedBaselineQbValue: scope.baselineValue,
+    baselineScopeAmendmentId: amendment.id,
+  });
+  production.scope = {...production.scope, resolvedTeamCount: scope.approvedTeamCount, excludedTeams: scope.excludedTeams};
+  production.appliedScopeAmendments = [{id: amendment.id, effectiveAt: amendment.approvedAt,
+    team: 'ATL', baselineValue: scope.baselineValue, historicalStarterSelected: false,
+    teamRatingReconstructed: false, marketViewed: false}];
+  production.lastAppliedAt = amendment.approvedAt;
 }
 
 function candidateLookup(registry, identity) {
@@ -317,7 +329,7 @@ function applyStaging(production, staging, contract) {
     if (!item.team || !item.bindingStatus || !item.reason || !Array.isArray(item.sourceRefs) || item.sourceRefs.length === 0) {
       fail(`STAGING_CASE_INVALID:${item.team || 'UNKNOWN'}`);
     }
-    if (item.team === 'ATL' || contract.productionScope.excludedTeams.includes(item.team)) fail(`STAGING_TEAM_OUT_OF_SCOPE:${item.team}`);
+    if (contract.productionScope.excludedTeams.includes(item.team)) fail(`STAGING_TEAM_OUT_OF_SCOPE:${item.team}`);
     const prior = byTeam.get(item.team);
     if (!prior) fail(`STAGING_TEAM_UNKNOWN:${item.team}`);
 
@@ -339,7 +351,9 @@ function applyStaging(production, staging, contract) {
       if (candidate.status !== 'STAGE3_CANDIDATE_NON_OPERATIONAL' || !finite(candidate.candidateValue)) {
         fail(`STAGING_CANDIDATE_NOT_APPROVED_BY_FROZEN_MODEL:${candidate.playerName}`);
       }
-      if (!finite(prior.embeddedBaselineQbValue) || !prior.embeddedBaselinePlayer) fail(`STAGING_BASELINE_UNRESOLVED:${item.team}`);
+      const compositeResolved = prior.embeddedBaselineStatus === 'RESOLVED_VALUE_INVARIANT_COMPOSITE' &&
+        prior.baselineScopeAmendmentId === productionQbScope(contract, ROOT).amendment?.id;
+      if (!finite(prior.embeddedBaselineQbValue) || (!prior.embeddedBaselinePlayer && !compositeResolved)) fail(`STAGING_BASELINE_UNRESOLVED:${item.team}`);
       const delta = round(Number(candidate.candidateValue) - Number(prior.embeddedBaselineQbValue));
       Object.assign(prior, {
         bindingStatus: AUTHORITY_TOKEN,
@@ -438,6 +452,10 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     for (const rule of matchingRules) {
       const index = adjustments.findIndex(adjustment => adjustmentMatchesRetirementRule(adjustment, rule));
       if (index < 0) continue;
+      const ruleBinding = bindings.get(rule.team);
+      if (rule.requiredStarterStatus && ruleBinding?.currentStarterStatus !== rule.requiredStarterStatus) {
+        fail(`RETIREMENT_REQUIRES_CONFIRMED_STARTER:${rule.team}`);
+      }
       const [removed] = adjustments.splice(index, 1);
       retiredNow.push({
         ...rule,
@@ -460,6 +478,21 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     const baseExactFairHome = round(priorExact - priorQbPoints - retiredNowPoints);
     const exactFairHome = round(baseExactFairHome + pointsToHomeSpread);
     const displayedFairHome = roundHalf(exactFairHome);
+    // A different team's staging batch must not restamp unchanged game evidence.
+    const unchanged = game.qbPerformanceStatus === 'OPERATIONAL_SCOPED_APPLIED' &&
+      priorQbAdjustments.length === 1 && !retiredNow.length && close(priorExact, exactFairHome) &&
+      close(game.qbPerformanceBaseExactFairHome, baseExactFairHome) &&
+      priorQbAdjustments[0].awayStarter === awayBinding.currentStarterPlayer.playerName &&
+      priorQbAdjustments[0].homeStarter === homeBinding.currentStarterPlayer.playerName &&
+      close(priorQbPoints, pointsToHomeSpread);
+    if (unchanged) {
+      gameResults.push({gameKey: game.gameKey, status: 'OPERATIONAL_SCOPED_APPLIED',
+        priorExactFairHome: priorExact, baseExactFairHome, exactFairHome,
+        priorDisplayedFairHome: priorDisplayed, displayedFairHome, pointsToHomeSpread,
+        awayTeamQbDelta: Number(awayBinding.teamQbDelta), homeTeamQbDelta: Number(homeBinding.teamQbDelta),
+        retiredStarterIdentityOverlayPoints: persistentRetiredPoints, displayedChanged: false});
+      continue;
+    }
     const sourceRefs = unique([
       CONTRACT_PATH,
       production.sourceAuthority.model.path,
@@ -535,9 +568,9 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     authorityToken: AUTHORITY_TOKEN,
     productionAuthority: true,
     grahamWritesAllowed: true,
-    approvedTeamCount: 31,
+    approvedTeamCount: contract.productionScope.resolvedTeamCount,
     currentResolvedTeamCount: resolvedTeamCount,
-    permanentlyExcludedTeams: ['ATL'],
+    permanentlyExcludedTeams: [...contract.productionScope.excludedTeams],
     currentFailClosedTeams: failClosedTeams,
     failClosedGameCount: gameResults.filter(item => item.status === 'FAIL_CLOSED_GAME_PRESERVED').length,
     lastAppliedAt: effectiveAt,
@@ -574,7 +607,7 @@ function validateBoard(board, production, contract) {
     const home = bindings.get(game.home);
     const adjustments = (game.adjustments || []).filter(adjustment => adjustment.type === QB_ADJUSTMENT_TYPE);
     if (!bindingResolved(away) || !bindingResolved(home)) {
-      if (game.gameKey === '2026-W01-ATL-PIT' && adjustments.length !== 0) fail('ATLANTA_QB_ADJUSTMENT_NOT_FAIL_CLOSED');
+      if (contract.productionScope.excludedTeams.includes('ATL') && game.gameKey === '2026-W01-ATL-PIT' && adjustments.length !== 0) fail('ATLANTA_QB_ADJUSTMENT_NOT_FAIL_CLOSED');
       if (game.qbPerformanceStatus !== 'FAIL_CLOSED_GAME_PRESERVED') fail(`FAIL_CLOSED_GAME_STATUS_MISSING:${game.gameKey}`);
       continue;
     }
@@ -610,7 +643,8 @@ function activateOrReconcile(mode, stagingPath) {
   let initialActivation = false;
   if (fs.existsSync(absolute(PRODUCTION_PATH))) {
     production = readJson(absolute(PRODUCTION_PATH));
-    validateProduction(production);
+    applyScopeAmendments(production, contract, active);
+    validateProduction(production, contract);
   } else {
     if (mode !== 'activate') fail('PRODUCTION_MANIFEST_MISSING_USE_ACTIVATE');
     production = buildInitialProduction(contract, bindings, active);
@@ -647,7 +681,7 @@ function activateOrReconcile(mode, stagingPath) {
 
   const board = clone(boardBefore);
   const gameResults = applyProductionToBoard(board, production, contract, effectiveAt);
-  validateProduction(production);
+  validateProduction(production, contract);
   validateBoard(board, production, contract);
   const afterProtected = protectedArtifactHashes(active);
   if (JSON.stringify(beforeProtected) !== JSON.stringify(afterProtected)) fail('PROTECTED_ARTIFACT_CHANGED');
@@ -736,7 +770,7 @@ function checkCurrent() {
   if (!fs.existsSync(absolute(PRODUCTION_PATH))) fail('PRODUCTION_MANIFEST_MISSING');
   const production = readJson(absolute(PRODUCTION_PATH));
   const board = readJson(active.absolutePaths.currentNumbers);
-  validateProduction(production);
+  validateProduction(production, contract);
   validateBoard(board, production, contract);
   if (!fs.existsSync(absolute(AUDIT_PATH)) || !fs.existsSync(absolute(ROLLBACK_PATH))) fail('ACTIVATION_EVIDENCE_MISSING');
   const audit = readJson(absolute(AUDIT_PATH));
@@ -763,7 +797,7 @@ function rollback() {
   const {contract} = validateContract();
   const active = resolveGrahamActiveWeek({root: ROOT, requireFiles: true});
   const production = readJson(absolute(PRODUCTION_PATH));
-  validateProduction(production);
+  validateProduction(production, contract);
   const audit = readJson(absolute(AUDIT_PATH));
   const snapshot = readJson(absolute(ROLLBACK_PATH));
   const currentHash = sha256File(active.absolutePaths.currentNumbers);

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
 
 const ROOT = process.cwd();
 const authorityPath = path.join(ROOT, 'GRAHAM_DELTA_1645_AUTHORITY.md');
@@ -85,11 +86,11 @@ if (
   qbProduction.productionAuthority !== true ||
   qbProduction.grahamWritesAllowed !== true ||
   qbProduction.marketViewed !== false ||
-  qbProduction.teamBindings?.length !== 32 ||
-  qbProduction.teamBindings?.find(item => item.team === 'ATL')?.bindingStatus === 'APPROVED_WALTERS_QB_PERFORMANCE'
+  qbProduction.teamBindings?.length !== 32
 ) {
   throw new Error('GRAHAM_DELTA_1645_QB_PRODUCTION_BOUNDARY_INVALID');
 }
+validateProductionQbScope(qbProduction, productionQbScope(qbContract, ROOT));
 if (
   delta?.time !== '16:45' ||
   delta?.rrule !== 'FREQ=WEEKLY;BYDAY=TU,WE,TH,FR,SA;BYHOUR=16;BYMINUTE=45;BYSECOND=0'
