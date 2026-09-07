@@ -54,9 +54,19 @@ Apply the dated amendments to their stated scope. The Contract's market-derived 
 Bind the exact `data/live-odds.json` snapshot for this lane. Enforce all Contract gates, including:
 - maximum 75-minute feed freshness;
 - maximum 30-minute executable quote age at feed generation: use `market.observedAt` for `quoteObservationVersion: 1`, and the original `market.updatedAt` rule only for legacy feeds;
-- scheduleMeta compatibility with the permanent Main Betting Edge slot;
+- scheduleMeta compatibility under the manual-snapshot binding rule below;
 - exact event, market, line, side and selection identity;
 - Bet365 and DraftKings as supported executable books.
+
+### Manual-snapshot binding — September 7 clarification
+
+The report task's `EXPECTED_REPORT_TIME` and the permanent Main schedule determine the report lane. The odds refresh trigger records collection provenance; it does not determine whether otherwise valid odds may be analyzed.
+
+A snapshot explicitly marked `scheduleMeta.triggerSource: manual` is eligible for any resolved Main report lane when its actual generation time is on the report's Vancouver operating date and it passes all normal feed freshness, exact-quote observation, identity and event-eligibility gates. Missing/null `canonicalSlot` and `plannedReportTime`, and the normal `MANUAL` pulse/slot markers, are expected for a manual refresh and must not cause a preflight block. Resolve the report's canonical slot, scheduled pulse/report times, label and featured metadata from section 1. Preserve the exact source feed bytes, blob SHA, timestamps and manual trigger provenance; never restamp or relabel the snapshot as an automatic scheduled pulse.
+
+For an automatic snapshot, continue requiring its declared schedule identity to match the resolved lane. Conflicting non-manual slot identities, unknown/invalid trigger provenance, stale/future feeds and unsafe quotes remain subject to the existing gates. Do not infer a missed/delayed automatic pulse merely because the bound snapshot is manual, or request replacement odds solely to obtain schedule metadata.
+
+A user-requested recovery retains the original canonical report lane, appends `— RECOVERY` to its display label and uses the actual issue time. It follows the same analysis, staged-publisher and durable read-back requirements; no backdating or direct History writes are permitted.
 
 Apply Contract section 4.0a and `docs/ODDS_OBSERVATION_FRESHNESS.md`. A new-format feed has `collectionStartedAt`, a completed-snapshot `generatedAt`, and market-level `observedAt` recorded from each successful exact response. Preserve the provider's `updatedAt` as last-change provenance. Missing, invalid or future observations cannot be replaced with another timestamp. The existing 90-minute retention horizon uses observation age. Missing/suspended quotes in the latest successful requested scope remain unavailable; older copies cannot supply them. Do not manually restamp feed data or count an unchanged re-observation as movement. Validation, coverage explanations, meters and lineage must agree on the bound feed's clock; legacy issued snapshots retain their original interpretation.
 
