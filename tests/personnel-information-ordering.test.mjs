@@ -77,7 +77,7 @@ requireOrder(
   contract,
   [
     '3. Stage 1 Material Information Scan over the eligible current slate',
-    '4. provisional independent current handicap, fair-value construction and value screen using the Stage 1 information',
+    '4. provisional independent current handicap and value screen using the Stage 1 information; from the September 7 source-first amendment, retrieve and verify the applicable sourced fair estimate under section 4.1',
     '5. Stage 2 Deep Personnel Sweep for serious candidates',
     '6. apply material Stage 2 findings back into the current handicap',
     '7. Research Fit read-only pass'
