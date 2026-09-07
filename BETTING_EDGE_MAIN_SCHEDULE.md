@@ -102,6 +102,8 @@ The legacy `scheduleProfileId`, `scheduleProfileLabel` and `scheduleProfileSchem
 
 Odds snapshots use `scheduleMeta` for corresponding schedule/pulse provenance. Existing automatic snapshots may identify `triggerSource: cloudflare-cron`; intentional manual refreshes identify `triggerSource: manual`.
 
+Manual refreshes remain valid report inputs under the normal freshness, exact-quote, identity and event-eligibility gates. Their null canonical slot/planned report time and `MANUAL` markers describe collection provenance, not a report-lane prohibition. The scheduled task resolves its own lane from its expected report time and this Main schedule, while retaining the source feed unchanged. Apply the manual-snapshot binding rule in `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` section 3.
+
 ## VigScope
 
 The Main schedule marks exactly three canonical slots as featured VigScope checkpoints. This does not choose or improve the VigScope state. The displayed state remains derived from actual Market Heat, Price Pressure and Market Agreement inputs. Schedule metadata controls only which three daily readings receive featured checkpoint treatment in the terminal and History.

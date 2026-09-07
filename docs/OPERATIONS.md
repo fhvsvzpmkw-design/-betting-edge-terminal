@@ -34,7 +34,7 @@ Every standard report trigger performs these steps in order:
 1. **Main schedule gate.** Read `BETTING_EDGE_MAIN_SCHEDULE.md` and `data/main-schedule.json`. If the trigger is not one of the five permanent report times, exit before analysis/history.
 2. **Contract/Core preflight.** Require Contract v1.0 OPERATIONAL and `core/core-v1.4-production.json` Core v1.4 OPERATIONAL. Resolve exact current Core framework and provenance identities.
 3. **Research/Walters/personnel authority.** Resolve Research v1.8, `BETTING_EDGE_PERSONNEL_SWEEP.md`, Walters interface and current Walters authority mode.
-4. **Live-feed validation.** Bind the exact `data/live-odds.json` snapshot and enforce scheduleMeta, feed/quote freshness and exact Bet365/DraftKings identity.
+4. **Live-feed validation.** Bind the exact `data/live-odds.json` snapshot and enforce feed/quote freshness and exact Bet365/DraftKings identity. Apply the shared scheduled authority's manual-snapshot binding rule: valid same-day manual refreshes may supply a scheduled report, whose lane comes from the task's expected time and Main schedule. Preserve manual feed provenance; automatic snapshots still require matching schedule identity.
 5. **Stage 1 handicap.** Perform broad current-information research and independent matchup/model work before finalizing provisional fair value.
 6. **Stage 2 personnel.** Where materially personnel-sensitive, perform the required deeper source sweep and explicit re-handicap.
 7. **Core 1.4 model-error pass.** Build `coreAssessment`, derive applicable fixed Research graduation IDs and recompute model-error state/eligibility. Market/book disagreement alone is not a WAIT.
