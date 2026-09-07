@@ -24,6 +24,9 @@ const state=await page.evaluate(()=>({
   decisionBox:Boolean(document.getElementById('resultsDecisionValueBox')),
   pizzaBox:Boolean(document.getElementById('resultsPizzaValueBox')),
   modelBox:Boolean(document.getElementById('resultsModelCalibrationBox')),
+  playerHero:Boolean(document.querySelector('#engine .valueGrid,#engine .actualPlayerCash')),
+  betCard:Boolean(document.querySelector('[data-why-status="BET"]')),
+  whyCards:document.querySelectorAll('.whyProofCard').length,
   whyHeading:[...document.querySelectorAll('#engine.resultsDesk .resultsSection')].some(x=>String(x.textContent||'').includes('WHY VIGSCOPE MATTERS')),
   cardLog:Boolean([...document.querySelectorAll('#engine.resultsDesk .resultsSection')].some(x=>/ISSUED CARD LOG|UNIQUE SELECTION LOG/.test(String(x.textContent||'')))),
   iframeCount:document.querySelectorAll('iframe').length,
@@ -45,7 +48,9 @@ const fail=message=>{throw new Error(message)};
 if(state.primaryView!=='engine')fail('VigScope Value did not open in the primary shell');
 if(!state.valueDesk)fail('VigScope Value desk missing');
 if(!state.valueTitle)fail('VigScope Value title missing');
-if(!state.decisionBox||!state.pizzaBox||!state.modelBox||!state.whyHeading||!state.cardLog)fail('Value overlays did not finish rendering');
+if(!state.decisionBox||!state.pizzaBox||!state.betCard||!state.whyHeading||!state.cardLog)fail('Value overlays did not finish rendering');
+if(state.modelBox||state.playerHero)fail('removed Value sections reappeared');
+if(state.whyCards!==6)fail('expanded Why VigScope Matters cards missing');
 if(state.iframeCount!==0)fail('application iframe reappeared');
 if(state.scrollHeight<=state.viewport+100)fail('Value page is not scrollable');
 if(down<100||secondDown<100)fail('native Value-page scroll did not move');
