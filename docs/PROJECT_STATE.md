@@ -1,10 +1,14 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-09-07 — Graham publication/QB reconciliation handoff
+**Last updated:** 2026-09-07 — Graham terminal renamed The Private Line
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
+
+## September 7 Graham publication name
+
+Graham Mercer’s terminal is now **The Private Line**, replacing The Nineteenth Hole at the user’s direction. The live masthead, browser title, directory and slot labels, character profile, shell, current publication metadata, feed builder and forward publishing references use the new name. Graham’s identity, routes, calculations, schedules and green-and-gold presentation remain unchanged. Historical rollback snapshots retain their original publication metadata.
 
 ## September 7 automatic Graham publication handoff
 
