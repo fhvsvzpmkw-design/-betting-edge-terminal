@@ -1,0 +1,87 @@
+name: Isolated Betting Edge card grading 2026-09-07
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-07.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-2026-09-07
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Grade Sep 6 issued cards and retry older unresolved cards
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const src='.github/workflows/card-grading-2026-09-06.yml';
+          const s=fs.readFileSync(src,'utf8');
+          const marker="          node - <<'NODE'\n";
+          const a=s.indexOf(marker);
+          if(a<0) throw Error('grader heredoc start not found');
+          const b=s.indexOf('\n          NODE',a+marker.length);
+          if(b<0) throw Error('grader heredoc end not found');
+          let body=s.slice(a+marker.length,b).split('\n').map(line=>line.startsWith('          ')?line.slice(10):line).join('\n');
+          const old="const TARGET_DATE='2026-09-05';";
+          if(!body.includes(old)) throw Error('prior TARGET_DATE token not found');
+          body=body.replace(old,"const TARGET_DATE='2026-09-06';");
+          fs.writeFileSync('/tmp/card-grader.js',body+'\n');
+          NODE
+          node --check /tmp/card-grader.js
+          node /tmp/card-grader.js
+
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify schema, coverage and strict isolation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const root='data/history/observations/2026-09-06';
+          const files=fs.readdirSync(root).filter(f=>f.endsWith('.json')).sort();
+          if(files.length!==5) throw Error(`expected 5 Sep 6 observation files, found ${files.length}`);
+          let cards=0,complete=0,unresolved=0;
+          for(const f of files){
+            const j=JSON.parse(fs.readFileSync(path.join(root,f),'utf8'));
+            if(j.schemaVersion!==1||j.kind!=='issued-card-observations'||!Array.isArray(j.recommendations)) throw Error(`bad observation schema ${f}`);
+            for(const r of j.recommendations){cards++;if(r.completion?.state==='complete')complete++;else if(r.completion?.state==='unresolved')unresolved++;else throw Error(`bad state ${f}`);}
+          }
+          const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          if(idx.coverage?.lastDate!=='2026-09-06') throw Error(`results index lastDate ${idx.coverage?.lastDate}`);
+          console.log(`OBSERVATIONS: cards=${cards} complete=${complete} unresolved=${unresolved}`);
+          console.log(`RESULTS INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents} lastDate=${idx.coverage?.lastDate}`);
+          console.log(`PRICE ANALYTICS: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit historical grading outputs only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations data/history/results-index.json
+          if git diff --cached --quiet; then
+            echo "No historical grading changes to commit"
+            exit 0
+          fi
+          git commit -m "Grade Sep 6 Betting Edge cards and refresh results index"
+          git pull --rebase origin main
+          git push origin main
