@@ -5,6 +5,7 @@ This directory contains durable, human-readable source material used to inform B
 ## Stanford Wong — *Sharp Sports Betting*
 
 - [Applied research notes and verified equations](sharp-sports-betting-methods.md)
+- [Full chapter review, corrections and quantitative audit](../SHARP_SPORTS_BETTING_FULL_REVIEW_2026-09-07.md)
 - [First application: Angels–Red Sox moneyline](../SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md)
 
 These original notes derive from the user-supplied EPUB, whose identity and chapter/section locators are recorded in the guide. The full book remains outside the public repository. The notes support the current research workflow through shared scheduled authority section 6; they introduce no numerical model, betting authority, Research Library graduation or historical report changes.
