@@ -20,6 +20,8 @@ This structure is intended to prevent two opposite errors:
 
 An officially unconfirmed lineup, starter, batting order, goalie or participant is the beginning of the information process, not the end of it.
 
+**Source-first fair-value alignment — forward from `2026-09-07T18:15:00-07:00`:** the report retrieves published fair estimates under Contract section 4.1 and shared scheduled authority section 6. Both research stages below remain required on their existing materiality basis. Verify that the adopted projection applies to the current roster, confirmed/projected lineup, starter, injuries, scratches, roles and availability; MLB includes the available bullpen. Distinguish known model assumptions from assumptions the provider has not disclosed. Re-handicapping here includes seeking an updated applicable source projection, reassessing uncertainty and deciding whether the estimate remains usable; it does not require creating an in-house model. Material news absent from the projection requires an updated applicable estimate or explicit bounded uncertainty/limitation. Avoid adding an adjustment for information already incorporated. Retain the existing official/fallback sources, closing check and pre-/post-Stage-2 evidence, including a justified `NO MATERIAL CHANGE` where appropriate.
+
 ## Stage 1 — Material Information Scan
 
 After live-feed/data validity, event/market/selection identity and basic executable-price eligibility have been established, but **before the provisional fair-value/value screen**, perform a current-information scan across the eligible slate where personnel could materially affect the priced market.
