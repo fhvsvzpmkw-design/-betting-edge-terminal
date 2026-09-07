@@ -343,9 +343,95 @@ export function derivePrimarySelectionInventory(report, feed, policy) {
 const PRIMARY_BLOCKER_REASONS = new Set(['SOURCE_UNAVAILABLE', 'FAIR_MODEL_UNAVAILABLE', 'PERSONNEL_UNRESOLVED', 'CALIBRATION_UNAVAILABLE', 'CONFLICTING_EVIDENCE', 'RESEARCH_INCOMPLETE']);
 export const PARTIAL_RESEARCH_FROM = '2026-09-06T18:15:00-07:00';
 
+// Read indexed issued work as historical context only. Never copy its receipts
+// into the current draft or grant current evaluation credit for an earlier run.
+export function loadPriorPrimaryResearch(root, report, inventory) {
+  const bySelection = new Map(), warnings = [];
+  const wanted = new Set(inventory.selections.map(item => item.selectionId));
+  const date = localDateKey(report.ts, 'America/Vancouver');
+  const indexPath = path.join(root, 'run-history.json');
+  if (!fs.existsSync(indexPath)) return {bySelection, warnings: ['Run history unavailable; start current research without inherited context.']};
+  const entries = (readJson(indexPath).runs || []).filter(entry =>
+    parseMs(entry.ts) !== null && parseMs(entry.ts) < parseMs(report.ts) &&
+    localDateKey(entry.ts, 'America/Vancouver') === date
+  ).sort((a, b) => parseMs(b.ts) - parseMs(a.ts));
+  for (const entry of entries) {
+    if ([...wanted].every(id => bySelection.has(id))) break;
+    try {
+      ensure(new RegExp(`^data/history/runs/${date}/[a-z0-9_-]+\\.json$`).test(entry.path || ''), 'invalid indexed report path');
+      ensure(entry.researchFitPath === entry.path.replace('/runs/', '/research-fit/'), 'invalid indexed research path');
+      const reportBytes = fs.readFileSync(path.join(root, entry.path));
+      const sidecarBytes = fs.readFileSync(path.join(root, entry.researchFitPath));
+      const priorReport = JSON.parse(reportBytes), priorSidecar = JSON.parse(sidecarBytes);
+      const reference = priorSidecar.reportReference;
+      ensure(priorReport.ts === entry.ts && priorReport.slot === entry.slot &&
+        priorReport.feedGeneratedAt === entry.feedGeneratedAt &&
+        reference?.ts === entry.ts && reference.slot === entry.slot &&
+        reference.reportPath === entry.path && reference.feedGeneratedAt === entry.feedGeneratedAt &&
+        priorSidecar.provenance?.feedBlobSha === entry.feedBlobSha &&
+        priorSidecar.primaryAnalysis?.feedGeneratedAt === entry.feedGeneratedAt &&
+        Array.isArray(priorSidecar.primaryAnalysis.receipts), 'indexed report/sidecar binding mismatch');
+      const source = {reportPath: entry.path, sidecarPath: entry.researchFitPath, ts: entry.ts,
+        feedGeneratedAt: entry.feedGeneratedAt, feedBlobSha: entry.feedBlobSha,
+        reportBlobSha: gitBlobSha(reportBytes), sidecarBlobSha: gitBlobSha(sidecarBytes)};
+      const receipts = priorSidecar.primaryAnalysis.receipts;
+      const candidates = [];
+      for (const receipt of receipts) {
+        if (!wanted.has(receipt?.selectionId) || bySelection.has(receipt.selectionId)) continue;
+        ensure(receipts.filter(item => item.selectionId === receipt.selectionId).length === 1, 'duplicate prior selection receipt');
+        const [, id, detail, side] = receipt.selectionId.split('|');
+        const expectedMarket = detail === 'full_game_moneyline' ? 'ml' : detail === 'full_game_primary_total' ? 'totals' : 'spread';
+        ensure(receipt.quote?.eventId === id && receipt.quote.side === side && receipt.quote.marketKey === expectedMarket &&
+          ['BLOCKED', 'EVALUATED'].includes(receipt.state), 'prior receipt identity mismatch');
+        candidates.push([receipt.selectionId, {source, receipt: structuredClone(receipt)}]);
+      }
+      for (const [id, context] of candidates) bySelection.set(id, context);
+    } catch (error) {
+      warnings.push(`${entry.path || entry.ts}: ${error.message}; unavailable context must be researched afresh.`);
+    }
+  }
+  return {bySelection, warnings};
+}
+
+function researchContext(prior, selection) {
+  if (!prior) return null;
+  const {receipt, source} = prior;
+  const personnel = receipt.decision?.personnelEvidence || receipt.evidence?.personnelEvidence;
+  return {
+    source, authority: 'HISTORICAL_CONTEXT_ONLY', requiresCurrentReview: true,
+    state: receipt.state, priorQuote: receipt.quote,
+    primaryLineChanged: !selection.quotes.some(quote => quote.line === receipt.quote.line),
+    ...(receipt.blocker ? {blocker: {reason: receipt.blocker.reason, missing: receipt.blocker.missing,
+      impact: receipt.blocker.impact, checkedAt: receipt.blocker.checkedAt, progress: receipt.blocker.progress}} : {}),
+    ...(receipt.state === 'EVALUATED' ? {
+      priorStatus: receipt.decision?.status,
+      priorFair: receipt.decision?.fair, priorPlayTo: receipt.decision?.playTo,
+      personnelDependency: personnel ? {target: personnel.dependencyTarget, state: personnel.personnelState,
+        unresolved: personnel.unresolved, decisionSensitivity: personnel.decisionSensitivity} : null
+    } : {})
+  };
+}
+
+function addSharedResearch(event, receipt, source, historical) {
+  const findings = [
+    ...(receipt?.blocker?.attempts || []).map(item => ({...item, kind: 'ATTEMPT'})),
+    ...(receipt?.decision?.sourceEvidence || receipt?.evidence?.sourceEvidence || [])
+  ];
+  for (const finding of findings) {
+    if (String(finding.eventId) !== event.eventId) continue;
+    const key = JSON.stringify([finding.url, finding.checkedAt, finding.finding, finding.kind]);
+    if (!event.sharedResearch.has(key)) event.sharedResearch.set(key, {
+      ...finding, historical, requiresCurrentReview: historical, source,
+      selectionIds: []
+    });
+    const ids = event.sharedResearch.get(key).selectionIds;
+    if (!ids.includes(receipt.selectionId)) ids.push(receipt.selectionId);
+  }
+}
+
 // A working queue derived from the existing inventory and draft receipts. It
 // neither creates research evidence nor certifies the recorded decisions.
-export function buildPrimaryResearchPlan(report, sidecar, inventory) {
+export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResearch = {bySelection: new Map(), warnings: []}) {
   const receipts = sidecar?.primaryAnalysis?.receipts || [];
   const analysisBound = sidecar?.primaryAnalysis?.feedGeneratedAt === report.feedGeneratedAt;
   const events = new Map();
@@ -354,6 +440,7 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory) {
     const matches = receipts.filter(receipt => receipt?.selectionId === selection.selectionId);
     const receipt = matches.length === 1 ? matches[0] : null;
     const bound = analysisBound && receipt && selection.quotes.some(quote => sameQuote(receipt.quote, quote));
+    const inherited = researchContext(priorResearch.bySelection.get(selection.selectionId), selection);
     let state = 'RESEARCH_PENDING', nextAction = 'START_STAGE_1';
     if (matches.length > 1 || (receipt && !bound)) nextAction = 'RECONCILE_EXACT_RECEIPT';
     else if (bound && receipt.state === 'EVALUATED') state = 'EVALUATED_RECORDED';
@@ -361,31 +448,42 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory) {
       if (receipt.blocker.reason === 'RESEARCH_INCOMPLETE') nextAction = 'RESUME_RESEARCH';
       else state = 'BLOCKER_RECORDED';
     }
+    if (!matches.length && inherited) nextAction = inherited.state === 'EVALUATED' ? 'REVALIDATE_PRIOR_RESEARCH' : 'RESUME_PRIOR_RESEARCH';
     if (state === 'RESEARCH_PENDING') counts.pending++;
     else if (state === 'EVALUATED_RECORDED') counts.evaluatedRecorded++;
     else counts.blockersRecorded++;
     const eventKey = `${selection.sport}|${selection.eventId}`;
-    if (!events.has(eventKey)) events.set(eventKey, {sport: selection.sport, eventId: selection.eventId, eventDate: selection.eventDate, markets: new Map()});
+    if (!events.has(eventKey)) events.set(eventKey, {sport: selection.sport, eventId: selection.eventId, eventDate: selection.eventDate, markets: new Map(), sharedResearch: new Map()});
     const event = events.get(eventKey);
+    if (bound) addSharedResearch(event, receipt, {ts: report.ts, feedGeneratedAt: report.feedGeneratedAt}, false);
+    if (inherited) addSharedResearch(event, priorResearch.bySelection.get(selection.selectionId).receipt, inherited.source, true);
     if (!event.markets.has(selection.marketDetail)) event.markets.set(selection.marketDetail, {marketDetail: selection.marketDetail, selections: []});
     event.markets.get(selection.marketDetail).selections.push({
       selectionId: selection.selectionId, side: selection.side, quotes: selection.quotes, state,
       nextAction: state === 'RESEARCH_PENDING' ? nextAction : 'VALIDATE_RECORDED_OUTCOME',
-      ...(bound && receipt.blocker ? {missing: receipt.blocker.missing, impact: receipt.blocker.impact, attempts: receipt.blocker.attempts} : {})
+      ...(inherited ? {priorResearch: inherited} : {}),
+      ...(bound && receipt.blocker ? {missing: receipt.blocker.missing, impact: receipt.blocker.impact, attempts: receipt.blocker.attempts} : {}),
+      ...(state === 'RESEARCH_PENDING' ? {remainingWork: structuredClone((bound ? receipt.blocker : inherited?.blocker)?.progress || {
+        stage: 'UNSPECIFIED', nextStep: 'Identify the exact missing evidence or unfinished calculation from the recorded attempts; do not infer research completion.',
+        stoppingReason: null
+      })} : {})
     });
   }
   return {
     feedGeneratedAt: report.feedGeneratedAt,
     state: counts.pending ? 'RESEARCH_PENDING' : 'READY_FOR_VALIDATION',
     counts,
+    handoff: {matchedSelections: inventory.selections.filter(item => priorResearch.bySelection.has(item.selectionId)).length,
+      warnings: priorResearch.warnings, authority: 'HISTORICAL_CONTEXT_ONLY'},
     workflow: [
-      'Stage 1: research current performance, matchup, material personnel and conditions; share relevant event facts.',
+      'Stage 1: scan every eligible event for current performance, matchup, personnel and conditions before concentrating deep research; share relevant facts across markets.',
+      'Review priorResearch with original source times. Recheck changing facts and exact current quotes; old decisions and fairs never count as current evaluation.',
       'Construct a supported provisional fair and range for each exact market; use applicable governed work or explain a defensible market-anchored derivation.',
       'Resolve material unknowns with targeted fallback research, including Stage 2 source depth and closing recheck when required; re-handicap.',
       'Grade both opposing selections coherently. Record actual evidence and decision, or a genuine terminal limitation after attempted alternatives.',
       'Continue pending work; publish validated decisions with explicit unfinished-selection accounting if work remains at delivery. All decision evidence/Core/coverage/bundle validators still apply.'
     ],
-    events: [...events.values()].sort((a, b) => Date.parse(a.eventDate) - Date.parse(b.eventDate) || a.eventId.localeCompare(b.eventId)).map(event => ({...event, markets: [...event.markets.values()]}))
+    events: [...events.values()].sort((a, b) => Date.parse(a.eventDate) - Date.parse(b.eventDate) || a.eventId.localeCompare(b.eventId)).map(event => ({...event, sharedResearch: [...event.sharedResearch.values()], markets: [...event.markets.values()]}))
   };
 }
 
@@ -1024,7 +1122,22 @@ function main() {
     const feed = loadBoundFeed(root, report, sidecar, args.feed || null);
     const {policy} = authority(root);
     const inventory = derivePrimarySelectionInventory(report, feed, policy);
-    console.log(JSON.stringify(buildPrimaryResearchPlan(report, sidecar, inventory), null, 2));
+    const priorResearch = loadPriorPrimaryResearch(root, report, inventory);
+    const plan = buildPrimaryResearchPlan(report, sidecar, inventory, priorResearch);
+    if (args.eventId) {
+      plan.events = plan.events.filter(event => event.eventId === String(args.eventId));
+      ensure(plan.events.length === 1, 'Requested event-id is not uniquely available in the current inventory');
+      plan.outputScope = {eventId: String(args.eventId), countsScope: 'FULL_CURRENT_INVENTORY'};
+    }
+    if (args.summary) {
+      plan.events = plan.events.map(event => ({sport: event.sport, eventId: event.eventId, eventDate: event.eventDate,
+        sharedFindingCount: event.sharedResearch.length,
+        markets: event.markets.map(market => ({marketDetail: market.marketDetail,
+          selections: market.selections.map(selection => ({selectionId: selection.selectionId, state: selection.state,
+            nextAction: selection.nextAction, remainingStage: selection.remainingWork?.stage,
+            priorRunTs: selection.priorResearch?.source.ts}))}))}));
+    }
+    console.log(JSON.stringify(plan, null, 2));
     return;
   }
   const result = validateCoverageAudit(report, sidecar, { root, feedFile: args.feed || null });
