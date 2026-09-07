@@ -136,6 +136,12 @@ Unavailable/stale/suspended/unmatched/incomplete Pinnacle is `PINNACLE_BENCHMARK
 
 ## 6. Research and current fair-value process
 
+### September 7 source-method clarification — Sharp Sports Betting
+
+Use [the applied Stanford Wong research notes](docs/source-material/sharp-sports-betting-methods.md) as a methodology reference for the existing process below. Work from checked event facts to an explained numerical estimate/range and then the exact price comparison. Retain source-linked inputs, the actual transformation or judgmental comparison, and the basis for the range in the existing `fairValueEvidence` fields; a source list plus a chosen adjustment or uncertainty band is insufficient. For a market-anchored estimate, explain what information or processing supports the incremental effect beyond the baseline, including a justified no-change result when appropriate. Keep opposing probabilities coherent and account for pushes at integer lines.
+
+The [first application](docs/SHARP_SPORTS_BETTING_TRIAL_2026-09-07.md) illustrates arithmetic that can be reproduced while the probability adjustment and range remain unsupported; do not reuse its historical numbers as current inputs. Pursue the exact unfinished input/calculation and retain `blocker.progress` as specified below. Book methods are not independent current-event evidence and do not authorize an empirical table, fixed adjustment, new model, or Research Library graduation. The permitted current judgmental/market-anchored route remains available; no new schema, publication veto, research quota, odds pull or scheduled task is introduced.
+
 ### Execute qualified odds → research → fair value → decision
 
 Start this process immediately after binding the qualified inventory; do not build a finished all-blocked report first. First perform the broad Stage 1 scan across every eligible event in start-time order, sharing relevant facts across its markets. Then complete market calculations and targeted deeper research. Give urgent current BET/LEAN/WAIT dependencies and approaching starts their required checks, and advance unfinished games instead of repeatedly rebuilding the first completed games. Complete each supportable market through both decisions as the work progresses; an unresolved total must not halt an independently supportable moneyline or another event. Cover the whole eligible slate without a card quota.
