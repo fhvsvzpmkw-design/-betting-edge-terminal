@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {
-  buildPrimaryResearchPlan, derivePrimarySelectionInventory,
+  buildPrimaryResearchPlan, derivePrimarySelectionInventory, loadPriorPrimaryResearch,
   PARTIAL_RESEARCH_FROM, validatePrimaryAnalysis, describeResearchCompletion
 } from '../tools/major-sport-market-coverage-gate.mjs';
 
@@ -76,3 +78,83 @@ for (const change of [m => delete m.observedAt, m => m.observedAt = '2026-09-07T
 }
 assert.equal(describeResearchCompletion(clockReport, {primaryAnalysis: {receipts: []}}).state, 'COMPLETE');
 console.log('PRIMARY RESEARCH PROGRESS: 15:15 replay = 30 pending / 5 events; unfinished receipts remain publishable without invented evaluations; historical validation, read-only planning and observation freshness preserved.');
+
+// Real 06:00 -> 08:00 handoff, starting with an empty new draft. Available
+// selections still need current research even when yesterday's code rated them.
+const morningPath = 'data/history/runs/2026-09-07/main-080700.json';
+const morning = read(morningPath);
+const morningSidecar = read(morningPath.replace('/runs/', '/research-fit/'));
+const compactCli = spawnSync(process.execPath, ['tools/major-sport-market-coverage-gate.mjs', 'research-plan', '--report', morningPath, '--sidecar', morningPath.replace('/runs/', '/research-fit/'), '--summary', '--event-id', '63303323'], {encoding: 'utf8'});
+assert.equal(compactCli.status, 0, compactCli.stderr);
+const compact = JSON.parse(compactCli.stdout);
+assert.equal(compact.events.length, 1);
+assert.equal(compact.counts.available, 60, 'event detail filtering cannot narrow coverage accounting');
+assert.equal(compact.events[0].sharedResearch, undefined, 'compact queue must omit repeated source payloads');
+const morningInventory = {selections: morningSidecar.primaryAnalysis.receipts.map(receipt => {
+  const [sport, eventId, marketDetail, side] = receipt.selectionId.split('|');
+  return {selectionId: receipt.selectionId, sport, eventId, marketDetail, side, quotes: [receipt.quote]};
+})};
+const inherited = loadPriorPrimaryResearch(process.cwd(), morning, morningInventory);
+assert.equal(inherited.bySelection.size, 54);
+assert.deepEqual(inherited.warnings, []);
+const emptyMorning = {primaryAnalysis: {feedGeneratedAt: morning.feedGeneratedAt, receipts: []}};
+const inheritedBytes = JSON.stringify([...inherited.bySelection]);
+const handoff = buildPrimaryResearchPlan(morning, emptyMorning, morningInventory, inherited);
+const sides = handoff.events.flatMap(event => event.markets.flatMap(market => market.selections));
+assert.equal(handoff.counts.pending, 60);
+assert.equal(handoff.counts.evaluatedRecorded, 0, 'prior decisions do not become current PASS cards');
+assert.equal(sides.filter(side => side.nextAction === 'RESUME_PRIOR_RESEARCH').length, 36);
+assert.equal(sides.filter(side => side.nextAction === 'REVALIDATE_PRIOR_RESEARCH').length, 18);
+assert.equal(sides.filter(side => side.nextAction === 'START_STAGE_1').length, 6, 'new NCAAF market must start current research');
+assert.equal(JSON.stringify([...inherited.bySelection]), inheritedBytes);
+assert.equal(emptyMorning.primaryAnalysis.receipts.length, 0);
+const angels = handoff.events.find(event => event.eventId === '63303323');
+assert.equal(angels.markets.length, 3);
+assert.ok(angels.sharedResearch.every(item => item.historical && item.requiresCurrentReview));
+assert.ok(angels.sharedResearch.every(item => item.checkedAt.startsWith('2026-09-07T06:18:')));
+assert.ok(angels.markets.every(market => market.selections.every(side => side.remainingWork.stage === 'UNSPECIFIED')));
+const evaluatedEvent = handoff.events.find(event => event.eventId === '63303047');
+assert.ok(evaluatedEvent.sharedResearch.some(item => item.selectionIds.length > 1), 'shared findings must be deduplicated across sides');
+assert.equal(loadPriorPrimaryResearch(process.cwd(), {...morning, ts: '2026-09-07T06:00:00-07:00'}, morningInventory).bySelection.size, 0, 'exclude later runs and other Vancouver dates');
+
+// Exact current inventory controls scope. A prior selection cannot resurrect a
+// now-missing quote; a new primary line carries only historical context.
+const subset = structuredClone(morningInventory);
+subset.selections = subset.selections.filter(item => item.eventId === '63303323');
+subset.selections.find(item => item.marketDetail === 'full_game_primary_total').quotes[0].line += 1;
+const subsetPlan = buildPrimaryResearchPlan(morning, emptyMorning, subset, inherited);
+assert.equal(subsetPlan.counts.available, 6);
+assert.ok(subsetPlan.events[0].markets.flatMap(market => market.selections).some(side => side.priorResearch.primaryLineChanged));
+
+// A concrete calculation handoff survives the next run with original facts.
+const progressed = structuredClone(inherited);
+const firstId = subset.selections[0].selectionId;
+progressed.bySelection.get(firstId).receipt.blocker.progress = {
+  stage: 'FAIR_CONSTRUCTION', nextStep: 'Calculate the current total from checked pitcher workloads and lineup inputs.',
+  stoppingReason: 'The pitcher workload input has not yet been translated into the run estimate.'
+};
+const progressedPlan = buildPrimaryResearchPlan(morning, emptyMorning, subset, progressed);
+assert.equal(progressedPlan.events[0].markets.flatMap(market => market.selections).find(side => side.selectionId === firstId).remainingWork.stage, 'FAIR_CONSTRUCTION');
+
+// An index mismatch or duplicate receipt must never leak partly loaded context.
+const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'research-handoff-'));
+try {
+  const entry = read('run-history.json').runs.find(run => run.path === 'data/history/runs/2026-09-07/open-061830.json');
+  for (const file of [entry.path, entry.researchFitPath]) {
+    fs.mkdirSync(path.dirname(path.join(temporary, file)), {recursive: true});
+    fs.copyFileSync(file, path.join(temporary, file));
+  }
+  fs.writeFileSync(path.join(temporary, 'run-history.json'), JSON.stringify({runs: [entry]}));
+  const prior = read(path.join(temporary, entry.researchFitPath));
+  prior.primaryAnalysis.receipts.push(prior.primaryAnalysis.receipts.at(-1));
+  fs.writeFileSync(path.join(temporary, entry.researchFitPath), JSON.stringify(prior));
+  const duplicate = loadPriorPrimaryResearch(temporary, morning, morningInventory);
+  assert.equal(duplicate.bySelection.size, 0);
+  assert.match(duplicate.warnings[0], /duplicate/);
+  prior.reportReference.ts = morning.ts;
+  fs.writeFileSync(path.join(temporary, entry.researchFitPath), JSON.stringify(prior));
+  const mismatch = loadPriorPrimaryResearch(temporary, morning, morningInventory);
+  assert.equal(mismatch.bySelection.size, 0);
+  assert.match(mismatch.warnings[0], /binding mismatch/);
+} finally { fs.rmSync(temporary, {recursive: true, force: true}); }
+console.log('MORNING RESEARCH HANDOFF: 36 resume + 18 revalidate + 6 new; no inherited evaluation credit; exact scope, original times, shared facts, progress and corrupt-context handling verified.');

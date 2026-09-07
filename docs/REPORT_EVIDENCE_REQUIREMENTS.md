@@ -31,6 +31,12 @@ For each sport record `primary.available`, `primary.evaluated`, `primary.blocked
 
 Always include `Primary selections: N available; N evaluated; N evidence-blocked; N unavailable.` using the actual four counts. Do not describe blocked research as a completed handicap or a PASS. The publisher derives the visible `coverageSummary` from verified receipts and the bound feed, including actual decision counts, blockers and acquisition causes. The displayed BET/LEAN/WAIT/PASS counters count the complete published EVALUATED decision set plus any separately governed unavailable continuity resolutions. Publisher retries and stored read-back validate the same receipt and derived summary.
 
+## Research handoff within the existing sidecars
+
+The `research-plan` command reads earlier indexed same-day report/sidecar pairs and matches their latest receipts to the current available selections. Its `priorResearch` is historical context only; old decisions, terminal blockers, sources and quotes do not become current receipts. The planner retains original source times and deduplicates checked findings/attempts into event-level `sharedResearch`. Recheck material changing facts, preserve current quote binding, and perform the current market-specific calculation and normal validation before issuing a decision. Full prior calculations remain at the returned sidecar path and blob hash.
+
+For new unfinished work, use the existing `blocker` object's optional `progress = {stage, nextStep, stoppingReason}` to make the handoff precise. Stages are `EVIDENCE_COLLECTION`, `FAIR_CONSTRUCTION`, `PERSONNEL_RECHECK` and `DECISION_VALIDATION`. Record a concrete next step and the observed stopping reason. This progress metadata does not certify evidence or add a publication veto. Older missing progress remains explicitly `UNSPECIFIED`; it is not inferred from narrative or from the presence of a URL. Shared scheduled authority section 6 governs the slate-wide initial scan and subsequent targeted work.
+
 ## Checked sources on every displayed card
 
 Retain `sourceEvidence` in the recommendation and its matching sidecar record. Each source has:
