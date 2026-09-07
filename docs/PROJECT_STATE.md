@@ -1,10 +1,14 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-09-07 — The Private Line research-date synchronization
+**Last updated:** 2026-09-07 — The Private Line artwork integration
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
+
+## September 7 The Private Line artwork
+
+The uploaded Graham Mercer asset pack is connected to the live terminal and its reusable shell. The masthead keeps its full aspect ratio; the live current-week rows and carried power sheet precede the clubhouse scene, member badge and desk vignette. Leather texture stays in the decorative member panel. The four lower images load lazily, and all images have explicit dimensions. The two-byte leather upload is restored byte-for-byte from the original asset pack. Current numbers, research dates and refresh logic remain live HTML/data. No calculation, betting gate, research task or shadow-run rule changes with this presentation update.
 
 ## September 7 Graham research-date synchronization
 
