@@ -1,10 +1,14 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-09-07 — Graham terminal renamed The Private Line
+**Last updated:** 2026-09-07 — The Private Line research-date synchronization
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
+
+## September 7 Graham research-date synchronization
+
+The Private Line’s INFO date now comes from the latest active-week research sweep with a matching COMPLETED runtime record and VERIFIED completion binding. Recent tasks append directly to the research ledger, while the older event-file synchronization path left the number board’s information timestamp at September 2. The terminal now derives this display metadata from the existing research records and refreshes on runtime-record pushes. No numeric change is required for a completed review to advance INFO. Started, blocked, mismatched and prior-week records cannot advance it; a new week without a verified completed review displays pending. The feed retains the review’s run ID, task and scope, so a limited review does not restamp every game. Number-board dates, fairs, ratings, research history, market observations, schedules and shadow-run rules are unchanged.
 
 ## September 7 Graham publication name
 

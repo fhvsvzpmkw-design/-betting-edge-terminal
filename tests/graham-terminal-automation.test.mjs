@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {matchNflFixture,extractPinnacleHomeSpread} from '../tools/graham-market-utils.mjs';
+import {selectCompletedResearchReview} from '../tools/graham-research-review.mjs';
 import {
   buildResearchLedgerCadenceProjection,
   loadGrahamScheduleAuthority,
@@ -33,6 +34,53 @@ assert.match(observer,/bookmakerOutcomeId:q\?\.bookmakerOutcomeId/,'OddsPapi obs
 assert.doesNotMatch(workflow,/oddspapi\.io|odds-api\.io|fetch\(/i,'Graham post-processing workflow must not call an external odds API');
 assert.match(workflow,/capture-graham-daily-pinnacle\.mjs/);
 assert.match(workflow,/build-graham-current-week\.mjs/);
+assert.match(workflow,/data\/walters\/nfl\/20\*\/week-\*-research-runtime\/\*\.json/,'completed runtime writes must refresh INFO even when fair numbers are unchanged');
+assert.match(builder,/lastResearchAt:researchReview\?\.completedAt\|\|null/,'INFO must use completed research rather than the number-board timestamp');
+
+const reviewActive={season:2026,week:1,paths:{researchLedger:'data/walters/nfl/2026/week-01-research-ledger.json'}};
+const reviewSweep={runEventId:'graham-daily-review-2026-w01-20260907T113228-0700',sourceTaskKey:'DAILY_REVIEW',
+  startedAt:'2026-09-07T11:32:28-07:00',completedAt:'2026-09-07T11:38:53-07:00',
+  completionResult:'NO_MATERIAL_CHANGE',summary:{marketViewed:false},scope:'DEN-KC review; remaining games retain their prior coverage.'};
+const reviewEvent={schema:1,policyId:'graham-research-runtime-v1',state:'COMPLETED',checkpoint:'COMPLETED',
+  runEventId:reviewSweep.runEventId,taskKey:'DAILY_REVIEW',season:2026,week:1,ledgerPath:reviewActive.paths.researchLedger,
+  ledgerSweepPresent:true,failure:null,marketViewed:false,completionResult:reviewSweep.completionResult,
+  startedAt:reviewSweep.startedAt,completedAt:'2026-09-07T11:43:42-07:00',completionReceipt:{
+    state:'VERIFIED',policyId:'graham-research-completion-v1',path:'data/walters/nfl/research-completion-current.json',
+    runEventId:reviewSweep.runEventId,taskKey:'DAILY_REVIEW',season:2026,week:1,marketViewed:false,
+    completionResult:reviewSweep.completionResult,verifiedAt:'2026-09-07T18:43:12.957Z',
+    ledgerBlobSha:'a'.repeat(40),receiptBlobSha:'b'.repeat(40)}};
+const reviewLedger={state:'ACTIVE',season:2026,week:1,sweeps:[reviewSweep]};
+const selectReview=(events,ledger=reviewLedger,active=reviewActive)=>selectCompletedResearchReview({active,ledger,events});
+const completedReview=selectReview([reviewEvent]);
+assert.equal(completedReview.completedAt,reviewSweep.completedAt,'a no-change review advances INFO to its research cutoff, not publication time');
+assert.equal(completedReview.scope,reviewSweep.scope,'retain limited review coverage without implying every game was re-reviewed');
+for(const [label,mutate] of [
+  ['started',event=>{event.state='RUN_STARTED';event.checkpoint='COMPLETION_PENDING';event.completionReceipt=null;}],
+  ['blocked',event=>{event.state='BLOCKED_WITH_DURABLE_RECORD';}],
+  ['blocked completion',event=>{event.completionResult='BLOCKED_WITH_DURABLE_RECORD';event.completionReceipt.completionResult=event.completionResult;}],
+  ['receipt missing',event=>{event.completionReceipt=null;}],
+  ['receipt wrong run',event=>{event.completionReceipt.runEventId='different-run';}],
+  ['receipt wrong week',event=>{event.completionReceipt.week=2;}],
+  ['receipt missing proof',event=>{event.completionReceipt.receiptBlobSha=null;}],
+  ['prior week',event=>{event.week=2;}],
+  ['wrong task',event=>{event.taskKey='DELTA_1645';}],
+  ['wrong ledger',event=>{event.ledgerPath='data/walters/nfl/2026/week-02-research-ledger.json';}],
+  ['invalid chronology',event=>{event.completedAt='2026-09-07T11:00:00-07:00';}],
+  ['market viewed',event=>{event.marketViewed=true;}]
+]){
+  const event=structuredClone(reviewEvent);mutate(event);
+  assert.equal(selectReview([event]),null,`${label} cannot advertise fresh research`);
+  assert.deepEqual(selectReview([reviewEvent,event]),completedReview,`${label} must retain the prior verified review`);
+}
+assert.equal(selectReview([]),null,'a week with no completed runtime records must remain pending');
+assert.equal(selectReview([reviewEvent],{...reviewLedger,sweeps:[]}),null,'a receipt without its sweep cannot advance INFO');
+assert.equal(selectReview([reviewEvent],{...reviewLedger,sweeps:[reviewSweep,reviewSweep]}),null,'ambiguous sweep identity cannot advance INFO');
+assert.equal(selectReview([reviewEvent],{...reviewLedger,week:2},{...reviewActive,week:2}),null,'rollover must not carry prior-week freshness');
+const laterSweep={...reviewSweep,runEventId:'later-run',startedAt:'2026-09-07T19:00:00Z',completedAt:'2026-09-07T19:02:00Z'};
+const laterEvent={...reviewEvent,runEventId:laterSweep.runEventId,startedAt:laterSweep.startedAt,completedAt:'2026-09-07T19:05:00Z',
+  completionReceipt:{...reviewEvent.completionReceipt,runEventId:laterSweep.runEventId,verifiedAt:'2026-09-07T19:03:00Z'}};
+assert.equal(selectReview([reviewEvent,laterEvent],{...reviewLedger,sweeps:[laterSweep,reviewSweep]}).completedAt,laterSweep.completedAt,
+  'use actual time ordering across UTC/Pacific offsets and unordered records');
 
 const helperSource=hotline.slice(hotline.indexOf('function finiteNumber'),hotline.indexOf('function moneylinePair'));
 const helperContext={};

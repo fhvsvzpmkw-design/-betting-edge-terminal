@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {matchNflFixture,extractPinnacleHomeSpread,extractPinnacleMoneyline} from './graham-market-utils.mjs';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
+import {loadCompletedResearchReview} from './graham-research-review.mjs';
 import {loadGrahamScheduleAuthority,validateGrahamBoardScheduleMetadata} from './graham-schedule-authority.mjs';
 
 const ROOT=process.cwd();
@@ -20,6 +21,7 @@ function roundHalf(v){return Number.isFinite(v)?Math.round(v*2)/2:null}
 function latestSnapshot(game){const rows=Array.isArray(game?.dailySnapshots)?game.dailySnapshots:[];return rows.slice().sort((a,b)=>Number(a.sequence||0)-Number(b.sequence||0)).at(-1)||null}
 
 const numbers=readJson(NUMBERS);
+const researchReview=loadCompletedResearchReview({active:ACTIVE,root:ROOT});
 const scheduleAuthority=loadGrahamScheduleAuthority({root:ROOT});
 validateGrahamBoardScheduleMetadata(numbers,scheduleAuthority);
 const ratings=readJson(RATINGS);
@@ -85,7 +87,7 @@ const out={
   schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE PRIVATE LINE',season:numbers.season,week:numbers.week,
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
   activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
-  lastResearchAt:numbers.lastResearchAt||null,marketStatus,marketObservedAt:marketStatus==='ok'?observer?.generatedAt||null:null,
+  lastResearchAt:researchReview?.completedAt||null,researchReview,marketStatus,marketObservedAt:marketStatus==='ok'?observer?.generatedAt||null:null,
   scheduleAuthority:numbers.scheduleAuthority,
   sourceScheduleMeta:live?.scheduleMeta||null,
   displayPolicy:{mode:'CURRENT_WEEK_TERMINAL',marketIsolation:true,pinnacleRole:'SHARP_MARKET_BENCHMARK_ONLY',bettingAuthority:false,rawOutput:true},
