@@ -60,10 +60,8 @@
     "marketInputAllowed": false
   },
   "productionScope": {
-    "resolvedTeamCount": 31,
-    "excludedTeams": [
-      "ATL"
-    ],
+    "resolvedTeamCount": 32,
+    "excludedTeams": [],
     "failClosedGameWhenEitherTeamUnresolved": true,
     "grahamFairWritesAllowed": true,
     "embeddedBaselineWritesAllowed": false,
@@ -87,6 +85,16 @@
         "adjustmentType": "QB_UNCERTAINTY",
         "expectedPointsToHomeSpread": 0.5,
         "disposition": "RETIRE_ON_SCOPED_ACTIVATION"
+      },
+      {
+        "gameKey": "2026-W01-ATL-PIT",
+        "team": "ATL",
+        "side": "AWAY",
+        "adjustmentType": "QB_UNCERTAINTY",
+        "expectedPointsToHomeSpread": -0.5,
+        "disposition": "RETIRE_ON_CONFIRMED_STARTER",
+        "requiredStarterStatus": "CONFIRMED_NAMED_STARTER",
+        "scopeAmendmentId": "atlanta-qb-baseline-2026-09-07-v1"
       }
     ]
   },
@@ -121,5 +129,38 @@
     "exactPostActivationBoardHashRequiredForAutomaticRollback": true,
     "laterBoardChangesRequireManualForwardReconciliation": true
   },
-  "marketViewed": false
+  "marketViewed": false,
+  "scopeAmendments": [
+    {
+      "id": "atlanta-qb-baseline-2026-09-07-v1",
+      "team": "ATL",
+      "state": "APPROVED",
+      "approvedAt": "2026-09-07T19:51:53+00:00",
+      "approval": {
+        "source": "USER_EXPLICIT_PROJECT_CONVERSATION",
+        "requestedLanguage": "Let's get it done.",
+        "scope": "Complete Atlanta baseline reconciliation, admit the team to QB production, retire the resolved starter-identity penalty, and apply both sides of ATL-PIT through the existing calculator."
+      },
+      "baseline": {
+        "method": "VALUE_INVARIANT_FROZEN_STAGE2_PRIORS",
+        "candidatePlayerIds": [
+          "14608",
+          "20916"
+        ],
+        "value": 7.5,
+        "reconstructTeamRating": false,
+        "selectHistoricalStarter": false,
+        "rationale": "The frozen Stage 4 authority identifies only Penix and Tagovailoa as unresolved baseline alternatives. Both frozen Stage 2 priors are exactly 7.5. Every mixture of those alternatives has the same numerical prior; no mixture weights, historical starter identity, or team-rating decomposition are inferred. This uses the existing Stage 2 differential-reference convention and is not an empirical reconstruction of the seed rating."
+      },
+      "evidence": [
+        {
+          "url": "https://www.atlantafalcons.com/news/kevin-stefanski-details-plan-for-quarterback-position-michael-penix-tua-tagovailoa",
+          "checkedAt": "2026-09-07T19:51:53+00:00",
+          "finding": "Atlanta named Tagovailoa for the Pittsburgh opener; Rush will back him up and Penix will be inactive. The named-starter uncertainty is resolved. Penix recovery is distinct from a new impairment penalty on Tagovailoa.",
+          "access": "Official article text retrieved through web search; direct retrieval of the separate starter-announcement URL failed."
+        }
+      ],
+      "marketViewed": false
+    }
+  ]
 }

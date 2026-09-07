@@ -1,10 +1,18 @@
 # Betting Edge — Project State
 
-**Last updated:** 2026-09-06 — partial publication correction following the research-completion repair
+**Last updated:** 2026-09-07 — Atlanta QB baseline scope amendment
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
 This is the practical current-state snapshot. It does not replace `BETTING_EDGE_CONTRACT.md`. Historical implementation detail remains available through Git history and dated acceptance/closeout records.
+
+## September 7 Atlanta QB baseline resolution
+
+The user-approved `atlanta-qb-baseline-2026-09-07-v1` amendment in the existing QB production contract admits Atlanta as the 32nd team. The frozen Stage 4 unresolved options both have Stage 2 prior value 7.5, so the differential reference is value-invariant. This resolves the numerical baseline without selecting an invented historical starter, inferring workload shares, or claiming to reconstruct the seed team rating. Original Stage 2–5 sources, activation audit and rollback snapshot remain immutable.
+
+Official Atlanta reporting confirms Tua Tagovailoa as the Week 1 starter, Cooper Rush as backup and Michael Penix inactive. Tua's frozen candidate 7.5 minus the fixed 7.5 baseline gives ATL delta 0; Pittsburgh's existing Rodgers delta is −0.75. The scoped production transition removes the obsolete −0.5 starter-identity uncertainty term and applies both QB deltas: old exact PIT −4.582 → base −4.082 → revised exact PIT −3.332, displayed PIT −3.5. No other matchup needs a numerical change for this amendment. Separate unresolved personnel cases remain subject to their own evidence requirements.
+
+The existing QB calculator generates the amended board and manifest, committed atomically with the amended contract so scheduled validators never see a partially applied scope. The production workflow verifies/reconciles the staged result and triggers terminal publication. Subsequent starters use the same fixed 7.5 Atlanta baseline. Newly unresolved starters still block fresh QB contributions and preserve the last approved fair. Scheduled tasks use the current contract and validated production binding rather than a permanent Atlanta exclusion. This scoped amendment does not change Core betting gates, wagers, stakes or review schedules.
 
 ## September 6 quote freshness correction
 

@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
+import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
 
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/walters/nfl/qb-production/production-contract-v1.json';
@@ -18,7 +19,7 @@ const absolute = relative => path.join(ROOT, relative);
 const readJson = relative => JSON.parse(fs.readFileSync(absolute(relative), 'utf8'));
 const sha256File = relative => crypto.createHash('sha256').update(fs.readFileSync(absolute(relative))).digest('hex');
 const sha256Value = value => crypto.createHash('sha256').update(`${JSON.stringify(value, null, 2)}\n`).digest('hex');
-const finite = value => Number.isFinite(Number(value));
+const finite = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
 const close = (left, right) => Math.abs(Number(left) - Number(right)) <= TOLERANCE;
 const fail = message => { throw new Error(`WALTERS_QB_PRODUCTION_VALIDATION:${message}`); };
 
@@ -53,8 +54,7 @@ if (
   contract.productionScope?.embeddedBaselineWritesAllowed !== false ||
   contract.productionScope?.carriedTeamRatingWritesAllowed !== false ||
   contract.productionScope?.automaticInSeasonRefitAllowed !== false ||
-  contract.productionScope?.failClosedGameWhenEitherTeamUnresolved !== true ||
-  JSON.stringify(contract.productionScope?.excludedTeams) !== JSON.stringify(['ATL'])
+  contract.productionScope?.failClosedGameWhenEitherTeamUnresolved !== true
 ) fail('CONTRACT_SCOPE_INVALID');
 if (
   contract.bettingBoundary?.qbLayerMaySetBetStatusDirectly !== false ||
@@ -79,13 +79,8 @@ if (
 ) fail('PRODUCTION_MANIFEST_INVALID');
 const teams = production.teamBindings || [];
 const resolved = teams.filter(item => item.bindingStatus === TOKEN);
-const atlanta = teams.find(item => item.team === 'ATL');
-if (teams.length !== 32 || new Set(teams.map(item => item.team)).size !== 32 || resolved.length > 31) {
-  fail('TEAM_BINDING_COUNT_INVALID');
-}
-if (!atlanta || atlanta.bindingStatus === TOKEN || atlanta.teamQbDelta !== null || atlanta.gameContributionEligible !== false) {
-  fail('ATLANTA_NOT_FAIL_CLOSED');
-}
+const scope = productionQbScope(contract, ROOT);
+validateProductionQbScope(production, scope);
 for (const item of resolved) {
   if (
     !finite(item.approvedProductionStarterValue) ||
@@ -100,9 +95,10 @@ if (
   board.qbPerformanceProduction?.authorityToken !== TOKEN ||
   board.qbPerformanceProduction?.productionAuthority !== true ||
   board.qbPerformanceProduction?.grahamWritesAllowed !== true ||
-  board.qbPerformanceProduction?.approvedTeamCount !== 31 ||
+  board.qbPerformanceProduction?.approvedTeamCount !== scope.approvedTeamCount ||
   board.qbPerformanceProduction?.currentResolvedTeamCount !== resolved.length ||
-  !board.qbPerformanceProduction?.currentFailClosedTeams?.includes('ATL') ||
+  JSON.stringify(board.qbPerformanceProduction?.permanentlyExcludedTeams) !== JSON.stringify(scope.excludedTeams) ||
+  JSON.stringify(board.qbPerformanceProduction?.currentFailClosedTeams) !== JSON.stringify(teams.filter(item => item.bindingStatus !== TOKEN).map(item => item.team)) ||
   board.qbPerformanceProduction?.postActivationCanaryState !== production.postActivationCanary?.state
 ) fail('ACTIVE_BOARD_PRODUCTION_METADATA_INVALID');
 
@@ -119,7 +115,7 @@ for (const game of board.games || []) {
   if (!eligible) {
     failClosedGames += 1;
     if (game.qbPerformanceStatus !== 'FAIL_CLOSED_GAME_PRESERVED') fail(`GAME_FAIL_CLOSED_STATUS_INVALID:${game.gameKey}`);
-    if ((game.away === 'ATL' || game.home === 'ATL') && qbAdjustments.length !== 0) fail(`ATLANTA_QB_TERM_PRESENT:${game.gameKey}`);
+    if (scope.excludedTeams.includes('ATL') && (game.away === 'ATL' || game.home === 'ATL') && qbAdjustments.length !== 0) fail(`ATLANTA_QB_TERM_PRESENT:${game.gameKey}`);
     continue;
   }
   appliedGames += 1;
@@ -136,6 +132,12 @@ for (const game of board.games || []) {
     !close(game.grahamExactFairHome, expectedExact) ||
     !close(game.grahamFairHome, roundHalf(expectedExact))
   ) fail(`QB_TERM_ARITHMETIC_INVALID:${game.gameKey}`);
+  for (const rule of contract.uncertaintyOverlayReconciliation.rules || []) {
+    if (rule.gameKey === game.gameKey && (game.adjustments || []).some(item =>
+      item.type === rule.adjustmentType && close(item.pointsToHomeSpread, rule.expectedPointsToHomeSpread))) {
+      fail(`RESOLVED_IDENTITY_OVERLAY_RESTORED:${game.gameKey}`);
+    }
+  }
 }
 const expectedFailClosedGames = (board.games || []).filter(game => {
   const away = bindingByTeam.get(game.away);
@@ -159,12 +161,12 @@ if (active.season === 2026 && active.week === 1) {
     (lasVegas.adjustments || []).some(item => item.type === 'QB_UNCERTAINTY')
   ) fail('LAS_VEGAS_RECONCILIATION_INVALID');
   const atlantaGame = board.games.find(game => game.gameKey === '2026-W01-ATL-PIT');
-  if (
+  if (!scope.amendment && (
     !atlantaGame ||
     !close(atlantaGame.grahamExactFairHome, -4.582) ||
     !close(atlantaGame.grahamFairHome, -4.5) ||
     !(atlantaGame.adjustments || []).some(item => item.type === 'QB_UNCERTAINTY' && close(item.pointsToHomeSpread, -0.5))
-  ) fail('ATLANTA_WEEK1_PRESERVATION_INVALID');
+  )) fail('ATLANTA_WEEK1_PRESERVATION_INVALID');
   const cleveland = board.games.find(game => game.gameKey === '2026-W01-CLE-JAX');
   const kansasCity = board.games.find(game => game.gameKey === '2026-W01-DEN-KC');
   if (!(cleveland?.adjustments || []).some(item => item.type === 'QB_REENTRY' && close(item.pointsToHomeSpread, -0.5))) {
@@ -206,5 +208,5 @@ noTrueMarketFlag(rollback, 'rollback');
 
 console.log(
   `WALTERS QB PRODUCTION VALIDATION: PASS // ${resolved.length} CURRENT RESOLVED TEAMS // ` +
-  `${appliedGames} ACTIVE-WEEK GAMES // ${failClosedGames} FAIL CLOSED // ATL EXCLUDED // MARKET FALSE`,
+  `${appliedGames} ACTIVE-WEEK GAMES // ${failClosedGames} FAIL CLOSED // ${scope.approvedTeamCount} APPROVED TEAMS // MARKET FALSE`,
 );
