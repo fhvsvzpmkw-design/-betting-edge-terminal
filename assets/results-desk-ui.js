@@ -30,23 +30,6 @@ function slotLabel(v){return ({open:'OPEN',main:'MAIN',final_morning:'FINAL',eve
 function gradeClass(g){g=String(g||'').toUpperCase();return g.includes('WIN')?'rWin':g.includes('LOSS')?'rLoss':g==='PUSH'||g==='VOID'?'rPush':'rOpen'}
 function statusClass(s){return `rStatus ${String(s||'pass').toLowerCase()}`}
 function valueClass(v){const n=Number(v);return !Number.isFinite(n)?'neutral':n>0?'positive':n<0?'negative':'neutral'}
-function parseBankrollText(v){
-  const text=String(v||'').replace(/,/g,'');
-  const m=text.match(/\$\s*([0-9]+(?:\.[0-9]+)?)/);
-  return m?Number(m[1]):null;
-}
-function bankrollSnapshot(d){
-  const exact=d.querySelector('#runnerBankrollCompact .runnerBankrollValue');
-  let bankroll=parseBankrollText(exact?.textContent);
-  if(!Number.isFinite(bankroll))bankroll=parseBankrollText(d.getElementById('runnerBankrollCompact')?.textContent);
-  if(!Number.isFinite(bankroll))return {bankroll:null,unit:null};
-  return {bankroll,unit:bankroll*.03};
-}
-function modelCashSnapshot(d,pa){
-  const bank=bankrollSnapshot(d);
-  const units=Number(pa?.netUnits);
-  return {...bank,cash:Number.isFinite(bank.unit)&&Number.isFinite(units)?bank.unit*units:null};
-}
 function bestRow(rows){
   const list=(Array.isArray(rows)?rows:[]).filter(r=>Number(r?.complete||0)>0&&Number.isFinite(Number(r?.roiPct)));
   return list.sort((a,b)=>Number(b.roiPct)-Number(a.roiPct))[0]||null;
@@ -64,22 +47,6 @@ function ensureStyle(d){
     #engine.resultsDesk .resultsValueHero{border:2px solid #5bd8e8;background:radial-gradient(circle at 14% 8%,rgba(57,231,255,.09),transparent 34%),linear-gradient(180deg,#07131d,#03090f);padding:14px;box-shadow:0 0 20px rgba(57,231,255,.10),inset 0 0 24px rgba(88,255,136,.025)}
     #engine.resultsDesk .resultsTitle{color:var(--results-accent);font-weight:950;letter-spacing:.09em;font-size:15px;text-align:center}
     #engine.resultsDesk .resultsSub{color:var(--results-soft);font-size:10px;margin-top:5px;line-height:1.45;text-align:center}
-    #engine.resultsDesk .valueGrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:12px;margin-top:13px}
-    #engine.resultsDesk .valueMain{border:1px solid #59d9dc;background:linear-gradient(180deg,rgba(4,22,25,.88),rgba(2,11,16,.96));padding:16px;min-height:224px;display:flex;flex-direction:column;justify-content:center;box-shadow:inset 0 0 20px rgba(88,255,136,.035)}
-    #engine.resultsDesk .valueLabel{color:var(--results-accent);font-size:clamp(18px,2.5vw,31px);font-weight:950;letter-spacing:.055em}
-    #engine.resultsDesk .resultsCashValue{font-size:clamp(48px,8vw,88px);font-weight:950;line-height:.96;margin-top:16px;letter-spacing:-.04em;text-shadow:0 0 18px currentColor}
-    #engine.resultsDesk .resultsCashValue.positive,#engine.resultsDesk .valueMetric b.positive,#engine.resultsDesk .metricValue.positive{color:var(--rgreen)}
-    #engine.resultsDesk .resultsCashValue.negative,#engine.resultsDesk .valueMetric b.negative,#engine.resultsDesk .metricValue.negative{color:var(--rred)}
-    #engine.resultsDesk .resultsCashValue.neutral,#engine.resultsDesk .valueMetric b.neutral,#engine.resultsDesk .metricValue.neutral{color:var(--results-soft)}
-    #engine.resultsDesk .valueCashLabel{color:var(--rgreen);font-size:clamp(13px,1.8vw,21px);font-weight:950;letter-spacing:.07em;margin-top:7px}
-    #engine.resultsDesk .valueFormula{color:#c3d3db;font-size:9px;line-height:1.5;margin-top:10px}
-    #engine.resultsDesk .valueDisclaimer{color:#96aab5;font-size:9px;line-height:1.45;margin-top:4px}
-    #engine.resultsDesk .valueMetricStack{display:grid;gap:9px}
-    #engine.resultsDesk .valueMetric{border:1px solid #2d6a5a;background:linear-gradient(180deg,#071813,#030b0a);padding:12px 13px;min-height:68px;display:flex;flex-direction:column;justify-content:center}
-    #engine.resultsDesk .valueMetric.cyan{border-color:#23627b;background:linear-gradient(180deg,#06151e,#030a10)}
-    #engine.resultsDesk .valueMetric .key{color:#a9c0ca;font-size:9px}
-    #engine.resultsDesk .valueMetric b{display:block;font-size:clamp(23px,3vw,36px);line-height:1;margin-bottom:6px}
-    #engine.resultsDesk .valueMetric.cyan b{color:var(--results-accent)}
     #engine.resultsDesk .proofBox,#engine.resultsDesk .auditBox,#engine.resultsDesk .resultsBox{border:1px solid var(--rline);background:var(--rpanel);padding:11px}
     #engine.resultsDesk .proofBox,#engine.resultsDesk .auditBox{margin-top:9px}
     #engine.resultsDesk .resultsSection{color:var(--results-accent);font-weight:950;letter-spacing:.08em;font-size:12px}
@@ -148,8 +115,8 @@ function ensureStyle(d){
     #engine.resultsDesk .resultsEmpty{padding:12px;border:1px dashed var(--results-accent);color:var(--results-soft);margin-top:8px}
     #engine.resultsDesk .resultsReason{color:#c8a96b}
     #engine.resultsDesk .resultsFoot{margin-top:9px;color:var(--results-soft);font-size:9px;line-height:1.45}
-    @media(max-width:900px){#engine.resultsDesk .valueGrid{grid-template-columns:1fr}#engine.resultsDesk .proofGrid{grid-template-columns:repeat(2,minmax(0,1fr))}#engine.resultsDesk .auditStats{grid-template-columns:repeat(3,minmax(0,1fr))}#engine.resultsDesk .topSportRow{grid-template-columns:1fr repeat(3,minmax(80px,.6fr))}}
-    @media(max-width:650px){#engine.resultsDesk .resultsGrid{grid-template-columns:1fr!important}#engine.resultsDesk .resultsBox.full{grid-column:auto!important}#engine.resultsDesk .proofGrid{grid-template-columns:1fr 1fr}#engine.resultsDesk .auditStats{grid-template-columns:repeat(2,minmax(0,1fr))}#engine.resultsDesk .valueMain{min-height:190px}#engine.resultsDesk .marketBarRow{grid-template-columns:90px 1fr 68px}#engine.resultsDesk .topSportRow{grid-template-columns:1fr 1fr}#engine.resultsDesk th,#engine.resultsDesk td{font-size:9px;padding:6px 5px}}
+    @media(max-width:900px){#engine.resultsDesk .proofGrid{grid-template-columns:repeat(2,minmax(0,1fr))}#engine.resultsDesk .auditStats{grid-template-columns:repeat(3,minmax(0,1fr))}#engine.resultsDesk .topSportRow{grid-template-columns:1fr repeat(3,minmax(80px,.6fr))}}
+    @media(max-width:650px){#engine.resultsDesk .resultsGrid{grid-template-columns:1fr!important}#engine.resultsDesk .resultsBox.full{grid-column:auto!important}#engine.resultsDesk .proofGrid{grid-template-columns:1fr 1fr}#engine.resultsDesk .auditStats{grid-template-columns:repeat(2,minmax(0,1fr))}#engine.resultsDesk .marketBarRow{grid-template-columns:90px 1fr 68px}#engine.resultsDesk .topSportRow{grid-template-columns:1fr 1fr}#engine.resultsDesk th,#engine.resultsDesk td{font-size:9px;padding:6px 5px}}
     @media(max-width:440px){#engine.resultsDesk .proofGrid{grid-template-columns:1fr}#engine.resultsDesk .statusPerfRow{grid-template-columns:60px 1fr 72px}#engine.resultsDesk .resultsTitle{font-size:12px}}
   `;
   d.head.appendChild(s);
@@ -205,44 +172,18 @@ function topSportRow(row){
   if(!row)return '<div class="resultsEmpty">NO SPORT DATA YET</div>';
   return `<div class="topSportRow"><div class="topSportName">${esc(row.name)}</div><div class="topSportMetric"><div class="key">CLOSED</div><b>${Number(row.complete||0)}</b></div><div class="topSportMetric"><div class="key">W-L</div><b>${esc(grades(row))}</b></div><div class="topSportMetric"><div class="key">ROI</div><b class="${valueClass(row.roiPct)}">${esc(pct(row.roiPct))}</b></div></div>`;
 }
-function refreshCash(d,pa){
-  const snap=modelCashSnapshot(d,pa);
-  const cash=d.querySelector('#engine.resultsDesk .resultsCashValue');
-  if(cash){cash.textContent=money(snap.cash);cash.className=`resultsCashValue ${valueClass(snap.cash)}`}
-  const formula=d.querySelector('#engine.resultsDesk .valueFormula');
-  if(formula){
-    formula.textContent=Number.isFinite(snap.bankroll)
-      ? `MODEL EQUIVALENT: ${signed(pa?.netUnits,2)}u × 3% OF ${money(snap.bankroll).replace(/^\+/,'')} BANKROLL (${money(snap.unit).replace(/^\+/,'')} / UNIT).`
-      : 'MODEL EQUIVALENT USES NET UNITS × THE CURRENT 3% BANKROLL UNIT WHEN BANKROLL IS AVAILABLE.';
-  }
-}
-
 function render(d,index){
   const engine=d.getElementById('engine');
   if(!engine)return;
   cached=index;
   engine.classList.add('resultsDesk');
-  const c=index.coverage||{},pa=index.priceAnalytics||{};
+  const c=index.coverage||{};
   const bet=statusRow(index,'BET'),pass=statusRow(index,'PASS'),wait=statusRow(index,'WAIT'),lean=statusRow(index,'LEAN');
   const bestMarket=bestRow(index.byMarket),bestSport=bestRow(index.bySport);
   engine.innerHTML=`
     <div class="resultsValueHero">
-      <div class="resultsTitle">🧠 VIGSCOPE // RESULTS &amp; VALUE 🧠</div>
-      <div class="resultsSub">WHAT THE ENGINE HAS BEEN WORTH // PERFORMANCE PROOF FIRST, AUDIT DETAIL BELOW</div>
-      <div class="valueGrid">
-        <div class="valueMain">
-          <div class="valueLabel">VIGSCOPE ADVANTAGE</div>
-          <div class="resultsCashValue neutral">—</div>
-          <div class="valueCashLabel">EST. CASH VALUE ADDED</div>
-          <div class="valueFormula">CALCULATING CURRENT 3% BANKROLL UNIT…</div>
-          <div class="valueDisclaimer">MODEL VALUE ONLY. THIS CONVERTS PRICE-ADJUSTED NET UNITS INTO A CURRENT-BANKROLL CASH EQUIVALENT; IT IS NOT OFFICIAL SETTLED BETTING PROFIT.</div>
-        </div>
-        <div class="valueMetricStack">
-          <div class="valueMetric"><b class="${valueClass(pa.netUnits)}">${esc(signed(pa.netUnits,2))}u</b><div class="key">NET EDGE CAPTURED</div></div>
-          <div class="valueMetric"><b class="${valueClass(pa.roiPct)}">${esc(pct(pa.roiPct))}</b><div class="key">ROI ON PRICED CARDS</div></div>
-          <div class="valueMetric cyan"><b>${Number(pa.pricedCards||0)}</b><div class="key">PRICED CARDS</div></div>
-        </div>
-      </div>
+      <div class="resultsTitle">VIGSCOPE // VALUE &amp; PERFORMANCE</div>
+      <div class="resultsSub">PIZZA PLAYS // BET RESULTS // DECISION REVIEW</div>
     </div>
 
     <div class="proofBox">
@@ -284,7 +225,6 @@ function render(d,index){
     </div>
     <div class="resultsFoot">INDEX GENERATED ${esc(index.generatedAt||'—')} // SOURCE THROUGH ${esc(c.lastDate||'—')} // RESULTS INDEX IS NON-AUTHORITATIVE AND MAY BE REBUILT FROM IMMUTABLE RUNS + OBSERVATIONS.</div>
   `;
-  refreshCash(d,pa);
   engine.querySelectorAll('[data-results-scope]').forEach(b=>b.addEventListener('click',()=>{state.scope=b.dataset.resultsScope;render(d,cached)}));
   engine.querySelectorAll('[data-results-status]').forEach(b=>b.addEventListener('click',()=>{state.status=b.dataset.resultsStatus;render(d,cached)}));
 }
@@ -293,13 +233,13 @@ async function load(d){
   const engine=d.getElementById('engine');
   if(!engine)return;
   engine.classList.add('resultsDesk');
-  engine.innerHTML='<div class="resultsValueHero"><div class="resultsTitle">🧠 VIGSCOPE // RESULTS &amp; VALUE 🧠</div><div class="resultsSub">LOADING RESULTS INDEX…</div></div>';
+  engine.innerHTML='<div class="resultsValueHero"><div class="resultsTitle">VIGSCOPE // VALUE &amp; PERFORMANCE</div><div class="resultsSub">LOADING RESULTS INDEX…</div></div>';
   try{
     const r=await fetch(`${INDEX_URL}?v=${Date.now()}`,{cache:'no-store'});
     if(!r.ok)throw new Error(`HTTP ${r.status}`);
     render(d,await r.json());
   }catch(e){
-    engine.innerHTML=`<div class="resultsValueHero"><div class="resultsTitle">🧠 VIGSCOPE // RESULTS &amp; VALUE 🧠</div><div class="resultsSub">RESULTS INDEX UNAVAILABLE // ${esc(e.message||e)}</div></div>`;
+    engine.innerHTML=`<div class="resultsValueHero"><div class="resultsTitle">VIGSCOPE // VALUE &amp; PERFORMANCE</div><div class="resultsSub">RESULTS INDEX UNAVAILABLE // ${esc(e.message||e)}</div></div>`;
   }
 }
 function install(d){
@@ -310,8 +250,6 @@ function install(d){
   if(engine.dataset[INSTALLED]!=='1'){
     engine.dataset[INSTALLED]='1';
     load(d);
-  }else if(cached){
-    refreshCash(d,cached.priceAnalytics||{});
   }
   return true;
 }
@@ -323,5 +261,4 @@ const timer=setInterval(()=>{
   if(d&&install(d))clearInterval(timer);
   if(tries>250)clearInterval(timer);
 },40);
-function refreshCachedValue(){const d=appDoc();if(d&&cached)refreshCash(d,cached.priceAnalytics||{})}window.addEventListener('pageshow',refreshCachedValue);window.addEventListener('focus',refreshCachedValue);
 })();
