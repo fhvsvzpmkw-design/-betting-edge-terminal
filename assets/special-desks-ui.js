@@ -96,6 +96,12 @@ function ensureStyle(d){
     .deskSectionBar{display:flex;align-items:center;gap:10px;margin:14px 0 9px;color:var(--deskAccent);font-size:10px;font-weight:950;letter-spacing:.12em;line-height:1.35;text-transform:uppercase}.deskSectionBar b{white-space:nowrap}.deskSectionBar span{margin-left:auto;color:var(--deskAccentSoft);font-size:8px;letter-spacing:.08em;text-align:right;order:2}.deskSectionBar:after{content:"";height:1px;flex:1 1 70px;order:1;background:linear-gradient(90deg,color-mix(in srgb,var(--deskAccent) 55%,transparent),transparent)}
     .pizzaPick{border-color:#a85d2b!important;border-left-color:var(--deskAccent)!important;box-shadow:inset 0 0 0 1px rgba(255,174,98,.045),inset 0 -28px 45px rgba(0,0,0,.14),0 0 25px rgba(203,88,28,.12)!important}.pizzaMarketStrip,.pizzaExplain,.pizzaEventMeta{box-shadow:inset 0 0 15px rgba(255,132,49,.018)}.pizzaLouTag{box-shadow:0 0 15px rgba(255,140,58,.18)!important}.pizzaPick h3{font-size:clamp(24px,3vw,31px)!important}
     .cryptoSourceBar{margin-top:0!important}.cryptoBoard{margin-top:0!important}.cryptoPick{box-shadow:inset 0 0 0 1px rgba(191,176,255,.02),inset 0 -22px 38px rgba(0,0,0,.10),0 0 15px rgba(96,72,166,.07)!important}
+    .cryptoPick{box-sizing:border-box;min-width:0}.cryptoTopLine{flex-wrap:wrap}.cryptoPick h3,.cryptoMarket{overflow-wrap:anywhere}
+    .cryptoValueStrip{align-items:start;gap:12px}.cryptoValueCell strong{font-variant-numeric:tabular-nums;line-height:1.3}.cryptoValueCell .cryptoPriceLabel{display:block;margin-top:5px;color:#aaa1bf;font-size:12px;font-weight:700;line-height:1.45;overflow-wrap:anywhere}.cryptoValueCell strong.cryptoPriceText{font-size:14px;font-weight:700;line-height:1.5}
+    .cryptoPriceReferences{margin-top:8px;padding:0 1px;color:#aaa1bf;font-size:13px;line-height:1.5;overflow-wrap:anywhere}.cryptoPriceReferences b{color:#bdb3d2;font-size:12px;letter-spacing:.04em}
+    .cryptoActionLine{flex-wrap:wrap;align-items:baseline;gap:5px 12px;line-height:1.5;overflow-wrap:anywhere}.cryptoEventMeta{gap:8px 16px;line-height:1.5}.cryptoEventMeta span{min-width:0;max-width:100%;overflow-wrap:anywhere}.cryptoEventMeta .eventStart{flex-basis:100%}
+    .cryptoAnalysisBtn{min-height:44px}.cryptoDetail{padding:12px;overflow-wrap:anywhere}.cryptoDetailCell{min-width:0}.cryptoSourceNote{overflow-wrap:anywhere}
+    @media(max-width:560px){.cryptoValueStrip{gap:8px}.cryptoValueCell small{font-size:10px}.cryptoValueCell .cryptoPriceLabel{font-size:12px}.cryptoActionLine span{margin-top:0}}
     @media(max-width:720px){#${PIZZA_PANEL},#${CRYPTO_PANEL}{margin-left:7px;margin-right:7px;padding:11px}.specialHead{min-height:42px;padding:8px 9px;margin-bottom:11px}.deskSectionBar{margin-top:12px}.deskSectionBar span{display:none}.pizzaPick h3{font-size:24px!important}}
 
     `;d.head.appendChild(s)
@@ -177,27 +183,48 @@ function shortRationale(card){
   const out=sentences.slice(0,2).join(' ').trim();
   return out.length>260?`${out.slice(0,257).trimEnd()}…`:out;
 }
+function observedPriceParts(value){
+  const [primary,...references]=priceText(value).split(/\s+·\s+/);
+  // Separate only an explicit leading quote; keep unfamiliar formats intact.
+  const quote=primary.match(/^(.*?)\s*(~?[+\-−]\d{3,}(?:\.\d+)?)(?=\s|$)(.*)$/);
+  if(!quote)return {price:primary,label:'',references:references.join(' · ')};
+  return {price:quote[2],label:quote[1].trim(),references:[quote[3].trim(),...references].filter(Boolean).join(' · ')};
+}
+function targetPriceParts(value){
+  const text=priceText(value),match=text.match(/^(~?[+\-−]\d{3,}(?:\.\d+)?)\s+(OR BETTER)$/i);
+  return match?{price:match[1],label:match[2]}:{price:text,label:''};
+}
 function actionLineText(card,status){
   const action=String(card?.actionLabel||status).trim()||status;
   const target=priceText(card?.targetPrice);
+  const parts=targetPriceParts(target);
+  if(parts.label&&action.toUpperCase().endsWith(` ${parts.price.toUpperCase()}`))return `${action} ${parts.label}`;
   if(target!=='—'&&!action.toUpperCase().includes(target.toUpperCase()))return `${action} // ${target}`;
   return action;
+}
+function actionDecisionText(card,status,action){
+  const decision=String(card?.decision||status).trim();
+  const key=text=>text.toUpperCase().replace(/−/g,'-').replace(/\b(?:FOR|REQUIRE)\b/g,'').replace(/[·/]/g,' ').replace(/\s+/g,' ').trim();
+  return decision.toUpperCase()===status||key(decision)===key(action)?'':decision;
 }
 function cryptoCardHtml(card,index){
   const status=String(card?.status||'WATCH').toUpperCase();
   const rank=String(card?.rank||'').toUpperCase();
   const detailId=`cryptoDetail${String(card?.id||index).replace(/[^a-zA-Z0-9_-]/g,'')}`;
   const gradeHtml=rank?`<span class="cryptoGrade">GRADE <b>${esc(rank)}</b></span>`:'';
+  const observed=observedPriceParts(card?.observedPrice),target=targetPriceParts(card?.targetPrice);
+  const action=actionLineText(card,status),decision=actionDecisionText(card,status,action);
   return `<article class="cryptoPick" data-status="${esc(status)}">
     <div class="cryptoTopLine"><span class="cryptoStatusTag">${esc(status)}</span>${gradeHtml}</div>
     <h3>${esc(card?.selection||card?.title||'UNTITLED')}</h3>
     <div class="cryptoMarket">${esc(card?.market||'MARKET')}</div>
     <div class="cryptoValueStrip">
-      <div class="cryptoValueCell"><small>CURRENT</small><strong>${esc(priceText(card?.observedPrice))}</strong></div>
+      <div class="cryptoValueCell"><small>CURRENT</small><strong${observed.price.length>24?' class="cryptoPriceText"':''}>${esc(observed.price)}</strong>${observed.label?`<span class="cryptoPriceLabel">${esc(observed.label)}</span>`:''}</div>
       <div class="cryptoValueCell fair"><small>FAIR</small><strong>${esc(fairPriceText(card))}</strong></div>
-      <div class="cryptoValueCell target"><small>TARGET</small><strong>${esc(priceText(card?.targetPrice))}</strong></div>
+      <div class="cryptoValueCell target"><small>TARGET</small><strong${target.price.length>24?' class="cryptoPriceText"':''}>${esc(target.price)}</strong>${target.label?`<span class="cryptoPriceLabel">${esc(target.label)}</span>`:''}</div>
     </div>
-    <div class="cryptoActionLine"><b>${esc(actionLineText(card,status))}</b><span>${esc(card?.decision||status)}</span></div>
+    ${observed.references?`<div class="cryptoPriceReferences"><b>MARKET REFERENCES //</b> ${esc(observed.references)}</div>`:''}
+    <div class="cryptoActionLine"><b>${esc(action)}</b>${decision?`<span>${esc(decision)}</span>`:''}</div>
     ${eventMetaHtml(card)}
     <div class="cryptoWhy"><b>WHY ${esc(status)}?</b>${esc(shortRationale(card))}</div>
     <div class="cryptoSourceNote"><b>SOURCE //</b> ${esc(card?.sourceLabel||crypto?.source?.name||'WEB SOURCE')}</div>
