@@ -5,7 +5,7 @@ const syndicates=json('data/syndicates.json');assert(JSON.stringify(syndicates.d
 const shellManifest=json('data/hotline-shells.json');assert(shellManifest.schema===1,'Hotline shell manifest schema must be 1');assert(shellManifest.rules?.normalUpdate==='REFRESH THE EDITION; PRESERVE THE PAGE.','Normal shell update rule missing');
 const expected={
 'eddie-numbers':['muddy-ledger-desk','syndicates/generated/eddie-numbers/hotline.html','MUDDY NUMBERS',3],
-'bill-weston':['private-sheet','syndicates/downtown-booth/shell.html','BILL WESTON // PRIVATE SHEET',1],
+'bill-weston':['private-sheet','syndicates/downtown-booth/shell-v2.html','BILL WESTON // PRIVATE SHEET',2],
 'larry-lombardo':['lizard-line','syndicates/lock-line/shell-v2.html','The Lizard Line!!!',2],
 'jesse-bains':['delphoria-nfl-book','syndicates/death-angel/shell-v3.html','NFL BOOK // GRAHAM SHEET',3],
 'lou-vega':['vegas-by-the-slice','syndicates/generated/lou-vega/shell-v3.html','VEGAS BY THE SLICE',3]};
