@@ -1,0 +1,115 @@
+name: Graham carried-rating audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/walters/nfl/carried-rating-audit-staging.json
+  pull_request:
+    paths:
+      - .github/workflows/graham-carried-rating-audit.yml
+      - tools/apply-graham-carried-rating-audit.mjs
+      - data/walters/nfl/carried-rating-audit-staging.json
+      - data/walters/nfl/active-week.json
+      - data/walters/nfl/home-field/home-field-production-current.json
+      - data/walters/nfl/home-field/h4-current.json
+      - data/walters/nfl/personnel-production-current.json
+      - data/walters/nfl/matchup-production-current.json
+      - data/walters/nfl/qb-production-current.json
+  workflow_dispatch:
+
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate governed audit code
+        run: |
+          set -euo pipefail
+          node --check tools/apply-graham-carried-rating-audit.mjs
+          node --check tools/graham-active-week.mjs
+          node --check tools/graham-fair-decomposition.mjs
+          node tools/graham-active-week.mjs --json >/tmp/graham-active-week.json
+
+      - name: Apply carried-rating personnel-layer audit
+        run: |
+          set -euo pipefail
+          node tools/apply-graham-carried-rating-audit.mjs data/walters/nfl/carried-rating-audit-staging.json
+
+      - name: Verify fair decomposition and market isolation
+        run: |
+          set -euo pipefail
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+          node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const staging=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json','utf8'));
+          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          const h4=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/home-field-production-current.json','utf8'));
+          const qb=JSON.parse(fs.readFileSync('data/walters/nfl/qb-production-current.json','utf8'));
+          if(staging.state!=='APPLIED'||staging.marketViewed!==false) throw new Error('audit staging readback failed');
+          if(active.schema!==1||active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER'||active.season!==staging.season||active.week!==staging.week) throw new Error('active week changed or invalid');
+          if(h4.state!=='OPERATIONAL_SCOPED'||h4.productionAuthority!==true||h4.marketViewed!==false) throw new Error('H4 production invalid');
+          if(h4.productionScope?.domesticLeagueBaseline?.homeLocationAdvantagePoints!==2.082||h4.productionScope?.domesticLeagueBaseline?.pointsToHomeSpread!==-2.082) throw new Error('H4 regression');
+          if(qb.state!=='OPERATIONAL_SCOPED'||qb.authorityToken!=='APPROVED_WALTERS_QB_PERFORMANCE'||qb.productionAuthority!==true||qb.grahamWritesAllowed!==true||qb.marketViewed!==false) throw new Error('QB production invalid');
+          console.log('GRAHAM CARRIED-RATING AUDIT VERIFY: PASS // ACTIVE WEEK + H4 + QB + MARKET ISOLATION');
+          NODE
+
+      - name: Publish governed audit outputs
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+          ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
+          git add -- \
+            data/walters/nfl-power-ratings-ledger.json \
+            "$ACTIVE_NUMBERS" \
+            "$ACTIVE_RESEARCH" \
+            data/walters/nfl/carried-rating-audit-staging.json
+          if git diff --cached --quiet; then
+            echo "No carried-rating audit changes to publish."
+            exit 0
+          fi
+          git commit -m "Apply Graham carried-rating personnel-layer audit"
+          git push origin HEAD:main
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f data/walters/nfl/carried-rating-audit-staging.json ]; then
+            node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs=require('node:fs');
+          const s=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json','utf8'));
+          console.log('## Graham carried-rating audit');
+          console.log(`- Audit: ${s.auditId||'unknown'}`);
+          console.log(`- State: ${s.state}`);
+          console.log(`- Season/week: ${s.season}/W${String(s.week).padStart(2,'0')}`);
+          console.log(`- Rating cases: ${(s.result?.ratingChanges||[]).length}`);
+          console.log(`- Games rebuilt: ${(s.result?.matchupChanges||[]).length}`);
+          console.log('- H4 location terms: preserved');
+          console.log('- Personnel overlays: preserved');
+          console.log('- QB reconciliation: required by downstream Graham QB performance production workflow');
+          console.log('- Market viewed: false');
+          console.log('- BET authority: false');
+          NODE
+          fi
