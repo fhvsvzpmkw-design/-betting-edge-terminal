@@ -43,7 +43,7 @@ jobs:
         run: node tests/vigscope-meter-production.test.mjs
       - name: Verify runner loads calibrated runtime
         run: |
-          grep -F '<script src="./assets/runner-core-runtime.js"></script>' runner.html
+          grep -F '<script src="./assets/runner-core-runtime.js' runner.html
           grep -F "VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1'" assets/runner-core-runtime.js
           grep -F "AGREEMENT UNMEASURED" assets/runner-core-runtime.js
       - name: Commit calibrated runtime

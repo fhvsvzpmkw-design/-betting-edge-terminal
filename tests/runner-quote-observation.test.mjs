@@ -89,7 +89,7 @@ for(const filename of ['assets/runner-core-runtime.js','runner-core.html']){
 
 for(const filename of ['runner.html','runner-app.html','runner-core.html']){
   const source=fs.readFileSync(filename,'utf8'),helperTag=source.indexOf('<script src="./assets/quote-observation.js"></script>');
-  const runtime=filename==='runner-core.html'?source.indexOf('<script>'):source.indexOf('<script src="./assets/runner-core-runtime.js"></script>');
+  const runtime=filename==='runner-core.html'?source.indexOf('<script>'):source.indexOf('<script src="./assets/runner-core-runtime.js');
   assert.ok(helperTag>=0&&runtime>helperTag,`${filename}: helper loads before runtime`);
 }
 

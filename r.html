@@ -376,11 +376,6 @@ function sessionApplicable(slot,day,now=new Date()){
   if(day>current.day)return false;
   return current.minutes>=minutes;
 }
-function b64ue(v){
-  const bytes=new TextEncoder().encode(v);let bin='';
-  bytes.forEach(b=>bin+=String.fromCharCode(b));
-  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
 function fail(text){msg.textContent=text;msg.classList.add('error')}
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 function revealTerminal(){
@@ -468,8 +463,11 @@ async function load(){
     if(entry.feedGeneratedAt&&String(run.feedGeneratedAt||'')!==String(entry.feedGeneratedAt))throw new Error('RUN FEED PROVENANCE VALIDATION FAILED');
     const priorRuns=await sameDayPriorRuns(index,entry);
     const hydrated={...run,counts:countsFromRecommendations(run),prior_runs:priorRuns};
+    // Keep the validated report and same-day history out of the navigation URL.
+    // Large report days exceed browser URL limits when serialized into #run.
+    frame.__vigscopeReport={ref:id,run:hydrated};
     frame.addEventListener('load',revealTerminal,{once:true});
-    frame.src='./runner.html?build='+Date.now()+'#run='+b64ue(JSON.stringify(hydrated));
+    frame.src='./runner.html?build='+Date.now()+'#runRef='+encodeURIComponent(id);
   }catch(e){fail('VIGSCOPE SHORT LINK ERROR // '+String(e&&e.message||e))}
 }
 load();

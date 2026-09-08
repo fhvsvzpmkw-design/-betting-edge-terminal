@@ -22,7 +22,18 @@ const issuedSessionCatalog=new Map();
 function deepClone(v){try{return JSON.parse(JSON.stringify(v))}catch(e){return v}}
 function b64u(v){try{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const bin=atob(v);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}catch(e){return null}}
 function b64ue(v){const bytes=new TextEncoder().encode(v);let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-function payload(){const h=location.hash.slice(1);if(!h)return null;const p=new URLSearchParams(h);let raw=null;if(p.has('run'))raw=b64u(p.get('run'));else if(p.has('json'))raw=p.get('json');if(!raw)return null;try{return JSON.parse(raw)}catch(e){return {__error:String(e)}}}
+function payload(){
+  const h=location.hash.slice(1);if(!h)return null;const p=new URLSearchParams(h);
+  try{
+    if(p.has('runRef')){
+      const report=window.frameElement?.__vigscopeReport;
+      if(!report||report.ref!==p.get('runRef')||!report.run?.ts)throw new Error('Report handoff unavailable. Reopen the original report link.');
+      return deepClone(report.run);
+    }
+    let raw=null;if(p.has('run'))raw=b64u(p.get('run'));else if(p.has('json'))raw=p.get('json');
+    return raw?JSON.parse(raw):null;
+  }catch(e){return {__error:String(e)}}
+}
 function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
 function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
 function displayPrice(v){const raw=txt(v,'VERIFY PRICE').trim();const m=raw.match(/([+−-]\d{2,4})(?![\d.])/);return m?m[1]:'—'}
@@ -69,7 +80,18 @@ function mergedPriorRuns(run){
   [...exact.values()].forEach(x=>{const k=historyFamilyKey(x),prior=grouped.get(k);if(!prior){grouped.set(k,{...x,snapshotCount:1});return}const newer=String(x.ts||'')>String(prior.ts||'')?x:prior;grouped.set(k,{...newer,snapshotCount:(prior.snapshotCount||1)+1})});
   return [...grouped.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')))
 }
-function updateRunnerHash(run){try{history.replaceState(null,'',location.pathname+location.search+'#run='+b64ue(JSON.stringify(run)))}catch(e){console.warn('Could not update runner URL',e)}}
+function updateRunnerHash(run){
+  try{
+    const p=new URLSearchParams(location.hash.slice(1));
+    if(p.has('runRef')){
+      const report=window.frameElement?.__vigscopeReport;
+      if(!report||report.ref!==p.get('runRef'))throw new Error('Report handoff unavailable');
+      report.run=deepClone(run);
+      return;
+    }
+    history.replaceState(null,'',location.pathname+location.search+'#run='+b64ue(JSON.stringify(run)));
+  }catch(e){console.warn('Could not update runner URL',e)}
+}
 
 function normName(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim()}
 function normMarket(v){return normName(v).replace(/\bstrikeouts?\b/g,'strikeout').replace(/\bhome runs?\b/g,'home run').replace(/\brbis?\b/g,'rbi').replace(/\btotal bases?\b/g,'total base').replace(/\bhits?\b/g,'hit').replace(/\bpassing yards?\b/g,'passing yard').replace(/\breceiving yards?\b/g,'receiving yard').replace(/\brushing yards?\b/g,'rushing yard').replace(/\bgoals?\b/g,'goal').replace(/\bshots?\b/g,'shot').replace(/\bpoints?\b/g,'point').replace(/\brebounds?\b/g,'rebound').replace(/\bassists?\b/g,'assist')}
@@ -935,6 +957,8 @@ function apply(run){
 }
 
 activeRun=payload();
+// Timing badges read the active session without decoding an oversized URL.
+globalThis.BettingEdgeRunnerPayload=()=>deepClone(activeRun);
 if(activeRun&&!activeRun.__error){
   rememberIssuedRun(activeRun);
   (Array.isArray(activeRun.prior_runs)?activeRun.prior_runs:[]).forEach(x=>rememberIssuedRun(x));

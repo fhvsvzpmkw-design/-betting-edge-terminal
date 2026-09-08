@@ -11,6 +11,7 @@
 
   function decodeRun(){
     try{
+      if(typeof window.BettingEdgeRunnerPayload==='function')return window.BettingEdgeRunnerPayload();
       const hash=location.hash.slice(1);
       if(!hash)return null;
       const params=new URLSearchParams(hash);
