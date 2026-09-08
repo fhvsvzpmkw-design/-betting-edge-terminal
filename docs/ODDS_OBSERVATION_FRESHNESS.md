@@ -26,7 +26,19 @@ The latest successful response controls the scope actually requested and identit
 
 For an unchanged price observed at 09:20 that last changed at 07:00, keep `updatedAt=07:00` and `observedAt=09:20`. Freshness comes from 09:20. A subsequent unchanged observation is `PRICE UNCHANGED`; actual matching price/line differences supply movement. Market-change timestamps are market-level provenance and do not prove every individual side moved.
 
-All report gates, coverage summaries, meters, lineage/repricing and price-observation consumers use the bound feed's versioned clock. Pinnacle/OddsPapi has its own benchmark timestamp policy and is outside this provider-specific correction.
+All report gates, coverage summaries, meters, lineage/repricing and price-observation consumers use the bound feed's versioned clock. The September 6 correction excluded Pinnacle/OddsPapi. The September 8 Pinnacle extension below closes that separate path.
+
+## Pinnacle extension — September 8
+
+New OddsPapi observers declare `quoteObservationVersion: 1`. For each successful `/odds-by-tournaments` response, the collector records the local receipt time as `observedAt` on the exact returned Pinnacle quote rows. A returned fixture must identify a requested tournament. Each batch retains its own receipt time; `collectionStartedAt` records collection start and `generatedAt` is finalized after all successful responses. Failed requests, malformed responses and mismatched fixture scopes do not produce a successful observer or refresh old rows. A later returned fixture replaces the earlier copy, including missing markets, sides or books; no previous snapshot is merged into the new observation.
+
+For these versioned observers, the existing 30-minute quote limit uses `generatedAt - quote.observedAt`. The independent 75-minute whole-observer limit still uses `report.ts - observer.generatedAt`. Missing, invalid or future observations are unavailable; observation times outside the actual collection interval fail observer validation. There is no fallback to a change time or a new snapshot timestamp. Unknown observation versions fail closed. Bookmaker, market, quote activation, suspension, two-sided main-line and exact event/selection matching checks still apply.
+
+OddsPapi documents `bookmakerChangedAt` and `changedAt` as **last-change** timestamps, not successful observations. Keep both originals in the observer and keep the original `quoteChangedAt` in paired benchmark outcomes; expose the separate `quoteObservedAt` for audit. Re-observing unchanged odds changes freshness only, not the price, line, no-vig reference or movement. [Provider field definitions](https://oddspapi.io/us/docs/get-odds-by-tournaments)
+
+Collection, benchmark annotation, observer/publication validation and exact market-reference resolution share this versioned rule. Existing observers without the marker retain their original change-time rules and benchmark payloads; never backfill them from `generatedAt` or Git metadata. The pinned observer supplies observation provenance even when an issued recommendation does not repeat `quoteObservedAt`; if supplied, that field must agree with the pinned exact quote. No issued report is regenerated or regraded by this correction.
+
+Pinnacle remains a non-executable market reference. Quote/observer age limits, request budgets, the 25-request reserve, schedules, decision thresholds, staking and Graham/Walters fair-number authority are unchanged. Only a subsequent successful collection can establish live recovery; a fixture test cannot refresh the September 8 15:15 snapshot.
 
 ## Historical boundary and verification
 

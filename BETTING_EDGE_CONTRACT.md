@@ -131,6 +131,8 @@ This amendment applies to newly collected feeds declaring `quoteObservationVersi
 
 The field definitions and regression expectations are in `docs/ODDS_OBSERVATION_FRESHNESS.md`. All five standard tasks inherit this correction through the shared scheduled authority. Books, primary-market scope, props pause, Core decision rules, staking, schedules and odds-request budget remain unchanged.
 
+**September 8 Pinnacle extension:** newly collected OddsPapi observers declaring `quoteObservationVersion: 1` use exact successful response-receipt `quote.observedAt` for the existing 30-minute benchmark quote limit, measured at the completed observer's `generatedAt`. Preserve `bookmakerChangedAt`, `changedAt` and benchmark `quoteChangedAt` as original change history. Missing, invalid, future or out-of-collection observations cannot qualify; a failed request or copied snapshot cannot refresh them. Keep the 75-minute whole-observer limit, exact active two-way main-line checks and non-executable authority. Collector, benchmark annotation, exact-reference resolver and publication validator must use the same marker. Unmarked historical observers keep their original rules; no backfill or regrading. This extends the earlier provider-specific correction without changing Pinnacle's age limits or decision permissions. The detailed collection and replay rules are in `docs/ODDS_OBSERVATION_FRESHNESS.md`.
+
 ## 4.1 Fair-value benchmark confidence and labeling
 
 Fair value must distinguish the source and strength of the estimate rather than presenting every de-vigged number as an equally strong independent handicap.

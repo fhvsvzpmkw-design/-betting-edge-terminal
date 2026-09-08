@@ -38,7 +38,7 @@ export function exactMarketReference(report, quote, observer) {
   const matches = [];
   for (const market of pinnacle?.markets || []) {
     if (!new RegExp(`^line/[^/]+/[^/]+/[^/]+/[^/]+/0/${suffix}$`).test(market.bookmakerMarketId || '')) continue;
-    const qualified = qualifyMarket({market, generatedAt: observer.generatedAt, primaryMatch: fixture.primaryMatch, bookmakerIsActive: pinnacle.bookmakerIsActive === true, suspended: pinnacle.suspended === true});
+    const qualified = qualifyMarket({market, generatedAt: observer.generatedAt, primaryMatch: fixture.primaryMatch, bookmakerIsActive: pinnacle.bookmakerIsActive === true, suspended: pinnacle.suspended === true, quoteObservationVersion: observer.quoteObservationVersion});
     if (qualified.state !== QUALIFIED) continue;
     const rows = qualified.pairedOutcomes;
     const expectedSides = quote.marketKey === 'totals' ? ['over', 'under'] : ['home', 'away'];
@@ -93,6 +93,7 @@ export function validateMarketAssessment(report, rec, item, ids) {
 export function validateBoundMarketAssessment(report, rec, observer) {
   const reference = exactMarketReference(report, rec.feed, observer), b = rec.pinnacleBenchmark;
   for (const field of ['noVigProbability', 'noVigPriceAmerican', 'quoteChangedAt', 'limit']) ensure(b[field] === reference.selected[field], `Market assessment ${field} differs from bound observer`);
+  if(b.quoteObservedAt!==undefined) ensure(b.quoteObservedAt===reference.selected.quoteObservedAt, 'Market assessment quoteObservedAt differs from bound observer');
   ensure(String(b.price) === String(reference.selected.priceAmerican) && String(b.pairedPrice) === String(reference.opposite.priceAmerican), 'Market assessment paired prices differ from bound observer');
   ensure(rec.marketAssessment.referenceGeneratedAt === reference.generatedAt, 'Market assessment reference timestamp differs from bound observer');
   return reference;

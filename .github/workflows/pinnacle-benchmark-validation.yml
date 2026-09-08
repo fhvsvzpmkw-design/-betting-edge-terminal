@@ -11,6 +11,8 @@ on:
       - tools/build-graham-current-week.mjs
       - syndicates/generated/graham-mercer/hotline.html
       - tests/oddspapi-retention-horizons.test.mjs
+      - tests/pinnacle-observation-freshness.test.mjs
+      - tools/market-price-assessment.mjs
       - tests/graham-terminal-automation.test.mjs
       - tools/graham-research-review.mjs
       - .github/workflows/odds-refresh.yml
@@ -27,6 +29,8 @@ on:
       - tools/build-graham-current-week.mjs
       - syndicates/generated/graham-mercer/hotline.html
       - tests/oddspapi-retention-horizons.test.mjs
+      - tests/pinnacle-observation-freshness.test.mjs
+      - tools/market-price-assessment.mjs
       - tests/graham-terminal-automation.test.mjs
       - tools/graham-research-review.mjs
       - .github/workflows/odds-refresh.yml
@@ -58,6 +62,7 @@ jobs:
           node tools/pinnacle-sharp-benchmark.mjs self-test
           node tools/pinnacle-benchmark-publication-gate.mjs self-test
           node tests/oddspapi-retention-horizons.test.mjs
+          node tests/pinnacle-observation-freshness.test.mjs
           node tests/graham-terminal-automation.test.mjs
       - name: Validate production JSON
         run: |

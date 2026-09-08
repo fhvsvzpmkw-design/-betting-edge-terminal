@@ -38,8 +38,12 @@ function quoteTime(quote){
   return Number.isFinite(ms)?{raw,ms}:null;
 }
 
-export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive=true,suspended=false,quoteFreshnessMinutes=30,futureClockSkewToleranceMinutes=5}={}){
+export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive=true,suspended=false,quoteFreshnessMinutes=30,futureClockSkewToleranceMinutes=5,quoteObservationVersion}={}){
   const base={state:UNAVAILABLE,authority:AUTHORITY,executionAuthority:false,decisionAuthority:false,fairValueAuthority:false,reason:null,generatedAt:generatedAt||null,pairedOutcomes:[]};
+  // Unmarked archives retain their original change-time interpretation exactly.
+  if(quoteObservationVersion!==undefined&&quoteObservationVersion!==1){base.reason='QUOTE_OBSERVATION_VERSION_UNSUPPORTED';return base;}
+  const observed=quoteObservationVersion===1;
+  if(observed){base.quoteObservationVersion=1;base.freshnessClock='observedAt';}
   if(!primaryMatch){base.reason='PRIMARY_EVENT_MATCH_REQUIRED';return base;}
   if(bookmakerIsActive!==true){base.reason='BOOKMAKER_INACTIVE';return base;}
   if(suspended===true){base.reason='BOOKMAKER_SUSPENDED';return base;}
@@ -57,8 +61,15 @@ export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive
   const generatedMs=Date.parse(generatedAt||'');
   if(!Number.isFinite(generatedMs)){base.reason='OBSERVER_TIMESTAMP_INVALID';return base;}
   const quoteTimes=rows.map(row=>quoteTime(row.quote));
-  if(quoteTimes.some(value=>!value)){base.reason='QUOTE_TIMESTAMP_INVALID';return base;}
-  const ages=quoteTimes.map(value=>(generatedMs-value.ms)/60000);
+  const freshnessTimes=observed?rows.map(row=>{
+    const raw=row.quote.observedAt;
+    const ms=typeof raw==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(raw)?Date.parse(raw):NaN;
+    return Number.isFinite(ms)?{raw,ms}:null;
+  }):quoteTimes;
+  if(freshnessTimes.some(value=>!value)){base.reason=observed?'QUOTE_OBSERVATION_INVALID':'QUOTE_TIMESTAMP_INVALID';return base;}
+  // Receipt times are local, so future observations cannot use provider skew tolerance.
+  if(observed&&freshnessTimes.some(value=>value.ms>generatedMs)){base.reason='QUOTE_OBSERVATION_FUTURE';return base;}
+  const ages=freshnessTimes.map(value=>(generatedMs-value.ms)/60000);
   if(ages.some(age=>age < -futureClockSkewToleranceMinutes || age > quoteFreshnessMinutes)){
     base.reason='QUOTE_STALE';
     base.maxQuoteAgeMinutes=Number(Math.max(...ages).toFixed(2));
@@ -80,13 +91,14 @@ export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive
     noVigProbability:noVig[index].probability,
     noVigPriceDecimal:noVig[index].priceDecimal,
     noVigPriceAmerican:noVig[index].priceAmerican,
-    quoteChangedAt:quoteTimes[index].raw,
+    quoteChangedAt:observed?(row.quote.bookmakerChangedAt||row.quote.changedAt||null):quoteTimes[index].raw,
+    ...(observed?{quoteObservedAt:freshnessTimes[index].raw}:{}),
     limit:Number.isFinite(Number(row.quote?.limit))?Number(row.quote.limit):null
   }));
   return base;
 }
 
-export function annotatePinnacle(pinnacle,{generatedAt,primaryMatch,quoteFreshnessMinutes=30,futureClockSkewToleranceMinutes=5}={}){
+export function annotatePinnacle(pinnacle,{generatedAt,primaryMatch,quoteFreshnessMinutes=30,futureClockSkewToleranceMinutes=5,quoteObservationVersion}={}){
   if(!pinnacle||typeof pinnacle!=='object') return pinnacle;
   const markets=Array.isArray(pinnacle.markets)?pinnacle.markets:[];
   let qualified=0;
@@ -98,7 +110,8 @@ export function annotatePinnacle(pinnacle,{generatedAt,primaryMatch,quoteFreshne
       bookmakerIsActive:pinnacle.bookmakerIsActive===true,
       suspended:pinnacle.suspended===true,
       quoteFreshnessMinutes,
-      futureClockSkewToleranceMinutes
+      futureClockSkewToleranceMinutes,
+      quoteObservationVersion
     });
     if(market.benchmark.state===QUALIFIED) qualified++;
   }
@@ -114,6 +127,7 @@ export function validateObserver(observer,{observerFreshnessMinutes=75,quoteFres
   if(observer.mode!=='official-sharp-benchmark') errors.push('observer mode is not official-sharp-benchmark');
   if(observer.benchmarkAuthority!==AUTHORITY) errors.push('observer benchmark authority mismatch');
   if(observer.executionAuthority!==false) errors.push('observer must remain non-executable');
+  if(observer.quoteObservationVersion!==undefined&&observer.quoteObservationVersion!==1) errors.push('unsupported quote observation version');
   if(observer.status==='ok'){
     const generatedMs=Date.parse(observer.generatedAt||'');
     const asOfMs=asOf instanceof Date?asOf.getTime():Date.parse(asOf||'');
@@ -122,11 +136,19 @@ export function validateObserver(observer,{observerFreshnessMinutes=75,quoteFres
       const age=(asOfMs-generatedMs)/60000;
       if(age < -futureClockSkewToleranceMinutes || age > observerFreshnessMinutes) errors.push('observer stale');
     }
+    if(observer.quoteObservationVersion===1){
+      const startedMs=Date.parse(observer.collectionStartedAt||'');
+      if(!Number.isFinite(startedMs)||startedMs>generatedMs) errors.push('observer collectionStartedAt invalid');
+      for(const fixture of observer.fixtures||[])for(const market of fixture.pinnacle?.markets||[])for(const outcome of market.outcomes||[])for(const quote of outcome.players||[]){
+        const observedMs=Date.parse(quote.observedAt||'');
+        if(!Number.isFinite(observedMs)||observedMs<startedMs||observedMs>generatedMs) errors.push(`quote observation outside collection fixture=${fixture.fixtureId||'unknown'} market=${market.marketId||'unknown'}`);
+      }
+    }
     for(const fixture of observer.fixtures||[]){
       const pinnacle=fixture?.pinnacle;
       if(!pinnacle) continue;
       for(const market of pinnacle.markets||[]){
-        const expected=qualifyMarket({market,generatedAt:observer.generatedAt,primaryMatch:fixture.primaryMatch,bookmakerIsActive:pinnacle.bookmakerIsActive===true,suspended:pinnacle.suspended===true,quoteFreshnessMinutes,futureClockSkewToleranceMinutes});
+        const expected=qualifyMarket({market,generatedAt:observer.generatedAt,primaryMatch:fixture.primaryMatch,bookmakerIsActive:pinnacle.bookmakerIsActive===true,suspended:pinnacle.suspended===true,quoteFreshnessMinutes,futureClockSkewToleranceMinutes,quoteObservationVersion:observer.quoteObservationVersion});
         const actual=market?.benchmark;
         if(JSON.stringify(actual)!==JSON.stringify(expected)) errors.push(`benchmark drift fixture=${fixture.fixtureId||'unknown'} market=${market.marketId||'unknown'}`);
       }

@@ -116,12 +116,12 @@ const args=parseArgs(process.argv.slice(2));
 if(args.command==='self-test'||args.command==='validate-runtime') selfTest();
 else if(args.command==='normalize'){
   check(args.report&&args.sidecar,'normalize requires --report and --sidecar');
-  const rt=runtime('.'),report=readJson(args.report),sidecar=readJson(args.sidecar);
+  const rt=runtime(args.root||'.'),report=readJson(args.report),sidecar=readJson(args.sidecar);
   if(normalize(rt,report,sidecar)) writeJson(args.sidecar,sidecar);
   validate(rt,report,sidecar);
   console.log('Pinnacle benchmark sidecar normalized');
 }else if(args.command==='validate'){
   check(args.report&&args.sidecar,'validate requires --report and --sidecar');
-  validate(runtime('.'),readJson(args.report),readJson(args.sidecar));
+  validate(runtime(args.root||'.'),readJson(args.report),readJson(args.sidecar));
   console.log('Pinnacle benchmark publication gate passed');
 }else fail('Usage: pinnacle-benchmark-publication-gate.mjs self-test|validate-runtime|normalize --report FILE --sidecar FILE|validate --report FILE --sidecar FILE');
