@@ -7,7 +7,7 @@
   "sport": "NFL",
   "season": 2026,
   "createdAt": "2026-08-30T13:23:00-07:00",
-  "updatedAt": "2026-08-30T14:28:30-07:00",
+  "updatedAt": "2026-09-08T13:04:41-07:00",
   "authority": {
     "owner": "Graham Mercer",
     "waltersInterface": "core/walters-intelligence-interface-v1.4.json",
@@ -412,16 +412,22 @@
       "team": "Green Bay",
       "abbr": "GB",
       "seedRating": 26.5,
-      "currentRating": 26,
-      "priorRating": 26.5,
-      "lastDelta": -0.5,
-      "lastUpdatedAt": "2026-08-30T14:28:30-07:00",
-      "lastUpdateType": "INITIAL_RESEARCH_DELTA",
-      "confidence": "CURRENT_RESEARCH_ADJUSTED",
+      "currentRating": 26.5,
+      "priorRating": 26,
+      "lastDelta": 0.5,
+      "lastUpdatedAt": "2026-09-08T13:04:41-07:00",
+      "lastUpdateType": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+      "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "2026 VSiN NFL Betting Guide // Steve Makinen's Power Ratings // page 37",
-        "https://www.cbssports.com/nfl/injuries/daily/"
+        "https://www.cbssports.com/nfl/injuries/daily/",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/2026/week-01-personnel-ledger.json",
+        "https://www.nfl.com/news/nfl-places-packers-rb-josh-jacobs-commissioner-exempt-list",
+        "https://www.packers.com/news/5-things-learned-from-gm-brian-gutekunst-about-packers-roster-sep-1-2026",
+        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
       ],
       "history": [
         {
@@ -448,6 +454,25 @@
           "sourceRefs": [
             "https://www.cbssports.com/nfl/injuries/daily/"
           ]
+        },
+        {
+          "sequence": 2,
+          "type": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+          "fromRating": 26,
+          "delta": 0.5,
+          "toRating": 26.5,
+          "effectiveAt": "2026-09-08T13:04:41-07:00",
+          "reason": "The August 30 Green Bay deduction was explicitly a Josh Jacobs temporary availability adjustment. The active Week 1 personnel ledger now owns that case: Jacobs remains on the Commissioner Exempt list and the replacement is an unresolved backfield committee, so production correctly fails closed rather than embedding an estimate in team strength. Reverse only the legacy carried-rating deduction; do not infer a personnel number and do not reset the seed.",
+          "sourceRefs": [
+            "data/walters/nfl-power-ratings-ledger.json",
+            "data/walters/nfl/2026/week-01-personnel-ledger.json",
+            "https://www.nfl.com/news/nfl-places-packers-rb-josh-jacobs-commissioner-exempt-list",
+            "https://www.packers.com/news/5-things-learned-from-gm-brian-gutekunst-about-packers-roster-sep-1-2026",
+            "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+            "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+          ],
+          "auditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700",
+          "marketViewed": false
         }
       ],
       "externalComparisons": {
@@ -464,7 +489,8 @@
           "role": "INDEPENDENT_COMPARISON_ONLY",
           "note": "ESPN's 2026 FPI page was captured during this sweep but identifies its own last update as 2026-06-02. Use matchup differentials/disagreement only; do not mechanically average raw FPI with Graham ratings."
         }
-      }
+      },
+      "lastCarriedRatingAuditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700"
     },
     {
       "team": "Chicago",
@@ -650,16 +676,23 @@
       "team": "LA Chargers",
       "abbr": "LAC",
       "seedRating": 24.5,
-      "currentRating": 24,
-      "priorRating": 24.5,
-      "lastDelta": -0.5,
-      "lastUpdatedAt": "2026-08-30T14:28:30-07:00",
-      "lastUpdateType": "INITIAL_RESEARCH_DELTA",
-      "confidence": "CURRENT_RESEARCH_ADJUSTED",
+      "currentRating": 24.5,
+      "priorRating": 24,
+      "lastDelta": 0.5,
+      "lastUpdatedAt": "2026-09-08T13:04:41-07:00",
+      "lastUpdateType": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+      "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "2026 VSiN NFL Betting Guide // Steve Makinen's Power Ratings // page 37",
-        "https://www.cbssports.com/nfl/injuries/daily/"
+        "https://www.cbssports.com/nfl/injuries/daily/",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/2026/week-01-personnel-ledger.json",
+        "https://www.chargers.com/news/mike-mcdaniel-jake-slaughter-offensive-line-depth-chart",
+        "https://www.chargers.com/news/tyler-biadasz-injury-jake-slaughter-starting-center",
+        "data/walters/nfl/player-values/by-team-v1/lac.json",
+        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
       ],
       "history": [
         {
@@ -686,6 +719,26 @@
           "sourceRefs": [
             "https://www.cbssports.com/nfl/injuries/daily/"
           ]
+        },
+        {
+          "sequence": 2,
+          "type": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+          "fromRating": 24,
+          "delta": 0.5,
+          "toRating": 24.5,
+          "effectiveAt": "2026-09-08T13:04:41-07:00",
+          "reason": "The August 30 Chargers deduction was a composite temporary offensive-line availability adjustment involving Tyler Biadasz, Branson Taylor and Rashawn Slater. Biadasz is now independently resolved in governed personnel production with Jake Slaughter as the replacement, while the remaining old availability premises do not justify retaining a blanket carried-rating penalty. Reverse only the legacy carried deduction and preserve the current governed personnel overlay without double counting.",
+          "sourceRefs": [
+            "data/walters/nfl-power-ratings-ledger.json",
+            "data/walters/nfl/2026/week-01-personnel-ledger.json",
+            "https://www.chargers.com/news/mike-mcdaniel-jake-slaughter-offensive-line-depth-chart",
+            "https://www.chargers.com/news/tyler-biadasz-injury-jake-slaughter-starting-center",
+            "data/walters/nfl/player-values/by-team-v1/lac.json",
+            "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+            "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+          ],
+          "auditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700",
+          "marketViewed": false
         }
       ],
       "externalComparisons": {
@@ -702,7 +755,8 @@
           "role": "INDEPENDENT_COMPARISON_ONLY",
           "note": "ESPN's 2026 FPI page was captured during this sweep but identifies its own last update as 2026-06-02. Use matchup differentials/disagreement only; do not mechanically average raw FPI with Graham ratings."
         }
-      }
+      },
+      "lastCarriedRatingAuditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700"
     },
     {
       "team": "Cincinnati",
@@ -1023,17 +1077,24 @@
       "team": "Washington",
       "abbr": "WAS",
       "seedRating": 23,
-      "currentRating": 22,
-      "priorRating": 23,
-      "lastDelta": -1,
-      "lastUpdatedAt": "2026-08-30T14:28:30-07:00",
-      "lastUpdateType": "INITIAL_RESEARCH_DELTA",
-      "confidence": "CURRENT_RESEARCH_ADJUSTED",
+      "currentRating": 23,
+      "priorRating": 22,
+      "lastDelta": 1,
+      "lastUpdatedAt": "2026-09-08T13:04:41-07:00",
+      "lastUpdateType": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+      "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "2026 VSiN NFL Betting Guide // Steve Makinen's Power Ratings // page 37",
         "https://www.cbssports.com/nfl/injuries/daily/",
-        "https://www.reuters.com/sports/commanders-cut-s-will-harris-reportedly-sign-ot-dj-humphries--flm-2026-08-26/"
+        "https://www.reuters.com/sports/commanders-cut-s-will-harris-reportedly-sign-ot-dj-humphries--flm-2026-08-26/",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/2026/week-01-personnel-ledger.json",
+        "https://www.commanders.com/news/commanders-place-tunsil-newton-on-ir-sign-moreau-tuttle",
+        "https://www.commanders.com/news/transcripts-hc-dan-quinn-08-10-26",
+        "data/walters/nfl/player-values/by-team-v1/was.json",
+        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
       ],
       "history": [
         {
@@ -1061,6 +1122,26 @@
             "https://www.cbssports.com/nfl/injuries/daily/",
             "https://www.reuters.com/sports/commanders-cut-s-will-harris-reportedly-sign-ot-dj-humphries--flm-2026-08-26/"
           ]
+        },
+        {
+          "sequence": 2,
+          "type": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+          "fromRating": 22,
+          "delta": 1,
+          "toRating": 23,
+          "effectiveAt": "2026-09-08T13:04:41-07:00",
+          "reason": "Washington's August 30 minus-one was explicitly a temporary personnel package for Laremy Tunsil, Jer'Zhan Newton and Dorance Armstrong. The current governed personnel ledger now handles the cases individually: Tunsil to Brandon Coleman is resolved one-for-one through production, while Newton and Armstrong remain fail closed because their replacement roles are committees. Remove the blanket personnel package from carried team strength and leave all actual Week 1 availability effects exclusively in governed personnel production.",
+          "sourceRefs": [
+            "data/walters/nfl-power-ratings-ledger.json",
+            "data/walters/nfl/2026/week-01-personnel-ledger.json",
+            "https://www.commanders.com/news/commanders-place-tunsil-newton-on-ir-sign-moreau-tuttle",
+            "https://www.commanders.com/news/transcripts-hc-dan-quinn-08-10-26",
+            "data/walters/nfl/player-values/by-team-v1/was.json",
+            "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+            "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+          ],
+          "auditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700",
+          "marketViewed": false
         }
       ],
       "externalComparisons": {
@@ -1077,22 +1158,30 @@
           "role": "INDEPENDENT_COMPARISON_ONLY",
           "note": "ESPN's 2026 FPI page was captured during this sweep but identifies its own last update as 2026-06-02. Use matchup differentials/disagreement only; do not mechanically average raw FPI with Graham ratings."
         }
-      }
+      },
+      "lastCarriedRatingAuditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700"
     },
     {
       "team": "New Orleans",
       "abbr": "NO",
       "seedRating": 22.5,
-      "currentRating": 22,
-      "priorRating": 22.5,
-      "lastDelta": -0.5,
-      "lastUpdatedAt": "2026-08-30T14:28:30-07:00",
-      "lastUpdateType": "INITIAL_RESEARCH_DELTA",
-      "confidence": "CURRENT_RESEARCH_ADJUSTED",
+      "currentRating": 22.5,
+      "priorRating": 22,
+      "lastDelta": 0.5,
+      "lastUpdatedAt": "2026-09-08T13:04:41-07:00",
+      "lastUpdateType": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+      "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "2026 VSiN NFL Betting Guide // Steve Makinen's Power Ratings // page 37",
-        "https://www.cbssports.com/nfl/injuries/daily/"
+        "https://www.cbssports.com/nfl/injuries/daily/",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/2026/week-01-personnel-ledger.json",
+        "https://www.neworleanssaints.com/news/garrett-nelson-edge-new-orleans-saints-roster-moves-august-7-2026",
+        "https://www.neworleanssaints.com/news/new-orleans-saints-rookie-guard-jeremiah-wright-poised-for-action-in-joint-practices-preseason-games",
+        "data/walters/nfl/player-values/by-team-v1/no.json",
+        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
       ],
       "history": [
         {
@@ -1119,6 +1208,26 @@
           "sourceRefs": [
             "https://www.cbssports.com/nfl/injuries/daily/"
           ]
+        },
+        {
+          "sequence": 2,
+          "type": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+          "fromRating": 22,
+          "delta": 0.5,
+          "toRating": 22.5,
+          "effectiveAt": "2026-09-08T13:04:41-07:00",
+          "reason": "New Orleans' August 30 half-point deduction was explicitly tied to the temporary Bryan Bresee and Dillon Radunz injured-reserve absences. Both cases are now recorded in the governed Week 1 personnel ledger and fail closed because current role replacement is not one-for-one. Reverse the legacy blanket deduction from carried team strength; preserve the fail-closed personnel cases without inventing a replacement value.",
+          "sourceRefs": [
+            "data/walters/nfl-power-ratings-ledger.json",
+            "data/walters/nfl/2026/week-01-personnel-ledger.json",
+            "https://www.neworleanssaints.com/news/garrett-nelson-edge-new-orleans-saints-roster-moves-august-7-2026",
+            "https://www.neworleanssaints.com/news/new-orleans-saints-rookie-guard-jeremiah-wright-poised-for-action-in-joint-practices-preseason-games",
+            "data/walters/nfl/player-values/by-team-v1/no.json",
+            "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+            "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+          ],
+          "auditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700",
+          "marketViewed": false
         }
       ],
       "externalComparisons": {
@@ -1135,7 +1244,8 @@
           "role": "INDEPENDENT_COMPARISON_ONLY",
           "note": "ESPN's 2026 FPI page was captured during this sweep but identifies its own last update as 2026-06-02. Use matchup differentials/disagreement only; do not mechanically average raw FPI with Graham ratings."
         }
-      }
+      },
+      "lastCarriedRatingAuditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700"
     },
     {
       "team": "Carolina",
@@ -1231,17 +1341,24 @@
       "team": "Atlanta",
       "abbr": "ATL",
       "seedRating": 21.5,
-      "currentRating": 21,
-      "priorRating": 21.5,
-      "lastDelta": -0.5,
-      "lastUpdatedAt": "2026-08-30T14:28:30-07:00",
-      "lastUpdateType": "INITIAL_RESEARCH_DELTA",
-      "confidence": "CURRENT_RESEARCH_ADJUSTED",
+      "currentRating": 21.5,
+      "priorRating": 21,
+      "lastDelta": 0.5,
+      "lastUpdatedAt": "2026-09-08T13:04:41-07:00",
+      "lastUpdateType": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+      "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "2026 VSiN NFL Betting Guide // Steve Makinen's Power Ratings // page 37",
         "https://www.cbssports.com/nfl/injuries/daily/",
-        "https://www.reuters.com/sports/falcons-qb1-battle-open-despite-michael-penix-jr-sitting-out-preseason--flm-2026-08-26/"
+        "https://www.reuters.com/sports/falcons-qb1-battle-open-despite-michael-penix-jr-sitting-out-preseason--flm-2026-08-26/",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/2026/week-01-personnel-ledger.json",
+        "https://www.atlantafalcons.com/news/james-pearce-jr-suspension-nfl-eight-games-season",
+        "https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season",
+        "data/walters/nfl/player-values/by-team-v1/atl.json",
+        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
       ],
       "history": [
         {
@@ -1269,6 +1386,26 @@
             "https://www.cbssports.com/nfl/injuries/daily/",
             "https://www.reuters.com/sports/falcons-qb1-battle-open-despite-michael-penix-jr-sitting-out-preseason--flm-2026-08-26/"
           ]
+        },
+        {
+          "sequence": 2,
+          "type": "CARRIED_RATING_PERSONNEL_LAYER_AUDIT",
+          "fromRating": 21,
+          "delta": 0.5,
+          "toRating": 21.5,
+          "effectiveAt": "2026-09-08T13:04:41-07:00",
+          "reason": "Atlanta's August 30 half-point deduction was explicitly tied to James Pearce Jr.'s suspension and Jalon Walker's injured-reserve absence. Walker was already governed as a fail-closed multi-role personnel case and Pearce is now likewise recorded as a fail-closed committee case. Remove the legacy blanket defensive-front personnel deduction from carried team strength while preserving both governed personnel cases and the independently governed quarterback-performance layer.",
+          "sourceRefs": [
+            "data/walters/nfl-power-ratings-ledger.json",
+            "data/walters/nfl/2026/week-01-personnel-ledger.json",
+            "https://www.atlantafalcons.com/news/james-pearce-jr-suspension-nfl-eight-games-season",
+            "https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season",
+            "data/walters/nfl/player-values/by-team-v1/atl.json",
+            "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
+            "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+          ],
+          "auditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700",
+          "marketViewed": false
         }
       ],
       "externalComparisons": {
@@ -1285,7 +1422,8 @@
           "role": "INDEPENDENT_COMPARISON_ONLY",
           "note": "ESPN's 2026 FPI page was captured during this sweep but identifies its own last update as 2026-06-02. Use matchup differentials/disagreement only; do not mechanically average raw FPI with Graham ratings."
         }
-      }
+      },
+      "lastCarriedRatingAuditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700"
     },
     {
       "team": "Cleveland",
