@@ -177,12 +177,6 @@ function fairPriceText(card){
   const m=text.match(/(?:NO-VIG|FAIR)\s*(~?\s*[+-]\d+(?:\.\d+)?)/i);
   return m?m[1].replace(/\s+/g,''):'—';
 }
-function shortRationale(card){
-  const text=String(card?.rationale||'').trim();if(!text)return 'No published rationale.';
-  const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text];
-  const out=sentences.slice(0,2).join(' ').trim();
-  return out.length>260?`${out.slice(0,257).trimEnd()}…`:out;
-}
 function observedPriceParts(value){
   const [primary,...references]=priceText(value).split(/\s+·\s+/);
   // Separate only an explicit leading quote; keep unfamiliar formats intact.
@@ -214,6 +208,7 @@ function cryptoCardHtml(card,index){
   const gradeHtml=rank?`<span class="cryptoGrade">GRADE <b>${esc(rank)}</b></span>`:'';
   const observed=observedPriceParts(card?.observedPrice),target=targetPriceParts(card?.targetPrice);
   const action=actionLineText(card,status),decision=actionDecisionText(card,status,action);
+  const reason=String(card?.statusReason||'').trim();
   return `<article class="cryptoPick" data-status="${esc(status)}">
     <div class="cryptoTopLine"><span class="cryptoStatusTag">${esc(status)}</span>${gradeHtml}</div>
     <h3>${esc(card?.selection||card?.title||'UNTITLED')}</h3>
@@ -226,7 +221,7 @@ function cryptoCardHtml(card,index){
     ${observed.references?`<div class="cryptoPriceReferences"><b>MARKET REFERENCES //</b> ${esc(observed.references)}</div>`:''}
     <div class="cryptoActionLine"><b>${esc(action)}</b>${decision?`<span>${esc(decision)}</span>`:''}</div>
     ${eventMetaHtml(card)}
-    <div class="cryptoWhy"><b>WHY ${esc(status)}?</b>${esc(shortRationale(card))}</div>
+    ${reason?`<div class="cryptoWhy"><b>WHY ${esc(status)}?</b>${esc(reason)}</div>`:''}
     <div class="cryptoSourceNote"><b>SOURCE //</b> ${esc(card?.sourceLabel||crypto?.source?.name||'WEB SOURCE')}</div>
     <button class="cryptoAnalysisBtn" type="button" data-crypto-detail="${esc(detailId)}">▶ VIEW ANALYSIS</button>
     <div id="${esc(detailId)}" class="cryptoDetail">
