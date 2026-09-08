@@ -34,7 +34,7 @@ const h4prod=read(H4_PROD),h4=read(H4_CURRENT),personnelProd=read(PERSONNEL_PROD
 if(h4prod.state!=='OPERATIONAL_SCOPED'||h4prod.productionAuthority!==true||h4prod.marketViewed!==false)fail('H4_PRODUCTION_INVALID');
 if(h4.state!=='OPERATIONAL_SCOPED'||h4.productionAuthority!==true||h4.marketViewed!==false)fail('H4_CURRENT_INVALID');
 if(!close(h4prod?.productionScope?.domesticLeagueBaseline?.homeLocationAdvantagePoints,2.082)||!close(h4prod?.productionScope?.domesticLeagueBaseline?.pointsToHomeSpread,-2.082))fail('H4_LEAGUE_VALUE_REGRESSION');
-if(personnelProd.state!=='OPERATIONAL'||personnelProd.productionAuthority!==true||personnelProd.marketViewed!==false)fail('PERSONNEL_PRODUCTION_INVALID');
+if(personnelProd.state!=='OPERATIONAL'||personnelProd.productionAuthority!==true||personnelProd.productionRules?.marketIsolationRequired!==true)fail('PERSONNEL_PRODUCTION_INVALID');
 if(matchupProd.state!=='OPERATIONAL_SCOPED'||matchupProd.productionAuthority!==true||matchupProd.marketViewed!==false)fail('MATCHUP_PRODUCTION_INVALID');
 if(qbProd.state!=='OPERATIONAL_SCOPED'||qbProd.authorityToken!=='APPROVED_WALTERS_QB_PERFORMANCE'||qbProd.productionAuthority!==true||qbProd.grahamWritesAllowed!==true||qbProd.marketViewed!==false)fail('QB_PRODUCTION_INVALID');
 
