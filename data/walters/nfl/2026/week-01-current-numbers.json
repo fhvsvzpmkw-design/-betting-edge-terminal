@@ -7,8 +7,8 @@
   "week": 1,
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PRESERVED_PROVISIONAL",
-  "updatedAt": "2026-09-07T19:51:53+00:00",
-  "lastResearchAt": "2026-09-02T18:49:44-07:00",
+  "updatedAt": "2026-09-08T11:10:00-07:00",
+  "lastResearchAt": "2026-09-08T11:10:00-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-01-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-01-daily-market-ledger.json",
@@ -1684,11 +1684,11 @@
       "away": "DAL",
       "home": "NYG",
       "startTimePacific": "2026-09-13T17:20:00-07:00",
-      "priorGrahamFairHome": 1,
-      "grahamFairHome": 0.5,
-      "grahamAsOf": "2026-09-02T19:16:51-07:00",
+      "priorGrahamFairHome": 0.5,
+      "grahamFairHome": -0.5,
+      "grahamAsOf": "2026-09-08T11:10:00-07:00",
       "numberStatus": "READY_PROVISIONAL_CUTDOWN_DELTA_REQUIRED",
-      "informationStatus": "REVIEWED_NO_MATERIAL_CHANGE_SOURCE_LOCKED",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1736,9 +1736,30 @@
           ],
           "effectiveAt": "2026-09-03T11:38:00-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "DAL",
+          "side": "AWAY",
+          "clusterGroup": "OFFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W01-DAL-Tyler-Smith"
+          ],
+          "rawTeamContributionDelta": -1.2,
+          "finalTeamContributionDelta": -1.2,
+          "pointsToHomeSpread": -1.2,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.dallascowboys.com/news/cowboys-have-a-ton-of-confidence-in-t-j-bass-filling-in-for-tyler-smith",
+            "https://www.dallascowboys.com/news/tyler-smith-expected-to-miss-4-6-weeks-with-injury",
+            "data/walters/nfl/player-values/player-values-access-v1.json",
+            "data/walters/nfl/player-values/by-team-v1/dal.json"
+          ]
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base +2.000; home field -2.082; other governed +0.660; pre-personnel exact +0.578; personnel +0.000; matchup +0.000; exact Graham home fair +0.578; displayed +0.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base +2.000; home field -2.082; other governed +0.660; pre-personnel exact +0.578; personnel -1.200; matchup +0.000; exact Graham home fair -0.622; displayed -0.5.",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "https://www.cbssports.com/nfl/injuries/daily/",
@@ -1751,12 +1772,16 @@
         "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
         "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
         "data/walters/nfl/2026/week-01-research-ledger.json",
-        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.dallascowboys.com/news/cowboys-have-a-ton-of-confidence-in-t-j-bass-filling-in-for-tyler-smith",
+        "https://www.dallascowboys.com/news/tyler-smith-expected-to-miss-4-6-weeks-with-injury",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/dal.json"
       ],
       "neutralBaseHome": 2,
       "espnFpiNeutralHome": 3,
       "lastInformationReviewAt": "2026-09-01T11:04:00-07:00",
-      "grahamExactFairHome": 0.578,
+      "grahamExactFairHome": -0.622,
       "homeFieldNonLocationExactFairHome": 2.5,
       "homeFieldProductionId": "walters-nfl-home-field-production-v1",
       "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
@@ -1772,10 +1797,10 @@
         "homeFieldPointsToHomeSpread": -2.082,
         "otherGovernedPointsToHomeSpread": 0.66,
         "prePersonnelExactFairHome": 0.578,
-        "personnelPointsToHomeSpread": 0,
+        "personnelPointsToHomeSpread": -1.2,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 0.578,
-        "displayedFairHome": 0.5,
+        "exactFairHome": -0.622,
+        "displayedFairHome": -0.5,
         "arithmeticVerified": true
       },
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
@@ -1787,7 +1812,13 @@
       "qbPerformanceHomeTeamDelta": -0.32,
       "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
       "qbPerformanceLastAppliedAt": "2026-09-03T11:38:00-07:00",
-      "qbPerformanceFailClosedTeams": []
+      "qbPerformanceFailClosedTeams": [],
+      "personnelBaselineExactFairHome": 0.578,
+      "personnelOverlayPointsToHomeSpread": -1.2,
+      "personnelProductionId": "walters-personnel-production-v1",
+      "personnelLastAppliedAt": "2026-09-08T11:10:00-07:00",
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": []
     },
     {
       "gameKey": "2026-W01-DEN-KC",
@@ -1922,8 +1953,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-delta-1645-cade-mays-week1-2026-09-02T184944-0700",
-    "lastAppliedAt": "2026-09-02T18:49:44-07:00",
+    "lastBatchId": "graham-tuesday-baseline-tyler-smith-week1-2026-09-08T111000-0700",
+    "lastAppliedAt": "2026-09-08T11:10:00-07:00",
     "marketViewed": false
   },
   "matchupExpansionProduction": {
