@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import quoteObservation from '../assets/quote-observation.js';
 import { validateRecommendationEvidence } from './report-evidence-gate.mjs';
+import {marketAssessmentEnabled, loadBoundMarketObserver, validateBoundMarketAssessment} from './market-price-assessment.mjs';
 import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
 import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
 
@@ -441,7 +442,7 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     const receipt = matches.length === 1 ? matches[0] : null;
     const bound = analysisBound && receipt && selection.quotes.some(quote => sameQuote(receipt.quote, quote));
     const inherited = researchContext(priorResearch.bySelection.get(selection.selectionId), selection);
-    let state = 'RESEARCH_PENDING', nextAction = 'START_STAGE_1';
+    let state = 'RESEARCH_PENDING', nextAction = marketAssessmentEnabled(report) ? 'GRADE_MARKET_PRICE' : 'START_STAGE_1';
     if (matches.length > 1 || (receipt && !bound)) nextAction = 'RECONCILE_EXACT_RECEIPT';
     else if (bound && receipt.state === 'EVALUATED') state = 'EVALUATED_RECORDED';
     else if (bound && receipt.state === 'BLOCKED' && PRIMARY_BLOCKER_REASONS.has(receipt.blocker?.reason)) {
@@ -475,7 +476,13 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     counts,
     handoff: {matchedSelections: inventory.selections.filter(item => priorResearch.bySelection.has(item.selectionId)).length,
       warnings: priorResearch.warnings, authority: 'HISTORICAL_CONTEXT_ONLY'},
-    workflow: [
+    workflow: marketAssessmentEnabled(report) ? [
+      'Grade exact current execution quotes against the qualified paired market reference; first-pull movement history is not required.',
+      'Review current roster, lineup, starter, injury, news and conditions for every event once; share the relevant sourced facts across its markets. Reopen initial grades when material information changes them.',
+      'Investigate a concrete unresolved dependency or attractive-price/forecast conflict when it can change the conclusion. Retain Stage 2 and final checks when material; no universal forecast/range hunt for non-wager market assessments.',
+      'Record a verified marketAssessment for a supported zero-stake PASS/LEAN/qualified WAIT, or use the existing supported fair/range and Core process for BET. Exact reference absence needs targeted forecast fallback, not invented PASS.',
+      'Publish every validated decision with honest remaining blockers and unfinished work. Reuse original research and odds snapshots without inventing new checks or changing issued history.'
+    ] : [
       'Stage 1: scan every eligible event for current performance, matchup, personnel and conditions before concentrating deep research; share relevant facts across markets.',
       'Review priorResearch with original source times. Recheck changing facts and exact current quotes; old decisions and fairs never count as current evaluation.',
       'Construct a supported provisional fair and range for each exact market; use applicable governed work or explain a defensible market-anchored derivation.',
@@ -521,13 +528,15 @@ function validatePrimaryBlocker(report, receipt, selection) {
   }
   for (const field of ['decision', 'evidence', 'fairValueEvidence', 'fair', 'status', 'marketFair']) ensure(receipt[field] == null, `${label} BLOCKED cannot carry a fabricated decision or fair`);
 }
-function receiptCore(decision, evidence, framework, label) {
+function receiptCore(decision, evidence, framework, label, marketAssessment = false) {
   const assessment = decision.coreAssessment, context = assessment?.context;
   ensure(isObject(assessment) && isObject(context) && exactObject(assessment, evidence.coreAssessment), `${label} requires identical recorded Core assessment in decision and evidence`);
   ensure(assessment.frameworkId === framework.frameworkId, `${label} Core framework identity mismatch`);
   validateContext(framework, context, label);
-  ensure(['INDEPENDENT_MODEL', 'MARKET_ANCHORED_MODEL'].includes(context.fairValueBasis), `${label} market-only/unavailable fair must be BLOCKED, not an evaluated value decision`);
-  ensure(['MODERATE', 'STRONG'].includes(context.independentCurrentSupport), `${label} evaluated value decision requires independent current support`);
+  if (!marketAssessment) {
+    ensure(['INDEPENDENT_MODEL', 'MARKET_ANCHORED_MODEL'].includes(context.fairValueBasis), `${label} market-only/unavailable fair must be BLOCKED, not an evaluated value decision`);
+    ensure(['MODERATE', 'STRONG'].includes(context.independentCurrentSupport), `${label} evaluated value decision requires independent current support`);
+  }
   const researchIds = [...new Set((framework.graduatedResearchRules || []).filter(rule => matchCondition(rule.when, context)).map(rule => rule.priorId))].sort();
   ensure(exactObject([...context.graduatedResearchIds].sort(), researchIds), `${label} Core graduated research allowlist mismatch`);
   const actual = evaluateCore(framework, context);
@@ -567,7 +576,7 @@ export function summarizePrimaryAnalysis(receipts) {
   return { primaryAvailable: primaryEvaluated + primaryBlocked, primaryEvaluated, primaryBlocked, outcomeCounts };
 }
 
-export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy = null, inventory = null, framework = null } = {}) {
+export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy = null, inventory = null, framework = null, observer = null } = {}) {
   if (!primaryAnalysisRequired(report)) return { enforced: false, reason: 'pre-cutover' };
   ensure(inventory || (feed && policy), 'Primary analysis validation requires the exact bound feed and coverage policy');
   const bound = inventory || derivePrimarySelectionInventory(report, feed, policy), analysis = sidecar?.primaryAnalysis;
@@ -608,17 +617,26 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
     ensure(nonEmpty(decision.analysis), `${label} requires event-specific analysis and decision rationale`);
     if (decision.status !== 'BET') ensure(/^\$?0(?:\.0+)?$/.test(String(decision.stake)), `${label} non-BET decision must carry zero stake`);
     validateRecommendationEvidence(report, decision, evidence, index);
-    ensure(isObject(decision.fairValueEvidence), `${label} evaluated PASS requires a numeric documented fair; use BLOCKED when fair cannot be established`);
-    const sourceKinds = new Map((decision.sourceEvidence || []).map(source => [source.id, source.kind]));
-    ensure(decision.fairValueEvidence.inputs.some(input => input.sourceIds.some(id => sourceKinds.get(id) !== 'MARKET' && sourceKinds.has(id))), `${label} numeric fair requires non-market source-linked inputs`);
+    const marketAssessment = marketAssessmentEnabled(report) && decision.marketAssessment != null;
+    if (marketAssessment) validateBoundMarketAssessment(report, decision, observer);
+    else {
+      ensure(isObject(decision.fairValueEvidence), `${label} evaluated PASS requires a numeric documented fair; use BLOCKED when fair cannot be established`);
+      const sourceKinds = new Map((decision.sourceEvidence || []).map(source => [source.id, source.kind]));
+      ensure(decision.fairValueEvidence.inputs.some(input => input.sourceIds.some(id => sourceKinds.get(id) !== 'MARKET' && sourceKinds.has(id))), `${label} numeric fair requires non-market source-linked inputs`);
+    }
     runtime ||= loadProductionFramework();
-    receiptCore(decision, evidence, runtime, label);
+    receiptCore(decision, evidence, runtime, label, marketAssessment);
     validatePersonnelSemantics({ ...report, recs: [decision] }, { ...sidecar, recommendations: [evidence] });
-    const fair = canonicalReceiptFair(selection, quote, decision.fairValueEvidence), prior = fairGroups.get(fair.key);
     const contractKey = `${selection.sport}|${selection.eventId}|${selection.marketDetail}|${quote.line ?? ''}`;
-    ensure(!fairBases.has(contractKey) || fairBases.get(contractKey) === fair.unit, `${label} opposing selections must share a coherent fair unit/basis`);
-    fairBases.set(contractKey, fair.unit);
-    if (prior) for (const field of ['estimate', 'low', 'high']) ensure(closeNumber(fair[field], prior[field]), `${label} opposing selections have incoherent shared market fair ${field}`);
+    const referenceSide = selection.marketClass === 'total' ? 'over' : 'home';
+    const fair = marketAssessment ? {key: `${contractKey}|MARKET_REFERENCE`, unit: 'selection_probability',
+      estimate: selection.side === referenceSide ? decision.marketAssessment.referenceProbability : 1 - decision.marketAssessment.referenceProbability}
+      : canonicalReceiptFair(selection, quote, decision.fairValueEvidence);
+    const prior = fairGroups.get(fair.key);
+    const basis = `${marketAssessment ? 'MARKET_REFERENCE' : 'MODEL'}|${fair.unit}`;
+    ensure(!fairBases.has(contractKey) || fairBases.get(contractKey) === basis, `${label} opposing selections must share a coherent fair unit/basis`);
+    fairBases.set(contractKey, basis);
+    if (prior) for (const field of marketAssessment ? ['estimate'] : ['estimate', 'low', 'high']) ensure(closeNumber(fair[field], prior[field]), `${label} opposing selections have incoherent shared market fair ${field}`);
     else fairGroups.set(fair.key, fair);
     const matchingCard = (report.recs || []).find(card => card.feed?.selectionKey === quote.selectionKey && String(card.feed?.eventId) === quote.eventId && card.book === quote.book);
     ensure(matchingCard && exactObject(matchingCard, decision), `${label} evaluated decision must match its published card; card-count curation is not permitted`);
@@ -944,7 +962,8 @@ export function validateCoverageAudit(report, sidecar, { root = process.cwd(), r
   const boundFeed = feed || loadBoundFeed(root, report, sidecar, feedFile);
   const bound = receiptRequired ? derivePrimarySelectionInventory(report, boundFeed, policy) : deriveBoundCoverage(report, boundFeed, policy);
   const framework = receiptRequired && sidecar?.primaryAnalysis?.receipts?.some(receipt => receipt.state === 'EVALUATED') ? loadBoundCoreFramework(root, sidecar, requireCurrentAuthority) : null;
-  const primaryAnalysis = receiptRequired ? validatePrimaryAnalysis(report, sidecar, { inventory: bound, framework }) : null;
+  const observer = sidecar?.primaryAnalysis?.receipts?.some(receipt => receipt.decision?.marketAssessment != null) ? loadBoundMarketObserver(sidecar, root) : null;
+  const primaryAnalysis = receiptRequired ? validatePrimaryAnalysis(report, sidecar, { inventory: bound, framework, observer }) : null;
   const mismatches = [];
   for (const sport of sportKeys) {
     const actual = audit.sports[sport];

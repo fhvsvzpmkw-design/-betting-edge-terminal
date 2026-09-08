@@ -1,5 +1,7 @@
 # Betting Edge Personnel Sweep — Operational Addendum
 
+**Main schedule order from `2026-09-07T18:31:00-07:00`:** follow shared scheduled authority section 6. Grade market prices provisionally first, perform the Stage 1 information scan for every eligible event second, and use Stage 2 for material unresolved dependencies, conflicts or deeper questions that can change the conclusion. Stage 1 remains before any final decision and before adopting an independent forecast; it can reopen an initially weak/PASS price. A supported non-wager market assessment does not require a full deep sweep solely to manufacture a forecast range. All applicable Stage 2 dependency, fallback, conflict and closing-check standards below remain in force. This ordering amendment applies to Main Betting Edge; it does not alter Graham/Walters tasks.
+
 **Status:** OPERATIONAL  
 **Activated:** 2026-08-25  
 **Scope:** report-generation research only; no change to odds-refresh/API budget, supported books, staking, or price-freshness gates.

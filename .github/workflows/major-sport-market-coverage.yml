@@ -14,6 +14,9 @@ on:
       - tests/report-bundle-preflight.test.mjs
       - tools/report-publication.mjs
       - tools/report-evidence-gate.mjs
+      - tools/market-price-assessment.mjs
+      - tests/market-price-assessment.test.mjs
+      - tests/fixtures/market-assessment-1815.mjs
       - tools/report-sidecar-contract.mjs
       - tests/report-evidence-gate.test.mjs
       - tests/coverage-summary.test.mjs
@@ -91,6 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           node tests/quote-observation.test.mjs
+          node tests/market-price-assessment.test.mjs
           node tests/server-quote-observation.test.mjs
           node tests/runner-quote-observation.test.mjs
           node tests/issued-price-observation.test.mjs

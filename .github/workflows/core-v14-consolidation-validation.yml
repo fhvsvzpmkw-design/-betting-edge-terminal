@@ -19,6 +19,9 @@ on:
       - 'tools/core-handicap-framework.mjs'
       - 'tools/core-v14-publication-gate.mjs'
       - 'tools/report-sidecar-contract.mjs'
+      - 'tools/market-price-assessment.mjs'
+      - 'tests/market-price-assessment.test.mjs'
+      - 'tests/fixtures/market-assessment-1815.mjs'
       - 'tools/selection-continuity.mjs'
       - 'tools/selection-availability.mjs'
       - 'tests/selection-availability.test.mjs'
@@ -37,6 +40,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -66,6 +71,8 @@ jobs:
           node tools/personnel-semantic-gate.mjs validate --report data/history/runs/2026-09-02/final_morning-093430.json --sidecar data/history/research-fit/2026-09-02/final_morning-093430.json
       - name: Validate production publication gate
         run: node tools/core-v14-publication-gate.mjs self-test
+      - name: Replay all six saved markets through assessment and publication gates
+        run: node tests/market-price-assessment.test.mjs
       - name: Verify Core 1.4 scope freeze
         run: |
           grep -q 'Results / CLV feedback learning loop' core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md

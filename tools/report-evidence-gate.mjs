@@ -2,11 +2,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {validateMarketAssessment} from './market-price-assessment.mjs';
 
 // Historical reports remain immutable. This adds evidence requirements for the
 // next scheduled lane; it does not supply a model, a fair, or a betting threshold.
 export const REPORT_EVIDENCE_FROM = '2026-09-05T17:00:00-07:00';
-export const REPORT_EVIDENCE_FIELDS = Object.freeze(['sourceEvidence', 'sourceShortfall', 'fairValueEvidence', 'benchmarkComparison']);
+export const REPORT_EVIDENCE_FIELDS = Object.freeze(['sourceEvidence', 'sourceShortfall', 'fairValueEvidence', 'benchmarkComparison', 'marketAssessment']);
 const SERIOUS = new Set(['BET', 'LEAN', 'WAIT']);
 const SOURCE_KINDS = new Set(['OFFICIAL', 'REPORTING', 'MODEL', 'MARKET']);
 const SHORTFALL_REASONS = new Set(['SOURCE_UNAVAILABLE', 'MARKET_UNAVAILABLE', 'QUOTE_STALE', 'IDENTITY_UNRESOLVED', 'EVENT_INELIGIBLE']);
@@ -144,7 +145,7 @@ function benchmarkEvidence(rec, label) {
     return;
   }
   ensure(String(benchmark.eventId) === String(rec.feed?.eventId) && benchmark.selectionKey === rec.feed?.selectionKey && benchmark.marketKey === rec.feed?.marketKey, `${label} Pinnacle benchmark identity does not match issued selection`);
-  const executable = impliedAmerican(rec.price), probability = benchmark.noVigProbability;
+  const executable = rec.marketAssessment != null ? 1 / Number(rec.feed?.priceDecimal) : impliedAmerican(rec.price), probability = benchmark.noVigProbability;
   ensure(executable !== null && Number.isFinite(probability) && probability > 0 && probability < 1, `${label} requires valid executable and benchmark probabilities`);
   const comparison = rec.benchmarkComparison;
   ensure(object(comparison), `${label} qualified benchmark requires benchmarkComparison`);
@@ -180,7 +181,7 @@ export function validateRecommendationEvidence(report, rec, item, index) {
     ensure(unavailableFair(rec), `${label} identity-shortfall PASS must state unavailable fair without an unsupported numeric estimate`);
   }
   const ids = sourceEvidence(rec, item, sport, reportMs, label);
-  fairEvidence(rec, item, ids, label);
+  if (!validateMarketAssessment(report, rec, item, ids)) fairEvidence(rec, item, ids, label);
   benchmarkEvidence(rec, label);
   leanWording(rec, label);
   return {enforced: true};
