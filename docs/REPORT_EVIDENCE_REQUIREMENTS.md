@@ -1,5 +1,40 @@
 # Report source and fair-value evidence
 
+## Market assessment completion — from `2026-09-07T18:31:00-07:00`
+
+This forward amendment supersedes the universal numeric model-fair/range and independent-support requirements below for a verified non-wager market assessment. The existing forecast-based path and BET gates remain intact. All five Main tasks follow the market-first sequence in shared scheduled authority section 6.
+
+Add identical `marketAssessment` to the card, sidecar recommendation and EVALUATED receipt decision/evidence:
+
+```json
+{
+  "schema": 1,
+  "basis": "QUALIFIED_PINNACLE",
+  "selectionKey": "exact feed selectionKey",
+  "referenceGeneratedAt": "bound observer generatedAt",
+  "referenceProbability": 0.5,
+  "referencePriceDecimal": 2,
+  "probabilityBasis": "CONDITIONAL_ON_NO_PUSH",
+  "referenceSourceIds": ["pinnacle-snapshot"],
+  "settlementRationale": "Explain exact full-game market, line and compatible push/void rules.",
+  "informationReview": {
+    "checkedAt": "actual current review timestamp",
+    "sourceIds": ["official-lineups"],
+    "state": "NO_MATERIAL_CONFLICT",
+    "impact": "Explain the checked roster/lineup/news facts and their effect on this conclusion."
+  },
+  "limitations": "Market reference; no independently established true probability or calibrated interval. No unconditional ROI claim.",
+  "decisionRationale": "Explain the final price/information assessment and remaining limitations."
+}
+```
+
+The numbers above illustrate the schema only. Obtain actual values via `exactMarketReference(report, rec.feed, pinnedObserver)` and `marketComparison(priceDecimal, referenceProbability)` from `tools/market-price-assessment.mjs`. Record normal `pinnacleBenchmark`, `benchmarkComparison` and exact MARKET/official/reporting `sourceEvidence`; preserve original source timestamps and the observer blob provenance. Keep `fairValueEvidence: null`, `fair: "Market reference: <benchmark no-vig American price>"`, `playTo: "NO BET"`, zero stake, no priceWatch and a recomputed `MARKET_DERIVED_ONLY` Core context. Ordinary facts do not automatically supply MODERATE independent predictive support or DIRECT calibration. Information states are NO_MATERIAL_CONFLICT, MATERIAL_REVIEW_COMPLETED or UNRESOLVED, each with decision impact. Material personnel dependencies still invoke existing personnel evidence and semantic checks.
+
+PASS requires an actual supported conclusion, LEAN requires a favorable exact comparison with material information resolved, and WAIT keeps the existing independent-signal/actionability/trigger checks. None authorizes a wager. To issue BET, use the established fair/range path and clear all existing BET gates. Opposing selections must share the same paired reference or coherent model basis. The coverage gate re-resolves event, period, market, side, line, active main-line pairing, freshness and arithmetic against the pinned observer; a producer-supplied QUALIFIED label alone is insufficient.
+
+For matched integer lines, the reference is conditional on no push. An unknown forecast push rate does not prevent this market-price comparison; it still prevents unsupported unconditional win/ROI claims. If no qualified matching reference is available, investigate an applicable published or governed fair. If neither assessment basis is supported, record the specific limitation as BLOCKED and publish the completed remainder.
+
+
 **Status:** OPERATIONAL from `2026-09-05T17:00:00-07:00` report timestamps.  
 **Authority:** Contract v1.0 section 6.4; Core v1.4 remains unchanged.  
 **Applies to:** all five Betting Edge report lanes, all active full-game primary markets.
@@ -66,7 +101,7 @@ If sources genuinely cannot be verified, an appropriately unavailable zero-stake
 
 ## Numerical fair evidence for serious candidates
 
-Every BET/LEAN/WAIT has `fairValueEvidence`, copied identically to the sidecar:
+Every BET and every forecast-based LEAN/WAIT has `fairValueEvidence`, copied identically to the sidecar:
 
 | Field | Meaning |
 |---|---|
@@ -116,7 +151,7 @@ node tools/report-evidence-gate.mjs validate --report report.json --sidecar side
 node tools/report-publication.mjs validate --report report.json --sidecar sidecar.json
 ```
 
-Mirror `sourceEvidence`, `sourceShortfall`, `fairValueEvidence` and `benchmarkComparison` between report and sidecar. The publisher validates again on retries and remote read-back. Validation does not fetch sources, calculate a new handicap, change decision/stake, request odds or rewrite archived reports. Failed validation requires a genuinely supported candidate before freeze; an already-frozen candidate cannot be repaired merely to force publication.
+Mirror `sourceEvidence`, `sourceShortfall`, `fairValueEvidence`, `benchmarkComparison` and, when used, `marketAssessment` between report and sidecar. The publisher validates again on retries and remote read-back. Validation does not fetch sources, calculate a new handicap, change decision/stake, request odds or rewrite archived reports. Failed validation requires a genuinely supported candidate before freeze; an already-frozen candidate cannot be repaired merely to force publication.
 
 Every visible report summary must distinguish unavailable primary selections from selections actually evaluated. Include exact evaluated and unavailable counts when the coverage receipt records limitations. The phrase “complete coverage” refers to accounted-for inventory, not universal quote availability.
 
