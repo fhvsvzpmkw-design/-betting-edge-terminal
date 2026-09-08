@@ -5,6 +5,7 @@ function assert(condition,message){if(!condition)throw new Error(message)}
 function readJson(p){return JSON.parse(fs.readFileSync(p,'utf8'))}
 function read(p){return fs.readFileSync(p,'utf8')}
 function repoRel(v){return String(v||'').replace(/^\.\//,'').split('?')[0]}
+function issuedCopy(html){return (html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1]||'').replace(/<!--[\s\S]*?-->/g,'').replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/gi,'').replace(/<[^>]+>/g,'').replace(/HOTLINE SHELL: PRIVATE SHEET v[12]\./g,'HOTLINE SHELL: PRIVATE SHEET.').replace(/\s+/g,' ').trim()}
 const manifest=readJson('data/syndicates.json');
 const roster=(manifest.profiles||[]).filter(p=>p?.characterId&&p?.characterFile&&p?.url);
 assert(roster.length>=5,'expected at least five Syndicate profiles');
@@ -52,7 +53,12 @@ for(const profile of roster){
  const date=last.timestamp.slice(0,10),m=String(last.label).match(/\b(\d{1,2}):(\d{2})\b/);assert(m,`${id}: cannot derive session from ${last.label}`);
  const session=`${m[1].padStart(2,'0')}${m[2]}`,root=path.posix.dirname(live),archive=`${root}/archive/${date}/${session}.html`,indexPath=`${root}/archive/index.json`;
  assert(fs.existsSync(archive),`${id}: latest archive missing ${archive}`);assert(fs.existsSync(indexPath),`${id}: archive index missing`);
- const archiveText=read(archive);assert(liveText===archiveText,`${id}: live Hotline does not match latest archived edition`);
+ const archiveText=read(archive);
+ // The approved Bill v2 art update preserves the issued copy and the original v1 archive.
+ // New editions on the same shell must still match their archive byte for byte.
+ const billArtUpgrade=id==='bill-weston'&&character.hotlineStyle?.shell?.version===2&&liveText.includes('data-shell-version="2"')&&archiveText.includes('data-shell-version="1"');
+ if(billArtUpgrade){assert(issuedCopy(liveText).length>0&&issuedCopy(liveText)===issuedCopy(archiveText),`${id}: artwork update changed the archived report copy`)}
+ else{assert(liveText===archiveText,`${id}: live Hotline does not match latest archived edition`)}
  const index=readJson(indexPath),issue=(index.issues||[]).find(x=>x.path===`${date}/${session}.html`);assert(issue,`${id}: archive index missing ${date}/${session}.html`);
  assert(issue.issuedAt===last.timestamp,`${id}: archive/index continuity timestamp mismatch`);assert(issue.label===last.label,`${id}: archive/index continuity label mismatch`);
  assert(fs.existsSync(issue.sourceReport),`${id}: authoritative source report missing ${issue.sourceReport}`);const report=readJson(issue.sourceReport);
