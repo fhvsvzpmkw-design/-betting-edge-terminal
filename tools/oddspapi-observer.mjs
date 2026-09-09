@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {annotatePinnacle,AUTHORITY} from './pinnacle-sharp-benchmark.mjs';
+import {annotatePinnacle,AUTHORITY,isFullGameAlternateTotalMarket} from './pinnacle-sharp-benchmark.mjs';
 
 const API_BASE='https://api.oddspapi.io/v4';
 const API_KEY=String(process.env.ODDSPAPI_API_KEY||'').trim();
@@ -42,7 +42,30 @@ async function apiGet(endpoint,params={}){const u=new URL(API_BASE+endpoint);u.s
 function activeSubscription(a){const c=String(a?.current_subscription_id||''),r=Array.isArray(a?.subscriptions)?a.subscriptions:[];return r.find(x=>String(x?.subscription_id||'')===c)||r.find(x=>x?.is_active)||r[0]||null}
 function payloadRows(p){if(Array.isArray(p))return p;if(Array.isArray(p?.fixtures))return p.fixtures;if(p?.fixtureId)return[p];return[]}
 function playerRows(o,observedAt){const rows=[];for(const[id,q]of Object.entries(o?.players||{})){const price=Number(q?.price);if(!Number.isFinite(price))continue;rows.push({playerId:id,playerName:q?.playerName||null,bookmakerOutcomeId:q?.bookmakerOutcomeId??null,bookmakerChangedAt:q?.bookmakerChangedAt??null,price,priceAmerican:q?.priceAmerican??null,active:q?.active!==false,mainLine:q?.mainLine===true,limit:Number.isFinite(Number(q?.limit))?Number(q.limit):null,changedAt:q?.changedAt||null,observedAt})}return rows}
-export function summarizePinnacle(book,observedAt){if(!book||typeof book!=='object')return null;const markets=[];let activeQuotes=0,suspendedQuotes=0;for(const[mid,m]of Object.entries(book?.markets||{})){const outcomes=[];let main=false;for(const[oid,o]of Object.entries(m?.outcomes||{})){const players=playerRows(o,observedAt);if(!players.length)continue;if(players.some(p=>p.mainLine))main=true;for(const p of players)p.active?activeQuotes++:suspendedQuotes++;outcomes.push({outcomeId:oid,players})}if(!outcomes.length)continue;if(main||markets.length<12)markets.push({marketId:String(mid),marketActive:m?.marketActive!==false,bookmakerMarketId:m?.bookmakerMarketId||null,outcomes});if(markets.length>=24)break}return{bookmakerIsActive:book?.bookmakerIsActive!==false,suspended:book?.suspended===true,activeQuotes,suspendedQuotes,marketCount:Object.keys(book?.markets||{}).length,markets}}
+export function summarizePinnacle(book,observedAt){
+  if(!book||typeof book!=='object')return null;
+  const markets=[];
+  let activeQuotes=0,suspendedQuotes=0,legacyRetained=0;
+  for(const[mid,m]of Object.entries(book?.markets||{})){
+    const alternateTotal=isFullGameAlternateTotalMarket(m);
+    // Preserve the original first-12/main-line budget for ordinary markets.
+    // Exact alternate totals must survive even when they arrive after that budget.
+    if(legacyRetained>=24&&!alternateTotal)continue;
+    const outcomes=[];let main=false;
+    for(const[oid,o]of Object.entries(m?.outcomes||{})){
+      const players=playerRows(o,observedAt);
+      if(!players.length)continue;
+      if(players.some(p=>p.mainLine))main=true;
+      for(const p of players)p.active?activeQuotes++:suspendedQuotes++;
+      outcomes.push({outcomeId:oid,players});
+    }
+    if(!outcomes.length)continue;
+    const retainedByOriginalRules=legacyRetained<24&&(main||legacyRetained<12);
+    if(retainedByOriginalRules)legacyRetained++;
+    if(retainedByOriginalRules||alternateTotal)markets.push({marketId:String(mid),marketActive:m?.marketActive!==false,bookmakerMarketId:m?.bookmakerMarketId||null,outcomes});
+  }
+  return{bookmakerIsActive:book?.bookmakerIsActive!==false,suspended:book?.suspended===true,activeQuotes,suspendedQuotes,marketCount:Object.keys(book?.markets||{}).length,markets};
+}
 function matchPrimary(f,events){const a=token(f?.participant1Name),b=token(f?.participant2Name),st=Date.parse(f?.startTime||'');if(!a||!b||!Number.isFinite(st))return null;for(const e of events||[]){const h=token(e?.home),aw=token(e?.away),es=Date.parse(e?.date||'');if(!h||!aw||!Number.isFinite(es)||Math.abs(es-st)>3*3600000)continue;if((a===h&&b===aw)||(a===aw&&b===h))return{eventId:String(e?.id||''),eventKey:String(e?.eventKey||e?.identity?.eventKey||''),matchedBy:'exact-participant-pair+start-time'}}return null}
 
 const primary=readJson(PRIMARY_FILE),now=Date.now();

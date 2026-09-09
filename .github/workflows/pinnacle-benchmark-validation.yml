@@ -12,6 +12,9 @@ on:
       - syndicates/generated/graham-mercer/hotline.html
       - tests/oddspapi-retention-horizons.test.mjs
       - tests/pinnacle-observation-freshness.test.mjs
+      - tests/pinnacle-exact-total-assessment.test.mjs
+      - tests/pinnacle-total-retention.test.mjs
+      - tests/fixtures/pinnacle-exact-total-1535.json
       - tools/market-price-assessment.mjs
       - tests/graham-terminal-automation.test.mjs
       - tools/graham-research-review.mjs
@@ -30,6 +33,9 @@ on:
       - syndicates/generated/graham-mercer/hotline.html
       - tests/oddspapi-retention-horizons.test.mjs
       - tests/pinnacle-observation-freshness.test.mjs
+      - tests/pinnacle-exact-total-assessment.test.mjs
+      - tests/pinnacle-total-retention.test.mjs
+      - tests/fixtures/pinnacle-exact-total-1535.json
       - tools/market-price-assessment.mjs
       - tests/graham-terminal-automation.test.mjs
       - tools/graham-research-review.mjs
@@ -48,6 +54,8 @@ jobs:
     steps:
       - name: Check out candidate
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -63,6 +71,8 @@ jobs:
           node tools/pinnacle-benchmark-publication-gate.mjs self-test
           node tests/oddspapi-retention-horizons.test.mjs
           node tests/pinnacle-observation-freshness.test.mjs
+          node tests/pinnacle-total-retention.test.mjs
+          node tests/pinnacle-exact-total-assessment.test.mjs
           node tests/graham-terminal-automation.test.mjs
       - name: Validate production JSON
         run: |
