@@ -18,7 +18,7 @@ const OUT=path.join(ROOT,'data/walters/nfl/current-week-terminal.json');
 function readJson(file){return JSON.parse(fs.readFileSync(file,'utf8'))}
 function numeric(v){if(v===null||v===undefined||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null}
 function roundHalf(v){return Number.isFinite(v)?Math.round(v*2)/2:null}
-function latestSnapshot(game){const rows=Array.isArray(game?.dailySnapshots)?game.dailySnapshots:[];return rows.slice().sort((a,b)=>Number(a.sequence||0)-Number(b.sequence||0)).at(-1)||null}
+function latestSnapshot(game){const rows=Array.isArray(game?.dailySnapshots)?game.dailySnapshots:[];return rows.filter(s=>s.pinnacleStatus==='AVAILABLE'&&numeric(s.pinnacleSpreadHome)!==null).sort((a,b)=>Number(a.sequence||0)-Number(b.sequence||0)).at(-1)||null}
 
 const numbers=readJson(NUMBERS);
 const researchReview=loadCompletedResearchReview({active:ACTIVE,root:ROOT});
@@ -57,7 +57,7 @@ const games=(numbers.games||[]).map(game=>{
   const priorGraham=numeric(game.priorGrahamFairHome);
   const gap=grahamFairHome!==null&&pinnacleSpreadHome!==null?roundHalf(pinnacleSpreadHome-grahamFairHome):null;
   const grahamMove=grahamFairHome!==null&&priorGraham!==null?roundHalf(grahamFairHome-priorGraham):null;
-  const pinnacleMove=pinnacleSpreadHome!==null&&officialPinnacle!==null?roundHalf(pinnacleSpreadHome-officialPinnacle):null;
+  const pinnacleMove=livePinnacle&&officialPinnacle!==null&&Date.parse(livePinnacle.observedAt)>=Date.parse(official.pinnacleObservedAt)?roundHalf(livePinnacle.homeSpread-officialPinnacle):null;
   const moneylineSelectorStatus=grahamFairHome===null?'FAIR_LINE_PENDING':pinnacleMoneylineStatus!=='AVAILABLE'?'MARKET_PENDING':'MARKET_READY_AWAITING_SPREAD_QUALIFICATION';
   return {
     gameKey:game.gameKey,away:game.away,home:game.home,startTimePacific:game.startTimePacific,

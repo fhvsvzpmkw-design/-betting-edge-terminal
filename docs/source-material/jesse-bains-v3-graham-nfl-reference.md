@@ -61,6 +61,8 @@ If the selector is unresolved, Jesse's natural reaction is to keep the phone ope
 
 `MKT Δ` is the current live Pinnacle home spread minus the latest official daily Pinnacle snapshot, rounded to the governed half-point convention in Graham's terminal.
 
+The daily baseline is the first usable scheduled or manual Pinnacle observation each Pacific day after Graham's independent number exists. Later same-day pulls retain that baseline so movement remains measurable. Recovered observations are marked BACKFILL with their original observation time. Missing current prices or a missing usable baseline leave MKT Δ unavailable; a stored baseline alone does not establish zero movement.
+
 Jesse may notice that a number moved. He may not claim to know why unless Graham's information layer actually supplies that reason.
 
 Good Jesse reactions:

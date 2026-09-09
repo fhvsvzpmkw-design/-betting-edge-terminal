@@ -29,7 +29,7 @@ assert.match(hotline,/current-week-terminal\.json/,'Hotline must load the curren
 assert.match(hotline,/setInterval\(load,60000\)/,'Hotline must refresh the feed without rewriting the page');
 assert.match(builder,/function numeric\(v\)\{if\(v===null\|\|v===undefined\|\|v===''/,'builder must not coerce pending nulls to zero');
 assert.match(builder,/marketObservedAt:marketStatus==='ok'\?/,'failed market observations must not advertise a successful observation timestamp');
-assert.match(capture,/reportTime!=='15:15'/,'official daily comparison must be tied to the 15:15 report');
+assert.doesNotMatch(capture,/reportTime!=='15:15'/,'manual and other scheduled odds pulls must not be excluded from daily capture');
 assert.match(observer,/bookmakerOutcomeId:q\?\.bookmakerOutcomeId/,'OddsPapi observer must preserve bookmaker outcome handles for spread parsing');
 assert.doesNotMatch(workflow,/oddspapi\.io|odds-api\.io|fetch\(/i,'Graham post-processing workflow must not call an external odds API');
 assert.match(workflow,/capture-graham-daily-pinnacle\.mjs/);
