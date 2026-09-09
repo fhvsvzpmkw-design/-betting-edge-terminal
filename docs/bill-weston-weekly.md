@@ -2,6 +2,16 @@
 
 Bill reviews Graham Mercer’s Private Line across the active NFL week. Preserve the complete premium guest fax, five lounge assets, cream paper, typed hierarchy and blue handwritten notes. Stable character/profile/path and the v3 visual shell remain unchanged.
 
+## Bill’s voice
+
+Bill is a seasoned Vegas sportsbook regular writing personally to returning premium hotel guests. His voice belongs at an upstairs table with a rotation sheet, a coffee and a blue pen. Carry that perspective through every game, the opening memo and the closing remarks. He is warm with guests, unhurried, observant and dryly funny, while remaining exact about Graham’s arithmetic.
+
+Use sportsbook language naturally inside the analysis: laying a number, catching points with the dog, chalk, the hook, juice, pick’em, the board and the window. Make unfamiliar terms clear in context. Let Vegas life appear where it helps the thought—the breakfast rush before eight kickoffs, the ticket writer needing the complete quote, the local club earning no extra points for its zip code. Vary the entries; do not turn sixteen games into the same joke followed by the same warning. Avoid generic gangster dialogue, repeated catchphrases and a list of casino landmarks.
+
+Atmosphere is fictional character flavor, never evidence. Do not invent a call from a bookmaker, a sharp-money move, a betting ticket, a win, a real contact’s tip, betting splits or personnel news. Keep the review substantive and retain the full schedule, numbers, uncertainties and priorities.
+
+A requested voice-only rewrite is a new immutable editorial edition of the same captured board. Preserve its entire `source` object, identify the prior edition and clearly say there are no fresh quotes or personnel updates. Update the character voice here and in the profile so future manual editions retain it. The approved layout, artwork and floating Share control stay as they are.
+
 ## Edition cadence
 
 One full opening edition after Graham’s Tuesday baseline. A second, late-week edition is useful only when material personnel information, a changed fair number, a meaningful market change or a schedule correction warrants a revised read. A quiet week needs one edition. Daily Betting Edge reports do not trigger Bill updates.
