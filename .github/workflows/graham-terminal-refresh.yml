@@ -15,6 +15,8 @@ on:
       - tools/build-graham-current-week.mjs
       - tools/graham-research-review.mjs
       - tools/capture-graham-daily-pinnacle.mjs
+      - tools/graham-market-utils.mjs
+      - tests/graham-daily-pinnacle.test.mjs
       - tools/validate-walters-qb-performance-production.mjs
       - tools/walters-qb-production-scope.mjs
   workflow_run:
@@ -54,6 +56,7 @@ jobs:
           node --check tools/graham-research-review.mjs
           node --check tools/graham-fair-decomposition.mjs
           node --check tools/graham-schedule-authority.mjs
+          node tests/graham-daily-pinnacle.test.mjs
           node tools/graham-schedule-authority.mjs --manifest
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
@@ -178,6 +181,6 @@ jobs:
             echo "- Graham fair: rebuilt immediately after governed Graham research changes"
             echo "- Pinnacle on research-only refresh: latest committed snapshot preserved with its original timestamp"
             echo "- Pinnacle on odds refresh: refreshed comparison consumed after the odds workflow completes"
-            echo "- Official daily Pinnacle capture: 15:15 odds-refresh path only, when an independent Graham number exists"
+            echo "- Official daily Pinnacle capture: first usable scheduled or manual odds pull each Pacific day after the independent Graham number exists; later pulls preserve the baseline"
             echo "- Market isolation: football information moves Graham; market refresh changes only the comparison"
           } >> "$GITHUB_STEP_SUMMARY"
