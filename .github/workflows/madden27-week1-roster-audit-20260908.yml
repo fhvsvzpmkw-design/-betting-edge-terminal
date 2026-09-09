@@ -1,0 +1,73 @@
+name: Madden Week 1 roster shadow audit 2026-09-08
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/madden27-week1-roster-audit-20260908.yml
+  workflow_dispatch:
+
+concurrency:
+  group: madden27-week1-roster-audit-20260908
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Capture current EA population in shadow and compare to freeze
+        run: |
+          set -euo pipefail
+          python3 tools/audit-madden27-week1-roster.py
+
+      - name: Prove frozen/live sources were not mutated
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- \
+            data/walters/nfl/madden27/madden27-current.json \
+            data/walters/nfl/player-values/player-values-2026-v1.json \
+            data/walters/nfl/player-values/player-values-access-v1.json \
+            data/walters/nfl/player-values/stage2-current.json \
+            data/walters/nfl/personnel-calibration-v1.json \
+            data/walters/nfl/2026/week-01-current-numbers.json
+          test -f data/walters/nfl/madden27/week1-roster-audit-2026-09-08.json
+          python3 - <<'PY'
+          import json
+          p='data/walters/nfl/madden27/week1-roster-audit-2026-09-08.json'
+          j=json.load(open(p,encoding='utf-8'))
+          assert j['state'] in ('SHADOW_COMPLETE','SHADOW_REVIEW_REQUIRED')
+          assert j['marketViewed'] is False
+          s=j['safety']
+          assert s['shadowOnly'] is True
+          for k in ['madden27CurrentMutated','playerValueRegistryMutated','playerValueShardsMutated','grahamNumbersMutated','existingFrozenOvrChangesApplied','existingWaltersValuesRebased','removalsDeleteFrozenValues','teamChangesMoveFrozenValuesAutomatically']:
+              assert s[k] is False, k
+          print('WEEK1 ROSTER AUDIT SAFETY: PASS')
+          PY
+
+      - name: Publish shadow audit only
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/walters/nfl/madden27/week1-roster-audit-2026-09-08.json
+          if git diff --cached --quiet; then
+            echo "Shadow audit already current."
+            exit 0
+          fi
+          git commit -m "Record Madden Week 1 roster shadow audit"
+          git push origin HEAD:main
