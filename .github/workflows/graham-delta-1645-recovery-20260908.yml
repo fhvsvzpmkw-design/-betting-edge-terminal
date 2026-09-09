@@ -31,7 +31,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const authority=fs.readFileSync('GRAHAM_DELTA_1645_AUTHORITY.md','utf8');
-          if(!authority.includes('Authority version: **2.1**')||!authority.includes('Status: **OPERATIONAL**')||!authority.includes('Task key: **DELTA_1645**')) throw new Error('GRAHAM_DELTA_1645_AUTHORITY_NOT_OPERATIONAL');
+          if(!authority.includes('- Authority version: 2.1')||!authority.includes('- Status: OPERATIONAL')||!authority.includes('- Task key: `DELTA_1645`')) throw new Error('GRAHAM_DELTA_1645_AUTHORITY_NOT_OPERATIONAL');
           const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
           if(active.schema!==1||active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER'||Number(active.season)!==2026||Number(active.week)!==1) throw new Error('ACTIVE_WEEK_MISMATCH');
           const h4=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/home-field-production-current.json','utf8'));
