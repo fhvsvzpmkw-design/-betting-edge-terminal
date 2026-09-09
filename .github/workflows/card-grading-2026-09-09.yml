@@ -39,6 +39,10 @@ jobs:
           const old="const TARGET_DATE='2026-09-05';";
           if(!body.includes(old)) throw Error('prior TARGET_DATE token not found');
           body=body.replace(old,"const TARGET_DATE='2026-09-08';");
+          // The legacy unsupported-market regex used unbounded `hits?`, which falsely
+          // matched the letters "hit" inside "White" and incorrectly left standard
+          // Chicago White Sox moneyline/spread cards unresolved. Bound the word only.
+          body=body.replace('|hits?|home run','|\\bhits?\\b|home run');
           fs.writeFileSync('/tmp/card-grader.js',body+'\n');
           NODE
           node --check /tmp/card-grader.js
@@ -97,6 +101,6 @@ jobs:
             echo "No historical grading changes to commit"
             exit 0
           fi
-          git commit -m "Grade Sep 8 Betting Edge cards and refresh results index"
+          git commit -m "Close Sep 8 Betting Edge cards and refresh results index"
           git pull --rebase origin main
           git push origin main
