@@ -1,0 +1,36 @@
+name: Card evidence application review
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/review-card-evidence.mjs
+      - tools/major-sport-market-coverage-gate.mjs
+      - tests/card-evidence-review.test.mjs
+      - tests/primary-research-progress.test.mjs
+      - docs/REPORT_CARD_EVIDENCE.md
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+      - .github/workflows/card-evidence-review.yml
+  pull_request:
+    paths:
+      - tools/review-card-evidence.mjs
+      - tools/major-sport-market-coverage-gate.mjs
+      - tests/card-evidence-review.test.mjs
+      - tests/primary-research-progress.test.mjs
+      - docs/REPORT_CARD_EVIDENCE.md
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+      - .github/workflows/card-evidence-review.yml
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/card-evidence-review.test.mjs
+      - run: node tests/primary-research-progress.test.mjs
+      - run: node tools/major-sport-market-coverage-gate.mjs self-test

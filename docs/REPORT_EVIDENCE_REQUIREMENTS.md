@@ -1,5 +1,9 @@
 # Report source and fair-value evidence
 
+## Card evidence application — September 9 clarification
+
+New unfrozen drafts also follow `REPORT_CARD_EVIDENCE.md`: use actual source facts in SUPPORT/CONTRARY/ANALYSIS, recognizable source names, and the canonical research pack for HIST FIT. Research gaps get an honest NR/unavailable explanation. Preserve earlier exact forecast leads for current revalidation. Run the read-only `tools/review-card-evidence.mjs` advice before freeze; its warnings add no publication gate and cannot replace the substantive review. The market-assessment and partial-publication allowances below remain authoritative. Forecast completion counts must distinguish extracted forecasts from no-vig references.
+
 ## Market assessment completion — from `2026-09-07T18:31:00-07:00`
 
 This forward amendment supersedes the universal numeric model-fair/range and independent-support requirements below for a verified non-wager market assessment. The existing forecast-based path and BET gates remain intact. All five Main tasks follow the market-first sequence in shared scheduled authority section 6.

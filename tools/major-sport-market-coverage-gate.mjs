@@ -347,17 +347,19 @@ export const PARTIAL_RESEARCH_FROM = '2026-09-06T18:15:00-07:00';
 // Read indexed issued work as historical context only. Never copy its receipts
 // into the current draft or grant current evaluation credit for an earlier run.
 export function loadPriorPrimaryResearch(root, report, inventory) {
-  const bySelection = new Map(), warnings = [];
+  const bySelection = new Map(), byForecast = new Map(), warnings = [];
   const wanted = new Set(inventory.selections.map(item => item.selectionId));
   const date = localDateKey(report.ts, 'America/Vancouver');
   const indexPath = path.join(root, 'run-history.json');
-  if (!fs.existsSync(indexPath)) return {bySelection, warnings: ['Run history unavailable; start current research without inherited context.']};
+  if (!fs.existsSync(indexPath)) return {bySelection, byForecast, warnings: ['Run history unavailable; start current research without inherited context.']};
   const entries = (readJson(indexPath).runs || []).filter(entry =>
     parseMs(entry.ts) !== null && parseMs(entry.ts) < parseMs(report.ts) &&
     localDateKey(entry.ts, 'America/Vancouver') === date
   ).sort((a, b) => parseMs(b.ts) - parseMs(a.ts));
   for (const entry of entries) {
-    if ([...wanted].every(id => bySelection.has(id))) break;
+    // A later market assessment must not hide an earlier sourced forecast.
+    // Retain both as historical leads; neither grants current decision credit.
+    if ([...wanted].every(id => bySelection.has(id) && byForecast.has(id))) break;
     try {
       ensure(new RegExp(`^data/history/runs/${date}/[a-z0-9_-]+\\.json$`).test(entry.path || ''), 'invalid indexed report path');
       ensure(entry.researchFitPath === entry.path.replace('/runs/', '/research-fit/'), 'invalid indexed research path');
@@ -378,7 +380,7 @@ export function loadPriorPrimaryResearch(root, report, inventory) {
       const receipts = priorSidecar.primaryAnalysis.receipts;
       const candidates = [];
       for (const receipt of receipts) {
-        if (!wanted.has(receipt?.selectionId) || bySelection.has(receipt.selectionId)) continue;
+        if (!wanted.has(receipt?.selectionId)) continue;
         ensure(receipts.filter(item => item.selectionId === receipt.selectionId).length === 1, 'duplicate prior selection receipt');
         const [, id, detail, side] = receipt.selectionId.split('|');
         const expectedMarket = detail === 'full_game_moneyline' ? 'ml' : detail === 'full_game_primary_total' ? 'totals' : 'spread';
@@ -386,12 +388,20 @@ export function loadPriorPrimaryResearch(root, report, inventory) {
           ['BLOCKED', 'EVALUATED'].includes(receipt.state), 'prior receipt identity mismatch');
         candidates.push([receipt.selectionId, {source, receipt: structuredClone(receipt)}]);
       }
-      for (const [id, context] of candidates) bySelection.set(id, context);
+      for (const [id, context] of candidates) {
+        if (!bySelection.has(id)) bySelection.set(id, context);
+        const fair = context.receipt.decision?.fairValueEvidence;
+        if (!byForecast.has(id) && context.receipt.state === 'EVALUATED' &&
+            fair?.selectionKey === context.receipt.quote.selectionKey &&
+            Number.isFinite(fair.estimate) && Number.isFinite(fair.range?.low) && Number.isFinite(fair.range?.high)) {
+          byForecast.set(id, context);
+        }
+      }
     } catch (error) {
       warnings.push(`${entry.path || entry.ts}: ${error.message}; unavailable context must be researched afresh.`);
     }
   }
-  return {bySelection, warnings};
+  return {bySelection, byForecast, warnings};
 }
 
 function researchContext(prior, selection) {
@@ -407,6 +417,8 @@ function researchContext(prior, selection) {
     ...(receipt.state === 'EVALUATED' ? {
       priorStatus: receipt.decision?.status,
       priorFair: receipt.decision?.fair, priorPlayTo: receipt.decision?.playTo,
+      ...(receipt.decision?.fairValueEvidence ? {fairValueEvidence: structuredClone(receipt.decision.fairValueEvidence),
+        sourceEvidence: structuredClone(receipt.decision.sourceEvidence || [])} : {}),
       personnelDependency: personnel ? {target: personnel.dependencyTarget, state: personnel.personnelState,
         unresolved: personnel.unresolved, decisionSensitivity: personnel.decisionSensitivity} : null
     } : {})
@@ -442,6 +454,7 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     const receipt = matches.length === 1 ? matches[0] : null;
     const bound = analysisBound && receipt && selection.quotes.some(quote => sameQuote(receipt.quote, quote));
     const inherited = researchContext(priorResearch.bySelection.get(selection.selectionId), selection);
+    const forecast = researchContext(priorResearch.byForecast?.get(selection.selectionId), selection);
     let state = 'RESEARCH_PENDING', nextAction = marketAssessmentEnabled(report) ? 'GRADE_MARKET_PRICE' : 'START_STAGE_1';
     if (matches.length > 1 || (receipt && !bound)) nextAction = 'RECONCILE_EXACT_RECEIPT';
     else if (bound && receipt.state === 'EVALUATED') state = 'EVALUATED_RECORDED';
@@ -458,11 +471,15 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     const event = events.get(eventKey);
     if (bound) addSharedResearch(event, receipt, {ts: report.ts, feedGeneratedAt: report.feedGeneratedAt}, false);
     if (inherited) addSharedResearch(event, priorResearch.bySelection.get(selection.selectionId).receipt, inherited.source, true);
+    if (forecast && forecast.source.reportPath !== inherited?.source.reportPath) {
+      addSharedResearch(event, priorResearch.byForecast.get(selection.selectionId).receipt, forecast.source, true);
+    }
     if (!event.markets.has(selection.marketDetail)) event.markets.set(selection.marketDetail, {marketDetail: selection.marketDetail, selections: []});
     event.markets.get(selection.marketDetail).selections.push({
       selectionId: selection.selectionId, side: selection.side, quotes: selection.quotes, state,
       nextAction: state === 'RESEARCH_PENDING' ? nextAction : 'VALIDATE_RECORDED_OUTCOME',
       ...(inherited ? {priorResearch: inherited} : {}),
+      ...(forecast ? {priorForecastResearch: forecast} : {}),
       ...(bound && receipt.blocker ? {missing: receipt.blocker.missing, impact: receipt.blocker.impact, attempts: receipt.blocker.attempts} : {}),
       ...(state === 'RESEARCH_PENDING' ? {remainingWork: structuredClone((bound ? receipt.blocker : inherited?.blocker)?.progress || {
         stage: 'UNSPECIFIED', nextStep: 'Identify the exact missing evidence or unfinished calculation from the recorded attempts; do not infer research completion.',
@@ -475,6 +492,7 @@ export function buildPrimaryResearchPlan(report, sidecar, inventory, priorResear
     state: counts.pending ? 'RESEARCH_PENDING' : 'READY_FOR_VALIDATION',
     counts,
     handoff: {matchedSelections: inventory.selections.filter(item => priorResearch.bySelection.has(item.selectionId)).length,
+      forecastSelections: inventory.selections.filter(item => priorResearch.byForecast?.has(item.selectionId)).length,
       warnings: priorResearch.warnings, authority: 'HISTORICAL_CONTEXT_ONLY'},
     workflow: marketAssessmentEnabled(report) ? [
       'Grade exact current execution quotes against the qualified paired market reference; first-pull movement history is not required.',

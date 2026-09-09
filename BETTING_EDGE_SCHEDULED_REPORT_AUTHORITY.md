@@ -16,6 +16,7 @@
 **Source-first fair-value amendment:** forward from `2026-09-07T18:15:00-07:00` — retrieve published fair estimates, verify current personnel, then compare executable prices
 **Market-first completion amendment:** forward from `2026-09-07T18:31:00-07:00`; section 6 overrides older universal fair/range and research-first requirements
 **Public forecast lookup and completion reporting:** 2026-09-07 — applies within the source-first amendment; use the sport/market routes below and disclose actual evidence completion
+**Card evidence application repair:** 2026-09-09 — apply specific current facts and canonical History Fit to new drafts; retain earlier forecast leads and advisory review without changing market-assessment or partial-publication eligibility
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 
@@ -43,6 +44,8 @@ Require:
 - current `core/pinnacle-sharp-benchmark-v1.4.json`;
 - `BETTING_EDGE_PERSONNEL_SWEEP.md`;
 - `data/major-sport-market-coverage-v1.json` and `BETTING_EDGE_MAJOR_SPORT_MARKET_COVERAGE.md`.
+
+For new drafts after the September 9 repair, also read `docs/REPORT_CARD_EVIDENCE.md`. It governs card explanations and actual research application; it adds no publication gate or independent-model requirement for market assessments.
 
 Retain exact current blob SHAs required by the production report/sidecar contract. Verify the production manifest sharp-market benchmark block is OPERATIONAL, its pinned policy id/blob matches the current Pinnacle policy, its authority is `OFFICIAL_NON_EXECUTABLE_SHARP_BENCHMARK`, and `executionAuthority=false`. Resolve current Walters mode.
 
@@ -85,7 +88,7 @@ For every in-scope game in MLB, NHL, NBA/WNBA, NFL, NCAAF and CFL, evaluate ever
 - NBA/WNBA: both moneyline sides, both sides of the primary spread, primary total over and under;
 - NFL/NCAAF/CFL: both moneyline sides, both sides of the primary spread, primary total over and under.
 
-Establish one internally coherent sourced fair for each exact primary market under section 6, then grade both opposing selections against their own exact executable prices. Do not manufacture separate contradictory fairs merely to force both sides into the process.
+Establish one coherent assessment basis for each exact primary market under section 6: a sourced fair/range for the forecast path, or the qualified paired reference for the market-assessment path. Grade both opposing selections against their own exact executable prices. Do not manufacture separate contradictory fairs merely to force both sides into the process.
 
 Never preselect an underdog, favorite, home team, away team, over or under as the only candidate side. One market never substitutes for another. One league never substitutes for another.
 
@@ -165,6 +168,14 @@ Pinnacle remains non-executable, does not overwrite independent fairs, and does 
 
 See `docs/REPORT_EVIDENCE_REQUIREMENTS.md` for the structured record. `validatePrimaryAnalysis` re-resolves the reference against the pinned observer; the evidence, coverage and publication gates validate the same record.
 
+### Card evidence application — September 9 repair
+
+Follow `docs/REPORT_CARD_EVIDENCE.md` while forming the draft. SUPPORT and CONTRARY must communicate the actual relevant facts and unresolved dependencies; ANALYSIS must explain their effect on this decision; SOURCE must identify recognizable publishers and readable Pacific check times. Apply the existing historical pack to HIST FIT with actual research links, mechanism and limitations; use NR or HISTORY LIBRARY UNAVAILABLE honestly when appropriate. Do not use a B grade to describe today's price comparison. Do not use an assembly loop that sets every matched selection to PASS, clears all earlier forecasts, or replaces completed research with generic process statements.
+
+The research plan now retains `priorForecastResearch` separately from the newest receipt. Review the earlier exact forecast, original sources and personnel assumptions even if an intervening market-only PASS omitted them; explain adoption or non-adoption from current evidence. Never inherit an old fair, status, quote or check time automatically. Prioritize concrete favorable-price/personnel and forecast-disagreement questions under existing Stage 2 rules, with no new numerical trigger or universal deep-research quota.
+
+Run `node tools/review-card-evidence.mjs review --report <report.json> --sidecar <sidecar.json>` before freeze and inspect its event facts and focused warnings. Correct the unfrozen draft from verified evidence and keep all copies aligned. This is advisory, not a publication veto: preserve every supported market assessment, use truthful selection-level limitations for genuinely unfinished current research, and publish the completed remainder. Historical-fit gaps do not block current decisions. The WAIT/BET requirements in section 6 remain unchanged.
+
 ### Published-forecast lookup — used when the market-first review needs it
 
 For report timestamps at/after `2026-09-07T18:15:00-07:00`, apply Contract section 4.1's source-first amendment. Betting Edge retrieves and assesses published fair estimates, verifies them against current matchup research, and compares them with the bound sportsbook prices. Independence means substantive model evidence separate from the execution quotes; it does not require a model built by Betting Edge. A verified external forecast may be used unchanged as the point estimate. Do not create a new predictive model or arbitrary raw-statistic/personnel adjustment during a standard run.
@@ -227,7 +238,7 @@ The normal feed and event clocks continue to apply throughout. If the bound feed
 
 ### Sourced fair estimates, uncertainty and terminal evidence limitations
 
-For every available primary market, seek a supported current fair under the source-first workflow. A verified model forecast is `sourceEvidence.kind=MODEL` and may support `fairValueBasis=INDEPENDENT_MODEL` without any homemade adjustment. Preserve `MARKET_ANCHORED_MODEL` only when the adopted source/approved method actually combines a market baseline with substantive independent inputs and that basis is explained. Outside publication alone does not make a no-vig quote independent. Existing governed Walters fair records remain eligible only within their current authority.
+For markets using the forecast path, seek a supported current fair under the source-first workflow. Supported non-wager market assessments retain the section 6 exception; no universal forecast hunt or range is required for them. A verified model forecast is `sourceEvidence.kind=MODEL` and may support `fairValueBasis=INDEPENDENT_MODEL` without any homemade adjustment. Preserve `MARKET_ANCHORED_MODEL` only when the adopted source/approved method actually combines a market baseline with substantive independent inputs and that basis is explained. Outside publication alone does not make a no-vig quote independent. Existing governed Walters fair records remain eligible only within their current authority.
 
 Use the existing evidence schema as described in `docs/REPORT_EVIDENCE_REQUIREMENTS.md`. The derivation may simply be the checked published probability divided by 100, with direct adoption and any odds conversion shown. A moneyline estimate does not establish a run-line, puck-line, spread or total fair. Do not transfer a probability at 7.5 to 8, infer an Over probability solely from a predicted score, or ignore a push at an integer line.
 
@@ -241,7 +252,7 @@ For `run.ts >= 2026-09-05T17:00:00-07:00`, read and apply `docs/REPORT_EVIDENCE_
 
 Every displayed card, including PASS, must retain event- and sport-matched `sourceEvidence` with actual URLs, check times and specific findings. Do not copy generic league/source text from another sport. If a source or market genuinely cannot be verified, record the permitted PASS `sourceShortfall` with its decision impact; never invent a source or numeric fair to complete a card.
 
-Every EVALUATED primary decision, including PASS, must retain `fairValueEvidence`: the exact selection, units and orientation, numeric inputs linked to the checked sources, method/calculation, final estimate, numeric uncertainty range, limitations and explicit personnel basis. A checked applicable external model forecast can supply the point estimate directly; verify source quality, current assumptions and uncertainty under the process above. The numerical trace documents adoption/conversion of the source estimate, not a requirement to reproduce its predictive model. Do not manufacture a formula or set `personnelRequired=false` to evade material Stage 2 work. If an estimate cannot be supported, resolve its analytical availability before freeze under the existing Core rules.
+Every EVALUATED primary decision on the forecast-based path, including a forecast-based PASS, must retain `fairValueEvidence`: the exact selection, units and orientation, numeric inputs linked to the checked sources, method/calculation, final estimate, numeric uncertainty range, limitations and explicit personnel basis. The qualified non-wager `marketAssessment` path instead retains its paired reference and current information review, with `fairValueEvidence: null`. A checked applicable external model forecast can supply the point estimate directly; verify source quality, current assumptions and uncertainty under the process above. The numerical trace documents adoption/conversion of the source estimate, not a requirement to reproduce its predictive model. Do not manufacture a formula or set `personnelRequired=false` to evade material Stage 2 work. If neither permitted assessment basis can be supported, record the exact selection-level limitation and preserve the completed remainder.
 
 Keep status and execution language consistent: a zero-stake LEAN is not an instruction to wager merely because a directional `playTo` threshold is met. State why BET strength is absent. Record the machine-checkable `benchmarkComparison` for each QUALIFIED Pinnacle card. A better independent handicap may disagree with Pinnacle; an unfavorable benchmark comparison must be described as unfavorable and may not be presented as confirming an execution advantage.
 
@@ -286,6 +297,8 @@ Complete the major-sport inventory accounting and publish every completed, valid
 The publisher derives `coverageSummary.researchCompletion` and the leading partial/incomplete notice in `report.summary` from validated receipts. This is display metadata and may be attached to the frozen bundle without changing decision content, status, price, fair, stake or research evidence. Read-back verifies the notice and counts. Normal terminal blockers, quote-unavailable selections and unfinished research remain distinguishable in the existing coverage details. `READY` means the bundle and its completed decisions are valid for publication, including honest partial publication; it does not mean every selection has a finished handicap.
 
 For source-first reports, follow the source lookup completion instructions in `docs/REPORT_EVIDENCE_REQUIREMENTS.md`: state the count of available primary selections with an applicable published point estimate, the verified evaluated/evidence-blocked counts, and the specific remaining evidence gaps. Derive the sourced-point count from actual extracted numbers and applicability findings in the existing receipts; a retrieved point is not necessarily a completed fair/range or decision. Preserve publisher-owned coverage notices. Check this explanation against durable read-back before delivery, and compare matching selections rather than different slates when claiming evidence graduation.
+
+Count extracted published forecasts separately from qualified market references. A no-vig reference is not an independent published forecast; do not substitute the evaluated-card count for the sourced-forecast count.
 
 For report timestamps at/after `2026-09-06T00:00:00-07:00`, there is **no numeric card minimum, target, profile or maximum**. Do not resolve a card-count preference and do not curate completed decisions toward a number. Publish every EVALUATED primary decision unchanged, including BET, LEAN, WAIT and PASS. The final card count is therefore an output of the completed analysis. Do not add filler. BLOCKED receipts remain evidence limitations rather than cards, except that separately governed unavailable continuity resolutions retain their existing behavior. Reports issued before this cutover remain immutable under their original presentation receipts.
 
