@@ -38,7 +38,11 @@ function quoteTime(quote){
   return Number.isFinite(ms)?{raw,ms}:null;
 }
 
-export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive=true,suspended=false,quoteFreshnessMinutes=30,futureClockSkewToleranceMinutes=5,quoteObservationVersion}={}){
+export function isFullGameAlternateTotalMarket(market){
+  return /^altLine\/[^/]+\/[^/]+\/[^/]+\/[^/]+\/[^/]+\/0\/totals$/.test(market?.bookmakerMarketId||'');
+}
+
+export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive=true,suspended=false,quoteFreshnessMinutes=30,futureClockSkewToleranceMinutes=5,quoteObservationVersion,exactTotalLine}={}){
   const base={state:UNAVAILABLE,authority:AUTHORITY,executionAuthority:false,decisionAuthority:false,fairValueAuthority:false,reason:null,generatedAt:generatedAt||null,pairedOutcomes:[]};
   // Unmarked archives retain their original change-time interpretation exactly.
   if(quoteObservationVersion!==undefined&&quoteObservationVersion!==1){base.reason='QUOTE_OBSERVATION_VERSION_UNSUPPORTED';return base;}
@@ -48,15 +52,26 @@ export function qualifyMarket({market,generatedAt,primaryMatch,bookmakerIsActive
   if(bookmakerIsActive!==true){base.reason='BOOKMAKER_INACTIVE';return base;}
   if(suspended===true){base.reason='BOOKMAKER_SUSPENDED';return base;}
   if(!market||market.marketActive===false){base.reason='MARKET_INACTIVE';return base;}
+  // Explicit report-time exception only. Observer annotations and unmarked
+  // historical calls retain the original main-line interpretation.
+  const exactAlternate=exactTotalLine!==undefined;
+  if(exactAlternate&&(!isFullGameAlternateTotalMarket(market)||typeof exactTotalLine!=='number'||!Number.isFinite(exactTotalLine)||exactTotalLine<=0||!Number.isInteger(exactTotalLine*2))){base.reason='EXACT_FULL_GAME_ALTERNATE_TOTAL_REQUIRED';return base;}
   const outcomes=Array.isArray(market.outcomes)?market.outcomes:[];
   const rows=[];
   for(const outcome of outcomes){
     const players=Array.isArray(outcome?.players)?outcome.players:[];
     for(const quote of players){
-      if(quote?.mainLine===true) rows.push({outcomeId:String(outcome?.outcomeId??''),quote});
+      if(exactAlternate||quote?.mainLine===true) rows.push({outcomeId:String(outcome?.outcomeId??''),quote});
     }
   }
-  if(rows.length!==2||new Set(rows.map(row=>row.outcomeId)).size!==2){base.reason='COMPLETE_TWO_WAY_MAIN_LINE_REQUIRED';return base;}
+  if(rows.length!==2||new Set(rows.map(row=>row.outcomeId)).size!==2){base.reason=exactAlternate?'COMPLETE_EXACT_TOTAL_PAIR_REQUIRED':'COMPLETE_TWO_WAY_MAIN_LINE_REQUIRED';return base;}
+  if(exactAlternate){
+    const sides=rows.map(row=>{
+      const parts=String(row.quote.bookmakerOutcomeId||'').split('/');
+      return parts.length===2&&/^(?:\d+(?:\.\d+)?|\.\d+)$/.test(parts[0])&&Number(parts[0])===exactTotalLine&&row.quote.mainLine===false?parts[1]:null;
+    });
+    if(!sides.includes('over')||!sides.includes('under')){base.reason='EXACT_TOTAL_LINE_AND_SIDES_REQUIRED';return base;}
+  }
   if(rows.some(row=>row.quote?.active!==true)){base.reason='QUOTE_INACTIVE';return base;}
   const generatedMs=Date.parse(generatedAt||'');
   if(!Number.isFinite(generatedMs)){base.reason='OBSERVER_TIMESTAMP_INVALID';return base;}
