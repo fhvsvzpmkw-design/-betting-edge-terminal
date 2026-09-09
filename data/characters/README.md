@@ -62,7 +62,7 @@ That can update voice traits while preserving his stable setting, visual identit
 
 Each character keeps one live Hotline page plus immutable issued copies beside it.
 
-Example for Bill Weston:
+Historical report-session example for Bill Weston:
 
 ```text
 syndicates/downtown-booth/wire.html
@@ -77,12 +77,14 @@ Archive files are immutable. If the same date/session already exists with differ
 From a checkout, save the character's current issued Hotline with:
 
 ```sh
-node tools/archive-syndicate-hotline.mjs --character bill-weston
+node tools/archive-syndicate-hotline.mjs --character larry-lombardo
 ```
 
 The helper reads `continuity.lastReportSeen`, derives the date/session and authoritative report path, copies the current live Hotline, and updates the character's archive index. Use `--dry-run` to preview or `--session HHMM` only when the report label does not provide the intended session code.
 
 ## Continuity rule
+
+**Bill Weston’s approved weekly NFL exception:** Bill now reviews Graham Mercer’s Private Line, using a frozen full-week source edition rather than report-session Betting Edge cards. Follow `docs/bill-weston-weekly.md` and use `node tools/build-bill-weston-weekly.mjs` to render and archive the issue. His continuity advances through `lastEditionSeen`. Preserve his premium guest fax, all games in kickoff order and immutable older report editions. One full opening edition and an optional material-change late-week edition replace the old daily session rhythm.
 
 When building a new Hotline edition, use:
 

@@ -11,7 +11,7 @@ const roster=(manifest.profiles||[]).filter(p=>p?.characterId&&p?.characterFile&
 assert(roster.length>=5,'expected at least five Syndicate profiles');
 const required={
 'eddie-numbers':['MUDDY NUMBERS','LEDGER DESK','ACTUAL CAD DOLLARS','MUDDY LEDGER // LAST 10 TICKETS','<canvas','MUDDY METERS','THE WALK TO THE CAGE','EDDIE:'],
-'bill-weston':['Last-Session Reconciliation','Change Memo','Current Window Entries','FINAL DESK DISPOSITION'],
+'bill-weston':['The Week’s Schedule','Edition Change Memo','Full-Week Game Files','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Today's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
 'jesse-bains':['Sports Desk','Hotel Delphoria','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
 'lou-vega':['VEGAS BY THE SLICE','data-zone="menu-board"','COUPON BOOK','BEST NUMBER IN TOWN','PIZZA BOOK // RUNNING REVIEW','data-zone="floor-walk"','LAST STOP']};
@@ -27,6 +27,17 @@ for(const profile of roster){
   assert(character?.hotlineStyle?.shell?.status==='locked',`${id}: v3 shell must remain locked`);
   const rotationRule=String(character?.hotlineStyle?.generationEngine?.rule||'');
   assert(rotationRule.includes('Do not force pizza, a progressive, video poker, a comp, a waitress and parking into the same issue.'),`${id}: rotating route-module safeguard missing`);
+ }
+ if(id==='bill-weston' && character?.authority?.mode==='graham-weekly-edition-authoritative'){
+  assert(character.authority.source==='data/walters/nfl/current-week-terminal.json','Bill: Graham source required');
+  assert(character.authority.scope==='NFL_ONLY' && character.authority.bettingAuthority===false,'Bill: editorial NFL authority only');
+  assert(liveText.includes('data-update-mode="weekly-static"') && !liveText.includes('fetch('),'Bill: preserve static weekly edition');
+  const pointer=readJson(character.authority.currentEdition),edition=readJson(pointer.path);
+  assert(character.continuity.lastEditionSeen.id===edition.id,'Bill: continuity edition mismatch');
+  assert((liveText.match(/data-game-key=/g)||[]).length===edition.source.games.length,'Bill: full schedule required');
+  const archived=read(character.continuity.lastEditionSeen.archivePath);
+  assert(liveText.replace('<base href="./">','<base href="../../">')===archived,'Bill: live/archive edition mismatch');
+  continue;
  }
  if(character?.authority?.mode==='ledger-authoritative'){
   assert(character.authority.source==='/api/bet-history',`${id}: ledger authority source mismatch`);

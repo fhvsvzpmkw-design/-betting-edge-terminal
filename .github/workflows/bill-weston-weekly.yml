@@ -1,0 +1,31 @@
+name: Bill Weston weekly fax
+on:
+  pull_request:
+    paths:
+      - 'data/characters/bill-weston.json'
+      - 'data/characters/bill-weston/**'
+      - 'syndicates/downtown-booth/**'
+      - 'tools/build-bill-weston-weekly.mjs'
+      - 'tests/bill-weston-weekly.test.mjs'
+      - '.github/workflows/bill-weston-weekly.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'data/characters/bill-weston.json'
+      - 'data/characters/bill-weston/**'
+      - 'syndicates/downtown-booth/**'
+      - 'tools/build-bill-weston-weekly.mjs'
+      - 'tests/bill-weston-weekly.test.mjs'
+      - '.github/workflows/bill-weston-weekly.yml'
+permissions:
+  contents: read
+jobs:
+  weekly-fax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/bill-weston-weekly.test.mjs
+      - run: node tests/syndicate-hotline-completeness.test.mjs
