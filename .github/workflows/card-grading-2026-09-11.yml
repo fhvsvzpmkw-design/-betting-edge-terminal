@@ -48,18 +48,22 @@ jobs:
           // result provider without touching live odds or report production.
           if(!body.includes('^(MLB|NCAAF)')) throw Error('sport parser patch token not found');
           body=body.replace('^(MLB|NCAAF)','^(MLB|NCAAF|NFL)');
-          const sourceToken="            if(sport==='NCAAF') return {name:`ESPN college football scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};\n            return null;";
+
+          const sourceToken="if(sport==='NCAAF') return {name:`ESPN college football scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};";
           if(!body.includes(sourceToken)) throw Error('source provider patch token not found');
-          body=body.replace(sourceToken,"            if(sport==='NCAAF') return {name:`ESPN college football scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};\n            if(sport==='NFL') return {name:`ESPN NFL scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};\n            return null;");
-          const providerToken="            if(sport==='NCAAF'){";
+          body=body.replace(sourceToken,sourceToken+"\n  if(sport==='NFL') return {name:`ESPN NFL scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};");
+
+          const providerToken="if(sport==='NCAAF'){";
           if(!body.includes(providerToken)) throw Error('football provider patch token not found');
-          body=body.replace(providerToken,"            if(sport==='NCAAF'||sport==='NFL'){");
+          body=body.replace(providerToken,"if(sport==='NCAAF'||sport==='NFL'){");
+
           const sportToken="out.push({sport:'NCAAF',id:String(e.id||''),date:e.date,";
           if(!body.includes(sportToken)) throw Error('football provider sport token not found');
           body=body.replace(sportToken,"out.push({sport,id:String(e.id||''),date:e.date,");
-          const logToken="            console.log(`NCAAF SOURCE: ${sourceFor('NCAAF',TARGET_DATE).url}`);";
+
+          const logToken="console.log(`NCAAF SOURCE: ${sourceFor('NCAAF',TARGET_DATE).url}`);";
           if(!body.includes(logToken)) throw Error('source log patch token not found');
-          body=body.replace(logToken,logToken+"\n            console.log(`NFL SOURCE: ${sourceFor('NFL',TARGET_DATE).url}`);");
+          body=body.replace(logToken,logToken+"\n  console.log(`NFL SOURCE: ${sourceFor('NFL',TARGET_DATE).url}`);");
 
           fs.writeFileSync('/tmp/card-grader.js',body+'\n');
           NODE
