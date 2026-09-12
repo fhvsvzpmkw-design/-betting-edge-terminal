@@ -57,7 +57,9 @@ jobs:
           NODE
       - name: Review card evidence (advisory only)
         continue-on-error: true
-        run: node tools/review-card-evidence.mjs review --report /tmp/report.json --sidecar /tmp/sidecar.json --summary
+        run: |
+          node tools/review-card-evidence.mjs review --report /tmp/report.json --sidecar /tmp/sidecar.json --summary
+          node tools/report-evidence-repair.mjs review --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Enforce personnel semantic evidence
         run: |
           node tools/personnel-semantic-gate.mjs self-test

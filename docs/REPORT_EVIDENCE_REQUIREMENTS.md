@@ -1,8 +1,12 @@
 # Report source and fair-value evidence
 
-## Card evidence application — September 9 clarification
+## Card evidence application — September 12 consolidated repair
 
 New unfrozen drafts also follow `REPORT_CARD_EVIDENCE.md`: use actual source facts in SUPPORT/CONTRARY/ANALYSIS, recognizable source names, and the canonical research pack for HIST FIT. Research gaps get an honest NR/unavailable explanation. Preserve earlier exact forecast leads for current revalidation. Run the read-only `tools/review-card-evidence.mjs` advice before freeze; its warnings add no publication gate and cannot replace the substantive review. The market-assessment and partial-publication allowances below remain authoritative. Forecast completion counts must distinguish extracted forecasts from no-vig references.
+
+Supply the `cardEvidence` handoff documented in `REPORT_CARD_EVIDENCE.md` for new cards. Shared draft preparation attaches forecast coverage, then renders exact-market forecast conflicts, source finding/application/limitation, concrete WAIT reassessment conditions and canonical History Fit. Synchronize the recommendation, matching research record and completed receipt. Advisory failures do not add a publication veto; existing execution/evidence validators retain authority. No assembler may choose PASS/WAIT/LEAN/BET, adopt a fair, refresh source times or promote an unfinished receipt.
+
+Compare applicable exact selection probabilities with the exact decimal execution price before calling them price support. At push-capable lines, respect the recorded conditional/non-push basis and retain win/push/loss treatment for unconditional expected return. Team-win percentages are not spread/run-line cover probabilities; predicted points or runs are not Over/Under settlement probabilities. A forecast opposing the price belongs in CONTRARY even when Pinnacle favors it. Assess provider market dependence and methodology rather than treating a brand as evidence of independence or calibration.
 
 ## Market assessment completion — from `2026-09-07T18:31:00-07:00`
 

@@ -4,6 +4,13 @@ on:
     branches: [main]
     paths:
       - tools/review-card-evidence.mjs
+      - tools/assemble-card-evidence.mjs
+      - tools/forecast-evidence.mjs
+      - tools/report-evidence-repair.mjs
+      - research/forecast-source-registry.json
+      - tests/forecast-evidence.test.mjs
+      - tests/card-evidence-assembly.test.mjs
+      - tests/report-evidence-repair.test.mjs
       - tools/major-sport-market-coverage-gate.mjs
       - tests/card-evidence-review.test.mjs
       - tests/primary-research-progress.test.mjs
@@ -13,6 +20,13 @@ on:
   pull_request:
     paths:
       - tools/review-card-evidence.mjs
+      - tools/assemble-card-evidence.mjs
+      - tools/forecast-evidence.mjs
+      - tools/report-evidence-repair.mjs
+      - research/forecast-source-registry.json
+      - tests/forecast-evidence.test.mjs
+      - tests/card-evidence-assembly.test.mjs
+      - tests/report-evidence-repair.test.mjs
       - tools/major-sport-market-coverage-gate.mjs
       - tests/card-evidence-review.test.mjs
       - tests/primary-research-progress.test.mjs
@@ -32,5 +46,8 @@ jobs:
         with:
           node-version: '22'
       - run: node tests/card-evidence-review.test.mjs
+      - run: node tests/forecast-evidence.test.mjs
+      - run: node tests/card-evidence-assembly.test.mjs
+      - run: node tests/report-evidence-repair.test.mjs
       - run: node tests/primary-research-progress.test.mjs
       - run: node tools/major-sport-market-coverage-gate.mjs self-test

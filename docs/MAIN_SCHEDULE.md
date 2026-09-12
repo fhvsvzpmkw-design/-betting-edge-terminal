@@ -4,6 +4,8 @@ Betting Edge uses one permanent schedule in `America/Vancouver`. It has no seaso
 
 `data/main-schedule.json` is the machine-readable authority. The canonical slot names remain unchanged so report generation, publication and History continue to use the established lanes.
 
+All five report producers read `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` from authoritative `main` (authority version 1.2). Its `evidenceRepairVersion: 2026-09-12` applies the same forecast-coverage, blocker-recovery and card-evidence preparation process before each draft is validated and frozen. Source coverage and advisory warnings do not create another whole-report publication gate; the existing qualified market-assessment and partial-publication rules remain in force.
+
 | Canonical slot | Odds pulse | Report run | Label | Featured VigScope |
 |---|---:|---:|---|---|
 | `open` | 05:50 | 06:00 | OPEN / OVERNIGHT | No |

@@ -1,6 +1,6 @@
 # Apply evidence to Betting Edge cards
 
-Operational for new, unfrozen Main report drafts after the September 9, 2026 repair. This clarifies the existing card fields and research process under Contract 1.0 and shared scheduled authority section 6. It does not regrade issued reports or add a publication gate.
+Operational for new, unfrozen Main report drafts; consolidated repair version `2026-09-12-r1`. This clarifies the existing card fields and research process under Contract 1.0 and shared scheduled authority section 6. It does not regrade issued reports or add a publication gate.
 
 ## Complete the assessment, then write the card
 
@@ -28,6 +28,59 @@ Write enough to explain this decision, without repeating all research in every f
 
 Keep the report recommendation, sidecar recommendation and EVALUATED receipt decision/evidence consistent before freeze. Presentation improvements must not be used to relabel market facts as independent predictive support or to hide incomplete research.
 
+## Structured assembly for new drafts
+
+Supply `cardEvidence` on each new card after completing its assessment. This is an explicit presentation handoff, not evidence manufactured by assembly:
+
+```json
+{
+  "schema": 1,
+  "selectionKey": "EXACT_CURRENT_SELECTION_KEY",
+  "findings": [{
+    "sourceIds": ["ACTUAL_SOURCE_ID"],
+    "stance": "CONTEXT",
+    "finding": "The actual named player, starter, availability or other source finding.",
+    "application": "How that finding affects this exact side, line and price.",
+    "limitation": "The actual uncertainty or scope limit."
+  }],
+  "decisionExplanation": "The completed reasoning, including disagreement and the existing status/stake conclusion.",
+  "waitCondition": {
+    "trigger": "The observable fact or exact price condition to reassess.",
+    "checkSource": "The source that can establish the condition.",
+    "remainingBetRequirements": "The actual existing BET requirements still missing after that condition clears."
+  },
+  "historyFit": {
+    "grade": "NR",
+    "priorIds": [],
+    "synthesisIds": [],
+    "clusterIds": [],
+    "finding": "The actual historical finding or explicit gap.",
+    "application": "Its application to this candidate's sport, market and mechanism.",
+    "limitation": "The principal evidence or transportability limitation.",
+    "directness": "gap",
+    "transportability": "not_applicable"
+  }
+}
+```
+
+Finding stances are `SUPPORT`, `CONTRARY`, `CONTEXT` or `UNRESOLVED`. Use `waitCondition` only for WAIT; its existence does not qualify that status. `historyFit` retains the producer's actual research judgment and IDs. Do not copy the example prose as a finding. Missing or invalid structured input produces advice, not a new report-wide gate.
+
+The shared preparation path calls `assembleCardEvidence(report, sidecar, {library, draft:true})` from `tools/assemble-card-evidence.mjs` after forecast coverage attachment and before freezing. It returns cloned report/sidecar objects, changes and warnings. It renders findings into the intended boxes and mirrors presentation to the matching EVALUATED receipt. It never adopts a probability, changes a quote/status/stake, completes a BLOCKED receipt, updates source check times or rewrites an archive. Legacy cards without the handoff receive advice without text mutation. Ambiguous identity or invalid source references leave the card unchanged.
+
+Forecast interpretation uses matched `forecastReview` records from `tools/forecast-evidence.mjs`. Compare eligible exact probabilities with the exact decimal execution price and recorded settlement basis. An opposing forecast goes in CONTRARY even when Pinnacle supports the price. Team-win forecasts and projected scores on run lines, spreads or totals belong in ANALYSIS as context, not exact cover/settlement support. MODEL source findings are routed through this reviewed forecast metadata instead of trusting a handwritten SUPPORT label. Retain the actual provider market-dependence and calibration limitations.
+
+The known examples illustrate the rule: DRatings' 56.6% Padres team-win estimate is below 58.48% break-even at decimal 1.71; if currently applicable its implication opposes the price. The Rays' 61.7% team-win estimate supplies no probability of covering −1.5. A +0.23 probability-point paired total comparison is favorable to the benchmark even when the final status remains PASS. These historical examples do not authorize new wagers or retrospective decision changes.
+
+Assembly renders the already validated benchmark arithmetic; it does not repair malformed numeric evidence to pass a gate. The producer's `decisionExplanation` still needs substantive review, particularly source disagreement. When every linked canonical history item explicitly has a gap role, existing policy requires NR/gap: assembly renders that policy and retains the originally requested grade in `cardEvidence` for audit. Unknown IDs cannot generate a grade. Library failure leaves the prior draft history for the producer's unavailable handling. An NR that claims priors were considered must still retain the actual considered IDs.
+
+For separate-file draft preparation:
+
+```bash
+node tools/assemble-card-evidence.mjs assemble --report <draft-report.json> --sidecar <draft-sidecar.json> --out-report <new-report.json> --out-sidecar <new-sidecar.json> --draft
+```
+
+Outputs must be new files, separate from inputs and outside `data/history/`. Use the shared preparation workflow for normal runs so forecast reconciliation and assembly happen together.
+
 ## Restore actual History Fit
 
 Read the active `research/manifest.json`, `research/research-library.json`, `research/source-registry.json`, `research/taxonomy.json` and `research/history-fit-policy.json`. Follow the existing policy's small relevant retrieval set, normally 1–4 primary priors and at most one useful synthesis, with cluster deduplication. Retrieve by sport, exact market, timing and mechanism; assess the finding itself, directness, era and contrary studies, rather than trusting a broad tag alone. Shared retrieval is appropriate for genuinely similar markets, with applicability checked for each card.
@@ -52,8 +105,10 @@ Before freezing, run:
 node tools/review-card-evidence.mjs review --report <report.json> --sidecar <sidecar.json>
 ```
 
-This read-only advisory identifies generic text, unsupported history grades, facts already recorded but absent from the card, favorable-price personnel questions, earlier forecast leads and missing-reference fallback work. Review the actual findings; it neither certifies research nor generates decisions. Resolve correctable content from verified evidence while the draft is unfrozen, and then run the unchanged publication validators. A warning count is not a new gate and there is no requirement to reach zero warnings before publication. The publisher only logs the summary and never rewrites frozen cards.
+This read-only advisory identifies generic text, gap-only or unlinked historical claims, numerical/prose direction disagreements, forecast price conflicts, missing market-translation limits, personnel questions, earlier forecast leads, incomplete WAIT triggers and imprecise blockers. Limited explicit legacy templates receive advice only; broad prose is not treated as a machine-readable probability or proof of current applicability. Review the actual findings; it neither certifies research nor generates decisions. Resolve correctable content while the draft is unfrozen, then run unchanged publication validators. Warning counts are not a gate and need not reach zero. Frozen cards are never rewritten.
 
 If current evidence genuinely cannot support a selection, record its actual missing input, attempts, stopping reason and next step in the existing selection-level receipt. Continue the useful work and publish every other completed, validated selection. Missing historical research alone is handled by NR/unavailable, not `RESEARCH_INCOMPLETE` for an otherwise supported current decision. A text-review warning cannot turn an EVALUATED market into BLOCKED. Preserve the supported market-assessment route, honest partial publication and all existing execution/evidence safeguards.
 
 Report completion honestly: count applicable published forecasts from extracted forecast numbers and source evidence, and describe market-reference assessments separately. Ninety qualified reference comparisons do not mean ninety independent forecasts. Keep publisher-owned evaluated/unfinished counts unchanged.
+
+Reconcile each reviewed blocker to a supported completed assessment, targeted follow-up with a concrete next action, or a genuine remaining blocker with its observed stopping reason. These are explanatory dispositions, not new receipt states. Check recorded points and the qualified exact paired reference route before declaring a missing independent model. An otherwise valid market-reference PASS/LEAN/WAIT assessment does not need an additional independent numerical fair; the existing WAIT independent-signal and BET requirements still apply. A found projected score can leave the exact probability missing. Do not clear a blocker merely because a URL or point estimate exists.

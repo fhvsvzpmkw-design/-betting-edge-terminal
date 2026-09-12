@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { exactSettledUnits, opposingMarketCoverage } from './lib/results-populations.mjs';
 
 const ROOT=process.cwd();
 const INDEX_PATH=path.join(ROOT,'data/history/results-index.json');
@@ -22,12 +23,7 @@ function round(v,d=4){
   const p=10**d;
   return Math.round(n*p)/p;
 }
-function strictUnits(card){
-  if(card?.completionState!=='complete')return null;
-  if(card?.units===null||card?.units===undefined||card?.units==='')return null;
-  const n=Number(card.units);
-  return Number.isFinite(n)?n:null;
-}
+function strictUnits(card){return exactSettledUnits(card)}
 function cardTime(card){
   const parsed=Date.parse(card?.runId||'');
   return Number.isFinite(parsed)?parsed:null;
@@ -162,9 +158,9 @@ function eligibleCalibration(rows,minSample=5){
 function calibrationState(row){
   if(!row||row.priced<5||!Number.isFinite(Number(row.shadowRoiPct)))return'SMALL SAMPLE';
   const roi=Number(row.shadowRoiPct);
-  if(roi<=-5)return'FILTER HELPING';
-  if(roi>=5)return'TOO TIGHT';
-  return'MIXED';
+  if(roi<0)return'NEGATIVE SHADOW RETURN';
+  if(roi>0)return'POSITIVE SHADOW RETURN';
+  return'FLAT SHADOW RETURN';
 }
 
 const finalDecisions=latestFinalNonBetDecisions(index.cards).map(enrichDecision);
@@ -190,15 +186,15 @@ if(latestMs!==null){
   previousSevenDay={start:new Date(previousStart).toISOString().slice(0,10),end:new Date(previousEnd).toISOString().slice(0,10),...aggregate(previousRows)};
   if(recentSevenDay.priced>=5&&previousSevenDay.priced>=5&&Number.isFinite(Number(recentSevenDay.shadowRoiPct))&&Number.isFinite(Number(previousSevenDay.shadowRoiPct))){
     recentTrendDeltaRoiPct=round(Number(recentSevenDay.shadowRoiPct)-Number(previousSevenDay.shadowRoiPct),2);
-    if(recentTrendDeltaRoiPct<=-2)recentTrend='IMPROVING';
-    else if(recentTrendDeltaRoiPct>=2)recentTrend='WEAKENING';
+    if(recentTrendDeltaRoiPct<=-2)recentTrend='LOWER SHADOW ROI';
+    else if(recentTrendDeltaRoiPct>=2)recentTrend='HIGHER SHADOW ROI';
     else recentTrend='STABLE';
   }
 }
 
 index.decisionValueShadowV2={
   version:2,
-  presentationVersion:3,
+  presentationVersion:4,
   methodology:'one final non-BET decision per exact unique selectionKey. Repeated report-lane appearances are deduplicated to the last issued decision. Price-based shadow results require a completed result and a non-null exact issued-price unit result. Each valid decision risks one historical full unit frozen at 3% of the bankroll stored in that final source report. Dollar P/L is the sum of those historically frozen units, not a flat-$100 conversion.',
   referenceUnitBasePct:3,
   unitDefinition:'1.00u = 3% of bankroll in the final source report for that decision',
@@ -226,6 +222,8 @@ index.decisionValueShadowV2={
   cappedDecisionScore:overall.cappedDecisionScore,
   byStatus:byStatus.map(row=>({...row,calibrationState:calibrationState(row)})),
   byMarket,
+  opposingMarkets:opposingMarketCoverage(finalDecisions),
+  denominator:'1u per settled selection with an exact issued price; priced pushes/voids included; pending and missing-price selections excluded',
   diagnostics:{
     bestMarket,
     weakestMarket,
@@ -236,8 +234,8 @@ index.decisionValueShadowV2={
     recentTrendDeltaRoiPct
   },
   notes:[
-    'Negative shadow ROI means the bets that were filtered out would have lost money; that is evidence the filters helped.',
-    'Positive shadow ROI means the filtered-out bets would have made money; that is a sign the filter may have been too tight.',
+    'Negative shadow ROI is a hypothetical loss, not evidence by itself of filter skill. Opposing sides are dependent and bookmaker margin affects the baseline.',
+    'Positive shadow ROI alone does not establish that a status was too restrictive. Assess exact market groups, evidence quality, uncertainty and sample size before changing rules.',
     'This is retrospective calibration only, not actual ledger profit and not a re-handicap.'
   ]
 };

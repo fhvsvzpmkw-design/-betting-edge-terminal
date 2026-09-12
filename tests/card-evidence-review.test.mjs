@@ -44,6 +44,7 @@ Object.assign(rec, {hist: 'NR — no reliable applicable historical prior was es
   contrary: 'San Francisco’s batting order remains pending; a material change would require reassessment.',
   source: 'DraftKings execution; Pinnacle market reference; MLB personnel checked 9:51 AM PT.',
   analysis: 'The offered price is unfavorable to the market reference. With San Francisco’s batting order still pending and no supported contrary forecast, this remains PASS at zero stake.'});
+rec.personnelEvidence.dependencyRationale = 'Pallante and Tidwell are the identified probable pitchers; the pending San Francisco batting order supplies no affirmative moneyline case at this unfavorable price.';
 const item = {...structuredClone(sidecar.recommendations[0]), grade: 'NR', hist: rec.hist, displayText: rec.hist};
 const specific = reviewCardEvidence({recs: [rec]}, {recommendations: [item]}, {library});
 assert.equal(specific.issues.length, 0);
@@ -63,4 +64,20 @@ assert.equal(JSON.parse(processResult.stdout).publicationBlocking, false);
 const absent = spawnSync(process.execPath, ['tools/review-card-evidence.mjs', 'review', '--report', 'absent-review-input.json', '--sidecar', sidecarPath], {encoding: 'utf8'});
 assert.equal(absent.status, 0, 'advisory input failure leaves hard-gate authority unchanged');
 assert.ok(JSON.parse(absent.stdout).warnings.length);
-console.log('CARD EVIDENCE REVIEW TESTS OK — earlier forecasts retained, facts surfaced, partial publication and immutability preserved');
+
+// Real archived examples: interpretation failures were missed by the old advice.
+const late = read('data/history/runs/2026-09-11/late-182000.json');
+const lateSidecar = read('data/history/research-fit/2026-09-11/late-182000.json');
+const lateBefore = JSON.stringify({late, lateSidecar});
+const lateReview = reviewCardEvidence(late, lateSidecar, {library});
+assert.ok(lateReview.issues.some(issue => issue.title === 'San Diego Padres' && issue.code === 'FORECAST_BELOW_PRICE_IN_SUPPORT'));
+assert.ok(lateReview.issues.some(issue => issue.title === 'Over 10.5' && issue.code === 'BENCHMARK_PROSE_DIRECTION'));
+assert.equal(JSON.stringify({late, lateSidecar}), lateBefore, 'archived decisions and evidence remain immutable');
+const evening = read('data/history/runs/2026-09-11/evening-153200.json');
+assert.ok(reviewCardEvidence(evening, read('data/history/research-fit/2026-09-11/evening-153200.json'), {library}).issues.some(issue => /Rays/.test(issue.title) && issue.code === 'FORECAST_MARKET_LIMITATION_MISSING'));
+const current = read('data/history/runs/2026-09-12/final_morning-093600.json');
+const currentSidecar = read('data/history/research-fit/2026-09-12/final_morning-093600.json');
+const currentReview = reviewCardEvidence(current, currentSidecar, {library});
+for (const code of ['HISTORY_FIT_GAP_ONLY', 'HISTORY_FIT_REFERENCES_MISSING', 'PERSONNEL_PROCESS_WITHOUT_FINDING', 'BLOCKED_DISPOSITION_DETAIL', 'WAIT_REASSESSMENT_DETAIL']) assert.ok(currentReview.issueCounts[code] > 0, code);
+assert.equal(currentReview.publicationBlocking, false);
+console.log('CARD EVIDENCE REVIEW TESTS OK — concrete historical defects identified; advisory, partial publication and immutability preserved');

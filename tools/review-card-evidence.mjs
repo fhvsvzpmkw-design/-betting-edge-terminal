@@ -9,10 +9,23 @@ const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value : '';
 const unique = values => [...new Set(values.filter(Boolean))];
+const isGap = item => item?.historyFitRole === 'gap' || item?.evidence?.tierAssignment === 'gap_summary';
+const processOnly = value => /(?:page|endpoint|schedule|reporting|review).{0,100}(?:checked|queried|reviewed|returned an access error)|(?:checked|queried|reviewed).{0,100}(?:page|endpoint|schedule)/i.test(text(value)) &&
+  !/\b(?:confirmed|named|starting pitcher|starts? at|will start|ruled out|scratched|active|inactive)\b.{0,80}\b(?:[A-Z][a-z]+\s+[A-Z][a-z]+)\b/.test(text(value));
+
+// Only recognize this exact legacy template, preserving team labels. Other
+// narrative numbers receive an interpretation advisory, never an inferred fair.
+function legacyDRatings(source, rec) {
+  const match = text(source.finding).match(/^DRatings projected (.+?) ([\d.]+), (.+?) ([\d.]+) \(([\d.]+)%\/([\d.]+)%\)/);
+  if (!match) return null;
+  const label = text(rec.title).toLowerCase(), away = label.startsWith(match[1].toLowerCase()), home = label.startsWith(match[3].toLowerCase());
+  return {probability: away !== home ? Number(match[away ? 5 : 6]) / 100 : null, first: match[1], second: match[3]};
+}
 
 export function reviewCardEvidence(report, sidecar, {library = null, priorResearch = null} = {}) {
   const issues = [], cards = [], events = new Map();
   const researchIds = new Set(list(library?.items).map(item => item.priorId));
+  const researchById = new Map(list(library?.items).map(item => [item.priorId, item]));
   const receipts = list(sidecar?.primaryAnalysis?.receipts);
   const add = (code, ordinal, title, detail) => issues.push({code, ordinal, title, detail});
   for (const [index, rec] of list(report?.recs).entries()) {
@@ -29,6 +42,47 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
     }
     if (library && ids.some(id => !researchIds.has(id))) {
       add('HISTORY_FIT_UNKNOWN_ID', ordinal, title, `Unknown research IDs: ${ids.filter(id => !researchIds.has(id)).join(', ')}. Resolve against the active library without inventing IDs.`);
+    }
+    const canonical = ids.map(id => researchById.get(id));
+    if (ids.length && canonical.every(entry => entry && isGap(entry)) && (grade && grade !== 'NR' || /^DIRECT$/i.test(text(item.directness)) || /^HIGH$/i.test(text(item.transportability)))) {
+      add('HISTORY_FIT_GAP_ONLY', ordinal, title, 'All linked canonical items explicitly document a gap. Use the existing NR/gap treatment; these records cannot establish a supportive grade or DIRECT/HIGH applicability. Preserve the real links and current decision.');
+    }
+    if (!ids.length && /priors? (?:were )?applied|(?:reverse favorite.longshot|market.efficiency) research/i.test(text(rec.hist))) {
+      add('HISTORY_FIT_REFERENCES_MISSING', ordinal, title, 'The card says historical findings were applied but does not retain their canonical prior/synthesis IDs. Reconcile the actual considered research, application and limitation; do not assign unrelated IDs after the fact.');
+    }
+    if (item.displayText != null && item.displayText !== rec.hist) add('HISTORY_FIT_DISPLAY_DRIFT', ordinal, title, 'History Fit text differs between the card and its research record. Preserve one reviewed finding, application and limitation in both.');
+    const direction = rec.benchmarkComparison?.direction;
+    for (const field of ['analysis', 'support', 'contrary', 'edge']) {
+      const stated = text(rec[field]).match(/\b\d+(?:\.\d+)?[ -]point\s+(favorable|unfavorable|neutral)\s+(?:price\/reference\s+)?comparison\b/i)?.[1]?.toUpperCase();
+      if (stated && direction && stated !== direction) add('BENCHMARK_PROSE_DIRECTION', ordinal, title, `${field} calls the numerical comparison ${stated}, but benchmarkComparison says ${direction}. Reconcile with the exact executable price and paired reference; this wording warning does not alter the decision.`);
+    }
+    const forecastReviews = list(rec.forecastReview?.records);
+    for (const forecast of forecastReviews) {
+      if (forecast.eligibility === 'ELIGIBLE_EXACT' && forecast.comparison?.direction === 'OPPOSES_PRICE') {
+        const explicit = rec.cardEvidence?.schema === 1 && /opposes this price/.test(text(rec.contrary));
+        if (!explicit) add('FORECAST_PRICE_CONFLICT_REVIEW', ordinal, title, `${forecast.publisher || forecast.sourceId || forecast.recordId} opposes the executable price by ${Math.abs(forecast.comparison.edgeProbabilityPoints).toFixed(2)} probability points. Put that disagreement in contrary evidence and explain its weight against the market reference; do not automatically change fair/status.`);
+      }
+    }
+    for (const source of sources.filter(source => /forecast|predictor|DRatings|Dimers|FanGraphs|MoneyPuck/i.test([source.title, source.finding].join(' ')))) {
+      if (!text(rec.support).includes(text(source.finding)) || !text(source.finding)) continue;
+      const parsed = legacyDRatings(source, rec), market = rec.coreAssessment?.context?.marketClass || rec.feed?.market;
+      if (parsed && market === 'moneyline' && parsed.probability != null && Number(rec.feed?.priceDecimal) > 1 && parsed.probability < 1 / Number(rec.feed.priceDecimal)) {
+        add('FORECAST_BELOW_PRICE_IN_SUPPORT', ordinal, title, `The explicitly labelled legacy DRatings team-win forecast is ${(parsed.probability * 100).toFixed(2)}%, below ${(100 / Number(rec.feed.priceDecimal)).toFixed(2)}% break-even at the frozen decimal price. Review its settlement/applicability and explain it as opposing the price if applicable. Its presence in SUPPORT is not resolved by a favorable Pinnacle comparison.`);
+      }
+      if (parsed && market !== 'moneyline' && !/team.win|moneyline forecast|win probability.{0,70}(?:cover|run.line)|does not establish.{0,60}(?:settlement|cover)/i.test([rec.support, rec.contrary, rec.analysis].map(text).join(' '))) {
+        add('FORECAST_MARKET_LIMITATION_MISSING', ordinal, title, 'A team-win forecast/projected score is repeated as support for a spread/run line/total without an explicit market-translation limit. It is context, not an exact cover or Over/Under settlement probability. Retain a separately qualified market-reference assessment where eligible.');
+      }
+      if (!parsed && !forecastReviews.length && /\d+(?:\.\d+)?\s*%|project(?:ed|s).{0,80}\d/i.test(text(source.finding))) {
+        add('FORECAST_INTERPRETATION_UNSTRUCTURED', ordinal, title, 'A numerical forecast appears in support without structured exact-market interpretation. Record source market/side/line, settlement and current applicability; distinguish projected scores from probabilities and compare any applicable probability with this price.');
+      }
+    }
+    if (currentFacts.length && currentFacts.every(processOnly)) add('PERSONNEL_PROCESS_WITHOUT_FINDING', ordinal, title, 'Recorded non-market evidence consists of source-check/access statements. Retain actual named starters/roles, projections or specific absences and their relevance; where unavailable state the exact missing fact and source shortfall. A blank final-lineup field does not automatically make every market material.');
+    if (unresolved.length && /material late starter, lineup or participation change requires a fresh assessment|starting pitchers and batting orders materially affect|named personnel inputs can materially affect/i.test([personnel.decisionSensitivity, personnel.dependencyRationale].map(text).join(' ')) && !rec.cardEvidence?.findings?.some(finding => finding.stance === 'UNRESOLVED' && text(finding.application))) {
+      add('PERSONNEL_MARKET_MATERIALITY_GENERIC', ordinal, title, 'Identify the specific remaining personnel input and how plausible outcomes affect this exact side/line decision. Apply the existing credible-projection/fallback process where relevant; do not impose final confirmation on every market.');
+    }
+    if (rec.status === 'WAIT') {
+      const condition = rec.cardEvidence?.waitCondition;
+      if (!text(condition?.trigger) || !text(condition?.checkSource) || !text(condition?.remainingBetRequirements)) add('WAIT_REASSESSMENT_DETAIL', ordinal, title, 'Record the concrete observable trigger, where it will be checked, and which existing BET requirements still remain after it resolves. Missing research alone is neither WAIT qualification nor a supported PASS. Existing WAIT validation retains authority.');
     }
     if (/information review was completed|official MLB review was completed/i.test(text(rec.support))) {
       add('SUPPORT_FACTS_NOT_APPLIED', ordinal, title, 'Replace the process statement with the actual relevant findings and their effect. Neutral information may be described as neutral; do not invent support.');
@@ -66,6 +120,9 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
   }
   for (const receipt of receipts.filter(row => row.state === 'BLOCKED')) {
     const blocker = receipt.blocker || {};
+    if (!text(blocker.missing) || !text(blocker.impact) || !list(blocker.attempts).length || !text(blocker.progress?.nextStep) || !text(blocker.progress?.stoppingReason)) add('BLOCKED_DISPOSITION_DETAIL', null, receipt.selectionId, 'Retain the precise missing input, decision impact, actual attempts, observed stopping reason and concrete next step in this selection-level blocker. Reconcile usable recorded evidence first; unfinished work does not become PASS/WAIT and does not block completed selections.');
+    if (list(blocker.attempts).some(attempt => attempt.kind === 'MODEL' && /\d+(?:\.\d+)?\s*%|project(?:ed|s).{0,80}\d/i.test(text(attempt.finding))) && /(?:no|missing|unavailable) (?:published |independent )?(?:forecast|model|point estimate)/i.test(text(blocker.missing))) add('BLOCKED_RECORDED_FORECAST_REVIEW', null, receipt.selectionId, 'A source attempt contains a numerical forecast while the missing-input text says no forecast. Review and retain the actual point, exact-market applicability and real remaining limitation; a found contextual score is not automatically a qualified exact probability.');
+    if (blocker.reason === 'FAIR_MODEL_UNAVAILABLE' && /qualified|exact paired|Pinnacle/.test(text(blocker.missing)) && !list(blocker.attempts).some(attempt => attempt.kind === 'MARKET')) add('BLOCKED_MARKET_ROUTE_UNREVIEWED', null, receipt.selectionId, 'Recheck the existing qualified exact paired Pinnacle route and record the result. An otherwise valid market assessment need not acquire an unnecessary independent numerical fair; BET requirements remain unchanged.');
     if (/reference|benchmark/i.test(text(blocker.missing)) && list(blocker.attempts).length &&
         list(blocker.attempts).every(attempt => ['MARKET', 'OFFICIAL'].includes(attempt.kind))) {
       add('REFERENCE_FALLBACK_REVIEW', null, receipt.selectionId, 'Only market/official checks are recorded. Pursue the targeted published-forecast alternative when useful and document the result; incomplete work stays selection-level and does not block other completed decisions.');
@@ -82,6 +139,7 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
     issueCounts: issues.reduce((counts, issue) => {counts[issue.code] = (counts[issue.code] || 0) + 1; return counts;}, {}),
     issues, recordedEventEvidence: [...events.values()], earlierForecasts: cards,
     limitations: ['Heuristic review; a clear result does not certify research quality or source truth.',
+      'Legacy forecast narrative checks recognize limited explicit templates for advice only; they never manufacture structured probabilities, research findings or decisions.',
       'Current research and final decisions remain the producer’s responsibility. No probability, history grade, status or stake is generated.'],
     warnings: [...(!library ? ['Research Library unavailable to this review; use the existing History Fit unavailable policy, without inventing a grade.'] : []), ...list(priorResearch?.warnings)]};
 }

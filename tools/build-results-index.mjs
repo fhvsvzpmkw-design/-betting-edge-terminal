@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import QuoteObservation from '../assets/quote-observation.js';
+import { finalSelectionCards, opposingMarketCoverage } from './lib/results-populations.mjs';
 
 const ROOT = process.cwd();
 const OBS_ROOT = path.join(ROOT, 'data/history/observations');
@@ -35,7 +36,9 @@ function americanFromDecimal(d) {
   return d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
 }
 function selectedLine(rec) {
-  const raw = Number(rec?.feed?.hdp ?? rec?.feed?.line);
+  const value = rec?.feed?.hdp ?? rec?.feed?.line;
+  if (value === null || value === undefined || value === '') return null;
+  const raw = Number(value);
   if (!Number.isFinite(raw)) return null;
   const market = cleanText(rec?.feed?.marketKey || rec?.feed?.market).toLowerCase();
   const side = cleanText(rec?.feed?.side).toLowerCase();
@@ -53,10 +56,14 @@ function marketFamily(rec) {
 function sportFamily(rec) {
   const meta = cleanText(rec?.meta).toUpperCase();
   const s = cleanText(rec?.feed?.sportKey).toLowerCase();
+  const league = cleanText(rec?.feed?.league || rec?.feed?.leagueKey || rec?.coreAssessment?.context?.sport).toUpperCase();
+  const identity = `${meta} ${league}`;
   if (meta.includes('MLB')) return 'MLB';
-  if (meta.includes('NFL')) return 'NFL preseason';
+  if (/\b(?:NCAAF|NCAA FOOTBALL|COLLEGE FOOTBALL)\b/.test(identity)) return 'NCAAF';
+  if (/\bCFL\b/.test(identity)) return 'CFL';
+  if (/\bNFL\b/.test(identity)) return /\bPRESEASON\b/.test(identity) ? 'NFL preseason' : 'NFL';
   if (meta.includes('WNBA') || s === 'basketball') return 'Basketball/WNBA';
-  if (s === 'american-football') return 'NFL preseason';
+  if (s === 'american-football') return 'American football';
   if (s === 'football' || s === 'soccer') return 'Soccer';
   if (s === 'hockey') return 'Hockey';
   if (s === 'baseball') return 'Other baseball';
@@ -110,7 +117,7 @@ function snapshotBlob(blobSha) {
 }
 function exactAnalysisPrice(run, rec, obsRec) {
   const issued = obsRec?.issued || {};
-  if (issued.analysisPriceState === 'exact' && Number.isFinite(Number(issued.analysisPriceDecimal))) {
+  if (issued.analysisPriceState === 'exact' && Number(issued.analysisPriceDecimal) > 1 && Number.isFinite(Number(issued.analysisPriceDecimal))) {
     return {
       state: 'exact',
       decimal: Number(issued.analysisPriceDecimal),
@@ -205,31 +212,30 @@ function loadRun(sourceRun) {
 }
 
 const cards = [];
-for (const obsFile of walkJson(OBS_ROOT)) {
-  const obs = readJson(obsFile);
-  if (!obs || obs.kind !== 'issued-card-observations' || !Array.isArray(obs.recommendations)) continue;
-  const run = loadRun(obs.sourceRun);
-  if (!run || !Array.isArray(run.recs)) continue;
-
-  obs.recommendations.forEach((o, index) => {
-    const rec = run.recs[index];
-    if (!rec) return;
+const observedRuns = new Set();
+function addRunCards(sourceRun, run, obs = null, obsFile = null) {
+  run.recs.forEach((rec, index) => {
+    const o = obs?.recommendations?.[index] || {};
+    const hasObservation = Boolean(obs?.recommendations?.[index]);
     const completion = o?.completion || {};
     const price = exactAnalysisPrice(run, rec, o);
     const grade = cleanText(completion.grade).toUpperCase() || null;
     const units = completion.state === 'complete' ? settledUnits(grade, price.decimal) : null;
 
     cards.push({
-      cardId: `${obs.sourceRun}#${index}`,
-      sourceRun: obs.sourceRun,
-      observationPath: repoPath(obsFile),
-      runId: obs.runId || run.ts || null,
-      date: cleanText(obs.runId || run.ts).slice(0, 10) || null,
-      slot: obs.slot || run.slot || null,
+      cardId: `${sourceRun}#${index}`,
+      sourceRun,
+      observationPath: obsFile ? repoPath(obsFile) : null,
+      observationState: hasObservation ? 'recorded' : 'awaiting_observation',
+      runId: obs?.runId || run.ts || null,
+      date: cleanText(obs?.runId || run.ts).slice(0, 10) || null,
+      slot: obs?.slot || run.slot || null,
       title: rec.title || o.title || null,
       status: cleanText(rec.status || o.status).toUpperCase() || null,
       eventId: String(rec?.feed?.eventId || completion.eventId || '') || null,
       selectionKey: rec?.feed?.selectionKey || o.selectionKey || null,
+      forecastRecordIds: Array.isArray(rec.forecastRecordIds) ? rec.forecastRecordIds : [],
+      forecastReview: rec.forecastReview || null,
       sport: sportFamily(rec),
       market: marketFamily(rec),
       marketKey: rec?.feed?.marketKey || rec?.feed?.market || null,
@@ -239,7 +245,7 @@ for (const obsFile of walkJson(OBS_ROOT)) {
       issuedPriceText: rec.price || o?.issued?.priceAmerican || null,
       analysisPrice: price,
       completionState: completion.state || 'unresolved',
-      unresolvedReason: completion.state === 'complete' ? null : (completion.reason || 'unresolved'),
+      unresolvedReason: completion.state === 'complete' ? null : (completion.reason || (hasObservation ? 'unresolved' : 'awaiting_observation')),
       grade,
       official: Boolean(completion.official),
       hypothetical: completion.hypothetical !== false,
@@ -251,6 +257,23 @@ for (const obsFile of walkJson(OBS_ROOT)) {
       settlementComponents: completion.settlementComponents || null
     });
   });
+}
+for (const obsFile of walkJson(OBS_ROOT)) {
+  const obs = readJson(obsFile);
+  if (!obs || obs.kind !== 'issued-card-observations' || !Array.isArray(obs.recommendations)) continue;
+  const run = loadRun(obs.sourceRun);
+  if (!run || !Array.isArray(run.recs)) continue;
+
+  observedRuns.add(obs.sourceRun);
+  addRunCards(obs.sourceRun, run, obs, obsFile);
+}
+const publishedRuns = (readJson(path.join(ROOT, 'run-history.json'))?.runs || []);
+for (const entry of publishedRuns) {
+  if (!entry?.path || observedRuns.has(entry.path)) continue;
+  const run = loadRun(entry.path);
+  if (!Array.isArray(run?.recs)) continue;
+  addRunCards(entry.path, run);
+  observedRuns.add(entry.path);
 }
 
 cards.sort((a, b) => String(a.runId || '').localeCompare(String(b.runId || '')) || String(a.cardId).localeCompare(String(b.cardId)));
@@ -301,6 +324,7 @@ for (const c of cards) {
     status: c.status,
     issuedPriceText: c.issuedPriceText,
     analysisPrice: c.analysisPrice,
+    forecastRecordIds: c.forecastRecordIds,
     completionState: c.completionState,
     grade: c.grade,
     units: c.units
@@ -342,6 +366,9 @@ const netUnits = pricedCompleted.reduce((n, c) => n + c.units, 0);
 const completeCards = cards.filter(c => c.completionState === 'complete').length;
 const completeSelections = selections.filter(s => s.completionState === 'complete').length;
 const unresolvedEvents = events.filter(e => e.state === 'unresolved');
+const finalCards = finalSelectionCards(cards);
+const observedCards = cards.filter(card => card.observationState === 'recorded');
+const pendingObservationCards = cards.filter(card => card.observationState === 'awaiting_observation');
 
 const result = {
   schemaVersion: 1,
@@ -350,6 +377,7 @@ const result = {
   authority: {
     runs: 'data/history/runs/**',
     observations: 'data/history/observations/**',
+    publication: 'run-history.json; published cards are included before observations exist',
     odds: 'data/history/odds-index.json + immutable Git blobs',
     indexAuthoritative: false
   },
@@ -359,6 +387,11 @@ const result = {
     cards: cards.length,
     completeCards,
     unresolvedCards: cards.length - completeCards,
+    observedCards: observedCards.length,
+    observedThroughDate: observedCards.at(-1)?.date || null,
+    pendingObservationCards: pendingObservationCards.length,
+    pendingObservationRuns: new Set(pendingObservationCards.map(card => card.sourceRun)).size,
+    publishedRuns: publishedRuns.length,
     selections: selections.length,
     completeSelections,
     unresolvedSelections: selections.length - completeSelections,
@@ -366,7 +399,7 @@ const result = {
     unresolvedEvents: unresolvedEvents.length
   },
   priceAnalytics: {
-    methodology: 'flat 1-unit risk per completed card with an exact fresh issued-snapshot quote; HALF_WIN/HALF_LOSS settle at half stake',
+    methodology: 'hypothetical flat 1-unit risk per completed card with an exact issued-snapshot quote; ROI denominator includes priced pushes and voids, excludes missing prices and unsettled cards; HALF_WIN/HALF_LOSS settle at half stake. Repeated appearances and opposing sides are retained, not independent opportunities.',
     pricedCards: pricedCompleted.length,
     netUnits: Number(netUnits.toFixed(4)),
     roiPct: pricedCompleted.length ? Number((netUnits / pricedCompleted.length * 100).toFixed(2)) : null
@@ -376,6 +409,14 @@ const result = {
   byMarket: marketRows,
   bySport: sportRows,
   byLane: laneRows,
+  finalSelectionAnalytics: {
+    methodology: 'one last-issued appearance per exact selectionKey; all statuses; flat 1u hypothetical risk, not issued-stake or ledger results',
+    selections: finalCards.length,
+    byStatus: aggregateRows(finalCards, card => card.status),
+    byMarket: aggregateRows(finalCards, card => card.market),
+    bySport: aggregateRows(finalCards, card => card.sport),
+    opposingMarkets: opposingMarketCoverage(finalCards)
+  },
   unresolved: cards.filter(c => c.completionState !== 'complete').map(c => ({
     cardId: c.cardId,
     eventId: c.eventId,

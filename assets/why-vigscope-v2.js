@@ -3,7 +3,7 @@
 
 const STYLE_ID='whyVigScopeV2Style';
 const INDEX_URL='./data/history/results-index.json';
-const VERSION='3';
+const VERSION='4';
 let cached=null;
 let loading=false;
 let applying=false;
@@ -34,7 +34,7 @@ function bestSport(rows){
   const list=(Array.isArray(rows)?rows:[]).filter(r=>Number(r?.priced||0)>=5&&finite(r?.roiPct));
   return list.sort((a,b)=>Number(b.roiPct)-Number(a.roiPct))[0]||null;
 }
-function shadowCardClass(v){return !finite(v)||Number(v)===0?'':Number(v)<0?'good':'warn'}
+function shadowCardClass(v){return !finite(v)||Number(v)===0?'':Number(v)>0?'good':'warn'}
 function opportunityCardClass(v){return !finite(v)||Number(v)===0?'':Number(v)>0?'good':'warn'}
 function betSummary(p={}){
   const issued=Number(p.issuedBets||0),settled=Number(p.settledBets||0),priced=Number(p.pricedBets||0);
@@ -51,7 +51,7 @@ function filterMeaning(v,good,bad){
   if(!finite(v))return 'WAITING FOR A VALID SAMPLE';
   if(Number(v)<0)return good;
   if(Number(v)>0)return bad;
-  return 'FILTER ROUGHLY NEUTRAL';
+  return 'FLAT HYPOTHETICAL RETURN';
 }
 function ensureStyle(d){
   if(d.getElementById(STYLE_ID))return;
@@ -74,7 +74,7 @@ function ensureStyle(d){
 }
 function signature(index){
   const v=index?.decisionValueShadowV2||{};
-  return JSON.stringify([index?.playerValueAnalytics,...['LEAN','WAIT','PASS'].map(s=>shadowRow(v,s)),bestSport(index?.bySport),v?.diagnostics?.recentSevenDay,v?.diagnostics?.recentTrend]);
+  return JSON.stringify([(index?.issuedBetAnalytics||index?.playerValueAnalytics),...['LEAN','WAIT','PASS'].map(s=>shadowRow(v,s)),bestSport(index?.finalSelectionAnalytics?.bySport || index?.bySport),v?.diagnostics?.recentSevenDay,v?.diagnostics?.recentTrend]);
 }
 function apply(d,index){
   if(applying)return false;
@@ -92,8 +92,8 @@ function apply(d,index){
     const lean=shadowRow(v,'LEAN');
     const wait=shadowRow(v,'WAIT');
     const pass=shadowRow(v,'PASS');
-    const bet=betSummary(index?.playerValueAnalytics);
-    const sport=bestSport(index?.bySport);
+    const bet=betSummary((index?.issuedBetAnalytics||index?.playerValueAnalytics));
+    const sport=bestSport(index?.finalSelectionAnalytics?.bySport || index?.bySport);
     const recent=v?.diagnostics?.recentSevenDay||null;
     const trend=String(v?.diagnostics?.recentTrend||'NO BASELINE').toUpperCase();
     const heading=proof.querySelector('.resultsSection');
@@ -114,32 +114,32 @@ function apply(d,index){
         <p class="whyProofExplain">BET is the actionable decision. Net units and ROI follow the issued stake sizes, so this record measures the plays VigScope actually recommended taking.</p>
       </div>
       <div class="proofCard whyProofCard ${shadowCardClass(lean.shadowRoiPct)}">
-        <div class="key">FILTER PROTECTION</div>
+        <div class="key">LEAN TRACKING</div>
         <b>LEAN ${esc(pct(lean.shadowRoiPct))}</b>
         <span>${esc(filterMeaning(lean.shadowRoiPct,'FILTERED LEANS WOULD HAVE LOST','FILTERED LEANS WOULD HAVE WON'))}</span>
-        <small class="whyProofMeta">${Number(lean.protectedOutcomes||0)} AVOIDED LOSERS // ${Number(lean.missedOutcomes||0)} MISSED WINNERS</small>
+        <small class="whyProofMeta">${Number(lean.protectedOutcomes||0)} LOSING OUTCOMES // ${Number(lean.missedOutcomes||0)} WINNING OUTCOMES</small>
         <p class="whyProofExplain">LEAN identifies interest without a BET recommendation. Shadow ROI asks whether those final leans would have paid off at their recorded prices.</p>
       </div>
       <div class="proofCard whyProofCard ${shadowCardClass(wait.shadowRoiPct)}">
-        <div class="key">WAIT DISCIPLINE</div>
+        <div class="key">WAIT TRACKING</div>
         <b>WAIT ${esc(pct(wait.shadowRoiPct))}</b>
         <span>${esc(filterMeaning(wait.shadowRoiPct,'FILTERED WAITS WOULD HAVE LOST','FILTERED WAITS WOULD HAVE WON'))}</span>
-        <small class="whyProofMeta">${Number(wait.protectedOutcomes||0)} AVOIDED LOSERS // ${Number(wait.missedOutcomes||0)} MISSED WINNERS</small>
+        <small class="whyProofMeta">${Number(wait.protectedOutcomes||0)} LOSING OUTCOMES // ${Number(wait.missedOutcomes||0)} WINNING OUTCOMES</small>
         <p class="whyProofExplain">WAIT holds a decision for a better price or clearer information. This checks the selections still marked WAIT at the final recorded decision.</p>
       </div>
       <div class="proofCard whyProofCard ${shadowCardClass(pass.shadowRoiPct)}">
-        <div class="key">PASS DISCIPLINE</div>
+        <div class="key">PASS TRACKING</div>
         <b>PASS ${esc(pct(pass.shadowRoiPct))}</b>
         <span>${esc(filterMeaning(pass.shadowRoiPct,'FILTERED PASSES WOULD HAVE LOST','FILTERED PASSES WOULD HAVE WON'))}</span>
-        <small class="whyProofMeta">${Number(pass.protectedOutcomes||0)} AVOIDED LOSERS // ${Number(pass.missedOutcomes||0)} MISSED WINNERS</small>
-        <p class="whyProofExplain">PASS means leave the selection alone. Reviewing both avoided losses and missed wins helps show where the decision rules may need attention.</p>
+        <small class="whyProofMeta">${Number(pass.protectedOutcomes||0)} LOSING OUTCOMES // ${Number(pass.missedOutcomes||0)} WINNING OUTCOMES</small>
+        <p class="whyProofExplain">PASS means leave the selection alone. Both opposing sides often appear. Their negative combined return can reflect bookmaker margin, so it does not alone demonstrate useful filtering.</p>
       </div>
       <div class="proofCard whyProofCard ${opportunityCardClass(sport?.roiPct)}">
-        <div class="key">BEST OPPORTUNITY</div>
+        <div class="key">HIGHEST HISTORICAL SPORT ROI</div>
         <b>${esc(sport?.name||'—')}</b>
-        <span>${esc(pct(sport?.roiPct))} MODEL ROI</span>
-        <small class="whyProofMeta">${sport?`${Number(sport.priced||0)} PRICED // ${esc(grades(sport))} W-L`:'MINIMUM 5 PRICED CARDS'}</small>
-        <p class="whyProofExplain">The strongest historical sport across completed, priced cards, including repeat report appearances. At least five priced cards are required; use sample size alongside ROI.</p>
+        <span>${esc(pct(sport?.roiPct))} HYPOTHETICAL ROI</span>
+        <small class="whyProofMeta">${sport?`${Number(sport.priced||0)} PRICED // ${esc(grades(sport))} W-L`:'MINIMUM 5 PRICED SELECTIONS'}</small>
+        <p class="whyProofExplain">The strongest historical sport across final exact selections with completed, priced results. Opposing sides remain; five selections is a display minimum, not evidence of a repeatable edge.</p>
       </div>
       <div class="proofCard whyProofCard ${shadowCardClass(recent?.shadowRoiPct)}">
         <div class="key">RECENT FORM</div>
@@ -150,7 +150,7 @@ function apply(d,index){
       </div>`;
     let method=proof.querySelector('.whyVigScopeMethod');
     if(!method){method=d.createElement('p');method.className='whyVigScopeMethod';grid.insertAdjacentElement('afterend',method)}
-    method.textContent='Reading the evidence: negative shadow ROI means the filtered selections would have lost money; positive shadow ROI means they would have made money. These are hypothetical returns, using one final decision per exact selection. Odds and sample size matter: a missed winner alone does not establish that a filter was wrong, and unfinished research is not evidence of a good pass.';
+    method.textContent='Shadow returns use one final decision per exact selection at its frozen price. The denominator is 1u per priced settled selection, including pushes and voids; pending cards and missing prices are excluded. Both opposing sides are retained and grouped: bookmaker margin and dependent outcomes prevent using negative PASS return alone as proof of filter skill. Issued BET stake results are recommendation replays, separate from hypothetical tracking and verified user wagers.';
     proof.dataset.whyVigScopeV2=VERSION;
     proof.dataset.whyVigScopeSignature=sig;
     return true;

@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { finiteValue, exactSettledUnits, opposingMarketCoverage } from './lib/results-populations.mjs';
 
 const ROOT=process.cwd();
 const INDEX_PATH=path.join(ROOT,'data/history/results-index.json');
@@ -74,7 +75,7 @@ function latestDecisionCards(cards){
 }
 function decisionStatusRow(rows,status){
   const list=rows.filter(row=>cleanText(row?.status).toUpperCase()===status);
-  const priced=list.filter(row=>row.completionState==='complete'&&Number.isFinite(Number(row.units)));
+  const priced=list.filter(row=>exactSettledUnits(row)!==null);
   const shadowNetUnits=priced.reduce((n,row)=>n+Number(row.units),0);
   const lossAvoidedUnits=priced.reduce((n,row)=>n+(Number(row.units)<0?-Number(row.units):0),0);
   const opportunityMissedUnits=priced.reduce((n,row)=>n+(Number(row.units)>0?Number(row.units):0),0);
@@ -95,7 +96,7 @@ function decisionStatusRow(rows,status){
 function pizzaStatusRow(rows,status){
   const list=rows.filter(row=>cleanText(row?.vigScopeStatus).toUpperCase()===status);
   const settled=list.filter(row=>row.completionState==='complete');
-  const priced=settled.filter(row=>Number.isFinite(Number(row.unitResult))&&Number.isFinite(Number(row.profitLossCad)));
+  const priced=settled.filter(row=>finiteValue(row.unitResult)&&finiteValue(row.profitLossCad));
   const netUnits=priced.reduce((n,row)=>n+Number(row.unitResult),0);
   const riskCad=priced.reduce((n,row)=>n+Number(row.trackingUnitCad||0),0);
   const profitLossCad=priced.reduce((n,row)=>n+Number(row.profitLossCad||0),0);
@@ -127,8 +128,8 @@ for(const card of index.cards){
   const referenceFullUnitCad=Number.isFinite(bankrollCad)&&bankrollCad>0?bankrollCad*UNIT_BASE_PCT:null;
   const issuedStakeCad=status==='BET'?parseStakeCad(rec?.stake):0;
   const stakeUnits=Number.isFinite(referenceFullUnitCad)&&referenceFullUnitCad>0?issuedStakeCad/referenceFullUnitCad:0;
-  const settledFlatUnits=Number(card.units);
-  const sizedNetUnits=card.completionState==='complete'&&Number.isFinite(settledFlatUnits)&&stakeUnits>0
+  const settledFlatUnits=exactSettledUnits(card);
+  const sizedNetUnits=settledFlatUnits!==null&&stakeUnits>0
     ?settledFlatUnits*stakeUnits
     :null;
 
@@ -140,10 +141,25 @@ for(const card of index.cards){
 
 const issuedBets=index.cards.filter(c=>cleanText(c.status).toUpperCase()==='BET'&&Number(c.issuedStakeCad)>0&&Number(c.stakeUnits)>0);
 const settledBets=issuedBets.filter(c=>c.completionState==='complete');
-const pricedBets=settledBets.filter(c=>Number.isFinite(Number(c.units))&&Number.isFinite(Number(c.sizedNetUnits)));
+const pricedBets=settledBets.filter(c=>exactSettledUnits(c)!==null&&finiteValue(c.sizedNetUnits));
 const riskUnits=pricedBets.reduce((n,c)=>n+Number(c.stakeUnits||0),0);
 const netUnits=pricedBets.reduce((n,c)=>n+Number(c.sizedNetUnits||0),0);
 const roiPct=riskUnits>0?netUnits/riskUnits*100:null;
+// Cash stake replay does not require a bankroll-normalized unit definition.
+const cashIssuedBets=index.cards.filter(c=>cleanText(c.status).toUpperCase()==='BET'&&Number(c.issuedStakeCad)>0);
+const cashSettledBets=cashIssuedBets.filter(c=>c.completionState==='complete');
+const cashPricedBets=cashSettledBets.filter(c=>exactSettledUnits(c)!==null);
+const issuedRiskCad=cashPricedBets.reduce((n,c)=>n+Number(c.issuedStakeCad),0);
+const issuedNetCad=cashPricedBets.reduce((n,c)=>n+Number(c.issuedStakeCad)*exactSettledUnits(c),0);
+index.issuedBetAnalytics={
+  methodology:'settlement replay of positive-stake issued BET cards at exact issued prices; repeated BET appearances remain card-level recommendations, not confirmed distinct wagers',
+  issuedBets:cashIssuedBets.length, settledBets:cashSettledBets.length, pricedBets:cashPricedBets.length,
+  pendingBets:cashIssuedBets.length-cashSettledBets.length, unpricedSettledBets:cashSettledBets.length-cashPricedBets.length,
+  riskCad:round(issuedRiskCad,2), netCad:round(issuedNetCad,2),
+  roiPct:issuedRiskCad>0?round(issuedNetCad/issuedRiskCad*100,2):null,
+  grades:gradeCounts(cashPricedBets),
+  note:'Uses issued cash stakes; LEAN, WAIT and PASS stakes do not contribute. Priced pushes and voids remain in issued-risk denominator. This is recommendation performance, not evidence that the user placed wagers.'
+};
 
 index.playerValueAnalytics={
   methodology:'actual issued BET stake is divided by 3% of that report bankroll to preserve the issued stake fraction, then replayed with a standardized $100 full unit',
@@ -157,11 +173,11 @@ index.playerValueAnalytics={
   roiPct:round(roiPct,2),
   riskCad:pricedBets.length?round(riskUnits*PLAYER_UNIT_CAD,2):0,
   cashValueCad:pricedBets.length?round(netUnits*PLAYER_UNIT_CAD,2):0,
-  note:'$100 defines the standardized full-unit reference only. Each actual BET keeps its issued Betting Edge stake fraction; non-BET statuses never contribute to realized player P/L.'
+  note:'$100 defines the standardized full-unit reference only. Each actual BET keeps its issued Betting Edge stake fraction; non-BET statuses never contribute. This is a standardized recommendation replay, not verified user wagering P/L.'
 };
 
 const finalDecisions=latestDecisionCards(index.cards);
-const pricedFinalDecisions=finalDecisions.filter(c=>c.completionState==='complete'&&Number.isFinite(Number(c.units)));
+const pricedFinalDecisions=finalDecisions.filter(c=>exactSettledUnits(c)!==null);
 const lossAvoidedUnits=pricedFinalDecisions.reduce((n,c)=>n+(Number(c.units)<0?-Number(c.units):0),0);
 const opportunityMissedUnits=pricedFinalDecisions.reduce((n,c)=>n+(Number(c.units)>0?Number(c.units):0),0);
 const shadowNetUnits=pricedFinalDecisions.reduce((n,c)=>n+Number(c.units),0);
@@ -181,7 +197,8 @@ index.decisionValueAnalytics={
   opportunityMissedCad:pricedFinalDecisions.length?round(opportunityMissedUnits*PLAYER_UNIT_CAD,2):null,
   netDecisionCad:pricedFinalDecisions.length?round(netDecisionUnits*PLAYER_UNIT_CAD,2):null,
   byStatus:['LEAN','WAIT','PASS'].map(status=>decisionStatusRow(finalDecisions,status)),
-  note:'Positive decision value means losses avoided exceeded profitable opportunities passed up. Negative decision value means the final non-BET filters left more profitable shadow value on the table than they protected.'
+  opposingMarkets:opposingMarketCoverage(finalDecisions),
+  note:'Legacy decision-value fields are the arithmetic inverse of hypothetical return, not measured value created by filtering. Opposing sides and bookmaker margin prevent interpreting their sign alone as filter skill.'
 };
 
 const cardMap=new Map(index.cards.map(card=>[cleanText(card.cardId),card]));
@@ -196,7 +213,7 @@ for(const {file,data} of pizzaArchives){
   const trackingUnitCad=Number(data?.tracking?.unitCad);
   const validUnit=Number.isFinite(trackingUnitCad)&&trackingUnitCad>0;
   const complete=card?.completionState==='complete';
-  const flatUnits=complete&&Number.isFinite(Number(card?.units))?Number(card.units):null;
+  const flatUnits=exactSettledUnits(card);
   const profitLossCad=validUnit&&flatUnits!==null?trackingUnitCad*flatUnits:null;
   pizzaRows.push({
     archivePath:path.relative(ROOT,file).split(path.sep).join('/'),
@@ -217,7 +234,7 @@ for(const {file,data} of pizzaArchives){
 }
 pizzaRows.sort((a,b)=>String(a.publishedAt||'').localeCompare(String(b.publishedAt||'')));
 const pizzaSettled=pizzaRows.filter(row=>row.completionState==='complete');
-const pizzaPriced=pizzaSettled.filter(row=>Number.isFinite(Number(row.unitResult))&&Number.isFinite(Number(row.profitLossCad))&&Number(row.trackingUnitCad)>0);
+const pizzaPriced=pizzaSettled.filter(row=>finiteValue(row.unitResult)&&finiteValue(row.profitLossCad)&&Number(row.trackingUnitCad)>0);
 const pizzaRiskCad=pizzaPriced.reduce((n,row)=>n+Number(row.trackingUnitCad),0);
 const pizzaProfitLossCad=pizzaPriced.reduce((n,row)=>n+Number(row.profitLossCad),0);
 const pizzaNetUnits=pizzaPriced.reduce((n,row)=>n+Number(row.unitResult),0);

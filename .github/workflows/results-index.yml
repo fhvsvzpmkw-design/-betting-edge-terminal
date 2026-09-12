@@ -6,12 +6,17 @@ on:
   push:
     branches: [main]
     paths:
+      - "run-history.json"
+      - "data/history/runs/**"
       - "data/history/observations/**"
       - "data/history/pizza-plays/**"
       - "tools/build-results-index.mjs"
       - "assets/quote-observation.js"
       - "tools/add-results-player-value.mjs"
       - "tools/add-results-shadow-v2.mjs"
+      - "tools/lib/results-populations.mjs"
+      - "tests/results-performance-populations.test.mjs"
+      - "tests/results-index-quote-observation.test.mjs"
       - ".github/workflows/results-index.yml"
 
 permissions:
@@ -36,7 +41,10 @@ jobs:
         run: git pull --ff-only origin main
 
       - name: Build results index
-        run: node tools/build-results-index.mjs
+        run: |
+          node tests/results-performance-populations.test.mjs
+          node tests/results-index-quote-observation.test.mjs
+          node tools/build-results-index.mjs
 
       - name: Add stake-aware player and Pizza value
         run: node tools/add-results-player-value.mjs

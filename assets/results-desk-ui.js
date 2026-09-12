@@ -124,7 +124,7 @@ function ensureStyle(d){
 
 function rowTable(rows,label){
   if(!rows?.length)return '<div class="resultsEmpty">NO DATA YET</div>';
-  return `<div class="resultsScroll"><table><thead><tr><th>${label}</th><th>CLOSED</th><th>W-L</th><th>OPEN</th><th>ROI</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${Number(r.complete||0)}</td><td>${esc(grades(r))}</td><td>${Number(r.unresolved||0)}</td><td class="${valueClass(r.roiPct)}">${esc(pct(r.roiPct))}</td></tr>`).join('')}</tbody></table></div>`;
+  return `<div class="resultsScroll"><table><thead><tr><th>${label}</th><th>CLOSED</th><th>W-L</th><th>OPEN</th><th>PRICED</th><th>ROI</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${Number(r.complete||0)}</td><td>${esc(grades(r))}</td><td>${Number(r.unresolved||0)}</td><td>${Number(r.priced||0)}</td><td class="${valueClass(r.roiPct)}">${esc(pct(r.roiPct))}</td></tr>`).join('')}</tbody></table></div>`;
 }
 function filteredCards(index){
   const cards=Array.isArray(index.cards)?index.cards:[];
@@ -178,8 +178,10 @@ function render(d,index){
   cached=index;
   engine.classList.add('resultsDesk');
   const c=index.coverage||{};
-  const bet=statusRow(index,'BET'),pass=statusRow(index,'PASS'),wait=statusRow(index,'WAIT'),lean=statusRow(index,'LEAN');
-  const bestMarket=bestRow(index.byMarket),bestSport=bestRow(index.bySport);
+  const final=index.finalSelectionAnalytics||index;
+  const bet=statusRow(final,'BET'),pass=statusRow(final,'PASS'),wait=statusRow(final,'WAIT'),lean=statusRow(final,'LEAN');
+  const issued=index.issuedBetAnalytics||{};
+  const bestMarket=bestRow(final.byMarket),bestSport=bestRow(final.bySport);
   engine.innerHTML=`
     <div class="resultsValueHero">
       <div class="resultsTitle">VIGSCOPE // VALUE &amp; PERFORMANCE</div>
@@ -191,7 +193,7 @@ function render(d,index){
       <div class="proofGrid">
         <div class="proofCard good"><div class="key">BEST MARKET</div><b>${esc(bestMarket?.name||'—')}</b><span>${esc(pct(bestMarket?.roiPct))} ROI</span></div>
         <div class="proofCard good"><div class="key">BEST SPORT</div><b>${esc(bestSport?.name||'—')}</b><span>${esc(pct(bestSport?.roiPct))} ROI</span></div>
-        <div class="proofCard warn"><div class="key">LEANS</div><b>${esc(grades(lean))}</b><span class="proofSecondary">${esc(pct(lean.roiPct))} MODEL ROI</span></div>
+        <div class="proofCard warn"><div class="key">LEANS</div><b>${esc(grades(lean))}</b><span class="proofSecondary">${esc(pct(lean.roiPct))} HYPOTHETICAL ROI</span></div>
         <div class="proofCard"><div class="key">FILTERING ENGINE</div><b>PASS ${esc(grades(pass))}</b><span class="proofSecondary">WAIT ${esc(grades(wait))}</span></div>
       </div>
     </div>
@@ -204,9 +206,9 @@ function render(d,index){
         <div class="auditStat"><div class="key">CARDS</div><b>${Number(c.cards||0)}</b></div>
         <div class="auditStat good"><div class="key">CLOSED</div><b>${Number(c.completeCards||0)}</b></div>
         <div class="auditStat open"><div class="key">OPEN EVENTS</div><b>${Number(c.unresolvedEvents||0)}</b></div>
-        <div class="auditStat"><div class="key">OFFICIAL BETS</div><b>${Number(bet.complete||0)}</b></div>
+        <div class="auditStat"><div class="key">ISSUED BET CARDS</div><b>${Number(issued.issuedBets||0)}</b></div>
       </div>
-      <div class="auditNotice">OFFICIAL BET PERFORMANCE REMAINS SEPARATE. THIS PAGE RANKS AND PRICES MODEL OPPORTUNITIES; HYPOTHETICAL LEAN / WAIT / PASS RESULTS ARE CALIBRATION EVIDENCE, NOT CASH WON.</div>
+      <div class="auditNotice">ISSUED BET STAKES ARE SEPARATE FROM HYPOTHETICAL LEAN / WAIT / PASS TRACKING. ${Number(c.pendingObservationCards||0)} PUBLISHED CARD APPEARANCES ACROSS ${Number(c.pendingObservationRuns||0)} REPORTS AWAIT OBSERVATIONS. OBSERVED HISTORY THROUGH ${esc(c.observedThroughDate||c.lastDate||'—')}; PUBLISHED CARDS THROUGH ${esc(c.lastDate||'—')}. PENDING IS NOT A LOSS OR AN OVERDUE-GRADING CLAIM. ${Number(final.opposingMarkets?.pairedGroups||0)} EXACT MARKET GROUPS INCLUDE BOTH OPPOSING SIDES; NEGATIVE COMBINED RETURNS CAN REFLECT BOOKMAKER MARGIN.</div>
       <div class="resultsControls">
         <button class="resultsCtl ${state.scope==='cards'?'active':''}" data-results-scope="cards">CARDS</button>
         <button class="resultsCtl ${state.scope==='unique'?'active':''}" data-results-scope="unique">UNIQUE</button>
@@ -214,13 +216,14 @@ function render(d,index){
       </div>
     </div>
 
+    <div class="resultsBox" style="margin-top:9px"><div class="resultsSection">ISSUED BET STAKES // RECOMMENDATION RESULTS</div><div class="resultsNote">${Number(issued.issuedBets||0)} ISSUED BET CARDS // ${Number(issued.pricedBets||0)} EXACT-PRICED SETTLED // ${Number(issued.pendingBets||0)} PENDING // ${Number(issued.unpricedSettledBets||0)} SETTLED WITHOUT PRICE</div><div class="resultsNote">ISSUED-STAKE REPLAY: ${Number(issued.pricedBets||0)?'$'+signed(issued.netCad,2):'—'} NET // ${pct(issued.roiPct)} ROI ON ${Number(issued.pricedBets||0)?'$'+Number(issued.riskCad||0).toFixed(2):'—'} PRICED ISSUED RISK. REPEATED BET CARDS REMAIN RECOMMENDATIONS; USER WAGERS ARE NOT CONFIRMED BY THIS RECORD.</div></div>
     <div class="resultsGrid">
-      <div class="resultsBox performancePanel"><div class="resultsSection">MARKET PERFORMANCE // ROI</div><div class="resultsNote">Price-adjusted model return by exact issued market.</div>${marketBars(index.byMarket||[])}</div>
-      <div class="resultsBox performancePanel"><div class="resultsSection">STATUS PERFORMANCE</div><div class="resultsNote">Calibration view; official BET results remain isolated.</div>${statusPerformance([pass,wait,lean])}</div>
+      <div class="resultsBox performancePanel"><div class="resultsSection">MARKET PERFORMANCE // ROI</div><div class="resultsNote">Hypothetical 1u return across final exact selections; opposing sides remain grouped in the audit.</div>${marketBars(final.byMarket||[])}</div>
+      <div class="resultsBox performancePanel"><div class="resultsSection">STATUS PERFORMANCE</div><div class="resultsNote">Final exact LEAN / WAIT / PASS selections; 1u hypothetical risk at frozen prices.</div>${statusPerformance([pass,wait,lean])}</div>
       <div class="resultsBox full"><div class="resultsSection">TOP SPORT PERFORMANCE</div>${topSportRow(bestSport)}</div>
-      <div class="resultsBox"><div class="resultsSection">BY SPORT // FULL TABLE</div><div class="resultsNote">Use ROI alongside W-L and sample size.</div>${rowTable(index.bySport||[],'SPORT')}</div>
-      <div class="resultsBox"><div class="resultsSection">BY REPORT LANE</div><div class="resultsNote">Repeated selections remain separate in CARDS mode.</div>${rowTable(index.byLane||[],'LANE')}</div>
-      <div class="resultsBox full"><div class="resultsSection">${state.scope==='cards'?'ISSUED CARD LOG':'UNIQUE SELECTION LOG'}</div><div class="resultsNote">${state.scope==='cards'?'Each report appearance is preserved.':'Exact selectionKey is deduplicated; status path shows how the card evolved across lanes.'}</div>${detailRows(index)}</div>
+      <div class="resultsBox"><div class="resultsSection">BY SPORT // FULL TABLE</div><div class="resultsNote">Final exact selections; priced pushes and voids count in the ROI denominator. Missing prices and pending grades do not.</div>${rowTable(final.bySport||[],'SPORT')}</div>
+      <div class="resultsBox"><div class="resultsSection">BY REPORT LANE</div><div class="resultsNote">All card appearances by lane; repeat selections remain separate here.</div>${rowTable(index.byLane||[],'LANE')}</div>
+      <div class="resultsBox full"><div class="resultsSection">${state.scope==='cards'?'ISSUED CARD LOG':'UNIQUE SELECTION LOG'}</div><div class="resultsNote">${state.scope==='cards'?'Each report appearance is preserved.':'Exact selectionKey is deduplicated; status path shows how the card evolved. Opposing sides remain separate selections within one common market.'}</div>${detailRows(index)}</div>
       <div class="resultsBox full"><div class="resultsSection">OPEN / UNRESOLVED</div><div class="resultsNote">Unresolved means not safely verified yet, not a loss. Closure retry metadata remains in the observation sidecars.</div>${unresolvedRows(index)}</div>
     </div>
     <div class="resultsFoot">INDEX GENERATED ${esc(index.generatedAt||'—')} // SOURCE THROUGH ${esc(c.lastDate||'—')} // RESULTS INDEX IS NON-AUTHORITATIVE AND MAY BE REBUILT FROM IMMUTABLE RUNS + OBSERVATIONS.</div>

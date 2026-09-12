@@ -6,6 +6,7 @@ import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs
 import {validateReportMarketScope} from './major-sport-market-coverage-gate.mjs';
 import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
 import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
+import {attachPublicationEvidenceAudit} from './report-evidence-repair.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -378,6 +379,10 @@ function publish(root,reportFile,sidecarFile){
   const decisionFingerprint=normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs});
   attachPublisherCoverageSummary({root,report,sidecar});
   attachPublisherInstrumentTelemetry({root,index,report,sidecar});
+  const existingReportPath = path.join(root,paths.reportPath), existingSidecarPath = path.join(root,paths.sidecarPath);
+  attachPublicationEvidenceAudit({root,report,sidecar,
+    existingReport:fs.existsSync(existingReportPath) ? readJson(existingReportPath) : null,
+    existingSidecar:fs.existsSync(existingSidecarPath) ? readJson(existingSidecarPath) : null});
   assert(normalizedJson({slot:report.slot,label:report.label,ts:report.ts,feedGeneratedAt:report.feedGeneratedAt,bankroll:report.bankroll,risk:report.risk,counts:report.counts,recs:report.recs})===decisionFingerprint,'VigScope meter telemetry derivation must not mutate betting decisions or recommendation content');
   const reportAbs = path.join(root,paths.reportPath);
   const sidecarAbs = path.join(root,paths.sidecarPath);
