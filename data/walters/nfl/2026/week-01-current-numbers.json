@@ -7,8 +7,8 @@
   "week": 1,
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PRESERVED_PROVISIONAL",
-  "updatedAt": "2026-09-11T11:31:45-07:00",
-  "lastResearchAt": "2026-09-09T16:58:00-07:00",
+  "updatedAt": "2026-09-12T16:49:00-07:00",
+  "lastResearchAt": "2026-09-12T16:49:00-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-01-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-01-daily-market-ledger.json",
@@ -2112,11 +2112,11 @@
       "away": "DEN",
       "home": "KC",
       "startTimePacific": "2026-09-14T17:15:00-07:00",
-      "priorGrahamFairHome": -1,
-      "grahamFairHome": 0,
-      "grahamAsOf": "2026-09-02T19:16:51-07:00",
+      "priorGrahamFairHome": 0,
+      "grahamFairHome": 1,
+      "grahamAsOf": "2026-09-12T16:49:00-07:00",
       "numberStatus": "READY_PROVISIONAL_CUTDOWN_DELTA_REQUIRED",
-      "informationStatus": "REVIEWED_NO_MATERIAL_CHANGE_SOURCE_LOCKED",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -2172,9 +2172,30 @@
           ],
           "effectiveAt": "2026-09-03T11:38:00-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "KC",
+          "side": "HOME",
+          "clusterGroup": "OFFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W01-KC-Josh-Simmons"
+          ],
+          "rawTeamContributionDelta": -0.9,
+          "finalTeamContributionDelta": -0.9,
+          "pointsToHomeSpread": 0.9,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/chiefs-qb-patrick-mahomes-knee-has-no-injury-status-cleared-for-comeback-monday-night-vs-broncos",
+            "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+            "data/walters/nfl/player-values/player-values-access-v1.json",
+            "data/walters/nfl/player-values/by-team-v1/kc.json"
+          ]
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base +1.000; home field -2.082; other governed +0.970; pre-personnel exact -0.112; personnel +0.000; matchup +0.000; exact Graham home fair -0.112; displayed +0.0.",
+      "researchSummary": "Governed fair decomposition: neutral/team base +1.000; home field -2.082; other governed +0.970; pre-personnel exact -0.112; personnel +0.900; matchup +0.000; exact Graham home fair +0.788; displayed +1.0.",
       "sourceRefs": [
         "core/staging/walters-nfl-seed-dataset-2026.json",
         "https://www.cbssports.com/nfl/injuries/daily/",
@@ -2188,12 +2209,16 @@
         "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
         "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
         "data/walters/nfl/2026/week-01-research-ledger.json",
-        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.nfl.com/news/chiefs-qb-patrick-mahomes-knee-has-no-injury-status-cleared-for-comeback-monday-night-vs-broncos",
+        "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/kc.json"
       ],
       "neutralBaseHome": 1,
       "espnFpiNeutralHome": -1.1,
       "lastInformationReviewAt": "2026-09-01T11:04:00-07:00",
-      "grahamExactFairHome": -0.112,
+      "grahamExactFairHome": 0.788,
       "homeFieldNonLocationExactFairHome": 1,
       "homeFieldProductionId": "walters-nfl-home-field-production-v1",
       "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
@@ -2209,10 +2234,10 @@
         "homeFieldPointsToHomeSpread": -2.082,
         "otherGovernedPointsToHomeSpread": 0.97,
         "prePersonnelExactFairHome": -0.112,
-        "personnelPointsToHomeSpread": 0,
+        "personnelPointsToHomeSpread": 0.9,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -0.112,
-        "displayedFairHome": 0,
+        "exactFairHome": 0.788,
+        "displayedFairHome": 1,
         "arithmeticVerified": true
       },
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
@@ -2224,7 +2249,13 @@
       "qbPerformanceHomeTeamDelta": -0.65,
       "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
       "qbPerformanceLastAppliedAt": "2026-09-03T11:38:00-07:00",
-      "qbPerformanceFailClosedTeams": []
+      "qbPerformanceFailClosedTeams": [],
+      "personnelBaselineExactFairHome": -0.112,
+      "personnelOverlayPointsToHomeSpread": 0.9,
+      "personnelProductionId": "walters-personnel-production-v1",
+      "personnelLastAppliedAt": "2026-09-12T16:49:00-07:00",
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": []
     }
   ],
   "initialBuildPolicy": {
@@ -2240,8 +2271,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-delta-1645-personnel-2026-w01-20260909T165800-0700",
-    "lastAppliedAt": "2026-09-09T16:58:00-07:00",
+    "lastBatchId": "graham-delta-1645-personnel-2026-w01-20260912T164900-0700",
+    "lastAppliedAt": "2026-09-12T16:49:00-07:00",
     "marketViewed": false
   },
   "matchupExpansionProduction": {
