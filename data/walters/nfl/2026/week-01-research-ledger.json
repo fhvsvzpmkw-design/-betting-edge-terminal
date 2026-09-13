@@ -8,7 +8,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-08-30T14:20:00-07:00",
-  "updatedAt": "2026-09-13T07:18:00-07:00",
+  "updatedAt": "2026-09-13T07:18:49-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -11514,6 +11514,329 @@
         "nonzeroOpponentMatchupIncrements": 0,
         "marketViewed": false,
         "productionId": "walters-nfl-matchup-production-v1"
+      }
+    },
+    {
+      "sequence": 36,
+      "type": "SUNDAY_PREGAME_INFORMATION_REVIEW",
+      "startedAt": "2026-09-13T07:03:05-07:00",
+      "completedAt": "2026-09-13T07:18:49-07:00",
+      "runEventId": "graham-sunday-pregame-2026-w01-20260913T070305-0700",
+      "sourceTaskKey": "SUNDAY_PREGAME",
+      "completionResult": "MATERIAL_CHANGE",
+      "scope": "Sunday pregame current-information review for all 14 active 2026 Week 1 games still awaiting kickoff. Covered quarterback status, official injury/designation state, offensive line, pass rush, secondary, playmakers, coaching/role replacement, current weather and travel context from the latest verified broad baseline through this run. No sportsbook, consensus, line-movement or other market data was viewed.",
+      "sourcesChecked": [
+        {
+          "source": "NFL official Week 1 injury report",
+          "url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+          "checkedAt": "2026-09-13T07:08:00-07:00",
+          "purpose": "Official final game-status designations for all active Week 1 games."
+        },
+        {
+          "source": "NFL Sunday pregame injury monitor",
+          "url": "https://www.nfl.com/news/week-1-injuries-sunday-pregame-2026-nfl-season",
+          "checkedAt": "2026-09-13T07:09:00-07:00",
+          "purpose": "Latest reliable expected-play and game-time availability reports."
+        },
+        {
+          "source": "Dallas Cowboys official Davis injury report",
+          "url": "https://www.dallascowboys.com/news/malik-davis-out-with-pretty-serious-injury",
+          "checkedAt": "2026-09-13T07:10:00-07:00",
+          "purpose": "Confirm Davis surgery/IR status and current replacement distribution."
+        },
+        {
+          "source": "Dallas Cowboys official transaction report",
+          "url": "https://www.dallascowboys.com/news/transactions-guard-signed-snowden-waived-injured",
+          "checkedAt": "2026-09-13T07:10:00-07:00",
+          "purpose": "Confirm IR transaction and Demercado/Abanikanda replacement pool."
+        },
+        {
+          "source": "Giants official depth chart",
+          "url": "https://www.giants.com/team/depth-chart/",
+          "checkedAt": "2026-09-13T07:11:00-07:00",
+          "purpose": "Opponent-specific zero-increment review for the Dallas running-back committee."
+        },
+        {
+          "source": "Current outdoor venue forecasts",
+          "url": "https://www.weather.gov/",
+          "checkedAt": "2026-09-13T07:08:00-07:00",
+          "purpose": "Revalidate temperature, storm/flood and outdoor-game context without embedding weather in HFA."
+        },
+        {
+          "source": "VSiN 2.0 supplemental current-revalidation layer",
+          "url": "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+          "checkedAt": "2026-09-13T07:06:00-07:00",
+          "purpose": "Supplemental team-state prompts only; newer official/reliable evidence retained as authority."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "Dallas",
+          "abbr": "DAL",
+          "summary": "Primary backup RB Malik Davis is on IR after a hip injury requiring surgery. Dallas identifies Emari Demercado and Israel Abanikanda as the replacement pool behind baseline starter Javonte Williams. Both included candidates carry identical locked 0.0 Walters values versus Davis at 0.2, clearing scoped value-invariant committee production.",
+          "materiality": "MATERIAL_PERSONNEL_INFORMATION_AND_GOVERNED_NUMBER_MOVE",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.dallascowboys.com/news/malik-davis-out-with-pretty-serious-injury",
+            "https://www.dallascowboys.com/news/transactions-guard-signed-snowden-waived-injured",
+            "data/walters/nfl/player-values/by-team-v1/dal.json",
+            "data/walters/nfl/player-values/by-team-v1/kc.json",
+            "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          ]
+        },
+        {
+          "team": "Atlanta",
+          "abbr": "ATL",
+          "summary": "Cooper Rush remains expected to start despite back spasms; the approved starter binding and governed ATL-PIT fair are preserved.",
+          "materiality": "MATERIAL_QB_REVALIDATION_NO_NEW_MOVE",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/news/week-1-injuries-sunday-pregame-2026-nfl-season",
+            "data/walters/nfl/qb-production-current.json"
+          ]
+        },
+        {
+          "team": "Arizona",
+          "abbr": "ARI",
+          "summary": "Jeremiyah Love is expected to play. No prior absence overlay was applied, so the current fair is preserved.",
+          "materiality": "CURRENT_AVAILABILITY_REVALIDATED_NO_MOVE",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/news/week-1-injuries-sunday-pregame-2026-nfl-season"
+          ]
+        },
+        {
+          "team": "Chicago",
+          "abbr": "CHI",
+          "summary": "Rome Odunze is expected to play; Xavier Woods remains a game-time decision with optimism. No percentage or numeric move is invented.",
+          "materiality": "CURRENT_AVAILABILITY_REVALIDATED_NO_MOVE",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/news/week-1-injuries-sunday-pregame-2026-nfl-season"
+          ]
+        },
+        {
+          "team": "New Orleans",
+          "abbr": "NO",
+          "summary": "Alvin Kamara is not expected to play but remained officially questionable and the replacement distribution was unresolved at the coverage end. The case remains fail closed pending an inactive list.",
+          "materiality": "MATERIAL_AVAILABILITY_MONITOR_FAIL_CLOSED",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/news/week-1-injuries-sunday-pregame-2026-nfl-season",
+            "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
+          ]
+        },
+        {
+          "team": "Pittsburgh",
+          "abbr": "PIT",
+          "summary": "Joey Porter Jr. is unlikely to play but remained officially questionable and no governed replacement resolution was established. No numeric move.",
+          "materiality": "MATERIAL_AVAILABILITY_MONITOR_FAIL_CLOSED",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/news/week-1-injuries-sunday-pregame-2026-nfl-season",
+            "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
+          ]
+        },
+        {
+          "team": "All other active Week 1 teams",
+          "abbr": "MULTI",
+          "summary": "Official final designations, roster/depth developments and current roles were revalidated through the coverage end. No additional one-for-one personnel case, accepted value-invariant committee, approved QB change, carried-rating delta or authorized nonzero matchup increment cleared the governed gates.",
+          "materiality": "NO_ADDITIONAL_GOVERNED_NUMBER_CHANGE",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ]
+        },
+        {
+          "team": "Outdoor active Week 1 venues",
+          "abbr": "MULTI",
+          "summary": "Heat, storm and morning flood conditions were rechecked. Philadelphia/East Rutherford flood warnings were scheduled to expire well before their later kickoffs; no exact calibrated W/S adjustment was supported. Weather remained separate from H4.",
+          "materiality": "WEATHER_MONITOR_ONLY",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.weather.gov/"
+          ]
+        }
+      ],
+      "ratingChanges": [],
+      "gameAdjustments": [
+        {
+          "gameKey": "2026-W01-CHI-CAR",
+          "priorExactFairHome": 1.168,
+          "currentExactFairHome": 1.168,
+          "priorPublishedFairHome": 1,
+          "currentPublishedFairHome": 1,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Rome Odunze is expected to play; Xavier Woods remains a game-time decision with optimism. Questionable status alone does not authorize a percentage or personnel move."
+        },
+        {
+          "gameKey": "2026-W01-BAL-IND",
+          "priorExactFairHome": 3.328,
+          "currentExactFairHome": 3.328,
+          "priorPublishedFairHome": 3.5,
+          "currentPublishedFairHome": 3.5,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Baltimore's confirmed absences and Indianapolis's Ajiake status were already reviewed; no new one-for-one replacement or accepted committee cleared production."
+        },
+        {
+          "gameKey": "2026-W01-ATL-PIT",
+          "priorExactFairHome": -3.582,
+          "currentExactFairHome": -3.582,
+          "priorPublishedFairHome": -3.5,
+          "currentPublishedFairHome": -3.5,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Cooper Rush remains expected to start despite back spasms and Za'Darius Smith is expected to play. Joey Porter Jr. is unlikely but remained officially questionable, so no new QB or personnel batch is authorized."
+        },
+        {
+          "gameKey": "2026-W01-CLE-JAX",
+          "priorExactFairHome": -7.072,
+          "currentExactFairHome": -7.072,
+          "priorPublishedFairHome": -7,
+          "currentPublishedFairHome": -7,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Teven Jenkins remains out and the other listed cases remain questionable; no new resolved replacement evidence changed the fair."
+        },
+        {
+          "gameKey": "2026-W01-TB-CIN",
+          "priorExactFairHome": -2.982,
+          "currentExactFairHome": -2.982,
+          "priorPublishedFairHome": -3,
+          "currentPublishedFairHome": -3,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "The existing doubtful Tampa receiver/running-back/tackle cases and Cincinnati defensive-end case still lack definitive game-day availability plus resolved replacement authority."
+        },
+        {
+          "gameKey": "2026-W01-NYJ-TEN",
+          "priorExactFairHome": -3.662,
+          "currentExactFairHome": -3.662,
+          "priorPublishedFairHome": -3.5,
+          "currentPublishedFairHome": -3.5,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Final listed absences remain without a new governed one-for-one replacement or value-invariant committee resolution."
+        },
+        {
+          "gameKey": "2026-W01-NO-DET",
+          "priorExactFairHome": -5.152,
+          "currentExactFairHome": -5.152,
+          "priorPublishedFairHome": -5,
+          "currentPublishedFairHome": -5,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Alvin Kamara is not expected to play but remained officially questionable at the coverage end; no inactive confirmation or resolved replacement committee was available, so the existing fair is preserved."
+        },
+        {
+          "gameKey": "2026-W01-BUF-HOU",
+          "priorExactFairHome": 2.408,
+          "currentExactFairHome": 2.408,
+          "priorPublishedFairHome": 2.5,
+          "currentPublishedFairHome": 2.5,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Houston has no injury designations; Buffalo's remaining questionable depth cases do not clear a governed numeric gate."
+        },
+        {
+          "gameKey": "2026-W01-ARI-LAC",
+          "priorExactFairHome": -7.962,
+          "currentExactFairHome": -7.962,
+          "priorPublishedFairHome": -8,
+          "currentPublishedFairHome": -8,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Jeremiyah Love is expected to play; that revalidation preserves the current board without a return overlay because no prior loss was applied."
+        },
+        {
+          "gameKey": "2026-W01-GB-MIN",
+          "priorExactFairHome": 1.578,
+          "currentExactFairHome": 1.578,
+          "priorPublishedFairHome": 1.5,
+          "currentPublishedFairHome": 1.5,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "No Sunday development superseded the Packers/Vikings status and role evidence already covered by the verified baseline and Delta."
+        },
+        {
+          "gameKey": "2026-W01-MIA-LV",
+          "priorExactFairHome": -3.032,
+          "currentExactFairHome": -3.032,
+          "priorPublishedFairHome": -3,
+          "currentPublishedFairHome": -3,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Brock Bowers remains out; the previously reviewed non-value-invariant Raiders tight-end role distribution remains fail closed."
+        },
+        {
+          "gameKey": "2026-W01-WAS-PHI",
+          "priorExactFairHome": -7.942,
+          "currentExactFairHome": -7.942,
+          "priorPublishedFairHome": -8,
+          "currentPublishedFairHome": -8,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Washington has no injury designations; Philadelphia's listed absences remain without new replacement closure."
+        },
+        {
+          "gameKey": "2026-W01-DAL-NYG",
+          "priorExactFairHome": -0.622,
+          "currentExactFairHome": -0.822,
+          "priorPublishedFairHome": -0.5,
+          "currentPublishedFairHome": -1,
+          "numberMoved": true,
+          "betCreated": false,
+          "finding": "Malik Davis was placed on IR. The governed value-invariant committee workflow used Emari Demercado and Israel Abanikanda at identical locked 0.0 values, excluded baseline starter Javonte Williams, applied zero opponent-specific matchup increment, and moved the exact/displayed Graham fair."
+        },
+        {
+          "gameKey": "2026-W01-DEN-KC",
+          "priorExactFairHome": 0.788,
+          "currentExactFairHome": 0.788,
+          "priorPublishedFairHome": 1,
+          "currentPublishedFairHome": 1,
+          "numberMoved": false,
+          "betCreated": false,
+          "finding": "Patrick Mahomes is cleared, has no designation and will start Monday. Josh Simmons/Chamarri Conner statuses were already captured by the verified Delta; no further change is justified."
+        }
+      ],
+      "summary": {
+        "teamsReviewed": 28,
+        "gamesReviewed": 14,
+        "materialDevelopments": 8,
+        "carriedRatingMoves": 0,
+        "fairNumberMoves": 1,
+        "exactFairNumberMoves": 1,
+        "displayedFairNumberMoves": 1,
+        "betsCreated": 0,
+        "personnelBatchesSubmitted": 0,
+        "m4BatchesSubmitted": 1,
+        "m4BatchId": "graham-sunday-pregame-m4-2026-w01-20260913T071800-0700",
+        "m4WorkflowRunId": 34761879453,
+        "m4WorkflowConclusion": "SUCCESS",
+        "qbBatchesSubmitted": 0,
+        "qbReconciliationWorkflowRunId": 34761902323,
+        "qbReconciliationConclusion": "SUCCESS",
+        "marketViewed": false,
+        "coverageBaselineRunEventId": "graham-daily-review-2026-w01-20260912T112939-0700",
+        "coverageBaselineSweepSequence": 32,
+        "coverageBaselineReceiptVerifiedAt": "2026-09-12T18:36:35.925Z",
+        "coverageBaselineLedgerBlobSha": "59e278abcb2e2975c28f2bad65e33d8b4b62200e",
+        "coverageStart": "2026-09-12T11:52:00-07:00",
+        "coverageEnd": "2026-09-13T07:18:49-07:00",
+        "missedRunCatchup": false,
+        "unresolvedCoverageGaps": [],
+        "note": "The latest verified broad-coverage baseline is runEventId graham-daily-review-2026-w01-20260912T112939-0700, sweep sequence 32, active 2026 Week 1. Its matching runtime event is COMPLETED and contains the VERIFIED graham-research-completion-v1 receipt for MATERIAL_CHANGE with marketViewed=false. Coverage starts at that review's explicit completedAt 2026-09-12T11:52:00-07:00 and ends at 2026-09-13T07:18:49-07:00. No broad review day was missed. This sweep deliberately overlaps and revalidates the later DELTA_1645 sequence 34 because that narrow run cannot advance the full 14-game baseline; no unresolved historical coverage gap remains. Official game-day inactive lists for the early Sunday games were not yet due by this scheduled coverage end and remain future checkpoints, not inferred completions. The only governed number change came from Dallas placing Malik Davis on IR: the scoped M4 value-invariant committee of Emari Demercado and Israel Abanikanda passed at identical locked 0.0 replacement values, with Javonte Williams excluded as the baseline starter and opponent-specific increment exactly zero. M4 workflow 34761879453 and QB reconciliation 34761902323 both succeeded. Durable board readback moved DAL-NYG from exact NYG -0.622 / displayed -0.5 to exact NYG -0.822 / displayed -1. All carried ratings were preserved. Domestic H4 remains exactly 2.082 points (-2.082 to home spread), every other H4/QB/personnel term remains preserved, VSiN was supplemental current revalidation only, the source-locked Walters package including BW-C001 was loaded, and no market data was viewed."
       }
     }
   ],
