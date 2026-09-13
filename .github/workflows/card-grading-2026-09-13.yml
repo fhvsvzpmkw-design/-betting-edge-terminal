@@ -44,26 +44,33 @@ jobs:
           // Chicago White Sox cannot be misclassified as player-prop markets.
           body=body.replace('|hits?|home run','|\\bhits?\\b|home run');
 
-          // Keep NFL historical score verification enabled without touching
-          // live odds or report production.
+          // Expand historical-only score verification. ESPN's default college
+          // scoreboard is effectively a limited/top slate; groups=90 covers all
+          // Division I (FBS + FCS). CFL uses the separate ESPN CFL scoreboard.
           if(!body.includes('^(MLB|NCAAF)')) throw Error('sport parser patch token not found');
-          body=body.replace('^(MLB|NCAAF)','^(MLB|NCAAF|NFL)');
+          body=body.replace('^(MLB|NCAAF)','^(MLB|NCAAF|NFL|CFL)');
 
           const sourceToken="if(sport==='NCAAF') return {name:`ESPN college football scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};";
           if(!body.includes(sourceToken)) throw Error('source provider patch token not found');
-          body=body.replace(sourceToken,sourceToken+"\n  if(sport==='NFL') return {name:`ESPN NFL scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${date.replaceAll('-','')}&limit=1000`};");
+          body=body.replace(sourceToken,"if(sport==='NCAAF') return {name:`ESPN Division I college football scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date.replaceAll('-','')}&groups=90&limit=400`};\n  if(sport==='NFL') return {name:`ESPN NFL scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${date.replaceAll('-','')}&limit=100`};\n  if(sport==='CFL') return {name:`ESPN CFL scoreboard — ${date}`,url:`https://site.api.espn.com/apis/site/v2/sports/football/cfl/scoreboard?dates=${date.replaceAll('-','')}&limit=100`};");
 
           const providerToken="if(sport==='NCAAF'){";
           if(!body.includes(providerToken)) throw Error('football provider patch token not found');
-          body=body.replace(providerToken,"if(sport==='NCAAF'||sport==='NFL'){");
+          body=body.replace(providerToken,"if(sport==='NCAAF'||sport==='NFL'||sport==='CFL'){");
 
           const sportToken="out.push({sport:'NCAAF',id:String(e.id||''),date:e.date,";
           if(!body.includes(sportToken)) throw Error('football provider sport token not found');
           body=body.replace(sportToken,"out.push({sport,id:String(e.id||''),date:e.date,");
 
+          // Do not routinely recheck already COMPLETE target-day cards; retry
+          // only unresolved target cards while preserving their issued records.
+          const loopToken="const old=pm.get(rec.feed?.selectionKey),item=await settleOne(rec,TARGET_DATE,old);";
+          if(!body.includes(loopToken)) throw Error('target retry patch token not found');
+          body=body.replace(loopToken,"const old=pm.get(rec.feed?.selectionKey); const item=old?.completion?.state==='complete'?old:await settleOne(rec,TARGET_DATE,old);");
+
           const logToken="console.log(`NCAAF SOURCE: ${sourceFor('NCAAF',TARGET_DATE).url}`);";
           if(!body.includes(logToken)) throw Error('source log patch token not found');
-          body=body.replace(logToken,logToken+"\n  console.log(`NFL SOURCE: ${sourceFor('NFL',TARGET_DATE).url}`);");
+          body=body.replace(logToken,logToken+"\n  console.log(`NFL SOURCE: ${sourceFor('NFL',TARGET_DATE).url}`);\n  console.log(`CFL SOURCE: ${sourceFor('CFL',TARGET_DATE).url}`);");
 
           fs.writeFileSync('/tmp/card-grader.js',body+'\n');
           NODE
@@ -123,8 +130,5 @@ jobs:
             echo "No historical grading changes to commit"
             exit 0
           fi
-          git commit -m "Close Sep 12 Betting Edge cards and refresh results index"
-          git pull --rebase origin main
+          git commit -m "Resolve Sep 12 historical grading backlog"
           git push origin main
-
-# trigger after workflow registration
