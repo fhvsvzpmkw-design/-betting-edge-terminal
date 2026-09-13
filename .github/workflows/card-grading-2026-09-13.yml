@@ -24,94 +24,138 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Close independently verified Sep 12 exceptions
+      - name: Close verified older pending observation backlog
         run: |
           node - <<'NODE'
           const fs=require('fs'),path=require('path');
-          const DATE='2026-09-12';
           const NOW=new Date().toISOString();
-          const obsRoot=path.join('data/history/observations',DATE);
-          const runRoot=path.join('data/history/runs',DATE);
-          const norm=s=>String(s||'').normalize('NFKD').replace(/[’'`´]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-          const sources={
-            BC:{name:'The Canadian Press — B.C. Lions 48, Montreal Alouettes 29 — 2026-09-12',url:'https://infonews.ca/news/7869535/horvaths-three-tds-power-bc-lions-to-48-29-victory-over-montreal-alouettes/'},
-            OTT:{name:'The Canadian Press — Toronto Argonauts 26, Ottawa Redblacks 23 — 2026-09-12',url:'https://rdnewsnow.com/2026/09/12/lirim-hajrullahus-29-yard-field-goal-earns-argos-26-23-victory-over-redblacks/'},
-            SSK:{name:'The Canadian Press — Winnipeg Blue Bombers 19, Saskatchewan Roughriders 6 — 2026-09-12',url:'https://rdnewsnow.com/2026/09/12/blue-bombers-pick-roughriders-apart-to-win-banjo-bowl-19-6/'},
-            MTSU:{name:'Associated Press — Marshall 28, Middle Tennessee 26 — 2026-09-12',url:'https://infonews.ca/news/7869372/turner-bradshaws-2-tds-rally-marshall-over-middle-tennessee-28-26/'},
-            TAR:{name:'Associated Press/CBS Sports — Tarleton State 27, McNeese 24 — 2026-09-12',url:'https://10704107906.golf.cbssports.com/college-football/gametracker/recap/NCAAF_20260912_TRLST%40MCN/'},
-            GRAM:{name:'Associated Press/CBS Sports — TCU 63, Grambling State 7 — 2026-09-12',url:'https://prueba.games.cbssports.com/college-football/gametracker/recap/NCAAF_20260912_GRAM%40TCU/'},
-            TUL:{name:'University of Tulsa Athletics — Tulsa 23, Sam Houston 17 — 2026-09-12',url:'https://tulsahurricane.com/news/2026/9/12/Tulsa-defeats-sam-houston-23-17'},
-            HOLY:{name:'Associated Press/CBS Sports — Miami (Ohio) 45, Holy Cross 7 — 2026-09-12',url:'https://5554.racing.cbssports.com/college-football/gametracker/recap/NCAAF_20260912_HOLY%40MIAOH/'},
-            APP:{name:'Associated Press/CBS Sports — Appalachian State 27, East Carolina 24 — 2026-09-12',url:'https://si.games.cbssports.com/college-football/gametracker/recap/NCAAF_20260912_APLST%40ECU/'}
-          };
-          const verified=[
-            {id:'BC',away:'Montreal Alouettes',home:'British Columbia Lions',as:29,hs:48,source:sources.BC},
-            {id:'OTT',away:'Ottawa Redblacks',home:'Toronto Argonauts',as:23,hs:26,source:sources.OTT},
-            {id:'SSK',away:'Saskatchewan Roughriders',home:'Winnipeg Blue Bombers',as:6,hs:19,source:sources.SSK},
-            {id:'MTSU',away:'Middle Tennessee State Blue Raiders',home:'Marshall Herd',as:26,hs:28,source:sources.MTSU},
-            {id:'TAR',away:'Tarleton State Texans',home:'McNeese State Cowboys',as:27,hs:24,source:sources.TAR},
-            {id:'GRAM',away:'Grambling State Tigers',home:'TCU Horned Frogs',as:7,hs:63,source:sources.GRAM},
-            {id:'TUL',away:'Tulsa Golden Hurricane',home:'Sam Houston State Bearkats',as:23,hs:17,source:sources.TUL},
-            {id:'HOLY',away:'Holy Cross Crusaders',home:'Miami Ohio RedHawks',as:7,hs:45,source:sources.HOLY},
-            {id:'APP',away:'Appalachian State Mountaineers',home:'East Carolina Pirates',as:27,hs:24,source:sources.APP}
+          const targets=[
+            'data/history/runs/2026-08-15/evening-152124.json',
+            'data/history/runs/2026-08-15/late-182100.json',
+            'data/history/runs/2026-08-16/open-060831.json',
+            'data/history/runs/2026-08-16/main-080114.json',
+            'data/history/runs/2026-08-16/final_morning-093240.json',
+            'data/history/runs/2026-08-16/evening-154530.json',
+            'data/history/runs/2026-08-16/late-190810.json',
+            'data/history/runs/2026-08-17/open-063217.json',
+            'data/history/runs/2026-08-17/main-080437.json',
+            'data/history/runs/2026-08-17/final_morning-093941.json',
+            'data/history/runs/2026-08-17/evening-152114.json',
+            'data/history/runs/2026-08-17/late-184110.json',
+            'data/history/runs/2026-08-23/late-182521.json'
           ];
-          const aliases=new Map([
-            ['bc lions','british columbia lions'],['miami oh redhawks','miami ohio redhawks'],['miami ohio redhawks','miami ohio redhawks'],
-            ['app state mountaineers','appalachian state mountaineers'],['middle tennessee blue raiders','middle tennessee state blue raiders'],
-            ['sam houston bearkats','sam houston state bearkats'],['mcneese cowboys','mcneese state cowboys'],['tcu horned frogs','tcu horned frogs']
-          ]);
-          function canon(s){const n=norm(s); return aliases.get(n)||n;}
-          function tokens(s){return new Set(canon(s).split(' ').filter(Boolean));}
-          function teamEq(a,b){
-            const x=canon(a),y=canon(b); if(!x||!y)return false; if(x===y||x.includes(y)||y.includes(x))return true;
-            const A=tokens(x),B=tokens(y),common=[...A].filter(t=>B.has(t)).length,small=Math.min(A.size,B.size);
-            return common>=2 && common/small>=0.6;
+          const S={
+            PHI:{name:'StatMuse — Philadelphia 9, Minnesota 1 — 2026-08-15',url:'https://www.statmuse.com/mlb/ask/phillies-vs-twins-last-15-game-log'},
+            MIL:{name:'Baseball-Reference — Milwaukee 4, Los Angeles Dodgers 1 — 2026-08-15',url:'https://www.baseball-reference.com/boxes/LAN/LAN202608150.shtml'},
+            TEX:{name:'StatMuse/AP — Texas 5, Athletics 3 — 2026-08-15',url:'https://www.statmuse.com/mlb/game/8-15-2026-tex-at-ath-235479'},
+            SEA:{name:'Sports Illustrated — Dallas Cowboys 17, Seattle Seahawks 7 — 2026-08-15 preseason',url:'https://www.si.com/nfl/scoreboard/cowboys-vs-seahawks-8-15-2026-351'},
+            KCR:{name:'Baseball-Reference — Los Angeles Angels 1, Kansas City 0 — 2026-08-15',url:'https://www.baseball-reference.com/boxes/ANA/ANA202608150.shtml'},
+            LAFC:{name:'Los Angeles Football Club — San Diego FC 1, LAFC 0 — 2026-08-15',url:'https://www.lafc.com/news/recap-lafc-4-0-san-diego-fc-2026-mls-season-august-15'},
+            CWS:{name:'Baseball-Reference — Chicago White Sox 7, Detroit 5 — 2026-08-16',url:'https://www.baseball-reference.com/boxes/DET/DET202608160.shtml'},
+            IND:{name:'Basketball-Reference — Indiana Fever 95, Atlanta Dream 91 (OT) — 2026-08-16',url:'https://www.basketball-reference.com/wnba/boxscores/202608160ATL.html'},
+            TBR:{name:'StatMuse/AP — Baltimore 10, Tampa Bay 2 — 2026-08-16',url:'https://www.statmuse.com/mlb/game/8-16-2026-bal-at-tbr-235109'},
+            BOS:{name:'CBS News/AP — Pittsburgh 8, Boston 3 — 2026-08-16',url:'https://www.cbsnews.com/pittsburgh/news/red-sox-pirates-score-bryan-reynolds-brandon-lowe/'},
+            POR:{name:'Basketball-Reference — Portland Fire 88, Phoenix Mercury 85 — 2026-08-16',url:'https://www.basketball-reference.com/wnba/boxscores/202608160PHO.html'},
+            VAN:{name:'Seattle Sounders FC — Vancouver Whitecaps 2, Seattle Sounders 0 — 2026-08-16',url:'https://www.soundersfc.com/news/match-recap-sounders-fc-drops-2-0-home-result-to-vancouver-whitecaps-fc'},
+            SDP:{name:'Baseball-Reference — New York Mets 2, San Diego 1 — 2026-08-17',url:'https://www.baseball-reference.com/boxes/NYN/NYN202608170.shtml'},
+            CHC:{name:'Fever Baseball/official MLB feed — Chicago Cubs 7, Chicago White Sox 5 — 2026-08-17',url:'https://www.feverbaseball.com/scorecard/2026-08-17-cws-chc'},
+            LAD:{name:'Baseball-Reference — Los Angeles Dodgers 11, Colorado 5 — 2026-08-17',url:'https://www.baseball-reference.com/boxes/COL/COL202608170.shtml'},
+            DET:{name:'Baseball-Reference — Detroit 8, Pittsburgh 5 — 2026-08-17',url:'https://www.baseball-reference.com/boxes/PIT/PIT202608170.shtml'},
+            GSV:{name:'CBS Sports/AP — Golden State Valkyries 78, Dallas Wings 70 — 2026-08-17',url:'https://www.cbssports.com/wnba/gametracker/live/WNBA_20260817_DAL%40GS/'},
+            ATL:{name:'Baseball-Reference — Minnesota 4, Atlanta 2 — 2026-08-17',url:'https://www.baseball-reference.com/boxes/MIN/MIN202608170.shtml'},
+            BOL:{name:'StatMuse — Lazio 1, Bologna 0 — 2026-08-24',url:'https://www.statmuse.com/fc/match/8-24-2026-bol-vs-laz-112083'},
+            OSA:{name:'StatMuse — Osasuna 0, Levante 0 — 2026-08-24',url:'https://www.statmuse.com/fc/match/8-23-2026-osa-vs-lev-113462'},
+            ROM:{name:'StatMuse — Roma 4, Fiorentina 0 — 2026-08-24',url:'https://www.statmuse.com/fc/match/8-24-2026-rom-vs-fio-112078'},
+            TAL:{name:'ElDoce — Talleres 2, Rosario Central 2 — 2026-08-24',url:'https://artear-eldoce-prod.web.arc-cdn.net/deportes/2026/08/24/un-necesitado-talleres-busca-salir-del-fondo-y-recibe-a-rosario-central-en-el-kempes-tv-y-formaciones/'}
+          };
+          const R={
+            '2026-08-15':{
+              'Philadelphia Phillies moneyline':{away:'Philadelphia Phillies',home:'Minnesota Twins',as:9,hs:1,src:S.PHI},
+              'Milwaukee Brewers moneyline':{away:'Milwaukee Brewers',home:'Los Angeles Dodgers',as:4,hs:1,src:S.MIL},
+              'Texas Rangers moneyline':{away:'Texas Rangers',home:'Athletics',as:5,hs:3,src:S.TEX},
+              'Seattle Seahawks moneyline':{away:'Dallas Cowboys',home:'Seattle Seahawks',as:17,hs:7,src:S.SEA},
+              'Kansas City Royals moneyline':{away:'Kansas City Royals',home:'Los Angeles Angels',as:0,hs:1,src:S.KCR},
+              'Los Angeles FC moneyline':{away:'San Diego FC',home:'Los Angeles FC',as:1,hs:0,src:S.LAFC}
+            },
+            '2026-08-16':{
+              'White Sox ML':{away:'Chicago White Sox',home:'Detroit Tigers',as:7,hs:5,src:S.CWS},
+              'Fever ML':{away:'Indiana Fever',home:'Atlanta Dream',as:95,hs:91,src:S.IND},
+              'Rays ML':{away:'Baltimore Orioles',home:'Tampa Bay Rays',as:10,hs:2,src:S.TBR},
+              'Red Sox ML':{away:'Boston Red Sox',home:'Pittsburgh Pirates',as:3,hs:8,src:S.BOS},
+              'Portland Fire ML':{away:'Portland Fire',home:'Phoenix Mercury',as:88,hs:85,src:S.POR},
+              'Vancouver Whitecaps FC ML':{away:'Vancouver Whitecaps FC',home:'Seattle Sounders FC',as:2,hs:0,src:S.VAN}
+            },
+            '2026-08-17':{
+              'Padres ML':{away:'San Diego Padres',home:'New York Mets',as:1,hs:2,src:S.SDP},
+              'Cubs ML':{away:'Chicago White Sox',home:'Chicago Cubs',as:5,hs:7,src:S.CHC},
+              'Dodgers ML':{away:'Los Angeles Dodgers',home:'Colorado Rockies',as:11,hs:5,src:S.LAD},
+              'Tigers ML':{away:'Detroit Tigers',home:'Pittsburgh Pirates',as:8,hs:5,src:S.DET},
+              'Valkyries -6.5':{away:'Dallas Wings',home:'Golden State Valkyries',as:70,hs:78,src:S.GSV},
+              'Valkyries -5.5':{away:'Dallas Wings',home:'Golden State Valkyries',as:70,hs:78,src:S.GSV},
+              'Braves ML':{away:'Atlanta Braves',home:'Minnesota Twins',as:2,hs:4,src:S.ATL}
+            },
+            '2026-08-23':{
+              'Bologna–Lazio under 2.5':{away:'Lazio',home:'Bologna',as:1,hs:0,src:S.BOL},
+              'Osasuna–Levante under 2.5':{away:'Levante',home:'Osasuna',as:0,hs:0,src:S.OSA},
+              'Roma–Fiorentina over 2.5':{away:'Fiorentina',home:'Roma',as:0,hs:4,src:S.ROM},
+              'Talleres–Rosario Central draw':{away:'Rosario Central',home:'Talleres',as:2,hs:2,src:S.TAL}
+            }
+          };
+          function dateOf(runPath){return runPath.split('/')[3]}
+          function lineValue(rec){const f=rec.feed||{};for(const v of [f.hdp,f.line])if(Number.isFinite(Number(v)))return Number(v);const p=String(f.selectionKey||'').split('|'),tail=p.length>=5?p[4]:null;return tail!==null&&tail!==''&&Number.isFinite(Number(tail))?Number(tail):null}
+          function inferLegacySide(title,result){
+            if(title==='Seattle Seahawks moneyline')return 'home';
+            if(title==='Los Angeles FC moneyline')return 'home';
+            if(title==='Rays ML')return 'home';
+            if(title==='Cubs ML')return 'home';
+            if(title.startsWith('Valkyries '))return 'home';
+            if(title==='Bologna–Lazio under 2.5'||title==='Osasuna–Levante under 2.5')return 'under';
+            if(title==='Roma–Fiorentina over 2.5')return 'over';
+            if(title==='Talleres–Rosario Central draw')return 'draw';
+            return 'away';
           }
-          function parseMeta(meta){
-            const m=String(meta||'').match(/^(?:MLB|NCAAF|NFL|CFL)\s*\|\s*(.+?)\s+at\s+(.+?)\s*\|/i);
-            return m?{away:m[1].trim(),home:m[2].trim()}:null;
-          }
-          function findVerified(rec){const m=parseMeta(rec.meta); if(!m)return null; return verified.find(v=>teamEq(m.away,v.away)&&teamEq(m.home,v.home))||null;}
-          function lineValue(rec){
-            const f=rec.feed||{};
-            for(const v of [f.hdp,f.line]) if(Number.isFinite(Number(v))) return Number(v);
-            const p=String(f.selectionKey||'').split('|'),tail=p.length>=5?p[4]:null;
-            return tail!==null&&tail!==''&&Number.isFinite(Number(tail))?Number(tail):null;
-          }
-          function grade(rec,v){
-            const f=rec.feed||{},key=String(f.marketKey||f.market||'').toLowerCase(),side=String(f.side||'').toLowerCase();
+          function marketKey(rec){const f=rec.feed||{}; if(f.marketKey)return String(f.marketKey).toLowerCase(); if(/under 2\.5|over 2\.5/i.test(rec.title))return 'totals'; if(/draw$/i.test(rec.title))return 'ml'; if(/-[0-9]+(?:\.[0-9]+)?$/.test(rec.title))return 'spread'; return 'ml'}
+          function sideOf(rec,result){return String(rec.feed?.side||inferLegacySide(rec.title,result)).toLowerCase()}
+          function grade(rec,v){const key=marketKey(rec),side=sideOf(rec,v),line=lineValue(rec) ?? (/under 2\.5|over 2\.5/i.test(rec.title)?2.5:(/-(\d+(?:\.\d+)?)$/.test(rec.title)?-Number(rec.title.match(/-(\d+(?:\.\d+)?)$/)[1]):null));
             if(key==='ml'){
-              const s=side==='home'?v.hs:side==='away'?v.as:null,o=side==='home'?v.as:side==='away'?v.hs:null;
-              if(s===null)return null; return s>o?'WIN':s<o?'LOSS':'PUSH';
+              if(side==='draw')return v.as===v.hs?'WIN':'LOSS';
+              const s=side==='home'?v.hs:v.as,o=side==='home'?v.as:v.hs; return s>o?'WIN':s<o?'LOSS':'PUSH';
             }
-            if(key==='spread'||key==='spreads'){
-              const raw=lineValue(rec); if(!Number.isFinite(raw)||!['home','away'].includes(side))return null;
-              const h=side==='home'?raw:-raw,s=side==='home'?v.hs:v.as,o=side==='home'?v.as:v.hs,z=s+h-o;
-              return z>0?'WIN':z<0?'LOSS':'PUSH';
+            if(key==='spread'){
+              const h=side==='home'?line:-line,s=side==='home'?v.hs:v.as,o=side==='home'?v.as:v.hs,z=s+h-o; return z>0?'WIN':z<0?'LOSS':'PUSH';
             }
-            if(key==='total'||key==='totals'){
-              const line=lineValue(rec); if(!Number.isFinite(line)||!['over','under'].includes(side))return null;
-              const total=v.hs+v.as; if(total===line)return 'PUSH'; return side==='over'?(total>line?'WIN':'LOSS'):(total<line?'WIN':'LOSS');
+            if(key==='totals'){
+              const total=v.hs+v.as;if(total===line)return 'PUSH';return side==='over'?(total>line?'WIN':'LOSS'):(total<line?'WIN':'LOSS');
             }
             return null;
           }
-          let closed=0,left=0; const leftTitles=[];
-          for(const f of fs.readdirSync(obsRoot).filter(x=>x.endsWith('.json')).sort()){
-            const op=path.join(obsRoot,f),rp=path.join(runRoot,f),obs=JSON.parse(fs.readFileSync(op,'utf8')),run=JSON.parse(fs.readFileSync(rp,'utf8'));
-            const recMap=new Map((run.recs||[]).map(r=>[r.feed?.selectionKey,r])); let changed=false;
-            for(let i=0;i<(obs.recommendations||[]).length;i++){
-              const item=obs.recommendations[i]; if(item.completion?.state!=='unresolved')continue;
-              const rec=recMap.get(item.selectionKey); if(!rec){left++;leftTitles.push(item.title);continue;}
-              const v=findVerified(rec); if(!v){left++;leftTitles.push(item.title);continue;}
-              const g=grade(rec,v); if(!g){left++;leftTitles.push(item.title);continue;}
-              const old=item.completion||{};
-              obs.recommendations[i]={...item,completion:{state:'complete',verificationState:'verified',grade:g,official:rec.status==='BET',hypothetical:rec.status!=='BET',verifiedAt:NOW,eventId:rec.feed?.eventId||null,finalScore:{home:v.home,away:v.away,homeScore:v.hs,awayScore:v.as},settlementMethod:'final_score',line:lineValue(rec),basis:null,observedValue:null,settlementComponents:null,source:v.source,firstUnresolvedAt:old.firstUnresolvedAt||null,lastVerificationAttemptAt:NOW,verificationAttempts:Number(old.verificationAttempts||0)+1,nextRetryTier:null}};
-              closed++; changed=true;
+          function baseItem(run,rec,old){return {
+            ...(old||{}),title:rec.title,status:rec.status,book:rec.book||null,selectionKey:rec.feed?.selectionKey||old?.selectionKey||null,commenceTime:rec.feed?.eventDate||old?.commenceTime||null,
+            issued:old?.issued||{priceAmerican:rec.price||null,feedGeneratedAt:run.feedGeneratedAt||null},
+            observation:old?.observation||{state:'unavailable',reason:rec.feed?.selectionKey?'price_not_backfilled':'issued_identity_missing'}
+          }}
+          function completed(run,rec,old,v){const g=grade(rec,v);if(!g)throw Error(`cannot grade ${rec.title}`);const prior=old?.completion||{};return {...baseItem(run,rec,old),completion:{state:'complete',verificationState:'verified',grade:g,official:rec.status==='BET',hypothetical:rec.status!=='BET',verifiedAt:NOW,eventId:rec.feed?.eventId||prior.eventId||null,finalScore:{home:v.home,away:v.away,homeScore:v.hs,awayScore:v.as},settlementMethod:'final_score',line:lineValue(rec)??(/under 2\.5|over 2\.5/i.test(rec.title)?2.5:(/-(\d+(?:\.\d+)?)$/.test(rec.title)?-Number(rec.title.match(/-(\d+(?:\.\d+)?)$/)[1]):null)),basis:null,observedValue:null,settlementComponents:null,source:v.src,firstUnresolvedAt:prior.firstUnresolvedAt||null,lastVerificationAttemptAt:NOW,verificationAttempts:Number(prior.verificationAttempts||0)+1,nextRetryTier:null}}}
+          let closed=0,created=0,updated=0;
+          for(const rp of targets){
+            const run=JSON.parse(fs.readFileSync(rp,'utf8')),date=dateOf(rp),op=rp.replace('/runs/','/observations/');
+            fs.mkdirSync(path.dirname(op),{recursive:true});
+            const old=fs.existsSync(op)?JSON.parse(fs.readFileSync(op,'utf8')):null;
+            const oldByKey=new Map((old?.recommendations||[]).map(x=>[x.selectionKey||`title:${x.title}`,x]));
+            const recs=[];
+            for(const rec of run.recs||[]){
+              const key=rec.feed?.selectionKey||`title:${rec.title}`,prior=oldByKey.get(key);
+              if(prior?.completion?.state==='complete'){recs.push(prior);continue;}
+              const v=R[date]?.[rec.title];
+              if(!v){
+                if(prior){recs.push(prior);continue;}
+                recs.push({...baseItem(run,rec,null),completion:{state:'unresolved',verificationState:'unresolved',grade:null,official:false,hypothetical:rec.status!=='BET',verifiedAt:null,eventId:rec.feed?.eventId||null,reason:'result_not_verified',firstUnresolvedAt:NOW,lastVerificationAttemptAt:NOW,verificationAttempts:1,nextRetryTier:'exception'}});continue;
+              }
+              recs.push(completed(run,rec,prior,v));closed++;
             }
-            if(changed) fs.writeFileSync(op,JSON.stringify(obs,null,2)+'\n');
+            const doc={schemaVersion:1,kind:'issued-card-observations',sourceRun:rp,runId:run.ts,slot:run.slot,resultMethod:old?.resultMethod||{lifecycle:'ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE',scoreMarkets:['ml','spread','totals'],spreadHdpSemantics:'raw hdp is the home-side handicap; away selected handicap is the opposite sign',unsupportedMarkets:'remain unresolved unless exact selection verification is supplied',officialOnlyWhenStatus:'BET',issuedReportMutable:false},recommendations:recs};
+            fs.writeFileSync(op,JSON.stringify(doc,null,2)+'\n');if(old)updated++;else created++;
           }
-          console.log(`SUPPORTED EXCEPTION CLOSEOUT: closed=${closed} remaining=${left}`);
-          console.log(`REMAINING TITLES: ${JSON.stringify([...new Set(leftTitles)])}`);
+          console.log(`OLDER BACKLOG CLOSEOUT: closed=${closed} createdSidecars=${created} updatedSidecars=${updated}`);
           NODE
 
       - name: Rebuild downstream results index
@@ -120,18 +164,15 @@ jobs:
           node tools/add-results-player-value.mjs
           node tools/add-results-shadow-v2.mjs
 
-      - name: Verify final Sep 12 grading and strict isolation
+      - name: Verify coverage and strict isolation
         run: |
           node - <<'NODE'
-          const fs=require('fs'),path=require('path'),date='2026-09-12';
-          const runRoot=path.join('data/history/runs',date),obsRoot=path.join('data/history/observations',date);
-          const rf=fs.readdirSync(runRoot).filter(f=>f.endsWith('.json')).sort(),of=fs.readdirSync(obsRoot).filter(f=>f.endsWith('.json')).sort();
-          if(JSON.stringify(rf)!==JSON.stringify(of))throw Error('observation/run file mismatch');
-          let cards=0,complete=0,unresolved=0,w=0,l=0,p=0; const statuses={};
-          for(const f of of){const j=JSON.parse(fs.readFileSync(path.join(obsRoot,f),'utf8')); for(const r of j.recommendations||[]){cards++;statuses[r.status]=(statuses[r.status]||0)+1;if(r.completion?.state==='complete'){complete++;if(r.completion.grade==='WIN')w++;else if(r.completion.grade==='LOSS')l++;else if(r.completion.grade==='PUSH')p++;}else if(r.completion?.state==='unresolved')unresolved++;}}
+          const fs=require('fs');
           const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
-          console.log(`FINAL SEP12: cards=${cards} complete=${complete} unresolved=${unresolved} WIN=${w} LOSS=${l} PUSH=${p} statuses=${JSON.stringify(statuses)}`);
-          console.log(`RESULTS INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents} lastDate=${idx.coverage?.lastDate}`);
+          console.log(`FINAL INDEX: cards=${idx.coverage.cards} complete=${idx.coverage.completeCards} unresolved=${idx.coverage.unresolvedCards} pendingObservationCards=${idx.coverage.pendingObservationCards} unresolvedSelections=${idx.coverage.unresolvedSelections} unresolvedEvents=${idx.coverage.unresolvedEvents} lastDate=${idx.coverage.lastDate}`);
+          console.log(`UNRESOLVED: ${JSON.stringify(idx.unresolved.map(x=>({date:x.date,title:x.title,reason:x.reason})))}`);
+          const d=idx.byDate.find(x=>x.name==='2026-09-12');
+          console.log(`SEP12 INDEX: ${JSON.stringify(d)}`);
           NODE
           bad=$(git diff --name-only | grep -Ev '^(data/history/observations/|data/history/results-index\.json$)' || true)
           if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
@@ -143,5 +184,5 @@ jobs:
           git config user.email "betting-edge-bot@users.noreply.github.com"
           git add data/history/observations data/history/results-index.json
           if git diff --cached --quiet; then echo "No historical grading changes to commit"; exit 0; fi
-          git commit -m "Close verified Sep 12 grading exceptions"
+          git commit -m "Close verified older historical grading backlog"
           git push origin main
