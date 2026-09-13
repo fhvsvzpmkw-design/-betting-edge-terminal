@@ -24,7 +24,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Grade Sep 11 issued cards and retry older unresolved cards
+      - name: Grade Sep 12 issued cards and retry older unresolved cards
         run: |
           node - <<'NODE'
           const fs=require('fs');
@@ -38,7 +38,7 @@ jobs:
           let body=s.slice(a+marker.length,b).split('\n').map(line=>line.startsWith('          ')?line.slice(10):line).join('\n');
           const old="const TARGET_DATE='2026-09-05';";
           if(!body.includes(old)) throw Error('prior TARGET_DATE token not found');
-          body=body.replace(old,"const TARGET_DATE='2026-09-11';");
+          body=body.replace(old,"const TARGET_DATE='2026-09-12';");
 
           // Bound the legacy player-hit token so normal team names such as
           // Chicago White Sox cannot be misclassified as player-prop markets.
@@ -80,7 +80,7 @@ jobs:
         run: |
           node - <<'NODE'
           const fs=require('fs'),path=require('path');
-          const date='2026-09-11';
+          const date='2026-09-12';
           const runRoot=path.join('data/history/runs',date);
           const obsRoot=path.join('data/history/observations',date);
           const runFiles=fs.readdirSync(runRoot).filter(f=>f.endsWith('.json')).sort();
@@ -106,7 +106,7 @@ jobs:
           }
           const idx=JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
           if(idx.coverage?.lastDate!==date) throw Error(`results index lastDate ${idx.coverage?.lastDate}`);
-          console.log(`SEP11 OBSERVATIONS: runs=${obsFiles.length} cards=${cards} complete=${complete} unresolved=${unresolved} WIN=${w} LOSS=${l} PUSH=${push} VOID=${voids} statuses=${JSON.stringify(statuses)}`);
+          console.log(`SEP12 OBSERVATIONS: runs=${obsFiles.length} cards=${cards} complete=${complete} unresolved=${unresolved} WIN=${w} LOSS=${l} PUSH=${push} VOID=${voids} statuses=${JSON.stringify(statuses)}`);
           console.log(`RESULTS INDEX: cards=${idx.coverage?.cards} complete=${idx.coverage?.completeCards} unresolved=${idx.coverage?.unresolvedCards} unresolvedSelections=${idx.coverage?.unresolvedSelections} unresolvedEvents=${idx.coverage?.unresolvedEvents} lastDate=${idx.coverage?.lastDate}`);
           console.log(`PRICE ANALYTICS: pricedCards=${idx.priceAnalytics?.pricedCards} netUnits=${idx.priceAnalytics?.netUnits} roiPct=${idx.priceAnalytics?.roiPct}`);
           NODE
@@ -123,6 +123,6 @@ jobs:
             echo "No historical grading changes to commit"
             exit 0
           fi
-          git commit -m "Close Sep 11 Betting Edge cards and refresh results index"
+          git commit -m "Close Sep 12 Betting Edge cards and refresh results index"
           git pull --rebase origin main
           git push origin main
