@@ -1,0 +1,233 @@
+name: Isolated Betting Edge card grading 2026-09-14
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-14.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-2026-09-14
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Grade previous Vancouver day and older unresolved backlog
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const cp = require('child_process');
+
+          const TARGET = '2026-09-13';
+          const VERIFIED_AT = new Date().toISOString();
+          const runFiles = [
+            'data/history/runs/2026-09-13/open-061524.json',
+            'data/history/runs/2026-09-13/main-081700.json',
+            'data/history/runs/2026-09-13/final_morning-093630.json',
+            'data/history/runs/2026-09-13/evening-153428.json'
+          ];
+
+          function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
+          function norm(s) { return String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]/g, ''); }
+          function sameName(a, b) {
+            const x = norm(a), y = norm(b);
+            if (!x || !y) return false;
+            return x === y || (x.length >= 6 && y.includes(x)) || (y.length >= 6 && x.includes(y));
+          }
+          function eventTeams(run, eventId) {
+            const recs = (run.recs || []).filter(r => String(r?.feed?.eventId || '') === String(eventId));
+            let away = null, home = null;
+            for (const r of recs) {
+              const mk = String(r?.feed?.marketKey || r?.feed?.market || '').toLowerCase();
+              const side = String(r?.feed?.side || '').toLowerCase();
+              if ((mk === 'ml' || mk === 'moneyline') && side === 'away') away = r.title;
+              if ((mk === 'ml' || mk === 'moneyline') && side === 'home') home = r.title;
+            }
+            if (!away || !home) {
+              for (const r of recs) {
+                const meta = String(r.meta || '');
+                const bits = meta.split('|').map(x => x.trim());
+                const matchup = bits.find(x => / at /i.test(x));
+                if (matchup) {
+                  const m = matchup.match(/^(.+?)\s+at\s+(.+)$/i);
+                  if (m) { away ||= m[1].trim(); home ||= m[2].trim(); break; }
+                }
+              }
+            }
+            const sample = recs[0] || {};
+            const sport = String(sample?.coreAssessment?.context?.sport || sample?.feed?.sport || (sample.meta || '').split('|')[0] || '').trim().toUpperCase();
+            return { away, home, sport, recs };
+          }
+          async function fetchJson(url) {
+            const res = await fetch(url, { headers: { 'user-agent': 'Betting-Edge-Historical-Grader/1.0' } });
+            if (!res.ok) throw new Error(`fetch ${url} failed ${res.status}`);
+            return res.json();
+          }
+          function nflTeams(comp) {
+            const cs = comp.competitors || [];
+            const away = cs.find(x => x.homeAway === 'away');
+            const home = cs.find(x => x.homeAway === 'home');
+            return { away, home };
+          }
+          function teamAliases(c) {
+            const t = c?.team || {};
+            return [t.displayName, t.shortDisplayName, t.location, t.name, t.abbreviation].filter(Boolean);
+          }
+          function aliasMatch(issued, competitor) {
+            return teamAliases(competitor).some(x => sameName(issued, x));
+          }
+
+          (async () => {
+            const runs = runFiles.map(p => ({ path: p, run: readJson(p) }));
+            const firstSeen = [];
+            const seen = new Set();
+            const infoByEvent = new Map();
+            for (const { run } of runs) {
+              for (const rec of run.recs || []) {
+                const id = String(rec?.feed?.eventId || '');
+                if (!id || seen.has(id)) continue;
+                seen.add(id);
+                firstSeen.push(id);
+                infoByEvent.set(id, eventTeams(run, id));
+              }
+            }
+
+            const attemptedA = firstSeen.slice(0, 20);
+            const deferredA = firstSeen.slice(20);
+            const verifiedEvents = [];
+            const unresolvedAttempted = [];
+
+            const mlbUrl = 'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-13&hydrate=linescore,team';
+            const nflUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20260913&limit=100';
+            const [mlb, nfl] = await Promise.all([fetchJson(mlbUrl), fetchJson(nflUrl)]);
+            const mlbGames = (mlb.dates || []).flatMap(d => d.games || []);
+            const nflEvents = nfl.events || [];
+
+            for (const id of attemptedA) {
+              const info = infoByEvent.get(id) || {};
+              if (info.sport === 'MLB') {
+                const g = mlbGames.find(g => sameName(info.away, g?.teams?.away?.team?.name) && sameName(info.home, g?.teams?.home?.team?.name));
+                const finalState = String(g?.status?.abstractGameState || g?.status?.detailedState || '').toLowerCase();
+                if (g && finalState.includes('final')) {
+                  verifiedEvents.push({
+                    eventId: id, status: 'final',
+                    away: g.teams.away.team.name, home: g.teams.home.team.name,
+                    awayScore: Number(g.teams.away.score), homeScore: Number(g.teams.home.score),
+                    source: { name: 'MLB official schedule — September 13, 2026', url: mlbUrl }
+                  });
+                } else unresolvedAttempted.push({ id, sport: info.sport, away: info.away, home: info.home, reason: g ? 'event_not_final' : 'result_not_verified' });
+              } else if (info.sport === 'NFL') {
+                const e = nflEvents.find(e => {
+                  const comp = e.competitions?.[0];
+                  const { away, home } = nflTeams(comp || {});
+                  return aliasMatch(info.away, away) && aliasMatch(info.home, home);
+                });
+                const comp = e?.competitions?.[0];
+                const { away, home } = nflTeams(comp || {});
+                const isFinal = Boolean(e?.status?.type?.completed) || /final/i.test(String(e?.status?.type?.description || ''));
+                if (e && away && home && isFinal) {
+                  verifiedEvents.push({
+                    eventId: id, status: 'final',
+                    away: away.team.displayName, home: home.team.displayName,
+                    awayScore: Number(away.score), homeScore: Number(home.score),
+                    source: { name: 'ESPN NFL scoreboard — September 13, 2026', url: 'https://www.espn.com/nfl/scoreboard/_/date/20260913' }
+                  });
+                } else unresolvedAttempted.push({ id, sport: info.sport, away: info.away, home: info.home, reason: e ? 'event_not_final' : 'result_not_verified' });
+              } else {
+                unresolvedAttempted.push({ id, sport: info.sport, away: info.away, home: info.home, reason: 'result_not_verified' });
+              }
+            }
+
+            const v = {
+              verifiedAt: VERIFIED_AT,
+              attemptedEventIds: attemptedA,
+              deferredEventIds: deferredA,
+              events: verifiedEvents
+            };
+            const vf = '/tmp/sep13-verification.json';
+            fs.writeFileSync(vf, JSON.stringify(v, null, 2));
+            for (const { path: rp } of runs) {
+              cp.execFileSync('node', ['tools/verify-issued-results.mjs', rp, vf], { stdio: 'inherit' });
+              cp.execFileSync('node', ['tools/observe-issued-prices.mjs', rp], { stdio: 'inherit' });
+            }
+
+            // Older unresolved Bucket B: retry the one durable older unresolved event present entering this run.
+            const idx = readJson('data/history/results-index.json');
+            const older = (idx.unresolved || []).filter(x => x.date < TARGET);
+            const olderEvents = [...new Set(older.map(x => String(x.eventId || '')).filter(Boolean))].slice(0, 10);
+            let backlogAttempted = 0, backlogClosedEvents = 0;
+            if (olderEvents.includes('70923746')) {
+              backlogAttempted += 1;
+              const oldRun = 'data/history/runs/2026-09-12/evening-152000.json';
+              const ov = {
+                verifiedAt: VERIFIED_AT,
+                attemptedEventIds: ['70923746'],
+                events: [{
+                  eventId: '70923746', status: 'final',
+                  away: 'North Alabama Lions', home: 'Southeastern Louisiana Lions',
+                  awayScore: 25, homeScore: 30,
+                  source: {
+                    name: 'University of North Alabama Athletics — Southeastern Louisiana 30, North Alabama 25 — September 12, 2026',
+                    url: 'https://roarlions.com/news/2026/9/12/football-stumbles-at-southeastern-louisiana-30-25.aspx'
+                  }
+                }]
+              };
+              const ovf = '/tmp/sep12-backlog-verification.json';
+              fs.writeFileSync(ovf, JSON.stringify(ov, null, 2));
+              cp.execFileSync('node', ['tools/verify-issued-results.mjs', oldRun, ovf], { stdio: 'inherit' });
+              backlogClosedEvents += 1;
+            }
+
+            console.log(`BUCKET_A unique=${firstSeen.length} attempted=${attemptedA.length} verifiedFinal=${verifiedEvents.length} deferred=${deferredA.length}`);
+            console.log(`BUCKET_A attempted ids=${attemptedA.join(',')}`);
+            console.log(`BUCKET_A deferred ids=${deferredA.join(',')}`);
+            console.log(`BUCKET_A unresolved attempted=${JSON.stringify(unresolvedAttempted)}`);
+            console.log(`BUCKET_B unresolvedCardsEntering=${older.length} uniqueEventsEntering=${olderEvents.length} attempted=${backlogAttempted} closedEvents=${backlogClosedEvents}`);
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify coverage and strict isolation
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const idx = JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          const d = idx.byDate.find(x => x.name === '2026-09-13');
+          const older = (idx.unresolved || []).filter(x => x.date < '2026-09-13');
+          console.log(`FINAL INDEX cards=${idx.coverage.cards} complete=${idx.coverage.completeCards} unresolved=${idx.coverage.unresolvedCards} pendingObservationCards=${idx.coverage.pendingObservationCards} unresolvedSelections=${idx.coverage.unresolvedSelections} unresolvedEvents=${idx.coverage.unresolvedEvents} observedThrough=${idx.coverage.observedThroughDate}`);
+          console.log(`SEP13=${JSON.stringify(d)}`);
+          console.log(`OLDER_UNRESOLVED=${JSON.stringify(older.map(x=>({date:x.date,eventId:x.eventId,title:x.title,reason:x.reason})))}`);
+          const quotaDeferred = (idx.unresolved || []).filter(x => x.date === '2026-09-13' && x.reason === 'verification_deferred_event_cap');
+          const genuine = (idx.unresolved || []).filter(x => x.reason !== 'verification_deferred_event_cap');
+          console.log(`REMAINING quotaDeferredCards=${quotaDeferred.length} genuineUnresolvedCards=${genuine.length}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit historical grading outputs only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations data/history/results-index.json
+          if git diff --cached --quiet; then echo "No historical grading changes to commit"; exit 0; fi
+          git commit -m "Grade September 13 issued cards and retry older unresolved"
+          git push origin main
