@@ -65,6 +65,7 @@ export function inspectCase(c,gate,registry,provenance={}){
   const unavailablePlayer=lookupPlayer(registry,c.player,c.playerEaId);
   const replacements=candidates.map(p=>lookupPlayer(registry,p.player,p.eaPlayerId));
   const gaps=[unavailablePlayer,...replacements].filter(p=>p.status!=='FOUND').map(p=>({player:p.requestedPlayer,status:p.status}));
+  for(const g of gaps)if(['IDENTITY_CONFLICT','AMBIGUOUS'].includes(g.status))errors.push(`LOOKUP_IDENTITY_UNRESOLVED:${g.player}`);
   const roleResolved=c.resolutionStatus==='RESOLVED_ONE_FOR_ONE';
   const state=errors.length?'RESEARCH_INCOMPLETE':gaps.length?'LOOKUP_GAP':roleResolved?'READY_FOR_GOVERNED_CALCULATOR':'ROLE_OR_COMMITTEE_UNRESOLVED';
   return {schema:1,state,errors,lookupGaps:gaps,unavailablePlayer,replacements,...provenance,marketViewed:false,numericAuthority:false};
@@ -109,7 +110,7 @@ function selfTest(){
   test('false lookup flag is incomplete',()=>{const c=copy();c.closureReview.candidateValuesChecked=false;assert.equal(check(c).state,'RESEARCH_INCOMPLETE');});
   test('all named candidates checked',()=>{const c=copy();c.replacementCandidates=['Replacement','Other'];assert.equal(check(c).replacements.length,2);assert.equal(check(c).state,'RESEARCH_INCOMPLETE');});
   test('consistent duplicates deduplicated',()=>{const c=copy();c.replacementCandidates=['Replacement'];assert.equal(check(c).replacements.length,1);});
-  test('identity conflict not numeric',()=>{const c=copy();c.replacementEaId='1';assert.equal(check(c).state,'LOOKUP_GAP');});
+  test('identity conflict prevents staging',()=>{const c=copy();c.replacementEaId='1';assert.equal(check(c).state,'RESEARCH_INCOMPLETE');});
   test('missing value is not zero',()=>assert.equal(lookupPlayer(registry,'No value','4').waltersPoints,null));
   test('missing player explicit',()=>assert.equal(lookupPlayer(registry,'Absent').status,'NOT_FOUND'));
   test('ambiguous name explicit',()=>assert.equal(lookupPlayer({players:[...registry.players,registry.players[0]]},'Starter').status,'AMBIGUOUS'));
