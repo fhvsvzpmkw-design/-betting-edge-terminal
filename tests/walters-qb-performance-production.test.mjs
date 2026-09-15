@@ -433,8 +433,8 @@ test('a newly unresolved starter fails closed without guessing or removing the l
       productionId: production.productionId,
       batchId: 'test-sea-unresolved-v1',
       effectiveAt: '2026-09-03T08:00:00-07:00',
-      season: 2026,
-      week: 1,
+      season: Number(active.season),
+      week: Number(active.week),
       sourceTask: 'TEST',
       marketViewed: false,
       cases: [{
@@ -478,8 +478,8 @@ test('market-contaminated staging is rejected before any board write', () => {
       productionId: production.productionId,
       batchId: 'test-market-contamination-v1',
       effectiveAt: '2026-09-03T08:00:00-07:00',
-      season: 2026,
-      week: 1,
+      season: Number(active.season),
+      week: Number(active.week),
       sourceTask: 'TEST',
       marketViewed: false,
       cases: [{
