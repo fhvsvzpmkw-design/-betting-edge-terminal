@@ -1,923 +1,140 @@
 {
   "schema": 1,
-  "state": "APPLIED",
+  "state": "READY",
   "auditType": "WALTERS_WEEKLY_90_10",
-  "auditId": "walters-weekly-90-10-2026-w01-to-w02-20260915T100223-0700",
+  "auditId": "walters-weekly-90-10-recovery-2026-w01-to-w02-20260915T105300-0700",
   "season": 2026,
   "sourceWeek": 1,
   "targetWeek": 2,
-  "effectiveAt": "2026-09-15T10:02:23-07:00",
-  "retryPreparedAt": "2026-09-15T10:18:00-07:00",
+  "effectiveAt": "2026-09-15T10:53:00-07:00",
+  "resume": true,
   "marketViewed": false,
-  "formulaIds": [
-    "BW-R016",
-    "BW-R017",
-    "BW-R018"
+  "formulaIds": ["BW-R016", "BW-R017", "BW-R018"],
+  "purpose": "Reconcile the existing partial Week 1 to Week 2 Walters update. Verify and preserve the six already-applied paired results, record targeted historical evidence findings for the ten blocked games, and update no additional rating unless both governed game-day injury inputs are supportable. This attempt has zero newly eligible games. No current-week fair construction is authorized.",
+  "sourceRefs": [
+    "data/walters/nfl/active-week.json",
+    "data/walters/nfl/2026/week-01-current-numbers.json",
+    "data/walters/nfl/2026/week-01-personnel-ledger.json",
+    "https://www.nfl.com/schedules/2026/by-week/week-1",
+    "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+    "ChatGPT File Library: walters-full-analysis-v1.0.md // weekly learning",
+    "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
+    "ChatGPT File Library: walters-rule-registry-v0.1.json // BW-R016 BW-R017 BW-R018"
   ],
-  "purpose": "Apply the source-exact Walters completed-game TGPL and 90/10 weekly power-rating update for resolved Week 1 games only. Fail closed by whole game when a required replacement-aware game-day injury-loss input is unresolved.",
+  "evidenceReview": {
+    "recordedAt": "2026-09-15T10:53:00-07:00",
+    "priorPersonnelBlobSha": "c5a2612146b82a60c826044bd4c3b6c2dee37a94",
+    "priorScheduleBlobSha": "05504980f7b62c55c603f8f4d3a84d076162dbde",
+    "sourceWeek": 1,
+    "targetWeek": 2,
+    "result": "NO_NEW_GOVERNED_GAME_DAY_INJURY_VALUES",
+    "note": "Authoritative final scores were revalidated and targeted official injury/role sources reviewed. No archived personnel value was changed. Participation or committee reporting alone does not authorize new workload weights, impairment fractions, locked player values, or replacement-loss arithmetic. Missing values remain unknown, not zero. The preserved prior-week personnel record was last updated September 13 at 07:18 Pacific. Historical numeric closure must use the existing governed valuation permissions with an additive prior-game evidence record; archived Week 1 cases must not be submitted through an active-Week-2-only production path.",
+    "marketViewed": false
+  },
+  "priorWeekCompletion": {
+    "season": 2026,
+    "week": 1,
+    "state": "COMPLETE",
+    "sourceRefs": ["https://www.nfl.com/schedules/2026/by-week/week-1"],
+    "finals": [
+      {"gameKey":"2026-W01-NE-SEA","away":"NE","home":"SEA","state":"FINAL","awayScore":10,"homeScore":13},
+      {"gameKey":"2026-W01-SF-LAR","away":"SF","home":"LAR","state":"FINAL","awayScore":27,"homeScore":7},
+      {"gameKey":"2026-W01-CHI-CAR","away":"CHI","home":"CAR","state":"FINAL","awayScore":59,"homeScore":37},
+      {"gameKey":"2026-W01-TB-CIN","away":"TB","home":"CIN","state":"FINAL","awayScore":27,"homeScore":33},
+      {"gameKey":"2026-W01-NO-DET","away":"NO","home":"DET","state":"FINAL","awayScore":30,"homeScore":31},
+      {"gameKey":"2026-W01-BUF-HOU","away":"BUF","home":"HOU","state":"FINAL","awayScore":36,"homeScore":31},
+      {"gameKey":"2026-W01-BAL-IND","away":"BAL","home":"IND","state":"FINAL","awayScore":41,"homeScore":23},
+      {"gameKey":"2026-W01-CLE-JAX","away":"CLE","home":"JAX","state":"FINAL","awayScore":10,"homeScore":34},
+      {"gameKey":"2026-W01-ATL-PIT","away":"ATL","home":"PIT","state":"FINAL","awayScore":13,"homeScore":20},
+      {"gameKey":"2026-W01-NYJ-TEN","away":"NYJ","home":"TEN","state":"FINAL","awayScore":23,"homeScore":10},
+      {"gameKey":"2026-W01-ARI-LAC","away":"ARI","home":"LAC","state":"FINAL","awayScore":26,"homeScore":14},
+      {"gameKey":"2026-W01-MIA-LV","away":"MIA","home":"LV","state":"FINAL","awayScore":13,"homeScore":27},
+      {"gameKey":"2026-W01-GB-MIN","away":"GB","home":"MIN","state":"FINAL","awayScore":22,"homeScore":39},
+      {"gameKey":"2026-W01-WAS-PHI","away":"WAS","home":"PHI","state":"FINAL","awayScore":22,"homeScore":24},
+      {"gameKey":"2026-W01-DAL-NYG","away":"DAL","home":"NYG","state":"FINAL","awayScore":20,"homeScore":28},
+      {"gameKey":"2026-W01-DEN-KC","away":"DEN","home":"KC","state":"FINAL","awayScore":10,"homeScore":31}
+    ]
+  },
   "games": [
     {
-      "gameKey": "2026-W01-NE-SEA",
-      "away": "NE",
-      "home": "SEA",
-      "status": "BLOCKED",
-      "reasons": [
-        "Required replacement-aware game-day injury-loss inputs are unresolved: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Preserve both team ratings rather than inventing values."
+      "gameKey":"2026-W01-NE-SEA","away":"NE","home":"SEA","status":"BLOCKED",
+      "reasons":[
+        "GAME_DAY_INJURY_VALUES_UNRESOLVED: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Final availability information does not by itself resolve replacement-aware point values for all required cases.",
+        "RECOVERY_ACTION: Reconcile final Week 1 availability and exact replacement roles with the preserved governed personnel cases; append validated values or supported full-availability closures under existing permissions. Preserve both ratings until both team-level injury inputs are complete."
       ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.nfl.com/news/nfl-kickoff-game-inactives-new-england-patriots-at-seattle-seahawks"]
     },
     {
-      "gameKey": "2026-W01-SF-LAR",
-      "away": "SF",
-      "home": "LAR",
-      "status": "BLOCKED",
-      "reasons": [
-        "Required replacement-aware game-day injury-loss inputs are unresolved: SF Alfred Collins remains an unresolved role committee; LAR Aaron Donald is recorded with a player-lookup failure despite a resolved one-for-one role. Preserve both ratings."
+      "gameKey":"2026-W01-SF-LAR","away":"SF","home":"LAR","status":"BLOCKED",
+      "reasons":[
+        "ROLE_AND_LOCKED_VALUE_GAPS: SF Alfred Collins remains an unresolved replacement-role committee. LAR Aaron Donald has a preserved player-lookup failure; reporting about an exact replacement does not create a missing locked player value.",
+        "RECOVERY_ACTION: Resolve Collins through an authorized replacement classification and address Donald's exact player identity/registry coverage through a governed correction. Do not copy a different player's value or assign zero. Preserve both ratings."
       ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.49ers.com/news/alfred-collins-out-james-thomas-jr-questionable-vs-rams-injury-report-ahead-of-sfvslar"]
     },
     {
-      "gameKey": "2026-W01-CHI-CAR",
-      "away": "CHI",
-      "home": "CAR",
-      "status": "READY",
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-1",
-        "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md"
+      "gameKey":"2026-W01-NO-DET","away":"NO","home":"DET","status":"BLOCKED",
+      "reasons":[
+        "GAME_DAY_INJURY_VALUES_UNRESOLVED: NO Jordyn Tyson, Bryan Bresee and Dillon Radunz lack complete governed replacement-aware Week 1 losses. Detroit's resolved inputs do not make the opposing injury input known.",
+        "RECOVERY_ACTION: Establish the actual prior-game roles and supported replacements, including required cluster context, and append approved historical valuations. Preserve both ratings until the New Orleans input is complete."
       ],
-      "teams": [
-        {
-          "team": "CHI",
-          "opponent": "CAR",
-          "oldRating": 26,
-          "opponentOldRating": 22,
-          "scoreMargin": 22,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        },
-        {
-          "team": "CAR",
-          "opponent": "CHI",
-          "oldRating": 22,
-          "opponentOldRating": 26,
-          "scoreMargin": -22,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        }
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.nfl.com/news/nfl-week-1-injury-report-2026-season","https://www.neworleanssaints.com/team/players-roster/"]
     },
     {
-      "gameKey": "2026-W01-TB-CIN",
-      "away": "TB",
-      "home": "CIN",
-      "status": "READY",
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-1",
-        "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md"
+      "gameKey":"2026-W01-BUF-HOU","away":"BUF","home":"HOU","status":"BLOCKED",
+      "reasons":[
+        "REPLACEMENT_COMMITTEE_UNRESOLVED: HOU Jayden Higgins is unavailable, but the preserved Boutte/Hutchinson/Noel role mapping has no governed complete replacement-aware game-day value.",
+        "RECOVERY_ACTION: Resolve the actual replacement role under existing one-for-one or authorized value-invariant-committee rules, excluding existing baseline contributors. Participation alone is not an authorized weighted committee model. Preserve both ratings."
       ],
-      "teams": [
-        {
-          "team": "TB",
-          "opponent": "CIN",
-          "oldRating": 23,
-          "opponentOldRating": 24,
-          "scoreMargin": -6,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        },
-        {
-          "team": "CIN",
-          "opponent": "TB",
-          "oldRating": 24,
-          "opponentOldRating": 23,
-          "scoreMargin": 6,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        }
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.nfl.com/news/texans-wr-jayden-higgins-torn-acl-out-2026-season"]
     },
     {
-      "gameKey": "2026-W01-NO-DET",
-      "away": "NO",
-      "home": "DET",
-      "status": "BLOCKED",
-      "reasons": [
-        "New Orleans has unresolved replacement-aware Week 1 injury-loss cases for Jordyn Tyson, Bryan Bresee and Dillon Radunz. Detroit's resolved losses cannot be paired with an invented New Orleans value, so both ratings are preserved."
+      "gameKey":"2026-W01-ATL-PIT","away":"ATL","home":"PIT","status":"BLOCKED",
+      "reasons":[
+        "MULTIROLE_AVAILABILITY_VALUES_UNRESOLVED: ATL Jalon Walker and James Pearce Jr. have no complete governed replacement-aware Week 1 loss. Walker's responsibilities span multiple roles, not a safely inferred one-for-one replacement.",
+        "RECOVERY_ACTION: Resolve both historical availability cases and obtain an authorized multi-role/cluster valuation where required. Do not invent workload shares from snap counts. Preserve both ratings."
       ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season"]
     },
     {
-      "gameKey": "2026-W01-BUF-HOU",
-      "away": "BUF",
-      "home": "HOU",
-      "status": "BLOCKED",
-      "reasons": [
-        "Houston's Jayden Higgins Week 1 replacement role remains an unresolved committee, so the required replacement-aware game-day injury loss is unsupported. Preserve both ratings."
+      "gameKey":"2026-W01-MIA-LV","away":"MIA","home":"LV","status":"BLOCKED",
+      "reasons":[
+        "REPLACEMENT_COMMITTEE_UNRESOLVED: LV Brock Bowers' absence is confirmed, but multiple tight ends covering his responsibilities do not establish a governed single replacement value or authorized committee loss.",
+        "RECOVERY_ACTION: Resolve the prior-game Bowers role through existing personnel/M4 permissions with baseline-double-count review. Do not automatically credit Michael Mayer's full baseline value or invent workload weights. Preserve both ratings."
       ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.raiders.com/news/las-vegas-raiders-miami-dolphins-nfl-week-1-2026-injury-report"]
     },
     {
-      "gameKey": "2026-W01-BAL-IND",
-      "away": "BAL",
-      "home": "IND",
-      "status": "READY",
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-1",
-        "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md"
+      "gameKey":"2026-W01-GB-MIN","away":"GB","home":"MIN","status":"BLOCKED",
+      "reasons":[
+        "REPLACEMENT_COMMITTEE_UNRESOLVED: GB Josh Jacobs' preserved Week 1 case lacks a supported replacement-aware backfield loss.",
+        "RECOVERY_ACTION: Verify final game-day availability and actual replacement responsibilities, then apply only existing approved one-for-one or value-invariant-committee rules with running-back cluster review where required. Preserve both ratings."
       ],
-      "teams": [
-        {
-          "team": "BAL",
-          "opponent": "IND",
-          "oldRating": 28.5,
-          "opponentOldRating": 23,
-          "scoreMargin": 18,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "team": "IND",
-          "opponent": "BAL",
-          "oldRating": 23,
-          "opponentOldRating": 28.5,
-          "scoreMargin": -18,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        }
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"]
     },
     {
-      "gameKey": "2026-W01-CLE-JAX",
-      "away": "CLE",
-      "home": "JAX",
-      "status": "READY",
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-1",
-        "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md"
+      "gameKey":"2026-W01-WAS-PHI","away":"WAS","home":"PHI","status":"BLOCKED",
+      "reasons":[
+        "GAME_DAY_INJURY_VALUES_UNRESOLVED: WAS Jer'Zhan Newton and Dorance Armstrong lack complete governed replacement-aware Week 1 availability losses. The already-resolved Laremy Tunsil value alone is insufficient.",
+        "RECOVERY_ACTION: Reconcile the prior-game defensive-front roles and approved replacements, including cluster treatment, before constructing a complete Washington injury input. Preserve both ratings."
       ],
-      "teams": [
-        {
-          "team": "CLE",
-          "opponent": "JAX",
-          "oldRating": 20.5,
-          "opponentOldRating": 24,
-          "scoreMargin": -24,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        },
-        {
-          "team": "JAX",
-          "opponent": "CLE",
-          "oldRating": 24,
-          "opponentOldRating": 20.5,
-          "scoreMargin": 24,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        }
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.commanders.com/news/commanders-release-2026-unofficial-depth-chart","https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"]
     },
     {
-      "gameKey": "2026-W01-ATL-PIT",
-      "away": "ATL",
-      "home": "PIT",
-      "status": "BLOCKED",
-      "reasons": [
-        "Atlanta has unresolved replacement-aware Week 1 injury/availability losses for Jalon Walker and James Pearce Jr. Preserve both ratings rather than estimating their replacement values."
+      "gameKey":"2026-W01-DAL-NYG","away":"DAL","home":"NYG","status":"BLOCKED",
+      "reasons":[
+        "PRIOR_ROLE_AND_INJURY_VALUE_UNRESOLVED: NYG Darius Slayton's preserved Week 1 replacement case is not numerically resolved. Dallas's supported personnel losses do not complete the opposing team input.",
+        "RECOVERY_ACTION: Verify Slayton's actual Week 1 roster/availability/role identity and whether the preserved case requires an additive correction; use an approved replacement-aware value or explicitly supported no-loss closure, never assume zero from a missing or stale case. Preserve both ratings."
       ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"]
     },
     {
-      "gameKey": "2026-W01-NYJ-TEN",
-      "away": "NYJ",
-      "home": "TEN",
-      "status": "READY",
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-1",
-        "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md"
+      "gameKey":"2026-W01-DEN-KC","away":"DEN","home":"KC","status":"BLOCKED",
+      "reasons":[
+        "UNSUPPORTED_MANUAL_INJURY_ADJUSTMENT: KC Josh Simmons has a governed 0.9-point loss, but DEN Jonathon Cooper is represented only by a manual half-point adjustment without a supported replacement-aware game-day loss. Reporting identifies multiple replacement options rather than an authorized numerical closure.",
+        "RECOVERY_ACTION: Validate Cooper's actual prior-game replacement role and apply existing approved locked-value/committee rules. Do not relabel the manual 0.5-point game adjustment as injury loss. Preserve both ratings."
       ],
-      "teams": [
-        {
-          "team": "NYJ",
-          "opponent": "TEN",
-          "oldRating": 18.5,
-          "opponentOldRating": 20.5,
-          "scoreMargin": 13,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        },
-        {
-          "team": "TEN",
-          "opponent": "NYJ",
-          "oldRating": 20.5,
-          "opponentOldRating": 18.5,
-          "scoreMargin": -13,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json"
-          ]
-        }
-      ]
-    },
-    {
-      "gameKey": "2026-W01-ARI-LAC",
-      "away": "ARI",
-      "home": "LAC",
-      "status": "READY",
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-1",
-        "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md"
-      ],
-      "teams": [
-        {
-          "team": "ARI",
-          "opponent": "LAC",
-          "oldRating": 17.5,
-          "opponentOldRating": 24.5,
-          "scoreMargin": 12,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0.7,
-          "teamLocationAdvantage": -2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "team": "LAC",
-          "opponent": "ARI",
-          "oldRating": 24.5,
-          "opponentOldRating": 17.5,
-          "scoreMargin": -12,
-          "teamInjuryLoss": 0.7,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082,
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        }
-      ]
-    },
-    {
-      "gameKey": "2026-W01-MIA-LV",
-      "away": "MIA",
-      "home": "LV",
-      "status": "BLOCKED",
-      "reasons": [
-        "Las Vegas' Brock Bowers Week 1 replacement role remains unresolved, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
-      ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
-    },
-    {
-      "gameKey": "2026-W01-GB-MIN",
-      "away": "GB",
-      "home": "MIN",
-      "status": "BLOCKED",
-      "reasons": [
-        "Green Bay's Josh Jacobs Week 1 replacement role remains an unresolved backfield committee, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
-      ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
-    },
-    {
-      "gameKey": "2026-W01-WAS-PHI",
-      "away": "WAS",
-      "home": "PHI",
-      "status": "BLOCKED",
-      "reasons": [
-        "Washington has unresolved replacement-aware Week 1 injury/availability losses for Jer'Zhan Newton and Dorance Armstrong. The resolved Laremy Tunsil loss cannot make the team-level injury input complete, so both ratings are preserved."
-      ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
-    },
-    {
-      "gameKey": "2026-W01-DAL-NYG",
-      "away": "DAL",
-      "home": "NYG",
-      "status": "BLOCKED",
-      "reasons": [
-        "New York's Darius Slayton Week 1 replacement role remains unresolved. Dallas has resolved numeric personnel losses, but the opposing team injury input is incomplete, so both ratings are preserved."
-      ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
-    },
-    {
-      "gameKey": "2026-W01-DEN-KC",
-      "away": "DEN",
-      "home": "KC",
-      "status": "BLOCKED",
-      "reasons": [
-        "Kansas City's Josh Simmons loss is resolved at 0.9 points, but Denver's Jonathon Cooper absence is represented only by a manual half-point game adjustment without a supported replacement-aware injury-loss value. Under the 90/10 input rule, that is insufficient; preserve both ratings."
-      ],
-      "sourceRefs": [
-        "data/walters/nfl/2026/week-01-current-numbers.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json"
-      ]
+      "sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json","data/walters/nfl/2026/week-01-personnel-ledger.json","https://www.denverbroncos.com/schedule/","https://www.milehighreport.com/denver-broncos-news/184357/broncos-week-1-53-man-roster-stock-up-stock-down"]
     }
-  ],
-  "appliedAt": "2026-09-15T10:02:23-07:00",
-  "result": {
-    "state": "PARTIAL_BLOCKED",
-    "ratingChanges": [
-      {
-        "team": "CHI",
-        "gameKey": "2026-W01-CHI-CAR",
-        "priorRating": 26,
-        "tgpl": 46.082,
-        "delta": 2.0082,
-        "currentRating": 28.0082,
-        "tgplInputs": {
-          "scoreMargin": 22,
-          "opponentOldRating": 22,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "CAR",
-        "gameKey": "2026-W01-CHI-CAR",
-        "priorRating": 22,
-        "tgpl": 1.918,
-        "delta": -2.0082,
-        "currentRating": 19.9918,
-        "tgplInputs": {
-          "scoreMargin": -22,
-          "opponentOldRating": 26,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "TB",
-        "gameKey": "2026-W01-TB-CIN",
-        "priorRating": 23,
-        "tgpl": 20.082,
-        "delta": -0.2918,
-        "currentRating": 22.7082,
-        "tgplInputs": {
-          "scoreMargin": -6,
-          "opponentOldRating": 24,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "CIN",
-        "gameKey": "2026-W01-TB-CIN",
-        "priorRating": 24,
-        "tgpl": 26.918,
-        "delta": 0.2918,
-        "currentRating": 24.2918,
-        "tgplInputs": {
-          "scoreMargin": 6,
-          "opponentOldRating": 23,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "BAL",
-        "gameKey": "2026-W01-BAL-IND",
-        "priorRating": 28.5,
-        "tgpl": 43.082,
-        "delta": 1.4582,
-        "currentRating": 29.9582,
-        "tgplInputs": {
-          "scoreMargin": 18,
-          "opponentOldRating": 23,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "IND",
-        "gameKey": "2026-W01-BAL-IND",
-        "priorRating": 23,
-        "tgpl": 8.418,
-        "delta": -1.4582,
-        "currentRating": 21.5418,
-        "tgplInputs": {
-          "scoreMargin": -18,
-          "opponentOldRating": 28.5,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "CLE",
-        "gameKey": "2026-W01-CLE-JAX",
-        "priorRating": 20.5,
-        "tgpl": 2.082,
-        "delta": -1.8418,
-        "currentRating": 18.6582,
-        "tgplInputs": {
-          "scoreMargin": -24,
-          "opponentOldRating": 24,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "JAX",
-        "gameKey": "2026-W01-CLE-JAX",
-        "priorRating": 24,
-        "tgpl": 42.418,
-        "delta": 1.8418,
-        "currentRating": 25.8418,
-        "tgplInputs": {
-          "scoreMargin": 24,
-          "opponentOldRating": 20.5,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "NYJ",
-        "gameKey": "2026-W01-NYJ-TEN",
-        "priorRating": 18.5,
-        "tgpl": 35.582,
-        "delta": 1.7082,
-        "currentRating": 20.2082,
-        "tgplInputs": {
-          "scoreMargin": 13,
-          "opponentOldRating": 20.5,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": -2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "TEN",
-        "gameKey": "2026-W01-NYJ-TEN",
-        "priorRating": 20.5,
-        "tgpl": 3.418,
-        "delta": -1.7082,
-        "currentRating": 18.7918,
-        "tgplInputs": {
-          "scoreMargin": -13,
-          "opponentOldRating": 18.5,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "ARI",
-        "gameKey": "2026-W01-ARI-LAC",
-        "priorRating": 17.5,
-        "tgpl": 37.882,
-        "delta": 2.0382,
-        "currentRating": 19.5382,
-        "tgplInputs": {
-          "scoreMargin": 12,
-          "opponentOldRating": 24.5,
-          "teamInjuryLoss": 0,
-          "opponentInjuryLoss": 0.7,
-          "teamLocationAdvantage": -2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      },
-      {
-        "team": "LAC",
-        "gameKey": "2026-W01-ARI-LAC",
-        "priorRating": 24.5,
-        "tgpl": 4.118,
-        "delta": -2.0382,
-        "currentRating": 22.4618,
-        "tgplInputs": {
-          "scoreMargin": -12,
-          "opponentOldRating": 17.5,
-          "teamInjuryLoss": 0.7,
-          "opponentInjuryLoss": 0,
-          "teamLocationAdvantage": 2.082
-        },
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "https://www.nfl.com/schedules/2026/by-week/week-1",
-          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md"
-        ]
-      }
-    ],
-    "successfulGames": [
-      "2026-W01-CHI-CAR",
-      "2026-W01-TB-CIN",
-      "2026-W01-BAL-IND",
-      "2026-W01-CLE-JAX",
-      "2026-W01-NYJ-TEN",
-      "2026-W01-ARI-LAC"
-    ],
-    "blockedGames": [
-      {
-        "gameKey": "2026-W01-NE-SEA",
-        "away": "NE",
-        "home": "SEA",
-        "reasons": [
-          "Required replacement-aware game-day injury-loss inputs are unresolved: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Preserve both team ratings rather than inventing values."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-SF-LAR",
-        "away": "SF",
-        "home": "LAR",
-        "reasons": [
-          "Required replacement-aware game-day injury-loss inputs are unresolved: SF Alfred Collins remains an unresolved role committee; LAR Aaron Donald is recorded with a player-lookup failure despite a resolved one-for-one role. Preserve both ratings."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-NO-DET",
-        "away": "NO",
-        "home": "DET",
-        "reasons": [
-          "New Orleans has unresolved replacement-aware Week 1 injury-loss cases for Jordyn Tyson, Bryan Bresee and Dillon Radunz. Detroit's resolved losses cannot be paired with an invented New Orleans value, so both ratings are preserved."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-BUF-HOU",
-        "away": "BUF",
-        "home": "HOU",
-        "reasons": [
-          "Houston's Jayden Higgins Week 1 replacement role remains an unresolved committee, so the required replacement-aware game-day injury loss is unsupported. Preserve both ratings."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-ATL-PIT",
-        "away": "ATL",
-        "home": "PIT",
-        "reasons": [
-          "Atlanta has unresolved replacement-aware Week 1 injury/availability losses for Jalon Walker and James Pearce Jr. Preserve both ratings rather than estimating their replacement values."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-MIA-LV",
-        "away": "MIA",
-        "home": "LV",
-        "reasons": [
-          "Las Vegas' Brock Bowers Week 1 replacement role remains unresolved, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-GB-MIN",
-        "away": "GB",
-        "home": "MIN",
-        "reasons": [
-          "Green Bay's Josh Jacobs Week 1 replacement role remains an unresolved backfield committee, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-WAS-PHI",
-        "away": "WAS",
-        "home": "PHI",
-        "reasons": [
-          "Washington has unresolved replacement-aware Week 1 injury/availability losses for Jer'Zhan Newton and Dorance Armstrong. The resolved Laremy Tunsil loss cannot make the team-level injury input complete, so both ratings are preserved."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-DAL-NYG",
-        "away": "DAL",
-        "home": "NYG",
-        "reasons": [
-          "New York's Darius Slayton Week 1 replacement role remains unresolved. Dallas has resolved numeric personnel losses, but the opposing team injury input is incomplete, so both ratings are preserved."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-DEN-KC",
-        "away": "DEN",
-        "home": "KC",
-        "reasons": [
-          "Kansas City's Josh Simmons loss is resolved at 0.9 points, but Denver's Jonathon Cooper absence is represented only by a manual half-point game adjustment without a supported replacement-aware injury-loss value. Under the 90/10 input rule, that is insufficient; preserve both ratings."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      }
-    ],
-    "receipt": {
-      "schema": 1,
-      "sourceWeek": 1,
-      "targetWeek": 2,
-      "state": "PARTIAL_BLOCKED",
-      "appliedAt": "2026-09-15T10:02:23-07:00",
-      "formulaIds": [
-        "BW-R016",
-        "BW-R017",
-        "BW-R018"
-      ],
-      "marketViewed": false,
-      "gamesProcessed": 16,
-      "gamesUpdated": 6,
-      "teamsUpdated": 12,
-      "blockedGames": [
-        {
-          "gameKey": "2026-W01-NE-SEA",
-          "away": "NE",
-          "home": "SEA",
-          "reasons": [
-            "Required replacement-aware game-day injury-loss inputs are unresolved: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Preserve both team ratings rather than inventing values."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-SF-LAR",
-          "away": "SF",
-          "home": "LAR",
-          "reasons": [
-            "Required replacement-aware game-day injury-loss inputs are unresolved: SF Alfred Collins remains an unresolved role committee; LAR Aaron Donald is recorded with a player-lookup failure despite a resolved one-for-one role. Preserve both ratings."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-NO-DET",
-          "away": "NO",
-          "home": "DET",
-          "reasons": [
-            "New Orleans has unresolved replacement-aware Week 1 injury-loss cases for Jordyn Tyson, Bryan Bresee and Dillon Radunz. Detroit's resolved losses cannot be paired with an invented New Orleans value, so both ratings are preserved."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-BUF-HOU",
-          "away": "BUF",
-          "home": "HOU",
-          "reasons": [
-            "Houston's Jayden Higgins Week 1 replacement role remains an unresolved committee, so the required replacement-aware game-day injury loss is unsupported. Preserve both ratings."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-ATL-PIT",
-          "away": "ATL",
-          "home": "PIT",
-          "reasons": [
-            "Atlanta has unresolved replacement-aware Week 1 injury/availability losses for Jalon Walker and James Pearce Jr. Preserve both ratings rather than estimating their replacement values."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-MIA-LV",
-          "away": "MIA",
-          "home": "LV",
-          "reasons": [
-            "Las Vegas' Brock Bowers Week 1 replacement role remains unresolved, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-GB-MIN",
-          "away": "GB",
-          "home": "MIN",
-          "reasons": [
-            "Green Bay's Josh Jacobs Week 1 replacement role remains an unresolved backfield committee, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-WAS-PHI",
-          "away": "WAS",
-          "home": "PHI",
-          "reasons": [
-            "Washington has unresolved replacement-aware Week 1 injury/availability losses for Jer'Zhan Newton and Dorance Armstrong. The resolved Laremy Tunsil loss cannot make the team-level injury input complete, so both ratings are preserved."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-DAL-NYG",
-          "away": "DAL",
-          "home": "NYG",
-          "reasons": [
-            "New York's Darius Slayton Week 1 replacement role remains unresolved. Dallas has resolved numeric personnel losses, but the opposing team injury input is incomplete, so both ratings are preserved."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        },
-        {
-          "gameKey": "2026-W01-DEN-KC",
-          "away": "DEN",
-          "home": "KC",
-          "reasons": [
-            "Kansas City's Josh Simmons loss is resolved at 0.9 points, but Denver's Jonathon Cooper absence is represented only by a manual half-point game adjustment without a supported replacement-aware injury-loss value. Under the 90/10 input rule, that is insufficient; preserve both ratings."
-          ],
-          "sourceRefs": [
-            "data/walters/nfl/2026/week-01-current-numbers.json",
-            "data/walters/nfl/2026/week-01-personnel-ledger.json"
-          ]
-        }
-      ]
-    },
-    "marketViewed": false
-  }
+  ]
 }
