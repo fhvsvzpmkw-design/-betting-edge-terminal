@@ -66,8 +66,9 @@ jobs:
           const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
           const h4=JSON.parse(fs.readFileSync('data/walters/nfl/home-field/home-field-production-current.json','utf8'));
           const qb=JSON.parse(fs.readFileSync('data/walters/nfl/qb-production-current.json','utf8'));
+          const expectedWeek=staging.auditType==='WALTERS_WEEKLY_90_10'?staging.targetWeek:staging.week;
           if(staging.state!=='APPLIED'||staging.marketViewed!==false) throw new Error('audit staging readback failed');
-          if(active.schema!==1||active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER'||active.season!==staging.season||active.week!==staging.week) throw new Error('active week changed or invalid');
+          if(active.schema!==1||active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER'||active.season!==staging.season||active.week!==expectedWeek) throw new Error('active week changed or invalid');
           if(h4.state!=='OPERATIONAL_SCOPED'||h4.productionAuthority!==true||h4.marketViewed!==false) throw new Error('H4 production invalid');
           if(h4.productionScope?.domesticLeagueBaseline?.homeLocationAdvantagePoints!==2.082||h4.productionScope?.domesticLeagueBaseline?.pointsToHomeSpread!==-2.082) throw new Error('H4 regression');
           if(qb.state!=='OPERATIONAL_SCOPED'||qb.authorityToken!=='APPROVED_WALTERS_QB_PERFORMANCE'||qb.productionAuthority!==true||qb.grahamWritesAllowed!==true||qb.marketViewed!==false) throw new Error('QB production invalid');
@@ -90,7 +91,7 @@ jobs:
             echo "No carried-rating audit changes to publish."
             exit 0
           fi
-          git commit -m "Apply Graham carried-rating personnel-layer audit"
+          git commit -m "Apply Graham carried-rating audit"
           git push origin HEAD:main
 
       - name: Summary
@@ -100,10 +101,11 @@ jobs:
             node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
           const fs=require('node:fs');
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json','utf8'));
+          const displayWeek=s.auditType==='WALTERS_WEEKLY_90_10'?s.targetWeek:s.week;
           console.log('## Graham carried-rating audit');
           console.log(`- Audit: ${s.auditId||'unknown'}`);
           console.log(`- State: ${s.state}`);
-          console.log(`- Season/week: ${s.season}/W${String(s.week).padStart(2,'0')}`);
+          console.log(`- Season/week: ${s.season}/W${String(displayWeek).padStart(2,'0')}`);
           console.log(`- Rating cases: ${(s.result?.ratingChanges||[]).length}`);
           console.log(`- Games rebuilt: ${(s.result?.matchupChanges||[]).length}`);
           console.log('- H4 location terms: preserved');
