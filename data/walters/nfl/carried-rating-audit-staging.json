@@ -1,265 +1,181 @@
 {
   "schema": 1,
-  "state": "APPLIED",
-  "auditId": "graham-carried-rating-personnel-layer-audit-2026-w01-20260908T130441-0700",
+  "state": "READY",
+  "auditType": "WALTERS_WEEKLY_90_10",
+  "auditId": "walters-weekly-90-10-2026-w01-to-w02-20260915T100223-0700",
   "season": 2026,
-  "week": 1,
-  "startedAt": "2026-09-08T13:04:41-07:00",
-  "effectiveAt": "2026-09-08T13:04:41-07:00",
-  "retryPreparedAt": "2026-09-08T13:07:30-07:00",
+  "sourceWeek": 1,
+  "targetWeek": 2,
+  "effectiveAt": "2026-09-15T10:02:23-07:00",
   "marketViewed": false,
-  "purpose": "Remove the five August 30 temporary named-player availability deductions from carried team strength now that governed personnel and quarterback production own those temporary effects. Preserve the origin seed as provenance and preserve every active personnel, matchup, quarterback and H4 layer.",
-  "cases": [
+  "formulaIds": ["BW-R016", "BW-R017", "BW-R018"],
+  "purpose": "Apply the source-exact Walters completed-game TGPL and 90/10 weekly power-rating update for resolved Week 1 games only. Fail closed by whole game when a required replacement-aware game-day injury-loss input is unresolved.",
+  "games": [
     {
-      "team": "GB",
-      "expectedCurrentRating": 26,
-      "legacyDelta": -0.5,
-      "correctionDelta": 0.5,
-      "expectedPostRating": 26.5,
-      "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-      "reason": "The August 30 Green Bay deduction was explicitly a Josh Jacobs temporary availability adjustment. The active Week 1 personnel ledger now owns that case: Jacobs remains on the Commissioner Exempt list and the replacement is an unresolved backfield committee, so production correctly fails closed rather than embedding an estimate in team strength. Reverse only the legacy carried-rating deduction; do not infer a personnel number and do not reset the seed.",
-      "sourceRefs": [
-        "data/walters/nfl-power-ratings-ledger.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.nfl.com/news/nfl-places-packers-rb-josh-jacobs-commissioner-exempt-list",
-        "https://www.packers.com/news/5-things-learned-from-gm-brian-gutekunst-about-packers-roster-sep-1-2026",
-        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+      "gameKey": "2026-W01-NE-SEA",
+      "away": "NE",
+      "home": "SEA",
+      "status": "BLOCKED",
+      "reasons": [
+        "Required replacement-aware game-day injury-loss inputs are unresolved: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Preserve both team ratings rather than inventing values."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-SF-LAR",
+      "away": "SF",
+      "home": "LAR",
+      "status": "BLOCKED",
+      "reasons": [
+        "Required replacement-aware game-day injury-loss inputs are unresolved: SF Alfred Collins remains an unresolved role committee; LAR Aaron Donald is recorded with a player-lookup failure despite a resolved one-for-one role. Preserve both ratings."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-CHI-CAR",
+      "away": "CHI",
+      "home": "CAR",
+      "status": "READY",
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "https://www.nfl.com/schedules/2026/by-week/week-1", "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262", "ChatGPT File Library: walters-full-analysis-v1.0.md"],
+      "teams": [
+        {"team":"CHI","opponent":"CAR","oldRating":26,"opponentOldRating":22,"scoreMargin":22,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":-2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]},
+        {"team":"CAR","opponent":"CHI","oldRating":22,"opponentOldRating":26,"scoreMargin":-22,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]}
       ]
     },
     {
-      "team": "LAC",
-      "expectedCurrentRating": 24,
-      "legacyDelta": -0.5,
-      "correctionDelta": 0.5,
-      "expectedPostRating": 24.5,
-      "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-      "reason": "The August 30 Chargers deduction was a composite temporary offensive-line availability adjustment involving Tyler Biadasz, Branson Taylor and Rashawn Slater. Biadasz is now independently resolved in governed personnel production with Jake Slaughter as the replacement, while the remaining old availability premises do not justify retaining a blanket carried-rating penalty. Reverse only the legacy carried deduction and preserve the current governed personnel overlay without double counting.",
-      "sourceRefs": [
-        "data/walters/nfl-power-ratings-ledger.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.chargers.com/news/mike-mcdaniel-jake-slaughter-offensive-line-depth-chart",
-        "https://www.chargers.com/news/tyler-biadasz-injury-jake-slaughter-starting-center",
-        "data/walters/nfl/player-values/by-team-v1/lac.json",
-        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+      "gameKey": "2026-W01-TB-CIN",
+      "away": "TB",
+      "home": "CIN",
+      "status": "READY",
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "https://www.nfl.com/schedules/2026/by-week/week-1", "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262", "ChatGPT File Library: walters-full-analysis-v1.0.md"],
+      "teams": [
+        {"team":"TB","opponent":"CIN","oldRating":23,"opponentOldRating":24,"scoreMargin":-6,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":-2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]},
+        {"team":"CIN","opponent":"TB","oldRating":24,"opponentOldRating":23,"scoreMargin":6,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]}
       ]
     },
     {
-      "team": "WAS",
-      "expectedCurrentRating": 22,
-      "legacyDelta": -1,
-      "correctionDelta": 1,
-      "expectedPostRating": 23,
-      "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-      "reason": "Washington's August 30 minus-one was explicitly a temporary personnel package for Laremy Tunsil, Jer'Zhan Newton and Dorance Armstrong. The current governed personnel ledger now handles the cases individually: Tunsil to Brandon Coleman is resolved one-for-one through production, while Newton and Armstrong remain fail closed because their replacement roles are committees. Remove the blanket personnel package from carried team strength and leave all actual Week 1 availability effects exclusively in governed personnel production.",
-      "sourceRefs": [
-        "data/walters/nfl-power-ratings-ledger.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.commanders.com/news/commanders-place-tunsil-newton-on-ir-sign-moreau-tuttle",
-        "https://www.commanders.com/news/transcripts-hc-dan-quinn-08-10-26",
-        "data/walters/nfl/player-values/by-team-v1/was.json",
-        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+      "gameKey": "2026-W01-NO-DET",
+      "away": "NO",
+      "home": "DET",
+      "status": "BLOCKED",
+      "reasons": [
+        "New Orleans has unresolved replacement-aware Week 1 injury-loss cases for Jordyn Tyson, Bryan Bresee and Dillon Radunz. Detroit's resolved losses cannot be paired with an invented New Orleans value, so both ratings are preserved."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-BUF-HOU",
+      "away": "BUF",
+      "home": "HOU",
+      "status": "BLOCKED",
+      "reasons": [
+        "Houston's Jayden Higgins Week 1 replacement role remains an unresolved committee, so the required replacement-aware game-day injury loss is unsupported. Preserve both ratings."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-BAL-IND",
+      "away": "BAL",
+      "home": "IND",
+      "status": "READY",
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json", "https://www.nfl.com/schedules/2026/by-week/week-1", "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262", "ChatGPT File Library: walters-full-analysis-v1.0.md"],
+      "teams": [
+        {"team":"BAL","opponent":"IND","oldRating":28.5,"opponentOldRating":23,"scoreMargin":18,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":-2.082,"sourceRefs":["data/walters/nfl/2026/week-01-personnel-ledger.json"]},
+        {"team":"IND","opponent":"BAL","oldRating":23,"opponentOldRating":28.5,"scoreMargin":-18,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":2.082,"sourceRefs":["data/walters/nfl/2026/week-01-personnel-ledger.json"]}
       ]
     },
     {
-      "team": "NO",
-      "expectedCurrentRating": 22,
-      "legacyDelta": -0.5,
-      "correctionDelta": 0.5,
-      "expectedPostRating": 22.5,
-      "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-      "reason": "New Orleans' August 30 half-point deduction was explicitly tied to the temporary Bryan Bresee and Dillon Radunz injured-reserve absences. Both cases are now recorded in the governed Week 1 personnel ledger and fail closed because current role replacement is not one-for-one. Reverse the legacy blanket deduction from carried team strength; preserve the fail-closed personnel cases without inventing a replacement value.",
-      "sourceRefs": [
-        "data/walters/nfl-power-ratings-ledger.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.neworleanssaints.com/news/garrett-nelson-edge-new-orleans-saints-roster-moves-august-7-2026",
-        "https://www.neworleanssaints.com/news/new-orleans-saints-rookie-guard-jeremiah-wright-poised-for-action-in-joint-practices-preseason-games",
-        "data/walters/nfl/player-values/by-team-v1/no.json",
-        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+      "gameKey": "2026-W01-CLE-JAX",
+      "away": "CLE",
+      "home": "JAX",
+      "status": "READY",
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "https://www.nfl.com/schedules/2026/by-week/week-1", "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262", "ChatGPT File Library: walters-full-analysis-v1.0.md"],
+      "teams": [
+        {"team":"CLE","opponent":"JAX","oldRating":20.5,"opponentOldRating":24,"scoreMargin":-24,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":-2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]},
+        {"team":"JAX","opponent":"CLE","oldRating":24,"opponentOldRating":20.5,"scoreMargin":24,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]}
       ]
     },
     {
-      "team": "ATL",
-      "expectedCurrentRating": 21,
-      "legacyDelta": -0.5,
-      "correctionDelta": 0.5,
-      "expectedPostRating": 21.5,
-      "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-      "reason": "Atlanta's August 30 half-point deduction was explicitly tied to James Pearce Jr.'s suspension and Jalon Walker's injured-reserve absence. Walker was already governed as a fail-closed multi-role personnel case and Pearce is now likewise recorded as a fail-closed committee case. Remove the legacy blanket defensive-front personnel deduction from carried team strength while preserving both governed personnel cases and the independently governed quarterback-performance layer.",
-      "sourceRefs": [
-        "data/walters/nfl-power-ratings-ledger.json",
-        "data/walters/nfl/2026/week-01-personnel-ledger.json",
-        "https://www.atlantafalcons.com/news/james-pearce-jr-suspension-nfl-eight-games-season",
-        "https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season",
-        "data/walters/nfl/player-values/by-team-v1/atl.json",
-        "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-        "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
+      "gameKey": "2026-W01-ATL-PIT",
+      "away": "ATL",
+      "home": "PIT",
+      "status": "BLOCKED",
+      "reasons": [
+        "Atlanta has unresolved replacement-aware Week 1 injury/availability losses for Jalon Walker and James Pearce Jr. Preserve both ratings rather than estimating their replacement values."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-NYJ-TEN",
+      "away": "NYJ",
+      "home": "TEN",
+      "status": "READY",
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "https://www.nfl.com/schedules/2026/by-week/week-1", "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262", "ChatGPT File Library: walters-full-analysis-v1.0.md"],
+      "teams": [
+        {"team":"NYJ","opponent":"TEN","oldRating":18.5,"opponentOldRating":20.5,"scoreMargin":13,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":-2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]},
+        {"team":"TEN","opponent":"NYJ","oldRating":20.5,"opponentOldRating":18.5,"scoreMargin":-13,"teamInjuryLoss":0,"opponentInjuryLoss":0,"teamLocationAdvantage":2.082,"sourceRefs":["data/walters/nfl/2026/week-01-current-numbers.json"]}
       ]
+    },
+    {
+      "gameKey": "2026-W01-ARI-LAC",
+      "away": "ARI",
+      "home": "LAC",
+      "status": "READY",
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json", "https://www.nfl.com/schedules/2026/by-week/week-1", "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262", "ChatGPT File Library: walters-full-analysis-v1.0.md"],
+      "teams": [
+        {"team":"ARI","opponent":"LAC","oldRating":17.5,"opponentOldRating":24.5,"scoreMargin":12,"teamInjuryLoss":0,"opponentInjuryLoss":0.7,"teamLocationAdvantage":-2.082,"sourceRefs":["data/walters/nfl/2026/week-01-personnel-ledger.json"]},
+        {"team":"LAC","opponent":"ARI","oldRating":24.5,"opponentOldRating":17.5,"scoreMargin":-12,"teamInjuryLoss":0.7,"opponentInjuryLoss":0,"teamLocationAdvantage":2.082,"sourceRefs":["data/walters/nfl/2026/week-01-personnel-ledger.json"]}
+      ]
+    },
+    {
+      "gameKey": "2026-W01-MIA-LV",
+      "away": "MIA",
+      "home": "LV",
+      "status": "BLOCKED",
+      "reasons": [
+        "Las Vegas' Brock Bowers Week 1 replacement role remains unresolved, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-GB-MIN",
+      "away": "GB",
+      "home": "MIN",
+      "status": "BLOCKED",
+      "reasons": [
+        "Green Bay's Josh Jacobs Week 1 replacement role remains an unresolved backfield committee, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-WAS-PHI",
+      "away": "WAS",
+      "home": "PHI",
+      "status": "BLOCKED",
+      "reasons": [
+        "Washington has unresolved replacement-aware Week 1 injury/availability losses for Jer'Zhan Newton and Dorance Armstrong. The resolved Laremy Tunsil loss cannot make the team-level injury input complete, so both ratings are preserved."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-DAL-NYG",
+      "away": "DAL",
+      "home": "NYG",
+      "status": "BLOCKED",
+      "reasons": [
+        "New York's Darius Slayton Week 1 replacement role remains unresolved. Dallas has resolved numeric personnel losses, but the opposing team injury input is incomplete, so both ratings are preserved."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
+    },
+    {
+      "gameKey": "2026-W01-DEN-KC",
+      "away": "DEN",
+      "home": "KC",
+      "status": "BLOCKED",
+      "reasons": [
+        "Kansas City's Josh Simmons loss is resolved at 0.9 points, but Denver's Jonathon Cooper absence is represented only by a manual half-point game adjustment without a supported replacement-aware injury-loss value. Under the 90/10 input rule, that is insufficient; preserve both ratings."
+      ],
+      "sourceRefs": ["data/walters/nfl/2026/week-01-current-numbers.json", "data/walters/nfl/2026/week-01-personnel-ledger.json"]
     }
-  ],
-  "appliedAt": "2026-09-08T13:04:41-07:00",
-  "result": {
-    "ratingChanges": [
-      {
-        "team": "GB",
-        "priorRating": 26,
-        "delta": 0.5,
-        "currentRating": 26.5,
-        "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-        "reason": "The August 30 Green Bay deduction was explicitly a Josh Jacobs temporary availability adjustment. The active Week 1 personnel ledger now owns that case: Jacobs remains on the Commissioner Exempt list and the replacement is an unresolved backfield committee, so production correctly fails closed rather than embedding an estimate in team strength. Reverse only the legacy carried-rating deduction; do not infer a personnel number and do not reset the seed.",
-        "sourceRefs": [
-          "data/walters/nfl-power-ratings-ledger.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "https://www.nfl.com/news/nfl-places-packers-rb-josh-jacobs-commissioner-exempt-list",
-          "https://www.packers.com/news/5-things-learned-from-gm-brian-gutekunst-about-packers-roster-sep-1-2026",
-          "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
-        ]
-      },
-      {
-        "team": "LAC",
-        "priorRating": 24,
-        "delta": 0.5,
-        "currentRating": 24.5,
-        "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-        "reason": "The August 30 Chargers deduction was a composite temporary offensive-line availability adjustment involving Tyler Biadasz, Branson Taylor and Rashawn Slater. Biadasz is now independently resolved in governed personnel production with Jake Slaughter as the replacement, while the remaining old availability premises do not justify retaining a blanket carried-rating penalty. Reverse only the legacy carried deduction and preserve the current governed personnel overlay without double counting.",
-        "sourceRefs": [
-          "data/walters/nfl-power-ratings-ledger.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "https://www.chargers.com/news/mike-mcdaniel-jake-slaughter-offensive-line-depth-chart",
-          "https://www.chargers.com/news/tyler-biadasz-injury-jake-slaughter-starting-center",
-          "data/walters/nfl/player-values/by-team-v1/lac.json",
-          "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
-        ]
-      },
-      {
-        "team": "WAS",
-        "priorRating": 22,
-        "delta": 1,
-        "currentRating": 23,
-        "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-        "reason": "Washington's August 30 minus-one was explicitly a temporary personnel package for Laremy Tunsil, Jer'Zhan Newton and Dorance Armstrong. The current governed personnel ledger now handles the cases individually: Tunsil to Brandon Coleman is resolved one-for-one through production, while Newton and Armstrong remain fail closed because their replacement roles are committees. Remove the blanket personnel package from carried team strength and leave all actual Week 1 availability effects exclusively in governed personnel production.",
-        "sourceRefs": [
-          "data/walters/nfl-power-ratings-ledger.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "https://www.commanders.com/news/commanders-place-tunsil-newton-on-ir-sign-moreau-tuttle",
-          "https://www.commanders.com/news/transcripts-hc-dan-quinn-08-10-26",
-          "data/walters/nfl/player-values/by-team-v1/was.json",
-          "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
-        ]
-      },
-      {
-        "team": "NO",
-        "priorRating": 22,
-        "delta": 0.5,
-        "currentRating": 22.5,
-        "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-        "reason": "New Orleans' August 30 half-point deduction was explicitly tied to the temporary Bryan Bresee and Dillon Radunz injured-reserve absences. Both cases are now recorded in the governed Week 1 personnel ledger and fail closed because current role replacement is not one-for-one. Reverse the legacy blanket deduction from carried team strength; preserve the fail-closed personnel cases without inventing a replacement value.",
-        "sourceRefs": [
-          "data/walters/nfl-power-ratings-ledger.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "https://www.neworleanssaints.com/news/garrett-nelson-edge-new-orleans-saints-roster-moves-august-7-2026",
-          "https://www.neworleanssaints.com/news/new-orleans-saints-rookie-guard-jeremiah-wright-poised-for-action-in-joint-practices-preseason-games",
-          "data/walters/nfl/player-values/by-team-v1/no.json",
-          "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
-        ]
-      },
-      {
-        "team": "ATL",
-        "priorRating": 21,
-        "delta": 0.5,
-        "currentRating": 21.5,
-        "disposition": "REMOVE_TEMPORARY_PERSONNEL_FROM_CARRIED_RATING",
-        "reason": "Atlanta's August 30 half-point deduction was explicitly tied to James Pearce Jr.'s suspension and Jalon Walker's injured-reserve absence. Walker was already governed as a fail-closed multi-role personnel case and Pearce is now likewise recorded as a fail-closed committee case. Remove the legacy blanket defensive-front personnel deduction from carried team strength while preserving both governed personnel cases and the independently governed quarterback-performance layer.",
-        "sourceRefs": [
-          "data/walters/nfl-power-ratings-ledger.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json",
-          "https://www.atlantafalcons.com/news/james-pearce-jr-suspension-nfl-eight-games-season",
-          "https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season",
-          "data/walters/nfl/player-values/by-team-v1/atl.json",
-          "ChatGPT File Library: walters-current-calibration-plan-v1.0.md // leakage and double-counting control",
-          "ChatGPT File Library: walters-full-analysis-v1.0.md // Chapters 21-22 replacement-aware injury treatment"
-        ]
-      }
-    ],
-    "matchupChanges": [
-      {
-        "gameKey": "2026-W01-ATL-PIT",
-        "away": "ATL",
-        "home": "PIT",
-        "priorNeutralBaseHome": -2,
-        "newNeutralBaseHome": -1.5,
-        "neutralBaseDelta": 0.5,
-        "priorExactFairHome": -3.332,
-        "newExactFairHome": -2.832,
-        "priorDisplayedFairHome": -3.5,
-        "newDisplayedFairHome": -3,
-        "personnelOverlayPointsToHomeSpread": 0,
-        "qbPerformancePointsToHomeSpread": 0.75
-      },
-      {
-        "gameKey": "2026-W01-NO-DET",
-        "away": "NO",
-        "home": "DET",
-        "priorNeutralBaseHome": -4,
-        "newNeutralBaseHome": -3.5,
-        "neutralBaseDelta": 0.5,
-        "priorExactFairHome": -5.652,
-        "newExactFairHome": -5.152,
-        "priorDisplayedFairHome": -5.5,
-        "newDisplayedFairHome": -5,
-        "personnelOverlayPointsToHomeSpread": 0.7,
-        "qbPerformancePointsToHomeSpread": -0.27
-      },
-      {
-        "gameKey": "2026-W01-ARI-LAC",
-        "away": "ARI",
-        "home": "LAC",
-        "priorNeutralBaseHome": -6.5,
-        "newNeutralBaseHome": -7,
-        "neutralBaseDelta": -0.5,
-        "priorExactFairHome": -7.462,
-        "newExactFairHome": -7.962,
-        "priorDisplayedFairHome": -7.5,
-        "newDisplayedFairHome": -8,
-        "personnelOverlayPointsToHomeSpread": 0.7,
-        "qbPerformancePointsToHomeSpread": 0.42
-      },
-      {
-        "gameKey": "2026-W01-GB-MIN",
-        "away": "GB",
-        "home": "MIN",
-        "priorNeutralBaseHome": 3,
-        "newNeutralBaseHome": 3.5,
-        "neutralBaseDelta": 0.5,
-        "priorExactFairHome": 1.078,
-        "newExactFairHome": 1.578,
-        "priorDisplayedFairHome": 1,
-        "newDisplayedFairHome": 1.5,
-        "personnelOverlayPointsToHomeSpread": 0,
-        "qbPerformancePointsToHomeSpread": 0.16
-      },
-      {
-        "gameKey": "2026-W01-WAS-PHI",
-        "away": "WAS",
-        "home": "PHI",
-        "priorNeutralBaseHome": -5,
-        "newNeutralBaseHome": -4,
-        "neutralBaseDelta": 1,
-        "priorExactFairHome": -8.942,
-        "newExactFairHome": -7.942,
-        "priorDisplayedFairHome": -9,
-        "newDisplayedFairHome": -8,
-        "personnelOverlayPointsToHomeSpread": -1.7,
-        "qbPerformancePointsToHomeSpread": -0.16
-      }
-    ],
-    "marketViewed": false
-  }
+  ]
 }
