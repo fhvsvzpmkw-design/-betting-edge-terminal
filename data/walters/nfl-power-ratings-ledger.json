@@ -7,7 +7,7 @@
   "sport": "NFL",
   "season": 2026,
   "createdAt": "2026-08-30T13:23:00-07:00",
-  "updatedAt": "2026-09-15T10:02:23-07:00",
+  "updatedAt": "2026-09-15T10:53:00-07:00",
   "authority": {
     "owner": "Graham Mercer",
     "waltersInterface": "core/walters-intelligence-interface-v1.4.json",
@@ -2176,7 +2176,7 @@
     "sourceWeek": 1,
     "targetWeek": 2,
     "state": "PARTIAL_BLOCKED",
-    "appliedAt": "2026-09-15T10:02:23-07:00",
+    "appliedAt": "2026-09-15T10:53:00-07:00",
     "formulaIds": [
       "BW-R016",
       "BW-R017",
@@ -2192,11 +2192,13 @@
         "away": "NE",
         "home": "SEA",
         "reasons": [
-          "Required replacement-aware game-day injury-loss inputs are unresolved: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Preserve both team ratings rather than inventing values."
+          "GAME_DAY_INJURY_VALUES_UNRESOLVED: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Final availability information does not by itself resolve replacement-aware point values for all required cases.",
+          "RECOVERY_ACTION: Reconcile final Week 1 availability and exact replacement roles with the preserved governed personnel cases; append validated values or supported full-availability closures under existing permissions. Preserve both ratings until both team-level injury inputs are complete."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.nfl.com/news/nfl-kickoff-game-inactives-new-england-patriots-at-seattle-seahawks"
         ]
       },
       {
@@ -2204,35 +2206,13 @@
         "away": "SF",
         "home": "LAR",
         "reasons": [
-          "Required replacement-aware game-day injury-loss inputs are unresolved: SF Alfred Collins remains an unresolved role committee; LAR Aaron Donald is recorded with a player-lookup failure despite a resolved one-for-one role. Preserve both ratings."
+          "ROLE_AND_LOCKED_VALUE_GAPS: SF Alfred Collins remains an unresolved replacement-role committee. LAR Aaron Donald has a preserved player-lookup failure; reporting about an exact replacement does not create a missing locked player value.",
+          "RECOVERY_ACTION: Resolve Collins through an authorized replacement classification and address Donald's exact player identity/registry coverage through a governed correction. Do not copy a different player's value or assign zero. Preserve both ratings."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-NO-DET",
-        "away": "NO",
-        "home": "DET",
-        "reasons": [
-          "New Orleans has unresolved replacement-aware Week 1 injury-loss cases for Jordyn Tyson, Bryan Bresee and Dillon Radunz. Detroit's resolved losses cannot be paired with an invented New Orleans value, so both ratings are preserved."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
-        ]
-      },
-      {
-        "gameKey": "2026-W01-BUF-HOU",
-        "away": "BUF",
-        "home": "HOU",
-        "reasons": [
-          "Houston's Jayden Higgins Week 1 replacement role remains an unresolved committee, so the required replacement-aware game-day injury loss is unsupported. Preserve both ratings."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.49ers.com/news/alfred-collins-out-james-thomas-jr-questionable-vs-rams-injury-report-ahead-of-sfvslar"
         ]
       },
       {
@@ -2240,23 +2220,42 @@
         "away": "ATL",
         "home": "PIT",
         "reasons": [
-          "Atlanta has unresolved replacement-aware Week 1 injury/availability losses for Jalon Walker and James Pearce Jr. Preserve both ratings rather than estimating their replacement values."
+          "MULTIROLE_AVAILABILITY_VALUES_UNRESOLVED: ATL Jalon Walker and James Pearce Jr. have no complete governed replacement-aware Week 1 loss. Walker's responsibilities span multiple roles, not a safely inferred one-for-one replacement.",
+          "RECOVERY_ACTION: Resolve both historical availability cases and obtain an authorized multi-role/cluster valuation where required. Do not invent workload shares from snap counts. Preserve both ratings."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season"
         ]
       },
       {
-        "gameKey": "2026-W01-MIA-LV",
-        "away": "MIA",
-        "home": "LV",
+        "gameKey": "2026-W01-NO-DET",
+        "away": "NO",
+        "home": "DET",
         "reasons": [
-          "Las Vegas' Brock Bowers Week 1 replacement role remains unresolved, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
+          "GAME_DAY_INJURY_VALUES_UNRESOLVED: NO Jordyn Tyson, Bryan Bresee and Dillon Radunz lack complete governed replacement-aware Week 1 losses. Detroit's resolved inputs do not make the opposing injury input known.",
+          "RECOVERY_ACTION: Establish the actual prior-game roles and supported replacements, including required cluster context, and append approved historical valuations. Preserve both ratings until the New Orleans input is complete."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+          "https://www.neworleanssaints.com/team/players-roster/"
+        ]
+      },
+      {
+        "gameKey": "2026-W01-BUF-HOU",
+        "away": "BUF",
+        "home": "HOU",
+        "reasons": [
+          "REPLACEMENT_COMMITTEE_UNRESOLVED: HOU Jayden Higgins is unavailable, but the preserved Boutte/Hutchinson/Noel role mapping has no governed complete replacement-aware game-day value.",
+          "RECOVERY_ACTION: Resolve the actual replacement role under existing one-for-one or authorized value-invariant-committee rules, excluding existing baseline contributors. Participation alone is not an authorized weighted committee model. Preserve both ratings."
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/2026/week-01-current-numbers.json",
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.nfl.com/news/texans-wr-jayden-higgins-torn-acl-out-2026-season"
         ]
       },
       {
@@ -2264,11 +2263,27 @@
         "away": "GB",
         "home": "MIN",
         "reasons": [
-          "Green Bay's Josh Jacobs Week 1 replacement role remains an unresolved backfield committee, so the required replacement-aware injury loss is unsupported. Preserve both ratings."
+          "REPLACEMENT_COMMITTEE_UNRESOLVED: GB Josh Jacobs' preserved Week 1 case lacks a supported replacement-aware backfield loss.",
+          "RECOVERY_ACTION: Verify final game-day availability and actual replacement responsibilities, then apply only existing approved one-for-one or value-invariant-committee rules with running-back cluster review where required. Preserve both ratings."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
+        ]
+      },
+      {
+        "gameKey": "2026-W01-MIA-LV",
+        "away": "MIA",
+        "home": "LV",
+        "reasons": [
+          "REPLACEMENT_COMMITTEE_UNRESOLVED: LV Brock Bowers' absence is confirmed, but multiple tight ends covering his responsibilities do not establish a governed single replacement value or authorized committee loss.",
+          "RECOVERY_ACTION: Resolve the prior-game Bowers role through existing personnel/M4 permissions with baseline-double-count review. Do not automatically credit Michael Mayer's full baseline value or invent workload weights. Preserve both ratings."
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/2026/week-01-current-numbers.json",
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.raiders.com/news/las-vegas-raiders-miami-dolphins-nfl-week-1-2026-injury-report"
         ]
       },
       {
@@ -2276,11 +2291,14 @@
         "away": "WAS",
         "home": "PHI",
         "reasons": [
-          "Washington has unresolved replacement-aware Week 1 injury/availability losses for Jer'Zhan Newton and Dorance Armstrong. The resolved Laremy Tunsil loss cannot make the team-level injury input complete, so both ratings are preserved."
+          "GAME_DAY_INJURY_VALUES_UNRESOLVED: WAS Jer'Zhan Newton and Dorance Armstrong lack complete governed replacement-aware Week 1 availability losses. The already-resolved Laremy Tunsil value alone is insufficient.",
+          "RECOVERY_ACTION: Reconcile the prior-game defensive-front roles and approved replacements, including cluster treatment, before constructing a complete Washington injury input. Preserve both ratings."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.commanders.com/news/commanders-release-2026-unofficial-depth-chart",
+          "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
         ]
       },
       {
@@ -2288,11 +2306,13 @@
         "away": "DAL",
         "home": "NYG",
         "reasons": [
-          "New York's Darius Slayton Week 1 replacement role remains unresolved. Dallas has resolved numeric personnel losses, but the opposing team injury input is incomplete, so both ratings are preserved."
+          "PRIOR_ROLE_AND_INJURY_VALUE_UNRESOLVED: NYG Darius Slayton's preserved Week 1 replacement case is not numerically resolved. Dallas's supported personnel losses do not complete the opposing team input.",
+          "RECOVERY_ACTION: Verify Slayton's actual Week 1 roster/availability/role identity and whether the preserved case requires an additive correction; use an approved replacement-aware value or explicitly supported no-loss closure, never assume zero from a missing or stale case. Preserve both ratings."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
         ]
       },
       {
@@ -2300,12 +2320,188 @@
         "away": "DEN",
         "home": "KC",
         "reasons": [
-          "Kansas City's Josh Simmons loss is resolved at 0.9 points, but Denver's Jonathon Cooper absence is represented only by a manual half-point game adjustment without a supported replacement-aware injury-loss value. Under the 90/10 input rule, that is insufficient; preserve both ratings."
+          "UNSUPPORTED_MANUAL_INJURY_ADJUSTMENT: KC Josh Simmons has a governed 0.9-point loss, but DEN Jonathon Cooper is represented only by a manual half-point adjustment without a supported replacement-aware game-day loss. Reporting identifies multiple replacement options rather than an authorized numerical closure.",
+          "RECOVERY_ACTION: Validate Cooper's actual prior-game replacement role and apply existing approved locked-value/committee rules. Do not relabel the manual 0.5-point game adjustment as injury loss. Preserve both ratings."
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-01-current-numbers.json",
-          "data/walters/nfl/2026/week-01-personnel-ledger.json"
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.denverbroncos.com/schedule/",
+          "https://www.milehighreport.com/denver-broncos-news/184357/broncos-week-1-53-man-roster-stock-up-stock-down"
         ]
+      }
+    ],
+    "season": 2026,
+    "attempts": [
+      {
+        "auditId": "walters-weekly-90-10-recovery-2026-w01-to-w02-20260915T105300-0700",
+        "appliedAt": "2026-09-15T10:53:00-07:00",
+        "newGamesUpdated": 0,
+        "newTeamsUpdated": 0,
+        "alreadyAppliedGames": [
+          "2026-W01-CHI-CAR",
+          "2026-W01-BAL-IND",
+          "2026-W01-CLE-JAX",
+          "2026-W01-TB-CIN",
+          "2026-W01-NYJ-TEN",
+          "2026-W01-ARI-LAC"
+        ],
+        "blockedGames": [
+          {
+            "gameKey": "2026-W01-NE-SEA",
+            "away": "NE",
+            "home": "SEA",
+            "reasons": [
+              "GAME_DAY_INJURY_VALUES_UNRESOLVED: NE Ben Brown and TreVeyon Henderson; SEA Ty Okada, Nick Emmanwori and Tory Horton. Final availability information does not by itself resolve replacement-aware point values for all required cases.",
+              "RECOVERY_ACTION: Reconcile final Week 1 availability and exact replacement roles with the preserved governed personnel cases; append validated values or supported full-availability closures under existing permissions. Preserve both ratings until both team-level injury inputs are complete."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.nfl.com/news/nfl-kickoff-game-inactives-new-england-patriots-at-seattle-seahawks"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-SF-LAR",
+            "away": "SF",
+            "home": "LAR",
+            "reasons": [
+              "ROLE_AND_LOCKED_VALUE_GAPS: SF Alfred Collins remains an unresolved replacement-role committee. LAR Aaron Donald has a preserved player-lookup failure; reporting about an exact replacement does not create a missing locked player value.",
+              "RECOVERY_ACTION: Resolve Collins through an authorized replacement classification and address Donald's exact player identity/registry coverage through a governed correction. Do not copy a different player's value or assign zero. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.49ers.com/news/alfred-collins-out-james-thomas-jr-questionable-vs-rams-injury-report-ahead-of-sfvslar"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-ATL-PIT",
+            "away": "ATL",
+            "home": "PIT",
+            "reasons": [
+              "MULTIROLE_AVAILABILITY_VALUES_UNRESOLVED: ATL Jalon Walker and James Pearce Jr. have no complete governed replacement-aware Week 1 loss. Walker's responsibilities span multiple roles, not a safely inferred one-for-one replacement.",
+              "RECOVERY_ACTION: Resolve both historical availability cases and obtain an authorized multi-role/cluster valuation where required. Do not invent workload shares from snap counts. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.atlantafalcons.com/news/jalon-walker-to-miss-2026-season"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-NO-DET",
+            "away": "NO",
+            "home": "DET",
+            "reasons": [
+              "GAME_DAY_INJURY_VALUES_UNRESOLVED: NO Jordyn Tyson, Bryan Bresee and Dillon Radunz lack complete governed replacement-aware Week 1 losses. Detroit's resolved inputs do not make the opposing injury input known.",
+              "RECOVERY_ACTION: Establish the actual prior-game roles and supported replacements, including required cluster context, and append approved historical valuations. Preserve both ratings until the New Orleans input is complete."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+              "https://www.neworleanssaints.com/team/players-roster/"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-BUF-HOU",
+            "away": "BUF",
+            "home": "HOU",
+            "reasons": [
+              "REPLACEMENT_COMMITTEE_UNRESOLVED: HOU Jayden Higgins is unavailable, but the preserved Boutte/Hutchinson/Noel role mapping has no governed complete replacement-aware game-day value.",
+              "RECOVERY_ACTION: Resolve the actual replacement role under existing one-for-one or authorized value-invariant-committee rules, excluding existing baseline contributors. Participation alone is not an authorized weighted committee model. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.nfl.com/news/texans-wr-jayden-higgins-torn-acl-out-2026-season"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-GB-MIN",
+            "away": "GB",
+            "home": "MIN",
+            "reasons": [
+              "REPLACEMENT_COMMITTEE_UNRESOLVED: GB Josh Jacobs' preserved Week 1 case lacks a supported replacement-aware backfield loss.",
+              "RECOVERY_ACTION: Verify final game-day availability and actual replacement responsibilities, then apply only existing approved one-for-one or value-invariant-committee rules with running-back cluster review where required. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-MIA-LV",
+            "away": "MIA",
+            "home": "LV",
+            "reasons": [
+              "REPLACEMENT_COMMITTEE_UNRESOLVED: LV Brock Bowers' absence is confirmed, but multiple tight ends covering his responsibilities do not establish a governed single replacement value or authorized committee loss.",
+              "RECOVERY_ACTION: Resolve the prior-game Bowers role through existing personnel/M4 permissions with baseline-double-count review. Do not automatically credit Michael Mayer's full baseline value or invent workload weights. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.raiders.com/news/las-vegas-raiders-miami-dolphins-nfl-week-1-2026-injury-report"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-WAS-PHI",
+            "away": "WAS",
+            "home": "PHI",
+            "reasons": [
+              "GAME_DAY_INJURY_VALUES_UNRESOLVED: WAS Jer'Zhan Newton and Dorance Armstrong lack complete governed replacement-aware Week 1 availability losses. The already-resolved Laremy Tunsil value alone is insufficient.",
+              "RECOVERY_ACTION: Reconcile the prior-game defensive-front roles and approved replacements, including cluster treatment, before constructing a complete Washington injury input. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.commanders.com/news/commanders-release-2026-unofficial-depth-chart",
+              "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-DAL-NYG",
+            "away": "DAL",
+            "home": "NYG",
+            "reasons": [
+              "PRIOR_ROLE_AND_INJURY_VALUE_UNRESOLVED: NYG Darius Slayton's preserved Week 1 replacement case is not numerically resolved. Dallas's supported personnel losses do not complete the opposing team input.",
+              "RECOVERY_ACTION: Verify Slayton's actual Week 1 roster/availability/role identity and whether the preserved case requires an additive correction; use an approved replacement-aware value or explicitly supported no-loss closure, never assume zero from a missing or stale case. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season"
+            ]
+          },
+          {
+            "gameKey": "2026-W01-DEN-KC",
+            "away": "DEN",
+            "home": "KC",
+            "reasons": [
+              "UNSUPPORTED_MANUAL_INJURY_ADJUSTMENT: KC Josh Simmons has a governed 0.9-point loss, but DEN Jonathon Cooper is represented only by a manual half-point adjustment without a supported replacement-aware game-day loss. Reporting identifies multiple replacement options rather than an authorized numerical closure.",
+              "RECOVERY_ACTION: Validate Cooper's actual prior-game replacement role and apply existing approved locked-value/committee rules. Do not relabel the manual 0.5-point game adjustment as injury loss. Preserve both ratings."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-01-current-numbers.json",
+              "data/walters/nfl/2026/week-01-personnel-ledger.json",
+              "https://www.denverbroncos.com/schedule/",
+              "https://www.milehighreport.com/denver-broncos-news/184357/broncos-week-1-53-man-roster-stock-up-stock-down"
+            ]
+          }
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/active-week.json",
+          "data/walters/nfl/2026/week-01-current-numbers.json",
+          "data/walters/nfl/2026/week-01-personnel-ledger.json",
+          "https://www.nfl.com/schedules/2026/by-week/week-1",
+          "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+          "ChatGPT File Library: walters-full-analysis-v1.0.md // weekly learning",
+          "ChatGPT File Library: gambler-chapters-21-22-clean-transcription.md // pages 259-262",
+          "ChatGPT File Library: walters-rule-registry-v0.1.json // BW-R016 BW-R017 BW-R018"
+        ],
+        "marketViewed": false
       }
     ]
   }
