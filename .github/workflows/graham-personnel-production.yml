@@ -30,48 +30,87 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Verify production contract, active week and calculator syntax
+      - name: Verify production contract, active week and closure tests
         run: |
+          set -euo pipefail
           node --check tools/apply-graham-personnel-staging.mjs
           node --check tools/validate-graham-personnel-closure.mjs
           node --check tools/graham-active-week.mjs
           node --check tools/graham-fair-decomposition.mjs
           node tools/graham-active-week.mjs
+          node tools/validate-graham-personnel-closure.mjs --self-test
           node - <<'NODE'
           const fs=require('node:fs');
           const prod=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-production-current.json','utf8'));
           const s2=JSON.parse(fs.readFileSync('data/walters/nfl/player-values/stage2-current.json','utf8'));
           const s3=JSON.parse(fs.readFileSync('data/walters/nfl/stage3/stage3-current.json','utf8'));
-          const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
-          const staging=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
           if(prod.state!=='OPERATIONAL'||prod.productionAuthority!==true)throw new Error('production contract not operational');
           if(prod.materialPersonnelClosureGate?.state!=='OPERATIONAL')throw new Error('material personnel closure gate not operational');
-          if(s2.auditPass!==true)throw new Error('Stage 2 audit not passed');
-          if(s3.acceptancePass!==true)throw new Error('Stage 3 acceptance not passed');
-          if(active.state!=='ACTIVE'||active.authority!=='GRAHAM_WEEK_ROLLOVER')throw new Error('active Graham week invalid');
-          if(Number(staging.season)!==Number(active.season)||Number(staging.week)!==Number(active.week))throw new Error(`personnel staging ${staging.season} W${staging.week} does not match active Graham ${active.season} W${active.week}`);
-          console.log(`GRAHAM PERSONNEL PRODUCTION PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')}`);
+          if(s2.auditPass!==true||s3.acceptancePass!==true)throw new Error('personnel calibration gates not passed');
           NODE
 
-      - name: Enforce material personnel closure review
-        run: node tools/validate-graham-personnel-closure.mjs data/walters/nfl/personnel-staging.json
+      - name: Audit outstanding candidate lookups without changing governed data
+        run: |
+          set -euo pipefail
+          node tools/validate-graham-personnel-closure.mjs --audit > /tmp/graham-active-lookup-audit.json
+          node tools/validate-graham-personnel-closure.mjs --audit-prior-week > /tmp/graham-prior-lookup-audit.json
+          node - <<'NODE'
+          const fs=require('node:fs');
+          for(const file of ['/tmp/graham-active-lookup-audit.json','/tmp/graham-prior-lookup-audit.json']){
+            const raw=fs.readFileSync(file,'utf8');let a;try{a=JSON.parse(raw)}catch{console.log(raw);continue}
+            console.log(JSON.stringify({...a,rows:(a.rows||[]).map(r=>({caseKey:r.caseKey,player:r.player,gameKey:r.gameKey,storedClosureReviewPresent:r.storedClosureReviewPresent,storedLookupEvidencePresent:r.storedLookupEvidencePresent,researchLeadIds:r.researchLeadIds,evidenceState:r.evidence.state,errors:r.evidence.errors,sourceRegistryGitBlobSha:r.evidence.sourceRegistryGitBlobSha,unavailablePlayer:r.evidence.unavailablePlayer,replacements:r.evidence.replacements,lookupGaps:r.evidence.lookupGaps}))},null,2));
+          }
+          NODE
+          git diff --exit-code -- data/walters
+
+      - name: Select only a new active-week batch
+        id: batch
+        run: |
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {resolveGrahamActiveWeek,grahamWeekPaths} from './tools/graham-active-week.mjs';
+          const active=resolveGrahamActiveWeek();
+          const s=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
+          let apply=false;
+          if(s.state==='READY'){
+            if(s.schema!==1||s.marketViewed!==false||!s.batchId)throw new Error('invalid personnel staging');
+            const p=grahamWeekPaths(s.season,s.week).relative.personnelLedger;
+            const ledger=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):null;
+            if(ledger&&(ledger.season!==Number(s.season)||ledger.week!==Number(s.week)||ledger.marketViewed!==false))throw new Error('staging ledger identity conflict');
+            const done=(ledger?.processedBatchIds||[]).includes(s.batchId);
+            if(done)console.log(`ALREADY_APPLIED_BATCH_NOOP: ${s.batchId}; no new research or rating update claimed`);
+            else{
+              if(Number(s.season)!==active.season||Number(s.week)!==active.week)throw new Error('unprocessed personnel staging does not match active Graham week');
+              apply=true;
+            }
+          }else console.log('NO_READY_PERSONNEL_BATCH; validation and read-only audit only');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`apply=${apply}\n`);
+          NODE
+
+      - name: Enforce closure and attach exact registry lookup evidence
+        if: steps.batch.outputs.apply == 'true'
+        run: node tools/validate-graham-personnel-closure.mjs data/walters/nfl/personnel-staging.json --write
 
       - name: Apply governed personnel staging batch
+        if: steps.batch.outputs.apply == 'true'
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json
 
       - name: Synchronize governed fair decomposition
+        if: steps.batch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
           node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS" --write
           node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
 
-      - name: Verify market isolation and live outputs
+      - name: Verify market isolation, durable lookup evidence and live outputs
+        if: steps.batch.outputs.apply == 'true'
         run: |
           node - <<'NODE'
           const fs=require('node:fs');
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-staging.json','utf8'));
           const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
+          const prod=JSON.parse(fs.readFileSync('data/walters/nfl/personnel-production-current.json','utf8'));
           const week=String(Number(s.week)).padStart(2,'0');
           const ledger=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-personnel-ledger.json`,'utf8'));
           const numbers=JSON.parse(fs.readFileSync(`data/walters/nfl/${s.season}/week-${week}-current-numbers.json`,'utf8'));
@@ -82,11 +121,18 @@ jobs:
           if(research.sweeps.at(-1)?.summary?.marketViewed!==false)throw new Error('research market isolation failed');
           if(numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))throw new Error('invalid fair number');
           if(numbers.fairDecompositionPolicyId!=='graham-fair-decomposition-v1'||numbers.fairExplanationState!=='SYNCHRONIZED')throw new Error('fair explanation synchronization missing');
-          console.log(`GRAHAM PERSONNEL PRODUCTION VERIFY: PASS // ${s.batchId}`);
+          for(const c of s.cases||[]){
+            if(!prod.materialPersonnelClosureGate.appliesToAvailability.includes(String(c.availabilityStatus).toUpperCase()))continue;
+            const e=ledger.events.find(e=>e.personnelEventId===c.personnelEventId);
+            if(e?.batchId!==s.batchId)continue;
+            const proof=e.closureReview?.lookupEvidence;
+            if(!proof||proof.marketViewed!==false||proof.numericAuthority!==false||JSON.stringify(proof)!==JSON.stringify(c.closureReview?.lookupEvidence))throw new Error(`lookup evidence not durable: ${c.caseKey}`);
+          }
+          console.log(`GRAHAM PERSONNEL PRODUCTION VERIFY: PASS // ${s.batchId} // CANDIDATE LOOKUP EVIDENCE DURABLE`);
           NODE
 
       - name: Publish governed personnel outputs
-        # Success hands off to QB reconciliation, then the terminal refresh.
+        if: steps.batch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           git config user.name "betting-edge-bot"
