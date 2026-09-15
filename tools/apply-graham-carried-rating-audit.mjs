@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
+import {resolveGrahamActiveWeek,grahamWeekPaths} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
 
 const ROOT=process.cwd();
@@ -20,6 +20,157 @@ const close=(a,b,tol=0.0005)=>Math.abs(Number(a)-Number(b))<=tol;
 const unique=a=>[...new Set((a||[]).filter(Boolean))];
 const fail=m=>{throw new Error(`GRAHAM_CARRIED_RATING_AUDIT:${m}`);};
 
+// Exact finite-decimal arithmetic: no TGPL or rating quantization.
+function dec(v){
+  if(!finite(v)||typeof v==='boolean')fail('INVALID_DECIMAL');
+  const m=String(v).match(/^(-?)(\d+)(?:\.(\d+))?(?:e([+-]?\d+))?$/i);
+  if(!m)fail('INVALID_DECIMAL');
+  let n=BigInt((m[1]||'')+m[2]+(m[3]||'')),s=(m[3]||'').length-Number(m[4]||0);
+  if(s<0){n*=10n**BigInt(-s);s=0;}
+  while(s>0&&n%10n===0n){n/=10n;s--;}
+  return {n,s};
+}
+function decimalText(d){const neg=d.n<0n;let x=(neg?-d.n:d.n).toString().padStart(d.s+1,'0');return (neg?'-':'')+(d.s?x.slice(0,-d.s)+'.'+x.slice(-d.s):x);}
+function exactNumber(d){const n=Number(decimalText(d)),r=dec(n);if(!Number.isFinite(n)||r.n*10n**BigInt(d.s)!==d.n*10n**BigInt(r.s))fail('EXACT_DECIMAL_NOT_REPRESENTABLE_IN_LEDGER');return n;}
+function exactSum(...vs){const ds=vs.map(dec),s=Math.max(...ds.map(x=>x.s));return exactNumber({n:ds.reduce((n,d)=>n+d.n*10n**BigInt(s-d.s),0n),s});}
+function exactProduct(a,b){const x=dec(a),y=dec(b);return exactNumber({n:x.n*y.n,s:x.s+y.s});}
+function weeklyCalculation(t){
+  for(const k of ['oldRating','opponentOldRating','scoreMargin','teamInjuryLoss','opponentInjuryLoss','teamLocationAdvantage'])if(!finite(t[k])||typeof t[k]==='boolean')fail(`INPUT_MISSING:${t.team}:${k}`);
+  if(Number(t.teamInjuryLoss)<0||Number(t.opponentInjuryLoss)<0)fail(`NEGATIVE_INJURY_LOSS:${t.team}`);
+  const tgpl=exactSum(t.scoreMargin,t.opponentOldRating,t.teamInjuryLoss,-Number(t.opponentInjuryLoss),-Number(t.teamLocationAdvantage));
+  const newRating=exactSum(exactProduct('0.9',t.oldRating),exactProduct('0.1',tgpl));
+  return {tgpl,newRating,delta:exactSum(newRating,-Number(t.oldRating))};
+}
+function weeklyUpdate(input,power,active,prior){
+  const formulas=['BW-R016','BW-R017','BW-R018'];
+  if(input.season!==active.season||input.targetWeek!==active.week||input.sourceWeek!==active.week-1||active.week<2)fail('WEEKLY_WEEK_MISMATCH');
+  if(!formulas.every(x=>input.formulaIds?.includes(x)))fail('FORMULA_IDS_INVALID');
+  if(prior.season!==active.season||prior.week!==input.sourceWeek||!Array.isArray(prior.games)||!prior.games.length)fail('PRIOR_WEEK_SCHEDULE_INVALID');
+  if(power.season!==active.season||!Array.isArray(power.teams)||power.teams.length!==32||new Set(power.teams.map(t=>t.abbr)).size!==32)fail('POWER_LEDGER_INVALID');
+  const schedule=new Map(prior.games.map(g=>[g.gameKey,g]));
+  if(schedule.size!==prior.games.length||new Set(prior.games.flatMap(g=>[g.away,g.home])).size!==2*prior.games.length)fail('PRIOR_GAME_IDENTITY_CONFLICT');
+  const completion=input.priorWeekCompletion;
+  if(completion?.state!=='COMPLETE'||completion.season!==active.season||completion.week!==input.sourceWeek||!completion.sourceRefs?.length||!Array.isArray(completion.finals)||completion.finals.length!==schedule.size)fail('PRIOR_WEEK_COMPLETION_UNVERIFIED');
+  const finals=new Map(completion.finals.map(g=>[g.gameKey,g]));
+  if(finals.size!==schedule.size)fail('DUPLICATE_FINAL_GAME');
+  for(const g of prior.games){const f=finals.get(g.gameKey);if(!f||f.away!==g.away||f.home!==g.home||f.state!=='FINAL'||![f.awayScore,f.homeScore].every(x=>Number.isInteger(x)&&x>=0))fail(`FINAL_IDENTITY_UNVERIFIED:${g.gameKey}`);}
+  if(!Array.isArray(input.games))fail('GAMES_MISSING');
+  const supplied=new Map();
+  for(const g of input.games){const p=schedule.get(g.gameKey);if(!p||p.away!==g.away||p.home!==g.home||supplied.has(g.gameKey)||!['READY','BLOCKED'].includes(g.status))fail(`INVALID_OR_DUPLICATE_GAME:${g.gameKey}`);supplied.set(g.gameKey,g);}
+  const previous=power.weekly90_10;
+  const matching=previous?.sourceWeek===input.sourceWeek&&previous?.targetWeek===input.targetWeek;
+  if(matching&&(previous.schema!==1||previous.marketViewed!==false||!['COMPLETE','PARTIAL_BLOCKED'].includes(previous.state)||!formulas.every(x=>previous.formulaIds?.includes(x))))fail('EXISTING_RECEIPT_INVALID');
+  if(previous&&!matching&&previous.targetWeek>=input.targetWeek)fail('RECEIPT_WEEK_CONFLICT');
+  if(matching&&input.resume!==true)fail('EXPLICIT_RESUME_REQUIRED');
+  if(matching&&previous.attempts?.some(a=>a.auditId===input.auditId))fail('AUDIT_ID_ALREADY_RECORDED');
+  const oldBlocked=new Map((matching?previous.blockedGames:[]).map(g=>[g.gameKey,g]));
+  const originalTeams=JSON.stringify(power.teams),ratingChanges=[],successfulGames=[],alreadyAppliedGames=[],blockedGames=[];
+  const byTeam=new Map(power.teams.map(t=>[t.abbr,t]));
+  const eventsFor=(team,g)=>(team.history||[]).filter(e=>e.type==='WALTERS_WEEKLY_90_10'&&e.sourceWeek===input.sourceWeek&&e.targetWeek===input.targetWeek&&e.gameKey===g.gameKey);
+  const frozen=(team,kickoff)=>{
+    const hs=(team.history||[]).filter(e=>Number.isFinite(Date.parse(e.effectiveAt))&&Date.parse(e.effectiveAt)<=kickoff&&finite(e.toRating)).sort((a,b)=>Date.parse(a.effectiveAt)-Date.parse(b.effectiveAt)||(Number(a.sequence)||0)-(Number(b.sequence)||0));
+    if(!hs.length)fail(`PREGAME_RATING_UNVERIFIED:${team.abbr}`);return Number(hs.at(-1).toRating);
+  };
+  const verifyPair=(g,es)=>{
+    const ts=[g.away,g.home].map((abbr,i)=>{const e=es[i];if(e.marketViewed!==false||!formulas.every(x=>e.formulaIds?.includes(x))||!e.sourceRefs?.length)fail(`EXISTING_EVENT_AUTHORITY:${abbr}`);const t={team:abbr,oldRating:e.fromRating,...e.tgplInputs},c=weeklyCalculation(t);if(e.tgpl!==c.tgpl||e.toRating!==c.newRating||e.delta!==c.delta||e.opponent!==[g.home,g.away][i])fail(`EXISTING_EVENT_ARITHMETIC:${abbr}`);return t;});
+    const [a,b]=ts;
+    if(a.oldRating!==b.opponentOldRating||b.oldRating!==a.opponentOldRating||a.scoreMargin!==-b.scoreMargin||a.teamInjuryLoss!==b.opponentInjuryLoss||b.teamInjuryLoss!==a.opponentInjuryLoss||a.teamLocationAdvantage!==-b.teamLocationAdvantage)fail(`EXISTING_PAIR_SNAPSHOT_CONFLICT:${g.gameKey}`);
+    const f=finals.get(g.gameKey);if(a.scoreMargin!==f.awayScore-f.homeScore)fail(`EXISTING_EVENT_SCORE_CONFLICT:${g.gameKey}`);
+  };
+  for(const p of prior.games){
+    const g=supplied.get(p.gameKey),ledgerTeams=[byTeam.get(p.away),byTeam.get(p.home)];
+    try{
+      if(ledgerTeams.some(t=>!t))fail('TEAM_NOT_FOUND');
+      const existing=ledgerTeams.map(t=>eventsFor(t,p));
+      if(existing.some(es=>es.length)){
+        if(existing.some(es=>es.length!==1))fail('ONE_SIDED_OR_DUPLICATE_WEEKLY_HISTORY');
+        verifyPair(p,existing.map(es=>es[0]));
+        // Never reset lastDelta/currentRating: a later legitimate transaction may exist.
+        successfulGames.push(p.gameKey);alreadyAppliedGames.push(p.gameKey);continue;
+      }
+      if(!g||g.status==='BLOCKED'){
+        const b=g||oldBlocked.get(p.gameKey);
+        blockedGames.push({gameKey:p.gameKey,away:p.away,home:p.home,reasons:b?.reasons?.length?b.reasons:['REQUIRED_GAME_DAY_INPUTS_NOT_SUBMITTED'],sourceRefs:unique(b?.sourceRefs||[])});continue;
+      }
+      const kickoff=Date.parse(p.startTimePacific);
+      if(!Number.isFinite(kickoff)||kickoff>=Date.parse(input.effectiveAt))fail('PREGAME_KICKOFF_UNVERIFIED');
+      const old=ledgerTeams.map(t=>frozen(t,kickoff));
+      if(ledgerTeams.some((t,i)=>Number(t.currentRating)!==old[i]||(t.history||[]).some(e=>Date.parse(e.effectiveAt)>kickoff)))fail('INTERVENING_CARRIED_RATING_UPDATE_REQUIRES_RECONCILIATION');
+      if(!Array.isArray(g.teams)||g.teams.length!==2||new Set(g.teams.map(t=>t.team)).size!==2)fail('READY_TEAMS_INVALID');
+      const evidence=g.gameDayEvidence;
+      if(evidence?.season!==active.season||evidence.sourceWeek!==input.sourceWeek||evidence.gameKey!==p.gameKey||evidence.coverage!=='FINAL_GAME_DAY'||evidence.marketViewed!==false||!evidence.sourceRefs?.length)fail('GOVERNED_GAME_DAY_EVIDENCE_REQUIRED');
+      const venue=p.homeFieldVenueClass,h=Number(p.homeFieldAdvantagePoints);
+      if(!['DOMESTIC_HOME','NEUTRAL','INTERNATIONAL_NEUTRAL'].includes(venue)||!finite(p.homeFieldAdvantagePoints)||(venue!=='DOMESTIC_HOME'&&h!==0)||h<0)fail('PRESERVED_H4_LOCATION_UNVERIFIED');
+      const f=finals.get(p.gameKey),updates=[];
+      for(let i=0;i<2;i++){
+        const abbr=[p.away,p.home][i],opp=[p.home,p.away][i],t=g.teams.find(t=>t.team===abbr),ev=evidence.teams?.find(t=>t.team===abbr);
+        if(!t||t.opponent!==opp||t.oldRating!==old[i]||t.opponentOldRating!==old[1-i])fail(`FROZEN_RATING_MISMATCH:${abbr}`);
+        if(!ev||ev.state!=='GOVERNED'||ev.injuryLoss!==t.teamInjuryLoss||!ev.sourceRefs?.length||!ev.sourceRefs.some(r=>String(r).includes(`/week-${String(input.sourceWeek).padStart(2,'0')}-`)))fail(`GOVERNED_INJURY_VALUE_MISSING:${abbr}`);
+        if(t.scoreMargin!==(i===0?f.awayScore-f.homeScore:f.homeScore-f.awayScore)||t.teamLocationAdvantage!==(i===0?-h:h))fail(`SCORE_OR_PRESERVED_LOCATION_MISMATCH:${abbr}`);
+        updates.push({t,ledgerTeam:ledgerTeams[i],...weeklyCalculation(t)});
+      }
+      const [a,b]=updates;
+      if(a.t.teamInjuryLoss!==b.t.opponentInjuryLoss||b.t.teamInjuryLoss!==a.t.opponentInjuryLoss)fail('INJURY_SNAPSHOT_ASYMMETRY');
+      // Both results and all evidence pass before either team is changed.
+      for(const u of updates){
+        const team=u.ledgerTeam,t=u.t,sourceRefs=unique([...(t.sourceRefs||[]),...(g.sourceRefs||[]),...evidence.sourceRefs,...evidence.teams.find(e=>e.team===t.team).sourceRefs,...completion.sourceRefs]);
+        const e={sequence:(team.history||[]).length?Math.max(...team.history.map(e=>Number(e.sequence)||0))+1:0,type:'WALTERS_WEEKLY_90_10',auditId:input.auditId,fromRating:t.oldRating,priorRating:t.oldRating,delta:u.delta,toRating:u.newRating,currentRating:u.newRating,effectiveAt:input.effectiveAt,reason:`Source-exact Walters weekly update from ${p.gameKey}: TGPL ${u.tgpl}; 90% frozen pregame rating plus 10% TGPL.`,season:active.season,sourceWeek:input.sourceWeek,targetWeek:input.targetWeek,gameKey:p.gameKey,opponent:t.opponent,kickoff:p.startTimePacific,tgplInputs:{scoreMargin:t.scoreMargin,opponentOldRating:t.opponentOldRating,teamInjuryLoss:t.teamInjuryLoss,opponentInjuryLoss:t.opponentInjuryLoss,teamLocationAdvantage:t.teamLocationAdvantage},tgpl:u.tgpl,formulaIds:formulas,sourceRefs,marketViewed:false};
+        team.priorRating=t.oldRating;team.currentRating=u.newRating;team.lastDelta=u.delta;team.lastUpdatedAt=input.effectiveAt;team.lastUpdateType='WALTERS_WEEKLY_90_10';team.sourceRefs=unique([...(team.sourceRefs||[]),...sourceRefs]);team.history=[...(team.history||[]),e];
+        ratingChanges.push({team:t.team,gameKey:p.gameKey,priorRating:t.oldRating,tgpl:u.tgpl,delta:u.delta,currentRating:u.newRating,tgplInputs:e.tgplInputs,sourceRefs});
+      }
+      successfulGames.push(p.gameKey);
+    }catch(err){blockedGames.push({gameKey:p.gameKey,away:p.away,home:p.home,reasons:[String(err.message)],sourceRefs:unique(g?.sourceRefs||oldBlocked.get(p.gameKey)?.sourceRefs||[])});}
+  }
+  const state=blockedGames.length?'PARTIAL_BLOCKED':'COMPLETE';
+  const attempt={auditId:input.auditId,appliedAt:input.effectiveAt,newGamesUpdated:ratingChanges.length/2,newTeamsUpdated:ratingChanges.length,alreadyAppliedGames,blockedGames,sourceRefs:unique(input.sourceRefs||[]),marketViewed:false};
+  const receipt={...(matching?previous:{}),schema:1,season:active.season,sourceWeek:input.sourceWeek,targetWeek:input.targetWeek,state,appliedAt:input.effectiveAt,formulaIds:formulas,marketViewed:false,gamesProcessed:prior.games.length,gamesUpdated:successfulGames.length,teamsUpdated:successfulGames.length*2,blockedGames,attempts:[...(matching?previous.attempts||[]:[]),attempt]};
+  if(previous&&!matching)receipt.previousReceipts=[previous];
+  power.weekly90_10=receipt;power.updatedAt=input.effectiveAt;
+  // Cumulative success must be supported by two exact persisted events per game.
+  for(const key of successfulGames){const g=schedule.get(key);verifyPair(g,[pAway(g),pHome(g)]);}
+  function pAway(g){return eventsFor(byTeam.get(g.away),g)[0];}
+  function pHome(g){return eventsFor(byTeam.get(g.home),g)[0];}
+  if(!ratingChanges.length&&JSON.stringify(power.teams)!==originalTeams)fail('NOOP_MUTATED_TEAM_LEDGER');
+  return {state,ratingChanges,successfulGames,alreadyAppliedGames,blockedGames,receipt,marketViewed:false};
+}
+
+if(process.argv[2]==='--self-test'){
+  const assert=(await import('node:assert/strict')).default;
+  let tests=0;const test=(name,f)=>{f();tests++;console.log(`PASS ${name}`);};
+  const inputFor=(old,opp,margin,inj,oppInj,h)=>({oldRating:old,opponentOldRating:opp,scoreMargin:margin,teamInjuryLoss:inj,opponentInjuryLoss:oppInj,teamLocationAdvantage:h});
+  test('book neutral Bears',()=>assert.equal(weeklyCalculation(inputFor(10,4,7,3.5,1.7,0)).newRating,10.28));
+  test('book neutral Vikings',()=>assert.equal(weeklyCalculation(inputFor(4,10,-7,1.7,3.5,0)).newRating,3.72));
+  test('book home Bears',()=>assert.equal(weeklyCalculation(inputFor(10,4,7,3.5,1.7,2)).newRating,10.08));
+  test('book visiting Vikings',()=>assert.equal(weeklyCalculation(inputFor(4,10,-7,1.7,3.5,0-2)).newRating,3.92));
+  test('unrounded four-decimal old ratings',()=>assert.deepEqual(weeklyCalculation(inputFor(28.0082,19.5382,7,0.25,0.125,-2.082)),{tgpl:28.7452,newRating:28.0819,delta:0.0737}));
+  test('missing injury is not zero',()=>assert.throws(()=>weeklyCalculation(inputFor(10,4,7,null,0,0))));
+  test('negative injury rejected',()=>assert.throws(()=>weeklyCalculation(inputFor(10,4,7,-0.1,0,0))));
+  const fixture=()=>{
+    const active={season:2026,week:2};
+    const prior={season:2026,week:1,games:[{gameKey:'2026-W01-A-B',away:'A',home:'B',startTimePacific:'2026-09-13T10:00:00-07:00',homeFieldVenueClass:'DOMESTIC_HOME',homeFieldAdvantagePoints:2.082},{gameKey:'2026-W01-C-D',away:'C',home:'D',startTimePacific:'2026-09-13T10:00:00-07:00',homeFieldVenueClass:'NEUTRAL',homeFieldAdvantagePoints:0}]};
+    const power={season:2026,teams:['A','B','C','D',...Array.from({length:28},(_,i)=>'BYE'+i)].map(abbr=>({abbr,currentRating:10,seedRating:10,lastDelta:0,history:[{type:'SEED',sequence:0,toRating:10,effectiveAt:'2026-09-01T00:00:00Z'}]}))};
+    const source='data/walters/nfl/2026/week-01-personnel-ledger.json';
+    const games=prior.games.map(p=>({gameKey:p.gameKey,away:p.away,home:p.home,status:'READY',sourceRefs:[source],teams:[p.away,p.home].map((team,i)=>({team,opponent:i?p.away:p.home,...inputFor(10,10,i?-7:7,0,0,i?p.homeFieldAdvantagePoints:-p.homeFieldAdvantagePoints)})),gameDayEvidence:{season:2026,sourceWeek:1,gameKey:p.gameKey,coverage:'FINAL_GAME_DAY',marketViewed:false,sourceRefs:[source],teams:[p.away,p.home].map(team=>({team,state:'GOVERNED',injuryLoss:0,sourceRefs:[source]}))}}));
+    const input={schema:1,state:'READY',auditId:'test-1',season:2026,sourceWeek:1,targetWeek:2,marketViewed:false,effectiveAt:'2026-09-15T10:00:00-07:00',formulaIds:['BW-R016','BW-R017','BW-R018'],games,priorWeekCompletion:{season:2026,week:1,state:'COMPLETE',sourceRefs:['official-final-test-fixture'],finals:prior.games.map(g=>({gameKey:g.gameKey,away:g.away,home:g.home,state:'FINAL',awayScore:27,homeScore:20}))}};
+    return {active,prior,power,input};
+  };
+  const run=x=>weeklyUpdate(x.input,x.power,x.active,x.prior);
+  test('both teams use frozen snapshot and exact H4',()=>{const x=fixture(),r=run(x);assert.equal(r.receipt.teamsUpdated,4);assert.equal(x.power.teams[0].currentRating,10.9082);assert.equal(x.power.teams[1].currentRating,9.0918);});
+  test('partial then subset recovery is cumulative',()=>{const x=fixture(),g=x.input.games[1];x.input.games[1]={...g,status:'BLOCKED',reasons:['missing injury']};assert.equal(run(x).receipt.teamsUpdated,2);const before=JSON.stringify(x.power.teams.slice(0,2));x.input={...x.input,auditId:'test-2',resume:true,games:[g]};const r=run(x);assert.equal(r.ratingChanges.length,2);assert.equal(r.receipt.teamsUpdated,4);assert.equal(JSON.stringify(x.power.teams.slice(0,2)),before);});
+  test('complete replay preserves all team fields',()=>{const x=fixture();run(x);const before=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'test-2',resume:true,games:[]};assert.equal(run(x).ratingChanges.length,0);assert.equal(JSON.stringify(x.power.teams),before);});
+  test('prior history survives recovery receipt',()=>{const x=fixture();run(x);x.input={...x.input,auditId:'test-2',resume:true,games:[]};run(x);assert.equal(x.power.weekly90_10.attempts.length,2);});
+  test('intervening carried rating fails only affected game',()=>{const x=fixture();x.power.teams[0].currentRating=11;x.power.teams[0].history.push({type:'DURABLE',sequence:1,toRating:11,effectiveAt:'2026-09-15T08:00:00-07:00'});const r=run(x);assert.equal(r.ratingChanges.length,2);assert.match(r.blockedGames[0].reasons[0],/INTERVENING/);assert.equal(x.power.teams[0].currentRating,11);});
+  test('one-sided history never double-updates opponent',()=>{const x=fixture();run(x);x.power.teams[0].history.pop();const before=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'test-2',resume:true,games:[]};const r=run(x);assert.match(r.blockedGames[0].reasons[0],/ONE_SIDED/);assert.equal(JSON.stringify(x.power.teams),before);});
+  test('invalid game identity rejected',()=>{const x=fixture();x.input.games[0].away='Z';assert.throws(()=>run(x),/INVALID_OR_DUPLICATE_GAME/);});
+  test('incomplete prior week rejected',()=>{const x=fixture();x.input.priorWeekCompletion.finals[0].state='PENDING';assert.throws(()=>run(x),/FINAL_IDENTITY_UNVERIFIED/);});
+  test('wrong active week rejected',()=>{const x=fixture();x.active.week=3;assert.throws(()=>run(x),/WEEKLY_WEEK_MISMATCH/);});
+  test('unsupported injury evidence blocks paired teams',()=>{const x=fixture();delete x.input.games[0].gameDayEvidence;const r=run(x);assert.equal(r.ratingChanges.length,2);assert.equal(x.power.teams[0].history.length,1);assert.equal(x.power.teams[1].history.length,1);});
+  test('unresolved venue blocks paired teams',()=>{const x=fixture();x.prior.games[0].homeFieldVenueClass='UNRESOLVED';assert.equal(run(x).ratingChanges.length,2);});
+  test('score mismatch blocks paired teams',()=>{const x=fixture();x.input.games[0].teams[0].scoreMargin=6;assert.equal(run(x).ratingChanges.length,2);});
+  test('already-applied later durable delta preserved',()=>{const x=fixture();run(x);x.power.teams[0].currentRating=11;x.power.teams[0].lastDelta=0.0918;x.power.teams[0].history.push({type:'DURABLE',sequence:2,toRating:11,effectiveAt:'2026-09-15T11:00:00-07:00'});const before=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'test-2',resume:true,games:[]};run(x);assert.equal(JSON.stringify(x.power.teams),before);});
+  console.log(`WALTERS WEEKLY RECOVERY SELF-TEST: ${tests} PASS`);process.exit(0);
+}
+
 const input=read(INPUT);
 if(input.schema!==1||input.state!=='READY'||input.marketViewed!==false)fail('INVALID_STAGING');
 if(!input.auditId||!input.effectiveAt||Number.isNaN(Date.parse(input.effectiveAt)))fail('INVALID_AUDIT_ID_OR_TIME');
@@ -27,82 +178,16 @@ if(/\b(Pinnacle|Bet365|DraftKings|sportsbook consensus|line movement|market-impl
 
 if(input.auditType==='WALTERS_WEEKLY_90_10'){
   const active=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
-  if(active.manifest?.schema!==1||active.manifest?.state!=='ACTIVE'||active.manifest?.authority!=='GRAHAM_WEEK_ROLLOVER')fail('ACTIVE_WEEK_INVALID');
-  if(Number(input.season)!==Number(active.season)||Number(input.targetWeek)!==Number(active.week))fail('ACTIVE_WEEK_MISMATCH');
-  if(Number(input.sourceWeek)!==Number(input.targetWeek)-1)fail('SOURCE_WEEK_MISMATCH');
-  if(!Array.isArray(input.formulaIds)||!['BW-R016','BW-R017','BW-R018'].every(x=>input.formulaIds.includes(x)))fail('FORMULA_IDS_INVALID');
-  if(!Array.isArray(input.games)||input.games.length!==16)fail('EXPECTED_SIXTEEN_GAMES');
-  const power=read(POWER);
-  if(Number(power.season)!==Number(active.season)||!Array.isArray(power.teams)||power.teams.length!==32)fail('POWER_LEDGER_INVALID');
-  if(power.weekly90_10?.targetWeek===input.targetWeek&&['COMPLETE','PARTIAL_BLOCKED'].includes(power.weekly90_10?.state))fail('WEEKLY_90_10_ALREADY_APPLIED');
-  const ratingChanges=[];
-  const successfulGames=[];
-  const blockedGames=[];
-  const formulaIds=['BW-R016','BW-R017','BW-R018'];
-  for(const g of input.games){
-    if(!g.gameKey||!g.away||!g.home||!['READY','BLOCKED'].includes(g.status))fail(`INVALID_GAME:${g.gameKey||'UNKNOWN'}`);
-    if(g.status==='BLOCKED'){
-      if(!Array.isArray(g.reasons)||!g.reasons.length)fail(`BLOCKED_REASON_MISSING:${g.gameKey}`);
-      blockedGames.push({gameKey:g.gameKey,away:g.away,home:g.home,reasons:g.reasons,sourceRefs:unique(g.sourceRefs||[])});
-      continue;
-    }
-    if(!Array.isArray(g.teams)||g.teams.length!==2)fail(`READY_TEAMS_INVALID:${g.gameKey}`);
-    const teamNames=new Set(g.teams.map(t=>t.team));
-    if(!teamNames.has(g.away)||!teamNames.has(g.home))fail(`READY_TEAM_IDENTITY:${g.gameKey}`);
-    const updates=[];
-    for(const t of g.teams){
-      for(const k of ['oldRating','opponentOldRating','scoreMargin','teamInjuryLoss','opponentInjuryLoss','teamLocationAdvantage'])if(!finite(t[k]))fail(`INPUT_MISSING:${g.gameKey}:${t.team}:${k}`);
-      if(Number(t.teamInjuryLoss)<0||Number(t.opponentInjuryLoss)<0)fail(`NEGATIVE_INJURY_LOSS:${g.gameKey}:${t.team}`);
-      const opp=t.team===g.away?g.home:g.away;
-      if(t.opponent!==opp)fail(`OPPONENT_IDENTITY:${g.gameKey}:${t.team}`);
-      const ledgerTeam=power.teams.find(x=>x.abbr===t.team);if(!ledgerTeam)fail(`TEAM_NOT_FOUND:${t.team}`);
-      if(!close(ledgerTeam.currentRating,t.oldRating))fail(`CURRENT_RATING_DRIFT:${t.team}:${ledgerTeam.currentRating}:${t.oldRating}`);
-      const oppLedger=power.teams.find(x=>x.abbr===opp);if(!oppLedger||!close(oppLedger.currentRating,t.opponentOldRating))fail(`OPPONENT_RATING_DRIFT:${t.team}:${t.opponentOldRating}`);
-      const tgpl=round(Number(t.scoreMargin)+Number(t.opponentOldRating)+Number(t.teamInjuryLoss)-Number(t.opponentInjuryLoss)-Number(t.teamLocationAdvantage),3);
-      const newRating=round(0.90*Number(t.oldRating)+0.10*tgpl,4);
-      const delta=round(newRating-Number(t.oldRating),4);
-      updates.push({ledgerTeam,t,opp,tgpl,newRating,delta});
-    }
-    const a=updates[0],b=updates[1];
-    if(!close(Number(a.t.scoreMargin),-Number(b.t.scoreMargin),0.00001))fail(`MARGIN_ASYMMETRY:${g.gameKey}`);
-    if(!close(Number(a.t.teamInjuryLoss),Number(b.t.opponentInjuryLoss),0.00001)||!close(Number(b.t.teamInjuryLoss),Number(a.t.opponentInjuryLoss),0.00001))fail(`INJURY_ASYMMETRY:${g.gameKey}`);
-    if(!close(Number(a.t.teamLocationAdvantage),-Number(b.t.teamLocationAdvantage),0.00001))fail(`LOCATION_ASYMMETRY:${g.gameKey}`);
-    for(const u of updates){
-      const seq=(u.ledgerTeam.history||[]).length?Math.max(...u.ledgerTeam.history.map(e=>Number(e.sequence)||0))+1:0;
-      const sourceRefs=unique([...(u.t.sourceRefs||[]),...(g.sourceRefs||[])]);
-      const historyEvent={sequence:seq,type:'WALTERS_WEEKLY_90_10',fromRating:Number(u.t.oldRating),priorRating:Number(u.t.oldRating),delta:u.delta,toRating:u.newRating,currentRating:u.newRating,effectiveAt:input.effectiveAt,reason:`Source-exact Walters weekly update from ${g.gameKey}: TGPL ${u.tgpl.toFixed(3)}, then 90% prior rating + 10% TGPL.`,sourceWeek:Number(input.sourceWeek),targetWeek:Number(input.targetWeek),gameKey:g.gameKey,opponent:u.opp,tgplInputs:{scoreMargin:Number(u.t.scoreMargin),opponentOldRating:Number(u.t.opponentOldRating),teamInjuryLoss:Number(u.t.teamInjuryLoss),opponentInjuryLoss:Number(u.t.opponentInjuryLoss),teamLocationAdvantage:Number(u.t.teamLocationAdvantage)},tgpl:u.tgpl,formulaIds,sourceRefs,marketViewed:false};
-      u.ledgerTeam.priorRating=Number(u.t.oldRating);
-      u.ledgerTeam.currentRating=u.newRating;
-      u.ledgerTeam.lastDelta=u.delta;
-      u.ledgerTeam.lastUpdatedAt=input.effectiveAt;
-      u.ledgerTeam.lastUpdateType='WALTERS_WEEKLY_90_10';
-      u.ledgerTeam.sourceRefs=unique([...(u.ledgerTeam.sourceRefs||[]),...sourceRefs]);
-      u.ledgerTeam.history=[...(u.ledgerTeam.history||[]),historyEvent];
-      ratingChanges.push({team:u.t.team,gameKey:g.gameKey,priorRating:Number(u.t.oldRating),tgpl:u.tgpl,delta:u.delta,currentRating:u.newRating,tgplInputs:historyEvent.tgplInputs,sourceRefs});
-    }
-    successfulGames.push(g.gameKey);
-  }
-  const state=blockedGames.length?'PARTIAL_BLOCKED':'COMPLETE';
-  const receipt={schema:1,sourceWeek:Number(input.sourceWeek),targetWeek:Number(input.targetWeek),state,appliedAt:input.effectiveAt,formulaIds,marketViewed:false,gamesProcessed:input.games.length,gamesUpdated:successfulGames.length,teamsUpdated:ratingChanges.length,blockedGames};
-  power.weekly90_10=receipt;
-  power.updatedAt=input.effectiveAt;
-  input.state='APPLIED';
-  input.appliedAt=input.effectiveAt;
-  input.result={state,ratingChanges,successfulGames,blockedGames,receipt,marketViewed:false};
+  const priorPaths=grahamWeekPaths(active.season,active.week-1,{root:ROOT});
+  const power=read(POWER),before=JSON.stringify(power),prior=read(priorPaths.absolute.currentNumbers);
+  const result=weeklyUpdate(input,power,active,prior);
+  const after=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
+  if(JSON.stringify(after.manifest)!==JSON.stringify(active.manifest))fail('ACTIVE_WEEK_CHANGED_DURING_AUDIT');
+  if(JSON.stringify(read(POWER))!==before)fail('POWER_LEDGER_CHANGED_DURING_AUDIT');
+  input.state='APPLIED';input.appliedAt=input.effectiveAt;input.result=result;
   write(POWER,power);write(INPUT,input);
-  const activeAfter=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
-  if(Number(activeAfter.season)!==Number(active.season)||Number(activeAfter.week)!==Number(active.week)||activeAfter.manifest.authority!=='GRAHAM_WEEK_ROLLOVER')fail('ACTIVE_WEEK_CHANGED_DURING_AUDIT');
-  const vp=read(POWER),vi=read(INPUT);
-  if(vi.state!=='APPLIED'||vi.auditId!==input.auditId)fail('STAGING_READBACK_FAILED');
-  if(vp.weekly90_10?.state!==state||vp.weekly90_10?.sourceWeek!==Number(input.sourceWeek)||vp.weekly90_10?.targetWeek!==Number(input.targetWeek)||vp.weekly90_10?.teamsUpdated!==ratingChanges.length)fail('RECEIPT_READBACK_FAILED');
-  for(const ch of ratingChanges){
-    const t=vp.teams.find(x=>x.abbr===ch.team);const e=t?.history?.at(-1);
-    if(!t||!close(t.currentRating,ch.currentRating,0.00001)||t.lastUpdateType!=='WALTERS_WEEKLY_90_10'||!e||e.type!=='WALTERS_WEEKLY_90_10'||e.gameKey!==ch.gameKey||!close(e.tgpl,ch.tgpl,0.00001)||!close(e.toRating,ch.currentRating,0.00001))fail(`POWER_READBACK_FAILED:${ch.team}`);
-    const calc=round(Number(e.tgplInputs.scoreMargin)+Number(e.tgplInputs.opponentOldRating)+Number(e.tgplInputs.teamInjuryLoss)-Number(e.tgplInputs.opponentInjuryLoss)-Number(e.tgplInputs.teamLocationAdvantage),3);
-    const nr=round(0.9*Number(e.fromRating)+0.1*calc,4);
-    if(!close(calc,e.tgpl,0.00001)||!close(nr,e.toRating,0.00001))fail(`ARITHMETIC_READBACK_FAILED:${ch.team}`);
-  }
-  console.log(`WALTERS WEEKLY 90/10 ${state} // ${successfulGames.length} GAMES UPDATED // ${ratingChanges.length} TEAMS // ${blockedGames.length} GAMES BLOCKED // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')} // MARKET VIEWED FALSE`);
+  if(JSON.stringify(read(POWER))!==JSON.stringify(power)||JSON.stringify(read(INPUT))!==JSON.stringify(input))fail('EXACT_READBACK_FAILED');
+  console.log(`WALTERS WEEKLY 90/10 ${result.state} // ${result.successfulGames.length} CUMULATIVE GAMES // ${result.ratingChanges.length} NEW TEAMS // ${result.alreadyAppliedGames.length} ALREADY APPLIED // ${result.blockedGames.length} BLOCKED // MARKET VIEWED FALSE`);
   process.exit(0);
 }
 
@@ -113,7 +198,7 @@ if(Number(input.season)!==Number(active.season)||Number(input.week)!==Number(act
 
 const h4prod=read(H4_PROD),h4=read(H4_CURRENT),personnelProd=read(PERSONNEL_PROD),matchupProd=read(MATCHUP_PROD),qbProd=read(QB_PROD);
 if(h4prod.state!=='OPERATIONAL_SCOPED'||h4prod.productionAuthority!==true||h4prod.marketViewed!==false)fail('H4_PRODUCTION_INVALID');
-if(h4.state!=='OPERATIONAL_SCOPED'||h4.productionAuthority!==true||h4.marketViewed!==false)fail('H4_CURRENT_INVALID');
+if(h4.state!=='OPERATIONAL_SCOPED'||h4.productionAuthority!==true||h4.productionAuthority!==true||h4.marketViewed!==false)fail('H4_CURRENT_INVALID');
 if(!close(h4prod?.productionScope?.domesticLeagueBaseline?.homeLocationAdvantagePoints,2.082)||!close(h4prod?.productionScope?.domesticLeagueBaseline?.pointsToHomeSpread,-2.082))fail('H4_LEAGUE_VALUE_REGRESSION');
 if(personnelProd.state!=='OPERATIONAL'||personnelProd.productionAuthority!==true||personnelProd.productionRules?.marketIsolationRequired!==true)fail('PERSONNEL_PRODUCTION_INVALID');
 if(matchupProd.state!=='OPERATIONAL_SCOPED'||matchupProd.productionAuthority!==true||matchupProd.marketViewed!==false)fail('MATCHUP_PRODUCTION_INVALID');
