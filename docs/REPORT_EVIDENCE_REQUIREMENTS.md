@@ -1,5 +1,11 @@
 # Report source and fair-value evidence
 
+## Candidate completion — September 16 forward amendment
+
+For reports at/after `2026-09-16T00:00:00-07:00`, follow `CANDIDATE_ASSESSMENT.md`. The ranked paired-market queue identifies concrete favorable-price and exact-forecast questions. Record their actual source-to-decision review, including accepted/rejected forecast records and material personnel reconciliation. A supported market LEAN still does not require an independent model or numerical range. Adopt a forecast fair coherently across the exact opposing contract before assessing both prices.
+
+The producer's unfrozen draft preparation retains actually unfinished promising candidates as `RESEARCH_INCOMPLETE` and publishes the completed remainder. Missing new metadata alone is not a blocker for an already completed supported market assessment. No assembler selects a betting grade, invents a fair, or promotes a recommendation. The publisher rejects a bypass that still calls an unfinished candidate EVALUATED; the remedy is to complete or defer that selection before freeze, not hold the rest of the slate. Historical receipts remain under their original rules.
+
 ## Card evidence application — September 12 consolidated repair
 
 New unfrozen drafts also follow `REPORT_CARD_EVIDENCE.md`: use actual source facts in SUPPORT/CONTRARY/ANALYSIS, recognizable source names, and the canonical research pack for HIST FIT. Research gaps get an honest NR/unavailable explanation. Preserve earlier exact forecast leads for current revalidation. Run the read-only `tools/review-card-evidence.mjs` advice before freeze; its warnings add no publication gate and cannot replace the substantive review. The market-assessment and partial-publication allowances below remain authoritative. Forecast completion counts must distinguish extracted forecasts from no-vig references.
