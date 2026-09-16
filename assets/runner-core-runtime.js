@@ -254,6 +254,125 @@ function coveragePanel(d,run){
   if(coverage.discoveryOmissions.length){const list=el(d,'ul');coverage.discoveryOmissions.forEach(b=>list.appendChild(el(d,'li','',`${b.label||'Event '+b.eventId}: ${coverageReasonText(b.reason,coverage)}.`)));details.appendChild(list);}
   panel.appendChild(details);return panel;
 }
+// This panel describes the publisher's recorded investigation. It never grades,
+// reprices or promotes a selection and is absent from older issued reports.
+function candidateText(value){return typeof value==='string'?value.trim():''}
+function candidatePrice(selection){
+  const q=selection?.quote,d=Number(q?.priceDecimal);
+  return q&&Number.isFinite(d)&&d>1?`${q.book||'Recorded book'} ${americanText(d)} (${d})`:'Executable price unavailable';
+}
+function candidateQuoteLabel(quote){
+  if(!quote)return '';
+  const side=candidateText(quote.side);
+  if(quote.marketKey==='ml')return `${side} moneyline`.trim();
+  if(Number.isFinite(quote.line)){
+    const line=quote.marketKey==='spread'&&side==='away'?-quote.line:quote.line;
+    return `${side} ${quote.marketKey==='spread'&&line>0?'+':''}${line}`.trim();
+  }
+  return side;
+}
+function candidateQuoteChanged(selection){
+  const a=selection?.assessedQuote,b=selection?.quote;
+  return a&&b&&['book','marketKey','side','line','priceDecimal'].some(key=>a[key]!==b[key]);
+}
+function candidateReviewLabel(selection){
+  return ({COMPLETE:'REVIEW COMPLETE',UNFINISHED:'RESEARCH UNFINISHED',NOT_REQUIRED:'SCREENED'})[selection?.reviewState]||'REVIEW NOT RECORDED';
+}
+function candidateResearchAction(value){
+  const code=String(value||'').split(':')[0];
+  return ({
+    CURRENT_EXACT_RECEIPT_REQUIRED:'Bind the assessment to the current exact quote.',
+    PRODUCER_CANDIDATE_ASSESSMENT_REQUIRED:'Complete and record the candidate investigation.',
+    CURRENT_CANDIDATE_REVIEW_REQUIRED:'Recheck the candidate using current information.',
+    CANDIDATE_QUOTE_BINDING_REQUIRED:'Match the investigation to this exact selection and price.',
+    BEST_AVAILABLE_PRICE_CHOICE_UNEXPLAINED:'Explain the choice of price when a better quote is available.',
+    FORECAST_DISPOSITION_REQUIRED:'Record how each eligible forecast affects the decision.',
+    FORECAST_DISPOSITION_INVALID:'Explain whether each forecast is accepted, contextual or rejected.',
+    FORECAST_ADOPTION_UNBOUND:'Connect the accepted forecast to the fair-value assessment.',
+    FAIR_FORECAST_DISPOSITION_REQUIRED:'Explain the use of each forecast behind the fair value.',
+    PERSONNEL_MATERIALITY_DISTINCTION_REQUIRED:'Resolve whether the remaining personnel uncertainty changes this market.',
+    SOURCE_LINKED_PERSONNEL_RESOLUTION_REQUIRED:'Resolve material starter and lineup questions using current sources.',
+    FINAL_DECISION_EXPLANATION_REQUIRED:'Record the final decision and its supporting reasoning.',
+    QUALIFIED_MARKET_LEAN_ROUTE_NOT_ASSESSED:'Assess whether the favorable market comparison supports a LEAN.',
+    FAVORABLE_MARKET_PASS_REQUIRES_SUBSTANTIVE_REASON:'Explain why the favorable market comparison still merits PASS.',
+    MISSING_MODEL_OR_INTERVAL_ALONE_DOES_NOT_EXCLUDE_MARKET_LEAN:'Assess the market-based LEAN route; a missing model alone does not rule it out.',
+    BET_ELIGIBILITY_ASSESSMENT_REQUIRED:'Complete the assessment of BET eligibility.',
+    SUPPORTED_CONSERVATIVE_FAIR_BOUND_REQUIRED:'Support the conservative fair-value estimate with evidence.',
+    DEFENSIBLE_PRICE_CONDITION_REQUIRED:'Establish what price would change the assessment, or explain why price alone cannot.'
+  })[code]||String(value||'');
+}
+function candidateReasons(d,selection,compact=false){
+  const box=el(d,'div','runnerCandidateReasons');
+  const reason=candidateText(selection?.reason);
+  if(reason)box.appendChild(el(d,'p','',`WHY REVIEW: ${reason}`));
+  if(candidateQuoteChanged(selection))box.appendChild(el(d,'p','runnerCandidateMeta',`Recorded decision assessed at: ${candidateQuoteLabel(selection.assessedQuote)} • ${candidatePrice({quote:selection.assessedQuote})}. Listed quote requires its own assessment.`));
+  const rationale=candidateText(selection?.decisionRationale);
+  if(rationale&&rationale!==reason)box.appendChild(el(d,'p','',rationale));
+  const rawMissing=(Array.isArray(selection?.missingResearch)?selection.missingResearch:[]).filter(x=>typeof x==='string'&&x.trim());
+  const priority=value=>/PERSONNEL|MARKET_LEAN|MARKET_PASS|BET_ELIGIBILITY|CONSERVATIVE_FAIR|FORECAST_DISPOSITION/.test(value)?0:1;
+  const missing=[...new Set(rawMissing.slice().sort((a,b)=>priority(a)-priority(b)).map(candidateResearchAction))];
+  const unresolved=selection?.personnel?.remainingUncertainty;
+  const specifics=Array.isArray(unresolved)?unresolved.filter(x=>typeof x==='string'):candidateText(unresolved)?[unresolved]:[];
+  if(specifics.length)box.appendChild(el(d,'p','runnerCandidateBlocker',`OPEN QUESTION: ${specifics.join(' • ')}`));
+  if(missing.length)box.appendChild(el(d,'p','runnerCandidateBlocker',`TO RESOLVE: ${(compact?missing.slice(0,2):missing).join(' • ')}${compact&&missing.length>2?` • ${missing.length-2} more checks below`:''}`));
+  if(!compact){
+    const dispositions=Array.isArray(selection?.forecastDispositions)?selection.forecastDispositions:[];
+    for(const item of dispositions){
+      const source=candidateText(item.sourceName)||candidateText(item.sourceId)||candidateText(item.recordId)||'Forecast';
+      const state=candidateText(item.disposition)||candidateText(item.state);
+      const reason=candidateText(item.rationale)||candidateText(item.reason);
+      if(state||reason)box.appendChild(el(d,'p','runnerCandidateForecast',`${source}: ${[state,reason].filter(Boolean).join(' — ')}`));
+    }
+  }
+  const condition=selection?.priceCondition;
+  const conditionText=candidateText(condition?.text);
+  if(condition?.state==='PRICE_THRESHOLD'&&condition.hypothetical===true&&conditionText&&candidateText(condition.basis)){
+    box.appendChild(el(d,'p','runnerCandidateCondition',`COMPARISON PRICE: ${conditionText}`));
+    if(candidateText(condition.rationale)&&!conditionText.includes(condition.rationale))box.appendChild(el(d,'p','runnerCandidateForecast',condition.rationale));
+  }else if(condition?.state==='NO_PRICE_ONLY_CHANGE'&&candidateText(condition.rationale)){
+    box.appendChild(el(d,'p','runnerCandidateForecast',`PRICE ALONE: ${condition.rationale}`));
+  }
+  return box;
+}
+function candidateAssessmentPanel(d,run){
+  const assessment=run?.candidateAssessment;
+  if(!assessment||assessment.schema!==1||assessment.version!=='candidate-assessment-v1'||!Array.isArray(assessment.shortlist))return null;
+  const panel=el(d,'section','runnerCandidateAssessment');panel.id='runnerCandidateAssessment';panel.setAttribute('aria-label','Candidate investigation shortlist');
+  panel.appendChild(el(d,'div','runnerCandidateTitle','CANDIDATE SHORTLIST'));
+  const counts=assessment.counts||{},count=k=>Number.isSafeInteger(counts[k])&&counts[k]>=0?counts[k]:null;
+  const scope=[];
+  if(count('markets')!==null)scope.push(`${count('markets')} market${count('markets')===1?'':'s'} screened`);
+  if(count('reviewComplete')!==null)scope.push(`${count('reviewComplete')} selection review${count('reviewComplete')===1?'':'s'} complete`);
+  if(count('unfinished')!==null)scope.push(`${count('unfinished')} selection review${count('unfinished')===1?'':'s'} unfinished`);
+  if(scope.length)panel.appendChild(el(d,'div','runnerCandidateScope',scope.join(' • ')));
+  panel.appendChild(el(d,'p','runnerCandidateNote','Prices and decisions belong to this report. Research status is shown separately from the recorded decision.'));
+  const rows=assessment.shortlist.filter(row=>row&&Array.isArray(row.selections)&&row.selections.length);
+  if(!rows.length)panel.appendChild(el(d,'p','runnerCandidateNote',count('unfinished')?'Candidate investigation is unfinished; no completed shortlist was recorded.':'No priority candidates were recorded for this report.'));
+  for(const market of rows){
+    const selections=market.selections.filter(s=>s&&typeof s==='object');if(!selections.length)continue;
+    const focus=selections.find(s=>s.selectionId===market.preferredSelectionId)||selections[0];
+    const item=el(d,'article','runnerCandidateMarket');
+    const heading=el(d,'div','runnerCandidateHeading');
+    heading.appendChild(el(d,'h3','',candidateText(market.label)||candidateText(market.title)||candidateText(focus.title)||'Market review'));
+    const state=el(d,'span','runnerCandidateState',candidateReviewLabel(focus));state.dataset.reviewState=focus.reviewState||'UNRECORDED';heading.appendChild(state);item.appendChild(heading);
+    item.appendChild(el(d,'div','runnerCandidateFocus',`${candidateText(focus.title)||candidateText(focus.side)||'Review focus'} • ${candidatePrice(focus)}`));
+    if(candidateQuoteLabel(focus.quote))item.appendChild(el(d,'div','runnerCandidateMeta',`Quoted market: ${candidateQuoteLabel(focus.quote)}`));
+    const decision=['BET','LEAN','WAIT','PASS'].includes(focus.status)?`Recorded decision: ${focus.status}`:'No recorded decision';
+    const marketName=candidateText(market.marketDetail).replace(/_/g,' ');
+    item.appendChild(el(d,'div','runnerCandidateMeta',[marketName,decision,market.pairComplete===false?'Opposing side unavailable':''].filter(Boolean).join(' • ')));
+    item.appendChild(candidateReasons(d,focus,true));
+    const details=el(d,'details','runnerCandidateDetails');details.appendChild(el(d,'summary','',selections.length>1?'BOTH SIDES & FORECAST CHECKS':'FORECAST CHECKS'));
+    for(const selection of selections){
+      const side=el(d,'div','runnerCandidateSide');
+      side.appendChild(el(d,'b','',`${candidateText(selection.title)||candidateText(selection.side)||'Selection'} • ${candidatePrice(selection)}`));
+      if(candidateQuoteLabel(selection.quote))side.appendChild(el(d,'div','runnerCandidateMeta',`Quoted market: ${candidateQuoteLabel(selection.quote)}`));
+      side.appendChild(el(d,'div','runnerCandidateMeta',`${candidateReviewLabel(selection)}${['BET','LEAN','WAIT','PASS'].includes(selection.status)?` • Recorded decision: ${selection.status}`:''}`));
+      side.appendChild(candidateReasons(d,selection));details.appendChild(side);
+    }
+    item.appendChild(details);panel.appendChild(item);
+  }
+  return panel;
+}
 function pressureReasonText(reason){return ({NO_DIRECTIONAL_REFERENCE:'No BET, LEAN or WAIT selection supplies a direction.',CONFLICTING_DIRECTIONAL_REFERENCES:'Opposing selections conflict; pressure cannot use them.',UNVERIFIED_DIRECTIONAL_REFERENCES:'Directional selections do not match verified primary quotes.',NO_EXACT_DIRECTIONAL_SAME_BOOK_BASELINE:'No earlier exact quote from the same book for the selected direction.'})[reason]||''}
 function meterBaselineText(run){
   if(telemetryIntegrityState(run)!=='VALID')return '';
@@ -511,6 +630,21 @@ function injectStyle(d){
   .runnerCoverageDetails ul{padding-left:20px;margin:7px 0}
   .runnerCoverageDetails li+li{margin-top:6px}
   .runnerCoverageSubhead{font-weight:900;color:var(--muted);margin-top:10px}
+  .runnerCandidateAssessment{margin:10px 0;padding:10px;border:1px solid #315746;background:#041009;min-width:0;overflow-wrap:anywhere}
+  .runnerCandidateTitle{font-size:12px;color:var(--green);font-weight:950;letter-spacing:.07em}
+  .runnerCandidateScope,.runnerCandidateNote,.runnerCandidateMeta{font-size:11px;line-height:1.45;color:var(--muted)}
+  .runnerCandidateScope{margin-top:5px}.runnerCandidateNote{margin:5px 0}
+  .runnerCandidateMarket{padding:10px 0;border-top:1px solid var(--line);margin-top:9px;min-width:0}
+  .runnerCandidateHeading{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .runnerCandidateHeading h3{font-size:12px;margin:0;line-height:1.45;flex:1 1 220px;color:var(--white)}
+  .runnerCandidateState{font-size:9px;font-weight:900;border:1px solid #315746;padding:3px 5px;line-height:1.35;color:var(--muted);max-width:100%}
+  .runnerCandidateState[data-review-state='UNFINISHED']{color:var(--yellow);border-color:#736833}
+  .runnerCandidateFocus{font-size:12px;color:var(--green);font-weight:800;line-height:1.45;margin:6px 0 3px}
+  .runnerCandidateReasons{font-size:11px;line-height:1.5}.runnerCandidateReasons p{margin:5px 0}
+  .runnerCandidateBlocker{color:var(--yellow)}.runnerCandidateForecast{color:var(--muted)}.runnerCandidateCondition{color:var(--green)}
+  .runnerCandidateDetails{font-size:11px;line-height:1.45;margin-top:7px}.runnerCandidateDetails summary{cursor:pointer;color:var(--muted);font-size:10px;padding:5px 0;font-weight:900}
+  .runnerCandidateSide{padding:8px;border-left:2px solid var(--line);margin-top:7px;min-width:0}.runnerCandidateSide>b{font-size:11px}
+  @media(max-width:520px){.runnerCandidateAssessment{padding:8px}.runnerCandidateHeading h3{flex-basis:100%}.runnerCandidateSide{padding:6px}}
   @media(max-width:520px){.runnerCoverageGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.runnerCoverage{padding:8px}}
   .runnerCounts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
   .runnerCount{border:1px solid var(--line);padding:9px;background:#020912;text-align:center}
@@ -928,6 +1062,7 @@ function apply(run){
       refresh.appendChild(delta)
     }
     box.appendChild(refresh);
+    const candidates=candidateAssessmentPanel(d,issuedMeterRun);if(candidates)box.appendChild(candidates);
     filterTools(d,run,box);
 
     const recs=(Array.isArray(run.recs)?run.recs:[]).filter(r=>statusFilter==='ALL'||String(r.status||'WAIT').toUpperCase()===statusFilter);

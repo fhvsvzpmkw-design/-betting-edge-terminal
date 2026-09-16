@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import QuoteObservation from '../assets/quote-observation.js';
 import { finalSelectionCards, opposingMarketCoverage } from './lib/results-populations.mjs';
+import { rebuildMarketMethodShadowIndex } from './market-method-shadow.mjs';
 
 const ROOT = process.cwd();
 const OBS_ROOT = path.join(ROOT, 'data/history/observations');
@@ -370,9 +371,18 @@ const finalCards = finalSelectionCards(cards);
 const observedCards = cards.filter(card => card.observationState === 'recorded');
 const pendingObservationCards = cards.filter(card => card.observationState === 'awaiting_observation');
 
+let marketMethodTest;
+try {
+  marketMethodTest = rebuildMarketMethodShadowIndex({root: ROOT});
+} catch (error) {
+  marketMethodTest = {state: 'UNAVAILABLE', authority: 'HYPOTHETICAL_ONLY', error: error.message};
+  console.warn(`Market method test unavailable: ${error.message}`);
+}
+
 const result = {
   schemaVersion: 1,
   kind: 'betting-edge-results-index',
+  marketMethodTest,
   generatedAt: new Date().toISOString(),
   authority: {
     runs: 'data/history/runs/**',

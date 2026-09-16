@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "methodVersion": "qualified-pinnacle-price-shadow-v1",
+  "activationAt": "2026-09-16T00:00:00-07:00",
+  "timezone": "America/Vancouver",
+  "authority": "HYPOTHETICAL_ONLY",
+  "rule": "For every exact full-game paired market, retain the side with the greatest strictly positive Pinnacle proportional-no-vig probability minus executable break-even probability. Use the best valid exact supported-book quote for that side. Resolve ties by selectionKey, then normalized book. Count only its first qualifying published appearance per exact market per Pacific day.",
+  "executionBooks": ["Bet365", "DraftKings"],
+  "marketKeys": ["ml", "spread", "totals"],
+  "minimumEdgeProbabilityPointsExclusive": 0,
+  "numericTolerance": 1e-8,
+  "maximumFeedAgeMinutes": 75,
+  "maximumQuoteAgeMinutes": 30,
+  "hypotheticalUnits": 1,
+  "probabilityBasis": "CONDITIONAL_ON_NO_PUSH",
+  "scoreReplaySports": ["MLB", "NBA_WNBA", "NFL", "NCAAF", "CFL", "NHL"],
+  "settlement": "Integer and half-point full-game lines only. A verified push or void returns zero net units. No unconditional expected ROI is inferred from a conditional market probability. Quarter lines are excluded in v1.",
+  "information": "Require a current source-linked market information review or candidateAssessment.personnel RESOLVED/NOT_MATERIAL review, with an explicit materiality explanation and remaining uncertainty whenever underlying personnel is unresolved. Reuse explicit compatible settlement treatment from the exact market assessment or an adopted exact forecast and its current applicability/revalidation. Missing research remains an exclusion, never a negative performance result.",
+  "evaluation": "Forward samples only. Earlier snapshots are development replay, never validation. No outcome, future quote or later report can change the first qualifying selection or its entry price. Prefer exact same-book verified settlement; otherwise require consistent verified same-event, same-sport, same-start, full-game scores from the SAME market family before applying the frozen line. Settled moneylines alone cannot establish run-line or total settlement. Publish missing settlements and price comparisons, and exclude them from the corresponding denominator.",
+  "closingDiagnostic": "Compare only an actually observed fresh exact same-book later pre-start price. Label it last observed pre-start unless an explicit verified closing record exists. Price movement is a diagnostic, not proof of true edge.",
+  "promotion": "No automatic promotion, betting authority, stake, Core threshold, schedule or issued-history changes. Rule changes require a new version and future activation. Report aggregate results without treating correlated events or repeated daily events as independent statistical evidence."
+}

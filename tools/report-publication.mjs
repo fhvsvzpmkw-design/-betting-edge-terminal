@@ -6,7 +6,7 @@ import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs
 import {validateReportMarketScope} from './major-sport-market-coverage-gate.mjs';
 import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
 import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
-import {attachPublicationEvidenceAudit} from './report-evidence-repair.mjs';
+import {attachPublicationEvidenceAudit, validateCandidateCompletion} from './report-evidence-repair.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -371,6 +371,7 @@ function readPublicationBundle(reportFile,sidecarFile,{root=process.cwd(),collec
   const paths = expectedPaths(report);
   const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true,collectRecommendationErrors});
   validateReportCoverageSummary({root,report,sidecar});
+  validateCandidateCompletion({root,report,sidecar});
   return {report,paths,sidecar};
 }
 function publish(root,reportFile,sidecarFile){

@@ -35,7 +35,7 @@ const document=new Document();const app=document.createElement('iframe');app.id=
 const context={console,document,location:{hash:'',search:''},localStorage:{getItem:()=>null},Intl,URLSearchParams,Date,setTimeout,clearTimeout};context.window={top:null};
 let source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
 const marker='\nactiveRun=payload();';
-vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster,card};'+marker),context);
+vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster,card,candidateAssessmentPanel};'+marker),context);
 const api=context.api;
 source=fs.readFileSync('assets/report-dashboard-vigscope.js.old','utf8');
 const tail=source.lastIndexOf("  const core=document.getElementById('core');");
@@ -100,4 +100,40 @@ assert.match(api.meterBaselineText(historical),/NO PUBLISHED SELECTIONS IN METER
 assert.equal(api.coveragePanel(document,historical),null);
 assert.match(api.noPublishedCardsText(historical),/analysis coverage was not recorded/);
 assert.equal(JSON.stringify(historical),before);
+// Candidate investigation must never rewrite issued grades, synthesize a
+// threshold, or describe unfinished research as a completed PASS assessment.
+assert.equal(api.candidateAssessmentPanel(document,report),null,'older reports retain the existing layout');
+const candidateRun={...report,recs:[{status:'PASS',title:'Visitors ML',price:'+115'}],candidateAssessment:{schema:1,version:'candidate-assessment-v1',counts:{available:2,markets:1,promising:1,reviewComplete:1,unfinished:1,blocked:0},shortlist:[{
+  marketId:'1|ml',label:'Visitors at Hosts',marketDetail:'full_game_moneyline',pairComplete:true,preferredSelectionId:'away',selections:[
+    {selectionId:'home',title:'Hosts ML',side:'home',status:'PASS',reviewState:'COMPLETE',quote:{book:'DraftKings',priceDecimal:1.8},decisionRationale:'Neither the exact forecast nor market comparison supports this price.',missingResearch:[]},
+    {selectionId:'away',title:'Visitors ML',side:'away',status:'PASS',reviewState:'UNFINISHED',quote:{book:'Bet365',priceDecimal:2.15},decisionRationale:'Favorable exact-market reference; starter confirmation is still required.',missingResearch:['Confirm the announced starter.'],forecastDispositions:[{sourceName:'Public forecast',disposition:'REJECTED',reason:'Different total line.'}],priceCondition:{state:'PRICE_THRESHOLD',hypothetical:true,text:'+125 comparison boundary',basis:'FORECAST_BREAK_EVEN',rationale:'This comparison boundary does not authorize a bet.'}}
+  ]
+}]}};
+const candidateBefore=JSON.stringify(candidateRun),candidatePanel=api.candidateAssessmentPanel(document,candidateRun);
+assert.match(candidatePanel.textContent,/1 market screened.*1 selection review complete.*1 selection review unfinished/);
+assert.match(candidatePanel.querySelector('.runnerCandidateHeading').textContent,/Visitors at HostsRESEARCH UNFINISHED/);
+assert.match(candidatePanel.querySelector('.runnerCandidateFocus').textContent,/Visitors ML.*Bet365 \+115 \(2.15\)/,'the publisher-selected focus is used rather than array position');
+assert.match(candidatePanel.textContent,/Recorded decision: PASS/);
+assert.match(candidatePanel.textContent,/TO RESOLVE: Confirm the announced starter\./);
+assert.match(candidatePanel.textContent,/Hosts ML.*DraftKings -125 \(1.8\)/,'the opposing side remains visible in the paired review');
+assert.match(candidatePanel.textContent,/Public forecast: REJECTED — Different total line\./);
+assert.match(candidatePanel.textContent,/COMPARISON PRICE: \+125 comparison boundary/);
+assert.equal(JSON.stringify(candidateRun),candidateBefore,'candidate rendering is read-only');
+const noBasis=structuredClone(candidateRun);delete noBasis.candidateAssessment.shortlist[0].selections[1].priceCondition.basis;
+assert.doesNotMatch(api.candidateAssessmentPanel(document,noBasis).textContent,/COMPARISON PRICE/,'missing provenance must not become a price threshold');
+const changedLine=structuredClone(candidateRun),changedSelection=changedLine.candidateAssessment.shortlist[0].selections[1];
+changedSelection.quote={book:'Bet365',marketKey:'spread',side:'away',line:-1.5,priceDecimal:2.15};
+changedSelection.assessedQuote={book:'DraftKings',marketKey:'spread',side:'away',line:-2.5,priceDecimal:2};
+changedSelection.missingResearch=['PERSONNEL_MATERIALITY_DISTINCTION_REQUIRED'];
+const changedPanel=api.candidateAssessmentPanel(document,changedLine);
+assert.match(changedPanel.textContent,/Quoted market: away \+1.5/,'spread lines are displayed for the quoted side');
+assert.match(changedPanel.textContent,/Recorded decision assessed at: away \+2.5.*DraftKings \+100/,'a decision at a different line or price cannot silently apply to the listed quote');
+assert.match(changedPanel.textContent,/Resolve whether the remaining personnel uncertainty changes this market/,'research codes become specific reader-facing actions');
+assert.doesNotMatch(changedPanel.textContent,/PERSONNEL_MATERIALITY_DISTINCTION_REQUIRED/);
+const unknownVersion=structuredClone(candidateRun);unknownVersion.candidateAssessment.version='unknown';
+assert.equal(api.candidateAssessmentPanel(document,unknownVersion),null,'unknown producer contracts are not guessed');
+const candidateLive=document.createElement('div');candidateLive.id='runnerCandidatePlacement';
+live.append(candidatePanel,candidateLive);context.dashboardApi.patchDashboard(document);
+assert.equal(candidatePanel.parentElement,live,'dashboard overlay preserves candidate section');
+assert.equal(candidatePanel.nextElementSibling,candidateLive,'dashboard overlay preserves shortlist placement before cards');
 console.log('PRIMARY DASHBOARD: PASS // VERIFIED COVERAGE + NO-CARD MARKET METERS + DIRECTION EXPLANATION + DOM ORDER + INTEGRITY + HISTORICAL PRESERVATION');
