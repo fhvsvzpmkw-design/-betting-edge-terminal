@@ -6,15 +6,23 @@
   "season": 2026,
   "week": 2,
   "ledgerPath": "data/walters/nfl/2026/week-02-research-ledger.json",
-  "state": "RUN_STARTED",
-  "checkpoint": "STARTED",
+  "state": "BLOCKED_WITH_DURABLE_RECORD",
+  "checkpoint": "CONTROLLED_FAILURE",
   "startedAt": "2026-09-15T16:47:44-07:00",
-  "lastCheckpointAt": "2026-09-15T16:47:44-07:00",
+  "lastCheckpointAt": "2026-09-16T00:24:20.221Z",
   "staleAfter": "2026-09-15T17:47:44-07:00",
   "marketViewed": false,
   "ledgerSweepPresent": false,
-  "completionResult": null,
+  "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
   "completionReceipt": null,
-  "failure": null,
-  "taskPromptVersion": "graham-delta-1645-v2.1"
+  "failure": {
+    "phase": "RUNTIME_START_VALIDATION",
+    "code": "GRAHAM_RESEARCH_RUNTIME_BLOCKED_SEMANTICS_INVALID",
+    "summary": "The initial runtime workflow failed on the September 14 Week 1 Daily Review's non-null completionReceipt in a blocked record. The Delta did not pass its durable-start gate; no research or market data was viewed and no personnel, matchup or QB batch was created. This abandoned start is closed during the historical-record repair; it does not establish reviewed coverage.",
+    "failedWorkflowRunId": 35037296485,
+    "invalidRunEventId": "graham-daily-review-2026-w01-20260914T112907-0700",
+    "automatic": false
+  },
+  "taskPromptVersion": "graham-delta-1645-v2.1",
+  "blockedAt": "2026-09-16T00:24:20.221Z"
 }

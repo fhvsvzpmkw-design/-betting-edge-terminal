@@ -89,7 +89,10 @@
       "controlledCheckpoint": "CONTROLLED_FAILURE",
       "watchdogCheckpoint": "WATCHDOG_CLOSED",
       "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
-      "failureRequired": true
+      "failureRequired": true,
+      "completionReceiptMustBeNull": true,
+      "completionReceiptEvidencePath": "failure.completionReceiptEvidence",
+      "receiptRule": "A VERIFIED research-completion receipt for BLOCKED_WITH_DURABLE_RECORD verifies only that the blocked ledger sweep was recorded. It does not prove completed research and must not populate a blocked runtime event's completionReceipt. Preserve any such receipt as audit evidence under failure.completionReceiptEvidence; retain the blocked runtime state and truthful ledgerSweepPresent."
     }
   },
   "completionBinding": {
