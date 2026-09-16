@@ -2,7 +2,7 @@
 import {exactMarketReference, marketComparison} from './market-price-assessment.mjs';
 import {forecastPriceComparison} from './forecast-evidence.mjs';
 
-export const CANDIDATE_ASSESSMENT_FROM = '2026-09-16T00:00:00-07:00';
+export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';

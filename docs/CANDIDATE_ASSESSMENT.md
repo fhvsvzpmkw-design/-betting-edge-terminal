@@ -1,6 +1,6 @@
-# Candidate assessment — September 16, 2026
+# Candidate assessment — September 15, 2026
 
-Version `2026-09-16.1`. Applies to Main reports at/after `2026-09-16T00:00:00-07:00`.
+Version `2026-09-15.1`. Applies to Main reports at/after `2026-09-15T18:15:00-07:00`.
 
 The producer must finish the research-to-decision step for a promising exact selection. A ranked lead is not a betting recommendation. The mechanism does not lower Core requirements, assign LEAN/BET, fabricate probabilities, change staking or rewrite issuance.
 
@@ -130,7 +130,7 @@ Show a numerical price condition only when it follows from an identified current
 
 ## Separate prospective method test
 
-`research/market-method-shadow-v1.json` fixes the experimental rule before forward observations. `report.marketMethodShadow` records hypothetical candidates and exclusions from September 16 onward. It has no wager authority. Earlier replay is development evidence only and cannot enter the prospective performance sample.
+`research/market-method-shadow-v1.json` fixes the experimental rule before forward observations. `report.marketMethodShadow` records hypothetical candidates and exclusions. The September 15 18:15 report is a labelled development replay; prospective samples begin September 16 at 00:00 Pacific. It has no wager authority. Earlier replay is development evidence only and cannot enter the prospective performance sample.
 
 Evaluation uses the first qualifying appearance per exact market and retains its exact price, selection, source times and limitations. Later repeated appearances cannot replace that entry based on outcomes. Resolved hypothetical 1u returns, missing results and comparable closing-price observations are reported separately; absent closing evidence remains missing. Results are rebuilt with the normal results index process into `results-index.json.marketMethodTest`, without a new scheduled task. Profitability has not been established.
 

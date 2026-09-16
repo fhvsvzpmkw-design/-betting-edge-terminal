@@ -5,15 +5,18 @@ import path from 'node:path';
 import {execFileSync, spawnSync} from 'node:child_process';
 import {prepareEvidenceDraft, validateCandidateCompletion} from '../tools/report-evidence-repair.mjs';
 import {marketComparison} from '../tools/market-price-assessment.mjs';
+import {evaluateMarketMethodShadow} from '../tools/market-method-shadow.mjs';
 import {replay1815, root as repositoryRoot} from './fixtures/market-assessment-1815.mjs';
 
-// SYNTHETIC ONLY: move the saved replay nine calendar days forward to exercise
-// the cutover. All changed clocks and prices are fixture data, never new checks.
+// SYNTHETIC ONLY: move the saved replay to the first evening or next day.
+// All changed clocks and prices are fixture data, never new checks.
+const tonight = process.argv.includes('--tonight');
+const shiftDays = tonight ? 8 : 9;
 const shift = (value, key = '') => {
   if (Array.isArray(value)) return value.map(item => shift(item));
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([name, item]) => [name, shift(item, name)]));
   if (key !== 'effectiveFrom' && typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
-    const day = new Date(Date.parse(`${value.slice(0,10)}T12:00:00Z`) + 9 * 86400000).toISOString().slice(0,10);
+    const day = new Date(Date.parse(`${value.slice(0,10)}T12:00:00Z`) + shiftDays * 86400000).toISOString().slice(0,10);
     return day + value.slice(10);
   }
   return value;
@@ -24,7 +27,7 @@ const {report, sidecar, feed, observer} = shift(fixture);
 report.label = 'SYNTHETIC candidate-publication fixture — never issued';
 sidecar.reportReference.label = report.label;
 sidecar.reportReference.reportPath = `data/history/runs/${report.ts.slice(0,10)}/late-183100.json`;
-assert.match(report.ts, /^2026-09-16T18:31:00/);
+assert.match(report.ts, tonight ? /^2026-09-15T18:31:00/ : /^2026-09-16T18:31:00/);
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'candidate-publication-'));
 const write = (file, value) => {
   const target = path.join(root, file); fs.mkdirSync(path.dirname(target), {recursive:true});
@@ -117,7 +120,8 @@ try {
   assert.equal(stored.coverageSummary.selections.blocked,1);
   assert.equal(stored.coverageSummary.researchCompletion.unfinished,1);
   assert.match(stored.summary,/^PARTIAL REPORT: 5 evaluated; 1 unfinished\./);
-  assert.equal(stored.marketMethodShadow.mode,'PROSPECTIVE');
+  assert.equal(stored.marketMethodShadow.mode,tonight ? 'DEVELOPMENT_REPLAY' : 'PROSPECTIVE');
+  if (tonight) assert.equal(evaluateMarketMethodShadow({snapshots:[stored.marketMethodShadow]}).summary.samples,0);
   assert.equal(stored.marketMethodShadow.authority,'HYPOTHETICAL_ONLY');
   assert.equal(stored.marketMethodShadow.decisionAuthority,false);
   assert.equal(stored.marketMethodShadow.executionAuthority,false);

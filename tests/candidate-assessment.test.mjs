@@ -4,7 +4,7 @@ import {marketComparison} from '../tools/market-price-assessment.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentEnabled} from '../tools/candidate-assessment.mjs';
 
 function fixture() {
-  const asOf = '2026-09-15T18:31:00-07:00', generatedAt = '2026-09-15T18:25:00-07:00', eventDate = '2026-09-15T20:00:00-07:00';
+  const asOf = '2026-09-14T18:31:00-07:00', generatedAt = '2026-09-14T18:25:00-07:00', eventDate = '2026-09-14T20:00:00-07:00';
   const specs = [['ml', 'moneyline', 'full_game_moneyline', null, ['home', 'away']],
     ['spread', 'spread', 'full_game_primary_run_line', 1.5, ['home', 'away']],
     ['totals', 'total', 'full_game_primary_total', 8, ['over', 'under']]];
@@ -291,7 +291,9 @@ test('no fabricated source attempts, frozen protection and forward activation', 
   assert.equal(result.deferFailures[0].reason, 'REAL_EVENT_SPECIFIC_SOURCE_ATTEMPT_REQUIRED');
   args.report.frozen = true;
   assert.equal(finalizeCandidateAssessmentDraft({...args, draft: true, developmentReplay: true}).applied, false);
-  assert.equal(candidateAssessmentEnabled({ts: '2026-09-15T23:59:59-07:00'}), false);
+  assert.equal(candidateAssessmentEnabled({ts: '2026-09-15T18:14:59-07:00'}), false);
+  assert.equal(candidateAssessmentEnabled({ts: '2026-09-15T18:15:00-07:00'}), true);
+  assert.equal(candidateAssessmentEnabled({ts: '2026-09-16T01:15:00Z'}), true);
   assert.equal(candidateAssessmentEnabled({ts: '2026-09-16T00:00:00-07:00'}), true);
   const absent = buildCandidateAssessment({report: args.report, sidecar: args.sidecar});
   assert.equal(absent.state, 'UNIVERSE_UNAVAILABLE');
