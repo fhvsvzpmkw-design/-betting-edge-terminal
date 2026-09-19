@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-15T17:32:45-07:00",
+  "lastAppliedAt": "2026-09-19T11:34:00-07:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -891,9 +891,17 @@
     {
       "team": "MIN",
       "teamName": "Minnesota",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "CONCUSSION_PROTOCOL_UNRESOLVED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_WEEK2_SPOT_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "17543",
+        "gsisId": "00-0032950",
+        "playerName": "Carson Wentz",
+        "candidateValue": 6.35,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "LOW",
+        "evidenceDropbacks": 209
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "20430",
@@ -902,22 +910,24 @@
         "priorValue": 8.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 6.35,
       "embeddedBaselineQbValue": 8.25,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
-      "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
+      "teamQbDelta": -1.9,
+      "gameContributionEligible": true,
+      "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Kyler Murray remains in the NFL concussion protocol after exiting Week 1. Minnesota has not confirmed whether Murray or Carson Wentz will start Week 2, so preserve the prior governed game fair and remove numeric QB production eligibility until the starter is resolved.",
+        "researchFinding": "Minnesota ruled Kyler Murray out for Week 2 while head coach Kevin O'Connell confirmed Carson Wentz will start against Chicago. Apply the frozen approved Carson Wentz candidate through the governed QB production calculator; no market information was viewed.",
         "sourceRefs": [
-          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-monday-sept-14",
-          "data/walters/nfl/qb-production/production-contract-v1.json"
+          "https://www.reuters.com/sports/vikings-qb-carson-wentz-start-kyler-murray-concussion-out-vs-bears--flm-2026-09-18/",
+          "https://www.nfl.com/news/nfl-week-2-injury-report-player-statuses-for-all-16-games",
+          "data/walters/nfl/qb-production/production-contract-v1.json",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-15T11:11:00-07:00",
+      "lastUpdatedAt": "2026-09-19T11:34:00-07:00",
       "marketViewed": false,
-      "failClosedCode": "CURRENT_STARTER_UNRESOLVED_CONCUSSION_PROTOCOL"
+      "failClosedCode": null
     },
     {
       "team": "NE",
@@ -1409,7 +1419,8 @@
     "atl-tua-oblique-unresolved-2026-09-10-v1",
     "graham-daily-review-atl-cooper-rush-2026-w01-20260911T113145-0700",
     "graham-tuesday-baseline-qb-2026-w02-20260915T111100-0700",
-    "graham-delta-1645-qb-2026-w02-20260915T173245-0700"
+    "graham-delta-1645-qb-2026-w02-20260915T173245-0700",
+    "graham-daily-review-qb-2026-w02-20260919T113400-0700"
   ],
   "bindingUpdates": [
     {
@@ -1465,6 +1476,15 @@
         "SEA"
       ],
       "sourceTask": "GRAHAM_DELTA_1645",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-daily-review-qb-2026-w02-20260919T113400-0700",
+      "effectiveAt": "2026-09-19T11:34:00-07:00",
+      "teams": [
+        "MIN"
+      ],
+      "sourceTask": "GRAHAM_DAILY_REVIEW",
       "marketViewed": false
     }
   ],
