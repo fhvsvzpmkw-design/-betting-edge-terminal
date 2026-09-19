@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {loadPriorPrimaryResearch} from './major-sport-market-coverage-gate.mjs';
+import {effectiveCardEvidence, inspectCardEvidence} from './card-evidence-identity.mjs';
 
 const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const list = value => Array.isArray(value) ? value : [];
@@ -30,6 +31,7 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
   const add = (code, ordinal, title, detail) => issues.push({code, ordinal, title, detail});
   for (const [index, rec] of list(report?.recs).entries()) {
     const ordinal = index + 1, title = rec.title, item = sidecar?.recommendations?.[index] || {};
+    const cardEvidence = effectiveCardEvidence(rec), cardEvidenceInspection = inspectCardEvidence(rec);
     const receipt = receipts.find(row => row.state === 'EVALUATED' && row.decision?.feed?.selectionKey === rec.feed?.selectionKey);
     const sources = list(rec.sourceEvidence), personnel = rec.personnelEvidence || {};
     const ids = unique([...list(item.priorIds), ...list(item.synthesisIds)]);
@@ -37,6 +39,9 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
     const currentFacts = unique([...list(personnel.facts), ...sources.filter(source => source.kind !== 'MARKET').map(source => source.finding)]);
     const unresolved = list(personnel.unresolved);
     const start = issues.length;
+    if (rec.cardEvidence && !cardEvidence) {
+      add('CARD_EVIDENCE_IDENTITY_MISMATCH', ordinal, title, `The structured presentation evidence is ${cardEvidenceInspection.state} for this selection and is treated as detached. Preserve the completed decision fields, then rebuild cardEvidence for the exact selectionKey before a new report is frozen.`);
+    }
     if (grade && grade !== 'NR' && !ids.length) {
       add('HISTORY_FIT_UNSUPPORTED', ordinal, title, 'History Fit grade has no research links. Read applicable canonical research, or state NR/unavailable with the real limitation; current price evidence does not support a historical B.');
     }
@@ -59,7 +64,7 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
     const forecastReviews = list(rec.forecastReview?.records);
     for (const forecast of forecastReviews) {
       if (forecast.eligibility === 'ELIGIBLE_EXACT' && forecast.comparison?.direction === 'OPPOSES_PRICE') {
-        const explicit = rec.cardEvidence?.schema === 1 && /opposes this price/.test(text(rec.contrary));
+        const explicit = cardEvidence?.schema === 1 && /opposes this price/.test(text(rec.contrary));
         if (!explicit) add('FORECAST_PRICE_CONFLICT_REVIEW', ordinal, title, `${forecast.publisher || forecast.sourceId || forecast.recordId} opposes the executable price by ${Math.abs(forecast.comparison.edgeProbabilityPoints).toFixed(2)} probability points. Put that disagreement in contrary evidence and explain its weight against the market reference; do not automatically change fair/status.`);
       }
     }
@@ -77,11 +82,11 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
       }
     }
     if (currentFacts.length && currentFacts.every(processOnly)) add('PERSONNEL_PROCESS_WITHOUT_FINDING', ordinal, title, 'Recorded non-market evidence consists of source-check/access statements. Retain actual named starters/roles, projections or specific absences and their relevance; where unavailable state the exact missing fact and source shortfall. A blank final-lineup field does not automatically make every market material.');
-    if (unresolved.length && /material late starter, lineup or participation change requires a fresh assessment|starting pitchers and batting orders materially affect|named personnel inputs can materially affect/i.test([personnel.decisionSensitivity, personnel.dependencyRationale].map(text).join(' ')) && !rec.cardEvidence?.findings?.some(finding => finding.stance === 'UNRESOLVED' && text(finding.application))) {
+    if (unresolved.length && /material late starter, lineup or participation change requires a fresh assessment|starting pitchers and batting orders materially affect|named personnel inputs can materially affect/i.test([personnel.decisionSensitivity, personnel.dependencyRationale].map(text).join(' ')) && !cardEvidence?.findings?.some(finding => finding.stance === 'UNRESOLVED' && text(finding.application))) {
       add('PERSONNEL_MARKET_MATERIALITY_GENERIC', ordinal, title, 'Identify the specific remaining personnel input and how plausible outcomes affect this exact side/line decision. Apply the existing credible-projection/fallback process where relevant; do not impose final confirmation on every market.');
     }
     if (rec.status === 'WAIT') {
-      const condition = rec.cardEvidence?.waitCondition;
+      const condition = cardEvidence?.waitCondition;
       if (!text(condition?.trigger) || !text(condition?.checkSource) || !text(condition?.remainingBetRequirements)) add('WAIT_REASSESSMENT_DETAIL', ordinal, title, 'Record the concrete observable trigger, where it will be checked, and which existing BET requirements still remain after it resolves. Missing research alone is neither WAIT qualification nor a supported PASS. Existing WAIT validation retains authority.');
     }
     if (/information review was completed|official MLB review was completed/i.test(text(rec.support))) {

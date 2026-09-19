@@ -5,6 +5,7 @@ import os from 'node:os';
 import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs';
 import {validateReportMarketScope} from './major-sport-market-coverage-gate.mjs';
 import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
+import {validateCardEvidenceBundle} from './card-evidence-identity.mjs';
 import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
 import {attachPublicationEvidenceAudit, validateCandidateCompletion} from './report-evidence-repair.mjs';
 
@@ -328,6 +329,7 @@ function validateSidecar(sidecar,report,reportPath,{strict=false,collectRecommen
     if(recommendationErrors.length){
       die(`Sidecar contains ${recommendationErrors.length} recommendation defect(s):\n- ${recommendationErrors.join('\n- ')}`);
     }
+    validateCardEvidenceBundle(report,sidecar);
   }
   return sidecar;
 }

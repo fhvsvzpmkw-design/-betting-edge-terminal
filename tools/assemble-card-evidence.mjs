@@ -3,9 +3,11 @@
 // deliberately not a handicap engine and cannot complete a blocked assessment.
 import fs from 'node:fs';
 import path from 'node:path';
+import {isDeepStrictEqual} from 'node:util';
 import {fileURLToPath} from 'node:url';
+import {inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
 
-export const CARD_EVIDENCE_VERSION = '2026-09-12-r1';
+export const CARD_EVIDENCE_VERSION = '2026-09-19-r2';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
 const unique = values => [...new Set(values.filter(Boolean))];
@@ -51,16 +53,74 @@ function pacificCheck(value) {
 }
 
 export function assembleCardEvidence(inputReport, inputSidecar, {library = null, draft = false} = {}) {
-  const report = structuredClone(inputReport), sidecar = structuredClone(inputSidecar), changes = [], warnings = [];
-  const result = {report, sidecar, changes, warnings, version: CARD_EVIDENCE_VERSION, mode: 'DRAFT_PRESENTATION_ONLY', publicationBlocking: false};
+  const report = structuredClone(inputReport), sidecar = structuredClone(inputSidecar), changes = [], warnings = [], detached = [];
+  const result = {report, sidecar, changes, warnings, detached, version: CARD_EVIDENCE_VERSION, mode: 'DRAFT_PRESENTATION_ONLY', publicationBlocking: false};
   if (!draft) { warnings.push('No unfrozen-draft authorization; presentation unchanged.'); return result; }
   const research = new Map(list(library?.items).map(item => [item.priorId, item]));
+  const recs = list(report?.recs), recByKey = new Map(recs.map(rec => [text(rec?.feed?.selectionKey), rec]).filter(([key]) => key));
+  const detach = (holder, selectionKey, scope, sourceRec) => {
+    if (!holder?.cardEvidence) return false;
+    const inspected = inspectCardEvidence({...sourceRec, feed: {selectionKey}, cardEvidence: holder.cardEvidence});
+    if (inspected.state === 'VALID') return false;
+    delete holder.cardEvidence;
+    detached.push({scope, selectionKey, reason: inspected.state, attachedSelectionKey: text(inspected.evidence?.selectionKey) || null});
+    return true;
+  };
+
+  // Detach invalid presentation handoffs from the cloned draft only. Decision
+  // fields and issued history are never changed by this operation.
+  for (const rec of recs) detach(rec, text(rec?.feed?.selectionKey), 'report', rec);
+  for (const [index, item] of list(sidecar?.recommendations).entries()) {
+    const claimedKey = sidecarSelectionKey(item), rec = recByKey.get(claimedKey);
+    if (item?.cardEvidence && (!rec || detach(item, claimedKey, `sidecar recommendation ${index + 1}`, rec))) {
+      if (!rec) {
+        const attachedSelectionKey = text(item.cardEvidence?.selectionKey) || claimedKey || null;
+        delete item.cardEvidence;
+        detached.push({scope: `sidecar recommendation ${index + 1}`, selectionKey: null, reason: 'IDENTITY_MISMATCH', attachedSelectionKey});
+      }
+    }
+    if (item?.selectionKey && !recByKey.has(text(item.selectionKey))) delete item.selectionKey;
+  }
+  for (const receipt of list(sidecar?.primaryAnalysis?.receipts).filter(row => row?.state === 'EVALUATED')) {
+    const selectionKey = text(receipt?.decision?.feed?.selectionKey), rec = recByKey.get(selectionKey) || receipt.decision;
+    detach(receipt.decision, selectionKey, `receipt decision ${receipt.selectionId || selectionKey}`, rec);
+    detach(receipt.evidence, selectionKey, `receipt evidence ${receipt.selectionId || selectionKey}`, rec);
+  }
+  if (detached.length) warnings.push(`${detached.length} mismatched or invalid cardEvidence attachment(s) were detached from the unfrozen draft; governed decisions were preserved and each affected card must be rebuilt or deferred before freeze.`);
+
+  const itemCandidates = new Map();
+  for (const item of list(sidecar?.recommendations)) {
+    const selectionKey = sidecarSelectionKey(item);
+    if (!selectionKey) continue;
+    if (!itemCandidates.has(selectionKey)) itemCandidates.set(selectionKey, []);
+    itemCandidates.get(selectionKey).push(item);
+  }
+  const itemByKey = new Map([...itemCandidates].filter(([, items]) => items.length === 1).map(([key, items]) => [key, items[0]]));
+  if (recs.length === list(sidecar?.recommendations).length && recs.every(rec => itemByKey.has(text(rec?.feed?.selectionKey)))) {
+    const ordered = recs.map((rec, index) => {
+      const item = itemByKey.get(text(rec.feed.selectionKey));
+      item.ordinal = index + 1;
+      item.selectionKey = rec.feed.selectionKey;
+      return item;
+    });
+    if (!ordered.every((item, index) => item === sidecar.recommendations[index])) changes.push({scope: 'sidecar', fields: ['recommendationOrder'], identity: 'selectionKey'});
+    sidecar.recommendations = ordered;
+  }
   for (const [index, rec] of list(report?.recs).entries()) {
-    const item = sidecar?.recommendations?.[index], evidence = rec.cardEvidence || item?.cardEvidence;
+    const selectionKey = text(rec?.feed?.selectionKey), item = itemByKey.get(selectionKey);
+    const candidates = [rec.cardEvidence, item?.cardEvidence].filter(Boolean);
+    if (candidates.length > 1 && !isDeepStrictEqual(candidates[0], candidates[1])) {
+      warnings.push(`Recommendation ${index + 1}: report and sidecar cardEvidence disagree for ${selectionKey}; both attachments were detached and the decision was preserved.`);
+      delete rec.cardEvidence;
+      delete item.cardEvidence;
+      detached.push({scope: `recommendation ${index + 1}`, selectionKey, reason: 'COPY_DRIFT', attachedSelectionKey: selectionKey});
+      continue;
+    }
+    const evidence = candidates[0];
     if (!evidence) continue;
     const warn = message => warnings.push(`Recommendation ${index + 1}: ${message}`);
     const receipts = list(sidecar?.primaryAnalysis?.receipts).filter(row => row.state === 'EVALUATED' && row.decision?.feed?.selectionKey === rec.feed?.selectionKey);
-    if (!item || item.title !== rec.title || (item.feed?.selectionKey && item.feed.selectionKey !== rec.feed?.selectionKey) || receipts.length > 1) { warn('Ambiguous report/sidecar/receipt identity; presentation unchanged.'); continue; }
+    if (!item || item.title !== rec.title || sidecarSelectionKey(item) !== rec.feed?.selectionKey || receipts.length > 1) { warn('Ambiguous report/sidecar/receipt identity; presentation unchanged.'); continue; }
     if (sidecar.primaryAnalysis && receipts.length !== 1) { warn('No matching completed receipt; presentation unchanged.'); continue; }
     if (evidence.schema !== 1 || !text(evidence.selectionKey) || evidence.selectionKey !== rec.feed?.selectionKey || !Array.isArray(evidence.findings) || !text(evidence.decisionExplanation)) { warn('Structured card evidence needs schema 1, exact selectionKey, findings and the completed decision explanation; presentation unchanged.'); continue; }
     const sources = new Map(list(rec.sourceEvidence).map(source => [source.id, source]));
@@ -111,11 +171,11 @@ export function assembleCardEvidence(inputReport, inputSidecar, {library = null,
       }
     }
     const before = Object.fromEntries(Object.keys(rendered).map(key => [key, rec[key]]));
-    Object.assign(rec, rendered); Object.assign(item, structuredClone(rendered), fitFields || {});
+    Object.assign(rec, rendered); Object.assign(item, {selectionKey, ...structuredClone(rendered)}, fitFields || {});
     if (rendered.hist) item.displayText = rendered.hist;
     if (receipts[0]) {
       Object.assign(receipts[0].decision, structuredClone(rendered));
-      if (receipts[0].evidence) Object.assign(receipts[0].evidence, structuredClone(rendered), fitFields || {});
+      if (receipts[0].evidence) Object.assign(receipts[0].evidence, {selectionKey, ...structuredClone(rendered)}, fitFields || {});
     }
     const fields = Object.keys(rendered).filter(key => JSON.stringify(before[key]) !== JSON.stringify(rendered[key]));
     if (fields.length || fitFields) changes.push({ordinal: index + 1, selectionKey: rec.feed.selectionKey, fields, historyFitPolicyApplied: Boolean(fitFields)});

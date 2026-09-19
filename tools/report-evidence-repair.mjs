@@ -13,6 +13,7 @@ import {assembleCardEvidence} from './assemble-card-evidence.mjs';
 import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
 import {buildMarketMethodShadow} from './market-method-shadow.mjs';
+import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
 
 export const EVIDENCE_REPAIR_VERSION = '2026-09-12';
 export const EVIDENCE_REPAIR_FROM = '2026-09-12T12:00:00-07:00';
@@ -132,6 +133,54 @@ function synchronizeCandidateDraft(report, sidecar) {
   delete report.evidenceApplication;
 }
 
+export function deferInvalidCardEvidenceDraft(report, sidecar) {
+  if (Date.parse(report?.ts || '') < Date.parse(CARD_EVIDENCE_IDENTITY_FROM)) return {selectionIds: [], failures: []};
+  const receipts = list(sidecar?.primaryAnalysis?.receipts), selectionIds = [], failures = [], keptRecs = [], keptItems = [];
+  for (const [index, rec] of list(report?.recs).entries()) {
+    const item = sidecar?.recommendations?.[index], selectionKey = rec?.feed?.selectionKey;
+    const inspected = inspectCardEvidence(rec);
+    let reason = inspected.state === 'VALID' ? null : inspected.state;
+    if (!reason && sidecarSelectionKey(item) !== selectionKey) reason = 'SIDECAR_IDENTITY_MISMATCH';
+    if (!reason && !isDeepStrictEqual(item?.cardEvidence, rec.cardEvidence)) reason = 'SIDECAR_COPY_DRIFT';
+    const matches = receipts.filter(row => row?.state === 'EVALUATED' && row?.decision?.feed?.selectionKey === selectionKey);
+    if (!reason && matches.length !== 1) reason = 'EVALUATED_RECEIPT_IDENTITY_MISMATCH';
+    if (!reason && (!isDeepStrictEqual(matches[0].decision?.cardEvidence, rec.cardEvidence) || !isDeepStrictEqual(matches[0].evidence?.cardEvidence, rec.cardEvidence))) reason = 'RECEIPT_COPY_DRIFT';
+    if (!reason) { keptRecs.push(rec); keptItems.push(item); continue; }
+    if (matches.length !== 1) {
+      failures.push({selectionKey, reason, detail: 'Exactly one matching EVALUATED receipt is required for safe selection-level deferral.'});
+      keptRecs.push(rec); keptItems.push(item); continue;
+    }
+    const receipt = matches[0];
+    const attempts = list(rec.sourceEvidence).filter(source => source && String(source.eventId) === String(rec.feed?.eventId) && source.finding && source.url && source.checkedAt)
+      .map(source => structuredClone(source));
+    if (!attempts.length) {
+      failures.push({selectionKey, reason, detail: 'At least one recorded event-specific source attempt is required for RESEARCH_INCOMPLETE.'});
+      keptRecs.push(rec); keptItems.push(item); continue;
+    }
+    const decision = structuredClone(receipt.decision), evidence = structuredClone(receipt.evidence);
+    delete decision.cardEvidence;
+    if (evidence) delete evidence.cardEvidence;
+    receipt.candidateDraft = {decision, evidence, authority: 'UNISSUED_INCOMPLETE_DRAFT_ONLY',
+      missingResearch: [`CARD_EVIDENCE_${reason}`]};
+    receipt.cardEvidenceDetachment = {version: CARD_EVIDENCE_IDENTITY_VERSION, selectionKey, reason,
+      attachedSelectionKey: inspected.evidence?.selectionKey || null};
+    receipt.state = 'BLOCKED';
+    receipt.blocker = {reason: 'RESEARCH_INCOMPLETE', checkedAt: report.ts,
+      missing: `Exact-selection structured card evidence is incomplete (${reason}).`,
+      impact: 'The unfinished presentation handoff is detached. No BET, LEAN, WAIT or PASS is issued for this selection until it is rebuilt against the exact side, line and price.',
+      attempts, progress: {stage: 'CARD_EVIDENCE_REBUILD', stoppingReason: reason,
+        nextStep: 'Rebuild cardEvidence from this selection’s recorded sources, rerun draft preparation, then reassess the same current quote.'},
+      nextAction: 'Rebuild the exact-selection card evidence and rerun all pre-freeze validators.'};
+    for (const field of ['decision', 'evidence', 'fairValueEvidence', 'fair', 'status', 'marketFair']) delete receipt[field];
+    selectionIds.push(receipt.selectionId || selectionKey);
+  }
+  if (selectionIds.length) {
+    report.recs = keptRecs;
+    sidecar.recommendations = keptItems;
+  }
+  return {selectionIds, failures};
+}
+
 export function validateCandidateCompletion({root = process.cwd(), report, sidecar, feedFile} = {}) {
   if (!candidateAssessmentRequired(report)) return null;
   const audit = buildEvidenceAudit({root, report, sidecar, feedFile});
@@ -158,6 +207,8 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
   }
   const after = JSON.stringify(list(draftReport.recs).map(rec => ({feed:rec.feed,status:rec.status,stake:rec.stake,fair:rec.fair,playTo:rec.playTo,coreAssessment:rec.coreAssessment,marketAssessment:rec.marketAssessment})));
   if (before !== after) throw new Error('Evidence preparation changed a governed assessment');
+  const identityDeferrals = deferInvalidCardEvidenceDraft(draftReport, draftSidecar);
+  if (identityDeferrals.selectionIds.length) synchronizeCandidateDraft(draftReport, draftSidecar);
   const candidateForecasts = buildForecastCoverage({report:draftReport, sidecar:draftSidecar, universe:ctx.universe, feed:ctx.feed, priorRecords:ctx.priorRecords, registry:ctx.registry, now:report.ts});
   const candidates = finalizeCandidateAssessmentDraft({report:draftReport, sidecar:draftSidecar, universe:ctx.universe,
     observer:ctx.observer, forecastCoverage:candidateForecasts, draft:true});
@@ -166,6 +217,7 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
     attachForecastCoverage({report:draftReport, sidecar:draftSidecar, universe:ctx.universe, feed:ctx.feed, priorRecords:ctx.priorRecords, registry:ctx.registry, now:report.ts});
   }
   draftSidecar.evidenceRepairVersion = EVIDENCE_REPAIR_VERSION;
+  draftSidecar.cardEvidenceIdentityVersion = CARD_EVIDENCE_IDENTITY_VERSION;
   const audit = buildEvidenceAudit({root, report: draftReport, sidecar: draftSidecar, context: ctx});
   audit.warnings.push(...list(assembled.warnings));
   audit.assemblyChanges = assembled.changes;
@@ -176,6 +228,7 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
     draftSidecar.candidateAssessmentVersion = audit.candidateAssessment.version;
   }
   audit.candidateDeferrals = {selectionIds:candidates.deferredSelectionIds, failures:candidates.deferFailures};
+  audit.cardEvidenceDeferrals = identityDeferrals;
   return {report: draftReport, sidecar: draftSidecar, audit, changes: assembled.changes, warnings: assembled.warnings};
 }
 
@@ -248,6 +301,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(JSON.stringify({mode:args[0] === 'prepare' ? 'DRAFT_PREPARED' : 'ADVISORY_ONLY', publicationBlocking:false, version:EVIDENCE_REPAIR_VERSION,
       forecastCoverage:audit.forecastCoverage?.totals || {state:audit.forecastCoverage?.state},
       candidateAssessment:audit.candidateAssessment?.counts, candidateDeferrals:audit.candidateDeferrals,
+      cardEvidenceDeferrals:audit.cardEvidenceDeferrals,
       issueCounts:audit.cardReview?.issueCounts, blockedReview:blockedSummary, changes:result.changes, warnings:audit.warnings},null,2));
   } catch (error) {console.error(error.message); process.exitCode = 1;}
 }

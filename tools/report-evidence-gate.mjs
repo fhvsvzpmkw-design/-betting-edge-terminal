@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {validateMarketAssessment} from './market-price-assessment.mjs';
+import {validateCardEvidenceBundle, validateRecommendationCardEvidence} from './card-evidence-identity.mjs';
 
 // Historical reports remain immutable. This adds evidence requirements for the
 // next scheduled lane; it does not supply a model, a fair, or a betting threshold.
@@ -184,6 +185,7 @@ export function validateRecommendationEvidence(report, rec, item, index) {
   if (!validateMarketAssessment(report, rec, item, ids)) fairEvidence(rec, item, ids, label);
   benchmarkEvidence(rec, label);
   leanWording(rec, label);
+  validateRecommendationCardEvidence(report, rec, item, index);
   return {enforced: true};
 }
 
@@ -197,6 +199,7 @@ export function validateReportEvidence(report, sidecar) {
     catch (error) { errors.push(error.message); }
   }
   ensure(!errors.length, `Report evidence contains ${errors.length} recommendation defect(s):\n- ${errors.join('\n- ')}`);
+  validateCardEvidenceBundle(report, sidecar);
   return {enforced: true, checked: report.recs.length};
 }
 

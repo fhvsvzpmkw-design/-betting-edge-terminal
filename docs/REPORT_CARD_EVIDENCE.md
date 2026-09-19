@@ -1,6 +1,8 @@
 # Apply evidence to Betting Edge cards
 
-Operational for new, unfrozen Main report drafts; consolidated repair version `2026-09-12-r1`. This clarifies the existing card fields and research process under Contract 1.0 and shared scheduled authority section 6. It does not regrade issued reports or add a publication gate.
+Operational for new, unfrozen Main report drafts; exact-identity repair version `2026-09-19-r2`. This clarifies the existing card fields and research process under Contract 1.0 and shared scheduled authority section 6. It never regrades issued reports. Beginning with the September 19 18:15 lane, a narrow publication gate prevents a structured presentation object from being attached to the wrong selection; it does not change Core, thresholds, status semantics, staking or analytical evidence requirements.
+
+`cardEvidence` is a detachable presentation/audit layer. The authoritative decision layer remains `feed`, `status`, `stake`, `marketAssessment`/`fairValueEvidence`, `benchmarkComparison`, `forecastReview`, `personnelEvidence` and `coreAssessment`. A mismatched legacy `cardEvidence` object is ignored at read time while the issued decision and visible card text remain unchanged. Issued History is never rewritten.
 
 ## Complete the assessment, then write the card
 
@@ -30,7 +32,7 @@ Keep the report recommendation, sidecar recommendation and EVALUATED receipt dec
 
 ## Structured assembly for new drafts
 
-Supply `cardEvidence` on each new card after completing its assessment. This is an explicit presentation handoff, not evidence manufactured by assembly:
+Supply a newly created `cardEvidence` object on each new card after completing its assessment. Never reuse an object from another recommendation or an earlier report. This is an explicit presentation handoff, not evidence manufactured by assembly:
 
 ```json
 {
@@ -63,9 +65,11 @@ Supply `cardEvidence` on each new card after completing its assessment. This is 
 }
 ```
 
-Finding stances are `SUPPORT`, `CONTRARY`, `CONTEXT` or `UNRESOLVED`. Use `waitCondition` only for WAIT; its existence does not qualify that status. `historyFit` retains the producer's actual research judgment and IDs. Do not copy the example prose as a finding. Missing or invalid structured input produces advice, not a new report-wide gate.
+Finding stances are `SUPPORT`, `CONTRARY`, `CONTEXT` or `UNRESOLVED`. Use `waitCondition` only for WAIT; its existence does not qualify that status. `historyFit` retains the producer's actual research judgment and IDs. Do not copy the example prose as a finding. Put the same exact `selectionKey` on the sidecar recommendation. The report recommendation, sidecar recommendation, matching EVALUATED receipt decision and receipt evidence must carry deep-equal copies of the same per-selection object.
 
-The shared preparation path calls `assembleCardEvidence(report, sidecar, {library, draft:true})` from `tools/assemble-card-evidence.mjs` after forecast coverage attachment and before freezing. It returns cloned report/sidecar objects, changes and warnings. It renders findings into the intended boxes and mirrors presentation to the matching EVALUATED receipt. It never adopts a probability, changes a quote/status/stake, completes a BLOCKED receipt, updates source check times or rewrites an archive. Legacy cards without the handoff receive advice without text mutation. Ambiguous identity or invalid source references leave the card unchanged.
+The shared preparation path calls `assembleCardEvidence(report, sidecar, {library, draft:true})` from `tools/assemble-card-evidence.mjs` after forecast coverage attachment and before freezing. It returns cloned report/sidecar objects, changes, detachments and warnings. It joins recommendations by exact `selectionKey`, renders findings into the intended boxes and mirrors presentation to the matching EVALUATED receipt. It never adopts a probability, changes a quote/status/stake, completes a BLOCKED receipt, updates source check times or rewrites an archive. A mismatched object is detached from the cloned draft without changing the decision. From the September 19 18:15 cutover, shared preparation retains that selection as `RESEARCH_INCOMPLETE` until its exact evidence handoff is rebuilt; other completed cards continue unchanged.
+
+Before freeze, `tools/card-evidence-identity.mjs` requires schema 1, the exact current selection key, source IDs owned by that card, one matching EVALUATED receipt, deep-equal report/sidecar/receipt copies and no reused selection key. `tools/report-evidence-gate.mjs` and the publisher enforce the same forward-only rule, including retry and remote read-back. This identity gate cannot select or modify BET, LEAN, WAIT or PASS.
 
 Forecast interpretation uses matched `forecastReview` records from `tools/forecast-evidence.mjs`. Compare eligible exact probabilities with the exact decimal execution price and recorded settlement basis. An opposing forecast goes in CONTRARY even when Pinnacle supports the price. Team-win forecasts and projected scores on run lines, spreads or totals belong in ANALYSIS as context, not exact cover/settlement support. MODEL source findings are routed through this reviewed forecast metadata instead of trusting a handwritten SUPPORT label. Retain the actual provider market-dependence and calibration limitations.
 
@@ -105,7 +109,7 @@ Before freezing, run:
 node tools/review-card-evidence.mjs review --report <report.json> --sidecar <sidecar.json>
 ```
 
-This read-only advisory identifies generic text, gap-only or unlinked historical claims, numerical/prose direction disagreements, forecast price conflicts, missing market-translation limits, personnel questions, earlier forecast leads, incomplete WAIT triggers and imprecise blockers. Limited explicit legacy templates receive advice only; broad prose is not treated as a machine-readable probability or proof of current applicability. Review the actual findings; it neither certifies research nor generates decisions. Resolve correctable content while the draft is unfrozen, then run unchanged publication validators. Warning counts are not a gate and need not reach zero. Frozen cards are never rewritten.
+This read-only advisory identifies generic text, gap-only or unlinked historical claims, numerical/prose direction disagreements, forecast price conflicts, missing market-translation limits, personnel questions, earlier forecast leads, incomplete WAIT triggers and imprecise blockers. Limited explicit legacy templates receive advice only; broad prose is not treated as a machine-readable probability or proof of current applicability. Review the actual findings; it neither certifies research nor generates decisions. Resolve correctable content while the draft is unfrozen, then run the publication validators. General warning counts are not a gate and need not reach zero. Exact `cardEvidence` identity/parity after the September 19 18:15 cutover is a separate mechanical gate. Frozen cards are never rewritten.
 
 If current evidence genuinely cannot support a selection, record its actual missing input, attempts, stopping reason and next step in the existing selection-level receipt. Continue the useful work and publish every other completed, validated selection. Missing historical research alone is handled by NR/unavailable, not `RESEARCH_INCOMPLETE` for an otherwise supported current decision. A text-review warning cannot turn an EVALUATED market into BLOCKED. Preserve the supported market-assessment route, honest partial publication and all existing execution/evidence safeguards.
 
