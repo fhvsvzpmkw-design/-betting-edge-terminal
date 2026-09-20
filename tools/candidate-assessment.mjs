@@ -1,6 +1,7 @@
 // Candidate triage and producer completion checks. Comparisons do not issue grades.
 import {exactMarketReference, marketComparison} from './market-price-assessment.mjs';
 import {forecastPriceComparison} from './forecast-evidence.mjs';
+import {compareRecordedFair} from './native-fair-review.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -70,7 +71,7 @@ function personnelReview(receipt, review, report) {
     materialityExplanation: p?.materialityExplanation || null, decisionImpact: p?.decisionImpact || null};
 }
 
-function compareQuote(report, selection, quote, observer, forecast, records) {
+function compareQuote(report, selection, quote, observer, forecast, records, receipt) {
   let market = null, marketUnavailable = null;
   try {
     const reference = exactMarketReference(report, {...quote, eventDate: selection.eventDate || selection.startTime}, observer);
@@ -87,9 +88,10 @@ function compareQuote(report, selection, quote, observer, forecast, records) {
       referenceBreakEvenPriceDecimal: comparison.breakEvenProbability * quote.priceDecimal / record.probability} : null;
   }).filter(Boolean).sort((a, b) => b.edgeProbabilityPoints - a.edgeProbabilityPoints);
   const scores = [market?.edgeProbabilityPoints, ...forecasts.map(row => row.edgeProbabilityPoints)].filter(finite);
-  return {quote, marketComparison: market, marketUnavailable, forecastComparisons: forecasts,
+  const nativeFairComparison = compareRecordedFair(report, selection, quote, receipt);
+  return {quote, marketComparison: market, marketUnavailable, forecastComparisons: forecasts, nativeFairComparison,
     forecastComparison: forecasts[0] || null, score: scores.length ? Math.max(...scores) : null,
-    promising: scores.some(score => score > 1e-8)};
+    promising: scores.some(score => score > 1e-8) || nativeFairComparison?.supportsPointReview === true};
 }
 
 function conditionFor(review, option, receipt) {
@@ -233,9 +235,9 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const matches = receipts.filter(row => row.selectionId === selection.selectionId);
     const receipt = matches.length === 1 ? matches[0] : null;
     const forecast = list(forecastCoverage?.selections).find(row => row.selectionId === selection.selectionId);
-    const options = list(selection.quotes).map(quote => compareQuote(report, selection, quote, observer, forecast, records))
+    const options = list(selection.quotes).map(quote => compareQuote(report, selection, quote, observer, forecast, records, receipt))
       .sort((a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity) || b.quote.priceDecimal - a.quote.priceDecimal || String(a.quote.book).localeCompare(String(b.quote.book)));
-    const best = options[0] || {quote: null, promising: false, score: null, marketComparison: null, forecastComparisons: []};
+    const best = options.find(option => option.nativeFairComparison?.supportsPointReview && !options.some(other => other.promising && !other.nativeFairComparison?.supportsPointReview)) || options[0] || {quote: null, promising: false, score: null, marketComparison: null, forecastComparisons: []};
     const review = receipt?.candidateAssessment;
     const researchReceipt = receipt?.state === 'BLOCKED' && receipt?.candidateDraft ? {...receipt,
       decision: receipt.candidateDraft.decision, evidence: receipt.candidateDraft.evidence} : receipt;
@@ -256,7 +258,8 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
       blocker: receipt?.blocker ? {reason: receipt.blocker.reason, missing: receipt.blocker.missing, impact: receipt.blocker.impact} : null,
       forecastGapReasons: list(forecast?.gapReasons), forecastAttempted: list(forecast?.attempts).some(row => row.valid) || list(forecast?.records).some(row => row.revalidatedAt),
       reason: best.promising ? [best.marketComparison?.direction === 'FAVORABLE' ? 'Favorable exact market-price comparison' : null,
-        best.forecastComparisons.some(row => row.direction === 'SUPPORTS_PRICE') ? 'Eligible exact forecast supports the price' : null].filter(Boolean).join('; ') : 'No positive qualified price comparison identified',
+        best.forecastComparisons.some(row => row.direction === 'SUPPORTS_PRICE') ? 'Eligible exact forecast supports the price' : null,
+        best.nativeFairComparison?.supportsPointReview ? 'Recorded native-unit fair supports a separate LEAN/BET review' : null].filter(Boolean).join('; ') : 'No positive qualified price comparison identified',
       action: reviewed.reviewState === 'UNFINISHED' ? 'Complete the named research and producer assessment before recording a decision.' :
         reviewed.reviewState === 'COMPLETE' ? 'Producer assessment complete; existing decision and publication rules apply.' : 'Retain the existing assessment; no automatic grade change.'};
   });

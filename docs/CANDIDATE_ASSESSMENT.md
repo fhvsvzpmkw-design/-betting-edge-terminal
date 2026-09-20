@@ -4,6 +4,12 @@ Version `2026-09-15.1`. Applies to Main reports at/after `2026-09-15T18:15:00-07
 
 The producer must finish the research-to-decision step for a promising exact selection. A ranked lead is not a betting recommendation. The mechanism does not lower Core requirements, assign LEAN/BET, fabricate probabilities, change staking or rewrite issuance.
 
+## Core decision-path clarification — September 20, 2026
+
+From `2026-09-20T18:15:00-07:00`, read `docs/CORE14_DEEP_REVIEW_2026-09-20.md`. The extra primary-receipt MODERATE/STRONG support floor is a BET requirement, not a universal non-wager completion requirement. All other source, fair/range, personnel, exact-identity and status-specific checks remain. A failed BET conservative bound must receive a separate LEAN/PASS assessment; it is not an automatic PASS. No grade is forced.
+
+The queue also retains source-linked current `fairValueEvidence` in native probability, spread or total units. `nativeFairComparison` identifies a review lead, not calibrated EV or betting authority. Different contracts do not inherit comparisons. Review existing governed Walters/Graham fairs explicitly rather than discarding them solely because no external exact cover probability was found. Keep one coherent adopted basis for opposing selections, and reject or retain each conflicting source explicitly. Do not use a universal fixed band or compulsory min/max of all publishers as a substitute for justified uncertainty.
+
 ## Event-first completion amendment — September 20, 2026
 
 Orchestration version `2026-09-20.1`, operational for all five Main lanes from the September 20 18:15 report (`2026-09-20T18:15:00-07:00`). This section supersedes the ordering in Working sequence steps 2–3 and any older requirement to exhaust exact numerical forecast searches before completing an otherwise supported market-based PASS. All existing preflight, personnel, exact-selection, candidate, Core, staking and publication checks remain in force.

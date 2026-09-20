@@ -30,7 +30,7 @@ function routeFor(row, receipt) {
   const directionalFinding = list(receipt?.decision?.cardEvidence?.findings).some(finding => finding.stance === 'SUPPORT') ||
     list(receipt?.candidateDraft?.decision?.cardEvidence?.findings).some(finding => finding.stance === 'SUPPORT');
   if (receipt?.researchRouting?.requiresDeepReview === true || row.promising || directionalFinding || options.some(option =>
-    option.marketComparison?.direction === 'FAVORABLE' || Number(option.marketComparison?.edgeProbabilityPoints) > 0 ||
+    option.nativeFairComparison?.supportsPointReview === true || option.marketComparison?.direction === 'FAVORABLE' || Number(option.marketComparison?.edgeProbabilityPoints) > 0 ||
     list(option.forecastComparisons).some(forecast => forecast.direction === 'SUPPORTS_PRICE'))) return 'DEEP_REVIEW';
   // A negative screen is permission to REVIEW a PASS, never an automatic PASS.
   // Producer-identified close calls, contrary model findings and material uncertainty
@@ -69,7 +69,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,
       state:row.state, status:row.status || null, route, quote:row.quote || null, assessedQuote:row.assessedQuote || null,
       exactOptions:list(row.options).map(option => ({quote:option.quote, marketComparison:option.marketComparison || null})),
-      priceComparison:row.marketComparison || null, blocker:row.blocker || receipt?.blocker?.reason || null,
+      priceComparison:row.marketComparison || null, nativeFairComparison:row.nativeFairComparison || null, blocker:row.blocker || receipt?.blocker?.reason || null,
       nextAction:actionFor(route), producerRoutingRationale:receipt?.researchRouting?.rationale || null});
     if (!identity || matches.length > 1) continue;
     const collect = (record, priorReportPath = null) => {
