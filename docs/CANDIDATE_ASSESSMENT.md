@@ -4,6 +4,34 @@ Version `2026-09-15.1`. Applies to Main reports at/after `2026-09-15T18:15:00-07
 
 The producer must finish the research-to-decision step for a promising exact selection. A ranked lead is not a betting recommendation. The mechanism does not lower Core requirements, assign LEAN/BET, fabricate probabilities, change staking or rewrite issuance.
 
+## Event-first completion amendment — September 20, 2026
+
+Orchestration version `2026-09-20.1`, operational for all five Main lanes from the September 20 18:15 report (`2026-09-20T18:15:00-07:00`). This section supersedes the ordering in Working sequence steps 2–3 and any older requirement to exhaust exact numerical forecast searches before completing an otherwise supported market-based PASS. All existing preflight, personnel, exact-selection, candidate, Core, staking and publication checks remain in force.
+
+### One event scan, separate market decisions
+
+After binding the normal inventory, run the existing `node tools/report-evidence-repair.mjs candidates --report <draft.json> --sidecar <draft-sidecar.json> --root <repo>` command (with the normal `--feed` when needed). Its `eventResearchPlan` is the complete work queue; the older positive-only `shortlist` and `unfinished` arrays are not the full research-completion denominator. An empty positive shortlist is not a stopping condition.
+
+Make one current event research package per exact sport/event/start-time identity. Start from the plan's recorded `OFFICIAL`/`REPORTING` source leads and the existing same-day research handoff. Revalidate applicable personnel/lineups/starters/goalies, weather, rest/travel, matchup information, relevant historical findings and existing forecast leads once for the event. Record actual observations and real lookup failures. A source's original `checkedAt`/`asOf` never changes merely because another selection or later run uses it. A schedule confirmation alone is not a completed material-personnel review. Failed availability endpoints require the existing alternate-source/current-information process.
+
+Reuse the factual findings and their source IDs, NOT a completed card, its `selectionKey`, directional stance, probability, clearance, grade or stake. For each exact primary pair, apply that package to its own win, cover or total-settlement question, at its own supported book/line/price. Write finding → application → limitation separately for each selection. Record the existing `sourceEvidence`, `marketAssessment`/fair evidence, `candidateAssessment` and exact-key `cardEvidence` required by the normal receipt schema. Pair coherence and September 19 evidence-detachment protections are unchanged. A lineup relevant to both ML and total does not imply the same directional conclusion for both.
+
+### Completion routes
+
+`MARKET_PASS_REVIEW` is a shorter research route, not an automatic decision. Complete a PASS only after the current event package and exact-selection applicability review support it: the executable price is unfavorable to a qualified compatible paired reference; available conflicting/directional findings and eligible exact forecasts have been considered; and material personnel uncertainty is resolved, found immaterial with explanation, or fully investigated with a specific reasoned PASS impact under the existing unresolved-review schema. Preserve the exact negative comparison and limitations in the decision. An independent fair-value model or published probability interval is not mandatory on this existing market-assessment path. A completed negative review need not launch separate exhaustive probability searches for all six sides of the same game. Neither a negative quote screen alone nor an unavailable model alone is sufficient to manufacture PASS.
+
+`DEEP_REVIEW` covers favorable exact comparisons, applicable forecast disagreements, directional research and producer-identified close calls. Escalate any nominally negative screen whose news, model assumptions or uncertainty could change the decision. The producer may record `receipt.researchRouting = {requiresDeepReview: true, rationale: "specific close-call or conflicting-finding explanation"}` to keep it in this route. This is an escalation hint only, not a new mandatory field or a betting threshold. Evaluate legitimate market-based LEAN and properly qualified WAIT without requiring a model merely for those routes; BET retains all existing independent-fair, uncertainty, personnel and risk controls.
+
+`REFERENCE_OR_FORECAST_RESEARCH` means the negative-market shortcut is not established: pursue a compatible reference or the applicable sourced forecast route. Missing comparison is not proof of no value. `REPAIR_EXACT_EVIDENCE` must rebuild the mismatched exact-selection evidence before any assessment is completed; it cannot be bypassed by shared-event reuse.
+
+### Coverage without starvation
+
+First complete a breadth-first event scan over every available event, giving approaching starts priority. Within each event, finish supported ordinary market reviews together and put genuinely decision-sensitive selections into the deeper queue. Then deepen the best opportunities and close calls, while resuming concrete remaining gaps. Do not stop merely because the positive shortlist is empty, and do not restart six independent news searches for six selections in one event. The plan retains every unfinished selection regardless of its initial price score.
+
+Re-run `candidates` and normal `prepare` before freezing. Reconcile `eventResearchPlan.counts.available = completed + pending` with the primary receipts. The full plan is retained in the sidecar evidence audit, and `report.evidenceApplication.researchCompletion` carries its count summary. An issued receipt, not a grouped source or queue item, establishes a completed decision. Describe a quote inventory scan, a real forecast lookup, a completed event scan and a completed selection assessment separately. Never claim a forecast lookup was attempted just because a market quote was loaded.
+
+When work remains at publication, keep its specific missing input, actual source attempts, stopping reason and next action as selection-level `RESEARCH_INCOMPLETE` or the applicable genuine blocker. Do not convert it into PASS/WAIT or let it suppress completed unrelated cards. Report both completed decisions and the full pending count; “no qualifying candidates” must be qualified by the actual unfinished coverage. This amendment neither adds a report-wide completion gate nor changes any schedule, odds pull, props pause, historical report, fair number, decision threshold or stake.
+
 ## Working sequence
 
 1. Bind the normal eligible primary inventory, exact execution quotes and qualified Pinnacle observer. Run `report-evidence-repair.mjs candidates` using the report/sidecar/root arguments already used by preparation. The initial queue works before decisions are populated.

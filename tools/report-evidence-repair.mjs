@@ -13,6 +13,7 @@ import {assembleCardEvidence} from './assemble-card-evidence.mjs';
 import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
 import {buildMarketMethodShadow} from './market-method-shadow.mjs';
+import {buildEventResearchPlan} from './event-research-plan.mjs';
 import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
 
 export const EVIDENCE_REPAIR_VERSION = '2026-09-12';
@@ -99,6 +100,7 @@ export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedF
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
     reportTs: report.ts, forecastCoverage: forecasts,
     candidateAssessment,
+    eventResearchPlan: buildEventResearchPlan({report, sidecar, candidateAssessment, priorReceipts: ctx.priorReceipts}),
     blockedReview: reviewBlockedSelections(report, sidecar, ctx),
     cardReview: {cardsReviewed: review.cardsReviewed, issueCounts: review.issueCounts, issues: review.issues},
     warnings: [...ctx.warnings, ...list(review.warnings)]};
@@ -257,6 +259,7 @@ export function attachPublicationEvidenceAudit({root, report, sidecar, existingR
   sidecar.evidenceApplication = audit;
   report.evidenceApplication = {schema:1, version:EVIDENCE_REPAIR_VERSION, publicationBlocking:false,
     forecastCoverage: audit.forecastCoverage, blockedReview: audit.blockedReview,
+    researchCompletion: audit.eventResearchPlan?.counts,
     issueCounts: audit.cardReview?.issueCounts || {}, warnings: audit.warnings};
   if (candidateAssessmentRequired(report)) {
     const ctx = loadContext(root, report, sidecar);
@@ -289,8 +292,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const audit = result.audit || result;
     if (args[0] === 'candidates') {
       const candidate = audit.candidateAssessment;
-      console.log(JSON.stringify(args.includes('--details') ? candidate : {schema:candidate.schema, version:candidate.version,
+      console.log(JSON.stringify(args.includes('--details') ? {...candidate, eventResearchPlan:audit.eventResearchPlan} : {schema:candidate.schema, version:candidate.version,
         asOf:candidate.asOf, counts:candidate.counts, shortlist:candidate.shortlist, unfinished:candidate.unfinished,
+        eventResearchPlan:audit.eventResearchPlan,
         forecastCoverage:audit.forecastCoverage?.totals, warnings:[...audit.warnings, ...list(candidate.warnings)]},null,2));
       process.exit(0);
     }
@@ -301,7 +305,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(JSON.stringify({mode:args[0] === 'prepare' ? 'DRAFT_PREPARED' : 'ADVISORY_ONLY', publicationBlocking:false, version:EVIDENCE_REPAIR_VERSION,
       forecastCoverage:audit.forecastCoverage?.totals || {state:audit.forecastCoverage?.state},
       candidateAssessment:audit.candidateAssessment?.counts, candidateDeferrals:audit.candidateDeferrals,
-      cardEvidenceDeferrals:audit.cardEvidenceDeferrals,
+      cardEvidenceDeferrals:audit.cardEvidenceDeferrals, researchCompletion:audit.eventResearchPlan?.counts,
       issueCounts:audit.cardReview?.issueCounts, blockedReview:blockedSummary, changes:result.changes, warnings:audit.warnings},null,2));
   } catch (error) {console.error(error.message); process.exitCode = 1;}
 }
