@@ -21,9 +21,37 @@ jobs:
           node-version: '22'
       - name: Historical attribution and rule scan
         run: python3 tools/audit-core14-review.py
+      - name: Package pinned review inputs without repository mutation
+        run: |
+          python3 - <<'PY'
+          import pathlib, subprocess, zipfile
+          root=pathlib.Path('.')
+          base='d4e1bf4ca6827d5123c054be78eb6da6d4648eaf'
+          paths=subprocess.check_output(['git','ls-tree','-r','--name-only',base],text=True).splitlines()
+          selected=[]
+          for p in paths:
+              include=(p.startswith(('tools/','core/','tests/','docs/','.github/workflows/')) or
+                  ('/' not in p and p.endswith(('.md','.json'))) or
+                  (p.startswith('research/') and p.count('/')==1 and p.endswith('.json')) or
+                  (p.startswith('data/') and p.count('/')==1 and p.endswith('.json')) or
+                  p.startswith(('data/history/runs/','data/history/research-fit/')) or
+                  p=='data/history/report-provenance-schema.json')
+              if include and pathlib.Path(p).suffix in ['.mjs','.js','.py','.json','.md','.yml','.yaml']:
+                  selected.append(p)
+          with zipfile.ZipFile('/tmp/core14-review-inputs.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for p in selected:
+                  z.writestr(p,subprocess.check_output(['git','show',base+':'+p]))
+              z.writestr('REVIEW_BASE.txt',base+'\nRead-only audit snapshot; not a deployment.\n')
+          print('Pinned review files:',len(selected),'zip bytes:',pathlib.Path('/tmp/core14-review-inputs.zip').stat().st_size)
+          PY
       - name: Confirm no governed files changed
         run: git diff --exit-code && test -z "$(git ls-files --others --exclude-standard)"
       - uses: actions/upload-artifact@v4
         with:
           name: core14-review-audit
           path: /tmp/core14-review-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: core14-review-inputs
+          path: /tmp/core14-review-inputs.zip
+          retention-days: 3
