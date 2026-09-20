@@ -28,7 +28,7 @@ jobs:
           node tools/core-handicap-framework.mjs self-test
           node tools/core-liquidity-classification.mjs self-test
           node tests/primary-analysis-receipt.test.mjs
-      - name: Commit tested changes only to isolated branch
+      - name: Commit tested non-workflow changes only to isolated branch
         run: |
           python3 - <<'PY'
           import subprocess
@@ -37,8 +37,10 @@ jobs:
           assert changed==allowed,(changed,allowed)
           assert not subprocess.check_output(['git','ls-files','--others','--exclude-standard'],text=True).strip()
           PY
-          rm tools/apply-core14-review-once.py .github/workflows/apply-core14-review-once.yml
-          git add -- .github/workflows/card-evidence-review.yml BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md docs/CANDIDATE_ASSESSMENT.md tools/candidate-assessment.mjs tools/core-handicap-framework.mjs tools/core-liquidity-classification.mjs tools/event-research-plan.mjs tools/major-sport-market-coverage-gate.mjs tools/report-evidence-repair.mjs tools/apply-core14-review-once.py .github/workflows/apply-core14-review-once.yml
+          # Workflow changes are handled by the authorized connector, not this token.
+          git restore -- .github/workflows/card-evidence-review.yml
+          rm tools/apply-core14-review-once.py
+          git add -- BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md docs/CANDIDATE_ASSESSMENT.md tools/candidate-assessment.mjs tools/core-handicap-framework.mjs tools/core-liquidity-classification.mjs tools/event-research-plan.mjs tools/major-sport-market-coverage-gate.mjs tools/report-evidence-repair.mjs tools/apply-core14-review-once.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'Apply tested Core 1.4 non-bet support and native-fair corrections'
