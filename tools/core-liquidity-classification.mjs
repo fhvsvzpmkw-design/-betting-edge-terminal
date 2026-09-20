@@ -48,7 +48,11 @@ export function loadLiquidityPolicy({verifyManifest=true}={}){
 }
 
 export function deriveRequiredLiquidityRisk(context,policy=loadLiquidityPolicy()){
-  const matches=(policy.deterministicRules||[]).filter(rule=>matchCondition(rule.when,context));
+  // Current inventory labels are aliases of the existing full-game contracts.
+  // This restores the already-governed NORMAL rule; it does not widen its scope.
+  const aliases={full_game_primary_run_line:'full_game_run_line',full_game_primary_total:'full_game_total'};
+  const canonical={...context,marketDetail:aliases[context?.marketDetail]||context?.marketDetail};
+  const matches=(policy.deterministicRules||[]).filter(rule=>matchCondition(rule.when,canonical));
   if(!matches.length)return null;
   const required=[...new Set(matches.map(rule=>rule.requiredLiquidityRisk))];
   if(required.length!==1)fail(`Conflicting deterministic liquidity rules for ${context?.sport||'UNKNOWN'} ${context?.marketClass||'UNKNOWN'} ${context?.marketDetail||'UNKNOWN'}`);

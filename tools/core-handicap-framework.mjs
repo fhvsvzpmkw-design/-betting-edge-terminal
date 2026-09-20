@@ -24,7 +24,10 @@ export function matchCondition(condition,context){
   if(condition.not) return !matchCondition(condition.not,context);
   return Object.entries(condition).every(([key,allowed])=>{
     const values=Array.isArray(allowed)?allowed:[allowed];
-    return values.some(value=>context[key]===value);
+    // Opt-in draft taxonomy repair only. Older issued contexts retain exact
+    // matching; the inventory's singular total is the rule's totals family.
+    const canonical = value => key==='marketClass' && context.coreTaxonomyVersion==='2026-09-20.1' && value==='totals' ? 'total' : value;
+    return values.some(value=>canonical(context[key])===canonical(value));
   });
 }
 

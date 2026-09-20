@@ -546,14 +546,20 @@ function validatePrimaryBlocker(report, receipt, selection) {
   }
   for (const field of ['decision', 'evidence', 'fairValueEvidence', 'fair', 'status', 'marketFair']) ensure(receipt[field] == null, `${label} BLOCKED cannot carry a fabricated decision or fair`);
 }
-function receiptCore(decision, evidence, framework, label, marketAssessment = false) {
+function receiptCore(decision, evidence, framework, label, marketAssessment = false, reportTs = null) {
   const assessment = decision.coreAssessment, context = assessment?.context;
   ensure(isObject(assessment) && isObject(context) && exactObject(assessment, evidence.coreAssessment), `${label} requires identical recorded Core assessment in decision and evidence`);
   ensure(assessment.frameworkId === framework.frameworkId, `${label} Core framework identity mismatch`);
   validateContext(framework, context, label);
   if (!marketAssessment) {
     ensure(['INDEPENDENT_MODEL', 'MARKET_ANCHORED_MODEL'].includes(context.fairValueBasis), `${label} market-only/unavailable fair must be BLOCKED, not an evaluated value decision`);
-    ensure(['MODERATE', 'STRONG'].includes(context.independentCurrentSupport), `${label} evaluated value decision requires independent current support`);
+    // September 20: the primary-receipt floor was incorrectly applied to all
+    // statuses. It remains a BET requirement, not a second BET-level gate on
+    // sourced zero-risk LEAN/PASS/WAIT decisions. Historical semantics stay fixed.
+    const statusSpecific = Date.parse(reportTs || '') >= Date.parse('2026-09-20T18:15:00-07:00');
+    if (!statusSpecific || decision.status === 'BET') {
+      ensure(['MODERATE', 'STRONG'].includes(context.independentCurrentSupport), `${label} evaluated value decision requires independent current support`);
+    }
   }
   const researchIds = [...new Set((framework.graduatedResearchRules || []).filter(rule => matchCondition(rule.when, context)).map(rule => rule.priorId))].sort();
   ensure(exactObject([...context.graduatedResearchIds].sort(), researchIds), `${label} Core graduated research allowlist mismatch`);
@@ -643,7 +649,7 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
       ensure(decision.fairValueEvidence.inputs.some(input => input.sourceIds.some(id => sourceKinds.get(id) !== 'MARKET' && sourceKinds.has(id))), `${label} numeric fair requires non-market source-linked inputs`);
     }
     runtime ||= loadProductionFramework();
-    receiptCore(decision, evidence, runtime, label, marketAssessment);
+    receiptCore(decision, evidence, runtime, label, marketAssessment, report.ts);
     validatePersonnelSemantics({ ...report, recs: [decision] }, { ...sidecar, recommendations: [evidence] });
     const contractKey = `${selection.sport}|${selection.eventId}|${selection.marketDetail}|${quote.line ?? ''}`;
     const referenceSide = selection.marketClass === 'total' ? 'over' : 'home';

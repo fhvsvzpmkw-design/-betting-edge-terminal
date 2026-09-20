@@ -20,6 +20,8 @@
 **evidenceRepairVersion:** `2026-09-12` — one shared forecast-coverage, evidence-application and blocker-recovery pass for all five Main lanes; authority version remains 1.2
 
 **Candidate assessment amendment:** `2026-09-15.1`, effective for reports at/after `2026-09-15T18:15:00-07:00`. Read `docs/CANDIDATE_ASSESSMENT.md`. Rank exact paired-market opportunities, complete their source-to-decision review, retain unfinished candidates as `RESEARCH_INCOMPLETE`, and display the shortlist separately from issued cards. The market-method test is hypothetical only. Core decision thresholds, BET authority, all existing Main times and the props pause are unchanged.
+**Core decision-path review amendment:** `2026-09-20.1`, effective at/after `2026-09-20T18:15:00-07:00`. Read `docs/CORE14_DEEP_REVIEW_2026-09-20.md` with the current candidate authority. Apply status-specific support requirements, retain sourced native-fair opportunities, and inspect `coreTaxonomyRepair` from shared draft preparation. The extra receipt support floor applies to BET, not every non-wager assessment. Do not use a failed BET bound as an automatic PASS, and do not invent universal uncertainty bands. Actual NBA/WNBA league identity comes from the exact bound event; no blind league mapping. All BET, price, identity, freshness, personnel, risk and immutable-publication safeguards remain.
+
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Branch:** `main`
 

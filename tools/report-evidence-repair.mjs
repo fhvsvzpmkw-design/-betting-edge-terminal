@@ -14,6 +14,7 @@ import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
 import {buildMarketMethodShadow} from './market-method-shadow.mjs';
 import {buildEventResearchPlan} from './event-research-plan.mjs';
+import {repairDraftCoreTaxonomy} from './core-draft-taxonomy.mjs';
 import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
 
 export const EVIDENCE_REPAIR_VERSION = '2026-09-12';
@@ -196,6 +197,7 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
 export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
   let draftReport = structuredClone(report), draftSidecar = structuredClone(sidecar);
   const ctx = loadContext(root, draftReport, draftSidecar, feedFile);
+  const taxonomy = repairDraftCoreTaxonomy(draftReport, draftSidecar, {feed:ctx.feed, framework:optional(path.join(root, 'core/core-handicap-framework-v1.4.json'))});
   const before = JSON.stringify(list(draftReport.recs).map(rec => ({feed:rec.feed,status:rec.status,stake:rec.stake,fair:rec.fair,playTo:rec.playTo,coreAssessment:rec.coreAssessment,marketAssessment:rec.marketAssessment})));
   attachForecastCoverage({report: draftReport, sidecar: draftSidecar, universe: ctx.universe, feed: ctx.feed, priorRecords: ctx.priorRecords, registry: ctx.registry, now: report.ts});
   const assembled = assembleCardEvidence(draftReport, draftSidecar, {library: ctx.library, draft: true});
@@ -221,7 +223,8 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
   draftSidecar.evidenceRepairVersion = EVIDENCE_REPAIR_VERSION;
   draftSidecar.cardEvidenceIdentityVersion = CARD_EVIDENCE_IDENTITY_VERSION;
   const audit = buildEvidenceAudit({root, report: draftReport, sidecar: draftSidecar, context: ctx});
-  audit.warnings.push(...list(assembled.warnings));
+  audit.warnings.push(...list(assembled.warnings), ...taxonomy.warnings);
+  audit.coreTaxonomyRepair = taxonomy;
   audit.assemblyChanges = assembled.changes;
   draftSidecar.evidenceApplication = audit;
   if (candidateAssessmentRequired(report)) {
@@ -305,7 +308,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(JSON.stringify({mode:args[0] === 'prepare' ? 'DRAFT_PREPARED' : 'ADVISORY_ONLY', publicationBlocking:false, version:EVIDENCE_REPAIR_VERSION,
       forecastCoverage:audit.forecastCoverage?.totals || {state:audit.forecastCoverage?.state},
       candidateAssessment:audit.candidateAssessment?.counts, candidateDeferrals:audit.candidateDeferrals,
-      cardEvidenceDeferrals:audit.cardEvidenceDeferrals, researchCompletion:audit.eventResearchPlan?.counts,
+      cardEvidenceDeferrals:audit.cardEvidenceDeferrals, coreTaxonomyRepair:audit.coreTaxonomyRepair, researchCompletion:audit.eventResearchPlan?.counts,
       issueCounts:audit.cardReview?.issueCounts, blockedReview:blockedSummary, changes:result.changes, warnings:audit.warnings},null,2));
   } catch (error) {console.error(error.message); process.exitCode = 1;}
 }
