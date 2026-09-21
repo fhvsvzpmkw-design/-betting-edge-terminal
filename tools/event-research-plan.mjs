@@ -95,7 +95,8 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     // Surface the existing coverage module's fallbacks in the event work plan.
     // One source retrieval can answer several sides; listing it is not execution.
     const forecastRows = list(forecastCoverage.selections).filter(row => String(row.eventId) === String(event.eventId) &&
-      row.sport === event.sport && time(row.startTime) === time(event.eventDate));
+      (row.sport === event.sport || (event.sport === 'NBA_WNBA' && ['NBA','WNBA'].includes(row.sport))) &&
+      time(row.startTime) === time(event.eventDate));
     const sourceQueue = new Map();
     for (const row of forecastRows.filter(row => !list(row.eligibleExactRecordIds).length)) {
       for (const source of list(row.nextRoutes)) {
