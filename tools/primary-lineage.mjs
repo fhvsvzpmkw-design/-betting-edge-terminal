@@ -138,6 +138,27 @@ function decisionProblems(rec) {
   if (!String(rec.fair || '').trim() || !String(rec.playTo || '').trim()) problems.push('requires current fair and playTo after reassessment');
   return problems;
 }
+function researchIncompleteContinuityReceipt(sidecar, prior, market, usable) {
+  const receipts = sidecar?.primaryAnalysis?.receipts;
+  if (!Array.isArray(receipts) || !usable.length) return null;
+  const wantedEvent = String(prior?.feed?.eventId || '');
+  const wantedSide = String(prior?.feed?.side || '').toLowerCase();
+  for (const receipt of receipts) {
+    if (String(receipt?.state || '').toUpperCase() !== 'BLOCKED') continue;
+    if (String(receipt?.blocker?.reason || '').toUpperCase() !== 'RESEARCH_INCOMPLETE') continue;
+    const quote = receipt?.quote || {};
+    if (String(quote.eventId || '') !== wantedEvent || marketKey(quote) !== market ||
+      String(quote.side || '').toLowerCase() !== wantedSide) continue;
+    const book = canonicalBook(quote.book), line = number(quote.line), dec = decimal(quote.priceDecimal);
+    if (!book || line === null || !dec || !String(quote.selectionKey || '')) continue;
+    const selected = usable.find(item => item.book === book &&
+      item.selectionKey === String(quote.selectionKey) &&
+      item.rawLine === line &&
+      Math.abs(item.priceDecimal - dec) <= EPSILON);
+    if (selected) return { receipt, selected };
+  }
+  return null;
+}
 function hasNumber(text, value) {
   return (String(text).match(/[+-]?\d+(?:\.\d+)?/g) || []).some(token => Math.abs(Number(token) - value) <= EPSILON);
 }
@@ -166,7 +187,8 @@ export function auditPrimaryLineage({ root = process.cwd(), report, sidecar = nu
     const start = ms(event?.date || event?.identity?.startTime || old.feed.eventDate);
     if (start !== null && start <= ms(report.ts)) continue;
     const current = currentBySide.get(key);
-    // Resolved PASS cards may be curated; active BET/LEAN/WAIT candidates cannot vanish.
+    // Resolved PASS cards may be curated; active BET/LEAN/WAIT candidates cannot vanish without either
+    // a current issued decision or an exact current RESEARCH_INCOMPLETE receipt.
     if (!current && !ACTIVE.has(String(old.status || '').toUpperCase())) continue;
     const oldLine = displayLine(rawRecommendationLine(old.feed, market), old.feed.side, market);
     const diagnostic = { eventId: String(old.feed.eventId), side: old.feed.side, sport, sourceTs: prior.sourceTs,
@@ -174,17 +196,36 @@ export function auditPrimaryLineage({ root = process.cwd(), report, sidecar = nu
       priorPrice: old.price || null, priorBook: old.book || null, priorStatus: old.status,
       priorFair: old.fair || null, priorPlayTo: old.playTo || null };
     const problems = [];
+    const primary = BOOKS.map(book => primaryLineQuote(event, book, old.feed.side, feed, market));
+    diagnostic.primary = primary;
+    const usable = primary.filter(item => item.state === 'OK');
     if (!current) {
+      const incomplete = researchIncompleteContinuityReceipt(sidecar, old, market, usable);
+      if (incomplete) {
+        const selected = incomplete.selected;
+        const movement = oldLine === null ? 'PRIOR LINE UNVERIFIED' : lineMovement(old.feed.side, oldLine, selected.line, market);
+        const oddsMovement = priceMovement(old.price, selected.priceAmerican);
+        Object.assign(diagnostic, {
+          state: 'RESEARCH_INCOMPLETE_CONTINUITY',
+          lineMovement: movement,
+          priceMovement: oddsMovement,
+          currentLine: selected.line,
+          currentPrice: selected.priceAmerican,
+          currentBook: selected.book,
+          currentSelectionKey: selected.selectionKey,
+          receiptSelectionId: incomplete.receipt.selectionId || null
+        });
+        diagnostics.push(diagnostic);
+        continue;
+      }
       diagnostic.state = 'RECONCILIATION_REQUIRED';
       diagnostics.push(diagnostic);
-      violations.push(key + ': tracked ' + spec.name + ' disappeared; preserve the game and ' + spec.sideName + ' and reconcile the current primary ' + spec.name);
+      violations.push(key + ': tracked ' + spec.name + ' disappeared; preserve the game and ' + spec.sideName +
+        ' with either a current decision card or an exact current RESEARCH_INCOMPLETE receipt tied to the fresh primary selection');
       continue;
     }
     problems.push(...decisionProblems(current));
     const text = String(current.move || '').toUpperCase();
-    const primary = BOOKS.map(book => primaryLineQuote(event, book, old.feed.side, feed, market));
-    diagnostic.primary = primary;
-    const usable = primary.filter(item => item.state === 'OK');
     if (!usable.length) {
       diagnostic.state = !event ? 'EVENT_NOT_IN_FEED' : primary.every(item => item.state === 'MISSING') ? 'MARKET_UNAVAILABLE' : 'PRICE_NOT_VERIFIED';
       const required = diagnostic.state === 'MARKET_UNAVAILABLE' ? /MARKET UNAVAILABLE|PRICE NOT VERIFIED/ : /PRICE NOT VERIFIED|IDENTITY MISMATCH|FEED STALE|CONFLICTING SIGNALS/;
