@@ -306,6 +306,16 @@ function candidateReasons(d,selection,compact=false){
   const reason=candidateText(selection?.reason);
   if(reason)box.appendChild(el(d,'p','',`WHY REVIEW: ${reason}`));
   if(candidateQuoteChanged(selection))box.appendChild(el(d,'p','runnerCandidateMeta',`Recorded decision assessed at: ${candidateQuoteLabel(selection.assessedQuote)} • ${candidatePrice({quote:selection.assessedQuote})}. Listed quote requires its own assessment.`));
+  const graham=selection?.grahamFairHandoff, review=selection?.grahamReview;
+  if(graham){
+    const signed=n=>`${n>0?'+':''}${Number(n.toFixed(3))}`;
+    const fair=graham.state==='EXACT_FAIR_REQUIRES_REVIEW'
+      ? `fair ${signed(graham.selectedFairPoints)}; offered ${signed(graham.selectedLinePoints)}; margin ${signed(graham.pointMargin)} points. As of ${graham.sourceAsOf}.`
+      : `unavailable: ${graham.reason||'source unresolved'}.`;
+    box.appendChild(el(d,'p','runnerCandidateForecast',`GRAHAM: ${fair}`));
+    if(review?.disposition)box.appendChild(el(d,'p','runnerCandidateForecast',`GRAHAM DECISION (${review.book||'assessed quote'}): ${review.disposition} — ${review.decisionImpact||review.rationale||''}`));
+    if(!compact&&graham.limitations?.length)box.appendChild(el(d,'p','runnerCandidateMeta',`Graham review limits: ${graham.limitations.map(x=>x.replaceAll('_',' ').toLowerCase()).join('; ')}.`));
+  }
   const rationale=candidateText(selection?.decisionRationale);
   if(rationale&&rationale!==reason)box.appendChild(el(d,'p','',rationale));
   const rawMissing=(Array.isArray(selection?.missingResearch)?selection.missingResearch:[]).filter(x=>typeof x==='string'&&x.trim());
@@ -952,6 +962,9 @@ function card(d,r){
   });
   if(facts.children.length)c.appendChild(facts);
 
+  if(r.grahamFairReview?.decisionImpact){
+    c.appendChild(el(d,'div','runnerDetail open',`GRAHAM ${r.grahamFairReview.disposition}: ${r.grahamFairReview.decisionImpact}`));
+  }
   if(r.analysis){
     const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS'),det=el(d,'div','runnerDetail',r.analysis);
     b.onclick=()=>{det.classList.toggle('open');b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS'};

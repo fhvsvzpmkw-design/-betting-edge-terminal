@@ -137,3 +137,7 @@ live.append(candidatePanel,candidateLive);context.dashboardApi.patchDashboard(do
 assert.equal(candidatePanel.parentElement,live,'dashboard overlay preserves candidate section');
 assert.equal(candidatePanel.nextElementSibling,candidateLive,'dashboard overlay preserves shortlist placement before cards');
 console.log('PRIMARY DASHBOARD: PASS // VERIFIED COVERAGE + NO-CARD MARKET METERS + DIRECTION EXPLANATION + DOM ORDER + INTEGRITY + HISTORICAL PRESERVATION');
+
+// The actual issued-card renderer keeps the Graham decision impact visible.
+const grahamCard=api.card(document,{title:'Synthetic NFL spread',status:'PASS',grahamFairReview:{disposition:'CONTEXT',decisionImpact:'Current personnel evidence supports retaining PASS.'}},report);
+assert.match(grahamCard.textContent,/GRAHAM CONTEXT: Current personnel evidence supports retaining PASS/);
