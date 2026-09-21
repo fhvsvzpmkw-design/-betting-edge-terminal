@@ -14,7 +14,7 @@ Estimated case loss is max(0, healthy locked value minus effective replacement v
 
 A blocked game's optional caseReviews can preserve supported individual estimates as CASE_ESTIMATE_ONLY. These are reusable research, never complete team totals or permission to apply one side of a game. To adopt them, promote the case into a fully covered paired game bundle, resolve final game-day availability and run the existing evidence evaluator. Both teams must pass. Newly applied history preserves the estimate details for both teams as well as the immutable evidence binding. Current-week personnel workflows do not acquire a new writer through this historical adapter.
 
-Start with data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-replacement-model-review.json. Reuse its individual estimates and explicit remaining coverage gaps. An unequal committee by itself is no longer a reason to keep a case unresolved.
+Start with data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ten-game-coverage-review.json. This latest pass retains the Jacobs and Cooper estimates, adds the Higgins-to-Boutte primary estimate, and records newly identified reserve-list coverage gaps. Its adjacent EA Week 1 capture recovers 76 names absent from the original registry, including Donald, Kiner and Foster; it is source evidence only, not an amendment to production values. Zero additional paired games passed. Preserve the original review in data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-replacement-model-review.json. Reuse its individual estimates and explicit remaining coverage gaps. An unequal committee by itself is no longer a reason to keep a case unresolved.
 
 ## Historical input binding amendment
 
