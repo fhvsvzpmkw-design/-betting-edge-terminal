@@ -103,7 +103,7 @@ export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedF
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
     reportTs: report.ts, forecastCoverage: forecasts,
     candidateAssessment,
-    eventResearchPlan: buildEventResearchPlan({report, sidecar, candidateAssessment, priorReceipts: ctx.priorReceipts}),
+    eventResearchPlan: buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts}),
     blockedReview: reviewBlockedSelections(report, sidecar, ctx),
     cardReview: {cardsReviewed: review.cardsReviewed, issueCounts: review.issueCounts, issues: review.issues},
     warnings: [...ctx.warnings, ...list(review.warnings)]};

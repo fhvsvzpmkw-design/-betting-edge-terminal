@@ -30,7 +30,10 @@ try {
     recs: [rec('paired', 'home'), rec('paired', 'away'), rec('missing', 'home'),
       rec('bet-priced', 'home', 'BET'), rec('bet-missing', 'home', 'BET'),
       rec('push', 'home', 'LEAN', { forecastRecordIds: ['forecast-exact-1'], forecastReview: { state: 'CONSIDERED' } }), rec('void', 'home', 'WAIT'),
-      rec('college', 'home', 'PASS', { meta: 'NCAAF | Team A at Team B' }),
+      rec('college', 'home', 'PASS', { meta: 'NCAAF | Team A at Team B',
+        forecastEvidenceIds: ['model-used', 'context-only', 'model-used'],
+        forecastReview: {eligibleExactRecordIds: ['model-used'], contextRecordIds: ['context-only']},
+        fairValueEvidence: {forecastRecordIds: ['model-used']} }),
       rec('nfl', 'home', 'PASS', { meta: 'NFL | Team A at Team B' }),
       rec('cfl', 'home', 'PASS', { meta: 'CFL | Team A at Team B' }),
       rec('pre', 'home', 'PASS', { meta: 'NFL preseason | Team A at Team B' })] };
@@ -56,6 +59,11 @@ try {
   const cards = new Map(index.cards.map(card => [card.eventId, card]));
   assert.equal(cards.get('pending').units, null);
   assert.deepEqual(cards.get('push').forecastRecordIds, ['forecast-exact-1']);
+  assert.deepEqual(cards.get('push').adoptedForecastRecordIds, [], 'legacy reviewed IDs must not imply adoption');
+  assert.deepEqual(cards.get('college').forecastRecordIds, ['model-used', 'context-only']);
+  assert.deepEqual(cards.get('college').forecastEvidenceIds, ['model-used', 'context-only']);
+  assert.deepEqual(cards.get('college').adoptedForecastRecordIds, ['model-used']);
+  assert.deepEqual(index.selections.find(row => row.eventId === 'college').timeline[0].adoptedForecastRecordIds, ['model-used']);
   assert.equal(cards.get('push').forecastReview.state, 'CONSIDERED');
   assert.equal(cards.get('missing').units, null);
   assert.equal(cards.get('bet-missing').sizedNetUnits, null);

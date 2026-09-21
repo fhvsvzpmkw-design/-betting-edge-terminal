@@ -18,6 +18,16 @@ assert.equal(JSON.stringify(input),before,'planner must not change grades, sourc
 assert.equal(plan.events[0].researchPackage.sources[0].requiresCurrentApplicabilityReview,true);
 assert.equal(plan.events[0].researchPackage.sources[0].source.checkedAt,source.checkedAt);
 assert.equal(plan.decisionAuthority,false);
+const fallbackInput={...input,forecastCoverage:{selections:rows.slice(0,2).map(row=>({
+  ...row,startTime:row.eventDate,eligibleExactRecordIds:[],attempts:[{sourceId:'fangraphs',outcome:'INACCESSIBLE'}],
+  nextRoutes:[{sourceId:'dratings',role:'EXACT_CANDIDATE',urls:['https://www.dratings.com/predictor/mlb-baseball-predictions/']}]
+}))}};
+const fallback=buildEventResearchPlan(fallbackInput).events[0].forecastRetrieval;
+assert.equal(fallback.state,'RETRIEVAL_QUEUE_NOT_EXECUTED');
+assert.equal(fallback.nextSources.length,1,'share retrieval across both sides');
+assert.equal(fallback.nextSources[0].selectionIds.length,2);
+assert.equal(fallback.attempts.length,2);
+assert.equal(buildEventResearchPlan({...fallbackInput,forecastCoverage:{selections:[]}}).events[0].forecastRetrieval.nextSources.length,0);
 const route = (row,receipt={}) => buildEventResearchPlan({report,candidateAssessment:{selections:[row]},sidecar:{primaryAnalysis:{receipts:[{selectionId:row.selectionId,...receipt}]}}}).events[0].selections[0].route;
 assert.equal(route({...make(),promising:true}),'DEEP_REVIEW');
 assert.equal(route({...make(),marketComparison:null}),'REFERENCE_OR_FORECAST_RESEARCH');

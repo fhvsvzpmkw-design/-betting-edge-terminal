@@ -214,6 +214,16 @@ function loadRun(sourceRun) {
 
 const cards = [];
 const observedRuns = new Set();
+const recordIds = (...groups) => [...new Set(groups.flatMap(group => Array.isArray(group) ? group : []).filter(id => typeof id === 'string' && id.trim()))];
+function forecastAttribution(rec) {
+  // Reviewed/context evidence is not proof of adoption. Preserve the historical
+  // top-level alias, but expose the actual fair-input IDs separately.
+  const forecastEvidenceIds = recordIds(rec.forecastEvidenceIds, rec.forecastRecordIds,
+    rec.forecastReview?.eligibleExactRecordIds, rec.forecastReview?.contextRecordIds);
+  const adoptedForecastRecordIds = recordIds(rec.fairValueEvidence?.forecastRecordIds);
+  return {forecastRecordIds: recordIds(forecastEvidenceIds, adoptedForecastRecordIds),
+    forecastEvidenceIds, adoptedForecastRecordIds};
+}
 function addRunCards(sourceRun, run, obs = null, obsFile = null) {
   run.recs.forEach((rec, index) => {
     const o = obs?.recommendations?.[index] || {};
@@ -235,7 +245,7 @@ function addRunCards(sourceRun, run, obs = null, obsFile = null) {
       status: cleanText(rec.status || o.status).toUpperCase() || null,
       eventId: String(rec?.feed?.eventId || completion.eventId || '') || null,
       selectionKey: rec?.feed?.selectionKey || o.selectionKey || null,
-      forecastRecordIds: Array.isArray(rec.forecastRecordIds) ? rec.forecastRecordIds : [],
+      ...forecastAttribution(rec),
       forecastReview: rec.forecastReview || null,
       sport: sportFamily(rec),
       market: marketFamily(rec),
@@ -326,6 +336,8 @@ for (const c of cards) {
     issuedPriceText: c.issuedPriceText,
     analysisPrice: c.analysisPrice,
     forecastRecordIds: c.forecastRecordIds,
+    forecastEvidenceIds: c.forecastEvidenceIds,
+    adoptedForecastRecordIds: c.adoptedForecastRecordIds,
     completionState: c.completionState,
     grade: c.grade,
     units: c.units

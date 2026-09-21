@@ -1,0 +1,53 @@
+name: Forecast attribution repair and recovery verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/build-results-index.mjs
+      - tools/import-forecast-evidence.mjs
+      - tools/verify-forecast-attribution.mjs
+      - tests/forecast-import.test.mjs
+      - .github/workflows/forecast-progression-2026-09-21.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: forecast-attribution-rebuild
+  cancel-in-progress: false
+jobs:
+  verify-and-rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regression checks
+        run: node --test tests/forecast-import.test.mjs tests/forecast-evidence.test.mjs tests/results-performance-populations.test.mjs tests/event-research-plan.test.mjs tests/graham-fair-handoff.test.mjs
+      - name: Rebuild and publish attribution only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "betting-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp data/history/results-index.json /tmp/results-before.json
+            node tools/build-results-index.mjs
+            node tools/add-results-player-value.mjs
+            node tools/add-results-shadow-v2.mjs
+            node tools/verify-forecast-attribution.mjs /tmp/results-before.json
+            unexpected=$(git diff --name-only | grep -Ev '^data/history/results-index\.json$' || true)
+            if [ -n "$unexpected" ]; then echo "$unexpected"; exit 1; fi
+            git add data/history/results-index.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "Repair reviewed and adopted forecast attribution in results index"
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo "Concurrent writes prevented index publication; no remote data overwritten."
+          exit 1

@@ -105,6 +105,19 @@ Call attachment/assembly before freezing the candidate or creating fingerprints.
 
 ## Commands and verification
 
+### Import actual findings into an unissued draft
+
+Create a capture JSON with `schema:1`, `records`, `attempts` and optional `revalidations`, using the existing fields above. The importer performs no network requests and supplies no missing review, probability or source time. It requires exact available-selection mapping and rejects ineligible records and conflicting immutable IDs before writing anything. Unknown forecast time can remain context, never exact eligible evidence. The output must be a new draft outside History.
+
+```sh
+node tools/import-forecast-evidence.mjs --report DRAFT_REPORT --sidecar DRAFT_SIDECAR --capture ACTUAL_CAPTURE --feed BOUND_FEED --out NEW_DRAFT_SIDECAR --root .
+node tools/report-evidence-repair.mjs prepare --report DRAFT_REPORT --sidecar NEW_DRAFT_SIDECAR --feed BOUND_FEED --root .
+```
+
+Review the preparation audit and producer dispositions before normal validation/freeze. Importing a record never adopts a fair or changes status/stake. A prior capture needs explicit current-report revalidations; do not edit its original timestamps or applicability object. The event research plan now surfaces outstanding sources beside the event's work, including completed market decisions with a remaining forecast gap. Qualified existing decisions still publish under their existing rules.
+
+Results indexing now retains `forecastEvidenceIds` (reviewed/context evidence) and `adoptedForecastRecordIds` (only explicit `fairValueEvidence.forecastRecordIds`). The legacy `forecastRecordIds` field is their deduplicated union for navigation, not an adoption indicator. All three are retained on selection timelines. Rebuilding the index does not rewrite issued cards or their grades.
+
 ```sh
 node tools/forecast-evidence.mjs coverage --report candidate.json --sidecar candidate-research.json --root . --summary
 node --test tests/forecast-evidence.test.mjs

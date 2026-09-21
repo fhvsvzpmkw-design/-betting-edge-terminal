@@ -52,7 +52,7 @@ const actionFor = route => ({
  * Source packages contain immutable review leads, not inherited personnel clearance,
  * probabilities, stances, card text, or current-run research-completion claims.
  */
-export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAssessment = {}, priorReceipts = new Map()} = {}) {
+export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAssessment = {}, forecastCoverage = {}, priorReceipts = new Map()} = {}) {
   const inventory = list(candidateAssessment.selections), receipts = list(sidecar.primaryAnalysis?.receipts);
   const groups = new Map(), warnings = [], seen = new Set();
   for (const row of inventory) {
@@ -92,12 +92,30 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
   const events = [...groups.values()].map(event => {
     for (const id of event.conflicts) { event.sourceMap.delete(id); warnings.push(`Conflicting source ID ${id} in ${event.eventKey}; source not shared.`); }
     const pending = event.selections.filter(row => row.route !== 'COMPLETED');
+    // Surface the existing coverage module's fallbacks in the event work plan.
+    // One source retrieval can answer several sides; listing it is not execution.
+    const forecastRows = list(forecastCoverage.selections).filter(row => String(row.eventId) === String(event.eventId) &&
+      row.sport === event.sport && time(row.startTime) === time(event.eventDate));
+    const sourceQueue = new Map();
+    for (const row of forecastRows.filter(row => !list(row.eligibleExactRecordIds).length)) {
+      for (const source of list(row.nextRoutes)) {
+        if (!sourceQueue.has(source.sourceId)) sourceQueue.set(source.sourceId, {...source, selectionIds:[], questions:[]});
+        const queued = sourceQueue.get(source.sourceId);
+        queued.selectionIds.push(row.selectionId);
+        queued.questions.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side, line:row.line, role:source.role});
+      }
+    }
+    const forecastRetrieval = {state:'RETRIEVAL_QUEUE_NOT_EXECUTED',
+      selectionsWithoutExactForecast:forecastRows.filter(row => !list(row.eligibleExactRecordIds).length).length,
+      attempts:forecastRows.flatMap(row => list(row.attempts).map(attempt => ({selectionId:row.selectionId,...attempt}))),
+      nextSources:[...sourceQueue.values()],
+      instruction:'Open the actual game panel or dated article for these ordered teams and kickoff. Record probability-specific update time, exact field and named personnel. A failed first source does not exhaust this queue. Import real findings, then re-run assessment; no automatic status change.'};
     return {eventKey:event.eventKey, sport:event.sport, eventId:event.eventId, eventDate:event.eventDate,
       label:event.label || `${event.sport} event ${event.eventId}`, available:event.selections.length,
       completed:event.selections.length-pending.length, pending:pending.length,
       sharedResearchRequired:pending.length>0, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
-      selections:event.selections};
+      forecastRetrieval, selections:event.selections};
   }).sort((a,b) => (time(a.eventDate) || Infinity)-(time(b.eventDate) || Infinity) || a.eventKey.localeCompare(b.eventKey));
   const rows = events.flatMap(event => event.selections), pending = rows.filter(row => row.route !== 'COMPLETED');
   const routes = {};
