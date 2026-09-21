@@ -1,6 +1,20 @@
 # Graham weekly 90/10 authority
 
-Version 1.1 — historical evidence recovery, 2026-09-21.
+Version 1.2 — approved replacement-role modelling convention, 2026-09-21.
+
+## Approved replacement modelling convention
+
+The user approved selecting a documented primary replacement, using role-weighted committee values, or using an explicitly assumed equal-share average when a genuine committee is established but its shares are unknown. This amendment supersedes earlier restrictions that blocked a case solely because candidate values differ or shares require the approved equal-share assumption. Read tools/graham-replacement-model.mjs and its tests. Model ID: graham-replacement-role-estimate-v1. This is a Graham modelling convention, not a formula attributed to Billy Walters. The Walters 90/10 arithmetic remains unchanged; injury inputs may now carry GRAHAM_MODEL_ESTIMATE provenance.
+
+Use PRIMARY_REPLACEMENT for a named starter or reported primary role (one candidate). Use WEIGHTED_COMMITTEE when supported role opportunities/shares are available: weight each locked value by its additional duties, calculated as observedRoleUnits minus baselineRoleUnits. These must use a common role-specific unit; total offensive/defensive snaps are not automatically replacement-role shares. Use EQUAL_SHARE_COMMITTEE when the actual candidate set is supported but allocation is unknown: average their locked values equally and explicitly label that allocation an assumption. Never average missing player values as zero or select a player because it yields a preferred rating. The tests and latest review JSON provide exact input examples.
+
+Every model case requires modelId, estimateAcknowledged:true, assumptionRationale, baselineTreatment:ADDITIONAL_DUTIES_ONLY, baselineDutiesDisplaced:false, baselineRationale and baselineSourceIds in addition to the existing identity, availability and role-source fields. The baseline statement is a documented modelling assessment: preserve a replacement's existing duties and value only added duties in the vacant role. If taking this role actually vacates another occupied role, reconcile that displacement separately before adoption. Do not reuse the same replacement across two simultaneous absence cases. Existing group/cluster checks still apply.
+
+Estimated case loss is max(0, healthy locked value minus effective replacement value). Record any replacement upgrade excluded by this floor explicitly; this injury-loss input cannot create a team upgrade. Keep the weighted numerator/denominator, weights, assumptions and candidate-endpoint loss range. That range is sensitivity to allocation, not a statistical confidence interval or an exhaustive uncertainty bound. Round the estimated case loss once to the existing 0.001 personnel-point precision; do not introduce rounding inside the subsequent 90/10 formula. Do not backdate the recording or rewrite prior events.
+
+A blocked game's optional caseReviews can preserve supported individual estimates as CASE_ESTIMATE_ONLY. These are reusable research, never complete team totals or permission to apply one side of a game. To adopt them, promote the case into a fully covered paired game bundle, resolve final game-day availability and run the existing evidence evaluator. Both teams must pass. Newly applied history preserves the estimate details for both teams as well as the immutable evidence binding. Current-week personnel workflows do not acquire a new writer through this historical adapter.
+
+Start with data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-replacement-model-review.json. Reuse its individual estimates and explicit remaining coverage gaps. An unequal committee by itself is no longer a reason to keep a case unresolved.
 
 ## Historical input binding amendment
 
@@ -8,7 +22,7 @@ For new READY updates effective from 2026-09-20 20:30 America/Vancouver, read to
 
 Create a new uniquely dated JSON under data/walters/nfl/{season}/week-XX-weekly-evidence/. Preserve prior bundles. Include actual recordedAt, exact game identity, marketViewed:false, inputCommit and inputBlobs for every fixed input path required by loadWeeklyEvidence. The input commit must be an ancestor of the executing code; each blob must match its path at that commit. Follow the evaluator schema and tests; do not label a game READY unless both teams have complete final game-day availability coverage, source-supported explicit QB no-loss, every archived case plus newly identified absences, and governed replacement roles.
 
-Only existing one-for-one and value-invariant committee methods are supported here. Missing locked values, unequal committees, unapproved impairment fractions, nonzero QB loss without this adapter's governed integration, cluster review, baseline duplication or unsupported replacement upgrades remain BLOCKED. Never invent weights, assume zero, substitute current-week reports or bypass this check with an earlier effectiveAt. Numerical QB losses require a separately governed adapter, not this non-QB closure path.
+Existing one-for-one and value-invariant committee methods remain supported alongside the approved model convention above. Missing locked values, unapproved impairment fractions, nonzero QB loss without this adapter's governed integration, unresolved cluster review or baseline duplication remain BLOCKED. Never invent weights outside the approved convention, assume missing values are zero, substitute current-week reports or bypass this check with an earlier effectiveAt. Numerical QB losses require a separately governed adapter, not this non-QB closure path.
 
 Each READY staging game's gameDayEvidence must include evidenceBinding={path,blobSha}, referencing the exact committed bundle bytes. Run node tools/graham-weekly-evidence.mjs PATH before staging. Preserve this binding in each new rating history event. A failed binding blocks both teams. Original sourceRefs and paired calculation checks remain mandatory.
 

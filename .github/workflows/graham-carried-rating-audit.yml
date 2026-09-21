@@ -10,6 +10,8 @@ on:
       - .github/workflows/graham-carried-rating-audit.yml
       - tools/apply-graham-carried-rating-audit.mjs
       - tools/graham-weekly-evidence.mjs
+      - tools/graham-replacement-model.mjs
+      - tools/test-graham-replacement-model.mjs
       - tools/test-graham-weekly-evidence.mjs
       - data/walters/nfl/**/week-*-weekly-evidence/**
       - GRAHAM_WEEKLY_90_10_AUTHORITY.md
@@ -45,6 +47,7 @@ jobs:
         run: |
           node tools/apply-graham-carried-rating-audit.mjs --self-test
           node tools/test-graham-weekly-evidence.mjs
+          node tools/test-graham-replacement-model.mjs
   apply:
     if: github.event_name != 'pull_request'
     needs: validate
