@@ -34,6 +34,7 @@ export function validateGrahamScheduleAuthority(authority) {
   if (authority?.state !== 'OPERATIONAL' || authority?.metadataAuthority !== true) throw new Error('Graham schedule authority not operational');
   if (authority?.timezone !== 'America/Vancouver') throw new Error('Graham schedule timezone must be America/Vancouver');
   if (authority?.timingMode !== 'exact_schedule') throw new Error('Graham schedule timingMode must be exact_schedule');
+  if (authority?.executionAuthority !== 'CHATGPT_SCHEDULED_TASKS') throw new Error('Graham execution authority mismatch');
   if (!Array.isArray(authority?.tasks)) throw new Error('Graham schedule tasks missing');
 
   const required = ['WEEK_ROLLOVER', 'TUESDAY_BASELINE', 'DAILY_REVIEW', 'DELTA_1645', 'SUNDAY_PREGAME'];
@@ -42,13 +43,29 @@ export function validateGrahamScheduleAuthority(authority) {
     if (!task?.taskKey || seen.has(task.taskKey)) throw new Error(`Duplicate or missing Graham taskKey: ${task?.taskKey}`);
     seen.add(task.taskKey);
     if (!task.title || !Array.isArray(task.days) || task.days.length === 0) throw new Error(`Incomplete Graham schedule task ${task.taskKey}`);
-    if (!/^\d{2}:\d{2}$/.test(task.time || '')) throw new Error(`Invalid Graham schedule time ${task.taskKey}`);
-    if (!/^FREQ=WEEKLY;/.test(task.rrule || '')) throw new Error(`Invalid Graham schedule RRULE ${task.taskKey}`);
+    if (task.days.some(day => !['MO','TU','WE','TH','FR','SA','SU'].includes(day)) || new Set(task.days).size !== task.days.length) throw new Error(`Invalid Graham schedule days ${task.taskKey}`);
+    if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(task.time || '')) throw new Error(`Invalid Graham schedule time ${task.taskKey}`);
+    const [hour, minute] = task.time.split(':').map(Number);
+    const expected = `FREQ=WEEKLY;BYDAY=${task.days.join(',')};BYHOUR=${hour};BYMINUTE=${minute};BYSECOND=0`;
+    if (task.rrule !== expected) throw new Error(`Graham schedule RRULE disagrees with days/time ${task.taskKey}`);
   }
   for (const key of required) if (!seen.has(key)) throw new Error(`Required Graham schedule task missing: ${key}`);
   if (seen.size !== required.length) throw new Error('Unexpected Graham schedule task found; update authority contract deliberately');
   return true;
 }
+
+const DAY_NAMES = {MO:'Monday',TU:'Tuesday',WE:'Wednesday',TH:'Thursday',FR:'Friday',SA:'Saturday',SU:'Sunday'};
+const dayNames = task => task.days.map(day => DAY_NAMES[day]).join('/');
+function compactDayNames(task) {
+  const order = Object.keys(DAY_NAMES), groups = [];
+  for (const day of task.days) {
+    const group = groups.at(-1);
+    if (group && order.indexOf(day) === order.indexOf(group.at(-1)) + 1) group.push(day);
+    else groups.push([day]);
+  }
+  return groups.map(group => group.length >= 3 ? `${DAY_NAMES[group[0]]}-${DAY_NAMES[group.at(-1)]}` : group.map(day=>DAY_NAMES[day]).join('/')).join('/');
+}
+
 
 function requireTask(authority, key) {
   const task = taskMap(authority).get(key);
@@ -62,11 +79,11 @@ export function buildResearchCadenceProjection(authority) {
   const delta = requireTask(authority, 'DELTA_1645');
   const sunday = requireTask(authority, 'SUNDAY_PREGAME');
   return {
-    tuesdayBaseline: `${baseline.time} PT Tuesday full 32-team weekly review after Monday Night Football`,
-    wednesdayFriday: `${daily.time} PT Monday/Wednesday/Thursday/Friday/Saturday main information review`,
-    saturday: `${daily.time} PT Saturday review is included in Graham Daily Review; no separate active Saturday task`,
-    sunday: `${sunday.time} PT Sunday pregame information review`,
-    pre315Delta: `${delta.time} PT Tuesday through Saturday late-day change-only delta review`
+    tuesdayBaseline: `${baseline.time} PT ${dayNames(baseline)} full 32-team weekly review after Monday Night Football`,
+    wednesdayFriday: `${daily.time} PT ${dayNames(daily)} main information review`,
+    saturday: daily.days.includes('SA') ? `${daily.time} PT Saturday review is included in Graham Daily Review; no separate active Saturday task` : 'No Saturday review is scheduled in Graham Daily Review',
+    sunday: `${sunday.time} PT ${dayNames(sunday)} pregame information review`,
+    pre315Delta: `${delta.time} PT ${compactDayNames(delta).replace('-', ' through ')} late-day change-only delta review`
   };
 }
 
@@ -77,13 +94,13 @@ export function buildResearchLedgerCadenceProjection(authority) {
   const sunday = requireTask(authority, 'SUNDAY_PREGAME');
   return [
     {
-      day: 'TUESDAY',
+      day: dayNames(baseline).toUpperCase(),
       timePacific: baseline.time,
       type: 'FULL_WEEKLY_BASELINE',
       scope: baseline.purpose
     },
     {
-      day: 'MONDAY/WEDNESDAY-FRIDAY',
+      day: compactDayNames({...daily,days:daily.days.filter(day=>day!=='SA')}).toUpperCase(),
       timePacific: daily.time,
       type: 'MAIN_DAILY_SWEEP',
       scope: daily.purpose
@@ -95,18 +112,18 @@ export function buildResearchLedgerCadenceProjection(authority) {
       scope: daily.purpose
     },
     {
-      day: 'SUNDAY',
+      day: dayNames(sunday).toUpperCase(),
       timePacific: sunday.time,
       type: 'PREGAME_SWEEP',
       scope: sunday.purpose
     },
     {
-      day: 'TUESDAY-SATURDAY',
+      day: compactDayNames(delta).toUpperCase(),
       timePacific: delta.time,
       type: 'LATE_DAY_DELTA',
       scope: delta.purpose
     }
-  ];
+  ].filter(row => row.type === 'MAIN_WEEKEND_SWEEP' ? daily.days.includes('SA') : row.day.length > 0);
 }
 
 export function buildScheduleAuthorityMetadata(authority) {

@@ -1,0 +1,48 @@
+name: Graham task authority validation
+on:
+  pull_request:
+    paths:
+      - 'GRAHAM_*_AUTHORITY.md'
+      - 'tools/graham-task-authority.mjs'
+      - 'tools/graham-schedule-authority.mjs'
+      - 'tests/graham-task-authority.test.mjs'
+      - 'tests/graham-schedule-authority.test.mjs'
+      - 'data/walters/nfl/graham-*-v1.json'
+      - 'docs/releases/graham-stage3*'
+      - '.github/workflows/graham-task-authority.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'GRAHAM_*_AUTHORITY.md'
+      - 'tools/graham-task-authority.mjs'
+      - 'tools/graham-schedule-authority.mjs'
+      - 'tests/graham-task-authority.test.mjs'
+      - 'tests/graham-schedule-authority.test.mjs'
+      - 'data/walters/nfl/graham-*-v1.json'
+      - 'docs/releases/graham-stage3*'
+      - '.github/workflows/graham-task-authority.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate task and schedule authorities
+        run: |
+          node tools/graham-task-authority.mjs
+          node tests/graham-task-authority.test.mjs
+          node tests/graham-schedule-authority.test.mjs
+          node tests/graham-terminal-automation.test.mjs
+          node tools/validate-graham-delta-1645-authority.mjs
+      - name: Preserve runtime and fair-decomposition compatibility
+        run: |
+          node tools/validate-graham-research-runtime.mjs
+          node tools/validate-graham-research-runtime.mjs --fixture tests/fixtures/graham-research-runtime.json
+          node tests/graham-fair-decomposition.test.mjs
