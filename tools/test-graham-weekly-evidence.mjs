@@ -30,4 +30,22 @@ check('exact archived audit replays and keeps ten explicit blockers',()=>{
  assert.ok(out.games.every(g=>g.teams.length===0&&g.blockers.every(b=>b.nextAction)));
  assert.throws(()=>boundJson(process.cwd(),path,'0'.repeat(40)),/BLOB_MISMATCH/);
 });
+check('approved primary model passes the full paired evidence evaluator',()=>{
+ const f=structuredClone(fixture),c=f.bundle.games[0].teams[0].cases[0];
+ Object.assign(c,{resolution:'PRIMARY_REPLACEMENT',modelId:'graham-replacement-role-estimate-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic documented primary assumption',primaryEvidence:'NAMED_STARTER',baselineTreatment:'ADDITIONAL_DUTIES_ONLY',baselineDutiesDisplaced:false,baselineRationale:'Synthetic retained baseline duties',baselineSourceIds:sourceIds});
+ const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].injuryLoss,1.2);assert.equal(g.teams[0].valueBasis,'INCLUDES_GRAHAM_MODEL_ESTIMATE');assert.equal(g.teams[0].cases[0].modelEstimate.method,'PRIMARY_REPLACEMENT');
+});
+check('unequal committee estimate can reach a fully covered paired game',()=>{
+ const f=structuredClone(fixture),c=f.bundle.games[0].teams[0].cases[0];
+ Object.assign(c,{resolution:'EQUAL_SHARE_COMMITTEE',modelId:'graham-replacement-role-estimate-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic equal incremental role allocation',baselineTreatment:'ADDITIONAL_DUTIES_ONLY',baselineDutiesDisplaced:false,baselineRationale:'Synthetic baseline retained',baselineSourceIds:sourceIds,replacements:[{player:c.replacements[0].player},{player:'Brandon Coleman'}]});
+ const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].cases[0].modelEstimate.method,'EQUAL_SHARE_COMMITTEE');assert.equal(g.teams[0].cases[0].modelEstimate.weights.length,2);
+});
+check('new real case reviews are retained without releasing blocked pairs',()=>{
+ const path='data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-replacement-model-review.json',bytes=fs.readFileSync(path),b=JSON.parse(bytes);
+ const out=loadWeeklyEvidence(process.cwd(),{path,blobSha:gitBlob(bytes)},{season:2026,sourceWeek:1,effectiveAt:b.recordedAt});
+ assert.equal(out.readyGames,0);assert.equal(out.blockedGames,10);
+ const cases=out.games.flatMap(g=>g.caseReviews||[]);assert.equal(cases.length,2);assert.ok(cases.every(c=>c.state==='CASE_ESTIMATE_ONLY'));
+ assert.equal(cases.find(c=>c.team==='GB').estimate.injuryLoss,1.567);assert.equal(cases.find(c=>c.team==='DEN').estimate.injuryLoss,0.7);
+ assert.ok(out.games.every(g=>g.teams.length===0));
+});
 console.log(`WEEKLY HISTORICAL EVIDENCE: ${count} PASS`);

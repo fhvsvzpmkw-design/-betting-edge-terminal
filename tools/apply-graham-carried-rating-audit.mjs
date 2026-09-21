@@ -93,7 +93,7 @@ function weeklyUpdate(input,power,active,prior){
         const b=g||oldBlocked.get(p.gameKey);
         blockedGames.push({gameKey:p.gameKey,away:p.away,home:p.home,reasons:b?.reasons?.length?b.reasons:['REQUIRED_GAME_DAY_INPUTS_NOT_SUBMITTED'],sourceRefs:unique(b?.sourceRefs||[])});continue;
       }
-      if(Date.parse(input.effectiveAt)>=Date.parse(WEEKLY_EVIDENCE_FROM))verifyWeeklyGameEvidence(ROOT,input,g);
+      const verifiedGame=Date.parse(input.effectiveAt)>=Date.parse(WEEKLY_EVIDENCE_FROM)?verifyWeeklyGameEvidence(ROOT,input,g):null;
       const kickoff=Date.parse(p.startTimePacific);
       if(!Number.isFinite(kickoff)||kickoff>=Date.parse(input.effectiveAt))fail('PREGAME_KICKOFF_UNVERIFIED');
       const old=ledgerTeams.map(t=>frozen(t,kickoff));
@@ -118,6 +118,7 @@ function weeklyUpdate(input,power,active,prior){
         const team=u.ledgerTeam,t=u.t,sourceRefs=unique([...(t.sourceRefs||[]),...(g.sourceRefs||[]),...evidence.sourceRefs,...evidence.teams.find(e=>e.team===t.team).sourceRefs,...completion.sourceRefs]);
         const e={sequence:(team.history||[]).length?Math.max(...team.history.map(e=>Number(e.sequence)||0))+1:0,type:'WALTERS_WEEKLY_90_10',auditId:input.auditId,fromRating:t.oldRating,priorRating:t.oldRating,delta:u.delta,toRating:u.newRating,currentRating:u.newRating,effectiveAt:input.effectiveAt,reason:`Source-exact Walters weekly update from ${p.gameKey}: TGPL ${u.tgpl}; 90% frozen pregame rating plus 10% TGPL.`,season:active.season,sourceWeek:input.sourceWeek,targetWeek:input.targetWeek,gameKey:p.gameKey,opponent:t.opponent,kickoff:p.startTimePacific,tgplInputs:{scoreMargin:t.scoreMargin,opponentOldRating:t.opponentOldRating,teamInjuryLoss:t.teamInjuryLoss,opponentInjuryLoss:t.opponentInjuryLoss,teamLocationAdvantage:t.teamLocationAdvantage},tgpl:u.tgpl,formulaIds:formulas,sourceRefs,marketViewed:false};
         if(evidence.evidenceBinding)e.gameDayEvidenceBinding=structuredClone(evidence.evidenceBinding);
+        if(verifiedGame?.teams.some(t=>t.cases.some(c=>c.modelEstimate)))e.gameDayModelEstimates=verifiedGame.teams.map(t=>({team:t.team,estimates:t.cases.filter(c=>c.modelEstimate).map(c=>({caseKey:c.caseKey,...c.modelEstimate}))}));
         team.priorRating=t.oldRating;team.currentRating=u.newRating;team.lastDelta=u.delta;team.lastUpdatedAt=input.effectiveAt;team.lastUpdateType='WALTERS_WEEKLY_90_10';team.sourceRefs=unique([...(team.sourceRefs||[]),...sourceRefs]);team.history=[...(team.history||[]),e];
         ratingChanges.push({team:t.team,gameKey:p.gameKey,priorRating:t.oldRating,tgpl:u.tgpl,delta:u.delta,currentRating:u.newRating,tgplInputs:e.tgplInputs,sourceRefs});
       }

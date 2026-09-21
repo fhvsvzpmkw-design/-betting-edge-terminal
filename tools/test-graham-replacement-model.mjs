@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {replacementEstimate,REPLACEMENT_MODEL_ID} from './graham-replacement-model.mjs';
+const registry=JSON.parse(fs.readFileSync('data/walters/nfl/player-values/player-values-2026-v1.json'));
+const names=['MarShawn Lloyd','Chris Brooks','Kaleb Johnson'];
+const rs=names.map(name=>registry.players.find(p=>p.player===name));
+const base={modelId:REPLACEMENT_MODEL_ID,resolution:'EQUAL_SHARE_COMMITTEE',estimateAcknowledged:true,assumptionRationale:'Equal additional duties are an explicit model assumption, not measured shares.',baselineTreatment:'ADDITIONAL_DUTIES_ONLY',baselineDutiesDisplaced:false,baselineRationale:'Only the vacant role is valued; original duties remain in baseline.',baselineSourceIds:['role-source'],replacements:names.map(player=>({player}))};
+let count=0;
+function test(name,fn){fn();count++;console.log('PASS '+name);}
+test('unequal locked values produce labelled equal-share estimate',()=>{const r=replacementEstimate(base,1.7,rs);assert.equal(r.replacementValue,0.133);assert.equal(r.injuryLoss,1.567);assert.equal(r.classification,'GRAHAM_MODEL_ESTIMATE');assert.deepEqual(r.injuryLossRange,{min:1.5,max:1.7});assert.equal(r.replacementValueRatio.denominator,3);});
+test('weighted committee subtracts existing baseline duties',()=>{const c={...base,resolution:'WEIGHTED_COMMITTEE',roleUnitType:'ROLE_SNAPS',replacements:names.map((player,i)=>({player,observedRoleUnits:[70,30,40][i],baselineRoleUnits:[20,20,0][i],unitsSourceIds:['units']}))};const r=replacementEstimate(c,1.7,rs);assert.equal(r.replacementValue,0.18);assert.equal(r.injuryLoss,1.52);assert.deepEqual(r.weights.map(r=>r.additionalRoleUnits),[50,10,40]);});
+test('documented primary works without inventing committee weights',()=>{const c={...base,resolution:'PRIMARY_REPLACEMENT',primaryEvidence:'REPORTED_PRIMARY',replacements:[{player:'Jonah Elliss'}]};const r=replacementEstimate(c,0.9,[registry.players.find(p=>p.player==='Jonah Elliss')]);assert.equal(r.injuryLoss,0.7);});
+test('replacement upgrade is explicit zero loss, never a rating upgrade',()=>{const r=replacementEstimate({...base,resolution:'PRIMARY_REPLACEMENT',primaryEvidence:'NAMED_STARTER',replacements:[base.replacements[0]]},0,[rs[0]]);assert.equal(r.injuryLoss,0);assert.equal(r.upgradeExcluded,true);});
+test('model declaration cannot be omitted',()=>assert.throws(()=>replacementEstimate({...base,modelId:null},1.7,rs),/DECLARATION/));
+test('displaced baseline duties need reconciliation',()=>assert.throws(()=>replacementEstimate({...base,baselineDutiesDisplaced:true},1.7,rs),/BASELINE/));
+test('missing value cannot be averaged as zero',()=>assert.throws(()=>replacementEstimate(base,1.7,[{waltersPoints:null}]),/LOCKED_VALUES/));
+test('all-snaps weighting cannot omit baseline units',()=>assert.throws(()=>replacementEstimate({...base,resolution:'WEIGHTED_COMMITTEE',roleUnitType:'ROLE_SNAPS',replacements:base.replacements.map(r=>({...r,observedRoleUnits:30}))},1.7,rs),/ADDITIONAL_ROLE/));
+test('negative incremental role units fail',()=>assert.throws(()=>replacementEstimate({...base,resolution:'WEIGHTED_COMMITTEE',roleUnitType:'ROLE_SNAPS',replacements:base.replacements.map(r=>({...r,observedRoleUnits:10,baselineRoleUnits:20}))},1.7,rs),/ADDITIONAL_ROLE/));
+test('equal method cannot silently discard submitted measured units',()=>assert.throws(()=>replacementEstimate({...base,replacements:base.replacements.map(r=>({...r,observedRoleUnits:10}))},1.7,rs),/WEIGHTED_METHOD/));
+test('primary choice requires documented role basis',()=>assert.throws(()=>replacementEstimate({...base,resolution:'PRIMARY_REPLACEMENT',replacements:[base.replacements[0]]},1.7,[rs[0]]),/PRIMARY_ROLE/));
+test('baseline and weighted source refs are checked',()=>assert.throws(()=>replacementEstimate(base,1.7,rs,{sourceCheck:()=>{throw Error('missing source');}}),/missing source/));
+console.log(`GRAHAM REPLACEMENT MODEL: ${count} PASS`);
