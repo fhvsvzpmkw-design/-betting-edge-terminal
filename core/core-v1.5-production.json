@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "coreVersion": "1.5",
+  "state": "OPERATIONAL",
+  "activatedAt": "2026-09-21T06:00:00-07:00",
+  "timezone": "America/Vancouver",
+  "purpose": "Core 1.5 consolidates the operational decision-path, candidate, exact-card evidence and partial-publication amendments through September 20. It retains the model-error 1.4 component and existing wagering safeguards.",
+  "governance": {
+    "contractVersion": "1.0",
+    "contractPath": "BETTING_EDGE_CONTRACT.md",
+    "versionTracksIndependent": true
+  },
+  "releaseState": {
+    "labelsAndDocsSynced": true,
+    "savedRunnerHistoryKeyPreserved": true,
+    "populatedForwardRunAccepted": false
+  },
+  "modelErrorFramework": {
+    "path": "core/core-handicap-framework-v1.4.json",
+    "blobSha": "a62886f1735f2410ce8784407a5fb96a270ebd7d",
+    "frameworkId": "core-1.4-model-error-r1-2026-08-25",
+    "state": "OPERATIONAL"
+  },
+  "liquidityClassification": {
+    "path": "core/core-liquidity-classification-v1.4.json",
+    "blobSha": "88c1beef20c4eb96d53f59a551e99116c70d4a7a",
+    "policyId": "core-1.4-liquidity-classification-r1-2026-09-01",
+    "state": "OPERATIONAL",
+    "requiredForEveryCoreContext": true,
+    "executionBookAvailabilityIsLiquidityEvidence": false,
+    "pinnacleAvailabilityIsLiquidityEvidence": false,
+    "mainstreamMlbPrimaryMarkets": "NORMAL",
+    "documentationPath": "core/CORE_V1_4_LIQUIDITY_CLASSIFICATION_ADDENDUM_2026-09-01.md",
+    "documentationBlobSha": "44bb474b30cce436127b90d13e8cf12457a732b4"
+  },
+  "researchLibrary": {
+    "version": "1.8",
+    "path": "research/research-library.json",
+    "blobSha": "1bfcd2f07cc39d64fabc065b6030fc3615f58ce7",
+    "manifestPath": "research/manifest.json",
+    "manifestBlobSha": "9ab907f096344816340384dd9cf8bd5624356898",
+    "authority": "FIXED_ALLOWLIST_MAY_RAISE_MODEL_ERROR_ONLY",
+    "mayCreateBet": false,
+    "mayMoveFairValuePointEstimate": false
+  },
+  "walters": {
+    "interfacePath": "core/walters-intelligence-interface-v1.4.json",
+    "interfaceBlobSha": "9ac1b94ad78e8f7f5c5031aa1bacde2892ab28f7",
+    "authorityPath": "core/walters-authority-v1.4.json",
+    "authorityConfigMutableAtRuntime": true,
+    "modeAtActivation": "BET_AUTHORITY",
+    "modeIsRuntimeSwitchable": true,
+    "mayOriginateBetWhenAuthorized": true,
+    "initialCoverage": [
+      "NFL spread",
+      "NFL moneyline"
+    ]
+  },
+  "personnel": {
+    "path": "BETTING_EDGE_PERSONNEL_SWEEP.md",
+    "requiredProcess": "STAGE_1_PLUS_STAGE_2_WHEN_MATERIAL",
+    "feedsModelError": true
+  },
+  "waitDiscipline": {
+    "independentCurrentSignalRequired": true,
+    "marketOnlyWaitAllowed": false,
+    "marketAssessmentWaitAllowedWithIndependentSignal": true
+  },
+  "sharpMarketBenchmark": {
+    "book": "Pinnacle",
+    "source": "OddsPapi v4",
+    "policyPath": "core/pinnacle-sharp-benchmark-v1.4.json",
+    "policyBlobSha": "3d7929de0574e79d2849d2fc6a9a1c596cb773bf",
+    "policyId": "pinnacle-sharp-benchmark-v1.4-2026-09-01",
+    "state": "OPERATIONAL",
+    "authority": "OFFICIAL_NON_EXECUTABLE_SHARP_BENCHMARK",
+    "executionAuthority": false,
+    "maySupplyExecutablePrice": false,
+    "mayOriginateBet": false,
+    "mayDirectlyChangeFairValuePointEstimate": false,
+    "mayDirectlyChangePlayTo": false,
+    "maySetStake": false,
+    "mayDirectlyChangeStatus": false,
+    "mayProvideOfficialNoVigBenchmark": true,
+    "mayRaiseUncertaintyOrModelErrorOnMaterialConflict": true,
+    "unavailableIsReportBlocking": false
+  },
+  "unchanged": {
+    "executionBooks": [
+      "Bet365",
+      "DraftKings"
+    ],
+    "feedFreshnessMinutes": 75,
+    "executableQuoteFreshnessMinutes": 30,
+    "stakingMethodology": "UNCHANGED",
+    "reportSchedule": "UNCHANGED",
+    "oddsApiBudget": "UNCHANGED",
+    "historicalReports": "IMMUTABLE"
+  },
+  "explicitlyDeferred": [
+    "RESULTS_CLV_FEEDBACK_LEARNING_LOOP",
+    "SHADOW_HISTORY_ACTIVATION",
+    "LEARNED_PLAYER_TEAM_ASSOCIATIONS",
+    "PERSONAL_LEDGER_CALIBRATION"
+  ],
+  "reportProvenanceRequired": true,
+  "operatingContractPath": "core/CORE_V1_5_OPERATING_CONTRACT.md",
+  "componentBaselinePath": "core/core-v1.4-production.json",
+  "decisionPathVersion": "2026-09-20.1",
+  "cardEvidenceIdentityVersion": "2026-09-19-r1"
+}

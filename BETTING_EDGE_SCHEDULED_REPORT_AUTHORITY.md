@@ -1,5 +1,7 @@
 # Betting Edge Scheduled Report Authority
 
+**Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
+
 **Status:** OPERATIONAL  
 **Authority version:** 1.2
 **Effective:** 2026-09-02  

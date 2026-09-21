@@ -3,7 +3,7 @@
 ## Current production boundary
 
 - **VigScope Terminal UI:** v1.5
-- **Betting Edge Core:** v1.4 OPERATIONAL
+- **Betting Edge Core:** v1.5 OPERATIONAL from 2026-09-21 06:00 America/Vancouver
 - **Governance Contract:** v1.0 OPERATIONAL
 - **Research Library:** v1.8 / R3 live read-only
 - **Walters mode:** runtime-switchable, currently `BET_AUTHORITY` for eligible NFL spread/moneyline
@@ -26,7 +26,9 @@ Current operating references:
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable historical architectural decisions. Dated entries record the state when they were made; current production authority is the boundary above plus `docs/PROJECT_STATE.md`.
 - [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md) — authoritative production governance contract.
 
-## Core v1.4 production authority
+## Core production authority
+
+Current release: `core/core-v1.5-production.json` and `core/CORE_V1_5_OPERATING_CONTRACT.md`. The 1.4 component filenames below remain deliberate compatibility dependencies, with historical semantics preserved.
 
 Authoritative Core files include:
 

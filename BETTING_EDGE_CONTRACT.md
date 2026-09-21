@@ -1,5 +1,7 @@
 # Betting Edge Governance & Report-Generation Contract — v1.0
 
+**Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
+
 **Document status:** OPERATIONAL — AUTHORITATIVE PRODUCTION CONTRACT  
 **Contract version:** 1.0  
 **Activated:** 2026-08-22  
@@ -8,7 +10,7 @@
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Authoritative branch:** `main`  
 **Production filename:** `BETTING_EDGE_CONTRACT.md`  
-**Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.4  
+**Validated runner family:** VigScope outer runner v1.5 / Betting Edge core runner v1.5
 **Promotion acceptance:** `BETTING_EDGE_V1.0_ACCEPTANCE_2026-08-22.md`
 **Operational amendment:** 2026-08-30 — fail-closed staged publication ownership  
 **Operational amendment:** 2026-09-06 — numeric report-card targets retired; unbounded evaluated-decision publication  
