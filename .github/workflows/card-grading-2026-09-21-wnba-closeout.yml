@@ -1,0 +1,121 @@
+name: Isolated Betting Edge WNBA grading closeout 2026-09-21
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/card-grading-2026-09-21-wnba-closeout.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: betting-edge-card-grading-2026-09-21-wnba-closeout
+  cancel-in-progress: false
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply independently verified WNBA finals
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const cp = require('child_process');
+          const verifiedAt = new Date().toISOString();
+          const events = [
+            {
+              eventId: '68096344', status: 'final',
+              away: 'Minnesota Lynx', home: 'Connecticut Sun', awayScore: 101, homeScore: 89,
+              source: {
+                name: 'WNBA official game recap — Minnesota Lynx 101, Connecticut Sun 89 (2026-09-20)',
+                url: 'https://www.wnba.com/watch/video/game-recap-minnesota-lynx-101-connecticut-sun-89-09-20-2026?collection=game-recaps'
+              }
+            },
+            {
+              eventId: '68096582', status: 'final',
+              away: 'New York Liberty', home: 'Toronto Tempo', awayScore: 106, homeScore: 69,
+              source: {
+                name: 'WNBA official game recap — New York Liberty 106, Toronto Tempo 69 (2026-09-20)',
+                url: 'https://www.wnba.com/watch/video/game-recap-new-york-liberty-106-toronto-tempo-69-09-20-2026?collection=game-recaps'
+              }
+            },
+            {
+              eventId: '68096418', status: 'final',
+              away: 'Portland Fire', home: 'Los Angeles Sparks', awayScore: 84, homeScore: 105,
+              source: {
+                name: 'WNBA official game recap — Los Angeles Sparks 105, Portland Fire 84 (2026-09-20)',
+                url: 'https://www.wnba.com/watch/video/game-recap-los-angeles-sparks-105-portland-fire-84-09-20-2026?collection=game-recaps'
+              }
+            }
+          ];
+          const vf = '/tmp/wnba-sep20-verification.json';
+          fs.writeFileSync(vf, JSON.stringify({
+            verifiedAt,
+            attemptedEventIds: events.map(x => x.eventId),
+            deferredEventIds: [],
+            events
+          }, null, 2));
+          const runs = [
+            'data/history/runs/2026-09-20/main-081200.json',
+            'data/history/runs/2026-09-20/evening-151713.json',
+            'data/history/runs/2026-09-20/late-181538.json'
+          ];
+          for (const rp of runs) {
+            if (!fs.existsSync(rp)) continue;
+            cp.execFileSync('node', ['tools/verify-issued-results.mjs', rp, vf], { stdio: 'inherit' });
+            cp.execFileSync('node', ['tools/observe-issued-prices.mjs', rp], { stdio: 'inherit' });
+          }
+          NODE
+
+      - name: Rebuild downstream results index
+        run: |
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify closeout and strict isolation
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const idx = JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          const d = (idx.byDate || []).find(x => x.name === '2026-09-20') || {};
+          const older = (idx.unresolved || []).filter(x => String(x.date || '') < '2026-09-20');
+          const targetUnresolved = (idx.unresolved || []).filter(x => String(x.date || '') === '2026-09-20');
+          const c = idx.coverage || {};
+          const g = d.grades || {};
+          const msg = [
+            'Close September 20 WNBA issued-card results',
+            '',
+            `TARGET issued=${d.issued ?? 'n/a'} complete=${d.complete ?? 'n/a'} unresolved=${d.unresolved ?? 'n/a'} WIN=${g.WIN ?? 0} LOSS=${g.LOSS ?? 0} PUSH=${g.PUSH ?? 0} VOID=${g.VOID ?? 0} HALF_WIN=${g.HALF_WIN ?? 0} HALF_LOSS=${g.HALF_LOSS ?? 0} priced=${d.priced ?? 'n/a'} netUnits=${d.netUnits ?? 'n/a'} roiPct=${d.roiPct ?? 'n/a'}`,
+            `OLDER remainingCards=${older.length} remainingEvents=${new Set(older.map(x => `${x.date}|${x.eventId}`)).size}`,
+            `TARGET_UNRESOLVED cards=${targetUnresolved.length} events=${new Set(targetUnresolved.map(x => x.eventId)).size}`,
+            `INDEX cards=${c.cards ?? 'n/a'} complete=${c.completeCards ?? 'n/a'} unresolved=${c.unresolvedCards ?? 'n/a'} pendingObservationCards=${c.pendingObservationCards ?? 'n/a'} unresolvedSelections=${c.unresolvedSelections ?? 'n/a'} unresolvedEvents=${c.unresolvedEvents ?? 'n/a'} observedThrough=${c.observedThroughDate ?? 'n/a'}`,
+            'ISOLATION historical-only'
+          ].join('\n');
+          fs.writeFileSync('/tmp/commit-msg.txt', msg);
+          console.log(msg);
+          console.log(`TARGET_UNRESOLVED_DETAIL=${JSON.stringify(targetUnresolved.map(x=>({eventId:x.eventId,title:x.title,reason:x.reason})))}`);
+          if (targetUnresolved.length) process.exitCode = 2;
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit historical grading closeout only
+        if: success()
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
+          git add data/history/observations data/history/results-index.json
+          if git diff --cached --quiet; then echo "No historical grading changes to commit"; exit 0; fi
+          git commit -F /tmp/commit-msg.txt
+          git pull --rebase origin main
+          git push origin main
