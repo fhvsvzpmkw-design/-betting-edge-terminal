@@ -1,6 +1,7 @@
 // Candidate triage and producer completion checks. Comparisons do not issue grades.
 import {exactMarketReference, marketComparison} from './market-price-assessment.mjs';
 import {forecastPriceComparison} from './forecast-evidence.mjs';
+import {compareGrahamFair, reviewGrahamHandoff} from './graham-fair-handoff.mjs';
 import {compareRecordedFair} from './native-fair-review.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
@@ -71,7 +72,7 @@ function personnelReview(receipt, review, report) {
     materialityExplanation: p?.materialityExplanation || null, decisionImpact: p?.decisionImpact || null};
 }
 
-function compareQuote(report, selection, quote, observer, forecast, records, receipt) {
+function compareQuote(report, selection, quote, observer, forecast, records, receipt, feed, grahamInputs) {
   let market = null, marketUnavailable = null;
   try {
     const reference = exactMarketReference(report, {...quote, eventDate: selection.eventDate || selection.startTime}, observer);
@@ -89,9 +90,10 @@ function compareQuote(report, selection, quote, observer, forecast, records, rec
   }).filter(Boolean).sort((a, b) => b.edgeProbabilityPoints - a.edgeProbabilityPoints);
   const scores = [market?.edgeProbabilityPoints, ...forecasts.map(row => row.edgeProbabilityPoints)].filter(finite);
   const nativeFairComparison = compareRecordedFair(report, selection, quote, receipt);
-  return {quote, marketComparison: market, marketUnavailable, forecastComparisons: forecasts, nativeFairComparison,
+  const grahamFairHandoff = compareGrahamFair({report,selection,quote,feed,inputs:grahamInputs});
+  return {quote, grahamFairHandoff, marketComparison: market, marketUnavailable, forecastComparisons: forecasts, nativeFairComparison,
     forecastComparison: forecasts[0] || null, score: scores.length ? Math.max(...scores) : null,
-    promising: scores.some(score => score > 1e-8) || nativeFairComparison?.supportsPointReview === true};
+    promising: scores.some(score => score > 1e-8) || nativeFairComparison?.supportsPointReview === true || grahamFairHandoff?.supportsPointReview === true};
 }
 
 function conditionFor(review, option, receipt) {
@@ -222,7 +224,7 @@ function completion(report, selection, receipt, best, options, forecast, review)
 }
 
 /** Pure, forward-compatible review. Inventory, not published cards, is denominator. */
-export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, limit = 8} = {}) {
+export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, limit = 8} = {}) {
   const inventory = universe?.selections || universe;
   if (!Array.isArray(inventory)) return {schema: 1, version: CANDIDATE_ASSESSMENT_VERSION, state: 'UNIVERSE_UNAVAILABLE',
     asOf: report?.ts, mode: 'REVIEW_ONLY', selections: [], markets: [], shortlist: [], unfinished: [],
@@ -235,13 +237,19 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const matches = receipts.filter(row => row.selectionId === selection.selectionId);
     const receipt = matches.length === 1 ? matches[0] : null;
     const forecast = list(forecastCoverage?.selections).find(row => row.selectionId === selection.selectionId);
-    const options = list(selection.quotes).map(quote => compareQuote(report, selection, quote, observer, forecast, records, receipt))
+    const options = list(selection.quotes).map(quote => compareQuote(report, selection, quote, observer, forecast, records, receipt, feed, grahamInputs))
       .sort((a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity) || b.quote.priceDecimal - a.quote.priceDecimal || String(a.quote.book).localeCompare(String(b.quote.book)));
-    const best = options.find(option => option.nativeFairComparison?.supportsPointReview && !options.some(other => other.promising && !other.nativeFairComparison?.supportsPointReview)) || options[0] || {quote: null, promising: false, score: null, marketComparison: null, forecastComparisons: []};
+    const nativeLead = option => option.nativeFairComparison?.supportsPointReview || option.grahamFairHandoff?.supportsPointReview;
+    const best = options.find(option => nativeLead(option) && !options.some(other => other.promising && !nativeLead(other))) || options[0] || {quote: null, promising: false, score: null, marketComparison: null, forecastComparisons: []};
     const review = receipt?.candidateAssessment;
     const researchReceipt = receipt?.state === 'BLOCKED' && receipt?.candidateDraft ? {...receipt,
       decision: receipt.candidateDraft.decision, evidence: receipt.candidateDraft.evidence} : receipt;
     const reviewed = completion(report, selection, researchReceipt, best, options, forecast, review);
+    const grahamOption=options.find(option=>sameQuote(option.quote,receipt?.quote)) || best;
+    const grahamReview=reviewGrahamHandoff({handoff:grahamOption.grahamFairHandoff,receipt:researchReceipt,report});
+    if(!grahamReview.complete) {reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...grahamReview.missing]);}
+    reviewed.grahamReview={...grahamReview,selectionKey:grahamOption.quote?.selectionKey,book:grahamOption.quote?.book};
+    reviewed.reviewRequired=best.promising || grahamReview.required;
     reviewed.assessedPriceCondition = displayCondition(reviewed.priceCondition, receipt?.quote);
     for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt).value, option.quote);
     reviewed.priceCondition = best.priceCondition || reviewed.assessedPriceCondition;
@@ -259,6 +267,7 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
       forecastGapReasons: list(forecast?.gapReasons), forecastAttempted: list(forecast?.attempts).some(row => row.valid) || list(forecast?.records).some(row => row.revalidatedAt),
       reason: best.promising ? [best.marketComparison?.direction === 'FAVORABLE' ? 'Favorable exact market-price comparison' : null,
         best.forecastComparisons.some(row => row.direction === 'SUPPORTS_PRICE') ? 'Eligible exact forecast supports the price' : null,
+        best.grahamFairHandoff?.supportsPointReview ? 'Graham native spread supports price review' : null,
         best.nativeFairComparison?.supportsPointReview ? 'Recorded native-unit fair supports a separate LEAN/BET review' : null].filter(Boolean).join('; ') : 'No positive qualified price comparison identified',
       action: reviewed.reviewState === 'UNFINISHED' ? 'Complete the named research and producer assessment before recording a decision.' :
         reviewed.reviewState === 'COMPLETE' ? 'Producer assessment complete; existing decision and publication rules apply.' : 'Retain the existing assessment; no automatic grade change.'};
@@ -284,12 +293,13 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
       score: sorted[0]?.score ?? null, promising: sorted.some(row => row.promising), preferredSelectionId: sorted[0]?.promising ? sorted[0].selectionId : null};
   }).sort((a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity) || a.marketId.localeCompare(b.marketId));
   const shortlist = markets.filter(row => row.promising).slice(0, Math.max(1, Math.floor(limit))).map((row, index) => ({...row, rank: index + 1}));
-  const unfinished = selections.filter(row => row.promising && row.reviewState !== 'COMPLETE').map(row => ({selectionId: row.selectionId,
+  const unfinished = selections.filter(row => (row.promising || row.reviewRequired) && row.reviewState === 'UNFINISHED').map(row => ({selectionId: row.selectionId,
     title: row.title, state: row.state, quote: row.quote, missingResearch: row.missingResearch}));
   return {schema: 1, version: CANDIDATE_ASSESSMENT_VERSION, state: 'COMPLETE_UNIVERSE_REVIEW', asOf: report.ts,
     mode: 'REVIEW_ONLY', denominator: 'ALL_AVAILABLE_PRIMARY_SELECTIONS_IN_BOUND_FEED_INCLUDING_BLOCKED',
     counts: {available: selections.length, markets: markets.length, promising: selections.filter(row => row.promising).length,
-      reviewComplete: selections.filter(row => row.promising && row.reviewState === 'COMPLETE').length, unfinished: unfinished.length,
+      reviewRequired: selections.filter(row => row.reviewRequired).length,
+      reviewComplete: selections.filter(row => row.reviewRequired && row.reviewState !== 'UNFINISHED').length, unfinished: unfinished.length,
       blocked: selections.filter(row => row.state === 'BLOCKED').length, technicalLeanEligible: selections.filter(row => row.technicalLeanEligible).length},
     selections, markets, shortlist, unfinished, warnings: [],
     limitations: ['Ranking is a research priority, not a betting decision or a claim of independent fair value.',
@@ -313,7 +323,7 @@ export function finalizeCandidateAssessmentDraft(args = {}) {
     return {review, deferredSelectionIds, deferFailures, applied: false};
   }
   const removed = new Set();
-  for (const row of review.selections.filter(row => row.promising && row.reviewState === 'UNFINISHED')) {
+  for (const row of review.selections.filter(row => (row.promising || row.reviewRequired) && row.reviewState === 'UNFINISHED')) {
     const receipt = list(sidecar.primaryAnalysis?.receipts).find(item => item.selectionId === row.selectionId);
     if (receipt?.state !== 'EVALUATED') continue;
     const attempts = realAttempts(receipt, row, report);
@@ -322,7 +332,7 @@ export function finalizeCandidateAssessmentDraft(args = {}) {
       authority: 'UNISSUED_INCOMPLETE_DRAFT_ONLY', missingResearch: row.missingResearch};
     receipt.state = 'BLOCKED';
     receipt.blocker = {reason: 'RESEARCH_INCOMPLETE', checkedAt: report.ts,
-      missing: row.missingResearch.join('; '), impact: 'A positive candidate still needs its recorded assessment completed. No betting decision has been issued for this selection.',
+      missing: row.missingResearch.join('; '), impact: 'A candidate still needs its recorded assessment completed. No betting decision has been issued for this selection.',
       attempts, nextAction: 'Resolve the named candidate assessment gaps, reassess the exact current quote, and record a producer decision.'};
     removed.add(receipt.decision.feed?.selectionKey);
     for (const field of ['decision', 'evidence', 'fairValueEvidence', 'fair', 'status', 'marketFair']) delete receipt[field];

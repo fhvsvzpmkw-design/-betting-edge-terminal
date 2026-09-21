@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Draft preparation and read-only publication diagnostics. Never assigns a betting decision.
 import fs from 'node:fs';
+import {loadGrahamHandoffInputs, grahamHandoffRequired} from './graham-fair-handoff.mjs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -54,7 +55,8 @@ function loadContext(root, report, sidecar, feedFile) {
     // Reuse still requires the forecast module's explicit current-run revalidation.
     for (const record of list(prior.forecastEvidence?.records)) priorRecords.push(record);
   }
-  return {root, feed, universe, observer, registry: registry || undefined, library, priorRecords, priorReceipts, warnings};
+  const grahamInputs = list(universe?.selections).some(selection=>grahamHandoffRequired(report,selection)) ? loadGrahamHandoffInputs(root,report,sidecar) : null;
+  return {root, feed, universe, observer, grahamInputs, registry: registry || undefined, library, priorRecords, priorReceipts, warnings};
 }
 
 export function reviewBlockedSelections(report, sidecar, {universe, observer, priorReceipts = new Map()} = {}) {
@@ -97,7 +99,7 @@ export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedF
   try {forecasts = buildForecastCoverage({report, sidecar, universe: ctx.universe, feed: ctx.feed, priorRecords: ctx.priorRecords, registry: ctx.registry, now: report.ts});}
   catch (error) {forecasts = {mode: 'ADVISORY_ONLY', publicationBlocking: false, warnings: [`Forecast review unavailable: ${error.message}`]};}
   const review = reviewCardEvidence(report, sidecar, {library: ctx.library});
-  const candidateAssessment = buildCandidateAssessment({report, sidecar, universe: ctx.universe, observer: ctx.observer, forecastCoverage: forecasts});
+  const candidateAssessment = buildCandidateAssessment({report, sidecar, universe: ctx.universe, observer: ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs, forecastCoverage: forecasts});
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
     reportTs: report.ts, forecastCoverage: forecasts,
     candidateAssessment,
@@ -188,8 +190,9 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
   if (!candidateAssessmentRequired(report)) return null;
   const audit = buildEvidenceAudit({root, report, sidecar, feedFile});
   const candidate = audit.candidateAssessment;
+  if(candidate.selections.some(row=>row.grahamFairHandoff?.inputBinding) && !sidecar.grahamFairHandoffInputs)throw new Error('Graham handoff inputs must be pinned in shared draft preparation before freeze');
   if (candidate.state === 'UNIVERSE_UNAVAILABLE') throw new Error('Candidate review requires the same bound inventory as publication');
-  const incomplete = candidate.selections.filter(row => row.promising && row.state === 'EVALUATED' && row.reviewState === 'UNFINISHED');
+  const incomplete = candidate.selections.filter(row => (row.promising || row.reviewRequired) && row.state === 'EVALUATED' && row.reviewState === 'UNFINISHED');
   if (incomplete.length) throw new Error(`Complete or defer the ${incomplete.length} unfinished candidate assessment(s) before freeze using report-evidence-repair.mjs prepare; completed other selections remain publishable: ${incomplete.map(row => `${row.selectionId}: ${row.missingResearch.join(', ')}`).join('; ')}`);
   return candidate;
 }
@@ -197,6 +200,7 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
 export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
   let draftReport = structuredClone(report), draftSidecar = structuredClone(sidecar);
   const ctx = loadContext(root, draftReport, draftSidecar, feedFile);
+  if(ctx.grahamInputs?.binding && !draftSidecar.grahamFairHandoffInputs)draftSidecar.grahamFairHandoffInputs=structuredClone(ctx.grahamInputs.binding);
   const taxonomy = repairDraftCoreTaxonomy(draftReport, draftSidecar, {feed:ctx.feed, framework:optional(path.join(root, 'core/core-handicap-framework-v1.4.json'))});
   const before = JSON.stringify(list(draftReport.recs).map(rec => ({feed:rec.feed,status:rec.status,stake:rec.stake,fair:rec.fair,playTo:rec.playTo,coreAssessment:rec.coreAssessment,marketAssessment:rec.marketAssessment})));
   attachForecastCoverage({report: draftReport, sidecar: draftSidecar, universe: ctx.universe, feed: ctx.feed, priorRecords: ctx.priorRecords, registry: ctx.registry, now: report.ts});
@@ -215,7 +219,7 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
   if (identityDeferrals.selectionIds.length) synchronizeCandidateDraft(draftReport, draftSidecar);
   const candidateForecasts = buildForecastCoverage({report:draftReport, sidecar:draftSidecar, universe:ctx.universe, feed:ctx.feed, priorRecords:ctx.priorRecords, registry:ctx.registry, now:report.ts});
   const candidates = finalizeCandidateAssessmentDraft({report:draftReport, sidecar:draftSidecar, universe:ctx.universe,
-    observer:ctx.observer, forecastCoverage:candidateForecasts, draft:true});
+    observer:ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs, forecastCoverage:candidateForecasts, draft:true});
   if (candidates.deferredSelectionIds.length) {
     synchronizeCandidateDraft(draftReport, draftSidecar);
     attachForecastCoverage({report:draftReport, sidecar:draftSidecar, universe:ctx.universe, feed:ctx.feed, priorRecords:ctx.priorRecords, registry:ctx.registry, now:report.ts});

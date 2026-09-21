@@ -176,3 +176,7 @@ Evaluation uses the first qualifying appearance per exact market and retains its
 - BET still needs the supported forecast/fair path and all existing controls.
 - Completed cards publish while unfinished candidates stay visible and resumable.
 - Future test selections are fixed before outcomes and counted once per exact market.
+
+## Graham NFL native fair handoff
+
+From `2026-09-21T06:00:00-07:00`, apply `docs/GRAHAM_NFL_FAIR_HANDOFF.md` to every NFL full-game primary spread. Its source snapshot and exact option review are additional to this candidate schema. Inspect `reviewRequired` and `unfinished`, including contrary or unavailable Graham rows; the promising shortlist alone is not the completion denominator.
