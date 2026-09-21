@@ -1,5 +1,11 @@
 # Betting Edge — Operations
 
+## September 21 Core 1.5 release checkpoint
+
+**Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
+
+Progression order: Core 1.5 consolidation and five Main prompts; then verify/close Graham Stage 3 schedule authority; then source-to-card handoff starting with Graham/Walters NFL spreads. A zero-card run proves publication only; populated forward grading acceptance remains pending. Older checkpoints below describe historical states.
+
 **Last updated:** 2026-09-06 — quote observation freshness correction and permanent Main schedule
 
 This is the practical operating runbook. The authoritative betting-governance file is `BETTING_EDGE_CONTRACT.md` **v1.0 OPERATIONAL**. Core methodology authority is `core/core-v1.4-production.json` **Core v1.4 OPERATIONAL**.

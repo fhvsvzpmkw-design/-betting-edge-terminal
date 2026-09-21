@@ -7,6 +7,10 @@ on:
     paths:
       - 'core/CORE_V1_4_CONSOLIDATION_PLAN_2026-08-25.md'
       - 'core/core-v1.4-production.json'
+      - 'core/core-v1.5-production.json'
+      - 'core/CORE_V1_5_OPERATING_CONTRACT.md'
+      - 'tools/core-release.mjs'
+      - 'tests/core15-release.test.mjs'
       - 'core/core-handicap-framework-v1.4.json'
       - 'core/walters-intelligence-interface-v1.4.json'
       - 'core/walters-authority-v1.4.json'
@@ -46,6 +50,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate Core 1.5 release compatibility
+        run: node tests/core15-release.test.mjs
       - name: Parse Core 1.4 production controls
         run: |
           node -e "for(const f of ['core/core-v1.4-production.json','core/core-handicap-framework-v1.4.json','core/walters-intelligence-interface-v1.4.json','core/walters-authority-v1.4.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('Core 1.4 production JSON OK')"

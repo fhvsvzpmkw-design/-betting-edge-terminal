@@ -1,5 +1,11 @@
 # Betting Edge — Roadmap
 
+## September 21 Core 1.5 release checkpoint
+
+**Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
+
+Progression order: Core 1.5 consolidation and five Main prompts; then verify/close Graham Stage 3 schedule authority; then source-to-card handoff starting with Graham/Walters NFL spreads. A zero-card run proves publication only; populated forward grading acceptance remains pending. Older checkpoints below describe historical states.
+
 **Last updated:** 2026-08-25 — Core 1.4 production closeout
 
 This roadmap separates completed foundations from active near-term work. Preserve the working pipeline, prove new layers independently, and avoid turning reliability or presentation fixes into unnecessary Core-version changes.

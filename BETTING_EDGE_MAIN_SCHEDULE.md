@@ -4,7 +4,7 @@
 **Effective:** 2026-08-19  
 **Updated:** 2026-09-06 — permanent Main Betting Edge schedule
 **Timezone:** `America/Vancouver`  
-**Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0 + Core v1.4 production manifest  
+**Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0 + Core v1.5 production manifest (from September 21 06:00; prior reports retain Core v1.4)
 **Schedule definition:** `data/main-schedule.json`
 
 ## Scope
@@ -69,7 +69,7 @@ A decision in one market never substitutes for evaluation of another. In particu
 - neither side-market decision satisfies the total requirement;
 - discovering or citing an external spread or total during matchup research is not equivalent to handicapping that market through the Betting Edge gate.
 
-The sweep must compare the independently evaluated markets before selecting the report's meaningful cards. A game may therefore produce more than one meaningful card when separate markets independently qualify. The nine-card presentation target remains a presentation target, not a reason to suppress a stronger football market or manufacture filler.
+The sweep must compare the independently evaluated markets before selecting the report's meaningful cards. A game may therefore produce more than one meaningful card when separate markets independently qualify. Publish every completed primary-market decision; no numeric card target applies.
 
 If a normally expected primary football market cannot be evaluated because no executable market is available in the supported feed, the run should preserve that as an availability limitation rather than silently treating another market as its substitute.
 
@@ -116,13 +116,13 @@ When the trigger matches, the report must require:
 
 - `BETTING_EDGE_CONTRACT.md` v1.0 OPERATIONAL;
 - VigScope Terminal UI v1.5;
-- `core/core-v1.4-production.json` Core v1.4 OPERATIONAL;
+- `core/core-v1.5-production.json` Core v1.5 OPERATIONAL from `2026-09-21T06:00:00-07:00`, with `core/CORE_V1_5_OPERATING_CONTRACT.md`;
 - Research Library v1.8 / R3 live read-only;
 - current Walters authority mode and exact provenance;
 - the normal freshness, identity, personnel, model-error, price, stake/risk and immutable-history gates;
 - same-day report-card event eligibility under `data/report-event-eligibility-v1.json`, applied before candidate research and again before staging;
 - for NFL/NCAAF, complete independent spread + moneyline + total primary-market evaluation as specified above.
 
-Scheduled report lanes target up to **nine meaningful cards**. Nine is a presentation/review target, not a quota: reports may contain fewer cards and zero BETs, and weak filler or next-day backfill must not be manufactured to reach nine.
+Scheduled report lanes publish every completed BET/LEAN/WAIT/PASS. There is no numeric card minimum, target or maximum. Unfinished work remains RESEARCH_INCOMPLETE; empty eligible boards may publish zero cards. Never manufacture filler or next-day backfill.
 
 Historical report tasks and issued reports remain immutable evidence under the contract/core/research state that governed them at issuance.

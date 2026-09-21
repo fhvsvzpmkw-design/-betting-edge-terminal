@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import {pathToFileURL} from 'node:url';
+import {resolveCoreRelease} from './core-release.mjs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {evaluate, loadProductionFramework, matchCondition, validateContext} from './core-handicap-framework.mjs';
@@ -152,10 +154,11 @@ function validateWaltersEvidence(runtime,evidence,assessment,rec,index,mode){
   }
 }
 
-function validateProvenance(runtime,provenance,{compareCurrent}){
+function validateProvenance(runtime,provenance,{compareCurrent,reportTs}){
+  const release=resolveCoreRelease(runtime.root,reportTs);
   assert(provenance&&typeof provenance==='object','Core 1.4 sidecar provenance is required');
-  assert(provenance.coreVersion==='1.4','Post-cutover report must declare coreVersion 1.4');
-  assert(provenance.coreProductionPath===PROD_PATH,'Core 1.4 coreProductionPath is invalid');
+  assert(provenance.coreVersion===release.coreVersion,`Report must declare coreVersion ${release.coreVersion}`);
+  assert(provenance.coreProductionPath===release.coreProductionPath,'Core production path does not match report release');
   assert(SHA40.test(String(provenance.coreProductionBlobSha||'')),'Core 1.4 coreProductionBlobSha must be a Git blob SHA');
   assert(provenance.coreFrameworkPath===runtime.prod.modelErrorFramework.path,'Core 1.4 coreFrameworkPath is invalid');
   assert(SHA40.test(String(provenance.coreFrameworkBlobSha||'')),'Core 1.4 coreFrameworkBlobSha must be a Git blob SHA');
@@ -169,7 +172,7 @@ function validateProvenance(runtime,provenance,{compareCurrent}){
   assert(WALTERS_MODES.has(provenance.waltersMode),`Invalid report Walters mode ${provenance.waltersMode}`);
 
   if(compareCurrent){
-    assert(provenance.coreProductionBlobSha===gitBlobSha(runtime.prodFile),'Core 1.4 report did not use the current production manifest blob');
+    assert(provenance.coreProductionBlobSha===release.coreProductionBlobSha,'Core 1.4 report did not use the current production manifest blob');
     assert(provenance.coreFrameworkBlobSha===gitBlobSha(runtime.frameworkFile),'Core 1.4 report did not use the current model-error framework blob');
     assert(provenance.researchLibraryBlobSha===gitBlobSha(runtime.libraryFile),'Core 1.4 report did not use the current Research Library blob');
     assert(provenance.researchManifestBlobSha===gitBlobSha(runtime.researchManifestFile),'Core 1.4 report did not use the current research manifest blob');
@@ -184,7 +187,7 @@ function validateBundle(runtime,report,sidecar,{compareCurrent=true,recompute=tr
   assert(Number.isFinite(reportMs),'Report ts must be valid');
   if(reportMs<CORE_V14_FROM) return {core14:false};
   assert(sidecar?.schema===3,'Core 1.4 production requires schema-3 sidecar');
-  validateProvenance(runtime,sidecar.provenance,{compareCurrent});
+  validateProvenance(runtime,sidecar.provenance,{compareCurrent,reportTs:report.ts});
   assert(Array.isArray(report.recs)&&Array.isArray(sidecar.recommendations),'Core 1.4 report/sidecar recommendations are required');
   assert(report.recs.length===sidecar.recommendations.length,'Core 1.4 sidecar recommendation count mismatch');
   const recommendationErrors=[];
@@ -206,7 +209,7 @@ function validateBundle(runtime,report,sidecar,{compareCurrent=true,recompute=tr
   if(recommendationErrors.length){
     fail(`Core 1.4 bundle contains ${recommendationErrors.length} recommendation defect(s):\n- ${recommendationErrors.join('\n- ')}`);
   }
-  return {core14:true};
+  return {core14:true,coreVersion:sidecar.provenance.coreVersion};
 }
 
 function syntheticProvenance(runtime){
@@ -293,7 +296,7 @@ function main(){
     assert(nonEmpty(args.report)&&nonEmpty(args.sidecar),'validate requires --report FILE --sidecar FILE');
     const runtime=loadRuntime(root);
     const result=validateBundle(runtime,readJson(path.resolve(args.report)),readJson(path.resolve(args.sidecar)),{compareCurrent:true,recompute:true});
-    console.log(result.core14?'CORE 1.4 PUBLICATION GATE OK':'CORE 1.4 GATE NOT APPLICABLE — HISTORICAL CORE 1.3');
+    console.log(result.core14?`CORE ${result.coreVersion} PUBLICATION GATE OK`:'CORE GATE NOT APPLICABLE — HISTORICAL CORE 1.3');
     return;
   }
   if(args.command==='verify-history') return verifyHistory(root);
@@ -301,4 +304,7 @@ function main(){
   fail('Usage: core-v14-publication-gate.mjs validate --report FILE --sidecar FILE [--root DIR] | verify-history [--root DIR] | self-test [--root DIR]');
 }
 
-try{main()}catch(error){console.error(`CORE 1.4 PUBLICATION GATE ERROR: ${error.message}`);process.exit(1)}
+export {loadRuntime, validateBundle};
+if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
+  try{main()}catch(error){console.error(`CORE PUBLICATION GATE ERROR: ${error.message}`);process.exit(1)}
+}
