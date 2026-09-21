@@ -1,0 +1,25 @@
+name: Primary lineage continuity repair test
+
+on:
+  push:
+    branches:
+      - 'repair/lineage-incomplete-continuity-20260921'
+    paths:
+      - 'tools/primary-lineage.mjs'
+      - 'tools/primary-lineage-continuity-test.mjs'
+      - '.github/workflows/primary-lineage-continuity-repair.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse primary lineage validator
+        run: node --check tools/primary-lineage.mjs
+      - name: Run incomplete-continuity regression
+        run: node tools/primary-lineage-continuity-test.mjs
+      - name: Run existing spread lineage self-test
+        run: node tools/spread-lineage.mjs self-test
