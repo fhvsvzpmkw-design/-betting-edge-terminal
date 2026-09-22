@@ -1,3 +1,4 @@
+import './test-graham-historical-value-estimates.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {evaluateWeeklyEvidence,loadWeeklyEvidence,gitBlob,boundJson,verifyWeeklyGameEvidence} from './graham-weekly-evidence.mjs';

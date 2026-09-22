@@ -6,6 +6,7 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {individualDelta,clusterMultiplier,playerValue} from './walters-personnel-calibration.mjs';
+import {historicalValueEstimates} from './graham-historical-value-estimates.mjs';
 import {historicalExposure,exposureWeightedLoss} from './graham-historical-exposure.mjs';
 export const WEEKLY_EVIDENCE_FROM='2026-09-20T20:30:00-07:00';
 const list=x=>Array.isArray(x)?x:[], nonempty=x=>typeof x==='string'&&x.trim().length>0;
@@ -37,10 +38,12 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
   const sourceCheck=(ids,key)=>{
     if(!list(ids).length||!ids.every(id=>list(sources.get(id)?.gameKeys).includes(key)))fail('GAME_SPECIFIC_SOURCE_REQUIRED:'+key);
   };
+  const estimatedPlayers=historicalValueEstimates({bundle,registry,calibration,supplementalPlayers,sourceCheck});
   const lookup=(name,id,allowQb=false)=>{
-    const found=[...list(registry.players),...supplementalPlayers].filter(p=>id?String(p.eaPlayerId)===String(id):norm(p.player)===norm(name));
+    const found=[...list(registry.players),...supplementalPlayers,...estimatedPlayers].filter(p=>id?String(p.eaPlayerId)===String(id):norm(p.player)===norm(name));
     if(found.length!==1||norm(found[0].player)!==norm(name))fail('LOCKED_PLAYER_IDENTITY:'+name);
-    const p=found[0];if(p.valueStatus!=='CALIBRATED'||!exact(p.waltersPoints)||!exact(p.maddenOvr)||(p.position==='QB'&&!allowQb)||playerValue(calibration,{position:p.position,maddenOvr:p.maddenOvr})!==p.waltersPoints)fail('LOCKED_PLAYER_VALUE:'+name);return p;
+    const p=found[0];if(p.valueStatus==='HISTORICAL_ESTIMATE')return p;
+    if(p.valueStatus!=='CALIBRATED'||!exact(p.waltersPoints)||!exact(p.maddenOvr)||(p.position==='QB'&&!allowQb)||playerValue(calibration,{position:p.position,maddenOvr:p.maddenOvr})!==p.waltersPoints)fail('LOCKED_PLAYER_VALUE:'+name);return p;
   };
   const results=[];
   for(const g of list(bundle.games)){
@@ -81,7 +84,7 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           const relief=lookup(qb.replacement?.player,qb.replacement?.eaPlayerId,true);
           if(!healthy.length||healthy.some(p=>p.position!=='QB')||relief.position!=='QB'||new Set(healthy.map(p=>String(p.eaPlayerId))).size!==healthy.length||healthy.some(p=>String(p.eaPlayerId)===String(relief.eaPlayerId))||new Set(healthy.map(p=>p.waltersPoints)).size!==1)fail('QB_LOCKED_BASELINE_IDENTITY_REQUIRED');
           const exposure=historicalExposure(qb.exposure,ids=>sourceCheck(ids,g.gameKey));
-          qbEstimate={modelId:'graham-historical-qb-replacement-v1',classification:'GRAHAM_MODEL_ESTIMATE',healthyCandidates:healthy.map(p=>({player:p.player,eaPlayerId:p.eaPlayerId,lockedValue:p.waltersPoints})),replacement:{player:relief.player,eaPlayerId:relief.eaPlayerId},...exposureWeightedLoss(healthy[0].waltersPoints,relief.waltersPoints,exposure),baselineRationale:qb.baselineRationale,replacementRationale:qb.replacementRationale,sourceIds:qb.sourceIds};
+          qbEstimate={modelId:'graham-historical-qb-replacement-v1',scaleLimitation:'Frozen Madden-derived historical replacement difference; not a performance-validated QB rating or a change to the active QB performance model.',classification:'GRAHAM_MODEL_ESTIMATE',healthyCandidates:healthy.map(p=>({player:p.player,eaPlayerId:p.eaPlayerId,lockedValue:p.waltersPoints})),replacement:{player:relief.player,eaPlayerId:relief.eaPlayerId},...exposureWeightedLoss(healthy[0].waltersPoints,relief.waltersPoints,exposure),baselineRationale:qb.baselineRationale,replacementRationale:qb.replacementRationale,sourceIds:qb.sourceIds};
         }else if(qb.state!=='NO_GAME_DAY_LOSS')fail('GOVERNED_QB_GAME_DAY_LOSS_REQUIRED');
         const archived=Object.values(personnel.currentCases||{}).filter(c=>c.gameKey===g.gameKey&&c.team===abbr);
         const cs=list(t.cases),keys=cs.map(c=>c.caseKey);
@@ -99,9 +102,10 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           sourceCheck(c.sourceIds,g.gameKey);
           if(c.resolution==='UNRESOLVED')fail('UNRESOLVED_CASE:'+c.caseKey);
           const p=lookup(c.player,c.eaPlayerId);
+          if(p.valueProvenance?.gameKeys&&!p.valueProvenance.gameKeys.includes(g.gameKey))fail('VALUE_ESTIMATE_WRONG_GAME');
           let value=null,modelEstimate=null;
           if(c.resolution==='ZERO_CALIBRATED_LOSS'){
-            if(calibration.nonQbConversion.bands.some(b=>!exact(b.points)||b.points<0)||p.waltersPoints!==0||c.estimateAcknowledged!==true||!nonempty(c.assumptionRationale))fail('ZERO_LOSS_PROOF_REQUIRED');
+            if(calibration.nonQbConversion.bands.some(b=>!exact(b.points)||b.points<0)||(p.waltersPoints!==0||p.valueStatus==='HISTORICAL_ESTIMATE')||c.estimateAcknowledged!==true||!nonempty(c.assumptionRationale))fail('ZERO_LOSS_PROOF_REQUIRED');
             modelEstimate={modelId:'graham-zero-calibrated-loss-v1',method:c.resolution,injuryLoss:0,rawTeamContributionDelta:0,healthyValue:0,replacementValue:null,assumptionRationale:c.assumptionRationale,proof:'All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero.'};
           }else if(c.resolution==='ACTIVE_FULL'){
             if(c.availabilityStatus!=='ACTIVE_FULL')fail('FULL_AVAILABILITY_NOT_ESTABLISHED');
@@ -113,6 +117,7 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             if(!rs.length||new Set(rs.map(r=>String(r.eaPlayerId))).size!==rs.length)fail('REPLACEMENT_SET_INVALID');
             if(c.resolution==='ONE_FOR_ONE'&&rs.length!==1)fail('ONE_FOR_ONE_REPLACEMENT_REQUIRED');
             if(c.resolution==='PARTIAL_TIME_EXPOSURE'){
+              if(c.availabilityStatus!=='PARTIAL_GAME')fail('PARTIAL_AVAILABILITY_REQUIRED');
               const role=replacementEstimate({...c,resolution:c.replacementResolution},p.waltersPoints,rs,{sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
               const exposure=historicalExposure(c.exposure,ids=>sourceCheck(ids,g.gameKey));
               const effective=role.replacementValueRatio.numerator/role.replacementValueRatio.denominator;
@@ -131,29 +136,52 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             }else if(c.resolution!=='ONE_FOR_ONE')fail('UNSUPPORTED_HISTORICAL_RESOLUTION');
             const reserved=modelEstimate?.reservedPlayers?modelEstimate.reservedPlayers.map(r=>lookup(r.player,r.eaPlayerId)):rs;
             for(const row of modelEstimate?.reconciledRoles?.before||[]){if(chainRoles.has(row.role))fail('CHAIN_SIMULTANEOUS_ROLE_OVERLAP');chainRoles.add(row.role);}
-            for(const r of reserved){if(String(r.eaPlayerId)===String(p.eaPlayerId)||group(r.position)!==group(p.position)||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');
-              if(modelEstimate?.reservedPlayers&&cs.some(other=>other!==c&&other.resolution!=='ACTIVE_FULL'&&String(lookup(other.player,other.eaPlayerId).eaPlayerId)===String(r.eaPlayerId)))fail('CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE');
+            for(const r of reserved){if(r.valueProvenance?.gameKeys&&!r.valueProvenance.gameKeys.includes(g.gameKey))fail('VALUE_ESTIMATE_WRONG_GAME');
+              if(String(r.eaPlayerId)===String(p.eaPlayerId)||group(r.position)!==group(p.position)||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');
+              if((modelEstimate?.reservedPlayers||bundle.estimationPolicy==='graham-historical-value-estimates-v1')&&cs.some(other=>other!==c&&['IR','OUT','SUSPENDED','COMMISSIONER_EXEMPT'].includes(other.availabilityStatus)&&other.resolution!=='ACTIVE_FULL'&&String(lookup(other.player,other.eaPlayerId).eaPlayerId)===String(r.eaPlayerId)))fail('CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE');
               replacements.add(String(r.eaPlayerId));}
             for(const ex of list(c.excludedBaselineContributors)){if(!nonempty(ex.player)||!nonempty(ex.rationale)||rs.some(r=>norm(r.player)===norm(ex.player)))fail('BASELINE_EXCLUSION_INVALID');sourceCheck(ex.sourceIds,g.gameKey);}
             value=modelEstimate?.replacementValue??rs[0].waltersPoints;
           }
           const result=modelEstimate||individualDelta(calibration,{availabilityStatus:c.availabilityStatus,healthyValue:p.waltersPoints,replacementValue:value});
-          computed.push({caseKey:c.caseKey,player:p.player,group:group(p.position),healthyValue:p.waltersPoints,replacementValue:value,rawTeamContributionDelta:result.rawTeamContributionDelta,...(modelEstimate?{modelEstimate}:{}),sourceIds:c.sourceIds,...(p.valueProvenance?{valueProvenance:p.valueProvenance}:{})});
+          computed.push({caseKey:c.caseKey,player:p.player,group:group(p.position),healthyValue:p.waltersPoints,replacementValue:value,rawTeamContributionDelta:result.rawTeamContributionDelta,...(modelEstimate?{modelEstimate}:{}),sourceIds:c.sourceIds,replacementValueProvenance:list(c.replacements).map(r=>lookup(r.player,r.eaPlayerId)).filter(r=>r.valueProvenance).map(r=>({player:r.player,...r.valueProvenance})),...(p.valueProvenance?{valueProvenance:p.valueProvenance}:{})});
         }
+        const specialistEstimates=[];
+        const specialistNames=new Set();
+        for(const c of list(t.specialistCases)){
+          if(!['K','P','LS'].includes(c.position)||!nonempty(c.player)||!nonempty(c.replacementPlayer)||c.player===c.replacementPlayer||c.method!=='NEUTRAL_SPECIALIST_REPLACEMENT_ESTIMATE'||c.estimateAcknowledged!==true||c.availableProfessionalReplacement!==true||c.materialRoleDisruption!==false||!nonempty(c.rationale))fail('SPECIALIST_ESTIMATE_DECLARATION_REQUIRED');
+          if(specialistNames.has(norm(c.player))||specialistNames.has(norm(c.replacementPlayer))||cs.some(x=>[norm(c.player),norm(c.replacementPlayer)].includes(norm(x.player))))fail('SPECIALIST_ROLE_DOUBLE_COUNT');
+          specialistNames.add(norm(c.player));specialistNames.add(norm(c.replacementPlayer));
+          sourceCheck(c.sourceIds,g.gameKey);sourceCheck(c.replacementSourceIds,g.gameKey);
+          specialistEstimates.push({...c,injuryLoss:0,uncertainty:'UNQUANTIFIED',limitation:'Neutral replacement-difference assumption; not a calibrated zero or proof of no specialist effect.'});
+        }
+        const participationReviews=list(t.participationReviews).map(r=>{
+          if(!nonempty(r.player)||!nonempty(r.finding))fail('PARTICIPATION_REVIEW_REQUIRED');sourceCheck(r.sourceIds,g.gameKey);return r;
+        });
         const groups=[];
         for(const name of new Set(computed.map(c=>c.group))){
           const entries=computed.filter(c=>c.group===name),cl=clusterMultiplier(calibration,name,entries);
+          let receiverReview=null;
+          if(name==='RECEIVER'&&cl.multiplier>1&&bundle.estimationPolicy==='graham-historical-value-estimates-v1'){
+            receiverReview=t.receiverClusterReview;
+            if(typeof receiverReview?.eligible!=='boolean'||!nonempty(receiverReview.rationale)||receiverReview.estimateAcknowledged!==true)fail('RECEIVER_CLUSTER_ELIGIBILITY_REQUIRED');
+            sourceCheck(receiverReview.sourceIds,g.gameKey);
+            if(receiverReview.eligible){
+              const names=list(receiverReview.topExpectedReceivers).map(norm);
+              if(names.length!==2||new Set(names).size!==2||receiverReview.simultaneousAbsence!==true||names.some(n=>!entries.some(c=>norm(c.player)===n&&c.rawTeamContributionDelta<0)))fail('TOP_RECEIVER_ABSENCE_REQUIRED');
+            }else cl.multiplier=1;
+          }
           if(cl.reviewRequired){
             const review=list(t.clusterReviews).find(r=>r.group===name);
             if(review?.method!=='ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE'||review.estimateAcknowledged!==true||review.disjointRolesReviewed!==true||!nonempty(review.rationale))fail(cl.code+':'+name);
             sourceCheck(review.sourceIds,g.gameKey);
           }
           if(name==='RECEIVER'&&cl.multiplier>1&&t.topReceiverClusterReviewed!==true)fail('TOP_RECEIVER_CLUSTER_REVIEW_REQUIRED');
-          groups.push({group:name,multiplier:cl.multiplier,loss:round(-entries.reduce((s,c)=>s+c.rawTeamContributionDelta,0)*cl.multiplier),...(cl.reviewRequired?{clusterReview:t.clusterReviews.find(r=>r.group===name)}:{})});
+          groups.push({group:name,multiplier:cl.multiplier,loss:round(-entries.reduce((s,c)=>s+c.rawTeamContributionDelta,0)*cl.multiplier),...(cl.reviewRequired?{clusterReview:t.clusterReviews.find(r=>r.group===name)}:{}),...(receiverReview?{receiverClusterReview:receiverReview}:{})});
         }
         const injuryLoss=round(groups.reduce((s,g)=>s+g.loss,0)+(qbEstimate?.injuryLoss||0));
         if(injuryLoss<0)fail('REPLACEMENT_UPGRADE_REQUIRES_LOSS_CONVENTION_REVIEW');
-        teams.push({team:abbr,state:'GOVERNED',coverageExclusions:exclusions,valueBasis:(qbEstimate||computed.some(c=>c.modelEstimate)||exclusions.some(e=>e.estimateAcknowledged)||groups.some(g=>g.clusterReview))?'INCLUDES_GRAHAM_MODEL_ESTIMATE':'EXISTING_CALIBRATED_METHOD',injuryLoss,cases:computed,groups,...(qbEstimate?{qbEstimate}:{}),sourceIds:t.sourceIds});
+        teams.push({team:abbr,state:'GOVERNED',coverageExclusions:exclusions,participationReviews,specialistEstimates,valueBasis:(specialistEstimates.length||qbEstimate||computed.some(c=>c.modelEstimate)||exclusions.some(e=>e.estimateAcknowledged)||groups.some(g=>g.clusterReview))?'INCLUDES_GRAHAM_MODEL_ESTIMATE':'EXISTING_CALIBRATED_METHOD',injuryLoss,cases:computed,groups,...(qbEstimate?{qbEstimate}:{}),sourceIds:t.sourceIds});
       }catch(e){blockers.push({team:abbr,code:e.message});}
     }
     results.push({gameKey:g.gameKey,state:blockers.length?'BLOCKED':'READY',teams,blockers});

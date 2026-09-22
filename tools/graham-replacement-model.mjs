@@ -12,14 +12,19 @@ export function reconciledRoleChainEstimate(c,absent,replacements,{lookup,source
   if(c.resolution!=='RECONCILED_ROLE_CHAIN'||c.modelId!==ROLE_CHAIN_MODEL_ID||c.estimateAcknowledged!==true||!text(c.assumptionRationale))fail('CHAIN_DECLARATION_REQUIRED');
   if(c.baselineTreatment!=='RECONCILED_ROLE_CHAIN'||c.baselineDutiesDisplaced!==true||!text(c.baselineRationale))fail('CHAIN_BASELINE_RECONCILIATION_REQUIRED');
   sourceCheck(c.baselineSourceIds);
-  const chain=c.roleChain,roles=['LT','LG','C','RG','RT'];
+  const chain=c.roleChain;
+  const ol=['LT','LG','C','RG','RT'],receivers=['WR','TE'];
+  const unit=ol.includes(absent.position)?'OFFENSIVE_LINE':receivers.includes(absent.position)?'RECEIVER':null;
+  if(!unit)fail('CHAIN_UNSUPPORTED_UNIT');
+  const roles=unit==='OFFENSIVE_LINE'?ol:['X','Z','SLOT','BASE_RECEIVER','TE1','TE2'];
+  const positions=unit==='OFFENSIVE_LINE'?ol:receivers;
   if(!chain||!Array.isArray(chain.before)||!Array.isArray(chain.after)||chain.before.length<2||chain.before.length>5||chain.before.length!==chain.after.length||replacements.length!==1)fail('CHAIN_ASSIGNMENTS_REQUIRED');
   const resolve=(rows,after)=>rows.map(row=>{
     if(!roles.includes(row.role)||!text(row.eaPlayerId)||!text(row.rationale))fail('CHAIN_ASSIGNMENT_IDENTITY');
     sourceCheck(row.sourceIds);
     const p=lookup(row.player,row.eaPlayerId);
-    if(!roles.includes(p.position)||!finite(p.waltersPoints)||p.waltersPoints<0)fail('CHAIN_LOCKED_OFFENSIVE_LINE_VALUE');
-    if(after&&(row.availabilityStatus!=='ACTIVE'||!['REPORTED_STARTER','GAMEBOOK_STARTER'].includes(row.assignmentEvidence)))fail('CHAIN_OCCUPANT_AVAILABILITY_REQUIRED');
+    if(!positions.includes(p.position)||!finite(p.waltersPoints)||p.waltersPoints<0)fail('CHAIN_LOCKED_OFFENSIVE_LINE_VALUE');
+    if(after&&(row.availabilityStatus!=='ACTIVE'||!['REPORTED_STARTER','GAMEBOOK_STARTER','REPORTED_ROLE'].includes(row.assignmentEvidence)))fail('CHAIN_OCCUPANT_AVAILABILITY_REQUIRED');
     return {role:row.role,player:p.player,eaPlayerId:String(p.eaPlayerId),lockedValue:p.waltersPoints};
   });
   const before=resolve(chain.before,false),after=resolve(chain.after,true);
@@ -49,7 +54,7 @@ export function reconciledRoleChainEstimate(c,absent,replacements,{lookup,source
     upgradeExcluded:effective>healthy,injuryLossRange:{min:injuryLoss,max:injuryLoss},
     reconciledRoles:{before,after,retainedPlayerValuesCancel:true},reservedPlayers:after.map(r=>({player:r.player,eaPlayerId:r.eaPlayerId})),
     baselineTreatment:c.baselineTreatment,assumptionRationale:c.assumptionRationale,
-    limitation:'Locked non-QB values are retained across documented OL positions; no positional proficiency penalty is invented. Complete paired coverage and existing cluster review still apply.'};
+    limitation:'Historical non-QB values are retained across documented unit roles; no positional proficiency penalty is invented. Complete paired coverage and existing cluster review still apply.'};
 }
 export function replacementEstimate(c,healthy,replacements,{sourceCheck=()=>{}}={}){
   if(c.modelId!==REPLACEMENT_MODEL_ID||!MODEL_RESOLUTIONS.includes(c.resolution)||c.estimateAcknowledged!==true||!text(c.assumptionRationale))fail('REPLACEMENT_MODEL_DECLARATION_REQUIRED');
@@ -58,10 +63,10 @@ export function replacementEstimate(c,healthy,replacements,{sourceCheck=()=>{}}=
   if(c.baselineTreatment!=='ADDITIONAL_DUTIES_ONLY'||c.baselineDutiesDisplaced!==false||!text(c.baselineRationale))fail('MODEL_BASELINE_RECONCILIATION_REQUIRED');
   sourceCheck(c.baselineSourceIds);
   if(c.resolution==='PRIMARY_REPLACEMENT'){
-    if(replacements.length!==1||!['NAMED_STARTER','REPORTED_PRIMARY'].includes(c.primaryEvidence))fail('MODEL_PRIMARY_ROLE_REQUIRED');
+    if(replacements.length!==1||!['NAMED_STARTER','REPORTED_PRIMARY','DOCUMENTED_DEPTH_ESTIMATE'].includes(c.primaryEvidence))fail('MODEL_PRIMARY_ROLE_REQUIRED');
   }else if(replacements.length<2)fail('MODEL_COMMITTEE_REQUIRED');
   let units=replacements.map(()=>1),weightBasis='EQUAL_ADDITIONAL_ROLE_ASSUMPTION';
-  if(c.resolution==='PRIMARY_REPLACEMENT')weightBasis='DOCUMENTED_PRIMARY_ROLE';
+  if(c.resolution==='PRIMARY_REPLACEMENT')weightBasis=c.primaryEvidence==='DOCUMENTED_DEPTH_ESTIMATE'?'DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION':'DOCUMENTED_PRIMARY_ROLE';
   if(c.resolution==='WEIGHTED_COMMITTEE'){
     if(!['ROLE_SNAPS','ROLE_OPPORTUNITIES','DOCUMENTED_ROLE_SHARES'].includes(c.roleUnitType))fail('MODEL_ROLE_UNIT_TYPE_REQUIRED');
     weightBasis=c.roleUnitType;
