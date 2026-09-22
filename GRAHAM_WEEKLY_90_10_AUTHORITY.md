@@ -1,6 +1,17 @@
 # Graham weekly 90/10 authority
 
-Version 1.4 — documented offensive-line displacement reconciliation, 2026-09-22.
+Version 1.5 — explicit historical completion estimates, 2026-09-22.
+
+## Operational historical completion conventions — September 22 recovery
+
+The user directed completing game updates, including necessary modelling repairs. The following explicit Graham estimates supplement v1.4; they do not change Walters 90/10 arithmetic or production player values.
+
+* A historical `valueSupplements` binding may calibrate a missing identity from a committed official EA Madden capture through the original pinned curve. Bind capture commit, path, blob and selected EA IDs; verify ancestry, capture time, original registry identity and rating iteration. Existing locked identities cannot be replaced. Record the retrospective capture assumption. Missing from both sources remains missing.
+* `ZERO_CALIBRATED_LOSS` proves zero when the known healthy value is zero and the unchanged replacement curve is nonnegative: max(0,0-replacement)=0. This avoids requiring a fictitious replacement for a mathematically immaterial absence. It never assigns zero to a missing player value.
+* `PARTIAL_VALUE_INVARIANT` covers a temporary absence when the documented relief candidates all equal the healthy value. Any unavailable fraction then gives the same zero replacement loss. Explicitly assume normal effectiveness while playing if no continuing impairment is reported; do not call that a medical finding. Unequal values or reported continuing impairment still need a separately supported exposure model. Record the baseline and relief-role assessment.
+* Final coverage classifies healthy scratches, unused backup/emergency quarterbacks, players released before the game, and camp-only personnel separately. A camp-only exclusion is an explicit projected-role assumption supported by roster transactions and depth review: no established regular-season duty is included in the game-day baseline. It is not a missing rating set to zero. Do not exclude an archived injury case or any established regular-season contributor through this category. Reopen the assessment if documented role evidence contradicts it. Preserve all exclusions in bound evidence and evaluated output.
+
+The Cleveland–Tampa Bay bundle uses these conventions. Its values are estimated game-day strength losses, not exact medical measurements. Historical QB loss is zero only when the established game quarterback had no reported injury-related lost duty; unavailable backup quarterbacks are not automatically charged as absent starters. Subsequent injury-driven QB substitution still requires a numerical adapter. Publication remains paired through the existing updater and workflow, with a separate current-week baseline refresh afterward.
 
 ## Documented offensive-line role chains
 

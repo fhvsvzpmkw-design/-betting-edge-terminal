@@ -53,3 +53,5 @@ console.log(`WEEKLY HISTORICAL EVIDENCE: ${count} PASS`);
 // Current-week routing and additive Week 2 evidence share this existing CI entrypoint.
 await import('./test-graham-weekly-recovery-context.mjs');
 await import('./test-graham-role-chain.mjs');
+
+await import("./test-graham-historical-completion.mjs");
