@@ -6,6 +6,7 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {individualDelta,clusterMultiplier,playerValue} from './walters-personnel-calibration.mjs';
+import {historicalExposure,exposureWeightedLoss} from './graham-historical-exposure.mjs';
 export const WEEKLY_EVIDENCE_FROM='2026-09-20T20:30:00-07:00';
 const list=x=>Array.isArray(x)?x:[], nonempty=x=>typeof x==='string'&&x.trim().length>0;
 const fail=x=>{throw Error(x);};
@@ -36,10 +37,10 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
   const sourceCheck=(ids,key)=>{
     if(!list(ids).length||!ids.every(id=>list(sources.get(id)?.gameKeys).includes(key)))fail('GAME_SPECIFIC_SOURCE_REQUIRED:'+key);
   };
-  const lookup=(name,id)=>{
+  const lookup=(name,id,allowQb=false)=>{
     const found=[...list(registry.players),...supplementalPlayers].filter(p=>id?String(p.eaPlayerId)===String(id):norm(p.player)===norm(name));
     if(found.length!==1||norm(found[0].player)!==norm(name))fail('LOCKED_PLAYER_IDENTITY:'+name);
-    const p=found[0];if(p.valueStatus!=='CALIBRATED'||!exact(p.waltersPoints)||!exact(p.maddenOvr)||p.position==='QB'||playerValue(calibration,{position:p.position,maddenOvr:p.maddenOvr})!==p.waltersPoints)fail('LOCKED_PLAYER_VALUE:'+name);return p;
+    const p=found[0];if(p.valueStatus!=='CALIBRATED'||!exact(p.waltersPoints)||!exact(p.maddenOvr)||(p.position==='QB'&&!allowQb)||playerValue(calibration,{position:p.position,maddenOvr:p.maddenOvr})!==p.waltersPoints)fail('LOCKED_PLAYER_VALUE:'+name);return p;
   };
   const results=[];
   for(const g of list(bundle.games)){
@@ -71,7 +72,17 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
       try{
         const t=g.teams.find(t=>t.team===abbr);if(!t||t.coverage!=='FINAL_GAME_DAY'||t.allAbsencesReviewed!==true||!nonempty(t.coverageRationale))fail('FINAL_GAME_DAY_COVERAGE_REQUIRED');
         sourceCheck(t.sourceIds,g.gameKey);
-        if(t.qbAvailability?.state!=='NO_GAME_DAY_LOSS'||!nonempty(t.qbAvailability.rationale))fail('GOVERNED_QB_GAME_DAY_LOSS_REQUIRED');sourceCheck(t.qbAvailability.sourceIds,g.gameKey);
+        const qb=t.qbAvailability;let qbEstimate=null;
+        if(!nonempty(qb?.rationale))fail('GOVERNED_QB_GAME_DAY_LOSS_REQUIRED');sourceCheck(qb.sourceIds,g.gameKey);
+        if(qb.state==='HISTORICAL_REPLACEMENT_ESTIMATE'){
+          if(qb.estimateAcknowledged!==true||qb.lossCause!=='INJURY_UNAVAILABILITY'||!nonempty(qb.baselineRationale)||!nonempty(qb.replacementRationale))fail('QB_REPLACEMENT_DECLARATION_REQUIRED');
+          sourceCheck(qb.baselineSourceIds,g.gameKey);sourceCheck(qb.replacementSourceIds,g.gameKey);
+          const healthy=list(qb.healthyCandidates).map(p=>lookup(p.player,p.eaPlayerId,true));
+          const relief=lookup(qb.replacement?.player,qb.replacement?.eaPlayerId,true);
+          if(!healthy.length||healthy.some(p=>p.position!=='QB')||relief.position!=='QB'||new Set(healthy.map(p=>String(p.eaPlayerId))).size!==healthy.length||healthy.some(p=>String(p.eaPlayerId)===String(relief.eaPlayerId))||new Set(healthy.map(p=>p.waltersPoints)).size!==1)fail('QB_LOCKED_BASELINE_IDENTITY_REQUIRED');
+          const exposure=historicalExposure(qb.exposure,ids=>sourceCheck(ids,g.gameKey));
+          qbEstimate={modelId:'graham-historical-qb-replacement-v1',classification:'GRAHAM_MODEL_ESTIMATE',healthyCandidates:healthy.map(p=>({player:p.player,eaPlayerId:p.eaPlayerId,lockedValue:p.waltersPoints})),replacement:{player:relief.player,eaPlayerId:relief.eaPlayerId},...exposureWeightedLoss(healthy[0].waltersPoints,relief.waltersPoints,exposure),baselineRationale:qb.baselineRationale,replacementRationale:qb.replacementRationale,sourceIds:qb.sourceIds};
+        }else if(qb.state!=='NO_GAME_DAY_LOSS')fail('GOVERNED_QB_GAME_DAY_LOSS_REQUIRED');
         const archived=Object.values(personnel.currentCases||{}).filter(c=>c.gameKey===g.gameKey&&c.team===abbr);
         const cs=list(t.cases),keys=cs.map(c=>c.caseKey);
         if(new Set(keys).size!==keys.length||archived.some(c=>!keys.includes(c.caseKey)))fail('PRIOR_CASE_OMITTED_OR_DUPLICATED');
@@ -95,13 +106,18 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           }else if(c.resolution==='ACTIVE_FULL'){
             if(c.availabilityStatus!=='ACTIVE_FULL')fail('FULL_AVAILABILITY_NOT_ESTABLISHED');
           }else{
-            if(!['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(c.availabilityStatus)&&!(c.resolution==='PARTIAL_VALUE_INVARIANT'&&c.availabilityStatus==='PARTIAL_GAME'))fail('HISTORICAL_AVAILABILITY_UNRESOLVED');
+            if(!['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(c.availabilityStatus)&&!(['PARTIAL_VALUE_INVARIANT','PARTIAL_TIME_EXPOSURE'].includes(c.resolution)&&c.availabilityStatus==='PARTIAL_GAME'))fail('HISTORICAL_AVAILABILITY_UNRESOLVED');
             if(c.baselineDoubleCountReviewed!==true||!nonempty(c.roleRationale))fail('REPLACEMENT_ROLE_REVIEW_REQUIRED');
             sourceCheck(c.roleSourceIds,g.gameKey);
             const rs=list(c.replacements).map(r=>lookup(r.player,r.eaPlayerId));
             if(!rs.length||new Set(rs.map(r=>String(r.eaPlayerId))).size!==rs.length)fail('REPLACEMENT_SET_INVALID');
             if(c.resolution==='ONE_FOR_ONE'&&rs.length!==1)fail('ONE_FOR_ONE_REPLACEMENT_REQUIRED');
-            if(c.resolution==='PARTIAL_VALUE_INVARIANT'){
+            if(c.resolution==='PARTIAL_TIME_EXPOSURE'){
+              const role=replacementEstimate({...c,resolution:c.replacementResolution},p.waltersPoints,rs,{sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
+              const exposure=historicalExposure(c.exposure,ids=>sourceCheck(ids,g.gameKey));
+              const effective=role.replacementValueRatio.numerator/role.replacementValueRatio.denominator;
+              modelEstimate={...role,method:c.resolution,...exposureWeightedLoss(p.waltersPoints,effective,exposure),roleAllocationRange:role.injuryLossRange};
+            }else if(c.resolution==='PARTIAL_VALUE_INVARIANT'){
               if(rs.some(r=>r.waltersPoints!==p.waltersPoints)||c.estimateAcknowledged!==true||c.activeEffectivenessConvention!=='NO_UNREPORTED_IMPAIRMENT'||!nonempty(c.assumptionRationale)||c.baselineDutiesDisplaced!==false||!nonempty(c.baselineRationale))fail('PARTIAL_VALUE_INVARIANCE_REQUIRED');
               sourceCheck(c.baselineSourceIds,g.gameKey);
               modelEstimate={modelId:'graham-partial-value-invariant-v1',method:c.resolution,healthyValue:p.waltersPoints,replacementValue:p.waltersPoints,injuryLoss:0,rawTeamContributionDelta:0,exposureRange:[0,1],assumptionRationale:c.assumptionRationale,activeEffectivenessConvention:c.activeEffectivenessConvention,proof:'Any unavailable fraction times max(0, healthy - equal-valued replacement) equals zero. Active play is valued normally absent reported continuing impairment; this is a modelling assumption, not a medical finding.'};
@@ -127,13 +143,17 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
         const groups=[];
         for(const name of new Set(computed.map(c=>c.group))){
           const entries=computed.filter(c=>c.group===name),cl=clusterMultiplier(calibration,name,entries);
-          if(cl.reviewRequired)fail(cl.code+':'+name);
+          if(cl.reviewRequired){
+            const review=list(t.clusterReviews).find(r=>r.group===name);
+            if(review?.method!=='ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE'||review.estimateAcknowledged!==true||review.disjointRolesReviewed!==true||!nonempty(review.rationale))fail(cl.code+':'+name);
+            sourceCheck(review.sourceIds,g.gameKey);
+          }
           if(name==='RECEIVER'&&cl.multiplier>1&&t.topReceiverClusterReviewed!==true)fail('TOP_RECEIVER_CLUSTER_REVIEW_REQUIRED');
-          groups.push({group:name,multiplier:cl.multiplier,loss:round(-entries.reduce((s,c)=>s+c.rawTeamContributionDelta,0)*cl.multiplier)});
+          groups.push({group:name,multiplier:cl.multiplier,loss:round(-entries.reduce((s,c)=>s+c.rawTeamContributionDelta,0)*cl.multiplier),...(cl.reviewRequired?{clusterReview:t.clusterReviews.find(r=>r.group===name)}:{})});
         }
-        const injuryLoss=round(groups.reduce((s,g)=>s+g.loss,0));
+        const injuryLoss=round(groups.reduce((s,g)=>s+g.loss,0)+(qbEstimate?.injuryLoss||0));
         if(injuryLoss<0)fail('REPLACEMENT_UPGRADE_REQUIRES_LOSS_CONVENTION_REVIEW');
-        teams.push({team:abbr,state:'GOVERNED',coverageExclusions:exclusions,valueBasis:(computed.some(c=>c.modelEstimate)||exclusions.some(e=>e.estimateAcknowledged))?'INCLUDES_GRAHAM_MODEL_ESTIMATE':'EXISTING_CALIBRATED_METHOD',injuryLoss,cases:computed,groups,sourceIds:t.sourceIds});
+        teams.push({team:abbr,state:'GOVERNED',coverageExclusions:exclusions,valueBasis:(qbEstimate||computed.some(c=>c.modelEstimate)||exclusions.some(e=>e.estimateAcknowledged)||groups.some(g=>g.clusterReview))?'INCLUDES_GRAHAM_MODEL_ESTIMATE':'EXISTING_CALIBRATED_METHOD',injuryLoss,cases:computed,groups,...(qbEstimate?{qbEstimate}:{}),sourceIds:t.sourceIds});
       }catch(e){blockers.push({team:abbr,code:e.message});}
     }
     results.push({gameKey:g.gameKey,state:blockers.length?'BLOCKED':'READY',teams,blockers});

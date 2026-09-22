@@ -57,3 +57,5 @@ await import('./test-graham-role-chain.mjs');
 await import("./test-graham-historical-completion.mjs");
 
 await import("./test-graham-rating-base-refresh.mjs");
+
+await import('./test-graham-historical-exposure.mjs');
