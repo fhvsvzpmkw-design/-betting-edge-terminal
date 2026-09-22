@@ -49,3 +49,6 @@ check('new real case reviews are retained without releasing blocked pairs',()=>{
  assert.ok(out.games.every(g=>g.teams.length===0));
 });
 console.log(`WEEKLY HISTORICAL EVIDENCE: ${count} PASS`);
+
+// Current-week routing and additive Week 2 evidence share this existing CI entrypoint.
+await import('./test-graham-weekly-recovery-context.mjs');

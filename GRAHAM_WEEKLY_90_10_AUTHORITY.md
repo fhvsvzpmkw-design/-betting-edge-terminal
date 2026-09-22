@@ -1,6 +1,12 @@
 # Graham weekly 90/10 authority
 
-Version 1.2 — approved replacement-role modelling convention, 2026-09-21.
+Version 1.3 — active-source-week recovery routing clarification, 2026-09-22.
+
+## Active recovery routing clarification
+
+Before dated evidence selection, run `node tools/graham-active-week.mjs --weekly-recovery-context`. Resolve targetWeek from the existing active-week authority and sourceWeek=targetWeek-1. Use the returned current-source-week evidence paths newest first, reusing earlier additive bundles for that same week. Discovery is not numerical validation; preserve and resolve any discovery errors before numerical work. A dated recovery example below never overrides the resolved source week. Older unresolved receipts remain preserved background and are investigated only for a specific identified dependency. Do not create a new rating attempt merely to repeat an unchanged blocked receipt.
+
+Initial current-week baseline construction is separate from a subsequent rating-driven refresh. Zero new 90/10 updates does not cancel an initial baseline. If the baseline has already completed, preserve that result; a later supported rating update requires a separate governed refresh. This clarification changes no formula, numerical permission, task schedule or publication ownership. The approved replacement convention, historical binding amendment and preserved original authority below retain their existing precedence.
 
 ## Approved replacement modelling convention
 
@@ -14,7 +20,7 @@ Estimated case loss is max(0, healthy locked value minus effective replacement v
 
 A blocked game's optional caseReviews can preserve supported individual estimates as CASE_ESTIMATE_ONLY. These are reusable research, never complete team totals or permission to apply one side of a game. To adopt them, promote the case into a fully covered paired game bundle, resolve final game-day availability and run the existing evidence evaluator. Both teams must pass. Newly applied history preserves the estimate details for both teams as well as the immutable evidence binding. Current-week personnel workflows do not acquire a new writer through this historical adapter.
 
-Start with data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ten-game-coverage-review.json. This latest pass retains the Jacobs and Cooper estimates, adds the Higgins-to-Boutte primary estimate, and records newly identified reserve-list coverage gaps. Its adjacent EA Week 1 capture recovers 76 names absent from the original registry, including Donald, Kiner and Foster; it is source evidence only, not an amendment to production values. Zero additional paired games passed. Preserve the original review in data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-replacement-model-review.json. Reuse its individual estimates and explicit remaining coverage gaps. An unequal committee by itself is no longer a reason to keep a case unresolved.
+Historical Week 1 example only: data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ten-game-coverage-review.json. This latest pass retains the Jacobs and Cooper estimates, adds the Higgins-to-Boutte primary estimate, and records newly identified reserve-list coverage gaps. Its adjacent EA Week 1 capture recovers 76 names absent from the original registry, including Donald, Kiner and Foster; it is source evidence only, not an amendment to production values. Zero additional paired games passed. Preserve the original review in data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-replacement-model-review.json. Reuse its individual estimates and explicit remaining coverage gaps. An unequal committee by itself is no longer a reason to keep a case unresolved.
 
 ## Historical input binding amendment
 
@@ -26,9 +32,9 @@ Existing one-for-one and value-invariant committee methods remain supported alon
 
 Each READY staging game's gameDayEvidence must include evidenceBinding={path,blobSha}, referencing the exact committed bundle bytes. Run node tools/graham-weekly-evidence.mjs PATH before staging. Preserve this binding in each new rating history event. A failed binding blocks both teams. Original sourceRefs and paired calculation checks remain mandatory.
 
-Start from data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-recovery-audit.json for the current ten unresolved games. That audit records zero newly resolved games; it is not numeric authority. Research only concrete remaining gaps or new evidence. No-op audit updates do not need a new carried-rating attempt. Preserve the six completed games and the PARTIAL_BLOCKED receipt. Partial recovery is not grounds to disable this weekly task. Do not claim complete recovery unless all required inputs and receipts verify. If a future source week becomes active, preserve older unresolved receipts and report their dependency explicitly.
+The preserved Week 1 recovery example is data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-recovery-audit.json; its ten unresolved games are dated background, not a permanent active assignment. That audit records zero newly resolved games; it is not numeric authority. Research only concrete remaining gaps or new evidence. No-op audit updates do not need a new carried-rating attempt. Preserve the six completed games and the PARTIAL_BLOCKED receipt. Partial recovery is not grounds to disable this weekly task. Do not claim complete recovery unless all required inputs and receipts verify. If a future source week becomes active, preserve older unresolved receipts and report their dependency explicitly.
 
-PR validation uses proposed code and never publishes ratings. Only non-PR workflow execution may publish governed outputs. Rating changes require subsequent separate governed current-week baseline refresh; no changes means no fair rebuild is required.
+PR validation uses proposed code and never publishes ratings. Only non-PR workflow execution may publish governed outputs. Rating changes require a subsequent separate governed current-week baseline refresh. No changes means no additional rating-driven refresh is required; the initial current-week baseline remains independently required.
 
 ## Original task authority (preserved)
 
