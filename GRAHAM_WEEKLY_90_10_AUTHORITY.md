@@ -1,6 +1,14 @@
 # Graham weekly 90/10 authority
 
-Version 1.3 — active-source-week recovery routing clarification, 2026-09-22.
+Version 1.4 — documented offensive-line displacement reconciliation, 2026-09-22.
+
+## Documented offensive-line role chains
+
+The Week 2 recovery supports `RECONCILED_ROLE_CHAIN`, model `graham-reconciled-role-chain-v1`, for a single unavailable offensive lineman when a documented starter changes position and an incoming replacement fills the resulting vacancy. This implements the required displacement reconciliation; it does not change Walters 90/10 arithmetic or introduce a position-switch penalty.
+
+Supply source-bound before/after assignments for every affected position, using exact locked player identities. There must be exactly one unavailable player leaving, one incoming player, and one connected chain across distinct offensive-line positions. Every retained player remains on both sides with the same locked value. The injury estimate is max(0, sum of healthy assigned values minus sum of game-day assigned values), algebraically the unavailable value minus incoming value. No moved starter becomes free replacement credit. Set baselineTreatment=RECONCILED_ROLE_CHAIN and baselineDutiesDisplaced=true, with an explicit baseline rationale and sources. After-assignment rows require ACTIVE and REPORTED_STARTER or GAMEBOOK_STARTER; these describe the supported assignment, not full-game availability.
+
+The evaluator reserves all chain occupants against duplicate replacement credit, rejects an occupant who is unavailable in another case, and retains existing paired coverage, archived-case, source binding and cluster requirements. Partial-game injuries, missing locked values, multiple simultaneous vacancies, and unsupported position-specific effects are not resolved by this path. The Philadelphia evidence is CASE_ESTIMATE_ONLY until both teams' final coverage passes. Preserve the old Lampkin record; the additive correction changes the assignment to Jurgens/Kendall and currently recomputes the same 1.200-point individual loss.
 
 ## Active recovery routing clarification
 
