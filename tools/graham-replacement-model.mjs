@@ -1,10 +1,56 @@
 // User-approved Graham convention, not a formula attributed to Billy Walters.
 export const REPLACEMENT_MODEL_ID='graham-replacement-role-estimate-v1';
 export const MODEL_RESOLUTIONS=['PRIMARY_REPLACEMENT','WEIGHTED_COMMITTEE','EQUAL_SHARE_COMMITTEE'];
+export const ROLE_CHAIN_MODEL_ID='graham-reconciled-role-chain-v1';
 const fail=code=>{throw Error(code);};
 const finite=x=>typeof x==='number'&&Number.isFinite(x);
 const text=x=>typeof x==='string'&&x.trim().length>0;
 const round=x=>Number(x.toFixed(3));
+// Reconcile a single vacant offensive-line role through documented position moves.
+// Retained players occur on BOTH sides: their locked values cancel, not add credit.
+export function reconciledRoleChainEstimate(c,absent,replacements,{lookup,sourceCheck}){
+  if(c.resolution!=='RECONCILED_ROLE_CHAIN'||c.modelId!==ROLE_CHAIN_MODEL_ID||c.estimateAcknowledged!==true||!text(c.assumptionRationale))fail('CHAIN_DECLARATION_REQUIRED');
+  if(c.baselineTreatment!=='RECONCILED_ROLE_CHAIN'||c.baselineDutiesDisplaced!==true||!text(c.baselineRationale))fail('CHAIN_BASELINE_RECONCILIATION_REQUIRED');
+  sourceCheck(c.baselineSourceIds);
+  const chain=c.roleChain,roles=['LT','LG','C','RG','RT'];
+  if(!chain||!Array.isArray(chain.before)||!Array.isArray(chain.after)||chain.before.length<2||chain.before.length>5||chain.before.length!==chain.after.length||replacements.length!==1)fail('CHAIN_ASSIGNMENTS_REQUIRED');
+  const resolve=(rows,after)=>rows.map(row=>{
+    if(!roles.includes(row.role)||!text(row.eaPlayerId)||!text(row.rationale))fail('CHAIN_ASSIGNMENT_IDENTITY');
+    sourceCheck(row.sourceIds);
+    const p=lookup(row.player,row.eaPlayerId);
+    if(!roles.includes(p.position)||!finite(p.waltersPoints)||p.waltersPoints<0)fail('CHAIN_LOCKED_OFFENSIVE_LINE_VALUE');
+    if(after&&(row.availabilityStatus!=='ACTIVE'||!['REPORTED_STARTER','GAMEBOOK_STARTER'].includes(row.assignmentEvidence)))fail('CHAIN_OCCUPANT_AVAILABILITY_REQUIRED');
+    return {role:row.role,player:p.player,eaPlayerId:String(p.eaPlayerId),lockedValue:p.waltersPoints};
+  });
+  const before=resolve(chain.before,false),after=resolve(chain.after,true);
+  for(const rows of [before,after])if(new Set(rows.map(r=>r.role)).size!==rows.length||new Set(rows.map(r=>r.eaPlayerId)).size!==rows.length)fail('CHAIN_DUPLICATE_ROLE_OR_PLAYER');
+  if(before.some(r=>!after.some(a=>a.role===r.role)))fail('CHAIN_UNFILLED_BASELINE_ROLE');
+  const absentId=String(absent.eaPlayerId),incomingId=String(replacements[0].eaPlayerId);
+  if(!before.some(r=>r.eaPlayerId===absentId)||after.some(r=>r.eaPlayerId===absentId)||before.some(r=>r.eaPlayerId===incomingId)||!after.some(r=>r.eaPlayerId===incomingId))fail('CHAIN_VACANCY_OR_INCOMING_IDENTITY');
+  if(before.filter(r=>r.eaPlayerId!==absentId).some(r=>!after.some(a=>a.eaPlayerId===r.eaPlayerId)))fail('CHAIN_SECOND_UNRECONCILED_ABSENCE');
+  let role=before.find(r=>r.eaPlayerId===absentId).role;
+  const visited=new Set();
+  while(true){
+    if(visited.has(role))fail('CHAIN_DISCONNECTED_OR_CYCLIC');
+    visited.add(role);
+    const occupant=after.find(r=>r.role===role);
+    if(occupant.eaPlayerId===incomingId)break;
+    const old=before.find(r=>r.eaPlayerId===occupant.eaPlayerId);
+    if(!old)fail('CHAIN_UNBOUND_OCCUPANT');
+    role=old.role;
+  }
+  if(visited.size!==before.length)fail('CHAIN_DISCONNECTED_OR_CYCLIC');
+  // Algebraically identical to sum(before)-sum(after), avoiding cancellation rounding.
+  const healthy=absent.waltersPoints,effective=replacements[0].waltersPoints;
+  const injuryLoss=round(Math.max(0,healthy-effective));
+  return {modelId:ROLE_CHAIN_MODEL_ID,classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,
+    weightBasis:'DOCUMENTED_SINGLE_VACANCY_ROLE_CHAIN',healthyValue:healthy,replacementValue:effective,
+    replacementValueRatio:{numerator:effective,denominator:1},injuryLoss,rawTeamContributionDelta:-injuryLoss,
+    upgradeExcluded:effective>healthy,injuryLossRange:{min:injuryLoss,max:injuryLoss},
+    reconciledRoles:{before,after,retainedPlayerValuesCancel:true},reservedPlayers:after.map(r=>({player:r.player,eaPlayerId:r.eaPlayerId})),
+    baselineTreatment:c.baselineTreatment,assumptionRationale:c.assumptionRationale,
+    limitation:'Locked non-QB values are retained across documented OL positions; no positional proficiency penalty is invented. Complete paired coverage and existing cluster review still apply.'};
+}
 export function replacementEstimate(c,healthy,replacements,{sourceCheck=()=>{}}={}){
   if(c.modelId!==REPLACEMENT_MODEL_ID||!MODEL_RESOLUTIONS.includes(c.resolution)||c.estimateAcknowledged!==true||!text(c.assumptionRationale))fail('REPLACEMENT_MODEL_DECLARATION_REQUIRED');
   if(!finite(healthy)||healthy<0||!replacements.length||replacements.some(r=>!finite(r.waltersPoints)||r.waltersPoints<0))fail('MODEL_LOCKED_VALUES_REQUIRED');

@@ -1,6 +1,6 @@
 // Historical input recovery uses existing locked values; it never writes old ledgers or fairs.
 import fs from 'node:fs';
-import {replacementEstimate,MODEL_RESOLUTIONS} from './graham-replacement-model.mjs';
+import {replacementEstimate,reconciledRoleChainEstimate,MODEL_RESOLUTIONS} from './graham-replacement-model.mjs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -58,7 +58,9 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           if(c.baselineDoubleCountReviewed!==true||!nonempty(c.roleRationale))fail('REPLACEMENT_ROLE_REVIEW_REQUIRED');
           const p=lookup(c.player,c.eaPlayerId),rs=list(c.replacements).map(r=>lookup(r.player,r.eaPlayerId));
           if(!rs.length||new Set(rs.map(r=>String(r.eaPlayerId))).size!==rs.length||rs.some(r=>group(r.position)!==group(p.position)||String(r.eaPlayerId)===String(p.eaPlayerId)))fail('CASE_REVIEW_REPLACEMENT_SET');
-          return {caseKey:c.caseKey,team:c.team,state:'CASE_ESTIMATE_ONLY',estimate:replacementEstimate(c,p.waltersPoints,rs,{sourceCheck:ids=>sourceCheck(ids,g.gameKey)}),limitation:'Individual role estimate only; complete paired game-day coverage and team cluster checks still required.'};
+          const options={lookup,sourceCheck:ids=>sourceCheck(ids,g.gameKey)};
+          const estimate=c.resolution==='RECONCILED_ROLE_CHAIN'?reconciledRoleChainEstimate(c,p,rs,options):replacementEstimate(c,p.waltersPoints,rs,options);
+          return {caseKey:c.caseKey,team:c.team,state:'CASE_ESTIMATE_ONLY',estimate,limitation:'Individual role estimate only; complete paired game-day coverage and team cluster checks still required.'};
         }catch(e){return {caseKey:c.caseKey,team:c.team,state:'BLOCKED',reason:e.message};}
       });
       results.push({gameKey:g.gameKey,state:'BLOCKED',blockers:g.blockers,teams:[],...(caseReviews.length?{caseReviews}:{})});continue;
@@ -73,7 +75,7 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
         const archived=Object.values(personnel.currentCases||{}).filter(c=>c.gameKey===g.gameKey&&c.team===abbr);
         const cs=list(t.cases),keys=cs.map(c=>c.caseKey);
         if(new Set(keys).size!==keys.length||archived.some(c=>!keys.includes(c.caseKey)))fail('PRIOR_CASE_OMITTED_OR_DUPLICATED');
-        const computed=[];const replacements=new Set();
+        const computed=[];const replacements=new Set(),chainRoles=new Set();
         for(const c of cs){
           const old=archived.find(a=>a.caseKey===c.caseKey);
           if(!nonempty(c.caseKey)||!nonempty(c.rationale)||(!old&&c.newlyIdentified!==true)||(old&&norm(old.player)!==norm(c.player)))fail('HISTORICAL_CASE_IDENTITY');
@@ -90,13 +92,19 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             const rs=list(c.replacements).map(r=>lookup(r.player,r.eaPlayerId));
             if(!rs.length||new Set(rs.map(r=>String(r.eaPlayerId))).size!==rs.length)fail('REPLACEMENT_SET_INVALID');
             if(c.resolution==='ONE_FOR_ONE'&&rs.length!==1)fail('ONE_FOR_ONE_REPLACEMENT_REQUIRED');
-            if(MODEL_RESOLUTIONS.includes(c.resolution)){
+            if(c.resolution==='RECONCILED_ROLE_CHAIN'){
+              modelEstimate=reconciledRoleChainEstimate(c,p,rs,{lookup,sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
+            }else if(MODEL_RESOLUTIONS.includes(c.resolution)){
               modelEstimate=replacementEstimate(c,p.waltersPoints,rs,{sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
             }else if(c.resolution==='VALUE_INVARIANT_COMMITTEE'){
               if(matchupProduction?.state!=='OPERATIONAL_SCOPED'||matchupProduction.productionAuthority!==true||rs.length<2||new Set(rs.map(r=>r.waltersPoints)).size!==1||c.clusterGuardStatus!=='PASS'||c.matchupReview?.status!=='REVIEWED_ZERO'||c.matchupReview.increment!==0)fail('COMMITTEE_NOT_AUTHORIZED_OR_VALUE_INVARIANT');
               if(rs[0].waltersPoints>p.waltersPoints)fail('COMMITTEE_REPLACEMENT_EXCEEDS_HEALTHY');
             }else if(c.resolution!=='ONE_FOR_ONE')fail('UNSUPPORTED_HISTORICAL_RESOLUTION');
-            for(const r of rs){if(String(r.eaPlayerId)===String(p.eaPlayerId)||group(r.position)!==group(p.position)||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');replacements.add(String(r.eaPlayerId));}
+            const reserved=modelEstimate?.reservedPlayers?modelEstimate.reservedPlayers.map(r=>lookup(r.player,r.eaPlayerId)):rs;
+            for(const row of modelEstimate?.reconciledRoles?.before||[]){if(chainRoles.has(row.role))fail('CHAIN_SIMULTANEOUS_ROLE_OVERLAP');chainRoles.add(row.role);}
+            for(const r of reserved){if(String(r.eaPlayerId)===String(p.eaPlayerId)||group(r.position)!==group(p.position)||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');
+              if(modelEstimate?.reservedPlayers&&cs.some(other=>other!==c&&other.resolution!=='ACTIVE_FULL'&&String(lookup(other.player,other.eaPlayerId).eaPlayerId)===String(r.eaPlayerId)))fail('CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE');
+              replacements.add(String(r.eaPlayerId));}
             for(const ex of list(c.excludedBaselineContributors)){if(!nonempty(ex.player)||!nonempty(ex.rationale)||rs.some(r=>norm(r.player)===norm(ex.player)))fail('BASELINE_EXCLUSION_INVALID');sourceCheck(ex.sourceIds,g.gameKey);}
             value=modelEstimate?.replacementValue??rs[0].waltersPoints;
           }
