@@ -55,3 +55,5 @@ await import('./test-graham-weekly-recovery-context.mjs');
 await import('./test-graham-role-chain.mjs');
 
 await import("./test-graham-historical-completion.mjs");
+
+await import("./test-graham-rating-base-refresh.mjs");
