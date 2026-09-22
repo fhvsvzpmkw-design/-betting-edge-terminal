@@ -30,6 +30,27 @@ Some independent pages report ratings for identities absent from both the frozen
 
 Completing every pair requires either resolving these players' actual baseline duties and recovering supported values, or explicitly adopting a broader estimation policy. Such a policy would need to state its permitted source hierarchy, treatment of genuinely unrated established contributors and specialists, uncertainty ranges, and publication labels. No substitute point values have been invented here.
 
+### Reviewable fallback proposal — not adopted
+
+1. Use the locked registry first, then the bound official EA supplement. Reconcile aliases before declaring an identity unrated.
+2. For a still-missing identity with a verifiable Madden 27 rating from an independent source, retain the source, retrieval date and version and apply the unchanged conversion curve. Label this an independent-source historical estimate; do not claim official EA capture or overwrite the production registry.
+3. For a documented non-QB role with no available rating, use the median of the corresponding position group in the locked registry as an explicitly imputed value. Retain the group's 10th–90th percentile spread as a sensitivity range, not a confidence interval. This is a broad position prior; it is not validated for unrated players and can misrepresent their strength. Do not impute a QB or use imputation to hide unresolved role identity.
+4. For an unpriced specialist replaced by an available professional specialist, use a disclosed neutral replacement-difference assumption in the approximate point estimate and flag unquantified specialist uncertainty. This is not proof of zero loss. If the specialist role was unfilled or materially disrupted, keep it unresolved.
+5. Apply the proposed time-exposure method only to source-supported injury absences. Preserve all assumptions in the evidence and label affected outputs as approximate. Keep the unchanged 90/10 arithmetic, paired application, prior history, and betting gates.
+
+The currently locked registry produces these cohort values mechanically:
+
+| Position group | Players | Median points | 10th–90th percentile points |
+|---|---:|---:|---:|
+| RB/FB | 169 | 0.2 | 0.0–1.2 |
+| WR/TE | 429 | 0.0 | 0.0–0.9 |
+| Offensive line | 425 | 0.0 | 0.0–0.9 |
+| Defensive line | 458 | 0.2 | 0.0–0.9 |
+| Linebacker | 219 | 0.0 | 0.0–0.9 |
+| Defensive back | 453 | 0.2 | 0.0–0.9 |
+
+This proposal would broaden the existing source-only value policy. It has not been implemented in the value loader, adopted as numerical authority, or applied to any game. Acceptance would authorize explicit imputation and neutral specialist assumptions, not relabel them as verified player values. Complete role and final-availability research would still be required.
+
 ## Verification and next gate
 
 The six time-exposure unit checks and the existing historical completion, weekly evidence, role-chain, routing, rating-base-refresh and exact 90/10 tests pass locally. This does not validate real game totals. Before production: complete final coverage for each pair, reconcile/adopt the new methods, add integration acceptance cases, run immutable evidence validation, stage through the existing updater, verify remote receipt, then separately refresh and verify the full Week 3 board.
