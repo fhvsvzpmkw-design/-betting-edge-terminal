@@ -1,8 +1,8 @@
 # Full Week 3 recovery — method review
 
-Status: implementation in progress under user-approved v1.6 historical-estimate authority. Scope: every one of the 16 Week 3 games.
+Status: all fifteen remaining Week 2 pairs evaluated READY under user-approved v1.6 historical-estimate authority; complete sixteen-game publication batch staged. Scope: every one of the 16 Week 3 games.
 
-The published receipt still records one completed Week 2 pair (CLE–TB). Its two Week 3 rating-base refreshes remain intact. This draft does not stage another rating batch, change a fair number, or claim that the remaining games are complete.
+The existing CLE–TB pair is preserved and verified rather than applied twice. The new evidence bundle and READY staging submit the other fifteen pairs. A local publication rehearsal produced a COMPLETE cumulative receipt with 16 games, 32 teams, 30 new team updates, one already-applied pair and no blocked pairs. A separate current-week propagation preview refreshed all 16 Week 3 matchups. The remote workflow receipt and site deployment remain the final publication checks.
 
 ## Adopted calculation changes
 
@@ -12,7 +12,7 @@ The evaluator integration also supports a historical QB replacement difference o
 
 For position groups whose calibration requests review rather than specifying a multiplier, the draft accepts an explicit disjoint-role assessment with an additive, no-extra-multiplier estimate. Existing calibrated receiver and defensive-line multipliers remain unchanged. The extra interaction effect is an adopted modelling assumption, not a measured zero.
 
-The user approved broader estimates on September 22. Authority v1.6 records adoption, scope and limitations; real game coverage still requires validation before production.
+The user approved broader estimates on September 22. Authority v1.6 records adoption, scope and limitations; real coverage has passed the evidence evaluator and the complete publication rehearsal.
 
 ## Source reconciliation findings
 
@@ -54,3 +54,9 @@ The user approved this broader policy. It is now implemented in the historical-o
 ## Verification and next gate
 
 The six time-exposure unit checks and the existing historical completion, weekly evidence, role-chain, routing, rating-base-refresh and exact 90/10 tests pass locally. This does not validate real game totals. Before production: complete final coverage for each pair, reconcile/adopt the new methods, add integration acceptance cases, run immutable evidence validation, stage through the existing updater, verify remote receipt, then separately refresh and verify the full Week 3 board.
+
+## Publication validation
+
+115 checks pass across weekly evidence, routing, replacement roles, missing-value provenance, exposure assumptions, paired arithmetic and rating-base propagation. The complete receipt clears only weekly-rating blockers; unresolved current-week personnel or QB inputs remain explicitly identified. Missing identities, double-counted replacements, changed historical receipts and mismatched evidence blobs remain rejected.
+
+The adjacent discovery inventory is retained as research history. The authoritative final absence classifications and assumptions are in `data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json`. Estimated values, brief-return duration priors, snap-based upper bounds and historical QB-scale limitations are disclosed there; these are modelling estimates, not measured medical effects.

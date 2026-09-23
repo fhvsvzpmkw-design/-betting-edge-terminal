@@ -16,6 +16,7 @@ def who(name):
   found=[p for p in cap['playersAbsentFromLockedRegistry'] if norm(p['fullName'])==norm(name)]
   if len(found)==1: return supplemental(found[0]['fullName'])
  if not rows: rows=[dict(player=p['player'],eaPlayerId=p['identity']) for p in b['valueEstimates'] if p['player']==name]
+ if name=='Marcus Harris' and len(rows)>1: rows=[p for p in rows if str(p['eaPlayerId'])=='15311'] # TEN cornerback, not KC defensive tackle.
  if len(rows)!=1: raise ValueError((name,len(rows)))
  return dict(player=rows[0]['player'],eaPlayerId=str(rows[0]['eaPlayerId']))
 def team(abbr,sources):return dict(team=abbr,coverage='FINAL_GAME_DAY',allAbsencesReviewed=True,coverageRationale='Reconciled pregame inactive list, retained reserve transactions, current depth roles against game-specific reporting, and postgame injury observations. Camp exclusions and assumptions remain explicit.',sourceIds=sources,qbAvailability=dict(state='NO_GAME_DAY_LOSS',rationale='Starting quarterback completed the reported game duties; reviewed recaps report no injury-related quarterback substitution.',sourceIds=sources),cases=[],coverageExclusions=[],clusterReviews=[],topReceiverClusterReviewed=True)
@@ -201,7 +202,7 @@ zeroes(mi,['Michael Jurgens','Tyler Batty','Benjamin Yurosek','Taki Taimani','Ty
 primary(mi,'Jamal Adams','Jake Golday',ms)
 case(mi,'Jordan Mason',ms,reps=['Aaron Jones Sr','Demond Claiborne','DeeJay Dallas'],role='Available backfield receives Mason additional duties with explicit equal allocation, preserving existing workload.')
 case(mi,'Jauan Jennings',ms,status='OUT',reps=['Tai Felton','Myles Price'],role='Available reserve receivers allocated Jennings third-receiver duties; Jefferson/Addison retain baseline roles.')
-c=primary(mi,'Blake Cashman','Ivan Pace Jr',ms,'PARTIAL_GAME');exposure(c,ms,1800,2700);c['exposure']['assumptionRationale']='Brief absence on opening Q3 drive; exact return clock not recovered. Explicit broad zero-to-one-quarter unavailable-duration bound, midpoint 450 seconds; normal effectiveness on return assumed.'
+c=primary(mi,'Blake Cashman','Ivan Pace Jr',ms,'PARTIAL_GAME');exposure(c,ms,1800,2700,2700,2700);c['exposure']['assumptionRationale']='Brief absence on opening Q3 drive; exact return clock not recovered. Explicit broad zero-to-one-quarter unavailable-duration bound, midpoint 450 seconds; normal effectiveness on return assumed.'
 qb_loss(mi,['Kyler Murray'],'Carson Wentz',ms)
 camp(mi,['Tyreek Chappell'],ms)
 impute(mi,'Jeshaun Jones','WR',['Dillon Bell'],ms,'https://www.maddenratings.com/jeshaun-jones')
@@ -274,5 +275,229 @@ c=primary(nj,'Mason Taylor','Kenyon Sadiq',ns,'PARTIAL_GAME');c.update(resolutio
 healthy(nj,["D'Angelo Ponds",'Trevin Wallace','Blake Grupe'],ns)
 receiver_review(nj,ns,'Garrett Wilson remains available; Patrick/Cooper and zero-valued Smith are not the two highest-valued expected receiving options.')
 b['games'].append(dict(gameKey=k,away='GB',home='NYJ',state='READY',teams=[gb,nj]))
+def impute_zero(t,name,pos,ss,url):
+ c=impute(t,name,pos,[],ss,url);c.update(resolution='ZERO_IMPUTED_BASELINE_ESTIMATE',assumptionRationale='Explicit zero-valued position-group median gives a zero point loss for any nonnegative replacement. Cohort sensitivity is retained; no invented substitute or calibrated-zero proof.')
+ return c
+k='2026-W02-CIN-HOU'
+cs=[source('cin-roster','https://www.bengals.com/team/players-roster/','Parker and JaSir Taylor retained IR.',k),source('cin-depth','https://www.bengals.com/team/depth-chart','Kris Jenkins reserve interior line role behind Hill; roster depth reconciled with final inactives.',k),source('cin-final','https://www.bengals.com/news/pregame-quick-hits-joe-burrow-gets-nod-shemar-makes-season-debut-with-b-j-hill-out','Hill unavailable; Burrow cleared, Stewart active. Remaining scratches not injury losses.',k),source('cin-post','https://www.bengals.com/news/postgame-quick-hits-bengals-win-texans-week-2-2026','Both starting QBs completed duties; Mims briefly left for shoe, not injury. Final 20–6 in regulation.',k)]
+hs=[source('hou-roster','https://www.houstontexans.com/team/players-roster/','Retained reserve inventory includes Byrd; available roster role groups.',k),source('hou-tx','https://www.houstontexans.com/team/transactions/2026','Retained injury transactions, including older Takitaki, Turner and Washington; no subsequent release in reviewed record.',k),source('hou-depth','https://www.houstontexans.com/team/depth-chart','Official depth image and active roster reconciled for available additional-duty assignments.',k),source('hou-final','https://www.houstontexans.com/news/texans-inactives-week-2-vs-cincinnati-bengals','Collins, Ingram, Clowney out; final seven-player inactive list.',k),source('hou-post','https://www.houstontexans.com/news/texans-red-zone-short-yardage-third-down-focus','Postgame offensive review identifies continued Stroud duties and active Boutte/Schultz receiving work.',k),'cin-post']
+ci=team('CIN',cs);ho=team('HOU',hs)
+zeroes(ci,['Brian Parker II',"Ja'Sir Taylor"],cs);primary(ci,'B.J. Hill','Kris Jenkins Jr',cs,'OUT')
+healthy(ci,['Landon Robinson',"Ke'Shawn Williams",'Josh Newton','Connor Lew','Myles Hinton'],cs)
+exclude(ci,'Josh Johnson','BACKUP_QB_NO_LOST_DUTY',cs,'Unused third QB; Burrow started and completed game duties.')
+ci['participationReviews']=[dict(player='Amarius Mims',finding='Brief absence caused by lost shoe; not injury unavailability.',sourceIds=cs)]
+zeroes(ho,['Ali Gaye','Dylan Horton','Jacob Hummel'],hs)
+impute(ho,'Solomon Byrd','EDGE',['Sabastian Harsh'],hs,'https://www.maddenratings.com/solomon-byrd')
+case(ho,'Sam Hagen',hs,identity=supplemental('Sam Hagen'))
+for n,r in [("Henry To'oTo'o",'Jake Hansen'),('E.J. Speed','Wade Woodaz'),('Kayden McDonald','Tommy Togiai'),('Braden Smith','Trent Brown'),('Nico Collins','Xavier Hutchinson'),('Jayden Higgins','Kayshon Boutte'),('Tank Dell','Jaylin Noel'),("Ja'Marcus Ingram",'Kamari Ramsey'),('Ed Ingram','Febechi Nwaiwu'),('Jadeveon Clowney','Dominique Robinson')]:primary(ho,n,r,hs,'OUT' if n in ['Nico Collins','Ed Ingram','Jadeveon Clowney'] else 'IR')
+impute(ho,'M.J. Stewart','SS',['Reed Blankenship'],hs,'https://www.maddenratings.com/mj-stewart')
+for n,pos,url in [('K.C. Ossai','LB','kc-ossai'),('Sione Takitaki','LB','sione-takitaki'),('DJ Turner','WR','dj-turner'),('Montrell Washington','WR','montrell-washington')]:impute_zero(ho,n,pos,hs,'https://www.maddenratings.com/'+url)
+camp(ho,['Joshua Pitsenberger'],hs)
+exclude(ho,'Graham Mertz','BACKUP_QB_NO_LOST_DUTY',hs,'Reserve quarterback not established starting baseline; Stroud remained available.')
+healthy(ho,['Brevin Jordan','Collin Wright','Nate Thomas'],hs)
+cluster(ho,'OFFENSIVE_LINE',hs,'Distinct RT and RG vacancies assigned Brown/Nwaiwu separately; no duplicate credit.')
+cluster(ho,'LINEBACKER',hs,'Distinct reserve linebacker duties assigned separate active depth; additive interaction estimate.')
+receiver_review(ho,hs,'Schultz remains available with .9 frozen value, above Higgins and Dell .5 each. Nico alone among the two highest-valued expected receiving options is unavailable.')
+b['games'].append(dict(gameKey=k,away='CIN',home='HOU',state='READY',teams=[ci,ho]))
+k='2026-W02-PHI-TEN'
+ps=[source('phi-roster','https://www.philadelphiaeagles.com/team/players-roster/','Retained IR includes Andre Sam and Johnny Wilson; older veterans reconciled with transactions.',k),source('phi-tx','https://www.philadelphiaeagles.com/team/transactions/2026','Mitchell, Castro-Fields IR; Danny Gray practice-squad IR.',k),source('phi-depth','https://www.philadelphiaeagles.com/team/depth-chart','Jurgens LG, Kendall C; active receiving, backfield, edge and secondary depth.',k),source('phi-final','https://www.philadelphiaeagles.com/news/eagles-at-titans-inactives-week-2-2026-nfl-regular-season','Greenard out; Mukuba active; healthy scratches separated.',k),source('phi-live','https://www.philadelphiaeagles.com/news/eagles-at-titans-game-recap-september-20-2026-nfl-week-2-regular-season','Barkley left before Q1 12:17 and returned start Q3; Goedert questionable before Q2 8:53 and no return. Hurts/Ward finished 24–20 regulation.',k),source('phi-post','https://www.philadelphiaeagles.com/news/eagles-6-takeaways-from-an-incredible-come-from-behind-win-over-the-titans-jalen-hurts-devonta-smith-2026-nfl-week-2','Dickerson line displacement and Bigsby/Shipley/Mundt relief; Carter played with wrist cast.',k)]
+ts=[source('ten-roster','https://www.tennesseetitans.com/team/players-roster/','Retained reserves include Brooks and Hampton, Mausi and Joshua Williams.',k),source('ten-tx','https://www.tennesseetitans.com/team/transactions/2026','Earlier reserves and releases reconciled.',k),source('ten-depth','https://www.tennesseetitans.com/team/depth-chart','Hill and Micah Robinson roles; depth assessed against final active identities.',k),source('ten-final','https://www.tennesseetitans.com/news/game-inactives-week-2-titans-vs-eagles','Flott and James Williams inactive despite earlier optimistic practice report; final game-day list controls.',k),source('ten-post','https://www.tennesseetitans.com/news/titans-see-lead-slip-away-in-closing-seconds-lose-24-20-to-eagles','Ward completed game; no other material injury absence reported in official game recap.',k),'phi-live']
+ph=team('PHI',ps);te=team('TEN',ts)
+zeroes(ph,['Grant Calcaterra'],ps)
+impute_zero(ph,'Johnny Wilson','WR',ps,'https://www.maddenratings.com/johnny-wilson')
+# Reuse the already-reviewed single-vacancy chain without replaying its prior evidence record.
+chain=case(ph,'Landon Dickerson',ps,reps=['Drew Kendall'],role='Dickerson LG absence moves retained Jurgens from C to LG; Kendall enters at C. Retained value cancels.')
+chain.update(resolution='RECONCILED_ROLE_CHAIN',modelId='graham-reconciled-role-chain-v1',baselineTreatment='RECONCILED_ROLE_CHAIN',baselineDutiesDisplaced=True)
+def line_assignment(role,n,after=False):
+ x=dict(role=role,**who(n),rationale='Documented single-vacancy line chain.',sourceIds=ps)
+ if after:x.update(availabilityStatus='ACTIVE',assignmentEvidence='REPORTED_STARTER')
+ return x
+chain['roleChain']=dict(before=[line_assignment('LG','Landon Dickerson'),line_assignment('C','Cam Jurgens')],after=[line_assignment('LG','Cam Jurgens',True),line_assignment('C','Drew Kendall',True)])
+primary(ph,'Eli Stowers','E.J. Jenkins',ps)
+primary(ph,'Jakorian Bennett','Jonathan Jones',ps)
+impute(ph,'Tariq Castro-Fields','CB',['Kelee Ringo'],ps,'https://www.maddenratings.com/tariq-castro-fields')
+independent(ph,'Elijah Mitchell','RB',['Will Shipley'],ps,'https://www.maddenratings.com/elijah-mitchell',72)
+camp(ph,['Tucker Large','Danny Gray','Andre Sam'],ps)
+case(ph,'Jonathan Greenard',ps,status='OUT',reps=['Nolan Smith Jr','Arnold Ebiketie','A.J. Epenesa','Jalyx Hunt'],role='Documented available edge committee; equal incremental duties assumed.')
+c=primary(ph,'Saquon Barkley','Tank Bigsby',ps,'PARTIAL_GAME');exposure(c,ps,72,163,1800,1800)
+c=primary(ph,'Dallas Goedert','Johnny Mundt',ps,'PARTIAL_GAME');exposure(c,ps,0,1267)
+ph['participationReviews']=[dict(player='Jalen Carter',finding='Reported wrist cast while playing. Normal active effectiveness assumption; no sourced lost interval or measured impairment percentage.',sourceIds=ps)]
+receiver_review(ph,ps,'DeVonta Smith remains active; Stowers/Goedert absences do not remove the top two receiving values.')
+healthy(ph,['Elijah Moore','Micah Morris'],ps)
+for n in ['Tanner McKee','Cole Payton']:exclude(ph,n,'BACKUP_QB_NO_LOST_DUTY',ps,'Unused reserve quarterback; Hurts remained available.')
+zeroes(te,['Andre James','Tanoh Kpassagnon','Jaren Kanak','Kendell Brooks'],ts)
+for n in ['Milo Eifler','Jaylen Harrell']:case(te,n,ts,identity=supplemental(n))
+impute_zero(te,'Dominique Hampton','LB',ts,'https://www.maddenratings.com/dominique-hampton')
+impute_zero(te,'Dorian Mausi','LB',ts,'https://www.maddenratings.com/dorian-mausi')
+primary(te,'Joshua Williams','Marcus Harris',ts)
+primary(te,"Cor'Dale Flott",'Micah Robinson',ts,'OUT')
+case(te,'James Williams Sr',ts,status='OUT')
+healthy(te,['Atonio Mafi','Brandon Crenshaw-Dickson','Kylen Granson','Jackie Marshall'],ts)
+cluster(te,'DEFENSIVE_BACK',ts,'Separate outside-corner vacancy and reserve-corner role assigned distinct active occupants; additive loss assumption.')
+b['games'].append(dict(gameKey=k,away='PHI',home='TEN',state='READY',teams=[ph,te]))
+k='2026-W02-LV-LAC'
+vs=[source('lv-roster','https://www.raiders.com/team/players-roster/','Retained reserve inventory, including Collier, Runyon and Shorter.',k),source('lv-tx','https://www.raiders.com/team/transactions/2026','Older retained reserve Martin and dated roster changes reconciled.',k),source('lv-depth','https://www.raiders.com/team/depth-chart','Available active depth for TE, defensive front and secondary.',k),source('lv-final','https://www.raiders.com/news/las-vegas-raiders-week-2-inactives-vs-los-angeles-chargers-092026','Bowers and Porter injury scratches; remaining inactive identities reviewed.',k),source('lv-lac-post','https://www.reuters.com/sports/nfl/kirk-cousins-raiders-earn-road-win-over-mistake-prone-chargers--flm-2026-09-20/','Stukes concussion and Njoku right-knee exit on first play of Q2; 26–14 regulation result.',k,'REPORTING')]
+ls=[source('lac-roster','https://www.chargers.com/team/players-roster/','Retained reserves including Lambert-Smith; pregame availability reconciled.',k),source('lac-tx','https://www.chargers.com/team/transactions/2026','Retained earlier reserve Jeremiah Wilson and dated transactions reviewed.',k),source('lac-depth','https://www.chargers.com/team/depth-chart','Slaughter starting center, Phillips linebacker, available safety and TE relief.',k),source('lac-final','https://www.chargers.com/news/raiders-inactives-ladd-mcconkey-fantasy-week-2','McConkey active; Molden/Pipkins/Leonard out. Other scratches separated.',k),source('lac-post','https://www.chargers.com/news/game-recap-raiders-week-2','Herbert completed reported game duties; Gadsden receiving role and Njoku injury.',k),'lv-lac-post']
+lv=team('LV',vs);lc=team('LAC',ls)
+zeroes(lv,["Dont'e Thornton Jr",'Chigozie Anusiem','Brennan Jackson'],vs)
+case(lv,'Justin Shorter',vs,identity=supplemental('Justin Shorter'))
+for n,pos,url,ovr in [('Chris Collier','RB','chris-collier',66),('Carter Runyon','TE','carter-runyon',59),('Brodric Martin','DT','brodric-martin',65)]:
+ c=independent(lv,n,pos,[],vs,'https://www.maddenratings.com/'+url,ovr);c.update(resolution='ZERO_IMPUTED_BASELINE_ESTIMATE',assumptionRationale='Verified independent rating maps to zero on frozen curve; nonnegative replacement floor yields zero point loss, preserving independent-source provenance.')
+camp(lv,['Justin Pickett','Corey Rucker'],vs)
+primary(lv,'Keyron Crawford','Patrick Johnson',vs)
+primary(lv,'Brock Bowers','Michael Mayer',vs,'OUT')
+primary(lv,'Darien Porter','Hezekiah Masses',vs,'OUT')
+c=primary(lv,'Treydan Stukes','Isaiah Pola-Mao',vs,'PARTIAL_GAME');exposure(c,vs,0,3600);c['exposure']['assumptionRationale']='Concussion exit is reported without game clock. Full zero-to-one-game duration range and midpoint estimate; not an exact departure time.'
+healthy(lv,['Tristin McCollum','Dalton Johnson','Bryce Cabeldue','JJ Pegues'],vs)
+exclude(lv,"Aidan O'Connell",'BACKUP_QB_NO_LOST_DUTY',vs,'Unused reserve quarterback; Cousins remained the game quarterback.')
+cluster(lv,'DEFENSIVE_BACK',vs,'Distinct corner and safety vacancies assigned separate available players; additive interaction estimate.')
+zeroes(lc,['Dalevon Campbell','Scott Matlock','Branson Taylor','Isaiah World','KeAndre Lambert-Smith','Trey Pipkins III','Deane Leonard'],ls)
+primary(lc,'Denzel Perryman',"Del'Shawn Phillips",ls)
+primary(lc,'Tyler Biadasz','Jake Slaughter',ls)
+impute(lc,'Jeremiah Wilson','CB',['Cam Hart'],ls,'https://www.maddenratings.com/jeremiah-wilson')
+primary(lc,'Elijah Molden','Tony Jefferson',ls,'OUT')
+c=primary(lc,'David Njoku','Oronde Gadsden',ls,'PARTIAL_GAME');exposure(c,ls,900,960)
+lc['participationReviews']=[dict(player='Derwin James Jr',finding='Finger injury with continued play; no independently established lost interval. Normal active effectiveness assumption, unquantified impairment uncertainty.',sourceIds=ls)]
+healthy(lc,['Isas Waxter','Logan Taylor','Alex Harkey'],ls)
+b['games'].append(dict(gameKey=k,away='LV',home='LAC',state='READY',teams=[lv,lc]))
+k='2026-W02-SEA-ARI'
+ss=[source('sea-roster','https://www.seahawks.com/team/players-roster/','Retained injured and PUP inventory.',k),source('sea-tx','https://www.seahawks.com/team/transactions/2026','Older retained Shemar Jean-Charles and game elevations reconciled.',k),source('sea-depth','https://www.seahawks.com/team/depth-chart/','Russell at FB, active Wilson/Holani backfield and distinct safety reserves.',k),source('sea-ari-final','https://www.seahawks.com/news/nick-emmanwori-active-for-seahawks-week-2-game-at-arizona','Both teams final inactive lists; Darnold, Okada, Bradford out; Emmanwori active.',k),source('sea-post','https://www.seahawks.com/news/seahawks-injury-updates-from-mike-macdonald-following-sunday-s-week-2-win-at-arizona','Price left Q4 with chest injury; Pili concussion; Holani cleared and returned. Emmanwori limited by planned return ramp.',k),source('sea-live','https://www.seahawks.com/news/2026-week-2-seahawks-at-cardinals-in-game-injury-updates','Pili ruled out before second half; Price reported chest injury.',k)]
+asrc=[source('ari-roster','https://www.azcardinals.com/team/players-roster/','Conner/Carter return-designated reserves and Benson/Bisontis/Blount/Crawford/Geers/Proctor retained IR.',k),source('ari-tx','https://www.azcardinals.com/team/transactions/2026','Reiman PUP; earlier injury-settlement departures excluded.',k),source('ari-depth','https://www.azcardinals.com/team/depth-chart','Active backfield, OL and defensive back/linebacker relief.',k),source('ari-post','https://www.azcardinals.com/news/cardinals-can-t-find-way-to-dent-seahawks-in-loss','Melton toe and Will Johnson neck exits; Mack Wilson brief thumb absence with return. Brissett completed 31–7 regulation loss.',k),'sea-ari-final']
+se=team('SEA',ss+['ari-post']);ar=team('ARI',asrc)
+zeroes(se,['Jake Bobo'],ss)
+for n in ['Brandon Pili','George Holani']:case(se,n,ss,status='PARTIAL_GAME')
+case(se,'Mason Richman',ss,identity=supplemental('Mason Richman'))
+c=independent(se,'Irvin Charles','WR',[],ss,'https://www.maddenratings.com/irvin-charles',64);c.update(resolution='ZERO_IMPUTED_BASELINE_ESTIMATE',assumptionRationale='Independent Madden 27 rating maps to zero; no fictional replacement needed for zero point loss. Official roster Irv Charles alias reconciled to Irvin Charles.')
+for n,r in [('Zach Charbonnet','Emanuel Wilson'),('Robbie Ouzts','Brady Russell'),('Bud Clark','AJ Finley'),('Ty Okada','Rodney Thomas II'),('Anthony Bradford','Christian Haynes')]:primary(se,n,r,ss,'OUT' if n in ['Ty Okada','Anthony Bradford'] else 'IR')
+impute(se,'Shemar Jean-Charles','CB',['Nehemiah Pritchett'],ss,'https://www.maddenratings.com/shemar-jean-charles')
+c=primary(se,'Jadarian Price','George Holani',ss,'PARTIAL_GAME');exposure(c,ss+['ari-post'],2700,3600)
+qb_loss(se,['Sam Darnold'],'Drew Lock',ss+['ari-post'])
+se['participationReviews']=[dict(player='Nick Emmanwori',finding='Active, planned return ramp; coach said he could have played more. No additional injury loss inferred solely from reduced snaps.',sourceIds=ss)]
+healthy(se,["Connor O'Toole",'Montorie Foster Jr','Mike Morris'],ss)
+cluster(se,'DEFENSIVE_BACK',ss,'Distinct reserve safety/corner vacancies assigned separate available depth; additive interaction assumption.')
+zeroes(ar,['Joey Blount','Kitan Crawford','Kaleb Proctor','Zach Carter','Tip Reiman'],asrc)
+camp(ar,['Jameson Geers'],asrc)
+for n,r in [('James Conner','Tyler Allgeier'),('Trey Benson','Jeremiyah Love'),('Chase Bisontis','Isaiah Adams'),('Garrett Williams','Denzel Burke')]:primary(ar,n,r,asrc,'OUT' if n=='Garrett Williams' else 'IR')
+for n,r in [('Will Johnson',"Kei'Trel Clark"),('Max Melton','Kalen King')]:
+ c=primary(ar,n,r,asrc,'PARTIAL_GAME');exposure(c,asrc,0,3600);c['exposure']['assumptionRationale']='Reported in-game exit without recovered clock; broad zero-to-full-game unavailable range, midpoint explicitly estimated.'
+c=primary(ar,'Mack Wilson Sr','Cody Simon',asrc,'PARTIAL_GAME');exposure(c,asrc,0,0,0,300);c['exposure']['unavailableDurationEstimate']=dict(minimumSeconds=0,maximumSeconds=300,convention='BRIEF_REPORTED_RETURN_UP_TO_FIVE_MINUTES',sourceIds=asrc,rationale='Official recap explicitly says brief absence and return; five-minute upper bound is a disclosed modelling convention, not observed timing.');del c['exposure']['unavailableIntervals'];c['exposure']['assumptionRationale']='Use 0–5 minutes for a reported brief absence with return when no clock is recovered; midpoint 2.5 minutes, assumption sensitivity retained.'
+cluster(ar,'DEFENSIVE_BACK',asrc,'Three distinct corner vacancies and available occupants, additive overlap assumption; partial-time uncertainty retained.')
+healthy(ar,['Josh Fryar','Reggie Virgil','Andrew Billings'],asrc)
+exclude(ar,'Carson Beck','BACKUP_QB_NO_LOST_DUTY',asrc,'Inactive backup; Brissett completed duties.')
+b['games'].append(dict(gameKey=k,away='SEA',home='ARI',state='READY',teams=[se,ar]))
+def brief(c,ss,duration=3600):
+ exposure(c,ss,0,0,0,300,duration);del c['exposure']['unavailableIntervals'];c['exposure']['unavailableDurationEstimate']=dict(minimumSeconds=0,maximumSeconds=300,convention='BRIEF_REPORTED_RETURN_UP_TO_FIVE_MINUTES',sourceIds=ss,rationale='Reported brief injury absence with return; 0–5 minute interval is a model prior, not observed timing.');c['exposure']['assumptionRationale']='Disclosed brief-return duration prior, midpoint 2.5 minutes; uncertainty includes zero through five minutes.'
+k='2026-W02-WAS-DAL'
+ws=[source('was-roster','https://www.commanders.com/team/players-roster/','Retained IR/PUP and retired players reconciled.',k),source('was-tx','https://www.commanders.com/team/transactions/2026','Earlier Cracraft IR and dated moves; Jerome Ford no longer retained.',k),source('was-cuts','https://www.commanders.com/news/commanders-announce-multiple-roster-cuts-place-2-players-on-ir','Amos/McNichols IR and Wise PUP before opener.',k),source('was-depth','https://www.commanders.com/team/depth-chart','Game-available line, defensive front, receiver and backfield roles reconciled.',k),source('was-final','https://www.commanders.com/news/inactives-commanders-vs-cowboys-week-2-2026','Luvu and Okonkwo out; other scratches separated.',k),source('was-post','https://www.commanders.com/news/jayden-daniels-dan-quinn-commanders','Daniels elbow injury and Mariota relief; Cross internal injury, Coleman finger, Kinlaw shoulder and Cosmi concussion.',k),source('was-live','https://www.commanders.com/news/gameday-blog-commanders-vs-cowboys-week-2-2026','Daniels ruled out at halftime; Mariota played second half.',k),source('was-snaps','https://www.commanders.com/news/commanders-cowboys-stats-snaps-week-2-2026','Cosmi 68/71, Coleman 61/71, Wylie12, Cross55/55. Snap absence is an upper bound, not proof of injury cause.',k)]
+ds=[source('dal-roster','https://www.dallascowboys.com/team/players-roster/','Retained IR includes Smith, Liufau, Moore, Davis, Fant, Hennessy, Gilliam and Rogers.',k),source('dal-depth','https://www.dallascowboys.com/team/depth-chart','Bass at LG, active secondary and linebacker relief.',k),source('dal-game','https://www.dallascowboys.com/news/updates-september-2026','Final inactives, Barham starting for Overshown, elevated Robinson/Barron; Durant/Locke injuries, brief Winters/Barham exits with returns.',k),'was-snaps']
+wa=team('WAS',ws);da=team('DAL',ds)
+zeroes(wa,['Jordan Magee'],ws)
+case(wa,'Brandon Coleman',ws,status='PARTIAL_GAME')
+impute_zero(wa,'River Cracraft','WR',ws,'https://www.maddenratings.com/river-cracraft')
+for n,r in [('Trey Amos','Rasul Douglas'),('Jeremy McNichols','Kaytron Allen'),("Jer'Zhan Newton",'Shy Tuttle'),('Laremy Tunsil','Brandon Coleman'),('Deatrich Wise Jr','Charles Omenihu'),('Chigoziem Okonkwo','Ben Sinnott'),('Frankie Luvu','Leo Chenal')]:primary(wa,n,r,ws,'OUT' if n in ['Chigoziem Okonkwo','Frankie Luvu'] else 'IR')
+c=primary(wa,'Sam Cosmi','Andrew Wylie',ws,'PARTIAL_GAME');exposure(c,ws,0,0,0,0);del c['exposure']['unavailableIntervals'];c['exposure']['unavailableSnapEstimate']=dict(playedSnaps=68,teamSnaps=71,injuryIndependentlyReported=True,healthyEverySnapRole=True,confoundingSubstitutionsAcknowledged=True,sourceIds=['was-post','was-snaps'],rationale='Independent concussion report with three nonplayed offensive snaps. Zero-to-three snaps bounds injury exposure; do not assert every substitution was injury-driven.');c['exposure']['assumptionRationale']='Missing snaps bound the loss for a normally every-snap OL role; midpoint of 0–3/71 is an explicit attribution estimate.'
+qb_loss(wa,['Jayden Daniels'],'Marcus Mariota',ws,1800,1800,why='Official live report establishes injury exit at halftime and Mariota for second half; use exactly half-game time exposure, not a full-game loss.')
+wa['participationReviews']=[dict(player='Nick Cross',finding='Internal injury reported after game, but played all 55 defensive snaps. No game-duty absence; normal active-effectiveness estimate.',sourceIds=ws),dict(player='Javon Kinlaw',finding='Shoulder issue reported; rotational snaps do not independently establish an injury-related lost interval. No percentage inferred from rotation.',sourceIds=ws)]
+healthy(wa,['Luke McCaffrey','Isaac Yiadom','Ricky Barber','Tanoa Togiai'],ws)
+exclude(wa,'Athan Kaliakmanis','BACKUP_QB_NO_LOST_DUTY',ws,'Emergency third QB; Mariota assumed starting duty after Daniels injury.')
+exclude(wa,'Jerome Ford','RELEASED_BEFORE_GAME',ws,'Subsequent Minnesota practice-squad signing establishes departure from Washington; not retained as a Washington loss.')
+cluster(wa,'OFFENSIVE_LINE',ws,'Tunsil full-game vacancy and Cosmi partial loss have separate occupants; Coleman has zero frozen value, no extra injury loss.')
+zeroes(da,['Marist Liufau','Devin Moore','Princeton Fant'],ds);case(da,'Matt Hennessy',ds,identity=supplemental('Matt Hennessy'))
+camp(da,['Kelvin Gilliam','DJ Rogers'],ds)
+for n,r in [('Tyler Smith','T.J. Bass'),('Malik Davis','Emari Demercado'),('DeMarvion Overshown','Jaishawn Barham'),('Malik Hooker','P.J. Locke')]:primary(da,n,r,ds,'OUT' if n in ['DeMarvion Overshown','Malik Hooker'] else 'IR')
+for n,r in [('Jaishawn Barham','Shemar James'),('Dee Winters','Curtis Robinson')]:
+ c=primary(da,n,r,ds,'PARTIAL_GAME');brief(c,ds)
+c=primary(da,'P.J. Locke','Markquese Bell',ds,'PARTIAL_GAME');c.update(resolution='PARTIAL_VALUE_INVARIANT',activeEffectivenessConvention='NO_UNREPORTED_IMPAIRMENT')
+c=primary(da,'Cobie Durant','Shavon Revel Jr',ds,'PARTIAL_GAME');exposure(c,ds,0,3600);c['exposure']['assumptionRationale']='Reported hamstring exit with no recovered clock; broad zero-to-full-game unavailable range, midpoint explicitly estimated.'
+healthy(da,['Caelen Carson','James Houston IV','Ajani Cornelius','Camden Brown','Tyler Goodson'],ds)
+cluster(da,'LINEBACKER',ds,'Overshown duty initially filled by Barham; separate small correction for Barham injury values relief below Barham, without valuing a second healthy starting position. Winters distinct duty. Additive estimate.')
+cluster(da,'DEFENSIVE_BACK',ds,'Hooker and Durant distinct full/partial vacancies; Locke equal-valued secondary relief has invariant zero incremental loss.')
+b['games'].append(dict(gameKey=k,away='WAS',home='DAL',state='READY',teams=[wa,da]))
+k='2026-W02-MIA-SF'
+ms=[source('mia-roster','https://www.miamidolphins.com/team/players-roster/','Retained reserves including Cole Turner.',k),source('mia-tx','https://www.miamidolphins.com/team/transactions/2026','Baker/Duck PUP, Grant/Moore/Salyer/Gonzalez IR; Ferrell/Llewellyn elevated, Ojabo released.',k),source('mia-depth','https://www.miamidolphins.com/team/depth-chart','Available professional specialists and active depth; Sep22 Andre Jones addition excluded retrospectively.',k),source('mia-final','https://www.thephinsider.com/miami-dolphins-injuries/122784/dolphins-vs-49ers-inactive-list-injuries-hit-starters','Chop Robinson injury inactive; Addington active; remaining scratches separated.',k,'REPORTING'),source('mia-post','https://www.miamidolphins.com/news/game-recap-dolphins-lose-week-2-matchup-to-49ers','Willis completed reported game duties; 35–13 regulation loss.',k)]
+fs=[source('sf-roster','https://www.49ers.com/team/players-roster/','Full retained reserve inventory including line reserves and Mykel Williams/Guerendo PUP.',k),source('sf-tx','https://www.49ers.com/team/transactions/2026','Earlier retained reserves and active relief moves reconciled.',k),source('sf-cuts','https://www.49ers.com/news/49ers-announce-moves-for-initial-53-man-roster-x1231','Kirk, Pleasants, Toth and Zakelj IR; Guerendo/Williams PUP.',k),source('sf-depth','https://www.49ers.com/team/depth-chart','Available replacement role groups; inactive Watkins/Prysock not used.',k),source('sf-final','https://www.49ers.com/news/eddy-pineiro-kaelon-black-available-vs-dolphins-inactives-for-week-2-miavssf','Black and Pineiro active, Stribling IR; final inactive list.',k),source('sf-post','https://www.49ers.com/news/49ers-defeat-dolphins-35-13-in-home-opener-takeaways-from-miavssf','Purdy completed reported duties in regulation win.',k),source('sf-injuries','https://www.49ers.com/news/shanahan-on-49ers-win-over-dolphins-provides-new-injury-updates','Height broken hand, Thompson/Robinson ankle sprains; Evans hip managed after game.',k)]
+mi=team('MIA',ms);sf=team('SF',fs)
+zeroes(mi,['Ronnie Harrison Jr','Kyle Louis','Storm Duck','Jamaree Salyer'],ms)
+camp(mi,['Rene Konga'],ms);impute_zero(mi,'Cole Turner','TE',ms,'https://www.maddenratings.com/cole-turner')
+for n,r in [('Darrell Baker Jr','Reese Taylor'),('Kenneth Grant','Keith Cooper Jr'),('Trey Moore','Max Llewellyn'),('Chop Robinson','Clelin Ferrell')]:primary(mi,n,r,ms,'OUT' if n=='Chop Robinson' else 'IR')
+mi['specialistCases']=[dict(player='Zane Gonzalez',position='K',replacementPlayer='Riley Patterson',method='NEUTRAL_SPECIALIST_REPLACEMENT_ESTIMATE',estimateAcknowledged=True,availableProfessionalReplacement=True,materialRoleDisruption=False,rationale='Established professional replacement kicker available; neutral specialist difference estimate with unquantified uncertainty.',sourceIds=ms,replacementSourceIds=ms)]
+mi['participationReviews']=[dict(player='Tucker Addington',finding='Questionable shoulder but active; no reported material snapping interruption in reviewed recap. Normal active assumption; later practice-squad insurance does not establish prior-game loss.',sourceIds=ms)]
+healthy(mi,['Jalen Tolbert','Marcellas Dial Jr','DJ Campbell','Chukwuebuka Godrick','Justin Joly'],ms)
+exclude(mi,'Brady Cook','BACKUP_QB_NO_LOST_DUTY',ms,'Inactive backup; Willis remained game quarterback.')
+exclude(mi,'David Ojabo','RELEASED_BEFORE_GAME',ms,'Released at final cuts; removed from earlier replacement pool.')
+zeroes(sf,['Sam Okuayinonu','Nick Martin','Victor Dimukeje','Darrick Forrest','Austen Pleasants','Brett Toth'],fs)
+camp(sf,['Mikail Kamara'],fs)
+impute_zero(sf,'Nick Zakelj','C',fs,'https://www.maddenratings.com/nick-zakelj')
+impute(sf,'Andrew Farmer II','EDGE',['Khalid Kareem'],fs,'https://www.maddenratings.com/andrew-farmer-ii')
+impute(sf,'Patrick Taylor Jr','RB',['Jordan James'],fs,'https://www.maddenratings.com/patrick-taylor-jr')
+for n,r in [('Jake Tonges','Brayden Willis'),('Alfred Collins','C.J. West'),('Nate Hobbs','Upton Stout'),('Ricky Pearsall','Deebo Samuel Sr'),("De'Zhaun Stribling",'Jacob Cowing'),('Christian Kirk','KhaDarel Hodge'),('Isaac Guerendo','Kaelon Black'),('Mykel Williams','Keion White')]:primary(sf,n,r,fs)
+c=primary(sf,'Romello Height','Ogbo Okoronkwo',fs,'PARTIAL_GAME');c.update(resolution='PARTIAL_VALUE_INVARIANT',activeEffectivenessConvention='NO_UNREPORTED_IMPAIRMENT')
+case(sf,'James Thompson Jr',fs,status='PARTIAL_GAME')
+c=primary(sf,'Demarcus Robinson','Mike Evans',fs,'PARTIAL_GAME');exposure(c,fs,0,3600);c['assumptionRationale']='Additional receiving duties among available Evans/Kittle/Deebo group can be supported without reducing healthy baseline. Evans assigned only this vacancy; his higher frozen value floors partial loss at zero, not a claimed improvement.'
+sf['participationReviews']=[dict(player='Mike Evans',finding='Postgame hip management reported; no confirmed missed interval from this issue in game coverage. Normal active effectiveness assumption, impairment uncertainty unquantified.',sourceIds=fs)]
+healthy(sf,['Ephesians Prysock','Jordan Watkins','Tatum Bethune','Enrique Cruz Jr'],fs)
+exclude(sf,'Kurtis Rourke','BACKUP_QB_NO_LOST_DUTY',fs,'Inactive reserve QB; Purdy completed reported duties.')
+receiver_review(sf,fs,'Kittle and Evans, the two highest-valued healthy receiving options, remain available. Multiple lower-value receiver absences do not alone qualify for the top-two multiplier.')
+b['games'].append(dict(gameKey=k,away='MIA',home='SF',state='READY',teams=[mi,sf]))
+k='2026-W02-IND-KC'
+isrc=[source('ind-roster','https://www.colts.com/team/players-roster/','Retained injured inventory and game-available depth.',k),source('ind-tx','https://www.colts.com/team/transactions/2026','McKeon/Owen/Mitchell/Towt IR; Gould game elevation. Slayton signed after game, not used retrospectively.',k),source('ind-depth','https://www.colts.com/team/depth-chart','Treadwell behind Pierce; available receivers and other role groups.',k),source('ind-final','https://www.colts.com/news/colts-announce-6-inactive-players-for-week-2-game-vs-kansas-city-chiefs','Dulin and Giddens injury inactive; Gould elevated.',k),source('ind-pierce','https://www.colts.com/news/x-rays-on-left-heel-negative-for-wr-alec-pierce','Pierce Q1 heel injury, no return.',k),source('ind-post','https://www.colts.com/news/colts-drop-heartbreaker-in-week-2-overtime-loss-to-kansas-city-chiefs','Final kick as ten-minute overtime expired; 4200-second total. Jones completed reported duties.',k)]
+ks=[source('kc-roster','https://www.chiefs.com/team/players-roster/','Retained injured/PUP inventory.',k),source('kc-tx','https://www.chiefs.com/team/transactions/2026','Holiday IR; Hanson/Oladokun/EJ Smith settled and excluded.',k),source('kc-depth','https://www.chiefs.com/team/depth-chart','Benson tackle and Hicks safety replacements.',k),source('kc-final','https://www.chiefs.com/news/week-2-inactive-players-colts-vs-chiefs','Conner/Simmons unavailable; remaining scratches reviewed.',k),source('kc-post','https://www.chiefs.com/news/chiefs-defeat-colts-33-30-in-overtime-thriller-on-sunday-night-football','Official recap explicitly reports clean injury bill; Mahomes completed reported duties.',k),'ind-post']
+inteam=team('IND',isrc);kc=team('KC',ks)
+zeroes(inteam,['Will Mallory','D.J. Montgomery'],isrc)
+case(inteam,'DJ Giddens',isrc,status='OUT');case(inteam,'Micheal Clemons',isrc,status='PARTIAL_GAME')
+for n,pos,url in [('Coleman Owen','WR','coleman-owen'),('Sean McKeon','TE','sean-mckeon')]:impute_zero(inteam,n,pos,isrc,'https://www.maddenratings.com/'+url)
+c=independent(inteam,'Cameron Mitchell','CB',[],isrc,'https://www.maddenratings.com/cameron-mitchell',71);c.update(resolution='ZERO_IMPUTED_BASELINE_ESTIMATE',assumptionRationale='Verified independent overall 71 maps to zero through frozen curve; nonnegative replacement floor yields zero point loss.')
+camp(inteam,['Carson Towt','Jack Wilson'],isrc)
+primary(inteam,'Ashton Dulin','Anthony Gould',isrc,'OUT')
+c=primary(inteam,'Alec Pierce','Laquon Treadwell',isrc,'PARTIAL_GAME');exposure(c,isrc,0,900,4200,4200,4200)
+healthy(inteam,['George Gumbs Jr','Austin Ajiake','Dalton Tucker'],isrc)
+exclude(inteam,'Riley Leonard','BACKUP_QB_NO_LOST_DUTY',isrc,'Emergency third QB; Jones completed duties.')
+receiver_review(inteam,isrc,'Tyler Warren, the highest-valued receiving option, remains available; Dulin/Pierce do not remove top-two receiving values.')
+zeroes(kc,['Cooper McDonald','Omarr Norman-Lott','Ethan Downs','John Michael Gyllenborg'],ks)
+impute_zero(kc,'Jimmy Holiday','WR',ks,'https://www.maddenratings.com/jimmy-holiday')
+camp(kc,['Jeff Caldwell'],ks)
+primary(kc,'Josh Simmons','Kahlil Benson',ks,'OUT');primary(kc,'Chamarri Conner','Jaden Hicks',ks,'OUT')
+healthy(kc,['Jared Wiley','Jack Pyburn','Diego Pounds','Bryson Eason'],ks)
+exclude(kc,'Garrett Nussmeier','BACKUP_QB_NO_LOST_DUTY',ks,'Emergency third QB; Mahomes completed game duties.')
+b['games'].append(dict(gameKey=k,away='IND',home='KC',state='READY',teams=[inteam,kc]))
+k='2026-W02-NYG-LAR'
+ns=[source('nyg-roster','https://www.giants.com/team/players-roster/','Retained injured inventory including Bernard-Converse and Robertson-Harris.',k),source('nyg-tx','https://www.giants.com/team/transactions/2026','Adebo IR; Berrios/Harrison elevated; Slayton released before game; active Tupou.',k),source('nyg-depth','https://www.giants.com/team/depth-chart','Active role group alternatives after removing final scratches.',k),source('nyg-post','https://www.giants.com/news/instant-analysis-giants-fall-to-rams-28-6','Dart seventh-play injury; Nabers Q1 0:01 exit and Q2 return; Thomas late exit; Burns exited at Q4 6:04. Hood started for Banks.',k),source('nyg-injury','https://www.giants.com/news/jaxson-dart-knee-injury-update-status-jameis-winston','Confirmed Dart, Burns, Thomas injuries and Nabers return.',k),source('nyg-lar-final','https://www.therams.com/news/puka-nacua-among-rams-inactives-for-monday-night-football-vs-giants-week-2-2026','Both teams final inactives: Banks/McFadden; Rams Nacua/Whittington/Kinchens.',k)]
+ls=[source('lar-roster','https://www.therams.com/team/players-roster/','Retained injured inventory including Thomas, Walls and Garrett.',k),source('lar-tx','https://www.therams.com/team/transactions/2026','Garrett IR; Ingle signed, Neal elevated; Chad Lindberg settlement; no Andersen elevation.',k),source('lar-depth','https://www.therams.com/team/depth-chart','Stewart edge, Atwell/Smith receivers and McCollough safety. Donald interior role distinct from Garrett edge vacancy.',k),source('lar-post','https://www.therams.com/news/game-recap-rams-defeat-giants-28-6-on-monday-night-football','Stafford completed 28–6 regulation win; Nabers targeted again by Q2 6:11.',k),'nyg-lar-final']
+ng=team('NYG',ns+['lar-post']);la=team('LAR',ls)
+zeroes(ng,['Korie Black','Gunner Olszewski'],ns)
+c=independent(ng,'Jarrick Bernard-Converse','CB',[],ns,'https://www.maddenratings.com/jarrick-bernard-converse',66);c.update(resolution='ZERO_IMPUTED_BASELINE_ESTIMATE',assumptionRationale='Verified independent rating maps to zero under frozen curve; preserve source provenance without fictional substitute.')
+camp(ng,['Thaddeus Dixon','Dante Miller','DJ James'],ns)
+primary(ng,'Paulson Adebo','Greg Newsome II',ns)
+primary(ng,'Calvin Austin','Braxton Berrios',ns)
+primary(ng,'Roy Robertson-Harris','Josh Tupou',ns)
+primary(ng,'Deonte Banks','Colton Hood',ns,'OUT')
+primary(ng,'Micah McFadden','Malik Harrison',ns,'OUT')
+c=primary(ng,'Andrew Thomas','Marcus Mbow',ns,'PARTIAL_GAME');exposure(c,ns+['lar-post'],2700,3600)
+c=primary(ng,'Brian Burns','Kayvon Thibodeaux',ns,'PARTIAL_GAME');exposure(c,ns+['lar-post'],3236,3236)
+c=primary(ng,'Malik Nabers','Malachi Fields',ns,'PARTIAL_GAME');exposure(c,ns+['lar-post'],899,899,900,1429);c['exposure']['assumptionRationale']='Exit at Q1 0:01. Return sometime in Q2, with target by Q2 6:11; unknown earlier return bounded rather than treating target as exact return clock.'
+qb_loss(ng,['Jaxson Dart'],'Jameis Winston',ns+['lar-post'],0,900,why='Seventh-play injury on opening drive in Q1; quarter-bound midpoint until game end, not a full-game absence or an exact injury clock.')
+healthy(ng,['Thomas Fidone II','J.C. Davis','Bobby Jamison-Travis','Darius Alexander','Jason Pinnock'],ns)
+exclude(ng,'Darius Slayton','RELEASED_BEFORE_GAME',ns,'Released September 7; no longer part of Giants game-day injury baseline.')
+receiver_review(ng,ns,'Calvin Austin and brief Nabers absence do not remove the two highest-valued expected receiving options while Mooney/Likely remain available.')
+zeroes(la,['Justin Dedich','Keagen Trost'],ls)
+c=independent(la,'Keir Thomas','EDGE',[],ls,'https://www.maddenratings.com/keir-thomas',62);c.update(resolution='ZERO_IMPUTED_BASELINE_ESTIMATE',assumptionRationale='Verified independent overall62 maps to zero through frozen curve; source distinction retained.')
+camp(la,['Eddie Walls III'],ls)
+exclude(la,'Chad Lindberg','RELEASED_BEFORE_GAME',ls,'June17 injury settlement; not a retained reserve absence.')
+exclude(la,'Matthew Caldwell','BACKUP_QB_NO_LOST_DUTY',ls,'Developmental reserve quarterback not established starting baseline; Stafford available.')
+for n,r in [('Myles Garrett','Josaiah Stewart'),('Puka Nacua','Tutu Atwell'),('Jordan Whittington','Xavier Smith'),('Kamren Kinchens','Jaylen McCollough')]:primary(la,n,r,ls,'IR' if n=='Myles Garrett' else 'OUT')
+healthy(la,['CJ Daniels Jr','Bill Murray'],ls)
+exclude(la,'Ty Simpson','BACKUP_QB_NO_LOST_DUTY',ls,'Emergency third QB; Stafford completed duties.')
+receiver_review(la,ls,'Davante Adams remains available; Nacua/Whittington do not remove both of the two highest-valued expected receivers.')
+b['games'].append(dict(gameKey=k,away='NYG',home='LAR',state='READY',teams=[ng,la]))
+# Final interaction review after all separately sourced vacancies are assembled.
+cluster(se,'RUNNING_BACK',ss,'Charbonnet full and Price partial backfield vacancies use Wilson and Holani separately; Ouzts fullback duties use Russell. Additive estimate with no extra group multiplier.')
+k='2026-W02-DET-BUF'
+detss=det['sourceIds']
+sid=source('det-maddox-exit','https://www.detroitlions.com/news/recap-lions-at-bills-goff-gibbs-stbrown','Maddox exited early Q2 and did not return; September22 IR followed game.',k)
+detss.append(sid)
+c=primary(det,'Avonte Maddox','Christian Izien',detss,'PARTIAL_GAME');c.update(resolution='PARTIAL_VALUE_INVARIANT',activeEffectivenessConvention='NO_UNREPORTED_IMPAIRMENT');c['assumptionRationale']='Available safety Izien supplies incremental Maddox relief at the same .2 frozen value; Joseph vacancy already uses Maddox .2, so this secondary relief has zero incremental loss at any exposure.'
+sid=source('buf-roster','https://www.buffalobills.com/team/players-roster/','Dorian Strong retained NFI roster identity, separate from available cornerbacks.',k)
+bs=buf['sourceIds']+[sid]
+independent(buf,'Dorian Strong','CB',['Davison Igbinosun'],bs,'https://www.maddenratings.com/dorian-strong',72)
 out=base/'2026-09-22-full-slate-approved-estimates.json';out.write_text(json.dumps(b,indent=2)+'\n');subprocess.run(['git','hash-object','-w',str(out)],cwd=root,check=True,stdout=subprocess.DEVNULL)
 print(out)

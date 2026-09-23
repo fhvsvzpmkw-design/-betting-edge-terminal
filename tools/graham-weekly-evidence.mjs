@@ -107,6 +107,9 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           if(c.resolution==='ZERO_CALIBRATED_LOSS'){
             if(calibration.nonQbConversion.bands.some(b=>!exact(b.points)||b.points<0)||(p.waltersPoints!==0||p.valueStatus==='HISTORICAL_ESTIMATE')||c.estimateAcknowledged!==true||!nonempty(c.assumptionRationale))fail('ZERO_LOSS_PROOF_REQUIRED');
             modelEstimate={modelId:'graham-zero-calibrated-loss-v1',method:c.resolution,injuryLoss:0,rawTeamContributionDelta:0,healthyValue:0,replacementValue:null,assumptionRationale:c.assumptionRationale,proof:'All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero.'};
+          }else if(c.resolution==='ZERO_IMPUTED_BASELINE_ESTIMATE'){
+            if(calibration.nonQbConversion.bands.some(b=>!exact(b.points)||b.points<0)||p.valueStatus!=='HISTORICAL_ESTIMATE'||p.waltersPoints!==0||c.estimateAcknowledged!==true||!nonempty(c.assumptionRationale))fail('ZERO_IMPUTED_BASELINE_REQUIRED');
+            modelEstimate={modelId:'graham-zero-imputed-baseline-v1',classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,injuryLoss:0,rawTeamContributionDelta:0,healthyValue:0,replacementValue:null,assumptionRationale:c.assumptionRationale,valueProvenance:p.valueProvenance,limitation:'Point estimate is zero under the explicitly imputed healthy baseline and nonnegative replacement floor. This is not calibrated zero; cohort sensitivity remains in value provenance. No fictional replacement identity or assignment is asserted.'};
           }else if(c.resolution==='ACTIVE_FULL'){
             if(c.availabilityStatus!=='ACTIVE_FULL')fail('FULL_AVAILABILITY_NOT_ESTABLISHED');
           }else{

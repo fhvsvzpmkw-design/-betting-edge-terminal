@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-22T11:13:00-07:00",
+  "lastAppliedAt": "2026-09-22T16:55:00-07:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -278,17 +278,9 @@
     {
       "team": "CHI",
       "teamName": "Chicago",
-      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "currentStarterStatus": "RESOLVED_QB1",
-      "currentStarterPlayer": {
-        "playerId": "14500",
-        "gsisId": "00-0039918",
-        "playerName": "Caleb Williams",
-        "candidateValue": 8.5,
-        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
-        "confidence": "HIGH",
-        "evidenceDropbacks": 1222
-      },
+      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
+      "currentStarterStatus": "WEEK3_STARTER_UNRESOLVED",
+      "currentStarterPlayer": null,
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "14500",
@@ -297,24 +289,23 @@
         "priorValue": 9.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": 8.5,
+      "approvedProductionStarterValue": null,
       "embeddedBaselineQbValue": 9.25,
-      "teamQbDelta": -0.75,
-      "gameContributionEligible": true,
+      "teamQbDelta": null,
+      "gameContributionEligible": false,
       "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchSweepSequence": 0,
-        "researchFinding": "Caleb Williams remains QB1. Jaylon Johnson and a broad defensive group are questionable, and the roster is changing with Gervon Dexter reportedly traded to Atlanta. The current cluster is kept under review without a carried move until the cutdown/trade picture settles.",
+        "researchFinding": "Caleb Williams is week-to-week with a hamstring injury and is considered likely to miss Week 3. Backup Tyson Bagent is in concussion protocol, and Case Keenum could start against Philadelphia if Bagent is not cleared. No Week 3 starter is confirmed. Preserve the prior governed fair and fail closed. No market information was viewed.",
         "sourceRefs": [
-          "data/walters/nfl/2026/week-01-research-ledger.json",
-          "core/staging/walters-nfl-seed-dataset-2026.json",
-          "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-          "data/walters/nfl/2026/week-01-research-ledger.json"
+          "https://www.nfl.com/news/nfl-network-bears-qb-tyson-bagent-in-concussion-protocol-case-keenum-could-start-week-3",
+          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
+          "data/walters/nfl/qb-production/production-contract-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-02T19:16:51-07:00",
-      "marketViewed": false
+      "lastUpdatedAt": "2026-09-22T16:55:00-07:00",
+      "marketViewed": false,
+      "failClosedCode": "CALEB_WILLIAMS_HAMSTRING_TYSON_BAGENT_CONCUSSION_PROTOCOL"
     },
     {
       "team": "CIN",
@@ -1029,16 +1020,17 @@
       "gameContributionEligible": false,
       "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Jaxson Dart left Monday night with a suspected left MCL sprain; X-rays were negative but MRI resolution and the Week 3 starter decision remain pending. Jameis Winston relieved him, but no confirmed Week 3 starter was established. Preserve the prior governed fair and fail closed. No market information was viewed.",
+        "researchFinding": "Tuesday testing showed Jaxson Dart's knee injury is worse than initially believed and could require season-ending surgery, but the Giants said evaluations and a final decision remain pending. Jameis Winston is expected to handle the role if Dart cannot play, but the club has not confirmed the Week 3 starter. Preserve the prior governed fair and fail closed. No market information was viewed.",
         "sourceRefs": [
-          "https://www.reuters.com/sports/giants-qb-jaxson-dart-knee-questionable-return--flm-2026-09-22/",
+          "https://www.nfl.com/news/nfl-network-giants-jaxson-dart-potentially-out-for-season-after-testing-shows-worse-knee-injury",
+          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
           "data/walters/nfl/qb-production/production-contract-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-22T11:13:00-07:00",
+      "lastUpdatedAt": "2026-09-22T16:55:00-07:00",
       "marketViewed": false,
-      "failClosedCode": "JAXSON_DART_MRI_AND_STARTER_UNRESOLVED"
+      "failClosedCode": "JAXSON_DART_WORSE_KNEE_INJURY_FINAL_DECISION_PENDING"
     },
     {
       "team": "NYJ",
@@ -1401,7 +1393,8 @@
     "graham-delta-1645-qb-2026-w02-20260915T173245-0700",
     "graham-daily-review-qb-2026-w02-20260919T113400-0700",
     "graham-tuesday-baseline-qb-2026-w03-20260922T110600-0700",
-    "graham-tuesday-baseline-qb-2026-w03-20260922T111300-0700"
+    "graham-tuesday-baseline-qb-2026-w03-20260922T111300-0700",
+    "graham-delta-1645-qb-2026-w03-20260922T165500-0700"
   ],
   "bindingUpdates": [
     {
@@ -1487,6 +1480,16 @@
         "SEA"
       ],
       "sourceTask": "GRAHAM_TUESDAY_BASELINE",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-delta-1645-qb-2026-w03-20260922T165500-0700",
+      "effectiveAt": "2026-09-22T16:55:00-07:00",
+      "teams": [
+        "CHI",
+        "NYG"
+      ],
+      "sourceTask": "GRAHAM_DELTA_1645",
       "marketViewed": false
     }
   ],

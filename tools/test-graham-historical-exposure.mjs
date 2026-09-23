@@ -35,4 +35,17 @@ test('invalid duration and reversed timing fail',()=>{
   const b=structuredClone(base);b.unavailableIntervals[0].startLatest=3601;
   assert.throws(()=>historicalExposure(b,sourceCheck),/INTERVAL_INVALID/);
 });
+test('brief reported return prior preserves its convention and uncertainty',()=>{
+ const b=structuredClone(base);delete b.unavailableIntervals;
+ b.unavailableDurationEstimate={minimumSeconds:0,maximumSeconds:300,convention:'BRIEF_REPORTED_RETURN_UP_TO_FIVE_MINUTES',rationale:'Synthetic reported brief exit and return',sourceIds:['game']};
+ const e=historicalExposure(b,sourceCheck);assert.equal(exposureWeightedLoss(.9,0,e).injuryLoss,.037);assert.equal(e.fractionRange.max,1/12);assert.ok(e.limitation.includes('prior'));
+ assert.throws(()=>historicalExposure({...b,unavailableIntervals:base.unavailableIntervals},sourceCheck),/BRIEF_RETURN/);
+ b.unavailableDurationEstimate.maximumSeconds=3600;assert.throws(()=>historicalExposure(b,sourceCheck),/BRIEF_RETURN/);
+});
+test('every-snap role bound does not attribute all missed snaps to injury',()=>{
+ const b=structuredClone(base);delete b.unavailableIntervals;b.unavailableSnapEstimate={playedSnaps:68,teamSnaps:71,injuryIndependentlyReported:true,healthyEverySnapRole:true,confoundingSubstitutionsAcknowledged:true,rationale:'Synthetic confirmed injury and snap bound',sourceIds:['game']};
+ const e=historicalExposure(b,sourceCheck);assert.equal(e.fraction,1.5/71);assert.deepEqual(e.fractionRange,{min:0,max:3/71});
+ for(const flag of ['injuryIndependentlyReported','healthyEverySnapRole','confoundingSubstitutionsAcknowledged']){const c=structuredClone(b);c.unavailableSnapEstimate[flag]=false;assert.throws(()=>historicalExposure(c,sourceCheck),/SNAP_BOUND/);}
+ b.unavailableSnapEstimate.playedSnaps=72;assert.throws(()=>historicalExposure(b,sourceCheck),/SNAP_BOUND/);
+});
 console.log(`HISTORICAL EXPOSURE: ${count} PASS`);
