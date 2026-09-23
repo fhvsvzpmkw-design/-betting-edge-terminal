@@ -1,0 +1,46 @@
+name: Lou Vega TenPlay counter
+on:
+  pull_request:
+    paths:
+      - 'data/characters/lou-vega.json'
+      - 'data/characters/lou-vega/**'
+      - 'data/hotline-shells.json'
+      - 'data/syndicates.json'
+      - 'syndicates/generated/lou-vega/**'
+      - 'docs/source-material/lou-vega-*.md'
+      - 'tools/build-lou-vega-counter.mjs'
+      - 'tools/archive-syndicate-hotline.mjs'
+      - 'tests/lou-vega-*.mjs'
+      - 'tests/syndicate-hotline-completeness.test.mjs'
+      - 'tests/hotline-shells.test.js'
+      - '.github/workflows/lou-vega-counter.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'data/characters/lou-vega.json'
+      - 'data/characters/lou-vega/**'
+      - 'data/hotline-shells.json'
+      - 'data/syndicates.json'
+      - 'syndicates/generated/lou-vega/**'
+      - 'docs/source-material/lou-vega-*.md'
+      - 'tools/build-lou-vega-counter.mjs'
+      - 'tools/archive-syndicate-hotline.mjs'
+      - 'tests/lou-vega-*.mjs'
+      - 'tests/syndicate-hotline-completeness.test.mjs'
+      - 'tests/hotline-shells.test.js'
+      - '.github/workflows/lou-vega-counter.yml'
+permissions:
+  contents: read
+jobs:
+  counter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/lou-vega-counter.test.mjs
+      - run: node tests/lou-vega-v3.test.mjs
+      - run: node tests/lou-vega-v2.test.mjs
+      - run: node tests/syndicate-hotline-completeness.test.mjs
+      - run: node tests/hotline-shells.test.js
