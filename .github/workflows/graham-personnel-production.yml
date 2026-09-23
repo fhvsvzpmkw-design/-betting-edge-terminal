@@ -100,10 +100,32 @@ jobs:
           ACTIVE_PERSONNEL="$(node tools/graham-active-week.mjs --path personnelLedger)"
           ACTIVE_RESEARCH="$(node tools/graham-active-week.mjs --path researchLedger)"
           ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
-          git add -- "$ACTIVE_PERSONNEL" "$ACTIVE_RESEARCH" "$ACTIVE_NUMBERS"
-          if git diff --cached --quiet; then
-            echo "No new personnel production outputs to publish."
-            exit 0
-          fi
-          git commit -m "Apply Graham governed personnel batch"
-          git push origin HEAD:main
+          STAGING_BLOB="$(git hash-object data/walters/nfl/personnel-staging.json)"
+          for attempt in 1 2 3; do
+            if [ "$attempt" -gt 1 ]; then
+              # Another publisher advanced main. Recompute from its latest inputs;
+              # never rebase stale generated fair numbers over another writer.
+              git fetch origin main
+              git reset --hard origin/main
+              test "$(git hash-object data/walters/nfl/personnel-staging.json)" = "$STAGING_BLOB"
+              node - <<'NODE'
+          const s=require('./data/walters/nfl/personnel-staging.json');
+          const a=require('./data/walters/nfl/active-week.json');
+          if(a.state!=='ACTIVE'||Number(s.season)!==Number(a.season)||Number(s.week)!==Number(a.week))throw Error('active week changed before personnel retry');
+          NODE
+              node tools/validate-graham-personnel-closure.mjs data/walters/nfl/personnel-staging.json
+              node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json
+              node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS" --write
+              node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
+            fi
+            git add -- "$ACTIVE_PERSONNEL" "$ACTIVE_RESEARCH" "$ACTIVE_NUMBERS"
+            if git diff --cached --quiet; then
+              echo "No new personnel production outputs to publish."
+              exit 0
+            fi
+            git commit -m "Apply Graham governed personnel batch"
+            if git push origin HEAD:main; then exit 0; fi
+            if [ "$attempt" -lt 3 ]; then sleep 5; fi
+          done
+          echo "Personnel publication failed after three attempts."
+          exit 1
