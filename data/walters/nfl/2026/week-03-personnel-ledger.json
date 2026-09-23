@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-09-22T04:27:21-07:00",
-  "updatedAt": "2026-09-22T17:00:00-07:00",
+  "updatedAt": "2026-09-22T20:10:57-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -22,7 +22,8 @@
   },
   "processedBatchIds": [
     "graham-tuesday-baseline-personnel-2026-w03-20260922T111500-0700",
-    "graham-delta-1645-personnel-2026-w03-20260922T170000-0700"
+    "graham-delta-1645-personnel-2026-w03-20260922T170000-0700",
+    "graham-manual-personnel-2026-w03-20260922T201057-0700"
   ],
   "events": [
     {
@@ -319,11 +320,8 @@
       "healthyWaltersPoints": 0.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_BACK"
-    }
-  ],
-  "currentCases": {
-    "2026-W03-ATL-A.J.-Terrell-Jr": {
-      "personnelEventId": "2026-W03-ATL-TERRELL-IR-CB-20260922-1115",
+    },
+    {
       "caseKey": "2026-W03-ATL-A.J.-Terrell-Jr",
       "gameKey": "2026-W03-ATL-GB",
       "team": "ATL",
@@ -332,8 +330,6 @@
       "playerEaId": "21002",
       "currentRole": "STARTING_BOUNDARY_CORNERBACK",
       "availabilityStatus": "IR",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "CB_REPLACEMENT_CONFIGURATION_AND_BASELINE_CONTRIBUTOR_REDISTRIBUTION",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -346,32 +342,379 @@
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
-        "replacementClassification": "MULTIROLE",
+        "replacementClassification": "ONE_FOR_ONE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
-      "reason": "Atlanta placed starting boundary corner A.J. Terrell Jr. on injured reserve with a groin injury. C.J. Henderson finished Week 2 in his place, but the club says Henderson could remain outside while Avieon Terrell also has inside-outside flexibility. That leaves a live multi-role configuration involving existing baseline contributors, not a verified one-for-one replacement or value-invariant committee. Preserve the prior fair and record no numeric personnel move.",
+      "personnelEventId": "2026-W03-ATL-21002-ESTIMATE-20260922T201057-0700",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
       "sourceRefs": [
         "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "data/walters/nfl/player-values/by-team-v1/atl.json"
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
-      "batchId": "graham-tuesday-baseline-personnel-2026-w03-20260922T111500-0700",
-      "effectiveAt": "2026-09-22T11:15:00-07:00",
-      "sourceTask": "TUESDAY_BASELINE",
+      "availabilitySourceRefs": [
+        "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+      ],
+      "roleSourceRefs": [
+        "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+      ],
+      "reopenOn": "An alternate starter, Avieon outside shift, or a Henderson availability change.",
+      "reason": "Henderson finished in the vacant boundary role. Assume he remains primary; the club has not fixed the full Week 3 alignment. Hughes and Avieon Terrell retain baseline duties. Henderson covers only the added vacant boundary duty; reopen if the actual alignment moves a baseline starter.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Henderson finished in the vacant boundary role. Assume he remains primary; the club has not fixed the full Week 3 alignment.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Hughes and Avieon Terrell retain baseline duties. Henderson covers only the added vacant boundary duty; reopen if the actual alignment moves a baseline starter.",
+        "baselineSourceIds": [
+          "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+        ],
+        "replacements": [
+          {
+            "player": "C.J. Henderson",
+            "eaPlayerId": "21004",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+            ]
+          }
+        ],
+        "primaryEvidence": "REPORTED_PRIMARY"
+      },
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "valueStatus": "NUMERIC_ELIGIBLE",
       "registryPosition": "CB",
       "maddenOvr": 88,
       "healthyWaltersPoints": 1.2,
-      "rawTeamContributionDelta": null,
-      "clusterGroup": "DEFENSIVE_BACK"
+      "rawTeamContributionDelta": -1.2,
+      "clusterGroup": "DEFENSIVE_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+        "healthyValue": 1.2,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 1.2,
+        "rawTeamContributionDelta": -1.2,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1.2,
+          "max": 1.2
+        },
+        "weights": [
+          {
+            "player": "C.J. Henderson",
+            "eaPlayerId": "21004",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Henderson finished in the vacant boundary role. Assume he remains primary; the club has not fixed the full Week 3 alignment.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "An alternate starter, Avieon outside shift, or a Henderson availability change."
+      }
     },
-    "2026-W03-GB-Zach-Bako-Bewele": {
-      "personnelEventId": "2026-W03-GB-BAKO-BEWELE-OUT-RT-20260922-1700",
+    {
+      "caseKey": "2026-W03-IND-Alec-Pierce",
+      "gameKey": "2026-W03-HOU-IND",
+      "team": "IND",
+      "side": "HOME",
+      "player": "Alec Pierce",
+      "playerEaId": "22085",
+      "currentRole": "STARTING_OUTSIDE_RECEIVER",
+      "availabilityStatus": "OUT",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Laquon Treadwell",
+          "Darius Slayton",
+          "Josh Downs",
+          "Keenan Allen"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "personnelEventId": "2026-W03-IND-22085-ESTIMATE-20260922T201057-0700",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "sourceRefs": [
+        "https://www.nfl.com/news/colts-wr-alec-pierce-heel-to-miss-several-weeks-won-t-have-surgery",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3",
+        "https://www.colts.com/news/colts-sign-wide-receiver-darius-slayton",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/colts-wr-alec-pierce-heel-to-miss-several-weeks-won-t-have-surgery"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+      ],
+      "reopenOn": "Pierce participates, a formal designation contradicts the reported absence, one reserve is unavailable, or reported role allocation supersedes the equal-share assumption.",
+      "reason": "Assume equal added outside-receiver duty for Treadwell and Slayton, the two reserves listed in Pierce's depth-chart row. These are assumed shares, not measured targets or snaps. Downs and Allen retain their independent baseline roles and receive no replacement credit. The model values only extra vacant outside duty for the two reserves.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal added outside-receiver duty for Treadwell and Slayton, the two reserves listed in Pierce's depth-chart row. These are assumed shares, not measured targets or snaps.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Downs and Allen retain their independent baseline roles and receive no replacement credit. The model values only extra vacant outside duty for the two reserves.",
+        "baselineSourceIds": [
+          "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+        ],
+        "replacements": [
+          {
+            "player": "Laquon Treadwell",
+            "eaPlayerId": "17555",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          },
+          {
+            "player": "Darius Slayton",
+            "eaPlayerId": "20655",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3",
+              "https://www.colts.com/news/colts-sign-wide-receiver-darius-slayton"
+            ]
+          }
+        ]
+      },
+      "availabilityEvidenceStatus": "RELIABLE_REPORTED_ABSENCE_PENDING_FORMAL_TEAM_DESIGNATION",
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 84,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.65,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0.25,
+        "replacementValueRatio": {
+          "numerator": 0.5,
+          "denominator": 2
+        },
+        "injuryLoss": 0.65,
+        "rawTeamContributionDelta": -0.65,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.4,
+          "max": 0.9
+        },
+        "weights": [
+          {
+            "player": "Laquon Treadwell",
+            "eaPlayerId": "17555",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          },
+          {
+            "player": "Darius Slayton",
+            "eaPlayerId": "20655",
+            "lockedValue": 0.5,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume equal added outside-receiver duty for Treadwell and Slayton, the two reserves listed in Pierce's depth-chart row. These are assumed shares, not measured targets or snaps.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "Pierce participates, a formal designation contradicts the reported absence, one reserve is unavailable, or reported role allocation supersedes the equal-share assumption."
+      }
+    },
+    {
+      "caseKey": "2026-W03-IND-Micheal-Clemons",
+      "gameKey": "2026-W03-HOU-IND",
+      "team": "IND",
+      "side": "HOME",
+      "player": "Micheal Clemons",
+      "playerEaId": "22162",
+      "currentRole": "ROTATIONAL_EDGE_DEFENDER",
+      "availabilityStatus": "IR",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Arden Key",
+          "Jaylahn Tuimoloau",
+          "George Gumbs Jr.",
+          "Caden Curry",
+          "JT Tuimoloau"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "personnelEventId": "2026-W03-IND-22162-ESTIMATE-20260922T201057-0700",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "sourceRefs": [
+        "https://www.colts.com/news/colts-place-de-micheal-clemons-on-injured-reserve-release-rb-anderson-castle-from-practice-squad",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-place-de-micheal-clemons-on-injured-reserve-release-rb-anderson-castle-from-practice-squad"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+      ],
+      "reopenOn": "A reserve becomes unavailable, the rotation changes, another line absence creates cluster exposure, or the frozen-value authority is amended.",
+      "reason": "Assume the listed reserve edges share Clemons's added rotation duty equally. The frozen healthy value is zero, so nonnegative replacements yield zero injury loss for every allocation. Key and Latu remain baseline starters and are excluded. Reserve baseline duties are retained; only additional rotation duty is estimated. No replacement upgrade is credited.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume the listed reserve edges share Clemons's added rotation duty equally. The frozen healthy value is zero, so nonnegative replacements yield zero injury loss for every allocation.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Key and Latu remain baseline starters and are excluded. Reserve baseline duties are retained; only additional rotation duty is estimated. No replacement upgrade is credited.",
+        "baselineSourceIds": [
+          "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+        ],
+        "replacements": [
+          {
+            "player": "JT Tuimoloau",
+            "eaPlayerId": "15175",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          },
+          {
+            "player": "Caden Curry",
+            "eaPlayerId": "16181",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          },
+          {
+            "player": "George Gumbs Jr.",
+            "eaPlayerId": "16360",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          }
+        ]
+      },
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "EDGE",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 0,
+        "replacementValue": 0.133,
+        "replacementValueRatio": {
+          "numerator": 0.4,
+          "denominator": 3
+        },
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "upgradeExcluded": true,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "weights": [
+          {
+            "player": "JT Tuimoloau",
+            "eaPlayerId": "15175",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.3333333333333333
+          },
+          {
+            "player": "Caden Curry",
+            "eaPlayerId": "16181",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.3333333333333333
+          },
+          {
+            "player": "George Gumbs Jr.",
+            "eaPlayerId": "16360",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.3333333333333333
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume the listed reserve edges share Clemons's added rotation duty equally. The frozen healthy value is zero, so nonnegative replacements yield zero injury loss for every allocation.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "A reserve becomes unavailable, the rotation changes, another line absence creates cluster exposure, or the frozen-value authority is amended."
+      }
+    },
+    {
       "caseKey": "2026-W03-GB-Zach-Bako-Bewele",
       "gameKey": "2026-W03-ATL-GB",
       "team": "GB",
@@ -380,8 +723,6 @@
       "playerEaId": "22434",
       "currentRole": "STARTING_RIGHT_TACKLE",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "RT_REPLACEMENT_ANTHONY_BELTON_LIMITED_AND_OL_CLUSTER_UNRESOLVED",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -399,15 +740,234 @@
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
       },
-      "reason": "Green Bay confirmed starting right tackle Zach Bako-Bewele tore his patellar tendon and is out for the season. The current depth chart lists Anthony Belton behind him, but Belton is himself limited with an elbow injury and the surrounding Packers line also has active injuries. The Week 3 replacement configuration is therefore not confirmed as a healthy one-for-one case. Preserve the prior fair and record no numeric move.",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "RT_REPLACEMENT_ANTHONY_BELTON_LIMITED_AND_OL_CLUSTER_UNRESOLVED",
       "sourceRefs": [
         "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
         "https://www.packers.com/team/depth-chart",
-        "data/walters/nfl/player-values/by-team-v1/gb.json"
+        "data/walters/nfl/player-values/by-team-v1/gb.json",
+        "https://www.packers.com/news/packers-falcons-injury-report-sept-21-2026"
       ],
-      "batchId": "graham-delta-1645-personnel-2026-w03-20260922T170000-0700",
-      "effectiveAt": "2026-09-22T17:00:00-07:00",
-      "sourceTask": "DELTA_1645",
+      "reason": "Green Bay confirmed starting right tackle Zach Bako-Bewele tore his patellar tendon and is out for the season. The current depth chart lists Anthony Belton behind him, but Belton is himself limited with an elbow injury and the surrounding Packers line also has active injuries. The Week 3 replacement configuration is therefore not confirmed as a healthy one-for-one case. Preserve the prior fair and record no numeric move.",
+      "personnelEventId": "2026-W03-GB-22434-REVIEW-20260922T201057-0700",
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "RT",
+      "maddenOvr": 87,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
+    },
+    {
+      "caseKey": "2026-W03-DET-Avonte-Maddox",
+      "gameKey": "2026-W03-NYJ-DET",
+      "team": "DET",
+      "side": "HOME",
+      "player": "Avonte Maddox",
+      "playerEaId": "13332",
+      "currentRole": "STARTING_SAFETY",
+      "availabilityStatus": "IR",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Christian Izien",
+          "Thomas Harper",
+          "Bishop Fitzgerald",
+          "Chuck Clark"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "MULTIROLE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "SECONDARY_REPLACEMENT_AND_EXISTING_INJURY_CLUSTER_UNRESOLVED",
+      "sourceRefs": [
+        "https://www.reuters.com/sports/lions-db-avonte-maddox-have-season-ending-foot-surgery--flm-2026-09-21/",
+        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
+        "https://www.detroitlions.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/det.json",
+        "https://www.detroitlions.com/news/key-questions-detroit-lions-dan-campbell-want-to-see-from-his-team-moving-forward"
+      ],
+      "reason": "Detroit placed starting safety Avonte Maddox on injured reserve after confirming season-ending foot surgery and added Bishop Fitzgerald to the active roster. The current secondary already has multiple unavailable contributors, and the depth chart plus roster move leave a live multi-role redistribution involving Christian Izien, Thomas Harper, Bishop Fitzgerald and Chuck Clark rather than a stable one-for-one replacement. Preserve the prior fair.",
+      "personnelEventId": "2026-W03-DET-13332-REVIEW-20260922T201057-0700",
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "FS",
+      "maddenOvr": 73,
+      "healthyWaltersPoints": 0.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_BACK"
+    }
+  ],
+  "currentCases": {
+    "2026-W03-ATL-A.J.-Terrell-Jr": {
+      "caseKey": "2026-W03-ATL-A.J.-Terrell-Jr",
+      "gameKey": "2026-W03-ATL-GB",
+      "team": "ATL",
+      "side": "AWAY",
+      "player": "A.J. Terrell Jr",
+      "playerEaId": "21002",
+      "currentRole": "STARTING_BOUNDARY_CORNERBACK",
+      "availabilityStatus": "IR",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "C.J. Henderson",
+          "Avieon Terrell",
+          "Mike Hughes"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "personnelEventId": "2026-W03-ATL-21002-ESTIMATE-20260922T201057-0700",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "sourceRefs": [
+        "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+      ],
+      "roleSourceRefs": [
+        "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+      ],
+      "reopenOn": "An alternate starter, Avieon outside shift, or a Henderson availability change.",
+      "reason": "Henderson finished in the vacant boundary role. Assume he remains primary; the club has not fixed the full Week 3 alignment. Hughes and Avieon Terrell retain baseline duties. Henderson covers only the added vacant boundary duty; reopen if the actual alignment moves a baseline starter.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Henderson finished in the vacant boundary role. Assume he remains primary; the club has not fixed the full Week 3 alignment.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Hughes and Avieon Terrell retain baseline duties. Henderson covers only the added vacant boundary duty; reopen if the actual alignment moves a baseline starter.",
+        "baselineSourceIds": [
+          "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+        ],
+        "replacements": [
+          {
+            "player": "C.J. Henderson",
+            "eaPlayerId": "21004",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve"
+            ]
+          }
+        ],
+        "primaryEvidence": "REPORTED_PRIMARY"
+      },
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "CB",
+      "maddenOvr": 88,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": -1.2,
+      "clusterGroup": "DEFENSIVE_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+        "healthyValue": 1.2,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 1.2,
+        "rawTeamContributionDelta": -1.2,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1.2,
+          "max": 1.2
+        },
+        "weights": [
+          {
+            "player": "C.J. Henderson",
+            "eaPlayerId": "21004",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Henderson finished in the vacant boundary role. Assume he remains primary; the club has not fixed the full Week 3 alignment.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "An alternate starter, Avieon outside shift, or a Henderson availability change."
+      }
+    },
+    "2026-W03-GB-Zach-Bako-Bewele": {
+      "caseKey": "2026-W03-GB-Zach-Bako-Bewele",
+      "gameKey": "2026-W03-ATL-GB",
+      "team": "GB",
+      "side": "HOME",
+      "player": "Zach Bako-Bewele",
+      "playerEaId": "22434",
+      "currentRole": "STARTING_RIGHT_TACKLE",
+      "availabilityStatus": "OUT",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Anthony Belton",
+          "Donovan Jennings",
+          "Travis Glover"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "RT_REPLACEMENT_ANTHONY_BELTON_LIMITED_AND_OL_CLUSTER_UNRESOLVED",
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
+        "https://www.packers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/gb.json",
+        "https://www.packers.com/news/packers-falcons-injury-report-sept-21-2026"
+      ],
+      "reason": "Green Bay confirmed starting right tackle Zach Bako-Bewele tore his patellar tendon and is out for the season. The current depth chart lists Anthony Belton behind him, but Belton is himself limited with an elbow injury and the surrounding Packers line also has active injuries. The Week 3 replacement configuration is therefore not confirmed as a healthy one-for-one case. Preserve the prior fair and record no numeric move.",
+      "personnelEventId": "2026-W03-GB-22434-REVIEW-20260922T201057-0700",
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -419,7 +979,6 @@
       "clusterGroup": "OFFENSIVE_LINE"
     },
     "2026-W03-IND-Alec-Pierce": {
-      "personnelEventId": "2026-W03-IND-PIERCE-OUT-WR-20260922-1700",
       "caseKey": "2026-W03-IND-Alec-Pierce",
       "gameKey": "2026-W03-HOU-IND",
       "team": "IND",
@@ -428,8 +987,6 @@
       "playerEaId": "22085",
       "currentRole": "STARTING_OUTSIDE_RECEIVER",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "WR_WORKLOAD_REDISTRIBUTION_TREADWELL_SLAYTON_DOWNS_ALLEN",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -446,29 +1003,115 @@
         "replacementClassification": "COMMITTEE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
-      "reason": "Alec Pierce is expected to miss several weeks with a heel injury. Indianapolis signed Darius Slayton, while its current depth chart also lists Laquon Treadwell behind Pierce and retains Josh Downs and Keenan Allen in the receiver rotation. That is a multi-player workload redistribution, not a verified one-for-one replacement or value-invariant committee. Preserve the prior fair and record no numeric move.",
+      "personnelEventId": "2026-W03-IND-22085-ESTIMATE-20260922T201057-0700",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
       "sourceRefs": [
         "https://www.nfl.com/news/colts-wr-alec-pierce-heel-to-miss-several-weeks-won-t-have-surgery",
-        "https://www.colts.com/team/depth-chart",
-        "data/walters/nfl/player-values/by-team-v1/ind.json"
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3",
+        "https://www.colts.com/news/colts-sign-wide-receiver-darius-slayton",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
-      "batchId": "graham-delta-1645-personnel-2026-w03-20260922T170000-0700",
-      "effectiveAt": "2026-09-22T17:00:00-07:00",
-      "sourceTask": "DELTA_1645",
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/colts-wr-alec-pierce-heel-to-miss-several-weeks-won-t-have-surgery"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+      ],
+      "reopenOn": "Pierce participates, a formal designation contradicts the reported absence, one reserve is unavailable, or reported role allocation supersedes the equal-share assumption.",
+      "reason": "Assume equal added outside-receiver duty for Treadwell and Slayton, the two reserves listed in Pierce's depth-chart row. These are assumed shares, not measured targets or snaps. Downs and Allen retain their independent baseline roles and receive no replacement credit. The model values only extra vacant outside duty for the two reserves.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal added outside-receiver duty for Treadwell and Slayton, the two reserves listed in Pierce's depth-chart row. These are assumed shares, not measured targets or snaps.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Downs and Allen retain their independent baseline roles and receive no replacement credit. The model values only extra vacant outside duty for the two reserves.",
+        "baselineSourceIds": [
+          "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+        ],
+        "replacements": [
+          {
+            "player": "Laquon Treadwell",
+            "eaPlayerId": "17555",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          },
+          {
+            "player": "Darius Slayton",
+            "eaPlayerId": "20655",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3",
+              "https://www.colts.com/news/colts-sign-wide-receiver-darius-slayton"
+            ]
+          }
+        ]
+      },
+      "availabilityEvidenceStatus": "RELIABLE_REPORTED_ABSENCE_PENDING_FORMAL_TEAM_DESIGNATION",
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "valueStatus": "NUMERIC_ELIGIBLE",
       "registryPosition": "WR",
       "maddenOvr": 84,
       "healthyWaltersPoints": 0.9,
-      "rawTeamContributionDelta": null,
-      "clusterGroup": "RECEIVER"
+      "rawTeamContributionDelta": -0.65,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0.25,
+        "replacementValueRatio": {
+          "numerator": 0.5,
+          "denominator": 2
+        },
+        "injuryLoss": 0.65,
+        "rawTeamContributionDelta": -0.65,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.4,
+          "max": 0.9
+        },
+        "weights": [
+          {
+            "player": "Laquon Treadwell",
+            "eaPlayerId": "17555",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          },
+          {
+            "player": "Darius Slayton",
+            "eaPlayerId": "20655",
+            "lockedValue": 0.5,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume equal added outside-receiver duty for Treadwell and Slayton, the two reserves listed in Pierce's depth-chart row. These are assumed shares, not measured targets or snaps.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "Pierce participates, a formal designation contradicts the reported absence, one reserve is unavailable, or reported role allocation supersedes the equal-share assumption."
+      }
     },
     "2026-W03-IND-Micheal-Clemons": {
-      "personnelEventId": "2026-W03-IND-CLEMONS-IR-EDGE-20260922-1700",
       "caseKey": "2026-W03-IND-Micheal-Clemons",
       "gameKey": "2026-W03-HOU-IND",
       "team": "IND",
@@ -477,8 +1120,6 @@
       "playerEaId": "22162",
       "currentRole": "ROTATIONAL_EDGE_DEFENDER",
       "availabilityStatus": "IR",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "EDGE_ROTATION_AND_DEFENSIVE_LINE_CLUSTER_UNRESOLVED",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -488,33 +1129,134 @@
           "Arden Key",
           "Jaylahn Tuimoloau",
           "George Gumbs Jr.",
-          "Caden Curry"
+          "Caden Curry",
+          "JT Tuimoloau"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
         "replacementClassification": "COMMITTEE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
-      "reason": "Indianapolis placed rotational edge defender Micheal Clemons on injured reserve. The current depth chart shows multiple edge contributors and no confirmed one-for-one workload transfer. The defensive-line cluster and baseline contributors were reviewed; the case is not eligible for a numeric personnel or M4 move. Preserve the prior fair.",
+      "personnelEventId": "2026-W03-IND-22162-ESTIMATE-20260922T201057-0700",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
       "sourceRefs": [
-        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
-        "https://www.colts.com/team/depth-chart",
-        "data/walters/nfl/player-values/by-team-v1/ind.json"
+        "https://www.colts.com/news/colts-place-de-micheal-clemons-on-injured-reserve-release-rb-anderson-castle-from-practice-squad",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
-      "batchId": "graham-delta-1645-personnel-2026-w03-20260922T170000-0700",
-      "effectiveAt": "2026-09-22T17:00:00-07:00",
-      "sourceTask": "DELTA_1645",
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-place-de-micheal-clemons-on-injured-reserve-release-rb-anderson-castle-from-practice-squad"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+      ],
+      "reopenOn": "A reserve becomes unavailable, the rotation changes, another line absence creates cluster exposure, or the frozen-value authority is amended.",
+      "reason": "Assume the listed reserve edges share Clemons's added rotation duty equally. The frozen healthy value is zero, so nonnegative replacements yield zero injury loss for every allocation. Key and Latu remain baseline starters and are excluded. Reserve baseline duties are retained; only additional rotation duty is estimated. No replacement upgrade is credited.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume the listed reserve edges share Clemons's added rotation duty equally. The frozen healthy value is zero, so nonnegative replacements yield zero injury loss for every allocation.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Key and Latu remain baseline starters and are excluded. Reserve baseline duties are retained; only additional rotation duty is estimated. No replacement upgrade is credited.",
+        "baselineSourceIds": [
+          "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+        ],
+        "replacements": [
+          {
+            "player": "JT Tuimoloau",
+            "eaPlayerId": "15175",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          },
+          {
+            "player": "Caden Curry",
+            "eaPlayerId": "16181",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          },
+          {
+            "player": "George Gumbs Jr.",
+            "eaPlayerId": "16360",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available reserve for the vacant role; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-ahead-of-week-3"
+            ]
+          }
+        ]
+      },
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "valueStatus": "NUMERIC_ELIGIBLE",
       "registryPosition": "EDGE",
       "maddenOvr": 71,
       "healthyWaltersPoints": 0,
-      "rawTeamContributionDelta": null,
-      "clusterGroup": "DEFENSIVE_LINE"
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 0,
+        "replacementValue": 0.133,
+        "replacementValueRatio": {
+          "numerator": 0.4,
+          "denominator": 3
+        },
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "upgradeExcluded": true,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "weights": [
+          {
+            "player": "JT Tuimoloau",
+            "eaPlayerId": "15175",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.3333333333333333
+          },
+          {
+            "player": "Caden Curry",
+            "eaPlayerId": "16181",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.3333333333333333
+          },
+          {
+            "player": "George Gumbs Jr.",
+            "eaPlayerId": "16360",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.3333333333333333
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume the listed reserve edges share Clemons's added rotation duty equally. The frozen healthy value is zero, so nonnegative replacements yield zero injury loss for every allocation.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "A reserve becomes unavailable, the rotation changes, another line absence creates cluster exposure, or the frozen-value authority is amended."
+      }
     },
     "2026-W03-NE-Mike-Onwenu": {
       "personnelEventId": "2026-W03-NE-ONWENU-IR-RG-20260922-1700",
@@ -568,7 +1310,6 @@
       "failClosedCode": null
     },
     "2026-W03-DET-Avonte-Maddox": {
-      "personnelEventId": "2026-W03-DET-MADDOX-IR-S-20260922-1700",
       "caseKey": "2026-W03-DET-Avonte-Maddox",
       "gameKey": "2026-W03-NYJ-DET",
       "team": "DET",
@@ -577,8 +1318,6 @@
       "playerEaId": "13332",
       "currentRole": "STARTING_SAFETY",
       "availabilityStatus": "IR",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "SECONDARY_REPLACEMENT_AND_EXISTING_INJURY_CLUSTER_UNRESOLVED",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
@@ -597,16 +1336,20 @@
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
       },
-      "reason": "Detroit placed starting safety Avonte Maddox on injured reserve after confirming season-ending foot surgery and added Bishop Fitzgerald to the active roster. The current secondary already has multiple unavailable contributors, and the depth chart plus roster move leave a live multi-role redistribution involving Christian Izien, Thomas Harper, Bishop Fitzgerald and Chuck Clark rather than a stable one-for-one replacement. Preserve the prior fair.",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "SECONDARY_REPLACEMENT_AND_EXISTING_INJURY_CLUSTER_UNRESOLVED",
       "sourceRefs": [
         "https://www.reuters.com/sports/lions-db-avonte-maddox-have-season-ending-foot-surgery--flm-2026-09-21/",
         "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
         "https://www.detroitlions.com/team/depth-chart",
-        "data/walters/nfl/player-values/by-team-v1/det.json"
+        "data/walters/nfl/player-values/by-team-v1/det.json",
+        "https://www.detroitlions.com/news/key-questions-detroit-lions-dan-campbell-want-to-see-from-his-team-moving-forward"
       ],
-      "batchId": "graham-delta-1645-personnel-2026-w03-20260922T170000-0700",
-      "effectiveAt": "2026-09-22T17:00:00-07:00",
-      "sourceTask": "DELTA_1645",
+      "reason": "Detroit placed starting safety Avonte Maddox on injured reserve after confirming season-ending foot surgery and added Bishop Fitzgerald to the active roster. The current secondary already has multiple unavailable contributors, and the depth chart plus roster move leave a live multi-role redistribution involving Christian Izien, Thomas Harper, Bishop Fitzgerald and Chuck Clark rather than a stable one-for-one replacement. Preserve the prior fair.",
+      "personnelEventId": "2026-W03-DET-13332-REVIEW-20260922T201057-0700",
+      "batchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+      "effectiveAt": "2026-09-22T20:10:57-07:00",
+      "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -618,6 +1361,6 @@
       "clusterGroup": "DEFENSIVE_BACK"
     }
   },
-  "lastBatchId": "graham-delta-1645-personnel-2026-w03-20260922T170000-0700",
-  "lastBatchSourceTask": "DELTA_1645"
+  "lastBatchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+  "lastBatchSourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION"
 }
