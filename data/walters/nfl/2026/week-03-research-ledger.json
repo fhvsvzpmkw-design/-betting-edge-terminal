@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-09-22T04:27:21-07:00",
-  "updatedAt": "2026-09-23T16:51:14-07:00",
+  "updatedAt": "2026-09-23T16:53:32-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -2610,6 +2610,162 @@
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 7,
+      "type": "LATE_DAY_DELTA",
+      "runEventId": "graham-delta-1645-2026-w03-20260923T164502-0700",
+      "sourceTaskKey": "DELTA_1645",
+      "completionResult": "MATERIAL_CHANGE",
+      "startedAt": "2026-09-23T16:45:02-07:00",
+      "completedAt": "2026-09-23T16:53:32-07:00",
+      "scope": "Late-day change-only review for all 16 active Week 3 games, covering material quarterback, final/practice availability, personnel/replacement, offensive-line, pass-rush, secondary, playmaker, coaching, weather and travel developments since the verified Wednesday Daily Review cutoff.",
+      "sourcesChecked": [
+        {
+          "source": "NFL Week 3 official injury report",
+          "url": "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Thursday final game designations and leaguewide Week 3 status review."
+        },
+        {
+          "source": "NFL official Week 3 practice reports",
+          "url": "https://www.nfl.com/injuries/",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Wednesday participation and unresolved quarterback/personnel monitoring across the active Week 3 schedule."
+        },
+        {
+          "source": "Green Bay Packers final Week 3 injury report",
+          "url": "https://www.packers.com/news/packers-rule-out-four-list-two-questionable-vs-falcons-week-3-injury-report-2026",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Final availability and current replacement participation for Jayden Reed, Aaron Banks, Zach Bako-Bewele, Skyy Moore, Donovan Jennings and Anthony Belton."
+        },
+        {
+          "source": "Green Bay Packers Week 3 depth chart",
+          "url": "https://www.packers.com/team/depth-chart",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Current starter/backup role verification for the three governed Green Bay personnel cases."
+        },
+        {
+          "source": "Packers Week 2 injury follow-up",
+          "url": "https://www.reuters.com/sports/packers-wr-jayden-reed-neck-rt-zach-bako-bewele-knee-carted-off-ruled-out--flm-2026-09-20/",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Actual in-game replacement evidence for Reed and Bako-Bewele."
+        },
+        {
+          "source": "National Weather Service Green Bay forecast",
+          "url": "https://forecast.weather.gov/MapClick.php?FcstType=text&TextType=2&lat=44.5132&lg=english&lon=-88.0099&unit=0",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Thursday-night Lambeau weather revalidation."
+        },
+        {
+          "source": "Walters player-value Green Bay shard",
+          "url": "data/walters/nfl/player-values/by-team-v1/gb.json",
+          "checkedAt": "2026-09-23T16:53:32-07:00",
+          "purpose": "Frozen governed unavailable-player and replacement values; blob binding verified against player-values-access-v1."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "GB",
+          "finding": "Green Bay ruled starting slot receiver Jayden Reed out. Skyy Moore is available, replaced Reed after his Week 2 exit and is the direct depth-chart backup. The governed personnel workflow applied a 0.700-point Green Bay loss, moving ATL-GB from Packers -11.891 exact / -12 displayed to Packers -11.191 exact / -11 displayed.",
+          "sourceRefs": [
+            "https://www.packers.com/news/packers-rule-out-four-list-two-questionable-vs-falcons-week-3-injury-report-2026",
+            "https://www.packers.com/team/depth-chart",
+            "https://www.reuters.com/sports/packers-wr-jayden-reed-neck-rt-zach-bako-bewele-knee-carted-off-ruled-out--flm-2026-09-20/",
+            "data/walters/nfl/player-values/by-team-v1/gb.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "GB",
+          "finding": "Zach Bako-Bewele remains out with Anthony Belton now full/available, and Aaron Banks is out with Donovan Jennings available. Both replacements resolved one-for-one, but the repository-owned simultaneous OFFENSIVE_LINE cluster guard blocked numeric application of both cases; no manual line adjustment was made.",
+          "sourceRefs": [
+            "https://www.packers.com/news/packers-rule-out-four-list-two-questionable-vs-falcons-week-3-injury-report-2026",
+            "https://www.packers.com/team/depth-chart",
+            "data/walters/nfl/2026/week-03-personnel-ledger.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "ATL",
+          "finding": "Samson Ebukam is out, but Atlanta's current depth chart lists him behind healthy starter Brandon Dorlus; no additional starting-role loss was supported. Billy Bowman Jr. is questionable, while Michael Penix Jr., Tua Tagovailoa, Jawaan Taylor and Brian Robinson Jr. are available. Penix remains the confirmed starter, so no QB batch was required.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+            "https://www.atlantafalcons.com/news/falcons-injury-report-qb-tua-tagovailoa-dl-brandon-dorlus-available-for-atlanta-in-green-bay",
+            "https://www.atlantafalcons.com/news/atlanta-falcons-week-3-depth-chart-vs-green-bay-packers"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "SEA",
+          "finding": "Sam Darnold returned only as a limited Wednesday participant; no Week 3 starter confirmation was published. The existing fail-closed unresolved starter status remains current, and SEA-WAS was preserved.",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/",
+            "data/walters/nfl/qb-production-current.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "ALL",
+          "finding": "The first Wednesday practice reports were reviewed across the active Week 3 schedule. DNP/limited listings without final game status or resolved replacement—among them Puka Nacua, Nico Collins, Nick Bosa and other high-impact players—remain monitoring cases and did not create effectiveness percentages or numeric moves. No other confirmed current starter or resolved material one-for-one change was found after the Daily Review cutoff.",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "ATL/GB",
+          "finding": "The updated National Weather Service forecast remains mild and dry with calm wind Thursday night at Green Bay; no calibrated W-factor adjustment was supported.",
+          "sourceRefs": [
+            "https://forecast.weather.gov/MapClick.php?FcstType=text&TextType=2&lat=44.5132&lg=english&lon=-88.0099&unit=0"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W03-ATL-GB",
+          "priorExactFairHome": -11.891,
+          "priorPublishedFairHome": -12,
+          "newExactFairHome": -11.191,
+          "newPublishedFairHome": -11,
+          "pointsToHomeSpread": 0.7,
+          "reason": "The governed personnel workflow calculated Jayden Reed (0.9) minus Skyy Moore (0.2) as a 0.700-point Green Bay loss. Simultaneous Bako-Bewele and Banks offensive-line cases were blocked by the repository cluster guard.",
+          "productionId": "walters-personnel-production-v1",
+          "batchId": "graham-delta-1645-personnel-2026-w03-20260923T165114-0700",
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-03-personnel-ledger.json",
+            "data/walters/nfl/2026/week-03-current-numbers.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_NO_CARRIED_RATING_CHANGE",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "note": "No carried-rating revision was proposed. FPI was not used to create or alter the personnel adjustment.",
+        "marketViewed": false
+      },
+      "summary": {
+        "teamsReviewed": 32,
+        "gamesReviewed": 16,
+        "materialInformationChanged": true,
+        "carriedRatingMoves": 0,
+        "fairNumberChanges": 1,
+        "displayedFairNumberChanges": 1,
+        "personnelBatchesSubmitted": 1,
+        "personnelCasesSubmitted": 3,
+        "personnelNumericCases": 3,
+        "personnelClusterBlockedCases": 2,
+        "matchupM4BatchesSubmitted": 0,
+        "qbBatchesSubmitted": 0,
+        "betsCreated": 0,
+        "h4DomesticHomeAdvantagePoints": 2.082,
+        "h4PointsToHomeSpread": -2.082,
+        "marketViewed": false,
+        "note": "Prior verified broad coverage: graham-daily-review-2026-w03-20260923T113242-0700, completed through 2026-09-23T11:44:00-07:00 with matching VERIFIED receipt and COMPLETED runtime. This narrow Delta reviewed every material development from that coverage endpoint through 2026-09-23T16:53:32-07:00. No missed-day catch-up was required and no unresolved coverage gap remained at cutoff. The production-batch sweep at sequence 6 is separate and does not replace this scheduled Delta sweep. Green Bay final designations resolved three personnel cases; production applied only Reed-to-Moore because the two simultaneous offensive-line losses were blocked by the cluster guard. No market information was viewed."
       }
     }
   ]
