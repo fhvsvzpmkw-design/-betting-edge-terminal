@@ -1,5 +1,7 @@
 # Graham scheduled task authority
 
+Current-week replacement-estimate amendment: `GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md` and the operational personnel contract permit source-supported, explicitly labelled primary/weighted/equal-share non-QB estimates through the existing personnel writer. This supersedes older blanket committee restrictions only within that adapter; unresolved availability, displaced roles, clusters, QB and matchup permissions retain their existing gates.
+
 - Authority version: 1.0
 - Status: OPERATIONAL
 - Schedule authority: `data/walters/nfl/graham-schedule-authority-v1.json`

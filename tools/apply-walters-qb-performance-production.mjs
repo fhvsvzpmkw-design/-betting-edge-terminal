@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
+import {synchronizePersonnelInputStatus} from './graham-current-personnel-estimates.mjs';
 import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
 
 const ROOT = process.cwd();
@@ -577,6 +578,7 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     marketViewed: false,
     postActivationCanaryState: production.postActivationCanary.state,
   };
+  for (const game of board.games) synchronizePersonnelInputStatus(game);
   synchronizeGrahamFairBoard(board, {write: true});
   return gameResults;
 }

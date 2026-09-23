@@ -1,5 +1,7 @@
 # Graham 16:45 Delta Authority
 
+Current-week replacement-estimate amendment: `GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md` and the operational personnel contract permit source-supported, explicitly labelled primary/weighted/equal-share non-QB estimates through the existing personnel writer. This supersedes older blanket committee restrictions only within that adapter; unresolved availability, displaced roles, clusters, QB and matchup permissions retain their existing gates.
+
 - Authority version: 2.1
 - Status: OPERATIONAL
 - Task key: `DELTA_1645`

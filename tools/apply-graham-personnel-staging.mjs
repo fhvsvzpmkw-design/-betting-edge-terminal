@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus} from './graham-current-personnel-estimates.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/personnel-staging.json');
@@ -87,7 +88,15 @@ for(const c of input.cases){
   if(!c?.personnelEventId||!c?.caseKey||!c?.gameKey||!c?.team||!c?.side||!c?.player||!Array.isArray(c.sourceRefs)||!c.sourceRefs.length||!c.reason)throw new Error(`INVALID_CASE:${c?.personnelEventId||'unknown'}`);
   if((ledger.events||[]).some(e=>e.personnelEventId===c.personnelEventId))continue;
   const event={...c,batchId:input.batchId,effectiveAt:input.effectiveAt,sourceTask:input.sourceTask||'UNKNOWN',marketViewed:false,productionId:prod.productionId,calibrationId:cal.calibrationId};
-  if(c.resolutionStatus==='RESOLVED_ONE_FOR_ONE'||c.resolutionStatus==='RESOLVED_ACTIVE'||String(c.availabilityStatus).toUpperCase()==='PLAYING_LIMITED'){
+  if(c.resolutionStatus==='RESOLVED_MODEL_ESTIMATE'){
+    try {
+      const p=playerLookup(c.player,c.playerEaId);
+      const estimate=currentPersonnelEstimate(c,p,{lookup:playerLookup,production:prod});
+      Object.assign(event,{valueStatus:'NUMERIC_ELIGIBLE',registryPosition:p.position,maddenOvr:p.maddenOvr,healthyWaltersPoints:p.waltersPoints,rawTeamContributionDelta:estimate.rawTeamContributionDelta,clusterGroup:clusterGroup(p.position),failClosedCode:null,replacementEstimate:estimate});
+    } catch(err) {
+      Object.assign(event,{valueStatus:'FAIL_CLOSED_NO_NUMERIC_MOVE',failClosedCode:String(err.message||err),rawTeamContributionDelta:null});
+    }
+  } else if(c.resolutionStatus==='RESOLVED_ONE_FOR_ONE'||c.resolutionStatus==='RESOLVED_ACTIVE'||String(c.availabilityStatus).toUpperCase()==='PLAYING_LIMITED'){
     try{
       const r=resolvedContribution(c);
       event.valueStatus='NUMERIC_ELIGIBLE';event.registryPosition=r.player.position;event.maddenOvr=r.player.maddenOvr;event.healthyWaltersPoints=r.healthy;event.replacementPlayer=r.replacement?.player||c.replacementPlayer||null;event.replacementRegistryPosition=r.replacement?.position||null;event.replacementMaddenOvr=r.replacement?.maddenOvr??null;event.replacementWaltersPoints=r.replacementValue;event.rawTeamContributionDelta=r.rawDelta;event.clusterGroup=clusterGroup(r.player.position);event.failClosedCode=null;
@@ -102,6 +111,7 @@ for(const c of input.cases){
 
 const boardGames=new Map((numbers.games||[]).map(g=>[g.gameKey,g]));
 const currentCases=Object.values(ledger.currentCases||{});
+assertDistinctPersonnelReplacements(currentCases);
 const affectedGames=new Set(input.cases.map(c=>c.gameKey));
 const matchupChanges=[];
 for(const gameKey of affectedGames){
@@ -142,6 +152,8 @@ for(const gameKey of affectedGames){
   game.personnelLastAppliedAt=input.effectiveAt;
   game.personnelUnresolvedCases=cases.filter(c=>c.valueStatus!=='NUMERIC_ELIGIBLE').map(c=>({caseKey:c.caseKey,player:c.player,failClosedCode:c.failClosedCode,resolutionStatus:c.resolutionStatus}));
   game.personnelBlockedGroups=blockedGroups;
+  game.personnelEstimateCases=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&c.replacementEstimate).map(c=>({caseKey:c.caseKey,player:c.player,...c.replacementEstimate,applied:!blockedGroups.some(g=>g.caseKeys.includes(c.caseKey))}));
+  synchronizePersonnelInputStatus(game);
   const priorAdjustments=(game.adjustments||[]).filter(a=>a.type!=='PERSONNEL_CALIBRATED_PRODUCTION');
   game.adjustments=[...priorAdjustments,...applied.map(a=>({type:'PERSONNEL_CALIBRATED_PRODUCTION',...a,productionId:prod.productionId,calibrationId:cal.calibrationId,sourceRefs:[...new Set(cases.filter(c=>a.caseKeys.includes(c.caseKey)).flatMap(c=>c.sourceRefs||[]))]}))];
   game.sourceRefs=[...new Set([...(game.sourceRefs||[]),...cases.flatMap(c=>c.sourceRefs||[])])];
@@ -155,7 +167,7 @@ const sweep={
   type:'PERSONNEL_PRODUCTION_BATCH',startedAt:input.startedAt||input.effectiveAt,completedAt:input.effectiveAt,
   scope:`Governed Walters personnel production batch ${input.batchId}. Current availability/replacement evidence only; market prices not viewed.`,
   sourcesChecked:[...new Map(input.cases.flatMap(c=>(c.sourceRefs||[]).map(url=>[url,{source:'Personnel production evidence',url,checkedAt:input.effectiveAt,purpose:c.reason}]))).values()],
-  teamFindings:batchEvents.map(e=>({team:e.team,player:e.player,availabilityStatus:e.availabilityStatus,resolutionStatus:e.resolutionStatus,valueStatus:e.valueStatus,failClosedCode:e.failClosedCode||null,reason:e.reason,sourceRefs:e.sourceRefs})),
+  teamFindings:batchEvents.map(e=>({team:e.team,player:e.player,availabilityStatus:e.availabilityStatus,resolutionStatus:e.resolutionStatus,valueStatus:e.valueStatus,failClosedCode:e.failClosedCode||null,reason:e.reason,sourceRefs:e.sourceRefs,...(e.replacementEstimate?{replacementEstimate:e.replacementEstimate}:{})})),
   ratingChanges:[],matchupChanges,
   espnFpiCapture:{status:'NOT_REFRESHED_PERSONNEL_ONLY',role:'INDEPENDENT_COMPARISON_ONLY'},
   summary:{casesSubmitted:input.cases.length,newEventsRecorded:batchEvents.length,numericEligible:batchEvents.filter(e=>e.valueStatus==='NUMERIC_ELIGIBLE').length,failedClosed:batchEvents.filter(e=>e.valueStatus!=='NUMERIC_ELIGIBLE').length,gamesRecomputed:matchupChanges.length,carriedRatingMoves:0,marketViewed:false,productionId:prod.productionId}

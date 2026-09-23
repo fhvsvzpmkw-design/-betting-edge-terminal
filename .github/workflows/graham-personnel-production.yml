@@ -8,6 +8,9 @@ on:
       - data/walters/nfl/personnel-staging.json
       - data/walters/nfl/personnel-production-current.json
       - tools/apply-graham-personnel-staging.mjs
+      - tools/graham-current-personnel-estimates.mjs
+      - tools/graham-replacement-model.mjs
+      - tests/graham-current-personnel-estimates.test.mjs
       - tools/validate-graham-personnel-closure.mjs
       - tools/graham-active-week.mjs
   workflow_dispatch:
@@ -55,6 +58,9 @@ jobs:
 
       - name: Enforce material personnel closure review
         run: node tools/validate-graham-personnel-closure.mjs data/walters/nfl/personnel-staging.json
+
+      - name: Verify replacement estimate safeguards
+        run: node --test tests/graham-current-personnel-estimates.test.mjs
 
       - name: Apply governed personnel staging batch
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json

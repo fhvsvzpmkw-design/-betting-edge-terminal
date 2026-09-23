@@ -64,6 +64,7 @@ const games=(numbers.games||[]).map(game=>{
     awayRating:awayCurrent,homeRating:homeCurrent,neutralBaseHome,
     espnNeutralHome,
     grahamFairHome,grahamAsOf:game.grahamAsOf||null,numberStatus:game.numberStatus||'PENDING',grahamMove,
+    personnelEstimateCases:game.personnelEstimateCases||[],personnelUnresolvedCases:game.personnelUnresolvedCases||[],qbPerformanceFailClosedTeams:game.qbPerformanceFailClosedTeams||[],
     informationStatus:game.informationStatus||'PENDING',researchSummary:game.researchSummary||null,adjustments:Array.isArray(game.adjustments)?game.adjustments:[],
     proposedWager:game.proposedWager&&typeof game.proposedWager==='object'?game.proposedWager:null,
     spreadVsMoneyline:game.spreadVsMoneyline&&typeof game.spreadVsMoneyline==='object'?game.spreadVsMoneyline:null,

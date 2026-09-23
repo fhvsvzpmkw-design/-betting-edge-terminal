@@ -32,26 +32,37 @@
     "numericPersonnelMoveRequires": [
       "current material availability evidence",
       "governed locked player value",
-      "resolved current role replacement",
+      "resolved current role replacement or explicitly acknowledged source-supported Graham replacement estimate",
       "governed locked replacement value",
       "sourceRefs",
       "explicit reason",
       "unique personnelEventId"
     ],
-    "resolvedStatuses": ["OUT", "IR", "SUSPENDED", "COMMISSIONER_EXEMPT"],
+    "resolvedStatuses": [
+      "OUT",
+      "IR",
+      "SUSPENDED",
+      "COMMISSIONER_EXEMPT"
+    ],
     "playingLimitedRequiresApprovedEffectivenessPct": true,
     "questionableOrDoubtfulDesignationAloneCannotMoveFair": true,
-    "committeeOrMultiroleReplacementMustFailClosed": true,
+    "committeeOrMultiroleReplacementMustFailClosed": false,
     "qbRequiresAdditionalWaltersPerformanceValidation": true,
     "temporaryPersonnelOverlayMayNotChangeCarriedTeamRating": true,
     "allInternalPersonnelMathUsesExactFairBeforeBoardRounding": true,
     "boardRoundingIncrement": 0.5,
-    "duplicateEventIdsAreIdempotent": true
+    "duplicateEventIdsAreIdempotent": true,
+    "unmodelledCommitteeOrDisplacedRoleMustFailClosed": true
   },
   "materialPersonnelClosureGate": {
     "state": "OPERATIONAL",
     "effectiveAt": "2026-09-01T17:35:00-07:00",
-    "appliesToAvailability": ["OUT", "IR", "SUSPENDED", "COMMISSIONER_EXEMPT"],
+    "appliesToAvailability": [
+      "OUT",
+      "IR",
+      "SUSPENDED",
+      "COMMISSIONER_EXEMPT"
+    ],
     "purpose": "Prevent a material confirmed absence from being dismissed as an unresolved no-move before the current roster, depth/role replacement and governed Walters values have actually been exhausted.",
     "requiredBeforeNoNumericMove": [
       "confirm the material availability transaction/status from current reliable evidence",
@@ -76,8 +87,18 @@
       "m4CommitteeEligibilityReviewed",
       "conclusion"
     ],
-    "replacementClassifications": ["ONE_FOR_ONE", "COMMITTEE", "MULTIROLE", "UNRESOLVED_AFTER_COMPLETE_SEARCH"],
-    "conclusions": ["RESOLVED_NUMERIC", "MATCHUP_M4_CANDIDATE", "FAIL_CLOSED_AFTER_FULL_REVIEW"],
+    "replacementClassifications": [
+      "ONE_FOR_ONE",
+      "COMMITTEE",
+      "MULTIROLE",
+      "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+    ],
+    "conclusions": [
+      "RESOLVED_NUMERIC",
+      "MATCHUP_M4_CANDIDATE",
+      "FAIL_CLOSED_AFTER_FULL_REVIEW",
+      "RESOLVED_MODEL_ESTIMATE"
+    ],
     "unresolvedCaseAction": "Every material confirmed absence that remains unresolved after the complete search must still be submitted through personnel-staging.json as a fail-closed case so the personnel ledger and research ledger receive durable evidence.",
     "taskCompletionRule": "A scheduled Graham research task that discovers a new material confirmed absence may not report the case complete, unchanged, or no numeric move until the governed personnel workflow has durably recorded the case. If the closure search or workflow cannot be completed, report PERSONNEL REVIEW INCOMPLETE or PERSONNEL PRODUCTION BLOCKED instead of a substantive no-move conclusion.",
     "durableCompletionRequires": [
@@ -101,5 +122,26 @@
     "currentNumbersPattern": "data/walters/nfl/2026/week-XX-current-numbers.json",
     "researchLedgerPattern": "data/walters/nfl/2026/week-XX-research-ledger.json"
   },
-  "productionAuthority": true
+  "productionAuthority": true,
+  "currentWeekReplacementEstimates": {
+    "state": "OPERATIONAL",
+    "effectiveAt": "2026-09-22T20:10:57-07:00",
+    "modelId": "graham-replacement-role-estimate-v1",
+    "allowedMethods": [
+      "PRIMARY_REPLACEMENT",
+      "WEIGHTED_COMMITTEE",
+      "EQUAL_SHARE_COMMITTEE"
+    ],
+    "authority": "User-approved Graham replacement convention and implementation judgment; manual September 22 personnel/QB resolution request. Integrated in the existing personnel writer; no change to frozen values, QB authority or carried ratings.",
+    "requiredClassification": "GRAHAM_MODEL_ESTIMATE",
+    "requireCurrentAvailabilityAndRoleEvidence": true,
+    "requireLockedValues": true,
+    "requireAdditionalDutiesOnly": true,
+    "displacedRolesAllowed": false,
+    "qbAllowed": false,
+    "impairmentEstimatesAllowed": false,
+    "injuryLossFloor": 0,
+    "clusterRulesUnchanged": true,
+    "sourceContract": "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+  }
 }

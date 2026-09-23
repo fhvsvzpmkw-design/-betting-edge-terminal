@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "reviewId": "graham-manual-week-03-personnel-qb-2026-09-22",
+  "recordedAt": "2026-09-22T20:14:59-07:00",
+  "scope": "Targeted unresolved current Week 3 personnel/QB inputs before Bill Weston hotline refresh. Not a full-team scheduled sweep.",
+  "marketViewed": false,
+  "inputCommit": "9927b896030ba078898939d3e7cba08375c3c9e4",
+  "personnelBatchId": "graham-manual-personnel-2026-w03-20260922T201057-0700",
+  "qbBatchId": "graham-manual-qb-2026-w03-20260922T201057-0700",
+  "governingSources": [
+    "walters-full-analysis-v1.0.md",
+    "walters-current-calibration-plan-v1.0.md",
+    "walters-page-disposition-ledger-v1.0.md",
+    "README.md",
+    "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+  ],
+  "resolutions": [
+    {
+      "player": "A.J. Terrell Jr",
+      "status": "GRAHAM_MODEL_ESTIMATE",
+      "method": "PRIMARY_REPLACEMENT",
+      "replacement": "C.J. Henderson",
+      "teamStrengthLoss": 1.2,
+      "qualification": "Documented relief role extrapolated to Week 3; alignment may change."
+    },
+    {
+      "player": "Alec Pierce",
+      "status": "GRAHAM_MODEL_ESTIMATE",
+      "method": "EQUAL_SHARE_COMMITTEE",
+      "replacements": [
+        "Laquon Treadwell",
+        "Darius Slayton"
+      ],
+      "teamStrengthLoss": 0.65,
+      "lossSensitivity": {
+        "min": 0.4,
+        "max": 0.9
+      },
+      "qualification": "Reported absence pending formal team designation; equal added-duty allocation is assumed."
+    },
+    {
+      "player": "Micheal Clemons",
+      "status": "GRAHAM_MODEL_ESTIMATE",
+      "method": "EQUAL_SHARE_COMMITTEE",
+      "teamStrengthLoss": 0,
+      "qualification": "Known healthy value zero and nonnegative replacement values make the floored loss invariant; no upgrade credited."
+    },
+    {
+      "team": "WAS",
+      "status": "CURRENT_STARTER_CORRECTED",
+      "starter": "Marcus Mariota",
+      "candidateValue": 8.25,
+      "embeddedBaseline": 8.5,
+      "teamQbDelta": -0.25,
+      "qualification": "Frozen model confidence LOW; Seattle starter unresolved, so no game-fair recalculation.",
+      "sourceRefs": [
+        "https://www.commanders.com/news/jayden-daniels-dan-quinn-commanders",
+        "https://www.commanders.com/news/jayden-daniels-injury-return-commanders",
+        "data/walters/nfl/qb-production/production-contract-v1.json"
+      ]
+    }
+  ],
+  "remaining": [
+    {
+      "team": "GB",
+      "input": "Bako-Bewele replacement and offensive-line cluster",
+      "reopenOn": "Belton health plus supported final line configuration",
+      "sourceRefs": [
+        "https://www.packers.com/news/packers-falcons-injury-report-sept-21-2026"
+      ]
+    },
+    {
+      "team": "DET",
+      "input": "Maddox vacancy and secondary configuration",
+      "reopenOn": "Supported role assignments and complete locked candidate values; Bishop Fitzgerald absent from frozen registry",
+      "sourceRefs": [
+        "https://www.detroitlions.com/news/key-questions-detroit-lions-dan-campbell-want-to-see-from-his-team-moving-forward"
+      ]
+    },
+    {
+      "team": "CHI",
+      "input": "Week 3 starting QB",
+      "reopenOn": "Named starter after Williams/Bagent availability decisions",
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-network-bears-qb-tyson-bagent-in-concussion-protocol-case-keenum-could-start-week-3"
+      ]
+    },
+    {
+      "team": "NYG",
+      "input": "Week 3 starting QB",
+      "reopenOn": "Club decision after continuing Dart evaluation",
+      "sourceRefs": [
+        "https://www.giants.com/news/jaxson-dart-knee-injury-update-status-jameis-winston"
+      ]
+    },
+    {
+      "team": "SEA",
+      "input": "Week 3 starting QB",
+      "reopenOn": "Darnold practice/health and named starter",
+      "sourceRefs": [
+        "https://www.reuters.com/sports/seahawks-plan-sam-darnold-return-practice-wednesday--flm-2026-09-22/"
+      ]
+    }
+  ],
+  "validation": {
+    "state": "LOCAL_DRY_RUN_PASS_REMOTE_PUBLICATION_PENDING",
+    "unitAndRegressionTests": 26,
+    "stagingRepeat": "BYTE_IDEMPOTENT",
+    "preserved": [
+      "prior personnel events",
+      "Onwenu one-for-one case",
+      "carried ratings",
+      "H4",
+      "frozen registry and QB model",
+      "unresolved QB game fairs"
+    ],
+    "gameChanges": [
+      {
+        "gameKey": "2026-W03-ATL-GB",
+        "priorExactHome": -10.691,
+        "newExactHome": -11.891,
+        "newDisplayedHome": -12,
+        "stillUnresolved": [
+          "GB"
+        ]
+      },
+      {
+        "gameKey": "2026-W03-HOU-IND",
+        "priorExactHome": -1.323,
+        "newExactHome": -0.673,
+        "newDisplayedHome": -0.5,
+        "label": "READY_WITH_PERSONNEL_MODEL_ESTIMATES"
+      }
+    ],
+    "publicationVerification": "Require matching batch IDs in remote personnel/research/numbers, corrected WAS binding, successful personnel/QB/terminal workflow chain."
+  }
+}

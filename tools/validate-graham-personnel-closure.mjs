@@ -57,6 +57,9 @@ for(const c of staging.cases||[]){
     if(audit.replacementClassification!=='ONE_FOR_ONE'||audit.conclusion!=='RESOLVED_NUMERIC')throw new Error(`MATERIAL_PERSONNEL_CLOSURE_ONE_FOR_ONE_MISMATCH:${c.personnelEventId||c.player}`);
     if(!c.replacementPlayer)throw new Error(`MATERIAL_PERSONNEL_CLOSURE_REPLACEMENT_PLAYER_MISSING:${c.personnelEventId||c.player}`);
     if(!audit.replacementCandidatesConsidered.includes(c.replacementPlayer))throw new Error(`MATERIAL_PERSONNEL_CLOSURE_REPLACEMENT_NOT_IN_CANDIDATE_SET:${c.personnelEventId||c.player}`);
+  } else if(c.resolutionStatus==='RESOLVED_MODEL_ESTIMATE'){
+    if(audit.conclusion!=='RESOLVED_MODEL_ESTIMATE'||!['ONE_FOR_ONE','COMMITTEE'].includes(audit.replacementClassification))throw new Error(`MATERIAL_PERSONNEL_CLOSURE_ESTIMATE_MISMATCH:${c.personnelEventId}`);
+    if(!c.replacementModel?.replacements?.length||c.replacementModel.replacements.some(r=>!audit.replacementCandidatesConsidered.includes(r.player)))throw new Error(`MATERIAL_PERSONNEL_CLOSURE_ESTIMATE_CANDIDATES_MISSING:${c.personnelEventId}`);
   } else {
     if(audit.conclusion==='RESOLVED_NUMERIC')throw new Error(`MATERIAL_PERSONNEL_CLOSURE_UNRESOLVED_MARKED_NUMERIC:${c.personnelEventId||c.player}`);
     if(!c.failClosedCode&&audit.conclusion==='FAIL_CLOSED_AFTER_FULL_REVIEW')throw new Error(`MATERIAL_PERSONNEL_CLOSURE_FAIL_CODE_MISSING:${c.personnelEventId||c.player}`);
