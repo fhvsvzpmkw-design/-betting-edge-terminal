@@ -1,8 +1,8 @@
 # Full Week 3 recovery — method review
 
-Status: all fifteen remaining Week 2 pairs evaluated READY under user-approved v1.6 historical-estimate authority; complete sixteen-game publication batch staged. Scope: every one of the 16 Week 3 games.
+Status: complete weekly learning for all 32 teams under user-approved v1.6 historical-estimate authority; all 16 Week 3 rating bases refreshed from the applied production receipt.
 
-The existing CLE–TB pair is preserved and verified rather than applied twice. The new evidence bundle and READY staging submit the other fifteen pairs. A local publication rehearsal produced a COMPLETE cumulative receipt with 16 games, 32 teams, 30 new team updates, one already-applied pair and no blocked pairs. A separate current-week propagation preview refreshed all 16 Week 3 matchups. The remote workflow receipt and site deployment remain the final publication checks.
+The existing CLE–TB pair is preserved byte-for-byte. PR #107 merged the other fifteen pairs, and the production workflow published commit `a0513e44` with a verified COMPLETE cumulative receipt: 16 games, 32 teams, 30 new team updates, one already-applied pair and no blocked pairs. This separate current-week propagation refreshes all 16 Week 3 matchups from those published ratings. It preserves the existing current-week personnel, QB, matchup and home-field overlays and clears the obsolete partial-weekly-rating warning.
 
 ## Adopted calculation changes
 
@@ -10,7 +10,7 @@ The existing CLE–TB pair is preserved and verified rather than applied twice. 
 
 The evaluator integration also supports a historical QB replacement difference on the original locked Madden conversion, without changing the current-week QB performance model. Authority v1.6 adopts this as a separate historical estimate and explicitly disclaims performance validation of the Madden-only scale; it does not modify the activated QB-performance model. The implementation supports a value-invariant healthy-QB competition; it rejects unequal candidate values and missing identities. It does not charge two unavailable quarterbacks as two starting roles.
 
-For position groups whose calibration requests review rather than specifying a multiplier, the draft accepts an explicit disjoint-role assessment with an additive, no-extra-multiplier estimate. Existing calibrated receiver and defensive-line multipliers remain unchanged. The extra interaction effect is an adopted modelling assumption, not a measured zero.
+For position groups whose calibration requests review rather than specifying a multiplier, the approved implementation accepts an explicit disjoint-role assessment with an additive, no-extra-multiplier estimate. Existing calibrated receiver and defensive-line multipliers remain unchanged. The extra interaction effect is an adopted modelling assumption, not a measured zero.
 
 The user approved broader estimates on September 22. Authority v1.6 records adoption, scope and limitations; real coverage has passed the evidence evaluator and the complete publication rehearsal.
 
@@ -30,7 +30,7 @@ Some independent pages report ratings for identities absent from both the frozen
 
 The approved v1.6 policy below resolves missing values through a disclosed source hierarchy. Final availability and role assessments remain separate requirements.
 
-### Approved fallback policy — implementation in progress
+### Approved fallback policy — implemented
 
 1. Use the locked registry first, then the bound official EA supplement. Reconcile aliases before declaring an identity unrated.
 2. For a still-missing identity with a verifiable Madden 27 rating from an independent source, retain the source, retrieval date and version and apply the unchanged conversion curve. Label this an independent-source historical estimate; do not claim official EA capture or overwrite the production registry.
@@ -49,11 +49,11 @@ The currently locked registry produces these cohort values mechanically:
 | Linebacker | 219 | 0.0 | 0.0–0.9 |
 | Defensive back | 453 | 0.2 | 0.0–0.9 |
 
-The user approved this broader policy. It is now implemented in the historical-only value loader and documented in authority v1.6. No new production game has yet been applied. Complete role and final-availability research remains required. Estimates retain provenance and cannot overwrite the frozen registry.
+The user approved this broader policy. It is implemented in the historical-only value loader, documented in authority v1.6 and applied through the complete Week 2 production batch. Complete role and final-availability research remains required for future batches. Estimates retain provenance and cannot overwrite the frozen registry.
 
-## Verification and next gate
+## Production verification
 
-The six time-exposure unit checks and the existing historical completion, weekly evidence, role-chain, routing, rating-base-refresh and exact 90/10 tests pass locally. This does not validate real game totals. Before production: complete final coverage for each pair, reconcile/adopt the new methods, add integration acceptance cases, run immutable evidence validation, stage through the existing updater, verify remote receipt, then separately refresh and verify the full Week 3 board.
+The main-branch carried-rating workflow completed successfully. Readback verifies the applied receipt, 30 new team-history events, unchanged CLE/TB records and no duplicate application. The separate board refresh passes schedule authority and fair-decomposition validation for all 16 games. Replaying it produces zero new changes. These checks establish implementation and publication consistency; they do not establish predictive accuracy for the new estimates.
 
 ## Publication validation
 
