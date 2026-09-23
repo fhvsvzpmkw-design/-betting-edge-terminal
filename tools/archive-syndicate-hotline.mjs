@@ -78,6 +78,7 @@ const characterPath = repoRel(roster.characterFile);
 const character = readJson(path.join(ROOT, characterPath));
 assert(character.id, `Character profile has no stable id: ${characterPath}`);
 assert(roster.characterId === character.id, `Roster characterId (${roster.characterId}) does not match character id (${character.id})`);
+assert(character.authority?.mode !== 'static-product-counter', 'Static product counters do not use report-session archives; use tools/build-lou-vega-counter.mjs');
 
 const last = character.continuity?.lastReportSeen;
 assert(last && last.timestamp && last.label && last.slot, `Character ${character.id} has no complete continuity.lastReportSeen to archive`);

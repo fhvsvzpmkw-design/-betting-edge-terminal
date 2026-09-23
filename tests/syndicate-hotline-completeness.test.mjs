@@ -14,7 +14,7 @@ const required={
 'bill-weston':['The Week’s Schedule','Edition Change Memo','Full-Week Game Files','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Today's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
 'jesse-bains':['Sports Desk','Hotel Delphoria','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
-'lou-vega':['VEGAS BY THE SLICE','data-zone="menu-board"','COUPON BOOK','BEST NUMBER IN TOWN','PIZZA BOOK // RUNNING REVIEW','data-zone="floor-walk"','LAST STOP']};
+'lou-vega':['VEGAS BY THE SLICE','data-zone="menu-board"','COUPON BOOK','OPEN TENPLAY','data-zone="lou-counter"','data-zone="quick-start"']};
 for(const profile of roster){
  const id=profile.characterId;if(!required[id])continue;
  const character=readJson(repoRel(profile.characterFile));
@@ -22,11 +22,17 @@ for(const profile of roster){
  const liveText=read(live);assert(liveText.length>=6000,`${id}: latest Hotline appears abbreviated (${liveText.length} chars)`);
  for(const marker of required[id])assert(liveText.includes(marker),`${id}: missing full-edition marker "${marker}"`);
  if(id==='lou-vega'){
-  assert(character?.hotlineStyle?.shell?.id==='vegas-by-the-slice',`${id}: v3 shell identity mismatch`);
-  assert(character?.hotlineStyle?.shell?.version===3,`${id}: v3 shell version mismatch`);
-  assert(character?.hotlineStyle?.shell?.status==='locked',`${id}: v3 shell must remain locked`);
-  const rotationRule=String(character?.hotlineStyle?.generationEngine?.rule||'');
-  assert(rotationRule.includes('Do not force pizza, a progressive, video poker, a comp, a waitress and parking into the same issue.'),`${id}: rotating route-module safeguard missing`);
+  assert(character.authority?.mode==='static-product-counter','Lou: static product authority required');
+  assert(character.hotlineStyle?.shell?.id==='vegas-by-the-slice' && character.hotlineStyle.shell.version===4 && character.hotlineStyle.shell.status==='locked','Lou: locked v4 counter shell required');
+  assert(character.continuity.automaticReportUpdates===false && !character.continuity.lastReportSeen,'Lou: report-session continuity must be retired');
+  assert(liveText.includes('data-update-mode="static-product-counter"') && !liveText.includes('fetch('),'Lou: static product page required');
+  const config=readJson(character.authority.source);
+  assert(character.continuity.lastEditionSeen.id===config.id,'Lou: current edition mismatch');
+  assert(liveText.includes(`href="${config.product.url}"`),'Lou: TenPlay action missing');
+  assert(!/PIZZA PLAY|SOURCE STATUS|NEW RISK|PLAY TO|data-zone="recommendations"/.test(liveText),'Lou: sports report content returned');
+  const archived=read(character.continuity.lastEditionSeen.archivePath);
+  assert(liveText.replace('<base href="./">','<base href="../../">')===archived,'Lou: live/archive counter mismatch');
+  continue;
  }
  if(id==='bill-weston' && character?.authority?.mode==='graham-weekly-edition-authoritative'){
   assert(character.authority.source==='data/walters/nfl/current-week-terminal.json','Bill: Graham source required');
