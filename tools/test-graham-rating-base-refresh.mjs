@@ -16,4 +16,14 @@ test('new carried ratings cannot be used without applied matching receipt',()=>{
 test('intervening unrelated rating cannot be overwritten',()=>{const c=structuredClone(f);c.power.teams.find(t=>t.abbr==='CAR').currentRating+=1;assert.throws(()=>refreshRatingBases(c),/UNRELATED_STALE/);});
 test('initial baseline and active week are required',()=>{const c=structuredClone(f);c.active.week=4;assert.throws(()=>refreshRatingBases(c),/ACTIVE_BASELINE/);});
 test('unfinished opponents remain explicitly blocked',()=>{for(const g of r.board.games.filter(g=>['CLE','TB'].includes(g.home))){assert.equal(g.weeklyRatingInput.homeUpdateState,'UPDATED');assert.deepEqual(g.weeklyRatingInput.blockedTeams,[g.away]);}});
+test('complete receipt clears weekly blockers while preserving unresolved overlays',()=>{
+ const c=structuredClone(f);Object.assign(c.power.weekly90_10,{state:'COMPLETE',gamesUpdated:16,teamsUpdated:32,blockedGames:[]});c.staging.result.receipt=structuredClone(c.power.weekly90_10);
+ const r=refreshRatingBases(c);assert.equal(r.board.baselineStatus,'TUESDAY_BASELINE_COMPLETE');assert.ok(r.board.games.every(g=>g.weeklyRatingInput.state==='COMPLETE'&&g.weeklyRatingInput.blockedTeams.length===0));assert.ok(r.board.games.every(g=>g.numberStatus!=='READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT'));
+ for(const g of r.board.games)if(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length||String(g.qbPerformanceStatus).startsWith('FAIL_CLOSED'))assert.equal(g.numberStatus,'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS');
+ const again=refreshRatingBases({...c,board:r.board});assert.deepEqual(again.board,r.board);
+});
+test('complete receipt cannot mask an unchanged stale base or incomplete coverage',()=>{
+ const c=structuredClone(f);Object.assign(c.power.weekly90_10,{state:'COMPLETE',gamesUpdated:16,teamsUpdated:32,blockedGames:[]});c.staging.result.receipt=structuredClone(c.power.weekly90_10);c.board.games[0].neutralBaseHome+=1;assert.throws(()=>refreshRatingBases(c),/COMPLETE_RECEIPT_STALE_BASE/);
+ c.power.weekly90_10.teamsUpdated=30;c.staging.result.receipt=structuredClone(c.power.weekly90_10);assert.throws(()=>refreshRatingBases(c),/COMPLETE_RECEIPT_COVERAGE/);
+});
 console.log(`RATING BASE REFRESH: ${n} PASS`);

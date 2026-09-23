@@ -1,3 +1,4 @@
+import './test-graham-historical-value-estimates.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {evaluateWeeklyEvidence,loadWeeklyEvidence,gitBlob,boundJson,verifyWeeklyGameEvidence} from './graham-weekly-evidence.mjs';
@@ -48,6 +49,52 @@ check('new real case reviews are retained without releasing blocked pairs',()=>{
  assert.equal(cases.find(c=>c.team==='GB').estimate.injuryLoss,1.567);assert.equal(cases.find(c=>c.team==='DEN').estimate.injuryLoss,0.7);
  assert.ok(out.games.every(g=>g.teams.length===0));
 });
+function estimatedZeroFixture(position='WR'){
+ const f=structuredClone(fixture);f.bundle.estimationPolicy='graham-historical-value-estimates-v1';
+ f.bundle.valueEstimates=[{player:'Synthetic Missing',identity:'estimate:test',position,method:'POSITION_GROUP_MEDIAN',estimateAcknowledged:true,rationale:'Synthetic missing value',gameKeys:[gameKey],sourceIds,roleSourceIds:sourceIds,officialAndIndependentSearchCompleted:true,searchFinding:'Synthetic exhausted search'}];
+ f.personnel.currentCases={};f.bundle.games[0].teams[0].cases=[{caseKey:'missing',player:'Synthetic Missing',eaPlayerId:'estimate:test',newlyIdentified:true,resolution:'ZERO_IMPUTED_BASELINE_ESTIMATE',availabilityStatus:'IR',rationale:'Synthetic reserve absence',sourceIds,estimateAcknowledged:true,assumptionRationale:'Explicit estimated zero; retain sensitivity.'}];return f;
+}
+check('imputed zero retains cohort sensitivity and is never calibrated proof',()=>{
+ const g=evaluateWeeklyEvidence(estimatedZeroFixture()).games[0];assert.equal(g.state,'READY');
+ const c=g.teams[0].cases[0];assert.equal(c.modelEstimate.classification,'GRAHAM_MODEL_ESTIMATE');assert.deepEqual(c.valueProvenance.valueRange,[0,.9]);assert.equal(c.rawTeamContributionDelta,0);
+});
+check('imputed zero rejects positive baseline and missing acknowledgment',()=>{
+ const positive=evaluateWeeklyEvidence(estimatedZeroFixture('RB')).games[0];assert.ok(positive.blockers.some(b=>b.code==='ZERO_IMPUTED_BASELINE_REQUIRED'));
+ const f=estimatedZeroFixture();delete f.bundle.games[0].teams[0].cases[0].estimateAcknowledged;assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');
+});
+function receiverFixture(){
+ const f=structuredClone(fixture);f.personnel.currentCases={};f.bundle.estimationPolicy='graham-historical-value-estimates-v1';const t=f.bundle.games[0].teams[0];
+ t.cases=[['CeeDee Lamb','Jalen Tolbert'],['George Pickens','Jonathan Mingo']].map(([player,replacement],i)=>({...structuredClone(c),caseKey:'receiver'+i,newlyIdentified:true,player,replacements:[{player:replacement}]}));t.topReceiverClusterReviewed=true;
+ t.receiverClusterReview={eligible:false,estimateAcknowledged:true,rationale:'Synthetic higher-value healthy receiving options remain available',sourceIds};return f;
+}
+check('receiver multiplier requires actual top-two eligibility',()=>{
+ const f=receiverFixture(),g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].groups[0].multiplier,1);
+ delete f.bundle.games[0].teams[0].receiverClusterReview;assert.ok(evaluateWeeklyEvidence(f).games[0].blockers.some(b=>b.code==='RECEIVER_CLUSTER_ELIGIBILITY_REQUIRED'));
+});
+check('eligible top-two receiver review preserves governed multiplier',()=>{
+ const f=receiverFixture();Object.assign(f.bundle.games[0].teams[0].receiverClusterReview,{eligible:true,topExpectedReceivers:['CeeDee Lamb','George Pickens'],simultaneousAbsence:true});
+ const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].groups[0].multiplier,1.5);
+ f.bundle.games[0].teams[0].receiverClusterReview.topExpectedReceivers=['CeeDee Lamb','CeeDee Lamb'];assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');
+});
+check('new policy cannot assign an unavailable player as a replacement',()=>{
+ const f=structuredClone(fixture);f.bundle.estimationPolicy='graham-historical-value-estimates-v1';f.bundle.games[0].teams[0].cases.push({caseKey:'bass',player:c.replacements[0].player,newlyIdentified:true,resolution:'ZERO_CALIBRATED_LOSS',availabilityStatus:'IR',rationale:'Synthetic unavailable relief',sourceIds,estimateAcknowledged:true,assumptionRationale:'Frozen zero'});
+ assert.ok(evaluateWeeklyEvidence(f).games[0].blockers.some(b=>b.code==='CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE'));
+});
+check('specialist estimate must disclose replacement and uncertainty',()=>{
+ const f=structuredClone(fixture),t=f.bundle.games[0].teams[0];t.specialistCases=[{player:'Synthetic specialist',position:'P',replacementPlayer:'Synthetic relief',method:'NEUTRAL_SPECIALIST_REPLACEMENT_ESTIMATE',estimateAcknowledged:true,availableProfessionalReplacement:true,materialRoleDisruption:false,rationale:'Synthetic professional relief',sourceIds,replacementSourceIds:sourceIds}];
+ const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].specialistEstimates[0].uncertainty,'UNQUANTIFIED');
+ t.specialistCases[0].materialRoleDisruption=true;assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');
+});
+check('historical quarterback difference is weighted and explicitly limited',()=>{
+ const f=structuredClone(fixture),q={state:'HISTORICAL_REPLACEMENT_ESTIMATE',estimateAcknowledged:true,lossCause:'INJURY_UNAVAILABILITY',rationale:'Synthetic injury',sourceIds,healthyCandidates:[{player:'Dak Prescott'}],replacement:{player:'Jameis Winston'},baselineRationale:'One QB duty',baselineSourceIds:sourceIds,replacementRationale:'Synthetic documented relief',replacementSourceIds:sourceIds,exposure:{modelId:'graham-historical-time-exposure-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic half game',activeEffectivenessConvention:'NORMAL_WHILE_ACTIVE_ESTIMATE',gameDurationSeconds:3600,durationSourceIds:sourceIds,unavailableIntervals:[{startEarliest:1800,startLatest:1800,endEarliest:3600,endLatest:3600,rationale:'Second half',sourceIds}]}};
+ f.bundle.games[0].teams[0].qbAvailability=q;const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].qbEstimate.injuryLoss,.875);assert.ok(g.teams[0].qbEstimate.scaleLimitation.includes('not a performance-validated'));
+ q.lossCause='PERFORMANCE_BENCHING';assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');
+});
+check('full recovery binds fifteen distinct game pairs and all thirty remaining teams',()=>{
+ const path='data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json',bytes=fs.readFileSync(path),bundle=JSON.parse(bytes);
+ const r=loadWeeklyEvidence(process.cwd(),{path,blobSha:gitBlob(bytes)},{season:2026,sourceWeek:2,effectiveAt:bundle.recordedAt});
+ assert.equal(r.readyGames,15);assert.equal(r.blockedGames,0);assert.equal(new Set(r.games.flatMap(g=>g.teams.map(t=>t.team))).size,30);assert.ok(r.games.every(g=>g.gameKey!=='2026-W02-CLE-TB'));
+});
 console.log(`WEEKLY HISTORICAL EVIDENCE: ${count} PASS`);
 
 // Current-week routing and additive Week 2 evidence share this existing CI entrypoint.
@@ -57,3 +104,5 @@ await import('./test-graham-role-chain.mjs');
 await import("./test-graham-historical-completion.mjs");
 
 await import("./test-graham-rating-base-refresh.mjs");
+
+await import('./test-graham-historical-exposure.mjs');

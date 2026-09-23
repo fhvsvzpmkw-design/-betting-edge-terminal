@@ -54,6 +54,17 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     g.sourceRefs=[...new Set([...g.sourceRefs,'data/walters/nfl/carried-rating-audit-staging.json'])];
     games.push({gameKey:g.gameKey,neutralDelta:delta,before,after:{neutralBaseHome:neutral,exactFairHome:g.grahamExactFairHome,displayedFairHome:g.grahamFairHome}});
   }
+  if(receipt.state==='COMPLETE'){
+    if(receipt.blockedGames.length||receipt.gamesUpdated!==result.games.length||receipt.teamsUpdated!==result.games.length*2)fail('COMPLETE_RECEIPT_COVERAGE_INVALID');
+    for(const g of result.games){
+      const away=byTeam.get(g.away),home=byTeam.get(g.home);
+      if(g.ratingCarryForward.awayRating!==away.currentRating||g.ratingCarryForward.homeRating!==home.currentRating||Math.abs(g.neutralBaseHome-decimalSum(away.currentRating,-home.currentRating))>1e-9)fail('COMPLETE_RECEIPT_STALE_BASE:'+g.gameKey);
+      g.weeklyRatingInput={...g.weeklyRatingInput,state:'COMPLETE',sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,awayCurrentRating:away.currentRating,homeCurrentRating:home.currentRating,awayUpdateState:'UPDATED',homeUpdateState:'UPDATED',blockedTeams:[],sourceBlobSha:powerBlobSha,appliedToFair:true,applicationStatus:'APPLIED',marketViewed:false};
+      if(g.numberStatus==='READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT')g.numberStatus=(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length||String(g.qbPerformanceStatus).startsWith('FAIL_CLOSED'))?'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS':'READY';
+    }
+    if(result.baselineStatus==='TUESDAY_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='TUESDAY_BASELINE_COMPLETE';
+    if(result.state==='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED')result.state=result.games.some(g=>g.numberStatus==='READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS')?'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS':'INFORMATION_REVIEW_CURRENT_FAIR';
+  }
   if(games.length){
     result.updatedAt=effectiveAt;
     result.ratingBaseRefresh={schema:1,state:'APPLIED',effectiveAt,sourceAuditId:staging.auditId,powerBlobSha,sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,games,marketViewed:false,scope:'Mechanical propagation of published weekly carried ratings only; existing initial baseline research and all current-week overlays preserved.'};
