@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-09-22T04:27:21-07:00",
-  "updatedAt": "2026-09-23T16:53:32-07:00",
+  "updatedAt": "2026-09-23T17:15:30-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -2766,6 +2766,106 @@
         "h4PointsToHomeSpread": -2.082,
         "marketViewed": false,
         "note": "Prior verified broad coverage: graham-daily-review-2026-w03-20260923T113242-0700, completed through 2026-09-23T11:44:00-07:00 with matching VERIFIED receipt and COMPLETED runtime. This narrow Delta reviewed every material development from that coverage endpoint through 2026-09-23T16:53:32-07:00. No missed-day catch-up was required and no unresolved coverage gap remained at cutoff. The production-batch sweep at sequence 6 is separate and does not replace this scheduled Delta sweep. Green Bay final designations resolved three personnel cases; production applied only Reed-to-Moore because the two simultaneous offensive-line losses were blocked by the cluster guard. No market information was viewed."
+      }
+    },
+    {
+      "sequence": 8,
+      "type": "LATE_DAY_DELTA",
+      "runEventId": "graham-delta-1645-2026-w03-20260923T170703-0700",
+      "sourceTaskKey": "DELTA_1645",
+      "completionResult": "MATERIAL_CHANGE",
+      "startedAt": "2026-09-23T17:07:03-07:00",
+      "completedAt": "2026-09-23T17:15:30-07:00",
+      "scope": "Post-cutoff late-day follow-up delta for all 16 active Week 3 games, limited to material developments published after the verified 16:53:32 Delta coverage endpoint and explicitly preventing replay of its Green Bay personnel adjustment.",
+      "sourcesChecked": [
+        {
+          "source": "NFL Wednesday Week 3 news roundup",
+          "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23",
+          "checkedAt": "2026-09-23T17:15:30-07:00",
+          "purpose": "Post-cutoff leaguewide quarterback, injury, roster and transaction developments, including the Giants' confirmed Week 3 starter."
+        },
+        {
+          "source": "Walters frozen Stage 3C quarterback candidates",
+          "url": "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+          "checkedAt": "2026-09-23T17:15:30-07:00",
+          "purpose": "Validated Jameis Winston identity and frozen approved production candidate for the repository-owned QB calculation."
+        },
+        {
+          "source": "Walters QB production contract and current manifest",
+          "url": "data/walters/nfl/qb-production-current.json",
+          "checkedAt": "2026-09-23T17:15:30-07:00",
+          "purpose": "Confirmed operational scope, prior Giants fail-closed binding, and durable post-workflow starter/fair read-back."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "NYG",
+          "finding": "New York confirmed Jameis Winston will start Week 3 against Tennessee after Jaxson Dart's multi-ligament knee injury. The governed QB workflow resolved the previous fail-closed Giants starter status and moved TEN-NYG from Giants -4.098 exact / -4 displayed to Giants -3.338 exact / -3.5 displayed.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23",
+            "data/walters/nfl/qb-production-current.json",
+            "data/walters/nfl/2026/week-03-current-numbers.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "IND",
+          "finding": "Indianapolis announced Alec Pierce will be placed on injured reserve. The absence is material, but no stable one-for-one receiver replacement was established in the post-cutoff reporting; the existing personnel uncertainty remains fail closed and HOU-IND was preserved.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23",
+            "data/walters/nfl/2026/week-03-personnel-ledger.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "ALL",
+          "finding": "The official league roundup was rechecked for developments after the prior verified Delta cutoff. No other confirmed current starter change or resolved material replacement was found that authorized a new governed fair adjustment. The prior Green Bay personnel move was not replayed.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W03-TEN-NYG",
+          "priorExactFairHome": -4.098,
+          "priorPublishedFairHome": -4,
+          "newExactFairHome": -3.338,
+          "newPublishedFairHome": -3.5,
+          "pointsToHomeSpread": 0.76,
+          "reason": "The governed QB workflow replaced the prior preserved Jaxson Dart differential with confirmed starter Jameis Winston. Repository production calculated TEN -0.75 minus NYG -1.08 as +0.33 to the home-spread coordinate, versus the prior preserved -0.43 term, a net +0.760 move toward Tennessee.",
+          "productionId": "walters-qb-performance-production-v1",
+          "batchId": "graham-delta-1645-qb-2026-w03-20260923T171130-0700",
+          "sourceRefs": [
+            "data/walters/nfl/qb-production-current.json",
+            "data/walters/nfl/2026/week-03-current-numbers.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_NO_CARRIED_RATING_CHANGE",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "note": "No carried-rating revision was proposed. FPI was not used to create or alter the QB adjustment.",
+        "marketViewed": false
+      },
+      "summary": {
+        "teamsReviewed": 32,
+        "gamesReviewed": 16,
+        "materialInformationChanged": true,
+        "carriedRatingMoves": 0,
+        "fairNumberChanges": 1,
+        "displayedFairNumberChanges": 1,
+        "personnelBatchesSubmitted": 0,
+        "matchupM4BatchesSubmitted": 0,
+        "qbBatchesSubmitted": 1,
+        "betsCreated": 0,
+        "h4DomesticHomeAdvantagePoints": 2.082,
+        "h4PointsToHomeSpread": -2.082,
+        "marketViewed": false,
+        "note": "Prior verified coverage: graham-delta-1645-2026-w03-20260923T164502-0700, completed through 2026-09-23T16:53:32-07:00 with matching VERIFIED receipt and COMPLETED runtime. This follow-up invocation reviewed all material developments from that exact endpoint through 2026-09-23T17:15:30-07:00. No missed-day catch-up was required and no unresolved coverage gap remained at cutoff. The earlier Green Bay adjustment was not replayed. A newly confirmed Giants starter cleared the governed QB production gate. No market information was viewed."
       }
     }
   ]
