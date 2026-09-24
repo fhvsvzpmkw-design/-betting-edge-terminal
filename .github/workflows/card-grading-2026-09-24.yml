@@ -44,15 +44,48 @@ jobs:
           PY
           node /tmp/card-grade.js
 
-      - name: Verify and commit grading outputs
+      - name: Rebuild downstream results index
         run: |
-          node scripts/history/verify-result-integrity.mjs --require-results-index
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+
+      - name: Verify coverage and strict isolation
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const idx = JSON.parse(fs.readFileSync('data/history/results-index.json','utf8'));
+          const runtime = JSON.parse(fs.readFileSync('/tmp/grading-runtime.json','utf8'));
+          const d = (idx.byDate || []).find(x => x.name === runtime.target) || {};
+          const older = (idx.unresolved || []).filter(x => String(x.date || '') < runtime.target);
+          const c = idx.coverage || {};
+          const grades = d.grades || {};
+          const status = runtime.statusCounts || {};
+          const msg = [
+            `Grade September 23 issued cards and retry older unresolved`,
+            ``,
+            `TARGET issued=${d.issued ?? runtime.issuedCards} complete=${d.complete ?? 'n/a'} unresolved=${d.unresolved ?? 'n/a'} WIN=${grades.WIN ?? 0} LOSS=${grades.LOSS ?? 0} PUSH=${grades.PUSH ?? 0} VOID=${grades.VOID ?? 0} HALF_WIN=${grades.HALF_WIN ?? 0} HALF_LOSS=${grades.HALF_LOSS ?? 0} priced=${d.priced ?? 'n/a'} netUnits=${d.netUnits ?? 'n/a'} roiPct=${d.roiPct ?? 'n/a'}`,
+            `STATUS PASS=${status.PASS ?? 0} WAIT=${status.WAIT ?? 0} LEAN=${status.LEAN ?? 0} BET=${status.BET ?? 0} OTHER=${Object.entries(status).filter(([k])=>!['PASS','WAIT','LEAN','BET'].includes(k)).reduce((s,[,v])=>s+v,0)}`,
+            `EVENTS unique=${runtime.currentUniqueEvents} verifiedFinal=${runtime.currentVerifiedFinal} unresolved=${runtime.currentUnresolvedEvents.length}`,
+            `BACKLOG enteringCards=${runtime.olderEnteringCards} enteringEvents=${runtime.olderEnteringEvents} verifiedFinal=${runtime.olderVerifiedFinal} unresolvedAttempted=${runtime.olderUnresolvedEvents.length} remainingCards=${older.length} remainingEvents=${new Set(older.map(x => `${x.date}|${x.eventId}`)).size}`,
+            `INDEX cards=${c.cards ?? 'n/a'} complete=${c.completeCards ?? 'n/a'} unresolved=${c.unresolvedCards ?? 'n/a'} pendingObservationCards=${c.pendingObservationCards ?? 'n/a'} unresolvedSelections=${c.unresolvedSelections ?? 'n/a'} unresolvedEvents=${c.unresolvedEvents ?? 'n/a'} observedThrough=${c.observedThroughDate ?? 'n/a'}`,
+            `ISOLATION historical-only`
+          ].join('\n');
+          fs.writeFileSync('/tmp/commit-msg.txt', msg);
+          console.log(msg);
+          console.log(`CURRENT_UNRESOLVED=${JSON.stringify(runtime.currentUnresolvedEvents)}`);
+          console.log(`OLDER_UNRESOLVED=${JSON.stringify(runtime.olderUnresolvedEvents)}`);
+          NODE
+          bad=$(git diff --name-only | grep -Ev '^(data/history/observations/|data/history/results-index\.json$)' || true)
+          if [ -n "$bad" ]; then echo "Unexpected changes outside historical grading outputs:"; echo "$bad"; exit 1; fi
+          if git diff --name-only | grep -q '^data/history/runs/'; then echo 'Issued run mutation forbidden'; exit 1; fi
+
+      - name: Commit historical grading outputs only
+        run: |
+          git config user.name "betting-edge-bot"
+          git config user.email "betting-edge-bot@users.noreply.github.com"
           git add data/history/observations data/history/results-index.json
-          if git diff --cached --quiet; then
-            echo "No grading changes to commit."
-          else
-            git commit -m "data: grade 2026-09-23 issued cards"
-            git push origin HEAD:main
-          fi
+          if git diff --cached --quiet; then echo "No historical grading changes to commit"; exit 0; fi
+          git commit -F /tmp/commit-msg.txt
+          git pull --rebase origin main
+          git push origin main
