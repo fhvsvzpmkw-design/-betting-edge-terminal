@@ -16,10 +16,11 @@ concurrency:
 jobs:
   grade:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -27,17 +28,19 @@ jobs:
           node-version: '20'
 
       - name: Grade 2026-09-23 issued cards and older unresolved
-        env:
-          TARGET: '2026-09-23'
-          API_BASE: https://site.api.espn.com/apis/site/v2/sports
         run: |
           python - <<'PY'
           from pathlib import Path
           src = Path('.github/workflows/card-grading-2026-09-23.yml').read_text()
-          marker = "            node <<'NODE'\n"
+          marker = "          node - <<'NODE'\n"
           start = src.index(marker) + len(marker)
-          end = src.index("\n            NODE", start)
-          Path('/tmp/card-grade.js').write_text(src[start:end])
+          end = src.index("\n          NODE", start)
+          body = src[start:end]
+          old = "const TARGET = '2026-09-22';"
+          new = "const TARGET = '2026-09-23';"
+          if old not in body:
+              raise RuntimeError('Expected grader target declaration not found')
+          Path('/tmp/card-grade.js').write_text(body.replace(old, new, 1))
           PY
           node /tmp/card-grade.js
 
