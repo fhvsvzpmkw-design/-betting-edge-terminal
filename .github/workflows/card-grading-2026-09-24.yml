@@ -1,0 +1,55 @@
+name: Card grading 2026-09-24
+
+on:
+  push:
+    paths:
+      - '.github/workflows/card-grading-2026-09-24.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: card-grading
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Grade 2026-09-23 issued cards and older unresolved
+        env:
+          TARGET: '2026-09-23'
+          API_BASE: https://site.api.espn.com/apis/site/v2/sports
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path('.github/workflows/card-grading-2026-09-23.yml').read_text()
+          marker = "            node <<'NODE'\n"
+          start = src.index(marker) + len(marker)
+          end = src.index("\n            NODE", start)
+          Path('/tmp/card-grade.js').write_text(src[start:end])
+          PY
+          node /tmp/card-grade.js
+
+      - name: Verify and commit grading outputs
+        run: |
+          node scripts/history/verify-result-integrity.mjs --require-results-index
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/history/observations data/history/results-index.json
+          if git diff --cached --quiet; then
+            echo "No grading changes to commit."
+          else
+            git commit -m "data: grade 2026-09-23 issued cards"
+            git push origin HEAD:main
+          fi
