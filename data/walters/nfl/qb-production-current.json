@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-22T20:10:57-07:00",
+  "lastAppliedAt": "2026-09-23T17:11:30-07:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -1003,9 +1003,17 @@
     {
       "team": "NYG",
       "teamName": "NY Giants",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "WEEK3_STARTER_UNRESOLVED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "19982",
+        "gsisId": "00-0031503",
+        "playerName": "Jameis Winston",
+        "candidateValue": 7.17,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "LOW",
+        "evidenceDropbacks": 375
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "14796",
@@ -1014,23 +1022,23 @@
         "priorValue": 8.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 7.17,
       "embeddedBaselineQbValue": 8.25,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
-      "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
+      "teamQbDelta": -1.08,
+      "gameContributionEligible": true,
+      "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Tuesday testing showed Jaxson Dart's knee injury is worse than initially believed and could require season-ending surgery, but the Giants said evaluations and a final decision remain pending. Jameis Winston is expected to handle the role if Dart cannot play, but the club has not confirmed the Week 3 starter. Preserve the prior governed fair and fail closed. No market information was viewed.",
+        "researchFinding": "The Giants confirmed Jameis Winston will start Week 3 against Tennessee after Jaxson Dart sustained a multi-ligament knee injury expected to require season-ending surgery. Resolve the prior fail-closed Week 3 starter status using Winston's frozen Stage 3C candidate; repository production owns the exact arithmetic and fair update.",
         "sourceRefs": [
-          "https://www.nfl.com/news/nfl-network-giants-jaxson-dart-potentially-out-for-season-after-testing-shows-worse-knee-injury",
-          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-tuesday-sept-22",
-          "data/walters/nfl/qb-production/production-contract-v1.json"
+          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23",
+          "data/walters/nfl/qb-production/production-contract-v1.json",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-22T16:55:00-07:00",
+      "lastUpdatedAt": "2026-09-23T17:11:30-07:00",
       "marketViewed": false,
-      "failClosedCode": "JAXSON_DART_WORSE_KNEE_INJURY_FINAL_DECISION_PENDING"
+      "failClosedCode": null
     },
     {
       "team": "NYJ",
@@ -1394,7 +1402,8 @@
     "graham-tuesday-baseline-qb-2026-w03-20260922T110600-0700",
     "graham-tuesday-baseline-qb-2026-w03-20260922T111300-0700",
     "graham-delta-1645-qb-2026-w03-20260922T165500-0700",
-    "graham-manual-qb-2026-w03-20260922T201057-0700"
+    "graham-manual-qb-2026-w03-20260922T201057-0700",
+    "graham-delta-1645-qb-2026-w03-20260923T171130-0700"
   ],
   "bindingUpdates": [
     {
@@ -1499,6 +1508,15 @@
         "WAS"
       ],
       "sourceTask": "MANUAL_PERSONNEL_QB_RESOLUTION",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-delta-1645-qb-2026-w03-20260923T171130-0700",
+      "effectiveAt": "2026-09-23T17:11:30-07:00",
+      "teams": [
+        "NYG"
+      ],
+      "sourceTask": "DELTA_1645",
       "marketViewed": false
     }
   ],
