@@ -1,0 +1,31 @@
+name: Selection continuity incomplete repair test
+
+on:
+  push:
+    branches:
+      - 'repair/selection-continuity-incomplete-20260925'
+    paths:
+      - 'tools/selection-continuity.mjs'
+      - '.github/workflows/report-history-staged.yml'
+      - '.github/workflows/selection-continuity-incomplete-repair.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse validator and workflow
+        run: |
+          node --check tools/selection-continuity.mjs
+          node -e "const fs=require('fs'); const s=fs.readFileSync('.github/workflows/report-history-staged.yml','utf8'); if(!s.includes('selection-continuity.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json')) process.exit(1)"
+      - name: Run selection continuity self-test
+        run: node tools/selection-continuity.mjs self-test
+      - name: Run primary-lineage continuity regression
+        run: node tools/primary-lineage-continuity-test.mjs
+      - name: Run spread lineage self-test
+        run: node tools/spread-lineage.mjs self-test
+      - name: Run total lineage self-test
+        run: node tools/total-lineage.mjs self-test
