@@ -213,8 +213,9 @@ function selfTest() {
   assert.equal(deferred.diagnostics[0].state, 'DEFERRED_TO_SPREAD_LINEAGE');
 
   const totalPrior = {
-    recs: [{ status: 'LEAN', title: 'Over 8.5', feed: { eventId: 'total-1', marketKey: 'totals', side: 'over', line: 8.5, selectionKey: 'total-1|totals|over||8.5', eventDate: '2026-08-30T20:00:00Z' } }]
+    recs: [{ status: 'LEAN', title: 'Over 8.5', feed: { eventId: 'total-1', marketKey: 'totals', side: 'over', line: 8.5, selectionKey: 'total-1|totals|over||8.5', eventDate: '2026-09-25T20:00:00Z' } }]
   };
+  const totalBase = { ts: '2026-09-25T09:30:00-07:00', recs: [] };
   const incompleteTotal = {
     primaryAnalysis: {
       receipts: [{
@@ -225,14 +226,14 @@ function selfTest() {
       }]
     }
   };
-  const totalDeferred = auditSelectionContinuity({ previous: totalPrior, report: base, sidecar: incompleteTotal });
+  const totalDeferred = auditSelectionContinuity({ previous: totalPrior, report: totalBase, sidecar: incompleteTotal });
   assert.equal(totalDeferred.ok, true, totalDeferred.violations.join('; '));
   assert.equal(totalDeferred.diagnostics[0].state, 'DEFERRED_TO_TOTAL_LINEAGE_INCOMPLETE');
   assert.equal(totalDeferred.diagnostics[0].currentSelectionKey, 'total-1|totals|over||9');
 
   const badIncompleteTotal = structuredClone(incompleteTotal);
   badIncompleteTotal.primaryAnalysis.receipts[0].quote.side = 'under';
-  const totalRejected = auditSelectionContinuity({ previous: totalPrior, report: base, sidecar: badIncompleteTotal });
+  const totalRejected = auditSelectionContinuity({ previous: totalPrior, report: totalBase, sidecar: badIncompleteTotal });
   assert.equal(totalRejected.ok, false);
   assert.match(totalRejected.violations.join(' '), /vanished before event start/i);
 
