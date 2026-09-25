@@ -92,7 +92,7 @@ jobs:
       - name: Enforce official non-executable Pinnacle benchmark
         run: node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Guard tracked selection continuity
-        run: node tools/selection-continuity.mjs audit --report /tmp/report.json
+        run: node tools/selection-continuity.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Verify every displayed moneyline and price movement
         run: node tools/moneyline-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Verify tracked non-spread book availability
