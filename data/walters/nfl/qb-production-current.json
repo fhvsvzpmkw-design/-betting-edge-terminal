@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-23T17:11:30-07:00",
+  "lastAppliedAt": "2026-09-25T16:54:00-07:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -1166,9 +1166,17 @@
     {
       "team": "SEA",
       "teamName": "Seattle",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "WEEK3_STARTER_UNRESOLVED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "13097",
+        "gsisId": "00-0034869",
+        "playerName": "Sam Darnold",
+        "candidateValue": 8.25,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "HIGH",
+        "evidenceDropbacks": 1084
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "13097",
@@ -1177,23 +1185,24 @@
         "priorValue": 9,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 8.25,
       "embeddedBaselineQbValue": 9,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
+      "teamQbDelta": -0.75,
+      "gameContributionEligible": true,
       "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Seattle expects Sam Darnold to return to practice Wednesday and says he resumes the starting role once healthy, but his Week 3 clearance is not yet confirmed. Drew Lock remains the last approved spot starter. Preserve the prior governed fair and fail closed. No market information was viewed.",
+        "researchFinding": "Seattle removed Sam Darnold from the Week 3 injury report and confirmed that he will start against Washington after missing Week 2. Resolve the prior fail-closed Week 3 starter status using Darnold's frozen Stage 3C candidate; repository production owns the exact arithmetic and fair update.",
         "sourceRefs": [
-          "https://www.seahawks.com/news/seahawks-planning-on-sam-darnold-returning-to-practice-this-week",
-          "https://www.reuters.com/sports/seahawks-plan-sam-darnold-return-practice-wednesday--flm-2026-09-22/",
-          "data/walters/nfl/qb-production/production-contract-v1.json"
+          "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
+          "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+          "data/walters/nfl/qb-production/production-contract-v1.json",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-22T11:13:00-07:00",
+      "lastUpdatedAt": "2026-09-25T16:54:00-07:00",
       "marketViewed": false,
-      "failClosedCode": "SAM_DARNOLD_RETURN_TO_PRACTICE_PENDING"
+      "failClosedCode": null
     },
     {
       "team": "SF",
@@ -1403,7 +1412,8 @@
     "graham-tuesday-baseline-qb-2026-w03-20260922T111300-0700",
     "graham-delta-1645-qb-2026-w03-20260922T165500-0700",
     "graham-manual-qb-2026-w03-20260922T201057-0700",
-    "graham-delta-1645-qb-2026-w03-20260923T171130-0700"
+    "graham-delta-1645-qb-2026-w03-20260923T171130-0700",
+    "graham-delta-1645-qb-2026-w03-20260925T165400-0700"
   ],
   "bindingUpdates": [
     {
@@ -1515,6 +1525,15 @@
       "effectiveAt": "2026-09-23T17:11:30-07:00",
       "teams": [
         "NYG"
+      ],
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-delta-1645-qb-2026-w03-20260925T165400-0700",
+      "effectiveAt": "2026-09-25T16:54:00-07:00",
+      "teams": [
+        "SEA"
       ],
       "sourceTask": "DELTA_1645",
       "marketViewed": false
