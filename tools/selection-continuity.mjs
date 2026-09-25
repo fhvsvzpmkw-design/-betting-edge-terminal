@@ -20,8 +20,26 @@ function spreadEventSide(rec) {
   return `${rec.feed.eventId}|${String(rec.feed.side).toLowerCase()}`;
 }
 function stakeNumber(value) { return Number(String(value ?? '0').replace(/[$,\s]/g, '')); }
+function researchIncompleteReceipt(sidecar, rec, wantedMarket) {
+  const receipts = sidecar?.primaryAnalysis?.receipts;
+  if (!Array.isArray(receipts)) return null;
+  const eventId = String(rec?.feed?.eventId || '');
+  const side = String(rec?.feed?.side || '').toLowerCase();
+  if (!eventId || !side) return null;
+  for (const receipt of receipts) {
+    if (String(receipt?.state || '').toUpperCase() !== 'BLOCKED') continue;
+    if (String(receipt?.blocker?.reason || '').toUpperCase() !== 'RESEARCH_INCOMPLETE') continue;
+    const quote = receipt?.quote || {};
+    if (String(quote.eventId || '') !== eventId) continue;
+    if (String(quote.marketKey || '').toLowerCase() !== wantedMarket) continue;
+    if (String(quote.side || '').toLowerCase() !== side) continue;
+    if (!String(quote.selectionKey || '').trim()) continue;
+    return receipt;
+  }
+  return null;
+}
 
-export function auditSelectionContinuity({ previous, report, scopePolicy = null }) {
+export function auditSelectionContinuity({ previous, report, sidecar = null, scopePolicy = null }) {
   const reportMs = parseMs(report?.ts);
   if (reportMs === null) die('Report ts is invalid');
   const scope = scopePolicy ? activeReportScope(report, scopePolicy) : null;
@@ -96,6 +114,16 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
         });
         continue;
       }
+      const incompleteSpread = researchIncompleteReceipt(sidecar, rec, 'spread');
+      if (incompleteSpread) {
+        diagnostics.push({
+          selectionKey: key,
+          priorStatus,
+          state: 'DEFERRED_TO_SPREAD_LINEAGE_INCOMPLETE',
+          currentSelectionKey: String(incompleteSpread.quote.selectionKey)
+        });
+        continue;
+      }
     }
 
     const totalKey = totalLineageApplies(report) ? totalEventSide(rec) : null;
@@ -104,6 +132,14 @@ export function auditSelectionContinuity({ previous, report, scopePolicy = null 
       diagnostics.push({ selectionKey: key, priorStatus, state: 'DEFERRED_TO_TOTAL_LINEAGE',
         currentSelectionKey: selectionKey(movedTotal) || null });
       continue;
+    }
+    if (totalKey) {
+      const incompleteTotal = researchIncompleteReceipt(sidecar, rec, 'totals');
+      if (incompleteTotal) {
+        diagnostics.push({ selectionKey: key, priorStatus, state: 'DEFERRED_TO_TOTAL_LINEAGE_INCOMPLETE',
+          currentSelectionKey: String(incompleteTotal.quote.selectionKey) });
+        continue;
+      }
     }
     const mlKey = moneylineApplies(report) ? moneylineEventSide(rec) : null;
     const currentMoneyline = mlKey ? currentMoneylineByEventSide.get(mlKey) : null;
@@ -176,6 +212,44 @@ function selfTest() {
   assert.equal(deferred.ok, true, deferred.violations.join('; '));
   assert.equal(deferred.diagnostics[0].state, 'DEFERRED_TO_SPREAD_LINEAGE');
 
+  const totalPrior = {
+    recs: [{ status: 'LEAN', title: 'Over 8.5', feed: { eventId: 'total-1', marketKey: 'totals', side: 'over', line: 8.5, selectionKey: 'total-1|totals|over||8.5', eventDate: '2026-08-30T20:00:00Z' } }]
+  };
+  const incompleteTotal = {
+    primaryAnalysis: {
+      receipts: [{
+        selectionId: 'MLB|total-1|full_game_primary_total|over',
+        quote: { book: 'Bet365', eventId: 'total-1', marketKey: 'totals', side: 'over', line: 9, selectionKey: 'total-1|totals|over||9', priceDecimal: 1.91 },
+        state: 'BLOCKED',
+        blocker: { reason: 'RESEARCH_INCOMPLETE', missing: 'Current moved total assessment unfinished.', impact: 'No decision authorized.' }
+      }]
+    }
+  };
+  const totalDeferred = auditSelectionContinuity({ previous: totalPrior, report: base, sidecar: incompleteTotal });
+  assert.equal(totalDeferred.ok, true, totalDeferred.violations.join('; '));
+  assert.equal(totalDeferred.diagnostics[0].state, 'DEFERRED_TO_TOTAL_LINEAGE_INCOMPLETE');
+  assert.equal(totalDeferred.diagnostics[0].currentSelectionKey, 'total-1|totals|over||9');
+
+  const badIncompleteTotal = structuredClone(incompleteTotal);
+  badIncompleteTotal.primaryAnalysis.receipts[0].quote.side = 'under';
+  const totalRejected = auditSelectionContinuity({ previous: totalPrior, report: base, sidecar: badIncompleteTotal });
+  assert.equal(totalRejected.ok, false);
+  assert.match(totalRejected.violations.join(' '), /vanished before event start/i);
+
+  const incompleteSpread = {
+    primaryAnalysis: {
+      receipts: [{
+        selectionId: 'NFL|spread-1|full_game_primary_spread|away',
+        quote: { book: 'Bet365', eventId: 'spread-1', marketKey: 'spread', side: 'away', line: -4, selectionKey: 'spread-1|spread|away||-4', priceDecimal: 1.91 },
+        state: 'BLOCKED',
+        blocker: { reason: 'RESEARCH_INCOMPLETE', missing: 'Current moved spread assessment unfinished.', impact: 'No decision authorized.' }
+      }]
+    }
+  };
+  const spreadDeferredIncomplete = auditSelectionContinuity({ previous: spreadPrior, report: base, sidecar: incompleteSpread });
+  assert.equal(spreadDeferredIncomplete.ok, true, spreadDeferredIncomplete.violations.join('; '));
+  assert.equal(spreadDeferredIncomplete.diagnostics[0].state, 'DEFERRED_TO_SPREAD_LINEAGE_INCOMPLETE');
+
   const duplicate = structuredClone(carried);
   duplicate.recs.push(structuredClone(duplicate.recs[0]));
   const duplicateAudit = auditSelectionContinuity({ previous: prior, report: duplicate });
@@ -188,18 +262,21 @@ function selfTest() {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.command === 'self-test') { selfTest(); return; }
-  if (args.command !== 'audit' || !args.report) die('Usage: selection-continuity.mjs audit --report FILE [--root DIR] | self-test');
+  if (args.command !== 'audit' || !args.report) die('Usage: selection-continuity.mjs audit --report FILE [--sidecar FILE] [--root DIR] | self-test');
   const root = path.resolve(args.root || process.cwd());
   const report = readJson(path.resolve(args.report));
+  const sidecar = args.sidecar ? readJson(path.resolve(args.sidecar)) : null;
   const prior = loadPrior(root, report);
   if (!prior) { console.log('SELECTION CONTINUITY OK: no prior same-day report'); return; }
 
   const scopePolicy = readJson(path.join(root, 'data/major-sport-market-coverage-v1.json'));
-  const result = auditSelectionContinuity({ previous: prior.report, report, scopePolicy });
+  const result = auditSelectionContinuity({ previous: prior.report, report, sidecar, scopePolicy });
   for (const item of result.diagnostics) {
     if (item.state === 'RE_EVALUATED') console.log(`SELECTION CONTINUITY RE-EVALUATED: ${item.selectionKey} ${item.priorStatus} -> ${item.nextStatus}`);
     else if (item.state === 'DEFERRED_TO_SPREAD_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
+    else if (item.state === 'DEFERRED_TO_SPREAD_LINEAGE_INCOMPLETE') console.log(`SELECTION CONTINUITY DEFERRED TO SPREAD LINEAGE INCOMPLETE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
     else if (item.state === 'DEFERRED_TO_TOTAL_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO TOTAL LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
+    else if (item.state === 'DEFERRED_TO_TOTAL_LINEAGE_INCOMPLETE') console.log(`SELECTION CONTINUITY DEFERRED TO TOTAL LINEAGE INCOMPLETE: ${item.selectionKey} -> ${item.currentSelectionKey || 'NEW LINE'}`);
     else if (item.state === 'DEFERRED_TO_MONEYLINE_LINEAGE') console.log(`SELECTION CONTINUITY DEFERRED TO MONEYLINE LINEAGE: ${item.selectionKey} -> ${item.currentSelectionKey || 'UNVERIFIED'}`);
     else if (item.state === 'PAUSED_BY_SCOPE') console.log(`SELECTION CONTINUITY PAUSED BY SCOPE: ${item.selectionKey} ${item.priorStatus}; issued history retained`);
   }
