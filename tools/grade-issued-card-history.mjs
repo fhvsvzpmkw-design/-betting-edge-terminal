@@ -112,7 +112,7 @@ async function main(requestPath) {
   const target = request.targetDate;
   assert.match(target, datePattern); assert.equal(new Date(target + 'T12:00:00Z').toISOString().slice(0, 10), target);
   assert.ok(target < vancouverDate(), 'Only past Vancouver dates may be graded');
-  const runs = [], groups = new Map(), statusCounts = {}; let issuedCards = 0, olderEnteringCards = 0;
+  const runs = [], groups = new Map(), statusCounts = {}, legacyIntegrityWarnings = []; let issuedCards = 0, olderEnteringCards = 0;
   const root = 'data/history/runs';
   for (const date of fs.readdirSync(root).filter(x => datePattern.test(x) && x <= target).sort()) {
     for (const name of fs.readdirSync(`${root}/${date}`).filter(x => x.endsWith('.json')).sort()) {
@@ -124,8 +124,11 @@ async function main(requestPath) {
         const status = String(rec.status || '').toUpperCase(); if (!knownStatuses.has(status)) continue;
         if (date === target) { issuedCards++; statusCounts[status] = (statusCounts[status] || 0) + 1; }
         const old = obs?.recommendations?.[index];
+        if (String(old?.completion?.state || '').toLowerCase() === 'complete') {
+          if ((old.selectionKey || null) !== (rec.feed?.selectionKey || null)) legacyIntegrityWarnings.push({ sourceRun: p, index, issuedSelectionKey: rec.feed?.selectionKey || null, observedSelectionKey: old.selectionKey || null, reason: 'previously_complete_identity_conflict_preserved_for_separate_review' });
+          continue;
+        }
         if (old) assert.equal(old.selectionKey || null, rec.feed?.selectionKey || null, `Observation identity mismatch: ${p}#${index}`);
-        if (String(old?.completion?.state || '').toLowerCase() === 'complete') continue;
         if (date < target) olderEnteringCards++;
         const row = { rec, date, index }; pending.push(row);
         const id = String(rec.feed?.eventId || ''); if (!id) continue;
@@ -159,7 +162,7 @@ async function main(requestPath) {
       result.resultMethod = { ...(result.resultMethod || {}), isolation: 'historical result providers and immutable issued snapshots only; no live odds or report-production inputs' };
       write(item.op, result); assert.equal(digest(item.p), item.hash, 'Issued report mutation forbidden');
     }
-    const summary = { schema: 1, requestId: request.requestId, targetDate: target, verifiedAt, issuedCards, statusCounts, olderEnteringCards, previousEventsAttempted: batch.previous.length, backlogEventsAttempted: batch.backlog.length, previousEventsVerifiedFinal: batch.previous.filter(g => outcomes.get(g.id)?.status === 'final').length, backlogEventsVerifiedFinal: batch.backlog.filter(g => outcomes.get(g.id)?.status === 'final').length, quotaDeferredEvents: batch.deferred.length, observationPaths: runs.map(x => x.op), verifiedEvents: [...outcomes.values()].filter(e => e.status === 'final'), unresolvedEvents: [...outcomes.values()].filter(e => e.status !== 'final'), isolation: 'historical-only' };
+    const summary = { schema: 1, requestId: request.requestId, targetDate: target, verifiedAt, issuedCards, statusCounts, olderEnteringCards, legacyIntegrityWarnings, previousEventsAttempted: batch.previous.length, backlogEventsAttempted: batch.backlog.length, previousEventsVerifiedFinal: batch.previous.filter(g => outcomes.get(g.id)?.status === 'final').length, backlogEventsVerifiedFinal: batch.backlog.filter(g => outcomes.get(g.id)?.status === 'final').length, quotaDeferredEvents: batch.deferred.length, observationPaths: runs.map(x => x.op), verifiedEvents: [...outcomes.values()].filter(e => e.status === 'final'), unresolvedEvents: [...outcomes.values()].filter(e => e.status !== 'final'), isolation: 'historical-only' };
     write('/tmp/card-grading-runtime.json', summary); console.log(JSON.stringify(summary));
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 }
