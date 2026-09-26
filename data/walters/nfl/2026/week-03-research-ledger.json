@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-09-22T04:27:21-07:00",
-  "updatedAt": "2026-09-26T16:51:04-07:00",
+  "updatedAt": "2026-09-26T16:56:30-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -5636,6 +5636,155 @@
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 18,
+      "type": "LATE_DAY_DELTA",
+      "runEventId": "graham-delta-1645-2026-w03-20260926T164514-0700",
+      "sourceTaskKey": "DELTA_1645",
+      "completionResult": "MATERIAL_CHANGE",
+      "startedAt": "2026-09-26T16:45:14-07:00",
+      "completedAt": "2026-09-26T16:56:30-07:00",
+      "scope": "Saturday late-day change-only sweep across all 32 teams and 16 Week 3 games from the verified 2026-09-26T11:35:42-07:00 MAIN_WEEKEND_SWEEP endpoint through completion. Current availability, replacement, quarterback and weather evidence only; market prices were not viewed.",
+      "sourcesChecked": [
+        {
+          "source": "Verified Saturday broad baseline and runtime receipt",
+          "url": "data/walters/nfl/2026/week-03-research-ledger.json",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Established the exact verified 11:35:42 Pacific coverage endpoint and prevented replay of the morning sweep or previously applied Week 3 changes."
+        },
+        {
+          "source": "NFL Week 3 injury report",
+          "url": "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Verified final Saturday designations, including Dallas Goedert, Marquise Brown and Fred Johnson out for Philadelphia; Caleb Williams out and Tyson Bagent questionable for Chicago."
+        },
+        {
+          "source": "NFL Saturday news roundup",
+          "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-sept-26",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Verified Saturday injured-reserve moves, practice developments and roster elevations without replaying already-recorded absences."
+        },
+        {
+          "source": "Philadelphia Eagles official depth chart",
+          "url": "https://www.philadelphiaeagles.com/team/depth-chart",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Resolved Johnny Mundt as the direct tight-end replacement for Dallas Goedert; confirmed Marquise Brown and Fred Johnson were not baseline starters requiring another direct starter-loss case."
+        },
+        {
+          "source": "Detroit Lions official depth chart",
+          "url": "https://www.detroitlions.com/team/depth-chart",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Confirmed Thomas Harper was a reserve safety, so his injured-reserve placement and Jalen Mills elevation did not establish a new baseline-starter replacement loss."
+        },
+        {
+          "source": "Walters personnel production and exact board read-back",
+          "url": "data/walters/nfl/2026/week-03-current-numbers.json",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Verified repository-owned calculation and exact remote output after batch graham-delta-1645-personnel-2026-w03-20260926T165104-0700: PHI-CHI -0.852 to -2.052 home-spread coordinate, displayed Chicago -1 to -2."
+        },
+        {
+          "source": "Walters player-value PHI shard",
+          "url": "data/walters/nfl/player-values/by-team-v1/phi.json",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Used governed frozen values for Dallas Goedert (1.2) and Johnny Mundt (0.0); no manual estimate was introduced."
+        },
+        {
+          "source": "Structured stadium-area weather forecasts",
+          "url": "https://weather.com/",
+          "checkedAt": "2026-09-26T16:56:30-07:00",
+          "purpose": "Rechecked active domestic outdoor venues; no forecast supported a calibrated fair-number adjustment."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "PHI",
+          "finding": "Dallas Goedert is out and the official depth chart resolves Johnny Mundt as the direct replacement. Governed personnel production applied a 1.2-point Philadelphia loss, moving PHI-CHI from Chicago -1 displayed / -0.852 exact to Chicago -2 displayed / -2.052 exact. Marquise Brown's rotational receiver workload remained unresolved and failed closed; Fred Johnson was a reserve behind Lane Johnson and did not create another baseline-starter loss.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-sept-26",
+            "https://www.philadelphiaeagles.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/phi.json",
+            "data/walters/nfl/2026/week-03-current-numbers.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "CHI",
+          "finding": "Caleb Williams is out. Tyson Bagent progressed to full practice but remained questionable in the concussion process, and Chicago did not name a Week 3 starter. The existing FAIL_CLOSED_UNRESOLVED_STARTER state was preserved; no quarterback number was guessed or moved.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+            "data/walters/nfl/qb-production-current.json",
+            "data/walters/nfl/2026/week-03-current-numbers.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "DET",
+          "finding": "Thomas Harper moved to injured reserve and Jalen Mills was elevated, but the official depth chart identified Harper as a reserve rather than the baseline starter. No new one-for-one baseline loss was supported, and the existing secondary cluster was not replayed.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-sept-26",
+            "https://www.detroitlions.com/team/depth-chart",
+            "data/walters/nfl/2026/week-03-personnel-ledger.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "ALL",
+          "finding": "Saturday injured-reserve placements and elevations involving already-known absences were reconciled without replay. No other direct replacement, quarterback resolution, matchup M4 trigger or calibrated weather condition supported a numeric change.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-sept-26",
+            "data/walters/nfl/2026/week-03-current-numbers.json"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W03-PHI-CHI",
+          "priorExactFairHome": -0.852,
+          "priorDisplayedFairHome": -1,
+          "currentExactFairHome": -2.052,
+          "currentDisplayedFairHome": -2,
+          "exactDelta": -1.2,
+          "displayedDelta": -1,
+          "reason": "Dallas Goedert ruled out; Johnny Mundt resolved as the direct replacement; governed personnel production calculated a 1.2-point Philadelphia loss.",
+          "personnelPriorPointsToHomeSpread": 0,
+          "personnelCurrentPointsToHomeSpread": -1.2,
+          "homeFieldPointsToHomeSpread": -2.082,
+          "marketViewed": false
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_NO_CARRIED_RATING_CHANGE",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "note": "No carried-rating revision was proposed; FPI was not used to create or alter the current-week fair.",
+        "marketViewed": false
+      },
+      "summary": {
+        "teamsReviewed": 32,
+        "gamesReviewed": 16,
+        "materialInformationChanged": true,
+        "carriedRatingMoves": 0,
+        "fairNumberChanges": 1,
+        "displayedFairNumberChanges": 1,
+        "personnelBatchesSubmitted": 1,
+        "personnelCasesSubmitted": 2,
+        "personnelNumericCases": 1,
+        "personnelFailClosedCases": 1,
+        "matchupM4BatchesSubmitted": 0,
+        "qbBatchesSubmitted": 0,
+        "betsCreated": 0,
+        "h4DomesticHomeAdvantagePoints": 2.082,
+        "h4PointsToHomeSpread": -2.082,
+        "internationalNeutralGames": [
+          "2026-W03-BAL-DAL"
+        ],
+        "marketViewed": false,
+        "note": "Prior verified broad coverage was graham-daily-review-2026-w03-20260926T113054-0700 through 2026-09-26T11:35:42-07:00 with a matching VERIFIED receipt and COMPLETED runtime. This Delta reviewed all material developments from that exact endpoint through 2026-09-26T16:56:30-07:00. Dallas Goedert's confirmed absence and Johnny Mundt's resolved direct replacement produced a governed 1.2-point Philadelphia loss, moving PHI-CHI from Chicago -1 to -2 displayed and -0.852 to -2.052 exact. Marquise Brown failed closed, Chicago's starter remained unresolved, and Thomas Harper's reserve status did not support a new baseline loss. No carried rating, M4, additional QB adjustment or BET changed; domestic HFA remained exactly 2.082, BAL-DAL remained neutral at zero base HFA, weather produced no calibrated move, and no market information was viewed."
       }
     }
   ]
