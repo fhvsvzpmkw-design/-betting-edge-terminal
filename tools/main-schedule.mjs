@@ -153,7 +153,12 @@ async function main(){
     return;
   }
   if(args.command==='resolve-workflow'){
-    console.log(outputLines(resolveWorkflowSchedule()));
+    const scheduledAt=process.env.TRIGGER_MODE==='cloudflare_scheduled'?process.env.SCHEDULED_AT:null;
+    if(scheduledAt){
+      const delta=(Date.now()-Date.parse(scheduledAt))/60000;
+      assert(Number.isFinite(delta)&&delta>=-2&&delta<=35,'Cloudflare scheduled_at is outside the dispatch window');
+    }
+    console.log(outputLines(resolveWorkflowSchedule(scheduledAt?{now:new Date(scheduledAt),eventName:'schedule'}:{})));
     return;
   }
   if(args.command==='describe'){

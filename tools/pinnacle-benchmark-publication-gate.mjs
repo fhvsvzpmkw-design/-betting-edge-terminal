@@ -2,6 +2,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import {loadBoundMarketObserver} from './market-price-assessment.mjs';
 import {AUTHORITY,QUALIFIED,UNAVAILABLE,validateObserver} from './pinnacle-sharp-benchmark.mjs';
 
 const PROD_PATH='core/core-v1.4-production.json';
@@ -53,11 +54,9 @@ function normalize(rt,report,sidecar){
   p.pinnacleBenchmarkAuthority=AUTHORITY;
   p.pinnacleBenchmarkExecutionAuthority=false;
   p.pinnacleObserverPath=observerPath;
-  if(fs.existsSync(observerFile)){
-    const observer=readJson(observerFile);
-    const currentSha=blobSha(observerFile);
-    if(p.pinnacleObserverBlobSha&&p.pinnacleObserverBlobSha!==currentSha) fail('Staged report Pinnacle observer blob does not match the bound current observer');
-    p.pinnacleObserverBlobSha=currentSha;
+  if(p.pinnacleObserverBlobSha||fs.existsSync(observerFile)){
+    if(!p.pinnacleObserverBlobSha)p.pinnacleObserverBlobSha=blobSha(observerFile);
+    const observer=loadBoundMarketObserver(sidecar,rt.root);
     p.pinnacleGeneratedAt=observer.generatedAt||p.pinnacleGeneratedAt||null;
     p.pinnacleObserverSourceStatus=observer.status||null;
     if(observer.status==='ok'&&officialObserverShape(observer)){
@@ -99,9 +98,9 @@ function validate(rt,report,sidecar){
   }
   const observerFile=path.join(rt.root,rt.policy.observerPath);
   if(p.pinnacleStatus==='ok'){
-    check(fs.existsSync(observerFile),'Pinnacle observer is missing despite status ok');
-    check(SHA40.test(String(p.pinnacleObserverBlobSha||''))&&p.pinnacleObserverBlobSha===blobSha(observerFile),'Pinnacle observer SHA mismatch');
-    const observer=readJson(observerFile);
+    let observer;
+    try{observer=loadBoundMarketObserver({provenance:{...p,pinnacleObserverPath:p.pinnacleObserverPath||rt.policy.observerPath}},rt.root);}
+    catch(error){fail(`Pinnacle observer SHA mismatch: ${error.message}`);}
     check(officialObserverShape(observer),'Official Pinnacle observer authority/schema shape is invalid');
     const result=validateObserver(observer,{observerFreshnessMinutes:rt.policy.rules.observerFreshnessMinutes,quoteFreshnessMinutes:rt.policy.rules.quoteFreshnessMinutes,futureClockSkewToleranceMinutes:rt.policy.rules.futureClockSkewToleranceMinutes,asOf:report.ts});
     check(result.ok,`Pinnacle observer validation failed: ${result.errors.join('; ')}`);

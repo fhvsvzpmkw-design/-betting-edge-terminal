@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-09-27.1
+**Operating revision:** 2026-09-27.2
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -114,7 +114,15 @@ Resolve `data/walters/nfl/active-week.json`, active current-numbers board, QB pr
 
 If the governed canary remains pending, identify the first published NFL-bearing report for FIRST_NFL_BEARING_BETTING_EDGE_READBACK and verify its exact board binding. The report producer cannot edit QB production, roll back the board or rewrite History.
 
-## 8. Prepare, validate and freeze
+## 8. One resumable producer
+
+`tools/report-run.mjs` owns producer state. Use `docs/REPORT_RUN_CONTROLLER.md` for the command sequence. After constructing the exact initial draft and source bindings, `start` a uniquely named checkpoint at `data/report-production/checkpoints/<run-id>.json`. Use `next` for the compact full queue and `next --event-id <id>` for one event. Export drafts outside the repository, complete actual research/decisions, and `checkpoint` them after each event with the expected revision. Persist the exact checkpoint through the connected repository so another execution can resume; this path never triggers publication. Read current remote state before resuming. Never reconstruct completed work from prose summaries.
+
+The checkpoint stores the current complete draft and phase atomically. It does not grant analytical clearance. `prepare` performs shared evidence assembly and derived-field normalization; inspect its deferrals before `freeze`. Before final preparation, use `retime` to advance an unfrozen draft to actual issuance time and reconcile event eligibility without changing source clocks. Freeze invokes the single validation plan in `tools/report-pipeline.mjs`. `stage` revalidates, serializes the sealed bytes and writes only the staging bundle. Resume a failed stage with the same frozen bytes. Frozen candidates cannot be edited; a changed issue time/feed/analysis starts a new actual-time candidate. Do not backdate the new candidate.
+
+`report-pipeline.mjs` is the single gate ordering used by the controller, publisher and publication retries. Do not independently reconstruct a second gate list in a task. The domain validators remain the owners of their requirements. Self-tests run in development CI, not repeatedly inside live publication.
+
+### Prepare, validate and freeze details
 
 Read bankroll from the authoritative ledger projection with its blob SHA. Use actual Vancouver issuance time, exact bound feed, Core 1.5 provenance, real counts/risk and all completed decisions. Publisher owns meters and completion display metadata; do not invent them.
 
@@ -140,10 +148,10 @@ Freeze only after checks pass. All finished decisions publish; incomplete select
 
 The task produces candidates only. Never directly create/update/delete/index `data/history/runs/**`, `data/history/research-fit/**`, or `run-history.json`.
 
-Stage only `data/history/staging/report-bundle.json`: `{schema:1,candidateId:"<report.ts>|<canonicalSlot>",phase:"<canonicalSlot>",report:<complete report>,sidecar:<complete schema-3 sidecar>,state:"READY"}`.
+For publication, the controller stages only `data/history/staging/report-bundle.json`: `{schema:1,candidateId:"<report.ts>|<canonicalSlot>",phase:"<canonicalSlot>",report:<complete report>,sidecar:<complete schema-3 sidecar>,state:"READY"}`.
 
 Serialize/parse the complete local file. Commit exact bytes through authenticated Git or the Git-data API populated programmatically from full length-checked bytes; verify returned blob SHA against local `git hash-object`. Never reconstruct from displayed/truncated output. Preserve frozen bytes for retries. Fetch main, confirm the staging commit and blob identity.
 
-`.github/workflows/report-history-staged.yml` alone owns publication and durable read-back. Inspect the run for the staging commit. A failed gate/transfer is `PUBLICATION BLOCKED — CANDIDATE NOT STORED`; incomplete execution is `PUBLICATION PENDING — CANDIDATE STAGED`. Neither permits a success claim or short link. Do not bypass it with a History write.
+`.github/workflows/report-history-staged.yml` alone owns publication and durable read-back. It reads the candidate from the exact triggering commit, not whichever bundle happens to be newest when the job starts. `report-history.yml` is verification-only; its legacy publish path is retired. Inspect the run for the staging commit. A failed gate/transfer is `PUBLICATION BLOCKED — CANDIDATE NOT STORED`; incomplete execution is `PUBLICATION PENDING — CANDIDATE STAGED`. Neither permits a success claim or short link. Do not bypass it with a History write.
 
-After workflow SUCCESS, read exact indexed report/sidecar from authoritative main. Then give the deterministic terminal link labeled `Open Betting Edge Terminal v1.5 — <report time>`. Report issued decisions/risk, completed versus pending counts and specific remaining limitations from those artifacts. Distinguish raw availability, source attempts, captured forecasts, adopted fairs and completed decisions. A published zero-card report with unfinished inventory is an incomplete analysis, not evidence that all opportunities were rejected. Profitability is measured by prospective results, prices and uncertainty; it cannot be inferred from more BET labels or publication success.
+After workflow SUCCESS, fetch authoritative main and run controller `readback` against the exact checkpoint. It verifies indexed decision/evidence identity and the shared read-back gates. Never run this against unpublished locally edited History. Read exact indexed report/sidecar from authoritative main. Then give the deterministic terminal link labeled `Open Betting Edge Terminal v1.5 — <report time>`. Report issued decisions/risk, completed versus pending counts and specific remaining limitations from those artifacts. Distinguish raw availability, source attempts, captured forecasts, adopted fairs and completed decisions. A published zero-card report with unfinished inventory is an incomplete analysis, not evidence that all opportunities were rejected. Profitability is measured by prospective results, prices and uncertainty; it cannot be inferred from more BET labels or publication success.

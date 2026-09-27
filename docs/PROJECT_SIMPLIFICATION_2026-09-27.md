@@ -30,3 +30,11 @@ Use this before draft preparation, then the existing `candidates --work-plan` an
 5. **Grade and measure:** preserve issued cards; the isolated grader owns settlement. Add per-run timings, request counts, input/output sizes, completed/blocked counts and telemetry where available. Compare actual completion, operational cost, calibration and settled performance separately.
 
 Next implementation should consolidate the producer into one resumable controller, not add another parallel task chain. Remove an old path only after its replacement passes replay, failure/retry and publication identity tests. Keep an immediate rollback to the existing producer. The compact reader is the first slice, not a claim that the complete rewrite or scheduler reliability work is finished.
+
+## Operational rewrite implemented later September 27
+
+The resumable controller and shared gate runner replace the producer's manual phase bookkeeping. The staged publisher binds its candidate to the triggering commit. The second legacy publisher has been retired; verification remains read-only. The controller stores optimistic-revision checkpoints, prevents edits after freeze, retries exact sealed bytes, and compares decisions/evidence at indexed read-back. New advisory records retain compact derived summaries while original research remains in canonical evidence fields.
+
+The odds workflow now has same-slot scheduled recovery and durable slot receipts, sharing one collector concurrency group. Inspection of the missed September 26 evening lane found no corresponding GitHub run; sampled successful runs were manual dispatches, including the late 18:19 refresh. The root cause of absent Cloudflare dispatch is not established. Recovery provides redundancy rather than claiming that cause was repaired. No Cloudflare deployment or secret changes are part of this release.
+
+The Pinnacle publication adapter now validates the exact pinned observer blob, including archived snapshots, against its original report time. It does not substitute the newest observer or reset any quote clock. Existing deterministic decisions, source/evidence checks, staking rules and History schemas remain the compatibility baseline for this operational rewrite.
