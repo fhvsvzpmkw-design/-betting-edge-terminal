@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {importForecastCapture} from '../tools/import-forecast-evidence.mjs';
 import {loadForecastSourceRegistry, forecastRoutes, forecastCandidate, forecastPriceComparison, evaluateForecast, buildForecastCoverage, attachForecastCoverage} from '../tools/forecast-evidence.mjs';
 
 const asOf = '2026-09-12T16:30:00Z', startTime = '2026-09-12T23:00:00Z';
@@ -170,4 +171,39 @@ test('unavailable universe clears stale derived eligibility without deleting raw
   assert.deepEqual(sidecar.recommendations[0].forecastEvidenceIds, []);
   assert.deepEqual(rec.forecastReview.gapReasons, ['CURRENT_FORECAST_REVIEW_UNAVAILABLE']);
   assert.equal(sidecar.forecastEvidence.records.length, 1);
+});
+
+test('forward observed pregame captures retain unknown model time and still require exact current applicability', () => {
+  const now='2026-09-27T19:15:00Z', start='2026-09-27T23:00:00Z', observed='2026-09-27T19:05:00Z';
+  const r=record({forecastAt:null, observedAt:observed, startTime:start, timingBasis:'OBSERVED_PREGAME_SNAPSHOT',
+    capture:{observedAt:observed,sourceUrl:record().url,eventLabel:'Synthetic away at home',probabilityField:'Home win probability',
+      publishedProbability:0.566,pageState:'PRE_GAME',evidenceRef:'synthetic retained page excerpt'},
+    applicability:{...currentReview(),forReportAt:now,checkedAt:now,observedSnapshotReviewed:true,
+      modelTimeLimitation:'Publisher calculation time is unknown; reviewed current named starters against the captured pregame field.'}});
+  const c={...candidate(),startTime:start}, before=JSON.stringify(r);
+  const result=evaluateForecast(r,c,{asOf:now,registry});
+  assert.equal(result.eligibility,'ELIGIBLE_EXACT');
+  assert.equal(result.forecastAt,null);
+  assert.equal(result.timingBasis,'OBSERVED_PREGAME_SNAPSHOT');
+  assert.equal(JSON.stringify(r),before);
+  const imported=importForecastCapture({report:{ts:now},sidecar:{},capture:{schema:1,records:[r]},
+    universe:{selections:[{...selection,eventDate:start}]},registry});
+  assert.equal(imported.diagnostics[0].eligibility,'ELIGIBLE_EXACT');
+  assert.equal(imported.decisionAuthority,false);
+  assert.deepEqual(imported.sidecar.forecastEvidence.records[0],r);
+  for(const change of [{capture:undefined},{capture:{...r.capture,publishedProbability:0.7}},
+    {capture:{...r.capture,pageState:'LIVE'}},{applicability:{...r.applicability,observedSnapshotReviewed:false}},
+    {forecastAt:'invalid'}]) {
+    assert.notEqual(evaluateForecast({...r,...change},c,{asOf:now,registry}).eligibility,'ELIGIBLE_EXACT');
+  }
+  for(const change of [{observedAt:'2026-09-28T00:00:00Z'}, {eventId:'wrong'},
+    {applicability:{...r.applicability,personnelStatus:'UNRESOLVED'}},
+    {applicability:{...r.applicability,forReportAt:'2026-09-27T18:00:00Z'}}]) {
+    assert.equal(evaluateForecast({...r,...change},c,{asOf:now,registry}).eligibility,'INELIGIBLE');
+  }
+  const old='2026-09-27T18:00:00Z';
+  const earlier={...r,observedAt:'2026-09-27T17:55:00Z',capture:{...r.capture,observedAt:'2026-09-27T17:55:00Z'},
+    applicability:{...r.applicability,forReportAt:old,checkedAt:old}};
+  assert.equal(evaluateForecast(earlier,c,{asOf:old,registry}).eligibility,'CONTEXT_ONLY','historical cutoff unchanged');
+  assert.equal(evaluateForecast({...r,settlement:{}},c,{asOf:now,registry}).comparison,null);
 });

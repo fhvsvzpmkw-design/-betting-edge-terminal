@@ -86,8 +86,10 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     };
     collect(receipt);
     const prior = priorReceipts instanceof Map ? priorReceipts.get(row.selectionId) : null;
-    const priorDate = prior?.row?.decision?.feed?.eventDate || prior?.row?.candidateDraft?.decision?.feed?.eventDate || prior?.row?.eventDate;
-    if (prior && time(priorDate) === time(row.eventDate)) collect(prior.row, prior.reportPath || null);
+    for (const entry of prior ? [...list(prior.researchHistory), prior] : []) {
+      const priorDate = entry?.row?.decision?.feed?.eventDate || entry?.row?.candidateDraft?.decision?.feed?.eventDate || entry?.row?.eventDate;
+      if (time(priorDate) === time(row.eventDate)) collect(entry.row, entry.reportPath || null);
+    }
   }
   const events = [...groups.values()].map(event => {
     for (const id of event.conflicts) { event.sourceMap.delete(id); warnings.push(`Conflicting source ID ${id} in ${event.eventKey}; source not shared.`); }
@@ -133,4 +135,39 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       'A market PASS needs an actual current event review and exact-selection rationale, not merely missing forecasts.',
       'Complete unrelated selections may publish while real unfinished work remains separately visible.'
     ]};
+}
+
+// Small producer-facing execution view. The full audit remains available; a
+// large repeated per-selection evidence payload must not hide the next work.
+export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
+  const events = list(plan.events).filter(event => event.pending > 0).map(event => ({
+    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,
+    pending:event.pending, completed:event.completed,
+    sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath}) => ({
+      id:source.id, url:source.url, observedAt:source.checkedAt || source.asOf,
+      finding:source.finding || source.fact, priorReportPath, requiresCurrentApplicabilityReview:true})),
+    selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
+      selectionId:row.selectionId, route:row.route, quote:row.quote, comparison:row.priceComparison,
+      nextAction:row.nextAction})),
+    forecastSources:list(event.forecastRetrieval?.nextSources).map(source => ({
+      sourceId:source.sourceId, urls:source.urls, questions:source.questions})),
+    nextAction:'Revalidate event facts, then finish a supported exact paired-market review before opening another event. Escalate decision-changing news. Record genuine remaining gaps; do not wait for whole-slate forecast coverage.'
+  }));
+  if (eventId !== null && !events.some(event => String(event.eventId) === String(eventId))) throw new Error('No pending event matches --event-id');
+  const outputEvents = eventId !== null ? events.filter(event => String(event.eventId) === String(eventId)) : events.map(event => ({
+    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label, pending:event.pending, completed:event.completed,
+    sourceLeadCount:event.sourceLeads.length,
+    routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
+    nextForecastSources:event.forecastSources.map(source => source.sourceId)
+  }));
+  return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,
+    completionState:plan.counts?.available > 0 && plan.counts?.completed === 0 ? 'NO_COMPLETED_DECISIONS' :
+      plan.counts?.pending > 0 ? 'PARTIAL' : 'COMPLETE',
+    instructions:[
+      'Scan the full inventory, then complete event reviews incrementally in start-time order; research leads are not completed research.',
+      'Missing independent forecasts or calibrated intervals do not block the qualified market LEAN/PASS route.',
+      'Capture a real forecast point before assessing its uncertainty. A missing BET bound is not a failed retrieval.',
+      'When no decisions are completed, diagnose the failed source-to-decision step explicitly; never describe this as no value found.'
+    ], detailInstruction:'Repeat candidates --work-plan --event-id EVENT_ID for exact quotes, original source leads and source questions for one pending event.',
+    events:outputEvents, warnings:list(plan.warnings)};
 }

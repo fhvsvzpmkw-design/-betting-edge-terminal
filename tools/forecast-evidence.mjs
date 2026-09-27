@@ -19,6 +19,7 @@ const sameLine = (a, b) => num(a) !== null && num(b) !== null && Math.abs(num(a)
 const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const eventId = event => String(event?.eventId || event?.identity?.eventId || event?.id || '');
 const ATTEMPT_OUTCOMES = new Set(['FOUND', 'INACCESSIBLE', 'STALE', 'WRONG_LINE', 'WRONG_MARKET', 'MISSING_PROBABILITY', 'INELIGIBLE', 'NOT_FOUND']);
+export const OBSERVED_FORECAST_FROM = '2026-09-27T12:00:00-07:00';
 
 export function loadForecastSourceRegistry(root = path.resolve(HERE, '..')) {
   return read(path.join(root, 'research/forecast-source-registry.json'));
@@ -111,8 +112,17 @@ export function evaluateForecast(record, candidate, {asOf, revalidations = [], r
   if (String(record.eventId || '') !== candidate.eventId || record.sport !== candidate.sport || !sameTime(record.startTime, candidate.startTime)) reasons.push('EVENT_MISMATCH');
   if (record.state !== 'PRE_GAME' || reportMs === null || startMs === null || reportMs >= startMs) reasons.push('NOT_PREGAME');
   if (observedMs === null || reportMs === null || observedMs > reportMs || startMs === null || observedMs >= startMs) reasons.push('OBSERVATION_TIME_INELIGIBLE');
-  if (forecastMs === null) reasons.push('FORECAST_TIME_UNKNOWN');
-  else if (observedMs === null || forecastMs > observedMs || forecastMs >= startMs) reasons.push('FORECAST_TIME_INELIGIBLE');
+  // A verifiable pregame capture establishes what was publicly available then,
+  // even when the publisher does not disclose its model calculation time.
+  // Keep that time unknown; never substitute the retrieval time for forecastAt.
+  const capturedPregame = reportMs >= time(OBSERVED_FORECAST_FROM) && record.forecastAt == null &&
+    record.timingBasis === 'OBSERVED_PREGAME_SNAPSHOT' && record.capture?.observedAt === record.observedAt &&
+    record.capture?.sourceUrl === record.url && text(record.capture?.eventLabel) && text(record.capture?.probabilityField) &&
+    record.capture?.publishedProbability === record.probability && record.capture?.pageState === 'PRE_GAME' &&
+    text(record.capture?.evidenceRef) && text(record.limitation) && review?.observedSnapshotReviewed === true &&
+    text(review?.modelTimeLimitation);
+  if (forecastMs === null && !capturedPregame) reasons.push('FORECAST_TIME_UNKNOWN');
+  else if (forecastMs !== null && (observedMs === null || forecastMs > observedMs || forecastMs >= startMs)) reasons.push('FORECAST_TIME_INELIGIBLE');
   if (!review) reasons.push('CURRENT_REVALIDATION_REQUIRED');
   else {
     if (time(review.checkedAt) === null || time(review.checkedAt) > reportMs || time(review.checkedAt) < observedMs) reasons.push('REVALIDATION_TIME_INELIGIBLE');
@@ -146,6 +156,8 @@ export function evaluateForecast(record, candidate, {asOf, revalidations = [], r
     kind: record.kind, probability: probability(record.probability) ? record.probability : null, probabilityBasis: record.probabilityBasis || null,
     marketDetail: record.marketDetail, period: record.period, side: record.side, line: record.line ?? null, projection: record.projection || null,
     forecastAt: record.forecastAt || null, observedAt: record.observedAt || null, revalidatedAt: review?.checkedAt || null,
+    timingBasis: forecastMs !== null ? 'PUBLISHED_MODEL_TIME' : capturedPregame ? 'OBSERVED_PREGAME_SNAPSHOT' : 'UNKNOWN',
+    timingLimitation: capturedPregame ? review.modelTimeLimitation : null,
     eligibility, reasons: unique(reasons), limitation: record.limitation || null,
     comparison: eligible ? forecastPriceComparison(record, candidate.priceDecimal) : null};
 }

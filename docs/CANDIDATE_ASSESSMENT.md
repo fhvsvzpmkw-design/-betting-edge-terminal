@@ -4,6 +4,10 @@ Version `2026-09-15.1`. Applies to Main reports at/after `2026-09-15T18:15:00-07
 
 The producer must finish the research-to-decision step for a promising exact selection. A ranked lead is not a betting recommendation. The mechanism does not lower Core requirements, assign LEAN/BET, fabricate probabilities, change staking or rewrite issuance.
 
+## Current execution order — September 27, 2026
+
+For reports at/after `2026-09-27T12:00:00-07:00`, the consolidated `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` owns ordering. Run `report-evidence-repair.mjs candidates ... --work-plan`, screen the full inventory, then review one event and finish its supported exact paired-market assessments before moving on. This replaces the historical breadth-first-all-events instruction below. Keep the full inventory and upcoming-start priority; do not wait for whole-slate forecast coverage. Earlier same-day source leads survive intervening incomplete reports and still require current applicability review. The schema and decision safeguards below remain current.
+
 ## Core decision-path clarification — September 20, 2026
 
 From `2026-09-20T18:15:00-07:00`, read `docs/CORE14_DEEP_REVIEW_2026-09-20.md`. The extra primary-receipt MODERATE/STRONG support floor is a BET requirement, not a universal non-wager completion requirement. All other source, fair/range, personnel, exact-identity and status-specific checks remain. A failed BET conservative bound must receive a separate LEAN/PASS assessment; it is not an automatic PASS. No grade is forced.

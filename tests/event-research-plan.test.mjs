@@ -84,3 +84,21 @@ if (process.argv.includes('--integration')) {
   assert.equal(fs.readFileSync(sidecarPath,'utf8'),rawSidecar);
   console.log('September 20 15:15 development replay (not a new report):',JSON.stringify(audit.eventResearchPlan.counts));
 }
+
+// An empty later receipt must not erase a useful earlier source package.
+const history = new Map([[rows[0].selectionId, {reportPath:'later-empty.json',row:{state:'BLOCKED'},
+  researchHistory:[{reportPath:'earlier.json',row:{decision:{feed:{eventDate:rows[0].eventDate},sourceEvidence:[priorSource]}}}]}]]);
+const resumed=buildEventResearchPlan({report,candidateAssessment:{selections:[rows[0]]},priorReceipts:history});
+assert.equal(resumed.events[0].researchPackage.sources.length,1);
+assert.equal(resumed.events[0].researchPackage.sources[0].source.checkedAt,priorSource.checkedAt);
+assert.equal(resumed.counts.completed,0);
+const {buildResearchWorkPlan}=await import('../tools/event-research-plan.mjs');
+const work=buildResearchWorkPlan(resumed,{eventId:'A'});
+assert.equal(work.completionState,'NO_COMPLETED_DECISIONS');
+assert.equal(work.decisionAuthority,false);
+assert.equal(work.events[0].sourceLeads[0].priorReportPath,'earlier.json');
+assert.equal(work.events[0].selections[0].route,'MARKET_PASS_REVIEW');
+assert.equal(buildResearchWorkPlan(resumed).events[0].sourceLeadCount,1);
+assert.equal(buildResearchWorkPlan(resumed).events[0].selections,undefined,'overview must not dump every quote and repeated source question');
+assert.throws(()=>buildResearchWorkPlan(resumed,{eventId:'missing'}),/No pending event/);
+assert.equal(buildResearchWorkPlan({counts:{available:2,completed:1,pending:1},events:[]}).completionState,'PARTIAL');

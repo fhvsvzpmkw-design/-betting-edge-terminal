@@ -14,7 +14,7 @@ import {assembleCardEvidence} from './assemble-card-evidence.mjs';
 import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
 import {buildMarketMethodShadow} from './market-method-shadow.mjs';
-import {buildEventResearchPlan} from './event-research-plan.mjs';
+import {buildEventResearchPlan, buildResearchWorkPlan} from './event-research-plan.mjs';
 import {repairDraftCoreTaxonomy} from './core-draft-taxonomy.mjs';
 import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
 
@@ -51,7 +51,13 @@ function loadContext(root, report, sidecar, feedFile) {
     if (!entry.researchFitPath) continue;
     const prior = optional(path.join(root, entry.researchFitPath));
     if (!prior || prior.reportReference?.ts !== entry.ts || prior.reportReference?.feedGeneratedAt !== entry.feedGeneratedAt) continue;
-    for (const row of list(prior.primaryAnalysis?.receipts)) priorReceipts.set(row.selectionId, {row, reportPath: entry.path});
+    for (const row of list(prior.primaryAnalysis?.receipts)) {
+      const previous = priorReceipts.get(row.selectionId);
+      // Keep the latest receipt for progress comparisons, but do not let a later
+      // empty/incomplete run erase earlier event research available for review.
+      const researchHistory = previous ? [...list(previous.researchHistory), {row:previous.row, reportPath:previous.reportPath}] : [];
+      priorReceipts.set(row.selectionId, {row, reportPath:entry.path, researchHistory});
+    }
     // Reuse still requires the forecast module's explicit current-run revalidation.
     for (const record of list(prior.forecastEvidence?.records)) priorRecords.push(record);
   }
@@ -299,6 +305,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const audit = result.audit || result;
     if (args[0] === 'candidates') {
       const candidate = audit.candidateAssessment;
+      if (args.includes('--work-plan')) {
+        console.log(JSON.stringify(buildResearchWorkPlan(audit.eventResearchPlan,{eventId:args.includes('--event-id') ? value('--event-id') : null}),null,2));
+        process.exit(0);
+      }
       console.log(JSON.stringify(args.includes('--details') ? {...candidate, eventResearchPlan:audit.eventResearchPlan} : {schema:candidate.schema, version:candidate.version,
         asOf:candidate.asOf, counts:candidate.counts, shortlist:candidate.shortlist, unfinished:candidate.unfinished,
         eventResearchPlan:audit.eventResearchPlan,
