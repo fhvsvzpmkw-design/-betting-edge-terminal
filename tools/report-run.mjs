@@ -9,6 +9,10 @@ import {buildResearchWorkPlan} from './event-research-plan.mjs';
 import {scheduleMetadataForReport} from './main-schedule.mjs';
 import {runPipeline} from './report-pipeline.mjs';
 import {blobSha,validateStagedBundle} from './extract-staged-report.mjs';
+import {bindIntelligence,projectGameIntelligence} from './game-intelligence.mjs';
+import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
+import {execFileSync} from 'node:child_process';
+import {isDeepStrictEqual} from 'node:util';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -50,6 +54,21 @@ function summary(state){
     publication:state.publication||null};
 }
 function bundleFor(state){return {schema:1,state:'READY',phase:String(state.identity.canonicalSlot),candidateId:state.identity.candidateId,report:state.report,sidecar:state.sidecar};}
+function bindGameInputs(root,report,sidecar){
+  if(sidecar.gameIntelligenceInputs)return;
+  let bytes;
+  try{bytes=execFileSync('git',['cat-file','blob',sidecar.provenance?.feedBlobSha],{cwd:root,maxBuffer:64*1024*1024,stdio:['ignore','pipe','pipe']});}
+  catch{
+    const file=path.join(root,'data/live-odds.json');
+    // Starting a resumable draft does not require completed acquisition. The
+    // established preflight/freeze gates still reject a missing bound feed.
+    if(!fs.existsSync(file))return;
+    bytes=fs.readFileSync(file);
+  }
+  if(blobSha(bytes)!==sidecar.provenance?.feedBlobSha)throw Error('Game dossier feed does not match the draft');
+  const feed=JSON.parse(bytes),policy=read(path.join(root,'data/major-sport-market-coverage-v1.json'));
+  bindIntelligence({root,report,sidecar,feed,universe:derivePrimarySelectionInventory(report,feed,policy)});
+}
 function sealedBytes(state){
   if(!['FROZEN','STAGED','PUBLISHED'].includes(state.phase)||!state.frozen)throw new Error('Run is not frozen');
   const bytes=json(bundleFor(state));
@@ -73,6 +92,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       if(state)throw new Error('Run already exists; resume it with status/next');
       if(!report||!sidecar)throw new Error('start requires complete local draft files');
       const r=read(path.resolve(report)),s=read(path.resolve(sidecar));
+      bindGameInputs(root,r,s);
       state={schema:1,identity:identity(r,s,root),phase:'DRAFT',revision:0,report:r,sidecar:s,events:[]};
     }else{
       if(state?.schema!==1||!Array.isArray(state.events))throw new Error('Run checkpoint is missing or invalid');
@@ -93,12 +113,17 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     }
     if(command==='next'){
       const audit=buildEvidenceAudit({root,report:state.report,sidecar:state.sidecar});
-      return {...summary(state),workPlan:buildResearchWorkPlan(audit.eventResearchPlan,{eventId:eventId||null}),warnings:audit.warnings};
+      const intelligence=audit.gameIntelligence;
+      return {...summary(state),workPlan:buildResearchWorkPlan(audit.eventResearchPlan,{eventId:eventId||null}),
+        gameIntelligence:intelligence?(eventId?projectGameIntelligence(intelligence,eventId):
+          {asOf:intelligence.asOf,collectedAt:intelligence.collectedAt,counts:intelligence.counts,sources:intelligence.sources,
+            games:intelligence.games.map(g=>({eventId:g.eventId,label:g.label,...g.summary}))}):null,warnings:audit.warnings};
     }
     if(['checkpoint','retime','prepare'].includes(command)&&!['DRAFT','PREPARED'].includes(state.phase))throw new Error('Frozen runs cannot be edited; start a new actual-time run');
     if(command==='checkpoint'){
       if(!report||!sidecar)throw new Error('checkpoint requires updated draft files');
       const r=read(path.resolve(report)),s=read(path.resolve(sidecar));
+      if(state.sidecar.gameIntelligenceInputs&&!isDeepStrictEqual(s.gameIntelligenceInputs,state.sidecar.gameIntelligenceInputs))throw Error('Pinned game inputs changed; export the saved draft or start a newly bound actual-time run');
       if(JSON.stringify(identity(r,s,root))!==JSON.stringify(state.identity))throw new Error('Cannot change run identity or feed binding; start a new run');
       state.report=r;state.sidecar=s;state.phase='DRAFT';delete state.validation;delete state.preparation;
     }
@@ -147,7 +172,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       const rfile=path.join(root,entry.path),sfile=path.join(root,entry.researchFitPath),issued=read(rfile),research=read(sfile);
       for(const key of ['ts','slot','label','feedGeneratedAt','bankroll','risk','counts','recs'])
         if(JSON.stringify(issued[key])!==JSON.stringify(state.report[key]))throw new Error(`Published ${key} differs from frozen candidate`);
-      for(const key of ['recommendations','primaryAnalysis','forecastEvidence'])
+      for(const key of ['recommendations','primaryAnalysis','forecastEvidence','gameIntelligenceInputs'])
         if(JSON.stringify(research[key])!==JSON.stringify(state.sidecar[key]))throw new Error(`Published evidence ${key} differs from frozen candidate`);
       if(research.provenance?.feedBlobSha!==state.identity.feedBlobSha)throw new Error('Published feed binding changed');
       pipeline({root,report:rfile,sidecar:sfile,mode:'readback'});

@@ -16,6 +16,7 @@ import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAss
 import {buildMarketMethodShadow} from './market-method-shadow.mjs';
 import {buildEventResearchPlan, buildResearchWorkPlan} from './event-research-plan.mjs';
 import {repairDraftCoreTaxonomy} from './core-draft-taxonomy.mjs';
+import {bindIntelligence,buildGameIntelligence} from './game-intelligence.mjs';
 import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCardEvidence, sidecarSelectionKey} from './card-evidence-identity.mjs';
 
 export const EVIDENCE_REPAIR_VERSION = '2026-09-12';
@@ -114,15 +115,19 @@ export function reviewBlockedSelections(report, sidecar, {universe, observer, pr
 
 export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedFile, context} = {}) {
   const ctx = context || loadContext(root, report, sidecar, feedFile);
+  sidecar=structuredClone(sidecar);
+  if(ctx.feed&&ctx.universe)bindIntelligence({root,report,sidecar,feed:ctx.feed,universe:ctx.universe});
   let forecasts;
   try {forecasts = buildForecastCoverage({report, sidecar, universe: ctx.universe, feed: ctx.feed, priorRecords: ctx.priorRecords, registry: ctx.registry, now: report.ts});}
   catch (error) {forecasts = {mode: 'ADVISORY_ONLY', publicationBlocking: false, warnings: [`Forecast review unavailable: ${error.message}`]};}
   const review = reviewCardEvidence(report, sidecar, {library: ctx.library});
   const candidateAssessment = buildCandidateAssessment({report, sidecar, universe: ctx.universe, observer: ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs, forecastCoverage: forecasts});
+  const eventResearchPlan=buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts});
+  const gameIntelligence=ctx.feed&&ctx.universe?buildGameIntelligence({report,sidecar,feed:ctx.feed,universe:ctx.universe,forecastCoverage:forecasts,candidateAssessment,eventResearchPlan,observer:ctx.observer}):null;
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
     reportTs: report.ts, forecastCoverage: forecasts,
     candidateAssessment,
-    eventResearchPlan: buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts}),
+    eventResearchPlan,gameIntelligence,
     blockedReview: reviewBlockedSelections(report, sidecar, ctx),
     cardReview: {cardsReviewed: review.cardsReviewed, issueCounts: review.issueCounts, issues: review.issues},
     warnings: [...ctx.warnings, ...list(review.warnings)]};
@@ -219,6 +224,7 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
 export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
   let draftReport = structuredClone(report), draftSidecar = structuredClone(sidecar);
   const ctx = loadContext(root, draftReport, draftSidecar, feedFile);
+  if(ctx.feed&&ctx.universe)bindIntelligence({root,report:draftReport,sidecar:draftSidecar,feed:ctx.feed,universe:ctx.universe});
   if(ctx.grahamInputs?.binding && !draftSidecar.grahamFairHandoffInputs)draftSidecar.grahamFairHandoffInputs=structuredClone(ctx.grahamInputs.binding);
   const taxonomy = repairDraftCoreTaxonomy(draftReport, draftSidecar, {feed:ctx.feed, framework:optional(path.join(root, 'core/core-handicap-framework-v1.4.json'))});
   const before = JSON.stringify(list(draftReport.recs).map(rec => ({feed:rec.feed,status:rec.status,stake:rec.stake,fair:rec.fair,playTo:rec.playTo,coreAssessment:rec.coreAssessment,marketAssessment:rec.marketAssessment})));
@@ -246,6 +252,7 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
   draftSidecar.evidenceRepairVersion = EVIDENCE_REPAIR_VERSION;
   draftSidecar.cardEvidenceIdentityVersion = CARD_EVIDENCE_IDENTITY_VERSION;
   const audit = buildEvidenceAudit({root, report: draftReport, sidecar: draftSidecar, context: ctx});
+  if(audit.gameIntelligence)draftReport.gameIntelligence=structuredClone(audit.gameIntelligence);
   audit.warnings.push(...list(assembled.warnings), ...taxonomy.warnings);
   audit.coreTaxonomyRepair = taxonomy;
   audit.assemblyChanges = assembled.changes;

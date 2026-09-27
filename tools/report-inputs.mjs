@@ -7,6 +7,7 @@ import {pathToFileURL} from 'node:url';
 import {loadMainSchedule, scheduleMetadataForReport} from './main-schedule.mjs';
 import {resolveCoreRelease} from './core-release.mjs';
 import {derivePrimarySelectionInventory, mergedFeedEvents} from './major-sport-market-coverage-gate.mjs';
+import {bindIntelligence,buildGameIntelligence,projectGameIntelligence} from './game-intelligence.mjs';
 
 function readBound(root, relative, parse = true) {
   const bytes = fs.readFileSync(path.join(root, relative));
@@ -36,6 +37,9 @@ export function buildReportInputs({root = process.cwd(), at, reportTime, eventId
   })).sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime) || a.eventId.localeCompare(b.eventId));
   const selected = eventId === null ? null : events.find(event => event.eventId === String(eventId));
   if (eventId !== null && !selected) throw new Error(`Event ${eventId} is not in this report inventory`);
+  const sidecar={};
+  bindIntelligence({root,report,sidecar,feed:feed.value,universe:inventory});
+  const intelligence=buildGameIntelligence({report,sidecar,feed:feed.value,universe:inventory});
   return {
     schema: 1, kind: 'REPORT_INPUT_PROJECTION', decisionAuthority: false,
     validationState: 'NOT_RUN',
@@ -49,6 +53,9 @@ export function buildReportInputs({root = process.cwd(), at, reportTime, eventId
     counts: {events: events.length, available: inventory.selections.length,
       unavailable: inventory.limitations.size,
       required: Object.values(inventory.sports).reduce((sum, sport) => sum + sport.primary.required, 0)},
+    gameIntelligence:intelligence?(selected?projectGameIntelligence(intelligence,selected.eventId):
+      {collectedAt:intelligence.collectedAt,counts:intelligence.counts,sources:intelligence.sources,
+        instruction:'Use --event-id for the complete dossier; report-run start binds these observations to the draft.'}):null,
     ...(selected ? {event: selected,
       selections: inventory.selections.filter(row => row.eventId === selected.eventId),
       limitations: Object.fromEntries([...inventory.limitations].filter(([key]) => key.split('|')[1] === selected.eventId))}
