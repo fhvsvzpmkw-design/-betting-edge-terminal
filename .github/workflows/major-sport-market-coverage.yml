@@ -13,6 +13,8 @@ on:
       - tests/primary-market-scope.test.mjs
       - tests/report-bundle-preflight.test.mjs
       - tools/report-publication.mjs
+      - tools/report-pipeline.mjs
+      - tests/report-pipeline.test.mjs
       - tools/report-evidence-gate.mjs
       - tools/card-evidence-identity.mjs
       - tools/market-price-assessment.mjs
@@ -127,10 +129,7 @@ jobs:
           node tools/major-sport-market-coverage-gate.mjs self-test
 
       - name: Verify publisher owns the coverage gate
-        run: |
-          set -euo pipefail
-          grep -q 'Enforce major-sport coverage receipt' .github/workflows/report-history-staged.yml
-          grep -q 'major-sport-market-coverage-gate.mjs validate' .github/workflows/report-history-staged.yml
+        run: node tests/report-pipeline.test.mjs
 
       - name: Summary
         if: always()
