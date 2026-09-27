@@ -4,6 +4,30 @@ The September 12, 2026 source review is implemented as a retrieval registry and 
 
 `research/forecast-source-registry.json` supplies the ordered exact-probability, provisional and score-context routes. `tools/forecast-evidence.mjs` applies those routes to the complete bound available-selection inventory, including `BLOCKED` and unassessed selections. It does not scrape, fabricate a source result, adopt a fair value or change a decision. Qualified existing Pinnacle assessments and partial publication retain their existing authority.
 
+## Observed pregame capture — forward from September 27, 2026 at noon Pacific
+
+For report timestamps at/after `2026-09-27T12:00:00-07:00`, a missing publisher calculation timestamp no longer automatically excludes an otherwise exact published point. This narrowly supersedes the missing-model-time statements below. It does not waive current assumptions, exact settlement, line matching, pregame availability, source provenance, uncertainty assessment or BET requirements.
+
+When calculation time is genuinely unavailable, keep `forecastAt:null`, original `observedAt`, `timingBasis:"OBSERVED_PREGAME_SNAPSHOT"`, and an explicit `limitation`. Also retain:
+
+```json
+{
+  "capture": {
+    "observedAt": "SAME_ACTUAL_TIME_AS_RECORD_OBSERVED_AT",
+    "sourceUrl": "SAME_INSPECTED_URL_AS_RECORD",
+    "eventLabel": "ACTUAL_ORDERED_TEAMS_AND_FIXTURE",
+    "probabilityField": "ACTUAL_PUBLISHED_FIELD_NAME",
+    "publishedProbability": 0.55,
+    "pageState": "PRE_GAME",
+    "evidenceRef": "RETAINED_PAGE_OR_EXCERPT_REFERENCE"
+  }
+}
+```
+
+The numeric probability is an illustration, never a default. The real capture must match `record.probability` exactly. Retain the actual source excerpt with the record. Add `observedSnapshotReviewed:true` and a concrete `modelTimeLimitation` to the current applicability/revalidation object, explaining how the captured event and named model assumptions remain current despite unknown calculation age. The ordinary checks still require `observedAt <= checkedAt <= report.ts < startTime`. No known timestamp can be erased or replaced by an observation clock. An invalid/non-null model time is not eligible for this exception.
+
+The output records the timing basis and limitation. Earlier reports retain their old eligibility. Later reuse requires a new explicit applicability review while preserving the original capture. A current point with no published interval is still a captured forecast; assess uncertainty and any BET conservative bound afterward. Do not label retrieval INELIGIBLE solely because calibration or a published confidence interval is missing. Qualified market LEAN/PASS remains available under its own evidence route even if no model point is usable.
+
 ## Source routing and retrieval
 
 | Sport | Moneyline lookup order | Primary line lookup | Total lookup |

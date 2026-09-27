@@ -7,7 +7,7 @@ for (const phrase of [
   'Status:** OPERATIONAL',
   'Authority version:** 1.2',
   'Main schedule gate',
-  'Core 1.4 production preflight',
+  'Core production preflight',
   'Major-sport market coverage',
   'both moneyline sides',
   'primary run line',
