@@ -1051,6 +1051,8 @@ function apply(run){
     box.appendChild(counts);
 
     const summary=el(d,'div','runnerSummary',txt(run.summary,'No summary supplied.'));box.appendChild(summary);
+    const intelligence=globalThis.BettingEdgeIntelligence?.render(d,issuedMeterRun.gameIntelligence);
+    if(intelligence)box.appendChild(intelligence);
 
     const refresh=el(d,'div','runnerRefresh'),latestReport=isLatestSessionRun(run);
     let refreshStatus=null,refreshBtn=null;

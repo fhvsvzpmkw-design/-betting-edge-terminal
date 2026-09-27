@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-09-27.2
+**Operating revision:** 2026-09-27.3
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -91,6 +91,16 @@ WAIT requires a real current independent signal, plausible actionability and the
 Follow `BETTING_EDGE_PERSONNEL_SWEEP.md`: Stage 1 current event facts precede final decisions or adopted fair; Stage 2 investigates decision-sensitive dependencies and conflicts. A blank final lineup is not automatically material. Name the actual dependency and its effect. Use official sources and credible fallback depth where needed; do not manufacture clearance by changing flags. Apply new findings back to the handicap, without double-counting news already in a forecast.
 
 For an unresolved material Stage 2 dependency, make the closing authoritative check and retain `finalRecheck: true`, origin/url/asOf and the dependency-specific fact, or an honest authoritative-source shortfall. One real check can support the same dependency on multiple cards. `checked=0` from a semantic check does not prove text/flags agree.
+
+### Shared game intelligence comes first
+
+Use `docs/GAME_INTELLIGENCE.md`. The shared collector maintains `data/game-intelligence/current.json` after odds refreshes; it does not consume the odds API budget. `report-run start` pins actual source observations, applicable internal Graham/Walters data and the research catalogue in `sidecar.gameIntelligenceInputs`. Read `next --event-id` to work from the combined dossier: outside model fields, exact book prices, native internal fair lines, current event facts, and knowledge-base references. Published reports retain this same snapshot for source comparison.
+
+Review the full dossier before deciding a game. Explain material agreement and disagreement; preserve native units and model-family dependence. Outside picks, model probabilities, projected scores, book prices and research principles are different evidence types. A descriptive model median/range is not a calibrated fair value or independent confirmation. Apply actual source-grounded reasoning through the existing candidate and forecast evidence contracts; do not silently replace the fair with an average or ignore a contrary source.
+
+Reuse fresh captures across sides and runs. Revalidate event/personnel/settlement applicability once per event, then bind exact selection reviews. The collector does not manufacture those judgments. Exported draft `forecastEvidence.records` includes captured probability fields; add genuine `forecastEvidence.revalidations` using `docs/FORECAST_EVIDENCE.md`, and record each applicable forecast's disposition. A wrong-line forecast remains useful comparison context without becoming the probability for today's different line. Read published model points before evaluating uncertainty.
+
+When coverage is missing, perform targeted source research using the existing registry and save permitted source captures for reuse. Source acquisition failures do not veto otherwise supported decisions. Dimers currently requires a permitted feed/permission for automated redistribution; do not add a scraper. Other sources marked research/import are not established automated feeds. Source names on the coverage panel never imply completed retrieval.
 
 ### Forecast intake before BET qualification
 

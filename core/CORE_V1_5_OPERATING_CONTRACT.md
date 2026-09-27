@@ -30,3 +30,7 @@ Use the consolidated shared scheduled authority for ordering and `docs/CANDIDATE
 Publish every completed BET/LEAN/WAIT/PASS; there is no numeric minimum, target or maximum and no forced status quota. Empty eligible boards may publish zero cards and zero risk. Empty publication is not a populated grading acceptance test. Only the staged publisher may write issued History. Verify the successful workflow and read back the exact indexed report/sidecar before claiming publication.
 
 Main times remain 06:00, 08:00, 09:30, 15:15 and 18:15 America/Vancouver. Props remain paused. Bet365/DraftKings execution, quote clocks, odds budget, stakes, immutable history, and the hypothetical-only market-method shadow remain unchanged. The base Core 1.5 release does not itself activate forecast-to-card expansion. The separately approved NFL spread handoff is governed by `docs/GRAHAM_NFL_FAIR_HANDOFF.md` from its stated cutover. Automated wagers, results/CLV learning and personal-ledger calibration remain outside this release.
+
+## Game intelligence aggregation — operational from September 27 noon Pacific
+
+All Main producers use the shared game dossiers described in `docs/GAME_INTELLIGENCE.md`. This activates source aggregation and comparison within the existing Core 1.5 decision routes. Original forecast observations, internal native fair lines, prices and research guidance remain separately attributable. The descriptive source range is not a new fair-value model. The collector and prospective source grader use no additional odds API requests or language-model calls.

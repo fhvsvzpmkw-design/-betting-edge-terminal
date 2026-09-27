@@ -50,6 +50,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate shared game intelligence
+        run: |
+          node --test tests/game-intelligence.test.mjs
+          node --check assets/game-intelligence.js
       - name: Validate resumable producer and scheduler recovery
         run: |
           node tests/report-inputs.test.mjs

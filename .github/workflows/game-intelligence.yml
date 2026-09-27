@@ -1,0 +1,76 @@
+name: Game intelligence aggregation
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Refresh Betting Edge odds]
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - tools/game-intelligence.mjs
+      - tools/collect-game-intelligence.mjs
+      - tools/build-game-board.mjs
+      - tools/grade-game-intelligence.mjs
+      - research/forecast-source-registry.json
+      - .github/workflows/game-intelligence.yml
+  schedule:
+    - cron: '40 10,11 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: game-intelligence
+  cancel-in-progress: false
+jobs:
+  aggregate:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve local nightly recovery
+        id: due
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const clock=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Vancouver',hour:'2-digit',hourCycle:'h23'}).format(new Date());
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`run=${process.env.EVENT_NAME!=='schedule'||clock==='03'}\n`);
+          NODE
+      - name: Collect and save shared source observations
+        if: steps.due.outputs.run == 'true'
+        run: |
+          node tools/collect-game-intelligence.mjs
+          cp data/game-intelligence/current.json /tmp/game-intelligence-candidate.json
+      - name: Publish collection, source results and game board
+        if: steps.due.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name betting-edge-bot
+          git config user.email actions@users.noreply.github.com
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {saveCapture} from './tools/collect-game-intelligence.mjs';
+          const capture=JSON.parse(fs.readFileSync('/tmp/game-intelligence-candidate.json'));
+          const current=fs.existsSync('data/game-intelligence/current.json')?JSON.parse(fs.readFileSync('data/game-intelligence/current.json')):null;
+          if(!current||Date.parse(current.collectedAt)<=Date.parse(capture.collectedAt))saveCapture(process.cwd(),capture);
+          NODE
+            node tools/grade-game-intelligence.mjs
+            node tools/build-game-board.mjs
+            git add -- data/game-intelligence
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Refresh shared game intelligence and prospective source tracking'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo 'Concurrent writes prevented game board publication.' >&2
+          exit 1

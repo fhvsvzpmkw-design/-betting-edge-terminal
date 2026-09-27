@@ -12,6 +12,13 @@ try{
  const {runCommand}=await import(pathToFileURL(path.join(temp,'tools/report-run.mjs')));
  const reportPath='data/history/runs/2026-09-27/main-081200.json',sidecarPath='data/history/research-fit/2026-09-27/main-081200.json';
  const r=JSON.parse(fs.readFileSync(path.join(temp,reportPath))),s=JSON.parse(fs.readFileSync(path.join(temp,sidecarPath)));
+ // Exercise the new report fields through every real publisher gate while
+ // replaying the historical decision fixture. No historical source is altered.
+ const {bindIntelligence}=await import(pathToFileURL(path.join(temp,'tools/game-intelligence.mjs')));
+ const {derivePrimarySelectionInventory}=await import(pathToFileURL(path.join(temp,'tools/major-sport-market-coverage-gate.mjs')));
+ const feed=JSON.parse(execFileSync('git',['cat-file','blob',s.provenance.feedBlobSha],{cwd:temp,maxBuffer:64*1024*1024}));
+ const policy=JSON.parse(fs.readFileSync(path.join(temp,'data/major-sport-market-coverage-v1.json')));
+ bindIntelligence({root:temp,report:r,sidecar:s,feed,universe:derivePrimarySelectionInventory(r,feed,policy),liveBoard:true});
  // Reconstruct a prepublication checkout in isolation. Real History remains untouched.
  const index=JSON.parse(fs.readFileSync(path.join(temp,'run-history.json')));
  for(const entry of index.runs.filter(x=>Date.parse(x.ts)>=Date.parse(r.ts)))for(const file of [entry.path,entry.researchFitPath])fs.rmSync(path.join(temp,file),{force:true});
@@ -25,6 +32,7 @@ try{
  a=runCommand({...base,command:'freeze',expectedRevision:a.revision});
  a=runCommand({...base,command:'stage',expectedRevision:a.revision});
  const bundle=JSON.parse(fs.readFileSync(path.join(temp,'data/history/staging/report-bundle.json')));
+ if(!bundle.report.gameIntelligence||!bundle.sidecar.gameIntelligenceInputs)throw Error('Game dossier was lost before publication');
  for(const[p,v]of [[report,bundle.report],[sidecar,bundle.sidecar]])fs.writeFileSync(p,JSON.stringify(v));
  execFileSync(process.execPath,['tools/report-publication.mjs','publish','--report',report,'--sidecar',sidecar],{cwd:temp,stdio:'pipe'});
  a=runCommand({...base,command:'readback',expectedRevision:a.revision});
