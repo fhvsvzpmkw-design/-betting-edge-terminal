@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "kind": "issued-card-observations",
+  "sourceRun": "data/history/runs/2026-09-25/late-181500.json",
+  "runId": "2026-09-25T18:15:00-07:00",
+  "slot": "late",
+  "resultMethod": {
+    "lifecycle": "ISSUED -> UNRESOLVED -> VERIFIED -> COMPLETE",
+    "scoreMarkets": [
+      "ml",
+      "spread",
+      "totals"
+    ],
+    "grades": [
+      "WIN",
+      "LOSS",
+      "PUSH",
+      "VOID",
+      "HALF_WIN",
+      "HALF_LOSS"
+    ],
+    "spreadHdpSemantics": "raw hdp is the home-side handicap; away selected handicap is the opposite sign",
+    "quarterLineSemantics": "quarter lines split into two equal half-stakes on the adjacent half-goal/half-point lines",
+    "unsupportedMarkets": "remain unresolved unless exact selection verification is supplied",
+    "officialOnlyWhenStatus": "BET",
+    "issuedReportMutable": false,
+    "isolation": "historical result providers and immutable issued snapshots only; no live odds or report-production inputs"
+  },
+  "recommendations": [
+    {
+      "title": "Clemson Tigers",
+      "status": "WAIT",
+      "book": "DraftKings",
+      "selectionKey": "70898654|ml|away||",
+      "commenceTime": "2026-09-26T02:30:00Z",
+      "issued": {
+        "priceAmerican": "-132",
+        "priceDecimal": 1.76,
+        "feedGeneratedAt": "2026-09-26T01:09:42.968Z",
+        "analysisPriceState": "verified_exact_issued_snapshot",
+        "analysisPriceReason": null,
+        "analysisPriceAmerican": -132,
+        "analysisPriceDecimal": 1.76,
+        "analysisBook": "DraftKings",
+        "analysisBookKey": "draftkings",
+        "analysisQuoteUpdatedAt": "2026-09-25T18:16:11.563Z",
+        "analysisSnapshotBlobSha": "c0d0afbdaecb25bd6d65d7cdfa4672ab2dcc080e",
+        "marketKey": "ml",
+        "side": "away",
+        "selectedLine": null,
+        "analysisQuoteObservedAt": "2026-09-26T01:09:42.967Z"
+      },
+      "observation": {
+        "state": "unavailable",
+        "reason": "no_later_prestart_snapshot"
+      },
+      "completion": {
+        "state": "complete",
+        "verificationState": "verified",
+        "grade": "WIN",
+        "official": false,
+        "hypothetical": true,
+        "verifiedAt": "2026-09-27T17:26:48.551Z",
+        "eventId": "70898654",
+        "finalScore": {
+          "home": "California Golden Bears",
+          "away": "Clemson Tigers",
+          "homeScore": 10,
+          "awayScore": 24
+        },
+        "settlementMethod": "final_score",
+        "line": null,
+        "basis": null,
+        "observedValue": null,
+        "settlementComponents": null,
+        "source": {
+          "name": "ESPN NCAAF historical final 2026-09-25; event 401858234",
+          "url": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=20260925&limit=300"
+        },
+        "firstUnresolvedAt": null,
+        "lastVerificationAttemptAt": "2026-09-27T17:26:48.551Z",
+        "verificationAttempts": 1,
+        "nextRetryTier": null
+      },
+      "bookKey": "draftkings"
+    }
+  ],
+  "method": {
+    "identity": "exact rec.feed.selectionKey",
+    "issuedPrice": "best fresh exact quote among the books named on the issued card, resolved from the immutable snapshot whose generatedAt exactly matches source feedGeneratedAt",
+    "issuedPriceFreshness": "quoteObservedAt must be no more than 30 minutes before source feedGeneratedAt; quoteUpdatedAt preserves the provider price-change timestamp",
+    "comparisonBook": "same normalized sportsbook selected for analysisPrice at issuance",
+    "window": "comparison snapshot generated after source feedGeneratedAt and before recommendation commenceTime",
+    "snapshotSource": "data/history/odds-index.json + immutable Git blob SHA",
+    "label": "last observed pre-start price; not a verified closing line",
+    "closingLine": false,
+    "newOddsApiRequests": 0
+  }
+}
