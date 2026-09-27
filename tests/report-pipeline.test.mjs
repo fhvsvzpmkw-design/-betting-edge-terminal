@@ -20,6 +20,16 @@ try{
   calls=[];
   assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,execute:(_,args)=>{calls.push(args);return {status:1,stderr:'synthetic gate failure'};}}),/synthetic gate failure/);
   assert.equal(calls.length,1,'fail before subsequent gates or publishing');
+  for(const mode of ['validate','readback']){
+    calls=[];
+    assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,mode,execute:(_,args)=>{
+      calls.push(path.basename(args[0]));
+      return path.basename(args[0])==='major-sport-market-coverage-gate.mjs'
+        ? {status:1,stderr:'incomplete primary coverage'} : {status:0};
+    }}),/incomplete primary coverage/,`${mode} must enforce the coverage gate`);
+    assert.equal(calls.at(-1),'major-sport-market-coverage-gate.mjs');
+    assert.ok(!calls.includes('report-publication.mjs'),'failed coverage cannot reach publication');
+  }
   assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,execute:()=>{fs.appendFileSync(r,' ');return {status:0};}}),/mutated candidate/);write(r,report);
   const checkpoint='data/report-production/checkpoints/test-run.json';
   const base={root:temp,checkpoint};
