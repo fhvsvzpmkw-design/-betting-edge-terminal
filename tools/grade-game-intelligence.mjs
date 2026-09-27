@@ -21,7 +21,8 @@ export function latestForecasts(captures,at){
   for(const row of latest.values()){
     const key=[row.sourceId,row.sport,row.eventId,row.startTime,row.marketDetail].join('|');
     const previous=grouped.get(key);
-    if(!previous||(['home','over'].includes(row.side)&&!['home','over'].includes(previous.side)))grouped.set(key,row);
+    if(!previous||time(row.observedAt)>time(previous.observedAt)||
+      (time(row.observedAt)===time(previous.observedAt)&&['home','over'].includes(row.side)&&!['home','over'].includes(previous.side)))grouped.set(key,row);
   }
   return [...grouped.values()];
 }

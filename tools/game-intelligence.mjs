@@ -109,7 +109,8 @@ export function summarizeModels(records,asOf) {
     ageMinutes:(time(asOf)-time(row.observedAt))/60000,
     freshness:time(asOf)>=time(row.startTime)?'EVENT_STARTED':time(asOf)-time(row.observedAt)>60*60000?'REFRESH_DUE':'RECENT_CAPTURE'}));
   const groups=new Map();
-  for(const row of rows.filter(r=>r.kind==='OUTCOME_PROBABILITY'&&r.freshness==='RECENT_CAPTURE')) {
+  for(const row of rows.filter(r=>r.kind==='OUTCOME_PROBABILITY'&&r.freshness==='RECENT_CAPTURE'&&
+    ['UNCONDITIONAL','CONDITIONAL_ON_NO_PUSH'].includes(r.probabilityBasis)&&r.settlement)) {
     const key=[row.marketDetail,row.side,row.line??'',row.probabilityBasis||'UNKNOWN',JSON.stringify(row.settlement||null)].join('|');
     if(!groups.has(key)) groups.set(key,[]);
     groups.get(key).push(row);

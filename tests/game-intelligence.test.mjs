@@ -35,9 +35,10 @@ test('published fields retain units, selected-side spread orientation and missin
   assert.equal(parseEspn(live,event,at,registry).records.length,0);
 });
 test('descriptive ranges deduplicate model families and exclude stale observations',()=>{
-  const base=fixture()[0],rows=[base,{...base,sourceId:'copy',probability:.7},{...base,sourceId:'other',modelFamily:'OTHER',probability:.5}];
+  const base=fixture()[2],rows=[base,{...base,sourceId:'copy',probability:.7},{...base,sourceId:'other',modelFamily:'OTHER',probability:.5}];
   const result=summarizeModels(rows,at);assert.equal(result.consensus[0].families,2);
-  assert.equal(result.consensus[0].median,.45);
+  assert.equal(result.consensus[0].median,.525);
+  assert.equal(summarizeModels([fixture()[0]],at).consensus.length,0,'unknown settlement conventions cannot establish a comparable numerical consensus');
   assert.equal(summarizeModels(rows,'2026-09-27T21:01:00Z').consensus.length,0);
 });
 test('invalid captures and future snapshots cannot enter a historical report',()=>{
