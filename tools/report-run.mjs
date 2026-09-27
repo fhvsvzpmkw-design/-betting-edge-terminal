@@ -107,7 +107,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       const localDate=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
       if(!at||!/(Z|[+-]\d\d:\d\d)$/.test(at)||!Number.isFinite(Date.parse(at))||Date.parse(at)<Date.parse(old)||localDate(at)!==localDate(old))throw new Error('Retime must advance within the same Vancouver operating date');
       // Issued paths use the established local ISO representation; preserve its offset/date.
-      if(at.slice(0,10)!==old.slice(0,10)||at.slice(-6)!==old.slice(-6))throw new Error('Retime must preserve the local ISO date and timezone representation');
+      if(at.slice(0,10)!==old.slice(0,10)||at.match(/(Z|[+-]\d\d:\d\d)$/)[1]!==old.match(/(Z|[+-]\d\d:\d\d)$/)[1])throw new Error('Retime must preserve the local ISO date and timezone representation');
       state.report.ts=at;
       const stem=`${state.report.slot}-${at.slice(11,19).replaceAll(':','')}`;
       Object.assign(state.sidecar.reportReference,{ts:at,reportPath:`data/history/runs/${at.slice(0,10)}/${stem}.json`,researchFitPath:`data/history/research-fit/${at.slice(0,10)}/${stem}.json`});

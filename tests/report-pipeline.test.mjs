@@ -52,6 +52,11 @@ try{
   const tampered=JSON.parse(fs.readFileSync(path.join(temp,checkpoint)));tampered.report.bankroll=200;write(path.join(temp,checkpoint),tampered);
   assert.throws(()=>runCommand({...base,command:'stage',expectedRevision:4,pipeline:passing}),/Frozen candidate bytes changed/);
   assert.throws(()=>runCommand({...base,checkpoint:'data/history/runs/evil.json',command:'start',report:r,sidecar:s}),/Checkpoint must/);
+  const utcCheckpoint='data/report-production/checkpoints/utc-time.json';
+  const utcReport={...report,ts:'2026-09-27T22:15:00Z'},utcSidecar={...sidecar,reportReference:{...sidecar.reportReference,ts:'2026-09-27T22:15:00Z'}};
+  write(r,utcReport);write(s,utcSidecar);
+  runCommand({root:temp,checkpoint:utcCheckpoint,command:'start',report:r,sidecar:s});
+  assert.equal(runCommand({root:temp,checkpoint:utcCheckpoint,command:'retime',expectedRevision:1,at:'2026-09-27T22:18:00Z'}).phase,'DRAFT');
   const bundle=JSON.parse(frozen);validateStagedBundle(bundle,{root:temp});
   assert.throws(()=>validateStagedBundle({...bundle,candidateId:'wrong'},{root:temp}),/candidateId/);
   const git=args=>execFileSync('git',args,{cwd:temp,encoding:'utf8'}).trim();
