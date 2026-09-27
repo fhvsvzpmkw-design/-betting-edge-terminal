@@ -50,6 +50,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate resumable producer and scheduler recovery
+        run: |
+          node tests/report-inputs.test.mjs
+          node tests/report-pipeline.test.mjs
+          node tests/odds-slot-state.test.mjs
+          node tests/main-schedule.test.mjs
+          node tests/report-run-replay.test.mjs
       - name: Validate Core 1.5 release compatibility
         run: node tests/core15-release.test.mjs
       - name: Parse Core 1.4 production controls

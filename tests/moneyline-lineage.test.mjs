@@ -178,10 +178,7 @@ try {
   assert.equal(cli.status, 0, cli.stderr); assert.match(cli.stdout, /MONEYLINE LINEAGE AUDIT OK 1 selection/);
   f.report.recs[0].price = '+999'; write(reportFile, f.report);
   cli = spawnSync(process.execPath, args, { encoding: 'utf8' }); assert.equal(cli.status, 1); assert.match(cli.stderr, /does not match/);
-  for (const file of ['.github/workflows/report-history.yml', '.github/workflows/report-history-staged.yml']) {
-    const workflow = fs.readFileSync(file, 'utf8');
-    for (const tool of ['moneyline', 'spread', 'total']) assert.equal((workflow.match(new RegExp('node tools/' + tool + '-lineage\\.mjs audit', 'g')) || []).length, 3, tool + ': before publication, after rebase, at remote read-back');
-    assert.ok(workflow.indexOf('run: node tools/moneyline-lineage.mjs audit') < workflow.indexOf('run: node tools/selection-availability.mjs audit'), 'dedicated moneyline check owns modern moneylines before legacy availability');
-  }
+  const pipeline = fs.readFileSync('tools/report-pipeline.mjs','utf8');
+  assert(pipeline.indexOf("['moneyline-lineage.mjs','audit']") < pipeline.indexOf("['selection-availability.mjs','audit']"));
   console.log('MONEYLINE LINEAGE: PASS — 210 seven-sport side/price/prior-status cases, new/PASS quote checks, newest-entry authority, availability, identity, history, CLI and publication wiring');
 } finally { fs.rmSync(root, { recursive: true, force: true }); }

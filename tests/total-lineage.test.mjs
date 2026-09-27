@@ -178,13 +178,8 @@ try {
   assert.match(cli.stdout, /TOTAL LINEAGE AUDIT OK 1 reconciliation/);
   assert.match(cli.stdout, /PRICE WORSENED/);
   assert.equal(fs.readFileSync(path.join(root, sourcePath), 'utf8'), before);
-  for (const file of ['.github/workflows/report-history.yml', '.github/workflows/report-history-staged.yml']) {
-    const workflow = fs.readFileSync(file, 'utf8');
-    assert.equal((workflow.match(/node tools\/total-lineage\.mjs audit/g) || []).length, 3, file + ': enforce before publish, after rebase, and at remote read-back');
-    assert.match(workflow, /run: node tools\/selection-continuity\.mjs audit --report \/tmp\/report\.json/, file + ': use shared continuity so moved totals can reach their lineage gate');
-    const readBack = workflow.split('      - name: Remote read-back gate')[1].split('      - name:')[0];
-    assert.match(readBack, /REPORT_PATH: \$\{\{ steps\.bundle\.outputs\.report_path \}\}/);
-    assert.match(readBack, /SIDECAR_PATH: \$\{\{ steps\.bundle\.outputs\.sidecar_path \}\}/);
-  }
+  const pipeline = fs.readFileSync('tools/report-pipeline.mjs','utf8');
+  assert.match(pipeline, /\['total-lineage.mjs','audit'\]/);
+  assert.match(pipeline, /\['selection-continuity.mjs','audit'\]/);
   console.log('TOTAL LINEAGE TEST: PASS — 126 seven-sport line/price cases, identity, primary selection, freshness, conflict, continuity, immutable history and publication wiring');
 } finally { fs.rmSync(root, { recursive: true, force: true }); }

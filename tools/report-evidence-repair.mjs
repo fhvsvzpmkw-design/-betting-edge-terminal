@@ -20,6 +20,19 @@ import {CARD_EVIDENCE_IDENTITY_FROM, CARD_EVIDENCE_IDENTITY_VERSION, inspectCard
 
 export const EVIDENCE_REPAIR_VERSION = '2026-09-12';
 export const EVIDENCE_REPAIR_FROM = '2026-09-12T12:00:00-07:00';
+export const COMPACT_DIAGNOSTICS_FROM = '2026-09-27T12:00:00-07:00';
+export function compactEvidenceAudit(audit) {
+  return {schema:1,version:audit.version,mode:'ADVISORY_ONLY',publicationBlocking:false,
+    representation:'COMPACT_DERIVED_DIAGNOSTICS',reportTs:audit.reportTs,
+    forecastCoverage:audit.forecastCoverage?.totals||null,
+    candidateAssessment:audit.candidateAssessment?.counts||null,
+    researchCompletion:audit.eventResearchPlan?.counts||null,
+    blockedReview:{recoveredCount:audit.blockedReview?.recoveredCount||0,stillBlockedCount:audit.blockedReview?.stillBlockedCount||0,
+      targetedFollowUpCount:audit.blockedReview?.targetedFollowUpCount||0,qualifiedReferenceReviewCount:audit.blockedReview?.qualifiedReferenceReviewCount||0},
+    cardReview:audit.cardReview,warnings:audit.warnings||[],
+    detailSource:'Regenerate the full advisory audit with report-evidence-repair.mjs review --details from the exact bound report and sidecar. Original research remains in primaryAnalysis, recommendation evidence and forecastEvidence.'};
+}
+const storedAudit=(report,audit)=>Date.parse(report.ts)>=Date.parse(COMPACT_DIAGNOSTICS_FROM)?compactEvidenceAudit(audit):audit;
 const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const list = value => Array.isArray(value) ? value : [];
 const blobSha = raw => createHash('sha1').update(Buffer.from(`blob ${raw.length}\0`)).update(raw).digest('hex');
@@ -236,7 +249,7 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
   audit.warnings.push(...list(assembled.warnings), ...taxonomy.warnings);
   audit.coreTaxonomyRepair = taxonomy;
   audit.assemblyChanges = assembled.changes;
-  draftSidecar.evidenceApplication = audit;
+  draftSidecar.evidenceApplication = storedAudit(report,audit);
   if (candidateAssessmentRequired(report)) {
     draftReport.candidateAssessment = audit.candidateAssessment;
     draftSidecar.candidateAssessment = structuredClone(audit.candidateAssessment);
@@ -269,8 +282,8 @@ export function attachPublicationEvidenceAudit({root, report, sidecar, existingR
   let audit;
   try {audit = buildEvidenceAudit({root, report, sidecar});}
   catch (error) {audit = {schema:1, version:EVIDENCE_REPAIR_VERSION, mode:'ADVISORY_ONLY', publicationBlocking:false, warnings:[error.message]};}
-  sidecar.evidenceApplication = audit;
-  report.evidenceApplication = {schema:1, version:EVIDENCE_REPAIR_VERSION, publicationBlocking:false,
+  sidecar.evidenceApplication = storedAudit(report,audit);
+  report.evidenceApplication = Date.parse(report.ts)>=Date.parse(COMPACT_DIAGNOSTICS_FROM)?compactEvidenceAudit(audit):{schema:1, version:EVIDENCE_REPAIR_VERSION, publicationBlocking:false,
     forecastCoverage: audit.forecastCoverage, blockedReview: audit.blockedReview,
     researchCompletion: audit.eventResearchPlan?.counts,
     issueCounts: audit.cardReview?.issueCounts || {}, warnings: audit.warnings};

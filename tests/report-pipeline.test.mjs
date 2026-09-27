@@ -1,0 +1,77 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {runPipeline,CANDIDATE_GATES} from '../tools/report-pipeline.mjs';
+import {extractStagedReport,validateStagedBundle,blobSha} from '../tools/extract-staged-report.mjs';
+import {runCommand} from '../tools/report-run.mjs';
+const temp=fs.mkdtempSync(path.join(os.tmpdir(),'pipeline-test-'));
+const write=(p,v)=>{fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,JSON.stringify(v,null,2)+'\n');};
+try{
+  fs.mkdirSync(path.join(temp,'data'),{recursive:true});fs.copyFileSync('data/main-schedule.json',path.join(temp,'data/main-schedule.json'));
+  const report={ts:'2026-09-27T15:15:00-07:00',slot:'evening',label:'EVENING',feedGeneratedAt:'2026-09-27T22:05:00Z',recs:[],counts:{bet:0,lean:0,wait:0,pass:0},risk:0,bankroll:100};
+  const sidecar={schema:3,provenance:{canonicalSlot:4,feedBlobSha:'a'.repeat(40)},reportReference:{ts:report.ts,slot:report.slot,feedGeneratedAt:report.feedGeneratedAt}};
+  const r=path.join(temp,'report.json'),s=path.join(temp,'sidecar.json');write(r,report);write(s,sidecar);
+  let calls=[];
+  const execute=(_,args)=>{calls.push(args);return {status:0};};
+  assert.equal(runPipeline({root:temp,report:r,sidecar:s,execute}).receipts.length,14);
+  assert.deepEqual(calls.map(args=>[path.basename(args[0]),args[1]]),CANDIDATE_GATES);
+  calls=[];
+  assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,execute:(_,args)=>{calls.push(args);return {status:1,stderr:'synthetic gate failure'};}}),/synthetic gate failure/);
+  assert.equal(calls.length,1,'fail before subsequent gates or publishing');
+  assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,execute:()=>{fs.appendFileSync(r,' ');return {status:0};}}),/mutated candidate/);write(r,report);
+  const checkpoint='data/report-production/checkpoints/test-run.json';
+  const base={root:temp,checkpoint};
+  let out=runCommand({...base,command:'start',report:r,sidecar:s});assert.equal(out.revision,1);
+  assert.throws(()=>runCommand({...base,command:'start',report:r,sidecar:s}),/already exists/);
+  assert.throws(()=>runCommand({...base,command:'checkpoint',report:r,sidecar:s,expectedRevision:0}),/Revision conflict/);
+  write(r,{...report,ts:'2026-09-27T15:16:00-07:00'});
+  assert.throws(()=>runCommand({...base,command:'checkpoint',report:r,sidecar:s,expectedRevision:1}),/identity/);write(r,report);
+  assert.throws(()=>runCommand({...base,command:'freeze',expectedRevision:1}),/Prepare/);
+  const timeCheckpoint='data/report-production/checkpoints/retime-test.json';
+  runCommand({root:temp,checkpoint:timeCheckpoint,command:'start',report:r,sidecar:s});
+  const advanced=runCommand({root:temp,checkpoint:timeCheckpoint,command:'retime',expectedRevision:1,at:'2026-09-27T15:18:00-07:00'});
+  assert.equal(advanced.run.ts,'2026-09-27T15:18:00-07:00');assert.equal(advanced.phase,'DRAFT');
+  const saved=JSON.parse(fs.readFileSync(path.join(temp,timeCheckpoint)));
+  assert.equal(saved.report.feedGeneratedAt,report.feedGeneratedAt,'retime cannot restamp source feed');
+  assert.deepEqual(saved.report.recs,report.recs);
+  assert.throws(()=>runCommand({root:temp,checkpoint:timeCheckpoint,command:'retime',expectedRevision:2,at:report.ts}),/advance/);
+
+  // A prepared checkpoint fixture isolates the state machine from analytical fixtures.
+  const state=JSON.parse(fs.readFileSync(path.join(temp,checkpoint)));state.phase='PREPARED';write(path.join(temp,checkpoint),state);
+  const passing=()=>({state:'PASS',receipts:[{gate:'test',state:'PASS'}]});
+  assert.throws(()=>runCommand({...base,command:'freeze',expectedRevision:1,pipeline:()=>{throw new Error('not qualified');}}),/not qualified/);
+  assert.equal(runCommand({...base,command:'status'}).phase,'PREPARED');
+  out=runCommand({...base,command:'freeze',expectedRevision:1,pipeline:passing});assert.equal(out.phase,'FROZEN');
+  assert.throws(()=>runCommand({...base,command:'checkpoint',report:r,sidecar:s,expectedRevision:2}),/Frozen runs cannot/);
+  out=runCommand({...base,command:'stage',expectedRevision:2,pipeline:passing});assert.equal(out.phase,'STAGED');
+  const stage=path.join(temp,'data/history/staging/report-bundle.json');const frozen=fs.readFileSync(stage);
+  assert.equal(blobSha(frozen),out.frozen.blobSha);
+  runCommand({...base,command:'stage',expectedRevision:3,pipeline:passing});assert.deepEqual(fs.readFileSync(stage),frozen,'retry uses identical bytes');
+  const tampered=JSON.parse(fs.readFileSync(path.join(temp,checkpoint)));tampered.report.bankroll=200;write(path.join(temp,checkpoint),tampered);
+  assert.throws(()=>runCommand({...base,command:'stage',expectedRevision:4,pipeline:passing}),/Frozen candidate bytes changed/);
+  assert.throws(()=>runCommand({...base,checkpoint:'data/history/runs/evil.json',command:'start',report:r,sidecar:s}),/Checkpoint must/);
+  const bundle=JSON.parse(frozen);validateStagedBundle(bundle,{root:temp});
+  assert.throws(()=>validateStagedBundle({...bundle,candidateId:'wrong'},{root:temp}),/candidateId/);
+  const git=args=>execFileSync('git',args,{cwd:temp,encoding:'utf8'}).trim();
+  git(['init','-q']);git(['config','user.name','Test']);git(['config','user.email','test@example.invalid']);git(['add','.']);git(['commit','-qm','candidate A']);const first=git(['rev-parse','HEAD']);
+  const newer=structuredClone(bundle);newer.report.bankroll=300;write(stage,newer);git(['add','.']);git(['commit','-qm','candidate B']);
+  const extracted=extractStagedReport({root:temp,commit:first,outputDir:path.join(temp,'extract')});
+  assert.equal(extracted.blobSha,blobSha(frozen));assert.equal(JSON.parse(fs.readFileSync(path.join(temp,'extract/report.json'))).bankroll,100,'queued A must not publish latest B');
+  const workflow=fs.readFileSync('.github/workflows/report-history-staged.yml','utf8');
+  assert.match(workflow,/CANDIDATE_COMMIT: \$\{\{ github.sha \}\}/);
+  assert.equal((workflow.match(/report-pipeline.mjs validate/g)||[]).length,2,'same checks initially and after rebase');
+  assert.match(workflow,/report-pipeline.mjs readback/);
+  const legacy=fs.readFileSync('.github/workflows/report-history.yml','utf8');
+  assert.doesNotMatch(legacy,/report-publication.mjs publish|contents: write|git push/,'retired workflow cannot write History');
+  console.log('PIPELINE: gate order/failures, revision conflicts, immutable freeze/retry, path isolation, exact-trigger extraction and one-writer wiring PASS');
+}finally{fs.rmSync(temp,{recursive:true,force:true});}
+
+// Forward reports retain source evidence once, rather than duplicating derived research plans.
+const {compactEvidenceAudit}=await import('../tools/report-evidence-repair.mjs');
+const full={version:'test',reportTs:'2026-09-27T15:15:00-07:00',forecastCoverage:{totals:{captured:2},selections:[{largeDerived:'x'.repeat(10000)}]},candidateAssessment:{counts:{available:2},selections:[{selectionId:'exact'}]},eventResearchPlan:{counts:{events:1},events:[{largeDerived:'x'.repeat(10000)}]},blockedReview:{stillBlockedCount:2},cardReview:{issueCounts:{}},warnings:[]};
+const frozen=JSON.stringify(full),compact=compactEvidenceAudit(full);
+assert.equal(JSON.stringify(full),frozen);
+assert.deepEqual(compact.candidateAssessment,{available:2});assert.equal(compact.blockedReview.stillBlockedCount,2);
+assert.ok(JSON.stringify(compact).length<JSON.stringify(full).length/10);

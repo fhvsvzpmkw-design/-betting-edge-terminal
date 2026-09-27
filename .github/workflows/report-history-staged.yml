@@ -1,6 +1,6 @@
 name: Report history staged publication
 # Fail-closed production publication for ChatGPT scheduled runs.
-# Scheduled tasks may write only the staging bundle; this workflow alone mutates durable History.
+# Scheduled producers write checkpoints and the staging bundle; only this workflow writes issued History.
 # Manual dispatch may replay the exact preserved staging bundle when deliberate recovery is required.
 # Publisher workflow edits do not auto-replay an older staged candidate.
 # Manual recovery publisher trigger: 2026-08-31 16:10 PT.
@@ -33,74 +33,16 @@ jobs:
         with:
           node-version: '22'
       - name: Require clean durable history before candidate publication
+        run: node tools/report-pipeline.mjs history
+      - name: Extract exact triggering candidate
+        env:
+          CANDIDATE_COMMIT: ${{ github.sha }}
+          CANDIDATE_DIR: /tmp
+        run: node tools/extract-staged-report.mjs
+      - name: Normalize derived fields and validate candidate
         run: |
-          node tools/report-publication.mjs verify
-          node tools/core-v14-publication-gate.mjs verify-history
-          node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
-          node tools/vigscope-meter-telemetry-gate.mjs self-test
-      - name: Extract staged candidate bundle
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const file = 'data/history/staging/report-bundle.json';
-          const bundle = JSON.parse(fs.readFileSync(file, 'utf8'));
-          if (bundle.schema !== 1) throw new Error('Staging bundle schema must be 1');
-          if (bundle.state !== 'READY') throw new Error('Staging bundle state must be READY');
-          if (typeof bundle.candidateId !== 'string' || !bundle.candidateId.trim()) throw new Error('Staging candidateId is required');
-          if (typeof bundle.phase !== 'string' || !bundle.phase.trim()) throw new Error('Staging phase is required');
-          if (!bundle.report || typeof bundle.report !== 'object' || Array.isArray(bundle.report)) throw new Error('Staging report object is required');
-          if (!bundle.sidecar || typeof bundle.sidecar !== 'object' || Array.isArray(bundle.sidecar)) throw new Error('Staging sidecar object is required');
-          if (bundle.sidecar.schema !== 3) throw new Error('Staging sidecar schema must be 3');
-          if (!bundle.report.ts || !Number.isFinite(Date.parse(bundle.report.ts))) throw new Error('Staging report.ts must be a valid timestamp');
-          fs.writeFileSync('/tmp/report.json', JSON.stringify(bundle.report, null, 2) + '\n');
-          fs.writeFileSync('/tmp/sidecar.json', JSON.stringify(bundle.sidecar, null, 2) + '\n');
-          NODE
-      - name: Review card evidence (advisory only)
-        continue-on-error: true
-        run: |
-          node tools/review-card-evidence.mjs review --report /tmp/report.json --sidecar /tmp/sidecar.json --summary
-          node tools/report-evidence-repair.mjs review --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Enforce personnel semantic evidence
-        run: |
-          node tools/personnel-semantic-gate.mjs self-test
-          node tools/personnel-semantic-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Enforce major-sport coverage receipt
-        run: |
-          node tools/major-sport-market-coverage-gate.mjs self-test
-          node tools/major-sport-market-coverage-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Enforce source, fair-value and exact-card evidence
-        run: node tools/report-evidence-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Enforce same-day event eligibility
-        run: |
-          node tools/report-event-eligibility.mjs self-test
-          node tools/report-event-eligibility.mjs validate --report /tmp/report.json
-      - name: Canonicalize report-derived sidecar fields
-        run: |
-          node tools/report-sidecar-contract.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
-          node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Canonicalize official Pinnacle benchmark provenance
-        run: |
-          node tools/pinnacle-sharp-benchmark.mjs self-test
-          node tools/pinnacle-benchmark-publication-gate.mjs self-test
-          node tools/pinnacle-benchmark-publication-gate.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Validate complete Core assessment trace
-        run: |
-          node tools/core-assessment-trace-gate.mjs self-test
-          node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
-      - name: Enforce Core 1.4 production handicap and Walters authority
-        run: node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Enforce official non-executable Pinnacle benchmark
-        run: node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Guard tracked selection continuity
-        run: node tools/selection-continuity.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Verify every displayed moneyline and price movement
-        run: node tools/moneyline-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Verify tracked non-spread book availability
-        run: node tools/selection-availability.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Reconcile tracked spread lineage
-        run: node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
-      - name: Reconcile tracked full-game total lineage
-        run: node tools/total-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
+          node tools/report-pipeline.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
+          node tools/report-pipeline.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
       - name: Validate bundle and derive paths
         id: bundle
         run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
@@ -123,20 +65,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -f -- "$REPORT_PATH" "$SIDECAR_PATH"
-            node tools/report-publication.mjs verify
-            node tools/core-v14-publication-gate.mjs verify-history
-            node tools/pinnacle-benchmark-publication-gate.mjs validate-runtime
-            node tools/personnel-semantic-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/major-sport-market-coverage-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/report-evidence-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/report-event-eligibility.mjs validate --report /tmp/report.json
-            node tools/report-sidecar-contract.mjs check --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/pinnacle-benchmark-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/core-assessment-trace-gate.mjs validate --report /tmp/report.json
-            node tools/core-v14-publication-gate.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/moneyline-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/spread-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
-            node tools/total-lineage.mjs audit --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/report-pipeline.mjs history
+            node tools/report-pipeline.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
             node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
             git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
@@ -162,16 +92,7 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           node tools/report-publication.mjs verify --ts "$REPORT_TS"
-          node tools/moneyline-lineage.mjs audit --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/spread-lineage.mjs audit --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/total-lineage.mjs audit --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/core-v14-publication-gate.mjs verify-history
-          node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"
-          node tools/personnel-semantic-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/major-sport-market-coverage-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/report-evidence-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/pinnacle-benchmark-publication-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
-          node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+          node tools/report-pipeline.mjs readback --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
       - name: Publication summary
         env:
           SHORT_ID: ${{ steps.bundle.outputs.short_id }}

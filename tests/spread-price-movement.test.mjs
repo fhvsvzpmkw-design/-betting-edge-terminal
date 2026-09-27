@@ -196,10 +196,8 @@ try {
   f.report.recs[0].move = 'MOVEMENT UNCHANGED'; write(reportFile, f.report);
   const rejected = spawnSync(process.execPath, [path.resolve('tools/spread-lineage.mjs'), 'audit', '--root', root, '--report', reportFile, '--feed', feedFile], { encoding: 'utf8' });
   assert.equal(rejected.status, 1); assert.match(rejected.stderr, /PRICE IMPROVED/);
-  for (const file of ['.github/workflows/report-history.yml', '.github/workflows/report-history-staged.yml']) {
-    const workflow = fs.readFileSync(file, 'utf8');
-    assert.equal((workflow.match(/node tools\/spread-lineage\.mjs audit/g) || []).length, 3, 'spread gate before publication, after rebase and at read-back');
-    assert.equal((workflow.match(/node tools\/total-lineage\.mjs audit/g) || []).length, 3, 'totals enforcement remains intact');
-  }
+  const pipeline = fs.readFileSync('tools/report-pipeline.mjs','utf8');
+  assert.match(pipeline, /\['spread-lineage.mjs','audit'\]/);
+  assert.match(pipeline, /\['total-lineage.mjs','audit'\]/);
   console.log('SPREAD PRICE MOVEMENT: PASS — 126 seven-sport home/away line/price cases, unchanged run/puck lines, retained alternates, key-only history, freshness, book conflicts, CLI and publication wiring');
 } finally { fs.rmSync(root, { recursive: true, force: true }); }
