@@ -8,6 +8,7 @@ import {mergedFeedEvents, majorSportKey} from './major-sport-market-coverage-gat
 import {forecastCandidate, forecastMarketClass, forecastPriceComparison} from './forecast-evidence.mjs';
 import {teamAbbr} from './graham-market-utils.mjs';
 import {exactMarketReference,marketComparison} from './market-price-assessment.mjs';
+import {loadGrahamHandoffInputs} from './graham-fair-handoff.mjs';
 
 export const INTELLIGENCE_FROM = '2026-09-27T12:00:00-07:00';
 export const list = x => Array.isArray(x) ? x : [];
@@ -47,11 +48,12 @@ export function loadCapture(root,asOf) {
   return null;
 }
 
-function internalModels(root,events,asOf) {
-  const active=readOptional(path.join(root,'data/walters/nfl/active-week.json'));
-  if(!active) return [];
-  const sourcePath=`data/walters/nfl/${active.season}/week-${String(active.week).padStart(2,'0')}-current-numbers.json`;
-  const board=readOptional(path.join(root,sourcePath));
+function internalModels(root,events,asOf,sidecar) {
+  if(!events.some(e=>e.sport==='NFL'))return [];
+  const inputs=loadGrahamHandoffInputs(root,{ts:asOf},sidecar);
+  if(!sidecar.grahamFairHandoffInputs)sidecar.grahamFairHandoffInputs=structuredClone(inputs.binding);
+  if(inputs.state!=='BOUND')return [];
+  const {board,boardPath:sourcePath}=inputs;
   return events.filter(e=>e.sport==='NFL').flatMap(event=>{
     const matches=list(board?.games).filter(g=>g.home===teamAbbr(event.home)&&g.away===teamAbbr(event.away)&&sameTime(g.startTimePacific,event.startTime));
     if(matches.length!==1) return [];
@@ -82,7 +84,7 @@ export function bindIntelligence({root,report,sidecar,feed,universe,liveBoard=fa
   const records=list(capture?.records).filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
   const facts=list(capture?.facts).filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
   const inputs={schema:1,asOf:report.ts,collectedAt:capture?.collectedAt||null,snapshotId:capture?.snapshotId||null,
-    sources:list(capture?.sources),records,facts,quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts),
+    sources:list(capture?.sources),records,facts,quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts,sidecar),
     knowledge:knowledge(root,unique(events.map(e=>e.sport))),
     limitation:'Original observation times are preserved. Report decisions must assess current event, personnel and exact quote applicability.'};
   sidecar.gameIntelligenceInputs=inputs;

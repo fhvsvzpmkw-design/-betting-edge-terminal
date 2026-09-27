@@ -137,6 +137,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       const stem=`${state.report.slot}-${at.slice(11,19).replaceAll(':','')}`;
       Object.assign(state.sidecar.reportReference,{ts:at,reportPath:`data/history/runs/${at.slice(0,10)}/${stem}.json`,researchFitPath:`data/history/research-fit/${at.slice(0,10)}/${stem}.json`});
       state.sidecar.provenance.reportTimestamp=at;
+      if(state.sidecar.grahamFairHandoffInputs)state.sidecar.grahamFairHandoffInputs.reportTs=at;
       state.identity=identity(state.report,state.sidecar,root);state.phase='DRAFT';delete state.validation;delete state.preparation;
     }
     if(command==='prepare'){
