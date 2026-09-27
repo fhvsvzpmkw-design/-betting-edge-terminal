@@ -29,6 +29,8 @@ Read schemas as needed for the chosen route: `docs/CANDIDATE_ASSESSMENT.md`, `do
 
 ## 2. Bind current executable prices
 
+Start with `node tools/report-inputs.mjs --at <actual-report-timestamp> --report-time <HH:MM> --root <repo-root>` for a compact inventory and exact source bindings; add `--event-id <id>` for one event's executable quotes and availability limitations. Process the full feed, observer and histories locally in code; do not print entire datasets into the conversation. This read-only projection runs the canonical inventory selector but is not issuance clearance: `validationState=NOT_RUN`. Existing feed provenance/freshness, evidence, Core and publication validators remain authoritative. Rebuild projections when bound bytes change. No extra odds pull is needed to build them.
+
 Bind exact `data/live-odds.json` bytes, blob SHA and `generatedAt`. Retain the actual clock; never backdate issuance or restamp quotes. Enforce 75-minute feed freshness and 30-minute executable quote age at feed generation. For `quoteObservationVersion:1`, quote freshness uses `observedAt`; provider `updatedAt` remains the last-change clock. Legacy feeds retain their original rule. Read `docs/ODDS_OBSERVATION_FRESHNESS.md`; observation freshness is not price movement.
 
 Executable books are Bet365 and DraftKings. One valid supported book can establish availability; it does not establish value. Bind exact event/start time, full-game period, side, line, settlement and selectionKey. Missing/suspended quotes in the newest successful scope cannot be supplied by older copies. Preserve disagreements between books.
