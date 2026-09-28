@@ -13,21 +13,21 @@
     "summary": {
       "samples": 48,
       "uniqueEvents": 43,
-      "settled": 35,
-      "unresolved": 13,
+      "settled": 47,
+      "unresolved": 1,
       "grades": {
-        "LOSS": 14,
-        "WIN": 20,
+        "LOSS": 22,
+        "WIN": 24,
         "PUSH": 1
       },
-      "netUnits": 3.41,
+      "netUnits": 0.31000000000000005,
       "hypotheticalUnitsPerSample": 1,
-      "settledUnitsAtRisk": 35,
-      "roiPct": 9.742857142857144,
-      "observedPriceComparisons": 13,
-      "missingPriceComparisons": 35,
+      "settledUnitsAtRisk": 47,
+      "roiPct": 0.6595744680851066,
+      "observedPriceComparisons": 23,
+      "missingPriceComparisons": 25,
       "verifiedClosingPrices": 0,
-      "meanEntryVsLaterPricePct": 4.972161492011574
+      "meanEntryVsLaterPricePct": 4.5001685927939645
     },
     "limitations": [
       "Hypothetical flat one-unit entries, never official bets or realized customer returns.",
@@ -4712,12 +4712,19 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63299339\",\"2026-09-27T19:05:00.000Z\",\"FULL_GAME\",\"totals\",7]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 823408",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
           "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
+          "reason": "no_exact_quote_in_later_prestart_snapshot",
           "verifiedClosingLine": false
         }
       },
@@ -4820,13 +4827,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63301803\",\"2026-09-27T19:07:00.000Z\",\"FULL_GAME\",\"totals\",8.5]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 822761",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:02.572Z",
+          "quoteUpdatedAt": "2026-09-27T16:17:37.92Z",
+          "priceDecimal": 1.83,
+          "entryPriceDecimal": 1.9,
+          "entryVsLaterPricePct": 3.82513661202184,
+          "beatLaterPrice": true,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -4927,13 +4951,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"NFL\",\"71515812\",\"2026-09-27T17:00:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "WIN",
+          "netUnits": 1.2000000000000002,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "ESPN NFL historical final 2026-09-27; event 401872949",
+            "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20260927&limit=300"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "DraftKings",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:04.780Z",
+          "quoteUpdatedAt": "2026-09-27T15:41:52.808Z",
+          "priceDecimal": 2.14,
+          "entryPriceDecimal": 2.2,
+          "entryVsLaterPricePct": 2.8037383177570208,
+          "beatLaterPrice": true,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5034,13 +5075,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"NFL\",\"71515828\",\"2026-09-27T17:00:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "WIN",
+          "netUnits": 1.5499999999999998,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "ESPN NFL historical final 2026-09-27; event 401872950",
+            "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20260927&limit=300"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:23:55.531Z",
+          "quoteUpdatedAt": "2026-09-27T16:23:23.644Z",
+          "priceDecimal": 2.55,
+          "entryPriceDecimal": 2.55,
+          "entryVsLaterPricePct": 0,
+          "beatLaterPrice": false,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5141,13 +5199,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"NFL\",\"71515832\",\"2026-09-27T20:05:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "ESPN NFL historical final 2026-09-27; event 401872958",
+            "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20260927&limit=300"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "DraftKings",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:03.223Z",
+          "quoteUpdatedAt": "2026-09-27T16:17:07.497Z",
+          "priceDecimal": 4.1,
+          "entryPriceDecimal": 4.1,
+          "entryVsLaterPricePct": 0,
+          "beatLaterPrice": false,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5248,13 +5323,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63299155\",\"2026-09-27T19:10:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 823731",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:02.572Z",
+          "quoteUpdatedAt": "2026-09-27T16:21:08.55Z",
+          "priceDecimal": 2.7,
+          "entryPriceDecimal": 3.05,
+          "entryVsLaterPricePct": 12.962962962962955,
+          "beatLaterPrice": true,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5359,9 +5451,19 @@
           "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:23:57.868Z",
+          "quoteUpdatedAt": "2026-09-27T16:23:07.059Z",
+          "priceDecimal": 2,
+          "entryPriceDecimal": 2.15,
+          "entryVsLaterPricePct": 7.499999999999996,
+          "beatLaterPrice": true,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5462,13 +5564,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63301953\",\"2026-09-27T19:10:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 823084",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:02.838Z",
+          "quoteUpdatedAt": "2026-09-27T16:20:37.315Z",
+          "priceDecimal": 2.45,
+          "entryPriceDecimal": 2.55,
+          "entryVsLaterPricePct": 4.081632653061207,
+          "beatLaterPrice": true,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5569,13 +5688,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63302721\",\"2026-09-27T19:10:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "WIN",
+          "netUnits": 1.1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 824055",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:02.838Z",
+          "quoteUpdatedAt": "2026-09-27T16:23:37.828Z",
+          "priceDecimal": 1.95,
+          "entryPriceDecimal": 2.1,
+          "entryVsLaterPricePct": 7.692307692307709,
+          "beatLaterPrice": true,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5677,12 +5813,19 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63302997\",\"2026-09-27T19:05:00.000Z\",\"FULL_GAME\",\"totals\",9.5]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 824948",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
           "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
+          "reason": "no_exact_quote_in_later_prestart_snapshot",
           "verifiedClosingLine": false
         }
       },
@@ -5784,13 +5927,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63303703\",\"2026-09-27T19:10:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 824542",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:02.572Z",
+          "quoteUpdatedAt": "2026-09-27T16:22:22.081Z",
+          "priceDecimal": 2.7,
+          "entryPriceDecimal": 2.7,
+          "entryVsLaterPricePct": 0,
+          "beatLaterPrice": false,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5891,13 +6051,30 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"MLB\",\"63303703\",\"2026-09-27T19:10:00.000Z\",\"FULL_GAME\",\"spread\",-1.5]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "LOSS",
+          "netUnits": -1,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "MLB official historical final 2026-09-27; event 824542",
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-09-27&hydrate=linescore,team"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
-          "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
-          "verifiedClosingLine": false
+          "state": "observed_exact",
+          "label": "Last observed pre-start price; not a verified closing line",
+          "verifiedClosingLine": false,
+          "book": "Bet365",
+          "snapshotGeneratedAt": "2026-09-27T16:24:05.283Z",
+          "snapshotBlobSha": "d2fb5b4217422d0179b2dce650369506ca766d4f",
+          "quoteObservedAt": "2026-09-27T16:24:02.572Z",
+          "quoteUpdatedAt": "2026-09-27T16:20:37.315Z",
+          "priceDecimal": 1.83,
+          "entryPriceDecimal": 1.83,
+          "entryVsLaterPricePct": 0,
+          "beatLaterPrice": false,
+          "noVigClosingEdge": null
         }
       },
       {
@@ -5998,12 +6175,19 @@
         "cohortDate": "2026-09-27",
         "sampleKey": "2026-09-27|[\"NFL\",\"71515838\",\"2026-09-28T00:20:00.000Z\",\"FULL_GAME\",\"ml\",null]",
         "result": {
-          "state": "unresolved",
-          "reason": "VERIFIED_EXACT_SETTLEMENT_OR_COMPATIBLE_SCORE_MISSING"
+          "state": "settled",
+          "grade": "WIN",
+          "netUnits": 1.0499999999999998,
+          "verifiedAt": "2026-09-28T10:29:09.013Z",
+          "source": {
+            "name": "ESPN NFL historical final 2026-09-27; event 401872962",
+            "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20260927&limit=300"
+          },
+          "settlementMethod": "VERIFIED_EXACT_SAME_BOOK_OBSERVATION"
         },
         "priceDiagnostic": {
           "state": "unavailable",
-          "reason": "NO_EXACT_SAME_BOOK_OBSERVATION",
+          "reason": "no_later_prestart_snapshot",
           "verifiedClosingLine": false
         }
       }
@@ -6052,7 +6236,7 @@
     ],
     "readWarnings": []
   },
-  "generatedAt": "2026-09-28T01:28:51.834Z",
+  "generatedAt": "2026-09-28T10:32:08.832Z",
   "authority": {
     "runs": "data/history/runs/**",
     "observations": "data/history/observations/**",
@@ -6064,42 +6248,42 @@
     "firstDate": "2026-08-15",
     "lastDate": "2026-09-27",
     "cards": 4310,
-    "completeCards": 4283,
-    "unresolvedCards": 27,
-    "observedCards": 4283,
-    "observedThroughDate": "2026-09-26",
-    "pendingObservationCards": 27,
-    "pendingObservationRuns": 3,
+    "completeCards": 4309,
+    "unresolvedCards": 1,
+    "observedCards": 4310,
+    "observedThroughDate": "2026-09-27",
+    "pendingObservationCards": 0,
+    "pendingObservationRuns": 0,
     "publishedRuns": 174,
     "selections": 2093,
-    "completeSelections": 2067,
-    "unresolvedSelections": 26,
+    "completeSelections": 2092,
+    "unresolvedSelections": 1,
     "events": 614,
-    "unresolvedEvents": 14
+    "unresolvedEvents": 1
   },
   "priceAnalytics": {
     "methodology": "hypothetical flat 1-unit risk per completed card with an exact issued-snapshot quote; ROI denominator includes priced pushes and voids, excludes missing prices and unsettled cards; HALF_WIN/HALF_LOSS settle at half stake. Repeated appearances and opposing sides are retained, not independent opportunities.",
-    "pricedCards": 4234,
-    "netUnits": -188.499,
-    "roiPct": -4.45
+    "pricedCards": 4260,
+    "netUnits": -195.249,
+    "roiPct": -4.58
   },
   "byStatus": [
     {
       "name": "LEAN",
       "issued": 48,
-      "complete": 45,
-      "unresolved": 3,
+      "complete": 48,
+      "unresolved": 0,
       "grades": {
         "WIN": 25,
-        "LOSS": 20,
+        "LOSS": 23,
         "PUSH": 0,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 41,
-      "netUnits": 6.36,
-      "roiPct": 15.51
+      "priced": 44,
+      "netUnits": 3.36,
+      "roiPct": 7.64
     },
     {
       "name": "WAIT",
@@ -6121,19 +6305,19 @@
     {
       "name": "PASS",
       "issued": 4168,
-      "complete": 4144,
-      "unresolved": 24,
+      "complete": 4167,
+      "unresolved": 1,
       "grades": {
-        "WIN": 2025,
-        "LOSS": 2081,
+        "WIN": 2035,
+        "LOSS": 2094,
         "PUSH": 37,
         "VOID": 1,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 4109,
-      "netUnits": -175.899,
-      "roiPct": -4.28
+      "priced": 4132,
+      "netUnits": -179.649,
+      "roiPct": -4.35
     }
   ],
   "byDate": [
@@ -6803,72 +6987,72 @@
     {
       "name": "2026-09-27",
       "issued": 27,
-      "complete": 0,
-      "unresolved": 27,
+      "complete": 26,
+      "unresolved": 1,
       "grades": {
-        "WIN": 0,
-        "LOSS": 0,
+        "WIN": 10,
+        "LOSS": 16,
         "PUSH": 0,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 0,
-      "netUnits": 0,
-      "roiPct": null
+      "priced": 26,
+      "netUnits": -6.75,
+      "roiPct": -25.96
     }
   ],
   "byMarket": [
     {
       "name": "Moneyline",
       "issued": 1749,
-      "complete": 1735,
-      "unresolved": 14,
+      "complete": 1748,
+      "unresolved": 1,
       "grades": {
-        "WIN": 832,
-        "LOSS": 903,
+        "WIN": 838,
+        "LOSS": 910,
         "PUSH": 0,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 1711,
-      "netUnits": -91.629,
-      "roiPct": -5.36
+      "priced": 1724,
+      "netUnits": -93.049,
+      "roiPct": -5.4
     },
     {
       "name": "Totals",
       "issued": 1310,
-      "complete": 1300,
-      "unresolved": 10,
+      "complete": 1310,
+      "unresolved": 0,
       "grades": {
-        "WIN": 634,
-        "LOSS": 637,
+        "WIN": 637,
+        "LOSS": 644,
         "PUSH": 29,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 1299,
-      "netUnits": -57.04,
-      "roiPct": -4.39
+      "priced": 1309,
+      "netUnits": -61.27,
+      "roiPct": -4.68
     },
     {
       "name": "Spread",
       "issued": 1151,
-      "complete": 1148,
-      "unresolved": 3,
+      "complete": 1151,
+      "unresolved": 0,
       "grades": {
-        "WIN": 573,
-        "LOSS": 567,
+        "WIN": 574,
+        "LOSS": 569,
         "PUSH": 8,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 1143,
-      "netUnits": -57.56,
-      "roiPct": -5.04
+      "priced": 1146,
+      "netUnits": -58.66,
+      "roiPct": -5.12
     },
     {
       "name": "Player props",
@@ -6926,19 +7110,19 @@
     {
       "name": "MLB",
       "issued": 3169,
-      "complete": 3159,
-      "unresolved": 10,
+      "complete": 3168,
+      "unresolved": 1,
       "grades": {
-        "WIN": 1546,
-        "LOSS": 1585,
+        "WIN": 1547,
+        "LOSS": 1593,
         "PUSH": 27,
         "VOID": 1,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 3135,
-      "netUnits": -128.84,
-      "roiPct": -4.11
+      "priced": 3144,
+      "netUnits": -135.74,
+      "roiPct": -4.32
     },
     {
       "name": "NCAAF",
@@ -6960,36 +7144,36 @@
     {
       "name": "NFL",
       "issued": 293,
-      "complete": 286,
-      "unresolved": 7,
+      "complete": 293,
+      "unresolved": 0,
       "grades": {
-        "WIN": 139,
-        "LOSS": 139,
+        "WIN": 143,
+        "LOSS": 142,
         "PUSH": 8,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 286,
-      "netUnits": -11.44,
-      "roiPct": -4
+      "priced": 293,
+      "netUnits": -9.69,
+      "roiPct": -3.31
     },
     {
       "name": "Basketball/WNBA",
       "issued": 265,
-      "complete": 255,
-      "unresolved": 10,
+      "complete": 265,
+      "unresolved": 0,
       "grades": {
-        "WIN": 125,
-        "LOSS": 130,
+        "WIN": 130,
+        "LOSS": 135,
         "PUSH": 0,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 247,
-      "netUnits": 6.32,
-      "roiPct": 2.56
+      "priced": 257,
+      "netUnits": 4.72,
+      "roiPct": 1.84
     },
     {
       "name": "Soccer",
@@ -7115,36 +7299,36 @@
     {
       "name": "open",
       "issued": 963,
-      "complete": 958,
-      "unresolved": 5,
+      "complete": 963,
+      "unresolved": 0,
       "grades": {
-        "WIN": 458,
-        "LOSS": 492,
+        "WIN": 460,
+        "LOSS": 495,
         "PUSH": 8,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 942,
-      "netUnits": -55.27,
-      "roiPct": -5.87
+      "priced": 947,
+      "netUnits": -55.52,
+      "roiPct": -5.86
     },
     {
       "name": "main",
       "issued": 999,
-      "complete": 991,
-      "unresolved": 8,
+      "complete": 998,
+      "unresolved": 1,
       "grades": {
-        "WIN": 475,
-        "LOSS": 503,
+        "WIN": 476,
+        "LOSS": 509,
         "PUSH": 12,
         "VOID": 1,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 977,
-      "netUnits": -58.795,
-      "roiPct": -6.02
+      "priced": 984,
+      "netUnits": -63.695,
+      "roiPct": -6.47
     },
     {
       "name": "final_morning",
@@ -7166,19 +7350,19 @@
     {
       "name": "evening",
       "issued": 884,
-      "complete": 870,
-      "unresolved": 14,
+      "complete": 884,
+      "unresolved": 0,
       "grades": {
-        "WIN": 425,
-        "LOSS": 437,
+        "WIN": 432,
+        "LOSS": 444,
         "PUSH": 8,
         "VOID": 0,
         "HALF_WIN": 0,
         "HALF_LOSS": 0
       },
-      "priced": 863,
-      "netUnits": -47.771,
-      "roiPct": -5.54
+      "priced": 877,
+      "netUnits": -49.371,
+      "roiPct": -5.63
     },
     {
       "name": "late",
@@ -7205,36 +7389,36 @@
       {
         "name": "LEAN",
         "issued": 32,
-        "complete": 30,
-        "unresolved": 2,
+        "complete": 32,
+        "unresolved": 0,
         "grades": {
           "WIN": 19,
-          "LOSS": 11,
+          "LOSS": 13,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 28,
-        "netUnits": 8.22,
-        "roiPct": 29.36
+        "priced": 30,
+        "netUnits": 6.22,
+        "roiPct": 20.73
       },
       {
         "name": "PASS",
         "issued": 2003,
-        "complete": 1979,
-        "unresolved": 24,
+        "complete": 2002,
+        "unresolved": 1,
         "grades": {
-          "WIN": 959,
-          "LOSS": 998,
+          "WIN": 969,
+          "LOSS": 1011,
           "PUSH": 21,
           "VOID": 1,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 1960,
-        "netUnits": -86.924,
-        "roiPct": -4.43
+        "priced": 1983,
+        "netUnits": -90.674,
+        "roiPct": -4.57
       },
       {
         "name": "WAIT",
@@ -7275,53 +7459,53 @@
       {
         "name": "Moneyline",
         "issued": 771,
-        "complete": 757,
-        "unresolved": 14,
+        "complete": 770,
+        "unresolved": 1,
         "grades": {
-          "WIN": 352,
-          "LOSS": 405,
+          "WIN": 358,
+          "LOSS": 412,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 748,
-        "netUnits": -53.149,
-        "roiPct": -7.11
+        "priced": 761,
+        "netUnits": -54.569,
+        "roiPct": -7.17
       },
       {
         "name": "Spread",
         "issued": 520,
-        "complete": 517,
-        "unresolved": 3,
+        "complete": 520,
+        "unresolved": 0,
         "grades": {
-          "WIN": 262,
-          "LOSS": 253,
+          "WIN": 263,
+          "LOSS": 255,
           "PUSH": 2,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 514,
-        "netUnits": -17.88,
-        "roiPct": -3.48
+        "priced": 517,
+        "netUnits": -18.98,
+        "roiPct": -3.67
       },
       {
         "name": "Totals",
         "issued": 734,
-        "complete": 725,
-        "unresolved": 9,
+        "complete": 734,
+        "unresolved": 0,
         "grades": {
-          "WIN": 353,
-          "LOSS": 353,
+          "WIN": 356,
+          "LOSS": 359,
           "PUSH": 19,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 725,
-        "netUnits": -29.945,
-        "roiPct": -4.13
+        "priced": 734,
+        "netUnits": -33.175,
+        "roiPct": -4.52
       },
       {
         "name": "Player props",
@@ -7362,19 +7546,19 @@
       {
         "name": "MLB",
         "issued": 1352,
-        "complete": 1343,
-        "unresolved": 9,
+        "complete": 1351,
+        "unresolved": 1,
         "grades": {
-          "WIN": 658,
-          "LOSS": 667,
+          "WIN": 659,
+          "LOSS": 674,
           "PUSH": 17,
           "VOID": 1,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 1331,
-        "netUnits": -47.98,
-        "roiPct": -3.6
+        "priced": 1339,
+        "netUnits": -53.88,
+        "roiPct": -4.02
       },
       {
         "name": "NFL preseason",
@@ -7430,19 +7614,19 @@
       {
         "name": "Basketball/WNBA",
         "issued": 154,
-        "complete": 144,
-        "unresolved": 10,
+        "complete": 154,
+        "unresolved": 0,
         "grades": {
-          "WIN": 69,
-          "LOSS": 75,
+          "WIN": 74,
+          "LOSS": 80,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 140,
-        "netUnits": 6.49,
-        "roiPct": 4.64
+        "priced": 150,
+        "netUnits": 4.89,
+        "roiPct": 3.26
       },
       {
         "name": "Soccer",
@@ -7532,19 +7716,19 @@
       {
         "name": "NFL",
         "issued": 114,
-        "complete": 107,
-        "unresolved": 7,
+        "complete": 114,
+        "unresolved": 0,
         "grades": {
-          "WIN": 53,
-          "LOSS": 52,
+          "WIN": 57,
+          "LOSS": 55,
           "PUSH": 2,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "priced": 107,
-        "netUnits": -3.15,
-        "roiPct": -2.94
+        "priced": 114,
+        "netUnits": -1.4,
+        "roiPct": -1.23
       }
     ],
     "opposingMarkets": {
@@ -29257,8 +29441,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63301803|totals||8.5",
@@ -29273,8 +29457,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "71515812|ml||",
@@ -29289,8 +29473,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.2
         },
         {
           "groupKey": "71515828|ml||",
@@ -29305,8 +29489,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.55
         },
         {
           "groupKey": "71515832|ml||",
@@ -29321,8 +29505,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63302997|totals||9.5",
@@ -29337,8 +29521,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63299155|ml||",
@@ -29353,8 +29537,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63303703|ml||",
@@ -29369,8 +29553,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63303703|spread||-1.5",
@@ -29385,8 +29569,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63302721|ml||",
@@ -29401,8 +29585,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.1
         },
         {
           "groupKey": "63299349|ml||",
@@ -29433,8 +29617,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "75042852|ml||",
@@ -29451,8 +29635,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.67
         },
         {
           "groupKey": "75042848|ml||",
@@ -29469,8 +29653,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.65
         },
         {
           "groupKey": "75042848|totals||154.5",
@@ -29487,8 +29671,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.1
         },
         {
           "groupKey": "75042852|spread||-7.5",
@@ -29505,8 +29689,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.1
         },
         {
           "groupKey": "75042852|totals||163.5",
@@ -29523,8 +29707,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.08
         },
         {
           "groupKey": "71515838|ml||",
@@ -29541,8 +29725,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": 0.05
         },
         {
           "groupKey": "71515838|totals||44.5",
@@ -29559,156 +29743,13 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.05
         }
       ]
     }
   },
   "unresolved": [
-    {
-      "cardId": "data/history/runs/2026-09-27/open-060000.json#0",
-      "eventId": "63299339",
-      "selectionKey": "63299339|totals|under||7",
-      "title": "Tampa Bay Rays–Philadelphia Phillies Under 7",
-      "date": "2026-09-27",
-      "slot": "open",
-      "status": "LEAN",
-      "sport": "MLB",
-      "market": "Totals",
-      "commenceTime": "2026-09-27T19:05:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/open-060000.json#1",
-      "eventId": "63301803",
-      "selectionKey": "63301803|totals|over||8.5",
-      "title": "Cincinnati Reds–Toronto Blue Jays Over 8.5",
-      "date": "2026-09-27",
-      "slot": "open",
-      "status": "PASS",
-      "sport": "MLB",
-      "market": "Totals",
-      "commenceTime": "2026-09-27T19:07:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/open-060000.json#2",
-      "eventId": "71515812",
-      "selectionKey": "71515812|ml|home||",
-      "title": "Cleveland Browns",
-      "date": "2026-09-27",
-      "slot": "open",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T17:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/open-060000.json#3",
-      "eventId": "71515828",
-      "selectionKey": "71515828|ml|home||",
-      "title": "Pittsburgh Steelers",
-      "date": "2026-09-27",
-      "slot": "open",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T17:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/open-060000.json#4",
-      "eventId": "71515832",
-      "selectionKey": "71515832|ml|away||",
-      "title": "Arizona Cardinals",
-      "date": "2026-09-27",
-      "slot": "open",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T20:05:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#0",
-      "eventId": "63299339",
-      "selectionKey": "63299339|totals|under||7",
-      "title": "Tampa Bay Rays–Philadelphia Phillies Under 7",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "LEAN",
-      "sport": "MLB",
-      "market": "Totals",
-      "commenceTime": "2026-09-27T19:05:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#1",
-      "eventId": "63302997",
-      "selectionKey": "63302997|totals|over||9.5",
-      "title": "Houston Astros–Athletics Over 9.5",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "LEAN",
-      "sport": "MLB",
-      "market": "Totals",
-      "commenceTime": "2026-09-27T19:05:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#2",
-      "eventId": "63299155",
-      "selectionKey": "63299155|ml|away||",
-      "title": "St. Louis Cardinals",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "PASS",
-      "sport": "MLB",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T19:10:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#3",
-      "eventId": "63303703",
-      "selectionKey": "63303703|ml|away||",
-      "title": "Colorado Rockies",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "PASS",
-      "sport": "MLB",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T19:10:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#4",
-      "eventId": "63303703",
-      "selectionKey": "63303703|spread|away||-1.5",
-      "title": "Colorado Rockies +1.5",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "PASS",
-      "sport": "MLB",
-      "market": "Spread",
-      "commenceTime": "2026-09-27T19:10:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#5",
-      "eventId": "63302721",
-      "selectionKey": "63302721|ml|home||",
-      "title": "Kansas City Royals",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "PASS",
-      "sport": "MLB",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T19:10:00Z",
-      "reason": "awaiting_observation"
-    },
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#6",
       "eventId": "63299349",
@@ -29720,327 +29761,16 @@
       "sport": "MLB",
       "market": "Moneyline",
       "commenceTime": "2026-09-27T17:05:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/main-081200.json#7",
-      "eventId": "63301953",
-      "selectionKey": "63301953|ml|away||",
-      "title": "Los Angeles Angels",
-      "date": "2026-09-27",
-      "slot": "main",
-      "status": "PASS",
-      "sport": "MLB",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T19:10:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#0",
-      "eventId": "75042852",
-      "selectionKey": "75042852|ml|away||",
-      "title": "Washington Mystics",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T23:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#1",
-      "eventId": "75042852",
-      "selectionKey": "75042852|ml|home||",
-      "title": "Atlanta Dream",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-27T23:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#10",
-      "eventId": "75042848",
-      "selectionKey": "75042848|ml|away||",
-      "title": "Dallas Wings",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-28T01:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#11",
-      "eventId": "75042848",
-      "selectionKey": "75042848|ml|home||",
-      "title": "Golden State Valkyries",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-28T01:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#12",
-      "eventId": "75042848",
-      "selectionKey": "75042848|totals|over||154.5",
-      "title": "Dallas Wings–Golden State Valkyries Over 154.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Totals",
-      "commenceTime": "2026-09-28T01:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#13",
-      "eventId": "75042848",
-      "selectionKey": "75042848|totals|under||154.5",
-      "title": "Dallas Wings–Golden State Valkyries Under 154.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Totals",
-      "commenceTime": "2026-09-28T01:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#2",
-      "eventId": "75042852",
-      "selectionKey": "75042852|spread|away||-7.5",
-      "title": "Washington Mystics +7.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Spread",
-      "commenceTime": "2026-09-27T23:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#3",
-      "eventId": "75042852",
-      "selectionKey": "75042852|spread|home||-7.5",
-      "title": "Atlanta Dream -7.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Spread",
-      "commenceTime": "2026-09-27T23:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#4",
-      "eventId": "75042852",
-      "selectionKey": "75042852|totals|over||163.5",
-      "title": "Washington Mystics–Atlanta Dream Over 163.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Totals",
-      "commenceTime": "2026-09-27T23:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#5",
-      "eventId": "75042852",
-      "selectionKey": "75042852|totals|under||163.5",
-      "title": "Washington Mystics–Atlanta Dream Under 163.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "Basketball/WNBA",
-      "market": "Totals",
-      "commenceTime": "2026-09-27T23:00:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#6",
-      "eventId": "71515838",
-      "selectionKey": "71515838|ml|away||",
-      "title": "Los Angeles Rams",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-28T00:20:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#7",
-      "eventId": "71515838",
-      "selectionKey": "71515838|ml|home||",
-      "title": "Denver Broncos",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Moneyline",
-      "commenceTime": "2026-09-28T00:20:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#8",
-      "eventId": "71515838",
-      "selectionKey": "71515838|totals|over||44.5",
-      "title": "Los Angeles Rams–Denver Broncos Over 44.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Totals",
-      "commenceTime": "2026-09-28T00:20:00Z",
-      "reason": "awaiting_observation"
-    },
-    {
-      "cardId": "data/history/runs/2026-09-27/evening-153200.json#9",
-      "eventId": "71515838",
-      "selectionKey": "71515838|totals|under||44.5",
-      "title": "Los Angeles Rams–Denver Broncos Under 44.5",
-      "date": "2026-09-27",
-      "slot": "evening",
-      "status": "PASS",
-      "sport": "NFL",
-      "market": "Totals",
-      "commenceTime": "2026-09-28T00:20:00Z",
-      "reason": "awaiting_observation"
+      "reason": "settlement_ambiguity"
     }
   ],
   "unresolvedEvents": [
-    {
-      "eventId": "63299339",
-      "cards": 2,
-      "unresolvedCards": 2,
-      "titles": [
-        "Tampa Bay Rays–Philadelphia Phillies Under 7"
-      ]
-    },
-    {
-      "eventId": "63301803",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Cincinnati Reds–Toronto Blue Jays Over 8.5"
-      ]
-    },
-    {
-      "eventId": "71515812",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Cleveland Browns"
-      ]
-    },
-    {
-      "eventId": "71515828",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Pittsburgh Steelers"
-      ]
-    },
-    {
-      "eventId": "71515832",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Arizona Cardinals"
-      ]
-    },
-    {
-      "eventId": "63302997",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Houston Astros–Athletics Over 9.5"
-      ]
-    },
-    {
-      "eventId": "63299155",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "St. Louis Cardinals"
-      ]
-    },
-    {
-      "eventId": "63303703",
-      "cards": 2,
-      "unresolvedCards": 2,
-      "titles": [
-        "Colorado Rockies",
-        "Colorado Rockies +1.5"
-      ]
-    },
-    {
-      "eventId": "63302721",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Kansas City Royals"
-      ]
-    },
     {
       "eventId": "63299349",
       "cards": 1,
       "unresolvedCards": 1,
       "titles": [
         "Baltimore Orioles"
-      ]
-    },
-    {
-      "eventId": "63301953",
-      "cards": 1,
-      "unresolvedCards": 1,
-      "titles": [
-        "Los Angeles Angels"
-      ]
-    },
-    {
-      "eventId": "75042852",
-      "cards": 6,
-      "unresolvedCards": 6,
-      "titles": [
-        "Washington Mystics",
-        "Atlanta Dream",
-        "Washington Mystics +7.5",
-        "Atlanta Dream -7.5",
-        "Washington Mystics–Atlanta Dream Over 163.5",
-        "Washington Mystics–Atlanta Dream Under 163.5"
-      ]
-    },
-    {
-      "eventId": "75042848",
-      "cards": 4,
-      "unresolvedCards": 4,
-      "titles": [
-        "Dallas Wings",
-        "Golden State Valkyries",
-        "Dallas Wings–Golden State Valkyries Over 154.5",
-        "Dallas Wings–Golden State Valkyries Under 154.5"
-      ]
-    },
-    {
-      "eventId": "71515838",
-      "cards": 4,
-      "unresolvedCards": 4,
-      "titles": [
-        "Los Angeles Rams",
-        "Denver Broncos",
-        "Los Angeles Rams–Denver Broncos Over 44.5",
-        "Los Angeles Rams–Denver Broncos Under 44.5"
       ]
     }
   ],
@@ -299438,8 +299168,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/open-060000.json#0",
       "sourceRun": "data/history/runs/2026-09-27/open-060000.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/open-060000.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T06:00:00-07:00",
       "date": "2026-09-27",
       "slot": "open",
@@ -299477,16 +299207,21 @@
         "snapshotBlobSha": "9e8fbf1edf043229f59d62937f32bf9a626267bf",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:05:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Philadelphia Phillies",
+        "away": "Tampa Bay Rays",
+        "homeScore": 7,
+        "awayScore": 3
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299496,8 +299231,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/open-060000.json#1",
       "sourceRun": "data/history/runs/2026-09-27/open-060000.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/open-060000.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T06:00:00-07:00",
       "date": "2026-09-27",
       "slot": "open",
@@ -299535,16 +299270,21 @@
         "snapshotBlobSha": "9e8fbf1edf043229f59d62937f32bf9a626267bf",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:07:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Toronto Blue Jays",
+        "away": "Cincinnati Reds",
+        "homeScore": 5,
+        "awayScore": 1
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299554,8 +299294,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/open-060000.json#2",
       "sourceRun": "data/history/runs/2026-09-27/open-060000.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/open-060000.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T06:00:00-07:00",
       "date": "2026-09-27",
       "slot": "open",
@@ -299594,16 +299334,21 @@
         "snapshotBlobSha": "9e8fbf1edf043229f59d62937f32bf9a626267bf",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 1.2000000000000002,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T17:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Cleveland Browns",
+        "away": "Carolina Panthers",
+        "homeScore": 21,
+        "awayScore": 18
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299613,8 +299358,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/open-060000.json#3",
       "sourceRun": "data/history/runs/2026-09-27/open-060000.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/open-060000.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T06:00:00-07:00",
       "date": "2026-09-27",
       "slot": "open",
@@ -299653,16 +299398,21 @@
         "snapshotBlobSha": "9e8fbf1edf043229f59d62937f32bf9a626267bf",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 1.5499999999999998,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T17:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Pittsburgh Steelers",
+        "away": "Cincinnati Bengals",
+        "homeScore": 30,
+        "awayScore": 27
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299672,8 +299422,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/open-060000.json#4",
       "sourceRun": "data/history/runs/2026-09-27/open-060000.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/open-060000.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T06:00:00-07:00",
       "date": "2026-09-27",
       "slot": "open",
@@ -299712,16 +299462,21 @@
         "snapshotBlobSha": "9e8fbf1edf043229f59d62937f32bf9a626267bf",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T20:05:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "San Francisco 49ers",
+        "away": "Arizona Cardinals",
+        "homeScore": 36,
+        "awayScore": 30
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299731,8 +299486,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#0",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -299771,16 +299526,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:05:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Philadelphia Phillies",
+        "away": "Tampa Bay Rays",
+        "homeScore": 7,
+        "awayScore": 3
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299790,8 +299550,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#1",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -299830,16 +299590,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:05:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Athletics",
+        "away": "Houston Astros",
+        "homeScore": 0,
+        "awayScore": 9
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299849,8 +299614,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#2",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -299889,16 +299654,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:10:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Milwaukee Brewers",
+        "away": "St. Louis Cardinals",
+        "homeScore": 6,
+        "awayScore": 4
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299908,8 +299678,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#3",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -299948,16 +299718,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:10:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Chicago White Sox",
+        "away": "Colorado Rockies",
+        "homeScore": 4,
+        "awayScore": 2
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -299967,8 +299742,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#4",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -300007,16 +299782,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:10:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Chicago White Sox",
+        "away": "Colorado Rockies",
+        "homeScore": 4,
+        "awayScore": 2
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300026,8 +299806,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#5",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -300066,16 +299846,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 1.1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:10:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Kansas City Royals",
+        "away": "Cleveland Guardians",
+        "homeScore": 3,
+        "awayScore": 2
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300085,8 +299870,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#6",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -300126,7 +299911,7 @@
         "source": "immutable-issued-snapshot"
       },
       "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
+      "unresolvedReason": "settlement_ambiguity",
       "grade": null,
       "official": false,
       "hypothetical": true,
@@ -300144,8 +299929,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/main-081200.json#7",
       "sourceRun": "data/history/runs/2026-09-27/main-081200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/main-081200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T08:12:00-07:00",
       "date": "2026-09-27",
       "slot": "main",
@@ -300184,16 +299969,21 @@
         "snapshotBlobSha": "dab2edae1f1b86861e95c9186949c80ed46ad2f1",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T19:10:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Seattle Mariners",
+        "away": "Los Angeles Angels",
+        "homeScore": 7,
+        "awayScore": 3
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300203,8 +299993,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#0",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -300305,16 +300095,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T23:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Atlanta Dream",
+        "away": "Washington Mystics",
+        "homeScore": 92,
+        "awayScore": 77
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300324,8 +300119,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#1",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -300426,16 +300221,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 0.33000000000000007,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T23:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Atlanta Dream",
+        "away": "Washington Mystics",
+        "homeScore": 92,
+        "awayScore": 77
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300445,8 +300245,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#10",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -300547,16 +300347,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T01:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Golden State Valkyries",
+        "away": "Dallas Wings",
+        "homeScore": 104,
+        "awayScore": 80
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300566,8 +300371,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#11",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -300668,16 +300473,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 0.3500000000000001,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T01:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Golden State Valkyries",
+        "away": "Dallas Wings",
+        "homeScore": 104,
+        "awayScore": 80
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300687,8 +300497,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#12",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -300793,16 +300603,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 0.8999999999999999,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T01:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Golden State Valkyries",
+        "away": "Dallas Wings",
+        "homeScore": 104,
+        "awayScore": 80
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300812,8 +300627,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#13",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -300918,16 +300733,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T01:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Golden State Valkyries",
+        "away": "Dallas Wings",
+        "homeScore": 104,
+        "awayScore": 80
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -300937,8 +300757,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#2",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -301043,16 +300863,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T23:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Atlanta Dream",
+        "away": "Washington Mystics",
+        "homeScore": 92,
+        "awayScore": 77
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -301062,8 +300887,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#3",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -301168,16 +300993,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 0.8999999999999999,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T23:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Atlanta Dream",
+        "away": "Washington Mystics",
+        "homeScore": 92,
+        "awayScore": 77
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -301187,8 +301017,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#4",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -301293,16 +301123,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 0.9199999999999999,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T23:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Atlanta Dream",
+        "away": "Washington Mystics",
+        "homeScore": 92,
+        "awayScore": 77
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -301312,8 +301147,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#5",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -301418,16 +301253,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-27T23:00:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Atlanta Dream",
+        "away": "Washington Mystics",
+        "homeScore": 92,
+        "awayScore": 77
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -301437,8 +301277,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#6",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -301635,16 +301475,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T00:20:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Denver Broncos",
+        "away": "Los Angeles Rams",
+        "homeScore": 30,
+        "awayScore": 26
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -301654,8 +301499,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#7",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -301851,16 +301696,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 1.0499999999999998,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T00:20:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Denver Broncos",
+        "away": "Los Angeles Rams",
+        "homeScore": 30,
+        "awayScore": 26
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -301870,8 +301720,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#8",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -302074,16 +301924,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "WIN",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": 0.95,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T00:20:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Denver Broncos",
+        "away": "Los Angeles Rams",
+        "homeScore": 30,
+        "awayScore": 26
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -302093,8 +301948,8 @@
     {
       "cardId": "data/history/runs/2026-09-27/evening-153200.json#9",
       "sourceRun": "data/history/runs/2026-09-27/evening-153200.json",
-      "observationPath": null,
-      "observationState": "awaiting_observation",
+      "observationPath": "data/history/observations/2026-09-27/evening-153200.json",
+      "observationState": "recorded",
       "runId": "2026-09-27T15:32:00-07:00",
       "date": "2026-09-27",
       "slot": "evening",
@@ -302297,16 +302152,21 @@
         "snapshotBlobSha": "104f610dbd9ae82bdd26bafe952e3d9f61ab8662",
         "source": "immutable-issued-snapshot"
       },
-      "completionState": "unresolved",
-      "unresolvedReason": "awaiting_observation",
-      "grade": null,
+      "completionState": "complete",
+      "unresolvedReason": null,
+      "grade": "LOSS",
       "official": false,
       "hypothetical": true,
-      "units": null,
-      "verifiedAt": null,
+      "units": -1,
+      "verifiedAt": "2026-09-28T10:29:09.013Z",
       "commenceTime": "2026-09-28T00:20:00Z",
-      "finalScore": null,
-      "settlementMethod": null,
+      "finalScore": {
+        "home": "Denver Broncos",
+        "away": "Los Angeles Rams",
+        "homeScore": 30,
+        "awayScore": 26
+      },
+      "settlementMethod": "final_score",
       "settlementComponents": null,
       "issuedStakeCad": 0,
       "referenceFullUnitCad": 15.7,
@@ -303037,13 +302897,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -312393,13 +312253,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 0.33000000000000007
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -312477,13 +312337,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 0.8999999999999999
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -332651,13 +332511,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -333001,13 +332861,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 1.2000000000000002
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -338264,13 +338124,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -339218,13 +339078,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -341603,13 +341463,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -341779,13 +341639,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 0.8999999999999999
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -341821,13 +341681,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -342271,13 +342131,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 1.0499999999999998
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -347434,13 +347294,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 0.3500000000000001
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -351131,13 +350991,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "LEAN"
       ]
@@ -355568,13 +355428,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 1.1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -360613,13 +360473,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -366438,13 +366298,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -366572,13 +366432,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 0.95
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -366614,13 +366474,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -404150,13 +404010,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 1.5499999999999998
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -418316,13 +418176,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -424140,9 +424000,9 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         },
         {
           "cardId": "data/history/runs/2026-09-27/main-081200.json#0",
@@ -424165,13 +424025,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "LEAN"
       ]
@@ -441490,13 +441350,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -441574,13 +441434,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -441729,13 +441589,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "WIN",
+          "units": 0.9199999999999999
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "WIN",
       "statusPath": [
         "PASS"
       ]
@@ -441771,13 +441631,13 @@
           "forecastRecordIds": [],
           "forecastEvidenceIds": [],
           "adoptedForecastRecordIds": [],
-          "completionState": "unresolved",
-          "grade": null,
-          "units": null
+          "completionState": "complete",
+          "grade": "LOSS",
+          "units": -1
         }
       ],
-      "completionState": "unresolved",
-      "grade": null,
+      "completionState": "complete",
+      "grade": "LOSS",
       "statusPath": [
         "PASS"
       ]
@@ -445582,35 +445442,35 @@
     "methodology": "one final issued non-BET decision per unique selectionKey; repeated report-lane appearances are deduplicated. Counterfactual shadow review uses a flat $100 full-unit risk at the final exact issued price. It is not actual betting P/L.",
     "standardizedFullUnitCad": 100,
     "uniqueFinalDecisions": 2093,
-    "pricedFinalDecisions": 2037,
-    "shadowNetUnits": -97.414,
-    "shadowRoiPct": -4.78,
-    "lossAvoidedUnits": 1034,
-    "opportunityMissedUnits": 936.586,
-    "netDecisionUnits": 97.414,
-    "lossAvoidedCad": 103400,
-    "opportunityMissedCad": 93658.6,
-    "netDecisionCad": 9741.4,
+    "pricedFinalDecisions": 2062,
+    "shadowNetUnits": -103.164,
+    "shadowRoiPct": -5,
+    "lossAvoidedUnits": 1049,
+    "opportunityMissedUnits": 945.836,
+    "netDecisionUnits": 103.164,
+    "lossAvoidedCad": 104900,
+    "opportunityMissedCad": 94583.6,
+    "netDecisionCad": 10316.4,
     "byStatus": [
       {
         "status": "LEAN",
         "decisions": 32,
-        "priced": 28,
+        "priced": 30,
         "grades": {
           "WIN": 17,
-          "LOSS": 11,
+          "LOSS": 13,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowNetUnits": 8.22,
-        "shadowRoiPct": 29.36,
-        "lossAvoidedUnits": 11,
+        "shadowNetUnits": 6.22,
+        "shadowRoiPct": 20.73,
+        "lossAvoidedUnits": 13,
         "opportunityMissedUnits": 19.22,
-        "decisionValueUnits": -8.22,
-        "shadowCashCad": 822,
-        "decisionValueCad": -822
+        "decisionValueUnits": -6.22,
+        "shadowCashCad": 622,
+        "decisionValueCad": -622
       },
       {
         "status": "WAIT",
@@ -445635,22 +445495,22 @@
       {
         "status": "PASS",
         "decisions": 2003,
-        "priced": 1960,
+        "priced": 1983,
         "grades": {
-          "WIN": 951,
-          "LOSS": 987,
+          "WIN": 961,
+          "LOSS": 1000,
           "PUSH": 21,
           "VOID": 1,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowNetUnits": -86.924,
-        "shadowRoiPct": -4.43,
-        "lossAvoidedUnits": 987,
-        "opportunityMissedUnits": 900.076,
-        "decisionValueUnits": 86.924,
-        "shadowCashCad": -8692.4,
-        "decisionValueCad": 8692.4
+        "shadowNetUnits": -90.674,
+        "shadowRoiPct": -4.57,
+        "lossAvoidedUnits": 1000,
+        "opportunityMissedUnits": 909.326,
+        "decisionValueUnits": 90.674,
+        "shadowCashCad": -9067.4,
+        "decisionValueCad": 9067.4
       }
     ],
     "opposingMarkets": {
@@ -467363,8 +467223,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63301803|totals||8.5",
@@ -467379,8 +467239,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "71515812|ml||",
@@ -467395,8 +467255,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.2
         },
         {
           "groupKey": "71515828|ml||",
@@ -467411,8 +467271,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.55
         },
         {
           "groupKey": "71515832|ml||",
@@ -467427,8 +467287,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63302997|totals||9.5",
@@ -467443,8 +467303,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63299155|ml||",
@@ -467459,8 +467319,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63303703|ml||",
@@ -467475,8 +467335,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63303703|spread||-1.5",
@@ -467491,8 +467351,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63302721|ml||",
@@ -467507,8 +467367,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.1
         },
         {
           "groupKey": "63299349|ml||",
@@ -467539,8 +467399,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "75042852|ml||",
@@ -467557,8 +467417,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.67
         },
         {
           "groupKey": "75042848|ml||",
@@ -467575,8 +467435,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.65
         },
         {
           "groupKey": "75042848|totals||154.5",
@@ -467593,8 +467453,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.1
         },
         {
           "groupKey": "75042852|spread||-7.5",
@@ -467611,8 +467471,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.1
         },
         {
           "groupKey": "75042852|totals||163.5",
@@ -467629,8 +467489,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.08
         },
         {
           "groupKey": "71515838|ml||",
@@ -467647,8 +467507,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": 0.05
         },
         {
           "groupKey": "71515838|totals||44.5",
@@ -467665,8 +467525,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.05
         }
       ]
     },
@@ -467676,18 +467536,18 @@
     "methodology": "each published Pizza Play is tracked as one unit equal to 3% of the bankroll frozen in its source Betting Edge report; settlement uses the exact issued-price flat-unit result already resolved by the Betting Edge Results index",
     "referenceUnitBasePct": 3,
     "plays": 53,
-    "settled": 51,
-    "pending": 2,
-    "pricedSettled": 49,
+    "settled": 53,
+    "pending": 0,
+    "pricedSettled": 51,
     "unpricedSettled": 2,
     "currentTrackingUnitCad": 15.7,
-    "riskCad": 712.21,
-    "profitLossCad": 45.84,
-    "netUnits": 2.97,
-    "roiPct": 6.44,
+    "riskCad": 743.61,
+    "profitLossCad": 14.44,
+    "netUnits": 0.97,
+    "roiPct": 1.94,
     "grades": {
       "WIN": 25,
-      "LOSS": 26,
+      "LOSS": 28,
       "PUSH": 0,
       "VOID": 0,
       "HALF_WIN": 0,
@@ -467716,21 +467576,21 @@
       {
         "status": "LEAN",
         "plays": 37,
-        "settled": 35,
-        "pending": 2,
-        "priced": 33,
+        "settled": 37,
+        "pending": 0,
+        "priced": 35,
         "grades": {
           "WIN": 20,
-          "LOSS": 15,
+          "LOSS": 17,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "netUnits": 7.57,
-        "riskCad": 480.77,
-        "profitLossCad": 111.19,
-        "roiPct": 23.13
+        "netUnits": 5.57,
+        "riskCad": 512.18,
+        "profitLossCad": 79.79,
+        "roiPct": 15.58
       },
       {
         "status": "WAIT",
@@ -467762,10 +467622,10 @@
       "vigScopeStatus": "LEAN",
       "bankrollCad": 523.38,
       "trackingUnitCad": 15.7014,
-      "completionState": "unresolved",
-      "grade": null,
-      "unitResult": null,
-      "profitLossCad": null,
+      "completionState": "complete",
+      "grade": "LOSS",
+      "unitResult": -1,
+      "profitLossCad": -15.7,
       "analysisPrice": {
         "state": "exact",
         "decimal": 1.95,
@@ -467787,60 +467647,60 @@
     "referenceUnitBasePct": 3,
     "unitDefinition": "1.00u = 3% of bankroll in the final source report for that decision",
     "uniqueFinalDecisions": 2093,
-    "completeFinalDecisions": 2067,
-    "pricedFinalDecisions": 2037,
-    "dollarValuedFinalDecisions": 2037,
-    "excludedFinalDecisions": 56,
-    "unresolvedFinalDecisions": 26,
-    "shadowRiskUnits": 2037,
-    "shadowNetUnits": -97.414,
-    "shadowRoiPct": -4.78,
-    "shadowRiskCad": 31311.04,
-    "shadowProfitLossCad": -1503.48,
-    "shadowRoiCadPct": -4.8,
-    "netDecisionUnits": 97.414,
-    "netDecisionCad": 1503.48,
-    "valueProtectedUnits": 1034,
-    "valueProtectedCad": 15848.33,
-    "valueMissedUnits": 936.586,
-    "valueMissedCad": 14344.85,
-    "protectedOutcomes": 1034,
-    "missedOutcomes": 981,
+    "completeFinalDecisions": 2092,
+    "pricedFinalDecisions": 2062,
+    "dollarValuedFinalDecisions": 2062,
+    "excludedFinalDecisions": 31,
+    "unresolvedFinalDecisions": 1,
+    "shadowRiskUnits": 2062,
+    "shadowNetUnits": -103.164,
+    "shadowRoiPct": -5,
+    "shadowRiskCad": 31703.58,
+    "shadowProfitLossCad": -1593.76,
+    "shadowRoiCadPct": -5.03,
+    "netDecisionUnits": 103.164,
+    "netDecisionCad": 1593.76,
+    "valueProtectedUnits": 1049,
+    "valueProtectedCad": 16083.85,
+    "valueMissedUnits": 945.836,
+    "valueMissedCad": 14490.09,
+    "protectedOutcomes": 1049,
+    "missedOutcomes": 991,
     "neutralOutcomes": 22,
-    "cappedDecisionScore": 53,
+    "cappedDecisionScore": 58,
     "byStatus": [
       {
         "status": "LEAN",
         "decisions": 32,
-        "complete": 30,
-        "unresolved": 2,
-        "priced": 28,
-        "excluded": 4,
-        "dollarValued": 28,
+        "complete": 32,
+        "unresolved": 0,
+        "priced": 30,
+        "excluded": 2,
+        "dollarValued": 30,
         "grades": {
           "WIN": 17,
-          "LOSS": 11,
+          "LOSS": 13,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 28,
-        "shadowNetUnits": 8.22,
-        "shadowRoiPct": 29.36,
-        "shadowRiskCad": 404.46,
-        "shadowProfitLossCad": 124.32,
-        "shadowRoiCadPct": 30.74,
-        "valueProtectedUnits": 11,
-        "valueProtectedCad": 155.13,
+        "shadowRiskUnits": 30,
+        "shadowNetUnits": 6.22,
+        "shadowRoiPct": 20.73,
+        "shadowRiskCad": 435.87,
+        "shadowProfitLossCad": 92.91,
+        "shadowRoiCadPct": 21.32,
+        "valueProtectedUnits": 13,
+        "valueProtectedCad": 186.53,
         "valueMissedUnits": 19.22,
         "valueMissedCad": 279.45,
-        "decisionValueUnits": -8.22,
-        "decisionValueCad": -124.32,
-        "protectedOutcomes": 11,
+        "decisionValueUnits": -6.22,
+        "decisionValueCad": -92.91,
+        "protectedOutcomes": 13,
         "missedOutcomes": 17,
         "neutralOutcomes": 0,
-        "cappedDecisionScore": -6,
+        "cappedDecisionScore": -4,
         "calibrationState": "POSITIVE SHADOW RETURN"
       },
       {
@@ -467880,35 +467740,35 @@
       {
         "status": "PASS",
         "decisions": 2003,
-        "complete": 1979,
-        "unresolved": 24,
-        "priced": 1960,
-        "excluded": 43,
-        "dollarValued": 1960,
+        "complete": 2002,
+        "unresolved": 1,
+        "priced": 1983,
+        "excluded": 20,
+        "dollarValued": 1983,
         "grades": {
-          "WIN": 951,
-          "LOSS": 987,
+          "WIN": 961,
+          "LOSS": 1000,
           "PUSH": 21,
           "VOID": 1,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 1960,
-        "shadowNetUnits": -86.924,
-        "shadowRoiPct": -4.43,
-        "shadowRiskCad": 30229.54,
-        "shadowProfitLossCad": -1367.72,
-        "shadowRoiCadPct": -4.52,
-        "valueProtectedUnits": 987,
-        "valueProtectedCad": 15196.1,
-        "valueMissedUnits": 900.076,
-        "valueMissedCad": 13828.38,
-        "decisionValueUnits": 86.924,
-        "decisionValueCad": 1367.72,
-        "protectedOutcomes": 987,
-        "missedOutcomes": 951,
+        "shadowRiskUnits": 1983,
+        "shadowNetUnits": -90.674,
+        "shadowRoiPct": -4.57,
+        "shadowRiskCad": 30590.67,
+        "shadowProfitLossCad": -1426.6,
+        "shadowRoiCadPct": -4.66,
+        "valueProtectedUnits": 1000,
+        "valueProtectedCad": 15400.22,
+        "valueMissedUnits": 909.326,
+        "valueMissedCad": 13973.62,
+        "decisionValueUnits": 90.674,
+        "decisionValueCad": 1426.6,
+        "protectedOutcomes": 1000,
+        "missedOutcomes": 961,
         "neutralOutcomes": 22,
-        "cappedDecisionScore": 36,
+        "cappedDecisionScore": 39,
         "calibrationState": "NEGATIVE SHADOW RETURN"
       }
     ],
@@ -467916,101 +467776,101 @@
       {
         "name": "Moneyline",
         "decisions": 771,
-        "complete": 757,
-        "unresolved": 14,
-        "priced": 748,
-        "excluded": 23,
-        "dollarValued": 748,
+        "complete": 770,
+        "unresolved": 1,
+        "priced": 761,
+        "excluded": 10,
+        "dollarValued": 761,
         "grades": {
-          "WIN": 349,
-          "LOSS": 399,
+          "WIN": 355,
+          "LOSS": 406,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 748,
-        "shadowNetUnits": -53.149,
-        "shadowRoiPct": -7.11,
-        "shadowRiskCad": 11258.8,
-        "shadowProfitLossCad": -789.36,
-        "shadowRoiCadPct": -7.01,
-        "valueProtectedUnits": 399,
-        "valueProtectedCad": 5974.67,
-        "valueMissedUnits": 345.851,
-        "valueMissedCad": 5185.31,
-        "decisionValueUnits": 53.149,
-        "decisionValueCad": 789.36,
-        "protectedOutcomes": 399,
-        "missedOutcomes": 349,
+        "shadowRiskUnits": 761,
+        "shadowNetUnits": -54.569,
+        "shadowRoiPct": -7.17,
+        "shadowRiskCad": 11462.92,
+        "shadowProfitLossCad": -811.66,
+        "shadowRoiCadPct": -7.08,
+        "valueProtectedUnits": 406,
+        "valueProtectedCad": 6084.58,
+        "valueMissedUnits": 351.431,
+        "valueMissedCad": 5272.92,
+        "decisionValueUnits": 54.569,
+        "decisionValueCad": 811.66,
+        "protectedOutcomes": 406,
+        "missedOutcomes": 355,
         "neutralOutcomes": 0,
-        "cappedDecisionScore": 50
+        "cappedDecisionScore": 51
       },
       {
         "name": "Totals",
         "decisions": 734,
-        "complete": 725,
-        "unresolved": 9,
-        "priced": 725,
-        "excluded": 9,
-        "dollarValued": 725,
+        "complete": 734,
+        "unresolved": 0,
+        "priced": 734,
+        "excluded": 0,
+        "dollarValued": 734,
         "grades": {
-          "WIN": 353,
-          "LOSS": 353,
+          "WIN": 356,
+          "LOSS": 359,
           "PUSH": 19,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 725,
-        "shadowNetUnits": -29.945,
-        "shadowRoiPct": -4.13,
-        "shadowRiskCad": 11339.55,
-        "shadowProfitLossCad": -467.13,
-        "shadowRoiCadPct": -4.12,
-        "valueProtectedUnits": 353,
-        "valueProtectedCad": 5520.61,
-        "valueMissedUnits": 323.055,
-        "valueMissedCad": 5053.48,
-        "decisionValueUnits": 29.945,
-        "decisionValueCad": 467.13,
-        "protectedOutcomes": 353,
-        "missedOutcomes": 353,
+        "shadowRiskUnits": 734,
+        "shadowNetUnits": -33.175,
+        "shadowRoiPct": -4.52,
+        "shadowRiskCad": 11480.86,
+        "shadowProfitLossCad": -517.85,
+        "shadowRoiCadPct": -4.51,
+        "valueProtectedUnits": 359,
+        "valueProtectedCad": 5614.82,
+        "valueMissedUnits": 325.825,
+        "valueMissedCad": 5096.97,
+        "decisionValueUnits": 33.175,
+        "decisionValueCad": 517.85,
+        "protectedOutcomes": 359,
+        "missedOutcomes": 356,
         "neutralOutcomes": 19,
-        "cappedDecisionScore": 0
+        "cappedDecisionScore": 3
       },
       {
         "name": "Spread",
         "decisions": 520,
-        "complete": 517,
-        "unresolved": 3,
-        "priced": 514,
-        "excluded": 6,
-        "dollarValued": 514,
+        "complete": 520,
+        "unresolved": 0,
+        "priced": 517,
+        "excluded": 3,
+        "dollarValued": 517,
         "grades": {
-          "WIN": 260,
-          "LOSS": 252,
+          "WIN": 261,
+          "LOSS": 254,
           "PUSH": 2,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 514,
-        "shadowNetUnits": -17.88,
-        "shadowRoiPct": -3.48,
-        "shadowRiskCad": 8037.54,
-        "shadowProfitLossCad": -295.05,
-        "shadowRoiCadPct": -3.67,
-        "valueProtectedUnits": 252,
-        "valueProtectedCad": 3947.96,
-        "valueMissedUnits": 234.12,
-        "valueMissedCad": 3652.91,
-        "decisionValueUnits": 17.88,
-        "decisionValueCad": 295.05,
-        "protectedOutcomes": 252,
-        "missedOutcomes": 260,
+        "shadowRiskUnits": 517,
+        "shadowNetUnits": -18.98,
+        "shadowRoiPct": -3.67,
+        "shadowRiskCad": 8084.65,
+        "shadowProfitLossCad": -312.32,
+        "shadowRoiCadPct": -3.86,
+        "valueProtectedUnits": 254,
+        "valueProtectedCad": 3979.36,
+        "valueMissedUnits": 235.02,
+        "valueMissedCad": 3667.04,
+        "decisionValueUnits": 18.98,
+        "decisionValueCad": 312.32,
+        "protectedOutcomes": 254,
+        "missedOutcomes": 261,
         "neutralOutcomes": 2,
-        "cappedDecisionScore": -8
+        "cappedDecisionScore": -7
       },
       {
         "name": "Player props",
@@ -489822,8 +489682,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63301803|totals||8.5",
@@ -489838,8 +489698,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "71515812|ml||",
@@ -489854,8 +489714,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.2
         },
         {
           "groupKey": "71515828|ml||",
@@ -489870,8 +489730,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.55
         },
         {
           "groupKey": "71515832|ml||",
@@ -489886,8 +489746,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63302997|totals||9.5",
@@ -489902,8 +489762,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63299155|ml||",
@@ -489918,8 +489778,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63303703|ml||",
@@ -489934,8 +489794,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63303703|spread||-1.5",
@@ -489950,8 +489810,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "63302721|ml||",
@@ -489966,8 +489826,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": 1.1
         },
         {
           "groupKey": "63299349|ml||",
@@ -489998,8 +489858,8 @@
           ],
           "opposingSidesPresent": false,
           "selections": 1,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 1,
+          "netUnits": -1
         },
         {
           "groupKey": "75042852|ml||",
@@ -490016,8 +489876,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.67
         },
         {
           "groupKey": "75042848|ml||",
@@ -490034,8 +489894,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.65
         },
         {
           "groupKey": "75042848|totals||154.5",
@@ -490052,8 +489912,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.1
         },
         {
           "groupKey": "75042852|spread||-7.5",
@@ -490070,8 +489930,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.1
         },
         {
           "groupKey": "75042852|totals||163.5",
@@ -490088,8 +489948,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.08
         },
         {
           "groupKey": "71515838|ml||",
@@ -490106,8 +489966,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": 0.05
         },
         {
           "groupKey": "71515838|totals||44.5",
@@ -490124,8 +489984,8 @@
           ],
           "opposingSidesPresent": true,
           "selections": 2,
-          "priced": 0,
-          "netUnits": 0
+          "priced": 2,
+          "netUnits": -0.05
         }
       ]
     },
@@ -490134,35 +489994,35 @@
       "bestMarket": {
         "name": "Moneyline",
         "decisions": 771,
-        "complete": 757,
-        "unresolved": 14,
-        "priced": 748,
-        "excluded": 23,
-        "dollarValued": 748,
+        "complete": 770,
+        "unresolved": 1,
+        "priced": 761,
+        "excluded": 10,
+        "dollarValued": 761,
         "grades": {
-          "WIN": 349,
-          "LOSS": 399,
+          "WIN": 355,
+          "LOSS": 406,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 748,
-        "shadowNetUnits": -53.149,
-        "shadowRoiPct": -7.11,
-        "shadowRiskCad": 11258.8,
-        "shadowProfitLossCad": -789.36,
-        "shadowRoiCadPct": -7.01,
-        "valueProtectedUnits": 399,
-        "valueProtectedCad": 5974.67,
-        "valueMissedUnits": 345.851,
-        "valueMissedCad": 5185.31,
-        "decisionValueUnits": 53.149,
-        "decisionValueCad": 789.36,
-        "protectedOutcomes": 399,
-        "missedOutcomes": 349,
+        "shadowRiskUnits": 761,
+        "shadowNetUnits": -54.569,
+        "shadowRoiPct": -7.17,
+        "shadowRiskCad": 11462.92,
+        "shadowProfitLossCad": -811.66,
+        "shadowRoiCadPct": -7.08,
+        "valueProtectedUnits": 406,
+        "valueProtectedCad": 6084.58,
+        "valueMissedUnits": 351.431,
+        "valueMissedCad": 5272.92,
+        "decisionValueUnits": 54.569,
+        "decisionValueCad": 811.66,
+        "protectedOutcomes": 406,
+        "missedOutcomes": 355,
         "neutralOutcomes": 0,
-        "cappedDecisionScore": 50
+        "cappedDecisionScore": 51
       },
       "weakestMarket": {
         "name": "Player props",
@@ -490200,70 +490060,70 @@
       "weakestStatus": {
         "status": "LEAN",
         "decisions": 32,
-        "complete": 30,
-        "unresolved": 2,
-        "priced": 28,
-        "excluded": 4,
-        "dollarValued": 28,
+        "complete": 32,
+        "unresolved": 0,
+        "priced": 30,
+        "excluded": 2,
+        "dollarValued": 30,
         "grades": {
           "WIN": 17,
-          "LOSS": 11,
+          "LOSS": 13,
           "PUSH": 0,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 28,
-        "shadowNetUnits": 8.22,
-        "shadowRoiPct": 29.36,
-        "shadowRiskCad": 404.46,
-        "shadowProfitLossCad": 124.32,
-        "shadowRoiCadPct": 30.74,
-        "valueProtectedUnits": 11,
-        "valueProtectedCad": 155.13,
+        "shadowRiskUnits": 30,
+        "shadowNetUnits": 6.22,
+        "shadowRoiPct": 20.73,
+        "shadowRiskCad": 435.87,
+        "shadowProfitLossCad": 92.91,
+        "shadowRoiCadPct": 21.32,
+        "valueProtectedUnits": 13,
+        "valueProtectedCad": 186.53,
         "valueMissedUnits": 19.22,
         "valueMissedCad": 279.45,
-        "decisionValueUnits": -8.22,
-        "decisionValueCad": -124.32,
-        "protectedOutcomes": 11,
+        "decisionValueUnits": -6.22,
+        "decisionValueCad": -92.91,
+        "protectedOutcomes": 13,
         "missedOutcomes": 17,
         "neutralOutcomes": 0,
-        "cappedDecisionScore": -6,
+        "cappedDecisionScore": -4,
         "calibrationState": "POSITIVE SHADOW RETURN"
       },
       "recentSevenDay": {
         "start": "2026-09-21",
         "end": "2026-09-27",
         "decisions": 455,
-        "complete": 429,
-        "unresolved": 26,
-        "priced": 429,
-        "excluded": 26,
-        "dollarValued": 429,
+        "complete": 454,
+        "unresolved": 1,
+        "priced": 454,
+        "excluded": 1,
+        "dollarValued": 454,
         "grades": {
-          "WIN": 212,
-          "LOSS": 216,
+          "WIN": 222,
+          "LOSS": 231,
           "PUSH": 1,
           "VOID": 0,
           "HALF_WIN": 0,
           "HALF_LOSS": 0
         },
-        "shadowRiskUnits": 429,
-        "shadowNetUnits": -17.46,
-        "shadowRoiPct": -4.07,
-        "shadowRiskCad": 6735.9,
-        "shadowProfitLossCad": -274.15,
-        "shadowRoiCadPct": -4.07,
-        "valueProtectedUnits": 216,
-        "valueProtectedCad": 3391.5,
-        "valueMissedUnits": 198.54,
-        "valueMissedCad": 3117.36,
-        "decisionValueUnits": 17.46,
-        "decisionValueCad": 274.15,
-        "protectedOutcomes": 216,
-        "missedOutcomes": 212,
+        "shadowRiskUnits": 454,
+        "shadowNetUnits": -23.21,
+        "shadowRoiPct": -5.11,
+        "shadowRiskCad": 7128.44,
+        "shadowProfitLossCad": -364.43,
+        "shadowRoiCadPct": -5.11,
+        "valueProtectedUnits": 231,
+        "valueProtectedCad": 3627.02,
+        "valueMissedUnits": 207.79,
+        "valueMissedCad": 3262.59,
+        "decisionValueUnits": 23.21,
+        "decisionValueCad": 364.43,
+        "protectedOutcomes": 231,
+        "missedOutcomes": 222,
         "neutralOutcomes": 1,
-        "cappedDecisionScore": 4
+        "cappedDecisionScore": 9
       },
       "previousSevenDay": {
         "start": "2026-09-14",
@@ -490300,7 +490160,7 @@
         "cappedDecisionScore": -1
       },
       "recentTrend": "STABLE",
-      "recentTrendDeltaRoiPct": 0.89
+      "recentTrendDeltaRoiPct": -0.15
     },
     "notes": [
       "Negative shadow ROI is a hypothetical loss, not evidence by itself of filter skill. Opposing sides are dependent and bookmaker margin affects the baseline.",
