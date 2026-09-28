@@ -11,6 +11,7 @@ const current = (value,report) => Number.isFinite(time(value)) && time(value)>=t
 
 /** Inspect recorded research only. Never infer a starter, confirm news or set a fair. */
 export function inspectQuarterbackFollowUp({report={},selection={},receipt={}}={}) {
+  receipt ??= {};
   const rec=receipt.decision || receipt.candidateDraft?.decision || {};
   const evidence=rec.personnelEvidence || receipt.evidence?.personnelEvidence || receipt.candidateDraft?.evidence?.personnelEvidence || {};
   const review=receipt.candidateAssessment?.personnel || {};

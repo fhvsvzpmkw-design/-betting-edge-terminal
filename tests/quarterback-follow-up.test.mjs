@@ -28,6 +28,13 @@ function expected(args){
   e.quarterbackFollowUp={checkedAt:checked,queries:['Fixture team replacement quarterback starter'],status:'EXPECTED_STARTER',playerName:'Test Player',sourceUrls:[e.officialSources[0].url,e.fallbackSources[0].url],remainingUncertainty:'Team has not officially named the starter; model assumptions need separate review.'};
   return e;
 }
+test('a candidate with no research receipt remains available for initial assessment',()=>{
+  const args=fixture();args.report.recs=[];args.sidecar.recommendations=[];args.sidecar.primaryAnalysis.receipts=[];
+  assert.deepEqual(inspectQuarterbackFollowUp({report:args.report,selection:args.universe.selections[0],receipt:null}),{required:false,complete:true,missing:[]});
+  const row=buildCandidateAssessment(args).selections[0];
+  assert.equal(row.state,'UNASSESSED');
+  assert.equal(args.sidecar.primaryAnalysis.receipts.length,0,'inspection does not fabricate research');
+});
 test('morning unresolved quarterback with generic shortfall cannot pass as completed research',()=>{
   const args=fixture(),before=JSON.stringify(args);
   assert.equal(inspect(args).complete,false);
