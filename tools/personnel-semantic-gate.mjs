@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
 
 const SEMANTIC_ENFORCEMENT_FROM = Date.parse('2026-09-02T10:40:00-07:00');
 const FINAL_RECHECK_FROM = Date.parse('2026-09-02T11:15:00-07:00');
@@ -130,6 +131,8 @@ export function validatePersonnelSemantics(report,sidecar){
   for(let index=0; index<report.recs.length; index++){
     const rec = report.recs[index];
     const item = sidecar.recommendations[index];
+    const followUp=inspectQuarterbackFollowUp({report,selection:{sport:item?.coreAssessment?.context?.sport || rec?.coreAssessment?.context?.sport || rec?.sport},receipt:{decision:rec,evidence:item}});
+    ensure(followUp.complete,`Recommendation ${index+1} quarterback follow-up incomplete: ${followUp.missing.join(', ')}`);
     if(item?.personnelRequired !== true) continue;
     checked++;
     const evidence = item?.personnelEvidence;

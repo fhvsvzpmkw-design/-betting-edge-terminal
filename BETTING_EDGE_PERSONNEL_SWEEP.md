@@ -314,3 +314,8 @@ Stage 2 now validates the causal personnel dependency of the exact wager before 
 ## Change note — 2026-09-02 universal closing re-check
 
 The prior sport-specific late-source reminders remain useful research timing guidance, but production publication now uses one cross-sport closing rule: every still-material unresolved Stage 2 dependency receives one final dependency-specific authoritative-source re-check before final status, recorded with `finalRecheck: true`, or a truthful authoritative-source shortfall. This closes the football inactive/availability enforcement mismatch without inventing a universal football clock or changing any betting threshold.
+
+
+## Current quarterback follow-up — September 28
+
+For new reports from 2026-09-28T07:30:00-07:00, `docs/QUARTERBACK_FOLLOW_UP.md` supplies the structured completion check for material unresolved/projected football starters. It applies at every reporting time, before the late pregame windows as well as within them. Current direct reporting can establish a named expectation without claiming official confirmation. A real source shortfall records actual searches and results. Existing betting and numerical production gates remain separate.

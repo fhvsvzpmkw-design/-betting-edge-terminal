@@ -44,3 +44,8 @@ The common schema is deliberately provider-neutral. An authorized source/export 
 ## Verification
 
 `node --test tests/game-intelligence.test.mjs` covers event identity, reversed sides, differing kickoffs, line orientation, unknown tie semantics, source-family deduplication, stale/future observations, source failure/cache reuse, exact comparison and prospective scoring. Existing report controller, evidence, forecast and publication regressions continue to test the original decision contract.
+
+
+## Targeted personnel news
+
+`data/game-intelligence/personnel-news.json` retains concise timestamped football-news findings from targeted research separately from automatic forecast collection. New dossiers pin only exact sport/event/kickoff/ordered-team matches observed before issue time. The collector cannot erase these leads. They retain `requiresCurrentApplicabilityReview:true`; use `docs/QUARTERBACK_FOLLOW_UP.md` to record an actual current review. They never automatically update a forecast, starter binding, fair or grade.

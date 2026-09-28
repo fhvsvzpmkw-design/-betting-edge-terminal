@@ -24,6 +24,7 @@ function signature(source) {
   return JSON.stringify([source.kind, String(source.eventId), source.url, source.checkedAt || source.asOf, source.finding || source.fact]);
 }
 function routeFor(row, receipt) {
+  if(row.quarterbackFollowUp?.required && !row.quarterbackFollowUp.complete)return 'QB_STARTER_FOLLOW_UP';
   if (row.state === 'EVALUATED' && ['BET', 'LEAN', 'WAIT', 'PASS'].includes(row.status) && !(row.promising && row.reviewState === 'UNFINISHED')) return 'COMPLETED';
   if (receipt?.cardEvidenceDetachment || receipt?.blocker?.progress?.stage === 'CARD_EVIDENCE_REBUILD') return 'REPAIR_EXACT_EVIDENCE';
   const options = [row, ...list(row.options)];
@@ -39,6 +40,7 @@ function routeFor(row, receipt) {
   return 'REFERENCE_OR_FORECAST_RESEARCH';
 }
 const actionFor = route => ({
+  QB_STARTER_FOLLOW_UP: 'Perform current team and targeted quarterback starter research; capture a named expected/confirmed starter or actual source-search shortfall. Then review the exact market. See docs/QUARTERBACK_FOLLOW_UP.md.',
   COMPLETED: 'Preserve the completed exact-selection decision and normal publication validation.',
   REPAIR_EXACT_EVIDENCE: 'Rebuild the exact-selection evidence binding before reassessment; never use a different selection card as a substitute.',
   DEEP_REVIEW: 'Use the event package, disposition applicable forecasts and directional findings, resolve material inputs, then assess the exact paired market under existing Core rules.',
@@ -70,7 +72,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       state:row.state, status:row.status || null, route, quote:row.quote || null, assessedQuote:row.assessedQuote || null,
       exactOptions:list(row.options).map(option => ({quote:option.quote, marketComparison:option.marketComparison || null})),
       priceComparison:row.marketComparison || null, nativeFairComparison:row.nativeFairComparison || null, blocker:row.blocker || receipt?.blocker?.reason || null,
-      nextAction:actionFor(route), producerRoutingRationale:receipt?.researchRouting?.rationale || null});
+      quarterbackFollowUp:row.quarterbackFollowUp || null, nextAction:actionFor(route), producerRoutingRationale:receipt?.researchRouting?.rationale || null});
     if (!identity || matches.length > 1) continue;
     const collect = (record, priorReportPath = null) => {
       for (const source of sourcesOf(record)) {
@@ -148,7 +150,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
       finding:source.finding || source.fact, priorReportPath, requiresCurrentApplicabilityReview:true})),
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
       selectionId:row.selectionId, route:row.route, quote:row.quote, comparison:row.priceComparison,
-      nextAction:row.nextAction})),
+      quarterbackFollowUp:row.quarterbackFollowUp || null, nextAction:row.nextAction})),
     forecastSources:list(event.forecastRetrieval?.nextSources).map(source => ({
       sourceId:source.sourceId, urls:source.urls, questions:source.questions})),
     nextAction:'Revalidate event facts, then finish a supported exact paired-market review before opening another event. Escalate decision-changing news. Record genuine remaining gaps; do not wait for whole-slate forecast coverage.'

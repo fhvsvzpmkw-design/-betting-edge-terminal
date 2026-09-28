@@ -82,8 +82,14 @@ export function bindIntelligence({root,report,sidecar,feed,universe,liveBoard=fa
   const events=[...mergedFeedEvents(feed).values()].map(eventIdentity).filter(e=>available.has(e.eventId));
   const capture=loadCapture(root,report.ts);
   const records=list(capture?.records).filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
-  const facts=list(capture?.facts).filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
+  const news=readOptional(path.join(root,'data/game-intelligence/personnel-news.json'));
+  const personnelFacts=news?.schema===1?list(news.facts).filter(row=>
+    row.requiresCurrentApplicabilityReview===true && /^https:\/\//.test(row.url||'') &&
+    Number.isFinite(time(row.observedAt)) && time(row.observedAt)<=time(report.ts) && time(row.observedAt)<time(row.startTime) &&
+    events.some(e=>sameEvent(row,e)&&row.home===e.home&&row.away===e.away)):[];
+  const facts=[...list(capture?.facts),...personnelFacts].filter(row=>time(row.observedAt)<=time(report.ts)&&events.some(e=>sameEvent(row,e)));
   const inputs={schema:1,asOf:report.ts,collectedAt:capture?.collectedAt||null,snapshotId:capture?.snapshotId||null,
+    personnelNewsDigest:personnelFacts.length?digest(personnelFacts):null,
     sources:list(capture?.sources),records,facts,quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts,sidecar),
     knowledge:knowledge(root,unique(events.map(e=>e.sport))),
     limitation:'Original observation times are preserved. Report decisions must assess current event, personnel and exact quote applicability.'};

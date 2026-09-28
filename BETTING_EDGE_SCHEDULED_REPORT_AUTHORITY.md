@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-09-27.3
+**Operating revision:** 2026-09-28.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -91,6 +91,8 @@ WAIT requires a real current independent signal, plausible actionability and the
 Follow `BETTING_EDGE_PERSONNEL_SWEEP.md`: Stage 1 current event facts precede final decisions or adopted fair; Stage 2 investigates decision-sensitive dependencies and conflicts. A blank final lineup is not automatically material. Name the actual dependency and its effect. Use official sources and credible fallback depth where needed; do not manufacture clearance by changing flags. Apply new findings back to the handicap, without double-counting news already in a forecast.
 
 For an unresolved material Stage 2 dependency, make the closing authoritative check and retain `finalRecheck: true`, origin/url/asOf and the dependency-specific fact, or an honest authoritative-source shortfall. One real check can support the same dependency on multiple cards. `checked=0` from a semantic check does not prove text/flags agree.
+
+**Quarterback follow-up, forward from 2026-09-28T07:30:00-07:00:** apply `docs/QUARTERBACK_FOLLOW_UP.md` on every report with a material unresolved/projected football starter. The morning clock does not excuse targeted research. Read the pinned personnel-news leads, recheck current team and originating reporter sources, record `personnelEvidence.quarterbackFollowUp`, name the expected/confirmed starter, and separately assess forecast applicability and Graham numeric authority. A generic game page plus an unresolved sentence is incomplete. The controller routes missing research to `QB_STARTER_FOLLOW_UP`; preparation defers only affected selections, and the semantic publication gate verifies completed cards.
 
 ### Shared game intelligence comes first
 

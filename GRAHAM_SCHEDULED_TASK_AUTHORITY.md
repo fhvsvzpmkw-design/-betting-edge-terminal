@@ -38,3 +38,8 @@ WEEK_ROLLOVER does not use the research-runtime lifecycle or pretend to be a ful
 ## Verification boundary
 
 `tools/graham-task-authority.mjs` checks a freshly retrieved automation snapshot against the schedule/binding manifests and canonical loaders. A checked-in snapshot is dated evidence, not proof of later scheduler state. Schedule synchronization cannot prove football coverage or scheduler punctuality. State these separately from completed research, applied numeric changes and unresolved valuation work.
+
+
+## Current starter follow-up — September 28
+
+Before carrying an unresolved quarterback binding into another review, perform a current player/game-specific search against the team channel and credible originating reports. Read `data/game-intelligence/personnel-news.json` as timestamped football-news leads only, then verify independently without consulting the market-bearing dossier. Explicitly record the named expected starter separately from official confirmation and numeric eligibility. Record actual search attempts when the question remains unresolved; an old failed-closed binding is not proof that current news is unavailable. Apply a confirmed eligible starter through the existing governed QB staging workflow and verify production read-back; expected-only reporting does not authorize a guessed numeric adjustment.

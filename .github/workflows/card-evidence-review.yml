@@ -8,6 +8,12 @@ on:
       - tools/card-evidence-identity.mjs
       - tools/forecast-evidence.mjs
       - tools/report-evidence-repair.mjs
+      - tools/quarterback-follow-up.mjs
+      - tools/personnel-semantic-gate.mjs
+      - tests/quarterback-follow-up.test.mjs
+      - tools/game-intelligence.mjs
+      - docs/QUARTERBACK_FOLLOW_UP.md
+      - data/game-intelligence/personnel-news.json
       - tools/event-research-plan.mjs
       - tools/core-draft-taxonomy.mjs
       - tools/native-fair-review.mjs
@@ -46,6 +52,12 @@ on:
       - tools/card-evidence-identity.mjs
       - tools/forecast-evidence.mjs
       - tools/report-evidence-repair.mjs
+      - tools/quarterback-follow-up.mjs
+      - tools/personnel-semantic-gate.mjs
+      - tests/quarterback-follow-up.test.mjs
+      - tools/game-intelligence.mjs
+      - docs/QUARTERBACK_FOLLOW_UP.md
+      - data/game-intelligence/personnel-news.json
       - tools/event-research-plan.mjs
       - tools/core-draft-taxonomy.mjs
       - tools/native-fair-review.mjs
@@ -89,6 +101,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: node tests/quarterback-follow-up.test.mjs
+      - run: node tests/game-intelligence.test.mjs
+      - run: node tools/personnel-semantic-gate.mjs self-test
       - run: node tests/card-evidence-review.test.mjs
       - run: node tests/forecast-evidence.test.mjs
       - run: node tests/card-evidence-assembly.test.mjs

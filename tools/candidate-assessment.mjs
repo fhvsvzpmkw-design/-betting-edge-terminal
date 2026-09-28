@@ -3,6 +3,7 @@ import {exactMarketReference, marketComparison} from './market-price-assessment.
 import {forecastPriceComparison} from './forecast-evidence.mjs';
 import {compareGrahamFair, reviewGrahamHandoff} from './graham-fair-handoff.mjs';
 import {compareRecordedFair} from './native-fair-review.mjs';
+import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -249,7 +250,10 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const grahamReview=reviewGrahamHandoff({handoff:grahamOption.grahamFairHandoff,receipt:researchReceipt,report});
     if(!grahamReview.complete) {reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...grahamReview.missing]);}
     reviewed.grahamReview={...grahamReview,selectionKey:grahamOption.quote?.selectionKey,book:grahamOption.quote?.book};
-    reviewed.reviewRequired=best.promising || grahamReview.required;
+    const quarterbackFollowUp=inspectQuarterbackFollowUp({report,selection,receipt:researchReceipt});
+    reviewed.quarterbackFollowUp=quarterbackFollowUp;
+    if(!quarterbackFollowUp.complete){reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...quarterbackFollowUp.missing]);}
+    reviewed.reviewRequired=best.promising || grahamReview.required || quarterbackFollowUp.required;
     reviewed.assessedPriceCondition = displayCondition(reviewed.priceCondition, receipt?.quote);
     for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt).value, option.quote);
     reviewed.priceCondition = best.priceCondition || reviewed.assessedPriceCondition;
