@@ -1,0 +1,1247 @@
+{
+  "schema": 1,
+  "boardId": "graham-mercer-nfl-2026-week-04-current-numbers-v1",
+  "title": "GRAHAM MERCER // WEEK 4 CURRENT NUMBERS",
+  "publication": "THE PRIVATE LINE",
+  "season": 2026,
+  "week": 4,
+  "timezone": "America/Vancouver",
+  "state": "PROVISIONAL_BASELINE_PENDING",
+  "createdAt": "2026-09-29T04:34:24-07:00",
+  "updatedAt": "2026-09-29T04:34:24-07:00",
+  "lastResearchAt": null,
+  "researchLedgerPath": "data/walters/nfl/2026/week-04-research-ledger.json",
+  "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
+  "marketComparisonLedgerPath": "data/walters/nfl/2026/week-04-daily-market-ledger.json",
+  "researchEventsDir": "data/walters/nfl/2026/week-04-research-events",
+  "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
+  "rolloverProvenance": {
+    "authority": "GRAHAM_WEEK_ROLLOVER",
+    "fromSeason": 2026,
+    "fromWeek": 3,
+    "activatedAt": "2026-09-29T04:34:24-07:00",
+    "completionGate": "PASS_16_OF_16_FINAL",
+    "carriedRatingSource": "data/walters/nfl-power-ratings-ledger.json",
+    "carriedRatingSourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+    "carriedRatingSourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+    "carriedTeamCount": 32,
+    "fullResearchBaselinePerformed": false,
+    "marketViewed": false
+  },
+  "homeFieldProduction": {
+    "state": "OPERATIONAL_SCOPED",
+    "productionId": "walters-nfl-home-field-production-v1",
+    "calibrationId": "walters-nfl-home-field-calibration-v1",
+    "productionAuthority": true,
+    "marketViewed": false,
+    "domesticHomeAdvantagePoints": 2.082,
+    "domesticPointsToHomeSpread": -2.082,
+    "neutralPointsToHomeSpread": 0,
+    "selectiveVenueAdjustmentsEnabled": false,
+    "teamVenueBlanketEnabled": false,
+    "unresolvedVenueAction": "FAIL_CLOSED_EXPLICIT_REVIEW"
+  },
+  "rules": {
+    "marketIsolation": "Finish each independent Graham fair number before viewing or comparing the contemporaneous Pinnacle spread.",
+    "ratingCarryForward": "Team ratings move only by explicit carried-rating delta with reason, source and timestamp. No silent reset to the origin seed.",
+    "noForcedMove": "A research sweep may end with no rating or fair-number move when current information does not justify one.",
+    "eventSpecificFactors": "Venue, rest, travel, weather and game-specific uncertainty may remain matchup adjustments rather than permanent team-rating changes.",
+    "pinnacleAuthority": "Pinnacle is a comparison benchmark only and may not set or silently overwrite Graham's fair number."
+  },
+  "researchCadence": {
+    "tuesdayBaseline": "11:00 PT Tuesday full 32-team weekly review after Monday Night Football",
+    "wednesdayFriday": "11:30 PT Monday/Wednesday/Thursday/Friday/Saturday main information review",
+    "saturday": "11:30 PT Saturday review is included in Graham Daily Review; no separate active Saturday task",
+    "sunday": "07:00 PT Sunday pregame information review",
+    "pre315Delta": "16:45 PT Tuesday through Saturday late-day change-only delta review"
+  },
+  "scheduleAuthority": {
+    "schema": 1,
+    "authorityId": "graham-schedule-metadata-v1",
+    "state": "SYNCHRONIZED",
+    "manifestPath": "data/walters/nfl/graham-schedule-authority-v1.json",
+    "timezone": "America/Vancouver",
+    "timingMode": "exact_schedule",
+    "executionAuthority": "CHATGPT_SCHEDULED_TASKS",
+    "tasks": [
+      {
+        "taskKey": "WEEK_ROLLOVER",
+        "title": "Graham Week Rollover",
+        "days": [
+          "TU"
+        ],
+        "time": "04:30",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=4;BYMINUTE=30;BYSECOND=0",
+        "purpose": "Mechanical completion-gated active-week rollover."
+      },
+      {
+        "taskKey": "TUESDAY_BASELINE",
+        "title": "Graham Tuesday Baseline",
+        "days": [
+          "TU"
+        ],
+        "time": "11:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=11;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Full weekly 32-team information baseline after Monday Night Football."
+      },
+      {
+        "taskKey": "DAILY_REVIEW",
+        "title": "Graham Daily Review",
+        "days": [
+          "MO",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "11:30",
+        "rrule": "FREQ=WEEKLY;BYDAY=MO,WE,TH,FR,SA;BYHOUR=11;BYMINUTE=30;BYSECOND=0",
+        "purpose": "Main information review, including the Saturday review function."
+      },
+      {
+        "taskKey": "DELTA_1645",
+        "title": "Graham 16:45 Delta",
+        "days": [
+          "TU",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "16:45",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR,SA;BYHOUR=16;BYMINUTE=45;BYSECOND=0",
+        "purpose": "Late-day change-only information delta."
+      },
+      {
+        "taskKey": "SUNDAY_PREGAME",
+        "title": "Graham Sunday Pregame",
+        "days": [
+          "SU"
+        ],
+        "time": "07:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=SU;BYHOUR=7;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Sunday pregame information review for active-week games awaiting kickoff."
+      }
+    ]
+  },
+  "fairDecompositionPolicyId": "graham-fair-decomposition-v1",
+  "fairExplanationState": "SYNCHRONIZED",
+  "scheduleSource": {
+    "provider": "NFL",
+    "url": "https://www.nfl.com/schedules/2026/by-week/week-4",
+    "capturedAt": "2026-09-29T04:34:24-07:00",
+    "role": "SCHEDULE_AND_LOCATION_ONLY",
+    "marketViewed": false
+  },
+  "games": [
+    {
+      "gameKey": "2026-W04-PIT-CLE",
+      "away": "PIT",
+      "home": "CLE",
+      "startTimePacific": "2026-10-01T17:15:00-07:00",
+      "grahamFairHome": 0,
+      "grahamExactFairHome": -0.1866,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +1.895; home field -2.082; other governed +0.000; pre-personnel exact -0.187; personnel +0.000; matchup +0.000; exact Graham home fair -0.187; displayed 0.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 1.8954,
+      "ratingCarryForward": {
+        "awayRating": 21.6268,
+        "homeRating": 19.7314,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -0.1866,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 1.8954,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 1.8954,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -0.1866,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -0.1866,
+        "displayedFairHome": 0,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-IND-WAS",
+      "away": "IND",
+      "home": "WAS",
+      "startTimePacific": "2026-10-04T06:30:00-07:00",
+      "grahamFairHome": 0,
+      "grahamExactFairHome": 0.1638,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": 0,
+          "reason": "Walters H4 production home-field calibration: resolved international-neutral games use zero base HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 0,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "INTERNATIONAL_NEUTRAL",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +0.164; home field +0.000; other governed +0.000; pre-personnel exact +0.164; personnel +0.000; matchup +0.000; exact Graham home fair +0.164; displayed 0.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 0.1638,
+      "ratingCarryForward": {
+        "awayRating": 21.87622,
+        "homeRating": 21.7124,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": 0.1638,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 0.1638,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "INTERNATIONAL_NEUTRAL",
+      "homeFieldAdvantagePoints": 0,
+      "homeFieldPointsToHomeSpread": 0,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 0.1638,
+        "homeFieldPointsToHomeSpread": 0,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 0.1638,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 0.1638,
+        "displayedFairHome": 0,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-TEN-BAL",
+      "away": "TEN",
+      "home": "BAL",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": -12,
+      "grahamExactFairHome": -11.7516,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -9.670; home field -2.082; other governed +0.000; pre-personnel exact -11.752; personnel +0.000; matchup +0.000; exact Graham home fair -11.752; displayed -12.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -9.6696,
+      "ratingCarryForward": {
+        "awayRating": 18.74442,
+        "homeRating": 28.41398,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -11.7516,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -9.6696,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -9.6696,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -11.7516,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -11.7516,
+        "displayedFairHome": -12,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-NE-BUF",
+      "away": "NE",
+      "home": "BUF",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": -2.5,
+      "grahamExactFairHome": -2.5598,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -0.478; home field -2.082; other governed +0.000; pre-personnel exact -2.560; personnel +0.000; matchup +0.000; exact Graham home fair -2.560; displayed -2.5.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -0.4778,
+      "ratingCarryForward": {
+        "awayRating": 28.3732,
+        "homeRating": 28.851,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -2.5598,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -0.4778,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -0.4778,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -2.5598,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -2.5598,
+        "displayedFairHome": -2.5,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-NYJ-CHI",
+      "away": "NYJ",
+      "home": "CHI",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": -9,
+      "grahamExactFairHome": -8.9545,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -6.872; home field -2.082; other governed +0.000; pre-personnel exact -8.954; personnel +0.000; matchup +0.000; exact Graham home fair -8.954; displayed -9.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -6.8725,
+      "ratingCarryForward": {
+        "awayRating": 19.69448,
+        "homeRating": 26.56698,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -8.9545,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -6.8725,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -6.8725,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -8.9545,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -8.9545,
+        "displayedFairHome": -9,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-JAX-CIN",
+      "away": "JAX",
+      "home": "CIN",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": -2,
+      "grahamExactFairHome": -2.1763,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -0.094; home field -2.082; other governed +0.000; pre-personnel exact -2.176; personnel +0.000; matchup +0.000; exact Graham home fair -2.176; displayed -2.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -0.0943,
+      "ratingCarryForward": {
+        "awayRating": 25.41252,
+        "homeRating": 25.50682,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -2.1763,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -0.0943,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -0.0943,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -2.1763,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -2.1763,
+        "displayedFairHome": -2,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-DAL-HOU",
+      "away": "DAL",
+      "home": "HOU",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": 0,
+      "grahamExactFairHome": -0.0794,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +2.003; home field -2.082; other governed +0.000; pre-personnel exact -0.079; personnel +0.000; matchup +0.000; exact Graham home fair -0.079; displayed 0.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 2.0026,
+      "ratingCarryForward": {
+        "awayRating": 25.2876,
+        "homeRating": 23.28498,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -0.0794,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 2.0026,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 2.0026,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -0.0794,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -0.0794,
+        "displayedFairHome": 0,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-ARI-NYG",
+      "away": "ARI",
+      "home": "NYG",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": -5,
+      "grahamExactFairHome": -4.8599,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -2.778; home field -2.082; other governed +0.000; pre-personnel exact -4.860; personnel +0.000; matchup +0.000; exact Graham home fair -4.860; displayed -5.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -2.7779,
+      "ratingCarryForward": {
+        "awayRating": 17.55238,
+        "homeRating": 20.3303,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -4.8599,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -2.7779,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -2.7779,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -4.8599,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -4.8599,
+        "displayedFairHome": -5,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-LAR-PHI",
+      "away": "LAR",
+      "home": "PHI",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": 2,
+      "grahamExactFairHome": 2.0403,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +4.122; home field -2.082; other governed +0.000; pre-personnel exact +2.040; personnel +0.000; matchup +0.000; exact Graham home fair +2.040; displayed 2.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 4.1223,
+      "ratingCarryForward": {
+        "awayRating": 31.1697,
+        "homeRating": 27.04738,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": 2.0403,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 4.1223,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 4.1223,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 2.0403,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 2.0403,
+        "displayedFairHome": 2,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-GB-TB",
+      "away": "GB",
+      "home": "TB",
+      "startTimePacific": "2026-10-04T10:00:00-07:00",
+      "grahamFairHome": 3.5,
+      "grahamExactFairHome": 3.2967,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +5.379; home field -2.082; other governed +0.000; pre-personnel exact +3.297; personnel +0.000; matchup +0.000; exact Graham home fair +3.297; displayed 3.5.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 5.3787,
+      "ratingCarryForward": {
+        "awayRating": 27.01372,
+        "homeRating": 21.635,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": 3.2967,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 5.3787,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 5.3787,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 3.2967,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 3.2967,
+        "displayedFairHome": 3.5,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-MIA-MIN",
+      "away": "MIA",
+      "home": "MIN",
+      "startTimePacific": "2026-10-04T13:05:00-07:00",
+      "grahamFairHome": -9.5,
+      "grahamExactFairHome": -9.327,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -7.245; home field -2.082; other governed +0.000; pre-personnel exact -9.327; personnel +0.000; matchup +0.000; exact Graham home fair -9.327; displayed -9.5.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -7.245,
+      "ratingCarryForward": {
+        "awayRating": 17.1962,
+        "homeRating": 24.44122,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -9.327,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -7.245,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -7.245,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -9.327,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -9.327,
+        "displayedFairHome": -9.5,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-KC-LV",
+      "away": "KC",
+      "home": "LV",
+      "startTimePacific": "2026-10-04T13:25:00-07:00",
+      "grahamFairHome": 2.5,
+      "grahamExactFairHome": 2.3361,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +4.418; home field -2.082; other governed +0.000; pre-personnel exact +2.336; personnel +0.000; matchup +0.000; exact Graham home fair +2.336; displayed 2.5.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 4.4181,
+      "ratingCarryForward": {
+        "awayRating": 25.66558,
+        "homeRating": 21.24748,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": 2.3361,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 4.4181,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 4.4181,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 2.3361,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 2.3361,
+        "displayedFairHome": 2.5,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-LAC-SEA",
+      "away": "LAC",
+      "home": "SEA",
+      "startTimePacific": "2026-10-04T13:25:00-07:00",
+      "grahamFairHome": -13,
+      "grahamExactFairHome": -12.8535,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -10.771; home field -2.082; other governed +0.000; pre-personnel exact -12.854; personnel +0.000; matchup +0.000; exact Graham home fair -12.854; displayed -13.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -10.7715,
+      "ratingCarryForward": {
+        "awayRating": 20.71432,
+        "homeRating": 31.48582,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -12.8535,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -10.7715,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -10.7715,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -12.8535,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -12.8535,
+        "displayedFairHome": -13,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-DEN-SF",
+      "away": "DEN",
+      "home": "SF",
+      "startTimePacific": "2026-10-04T13:25:00-07:00",
+      "grahamFairHome": -3.5,
+      "grahamExactFairHome": -3.4565,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -1.375; home field -2.082; other governed +0.000; pre-personnel exact -3.457; personnel +0.000; matchup +0.000; exact Graham home fair -3.457; displayed -3.5.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -1.3745,
+      "ratingCarryForward": {
+        "awayRating": 27.42928,
+        "homeRating": 28.8038,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -3.4565,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -1.3745,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -1.3745,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -3.4565,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -3.4565,
+        "displayedFairHome": -3.5,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-DET-CAR",
+      "away": "DET",
+      "home": "CAR",
+      "startTimePacific": "2026-10-04T17:20:00-07:00",
+      "grahamFairHome": 0,
+      "grahamExactFairHome": 0.1504,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base +2.232; home field -2.082; other governed +0.000; pre-personnel exact +0.150; personnel +0.000; matchup +0.000; exact Graham home fair +0.150; displayed 0.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": 2.2324,
+      "ratingCarryForward": {
+        "awayRating": 25.649,
+        "homeRating": 23.41662,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": 0.1504,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": 2.2324,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": 2.2324,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": 0.1504,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": 0.1504,
+        "displayedFairHome": 0,
+        "arithmeticVerified": true
+      }
+    },
+    {
+      "gameKey": "2026-W04-ATL-NO",
+      "away": "ATL",
+      "home": "NO",
+      "startTimePacific": "2026-10-05T17:15:00-07:00",
+      "grahamFairHome": -8,
+      "grahamExactFairHome": -8.051,
+      "grahamAsOf": "2026-09-29T04:34:24-07:00",
+      "numberStatus": "PROVISIONAL_BASELINE_PENDING",
+      "informationStatus": "WEEK_ROLLOVER_CARRY_FORWARD_ONLY",
+      "adjustments": [
+        {
+          "type": "HOME_FIELD",
+          "pointsToHomeSpread": -2.082,
+          "reason": "Walters H4 production home-field calibration: governed 2026 domestic home games use the exact 2.082-point league HFA. Selective venue and team/stadium blanket adjustments remain disabled.",
+          "sourceRefs": [
+            "data/walters/nfl/home-field/home-field-production-current.json",
+            "data/walters/nfl/home-field/h4-current.json"
+          ],
+          "homeLocationAdvantagePoints": 2.082,
+          "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+          "calibrationId": "walters-nfl-home-field-calibration-v1",
+          "venueClass": "DOMESTIC_HOME",
+          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        }
+      ],
+      "researchSummary": "Governed fair decomposition: neutral/team base -5.969; home field -2.082; other governed +0.000; pre-personnel exact -8.051; personnel +0.000; matchup +0.000; exact Graham home fair -8.051; displayed -8.0.",
+      "sourceRefs": [
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
+      ],
+      "neutralBaseHome": -5.969,
+      "ratingCarryForward": {
+        "awayRating": 18.07518,
+        "homeRating": 24.04422,
+        "formula": "away currentRating minus home currentRating",
+        "source": "data/walters/nfl-power-ratings-ledger.json",
+        "sourceBlobSha": "5f1988313fd6caae6b8468d1c465f81a9c4452b6",
+        "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
+        "marketViewed": false
+      },
+      "personnelBaselineExactFairHome": -8.051,
+      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelUnresolvedCases": [],
+      "personnelBlockedGroups": [],
+      "matchupOverlayPointsToHomeSpread": 0,
+      "homeFieldNonLocationExactFairHome": -5.969,
+      "homeFieldProductionId": "walters-nfl-home-field-production-v1",
+      "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
+      "homeFieldVenueClass": "DOMESTIC_HOME",
+      "homeFieldAdvantagePoints": 2.082,
+      "homeFieldPointsToHomeSpread": -2.082,
+      "homeFieldLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "fairDecomposition": {
+        "schema": 1,
+        "policyId": "graham-fair-decomposition-v1",
+        "neutralTeamBaseHome": -5.969,
+        "homeFieldPointsToHomeSpread": -2.082,
+        "otherGovernedPointsToHomeSpread": 0,
+        "prePersonnelExactFairHome": -8.051,
+        "personnelPointsToHomeSpread": 0,
+        "matchupPointsToHomeSpread": 0,
+        "exactFairHome": -8.051,
+        "displayedFairHome": -8,
+        "arithmeticVerified": true
+      }
+    }
+  ],
+  "bettingBoundary": {
+    "betIssued": false,
+    "marketMaySetGrahamNumber": false,
+    "rolloverMayIssueBet": false
+  }
+}
