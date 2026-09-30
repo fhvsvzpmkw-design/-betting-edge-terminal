@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-09-30.1
+**Operating revision:** 2026-09-30.2
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -105,6 +105,10 @@ Use `docs/GAME_INTELLIGENCE.md`. The shared collector maintains `data/game-intel
 Review the full dossier before deciding a game. Explain material agreement and disagreement; preserve native units and model-family dependence. Outside picks, model probabilities, projected scores, book prices and research principles are different evidence types. A descriptive model median/range is not a calibrated fair value or independent confirmation. Apply actual source-grounded reasoning through the existing candidate and forecast evidence contracts; do not silently replace the fair with an average or ignore a contrary source.
 
 Reuse fresh captures across sides and runs. Revalidate event/personnel/settlement applicability once per event, then bind exact selection reviews. The collector does not manufacture those judgments. Exported draft `forecastEvidence.records` includes captured probability fields; add genuine `forecastEvidence.revalidations` using `docs/FORECAST_EVIDENCE.md`, and record each applicable forecast's disposition. A wrong-line forecast remains useful comparison context without becoming the probability for today's different line. Read published model points before evaluating uncertainty.
+
+The compact work plan includes `forecastReviews` even when the event already has completed market cards. Review these captured fields before new source discovery. Inspect the actual record/capture in the exported draft, preserve its times, and append real current-report applicability reviews or concrete shortfalls. For observed pregame snapshots, retain `observedSnapshotReviewed` and `modelTimeLimitation` when justified. A capture without that judgment is found-but-unreviewed, not proof that forecasts were unavailable. Qualified completed cards retain their publication authority; this review queue is advisory. Attribute each personnel fact to its originating source: an ESPN injury listing is REPORTING evidence with its ESPN URL, even when an official game page was also checked. Do not transfer it into an official source's finding.
+
+For NHL, confirm that the Pinnacle collector requested tournament 234. Its live catalogue must identify game markets with `period:result`, including overtime and penalties. Regulation markets and matching-line totals/puck lines cannot substitute. Record catalogue/acquisition failure separately from a genuinely absent Pinnacle price. No extra primary odds pull is authorized merely by an unfavorable result.
 
 When coverage is missing, perform targeted source research using the existing registry and save permitted source captures for reuse. Source acquisition failures do not veto otherwise supported decisions. Dimers currently requires a permitted feed/permission for automated redistribution; do not add a scraper. Other sources marked research/import are not established automated feeds. Source names on the coverage panel never imply completed retrieval.
 

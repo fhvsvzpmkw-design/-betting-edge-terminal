@@ -7,6 +7,7 @@ import {AUTHORITY, QUALIFIED, qualifyMarket, isFullGameAlternateTotalMarket} fro
 // Applies only to new assessments; issued reports keep their original evidence.
 export const MARKET_ASSESSMENT_FROM = '2026-09-07T18:31:00-07:00';
 export const EXACT_ALTERNATE_TOTALS_FROM = '2026-09-09T16:00:00-07:00';
+export const NHL_REFERENCE_FROM = '2026-09-30T16:00:00-07:00';
 const EPS = 1e-8;
 const nonEmpty = value => typeof value === 'string' && value.trim().length > 0;
 const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= EPS;
@@ -38,6 +39,12 @@ export function exactMarketReference(report, quote, observer) {
   ensure(suffix, 'Market assessment supports full-game two-way primary markets only');
   const matches = [];
   for (const market of pinnacle?.markets || []) {
+    if(Number(fixture.sportId)===15&&Date.parse(report.ts)>=Date.parse(NHL_REFERENCE_FROM)){
+      const definition=market.definition;
+      const expected={ml:'Winner (incl. overtime and penalties)',spread:'Handicap (incl. overtime and penalties)',totals:'Total (incl. overtime and penalties)'}[quote.marketKey];
+      if(!definition||String(definition.marketId)!==String(market.marketId)||definition.sportId!==15||
+        definition.period!=='result'||definition.playerProp!==false||definition.marketLength!==2||definition.marketName!==expected)continue;
+    }
     const exactAlternate = quote.marketKey === 'totals' && Date.parse(report.ts) >= Date.parse(EXACT_ALTERNATE_TOTALS_FROM) && isFullGameAlternateTotalMarket(market);
     if (!exactAlternate && !new RegExp(`^line/[^/]+/[^/]+/[^/]+/[^/]+/0/${suffix}$`).test(market.bookmakerMarketId || '')) continue;
     const qualified = qualifyMarket({market, generatedAt: observer.generatedAt, primaryMatch: fixture.primaryMatch, bookmakerIsActive: pinnacle.bookmakerIsActive === true, suspended: pinnacle.suspended === true, quoteObservationVersion: observer.quoteObservationVersion, ...(exactAlternate ? {exactTotalLine: quote.line} : {})});

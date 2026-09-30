@@ -16,10 +16,10 @@ const FUTURE_CLOCK_SKEW_TOLERANCE_MINUTES=5;
 // initialized before Week 1 while leaving the tighter preseason horizon alone.
 const RETENTION_HORIZONS_HOURS={default:30,NFL:384,NFL_PRESEASON:192,BOXING:30};
 const ALWAYS_OBSERVE=new Set(['NFL','NFL_PRESEASON']);
-const TOURNAMENTS=[
+export const TOURNAMENTS=[
   {key:'NBA',id:132},{key:'NFL',id:31},{key:'NFL_PRESEASON',id:233},
   {key:'CFL',id:790},{key:'NCAAF',id:27653},{key:'BOXING',id:24327},
-  {key:'MLB',id:109},{key:'WNBA',id:486}
+  {key:'MLB',id:109},{key:'WNBA',id:486},{key:'NHL',id:234}
 ];
 
 function readJson(f){try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch{return null}}
@@ -28,7 +28,19 @@ function norm(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ')}
 function token(v){return norm(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
 function safeError(e){return String(e?.message||e||'Unknown OddsPapi error').replace(API_KEY,'REDACTED').slice(0,700)}
 function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-function categoryKey(e){const s=norm(e?.sport?.slug||e?.sport?.name),t=norm([e?.league?.name,e?.league?.slug,e?.tournament?.name,e?.sport?.name,e?.sport?.slug].filter(Boolean).join(' '));if(/\bmlb\b|major league baseball/.test(t))return'MLB';if(/\bnba\b/.test(t))return'NBA';if(/\bwnba\b/.test(t))return'WNBA';if(/\bnfl\b/.test(t))return'NFL';if(s==='american-football'&&/\bncaaf\b|\bncaa\b|college/.test(t))return'NCAAF';if(/\bcfl\b|canadian football/.test(t))return'CFL';if(s==='boxing'||/boxing/.test(s))return'BOXING';return null}
+export function categoryKey(e){const s=norm(e?.sport?.slug||e?.sport?.name),t=norm([e?.league?.name,e?.league?.slug,e?.tournament?.name,e?.sport?.name,e?.sport?.slug].filter(Boolean).join(' '));if(/\bmlb\b|major league baseball/.test(t))return'MLB';if(/\bwnba\b/.test(t))return'WNBA';if(/\bnba\b/.test(t))return'NBA';if(/\bnhl\b|national hockey league/.test(t))return'NHL';if(/\bnfl\b/.test(t))return'NFL';if(s==='american-football'&&/\bncaaf\b|\bncaa\b|college/.test(t))return'NCAAF';if(/\bcfl\b|canadian football/.test(t))return'CFL';if(s==='boxing'||/boxing/.test(s))return'BOXING';return null}
+
+// Hockey regulation and overtime markets can share the same handicap and
+// Pinnacle path suffix. Retain provider definitions; never infer the clock.
+export function hockeyDefinitions(payload){
+  if(!Array.isArray(payload))throw new Error('OddsPapi market catalogue is not an array');
+  const rows=payload.filter(m=>Number(m.sportId)===15&&m.playerProp===false&&m.period==='result'&&
+    Number(m.marketLength)===2&&['Winner (incl. overtime and penalties)','Handicap (incl. overtime and penalties)','Total (incl. overtime and penalties)'].includes(m.marketName))
+    .map(m=>({marketId:String(m.marketId),sportId:15,marketName:m.marketName,period:m.period,playerProp:false,marketLength:2,handicap:m.handicap,marketType:m.marketType}));
+  if(!rows.some(m=>m.marketId==='151'))throw new Error('NHL overtime moneyline definition missing');
+  if(new Set(rows.map(m=>m.marketId)).size!==rows.length)throw new Error('Duplicate NHL market definitions');
+  return rows;
+}
 function fixtureHorizonHours(f){const tournament=TOURNAMENTS.find(t=>t.id===Number(f?.tournamentId));return RETENTION_HORIZONS_HOURS[tournament?.key]??RETENTION_HORIZONS_HOURS.default}
 export function planTournamentBatches(selected,maxIds=MAX_TOURNAMENT_IDS_PER_REQUEST){
   if(!Array.isArray(selected))throw new TypeError('Selected tournaments must be an array.');
@@ -42,15 +54,17 @@ async function apiGet(endpoint,params={}){const u=new URL(API_BASE+endpoint);u.s
 function activeSubscription(a){const c=String(a?.current_subscription_id||''),r=Array.isArray(a?.subscriptions)?a.subscriptions:[];return r.find(x=>String(x?.subscription_id||'')===c)||r.find(x=>x?.is_active)||r[0]||null}
 function payloadRows(p){if(Array.isArray(p))return p;if(Array.isArray(p?.fixtures))return p.fixtures;if(p?.fixtureId)return[p];return[]}
 function playerRows(o,observedAt){const rows=[];for(const[id,q]of Object.entries(o?.players||{})){const price=Number(q?.price);if(!Number.isFinite(price))continue;rows.push({playerId:id,playerName:q?.playerName||null,bookmakerOutcomeId:q?.bookmakerOutcomeId??null,bookmakerChangedAt:q?.bookmakerChangedAt??null,price,priceAmerican:q?.priceAmerican??null,active:q?.active!==false,mainLine:q?.mainLine===true,limit:Number.isFinite(Number(q?.limit))?Number(q.limit):null,changedAt:q?.changedAt||null,observedAt})}return rows}
-export function summarizePinnacle(book,observedAt){
+export function summarizePinnacle(book,observedAt,hockeyCatalogue=null){
   if(!book||typeof book!=='object')return null;
   const markets=[];
   let activeQuotes=0,suspendedQuotes=0,legacyRetained=0;
   for(const[mid,m]of Object.entries(book?.markets||{})){
+    const definition=hockeyCatalogue?.find(d=>d.marketId===String(mid));
+    if(hockeyCatalogue&&!definition)continue;
     const alternateTotal=isFullGameAlternateTotalMarket(m);
     // Preserve the original first-12/main-line budget for ordinary markets.
     // Exact alternate totals must survive even when they arrive after that budget.
-    if(legacyRetained>=24&&!alternateTotal)continue;
+    if(legacyRetained>=24&&!alternateTotal&&!definition)continue;
     const outcomes=[];let main=false;
     for(const[oid,o]of Object.entries(m?.outcomes||{})){
       const players=playerRows(o,observedAt);
@@ -62,7 +76,7 @@ export function summarizePinnacle(book,observedAt){
     if(!outcomes.length)continue;
     const retainedByOriginalRules=legacyRetained<24&&(main||legacyRetained<12);
     if(retainedByOriginalRules)legacyRetained++;
-    if(retainedByOriginalRules||alternateTotal)markets.push({marketId:String(mid),marketActive:m?.marketActive!==false,bookmakerMarketId:m?.bookmakerMarketId||null,outcomes});
+    if(retainedByOriginalRules||alternateTotal||definition)markets.push({marketId:String(mid),marketActive:m?.marketActive!==false,bookmakerMarketId:m?.bookmakerMarketId||null,outcomes,...(definition?{definition}:{})});
   }
   return{bookmakerIsActive:book?.bookmakerIsActive!==false,suspended:book?.suspended===true,activeQuotes,suspendedQuotes,marketCount:Object.keys(book?.markets||{}).length,markets};
 }
@@ -82,6 +96,23 @@ async function main(){
   observation.diagnostics.tournamentBatches=batches.map(batch=>batch.map(t=>t.id));
   try{const account=await apiGet('/account');const sub=activeSubscription(account);if(!sub)throw new Error('No active OddsPapi subscription found.');const limit=Number(sub?.request_limit),count=Number(sub?.request_count),remaining=Number.isFinite(limit)&&Number.isFinite(count)?Math.max(0,limit-count):null;const estimatedRemainingAfter=remaining===null?null:remaining-batches.length;observation.quota={requestLimit:Number.isFinite(limit)?limit:null,requestCountBefore:Number.isFinite(count)?count:null,remainingBefore:remaining,protectedReserve:RESERVE,estimatedRemainingAfter};if(estimatedRemainingAfter!==null&&estimatedRemainingAfter<RESERVE){observation.status='quota-reserve-protected';writeJson(OUTFILE,observation);return}}catch(e){observation.status='account-error';observation.diagnostics.errors.push(safeError(e));writeJson(OUTFILE,observation);return}
   try{
+    if(active.has('NHL')){
+      const prior=readJson(OUTFILE),age=now-Date.parse(prior?.marketDefinitionsObservedAt||'');
+      try{
+        if(Number.isFinite(age)&&age>=0&&age<=30*86400000&&Array.isArray(prior.marketDefinitions)){
+          observation.marketDefinitions=hockeyDefinitions(prior.marketDefinitions);
+          observation.marketDefinitionsObservedAt=prior.marketDefinitionsObservedAt;
+        }else{
+          observation.diagnostics.discoveryRequests++;
+          observation.marketDefinitions=hockeyDefinitions(await apiGet('/markets',{language:'en'}));
+          observation.marketDefinitionsObservedAt=new Date().toISOString();
+        }
+      }catch(e){
+        observation.marketDefinitions=[];
+        observation.diagnostics.errors.push(safeError(e));
+        observation.diagnostics.skippedCategories.push({category:'NHL',reason:'SETTLEMENT_CATALOGUE_UNAVAILABLE'});
+      }
+    }
     const latestFixtures=new Map();
     let fixtureCountRaw=0;
     for(const [index,batch] of batches.entries()){
@@ -100,7 +131,7 @@ async function main(){
     }
     observation.fixtureCountRaw=fixtureCountRaw;
     observation.generatedAt=new Date().toISOString();
-    for(const {fixture:f,observedAt} of latestFixtures.values()){const st=Date.parse(f?.startTime||'');const retentionHorizonHours=fixtureHorizonHours(f);const end=now+retentionHorizonHours*3600000;if(!Number.isFinite(st)||st<now-2*3600000||st>end)continue;const pinnacle=summarizePinnacle(f?.bookmakerOdds?.pinnacle,observedAt);if(!pinnacle)continue;const match=matchPrimary(f,primary.events);if(match)observation.primaryMatches++;annotatePinnacle(pinnacle,{generatedAt:observation.generatedAt,primaryMatch:match,quoteObservationVersion:observation.quoteObservationVersion,quoteFreshnessMinutes:QUOTE_FRESHNESS_MINUTES,futureClockSkewToleranceMinutes:FUTURE_CLOCK_SKEW_TOLERANCE_MINUTES});observation.qualifiedBenchmarkMarkets+=Number(pinnacle.qualifiedBenchmarkMarkets||0);observation.fixtures.push({fixtureId:f?.fixtureId||null,sportId:f?.sportId??null,tournamentId:f?.tournamentId??null,startTime:f?.startTime||null,updatedAt:f?.updatedAt||null,statusName:f?.statusName||null,participant1Name:f?.participant1Name||null,participant2Name:f?.participant2Name||null,retentionHorizonHours,primaryMatch:match,pinnacle})}
+    for(const {fixture:f,observedAt} of latestFixtures.values()){const st=Date.parse(f?.startTime||'');const retentionHorizonHours=fixtureHorizonHours(f);const end=now+retentionHorizonHours*3600000;if(!Number.isFinite(st)||st<now-2*3600000||st>end)continue;const hockey=Number(f.sportId)===15;if(hockey&&!observation.marketDefinitions?.length)continue;const pinnacle=summarizePinnacle(f?.bookmakerOdds?.pinnacle,observedAt,hockey?observation.marketDefinitions:null);if(!pinnacle)continue;const match=matchPrimary(f,primary.events);if(match)observation.primaryMatches++;annotatePinnacle(pinnacle,{generatedAt:observation.generatedAt,primaryMatch:match,quoteObservationVersion:observation.quoteObservationVersion,quoteFreshnessMinutes:QUOTE_FRESHNESS_MINUTES,futureClockSkewToleranceMinutes:FUTURE_CLOCK_SKEW_TOLERANCE_MINUTES});observation.qualifiedBenchmarkMarkets+=Number(pinnacle.qualifiedBenchmarkMarkets||0);observation.fixtures.push({fixtureId:f?.fixtureId||null,sportId:f?.sportId??null,tournamentId:f?.tournamentId??null,startTime:f?.startTime||null,updatedAt:f?.updatedAt||null,statusName:f?.statusName||null,participant1Name:f?.participant1Name||null,participant2Name:f?.participant2Name||null,retentionHorizonHours,primaryMatch:match,pinnacle})}
     observation.fixtureCount=observation.fixtures.length;observation.status='ok';
   }catch(e){observation.status='odds-error';observation.diagnostics.errors.push(safeError(e))}
   writeJson(OUTFILE,observation);

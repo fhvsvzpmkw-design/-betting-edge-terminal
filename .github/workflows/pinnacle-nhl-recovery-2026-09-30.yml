@@ -1,0 +1,82 @@
+name: Verify Pinnacle NHL recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/pinnacle-nhl-recovery-2026-09-30.yml]
+permissions:
+  contents: write
+concurrency:
+  group: betting-edge-odds-refresh
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify category, batching, settlement and research handoff
+        run: |
+          node tests/pinnacle-nhl-coverage.test.mjs
+          node tests/oddspapi-retention-horizons.test.mjs
+          node tests/event-research-plan.test.mjs
+      - name: Refresh Pinnacle only using the existing primary snapshot
+        env:
+          ODDSPAPI_API_KEY: ${{ secrets.ODDSPAPI_API_KEY }}
+        run: |
+          set -euo pipefail
+          git hash-object data/live-odds.json > /tmp/primary-binding
+          node tools/oddspapi-observer.mjs
+          node tools/pinnacle-sharp-benchmark.mjs validate-observer data/oddspapi-observer.json
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const o=JSON.parse(fs.readFileSync('data/oddspapi-observer.json'));
+          if(o.status!=='ok'||!o.tournaments.some(t=>t.key==='NHL'&&t.id===234))throw Error('Live NHL tournament was not requested');
+          if(!o.marketDefinitions?.length)throw Error('Live NHL settlement catalogue unavailable');
+          const fixtures=o.fixtures.filter(f=>f.sportId===15),matched=fixtures.filter(f=>f.primaryMatch);
+          const receipt={generatedAt:o.generatedAt,state:'NHL_REQUEST_VERIFIED',tournaments:o.tournaments,diagnostics:o.diagnostics,
+            retainedNhlFixtures:fixtures.length,matchedNhlFixtures:matched.length,
+            games:matched.map(f=>({eventId:f.primaryMatch.eventId,fixtureId:f.fixtureId,home:f.participant1Name,away:f.participant2Name,
+              qualifiedMarkets:f.pinnacle.qualifiedBenchmarkMarkets,markets:f.pinnacle.markets.map(m=>({id:m.marketId,name:m.definition.marketName,period:m.definition.period,state:m.benchmark.state}))}))};
+          fs.writeFileSync('/tmp/pinnacle-nhl-live-receipt.json',JSON.stringify(receipt,null,2)+'\n');
+          console.log(JSON.stringify(receipt,null,2));
+          NODE
+          cp data/oddspapi-observer.json /tmp/pinnacle-candidate.json
+      - name: Publish the exact observer with collision checks
+        run: |
+          set -euo pipefail
+          git config user.name betting-edge-bot
+          git config user.email actions@users.noreply.github.com
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            remote_feed=$(git rev-parse origin/main:data/live-odds.json)
+            if [ "$remote_feed" != "$(cat /tmp/primary-binding)" ]; then
+              echo 'Primary snapshot advanced; preserve it and discard this older-bound observer.'
+              exit 1
+            fi
+            git reset --hard origin/main
+            node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const current=JSON.parse(fs.readFileSync('data/oddspapi-observer.json'));
+          const candidate=JSON.parse(fs.readFileSync('/tmp/pinnacle-candidate.json'));
+          if(Date.parse(current.generatedAt)>Date.parse(candidate.generatedAt))throw Error('A newer observer already exists');
+          fs.copyFileSync('/tmp/pinnacle-candidate.json','data/oddspapi-observer.json');
+          NODE
+            node tools/pinnacle-sharp-benchmark.mjs validate-observer data/oddspapi-observer.json
+            git add -- data/oddspapi-observer.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Verify live Pinnacle NHL collection and overtime market definitions'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pinnacle-nhl-live-receipt
+          path: /tmp/pinnacle-nhl-live-receipt.json

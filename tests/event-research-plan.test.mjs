@@ -134,3 +134,29 @@ assert.equal(buildResearchWorkPlan(resumed).events[0].personnelFollowUpState,'CU
 assert.equal(buildResearchWorkPlan(resumed).events[0].selections,undefined,'overview must not dump every quote and repeated source question');
 assert.throws(()=>buildResearchWorkPlan(resumed,{eventId:'missing'}),/No pending event/);
 assert.equal(buildResearchWorkPlan({counts:{available:2,completed:1,pending:1},events:[]}).completionState,'PARTIAL');
+
+// Completed market cards must not remove actual captured points from the
+// producer's compact queue. Old captures remain immutable review leads.
+const forecast={recordId:'latest-point',sourceId:'espn',modelFamily:'ESPN_MATCHUP_PREDICTOR',kind:'OUTCOME_PROBABILITY',
+  url:'https://www.espn.com/mlb/game/_/gameId/synthetic',marketDetail:'full_game_moneyline',period:'FULL_GAME',side:'home',line:null,
+  probability:.55,probabilityBasis:'UNCONDITIONAL',observedAt:'2026-09-20T18:20:00-07:00',forecastAt:null,
+  reasons:['CURRENT_REVALIDATION_REQUIRED','FORECAST_TIME_UNKNOWN','SETTLEMENT_UNRESOLVED']};
+const completedRows=rows.map(row=>({...row,state:'EVALUATED',status:'PASS'}));
+const capturedInput={report,candidateAssessment:{selections:completedRows},forecastCoverage:{selections:completedRows.map(row=>({
+  ...row,startTime:row.eventDate,eligibleExactRecordIds:[],records:[{...forecast,recordId:'older-point',observedAt:'2026-09-20T17:00:00-07:00'},forecast]
+}))}};
+const capturedBefore=JSON.stringify(capturedInput),capturedPlan=buildEventResearchPlan(capturedInput);
+assert.deepEqual(capturedPlan.forecastReviewCounts,{events:1,records:1});
+assert.equal(capturedPlan.counts.pending,0,'forecast review is separate from decision completion');
+assert.equal(capturedPlan.events[0].forecastReviews[0].recordId,'latest-point');
+assert.deepEqual(capturedPlan.events[0].forecastReviews[0].selectionIds,[rows[0].selectionId]);
+assert.equal(buildResearchWorkPlan(capturedPlan).events[0].capturedForecastsAwaitingReview,1);
+assert.equal(buildResearchWorkPlan(capturedPlan,{eventId:'A'}).events[0].forecastReviews[0].probability,.55);
+assert.equal(buildResearchWorkPlan(capturedPlan).completionState,'COMPLETE','advisory review cannot veto completed cards');
+assert.equal(JSON.stringify(capturedInput),capturedBefore);
+const reviewed=structuredClone(capturedInput);
+reviewed.forecastCoverage.selections.forEach(row=>row.records.forEach(record=>{record.reasons=record.recordId==='latest-point'?['PERSONNEL_APPLICABILITY_UNRESOLVED']:record.reasons;}));
+assert.equal(buildEventResearchPlan(reviewed).forecastReviewCounts.records,0,'a current applicability shortfall is not an unperformed review');
+const foreign=structuredClone(capturedInput);
+foreign.forecastCoverage.selections.forEach(row=>row.records.forEach(record=>record.reasons.push('EVENT_MISMATCH')));
+assert.equal(buildEventResearchPlan(foreign).forecastReviewCounts.records,0);

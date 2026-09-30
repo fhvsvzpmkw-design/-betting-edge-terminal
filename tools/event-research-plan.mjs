@@ -1,5 +1,5 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
-export const EVENT_RESEARCH_VERSION = '2026-09-30.2';
+export const EVENT_RESEARCH_VERSION = '2026-09-30.3';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
@@ -142,6 +142,27 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     const forecastRows = list(forecastCoverage.selections).filter(row => String(row.eventId) === String(event.eventId) &&
       (row.sport === event.sport || (event.sport === 'NBA_WNBA' && ['NBA','WNBA'].includes(row.sport))) &&
       time(row.startTime) === time(event.eventDate));
+    // A completed market decision must not hide captured forecasts still
+    // awaiting applicability review. Share latest source fields once per event;
+    // neither this queue nor a capture establishes eligibility or a decision.
+    const latestForecasts=new Map();
+    for(const row of forecastRows)for(const record of list(row.records)){
+      if(!record.recordId||!Number.isFinite(time(record.observedAt))||time(record.observedAt)>time(report.ts)||
+        list(record.reasons).some(reason=>['EVENT_MISMATCH','OBSERVATION_TIME_INELIGIBLE','MODEL_FAMILY_CONFLICT','MARKET_DEPENDENCE_CONFLICT','SOURCE_NOT_REGISTERED','SOURCE_PROVENANCE_INCOMPLETE'].includes(reason)))continue;
+      const key=JSON.stringify([record.sourceId,record.kind,record.marketDetail,record.period,record.side,record.line??null]);
+      const prior=latestForecasts.get(key);
+      if(!prior||time(record.observedAt)>time(prior.observedAt))latestForecasts.set(key,record);
+    }
+    const forecastReviews=[...latestForecasts.values()].filter(record=>list(record.reasons).includes('CURRENT_REVALIDATION_REQUIRED')).map(record=>({
+      recordId:record.recordId,sourceId:record.sourceId,modelFamily:record.modelFamily,url:record.url,
+      kind:record.kind,probability:record.probability,probabilityBasis:record.probabilityBasis,
+      marketDetail:record.marketDetail,period:record.period,side:record.side,line:record.line??null,
+      forecastAt:record.forecastAt,observedAt:record.observedAt,limitation:record.limitation,
+      selectionIds:forecastRows.filter(row=>row.marketDetail===record.marketDetail&&row.side===record.side&&
+        (record.marketDetail==='full_game_moneyline'||row.line===record.line)).map(row=>row.selectionId),
+      requiresCurrentApplicabilityReview:true,
+      nextAction:'Inspect the immutable captured field and named current personnel/settlement assumptions. Append an actual current-report revalidation or record a concrete applicability shortfall; preserve original model and observation times. Then reassess agreement/conflict at each exact price.'
+    }));
     const sourceQueue = new Map();
     for (const row of forecastRows.filter(row => !list(row.eligibleExactRecordIds).length)) {
       for (const source of list(row.nextRoutes)) {
@@ -161,7 +182,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       completed:event.selections.length-pending.length, pending:pending.length,
       sharedResearchRequired:pending.length>0, personnelFollowUp, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
-      forecastRetrieval, selections:event.selections};
+      forecastRetrieval, forecastReviews, selections:event.selections};
   }).sort((a,b) => (time(a.eventDate) || Infinity)-(time(b.eventDate) || Infinity) || a.eventKey.localeCompare(b.eventKey));
   const rows = events.flatMap(event => event.selections), pending = rows.filter(row => row.route !== 'COMPLETED');
   const routes = {};
@@ -171,6 +192,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     counts:{available:rows.length, events:events.length, completed:rows.length-pending.length, pending:pending.length,
       researchIncomplete:pending.filter(row => row.blocker?.reason === 'RESEARCH_INCOMPLETE' || row.blocker === 'RESEARCH_INCOMPLETE').length,
       eventScansPending:events.filter(event => event.pending>0).length, routes}, events,
+    forecastReviewCounts:{events:events.filter(event=>event.forecastReviews.length).length,records:events.reduce((sum,event)=>sum+event.forecastReviews.length,0)},
     summary:`${rows.length-pending.length} completed decisions; ${pending.length} selections still require assessment across ${events.filter(event => event.pending>0).length} events. An empty positive shortlist does not mean research is complete or no value exists.`,
     warnings, limitations:[
       'All routes are research instructions, not betting decisions. No grade, stake, fair value or price is changed.',
@@ -183,19 +205,20 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
 // Small producer-facing execution view. The full audit remains available; a
 // large repeated per-selection evidence payload must not hide the next work.
 export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
-  const events = list(plan.events).filter(event => event.pending > 0).map(event => ({
+  const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0).map(event => ({
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,
     pending:event.pending, completed:event.completed,
     sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath}) => ({
       id:source.id, url:source.url, observedAt:source.checkedAt || source.asOf,
       finding:source.finding || source.fact, priorReportPath, requiresCurrentApplicabilityReview:true})),
     personnelFollowUp:event.personnelFollowUp || null,
+    forecastReviews:list(event.forecastReviews),
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
       selectionId:row.selectionId, route:row.route, quote:row.quote, comparison:row.priceComparison,
       quarterbackFollowUp:row.quarterbackFollowUp || null, nextAction:row.nextAction})),
     forecastSources:list(event.forecastRetrieval?.nextSources).map(source => ({
       sourceId:source.sourceId, urls:source.urls, questions:source.questions})),
-    nextAction:event.personnelFollowUp?.required ? event.personnelFollowUp.instruction :
+    nextAction:event.forecastReviews?.length ? 'Review the captured forecast fields and current applicability before repeating source discovery or treating this event as fully reviewed. Completed market cards remain publishable under their own evidence rules.' : event.personnelFollowUp?.required ? event.personnelFollowUp.instruction :
       'Revalidate event facts, then finish a supported exact paired-market review before opening another event. Escalate decision-changing news. Record genuine remaining gaps; do not wait for whole-slate forecast coverage.'
   }));
   if (eventId !== null && !events.some(event => String(event.eventId) === String(eventId))) throw new Error('No pending event matches --event-id');
@@ -203,15 +226,16 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label, pending:event.pending, completed:event.completed,
     sourceLeadCount:event.sourceLeads.length, personnelFollowUpState:event.personnelFollowUp?.state || null,
     routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
-    nextForecastSources:event.forecastSources.map(source => source.sourceId)
+    nextForecastSources:event.forecastSources.map(source => source.sourceId),
+    capturedForecastsAwaitingReview:event.forecastReviews.length,nextAction:event.nextAction
   }));
-  return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,
+  return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,forecastReviewCounts:plan.forecastReviewCounts,
     completionState:plan.counts?.available > 0 && plan.counts?.completed === 0 ? 'NO_COMPLETED_DECISIONS' :
       plan.counts?.pending > 0 ? 'PARTIAL' : 'COMPLETE',
     instructions:[
       'Scan the full inventory, then complete event reviews incrementally in start-time order; research leads are not completed research.',
       'Missing independent forecasts or calibrated intervals do not block the qualified market LEAN/PASS route.',
-      'Capture a real forecast point before assessing its uncertainty. A missing BET bound is not a failed retrieval.',
+      'Review already captured forecast points first, including events with completed market decisions. Append real applicability checks; this queue does not certify eligibility or block publication. A missing BET bound is not a failed retrieval.',
       'When no decisions are completed, diagnose the failed source-to-decision step explicitly; never describe this as no value found.'
     ], detailInstruction:'Repeat candidates --work-plan --event-id EVENT_ID for exact quotes, original source leads and source questions for one pending event.',
     events:outputEvents, warnings:list(plan.warnings)};

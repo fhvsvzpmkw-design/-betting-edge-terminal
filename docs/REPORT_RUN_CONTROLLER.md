@@ -16,6 +16,8 @@ node tools/report-run.mjs next --checkpoint data/report-production/checkpoints/<
 
 Choose a unique run ID using the operating date, slot and actual issue clock. `start` refuses to overwrite an existing run. The status response gives the current revision. Mutations require `--expected-revision <current-revision>`; stale updates fail without replacing the checkpoint. The entire draft is saved atomically under one checkpoint. There is no model API call in these commands.
 
+`next` also exposes captured forecasts awaiting actual applicability review on events with completed market cards. `next --event-id` includes the latest immutable record IDs, probabilities, native units, original observation times and exact selection questions. Review the actual exported capture and append genuine revalidations or explicit shortfalls; the queue never creates eligibility. Decision completion and outstanding forecast review counts remain separate, and completed qualified cards may still publish.
+
 ## Work one event and save
 
 ```
