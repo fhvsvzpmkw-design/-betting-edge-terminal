@@ -13,13 +13,26 @@ const BOOKS = ['Bet365', 'DraftKings'];
 const FEED_MAX_AGE_MINUTES = 75;
 const QUOTE_MAX_AGE_MINUTES = 30;
 const PRIMARY_SCORE_EPSILON = 1e-8;
+const SPREAD_DISPLAY_IDENTITY_FROM = '2026-09-30T10:30:00-07:00';
 
 function die(message) { throw new Error(message); }
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function writeJson(file, value) { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); }
 function parseMs(value) { const ms = Date.parse(value || ''); return Number.isFinite(ms) ? ms : null; }
 function marketKey(market) { return String(market?.marketKey || market?.identity?.marketKey || '').toLowerCase(); }
-function isSpreadRec(rec) { return String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() === 'spread' && rec?.feed?.eventId && rec?.feed?.side && Number.isFinite(Number(rec?.feed?.hdp)); }
+function rawSpreadLine(feed) {
+  const parts = String(feed?.selectionKey || '').split('|');
+  const keyed = parts.length === 5 && parts[0] === String(feed?.eventId || '') && parts[1] === 'spread' &&
+    parts[2] === String(feed?.side || '').toLowerCase() && parts[4] !== '' && Number.isFinite(Number(parts[4])) ? Number(parts[4]) : null;
+  const supplied = ['hdp','line'].map(key => feed?.[key]).filter(value => value !== null && value !== undefined && value !== '');
+  const parsed = supplied.map(Number);
+  if (parsed.some(value => !Number.isFinite(value))) return null;
+  if (parsed.length > 1 && parsed.some(value => Math.abs(value - parsed[0]) > 0.001)) return null;
+  const raw = parsed.length ? parsed[0] : keyed;
+  if (raw === null || (keyed !== null && Math.abs(raw - keyed) > 0.001)) return null;
+  return raw;
+}
+function isSpreadRec(rec) { return String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() === 'spread' && rec?.feed?.eventId && rec?.feed?.side && rawSpreadLine(rec.feed) !== null; }
 function lineFromRaw(raw, side) { const n = Number(raw); if (!Number.isFinite(n)) return null; const line = String(side).toLowerCase() === 'away' ? -n : n; return Object.is(line, -0) ? 0 : line; }
 function lineText(value) { const n = Number(value); if (!Number.isFinite(n)) return '—'; return n > 0 ? `+${n}` : String(n); }
 function decimalOdds(value) { const n = Number(value); return Number.isFinite(n) && n > 1 ? n : null; }
@@ -32,6 +45,33 @@ function recKey(rec) { return `${rec.feed.eventId}|${String(rec.feed.side).toLow
 function combinedText(rec) { return [rec?.title, rec?.move, rec?.analysis, rec?.price, rec?.source].filter(Boolean).join(' // ').toUpperCase(); }
 function unavailableText(text) { return /(MARKET UNAVAILABLE|PRICE NOT VERIFIED|FEED STALE|IDENTITY MISMATCH)/.test(text); }
 function explicitPrimaryRow(row) { return row?.primary === true || row?.isPrimary === true || row?.main === true || row?.isMain === true || row?.mainLine === true || row?.isMainLine === true; }
+function trailingLine(value) {
+  const match = String(value || '').replaceAll('−','-').trim().match(/([+-]?\d+(?:\.\d+)?)$/);
+  return match ? Number(match[1]) : null;
+}
+function spreadDisplayViolations(report) {
+  if (parseMs(report?.ts) === null || parseMs(report.ts) < parseMs(SPREAD_DISPLAY_IDENTITY_FROM)) return [];
+  const violations = [];
+  for (const [index, rec] of (report?.recs || []).entries()) {
+    if (String(rec?.feed?.marketKey || rec?.feed?.market || '').toLowerCase() !== 'spread') continue;
+    const raw = rawSpreadLine(rec.feed);
+    if (raw === null) {
+      violations.push(`Recommendation ${index + 1}: spread feed raw handicap disagrees with its exact selectionKey`);
+      continue;
+    }
+    const expected = lineFromRaw(raw, rec.feed.side), shown = trailingLine(rec.title);
+    if (shown === null || Math.abs(shown - expected) > 0.001) {
+      violations.push(`Recommendation ${index + 1}: ${rec.title || 'untitled spread'} displays ${shown === null ? 'no signed handicap' : lineText(shown)} but exact ${rec.feed.side} selection ${rec.feed.selectionKey} requires ${lineText(expected)}; raw feed handicap is home-oriented`);
+    }
+    if (typeof rec.feed.label === 'string') {
+      const labelLine = trailingLine(rec.feed.label);
+      if (labelLine !== null && Math.abs(labelLine - expected) > 0.001) {
+        violations.push(`Recommendation ${index + 1}: feed.label displays ${lineText(labelLine)} but bettor-facing ${rec.feed.side} handicap is ${lineText(expected)}`);
+      }
+    }
+  }
+  return violations;
+}
 
 function parseArgs(argv) {
   const [command, ...rest] = argv;
@@ -158,7 +198,7 @@ function exactFreshQuotes(event, priorRec, feedGeneratedAt) {
   const out = [];
   const side = String(priorRec.feed.side).toLowerCase();
   const selectionKey = String(priorRec.feed.selectionKey || '');
-  const rawHdp = Number(priorRec.feed.hdp);
+  const rawHdp = rawSpreadLine(priorRec.feed);
   for (const book of BOOKS) {
     const market = latestCanonicalSpreadMarket(event, book, feedGeneratedAt);
     if (!market || !quoteFresh(market, feedGeneratedAt)) continue;
@@ -217,12 +257,12 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
   for (const rec of report?.recs || []) if (isSpreadRec(rec)) currentSpreads.set(recKey(rec), rec);
 
   const diagnostics = [];
-  const violations = [];
+  const violations = spreadDisplayViolations(report);
   for (const tracked of priorTrackedSpreads(root, report)) {
     const prior = tracked.rec;
     const commenceMs = parseMs(prior?.feed?.eventDate);
     if (commenceMs !== null && commenceMs <= reportMs) continue;
-    const oldLine = lineFromRaw(prior.feed.hdp, prior.feed.side);
+    const oldLine = lineFromRaw(rawSpreadLine(prior.feed), prior.feed.side);
     const currentRec = currentSpreads.get(recKey(prior));
     const event = events.get(String(prior.feed.eventId));
     if (!event) {
@@ -418,6 +458,23 @@ function selfTest() {
     assert.equal(providerMarked.ok, true, providerMarked.violations.join('; '));
     assert.equal(providerMarked.diagnostics[0].primary[0].method, 'PROVIDER_PRIMARY');
     assert.equal(providerMarked.diagnostics[0].currentLine, 12);
+
+    const forwardFeed = spreadFeed([spreadRow(-11, 1.91, 1.91)], { generatedAt: '2026-09-30T22:15:00Z', updatedAt: '2026-09-30T22:14:00Z' });
+    forwardFeed.events[0].date = '2026-10-01T02:00:00Z';
+    const wrongDisplay = { slot: 'evening', label: '15:15 EVENING', ts: '2026-09-30T15:16:00-07:00', feedGeneratedAt: forwardFeed.generatedAt, recs: [{
+      status: 'PASS', title: 'Toronto Tempo -11', stake: '$0',
+      feed: { eventId: '68096572', marketKey: 'spread', side: 'away', line: -11,
+        selectionKey: '68096572|spread|away||-11', eventDate: '2026-10-01T02:00:00Z', label: 'Toronto Tempo -11' }
+    }] };
+    const rejectedDisplay = auditLineage({ root, report: wrongDisplay, feed: forwardFeed });
+    assert.equal(rejectedDisplay.ok, false);
+    assert.match(rejectedDisplay.violations.join(' '), /requires \+11/);
+    const correctDisplay = structuredClone(wrongDisplay);
+    correctDisplay.recs[0].title = 'Toronto Tempo +11';
+    correctDisplay.recs[0].feed.label = 'Toronto Tempo +11';
+    const acceptedDisplay = auditLineage({ root, report: correctDisplay, feed: forwardFeed });
+    assert.equal(acceptedDisplay.ok, true, acceptedDisplay.violations.join('; '));
+    assert.equal(rawSpreadLine(correctDisplay.recs[0].feed), -11);
 
     const duplicateFeed = spreadFeed([
       spreadRow(-10.5, 1.91, 1.91)
