@@ -48,6 +48,8 @@ jobs:
       - name: Collect and save shared source observations
         if: steps.due.outputs.run == 'true'
         run: |
+          node tests/official-personnel.test.mjs
+          node --test tests/game-intelligence.test.mjs
           node tools/collect-game-intelligence.mjs
           cp data/game-intelligence/current.json /tmp/game-intelligence-candidate.json
       - name: Publish collection, source results and game board
