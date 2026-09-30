@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-09-30T11:45:00-07:00",
+  "updatedAt": "2026-09-30T16:53:14-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -21,7 +21,8 @@
     "marketViewed": false
   },
   "processedBatchIds": [
-    "graham-daily-review-personnel-2026-w04-20260930T114500-0700"
+    "graham-daily-review-personnel-2026-w04-20260930T114500-0700",
+    "graham-delta-1645-personnel-2026-w04-20260930T165130-0700"
   ],
   "events": [
     {
@@ -745,6 +746,440 @@
       "registryPosition": "RG",
       "maddenOvr": 68,
       "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
+    },
+    {
+      "personnelEventId": "2026-W04-PIT-21039-ESTIMATE-20260930T165130-0700",
+      "caseKey": "2026-W04-PIT-Rico-Dowdle",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "PIT",
+      "side": "AWAY",
+      "player": "Rico Dowdle",
+      "playerEaId": "21039",
+      "currentRole": "SECOND_RUNNING_BACK",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Pittsburgh ruled Rico Dowdle out. The official depth chart lists Eli Heidenreich and Travis Homer after Dowdle. Assume those two active reserves share only Dowdle's added vacant duties equally; Jaylen Warren retains his baseline starting role and receives no replacement credit.",
+      "reopenOn": "Pittsburgh names a primary replacement, changes the active reserve group, or an additional running-back absence creates a cluster.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Eli Heidenreich",
+          "Travis Homer"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.steelers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/pit.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games"
+      ],
+      "roleSourceRefs": [
+        "https://www.steelers.com/team/depth-chart"
+      ],
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal added reserve duty for Eli Heidenreich and Travis Homer, the two available backs listed after the absent Rico Dowdle.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Jaylen Warren remains the listed starter and retains his baseline duties. Only Dowdle's additional vacant duties are estimated for the two reserves.",
+        "baselineSourceIds": [
+          "https://www.steelers.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Eli Heidenreich",
+            "eaPlayerId": "1873",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current listed reserve after Dowdle; only added vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.steelers.com/team/depth-chart"
+            ]
+          },
+          {
+            "player": "Travis Homer",
+            "eaPlayerId": "20640",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current listed reserve after Dowdle; only added vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.steelers.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 84,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.9,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 2
+        },
+        "injuryLoss": 0.9,
+        "rawTeamContributionDelta": -0.9,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.9,
+          "max": 0.9
+        },
+        "weights": [
+          {
+            "player": "Eli Heidenreich",
+            "eaPlayerId": "1873",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          },
+          {
+            "player": "Travis Homer",
+            "eaPlayerId": "20640",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume equal added reserve duty for Eli Heidenreich and Travis Homer, the two available backs listed after the absent Rico Dowdle.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "Pittsburgh names a primary replacement, changes the active reserve group, or an additional running-back absence creates a cluster."
+      }
+    },
+    {
+      "personnelEventId": "2026-W04-PIT-22706-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-PIT-Joey-Porter-Jr",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "PIT",
+      "side": "AWAY",
+      "player": "Joey Porter Jr.",
+      "playerEaId": "22706",
+      "currentRole": "STARTING_CORNERBACK",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "SECONDARY_REPLACEMENT_AVAILABILITY_AND_CLUSTER_UNRESOLVED",
+      "reason": "Pittsburgh ruled Joey Porter Jr. out while adjacent defensive backs Brandin Echols and Jalen Ramsey are questionable. The official depth chart identifies Asante Samuel Jr. and Daylen Everette in the corner depth, but the active Week 4 secondary alignment and surrounding availability remain unresolved.",
+      "reopenOn": "Pittsburgh resolves Echols and Ramsey and publishes or reports a stable Week 4 secondary alignment.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Asante Samuel Jr",
+          "Brandin Echols",
+          "Jalen Ramsey",
+          "Daylen Everette"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.steelers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/pit.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "CB",
+      "maddenOvr": 85,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_BACK"
+    },
+    {
+      "personnelEventId": "2026-W04-CLE-21619-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-CLE-Tylan-Wallace",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Tylan Wallace",
+      "playerEaId": "21619",
+      "currentRole": "RESERVE_WIDE_RECEIVER",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "RESERVE_RECEIVER_ROLE_REDISTRIBUTION_UNRESOLVED",
+      "reason": "Cleveland ruled Tylan Wallace out. He is listed behind Jerry Jeudy, but the official depth chart does not identify a direct replacement for Wallace's reserve and special-role workload. His frozen value is zero, so no unsupported upgrade or negative loss is credited.",
+      "reopenOn": "Cleveland identifies the active replacement for Wallace's Week 4 offensive and special-role duties.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Malachi Corley",
+          "Isaiah Bond",
+          "KC Concepcion Jr"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.clevelandbrowns.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/cle.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "WR",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "RECEIVER"
+    },
+    {
+      "personnelEventId": "2026-W04-CLE-21537-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-CLE-Teven-Jenkins",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Teven Jenkins",
+      "playerEaId": "21537",
+      "currentRole": "STARTING_RIGHT_GUARD",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "MULTIPLE_OFFENSIVE_LINE_ABSENCES_CONFIGURATION_UNRESOLVED",
+      "reason": "Cleveland ruled starting right guard Teven Jenkins out together with starting center Elgton Jenkins. The paired interior-line absences require a cluster review and a stable five-man configuration; the depth chart alone does not resolve the game-day alignment.",
+      "reopenOn": "Cleveland reports or publishes a stable Week 4 offensive-line configuration.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Austin Barber",
+          "Luke Wypler",
+          "Parker Brailsford",
+          "Zion Johnson"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.clevelandbrowns.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/cle.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "RG",
+      "maddenOvr": 77,
+      "healthyWaltersPoints": 0.5,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
+    },
+    {
+      "personnelEventId": "2026-W04-CLE-20376-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-CLE-Elgton-Jenkins",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Elgton Jenkins",
+      "playerEaId": "20376",
+      "currentRole": "STARTING_CENTER",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "MULTIPLE_OFFENSIVE_LINE_ABSENCES_CONFIGURATION_UNRESOLVED",
+      "reason": "Cleveland ruled starting center Elgton Jenkins out together with starting right guard Teven Jenkins. The paired interior-line absences require a cluster review and a stable five-man configuration; the depth chart alone does not resolve the game-day alignment.",
+      "reopenOn": "Cleveland reports or publishes a stable Week 4 offensive-line configuration.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Luke Wypler",
+          "Parker Brailsford",
+          "Austin Barber",
+          "Zion Johnson"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.clevelandbrowns.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/cle.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "C",
+      "maddenOvr": 84,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
+    },
+    {
+      "personnelEventId": "2026-W04-WAS-22398-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-WAS-Nick-Cross",
+      "gameKey": "2026-W04-IND-WAS",
+      "team": "WAS",
+      "side": "HOME",
+      "player": "Nick Cross",
+      "playerEaId": "22398",
+      "currentRole": "STARTING_STRONG_SAFETY",
+      "availabilityStatus": "OUT",
+      "replacementPlayer": "Tyler Owens",
+      "replacementEaId": "1379",
+      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+      "reason": "Washington ruled starting strong safety Nick Cross out. The official depth chart lists Tyler Owens directly behind Cross; submit the one-for-one replacement and let repository production own exact arithmetic and any cluster safeguards.",
+      "reopenOn": "Washington names a different strong-safety replacement or Tyler Owens becomes unavailable.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tyler Owens"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_NUMERIC"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.commanders.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/was.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games"
+      ],
+      "roleSourceRefs": [
+        "https://www.commanders.com/team/depth-chart"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "SS",
+      "maddenOvr": 81,
+      "healthyWaltersPoints": 0.9,
+      "replacementRegistryPosition": "SS",
+      "replacementMaddenOvr": 65,
+      "replacementWaltersPoints": 0,
+      "rawTeamContributionDelta": -0.9,
+      "clusterGroup": "DEFENSIVE_BACK",
+      "failClosedCode": null
+    },
+    {
+      "personnelEventId": "2026-W04-WAS-21419-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-WAS-Sam-Cosmi",
+      "gameKey": "2026-W04-IND-WAS",
+      "team": "WAS",
+      "side": "HOME",
+      "player": "Sam Cosmi",
+      "playerEaId": "21533",
+      "currentRole": "STARTING_RIGHT_GUARD",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "OFFENSIVE_LINE_REPLACEMENT_NOT_BOUND_TO_FROZEN_REGISTRY",
+      "reason": "Washington ruled starting right guard Sam Cosmi out. The official depth chart lists Tanoa Togiai behind Cosmi, but that replacement cannot be resolved in the bound frozen team shard; preserve the prior fair rather than inventing a value.",
+      "reopenOn": "Washington confirms the Week 4 right guard and the replacement is bound to governed player-value authority.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tanoa Togiai",
+          "Andrew Wylie",
+          "Chris Paul"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.commanders.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/was.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "RG",
+      "maddenOvr": 87,
+      "healthyWaltersPoints": 1.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "OFFENSIVE_LINE"
     }
@@ -1473,8 +1908,442 @@
       "healthyWaltersPoints": 0,
       "rawTeamContributionDelta": null,
       "clusterGroup": "OFFENSIVE_LINE"
+    },
+    "2026-W04-PIT-Rico-Dowdle": {
+      "personnelEventId": "2026-W04-PIT-21039-ESTIMATE-20260930T165130-0700",
+      "caseKey": "2026-W04-PIT-Rico-Dowdle",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "PIT",
+      "side": "AWAY",
+      "player": "Rico Dowdle",
+      "playerEaId": "21039",
+      "currentRole": "SECOND_RUNNING_BACK",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Pittsburgh ruled Rico Dowdle out. The official depth chart lists Eli Heidenreich and Travis Homer after Dowdle. Assume those two active reserves share only Dowdle's added vacant duties equally; Jaylen Warren retains his baseline starting role and receives no replacement credit.",
+      "reopenOn": "Pittsburgh names a primary replacement, changes the active reserve group, or an additional running-back absence creates a cluster.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Eli Heidenreich",
+          "Travis Homer"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.steelers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/pit.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games"
+      ],
+      "roleSourceRefs": [
+        "https://www.steelers.com/team/depth-chart"
+      ],
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal added reserve duty for Eli Heidenreich and Travis Homer, the two available backs listed after the absent Rico Dowdle.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Jaylen Warren remains the listed starter and retains his baseline duties. Only Dowdle's additional vacant duties are estimated for the two reserves.",
+        "baselineSourceIds": [
+          "https://www.steelers.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Eli Heidenreich",
+            "eaPlayerId": "1873",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current listed reserve after Dowdle; only added vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.steelers.com/team/depth-chart"
+            ]
+          },
+          {
+            "player": "Travis Homer",
+            "eaPlayerId": "20640",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current listed reserve after Dowdle; only added vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.steelers.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 84,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.9,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 2
+        },
+        "injuryLoss": 0.9,
+        "rawTeamContributionDelta": -0.9,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.9,
+          "max": 0.9
+        },
+        "weights": [
+          {
+            "player": "Eli Heidenreich",
+            "eaPlayerId": "1873",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          },
+          {
+            "player": "Travis Homer",
+            "eaPlayerId": "20640",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume equal added reserve duty for Eli Heidenreich and Travis Homer, the two available backs listed after the absent Rico Dowdle.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "Pittsburgh names a primary replacement, changes the active reserve group, or an additional running-back absence creates a cluster."
+      }
+    },
+    "2026-W04-PIT-Joey-Porter-Jr": {
+      "personnelEventId": "2026-W04-PIT-22706-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-PIT-Joey-Porter-Jr",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "PIT",
+      "side": "AWAY",
+      "player": "Joey Porter Jr.",
+      "playerEaId": "22706",
+      "currentRole": "STARTING_CORNERBACK",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "SECONDARY_REPLACEMENT_AVAILABILITY_AND_CLUSTER_UNRESOLVED",
+      "reason": "Pittsburgh ruled Joey Porter Jr. out while adjacent defensive backs Brandin Echols and Jalen Ramsey are questionable. The official depth chart identifies Asante Samuel Jr. and Daylen Everette in the corner depth, but the active Week 4 secondary alignment and surrounding availability remain unresolved.",
+      "reopenOn": "Pittsburgh resolves Echols and Ramsey and publishes or reports a stable Week 4 secondary alignment.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Asante Samuel Jr",
+          "Brandin Echols",
+          "Jalen Ramsey",
+          "Daylen Everette"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.steelers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/pit.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "CB",
+      "maddenOvr": 85,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_BACK"
+    },
+    "2026-W04-CLE-Tylan-Wallace": {
+      "personnelEventId": "2026-W04-CLE-21619-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-CLE-Tylan-Wallace",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Tylan Wallace",
+      "playerEaId": "21619",
+      "currentRole": "RESERVE_WIDE_RECEIVER",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "RESERVE_RECEIVER_ROLE_REDISTRIBUTION_UNRESOLVED",
+      "reason": "Cleveland ruled Tylan Wallace out. He is listed behind Jerry Jeudy, but the official depth chart does not identify a direct replacement for Wallace's reserve and special-role workload. His frozen value is zero, so no unsupported upgrade or negative loss is credited.",
+      "reopenOn": "Cleveland identifies the active replacement for Wallace's Week 4 offensive and special-role duties.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Malachi Corley",
+          "Isaiah Bond",
+          "KC Concepcion Jr"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.clevelandbrowns.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/cle.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "WR",
+      "maddenOvr": 71,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "RECEIVER"
+    },
+    "2026-W04-CLE-Teven-Jenkins": {
+      "personnelEventId": "2026-W04-CLE-21537-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-CLE-Teven-Jenkins",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Teven Jenkins",
+      "playerEaId": "21537",
+      "currentRole": "STARTING_RIGHT_GUARD",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "MULTIPLE_OFFENSIVE_LINE_ABSENCES_CONFIGURATION_UNRESOLVED",
+      "reason": "Cleveland ruled starting right guard Teven Jenkins out together with starting center Elgton Jenkins. The paired interior-line absences require a cluster review and a stable five-man configuration; the depth chart alone does not resolve the game-day alignment.",
+      "reopenOn": "Cleveland reports or publishes a stable Week 4 offensive-line configuration.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Austin Barber",
+          "Luke Wypler",
+          "Parker Brailsford",
+          "Zion Johnson"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.clevelandbrowns.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/cle.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "RG",
+      "maddenOvr": 77,
+      "healthyWaltersPoints": 0.5,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
+    },
+    "2026-W04-CLE-Elgton-Jenkins": {
+      "personnelEventId": "2026-W04-CLE-20376-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-CLE-Elgton-Jenkins",
+      "gameKey": "2026-W04-PIT-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Elgton Jenkins",
+      "playerEaId": "20376",
+      "currentRole": "STARTING_CENTER",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "MULTIPLE_OFFENSIVE_LINE_ABSENCES_CONFIGURATION_UNRESOLVED",
+      "reason": "Cleveland ruled starting center Elgton Jenkins out together with starting right guard Teven Jenkins. The paired interior-line absences require a cluster review and a stable five-man configuration; the depth chart alone does not resolve the game-day alignment.",
+      "reopenOn": "Cleveland reports or publishes a stable Week 4 offensive-line configuration.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Luke Wypler",
+          "Parker Brailsford",
+          "Austin Barber",
+          "Zion Johnson"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.clevelandbrowns.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/cle.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "C",
+      "maddenOvr": 84,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
+    },
+    "2026-W04-WAS-Nick-Cross": {
+      "personnelEventId": "2026-W04-WAS-22398-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-WAS-Nick-Cross",
+      "gameKey": "2026-W04-IND-WAS",
+      "team": "WAS",
+      "side": "HOME",
+      "player": "Nick Cross",
+      "playerEaId": "22398",
+      "currentRole": "STARTING_STRONG_SAFETY",
+      "availabilityStatus": "OUT",
+      "replacementPlayer": "Tyler Owens",
+      "replacementEaId": "1379",
+      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+      "reason": "Washington ruled starting strong safety Nick Cross out. The official depth chart lists Tyler Owens directly behind Cross; submit the one-for-one replacement and let repository production own exact arithmetic and any cluster safeguards.",
+      "reopenOn": "Washington names a different strong-safety replacement or Tyler Owens becomes unavailable.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tyler Owens"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_NUMERIC"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.commanders.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/was.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games"
+      ],
+      "roleSourceRefs": [
+        "https://www.commanders.com/team/depth-chart"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "SS",
+      "maddenOvr": 81,
+      "healthyWaltersPoints": 0.9,
+      "replacementRegistryPosition": "SS",
+      "replacementMaddenOvr": 65,
+      "replacementWaltersPoints": 0,
+      "rawTeamContributionDelta": -0.9,
+      "clusterGroup": "DEFENSIVE_BACK",
+      "failClosedCode": null
+    },
+    "2026-W04-WAS-Sam-Cosmi": {
+      "personnelEventId": "2026-W04-WAS-21419-OUT-20260930T165130-0700",
+      "caseKey": "2026-W04-WAS-Sam-Cosmi",
+      "gameKey": "2026-W04-IND-WAS",
+      "team": "WAS",
+      "side": "HOME",
+      "player": "Sam Cosmi",
+      "playerEaId": "21533",
+      "currentRole": "STARTING_RIGHT_GUARD",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+      "failClosedCode": "OFFENSIVE_LINE_REPLACEMENT_NOT_BOUND_TO_FROZEN_REGISTRY",
+      "reason": "Washington ruled starting right guard Sam Cosmi out. The official depth chart lists Tanoa Togiai behind Cosmi, but that replacement cannot be resolved in the bound frozen team shard; preserve the prior fair rather than inventing a value.",
+      "reopenOn": "Washington confirms the Week 4 right guard and the replacement is bound to governed player-value authority.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tanoa Togiai",
+          "Andrew Wylie",
+          "Chris Paul"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "sourceRefs": [
+        "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+        "https://www.commanders.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/was.json"
+      ],
+      "batchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+      "effectiveAt": "2026-09-30T16:53:14-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "RG",
+      "maddenOvr": 87,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "OFFENSIVE_LINE"
     }
   },
-  "lastBatchId": "graham-daily-review-personnel-2026-w04-20260930T114500-0700",
-  "lastBatchSourceTask": "DAILY_REVIEW"
+  "lastBatchId": "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
+  "lastBatchSourceTask": "DELTA_1645"
 }
