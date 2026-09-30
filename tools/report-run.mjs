@@ -80,7 +80,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
   root=fs.realpathSync(root);
   if(!checkpoint)throw new Error('--checkpoint is required');
   const file=path.resolve(root,checkpoint);safeCheckpoint(root,file);
-  const readonly=['status','next','export'].includes(command);
+  const readonly=['status','next','export','diagnose'].includes(command);
   const mutating=['start','checkpoint','retime','prepare','freeze','stage','readback'].includes(command);
   if(!readonly&&!mutating)throw new Error('Unknown run command');
   fs.mkdirSync(path.dirname(file),{recursive:true});
@@ -101,6 +101,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       if(mutating&&Number(expectedRevision)!==state.revision)throw new Error(`Revision conflict: current revision is ${state.revision}`);
     }
     if(command==='status')return summary(state);
+    if(command==='diagnose')return {...summary(state),diagnostics:temporaryDraft(state,files=>pipeline({root,...files,mode:'diagnose'}))};
     if(command==='export'){
       if(!outputDir)throw new Error('export requires --output-dir outside the repository');
       const requested=path.resolve(outputDir);
@@ -148,6 +149,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
         state.report=read(files.report);state.sidecar=read(files.sidecar);
       });
       state.preparation={candidateDeferrals:prepared.audit.candidateDeferrals,cardEvidenceDeferrals:prepared.audit.cardEvidenceDeferrals,warnings:prepared.audit.warnings};
+      state.preparation.diagnostics=temporaryDraft(state,files=>pipeline({root,...files,mode:'diagnose'}));
       state.phase='PREPARED';delete state.validation;
     }
     if(command==='freeze'){

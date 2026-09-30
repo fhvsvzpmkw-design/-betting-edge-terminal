@@ -1,0 +1,62 @@
+name: Graham baseline recovery
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/graham-baseline-recovery.mjs
+      - tools/graham-research-review.mjs
+      - tests/graham-baseline-recovery.test.mjs
+      - .github/workflows/graham-baseline-recovery.yml
+      - data/walters/nfl/20*/week-*-research-runtime/*.json
+  workflow_run:
+    workflows: [Graham research runtime]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+jobs:
+  recover:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify recovery regressions
+        run: node tests/graham-baseline-recovery.test.mjs
+      - name: Reconcile pending baseline against exact verified review
+        run: |
+          set -euo pipefail
+          git config user.name betting-edge-bot
+          git config user.email actions@users.noreply.github.com
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+            BASELINE="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).baselineStatus" "$ACTIVE_NUMBERS")"
+            if [ "$BASELINE" = "PENDING_TUESDAY_GRAHAM_BASELINE" ]; then
+              # Incomplete or unverified research stays pending without a fabricated sweep.
+              if ! node tools/graham-baseline-recovery.mjs --write; then
+                echo "Baseline remains pending; verified full catch-up is not yet available."
+                exit 0
+              fi
+            else
+              exit 0
+            fi
+            node tools/validate-walters-qb-performance-production.mjs
+            git add -- "$ACTIVE_NUMBERS"
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Recover initial Graham baseline from verified full catch-up'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo 'Concurrent writes prevented baseline recovery publication.' >&2
+          exit 1

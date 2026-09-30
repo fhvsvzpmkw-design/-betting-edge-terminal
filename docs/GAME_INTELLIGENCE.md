@@ -48,4 +48,6 @@ The common schema is deliberately provider-neutral. An authorized source/export 
 
 ## Targeted personnel news
 
+The automatic MLB adapter makes one official `statsapi.mlb.com` schedule request per date, cached for fifteen minutes across report lanes. It matches ordered teams and exact kickoff, collects official probable pitchers and published lineup entries, and records unpublished or incomplete lineups explicitly. It excludes started games, preserves actual source observation times and adds no odds requests. These facts are pinned in the report dossier as review leads. They do not confer personnel clearance, a confirmed starter, a probability or a decision. Recent exact-event official observations from an earlier lane also remain reusable with current applicability review.
+
 `data/game-intelligence/personnel-news.json` retains concise timestamped football-news findings from targeted research separately from automatic forecast collection. New dossiers pin only exact sport/event/kickoff/ordered-team matches observed before issue time. The collector cannot erase these leads. They retain `requiresCurrentApplicabilityReview:true`; use `docs/QUARTERBACK_FOLLOW_UP.md` to record an actual current review. They never automatically update a forecast, starter binding, fair or grade.

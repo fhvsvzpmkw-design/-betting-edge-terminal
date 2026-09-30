@@ -5,6 +5,7 @@ import path from 'node:path';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
 import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
+import {validatePriorEstimateBinding} from './walters-qb-prior-estimate.mjs';
 
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/walters/nfl/qb-production/production-contract-v1.json';
@@ -82,6 +83,7 @@ const resolved = teams.filter(item => item.bindingStatus === TOKEN);
 const scope = productionQbScope(contract, ROOT);
 validateProductionQbScope(production, scope);
 for (const item of resolved) {
+  validatePriorEstimateBinding(item,{registry:readJson(contract.sourceAuthority.candidateRegistry.path),policy:contract.priorFallbackPolicy});
   if (
     !finite(item.approvedProductionStarterValue) ||
     !finite(item.embeddedBaselineQbValue) ||

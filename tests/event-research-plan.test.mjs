@@ -32,7 +32,21 @@ assert.equal(personnelPlan.events[0].personnelFollowUp.required,false);
 assert.equal(personnelPlan.events[0].personnelFollowUp.sources.length,1);
 const stalePersonnelInput=structuredClone(personnelInput);
 stalePersonnelInput.sidecar.primaryAnalysis.receipts[0].decision.personnelEvidence.officialSources[0].asOf='2026-09-20T18:10:00-07:00';
-assert.equal(buildEventResearchPlan(stalePersonnelInput).events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
+assert.equal(buildEventResearchPlan(stalePersonnelInput).events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_RECORDED','a recent event check survives a later odds snapshot');
+stalePersonnelInput.sidecar.primaryAnalysis.receipts[0].decision.personnelEvidence.officialSources[0].asOf='2026-09-20T15:00:00-07:00';
+assert.equal(buildEventResearchPlan(stalePersonnelInput).events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED','stale event facts still require a new check');
+const priorPersonnel=new Map([[rows[0].selectionId,{reportPath:'earlier-lane.json',row:{decision:{feed:{eventDate:rows[0].eventDate},personnelEvidence:personnelInput.sidecar.primaryAnalysis.receipts[0].decision.personnelEvidence}}}]]);
+const reusedPersonnel=buildEventResearchPlan({report:personnelInput.report,candidateAssessment:{selections:[rows[0]]},priorReceipts:priorPersonnel});
+assert.equal(reusedPersonnel.events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_RECORDED');
+assert.equal(reusedPersonnel.events[0].personnelFollowUp.sources[0].priorReportPath,'earlier-lane.json');
+assert.equal(reusedPersonnel.events[0].personnelFollowUp.sources[0].requiresCurrentApplicabilityReview,true);
+assert.equal(reusedPersonnel.counts.completed,0);
+priorPersonnel.get(rows[0].selectionId).row.decision.feed.eventDate='2026-09-22T02:00:00Z';
+assert.equal(buildEventResearchPlan({report:personnelInput.report,candidateAssessment:{selections:[rows[0]]},priorReceipts:priorPersonnel}).events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
+const dossier={...input,sidecar:{gameIntelligenceInputs:{facts:[{kind:'OFFICIAL_PERSONNEL',sourceKind:'OFFICIAL',sport:'MLB',eventId:'A',startTime:rows[0].eventDate,url:source.url,observedAt:source.checkedAt,details:{unresolved:['FINAL_LINEUP_NOT_PUBLISHED']}}]}}};
+assert.equal(buildEventResearchPlan(dossier).events[0].personnelFollowUp.sources[0].fromPinnedDossier,true);
+dossier.sidecar.gameIntelligenceInputs.facts[0].eventId='B';
+assert.equal(buildEventResearchPlan(dossier).events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
 const fallbackInput={...input,forecastCoverage:{selections:rows.slice(0,2).map(row=>({
   ...row,startTime:row.eventDate,eligibleExactRecordIds:[],attempts:[{sourceId:'fangraphs',outcome:'INACCESSIBLE'}],
   nextRoutes:[{sourceId:'dratings',role:'EXACT_CANDIDATE',urls:['https://www.dratings.com/predictor/mlb-baseball-predictions/']}]

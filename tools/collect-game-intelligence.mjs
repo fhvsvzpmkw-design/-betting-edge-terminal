@@ -10,6 +10,7 @@ import {forecastCandidate} from './forecast-evidence.mjs';
 import {teamAbbr} from './graham-market-utils.mjs';
 import {list,number,digest,readOptional,eventIdentity,sameEvent,recordId,validateCapture} from './game-intelligence.mjs';
 import {loadForecastSourceRegistry} from './forecast-evidence.mjs';
+import {mlbScheduleUrl,parseOfficialMlb} from './official-personnel.mjs';
 
 export const ROUTES={NFL:'football/nfl',NCAAF:'football/college-football',CFL:'football/cfl',MLB:'baseball/mlb',NBA:'basketball/nba',WNBA:'basketball/wnba',NHL:'hockey/nhl'};
 export const NFELO_URL='https://raw.githubusercontent.com/greerreNFL/nfelo/main/output_data/nfelo_games.csv';
@@ -121,7 +122,7 @@ async function pool(items,fn,concurrency=3) {
   await Promise.all(Array.from({length:Math.min(concurrency,items.length)},async()=>{while(next<items.length){const i=next++;output[i]=await fn(items[i]);}}));
   return output;
 }
-export async function collect({root=process.cwd(),at=new Date().toISOString(),fetchImpl=fetch,force=false}) {
+export async function collect({root=process.cwd(),at=new Date().toISOString(),fetchImpl=fetch,force=false}={}) {
   if(!Number.isFinite(time(at)))throw Error('Actual collection time required');
   const startedAt=time(at),elapsedStart=Date.now(),clock=()=>new Date(startedAt+Date.now()-elapsedStart).toISOString();
   const registry=loadForecastSourceRegistry(root),feed=readOptional(path.join(root,'data/live-odds.json'));
@@ -176,6 +177,24 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
       records.push(...parsed.records);facts.push(...parsed.facts);cache[key]=observedAt;
       sources.push({sourceId:'espn',eventId:event.eventId,state:parsed.records.length?'COLLECTED':'CONTEXT_ONLY',records:parsed.records.length,facts:parsed.facts.length,checkedAt:observedAt});
     }catch(error){sources.push({sourceId:'espn',eventId:event.eventId,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message});}
+  });
+  // One official schedule request serves every MLB side on that date. Keep
+  // original source clocks independent from the latest executable price clock.
+  const mlbDays=[...new Set(events.filter(e=>e.sport==='MLB').map(e=>date(e.startTime)))];
+  await pool(mlbDays,async day=>{
+    const url=mlbScheduleUrl(day),key=`mlb_official:${day}`;
+    const due=force||!cache[key]||time(at)-time(cache[key])>=15*60000;
+    if(!due){sources.push({sourceId:'mlb_official',scope:day,state:'CACHED',checkedAt:cache[key],url});return;}
+    try{
+      const schedule=await get(url),observedAt=clock();
+      for(const event of events.filter(e=>e.sport==='MLB'&&date(e.startTime)===day)){
+        const parsed=parseOfficialMlb(schedule,event,observedAt,url);
+        for(let i=facts.length-1;i>=0;i--)if(facts[i].sourceId==='mlb_official'&&sameEvent(facts[i],event))facts.splice(i,1);
+        facts.push(...parsed.facts);
+        sources.push({sourceId:'mlb_official',eventId:event.eventId,state:parsed.state,checkedAt:observedAt,url});
+      }
+      cache[key]=observedAt;
+    }catch(error){sources.push({sourceId:'mlb_official',scope:day,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
   });
   const nfl=events.filter(e=>e.sport==='NFL'&&matches.has(e.eventId));
   if(nfl.length) {

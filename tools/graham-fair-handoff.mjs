@@ -4,6 +4,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {teamAbbr} from './graham-market-utils.mjs';
+import {baselineComplete} from './graham-baseline-recovery.mjs';
 export const GRAHAM_HANDOFF_FROM='2026-09-21T06:00:00-07:00';
 export const grahamHandoffRequired=(report,selection)=>Date.parse(report?.ts)>=Date.parse(GRAHAM_HANDOFF_FROM) && selection?.sport==='NFL' && selection.marketClass==='spread' && selection.marketDetail==='full_game_primary_spread';
 const list=x=>Array.isArray(x)?x:[], finite=x=>typeof x==='number'&&Number.isFinite(x), text=x=>typeof x==='string'&&x.trim().length>0;
@@ -66,7 +67,7 @@ export function compareGrahamFair({report,selection,quote,feed,inputs}) {
   if(!Number.isFinite(Date.parse(game.grahamAsOf)) || Date.parse(game.grahamAsOf)>Date.parse(report.ts) || !list(game.sourceRefs).length)return unavailable('Fair source timing or lineage missing/future');
   if(!finite(game.grahamExactFairHome) || d?.arithmeticVerified!==true || !close(d.exactFairHome,game.grahamExactFairHome) || !close(d.displayedFairHome,game.grahamFairHome) || !close(d.neutralTeamBaseHome+d.homeFieldPointsToHomeSpread+d.otherGovernedPointsToHomeSpread+d.personnelPointsToHomeSpread+d.matchupPointsToHomeSpread,game.grahamExactFairHome))return unavailable('Fair decomposition missing or inconsistent');
   if(game.qbPerformanceStatus!=='OPERATIONAL_SCOPED_APPLIED' || game.qbPerformanceAuthorityToken!=='APPROVED_WALTERS_QB_PERFORMANCE')return unavailable('QB production is unresolved; preserved fair cannot be adopted');
-  if(!String(game.numberStatus).startsWith('READY') || !String(inputs.board.baselineStatus).startsWith('TUESDAY_BASELINE_COMPLETE'))return unavailable('Graham baseline/fair not ready');
+  if(!String(game.numberStatus).startsWith('READY') || !baselineComplete(inputs.board.baselineStatus))return unavailable('Graham baseline/fair not ready');
   result.homeFairPoints=game.grahamExactFairHome;
   result.selectedFairPoints=quote.side==='home'?game.grahamExactFairHome:-game.grahamExactFairHome;
   result.selectedLinePoints=quote.side==='home'?quote.line:-quote.line;
@@ -79,7 +80,8 @@ export function compareGrahamFair({report,selection,quote,feed,inputs}) {
   if(list(game.personnelUnresolvedCases).length)result.limitations.push('UNRESOLVED_PERSONNEL_CASES');
   if(list(game.personnelBlockedGroups).length)result.limitations.push('BLOCKED_PERSONNEL_GROUPS');
   if(list(game.qbPerformanceFailClosedTeams).length)result.limitations.push('QB_FAIL_CLOSED_TEAMS');
-  result.unresolvedInputs={weeklyRatingInput:game.weeklyRatingInput||null,personnelCases:list(game.personnelUnresolvedCases),personnelGroups:list(game.personnelBlockedGroups),qbTeams:list(game.qbPerformanceFailClosedTeams),numberStatus:game.numberStatus};
+  if(list(game.qbPriorEstimateTeams).length)result.limitations.push('QB_FROZEN_PRIOR_ESTIMATE_WITHOUT_PERFORMANCE_SAMPLE');
+  result.unresolvedInputs={weeklyRatingInput:game.weeklyRatingInput||null,personnelCases:list(game.personnelUnresolvedCases),personnelGroups:list(game.personnelBlockedGroups),qbTeams:list(game.qbPerformanceFailClosedTeams),qbPriorEstimates:list(game.qbPriorEstimates),numberStatus:game.numberStatus};
   result.state='EXACT_FAIR_REQUIRES_REVIEW';result.reason='Native fair in selected-side points; not EV, a range or a betting decision';
   return finish();
 }

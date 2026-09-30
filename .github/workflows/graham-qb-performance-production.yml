@@ -14,6 +14,8 @@ on:
       - tools/apply-walters-qb-performance-production.mjs
       - tools/validate-walters-qb-performance-production.mjs
       - tools/walters-qb-production-scope.mjs
+      - tools/walters-qb-prior-estimate.mjs
+      - tests/walters-qb-prior-estimate.test.mjs
       - tests/walters-qb-performance-production.test.mjs
   pull_request:
     paths:
@@ -34,6 +36,8 @@ on:
       - tools/apply-walters-qb-performance-production.mjs
       - tools/validate-walters-qb-performance-production.mjs
       - tools/walters-qb-production-scope.mjs
+      - tools/walters-qb-prior-estimate.mjs
+      - tests/walters-qb-prior-estimate.test.mjs
       - tests/walters-qb-performance-production.test.mjs
   # Bot-authored board commits do not fire downstream push workflows.
   # Every numeric football publisher must finish QB reconciliation before refresh.
@@ -45,6 +49,7 @@ on:
       - Walters Matchup M5 Catch-up
       - Walters Home Field H4 Activation
       - Apply Graham research input
+      - Graham baseline recovery
     branches: [main]
     types: [completed]
   workflow_dispatch:
@@ -79,6 +84,7 @@ jobs:
           node --check tools/apply-walters-qb-performance-production.mjs
           node --check tools/validate-walters-qb-performance-production.mjs
           node --check tools/walters-qb-production-scope.mjs
+          node tests/walters-qb-prior-estimate.test.mjs
           node --check tests/walters-qb-performance-production.test.mjs
 
       - name: Validate proposed governed state

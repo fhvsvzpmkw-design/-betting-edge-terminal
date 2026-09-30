@@ -1,5 +1,5 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
-export const EVENT_RESEARCH_VERSION = '2026-09-30.1';
+export const EVENT_RESEARCH_VERSION = '2026-09-30.2';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
@@ -29,11 +29,15 @@ function personnelBlocksOf(record) {
     record?.candidateDraft?.decision?.personnelEvidence, record?.candidateDraft?.evidence?.personnelEvidence
   ].filter(Boolean);
 }
-function currentOfficialPersonnelSource(source, report) {
+function currentOfficialPersonnelSource(source, report, sport) {
   if (!source || !text(source.url) || !text(source.fact || source.finding)) return false;
-  const observed = time(source.asOf || source.checkedAt), issued = time(report.ts), bound = time(report.feedGeneratedAt);
+  const observed = time(source.asOf || source.checkedAt), issued = time(report.ts);
   if (!Number.isFinite(observed) || !Number.isFinite(issued) || observed > issued) return false;
-  if (Number.isFinite(bound) && observed < bound) return false;
+  // Odds observation and personnel observation are separate clocks. A new
+  // price snapshot does not make recent, same-event official facts disappear.
+  // This is a reuse lead; final dependency/materiality gates still own clearance.
+  const window={MLB:120,NHL:240,NBA_WNBA:180,NFL:180,NCAAF:180,CFL:180,SOCCER:90}[sport]||90;
+  if (issued-observed > window*60000) return false;
   try { const url = new URL(source.url); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password; }
   catch { return false; }
 }
@@ -84,11 +88,6 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     const event = groups.get(eventKey), matches = receipts.filter(receipt => receipt.selectionId === row.selectionId);
     const receipt = matches.length === 1 ? matches[0] : null;
     if (matches.length > 1) warnings.push(`Duplicate receipts for ${row.selectionId}; no research reuse or completion inferred.`);
-    for (const block of personnelBlocksOf(receipt)) for (const source of list(block?.officialSources)) {
-      if (!currentOfficialPersonnelSource(source, report)) continue;
-      const view = personnelSourceView(source);
-      event.personnelMap.set(JSON.stringify([view.url, view.asOf, view.fact]), view);
-    }
     const route = !identity || matches.length > 1 ? 'IDENTITY_REVIEW' : routeFor(row, receipt);
     if (!event.label && row.eventLabel) event.label = row.eventLabel;
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,
@@ -98,6 +97,11 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       quarterbackFollowUp:row.quarterbackFollowUp || null, nextAction:actionFor(route), producerRoutingRationale:receipt?.researchRouting?.rationale || null});
     if (!identity || matches.length > 1) continue;
     const collect = (record, priorReportPath = null) => {
+      for (const block of personnelBlocksOf(record)) for (const source of list(block?.officialSources)) {
+        if (!currentOfficialPersonnelSource(source, report,event.sport)) continue;
+        const view={...personnelSourceView(source),priorReportPath,requiresCurrentApplicabilityReview:true};
+        event.personnelMap.set(JSON.stringify([view.url,view.asOf,view.fact]),view);
+      }
       for (const source of sourcesOf(record)) {
         if (!usableSource(source, event, report)) continue;
         const existing = event.sourceMap.get(source.id);
@@ -119,14 +123,20 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
   const events = [...groups.values()].map(event => {
     for (const id of event.conflicts) { event.sourceMap.delete(id); warnings.push(`Conflicting source ID ${id} in ${event.eventKey}; source not shared.`); }
     const pending = event.selections.filter(row => row.route !== 'COMPLETED');
+    for(const fact of list(sidecar.gameIntelligenceInputs?.facts)){
+      if(fact.kind!=='OFFICIAL_PERSONNEL'||fact.sourceKind!=='OFFICIAL'||fact.sport!==event.sport||String(fact.eventId)!==String(event.eventId)||time(fact.startTime)!==time(event.eventDate))continue;
+      const source={url:fact.url,origin:'Official league personnel observation',asOf:fact.observedAt,fact:JSON.stringify(fact.details)};
+      if(!currentOfficialPersonnelSource(source,report,event.sport))continue;
+      event.personnelMap.set(JSON.stringify([source.url,source.asOf,source.fact]),{...source,requiresCurrentApplicabilityReview:true,fromPinnedDossier:true});
+    }
     const currentOfficialPersonnelSources = [...event.personnelMap.values()];
     const personnelFollowUp = pending.length === 0
       ? {required:false,state:'NOT_REQUIRED',sources:currentOfficialPersonnelSources,instruction:'No pending exact selection requires a new personnel review.'}
       : currentOfficialPersonnelSources.length
         ? {required:false,state:'CURRENT_OFFICIAL_CHECK_RECORDED',sources:currentOfficialPersonnelSources,
-            instruction:'A current official personnel check is recorded inside the bound report window; assess its materiality and any remaining dependency-specific shortfall before deciding pending selections.'}
+            instruction:'Recent official personnel facts are recorded for this exact event. Preserve their observation times, review current applicability and any changed dependencies, and perform only the remaining material checks. A new odds pull alone does not require repeating unchanged event research.'}
         : {required:true,state:'CURRENT_OFFICIAL_CHECK_REQUIRED',sources:[],
-            instruction:'Perform and record a current authoritative league/team personnel check inside the bound report window before finalizing pending selections. Game-intelligence or reporting leads alone are not personnel clearance.'};
+            instruction:'Perform and record a current authoritative league/team personnel check, or document a real dependency-specific source shortfall and assess its decision sensitivity under the personnel gate. Reporting leads alone are not personnel clearance; a source does not have to postdate the odds pull.'};
     // Surface the existing coverage module's fallbacks in the event work plan.
     // One source retrieval can answer several sides; listing it is not execution.
     const forecastRows = list(forecastCoverage.selections).filter(row => String(row.eventId) === String(event.eventId) &&

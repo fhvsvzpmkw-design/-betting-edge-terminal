@@ -64,7 +64,7 @@ const games=(numbers.games||[]).map(game=>{
     awayRating:awayCurrent,homeRating:homeCurrent,neutralBaseHome,
     espnNeutralHome,
     grahamFairHome,grahamAsOf:game.grahamAsOf||null,numberStatus:game.numberStatus||'PENDING',grahamMove,
-    personnelEstimateCases:game.personnelEstimateCases||[],personnelUnresolvedCases:game.personnelUnresolvedCases||[],qbPerformanceFailClosedTeams:game.qbPerformanceFailClosedTeams||[],
+    personnelEstimateCases:game.personnelEstimateCases||[],personnelUnresolvedCases:game.personnelUnresolvedCases||[],personnelBlockedGroups:game.personnelBlockedGroups||[],qbPerformanceFailClosedTeams:game.qbPerformanceFailClosedTeams||[],qbPriorEstimateTeams:game.qbPriorEstimateTeams||[],qbPriorEstimates:game.qbPriorEstimates||[],weeklyRatingInput:game.weeklyRatingInput||null,
     informationStatus:game.informationStatus||'PENDING',researchSummary:game.researchSummary||null,adjustments:Array.isArray(game.adjustments)?game.adjustments:[],
     proposedWager:game.proposedWager&&typeof game.proposedWager==='object'?game.proposedWager:null,
     spreadVsMoneyline:game.spreadVsMoneyline&&typeof game.spreadVsMoneyline==='object'?game.spreadVsMoneyline:null,
@@ -87,6 +87,7 @@ const games=(numbers.games||[]).map(game=>{
 const out={
   schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE PRIVATE LINE',season:numbers.season,week:numbers.week,
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
+  baselineStatus:numbers.baselineStatus,baselineRecovery:numbers.baselineRecovery||null,
   activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
   lastResearchAt:researchReview?.completedAt||null,researchReview,marketStatus,marketObservedAt:marketStatus==='ok'?observer?.generatedAt||null:null,
   scheduleAuthority:numbers.scheduleAuthority,

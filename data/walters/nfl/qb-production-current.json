@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-30T11:41:22-07:00",
+  "lastAppliedAt": "2026-09-30T19:34:02.940405+00:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -1248,9 +1248,17 @@
     {
       "team": "TB",
       "teamName": "Tampa Bay",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "CONFIRMED_STARTER_FROZEN_MODEL_INELIGIBLE",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "16312",
+        "gsisId": "00-0041251",
+        "playerName": "Jalon Daniels",
+        "candidateValue": 6,
+        "candidateStatus": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "confidence": "LOW",
+        "evidenceDropbacks": 0
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "13117",
@@ -1259,24 +1267,39 @@
         "priorValue": 8.5,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 6,
       "embeddedBaselineQbValue": 8.5,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
-      "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
+      "teamQbDelta": -2.5,
+      "gameContributionEligible": true,
+      "sampleTreatment": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
       "evidence": {
-        "researchFinding": "Tampa Bay confirmed Jalon Daniels will start Week 4 while Baker Mayfield is out. Daniels is present in the frozen Stage 3C registry, but his candidate is operational:false with status BLOCKED_INSUFFICIENT_QB_SAMPLE; production numeric approval is therefore unavailable. Fail closed and preserve the prior governed fair.",
+        "researchFinding": "Official club reporting confirms Baker Mayfield will miss at least three weeks and Jalon Daniels will start Week 4. Use the labelled frozen 6.0 prior because the registry has no qualifying NFL performance sample. No performance calibration is claimed.",
         "sourceRefs": [
           "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
-          "https://www.buccaneers.com/news/zyon-mccollum-clamping-down-by-the-numbers-week-four",
-          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
-          "data/walters/nfl/qb-production/production-contract-v1.json"
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-30T11:41:22-07:00",
+      "lastUpdatedAt": "2026-09-30T19:34:02.940405+00:00",
       "marketViewed": false,
-      "failClosedCode": "CONFIRMED_JALON_DANIELS_BLOCKED_INSUFFICIENT_QB_SAMPLE"
+      "failClosedCode": null,
+      "priorEstimate": {
+        "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "value": 6,
+        "confidence": "LOW",
+        "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+        "evidenceDropbacks": 0,
+        "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+        "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+        "starterEvidence": {
+          "kind": "OFFICIAL",
+          "team": "TB",
+          "playerId": "16312",
+          "url": "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
+          "observedAt": "2026-09-30T19:34:02.940405+00:00",
+          "finding": "The club states that Jalon Daniels will start against Green Bay in Week 4 while Baker Mayfield is sidelined with a thumb injury."
+        }
+      }
     },
     {
       "team": "TEN",
@@ -1398,7 +1421,8 @@
     "graham-manual-qb-2026-w03-20260922T201057-0700",
     "graham-delta-1645-qb-2026-w03-20260923T171130-0700",
     "graham-delta-1645-qb-2026-w03-20260925T165400-0700",
-    "graham-daily-review-qb-2026-w04-20260930T114122-0700"
+    "graham-daily-review-qb-2026-w04-20260930T114122-0700",
+    "vigscope-debug-qb-20260930-jalon-prior-v1"
   ],
   "bindingUpdates": [
     {
@@ -1532,6 +1556,15 @@
         "CHI"
       ],
       "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false
+    },
+    {
+      "batchId": "vigscope-debug-qb-20260930-jalon-prior-v1",
+      "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
+      "teams": [
+        "TB"
+      ],
+      "sourceTask": "USER_AUTHORIZED_VIGSCOPE_DEBUG",
       "marketViewed": false
     }
   ],

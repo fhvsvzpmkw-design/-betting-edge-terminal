@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {parseOfficialMlb,mlbScheduleUrl} from '../tools/official-personnel.mjs';
+const event={eventId:'A',sport:'MLB',away:'Philadelphia Phillies',home:'Atlanta Braves',startTime:'2026-09-30T18:00:00Z'};
+const game={gamePk:1,gameDate:event.startTime,status:{abstractGameState:'Preview'},teams:{away:{team:{name:event.away},probablePitcher:{id:2,fullName:'Pitcher A'}},home:{team:{name:event.home}}}};
+const schedule={dates:[{games:[game]}]},at='2026-09-30T16:00:00Z',url=mlbScheduleUrl('2026-09-30');
+const before=JSON.stringify(schedule),r=parseOfficialMlb(schedule,event,at,url);
+assert.equal(r.state,'COLLECTED');assert.equal(r.facts[0].details.probablePitchers.away.status,'OFFICIAL_PROBABLE');
+assert.equal(r.facts[0].details.probablePitchers.home,null);assert.ok(r.facts[0].details.unresolved.includes('HOME_PROBABLE_PITCHER_NOT_PUBLISHED'));
+assert.equal(JSON.stringify(schedule),before);assert.equal(r.facts[0].observedAt,at);
+assert.equal(parseOfficialMlb(schedule,{...event,home:event.away,away:event.home},at,url).state,'NO_EXACT_EVENT');
+assert.equal(parseOfficialMlb({dates:[{games:[game,game]}]},event,at,url).state,'AMBIGUOUS_EVENT');
+assert.equal(parseOfficialMlb(schedule,event,event.startTime,url).facts.length,0);
+assert.equal(parseOfficialMlb(schedule,event,'invalid',url).facts.length,0);
+game.lineups={awayPlayers:Array.from({length:9},()=>({id:3,fullName:'Duplicated player'}))};
+assert.ok(parseOfficialMlb(schedule,event,at,url).facts[0].details.unresolved.includes('AWAY_FINAL_LINEUP_NOT_PUBLISHED'));
+game.status.abstractGameState='Live';assert.equal(parseOfficialMlb(schedule,event,at,url).facts.length,0);
+console.log('Official personnel: exact event matching, ambiguous matches, missing lineups and pregame clocks PASS');

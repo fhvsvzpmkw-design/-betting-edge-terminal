@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {deriveGrahamFairDecomposition,synchronizeGrahamFairBoard,roundHalf} from './graham-fair-decomposition.mjs';
+import {baselineComplete} from './graham-baseline-recovery.mjs';
 const fail=s=>{throw Error('RATING_BASE_REFRESH:'+s);};
 const round=n=>Number(n.toFixed(3));
 function decimalSum(...values){
@@ -19,7 +20,7 @@ function decimalSum(...values){
   return Number((negative?'-':'')+(scale?text.slice(0,-scale)+'.'+text.slice(-scale):text));
 }
 export function refreshRatingBases({board,power,staging,active,policy,effectiveAt,powerBlobSha}){
-  if(board.season!==active.season||board.week!==active.week||!String(board.baselineStatus).startsWith('TUESDAY_BASELINE_COMPLETE'))fail('COMPLETED_ACTIVE_BASELINE_REQUIRED');
+  if(board.season!==active.season||board.week!==active.week||!baselineComplete(board.baselineStatus))fail('COMPLETED_ACTIVE_BASELINE_REQUIRED');
   const receipt=power.weekly90_10;
   if(staging.state!=='APPLIED'||staging.auditType!=='WALTERS_WEEKLY_90_10'||staging.marketViewed!==false||receipt?.marketViewed!==false||receipt.sourceWeek!==active.week-1||receipt.targetWeek!==active.week||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))fail('APPLIED_WEEKLY_RECEIPT_REQUIRED');
   if(!Number.isFinite(Date.parse(effectiveAt))||Date.parse(effectiveAt)<Date.parse(staging.appliedAt)||!/^[0-9a-f]{40}$/.test(powerBlobSha))fail('SOURCE_OR_TIME_INVALID');
@@ -63,6 +64,7 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
       if(g.numberStatus==='READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT')g.numberStatus=(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length||String(g.qbPerformanceStatus).startsWith('FAIL_CLOSED'))?'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS':'READY';
     }
     if(result.baselineStatus==='TUESDAY_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='TUESDAY_BASELINE_COMPLETE';
+    if(result.baselineStatus==='CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='CURRENT_BASELINE_COMPLETE';
     if(result.state==='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED')result.state=result.games.some(g=>g.numberStatus==='READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS')?'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS':'INFORMATION_REVIEW_CURRENT_FAIR';
   }
   if(games.length){

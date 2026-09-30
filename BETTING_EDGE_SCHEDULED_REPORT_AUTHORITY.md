@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-09-28.1
+**Operating revision:** 2026-09-30.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -64,6 +64,10 @@ The existing exact alternate-total exception remains: an unambiguous matching fu
 Pinnacle is non-executable. It cannot alone originate BET, set stake, replace execution books or overwrite Graham/Core fair. Unavailable Pinnacle is `PINNACLE_BENCHMARK_UNAVAILABLE`, a selection limitation rather than a report-wide veto.
 
 ## 5. One research queue, incremental completed decisions
+
+Official personnel observations retain their original clocks and can be reused across lanes for the exact event and kickoff while recent and still applicable. A newer odds snapshot alone does not invalidate them. The event planner surfaces current and prior-lane personnel sources and pinned official MLB observations; review changed dependencies and decision sensitivity once per event. Published probable pitchers are not confirmed starters, and missing final lineups stay unresolved. Preserve dependency-specific source shortfalls under the personnel gate rather than making every missing official observation a universal market-PASS veto. BET retains its existing final personnel checks.
+
+Use `report-run diagnose` to inspect all fourteen read-only candidate gates together. Preparation includes the same diagnostics. Correct actual recoverable problems and inspect all deferrals before freezing; do not repeatedly prepare unchanged evidence or relabel unfinished research as PASS. Freeze and publication keep the existing blocking validation sequence.
 
 1. Screen the entire valid inventory at exact prices. Run `node tools/report-evidence-repair.mjs candidates --report <draft-report.json> --sidecar <draft-sidecar.json> --root <repo-root> --work-plan`. Use `--work-plan --event-id <eventId>` to open one pending event’s exact quotes and source leads. The full audit remains available without `--work-plan`.
 2. Work events in start-time order, raising decision-changing opportunities and previously researched candidates within that order. Revalidate the event's recorded source leads and named starter/lineup/injury/conditions facts once. Preserve original source times. A later incomplete receipt must not erase earlier useful research. Earlier findings are review leads, never inherited clearance or grades.

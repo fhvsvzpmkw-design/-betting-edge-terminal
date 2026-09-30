@@ -27,7 +27,7 @@ export const CANDIDATE_GATES = Object.freeze([
 ]);
 export function runPipeline({root=process.cwd(), report, sidecar, mode='validate', execute=spawnSync}={}) {
   root=path.resolve(root);
-  if (!['normalize','validate','readback','history'].includes(mode)) throw new Error('Unknown pipeline mode');
+  if (!['normalize','validate','diagnose','readback','history'].includes(mode)) throw new Error('Unknown pipeline mode');
   const history=[['report-publication.mjs','verify'],['core-v14-publication-gate.mjs','verify-history'],['pinnacle-benchmark-publication-gate.mjs','validate-runtime']];
   const gates=mode==='history'?history:mode==='normalize'?NORMALIZERS:mode==='readback'?[...CANDIDATE_GATES,['vigscope-meter-telemetry-gate.mjs','validate']]:CANDIDATE_GATES;
   if (mode!=='history' && (!report || !sidecar)) throw new Error('Pipeline requires report and sidecar files');
@@ -46,12 +46,14 @@ export function runPipeline({root=process.cwd(), report, sidecar, mode='validate
     const receipt={gate:tool,command,state:result.status===0?'PASS':'FAIL',durationMs:Date.now()-started};
     receipts.push(receipt);
     if (result.status!==0) {
+      receipt.detail=String(result.stderr||result.stdout||result.error||'failed').slice(-6000);
+      if(mode==='diagnose')continue;
       const error=new Error(`${tool}: ${String(result.stderr||result.stdout||result.error||'failed').slice(-6000)}`);
       error.receipts=receipts; throw error;
     }
   }
   if (mode!=='normalize') for (let i=0;i<files.length;i++) if (!before[i].equals(fs.readFileSync(files[i]))) throw new Error('Read-only validation mutated candidate bytes');
-  return {schema:1,mode,state:'PASS',receipts};
+  return {schema:1,mode,state:receipts.some(r=>r.state==='FAIL')?'FAIL':'PASS',receipts};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
   try{
@@ -60,6 +62,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
       if(!['--root','--report','--sidecar'].includes(args[i])||!args[i+1])throw new Error('Invalid pipeline arguments');
       options[args[i].slice(2)]=args[i+1];
     }
-    console.log(JSON.stringify(runPipeline(options),null,2));
+    const result=runPipeline(options);
+    console.log(JSON.stringify(result,null,2));
+    if(result.state==='FAIL')process.exitCode=1;
   }catch(error){console.error(JSON.stringify({state:'FAIL',error:error.message,receipts:error.receipts||[]}));process.exitCode=1;}
 }

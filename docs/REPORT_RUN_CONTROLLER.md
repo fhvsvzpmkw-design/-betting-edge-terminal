@@ -36,6 +36,8 @@ This advances only the report clock and derived paths; it never changes source/q
 
 ## Prepare, freeze and stage
 
+`node tools/report-run.mjs diagnose --checkpoint <checkpoint>` runs all fourteen candidate gates on temporary copies and returns every failure without changing the checkpoint. `prepare` records the same diagnostics after evidence assembly and normalization. Inspect all actual failures in one pass before freezing. These diagnostics grant no publication clearance; the normal freeze, staged publisher and readback checks remain mandatory.
+
 ```
 node tools/report-run.mjs prepare --checkpoint <checkpoint> --expected-revision <revision>
 # Inspect reported deferrals; complete recoverable work or retain honest blockers.

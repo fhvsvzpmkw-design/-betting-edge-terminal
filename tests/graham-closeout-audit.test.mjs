@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {auditCloseout} from '../tools/graham-closeout-audit.mjs';
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const args={facts:read('data/walters/nfl/2026/weeks-01-03-final-facts-20260930.json'),boards:[1,2,3].map(w=>read(`data/walters/nfl/2026/week-0${w}-current-numbers.json`)),power:read('data/walters/nfl-power-ratings-ledger.json')};
+const before=JSON.stringify(args),result=auditCloseout(args);
+assert.equal(JSON.stringify(args),before);
+assert.equal(result.summary.finalsVerified,48);assert.equal(result.summary.governedGameUpdatesAudited,22);assert.equal(result.summary.missingPairedInputs,26);assert.equal(result.summary.legacyBindingGameUpdates,6);assert.equal(result.summary.auditErrors,0);
+const bad=structuredClone(args);bad.facts.weeks[1].games[0].awayScore+=1;
+assert.ok(auditCloseout(bad).summary.auditErrors>0,'score disagreements invalidate historical arithmetic');
+bad.facts.weeks[1].games[0].startTimePacific='2026-09-01T00:00:00Z';assert.throws(()=>auditCloseout(bad),/FINAL_IDENTITY/);
+const missing=structuredClone(args);missing.facts.weeks[0].games.pop();assert.throws(()=>auditCloseout(missing),/EXACT_WEEK_COVERAGE/);
+const partial=structuredClone(args);const team=partial.power.teams.find(t=>t.history.some(h=>h.type==='WALTERS_WEEKLY_90_10'&&h.sourceWeek===2));team.history=team.history.filter(h=>!(h.type==='WALTERS_WEEKLY_90_10'&&h.sourceWeek===2));assert.ok(auditCloseout(partial).issues.some(i=>i.code==='UNPAIRED_OR_DUPLICATE_HISTORY'));
+console.log('48-game closeout: exact finals, paired arithmetic, missing inputs, legacy limitations and immutable inputs verified.');

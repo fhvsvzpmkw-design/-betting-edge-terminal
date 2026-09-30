@@ -80,6 +80,11 @@ if(sweep.completionResult!==staging.expectedCompletionResult)throw new Error(`GR
 if(!policy.researchSweepRule.allowedCompletionResults.includes(sweep.completionResult))throw new Error('GRAHAM_RESEARCH_COMPLETION_SWEEP_RESULT_INVALID');
 if(policy.researchSweepRule.marketViewedMustBeFalse&&sweep.summary.marketViewed!==false)throw new Error('GRAHAM_RESEARCH_COMPLETION_MARKET_ISOLATION_NOT_PROVEN');
 
+const verificationTime=new Date();
+if(Date.parse(sweep.startedAt)>Date.parse(sweep.completedAt)
+  || Date.parse(staging.submittedAt)<Date.parse(sweep.completedAt)
+  || Date.parse(staging.submittedAt)>verificationTime.getTime())throw new Error('GRAHAM_RESEARCH_COMPLETION_TIME_ORDER_INVALID');
+
 if(sweep.completionResult==='NO_MATERIAL_CHANGE'){
   if(sweep.ratingChanges.length!==0||sweep.matchupChanges.length!==0)throw new Error('GRAHAM_RESEARCH_COMPLETION_NO_CHANGE_HAS_NUMERIC_CHANGES');
 }
@@ -89,7 +94,7 @@ const receipt={
   schema:1,
   state:'VERIFIED',
   policyId:policy.policyId,
-  verifiedAt:new Date().toISOString(),
+  verifiedAt:verificationTime.toISOString(),
   runEventId:staging.runEventId,
   taskKey:staging.taskKey,
   season:Number(active.season),

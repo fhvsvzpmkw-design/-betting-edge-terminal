@@ -64,6 +64,7 @@ function internalModels(root,events,asOf,sidecar) {
       sourcePath,sourceDigest:digest(g),numberStatus:g.numberStatus,summary:g.researchSummary,
       decomposition:g.fairDecomposition||null,adjustments:list(g.adjustments).map(a=>({type:a.type,pointsToHomeSpread:a.pointsToHomeSpread,reason:a.reason})),
       unresolved:{personnel:list(g.personnelUnresolvedCases),groups:list(g.personnelBlockedGroups),qb:list(g.qbPerformanceFailClosedTeams)},
+      weeklyRatingInput:g.weeklyRatingInput||null,qbPriorEstimates:list(g.qbPriorEstimates),
       sourceRefs:list(g.sourceRefs),limitation:'One related internal model family. Native spread points; current personnel review is still required.'}];
   });
 }

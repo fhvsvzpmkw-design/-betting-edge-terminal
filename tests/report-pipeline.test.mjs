@@ -20,6 +20,14 @@ try{
   calls=[];
   assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,execute:(_,args)=>{calls.push(args);return {status:1,stderr:'synthetic gate failure'};}}),/synthetic gate failure/);
   assert.equal(calls.length,1,'fail before subsequent gates or publishing');
+  calls=[];
+  const diagnosis=runPipeline({root:temp,report:r,sidecar:s,mode:'diagnose',execute:(_,args)=>{
+    calls.push(args);return {status:1,stderr:'independent missing input'};
+  }});
+  assert.equal(diagnosis.state,'FAIL');assert.equal(diagnosis.receipts.length,14);
+  assert.equal(calls.length,14,'diagnose reveals all failures without issuing a report');
+  assert.ok(diagnosis.receipts.every(x=>x.detail==='independent missing input'));
+  assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,mode:'diagnose',execute:()=>{fs.appendFileSync(r,' ');return {status:1};}}),/mutated candidate/);write(r,report);
   for(const mode of ['validate','readback']){
     calls=[];
     assert.throws(()=>runPipeline({root:temp,report:r,sidecar:s,mode,execute:(_,args)=>{

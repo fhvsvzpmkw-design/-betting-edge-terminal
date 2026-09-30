@@ -6,6 +6,7 @@ import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
 import {synchronizePersonnelInputStatus} from './graham-current-personnel-estimates.mjs';
 import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
+import {confirmedStarterPrior,validatePriorEstimateBinding,PRIOR_ESTIMATE_METHOD} from './walters-qb-prior-estimate.mjs';
 
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/walters/nfl/qb-production/production-contract-v1.json';
@@ -254,6 +255,7 @@ function validateProduction(production, contract) {
   const resolved = bindings.filter(binding => binding.bindingStatus === AUTHORITY_TOKEN);
   validateProductionQbScope(production, productionQbScope(contract, ROOT));
   for (const binding of resolved) {
+    validatePriorEstimateBinding(binding,{registry:readJson(absolute(contract.sourceAuthority.candidateRegistry.path)),policy:contract.priorFallbackPolicy});
     if (
       !finite(binding.approvedProductionStarterValue) ||
       !finite(binding.embeddedBaselineQbValue) ||
@@ -314,6 +316,7 @@ function applyStaging(production, staging, contract) {
     !staging.batchId ||
     !staging.effectiveAt ||
     Number.isNaN(Date.parse(staging.effectiveAt)) ||
+    Date.parse(staging.effectiveAt) > Date.now() ||
     !Array.isArray(staging.cases) ||
     staging.cases.length === 0
   ) fail('STAGING_INVALID');
@@ -347,15 +350,18 @@ function applyStaging(production, staging, contract) {
         lastUpdatedAt: staging.effectiveAt,
         marketViewed: false,
       });
-    } else if (item.bindingStatus === 'RESOLVED_CURRENT_STARTER') {
+    } else if (['RESOLVED_CURRENT_STARTER','RESOLVED_CURRENT_STARTER_PRIOR_ESTIMATE'].includes(item.bindingStatus)) {
       const candidate = candidateLookup(registry, item);
-      if (candidate.status !== 'STAGE3_CANDIDATE_NON_OPERATIONAL' || !finite(candidate.candidateValue)) {
+      const priorEstimate = item.bindingStatus === 'RESOLVED_CURRENT_STARTER_PRIOR_ESTIMATE'
+        ? confirmedStarterPrior({candidate,item,policy:contract.priorFallbackPolicy,effectiveAt:staging.effectiveAt}) : null;
+      if (!priorEstimate && (candidate.status !== 'STAGE3_CANDIDATE_NON_OPERATIONAL' || !finite(candidate.candidateValue))) {
         fail(`STAGING_CANDIDATE_NOT_APPROVED_BY_FROZEN_MODEL:${candidate.playerName}`);
       }
       const compositeResolved = prior.embeddedBaselineStatus === 'RESOLVED_VALUE_INVARIANT_COMPOSITE' &&
         prior.baselineScopeAmendmentId === productionQbScope(contract, ROOT).amendment?.id;
       if (!finite(prior.embeddedBaselineQbValue) || (!prior.embeddedBaselinePlayer && !compositeResolved)) fail(`STAGING_BASELINE_UNRESOLVED:${item.team}`);
-      const delta = round(Number(candidate.candidateValue) - Number(prior.embeddedBaselineQbValue));
+      const starterValue = priorEstimate ? priorEstimate.value : Number(candidate.candidateValue);
+      const delta = round(starterValue - Number(prior.embeddedBaselineQbValue));
       Object.assign(prior, {
         bindingStatus: AUTHORITY_TOKEN,
         currentStarterStatus: item.currentStarterStatus || 'CONFIRMED_NAMED_STARTER',
@@ -363,16 +369,17 @@ function applyStaging(production, staging, contract) {
           playerId: candidate.playerId,
           gsisId: candidate.gsisId,
           playerName: candidate.playerName,
-          candidateValue: candidate.candidateValue,
-          candidateStatus: AUTHORITY_TOKEN,
+          candidateValue: starterValue,
+          candidateStatus: priorEstimate ? PRIOR_ESTIMATE_METHOD : AUTHORITY_TOKEN,
           confidence: candidate.confidence,
           evidenceDropbacks: candidate.evidence?.candidateEvidenceDropbacks,
         },
-        approvedProductionStarterValue: Number(candidate.candidateValue),
+        approvedProductionStarterValue: starterValue,
         teamQbDelta: delta,
         gameContributionEligible: true,
         failClosedCode: null,
-        sampleTreatment: 'FROZEN_STAGE3_PERFORMANCE_CANDIDATE',
+        sampleTreatment: priorEstimate ? PRIOR_ESTIMATE_METHOD : 'FROZEN_STAGE3_PERFORMANCE_CANDIDATE',
+        priorEstimate,
         evidence: {researchFinding: item.reason, sourceRefs: unique(item.sourceRefs)},
         lastUpdatedAt: staging.effectiveAt,
         marketViewed: false,
@@ -515,7 +522,8 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
       awayTeamQbDelta: Number(awayBinding.teamQbDelta),
       homeTeamQbDelta: Number(homeBinding.teamQbDelta),
       pointsToHomeSpread,
-      reason: `Approved Walters QB performance differential: ${game.away} ${Number(awayBinding.teamQbDelta).toFixed(2)} minus ${game.home} ${Number(homeBinding.teamQbDelta).toFixed(2)} equals ${pointsToHomeSpread >= 0 ? '+' : ''}${pointsToHomeSpread.toFixed(2)} points to the home-spread coordinate.${retiredPhrase}`,
+      reason: `Governed Walters QB differential: ${game.away} ${Number(awayBinding.teamQbDelta).toFixed(2)} minus ${game.home} ${Number(homeBinding.teamQbDelta).toFixed(2)} equals ${pointsToHomeSpread >= 0 ? '+' : ''}${pointsToHomeSpread.toFixed(2)} points to the home-spread coordinate.${[awayBinding,homeBinding].filter(binding=>binding.priorEstimate).map(binding=>` ${binding.team} uses a labelled frozen-prior estimate without a qualifying NFL performance sample.`).join('')}${retiredPhrase}`,
+      valuationMethods: {away:awayBinding.sampleTreatment,home:homeBinding.sampleTreatment},
       sourceRefs,
       effectiveAt,
       marketViewed: false,
@@ -538,6 +546,8 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     game.qbPerformanceRetiredStarterIdentityOverlayPoints = persistentRetiredPoints;
     game.qbPerformanceLastAppliedAt = effectiveAt;
     game.qbPerformanceFailClosedTeams = [];
+    game.qbPriorEstimateTeams = [awayBinding,homeBinding].filter(binding=>binding.sampleTreatment===PRIOR_ESTIMATE_METHOD).map(binding=>binding.team);
+    game.qbPriorEstimates = [awayBinding,homeBinding].filter(binding=>binding.sampleTreatment===PRIOR_ESTIMATE_METHOD).map(binding=>({team:binding.team,...binding.priorEstimate}));
     game.sourceRefs = unique([...(game.sourceRefs || []), ...sourceRefs]);
 
     gameResults.push({
