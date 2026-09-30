@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {categoryKey,TOURNAMENTS,planTournamentBatches,hockeyDefinitions,summarizePinnacle} from '../tools/oddspapi-observer.mjs';
 import {annotatePinnacle,AUTHORITY} from '../tools/pinnacle-sharp-benchmark.mjs';
 import {exactMarketReference} from '../tools/market-price-assessment.mjs';
+import {buildPinnacleInputCoverage} from '../tools/report-inputs.mjs';
 
 // Synthetic market fixtures exercise acquisition scope and settlement identity.
 assert.equal(categoryKey({sport:{slug:'ice-hockey'},league:{slug:'usa-nhl',name:'USA - NHL'}}),'NHL');
@@ -42,3 +43,25 @@ for(const [marketKey,side,line] of [['ml','home',null],['spread','away',-1.5],['
   assert.throws(()=>exactMarketReference(report,quote,bad),/exact full-game paired reference/);
 }
 console.log('Pinnacle NHL coverage: category, tournament, batching and exact overtime settlement PASS');
+
+const inventory={selections:[
+  {sport:'NHL',eventId:'nhl-test',eventDate:startTime,selectionId:'NHL|nhl-test|total|over',quotes:[
+    {eventId:'nhl-test',marketKey:'totals',side:'over',line:7.5,selectionKey:'wrong-line'},
+    {eventId:'nhl-test',marketKey:'totals',side:'over',line:6.5,selectionKey:'exact-line'}]},
+  {sport:'NHL',eventId:'missing',eventDate:startTime,selectionId:'NHL|missing|ml|home',quotes:[
+    {eventId:'missing',marketKey:'ml',side:'home',line:null,selectionKey:'missing-event'}]}
+]};
+const immutable=JSON.stringify({report,inventory,observer});
+const coverage=buildPinnacleInputCoverage(report,inventory,observer,{eventId:'nhl-test'});
+assert.equal(coverage.withExactReference,1,'count selections once, even with multiple bookmaker quotes');
+assert.equal(coverage.withoutExactReference,1,'do not hide missing event matches');
+assert.deepEqual(coverage.sports.NHL,{availableSelections:2,withExactReference:1,withoutExactReference:1});
+assert.deepEqual(coverage.selections[0].attempts.map(attempt=>attempt.available),[false,true]);
+assert.equal(coverage.decisionAuthority,false);
+assert.equal(JSON.stringify({report,inventory,observer}),immutable);
+const stale=buildPinnacleInputCoverage({...report,ts:'2026-09-30T17:30:00-07:00'},inventory,observer,{eventId:'nhl-test'});
+assert.equal(stale.withExactReference,0,'old acquisition does not clear a future report');
+assert.match(stale.selections[0].attempts[0].reason,/stale/);
+const unknown=structuredClone(observer);
+unknown.fixtures[0].pinnacle.markets.forEach(m=>delete m.definition);
+assert.equal(buildPinnacleInputCoverage(report,inventory,unknown).withExactReference,0);

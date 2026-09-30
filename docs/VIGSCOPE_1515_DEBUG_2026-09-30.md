@@ -41,6 +41,16 @@ Remaining analytical work: actual current forecast/personnel/settlement applicab
 
 ## Reproduction and verification
 
+### Additional prevention before 18:15
+
+The September 30 follow-up adds three producer diagnostics. `report-inputs` now checks the pinned live observer with the canonical exact-selection matcher and exposes per-sport `pinnacleCoverage`, collection errors, skipped categories and event-level failed matches before research. A read-only development replay at 16:00 Pacific finds 36/36 available selections with exact references, including 18/18 NHL. This replay is not a new report and does not clear the future 18:15 snapshot.
+
+The work plan retains decision `completionState` and now separately reports `reviewCompletionState` plus `capturedForecastReviewsPending`. Completed decisions cannot imply that found forecast points were reviewed. The card advisor also detects the specific known ESPN reporting attribution mismatch; it reproduces the shared Atlanta finding on all six affected cards without modifying issued source text. Proper ESPN REPORTING sources and league findings do not trigger this warning. The heuristic cannot certify every source's truth or detect all attribution problems.
+
+Regression checks cover mixed exact/wrong-line bookmaker quotes, unavailable/stale observers, unknown NHL settlement definitions, separate decision/review completion, and source attribution without rewriting findings. Changes require no extra odds request or schedule change. All five report tasks already read the updated shared authority at startup. Goalie, lineup and forecast judgments remain actual producer research at the next lane.
+
+Validation: twelve targeted tests passed; the full isolated controller replay published and reread its historical fixture at two LEAN/six PASS; all fifteen issued-evening readback gates passed. These are development checks, not additional issued reports.
+
 - `node tests/pinnacle-nhl-coverage.test.mjs`: acquisition category, tournament, batching and full-game overtime settlement; rejects regulation and unknown definitions.
 - `node tests/event-research-plan.test.mjs --integration`: latest captured points on completed market cards, real-review shortfalls, identity isolation and unchanged historical source/decision counts.
 - `node tests/oddspapi-retention-horizons.test.mjs`: existing horizon, reserve and pacing checks.

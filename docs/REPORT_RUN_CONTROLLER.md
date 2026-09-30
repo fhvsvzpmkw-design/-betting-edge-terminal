@@ -16,9 +16,13 @@ node tools/report-run.mjs next --checkpoint data/report-production/checkpoints/<
 
 Choose a unique run ID using the operating date, slot and actual issue clock. `start` refuses to overwrite an existing run. The status response gives the current revision. Mutations require `--expected-revision <current-revision>`; stale updates fail without replacing the checkpoint. The entire draft is saved atomically under one checkpoint. There is no model API call in these commands.
 
+The initial `report-inputs` view includes `pinnacleCoverage`: exact-reference counts by sport, skipped categories and collection errors. Event detail supplies failed match reasons at each executable quote. It uses the same exact-market matcher as assessment, including NHL settlement definitions and freshness. Inspect gaps before research; acquisition coverage is not completed analysis or issuance clearance.
+
 `next` also exposes captured forecasts awaiting actual applicability review on events with completed market cards. `next --event-id` includes the latest immutable record IDs, probabilities, native units, original observation times and exact selection questions. Review the actual exported capture and append genuine revalidations or explicit shortfalls; the queue never creates eligibility. Decision completion and outstanding forecast review counts remain separate, and completed qualified cards may still publish.
 
 ## Work one event and save
+
+In the work plan, `completionState` describes completed decisions only. Read `reviewCompletionState` and `capturedForecastReviewsPending` separately; completed market decisions can coexist with unperformed forecast reviews. Resolve or disclose that remaining review work before describing the event as fully reviewed. `SOURCE_ORIGIN_ATTRIBUTION` in the card review flags known ESPN reporting facts attached to another publisher or labelled official; correct the source in the current draft using the actually checked reporting URL and original time.
 
 ```
 node tools/report-run.mjs export --checkpoint <checkpoint> --output-dir /tmp/betting-edge-draft

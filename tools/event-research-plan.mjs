@@ -1,5 +1,5 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
-export const EVENT_RESEARCH_VERSION = '2026-09-30.3';
+export const EVENT_RESEARCH_VERSION = '2026-09-30.4';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
@@ -205,6 +205,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
 // Small producer-facing execution view. The full audit remains available; a
 // large repeated per-selection evidence payload must not hide the next work.
 export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
+  const capturedReviews = list(plan.events).reduce((count,event) => count + list(event.forecastReviews).length,0);
   const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0).map(event => ({
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,
     pending:event.pending, completed:event.completed,
@@ -230,6 +231,8 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
     capturedForecastsAwaitingReview:event.forecastReviews.length,nextAction:event.nextAction
   }));
   return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,forecastReviewCounts:plan.forecastReviewCounts,
+    reviewCompletionState:plan.counts?.pending > 0 ? 'DECISIONS_PENDING' : capturedReviews > 0 ? 'CAPTURED_FORECAST_REVIEW_PENDING' : 'COMPLETE',
+    capturedForecastReviewsPending:capturedReviews,
     completionState:plan.counts?.available > 0 && plan.counts?.completed === 0 ? 'NO_COMPLETED_DECISIONS' :
       plan.counts?.pending > 0 ? 'PARTIAL' : 'COMPLETE',
     instructions:[

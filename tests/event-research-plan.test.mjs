@@ -153,10 +153,14 @@ assert.deepEqual(capturedPlan.events[0].forecastReviews[0].selectionIds,[rows[0]
 assert.equal(buildResearchWorkPlan(capturedPlan).events[0].capturedForecastsAwaitingReview,1);
 assert.equal(buildResearchWorkPlan(capturedPlan,{eventId:'A'}).events[0].forecastReviews[0].probability,.55);
 assert.equal(buildResearchWorkPlan(capturedPlan).completionState,'COMPLETE','advisory review cannot veto completed cards');
+assert.equal(buildResearchWorkPlan(capturedPlan).reviewCompletionState,'CAPTURED_FORECAST_REVIEW_PENDING','completed decisions cannot imply captured forecasts were reviewed');
+assert.equal(buildResearchWorkPlan(capturedPlan).capturedForecastReviewsPending,1);
 assert.equal(JSON.stringify(capturedInput),capturedBefore);
 const reviewed=structuredClone(capturedInput);
 reviewed.forecastCoverage.selections.forEach(row=>row.records.forEach(record=>{record.reasons=record.recordId==='latest-point'?['PERSONNEL_APPLICABILITY_UNRESOLVED']:record.reasons;}));
 assert.equal(buildEventResearchPlan(reviewed).forecastReviewCounts.records,0,'a current applicability shortfall is not an unperformed review');
+assert.equal(buildResearchWorkPlan(buildEventResearchPlan(reviewed)).reviewCompletionState,'COMPLETE');
+assert.equal(buildResearchWorkPlan(plan).reviewCompletionState,'DECISIONS_PENDING');
 const foreign=structuredClone(capturedInput);
 foreign.forecastCoverage.selections.forEach(row=>row.records.forEach(record=>record.reasons.push('EVENT_MISMATCH')));
 assert.equal(buildEventResearchPlan(foreign).forecastReviewCounts.records,0);

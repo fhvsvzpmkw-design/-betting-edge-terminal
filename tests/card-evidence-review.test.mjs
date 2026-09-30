@@ -52,6 +52,20 @@ assert.equal(rec.fairValueEvidence, null);
 assert.equal(rec.status, 'PASS');
 assert.equal(reviewCardEvidence({recs: []}, {recommendations: []}, {}).publicationBlocking, false);
 
+const attribution=structuredClone(rec);
+attribution.sourceEvidence=[{kind:'OFFICIAL',url:'https://www.wnba.com/game/fixture',finding:'The league page was checked. ESPN listed Player Example out.'}];
+const attributionBefore=JSON.stringify(attribution);
+assert.equal(reviewCardEvidence({recs:[attribution]},{},{}).issueCounts.SOURCE_ORIGIN_ATTRIBUTION,1);
+assert.equal(JSON.stringify(attribution),attributionBefore,'source advice cannot rewrite historical findings or invent URLs');
+attribution.sourceEvidence=[{kind:'REPORTING',url:'https://www.espn.com/wnba/injuries',finding:'ESPN listed Player Example out.'}];
+assert.equal(reviewCardEvidence({recs:[attribution]},{},{}).issueCounts.SOURCE_ORIGIN_ATTRIBUTION,undefined);
+attribution.sourceEvidence[0].kind='OFFICIAL';
+assert.equal(reviewCardEvidence({recs:[attribution]},{},{}).issueCounts.SOURCE_ORIGIN_ATTRIBUTION,1);
+attribution.sourceEvidence=[{kind:'OFFICIAL',url:'https://www.wnba.com/game/fixture',finding:'The league listed Player Example out.'}];
+assert.equal(reviewCardEvidence({recs:[attribution]},{},{}).issueCounts.SOURCE_ORIGIN_ATTRIBUTION,undefined);
+attribution.sourceEvidence=[{kind:'REPORTING',url:'https://espn.com.other.example/article',finding:'ESPN reported Player Example out.'}];
+assert.equal(reviewCardEvidence({recs:[attribution]},{},{}).issueCounts.SOURCE_ORIGIN_ATTRIBUTION,1);
+
 // The reviewer checks links, but never claims an existing ID proves applicability.
 item.grade = 'C'; item.priorIds = ['not-a-real-prior'];
 assert.ok(reviewCardEvidence({recs: [rec]}, {recommendations: [item]}, {library}).issues.some(issue => issue.code === 'HISTORY_FIT_UNKNOWN_ID'));

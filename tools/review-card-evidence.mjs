@@ -39,6 +39,14 @@ export function reviewCardEvidence(report, sidecar, {library = null, priorResear
     const currentFacts = unique([...list(personnel.facts), ...sources.filter(source => source.kind !== 'MARKET').map(source => source.finding)]);
     const unresolved = list(personnel.unresolved);
     const start = issues.length;
+    for (const source of sources) {
+      let espnUrl = false;
+      try { const host = new URL(source.url).hostname.toLowerCase(); espnUrl = host === 'espn.com' || host.endsWith('.espn.com'); } catch { /* existing provenance gates handle invalid URLs */ }
+      const espnFinding = /\bESPN\s+(?:listed|lists|reported|reports|confirmed|identified|named|said|says)\b/i.test(text(source.finding));
+      if ((source.kind === 'OFFICIAL' && espnUrl) || (espnFinding && (!espnUrl || source.kind !== 'REPORTING'))) {
+        add('SOURCE_ORIGIN_ATTRIBUTION', ordinal, title, 'An ESPN reporting fact is attached to another source URL or labelled OFFICIAL. Split league/team facts from reporting facts; retain the actual ESPN URL and REPORTING type for the ESPN finding, with its original check time. Do not infer a replacement URL or upgrade the fact to official confirmation.');
+      }
+    }
     if (rec.cardEvidence && !cardEvidence) {
       add('CARD_EVIDENCE_IDENTITY_MISMATCH', ordinal, title, `The structured presentation evidence is ${cardEvidenceInspection.state} for this selection and is treated as detached. Preserve the completed decision fields, then rebuild cardEvidence for the exact selectionKey before a new report is frozen.`);
     }

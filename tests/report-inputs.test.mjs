@@ -38,6 +38,12 @@ try {
   assert.equal(overview.events[0].unavailable, 4);
   assert.equal(overview.decisionAuthority, false);
   assert.equal(overview.validationState, 'NOT_RUN');
+  assert.equal(overview.pinnacleCoverage.observerStatus,'UNAVAILABLE');
+  assert.equal(overview.pinnacleCoverage.withExactReference,0);
+  assert.equal(overview.pinnacleCoverage.withoutExactReference,2);
+  assert.equal(overview.pinnacleCoverage.selections,undefined,'keep initial inventory compact');
+  assert.equal(detail.pinnacleCoverage.selections.length,2);
+  assert.match(detail.pinnacleCoverage.selections[0].attempts[0].reason,/official available Pinnacle observer/);
   assert.equal(overview.bindings.feed.blobSha, execFileSync('git',['hash-object',feedPath],{encoding:'utf8'}).trim());
   assert.deepEqual(fs.readFileSync(feedPath), before, 'projection must never mutate source');
   assert.throws(() => buildReportInputs({...options,eventId:'foreign'}), /not in this report inventory/);
@@ -54,6 +60,7 @@ try {
   assert.equal(unavailable.counts.events, 1, 'do not hide events with no executable markets');
   assert.equal(unavailable.counts.available, 0);
   assert.equal(unavailable.counts.unavailable, 6);
+  assert.equal(unavailable.pinnacleCoverage.availableSelections,0);
   assert.notEqual(unavailable.bindings.feed.blobSha, overview.bindings.feed.blobSha);
 } finally { fs.rmSync(root, {recursive:true,force:true}); }
 console.log('REPORT INPUT PROJECTION TESTS PASS');
