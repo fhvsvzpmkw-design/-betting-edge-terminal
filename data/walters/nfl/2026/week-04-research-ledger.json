@@ -7,9 +7,9 @@
   "week": 4,
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
-  "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
+  "baselineStatus": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-09-30T16:53:14-07:00",
+  "updatedAt": "2026-09-30T16:54:49-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -2051,6 +2051,304 @@
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 3,
+      "type": "LATE_DAY_DELTA",
+      "startedAt": "2026-09-30T16:44:35-07:00",
+      "completedAt": "2026-09-30T16:54:49-07:00",
+      "runEventId": "graham-delta-1645-2026-w04-20260930T164435-0700",
+      "sourceTaskKey": "DELTA_1645",
+      "completionResult": "MATERIAL_CHANGE",
+      "scope": "Late-day change-only information review from the latest verified full Week 4 sweep cutoff through the current completion time. Quarterback, injury/practice status, roster/personnel, offensive line, pass rush, secondary, playmakers, weather and schedule/rest/travel were rechecked without market access.",
+      "sourcesChecked": [
+        {
+          "source": "NFL Wednesday roundup",
+          "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Current late-window official injury, practice, roster and starter updates across the Week 4 slate."
+        },
+        {
+          "source": "NFL Week 4 injury report",
+          "url": "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Official final OUT and QUESTIONABLE designations for Pittsburgh-Cleveland and early London designations for Washington."
+        },
+        {
+          "source": "Steelers official depth chart",
+          "url": "https://www.steelers.com/team/depth-chart",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Current running-back and secondary depth for the confirmed Pittsburgh absences."
+        },
+        {
+          "source": "Browns official depth chart",
+          "url": "https://www.clevelandbrowns.com/team/depth-chart",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Current receiver and interior offensive-line depth for Cleveland's confirmed absences."
+        },
+        {
+          "source": "Commanders official depth chart",
+          "url": "https://www.commanders.com/team/depth-chart",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Current strong-safety and right-guard depth for Washington's confirmed absences."
+        },
+        {
+          "source": "Reuters current quarterback update",
+          "url": "https://www.reuters.com/sports/commanders-jayden-daniels-limited-practice-london-2026-09-30/",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Jayden Daniels remained limited; Washington's Week 4 starter was not officially resolved."
+        },
+        {
+          "source": "Graham QB prior repair",
+          "url": "docs/GRAHAM_QB_PRIOR_ESTIMATES.md",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Verified the already-published labelled frozen-prior fallback for officially confirmed Tampa Bay starter Jalon Daniels."
+        },
+        {
+          "source": "Graham baseline recovery adapter",
+          "url": "tools/graham-baseline-recovery.mjs",
+          "checkedAt": "2026-09-30T16:54:49-07:00",
+          "purpose": "Verified the full activation-to-current catch-up had recovered the pending initial Week 4 baseline while preserving the missed Tuesday attempt and partial weekly inputs."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "BAL",
+          "finding": "Lamar Jackson returned on a limited basis and described the issue as small; no confirmed Week 4 starter change or resolved numeric input.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "BUF",
+          "finding": "Late practice absences and limitations remained non-final; no resolved one-for-one input changed the governed fair.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "CHI",
+          "finding": "Caleb Williams did not practice and Chicago still had not officially confirmed the Week 4 starter. The quarterback binding remains fail closed.",
+          "status": "QB_STARTER_UNRESOLVED_FAIL_CLOSED",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "PIT",
+          "finding": "Rico Dowdle and Joey Porter Jr. were ruled out. The governed personnel writer applied a 0.9-point Dowdle loss using an explicitly labelled equal-share reserve-duty estimate; the surrounding secondary remained unresolved with Brandin Echols and Jalen Ramsey questionable.",
+          "status": "PERSONNEL_APPLIED_AND_SECONDARY_FAIL_CLOSED",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+            "https://www.steelers.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/pit.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "CLE",
+          "finding": "Tylan Wallace, Teven Jenkins and Elgton Jenkins were ruled out. The reserve receiver role and paired interior-line configuration remain unresolved, so the prior inputs were preserved.",
+          "status": "PERSONNEL_FAIL_CLOSED",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+            "https://www.clevelandbrowns.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/cle.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "WAS",
+          "finding": "Nick Cross and Sam Cosmi were ruled out. The governed writer applied Cross-to-Tyler Owens for a 0.9-point home-spread move; Cosmi's replacement was not bound to the frozen registry. Jayden Daniels remained limited and the starter stayed unresolved.",
+          "status": "PERSONNEL_APPLIED_AND_QB_PERSONNEL_FAIL_CLOSED",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+            "https://www.commanders.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/was.json"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "DAL",
+          "finding": "Late roster transactions placed Jonathan Bullard and Michael Jackson on injured reserve, but no stable new role transfer supplied a governed numeric input.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30",
+            "https://www.dallascowboys.com/team/depth-chart"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "DET",
+          "finding": "Ben Bartch and D.J. Wonnum did not practice and D.J. Reed was limited; availability and replacements were not final.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "GB",
+          "finding": "Late practice reporting added no resolved change beyond the already-published Jayden Reed personnel adjustment.",
+          "status": "NO_NEW_RESOLVED_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "HOU",
+          "finding": "Nico Collins, Ed Ingram and Jadeveon Clowney were limited while Azeez Al-Shaair was held out and described as week-to-week; no final availability or replacement input was resolved.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "KC",
+          "finding": "Josh Simmons did not practice; the late window did not establish a final absence or resolved replacement.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "LAR",
+          "finding": "Puka Nacua was expected to play while Aaron Donald did not practice; no governed numeric change was resolved.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "PHI",
+          "finding": "DeVonta Smith, Dallas Goedert and Zack Baun were estimated nonparticipants in a walkthrough; no final availability input was resolved.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "SF",
+          "finding": "Mike Evans, Nick Bosa and Dre Greenlaw did not practice; the late window supplied no final availability/replacement resolution.",
+          "status": "NO_RESOLVED_NUMERIC_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "TB",
+          "finding": "The current-week prior-fallback repair had already applied the officially confirmed Jalon Daniels starter as a labelled LOW-confidence frozen prior. It was verified and not replayed; other late practice statuses remained non-final.",
+          "status": "QB_PRIOR_FALLBACK_ALREADY_APPLIED",
+          "sourceRefs": [
+            "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
+            "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
+          ],
+          "marketViewed": false
+        },
+        {
+          "team": "TEN",
+          "finding": "Tony Pollard and Tyjae Spears did not practice; the already-recorded guard surgeries remained unresolved and no new numeric input was authorized.",
+          "status": "NO_NEW_RESOLVED_INPUT",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30"
+          ],
+          "marketViewed": false
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W04-PIT-CLE",
+          "priorExactFairHome": -0.287,
+          "priorDisplayedFairHome": -0.5,
+          "currentExactFairHome": -1.187,
+          "currentDisplayedFairHome": -1,
+          "exactDelta": -0.9,
+          "displayedDelta": -0.5,
+          "status": "PERSONNEL_PRODUCTION_APPLIED",
+          "reason": "Rico Dowdle's confirmed absence produced a 0.9-point Pittsburgh personnel loss through the governed replacement-estimate writer. Other Pittsburgh/Cleveland cases failed closed.",
+          "marketViewed": false
+        },
+        {
+          "gameKey": "2026-W04-IND-WAS",
+          "priorExactFairHome": 0.574,
+          "priorDisplayedFairHome": 0.5,
+          "currentExactFairHome": 1.474,
+          "currentDisplayedFairHome": 1.5,
+          "exactDelta": 0.9,
+          "displayedDelta": 1,
+          "status": "PERSONNEL_PRODUCTION_APPLIED",
+          "reason": "Nick Cross to Tyler Owens produced a 0.9-point Washington personnel loss through the governed one-for-one writer. Cosmi and the Washington quarterback state remain unresolved.",
+          "marketViewed": false
+        },
+        {
+          "gameKey": "2026-W04-GB-TB",
+          "priorExactFairHome": 3.407,
+          "priorDisplayedFairHome": 3.5,
+          "currentExactFairHome": 5.257,
+          "currentDisplayedFairHome": 5.5,
+          "exactDelta": 1.85,
+          "displayedDelta": 2,
+          "status": "QB_PRIOR_FALLBACK_ALREADY_APPLIED",
+          "reason": "Before this Delta, the September 30 repair applied officially confirmed Tampa Bay starter Jalon Daniels through the labelled LOW-confidence frozen-prior policy. The Delta verified and did not replay it.",
+          "marketViewed": false
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_LATE_DELTA",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "note": "No independent FPI input was needed for the change-only late review.",
+        "marketViewed": false
+      },
+      "summary": {
+        "teamsReviewed": 32,
+        "gamesReviewed": 16,
+        "materialInformationChanged": true,
+        "carriedRatingMoves": 0,
+        "fairNumberChanges": 3,
+        "displayedFairNumberChanges": 3,
+        "baselineRecovery": {
+          "state": "APPLIED_BEFORE_DELTA",
+          "result": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
+          "numericMoves": 0,
+          "missedTuesdayAttemptPreserved": true,
+          "partialWeeklyInputsPreserved": true
+        },
+        "qbPriorFallback": {
+          "state": "APPLIED_BEFORE_DELTA",
+          "team": "TB",
+          "starter": "Jalon Daniels",
+          "confidence": "LOW",
+          "fairNumberChanges": 1,
+          "replayed": false
+        },
+        "personnelBatchesSubmitted": 1,
+        "personnelCasesSubmitted": 7,
+        "personnelNumericCases": 2,
+        "personnelFailClosedCases": 5,
+        "betsCreated": 0,
+        "h4DomesticHomeAdvantagePoints": 2.082,
+        "internationalNeutralGames": [
+          "2026-W04-IND-WAS"
+        ],
+        "priorVerifiedRunEventId": "graham-daily-review-2026-w04-20260930T113504-0700",
+        "coverageStart": "2026-09-30T11:56:30-07:00",
+        "coverageEnd": "2026-09-30T16:54:49-07:00",
+        "missedDayCatchUp": false,
+        "unresolvedCoverageGaps": [],
+        "marketViewed": false,
+        "note": "Verified coverage resumed from the full Daily Review cutoff. The pending initial baseline had already been recovered from that verified activation-to-current catch-up, with the missed Tuesday attempt and PARTIAL_BLOCKED weekly inputs preserved. The labelled Tampa Bay QB prior moved GB-TB before this Delta and was not replayed. This Delta then applied two calculator-owned personnel changes and preserved five unresolved cases fail closed. No market information was viewed."
       }
     }
   ]
