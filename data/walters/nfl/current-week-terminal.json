@@ -4,7 +4,7 @@
   "publication": "THE PRIVATE LINE",
   "season": 2026,
   "week": 4,
-  "generatedAt": "2026-09-30T23:46:46.439Z",
+  "generatedAt": "2026-09-30T23:54:45.696Z",
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
@@ -158,12 +158,82 @@
       "homeRating": 19.7314,
       "neutralBaseHome": 2,
       "espnNeutralHome": 4.5,
-      "grahamFairHome": -0.5,
-      "grahamAsOf": "2026-09-30T11:56:30-07:00",
+      "grahamFairHome": -1,
+      "grahamAsOf": "2026-09-30T16:53:14-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
       "grahamMove": -0.5,
-      "personnelEstimateCases": [],
-      "personnelUnresolvedCases": [],
+      "personnelEstimateCases": [
+        {
+          "caseKey": "2026-W04-PIT-Rico-Dowdle",
+          "player": "Rico Dowdle",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "EQUAL_SHARE_COMMITTEE",
+          "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+          "healthyValue": 0.9,
+          "replacementValue": 0,
+          "replacementValueRatio": {
+            "numerator": 0,
+            "denominator": 2
+          },
+          "injuryLoss": 0.9,
+          "rawTeamContributionDelta": -0.9,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 0.9,
+            "max": 0.9
+          },
+          "weights": [
+            {
+              "player": "Eli Heidenreich",
+              "eaPlayerId": "1873",
+              "lockedValue": 0,
+              "additionalRoleUnits": 1,
+              "weight": 0.5
+            },
+            {
+              "player": "Travis Homer",
+              "eaPlayerId": "20640",
+              "lockedValue": 0,
+              "additionalRoleUnits": 1,
+              "weight": 0.5
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "Assume equal added reserve duty for Eli Heidenreich and Travis Homer, the two available backs listed after the absent Rico Dowdle.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+          "reopenOn": "Pittsburgh names a primary replacement, changes the active reserve group, or an additional running-back absence creates a cluster.",
+          "applied": true
+        }
+      ],
+      "personnelUnresolvedCases": [
+        {
+          "caseKey": "2026-W04-PIT-Joey-Porter-Jr",
+          "player": "Joey Porter Jr.",
+          "failClosedCode": "SECONDARY_REPLACEMENT_AVAILABILITY_AND_CLUSTER_UNRESOLVED",
+          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+        },
+        {
+          "caseKey": "2026-W04-CLE-Tylan-Wallace",
+          "player": "Tylan Wallace",
+          "failClosedCode": "RESERVE_RECEIVER_ROLE_REDISTRIBUTION_UNRESOLVED",
+          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+        },
+        {
+          "caseKey": "2026-W04-CLE-Teven-Jenkins",
+          "player": "Teven Jenkins",
+          "failClosedCode": "MULTIPLE_OFFENSIVE_LINE_ABSENCES_CONFIGURATION_UNRESOLVED",
+          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+        },
+        {
+          "caseKey": "2026-W04-CLE-Elgton-Jenkins",
+          "player": "Elgton Jenkins",
+          "failClosedCode": "MULTIPLE_OFFENSIVE_LINE_ABSENCES_CONFIGURATION_UNRESOLVED",
+          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+        }
+      ],
       "personnelBlockedGroups": [],
       "qbPerformanceFailClosedTeams": [],
       "qbPriorEstimateTeams": [],
@@ -185,8 +255,8 @@
         "applicationStatus": "CARRIED_BASE_VERIFIED",
         "marketViewed": false
       },
-      "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
-      "researchSummary": "Governed fair decomposition: neutral/team base +1.895; home field -2.082; other governed -0.100; pre-personnel exact -0.287; personnel +0.000; matchup +0.000; exact Graham home fair -0.287; displayed -0.5.",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
+      "researchSummary": "Governed fair decomposition: neutral/team base +1.895; home field -2.082; other governed -0.100; pre-personnel exact -0.287; personnel -0.900; matchup +0.000; exact Graham home fair -1.187; displayed -1.0.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -204,6 +274,27 @@
           "marketViewed": false
         },
         {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "PIT",
+          "side": "AWAY",
+          "clusterGroup": "RUNNING_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W04-PIT-Rico-Dowdle"
+          ],
+          "rawTeamContributionDelta": -0.9,
+          "finalTeamContributionDelta": -0.9,
+          "pointsToHomeSpread": -0.9,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+            "https://www.steelers.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/pit.json",
+            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+          ]
+        },
+        {
           "type": "QB_PERFORMANCE_PRODUCTION",
           "productionId": "walters-qb-performance-production-v1",
           "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -214,7 +305,11 @@
           "awayTeamQbDelta": -0.75,
           "homeTeamQbDelta": -0.65,
           "pointsToHomeSpread": -0.1,
-          "reason": "Approved Walters QB performance differential: PIT -0.75 minus CLE -0.65 equals -0.10 points to the home-spread coordinate.",
+          "reason": "Governed Walters QB differential: PIT -0.75 minus CLE -0.65 equals -0.10 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
           "sourceRefs": [
             "data/walters/nfl/qb-production/production-contract-v1.json",
             "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
@@ -223,7 +318,7 @@
             "core/staging/walters-nfl-seed-dataset-2026.json",
             "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
           ],
-          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
           "marketViewed": false
         }
       ],
@@ -249,7 +344,7 @@
       "pinnacleMoneylineAwayLimit": 11329,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 3.5,
+      "grahamHomeStrengthGap": 4,
       "officialDailySequence": 1,
       "officialDailyCapturedAt": "2026-09-30T14:55:22.434Z"
     },
@@ -262,16 +357,22 @@
       "homeRating": 21.7124,
       "neutralBaseHome": 0,
       "espnNeutralHome": 0,
-      "grahamFairHome": 0.5,
-      "grahamAsOf": "2026-09-30T11:56:30-07:00",
+      "grahamFairHome": 1.5,
+      "grahamAsOf": "2026-09-30T16:53:14-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "grahamMove": 0,
+      "grahamMove": 1,
       "personnelEstimateCases": [],
       "personnelUnresolvedCases": [
         {
           "caseKey": "2026-W04-WAS-Leo-Chenal",
           "player": "Leo Chenal",
           "failClosedCode": "LINEBACKER_ROLE_AND_CLUSTER_CONFIGURATION_UNRESOLVED",
+          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+        },
+        {
+          "caseKey": "2026-W04-WAS-Sam-Cosmi",
+          "player": "Sam Cosmi",
+          "failClosedCode": "OFFENSIVE_LINE_REPLACEMENT_NOT_BOUND_TO_FROZEN_REGISTRY",
           "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
         }
       ],
@@ -298,8 +399,8 @@
         "applicationStatus": "CARRIED_BASE_VERIFIED",
         "marketViewed": false
       },
-      "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
-      "researchSummary": "Governed fair decomposition: neutral/team base +0.164; home field +0.000; other governed +0.410; pre-personnel exact +0.574; personnel +0.000; matchup +0.000; exact Graham home fair +0.574; displayed +0.5.",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
+      "researchSummary": "Governed fair decomposition: neutral/team base +0.164; home field +0.000; other governed +0.410; pre-personnel exact +0.574; personnel +0.900; matchup +0.000; exact Graham home fair +1.474; displayed +1.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -338,6 +439,26 @@
           ],
           "effectiveAt": "2026-09-29T04:34:24-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "WAS",
+          "side": "HOME",
+          "clusterGroup": "DEFENSIVE_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W04-WAS-Nick-Cross"
+          ],
+          "rawTeamContributionDelta": -0.9,
+          "finalTeamContributionDelta": -0.9,
+          "pointsToHomeSpread": 0.9,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+            "https://www.commanders.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/was.json"
+          ]
         }
       ],
       "proposedWager": null,
@@ -362,7 +483,7 @@
       "pinnacleMoneylineAwayLimit": 15000,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 3,
+      "grahamHomeStrengthGap": 2,
       "officialDailySequence": 1,
       "officialDailyCapturedAt": "2026-09-30T14:55:22.434Z"
     },
