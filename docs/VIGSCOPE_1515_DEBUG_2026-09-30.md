@@ -29,7 +29,13 @@ The revised shared authority and all five Main task prompts require operating re
 
 ## Live verification and remaining work
 
-The one-time `Verify Pinnacle NHL recovery` workflow refreshes only the observer using the existing primary feed, stores an exact source-binding receipt, and refuses to overwrite a newer feed/observer. It makes no primary odds request and writes no report History. A request accepted by the provider and an actually qualified price are separate results. Record the resulting fixture/market counts after completion; no forecast review is marked completed by this workflow.
+The one-time `Verify Pinnacle NHL recovery` workflow completed successfully: run `36788203916`, observer commit `abc2a94e9975a53583fcf22598578c2db5e81c32`. The observer was generated at `2026-09-30T22:54:45.958Z` (15:54 Pacific), status `ok`. It refreshed only the observer using the existing primary feed, stored an exact source-binding receipt, and refused to overwrite a newer feed/observer. It made no primary odds request and wrote no report History. No forecast review was marked completed by this workflow.
+
+The live response included NHL tournament 234, with six matched NHL fixtures (three today and three tomorrow) and three qualified main markets per fixture. The official catalogue supplied 57 verified full-game overtime/penalty market definitions. Two paced odds requests covered the existing scope plus NHL; one catalogue discovery request supplied settlement metadata. No skipped categories or collection errors were recorded, and the protected reserve remained in force.
+
+A read-only exact-selection assessment at 16:00 Pacific matched all eighteen available NHL selections for today's Pittsburgh–Philadelphia, Islanders–Toronto and Los Angeles–Colorado games. Moneylines, puck lines and exact totals qualified; alternate 6.5 totals were retained when the main total was 6.0. This verifies price acquisition and matching, not completed research cards or issued recommendations. Receipt artifact `11130907544` has SHA-256 `3dca63cf05aa8bb7d1ea32d63f4b305d1aab2b0c8b71eae7457272f86c71ab92`.
+
+All five active Main automations were reread and confirmed to contain operating revision `2026-09-30.2`, NHL settlement/acquisition checks and the captured-forecast review instruction, with their original daily schedules. Remote Core production, major-sport coverage, card evidence and Pinnacle benchmark workflows passed. Pages build/deploy `36788249357` succeeded for the live observer commit.
 
 Remaining analytical work: actual current forecast/personnel/settlement applicability judgments, NHL goalie/lineup checks and any genuine source limitations. New NHL prices cannot retroactively amend the 15:15 report. Weeks 1–3 historical personnel gaps and Week 4 starter limitations retain the prior audit's scope.
 
