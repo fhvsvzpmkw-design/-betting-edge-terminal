@@ -17,7 +17,22 @@ assert.equal(plan.counts.routes.MARKET_PASS_REVIEW,6); assert.equal(plan.events[
 assert.equal(JSON.stringify(input),before,'planner must not change grades, source times or receipts');
 assert.equal(plan.events[0].researchPackage.sources[0].requiresCurrentApplicabilityReview,true);
 assert.equal(plan.events[0].researchPackage.sources[0].source.checkedAt,source.checkedAt);
+assert.equal(plan.events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
+assert.equal(plan.events[0].personnelFollowUp.required,true);
 assert.equal(plan.decisionAuthority,false);
+const personnelInput=structuredClone(input);
+personnelInput.report.feedGeneratedAt='2026-09-20T18:15:00-07:00';
+personnelInput.sidecar.primaryAnalysis.receipts[0].decision={personnelEvidence:{officialSources:[{
+  url:'https://example.org/official/A',origin:'Official league board',asOf:'2026-09-20T18:21:00-07:00',
+  fact:'Current official pitcher and lineup board checked for event A.',finalRecheck:true
+}]}};
+const personnelPlan=buildEventResearchPlan(personnelInput);
+assert.equal(personnelPlan.events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_RECORDED');
+assert.equal(personnelPlan.events[0].personnelFollowUp.required,false);
+assert.equal(personnelPlan.events[0].personnelFollowUp.sources.length,1);
+const stalePersonnelInput=structuredClone(personnelInput);
+stalePersonnelInput.sidecar.primaryAnalysis.receipts[0].decision.personnelEvidence.officialSources[0].asOf='2026-09-20T18:10:00-07:00';
+assert.equal(buildEventResearchPlan(stalePersonnelInput).events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
 const fallbackInput={...input,forecastCoverage:{selections:rows.slice(0,2).map(row=>({
   ...row,startTime:row.eventDate,eligibleExactRecordIds:[],attempts:[{sourceId:'fangraphs',outcome:'INACCESSIBLE'}],
   nextRoutes:[{sourceId:'dratings',role:'EXACT_CANDIDATE',urls:['https://www.dratings.com/predictor/mlb-baseball-predictions/']}]
@@ -98,7 +113,10 @@ assert.equal(work.completionState,'NO_COMPLETED_DECISIONS');
 assert.equal(work.decisionAuthority,false);
 assert.equal(work.events[0].sourceLeads[0].priorReportPath,'earlier.json');
 assert.equal(work.events[0].selections[0].route,'MARKET_PASS_REVIEW');
+assert.equal(work.events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
+assert.match(work.events[0].nextAction,/authoritative league\/team personnel check/);
 assert.equal(buildResearchWorkPlan(resumed).events[0].sourceLeadCount,1);
+assert.equal(buildResearchWorkPlan(resumed).events[0].personnelFollowUpState,'CURRENT_OFFICIAL_CHECK_REQUIRED');
 assert.equal(buildResearchWorkPlan(resumed).events[0].selections,undefined,'overview must not dump every quote and repeated source question');
 assert.throws(()=>buildResearchWorkPlan(resumed,{eventId:'missing'}),/No pending event/);
 assert.equal(buildResearchWorkPlan({counts:{available:2,completed:1,pending:1},events:[]}).completionState,'PARTIAL');

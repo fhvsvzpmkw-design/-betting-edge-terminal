@@ -1,5 +1,5 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
-export const EVENT_RESEARCH_VERSION = '2026-09-20.1';
+export const EVENT_RESEARCH_VERSION = '2026-09-30.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
@@ -22,6 +22,24 @@ function usableSource(source, event, report) {
 }
 function signature(source) {
   return JSON.stringify([source.kind, String(source.eventId), source.url, source.checkedAt || source.asOf, source.finding || source.fact]);
+}
+function personnelBlocksOf(record) {
+  return [
+    record?.decision?.personnelEvidence, record?.evidence?.personnelEvidence,
+    record?.candidateDraft?.decision?.personnelEvidence, record?.candidateDraft?.evidence?.personnelEvidence
+  ].filter(Boolean);
+}
+function currentOfficialPersonnelSource(source, report) {
+  if (!source || !text(source.url) || !text(source.fact || source.finding)) return false;
+  const observed = time(source.asOf || source.checkedAt), issued = time(report.ts), bound = time(report.feedGeneratedAt);
+  if (!Number.isFinite(observed) || !Number.isFinite(issued) || observed > issued) return false;
+  if (Number.isFinite(bound) && observed < bound) return false;
+  try { const url = new URL(source.url); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password; }
+  catch { return false; }
+}
+function personnelSourceView(source) {
+  return {url:source.url, origin:source.origin || source.title || null, asOf:source.asOf || source.checkedAt,
+    fact:source.fact || source.finding, finalRecheck:source.finalRecheck === true};
 }
 function routeFor(row, receipt) {
   if(row.quarterbackFollowUp?.required && !row.quarterbackFollowUp.complete)return 'QB_STARTER_FOLLOW_UP';
@@ -62,10 +80,15 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     seen.add(row.selectionId);
     const identity = keyFor(row), eventKey = identity || `INVALID:${row.selectionId}`;
     if (!groups.has(eventKey)) groups.set(eventKey, {eventKey, sport:row.sport, eventId:row.eventId,
-      eventDate:row.eventDate, label:row.eventLabel || null, selections:[], sourceMap:new Map(), conflicts:new Set()});
+      eventDate:row.eventDate, label:row.eventLabel || null, selections:[], sourceMap:new Map(), personnelMap:new Map(), conflicts:new Set()});
     const event = groups.get(eventKey), matches = receipts.filter(receipt => receipt.selectionId === row.selectionId);
     const receipt = matches.length === 1 ? matches[0] : null;
     if (matches.length > 1) warnings.push(`Duplicate receipts for ${row.selectionId}; no research reuse or completion inferred.`);
+    for (const block of personnelBlocksOf(receipt)) for (const source of list(block?.officialSources)) {
+      if (!currentOfficialPersonnelSource(source, report)) continue;
+      const view = personnelSourceView(source);
+      event.personnelMap.set(JSON.stringify([view.url, view.asOf, view.fact]), view);
+    }
     const route = !identity || matches.length > 1 ? 'IDENTITY_REVIEW' : routeFor(row, receipt);
     if (!event.label && row.eventLabel) event.label = row.eventLabel;
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,
@@ -96,6 +119,14 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
   const events = [...groups.values()].map(event => {
     for (const id of event.conflicts) { event.sourceMap.delete(id); warnings.push(`Conflicting source ID ${id} in ${event.eventKey}; source not shared.`); }
     const pending = event.selections.filter(row => row.route !== 'COMPLETED');
+    const currentOfficialPersonnelSources = [...event.personnelMap.values()];
+    const personnelFollowUp = pending.length === 0
+      ? {required:false,state:'NOT_REQUIRED',sources:currentOfficialPersonnelSources,instruction:'No pending exact selection requires a new personnel review.'}
+      : currentOfficialPersonnelSources.length
+        ? {required:false,state:'CURRENT_OFFICIAL_CHECK_RECORDED',sources:currentOfficialPersonnelSources,
+            instruction:'A current official personnel check is recorded inside the bound report window; assess its materiality and any remaining dependency-specific shortfall before deciding pending selections.'}
+        : {required:true,state:'CURRENT_OFFICIAL_CHECK_REQUIRED',sources:[],
+            instruction:'Perform and record a current authoritative league/team personnel check inside the bound report window before finalizing pending selections. Game-intelligence or reporting leads alone are not personnel clearance.'};
     // Surface the existing coverage module's fallbacks in the event work plan.
     // One source retrieval can answer several sides; listing it is not execution.
     const forecastRows = list(forecastCoverage.selections).filter(row => String(row.eventId) === String(event.eventId) &&
@@ -118,7 +149,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     return {eventKey:event.eventKey, sport:event.sport, eventId:event.eventId, eventDate:event.eventDate,
       label:event.label || `${event.sport} event ${event.eventId}`, available:event.selections.length,
       completed:event.selections.length-pending.length, pending:pending.length,
-      sharedResearchRequired:pending.length>0, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
+      sharedResearchRequired:pending.length>0, personnelFollowUp, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
       forecastRetrieval, selections:event.selections};
   }).sort((a,b) => (time(a.eventDate) || Infinity)-(time(b.eventDate) || Infinity) || a.eventKey.localeCompare(b.eventKey));
@@ -148,17 +179,19 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
     sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath}) => ({
       id:source.id, url:source.url, observedAt:source.checkedAt || source.asOf,
       finding:source.finding || source.fact, priorReportPath, requiresCurrentApplicabilityReview:true})),
+    personnelFollowUp:event.personnelFollowUp || null,
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
       selectionId:row.selectionId, route:row.route, quote:row.quote, comparison:row.priceComparison,
       quarterbackFollowUp:row.quarterbackFollowUp || null, nextAction:row.nextAction})),
     forecastSources:list(event.forecastRetrieval?.nextSources).map(source => ({
       sourceId:source.sourceId, urls:source.urls, questions:source.questions})),
-    nextAction:'Revalidate event facts, then finish a supported exact paired-market review before opening another event. Escalate decision-changing news. Record genuine remaining gaps; do not wait for whole-slate forecast coverage.'
+    nextAction:event.personnelFollowUp?.required ? event.personnelFollowUp.instruction :
+      'Revalidate event facts, then finish a supported exact paired-market review before opening another event. Escalate decision-changing news. Record genuine remaining gaps; do not wait for whole-slate forecast coverage.'
   }));
   if (eventId !== null && !events.some(event => String(event.eventId) === String(eventId))) throw new Error('No pending event matches --event-id');
   const outputEvents = eventId !== null ? events.filter(event => String(event.eventId) === String(eventId)) : events.map(event => ({
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label, pending:event.pending, completed:event.completed,
-    sourceLeadCount:event.sourceLeads.length,
+    sourceLeadCount:event.sourceLeads.length, personnelFollowUpState:event.personnelFollowUp?.state || null,
     routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
     nextForecastSources:event.forecastSources.map(source => source.sourceId)
   }));
