@@ -216,7 +216,10 @@ function coverageReasonText(reason,coverage){
   return ({STALE_EXECUTABLE_QUOTE:'Quote older than 30m or timestamp invalid',STALE_BEYOND_RETENTION:Number.isFinite(retention)?`Quote older than ${retention}m retention`:'Quote beyond feed retention',MARKET_NOT_RETURNED:'Market not returned',IDENTITY_UNRESOLVED:'Selection identity unresolved',PRIMARY_LINE_UNRESOLVED:'Primary line unresolved',INCOMPLETE_TWO_SIDED_MARKET:'Incomplete two-sided market',EVENT_NOT_RETURNED:'Event not returned by either book',EVENT_ACQUISITION_INCOMPLETE:'Event acquisition incomplete',SOURCE_UNAVAILABLE:'Research source unavailable',FAIR_MODEL_UNAVAILABLE:'Fair-value model unavailable',PERSONNEL_UNRESOLVED:'Personnel unresolved',CALIBRATION_UNAVAILABLE:'Calibration unavailable',CONFLICTING_EVIDENCE:'Conflicting evidence',RESEARCH_INCOMPLETE:'Research incomplete'})[reason]||String(reason||'Unspecified limitation').replace(/_/g,' ').toLowerCase();
 }
 function noPublishedCardsText(run){
-  if((run?.recs||[]).length)return `No ${sportFilter==='ALL'?'':sportFilter+' '}${statusFilter==='ALL'?'':statusFilter+' '}cards published in this run. Choose ALL statuses or ALL SPORTS to broaden the view.`;
+  if((run?.recs||[]).length){
+    if(statusFilter==='ALL'&&sportFilter==='ALL')return 'No published selections match ALL. Choose ALL to see the published cards.';
+    return `No ${sportFilter==='ALL'?'':sportFilter+' '}${statusFilter==='ALL'?'':statusFilter+' '}cards match these filters. Choose ALL statuses or ALL SPORTS to broaden the view.`;
+  }
   const state=coverageSummaryState(run),c=run?.coverageSummary?.selections;
   if(state==='VALID')return `No cards published. ${c.evaluated} documented decisions; ${c.blocked} selections blocked by evidence; ${c.unavailable} without usable odds. Reviewed decisions and published cards are counted separately.`;
   if(state==='HISTORICAL')return 'No cards published in this issued report. Selection-by-selection analysis coverage was not recorded in this historical report; zero cards does not establish that zero markets were available.';

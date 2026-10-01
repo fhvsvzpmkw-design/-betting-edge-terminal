@@ -9,6 +9,9 @@ on:
       - data/history/report-provenance-schema.json
       - r.html
       - runner.html
+      - assets/runner-core-runtime.js
+      - assets/runner-picks-ui.css
+      - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
       - assets/menu-order-controller.js
       - assets/primary-nav-shell.js
@@ -37,6 +40,9 @@ on:
       - data/history/report-provenance-schema.json
       - r.html
       - runner.html
+      - assets/runner-core-runtime.js
+      - assets/runner-picks-ui.css
+      - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
       - assets/menu-order-controller.js
       - assets/primary-nav-shell.js
@@ -76,6 +82,7 @@ jobs:
           node-version: '22'
       - name: Syntax-check runner UI modules
         run: |
+          node --check assets/runner-core-runtime.js
           node --check assets/preferences-framework.js
           node --check assets/report-dashboard-vigscope.js
           node --check assets/game-window-intelligence.js
@@ -92,6 +99,8 @@ jobs:
         run: node tests/runner-report-handoff.test.mjs
       - name: Run runner session strip regression
         run: node tests/runner-session-strip-applicability.test.js
+      - name: Run published-pick filters and report comparison regression
+        run: node tests/runner-picks-ui.test.mjs
       - name: Run permanent Main Betting Edge schedule regression
         run: node tests/main-schedule.test.mjs
       - name: Run F6 preferences framework regression
