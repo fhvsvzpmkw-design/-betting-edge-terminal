@@ -17,6 +17,8 @@ let activeRun=null;
 let originalRun=null;
 let refreshBusy=false;
 let statusFilter='ALL';
+let sportFilter='ALL';
+const priorChangesCache=new Map();
 const issuedSessionCatalog=new Map();
 
 function deepClone(v){try{return JSON.parse(JSON.stringify(v))}catch(e){return v}}
@@ -214,7 +216,7 @@ function coverageReasonText(reason,coverage){
   return ({STALE_EXECUTABLE_QUOTE:'Quote older than 30m or timestamp invalid',STALE_BEYOND_RETENTION:Number.isFinite(retention)?`Quote older than ${retention}m retention`:'Quote beyond feed retention',MARKET_NOT_RETURNED:'Market not returned',IDENTITY_UNRESOLVED:'Selection identity unresolved',PRIMARY_LINE_UNRESOLVED:'Primary line unresolved',INCOMPLETE_TWO_SIDED_MARKET:'Incomplete two-sided market',EVENT_NOT_RETURNED:'Event not returned by either book',EVENT_ACQUISITION_INCOMPLETE:'Event acquisition incomplete',SOURCE_UNAVAILABLE:'Research source unavailable',FAIR_MODEL_UNAVAILABLE:'Fair-value model unavailable',PERSONNEL_UNRESOLVED:'Personnel unresolved',CALIBRATION_UNAVAILABLE:'Calibration unavailable',CONFLICTING_EVIDENCE:'Conflicting evidence',RESEARCH_INCOMPLETE:'Research incomplete'})[reason]||String(reason||'Unspecified limitation').replace(/_/g,' ').toLowerCase();
 }
 function noPublishedCardsText(run){
-  if((run?.recs||[]).length)return `No published selections match ${statusFilter}. Choose ALL to see the published cards.`;
+  if((run?.recs||[]).length)return `No ${sportFilter==='ALL'?'':sportFilter+' '}${statusFilter==='ALL'?'':statusFilter+' '}cards published in this run. Choose ALL statuses or ALL SPORTS to broaden the view.`;
   const state=coverageSummaryState(run),c=run?.coverageSummary?.selections;
   if(state==='VALID')return `No cards published. ${c.evaluated} documented decisions; ${c.blocked} selections blocked by evidence; ${c.unavailable} without usable odds. Reviewed decisions and published cards are counted separately.`;
   if(state==='HISTORICAL')return 'No cards published in this issued report. Selection-by-selection analysis coverage was not recorded in this historical report; zero cards does not establish that zero markets were available.';
@@ -787,6 +789,7 @@ function instrumentGauge(d,title,type,reading){
   const defs=type==='heat'?[['DORM','g'],['QUIET','g'],['FORM','y'],['ACTIVE','y'],['PRESS','y'],['HOT','r'],['EXTREME','r']]:type==='pressure'?[['AGAINST','r'],['NEUTRAL','y'],['FAVOR','g']]:[['FRAG','r'],['MIXED','y'],['STRONG','g'],['CONSENSUS','g']];
   const band=el(d,'div',`instrumentBand ${type}`);defs.forEach(([label,c])=>band.appendChild(el(d,'span',c,label)));wrap.appendChild(band);
   const evidence=reading.evidenceQuality?` • ${reading.evidenceQuality}`:'',excluded=`${reading.conflictingSelections?` • ${reading.conflictingSelections} CONFLICTING SIDES EXCLUDED`:''}${reading.unverifiedReferences?` • ${reading.unverifiedReferences} UNVERIFIED REFERENCES EXCLUDED`:''}`;wrap.appendChild(el(d,'div','instrumentConf',`${measured?'':'PARKED • '}CONF ${reading.confidence}%${evidence}${reading.pairs?` • ${reading.pairs} PAIRS`:''}${excluded}`));
+  wrap.appendChild(el(d,'div','runnerMeterHelp',({heat:'How actively prices are moving.',pressure:'Whether prices improve for our selected sides.',agreement:'How closely the two books agree.'})[type]));
   return wrap
 }
 function instrumentCluster(d,run){const r=deriveInstrumentReadings(run),cluster=el(d,'div','instrumentCluster');cluster.append(instrumentGauge(d,'MARKET HEAT','heat',r.heat),instrumentGauge(d,'PRICE PRESSURE','pressure',r.pressure),instrumentGauge(d,'MARKET AGREEMENT','agreement',r.agreement));return cluster}
@@ -906,12 +909,112 @@ function sessionStrip(d,run){
 }
 function filterTools(d,run,container){
   const tools=el(d,'div','runnerTools');
+  tools.id='runnerPickFilters';tools.setAttribute('aria-label','Filter published selections');
   ['ALL','BET','LEAN','WAIT','PASS'].forEach(k=>{
     const b=el(d,'button','filterBtn'+(statusFilter===k?' active':''),k);
-    b.onclick=()=>{statusFilter=k;apply(run)};
+    b.type='button';b.id='runnerStatus'+k;b.setAttribute('aria-pressed',String(statusFilter===k));
+    b.onclick=()=>setPickFilter(d,run,k,sportFilter,b.id);
     tools.appendChild(b)
   });
+  const label=el(d,'label','runnerSportLabel','SPORT');label.htmlFor='runnerSportFilter';
+  const select=el(d,'select','runnerSportSelect');select.id='runnerSportFilter';
+  ['ALL',...runSports(run)].forEach(s=>{const option=el(d,'option','',s==='ALL'?'ALL SPORTS':s);option.value=s;option.selected=s===sportFilter;select.appendChild(option)});
+  select.onchange=()=>setPickFilter(d,run,statusFilter,select.value,select.id);
+  label.appendChild(select);tools.appendChild(label);
+  const showing=filteredPicks(run).length,total=(run.recs||[]).length;
+  const summary=el(d,'div','runnerFilterSummary',`Showing ${showing} of ${total} published cards${sportFilter!=='ALL'?' • '+sportFilter:''}${statusFilter!=='ALL'?' • '+statusFilter:''}`);
+  summary.setAttribute('role','status');tools.appendChild(summary);
   container.appendChild(tools)
+}
+function recSport(rec){
+  const raw=rec?.coreAssessment?.context?.sport||rec?.sport||rec?.feed?.sportKey||String(rec?.meta||'').split('|')[0];
+  const value=String(raw||'').trim().toUpperCase();
+  return ({AMERICANFOOTBALL_NFL:'NFL',AMERICANFOOTBALL_NCAAF:'NCAAF',BASKETBALL_NBA:'NBA',BASKETBALL_WNBA:'WNBA',BASKETBALL_NCAAB:'NCAAB',BASEBALL_MLB:'MLB',ICEHOCKEY_NHL:'NHL'})[value]||value||'OTHER';
+}
+function runSports(run){return [...new Set((run?.recs||[]).map(recSport))].sort()}
+function filteredPicks(run){
+  const rank={BET:0,LEAN:1,WAIT:2,PASS:3};
+  return (run?.recs||[]).filter(r=>(sportFilter==='ALL'||recSport(r)===sportFilter)&&(statusFilter==='ALL'||String(r.status||'WAIT').toUpperCase()===statusFilter)).slice().sort((a,b)=>(rank[a.status]??4)-(rank[b.status]??4));
+}
+function setPickFilter(d,run,status,sport,focusId,scroll=false){
+  statusFilter=status;sportFilter=sport;apply(run);
+  d.getElementById(focusId)?.focus({preventScroll:true});
+  if(scroll)d.getElementById('runnerPickFilters')?.scrollIntoView({block:'start',behavior:'auto'});
+  document.dispatchEvent(new CustomEvent('vigscope-app-ready'));
+}
+function pickReason(rec){
+  const raw=String(rec?.marketAssessment?.decisionRationale||rec?.coreAssessment?.rationale||rec?.analysis||rec?.edge||rec?.support||'Open analysis for the recorded reasoning.').replace(/\s+/g,' ').trim();
+  const first=raw.split(/(?<=[.!?])\s+(?=[A-Z])/)[0];
+  return first.length<=260?first:first.slice(0,257).replace(/\s+\S*$/,'')+'…';
+}
+function pickMeta(rec){
+  const parts=String(rec?.meta||'').split('|').map(x=>x.trim()).filter(Boolean);
+  const matchup=parts.find(x=>/@|\bvs\.?\b/i.test(x))||'';
+  const ts=rec?.feed?.eventDate||parts.find(x=>/^\d{4}-\d\d-\d\dT/.test(x));
+  let time='';if(Number.isFinite(Date.parse(ts)))time=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}).format(new Date(ts))+' PT';
+  return [recSport(rec),matchup,time].filter(Boolean).join(' • ');
+}
+function changeIdentity(rec){
+  const f=rec?.feed||{},key=String(f.selectionKey||rec?.selectionKey||'');
+  // Canonical keys retain participant/period identity; only the final line segment is removed.
+  const logical=key.includes('|')?key.slice(0,key.lastIndexOf('|')):null;
+  return logical?[recSport(rec),rec?.coreAssessment?.context?.marketDetail||'',logical].join('|'):
+    f.eventId&&f.marketKey&&f.side?[recSport(rec),f.eventId,f.marketKey,f.side,f.label||''].join('|'):null;
+}
+function pickLine(rec){const f=rec?.feed||{};const v=f.hdp??f.line;if(v===null||v===undefined||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null}
+function compareRunPicks(current,prior,sport='ALL'){
+  const group=run=>{const m=new Map();for(const rec of run?.recs||[]){const key=changeIdentity(rec);if(key)m.set(key,[...(m.get(key)||[]),rec])}return m};
+  const before=group(prior),now=group(current),changes=[];
+  for(const [key,records] of now){
+    if(records.length!==1)continue;
+    const rec=records[0];if(sport!=='ALL'&&recSport(rec)!==sport)continue;
+    const matches=before.get(key)||[];if(matches.length>1)continue;
+    const old=matches[0],labels=[];
+    if(!old)labels.push('NEW SELECTION');
+    else{
+      if(rec.status!==old.status)labels.push(`${old.status} → ${rec.status}`);
+      const a=pickLine(old),b=pickLine(rec);
+      if(a!==null&&b!==null&&a!==b)labels.push(`LINE CHANGED: ${old.title} → ${rec.title}`);
+      else if(a===b&&rec.book===old.book){
+        const from=displayPrice(old.price),to=displayPrice(rec.price),p=americanProb(americanFromText(from)),q=americanProb(americanFromText(to));
+        if(p!==null&&q!==null&&Math.abs(p-q)>=.005)labels.push(`PRICE: ${from} → ${to} (${rec.book})`);
+      }
+      if(rec.book!==old.book)labels.push(`BOOK: ${old.book||'unspecified'} → ${rec.book||'unspecified'}`);
+    }
+    if(labels.length)changes.push({rec,labels,newSelection:!old,statusChanged:Boolean(old&&old.status!==rec.status)});
+  }
+  const rank={BET:0,LEAN:1,WAIT:2,PASS:3};
+  return changes.sort((a,b)=>(rank[a.rec.status]??4)-(rank[b.rec.status]??4)||Number(b.statusChanged)-Number(a.statusChanged));
+}
+async function fetchPriorChangeRun(run){
+  const response=await fetch(`${RUN_HISTORY_URL}?t=${Date.now()}`,{cache:'no-store'});if(!response.ok)throw new Error('History unavailable');
+  const index=await response.json(),day=vancouverSessionNow(new Date(run.ts)).day;
+  const entry=(index.runs||[]).filter(x=>Number.isFinite(Date.parse(x.ts))&&Date.parse(x.ts)<Date.parse(run.ts)&&vancouverSessionNow(new Date(x.ts)).day===day).sort((a,b)=>Date.parse(b.ts)-Date.parse(a.ts))[0];
+  if(!entry)return null;
+  if(!/^data\/history\/runs\/\d{4}-\d{2}-\d{2}\/[a-z_]+-\d{6}\.json$/.test(entry.path))throw new Error('History path unavailable');
+  const res=await fetch(`./${entry.path}?t=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error('Earlier report unavailable');
+  const prior=await res.json();if(prior.ts!==entry.ts||prior.slot!==entry.slot||!Array.isArray(prior.recs))throw new Error('Earlier report identity mismatch');
+  return normalizeRun(prior);
+}
+function changesPanel(d,run){
+  const panel=el(d,'section','runnerChanges');panel.id='runnerChanges';panel.setAttribute('aria-label','Changes since the previous issued report');
+  const render=(prior,state)=>{
+    panel.replaceChildren(el(d,'div','sectiontitle','SINCE LAST RUN'));
+    if(!prior){panel.appendChild(el(d,'div','runnerChangesNote',state==='LOADING'?'Checking the previous same-day report…':state==='ERROR'?'Earlier report could not be loaded. Changes are unavailable.':'First report of the day — no earlier issued report to compare.'));return}
+    const changes=compareRunPicks(withoutComparison(run),prior,sportFilter);
+    panel.appendChild(el(d,'div','runnerChangesNote',`Compared with ${prior.label||prior.slot} • ${vancouverClock(prior.ts)}${sportFilter!=='ALL'?' • '+sportFilter:''}`));
+    if(!changes.length){panel.appendChild(el(d,'div','runnerChangesNote','No new selections, status changes, line changes or meaningful price moves in comparable selections.'));return}
+    const details=el(d,'details','runnerChangesList');
+    details.appendChild(el(d,'summary','',`${changes.length} changed selections • ${changes.filter(x=>x.newSelection).length} new • ${changes.filter(x=>x.statusChanged).length} status changes`));
+    const list=el(d,'ul');for(const change of changes){const item=el(d,'li');item.append(el(d,'b',cls(change.rec.status),`${change.rec.status} • ${change.rec.title}`),el(d,'div','',change.labels.join(' • ')));list.appendChild(item)}
+    details.appendChild(list);panel.appendChild(details);
+    const highlights=changes.filter(x=>x.statusChanged||x.newSelection||x.labels.some(label=>/^(LINE CHANGED|PRICE:)/.test(label))).slice(0,3);
+    highlights.forEach((change,index)=>{const preview=el(d,'div','runnerChangePreview',`${change.rec.status} • ${change.rec.title} — ${change.labels.map(label=>label.startsWith('LINE CHANGED:')?'LINE CHANGED':label).join(' • ')}`);preview.dataset.previewIndex=String(index);panel.appendChild(preview)});
+  };
+  render(null,'LOADING');const key=runKey(run);
+  if(!priorChangesCache.has(key))priorChangesCache.set(key,fetchPriorChangeRun(run).then(prior=>({prior,state:'READY'})).catch(()=>({prior:null,state:'ERROR'})));
+  priorChangesCache.get(key).then(({prior,state})=>{if(d.getElementById('runnerChanges')===panel)render(prior,state)});
+  return panel;
 }
 function priceWatchMeta(r){
   if(String(r?.status||'PASS').toUpperCase()!=='PASS')return null;
@@ -920,12 +1023,12 @@ function priceWatchMeta(r){
   return {target,reason:txt(w.reason,'').trim()}
 }
 function card(d,r){
-  const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
+  const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);c.dataset.status=r.status;c.dataset.sport=recSport(r);
   const top=el(d,'div','runnerTop'),l=el(d,'div');
   const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
   const badges=el(d,'div','runnerBadgeRow');badges.appendChild(badge);
   if(watch)badges.appendChild(el(d,'span','priceWatchBadge','PRICE WATCH'));
-  l.append(badges,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  l.append(badges,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',pickMeta(r)));
   if(watch)l.appendChild(el(d,'div','runnerMeta priceWatchTarget',`WATCH TARGET: ${watch.target}${watch.reason?` // ${watch.reason}`:''}`));
   const rr=el(d,'div','execution');
   const snapshotTime=displayPriceTime(r.price);
@@ -934,6 +1037,10 @@ function card(d,r){
   const stateLabel=snapshotTime&&state==='ISSUED SNAPSHOT'?`${state} • ${snapshotTime}`:state;
   rr.appendChild(el(d,'div','priceState '+(state==='UPDATED'?'updated':state==='REFRESH UNRESOLVED'?'unresolved':''),stateLabel));
   top.append(l,rr);c.appendChild(top);
+  c.appendChild(el(d,'div','runnerPickReason',pickReason(r)));
+  const status=String(r.status||'WAIT').toUpperCase(),target=r.playTo||r.betAt;
+  if(['BET','LEAN','WAIT'].includes(status)&&target)c.appendChild(el(d,'div','runnerPickAction',`${status==='WAIT'?'WATCH FOR':'PLAY TO'}: ${target}${status==='BET'?' • STAKE '+txt(r.stake,'$0'):''}`));
+  const expanded=el(d,'div','runnerExpanded');expanded.hidden=true;
 
   if(r.priceComparison){
     const pc=r.priceComparison,panel=el(d,'div','comparisonPanel');
@@ -956,23 +1063,23 @@ function card(d,r){
   const stake=el(d,'div','decisionFact stakeFact');stake.append(el(d,'div','key','STAKE'),el(d,'div','value',txt(r.stake,'$0')));
   const fallbackPlayTo=String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':(/STALE|UNVERIFIED/i.test(String(r.priceState||''))?'WAIT FOR FRESH PRICE':'NOT SET');
   const playTo=el(d,'div','decisionFact');playTo.append(el(d,'div','key','BET AT / PLAY TO'),el(d,'div','value',txt(r.playTo||r.betAt,fallbackPlayTo)));
-  decision.append(fair,move,stake,playTo);c.appendChild(decision);
+  decision.append(fair,move,stake,playTo);expanded.appendChild(decision);
 
   const facts=el(d,'div','runnerFacts');
   [['HIST FIT',r.hist],['SUPPORT',r.support],['CONTRARY',r.contrary],['SOURCE',r.source]].forEach(([k,v])=>{
     if(v===undefined||v===null||v==='')return;
     const f=el(d,'div','runnerFact');f.append(el(d,'b','',k),d.createElement('br'),d.createTextNode(txt(v)));facts.appendChild(f)
   });
-  if(facts.children.length)c.appendChild(facts);
+  if(facts.children.length)expanded.appendChild(facts);
+  if(r.meta)expanded.appendChild(el(d,'div','runnerDetail open','ISSUED EVENT METADATA: '+r.meta));
 
   if(r.grahamFairReview?.decisionImpact){
-    c.appendChild(el(d,'div','runnerDetail open',`GRAHAM ${r.grahamFairReview.disposition}: ${r.grahamFairReview.decisionImpact}`));
+    expanded.appendChild(el(d,'div','runnerDetail open',`GRAHAM ${r.grahamFairReview.disposition}: ${r.grahamFairReview.decisionImpact}`));
   }
-  if(r.analysis){
-    const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS'),det=el(d,'div','runnerDetail',r.analysis);
-    b.onclick=()=>{det.classList.toggle('open');b.textContent=det.classList.contains('open')?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS'};
-    c.append(b,det)
-  }
+  if(r.analysis)expanded.appendChild(el(d,'div','runnerDetail open',r.analysis));
+  const b=el(d,'button','runnerBtn','▶ VIEW ANALYSIS');b.type='button';b.setAttribute('aria-expanded','false');
+  b.onclick=()=>{expanded.hidden=!expanded.hidden;b.setAttribute('aria-expanded',String(!expanded.hidden));b.textContent=expanded.hidden?'▶ VIEW ANALYSIS':'▼ HIDE ANALYSIS'};
+  c.append(b,expanded);
   return c
 }
 function priorSection(d,run){
@@ -1006,6 +1113,7 @@ function hideStaticMarket(market){[...market.children].forEach(x=>{if(x.id!=='ru
 function apply(run){
   const frame=$('#app'),d=frame.contentDocument;if(!d)return;
   injectStyle(d);
+  if(!d.getElementById('runnerPicksUiStyles')){const link=el(d,'link');link.id='runnerPicksUiStyles';link.rel='stylesheet';link.href='./assets/runner-picks-ui.css?v=20261001';d.head.appendChild(link)}
   const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
   const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='VIGSCOPE TERMINAL UI v1.3';
   const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
@@ -1029,6 +1137,7 @@ function apply(run){
   const empty=d.getElementById('runnerEmpty');if(empty)empty.remove();
   if(run.__error){const e=$('#err');e.textContent='VigScope runner payload error: '+run.__error;e.style.display='block';return}
   setStats(d,run);
+  if(sportFilter!=='ALL'&&!runSports(run).includes(sportFilter))sportFilter='ALL';
 
   const board=d.getElementById('board');
   if(board){
@@ -1037,7 +1146,8 @@ function apply(run){
     const box=el(d,'div');box.id='runnerLive';
 
     const head=el(d,'div','runnerHead'),left=el(d,'div'),right=el(d,'div','runnerHeadRight');
-    left.append(el(d,'div','runnerTitle',txt(run.label||run.slot,'CURRENT RUN')),el(d,'div','small muted',txt(run.ts,'')));
+    const issuedTime=el(d,'time','runnerIssuedTime muted',`ISSUED ${vancouverClock(run.ts)} PT`);issuedTime.dateTime=run.ts;
+    left.append(el(d,'div','runnerTitle',txt(run.label||run.slot,'CURRENT RUN')),issuedTime);
     const issuedMeterRun=run.comparison?(originalRun||withoutComparison(run)):run,state=marketState(issuedMeterRun);
     const priceStateText=run.comparison?`COMPARED ${vancouverClock(run.comparison.feedGeneratedAt)} • ISSUED SNAPSHOT SAVED`:run.feedGeneratedAt?`ODDS ${vancouverClock(run.feedGeneratedAt)} • ${ageLabel(run.feedGeneratedAt)}`:'SNAPSHOT PRICE STATE';
     const fresh=el(d,'div','runnerFresh');
@@ -1048,15 +1158,17 @@ function apply(run){
     const coverage=coveragePanel(d,issuedMeterRun);if(coverage)box.appendChild(coverage);
     box.appendChild(sessionStrip(d,run));
 
-    const counts=el(d,'div','runnerCounts'),cc=run.counts||{};
+    const counts=el(d,'div','runnerCounts'),cc=sportFilter==='ALL'?run.counts||{}:(run.recs||[]).filter(r=>recSport(r)===sportFilter).reduce((out,r)=>{const k=String(r.status||'').toLowerCase();out[k]=(out[k]||0)+1;return out},{});
     [['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{
-      const q=el(d,'div','runnerCount');q.append(el(d,'div','callName '+cls(k),k),el(d,'b',cls(k),txt(v,0)));counts.appendChild(q)
+      const q=el(d,'button','runnerCount filterBtn');q.type='button';q.id='runnerCount'+k;q.setAttribute('aria-pressed',String(statusFilter===k));q.setAttribute('aria-label',`${k}: ${txt(v,0)} ${sportFilter==='ALL'?'':sportFilter+' '}cards. Filter ${k}.`);
+      q.onclick=()=>setPickFilter(d,run,statusFilter===k?'ALL':k,sportFilter,q.id,true);
+      q.append(el(d,'div','callName '+cls(k),k),el(d,'b',cls(k),txt(v,0)));counts.appendChild(q)
     });
     box.appendChild(counts);
 
     const summary=el(d,'div','runnerSummary',txt(run.summary,'No summary supplied.'));box.appendChild(summary);
     const intelligence=globalThis.BettingEdgeIntelligence?.render(d,issuedMeterRun.gameIntelligence);
-    if(intelligence)box.appendChild(intelligence);
+    if(intelligence){const details=el(d,'details','runnerMarketReview');details.append(el(d,'summary','','GAME CONTEXT • LINEUPS AND MATCHUP NOTES'),intelligence);box.appendChild(details)}
 
     const refresh=el(d,'div','runnerRefresh'),latestReport=isLatestSessionRun(run);
     let refreshStatus=null,refreshBtn=null;
@@ -1081,10 +1193,11 @@ function apply(run){
       refresh.appendChild(delta)
     }
     box.appendChild(refresh);
-    const candidates=candidateAssessmentPanel(d,issuedMeterRun);if(candidates)box.appendChild(candidates);
+    const candidates=candidateAssessmentPanel(d,issuedMeterRun);if(candidates){const details=el(d,'details','runnerMarketReview');details.append(el(d,'summary','','MARKET REVIEW • COVERAGE AND CANDIDATE NOTES'),candidates);box.appendChild(details)}
     filterTools(d,run,box);
+    box.appendChild(changesPanel(d,issuedMeterRun));
 
-    const recs=(Array.isArray(run.recs)?run.recs:[]).filter(r=>statusFilter==='ALL'||String(r.status||'WAIT').toUpperCase()===statusFilter);
+    const recs=filteredPicks(run);
     recs.forEach(r=>box.appendChild(card(d,r)));
     if(!recs.length)box.appendChild(el(d,'div','runnerSummary runnerNoCards',noPublishedCardsText(run)));
 
