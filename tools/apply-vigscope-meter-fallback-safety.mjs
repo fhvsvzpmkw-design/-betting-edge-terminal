@@ -13,6 +13,13 @@ function replaceOnce(text,from,to,label){
 
 let runtime=fs.readFileSync(RUNTIME,'utf8');
 
+// This historical migration must not reapply retired display rules to a
+// runtime that already uses the safe explicit movement parser.
+if(runtime.includes('function explicitMovementOddsPairs(v)')&&runtime.includes('const pairs=explicitMovementOddsPairs(rec?.move);')&&!runtime.includes('const nums=signedOdds(rec?.move);')){
+  console.log('VIGSCOPE MOVEMENT SAFETY ALREADY APPLIED — CURRENT METER PRESENTATION PRESERVED');
+  process.exit(0);
+}
+
 runtime=replaceOnce(
   runtime,
   "function signedOdds(v){return [...String(v||'').replace(/−/g,'-').matchAll(/([+-]\\d{2,4})(?![\\d.])/g)].map(m=>Number(m[1])).filter(Number.isFinite)}\nfunction recWeight(rec){",
