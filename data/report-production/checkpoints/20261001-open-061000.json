@@ -7,8 +7,8 @@
     "canonicalSlot": 1,
     "feedBlobSha": "074bc784d7266f97d17ff22ceab21556c19815dc"
   },
-  "phase": "PREPARED",
-  "revision": 19,
+  "phase": "PUBLISHED",
+  "revision": 22,
   "report": {
     "ts": "2026-10-01T06:26:00-07:00",
     "slot": "open",
@@ -194579,6 +194579,27 @@
       "revision": 19,
       "phase": "PREPARED",
       "durationMs": 4370
+    },
+    {
+      "command": "freeze",
+      "at": "2026-10-01T13:34:49.061Z",
+      "revision": 20,
+      "phase": "FROZEN",
+      "durationMs": 3568
+    },
+    {
+      "command": "stage",
+      "at": "2026-10-01T13:34:53.062Z",
+      "revision": 21,
+      "phase": "STAGED",
+      "durationMs": 3737
+    },
+    {
+      "command": "readback",
+      "at": "2026-10-01T13:41:11.075Z",
+      "revision": 22,
+      "phase": "PUBLISHED",
+      "durationMs": 4464
     }
   ],
   "preparation": {
@@ -194684,5 +194705,107 @@
         }
       ]
     }
+  },
+  "validation": {
+    "schema": 1,
+    "mode": "validate",
+    "state": "PASS",
+    "receipts": [
+      {
+        "gate": "personnel-semantic-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 128
+      },
+      {
+        "gate": "major-sport-market-coverage-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 564
+      },
+      {
+        "gate": "report-evidence-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 135
+      },
+      {
+        "gate": "report-event-eligibility.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 91
+      },
+      {
+        "gate": "report-sidecar-contract.mjs",
+        "command": "check",
+        "state": "PASS",
+        "durationMs": 122
+      },
+      {
+        "gate": "core-assessment-trace-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 84
+      },
+      {
+        "gate": "core-v14-publication-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 142
+      },
+      {
+        "gate": "pinnacle-benchmark-publication-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 166
+      },
+      {
+        "gate": "selection-continuity.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 135
+      },
+      {
+        "gate": "moneyline-lineage.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 298
+      },
+      {
+        "gate": "selection-availability.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 148
+      },
+      {
+        "gate": "spread-lineage.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 231
+      },
+      {
+        "gate": "total-lineage.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 166
+      },
+      {
+        "gate": "report-publication.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 928
+      }
+    ]
+  },
+  "frozen": {
+    "blobSha": "ece24686345e84b0b0cee8fd43af7fc043bfdca5",
+    "bytes": 10075334
+  },
+  "publication": {
+    "reportPath": "data/history/runs/2026-10-01/open-062600.json",
+    "sidecarPath": "data/history/research-fit/2026-10-01/open-062600.json",
+    "reportBlobSha": "345aebf3da81152d8c69df80087999d4cf375f53",
+    "sidecarBlobSha": "be7cad1eb91eefa0421a50059e429d6e030020dd",
+    "readbackAt": "2026-10-01T13:41:11.075Z"
   }
 }
