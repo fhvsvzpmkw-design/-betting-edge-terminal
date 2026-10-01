@@ -162,6 +162,22 @@ export function evaluateForecast(record, candidate, {asOf, revalidations = [], r
     comparison: eligible ? forecastPriceComparison(record, candidate.priceDecimal) : null};
 }
 
+// The publisher replays the original record and current applicability review.
+// A producer-written ELIGIBLE_EXACT display field is not sufficient authority.
+export function validateBoundForecastLean({report, sidecar, selection, receipt, feed = null}) {
+  const rec=receipt?.decision, a=rec?.forecastLean;
+  if (a==null) return false;
+  const records=list(sidecar.forecastEvidence?.records).filter(r=>r.recordId===a.forecastRecordId);
+  if (records.length!==1) throw new Error('Forecast LEAN requires one immutable bound record');
+  const raw=records[0], candidate=forecastCandidate(selection,{receipt,feed});
+  const actual=evaluateForecast(raw,candidate,{asOf:report.ts,revalidations:sidecar.forecastEvidence?.revalidations});
+  if (actual.eligibility!=='ELIGIBLE_EXACT' || actual.comparison?.direction!=='SUPPORTS_PRICE' || actual.probability!==a.probability || actual.probabilityBasis!==a.probabilityBasis)
+    throw new Error(`Forecast LEAN bound record/applicability does not qualify: ${actual.reasons.join(', ')}`);
+  const display=list(rec.forecastReview?.records).filter(r=>r.recordId===a.forecastRecordId);
+  if (display.length!==1 || !isDeepStrictEqual(display[0],actual)) throw new Error('Forecast LEAN reviewed display differs from bound source replay');
+  return true;
+}
+
 function validateAttempts(attempts, candidate, asOf) {
   return list(attempts).filter(attempt => attempt.selectionId === candidate.selectionId).map(attempt => {
     const valid = !!text(attempt.attemptId) && !!text(attempt.sourceId) && /^https?:\/\//i.test(text(attempt.url)) &&

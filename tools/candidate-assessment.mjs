@@ -4,6 +4,7 @@ import {forecastPriceComparison} from './forecast-evidence.mjs';
 import {compareGrahamFair, reviewGrahamHandoff} from './graham-fair-handoff.mjs';
 import {compareRecordedFair} from './native-fair-review.mjs';
 import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
+import {FORECAST_LEAN_FROM,validateForecastLean} from './forecast-lean.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -62,9 +63,11 @@ function personnelReview(receipt, review, report) {
   // A nonfinal batting order can be immaterial to a market comparison while a
   // forecast's starter assumption still needs review. Require that distinction.
   const distinction = !discrepancy || (text(p?.materialityExplanation) && text(p?.remainingUncertainty));
+  let provisionalLean=false;
+  try { provisionalLean=receipt?.decision?.forecastLean?.provisional===true && validateForecastLean(report,receipt.decision,sources); } catch {}
   const completedUnresolved = p?.state === 'REVIEW_COMPLETED_UNRESOLVED' && text(p.rationale) && text(p.materialityExplanation) &&
     text(p.remainingUncertainty) && text(p.decisionImpact) && sourceLinked(p.sourceIds, sources, ['OFFICIAL', 'REPORTING']) &&
-    (receipt?.decision?.status === 'PASS' || (receipt?.decision?.status === 'WAIT' && recordedWaitQualification(receipt)));
+    (receipt?.decision?.status === 'PASS' || provisionalLean || (receipt?.decision?.status === 'WAIT' && recordedWaitQualification(receipt)));
   return {resolved: p?.state !== 'REVIEW_COMPLETED_UNRESOLVED' && Boolean((explicit && distinction) || (marketResolved && !discrepancy)),
     producerComplete: Boolean((explicit && distinction) || completedUnresolved), discrepancy: Boolean(discrepancy),
     state: p?.state || (marketResolved ? 'RESOLVED' : 'UNRESOLVED'),
@@ -209,6 +212,10 @@ function completion(report, selection, receipt, best, options, forecast, review)
   if (!personnel.producerComplete) missing.push(personnel.discrepancy ? 'PERSONNEL_MATERIALITY_DISTINCTION_REQUIRED' : 'SOURCE_LINKED_PERSONNEL_RESOLUTION_REQUIRED');
   const decision = review?.decision;
   if (!['BET', 'LEAN', 'WAIT', 'PASS'].includes(decision?.status) || decision.status !== receipt?.decision?.status || !text(decision?.rationale)) missing.push('FINAL_DECISION_EXPLANATION_REQUIRED');
+  const forecastSupportsPrice=list(selected?.forecastComparisons).some(row=>row.direction==='SUPPORTS_PRICE');
+  if (time(report.ts)>=time(FORECAST_LEAN_FROM) && forecastSupportsPrice && decision?.status==='PASS' &&
+      (decision.directionalReview?.state!=='REJECTED' || !text(decision.directionalReview.rationale)))
+    missing.push('FORECAST_SUPPORTED_PASS_REQUIRES_DIRECTIONAL_REVIEW');
   if (best.marketComparison?.direction === 'FAVORABLE' && (decision?.marketRoute?.considered !== true || !text(decision?.marketRoute?.rationale))) missing.push('QUALIFIED_MARKET_LEAN_ROUTE_NOT_ASSESSED');
   if (technicalLeanEligible && decision?.status === 'PASS' && !text(decision?.marketPassReason)) missing.push('FAVORABLE_MARKET_PASS_REQUIRES_SUBSTANTIVE_REASON');
   const eligibility = decision?.betEligibility, fair = receipt?.decision?.fairValueEvidence;

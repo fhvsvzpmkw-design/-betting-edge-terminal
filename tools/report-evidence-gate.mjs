@@ -4,11 +4,12 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {validateMarketAssessment} from './market-price-assessment.mjs';
 import {validateCardEvidenceBundle, validateRecommendationCardEvidence} from './card-evidence-identity.mjs';
+import {validateForecastLean,validateForecastLeanDirections} from './forecast-lean.mjs';
 
 // Historical reports remain immutable. This adds evidence requirements for the
 // next scheduled lane; it does not supply a model, a fair, or a betting threshold.
 export const REPORT_EVIDENCE_FROM = '2026-09-05T17:00:00-07:00';
-export const REPORT_EVIDENCE_FIELDS = Object.freeze(['sourceEvidence', 'sourceShortfall', 'fairValueEvidence', 'benchmarkComparison', 'marketAssessment']);
+export const REPORT_EVIDENCE_FIELDS = Object.freeze(['sourceEvidence', 'sourceShortfall', 'fairValueEvidence', 'benchmarkComparison', 'marketAssessment', 'forecastLean']);
 const SERIOUS = new Set(['BET', 'LEAN', 'WAIT']);
 const SOURCE_KINDS = new Set(['OFFICIAL', 'REPORTING', 'MODEL', 'MARKET']);
 const SHORTFALL_REASONS = new Set(['SOURCE_UNAVAILABLE', 'MARKET_UNAVAILABLE', 'QUOTE_STALE', 'IDENTITY_UNRESOLVED', 'EVENT_INELIGIBLE']);
@@ -182,6 +183,7 @@ export function validateRecommendationEvidence(report, rec, item, index) {
     ensure(unavailableFair(rec), `${label} identity-shortfall PASS must state unavailable fair without an unsupported numeric estimate`);
   }
   const ids = sourceEvidence(rec, item, sport, reportMs, label);
+  validateForecastLean(report, rec, ids);
   if (!validateMarketAssessment(report, rec, item, ids)) fairEvidence(rec, item, ids, label);
   benchmarkEvidence(rec, label);
   leanWording(rec, label);
@@ -200,6 +202,7 @@ export function validateReportEvidence(report, sidecar) {
   }
   ensure(!errors.length, `Report evidence contains ${errors.length} recommendation defect(s):\n- ${errors.join('\n- ')}`);
   validateCardEvidenceBundle(report, sidecar);
+  validateForecastLeanDirections(report);
   return {enforced: true, checked: report.recs.length};
 }
 

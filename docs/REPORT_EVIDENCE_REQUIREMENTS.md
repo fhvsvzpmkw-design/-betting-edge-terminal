@@ -1,5 +1,9 @@
 # Report source and fair-value evidence
 
+## Directional LEAN — October 1 noon Pacific forward amendment
+
+For new reports at/after `2026-10-01T12:00:00-07:00`, follow `FORECAST_DIRECTIONAL_LEANS.md`. The existing qualified exact market assessment may carry a separately attributed `forecastLean` from one current exact eligible published outcome probability that supports the current quote. It is a zero-stake opinion with explicitly unquantified forecast uncertainty, not an adopted numeric fair/range or BET. Retain the actual Pinnacle comparison even when unfavorable. Completed unresolved personnel can support only a visibly provisional opinion with a named recheck; actual source/applicability, Stage 2 where required and quarterback checks remain enforced. The publisher replays the original record and current applicability. Any eligible forecast-supported PASS additionally requires the explicit candidate directional rejection review. Historical evidence and other routes retain their existing requirements.
+
 ## Candidate completion — September 15 18:15 forward amendment
 
 For reports at/after `2026-09-15T18:15:00-07:00`, follow `CANDIDATE_ASSESSMENT.md`. The ranked paired-market queue identifies concrete favorable-price and exact-forecast questions. Record their actual source-to-decision review, including accepted/rejected forecast records and material personnel reconciliation. A supported market LEAN still does not require an independent model or numerical range. Adopt a forecast fair coherently across the exact opposing contract before assessing both prices.

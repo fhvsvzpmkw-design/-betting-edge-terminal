@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import quoteObservation from '../assets/quote-observation.js';
 import { validateRecommendationEvidence } from './report-evidence-gate.mjs';
 import {marketAssessmentEnabled, loadBoundMarketObserver, validateBoundMarketAssessment} from './market-price-assessment.mjs';
+import {validateBoundForecastLean} from './forecast-evidence.mjs';
 import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
 import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
 
@@ -641,6 +642,7 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
     ensure(nonEmpty(decision.analysis), `${label} requires event-specific analysis and decision rationale`);
     if (decision.status !== 'BET') ensure(/^\$?0(?:\.0+)?$/.test(String(decision.stake)), `${label} non-BET decision must carry zero stake`);
     validateRecommendationEvidence(report, decision, evidence, index);
+    validateBoundForecastLean({report,sidecar,selection,receipt,feed});
     const marketAssessment = marketAssessmentEnabled(report) && decision.marketAssessment != null;
     if (marketAssessment) validateBoundMarketAssessment(report, decision, observer);
     else {
