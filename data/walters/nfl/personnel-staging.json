@@ -1,54 +1,157 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-daily-review-personnel-2026-w04-20261001T114152-0700",
-  "runEventId": "graham-daily-review-2026-w04-20261001T113526-0700",
+  "batchId": "graham-delta-1645-personnel-2026-w04-20261001T165220-0700",
+  "runEventId": "graham-delta-1645-2026-w04-20261001T164756-0700",
   "season": 2026,
   "week": 4,
-  "startedAt": "2026-10-01T11:35:26-07:00",
-  "effectiveAt": "2026-10-01T11:41:52-07:00",
+  "startedAt": "2026-10-01T16:47:56-07:00",
+  "effectiveAt": "2026-10-01T16:52:20-07:00",
   "marketViewed": false,
-  "sourceTask": "DAILY_REVIEW",
+  "sourceTask": "DELTA_1645",
   "cases": [
     {
-      "personnelEventId": "2026-W04-PIT-22706-OUT-20261001T114152-0700",
-      "caseKey": "2026-W04-PIT-Joey-Porter-Jr",
+      "personnelEventId": "2026-W04-PIT-21039-ESTIMATE-20261001T165220-0700",
+      "caseKey": "2026-W04-PIT-Rico-Dowdle",
       "gameKey": "2026-W04-PIT-CLE",
       "team": "PIT",
       "side": "AWAY",
-      "player": "Joey Porter Jr.",
-      "playerEaId": "22706",
-      "currentRole": "FORMER_STARTING_CORNERBACK_TRADED",
+      "player": "Rico Dowdle",
+      "playerEaId": "21039",
+      "currentRole": "SECOND_RUNNING_BACK",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "DISPLACED_BASELINE_SECONDARY_ROLES_AND_CLUSTER_UNRESOLVED",
-      "reason": "Pittsburgh traded Joey Porter Jr. to Dallas after he was ruled out for Thursday. Pittsburgh's updated depth chart lists Asante Samuel Jr. and Jamel Dean as the outside starters, Jalen Ramsey at nickel and Brandin Echols behind Ramsey. Those defenders already carry baseline duties, Ramsey remains questionable with a broken wrist, and Dallas has not resolved Porter's Week 4 availability or role. The vacant-role redistribution therefore cannot be isolated without displacing or double-counting baseline duties; preserve the prior fair.",
-      "reopenOn": "An official game-day alignment resolves Pittsburgh's secondary redistribution with separately reconciled baseline duties, or a later governed carried-rating transaction authorizes the team change.",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Pittsburgh's official game-day report again lists Rico Dowdle inactive and now identifies Jaylen Warren as the back asked to carry the load. The prior equal-share reserve estimate is therefore reopened: Eli Heidenreich is inactive, while Warren is the documented primary for Dowdle's additional vacant duties. Preserve Warren's existing starting duties and model only the incremental role through the governed primary-replacement adapter.",
+      "reopenOn": "Pittsburgh changes the active backfield, limits Warren, or reports that another back has assumed the primary additional workload.",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Asante Samuel Jr",
-          "Jamel Dean",
-          "Jalen Ramsey",
-          "Brandin Echols",
-          "Daylen Everette"
+          "Jaylen Warren"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
-        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "replacementClassification": "ONE_FOR_ONE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
       "sourceRefs": [
-        "https://www.dallascowboys.com/news/cowboys-agree-to-terms-on-trade-for-steelers-cb-joey-porter-jr",
-        "https://www.steelers.com/news/week-4-injury-report-browns",
-        "https://www.steelers.com/team/depth-chart/",
-        "data/walters/nfl/player-values/by-team-v1/pit.json"
-      ]
+        "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns",
+        "data/walters/nfl/player-values/by-team-v1/pit.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns"
+      ],
+      "roleSourceRefs": [
+        "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns"
+      ],
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "REPORTED_PRIMARY",
+        "assumptionRationale": "Treat Jaylen Warren as the primary handler of Dowdle's additional vacant role because Pittsburgh's official game-day report says Warren will be asked to carry the load.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Warren retains his existing starting contribution. This estimate applies his locked value only to the separately reported additional load created by Dowdle's confirmed absence.",
+        "baselineSourceIds": [
+          "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns"
+        ],
+        "replacements": [
+          {
+            "player": "Jaylen Warren",
+            "eaPlayerId": "22471",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official game-day reporting names Warren as the back asked to carry the load with Dowdle inactive; only the added vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "personnelEventId": "2026-W04-NO-21721-ESTIMATE-20261001T165220-0700",
+      "caseKey": "2026-W04-NO-Travis-Etienne-Jr",
+      "gameKey": "2026-W04-ATL-NO",
+      "team": "NO",
+      "side": "HOME",
+      "player": "Travis Etienne Jr",
+      "playerEaId": "21721",
+      "currentRole": "CO_STARTING_RUNNING_BACK",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "New Orleans placed Travis Etienne Jr. on injured reserve. The current team depth chart lists Alvin Kamara alongside Etienne with Kendre Miller next, and the club's current role report says Kamara and Miller will handle the vacated load. Estimate only Etienne's additional vacant duties as an equal-share committee; CJ Donaldson retains his separate short-yardage/pass-protection role and receives no replacement credit.",
+      "reopenOn": "New Orleans names a primary replacement, reports unequal additional role shares, changes Kamara or Miller's availability, or materially changes Donaldson's separate role.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Alvin Kamara",
+          "Kendre Miller"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "sourceRefs": [
+        "https://www.neworleanssaints.com/news/ulysses-bentley-iv-david-ojabo-saints-roster-moves-transaction-alert-october-1-2026",
+        "https://www.neworleanssaints.com/news/new-orleans-saints-running-back-depth-being-tested-early",
+        "https://www.neworleanssaints.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/no.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.neworleanssaints.com/news/ulysses-bentley-iv-david-ojabo-saints-roster-moves-transaction-alert-october-1-2026"
+      ],
+      "roleSourceRefs": [
+        "https://www.neworleanssaints.com/news/new-orleans-saints-running-back-depth-being-tested-early",
+        "https://www.neworleanssaints.com/team/depth-chart"
+      ],
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal added vacant-role duty for Alvin Kamara and Kendre Miller, the two active backs the club says will handle Etienne's load.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Kamara and Miller retain their existing contributions; only Etienne's additional vacant duties are estimated. CJ Donaldson's separate short-yardage and pass-protection role remains unchanged and is excluded from replacement credit.",
+        "baselineSourceIds": [
+          "https://www.neworleanssaints.com/news/new-orleans-saints-running-back-depth-being-tested-early",
+          "https://www.neworleanssaints.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Alvin Kamara",
+            "eaPlayerId": "12551",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Club reporting identifies Kamara as one of the two backs who will handle Etienne's vacated load; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.neworleanssaints.com/news/new-orleans-saints-running-back-depth-being-tested-early",
+              "https://www.neworleanssaints.com/team/depth-chart"
+            ]
+          },
+          {
+            "player": "Kendre Miller",
+            "eaPlayerId": "22742",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Club reporting identifies Miller as one of the two backs who will handle Etienne's vacated load; only added duties are estimated.",
+            "sourceRefs": [
+              "https://www.neworleanssaints.com/news/new-orleans-saints-running-back-depth-being-tested-early",
+              "https://www.neworleanssaints.com/team/depth-chart"
+            ]
+          }
+        ]
+      }
     }
   ]
 }
