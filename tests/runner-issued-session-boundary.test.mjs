@@ -158,17 +158,16 @@ const recoveredFirst=await api.recoverCanonicalIssuedRun(damagedFirst);
 assert.ok(recoveredFirst,'archive recovery must also accept the valid first same-day receipt');
 assertJsonEqual(recoveredFirst.instrumentTelemetry,firstSameDay.instrumentTelemetry);
 
-// Presentation must not convert the visible no-reading dash into numeric zero
-// and select adverse-market artwork. A measured zero still remains a number.
+// Parked display positions keep artwork visible without inventing measurements.
 const dashboardSource=fs.readFileSync('assets/report-dashboard-vigscope.js.old','utf8');
 const presentationSource=dashboardSource.slice(dashboardSource.indexOf('  function numberFromInstrument('),dashboardSource.indexOf('  function updateContributorMeters('));
 const presentation={};vm.runInNewContext(presentationSource,presentation);
-const cluster=(values,textContent='')=>({textContent,querySelectorAll:()=>values.map(value=>({querySelector:()=>({textContent:value})}))});
-assert.equal(presentation.stateFromCluster(cluster(['—','—','—'])).file,null,'unmeasured inputs must not choose market artwork');
-assert.equal(presentation.stateFromCluster(cluster(['—','—','—'])).key,'MARKET STATE UNMEASURED');
-assert.equal(presentation.stateFromCluster(cluster(['—','—','—'],'INTEGRITY ERROR')).key,'TELEMETRY INTEGRITY ERROR');
-assert.equal(presentation.stateFromCluster(cluster(['17','—','91'])).key,'MARKET STATE PARTIAL');
-assert.equal(presentation.stateFromCluster(cluster(['0','50','91'])).file,'vig-low-neutral-high.jpg','measured zero must not become missing data');
-assert.equal(presentation.stateFromCluster(cluster(['17','52','91'])).file,'vig-low-neutral-high.jpg','existing measured presentation must remain available');
+const cluster=(values,textContent='')=>({textContent,querySelectorAll:()=>values.map((value,i)=>({dataset:{meterMeasured:String(value!=='—'),meterValue:value,meterDisplayValue:value==='—'?(i===1?'50':'0'):value},querySelector:()=>({textContent:['MARKET HEAT','PRICE PRESSURE','MARKET AGREEMENT'][i]})}))});
+assert.equal(presentation.stateFromCluster(cluster(['—','—','—'])).file,'vig-low-neutral-low.jpg');
+assert.equal(presentation.stateFromCluster(cluster(['—','—','—'])).pending,3);
+assert.match(presentation.stateFromCluster(cluster(['—','—','—'],'INTEGRITY ERROR')).detail,/TELEMETRY INTEGRITY ERROR/);
+assert.equal(presentation.stateFromCluster(cluster(['17','—','91'])).pending,1);
+assert.equal(presentation.stateFromCluster(cluster(['0','50','91'])).file,'vig-low-neutral-high.jpg','measured zero remains a valid measurement');
+assert.equal(presentation.stateFromCluster(cluster(['17','52','91'])).file,'vig-low-favorable-high.jpg','image thresholds must match calibrated runtime');
 
 console.log(JSON.stringify({state:'PASS',sequence:'09:30 -> 08:00 -> 06:00 -> 09:30',meters:{heat:returned0930.instrumentTelemetry.heat.value,pressure:returned0930.instrumentTelemetry.pressure.value,agreement:returned0930.instrumentTelemetry.agreement.score},futureSlots:['15:15','18:15'],cache:'v1.4',archiveRecovery:'PASS'},null,2));

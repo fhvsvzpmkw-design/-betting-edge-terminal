@@ -97,8 +97,8 @@ assert.equal(agreement.confidence,0);
 for(const token of [
   'function explicitMovementOddsPairs(v)',
   'const pairs=explicitMovementOddsPairs(rec?.move);',
-  "const displayValue=Number(reading.confidence)>0?`${reading.value}`:'—';",
-  "if(Number(reading.confidence)<=0)needle.style.opacity='0';",
+  "displayValue=measured?clamp(reading.value):(type==='pressure'?50:0)",
+  "wrap.dataset.meterMeasured=String(measured)",
   "'MARKET STATE UNMEASURED'",
   '\\bVALUE IMPROVED\\b',
   '\\bLINE MOVED AGAINST\\b'
@@ -111,6 +111,6 @@ console.log(JSON.stringify({
   state:'PASS',
   fixture:'2026-09-02 06:00',
   falseMovementSignals:0,
-  expectedUnmeasuredDisplay:{heat:'—',pressure:'—',agreement:'—'},
+  expectedParkedDisplay:{heat:0,pressure:50,agreement:0,measured:false},
   internalFallback:{heat,pressure,agreementScore:agreement.score,agreementConfidence:agreement.confidence}
 },null,2));

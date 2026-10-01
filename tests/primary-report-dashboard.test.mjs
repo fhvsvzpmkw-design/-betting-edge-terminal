@@ -6,7 +6,7 @@ import {derivePrimaryMarketInstrumentTelemetry, deriveResilientInstrumentTelemet
 // Minimal DOM fixture exercises the actual renderer and active dashboard
 // rearrangement without a browser/network dependency in publication checks.
 class Element {
-  constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.parentElement=null;this.className='';this.id='';this.dataset={};this.style={setProperty(k,v){this[k]=v}};this.attributes={};this._text='';this.classList={add:(c)=>this.className=[...new Set([...this.className.split(' ').filter(Boolean),c])].join(' '),contains:c=>this.className.split(' ').includes(c),toggle:(c,on)=>{const set=new Set(this.className.split(' ').filter(Boolean));if(on??!set.has(c))set.add(c);else set.delete(c);this.className=[...set].join(' ');}};}
+  constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.parentElement=null;this.className='';this.id='';this.dataset={};this.style={setProperty(k,v){this[k]=v}};this.attributes={};this._text='';this.classList={remove:(c)=>this.className=this.className.split(' ').filter(x=>x!==c).join(' '),add:(c)=>this.className=[...new Set([...this.className.split(' ').filter(Boolean),c])].join(' '),contains:c=>this.className.split(' ').includes(c),toggle:(c,on)=>{const set=new Set(this.className.split(' ').filter(Boolean));if(on??!set.has(c))set.add(c);else set.delete(c);this.className=[...set].join(' ');}};}
   get textContent(){return this._text+this.children.map(c=>c.textContent).join('');}
   set textContent(v){this._text=String(v);for(const c of this.children)c.parentElement=null;this.children=[];}
   get firstChild(){return this.children[0]||null;}
@@ -35,7 +35,7 @@ const document=new Document();const app=document.createElement('iframe');app.id=
 const context={console,document,location:{hash:'',search:''},localStorage:{getItem:()=>null},Intl,URLSearchParams,Date,setTimeout,clearTimeout};context.window={top:null};
 let source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
 const marker='\nactiveRun=payload();';
-vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster,card,candidateAssessmentPanel};'+marker),context);
+vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster,instrumentGauge,card,candidateAssessmentPanel};'+marker),context);
 const api=context.api;
 source=fs.readFileSync('assets/report-dashboard-vigscope.js.old','utf8');
 const tail=source.lastIndexOf("  const core=document.getElementById('core');");
@@ -80,8 +80,8 @@ context.dashboardApi.patchDashboard(document);context.dashboardApi.patchDashboar
 assert.equal(head.nextElementSibling,panel);assert.equal(panel.nextElementSibling.id,'runnerMarketIntel');
 assert.equal(document.getElementById('runnerMarketIntel').querySelector('.runnerSummary'),summary);
 assert.equal(document.getElementById('runnerVigPicks').querySelector('.runnerVigSectionTitle').textContent,'PUBLISHED CARDS');
-assert.match(document.getElementById('runnerVigScope').textContent,/NO PICK DIRECTION[\s\S]*No BET, LEAN or WAIT direction/);
-assert.equal(cluster.querySelectorAll('.instrument')[1].querySelector('.instrumentRead b').textContent,'—','no neutral 50 may be shown as measured pressure');
+assert.match(document.getElementById('runnerVigScope').textContent,/PARKED: PRICE PRESSURE.*NO PICK DIRECTION.*Waiting for supported data/);
+assert.equal(cluster.querySelectorAll('.instrument')[1].querySelector('.instrumentRead b').textContent,'50','unmeasured pressure uses a clearly parked neutral display');
 assert.equal(counts.textContent,'0000','no PASS cards may be synthesized');
 assert.equal(JSON.stringify(report),immutable,'rendering may never rewrite the report');
 assert.match(api.noPublishedCardsText({...report,recs:[{status:'PASS'}]}),/No published selections match ALL/,'filter-empty text is distinct from zero cards');
@@ -141,3 +141,37 @@ console.log('PRIMARY DASHBOARD: PASS // VERIFIED COVERAGE + NO-CARD MARKET METER
 // The actual issued-card renderer keeps the Graham decision impact visible.
 const grahamCard=api.card(document,{title:'Synthetic NFL spread',status:'PASS',grahamFairReview:{disposition:'CONTEXT',decisionImpact:'Current personnel evidence supports retaining PASS.'}},report);
 assert.match(grahamCard.textContent,/GRAHAM CONTEXT: Current personnel evidence supports retaining PASS/);
+
+// Always-visible condition images cover all 18 assets using the calibrated
+// thresholds, while missing inputs retain their unmeasured evidence state.
+const manifest=JSON.parse(fs.readFileSync('assets/vig-scope/manifest.json','utf8'));
+const makeCluster=(values,confidence=100)=>{
+  const cluster=document.createElement('div');cluster.className='instrumentCluster';
+  ['heat','pressure','agreement'].forEach((kind,i)=>cluster.appendChild(api.instrumentGauge(document,kind.toUpperCase(),kind,{value:Math.round(values[i]),rawValue:values[i],label:confidence?'MEASURED':'NO DATA',confidence})));
+  return cluster;
+};
+const indices=new Set();
+for(const heat of [0,20,40])for(const pressure of [0,50,100])for(const agreement of [0,45]){
+  const state=context.dashboardApi.stateFromCluster(makeCluster([heat,pressure,agreement]));
+  assert.equal(state.pending,0);assert.equal(state.file,manifest.states[state.imageIndex-1]);
+  assert.ok(fs.existsSync('assets/vig-scope/'+state.file));indices.add(state.imageIndex);
+}
+assert.equal(indices.size,18);
+assert.equal(context.dashboardApi.stateFromCluster(makeCluster([19.99,47.99,44.99])).file,'vig-low-adverse-low.jpg');
+assert.equal(context.dashboardApi.stateFromCluster(makeCluster([39.99,51.99,45])).file,'vig-medium-neutral-high.jpg');
+const parked=makeCluster([99,99,99],0),parkedState=context.dashboardApi.stateFromCluster(parked);
+assert.equal(parkedState.pending,3);assert.equal(parkedState.file,'vig-low-neutral-low.jpg');
+assert.match(parkedState.detail,/PARKED/);
+assert.ok(parked.querySelectorAll('.gaugeNeedle').every(needle=>needle.style.opacity!=='0'));
+const scope=document.getElementById('runnerVigScope');
+assert.equal(scope.querySelector('.runnerVigScopeAsset').getAttribute('src'),'./assets/vig-scope/'+context.dashboardApi.stateFromCluster(cluster).file);
+assert.equal(scope.dataset.parkedMeters,'1');
+assert.equal(cluster.querySelectorAll('.instrument')[1].dataset.meterMeasured,'false');
+assert.ok(cluster.querySelectorAll('.instrument').every(instrument=>instrument.querySelectorAll('.runnerLedBlocks .on').length>0),'every meter keeps a visible indicator');
+assert.match(cluster.querySelectorAll('.instrument')[1].textContent,/PARKED.*CONF 0%/);
+const bad=structuredClone(report);delete bad.instrumentTelemetry.source.coverageAuthorityBlobSha;
+const errorState=context.dashboardApi.stateFromCluster(api.instrumentCluster(document,bad));
+assert.equal(errorState.pending,3);assert.match(errorState.detail,/INTEGRITY ERROR/);
+assert.equal(errorState.file,'vig-low-neutral-low.jpg');
+assert.equal(JSON.stringify(report),immutable);
+console.log('ALWAYS-VISIBLE METERS: PASS // ALL 18 IMAGES + EXACT BOUNDARIES + PARKED INPUTS + INTEGRITY ERRORS + IMMUTABLE RECEIPTS');

@@ -36,3 +36,11 @@ Use the existing calibrated formulas and evidence-coverage confidence. With curr
 Reports before the effective time retain the original calculation and exact receipts, including the recovered September 5 09:30 report. No retrospective rewrite, reprice overlay, or scheduled-task estimate may replace issued telemetry. The new behavior applies automatically to future published reports.
 
 Regression: `tests/vigscope-meter-resilient.test.mjs` covers absent reports, new selections, mixed sources, overnight baselines, stale/future/mismatched evidence, same-book comparison, current-only agreement, immutable replay, receipt tampering and terminal handling.
+
+## Always-visible terminal presentation — October 1, 2026
+
+The terminal keeps all three meter indicators and one of the existing 18 condition images visible, including when inputs are unavailable. Measured values and publisher telemetry remain unchanged on the 0–100 scale. Only the display parks missing heat and agreement at 0 and missing directional pressure at 50. Each parked meter retains its original NO DATA / NO DIRECTION / UNMEASURED or INTEGRITY ERROR label, CONF 0%, explicit PARKED text and an unmeasured flag. The image caption names parked inputs and explains that display baselines are included. A parked agreement position never implies measured agreement, and a parked pressure position never implies a supported direction.
+
+The 18 images use the production thresholds: heat below 20 / below 40 / 40 or above; pressure below 48 / below 52 / 52 or above; agreement below 45 / 45 or above. Exact raw measured values determine the image, avoiding category changes caused by rounded readouts. Image identity 1–18 follows the existing manifest order. The terminal image no longer disappears when a meter is unmeasured. Publication integrity checks, the semantic market-state summary, source receipts and historical reports remain unchanged.
+
+Regression: `tests/primary-report-dashboard.test.mjs` checks all 18 image mappings, fractional boundaries, visible parked indicators, explicit unmeasured flags and integrity-error presentation without modifying issued reports.

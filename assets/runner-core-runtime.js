@@ -764,9 +764,12 @@ function gaugePalette(type){
   return ['#00ff78','#a9d92e','#ffd43b','#ff7a2f','#ff334f']
 }
 function instrumentGauge(d,title,type,reading){
-  const wrap=el(d,'div','instrument'),lab=el(d,'div','instrumentLabel',title);if(reading.reason){wrap.dataset.meterReason=reading.reason;wrap.title=pressureReasonText(reading.reason)}wrap.appendChild(lab);
+  const measured=Number(reading.confidence)>0,displayValue=measured?clamp(reading.value):(type==='pressure'?50:0);
+  const wrap=el(d,'div','instrument'),lab=el(d,'div','instrumentLabel',title);
+  wrap.dataset.meterMeasured=String(measured);wrap.dataset.meterValue=String(clamp(reading.rawValue??reading.value));wrap.dataset.meterDisplayValue=String(displayValue);
+  if(reading.reason){wrap.dataset.meterReason=reading.reason;wrap.title=pressureReasonText(reading.reason)}wrap.appendChild(lab);
   const scale=el(d,'div','instrumentScale');['0','25','50','75','100'].forEach(v=>scale.appendChild(el(d,'span','',v)));wrap.appendChild(scale);
-  const ns='http://www.w3.org/2000/svg',svg=d.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 160 88');svg.setAttribute('aria-label',`${title} ${Number(reading.confidence)>0?reading.value:'unmeasured'} ${reading.label}`);
+  const ns='http://www.w3.org/2000/svg',svg=d.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 160 88');svg.setAttribute('aria-label',`${title} ${displayValue} ${reading.label}${measured?'':' — parked display, unmeasured'}`);
   const colors=gaugePalette(type),angles=[-72,-43.2,-14.4,14.4,43.2,72];
   function polar(a,r=58){const rad=(a-90)*Math.PI/180;return [80+r*Math.cos(rad),72+r*Math.sin(rad)]}
   for(let i=0;i<5;i++){
@@ -777,13 +780,13 @@ function instrumentGauge(d,title,type,reading){
     const a=-72+i*12,[x1,y1]=polar(a,48),[x2,y2]=polar(a,54),tick=d.createElementNS(ns,'line');
     tick.setAttribute('x1',x1);tick.setAttribute('y1',y1);tick.setAttribute('x2',x2);tick.setAttribute('y2',y2);tick.setAttribute('stroke',i%3===0?'#d8d59a':'#718178');tick.setAttribute('stroke-width',i%3===0?'1.4':'.8');svg.appendChild(tick)
   }
-  const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+clamp(reading.value)*1.44}deg)`;if(Number(reading.confidence)<=0)needle.style.opacity='0';
+  const needle=d.createElementNS(ns,'g');needle.setAttribute('class','gaugeNeedle');needle.style.transform=`rotate(${-72+displayValue*1.44}deg)`;
   const line=d.createElementNS(ns,'line');line.setAttribute('x1','80');line.setAttribute('y1','72');line.setAttribute('x2','80');line.setAttribute('y2','27');line.setAttribute('stroke','#f4fff9');line.setAttribute('stroke-width','2.2');
   const hub=d.createElementNS(ns,'circle');hub.setAttribute('cx','80');hub.setAttribute('cy','72');hub.setAttribute('r','4');hub.setAttribute('fill','#f4fff9');needle.append(line,hub);svg.appendChild(needle);wrap.appendChild(svg);
-  const displayValue=Number(reading.confidence)>0?`${reading.value}`:'—';const read=el(d,'div','instrumentRead');read.append(el(d,'b','',displayValue),d.createTextNode(reading.label));wrap.appendChild(read);
+  const read=el(d,'div','instrumentRead');read.append(el(d,'b','',String(displayValue)),d.createTextNode(reading.label));wrap.appendChild(read);
   const defs=type==='heat'?[['DORM','g'],['QUIET','g'],['FORM','y'],['ACTIVE','y'],['PRESS','y'],['HOT','r'],['EXTREME','r']]:type==='pressure'?[['AGAINST','r'],['NEUTRAL','y'],['FAVOR','g']]:[['FRAG','r'],['MIXED','y'],['STRONG','g'],['CONSENSUS','g']];
   const band=el(d,'div',`instrumentBand ${type}`);defs.forEach(([label,c])=>band.appendChild(el(d,'span',c,label)));wrap.appendChild(band);
-  const evidence=reading.evidenceQuality?` • ${reading.evidenceQuality}`:'',excluded=`${reading.conflictingSelections?` • ${reading.conflictingSelections} CONFLICTING SIDES EXCLUDED`:''}${reading.unverifiedReferences?` • ${reading.unverifiedReferences} UNVERIFIED REFERENCES EXCLUDED`:''}`;wrap.appendChild(el(d,'div','instrumentConf',`CONF ${reading.confidence}%${evidence}${reading.pairs?` • ${reading.pairs} PAIRS`:''}${excluded}`));
+  const evidence=reading.evidenceQuality?` • ${reading.evidenceQuality}`:'',excluded=`${reading.conflictingSelections?` • ${reading.conflictingSelections} CONFLICTING SIDES EXCLUDED`:''}${reading.unverifiedReferences?` • ${reading.unverifiedReferences} UNVERIFIED REFERENCES EXCLUDED`:''}`;wrap.appendChild(el(d,'div','instrumentConf',`${measured?'':'PARKED • '}CONF ${reading.confidence}%${evidence}${reading.pairs?` • ${reading.pairs} PAIRS`:''}${excluded}`));
   return wrap
 }
 function instrumentCluster(d,run){const r=deriveInstrumentReadings(run),cluster=el(d,'div','instrumentCluster');cluster.append(instrumentGauge(d,'MARKET HEAT','heat',r.heat),instrumentGauge(d,'PRICE PRESSURE','pressure',r.pressure),instrumentGauge(d,'MARKET AGREEMENT','agreement',r.agreement));return cluster}
@@ -1015,7 +1018,8 @@ function apply(run){
       hideStaticBoard(board);
       let empty=d.getElementById('runnerEmpty');
       if(!empty){
-        empty=el(d,'div','runnerSummary','NO RUN LOADED // Open a VigScope report link to load the current selections and controls.');
+        empty=el(d,'div','runnerSummary');
+        empty.append(instrumentCluster(d,{}),el(d,'div','small muted','NO RUN LOADED // Open a VigScope report link to load the current selections and controls.'));
         empty.id='runnerEmpty';board.prepend(empty)
       }
     }

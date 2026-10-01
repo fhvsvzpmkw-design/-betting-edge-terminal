@@ -95,7 +95,7 @@
       .instrument[data-meter-kind='heat'] .runnerMiniRailTrack{background:linear-gradient(90deg,#00ff78 0%,#a9d92e 28%,#ffd43b 50%,#ff7a2f 72%,#ff334f 100%)}
       .instrument[data-meter-kind='pressure'] .runnerMiniRailTrack,.instrument[data-meter-kind='agreement'] .runnerMiniRailTrack{background:linear-gradient(90deg,#ff334f 0%,#ff7a2f 27%,#ffd43b 50%,#a9d92e 72%,#00ff78 100%)}
       .runnerMiniRailMarker{position:absolute;top:-3px;left:calc(var(--meter-value,50) * 1%);width:2px;height:12px;background:#effff3;box-shadow:0 0 5px rgba(235,255,240,.65);transform:translateX(-1px)}
-      .instrument[data-meter-measured='false'] .runnerMiniRailMarker{display:none}
+      .instrument[data-meter-measured='false'] .runnerMiniRailMarker{background:#ffe96b;box-shadow:none}
       .runnerLedBlocks{display:none}
 
       /* SECTION 3 — VIG METER */
@@ -113,6 +113,7 @@
       #runnerVigScope.unmeasured{align-self:start;grid-template-rows:auto auto auto!important}
       #runnerVigScope.unmeasured .runnerVigScopeFrame{height:auto!important;min-height:72px!important;aspect-ratio:auto!important}
       #runnerVigScope.unmeasured .runnerVigScopeFallback{white-space:pre-line;line-height:1.7}
+      #runnerVigScope.parked .runnerVigScopeKey{color:var(--yellow);white-space:normal;overflow:visible;line-height:1.4}
       .runnerVigScopeKey{margin-top:6px;color:#b1d8bc;font-size:8px;font-weight:900;letter-spacing:.11em;text-align:center;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
       /* Default segmented LEDs. */
@@ -191,28 +192,27 @@
 
   function stateFromCluster(cluster){
     const instruments=[...cluster.querySelectorAll('.instrument')];
-    const heatValue=numberFromInstrument(instruments[0]);
-    const pressureValue=numberFromInstrument(instruments[1]);
-    const agreementValue=numberFromInstrument(instruments[2]);
-    if([heatValue,pressureValue,agreementValue].some(value=>value===null)){
-      const error=String(cluster.textContent||'').includes('INTEGRITY ERROR');
-      const empty=[heatValue,pressureValue,agreementValue].every(value=>value===null);
-      const reason=instruments[1]?.dataset?.meterReason;
-      const noDirection=reason==='NO_DIRECTIONAL_REFERENCE';
-      const summary=error||empty?'':`HEAT ${heatValue??'—'} • PRESSURE ${pressureValue??'—'} • AGREEMENT ${agreementValue??'—'}`;
-      return {file:null,noDirection,summary,key:error?'TELEMETRY INTEGRITY ERROR':noDirection?'NO PICK DIRECTION':empty?'MARKET STATE UNMEASURED':'MARKET STATE PARTIAL',detail:noDirection?'No BET, LEAN or WAIT direction. Heat and agreement describe available primary markets.':reason?instruments[1].title:'ISSUED INPUTS INCOMPLETE'};
-    }
-    const heat=heatValue<40?'low':heatValue<55?'medium':'high';
-    const pressure=pressureValue<45?'adverse':pressureValue<56?'neutral':'favorable';
+    const values=instruments.map(instrument=>Number(instrument.dataset.meterMeasured==='true'?instrument.dataset.meterValue:instrument.dataset.meterDisplayValue));
+    const heatValue=Number.isFinite(values[0])?values[0]:0;
+    const pressureValue=Number.isFinite(values[1])?values[1]:50;
+    const agreementValue=Number.isFinite(values[2])?values[2]:0;
+    const pending=instruments.filter(instrument=>instrument.dataset.meterMeasured!=='true');
+    const error=String(cluster.textContent||'').includes('INTEGRITY ERROR');
+    const noDirection=instruments[1]?.dataset?.meterReason==='NO_DIRECTIONAL_REFERENCE';
+    // Match the calibrated 0–100 thresholds used by the issued report runtime.
+    const heat=heatValue<20?'low':heatValue<40?'medium':'high';
+    const pressure=pressureValue<48?'adverse':pressureValue<52?'neutral':'favorable';
     const agreement=agreementValue<45?'low':'high';
-    return {heat,pressure,agreement,file:`vig-${heat}-${pressure}-${agreement}.jpg`,key:`${heat} • ${pressure} • ${agreement}`};
+    const imageIndex=['low','medium','high'].indexOf(heat)*6+['adverse','neutral','favorable'].indexOf(pressure)*2+(agreement==='high'?2:1);
+    const detail=error?'TELEMETRY INTEGRITY ERROR — ALL METERS PARKED':pending.length?`PARKED: ${pending.map(instrument=>instrument.querySelector('.instrumentLabel')?.textContent||'meter').join(', ')}${noDirection?' — NO PICK DIRECTION':''}. Waiting for supported data; image includes display baselines.`:'';
+    return {heat,pressure,agreement,imageIndex,noDirection,pending:pending.length,error,file:`vig-${heat}-${pressure}-${agreement}.jpg`,key:`${heat} • ${pressure} • ${agreement}`,detail};
   }
 
   function updateContributorMeters(d,cluster){
     const kinds=['heat','pressure','agreement'];
     [...cluster.querySelectorAll('.instrument')].forEach((instrument,index)=>{
-      const reading=numberFromInstrument(instrument),measured=reading!==null;
-      const value=measured?Math.max(0,Math.min(100,reading)):0;
+      const measured=instrument.dataset.meterMeasured==='true';
+      const value=Math.max(0,Math.min(100,Number(instrument.dataset.meterDisplayValue)||0));
       instrument.dataset.meterKind=kinds[index]||'agreement';
       instrument.dataset.meterMeasured=String(measured);
       instrument.style.setProperty('--meter-value',String(value));
@@ -234,7 +234,7 @@
         const conf=instrument.querySelector('.instrumentConf');
         if(conf)instrument.insertBefore(blocks,conf);else instrument.appendChild(blocks);
       }
-      const lit=measured?Math.max(1,Math.ceil(value/10)):0;
+      const lit=Math.max(1,Math.ceil(value/10));
       [...blocks.children].forEach((seg,i)=>seg.classList.toggle('on',i<lit));
     });
   }
@@ -281,8 +281,11 @@
       img.onerror=()=>scope.classList.add('assetError');
       img.setAttribute('src',src);
     }
-    if(img)img.alt=`VIG meter condition ${state.heat}, ${state.pressure}, ${state.agreement}`;
-    if(key&&key.textContent!==state.key)key.textContent=state.key;
+    if(img)img.alt=`VIG meter condition ${state.imageIndex} of 18: ${state.heat}, ${state.pressure}, ${state.agreement}${state.pending?'; includes parked display baselines':''}`;
+    const displayKey=[`IMAGE ${state.imageIndex}/18`,state.key,state.detail].filter(Boolean).join(' • ');
+    if(key&&key.textContent!==displayKey)key.textContent=displayKey;
+    scope.dataset.vigScopeImage=String(state.imageIndex);scope.dataset.parkedMeters=String(state.pending);
+    scope.classList.toggle('parked',state.pending>0);
     scope.dataset.vigScopeState=state.file.replace(/^vig-|\.jpg$/g,'');
     return scope;
   }
@@ -320,7 +323,11 @@
     ensureStyle(d);
 
     const live=d.getElementById('runnerLive');
-    if(!live)return;
+    if(!live){
+      const empty=d.getElementById('runnerEmpty'),cluster=empty?.querySelector('.instrumentCluster');
+      if(cluster){updateContributorMeters(d,cluster);const scope=ensureVigScope(d,cluster);if(scope.parentElement!==empty)empty.appendChild(scope);}
+      return;
+    }
     const head=live.querySelector(':scope > .runnerHead');
     const session=live.querySelector(':scope > .sessionStrip');
     const counts=live.querySelector('.runnerCounts');

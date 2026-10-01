@@ -17,6 +17,7 @@ on:
       - 'tools/vigscope-meter-telemetry-gate.mjs'
       - 'tools/report-publication.mjs'
       - 'tests/vigscope-meter-production.test.mjs'
+      - 'tests/primary-report-dashboard.test.mjs'
       - 'tests/vigscope-meter-fallback-safety.test.mjs'
       - 'tests/vigscope-meter-telemetry.test.mjs'
       - 'tests/vigscope-meter-resilient.test.mjs'
@@ -38,6 +39,8 @@ jobs:
           node-version: '22'
       - name: Run calibrated meter regression
         run: node tests/vigscope-meter-production.test.mjs
+      - name: Run always-visible meter image regression
+        run: node tests/primary-report-dashboard.test.mjs
       - name: Run fallback meter safety regression
         run: node tests/vigscope-meter-fallback-safety.test.mjs
       - name: Run observed quote and movement regression
