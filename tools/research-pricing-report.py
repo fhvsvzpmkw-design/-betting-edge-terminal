@@ -16,6 +16,16 @@ def row(label,v):
 primary=s['tests']['primary_1pp'];mlb=s['mlbTotals']['at_least_1pp'];shadow=s['prospectiveShadow']
 selected=[r for r in e['firstPairedMarkets'] if r['edgePp']>=1]
 mlbselected=[r for r in selected if r['sport']=='MLB' and r['market']=='totals']
+passaudit=[]
+for r in mlbselected:
+    if r['issuedStatus']!='PASS':continue
+    run=json.loads((root/r['sourceRun']).read_text());rec=run['recs'][int(r['cardId'].rsplit('#',1)[1])]
+    ctx=rec.get('coreAssessment',{}).get('context',{})
+    passaudit.append({'cardId':r['cardId'],'date':r['date'],'title':r['title'],'grade':r['grade'],
+                      'studyPrice':r['price'],'studyBook':r['book'],'issuedPrice':rec['price'],'issuedBook':rec['book'],
+                      'edgePp':r['edgePp'],'personnelSensitivity':ctx.get('personnelSensitivity'),
+                      'modelErrorState':rec.get('coreAssessment',{}).get('modelErrorState'),
+                      'originalRationale':(rec.get('marketAssessment') or {}).get('decisionRationale') or rec.get('analysis')})
 report=[
 '# Betting Edge pricing study — October 1, 2026',
 '',
@@ -60,6 +70,10 @@ f"The MLB-total ≥1pp subgroup contains {sum(r['book']=='bet365' for r in mlbse
 '## Why PASS cards matter',
 '',
 f"The MLB-total ≥1pp subgroup was issued as {collections.Counter(r['issuedStatus'] for r in mlbselected).get('PASS',0)} PASS, one LEAN and one WAIT. The returns are hypothetical and do not affect the betting ledger. Positive outcomes do not prove those rejections were mistakes: this study deliberately does not require independent fair-value support, calibrated model error, current personnel clearance or all production BET checks. Review the original rejection reasons against the price signal before considering a policy change.",
+'',
+'The original 13 PASS reasons were inspected. Nine retain UNRESOLVED personnel and four record RESOLVED personnel. All 13 are ELEVATED model error. Their study prices and books match the prices/books on the original cards, so these cases are not created by substituting a newly selected bookmaker. Several rationales reject favorable market prices because DRatings score projections lean the other way while supplying no exact total probability or calibrated uncertainty. This is a decision-method question worth testing: an uncalibrated score projection may be getting veto authority over a separately measured price signal. The winning and losing cases must both remain visible.',
+'',
+'For example, the September 25 Cleveland–Kansas City Under 7.5 was rejected despite a 2.74pp price advantage because a DRatings score projection totaled 7.59 and supplied no exact under probability. That PASS subsequently lost as a hypothetical selection, so the example does not establish a missed winning bet. The September 23 St. Louis–Pittsburgh Under 7.5 had a 3.31pp price advantage and was rejected against an 8.09 score projection; it won. These opposing outcomes illustrate why the rejection rule needs prospective evaluation rather than anecdotal reversal.',
 '',
 '## Price movement',
 '',
@@ -112,4 +126,5 @@ f"{s['audit']['conflictingEvents']} exact event identities have conflicting hist
 (out/'README.md').write_text('\n'.join(report)+'\n')
 (out/'primary-candidates.json').write_text(json.dumps({'rule':'first paired reference appearance; best supported quote; edge >= 1pp',
                                                     'sourceIndexSha256':s['sourceIndexSha256'],'entries':selected},indent=2)+'\n')
+(out/'pass-reasons.json').write_text(json.dumps(passaudit,indent=2)+'\n')
 print('Wrote README.md and primary-candidates.json')
