@@ -8,8 +8,8 @@
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-10-01T16:52:20-07:00",
-  "lastResearchAt": "2026-10-01T16:52:20-07:00",
+  "updatedAt": "2026-10-01T16:55:30-07:00",
+  "lastResearchAt": "2026-10-01T16:55:30-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-04-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-04-daily-market-ledger.json",
@@ -1658,11 +1658,11 @@
       "away": "MIA",
       "home": "MIN",
       "startTimePacific": "2026-10-04T13:05:00-07:00",
-      "grahamFairHome": -9.5,
-      "grahamExactFairHome": -9.327,
-      "grahamAsOf": "2026-09-30T11:56:30-07:00",
+      "grahamFairHome": -10.5,
+      "grahamExactFairHome": -10.327,
+      "grahamAsOf": "2026-10-01T16:55:30-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1703,9 +1703,30 @@
           ],
           "effectiveAt": "2026-09-29T04:34:24-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "MIA",
+          "side": "AWAY",
+          "clusterGroup": "RUNNING_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W04-MIA-DeVon-Achane"
+          ],
+          "rawTeamContributionDelta": -1,
+          "finalTeamContributionDelta": -1,
+          "pointsToHomeSpread": -1,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.miamidolphins.com/team/injury-report/",
+            "https://www.miamidolphins.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/mia.json",
+            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+          ]
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base -7.245; home field -2.082; other governed +0.000; pre-personnel exact -9.327; personnel +0.000; matchup +0.000; exact Graham home fair -9.327; displayed -9.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -7.245; home field -2.082; other governed +0.000; pre-personnel exact -9.327; personnel -1.000; matchup +0.000; exact Graham home fair -10.327; displayed -10.5.",
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
@@ -1724,7 +1745,9 @@
         "data/walters/nfl/player-values/by-team-v1/mia.json",
         "https://www.vikings.com/team/depth-chart",
         "data/walters/nfl/player-values/by-team-v1/min.json",
-        "data/walters/nfl/2026/week-04-research-ledger.json"
+        "data/walters/nfl/2026/week-04-research-ledger.json",
+        "https://www.miamidolphins.com/team/injury-report/",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
       "neutralBaseHome": -7.245,
       "ratingCarryForward": {
@@ -1737,14 +1760,8 @@
         "marketViewed": false
       },
       "personnelBaselineExactFairHome": -9.327,
-      "personnelOverlayPointsToHomeSpread": 0,
+      "personnelOverlayPointsToHomeSpread": -1,
       "personnelUnresolvedCases": [
-        {
-          "caseKey": "2026-W04-MIA-DeVon-Achane",
-          "player": "De'Von Achane",
-          "failClosedCode": "RB_COMMITTEE_AND_JAYLEN_WRIGHT_AVAILABILITY_UNRESOLVED",
-          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
-        },
         {
           "caseKey": "2026-W04-MIN-Josh-Oliver",
           "player": "Josh Oliver",
@@ -1768,10 +1785,10 @@
         "homeFieldPointsToHomeSpread": -2.082,
         "otherGovernedPointsToHomeSpread": 0,
         "prePersonnelExactFairHome": -9.327,
-        "personnelPointsToHomeSpread": 0,
+        "personnelPointsToHomeSpread": -1,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -9.327,
-        "displayedFairHome": -9.5,
+        "exactFairHome": -10.327,
+        "displayedFairHome": -10.5,
         "arithmeticVerified": true
       },
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
@@ -1786,8 +1803,53 @@
       "qbPerformanceFailClosedTeams": [],
       "priorGrahamFairHome": -9.5,
       "personnelProductionId": "walters-personnel-production-v1",
-      "personnelLastAppliedAt": "2026-09-30T11:45:00-07:00",
-      "personnelEstimateCases": [],
+      "personnelLastAppliedAt": "2026-10-01T16:55:30-07:00",
+      "personnelEstimateCases": [
+        {
+          "caseKey": "2026-W04-MIA-DeVon-Achane",
+          "player": "De'Von Achane",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "EQUAL_SHARE_COMMITTEE",
+          "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+          "healthyValue": 1.2,
+          "replacementValue": 0.2,
+          "replacementValueRatio": {
+            "numerator": 0.4,
+            "denominator": 2
+          },
+          "injuryLoss": 1,
+          "rawTeamContributionDelta": -1,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 1,
+            "max": 1
+          },
+          "weights": [
+            {
+              "player": "Jaylen Wright",
+              "eaPlayerId": "14632",
+              "lockedValue": 0.2,
+              "additionalRoleUnits": 1,
+              "weight": 0.5
+            },
+            {
+              "player": "Ollie Gordon II",
+              "eaPlayerId": "15049",
+              "lockedValue": 0.2,
+              "additionalRoleUnits": 1,
+              "weight": 0.5
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+          "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence.",
+          "applied": true
+        }
+      ],
       "weeklyRatingInput": {
         "state": "PARTIAL_BLOCKED",
         "sourceWeek": 3,
@@ -2582,8 +2644,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-delta-1645-personnel-2026-w04-20261001T165220-0700",
-    "lastAppliedAt": "2026-10-01T16:52:20-07:00",
+    "lastBatchId": "graham-delta-1645-personnel-mia-2026-w04-20261001T165530-0700",
+    "lastAppliedAt": "2026-10-01T16:55:30-07:00",
     "marketViewed": false
   },
   "baselineRecovery": {

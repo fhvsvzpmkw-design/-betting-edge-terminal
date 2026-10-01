@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-10-01T16:52:20-07:00",
+  "updatedAt": "2026-10-01T16:55:30-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -24,7 +24,8 @@
     "graham-daily-review-personnel-2026-w04-20260930T114500-0700",
     "graham-delta-1645-personnel-2026-w04-20260930T165130-0700",
     "graham-daily-review-personnel-2026-w04-20261001T114152-0700",
-    "graham-delta-1645-personnel-2026-w04-20261001T165220-0700"
+    "graham-delta-1645-personnel-2026-w04-20261001T165220-0700",
+    "graham-delta-1645-personnel-mia-2026-w04-20261001T165530-0700"
   ],
   "events": [
     {
@@ -1480,11 +1481,9 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
         "reopenOn": "New Orleans names a primary replacement, reports unequal additional role shares, changes Kamara or Miller's availability, or materially changes Donaldson's separate role."
       }
-    }
-  ],
-  "currentCases": {
-    "2026-W04-MIA-DeVon-Achane": {
-      "personnelEventId": "2026-W04-MIA-22692-IR-20260930T114500-0700",
+    },
+    {
+      "personnelEventId": "2026-W04-MIA-22692-ESTIMATE-20261001T165530-0700",
       "caseKey": "2026-W04-MIA-DeVon-Achane",
       "gameKey": "2026-W04-MIA-MIN",
       "team": "MIA",
@@ -1493,44 +1492,257 @@
       "playerEaId": "22692",
       "currentRole": "STARTING_RUNNING_BACK",
       "availabilityStatus": "IR",
-      "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
-      "failClosedCode": "RB_COMMITTEE_AND_JAYLEN_WRIGHT_AVAILABILITY_UNRESOLVED",
-      "reason": "Miami placed De'Von Achane on injured reserve after a season-ending ACL tear. Ollie Gordon II handled the vacated Week 3 work while Jaylen Wright was inactive; Wright is only limited with a foot injury and the coach described multiple backfield roles. The Week 4 committee and Wright's availability remain unresolved, so preserve the prior fair.",
-      "reopenOn": "Miami confirms Jaylen Wright's Week 4 availability and identifies a primary back or supportable committee allocation.",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved.",
+      "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence.",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Ollie Gordon II",
-          "Jaylen Wright"
+          "Jaylen Wright",
+          "Ollie Gordon II"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
         "replacementClassification": "COMMITTEE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
       "sourceRefs": [
-        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-monday-sept-28",
-        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30",
+        "https://www.miamidolphins.com/team/injury-report/",
         "https://www.miamidolphins.com/team/depth-chart",
-        "data/walters/nfl/player-values/by-team-v1/mia.json"
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
-      "batchId": "graham-daily-review-personnel-2026-w04-20260930T114500-0700",
-      "effectiveAt": "2026-09-30T11:45:00-07:00",
-      "sourceTask": "DAILY_REVIEW",
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart"
+      ],
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Wright and Gordon retain their existing contributions; only Achane's additional vacant duties are estimated. No existing duties are displaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.miamidolphins.com/team/injury-report/",
+          "https://www.miamidolphins.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Jaylen Wright",
+            "eaPlayerId": "14632",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official injury reporting upgraded Wright to full participation and the current depth chart lists him first; only additional vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.miamidolphins.com/team/injury-report/",
+              "https://www.miamidolphins.com/team/depth-chart"
+            ]
+          },
+          {
+            "player": "Ollie Gordon II",
+            "eaPlayerId": "15049",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The current official depth chart lists Gordon directly behind Wright in the active two-back group; only additional vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.miamidolphins.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "batchId": "graham-delta-1645-personnel-mia-2026-w04-20261001T165530-0700",
+      "effectiveAt": "2026-10-01T16:55:30-07:00",
+      "sourceTask": "DELTA_1645",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "valueStatus": "NUMERIC_ELIGIBLE",
       "registryPosition": "RB",
       "maddenOvr": 88,
       "healthyWaltersPoints": 1.2,
-      "rawTeamContributionDelta": null,
-      "clusterGroup": "RUNNING_BACK"
+      "rawTeamContributionDelta": -1,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 1.2,
+        "replacementValue": 0.2,
+        "replacementValueRatio": {
+          "numerator": 0.4,
+          "denominator": 2
+        },
+        "injuryLoss": 1,
+        "rawTeamContributionDelta": -1,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1,
+          "max": 1
+        },
+        "weights": [
+          {
+            "player": "Jaylen Wright",
+            "eaPlayerId": "14632",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          },
+          {
+            "player": "Ollie Gordon II",
+            "eaPlayerId": "15049",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence."
+      }
+    }
+  ],
+  "currentCases": {
+    "2026-W04-MIA-DeVon-Achane": {
+      "personnelEventId": "2026-W04-MIA-22692-ESTIMATE-20261001T165530-0700",
+      "caseKey": "2026-W04-MIA-DeVon-Achane",
+      "gameKey": "2026-W04-MIA-MIN",
+      "team": "MIA",
+      "side": "AWAY",
+      "player": "De'Von Achane",
+      "playerEaId": "22692",
+      "currentRole": "STARTING_RUNNING_BACK",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved.",
+      "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jaylen Wright",
+          "Ollie Gordon II"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "sourceRefs": [
+        "https://www.miamidolphins.com/team/injury-report/",
+        "https://www.miamidolphins.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/mia.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.miamidolphins.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.miamidolphins.com/team/depth-chart"
+      ],
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Wright and Gordon retain their existing contributions; only Achane's additional vacant duties are estimated. No existing duties are displaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.miamidolphins.com/team/injury-report/",
+          "https://www.miamidolphins.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Jaylen Wright",
+            "eaPlayerId": "14632",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official injury reporting upgraded Wright to full participation and the current depth chart lists him first; only additional vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.miamidolphins.com/team/injury-report/",
+              "https://www.miamidolphins.com/team/depth-chart"
+            ]
+          },
+          {
+            "player": "Ollie Gordon II",
+            "eaPlayerId": "15049",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The current official depth chart lists Gordon directly behind Wright in the active two-back group; only additional vacant duties are estimated.",
+            "sourceRefs": [
+              "https://www.miamidolphins.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "batchId": "graham-delta-1645-personnel-mia-2026-w04-20261001T165530-0700",
+      "effectiveAt": "2026-10-01T16:55:30-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 88,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": -1,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "EQUAL_SHARE_COMMITTEE",
+        "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+        "healthyValue": 1.2,
+        "replacementValue": 0.2,
+        "replacementValueRatio": {
+          "numerator": 0.4,
+          "denominator": 2
+        },
+        "injuryLoss": 1,
+        "rawTeamContributionDelta": -1,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1,
+          "max": 1
+        },
+        "weights": [
+          {
+            "player": "Jaylen Wright",
+            "eaPlayerId": "14632",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          },
+          {
+            "player": "Ollie Gordon II",
+            "eaPlayerId": "15049",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 0.5
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+        "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence."
+      }
     },
     "2026-W04-NYG-Brian-Burns": {
       "personnelEventId": "2026-W04-NYG-20566-OUT-20260930T114500-0700",
@@ -2760,6 +2972,6 @@
       }
     }
   },
-  "lastBatchId": "graham-delta-1645-personnel-2026-w04-20261001T165220-0700",
+  "lastBatchId": "graham-delta-1645-personnel-mia-2026-w04-20261001T165530-0700",
   "lastBatchSourceTask": "DELTA_1645"
 }

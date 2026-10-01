@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-10-01T16:52:20-07:00",
+  "updatedAt": "2026-10-01T16:55:30-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -3212,6 +3212,146 @@
         "numericEligible": 2,
         "failedClosed": 0,
         "gamesRecomputed": 2,
+        "carriedRatingMoves": 0,
+        "marketViewed": false,
+        "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 7,
+      "type": "PERSONNEL_PRODUCTION_BATCH",
+      "startedAt": "2026-10-01T16:47:56-07:00",
+      "completedAt": "2026-10-01T16:55:30-07:00",
+      "scope": "Governed Walters personnel production batch graham-delta-1645-personnel-mia-2026-w04-20261001T165530-0700. Current availability/replacement evidence only; market prices not viewed.",
+      "sourcesChecked": [
+        {
+          "source": "Personnel production evidence",
+          "url": "https://www.miamidolphins.com/team/injury-report/",
+          "checkedAt": "2026-10-01T16:55:30-07:00",
+          "purpose": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved."
+        },
+        {
+          "source": "Personnel production evidence",
+          "url": "https://www.miamidolphins.com/team/depth-chart",
+          "checkedAt": "2026-10-01T16:55:30-07:00",
+          "purpose": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved."
+        },
+        {
+          "source": "Personnel production evidence",
+          "url": "data/walters/nfl/player-values/by-team-v1/mia.json",
+          "checkedAt": "2026-10-01T16:55:30-07:00",
+          "purpose": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved."
+        },
+        {
+          "source": "Personnel production evidence",
+          "url": "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md",
+          "checkedAt": "2026-10-01T16:55:30-07:00",
+          "purpose": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "MIA",
+          "player": "De'Von Achane",
+          "availabilityStatus": "IR",
+          "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+          "valueStatus": "NUMERIC_ELIGIBLE",
+          "failClosedCode": null,
+          "reason": "Miami's official Thursday report upgraded Jaylen Wright to full participation, resolving the availability condition that blocked the prior De'Von Achane case. The current official depth chart lists Wright first and Ollie Gordon II second. Estimate Achane's additional vacant duties across that active two-back group; both candidates have the same locked value, so the equal-share assumption is value-invariant while their existing duties remain preserved.",
+          "sourceRefs": [
+            "https://www.miamidolphins.com/team/injury-report/",
+            "https://www.miamidolphins.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/mia.json",
+            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+          ],
+          "replacementEstimate": {
+            "modelId": "graham-replacement-role-estimate-v1",
+            "classification": "GRAHAM_MODEL_ESTIMATE",
+            "method": "EQUAL_SHARE_COMMITTEE",
+            "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+            "healthyValue": 1.2,
+            "replacementValue": 0.2,
+            "replacementValueRatio": {
+              "numerator": 0.4,
+              "denominator": 2
+            },
+            "injuryLoss": 1,
+            "rawTeamContributionDelta": -1,
+            "upgradeExcluded": false,
+            "injuryLossRange": {
+              "min": 1,
+              "max": 1
+            },
+            "weights": [
+              {
+                "player": "Jaylen Wright",
+                "eaPlayerId": "14632",
+                "lockedValue": 0.2,
+                "additionalRoleUnits": 1,
+                "weight": 0.5
+              },
+              {
+                "player": "Ollie Gordon II",
+                "eaPlayerId": "15049",
+                "lockedValue": 0.2,
+                "additionalRoleUnits": 1,
+                "weight": 0.5
+              }
+            ],
+            "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+            "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+            "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+            "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+            "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+            "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence."
+          }
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W04-MIA-MIN",
+          "priorPublishedFairHome": -9.5,
+          "baselineExactFairHome": -9.327,
+          "priorPersonnelOverlay": 0,
+          "newPersonnelOverlay": -1,
+          "newExactFairHome": -10.327,
+          "newPublishedFairHome": -10.5,
+          "applied": [
+            {
+              "team": "MIA",
+              "side": "AWAY",
+              "clusterGroup": "RUNNING_BACK",
+              "clusterMultiplier": 1,
+              "caseKeys": [
+                "2026-W04-MIA-DeVon-Achane"
+              ],
+              "rawTeamContributionDelta": -1,
+              "finalTeamContributionDelta": -1,
+              "pointsToHomeSpread": -1
+            }
+          ],
+          "blockedGroups": [],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W04-MIN-Josh-Oliver",
+              "player": "Josh Oliver",
+              "failClosedCode": "MULTIPLE_TIGHT_END_WORKLOAD_TRANSFER_UNRESOLVED",
+              "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
+            }
+          ]
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_PERSONNEL_ONLY",
+        "role": "INDEPENDENT_COMPARISON_ONLY"
+      },
+      "summary": {
+        "casesSubmitted": 1,
+        "newEventsRecorded": 1,
+        "numericEligible": 1,
+        "failedClosed": 0,
+        "gamesRecomputed": 1,
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
