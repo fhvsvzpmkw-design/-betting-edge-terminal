@@ -161,6 +161,26 @@
           "marketViewed": false
         },
         {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "PIT",
+          "side": "AWAY",
+          "clusterGroup": "RUNNING_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W04-PIT-Rico-Dowdle"
+          ],
+          "rawTeamContributionDelta": 0,
+          "finalTeamContributionDelta": 0,
+          "pointsToHomeSpread": 0,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns",
+            "data/walters/nfl/player-values/by-team-v1/pit.json",
+            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+          ]
+        },
+        {
           "type": "QB_PERFORMANCE_PRODUCTION",
           "productionId": "walters-qb-performance-production-v1",
           "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -186,26 +206,6 @@
           ],
           "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
           "marketViewed": false
-        },
-        {
-          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
-          "team": "PIT",
-          "side": "AWAY",
-          "clusterGroup": "RUNNING_BACK",
-          "clusterMultiplier": 1,
-          "caseKeys": [
-            "2026-W04-PIT-Rico-Dowdle"
-          ],
-          "rawTeamContributionDelta": 0,
-          "finalTeamContributionDelta": 0,
-          "pointsToHomeSpread": 0,
-          "productionId": "walters-personnel-production-v1",
-          "calibrationId": "walters-nfl-personnel-calibration-v1",
-          "sourceRefs": [
-            "https://www.steelers.com/news/steelers-inactives-for-week-4-vs-browns",
-            "data/walters/nfl/player-values/by-team-v1/pit.json",
-            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-          ]
         }
       ],
       "researchSummary": "Governed fair decomposition: neutral/team base +1.895; home field -2.082; other governed -0.100; pre-personnel exact -0.287; personnel +0.000; matchup +0.000; exact Graham home fair -0.287; displayed -0.5.",
@@ -295,7 +295,7 @@
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "qbPerformanceBaseExactFairHome": -1.087,
+      "qbPerformanceBaseExactFairHome": -0.187,
       "qbPerformancePointsToHomeSpread": -0.1,
       "qbPerformanceAwayTeamDelta": -0.75,
       "qbPerformanceHomeTeamDelta": -0.65,
@@ -2369,31 +2369,6 @@
           "marketViewed": false
         },
         {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "ATL",
-          "homeTeam": "NO",
-          "awayStarter": "Michael Penix Jr",
-          "homeStarter": "Tyler Shough",
-          "awayTeamQbDelta": 0.49,
-          "homeTeamQbDelta": -0.49,
-          "pointsToHomeSpread": 0.98,
-          "reason": "Approved Walters QB performance differential: ATL 0.49 minus NO -0.49 equals +0.98 points to the home-spread coordinate.",
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "https://www.atlantafalcons.com/news/michael-penix-jr-starting-qb-thursday-night-football-vs-packers",
-            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-          ],
-          "effectiveAt": "2026-09-29T04:34:24-07:00",
-          "marketViewed": false
-        },
-        {
           "type": "PERSONNEL_CALIBRATED_PRODUCTION",
           "team": "NO",
           "side": "HOME",
@@ -2414,6 +2389,35 @@
             "data/walters/nfl/player-values/by-team-v1/no.json",
             "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
           ]
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "ATL",
+          "homeTeam": "NO",
+          "awayStarter": "Michael Penix Jr",
+          "homeStarter": "Tyler Shough",
+          "awayTeamQbDelta": 0.49,
+          "homeTeamQbDelta": -0.49,
+          "pointsToHomeSpread": 0.98,
+          "reason": "Governed Walters QB differential: ATL 0.49 minus NO -0.49 equals +0.98 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "https://www.atlantafalcons.com/news/michael-penix-jr-starting-qb-thursday-night-football-vs-packers",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
+          "marketViewed": false
         }
       ],
       "researchSummary": "Governed fair decomposition: neutral/team base -5.969; home field -2.082; other governed +0.980; pre-personnel exact -7.071; personnel +0.700; matchup +0.000; exact Graham home fair -6.371; displayed -6.5.",
@@ -2475,12 +2479,12 @@
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "qbPerformanceBaseExactFairHome": -8.051,
+      "qbPerformanceBaseExactFairHome": -7.351,
       "qbPerformancePointsToHomeSpread": 0.98,
       "qbPerformanceAwayTeamDelta": 0.49,
       "qbPerformanceHomeTeamDelta": -0.49,
       "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
-      "qbPerformanceLastAppliedAt": "2026-09-29T04:34:24-07:00",
+      "qbPerformanceLastAppliedAt": "2026-09-30T19:34:02.940405+00:00",
       "qbPerformanceFailClosedTeams": [],
       "weeklyRatingInput": {
         "state": "PARTIAL_BLOCKED",
@@ -2546,7 +2550,9 @@
           "reopenOn": "New Orleans names a primary replacement, reports unequal additional role shares, changes Kamara or Miller's availability, or materially changes Donaldson's separate role.",
           "applied": true
         }
-      ]
+      ],
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     }
   ],
   "bettingBoundary": {
