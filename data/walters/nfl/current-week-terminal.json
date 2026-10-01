@@ -4,7 +4,7 @@
   "publication": "THE PRIVATE LINE",
   "season": 2026,
   "week": 4,
-  "generatedAt": "2026-10-01T23:55:04.828Z",
+  "generatedAt": "2026-10-01T23:57:32.019Z",
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
@@ -1407,18 +1407,57 @@
       "homeRating": 24.44122,
       "neutralBaseHome": -7,
       "espnNeutralHome": -5.5,
-      "grahamFairHome": -9.5,
-      "grahamAsOf": "2026-09-30T11:56:30-07:00",
+      "grahamFairHome": -10.5,
+      "grahamAsOf": "2026-10-01T16:55:30-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "grahamMove": 0,
-      "personnelEstimateCases": [],
-      "personnelUnresolvedCases": [
+      "grahamMove": -1,
+      "personnelEstimateCases": [
         {
           "caseKey": "2026-W04-MIA-DeVon-Achane",
           "player": "De'Von Achane",
-          "failClosedCode": "RB_COMMITTEE_AND_JAYLEN_WRIGHT_AVAILABILITY_UNRESOLVED",
-          "resolutionStatus": "UNRESOLVED_AFTER_COMPLETE_SEARCH"
-        },
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "EQUAL_SHARE_COMMITTEE",
+          "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+          "healthyValue": 1.2,
+          "replacementValue": 0.2,
+          "replacementValueRatio": {
+            "numerator": 0.4,
+            "denominator": 2
+          },
+          "injuryLoss": 1,
+          "rawTeamContributionDelta": -1,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 1,
+            "max": 1
+          },
+          "weights": [
+            {
+              "player": "Jaylen Wright",
+              "eaPlayerId": "14632",
+              "lockedValue": 0.2,
+              "additionalRoleUnits": 1,
+              "weight": 0.5
+            },
+            {
+              "player": "Ollie Gordon II",
+              "eaPlayerId": "15049",
+              "lockedValue": 0.2,
+              "additionalRoleUnits": 1,
+              "weight": 0.5
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "Assume equal additional vacant-role duty for Jaylen Wright and Ollie Gordon II, the two active backs on Miami's current official depth chart. Their locked values are identical, so the effective replacement value is allocation-invariant.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.",
+          "reopenOn": "Miami names a different primary back, changes Wright or Gordon's availability, documents unequal additional role shares, or adds another running-back absence.",
+          "applied": true
+        }
+      ],
+      "personnelUnresolvedCases": [
         {
           "caseKey": "2026-W04-MIN-Josh-Oliver",
           "player": "Josh Oliver",
@@ -1447,8 +1486,8 @@
         "applicationStatus": "CARRIED_BASE_VERIFIED",
         "marketViewed": false
       },
-      "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
-      "researchSummary": "Governed fair decomposition: neutral/team base -7.245; home field -2.082; other governed +0.000; pre-personnel exact -9.327; personnel +0.000; matchup +0.000; exact Graham home fair -9.327; displayed -9.5.",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
+      "researchSummary": "Governed fair decomposition: neutral/team base -7.245; home field -2.082; other governed +0.000; pre-personnel exact -9.327; personnel -1.000; matchup +0.000; exact Graham home fair -10.327; displayed -10.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1466,6 +1505,27 @@
           "marketViewed": false
         },
         {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "MIA",
+          "side": "AWAY",
+          "clusterGroup": "RUNNING_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W04-MIA-DeVon-Achane"
+          ],
+          "rawTeamContributionDelta": -1,
+          "finalTeamContributionDelta": -1,
+          "pointsToHomeSpread": -1,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.miamidolphins.com/team/injury-report/",
+            "https://www.miamidolphins.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/mia.json",
+            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+          ]
+        },
+        {
           "type": "QB_PERFORMANCE_PRODUCTION",
           "productionId": "walters-qb-performance-production-v1",
           "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -1476,7 +1536,11 @@
           "awayTeamQbDelta": 0,
           "homeTeamQbDelta": 0,
           "pointsToHomeSpread": 0,
-          "reason": "Approved Walters QB performance differential: MIA 0.00 minus MIN 0.00 equals +0.00 points to the home-spread coordinate.",
+          "reason": "Governed Walters QB differential: MIA 0.00 minus MIN 0.00 equals +0.00 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "FROZEN_STAGE2_PRIOR_RETAINED_ZERO_PERFORMANCE_DELTA",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
           "sourceRefs": [
             "data/walters/nfl/qb-production/production-contract-v1.json",
             "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
@@ -1487,7 +1551,7 @@
             "https://www.vikings.com/news/kyler-murray-starting-quarterback-week-3-buccaneers-injury",
             "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
           ],
-          "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
           "marketViewed": false
         }
       ],
@@ -1513,7 +1577,7 @@
       "pinnacleMoneylineAwayLimit": 7500,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": -1.5,
+      "grahamHomeStrengthGap": -0.5,
       "officialDailySequence": 2,
       "officialDailyCapturedAt": "2026-10-01T12:55:18.459Z"
     },
