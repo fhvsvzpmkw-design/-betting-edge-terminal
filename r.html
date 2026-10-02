@@ -467,7 +467,8 @@ async function load(){
     // Large report days exceed browser URL limits when serialized into #run.
     frame.__vigscopeReport={ref:id,run:hydrated};
     frame.addEventListener('load',revealTerminal,{once:true});
-    frame.src='./runner.html?build='+Date.now()+'#runRef='+encodeURIComponent(id);
+    const entryView=new URLSearchParams(location.search).get('view');
+    frame.src='./runner.html?build='+Date.now()+'#runRef='+encodeURIComponent(id)+(entryView==='syndicate'?'&view=syndicate':'');
   }catch(e){fail('VIGSCOPE SHORT LINK ERROR // '+String(e&&e.message||e))}
 }
 load();
