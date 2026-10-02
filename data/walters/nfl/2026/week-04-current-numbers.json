@@ -8,8 +8,8 @@
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-10-02T11:41:36-07:00",
-  "lastResearchAt": "2026-10-02T11:41:36-07:00",
+  "updatedAt": "2026-10-02T11:48:26-07:00",
+  "lastResearchAt": "2026-10-02T11:48:26-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-04-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-04-daily-market-ledger.json",
@@ -1598,10 +1598,10 @@
       "home": "TB",
       "startTimePacific": "2026-10-04T10:00:00-07:00",
       "grahamFairHome": 5.5,
-      "grahamExactFairHome": 5.257,
-      "grahamAsOf": "2026-09-30T19:34:02.940405+00:00",
+      "grahamExactFairHome": 5.657,
+      "grahamAsOf": "2026-10-02T11:48:26-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "informationStatus": "VERIFIED_CURRENT_BASELINE_RECOVERED",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1616,6 +1616,35 @@
           "calibrationId": "walters-nfl-home-field-calibration-v1",
           "venueClass": "DOMESTIC_HOME",
           "effectiveAt": "2026-09-29T04:34:24-07:00",
+          "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "GB",
+          "homeTeam": "TB",
+          "awayStarter": "Jordan Love",
+          "homeStarter": "Jalon Daniels",
+          "awayTeamQbDelta": 0.16,
+          "homeTeamQbDelta": -2.5,
+          "pointsToHomeSpread": 2.66,
+          "reason": "Governed Walters QB differential: GB 0.16 minus TB -2.50 equals +2.66 points to the home-spread coordinate. TB uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+          ],
+          "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
           "marketViewed": false
         },
         {
@@ -1659,36 +1688,27 @@
           ]
         },
         {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "GB",
-          "homeTeam": "TB",
-          "awayStarter": "Jordan Love",
-          "homeStarter": "Jalon Daniels",
-          "awayTeamQbDelta": 0.16,
-          "homeTeamQbDelta": -2.5,
-          "pointsToHomeSpread": 2.66,
-          "reason": "Governed Walters QB differential: GB 0.16 minus TB -2.50 equals +2.66 points to the home-spread coordinate. TB uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
-          "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-            "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
-            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "TB",
+          "side": "HOME",
+          "clusterGroup": "DEFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W04-TB-Rueben-Bain-Jr"
           ],
-          "effectiveAt": "2026-09-30T19:34:02.940405+00:00",
-          "marketViewed": false
+          "rawTeamContributionDelta": -0.4,
+          "finalTeamContributionDelta": -0.4,
+          "pointsToHomeSpread": 0.4,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-friday-oct-2",
+            "https://www.buccaneers.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/tb.json"
+          ]
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base +5.379; home field -2.082; other governed +2.660; pre-personnel exact +5.957; personnel -0.700; matchup +0.000; exact Graham home fair +5.257; displayed +5.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base +5.379; home field -2.082; other governed +2.660; pre-personnel exact +5.957; personnel -0.300; matchup +0.000; exact Graham home fair +5.657; displayed +5.5.",
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
@@ -1706,7 +1726,9 @@
         "data/walters/nfl/player-values/by-team-v1/tb.json",
         "data/walters/nfl/2026/week-04-research-ledger.json",
         "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
-        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-friday-oct-2",
+        "https://www.buccaneers.com/team/depth-chart"
       ],
       "neutralBaseHome": 5.379,
       "ratingCarryForward": {
@@ -1718,8 +1740,8 @@
         "sourceUpdatedAt": "2026-09-23T00:16:52.540556+00:00",
         "marketViewed": false
       },
-      "personnelBaselineExactFairHome": 4.107,
-      "personnelOverlayPointsToHomeSpread": -0.7,
+      "personnelBaselineExactFairHome": 5.957,
+      "personnelOverlayPointsToHomeSpread": -0.3,
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
       "matchupOverlayPointsToHomeSpread": 0,
@@ -1737,13 +1759,13 @@
         "homeFieldPointsToHomeSpread": -2.082,
         "otherGovernedPointsToHomeSpread": 2.66,
         "prePersonnelExactFairHome": 5.957,
-        "personnelPointsToHomeSpread": -0.7,
+        "personnelPointsToHomeSpread": -0.3,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 5.257,
+        "exactFairHome": 5.657,
         "displayedFairHome": 5.5,
         "arithmeticVerified": true
       },
-      "priorGrahamFairHome": 3.5,
+      "priorGrahamFairHome": 5.5,
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -1755,7 +1777,7 @@
       "qbPerformanceLastAppliedAt": "2026-09-30T19:34:02.940405+00:00",
       "qbPerformanceFailClosedTeams": [],
       "personnelProductionId": "walters-personnel-production-v1",
-      "personnelLastAppliedAt": "2026-09-30T11:45:00-07:00",
+      "personnelLastAppliedAt": "2026-10-02T11:48:26-07:00",
       "personnelEstimateCases": [],
       "weeklyRatingInput": {
         "state": "PARTIAL_BLOCKED",
@@ -2794,8 +2816,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-daily-review-personnel-2026-w04-20261002T114136-0700",
-    "lastAppliedAt": "2026-10-02T11:41:36-07:00",
+    "lastBatchId": "graham-daily-review-personnel-tb-2026-w04-20261002T114826-0700",
+    "lastAppliedAt": "2026-10-02T11:48:26-07:00",
     "marketViewed": false
   },
   "baselineRecovery": {
