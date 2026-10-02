@@ -123,9 +123,9 @@ function ptDateTime(value){
   const d=new Date(String(value||''));if(!Number.isFinite(d.getTime()))return '';
   return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}).format(d).toUpperCase();
 }
-function priceText(v){return String(v??'').trim()||'—'}
+function priceText(v){return globalThis.VigScopeOddsFormat?.text(String(v??'').trim())||String(v??'').trim()||'—'}
 function pizzaPanelHtml(data){
-  const play=data?.play;const source=data?.source||{};const live=String(data?.status||'').toUpperCase()==='PLAY'&&play;
+  const play=globalThis.VigScopeOddsFormat?globalThis.VigScopeOddsFormat.record(data?.play):data?.play;const source=data?.source||{};const live=String(data?.status||'').toUpperCase()==='PLAY'&&play;
   const reportLabel=esc(source.reportLabel||source.slot||'CURRENT REPORT');
   const badge=live?`ONE SLICE // ${reportLabel}`:`OVEN CLOSED // ${reportLabel}`;
   const head=`<div class="specialHead deskStatusRail pizzaHead"><div class="specialBadge pizzaBadge">${badge}</div></div>`;
@@ -202,6 +202,7 @@ function actionDecisionText(card,status,action){
   return decision.toUpperCase()===status||key(decision)===key(action)?'':decision;
 }
 function cryptoCardHtml(card,index){
+  if(globalThis.VigScopeOddsFormat)card=globalThis.VigScopeOddsFormat.record(card);
   const status=String(card?.status||'WATCH').toUpperCase();
   const rank=String(card?.rank||'').toUpperCase();
   const detailId=`cryptoDetail${String(card?.id||index).replace(/[^a-zA-Z0-9_-]/g,'')}`;

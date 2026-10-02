@@ -1,12 +1,13 @@
 (function(root){
   'use strict';
   const list=x=>Array.isArray(x)?x:[];
+  const odds=root.VigScopeOddsFormat;
   const pct=x=>typeof x==='number'?(x*100).toFixed(1)+'%':'—';
   const names={espn:'ESPN',mlb_official:'MLB official',nfelo:'nfelo',dimers:'Dimers',dratings:'DRatings',moneypuck:'MoneyPuck',fangraphs:'FanGraphs',stats_insider:'Stats Insider',dunks_threes:'Dunks & Threes',puckcast:'PuckCast',oddstrader:'OddsTrader'};
   const market=x=>/moneyline/.test(x)?'Moneyline':/spread|run_line|puck_line/.test(x)?'Spread':/total/.test(x)?'Total':x;
   const signed=n=>typeof n==='number'?(n>0?'+':'')+n:'—';
   const clock=x=>{try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(x))+' PT';}catch{return 'Time unavailable';}};
-  function node(d,tag,text,className){const e=d.createElement(tag);if(text!==undefined)e.textContent=text;if(className)e.className=className;return e;}
+  function node(d,tag,text,className){const e=d.createElement(tag);if(text!==undefined)e.textContent=odds?odds.text(text):text;if(className)e.className=className;return e;}
   function sourceLink(d,label,url){
     const a=node(d,'a',label);try{const u=new URL(url);if(u.protocol!=='https:'||u.username||u.password)return node(d,'span',label);a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';}catch{return node(d,'span',label);}return a;
   }
@@ -33,13 +34,13 @@
     if(g.internalModels?.length){details.append(node(d,'h3','GRAHAM / WALTERS'));for(const m of g.internalModels){details.append(node(d,'div',`${g.home} ${signed(m.homeFairPoints)} · ${clock(m.observedAt)}`));details.append(node(d,'p',m.summary));if(m.numberStatus?.includes('UNRESOLVED')||m.unresolved?.qb?.length||m.unresolved?.personnel?.length||m.unresolved?.groups?.length)details.append(node(d,'div','Personnel or quarterback inputs remain unresolved. A preserved fair requires current review.','gi-warning'));if(m.weeklyRatingInput&&m.weeklyRatingInput.state!=='COMPLETE')details.append(node(d,'div','Historical weekly rating inputs remain incomplete.','gi-warning'));if(m.qbPriorEstimates?.length)details.append(node(d,'div','This fair includes a frozen quarterback prior estimate without a qualifying NFL performance sample.','gi-warning'));}}
     details.append(node(d,'h3','AVAILABLE PRICES'));
     details.append(node(d,'div',`Odds snapshot ${clock(g.priceSnapshotAt)}. Verify an executable current price before acting.`,'gi-meta'));
-    const quotes=list(g.markets).flatMap(m=>list(m.quotes).map(q=>[market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book||'—',q.priceDecimal?.toFixed(3)||'—',pct(q.breakEvenProbability),
+    const quotes=list(g.markets).flatMap(m=>list(m.quotes).map(q=>[market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book||'—',odds?odds.fromDecimal(q.priceDecimal):'—',pct(q.breakEvenProbability),
       `${clock(q.observedAt||q.changedAt)}${q.priceState==='REFRESH_REQUIRED'?' · Refresh required':''}`]));
-    details.append(table(d,['MARKET','SIDE','LINE','BOOK','DECIMAL','BREAK-EVEN','OBSERVED'],quotes));
+    details.append(table(d,['MARKET','SIDE','LINE','BOOK','AMERICAN ODDS','BREAK-EVEN','OBSERVED'],quotes));
     const benchmarks=list(g.markets).flatMap(m=>list(m.quotes).filter(q=>q.benchmark).map(q=>[market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book,pct(q.benchmark.benchmarkNoVigProbability),q.benchmark.edgeProbabilityPoints.toFixed(2)+' pp']));
     if(benchmarks.length){details.append(node(d,'h3','PINNACLE PRICE COMPARISON'));details.append(table(d,['MARKET','SIDE','LINE','EXECUTION BOOK','NO-VIG REFERENCE','PRICE DIFFERENCE'],benchmarks));}
     else details.append(node(d,'div','A current exact Pinnacle comparison is unavailable in this snapshot.','gi-meta'));
-    const moves=list(g.markets).flatMap(m=>list(m.quotes).filter(q=>q.movement).map(q=>`${q.book} ${market(m.marketDetail)} ${g[m.side]||m.side}: ${q.movement.lineChange?`line ${signed(q.movement.previousLine)} → ${signed(q.line)}`:`decimal ${q.movement.previousPrice} → ${q.priceDecimal}`} since ${clock(q.movement.from)}`));
+    const moves=list(g.markets).flatMap(m=>list(m.quotes).filter(q=>q.movement).map(q=>`${q.book} ${market(m.marketDetail)} ${g[m.side]||m.side}: ${q.movement.lineChange?`line ${signed(q.movement.previousLine)} → ${signed(q.line)}`:`odds ${odds?odds.fromDecimal(q.movement.previousPrice):'—'} → ${odds?odds.fromDecimal(q.priceDecimal):'—'}`} since ${clock(q.movement.from)}`));
     if(moves.length){const movement=node(d,'details');movement.append(node(d,'summary','PRICE MOVEMENT'));for(const text of moves)movement.append(node(d,'p',text));details.append(movement);}
     if(g.facts?.length){const f=node(d,'details');f.append(node(d,'summary',`EVENT RESEARCH · ${g.facts.length} observations`));const grid=node(d,'div',undefined,'gi-grid');for(const fact of g.facts){const box=node(d,'div',undefined,'gi-fact');box.append(node(d,'b',fact.kind||'RESEARCH'),node(d,'div',factText(fact)),sourceLink(d,clock(fact.observedAt),fact.url));grid.append(box);}f.append(grid);details.append(f);}
     const relevant=list(knowledge).filter(k=>list(g.knowledgeIds).includes(k.id));

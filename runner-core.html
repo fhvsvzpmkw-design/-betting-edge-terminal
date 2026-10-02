@@ -12,6 +12,7 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 #app{border:0;width:100%;height:100%;display:block;background:#01040a}
 #err{position:fixed;z-index:10;left:10px;right:10px;top:10px;padding:10px;background:#25060d;color:#ff9cad;border:1px solid #ff6178;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;display:none}
 </style>
+<script src="./assets/odds-format.js?v=american-only-20261002"></script>
 </head>
 <body>
 <div id="err"></div>
@@ -26,6 +27,7 @@ const HISTORY_LIMIT=30;
 const FEED_URL='./data/live-odds.json';
 const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const QuoteObservation=globalThis.BettingEdgeQuoteObservation;
+const OddsFormat=globalThis.VigScopeOddsFormat;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
 let activeRun=null;
 let originalRun=null;
@@ -38,13 +40,13 @@ function b64ue(v){const bytes=new TextEncoder().encode(v);let bin='';bytes.forEa
 function payload(){const h=location.hash.slice(1);if(!h)return null;const p=new URLSearchParams(h);let raw=null;if(p.has('run'))raw=b64u(p.get('run'));else if(p.has('json'))raw=p.get('json');if(!raw)return null;try{return JSON.parse(raw)}catch(e){return {__error:String(e)}}}
 function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
 function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
-function displayPrice(v){const raw=txt(v,'VERIFY PRICE').trim();const m=raw.match(/([+−-]\d{2,4})(?![\d.])/);return m?m[1]:'—'}
+function displayPrice(v){const raw=(OddsFormat?OddsFormat.price(v):txt(v,'VERIFY PRICE')).trim();const m=raw.match(/([+−-]\d{3,})(?![\d.])/);return m?m[1]:'—'}
 function displayPriceTime(v){const raw=String(v||'');let m=raw.match(/\bsnapshot\s+([^)]+?)(?:\)|$)/i);if(m)return m[1].trim();m=raw.match(/\bupdated\s+(.+)$/i);return m?m[1].trim():''}
 function isEventStartedClosed(rec){return /EVENT\s+STARTED\s*\/\s*CLOSED/i.test([rec?.price,rec?.move,rec?.analysis,rec?.title].filter(Boolean).join(' '))}
 function americanFromText(v){const m=String(v||'').replace(/−/g,'-').match(/[+-]?\d{2,4}/);return m?Number(m[0]):null}
 function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN'?'y':s==='WAIT'?'c':'muted'}
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
-function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
+function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=OddsFormat?OddsFormat.text(text):text;return x}
 
 function normalizeRun(run){const c=run&&run.counts||{};return {slot:txt(run&&run.slot,''),label:txt(run&&run.label,''),ts:txt(run&&run.ts,''),bankroll:run&&run.bankroll,risk:run&&run.risk,counts:{bet:Number(c.bet)||0,lean:Number(c.lean)||0,wait:Number(c.wait)||0,pass:Number(c.pass)||0},summary:txt(run&&run.summary,''),feedGeneratedAt:txt(run&&run.feedGeneratedAt,''),repriceBaseLabel:txt(run&&run.repriceBaseLabel,''),recs:Array.isArray(run&&run.recs)?run.recs:[]}}
 function runKey(run){return [txt(run.ts,''),txt(run.slot,''),txt(run.label,'')].join('|')}
@@ -67,7 +69,7 @@ function normMarket(v){return normName(v).replace(/\bstrikeouts?\b/g,'strikeout'
 function keywordMatch(a,b){const x=normMarket(a),y=normMarket(b);if(!x||!y)return false;return x===y||x.includes(y)||y.includes(x)}
 function decimalOdds(v){const n=Number(v);return Number.isFinite(n)&&n>1.001?n:null}
 function americanNumber(dec){const d=Number(dec);if(!Number.isFinite(d)||d<=1)return null;return d>=2?Math.round((d-1)*100):Math.round(-100/(d-1))}
-function americanText(dec){const n=americanNumber(dec);return n===null?'UNAVAILABLE':(n>0?'+':'')+n}
+function americanText(dec){if(OddsFormat)return OddsFormat.fromDecimal(dec);const n=americanNumber(dec);return n===null?'UNAVAILABLE':(n>0?'+':'')+n}
 function americanProb(a){const n=Number(a);if(!Number.isFinite(n)||n===0)return null;return n>0?100/(n+100):(-n)/((-n)+100)}
 function inheritedFairProb(fair){const text=String(fair||'');if(/RECALC|UNVERIFIED|UNAVAILABLE|N\/A/i.test(text))return null;const m=text.match(/([+-]\d{3,4})/);return m?americanProb(Number(m[1])):null}
 function clamp(v,min=0,max=100){return Math.max(min,Math.min(max,Number(v)||0))}
@@ -571,6 +573,7 @@ function priceWatchMeta(r){
   return {target,reason:txt(w.reason,'').trim()}
 }
 function card(d,r){
+  if(OddsFormat)r=OddsFormat.record(r);
   const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
   const top=el(d,'div','runnerTop'),l=el(d,'div');
   const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
@@ -741,7 +744,8 @@ function apply(run){
     const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
     ['CALL','MARKET','BOOK / PRICE','BET AT / PLAY TO','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
     const tb=el(d,'tbody');
-    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
+    (Array.isArray(run.recs)?run.recs:[]).forEach(issued=>{
+      const r=OddsFormat?OddsFormat.record(issued):issued;
       const tr=el(d,'tr');
       const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
       [txt(r.status),txt(r.title),[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));

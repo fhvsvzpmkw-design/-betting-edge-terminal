@@ -57,6 +57,7 @@
 @media(max-width:560px){#history .premiumgrid,#history .premiumSummaryRow{grid-template-columns:1fr}}
 @media(max-width:560px){#ledger .filters{grid-template-columns:1fr}}
 </style>
+<script src="./assets/odds-format.js?v=american-only-20261002"></script>
 </head>
 <body>
 <main class="term">
@@ -115,7 +116,7 @@ const hviews=['summary','sports','types','timing','prices','books','time','clv',
 document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{const d=$(b.dataset.detail);const open=!d.classList.contains('open');d.classList.toggle('open');b.textContent=open?'▼ HIDE ANALYSIS':'▶ VIEW ANALYSIS';});
 function rec(r){return {id:r[0],book:r[1]||'Unknown',placed:r[3],settled:r[4],sport:r[5]||'',league:r[6]||'',desc:r[7]||'',odds:+r[8],risk:+r[9]||0,result:r[10]||'',pl:+r[11]||0,timing:r[12]||'UNKNOWN',clv:r[13],boosted:!!r[14],events:Array.isArray(r[15])?r[15]:[],legs:Array.isArray(r[16])?r[16]:[],tags:r[17]||''}}
 
-function money(n){const a=Math.abs(n).toFixed(2);return n<0?'-$'+a:n>0?'+$'+a:'$0.00'}function odds(n){return n>0?'+'+n:String(n)}function localDate(s){if(!s)return'—';const d=new Date(s);if(Number.isNaN(d.getTime()))return s;return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d).replace(',','')}
+function money(n){const a=Math.abs(n).toFixed(2);return n<0?'-$'+a:n>0?'+$'+a:'$0.00'}function odds(n){return globalThis.VigScopeOddsFormat.price(n)}function localDate(s){if(!s)return'—';const d=new Date(s);if(Number.isNaN(d.getTime()))return s;return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d).replace(',','')}
 function corpus(x){return [x.book,x.sport,x.league,x.desc,x.result,...x.events,...x.legs].join(' ').toLowerCase()}
 function filtered(){let d=DATA.slice(),q=$('search').value.trim().toLowerCase(),res=$('result').value;if(q)d=d.filter(x=>corpus(x).includes(q));if(res)d=d.filter(x=>x.result===res);const t=x=>Date.parse(x.placed)||0;d.sort((a,b)=>t(b)-t(a)||b.id-a.id);return d}
 function td(tr,text,cls=''){const e=document.createElement('td');e.textContent=text;if(cls)e.className=cls;tr.appendChild(e)}
@@ -180,7 +181,7 @@ $('prev').onclick=()=>{page--;render()};$('next').onclick=()=>{page++;render()};
 
 </script>
 <script src="./assets/quote-observation.js"></script>
-<script src="./assets/runner-core-runtime.js?v=active-meters-20261001"></script>
+<script src="./assets/runner-core-runtime.js?v=american-only-20261002"></script>
 <script>
 (()=>{
   const app=document.getElementById('app');

@@ -44,6 +44,8 @@ Core v1.4 adds explicit fair-value basis/model-error states, Research v1.8 uncer
 
 ## Report decisions
 
+Public odds use American format only. `assets/odds-format.js` is the shared display formatter for the terminal and generated candidate price text. Structured decimal prices retain their original precision for probability, value and settlement calculations; formatting must never rewrite issued report history. New odds displays should use this formatter and keep spreads, totals, probabilities and monetary amounts in their native units.
+
 From September 6, every EVALUATED primary decision is published, including PASS. There is no numeric card target or maximum. Research follows the shared scheduled authority's qualified-odds → current-research → fair-value → decision process. Continue unfinished work, but publish completed, validated decisions even when other selections remain unfinished. From 18:15 September 6 the publisher adds a PARTIAL REPORT notice with exact counts, or ANALYSIS INCOMPLETE when no selections were evaluated. Genuine terminal limitations remain distinct; unfinished selections receive no fabricated fair, decision or stake.
 
 Pizza Plays remains downstream of VigScope. If there is no suitable qualifying play, no Pizza selection is preferable to forcing a weak or extreme longshot.

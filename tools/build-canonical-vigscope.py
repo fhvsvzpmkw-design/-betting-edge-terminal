@@ -40,6 +40,7 @@ app = f'''<!doctype html>
 <meta http-equiv="Expires" content="0">
 <title>VigScope Terminal UI v1.5 App</title>
 <style>{style}</style>
+<script src="./assets/odds-format.js?v=american-only-20261002"></script>
 </head>
 <body>
 <main class="term">

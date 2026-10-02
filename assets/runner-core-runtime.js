@@ -6,6 +6,7 @@ const HISTORY_LIMIT=30;
 const FEED_URL='./data/live-odds.json';
 const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const QuoteObservation=globalThis.BettingEdgeQuoteObservation;
+const OddsFormat=globalThis.VigScopeOddsFormat;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
 const VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1';
 const VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00';
@@ -38,13 +39,13 @@ function payload(){
 }
 function txt(v,f='—'){return(v===null||v===undefined||v==='')?f:String(v)}
 function money(v){const n=Number(v);return Number.isFinite(n)?'$'+n.toFixed(2):txt(v,'$0.00')}
-function displayPrice(v){const raw=txt(v,'VERIFY PRICE').trim();const m=raw.match(/([+−-]\d{2,4})(?![\d.])/);return m?m[1]:'—'}
+function displayPrice(v){const raw=(OddsFormat?OddsFormat.price(v):txt(v,'VERIFY PRICE')).trim();const m=raw.match(/([+−-]\d{3,})(?![\d.])/);return m?m[1]:'—'}
 function displayPriceTime(v){const raw=String(v||'');let m=raw.match(/\bsnapshot\s+([^)]+?)(?:\)|$)/i);if(m)return m[1].trim();m=raw.match(/\bupdated\s+(.+)$/i);return m?m[1].trim():''}
 function isEventStartedClosed(rec){return /EVENT\s+STARTED\s*\/\s*CLOSED/i.test([rec?.price,rec?.move,rec?.analysis,rec?.title].filter(Boolean).join(' '))}
 function americanFromText(v){const m=String(v||'').replace(/−/g,'-').match(/[+-]?\d{2,4}/);return m?Number(m[0]):null}
 function cls(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'g':s==='LEAN'?'y':s==='WAIT'?'c':'muted'}
 function border(s){s=String(s||'WAIT').toUpperCase();return s==='BET'?'var(--green)':s==='LEAN'?'var(--yellow)':s==='WAIT'?'var(--cyan)':'var(--muted)'}
-function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=text;return x}
+function el(d,t,c,text){const x=d.createElement(t);if(c)x.className=c;if(text!==undefined)x.textContent=OddsFormat?OddsFormat.text(text):text;return x}
 
 function normalizeRun(run){
   const source=withoutComparison(run)||{},c=source.counts||{},out=deepClone(source)||{};
@@ -100,7 +101,7 @@ function normMarket(v){return normName(v).replace(/\bstrikeouts?\b/g,'strikeout'
 function keywordMatch(a,b){const x=normMarket(a),y=normMarket(b);if(!x||!y)return false;return x===y||x.includes(y)||y.includes(x)}
 function decimalOdds(v){const n=Number(v);return Number.isFinite(n)&&n>1.001?n:null}
 function americanNumber(dec){const d=Number(dec);if(!Number.isFinite(d)||d<=1)return null;return d>=2?Math.round((d-1)*100):Math.round(-100/(d-1))}
-function americanText(dec){const n=americanNumber(dec);return n===null?'UNAVAILABLE':(n>0?'+':'')+n}
+function americanText(dec){if(OddsFormat)return OddsFormat.fromDecimal(dec);const n=americanNumber(dec);return n===null?'UNAVAILABLE':(n>0?'+':'')+n}
 function americanProb(a){const n=Number(a);if(!Number.isFinite(n)||n===0)return null;return n>0?100/(n+100):(-n)/((-n)+100)}
 function inheritedFairProb(fair){const text=String(fair||'');if(/RECALC|UNVERIFIED|UNAVAILABLE|N\/A/i.test(text))return null;const m=text.match(/([+-]\d{3,4})/);return m?americanProb(Number(m[1])):null}
 function clamp(v,min=0,max=100){return Math.max(min,Math.min(max,Number(v)||0))}
@@ -264,7 +265,7 @@ function coveragePanel(d,run){
 function candidateText(value){return typeof value==='string'?value.trim():''}
 function candidatePrice(selection){
   const q=selection?.quote,d=Number(q?.priceDecimal);
-  return q&&Number.isFinite(d)&&d>1?`${q.book||'Recorded book'} ${americanText(d)} (${d})`:'Executable price unavailable';
+  return q&&Number.isFinite(d)&&d>1?`${q.book||'Recorded book'} ${americanText(d)}`:'Executable price unavailable';
 }
 function candidateQuoteLabel(quote){
   if(!quote)return '';
@@ -307,6 +308,7 @@ function candidateResearchAction(value){
   })[code]||String(value||'');
 }
 function candidateReasons(d,selection,compact=false){
+  if(OddsFormat)selection=OddsFormat.record(selection);
   const box=el(d,'div','runnerCandidateReasons');
   const reason=candidateText(selection?.reason);
   if(reason)box.appendChild(el(d,'p','',`WHY REVIEW: ${reason}`));
@@ -946,7 +948,8 @@ function setPickFilter(d,run,status,sport,focusId,scroll=false){
   document.dispatchEvent(new CustomEvent('vigscope-app-ready'));
 }
 function pickReason(rec){
-  const raw=String(rec?.marketAssessment?.decisionRationale||rec?.coreAssessment?.rationale||rec?.analysis||rec?.edge||rec?.support||'Open analysis for the recorded reasoning.').replace(/\s+/g,' ').trim();
+  const original=String(rec?.marketAssessment?.decisionRationale||rec?.coreAssessment?.rationale||rec?.analysis||rec?.edge||rec?.support||'Open analysis for the recorded reasoning.');
+  const raw=(OddsFormat?OddsFormat.text(original,OddsFormat.decimalValues(rec)):original).replace(/\s+/g,' ').trim();
   const first=raw.split(/(?<=[.!?])\s+(?=[A-Z])/)[0];
   return first.length<=260?first:first.slice(0,257).replace(/\s+\S*$/,'')+'…';
 }
@@ -1026,6 +1029,7 @@ function priceWatchMeta(r){
   return {target,reason:txt(w.reason,'').trim()}
 }
 function card(d,r){
+  if(OddsFormat)r=OddsFormat.record(r);
   const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);c.dataset.status=r.status;c.dataset.sport=recSport(r);
   const top=el(d,'div','runnerTop'),l=el(d,'div');
   const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
@@ -1216,7 +1220,8 @@ function apply(run){
     const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
     ['CALL','MARKET','BOOK / PRICE','BET AT / PLAY TO','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
     const tb=el(d,'tbody');
-    (Array.isArray(run.recs)?run.recs:[]).forEach(r=>{
+    (Array.isArray(run.recs)?run.recs:[]).forEach(issued=>{
+      const r=OddsFormat?OddsFormat.record(issued):issued;
       const tr=el(d,'tr');
       const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
       [txt(r.status),txt(r.title),[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
