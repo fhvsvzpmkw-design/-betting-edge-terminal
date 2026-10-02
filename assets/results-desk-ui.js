@@ -143,7 +143,7 @@ function detailRows(index){
   }
   const list=filteredCards(index).slice(0,45);
   if(!list.length)return '<div class="resultsEmpty">CARD DETAIL WILL APPEAR AFTER THE INDEX BUILDER COMPLETES.</div>';
-  return `<div class="resultsScroll"><table><thead><tr><th>DATE / LANE</th><th>CARD</th><th>STATUS</th><th>PRICE</th><th>RESULT</th><th>u</th></tr></thead><tbody>${list.map(c=>`<tr><td>${esc(dateLabel(c.date))} / ${esc(slotLabel(c.slot))}</td><td>${esc(c.title)}</td><td class="${statusClass(c.status)}">${esc(c.status)}</td><td>${esc(c.analysisPrice?.state==='exact'?(c.analysisPrice.american>0?'+':'')+c.analysisPrice.american:c.issuedPriceText||'—')}</td><td class="${gradeClass(c.grade)}">${esc(c.grade||'OPEN')}</td><td>${c.units===null||c.units===undefined?'—':esc(signed(c.units,2))}</td></tr>`).join('')}</tbody></table></div>`;
+  return `<div class="resultsScroll"><table><thead><tr><th>DATE / LANE</th><th>CARD</th><th>STATUS</th><th>PRICE</th><th>RESULT</th><th>u</th></tr></thead><tbody>${list.map(c=>`<tr><td>${esc(dateLabel(c.date))} / ${esc(slotLabel(c.slot))}</td><td>${esc(c.title)}</td><td class="${statusClass(c.status)}">${esc(c.status)}</td><td>${esc(c.analysisPrice?.state==='exact'?(c.analysisPrice.american>0?'+':'')+c.analysisPrice.american:globalThis.VigScopeOddsFormat?.price(c.issuedPriceText)||c.issuedPriceText||'—')}</td><td class="${gradeClass(c.grade)}">${esc(c.grade||'OPEN')}</td><td>${c.units===null||c.units===undefined?'—':esc(signed(c.units,2))}</td></tr>`).join('')}</tbody></table></div>`;
 }
 function unresolvedRows(index){
   const rows=Array.isArray(index.unresolved)?index.unresolved:[];

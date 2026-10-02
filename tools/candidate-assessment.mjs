@@ -1,5 +1,6 @@
 // Candidate triage and producer completion checks. Comparisons do not issue grades.
 import {exactMarketReference, marketComparison} from './market-price-assessment.mjs';
+import OddsFormat from '../assets/odds-format.js';
 import {forecastPriceComparison} from './forecast-evidence.mjs';
 import {compareGrahamFair, reviewGrahamHandoff} from './graham-fair-handoff.mjs';
 import {compareRecordedFair} from './native-fair-review.mjs';
@@ -139,7 +140,7 @@ function conservativeValue(fair, side) {
 function displayCondition(value, quote) {
   return {...value, basis: value.basis || 'MATERIAL_REVIEW_REQUIRED',
     selectionKey: quote?.selectionKey || null, book: quote?.book || null,
-    text: value.state === 'PRICE_THRESHOLD' ? `Approximately ${value.priceDecimal.toFixed(3)} decimal comparison boundary. ${value.rationale}` : value.rationale};
+    text: value.state === 'PRICE_THRESHOLD' ? `Approximately ${OddsFormat.fromDecimal(value.priceDecimal)} comparison boundary. ${value.rationale}` : value.rationale};
 }
 
 function completion(report, selection, receipt, best, options, forecast, review) {

@@ -33,6 +33,7 @@ class Document extends Element {
 }
 const document=new Document();const app=document.createElement('iframe');app.id='app';document.body.appendChild(app);
 const context={console,document,location:{hash:'',search:''},localStorage:{getItem:()=>null},Intl,URLSearchParams,Date,setTimeout,clearTimeout};context.window={top:null};
+vm.runInNewContext(fs.readFileSync('assets/odds-format.js','utf8'),context);
 let source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
 const marker='\nactiveRun=payload();';
 vm.runInNewContext(source.replace(marker,'\nglobalThis.api={telemetryIntegrityState,deriveInstrumentReadings,meterBaselineText,coverageSummaryState,coveragePanel,noPublishedCardsText,instrumentCluster,instrumentGauge,card,candidateAssessmentPanel};'+marker),context);
@@ -112,10 +113,11 @@ const candidateRun={...report,recs:[{status:'PASS',title:'Visitors ML',price:'+1
 const candidateBefore=JSON.stringify(candidateRun),candidatePanel=api.candidateAssessmentPanel(document,candidateRun);
 assert.match(candidatePanel.textContent,/1 market screened.*1 selection review complete.*1 selection review unfinished/);
 assert.match(candidatePanel.querySelector('.runnerCandidateHeading').textContent,/Visitors at HostsRESEARCH UNFINISHED/);
-assert.match(candidatePanel.querySelector('.runnerCandidateFocus').textContent,/Visitors ML.*Bet365 \+115 \(2.15\)/,'the publisher-selected focus is used rather than array position');
+assert.match(candidatePanel.querySelector('.runnerCandidateFocus').textContent,/Visitors ML.*Bet365 \+115$/,'the publisher-selected focus is used rather than array position');
 assert.match(candidatePanel.textContent,/Recorded decision: PASS/);
 assert.match(candidatePanel.textContent,/TO RESOLVE: Confirm the announced starter\./);
-assert.match(candidatePanel.textContent,/Hosts ML.*DraftKings -125 \(1.8\)/,'the opposing side remains visible in the paired review');
+assert.match(candidatePanel.textContent,/Hosts ML.*DraftKings -125/,'the opposing side remains visible in the paired review');
+assert.doesNotMatch(candidatePanel.textContent,/\(2\.15\)|\(1\.8\)/,'shortlist prices use American odds only');
 assert.match(candidatePanel.textContent,/Public forecast: REJECTED — Different total line\./);
 assert.match(candidatePanel.textContent,/COMPARISON PRICE: \+125 comparison boundary/);
 assert.equal(JSON.stringify(candidateRun),candidateBefore,'candidate rendering is read-only');

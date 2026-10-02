@@ -31,7 +31,7 @@ function statusClass(s){return `rStatus ${String(s||'pass').toLowerCase()}`}
 function exactPrice(c){
   const a=Number(c?.analysisPrice?.american);
   if(c?.analysisPrice?.state==='exact'&&Number.isFinite(a))return `${a>0?'+':''}${a}`;
-  return String(c?.issuedPriceText||'—');
+  return globalThis.VigScopeOddsFormat?.price(c?.issuedPriceText)||String(c?.issuedPriceText||'—');
 }
 function latestSelectionRun(s){
   const timeline=Array.isArray(s?.timeline)?s.timeline:[];
