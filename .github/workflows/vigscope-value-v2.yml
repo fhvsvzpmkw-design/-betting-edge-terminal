@@ -1,0 +1,43 @@
+name: VigScope Value validation
+on:
+  pull_request:
+    paths:
+      - 'assets/results-value-desk-v2.js'
+      - 'assets/value-analytics.js'
+      - 'assets/report-dashboard-vigscope.js'
+      - 'tools/build-graham-pinnacle-value.mjs'
+      - 'tools/build-results-index.mjs'
+      - 'tests/vigscope-value*'
+      - '.github/workflows/vigscope-value-v2.yml'
+jobs:
+  value:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          node tests/vigscope-value-v2.test.mjs
+          node tests/results-performance-populations.test.mjs
+          node tools/build-results-index.mjs
+          node tools/add-results-player-value.mjs
+          node tools/add-results-shadow-v2.mjs
+          node tools/build-graham-pinnacle-value.mjs
+      - run: npm install --no-save puppeteer-core@24
+      - name: Mobile and desktop Value checks
+        run: |
+          export CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          python3 -m http.server 8765 >/tmp/value-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID"' EXIT
+          node tests/vigscope-value-scroll-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vigscope-value-screenshots
+          path: .qa/value-*.png
+          include-hidden-files: true

@@ -71,29 +71,26 @@
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
-  // F8 Results replaces the old visible Engine panel while keeping the route
-  // hook stable. It is read-only and consumes the rebuildable results index.
+  // One Value renderer owns the summaries, filters and complete archive.
+  const valueAnalytics=document.createElement('script');
+  valueAnalytics.id='valueAnalyticsLoader';
+  valueAnalytics.src=`./assets/value-analytics.js?v=1&b=${UI_CACHE_BUST}`;
+  valueAnalytics.async=false;
+  document.head.appendChild(valueAnalytics);
+
   const resultsDesk=document.createElement('script');
   resultsDesk.id='resultsDeskUiLoader';
-  resultsDesk.src=`./assets/results-desk-ui.js?v=2&b=${UI_CACHE_BUST}`;
+  resultsDesk.src=`./assets/results-value-desk-v2.js?v=1&b=${UI_CACHE_BUST}`;
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
-  // Player/decision/model value overlay. The $100 player view is actual BET
-  // performance only; non-BET decisions and flat-card calibration stay separate.
-  const resultsPlayerScale=document.createElement('script');
-  resultsPlayerScale.id='resultsPlayerScaleLoader';
-  resultsPlayerScale.src=`./assets/results-player-scale.js?v=3&b=${UI_CACHE_BUST}`;
-  resultsPlayerScale.async=false;
-  document.head.appendChild(resultsPlayerScale);
-
-  // Keep the issued-card and unique-selection logs compact as history grows.
-  // Filters apply first; the user then chooses 10 / 25 / 50 / 100 / ALL rows.
-  const resultsCardLogPagination=document.createElement('script');
-  resultsCardLogPagination.id='resultsCardLogPaginationLoader';
-  resultsCardLogPagination.src=`./assets/results-card-log-pagination.js?v=1&b=${UI_CACHE_BUST}`;
-  resultsCardLogPagination.async=false;
-  document.head.appendChild(resultsCardLogPagination);
+  // Preserve Bet History profit and the shared header bankroll updates.
+  for(const src of ['./assets/f3-overall-profit.js','./assets/terminal-header-bankroll-sync.js']){
+    const script=document.createElement('script');
+    script.src=`${src}?b=${UI_CACHE_BUST}`;
+    script.async=false;
+    document.head.appendChild(script);
+  }
 
   // Install Pizza and Crypto navigation before Meat Desk binds F7. The final
   // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Results.
