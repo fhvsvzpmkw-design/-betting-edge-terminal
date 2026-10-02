@@ -11,8 +11,10 @@ try{
  await page.setViewport({width:390,height:844,deviceScaleFactor:1,isMobile:true,hasTouch:true});
  await page.goto('http://127.0.0.1:8765/runner.html',{waitUntil:'domcontentloaded',timeout:60000});
  await page.waitForSelector('.tabs>.btn[data-view="engine"]',{timeout:60000});
+ await page.waitForSelector('#resultsGrahamValue .comparisonTable',{timeout:60000,visible:false});
+ await page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).display==='none'||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
  await page.click('.tabs>.btn[data-view="engine"]');
- await page.waitForSelector('#resultsGrahamValue .comparisonTable',{timeout:60000});
+ await page.waitForFunction(()=>document.body.dataset.primaryView==='engine',{timeout:10000});
  const initial=await page.evaluate(()=>({view:document.body.dataset.primaryView,title:document.querySelector('#engine .resultsTitle')?.textContent,proof:document.querySelectorAll('.whyProofCard').length,pizza:!!document.querySelector('#resultsPizzaValueBox'),shadow:!!document.querySelector('#resultsDecisionValueBox'),archive:!!document.querySelector('#resultsCardLog'),filters:!!document.querySelector('#valueHistoryFilters'),graham:document.querySelector('.comparisonTable').innerText,iframe:document.querySelectorAll('iframe').length}));
  assert.equal(initial.view,'engine');assert.equal(initial.title,undefined);assert.equal(initial.proof,6);assert.ok(initial.pizza&&initial.shadow&&initial.archive&&initial.filters);assert.equal(initial.iframe,0);assert.match(initial.graham,/25–20–3/);assert.equal(requests.length,1,'one shared history request');
  await page.select('#gWeek','1');
