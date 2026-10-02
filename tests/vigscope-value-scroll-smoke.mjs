@@ -1,59 +1,40 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
-
 const executablePath=process.env.CHROME;
 if(!executablePath)throw new Error('CHROME is required');
-
 const browser=await puppeteer.launch({headless:true,executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});
-const page=await browser.newPage();
-await page.setViewport({width:390,height:844,deviceScaleFactor:2,isMobile:true,hasTouch:true});
-const pageErrors=[];
-page.on('pageerror',error=>pageErrors.push(String(error)));
-
-await page.goto('http://127.0.0.1:8765/runner.html',{waitUntil:'domcontentloaded',timeout:45000});
-await new Promise(resolve=>setTimeout(resolve,5200));
-
-const engineButton=await page.$('.runnerNavPad .tabs>.btn[data-view="engine"],.tabs>.btn[data-view="engine"]');
-if(!engineButton)throw new Error('VigScope Value menu button missing');
-await engineButton.click();
-await new Promise(resolve=>setTimeout(resolve,2800));
-
-const state=await page.evaluate(()=>({
-  primaryView:document.body?.dataset?.primaryView||'',
-  valueDesk:Boolean(document.querySelector('#engine.resultsDesk')),
-  valueTitle:document.querySelector('#engine.resultsDesk .resultsTitle')?.textContent||'',
-  decisionBox:Boolean(document.getElementById('resultsDecisionValueBox')),
-  pizzaBox:Boolean(document.getElementById('resultsPizzaValueBox')),
-  modelBox:Boolean(document.getElementById('resultsModelCalibrationBox')),
-  playerHero:Boolean(document.querySelector('#engine .valueGrid,#engine .actualPlayerCash')),
-  betCard:Boolean(document.querySelector('[data-why-status="BET"]')),
-  whyCards:document.querySelectorAll('.whyProofCard').length,
-  whyHeading:[...document.querySelectorAll('#engine.resultsDesk .resultsSection')].some(x=>String(x.textContent||'').includes('WHY VIGSCOPE MATTERS')),
-  cardLog:Boolean([...document.querySelectorAll('#engine.resultsDesk .resultsSection')].some(x=>/ISSUED CARD LOG|UNIQUE SELECTION LOG/.test(String(x.textContent||'')))),
-  iframeCount:document.querySelectorAll('iframe').length,
-  scrollHeight:document.scrollingElement?.scrollHeight||0,
-  viewport:window.innerHeight,
-}));
-
-await page.evaluate(()=>window.scrollTo(0,Math.max(0,(document.scrollingElement?.scrollHeight||0)*0.60)));
-await new Promise(resolve=>setTimeout(resolve,350));
-const down=await page.evaluate(()=>window.scrollY);
-await page.evaluate(()=>window.scrollTo(0,0));
-await new Promise(resolve=>setTimeout(resolve,150));
-await page.evaluate(()=>window.scrollTo(0,Math.max(0,(document.scrollingElement?.scrollHeight||0)*0.82)));
-await new Promise(resolve=>setTimeout(resolve,350));
-const secondDown=await page.evaluate(()=>window.scrollY);
-
-console.log(JSON.stringify({state,down,secondDown,pageErrors},null,2));
-const fail=message=>{throw new Error(message)};
-if(state.primaryView!=='engine')fail('VigScope Value did not open in the primary shell');
-if(!state.valueDesk)fail('VigScope Value desk missing');
-if(!state.valueTitle)fail('VigScope Value title missing');
-if(!state.decisionBox||!state.pizzaBox||!state.betCard||!state.whyHeading||!state.cardLog)fail('Value overlays did not finish rendering');
-if(state.modelBox||state.playerHero)fail('removed Value sections reappeared');
-if(state.whyCards!==6)fail('expanded Why VigScope Matters cards missing');
-if(state.iframeCount!==0)fail('application iframe reappeared');
-if(state.scrollHeight<=state.viewport+100)fail('Value page is not scrollable');
-if(down<100||secondDown<100)fail('native Value-page scroll did not move');
-if(pageErrors.length)fail(`page errors: ${pageErrors.join(' | ')}`);
-
-await browser.close();
+try{
+ const page=await browser.newPage(),errors=[],requests=[];
+ page.on('pageerror',e=>errors.push(String(e)));
+ page.on('request',r=>{if(r.url().includes('/data/history/results-index.json'))requests.push(r.url());});
+ await page.setViewport({width:390,height:844,deviceScaleFactor:1,isMobile:true,hasTouch:true});
+ await page.goto('http://127.0.0.1:8765/runner.html',{waitUntil:'domcontentloaded',timeout:60000});
+ await page.waitForSelector('.tabs>.btn[data-view="engine"]',{timeout:60000});
+ await page.click('.tabs>.btn[data-view="engine"]');
+ await page.waitForSelector('#resultsGrahamValue .comparisonTable',{timeout:60000});
+ const initial=await page.evaluate(()=>({view:document.body.dataset.primaryView,title:document.querySelector('#engine .resultsTitle')?.textContent,proof:document.querySelectorAll('.whyProofCard').length,pizza:!!document.querySelector('#resultsPizzaValueBox'),shadow:!!document.querySelector('#resultsDecisionValueBox'),archive:!!document.querySelector('#resultsCardLog'),filters:!!document.querySelector('#valueHistoryFilters'),graham:document.querySelector('.comparisonTable').innerText,iframe:document.querySelectorAll('iframe').length}));
+ assert.equal(initial.view,'engine');assert.equal(initial.title,undefined);assert.equal(initial.proof,6);assert.ok(initial.pizza&&initial.shadow&&initial.archive&&initial.filters);assert.equal(initial.iframe,0);assert.match(initial.graham,/25–20–3/);assert.equal(requests.length,1,'one shared history request');
+ await page.select('#gWeek','1');
+ assert.match(await page.$eval('.comparisonTable',e=>e.innerText),/7–8–1/);
+ await page.select('#gWeek','ALL');await page.click('[data-strategy="dogs"]');
+ assert.match(await page.$eval('#grahamGameLog summary',e=>e.innerText),/Pinnacle dogs/);
+ await page.select('#valueGrade','OPEN');
+ assert.ok(await page.$$eval('#resultsCardLog tbody tr',rows=>rows.every(r=>r.innerText.includes('OPEN'))));
+ await page.select('#valueGrade','ALL');await page.select('#valueSize','25');
+ const n=await page.$$eval('#resultsCardLog tbody tr',rows=>rows.length);assert.ok(n>10&&n<=25);
+ await page.click('[data-page="1"]');assert.match(await page.$eval('#resultsCardLog .valuePager',e=>e.innerText),/Page 2/);
+ await page.click('#resultsCardLog .archiveCard summary');
+ await page.waitForFunction(()=>{const el=document.querySelector('#resultsCardLog .archiveCard[open]');return el?.dataset.loaded==='1';},{timeout:30000});
+ await page.select('#valueSport','NFL');
+ await page.click('[data-period="ALL"]');
+ fs.mkdirSync('.qa',{recursive:true});
+ for(const width of [390,1024,1440]){
+  await page.setViewport({width,height:900,deviceScaleFactor:1});await page.evaluate(()=>window.scrollTo(0,0));
+  const size=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,height:document.scrollingElement.scrollHeight}));
+  assert.ok(size.scroll<=size.width+2,`body overflow at ${width}: ${size.scroll}/${size.width}`);assert.ok(size.height>1200);
+  await page.screenshot({path:`.qa/value-${width}.png`,fullPage:true});
+  await page.evaluate(()=>window.scrollTo(0,document.scrollingElement.scrollHeight*.6));assert.ok(await page.evaluate(()=>scrollY)>100);
+ }
+ assert.deepEqual(errors,[]);console.log('VIGSCOPE VALUE BROWSER: PASS // mobile/tablet/desktop, archive, filters, strategies, source analysis, scrolling, one history request');
+}finally{await browser.close();}

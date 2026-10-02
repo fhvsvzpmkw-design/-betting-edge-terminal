@@ -11,6 +11,11 @@ on:
       - "data/history/observations/**"
       - "data/history/pizza-plays/**"
       - "tools/build-results-index.mjs"
+      - "tools/build-graham-pinnacle-value.mjs"
+      - "assets/value-analytics.js"
+      - "tests/vigscope-value-v2.test.mjs"
+      - "data/walters/nfl/**/week-*-daily-market-ledger.json"
+      - "data/walters/nfl/**/*final-facts*.json"
       - "tools/market-method-shadow.mjs"
       - "research/market-method-shadow-v1.json"
       - "tests/market-method-shadow.test.mjs"
@@ -56,11 +61,16 @@ jobs:
       - name: Add Decision Value Shadow Review V2
         run: node tools/add-results-shadow-v2.mjs
 
+      - name: Build the Graham / Pinnacle comparison
+        run: |
+          node tests/vigscope-value-v2.test.mjs
+          node tools/build-graham-pinnacle-value.mjs
+
       - name: Publish results index
         run: |
           git config user.name "betting-edge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/history/results-index.json
+          git add data/history/results-index.json data/history/graham-pinnacle-value.json
           if git diff --cached --quiet; then
             echo "No results index changes to publish."
             exit 0
