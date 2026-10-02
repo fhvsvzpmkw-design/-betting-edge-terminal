@@ -180,7 +180,7 @@ function bind(d){
   d.documentElement.dataset.primaryNavShellBound='5';
   ensureStyle(d);
   restoreAllMenuButtons(d);
-  enterMenu(d);
+  if(workspaceOpen(d))leaveMenu(d);else enterMenu(d);
 
   d.addEventListener('click',e=>{
     const navButton=e.target.closest?.('.runnerNavPad .tabs>.btn,.tabs>.btn');if(!navButton)return;
@@ -190,7 +190,7 @@ function bind(d){
       // The legacy terminal programmatically activates its first tab during boot.
       // Ignore that synthetic click until the user actually interacts with the menu.
       if(!e.isTrusted&&d.documentElement.dataset.primaryNavUserActivated!=='1'){
-        e.preventDefault();e.stopImmediatePropagation();enterMenu(d);return;
+        e.preventDefault();e.stopImmediatePropagation();if(!workspaceOpen(d))enterMenu(d);return;
       }
       if(e.isTrusted)d.documentElement.dataset.primaryNavUserActivated='1';
       if(d.body.classList.contains(SHELL_CLASS)&&d.body.dataset.primaryView===view){
