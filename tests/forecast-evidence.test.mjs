@@ -31,6 +31,15 @@ test('registry routes all 21 combinations and keeps CFL exact gaps and Cipher id
   assert.equal(forecastRoutes('NBA_WNBA', 'moneyline', registry).capability, 'UNRESOLVED_SPORT_OR_MARKET');
 });
 
+test('WNBA receipt identity survives inventory-only publication replay', () => {
+  const wnba = forecastCandidate({selectionId: 'NBA_WNBA|75186012|full_game_moneyline|away', sport: 'NBA_WNBA',
+    eventId: '75186012', eventDate: '2026-10-03T01:00:00Z', marketDetail: 'full_game_moneyline', side: 'away',
+    quotes: [{eventId: '75186012', marketKey: 'ml', side: 'away', line: null, selectionKey: '75186012|ml|away||', priceDecimal: 3.75}]},
+  {receipt: {decision: {coreAssessment: {context: {sport: 'WNBA'}}}}});
+  assert.equal(wnba.sport, 'WNBA');
+  assert.deepEqual(forecastRoutes(wnba.sport, wnba.marketDetail, registry).exact, ['espn', 'dratings', 'dimers']);
+});
+
 test('Padres-style forecast opposes the executable -141 price without changing status', () => {
   const result = evaluateForecast(record(), candidate(), {asOf, registry});
   assert.equal(result.eligibility, 'ELIGIBLE_EXACT');

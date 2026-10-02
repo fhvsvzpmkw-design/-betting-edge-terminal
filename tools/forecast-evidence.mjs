@@ -64,7 +64,12 @@ export function forecastCandidate(selection, {receipt = null, feed = null} = {})
   const marketDetail = selection.marketDetail || parts[2], marketClass = forecastMarketClass(marketDetail || quote.marketKey);
   const side = selection.side || parts[3] || quote.side;
   const line = marketClass === 'moneyline' ? null : num(quote.line) === null ? null : marketClass === 'spread' && side === 'away' ? -num(quote.line) : num(quote.line);
-  return {selectionId: selection.selectionId, sport: sportFor(selection.sport || parts[0], event), eventId: String(selection.eventId || parts[1] || quote.eventId || ''),
+  const inventorySport = selection.sport || parts[0];
+  const decisionSport = receipt?.decision?.coreAssessment?.context?.sport;
+  const routedSport = inventorySport === 'NBA_WNBA' && ['NBA', 'WNBA'].includes(decisionSport)
+    ? decisionSport
+    : sportFor(inventorySport, event);
+  return {selectionId: selection.selectionId, sport: routedSport, eventId: String(selection.eventId || parts[1] || quote.eventId || ''),
     startTime: selection.startTime || selection.eventDate || receipt?.decision?.feed?.eventDate || event?.date || event?.identity?.startTime || null,
     marketDetail, marketClass, period: 'FULL_GAME', side, line, selectionKey: quote.selectionKey || null,
     priceDecimal: num(quote.priceDecimal), quote, state: receipt?.state || 'UNASSESSED', blocker: receipt?.blocker || null};
