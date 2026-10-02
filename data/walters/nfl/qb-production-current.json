@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-09-30T19:34:02.940405+00:00",
+  "lastAppliedAt": "2026-10-02T11:38:58-07:00",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -1345,9 +1345,17 @@
     {
       "team": "WAS",
       "teamName": "Washington",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "WEEK4_STARTER_UNRESOLVED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "19983",
+        "gsisId": "00-0032268",
+        "playerName": "Marcus Mariota",
+        "candidateValue": 8.25,
+        "candidateStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+        "confidence": "LOW",
+        "evidenceDropbacks": 270
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "14579",
@@ -1356,23 +1364,24 @@
         "priorValue": 8.5,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 8.25,
       "embeddedBaselineQbValue": 8.5,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
+      "teamQbDelta": -0.25,
+      "gameContributionEligible": true,
       "sampleTreatment": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
       "evidence": {
-        "researchFinding": "Jayden Daniels returned to limited practice in London, but Washington has not named the Week 4 starter; Marcus Mariota starts only if Daniels is not ready. The current Week 4 starter is unresolved, so preserve the prior governed fair without guessing.",
+        "researchFinding": "Washington officially ruled Jayden Daniels out for Week 4 and named Marcus Mariota the starter against Indianapolis. Apply Mariota's frozen Stage 3C performance candidate through the governed QB production calculator; preserve the international-neutral H4 classification, personnel overlays, carried ratings and betting gates.",
         "sourceRefs": [
-          "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-30",
-          "https://www.reuters.com/sports/commanders-qb-jayden-daniels-practices-limited-capacity--flm-2026-09-30/",
-          "data/walters/nfl/qb-production/production-contract-v1.json"
+          "https://www.commanders.com/news/game-status-commanders-colts-2026",
+          "https://www.nfl.com/news/jayden-daniels-left-elbow-out-london-game-qb-marcus-mariota-start-colts",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-30T11:41:22-07:00",
+      "lastUpdatedAt": "2026-10-02T11:38:58-07:00",
       "marketViewed": false,
-      "failClosedCode": "JAYDEN_DANIELS_LIMITED_MARIOTA_IF_NOT_READY"
+      "failClosedCode": null,
+      "priorEstimate": null
     }
   ],
   "retiredOverlays": [
@@ -1422,7 +1431,8 @@
     "graham-delta-1645-qb-2026-w03-20260923T171130-0700",
     "graham-delta-1645-qb-2026-w03-20260925T165400-0700",
     "graham-daily-review-qb-2026-w04-20260930T114122-0700",
-    "vigscope-debug-qb-20260930-jalon-prior-v1"
+    "vigscope-debug-qb-20260930-jalon-prior-v1",
+    "graham-daily-review-qb-2026-w04-20261002T113858-0700"
   ],
   "bindingUpdates": [
     {
@@ -1565,6 +1575,15 @@
         "TB"
       ],
       "sourceTask": "USER_AUTHORIZED_VIGSCOPE_DEBUG",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-daily-review-qb-2026-w04-20261002T113858-0700",
+      "effectiveAt": "2026-10-02T11:38:58-07:00",
+      "teams": [
+        "WAS"
+      ],
+      "sourceTask": "DAILY_REVIEW",
       "marketViewed": false
     }
   ],
