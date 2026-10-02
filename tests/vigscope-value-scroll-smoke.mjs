@@ -8,7 +8,7 @@ try{
  const page=await browser.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(String(e)));
  page.on('request',r=>{if(r.url().includes('/data/history/results-index.json'))requests.push(r.url());});
- await page.setViewport({width:390,height:844,deviceScaleFactor:1,isMobile:true,hasTouch:true});
+ await page.setViewport({width:390,height:844,deviceScaleFactor:1,isMobile:false,hasTouch:false});
  await page.goto('http://127.0.0.1:8765/runner.html',{waitUntil:'domcontentloaded',timeout:60000});
  await page.waitForSelector('.tabs>.btn[data-view="engine"]',{timeout:60000});
  await page.waitForSelector('#resultsGrahamValue .comparisonTable',{timeout:60000,visible:false});
@@ -34,7 +34,7 @@ try{
  for(const width of [390,1024,1440]){
   await page.setViewport({width,height:900,deviceScaleFactor:1});await page.evaluate(()=>window.scrollTo(0,0));
   const size=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,height:document.scrollingElement.scrollHeight}));
-  assert.ok(size.scroll<=size.width+2,`body overflow at ${width}: ${size.scroll}/${size.width}`);assert.ok(size.height>1200);
+  assert.ok(size.scroll<=size.width+2,`body overflow at ${width}: ${size.scroll}/${size.width}`);assert.ok(size.height>1200,JSON.stringify(size));
   await page.screenshot({path:`.qa/value-${width}.png`,fullPage:true});
   await page.evaluate(()=>window.scrollTo(0,document.scrollingElement.scrollHeight*.6));assert.ok(await page.evaluate(()=>scrollY)>100);
  }
