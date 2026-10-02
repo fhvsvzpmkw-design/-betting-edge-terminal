@@ -5,6 +5,7 @@ import {compareGrahamFair, reviewGrahamHandoff} from './graham-fair-handoff.mjs'
 import {compareRecordedFair} from './native-fair-review.mjs';
 import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
 import {FORECAST_LEAN_FROM,validateForecastLean} from './forecast-lean.mjs';
+import {inspectForecastLeadReview} from './forecast-lead-routing.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -232,7 +233,7 @@ function completion(report, selection, receipt, best, options, forecast, review)
 }
 
 /** Pure, forward-compatible review. Inventory, not published cards, is denominator. */
-export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, limit = 8} = {}) {
+export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, limit = 8, developmentReplay = false} = {}) {
   const inventory = universe?.selections || universe;
   if (!Array.isArray(inventory)) return {schema: 1, version: CANDIDATE_ASSESSMENT_VERSION, state: 'UNIVERSE_UNAVAILABLE',
     asOf: report?.ts, mode: 'REVIEW_ONLY', selections: [], markets: [], shortlist: [], unfinished: [],
@@ -253,6 +254,13 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const researchReceipt = receipt?.state === 'BLOCKED' && receipt?.candidateDraft ? {...receipt,
       decision: receipt.candidateDraft.decision, evidence: receipt.candidateDraft.evidence} : receipt;
     const reviewed = completion(report, selection, researchReceipt, best, options, forecast, review);
+    const forecastLeadReview = inspectForecastLeadReview({report,sidecar,selection,receipt:researchReceipt,
+      forecast,feed,developmentReplay});
+    reviewed.forecastLeadReview = forecastLeadReview;
+    if (!forecastLeadReview.complete) {
+      reviewed.reviewState = 'UNFINISHED';
+      reviewed.missingResearch = unique([...reviewed.missingResearch,...forecastLeadReview.missing]);
+    }
     const grahamOption=options.find(option=>sameQuote(option.quote,receipt?.quote)) || best;
     const grahamReview=reviewGrahamHandoff({handoff:grahamOption.grahamFairHandoff,receipt:researchReceipt,report});
     if(!grahamReview.complete) {reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...grahamReview.missing]);}
@@ -260,7 +268,7 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const quarterbackFollowUp=inspectQuarterbackFollowUp({report,selection,receipt:researchReceipt});
     reviewed.quarterbackFollowUp=quarterbackFollowUp;
     if(!quarterbackFollowUp.complete){reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...quarterbackFollowUp.missing]);}
-    reviewed.reviewRequired=best.promising || grahamReview.required || quarterbackFollowUp.required;
+    reviewed.reviewRequired=best.promising || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required;
     reviewed.assessedPriceCondition = displayCondition(reviewed.priceCondition, receipt?.quote);
     for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt).value, option.quote);
     reviewed.priceCondition = best.priceCondition || reviewed.assessedPriceCondition;

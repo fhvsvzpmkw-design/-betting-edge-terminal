@@ -42,6 +42,8 @@ This advances only the report clock and derived paths; it never changes source/q
 
 ## Prepare, freeze and stage
 
+From October 1, 2026 at 18:47:44 Pacific, `start` and `checkpoint` route standard typed `forecastCapture` inputs from MODEL findings/attempts or `forecastEvidence.pendingCaptures` into the immutable forecast record set. They attach current `forecastReview` metadata without changing decisions, fair or stake. See `docs/FORECAST_LEAD_ROUTING.md`. Checkpoint a newly found field, export the updated draft, then use that exact reviewed record for the producer's BET/LEAN assessment. `next --event-id` includes unresolved `forecastCaptureReviews`; known positive model points cannot disappear behind an unfavorable market screen. `prepare` repeats intake safely and checks final completion. An existing capture is idempotent; a changed immutable ID or future/wrong-event observation fails rather than being repaired silently.
+
 `node tools/report-run.mjs diagnose --checkpoint <checkpoint>` runs all fourteen candidate gates on temporary copies and returns every failure without changing the checkpoint. `prepare` records the same diagnostics after evidence assembly and normalization. Inspect all actual failures in one pass before freezing. These diagnostics grant no publication clearance; the normal freeze, staged publisher and readback checks remain mandatory.
 
 ```

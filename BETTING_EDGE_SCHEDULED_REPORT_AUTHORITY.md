@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-09-30.2
+**Operating revision:** 2026-10-01.3
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -91,6 +91,8 @@ The market route does not require an independent model, numerical fair/range or 
 A forecast can supply its published point estimate without rebuilding the provider's model. Source-grounded scenario/sensitivity ranges are permitted and must be described honestly; they are not automatically calibrated confidence intervals. No universal point-to-probability conversion, fixed uncertainty width, mandatory min/max across all providers or arbitrary streak/injury adjustment. Missing published intervals starts uncertainty assessment, not automatic rejection of the point. BET requires supported fair/range, conservative-bound clearance, sufficient independent support, model-error eligibility, material personnel, current execution, playTo, exposure and staking checks. A failed BET bound does not automatically mean PASS.
 
 **Directional LEAN amendment, forward from October 1 noon Pacific:** follow `docs/FORECAST_DIRECTIONAL_LEANS.md`. On a completed qualified market assessment, a reviewed exact published outcome probability that supports the current price may support a separately attributed zero-stake directional LEAN through `tools/forecast-lean.mjs`, without inventing a forecast interval or adopted independent fair. Review BET first, then LEAN. Rejection solely because the point is not BET-grade is insufficient; explain the actual directional objection. Genuine unresolved personnel requires visible PROVISIONAL LEAN and its named recheck, with unresolved flags retained. Model disagreement remains visible. The publisher independently replays the bound original forecast and current applicability. This does not authorize market-only BET, change staking or impose a pick quota.
+
+**Forecast routing repair, forward from 2026-10-01T18:47:44-07:00:** follow `docs/FORECAST_LEAD_ROUTING.md`. When source research finds an exact outcome probability, save the standard `forecastCapture` beside that MODEL finding/attempt, or in `forecastEvidence.pendingCaptures`; do not leave its point only in prose or mark it INELIGIBLE solely for unknown model time/interval. Controller start/checkpoint/prepare imports real typed captures and derives current forecast reviews. Checkpoint the capture, read the exported exact review, assess BET then LEAN, and checkpoint the actual decision. Complete `FORECAST_CAPTURE_REVIEW` items before concluding a positive forecast-supported price is PASS. Reuse the already-read event field and current official facts; do not start redundant whole-slate retrieval. A genuine unusable-source rejection needs source-linked factual grounds and a separate directional objection. Preparation defers only the affected unfinished selection; clear unfavorable prices and unsupported score context retain their existing route. All five Main lanes inherit this rule.
 
 WAIT requires a real current independent signal, plausible actionability and the existing HIGH-error support rule. Work not yet done is not WAIT. An unresolved material fact can support a completed reasoned PASS or qualified WAIT after the actual investigation; unexplained uncertainty remains incomplete. Every LEAN/WAIT has zero stake; market LEAN uses NO BET execution language.
 

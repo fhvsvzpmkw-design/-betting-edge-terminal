@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {prepareEvidenceDraft,buildEvidenceAudit} from './report-evidence-repair.mjs';
+import {prepareEvidenceDraft,buildEvidenceAudit,captureForecastEvidenceDraft} from './report-evidence-repair.mjs';
 import {buildResearchWorkPlan} from './event-research-plan.mjs';
 import {scheduleMetadataForReport} from './main-schedule.mjs';
 import {runPipeline} from './report-pipeline.mjs';
@@ -91,8 +91,9 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     if(command==='start'){
       if(state)throw new Error('Run already exists; resume it with status/next');
       if(!report||!sidecar)throw new Error('start requires complete local draft files');
-      const r=read(path.resolve(report)),s=read(path.resolve(sidecar));
+      let r=read(path.resolve(report)),s=read(path.resolve(sidecar));
       bindGameInputs(root,r,s);
+      ({report:r,sidecar:s}=captureForecastEvidenceDraft({root,report:r,sidecar:s}));
       state={schema:1,identity:identity(r,s,root),phase:'DRAFT',revision:0,report:r,sidecar:s,events:[]};
     }else{
       if(state?.schema!==1||!Array.isArray(state.events))throw new Error('Run checkpoint is missing or invalid');
@@ -123,9 +124,10 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     if(['checkpoint','retime','prepare'].includes(command)&&!['DRAFT','PREPARED'].includes(state.phase))throw new Error('Frozen runs cannot be edited; start a new actual-time run');
     if(command==='checkpoint'){
       if(!report||!sidecar)throw new Error('checkpoint requires updated draft files');
-      const r=read(path.resolve(report)),s=read(path.resolve(sidecar));
+      let r=read(path.resolve(report)),s=read(path.resolve(sidecar));
       if(state.sidecar.gameIntelligenceInputs&&!isDeepStrictEqual(s.gameIntelligenceInputs,state.sidecar.gameIntelligenceInputs))throw Error('Pinned game inputs changed; export the saved draft or start a newly bound actual-time run');
       if(JSON.stringify(identity(r,s,root))!==JSON.stringify(state.identity))throw new Error('Cannot change run identity or feed binding; start a new run');
+      ({report:r,sidecar:s}=captureForecastEvidenceDraft({root,report:r,sidecar:s}));
       state.report=r;state.sidecar=s;state.phase='DRAFT';delete state.validation;delete state.preparation;
     }
     if(command==='retime'){
@@ -149,6 +151,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
         state.report=read(files.report);state.sidecar=read(files.sidecar);
       });
       state.preparation={candidateDeferrals:prepared.audit.candidateDeferrals,cardEvidenceDeferrals:prepared.audit.cardEvidenceDeferrals,warnings:prepared.audit.warnings};
+      state.preparation.forecastRouting=prepared.audit.forecastRouting;
       state.preparation.diagnostics=temporaryDraft(state,files=>pipeline({root,...files,mode:'diagnose'}));
       state.phase='PREPARED';delete state.validation;
     }

@@ -10,6 +10,7 @@ import {isDeepStrictEqual} from 'node:util';
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
 import {loadBoundMarketObserver, exactMarketReference} from './market-price-assessment.mjs';
 import {buildForecastCoverage, attachForecastCoverage} from './forecast-evidence.mjs';
+import {routeForecastCaptures} from './forecast-lead-routing.mjs';
 import {assembleCardEvidence} from './assemble-card-evidence.mjs';
 import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
@@ -221,9 +222,24 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
   return candidate;
 }
 
+// Capture/derive only, before producer judgment and candidate finalization.
+// Checkpointing a real source field makes it visible to the next work plan.
+export function captureForecastEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
+  const draftReport = structuredClone(report);
+  const ctx = loadContext(root, draftReport, sidecar, feedFile);
+  const routed = routeForecastCaptures({report:draftReport,sidecar,
+    universe:ctx.universe,feed:ctx.feed,registry:ctx.registry});
+  if (routed.applied) attachForecastCoverage({report:draftReport,sidecar:routed.sidecar,
+    universe:ctx.universe,feed:ctx.feed,priorRecords:ctx.priorRecords,registry:ctx.registry,now:report.ts});
+  return {report:draftReport,sidecar:routed.sidecar,routing:{applied:routed.applied,imported:routed.imported}};
+}
+
 export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
   let draftReport = structuredClone(report), draftSidecar = structuredClone(sidecar);
   const ctx = loadContext(root, draftReport, draftSidecar, feedFile);
+  const forecastRouting = routeForecastCaptures({report:draftReport,sidecar:draftSidecar,
+    universe:ctx.universe,feed:ctx.feed,registry:ctx.registry});
+  draftSidecar = forecastRouting.sidecar;
   if(ctx.feed&&ctx.universe)bindIntelligence({root,report:draftReport,sidecar:draftSidecar,feed:ctx.feed,universe:ctx.universe});
   if(ctx.grahamInputs?.binding && !draftSidecar.grahamFairHandoffInputs)draftSidecar.grahamFairHandoffInputs=structuredClone(ctx.grahamInputs.binding);
   const taxonomy = repairDraftCoreTaxonomy(draftReport, draftSidecar, {feed:ctx.feed, framework:optional(path.join(root, 'core/core-handicap-framework-v1.4.json'))});
@@ -263,6 +279,7 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
     draftSidecar.candidateAssessmentVersion = audit.candidateAssessment.version;
   }
   audit.candidateDeferrals = {selectionIds:candidates.deferredSelectionIds, failures:candidates.deferFailures};
+  audit.forecastRouting = {applied:forecastRouting.applied, imported:forecastRouting.imported};
   audit.cardEvidenceDeferrals = identityDeferrals;
   return {report: draftReport, sidecar: draftSidecar, audit, changes: assembled.changes, warnings: assembled.warnings};
 }

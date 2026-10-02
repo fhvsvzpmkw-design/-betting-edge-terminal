@@ -69,7 +69,7 @@ Each record is immutable under its `recordId`. All probabilities are numeric fra
 | `marketDetail`, `period`, `side`, `line` | Existing exact `full_game_*` market, `FULL_GAME`, selected `home`/`away`/`over`/`under`, selected-side handicap or total. Moneyline line is null. |
 | `kind` | `OUTCOME_PROBABILITY` or `SCORE_CONTEXT`. Projected scores belong in optional `projection`; no probability is generated from them. |
 | `probability`, `probabilityBasis`, `pushProbability` | Selected outcome probability; `UNCONDITIONAL` or `CONDITIONAL_ON_NO_PUSH`; actual push probability if published/justified. Unknown push probability stays absent. |
-| `forecastAt`, `observedAt`, `state` | Original model calculation/update time, original retrieval time, `PRE_GAME`. A page refresh does not replace the model timestamp. Missing model time is explicit and cannot count as an eligible exact forecast. |
+| `forecastAt`, `observedAt`, `state` | Original model calculation/update time, original retrieval time, `PRE_GAME`. A page refresh does not replace the model timestamp. Missing model time stays explicit; the documented reviewed observed-pregame capture may establish exact point availability after its forward cutoff. |
 | `settlement` | `{ "includesOvertime": true/false, "pushRule": "NO_PUSH"/"REFUND" }`; verify against this selected market's actual rules. |
 | `personnelAssumptions`, `limitation` | Named pitchers, goalies, players, projected roles or known model assumptions, with their material limitation. |
 | `applicability` | Initial per-run review described below. Never rewrite it on an older record. |
@@ -131,7 +131,7 @@ Call attachment/assembly before freezing the candidate or creating fingerprints.
 
 ### Import actual findings into an unissued draft
 
-Create a capture JSON with `schema:1`, `records`, `attempts` and optional `revalidations`, using the existing fields above. The importer performs no network requests and supplies no missing review, probability or source time. It requires exact available-selection mapping and rejects ineligible records and conflicting immutable IDs before writing anything. Unknown forecast time can remain context, never exact eligible evidence. The output must be a new draft outside History.
+Create a capture JSON with `schema:1`, `records`, `attempts` and optional `revalidations`, using the existing fields above. The importer performs no network requests and supplies no missing review, probability or source time. It requires exact available-selection mapping and rejects ineligible records and conflicting immutable IDs before writing anything. Unknown model time remains context unless the documented observed-pregame capture and current applicability review actually qualify it. The output must be a new draft outside History. From October 1 at 18:47:44 Pacific the shared controller also imports this same schema from embedded `forecastCapture` inputs; see `docs/FORECAST_LEAD_ROUTING.md`.
 
 ```sh
 node tools/import-forecast-evidence.mjs --report DRAFT_REPORT --sidecar DRAFT_SIDECAR --capture ACTUAL_CAPTURE --feed BOUND_FEED --out NEW_DRAFT_SIDECAR --root .
