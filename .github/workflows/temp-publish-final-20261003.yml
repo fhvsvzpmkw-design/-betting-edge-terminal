@@ -1,0 +1,87 @@
+name: Temporary publish final morning 2026-10-03
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/temp-publish-final-20261003.yml
+
+concurrency:
+  group: betting-edge-report-history
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Extract, normalize and validate exact staged candidate
+        env:
+          CANDIDATE_COMMIT: cf1e642356d9baf6924da2a6ead90728b09e12c6
+          CANDIDATE_DIR: /tmp
+        run: |
+          set -euo pipefail
+          node tools/report-pipeline.mjs history
+          node tools/extract-staged-report.mjs
+          node tools/report-pipeline.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
+          node tools/report-pipeline.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Publish immutable History entry
+        id: bundle
+        run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Validate derived meter telemetry
+        env:
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+      - name: Commit payload, sidecar and index together
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          published=0
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -f -- "$REPORT_PATH" "$SIDECAR_PATH"
+            node tools/report-pipeline.mjs history
+            node tools/report-pipeline.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+            git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
+            if git diff --cached --quiet; then published=1; break; fi
+            git commit -m "history: publish ${REPORT_TS} staged report bundle"
+            if git push origin HEAD:main; then published=1; break; fi
+          done
+          test "$published" -eq 1
+      - name: Remote read-back gate
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          node tools/report-publication.mjs verify --ts "$REPORT_TS"
+          node tools/report-pipeline.mjs readback --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+      - name: Remove temporary publisher
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-publish-final-20261003.yml
+          git commit -m "Remove temporary final morning publisher"
+          git push origin main
