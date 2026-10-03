@@ -49,7 +49,7 @@ Inventory both moneyline sides, both sides of the primary spread, MLB primary ru
 
 ### Player props — PAUSED_BY_SCOPE
 
-`PRIMARY_FULL_GAME_ONLY` remains active. Disabled player props are no longer requested by the primary collector: both odds endpoints request `ML,Spread,Totals`, no dedicated player-prop calls run, and accidental returned props are removed. Old bound snapshots can still contain props; those remain excluded inventory with no research or new/carried decisions. Retain `props.state=PAUSED_BY_SCOPE`, screened/deep-reviewed=0, excludedByScope=returned, and the scope fields required by coverage validation. The independently enabled exact Crypto combat watch retains its separate deep markets. College soccer (NCAA/college/NAIA/NJCAA, including women) is excluded before pricing and from Main research; professional soccer and college football remain eligible.
+`PRIMARY_FULL_GAME_ONLY` remains active. Disabled player props are no longer requested by the primary collector: both odds endpoints request `ML,Spread,Totals`, no dedicated player-prop calls run, and accidental returned props are removed. Old bound snapshots can still contain props in `live-odds.events`, `deepMarkets` or `baseballProps`; those remain excluded inventory with no research or new/carried decisions. Retain `props.state=PAUSED_BY_SCOPE`, screened/deep-reviewed=0, excludedByScope=returned, and the scope fields required by coverage validation. The independently enabled exact Crypto combat watch retains its separate deep markets. College soccer (NCAA/college/NAIA/NJCAA, including women) is excluded before pricing and from Main research; professional soccer and college football remain eligible.
 
 ### Completion accounting
 
