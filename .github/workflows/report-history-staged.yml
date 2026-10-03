@@ -1,23 +1,29 @@
 name: Report history staged publication
+# Fail-closed production publication for ChatGPT scheduled runs.
+# Scheduled producers write checkpoints and the staging bundle; only this workflow writes issued History.
+# Manual dispatch may replay the exact preserved staging bundle when deliberate recovery is required.
+# Publisher workflow edits do not auto-replay an older staged candidate.
+# Manual recovery publisher trigger: 2026-08-31 16:10 PT.
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - data/report-production/readback-triggers/20261003-main-081824.txt
+      - data/history/staging/report-bundle.json
 
 concurrency:
   group: betting-edge-report-history
   cancel-in-progress: false
 
 jobs:
-  controller-readback:
+  publish:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     permissions:
       contents: write
     steps:
-      - name: Check out authoritative main
+      - name: Check out main
         uses: actions/checkout@v4
         with:
           ref: main
@@ -26,19 +32,89 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run controller readback and persist exact checkpoint
-        shell: bash
+      - name: Require clean durable history before candidate publication
+        run: node tools/report-pipeline.mjs history
+      - name: Extract exact triggering candidate
+        env:
+          CANDIDATE_COMMIT: ${{ github.sha }}
+          CANDIDATE_DIR: /tmp
+        run: node tools/extract-staged-report.mjs
+      - name: Normalize derived fields and validate candidate
+        run: |
+          node tools/report-pipeline.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
+          node tools/report-pipeline.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Validate bundle and derive paths
+        id: bundle
+        run: node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+      - name: Validate derived meter telemetry before commit
+        env:
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+      - name: Commit payload, sidecar and index together
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
         run: |
           set -euo pipefail
-          git fetch origin main
-          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
-          checkpoint=data/report-production/checkpoints/20261003-main-0805.json
-          node tools/report-run.mjs readback --checkpoint "$checkpoint" --expected-revision 10
-          node -e 'const fs=require("fs");const p=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));if(p.revision!==11||p.phase!=="PUBLISHED"||!p.publication?.readbackAt)process.exit(1)' "$checkpoint"
-          git show "$GITHUB_SHA^:.github/workflows/report-history-staged.yml" > .github/workflows/report-history-staged.yml
-          git rm -f -- data/report-production/readback-triggers/20261003-main-081824.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -- .github/workflows/report-history-staged.yml "$checkpoint"
-          git commit -m "Record 2026-10-03 main report readback"
-          git push origin HEAD:main
+          published=0
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -f -- "$REPORT_PATH" "$SIDECAR_PATH"
+            node tools/report-pipeline.mjs history
+            node tools/report-pipeline.mjs validate --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/report-publication.mjs publish --report /tmp/report.json --sidecar /tmp/sidecar.json
+            node tools/vigscope-meter-telemetry-gate.mjs validate --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+            git add -- "$REPORT_PATH" "$SIDECAR_PATH" run-history.json
+            if git diff --cached --quiet; then
+              echo "Bundle already exists unchanged."
+              published=1
+              break
+            fi
+            git commit -m "history: publish ${REPORT_TS} staged report bundle"
+            if git push origin HEAD:main; then
+              published=1
+              break
+            fi
+            echo "Push raced another repository update; retrying from current main."
+          done
+          test "$published" -eq 1
+      - name: Remote read-back gate
+        env:
+          REPORT_TS: ${{ steps.bundle.outputs.report_ts }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          node tools/report-publication.mjs verify --ts "$REPORT_TS"
+          node tools/report-pipeline.mjs readback --report "$REPORT_PATH" --sidecar "$SIDECAR_PATH"
+      - name: Publication summary
+        env:
+          SHORT_ID: ${{ steps.bundle.outputs.short_id }}
+          REPORT_PATH: ${{ steps.bundle.outputs.report_path }}
+          SIDECAR_PATH: ${{ steps.bundle.outputs.sidecar_path }}
+        run: |
+          {
+            echo "## Betting Edge staged report published"
+            echo
+            echo "- Short ID: \`$SHORT_ID\`"
+            echo "- Report: \`$REPORT_PATH\`"
+            echo "- Sidecar: \`$SIDECAR_PATH\`"
+            echo "- Index: \`run-history.json\`"
+            echo "- Preflight history: passed"
+            echo "- Personnel semantic evidence: passed"
+            echo "- Major-sport coverage receipt: passed"
+            echo "- Source/fair-value evidence: passed under timestamp-specific rules"
+            echo "- Card evidence identity: exact selection-key copies passed"
+            echo "- Same-day event eligibility: passed"
+            echo "- Core gate: passed"
+            echo "- Pinnacle benchmark gate: passed (official, non-executable)"
+            echo "- VigScope meter telemetry gate: passed"
+            echo "- Read-back: passed"
+            echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
+          } >> "$GITHUB_STEP_SUMMARY"
