@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-01.3
+**Operating revision:** 2026-10-03.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -49,7 +49,7 @@ Inventory both moneyline sides, both sides of the primary spread, MLB primary ru
 
 ### Player props — PAUSED_BY_SCOPE
 
-`PRIMARY_FULL_GAME_ONLY` remains active. Props in `live-odds.events`, `deepMarkets` or `baseballProps` are inventory only: no prop research, fair construction or new/carried prop decisions. Retain `props.state=PAUSED_BY_SCOPE`, screened/deep-reviewed=0, excludedByScope=returned, and the scope fields required by coverage validation. State that player-prop analysis is paused.
+`PRIMARY_FULL_GAME_ONLY` remains active. Disabled player props are no longer requested by the primary collector: both odds endpoints request `ML,Spread,Totals`, no dedicated player-prop calls run, and accidental returned props are removed. Old bound snapshots can still contain props; those remain excluded inventory with no research or new/carried decisions. Retain `props.state=PAUSED_BY_SCOPE`, screened/deep-reviewed=0, excludedByScope=returned, and the scope fields required by coverage validation. The independently enabled exact Crypto combat watch retains its separate deep markets. College soccer (NCAA/college/NAIA/NJCAA, including women) is excluded before pricing and from Main research; professional soccer and college football remain eligible.
 
 ### Completion accounting
 
@@ -91,6 +91,8 @@ The market route does not require an independent model, numerical fair/range or 
 A forecast can supply its published point estimate without rebuilding the provider's model. Source-grounded scenario/sensitivity ranges are permitted and must be described honestly; they are not automatically calibrated confidence intervals. No universal point-to-probability conversion, fixed uncertainty width, mandatory min/max across all providers or arbitrary streak/injury adjustment. Missing published intervals starts uncertainty assessment, not automatic rejection of the point. BET requires supported fair/range, conservative-bound clearance, sufficient independent support, model-error eligibility, material personnel, current execution, playTo, exposure and staking checks. A failed BET bound does not automatically mean PASS.
 
 **Directional LEAN amendment, forward from October 1 noon Pacific:** follow `docs/FORECAST_DIRECTIONAL_LEANS.md`. On a completed qualified market assessment, a reviewed exact published outcome probability that supports the current price may support a separately attributed zero-stake directional LEAN through `tools/forecast-lean.mjs`, without inventing a forecast interval or adopted independent fair. Review BET first, then LEAN. Rejection solely because the point is not BET-grade is insufficient; explain the actual directional objection. Genuine unresolved personnel requires visible PROVISIONAL LEAN and its named recheck, with unresolved flags retained. Model disagreement remains visible. The publisher independently replays the bound original forecast and current applicability. This does not authorize market-only BET, change staking or impose a pick quota.
+
+**Game Day repair, forward from 2026-10-03T11:34:58-07:00:** follow `docs/GAME_DAY_COVERAGE_REPAIR.md`. Complete the supported college-football event reviews incrementally before the 09:30 report. Read the work plan's per-sport completion counts; a fully blocked NCAAF board is unfinished coverage, not a completed no-value finding. Reuse real earlier event research and review changed assumptions. A missing final lineup or a failed BET bound does not by itself reject a zero-stake opinion. For a positive exact forecast recorded as PASS, or an earlier same-event/same-key LEAN changed to PASS, record the source-linked directional review, explicit provisional alternative and, when applicable, the exact earlier decision and changed finding. The candidate planner routes missing review to `DIRECTIONAL_OPINION_REVIEW`; preparation and publication validate it. Do not manufacture picks or inherit grades automatically. All five Main tasks read this authority.
 
 **Forecast routing repair, forward from 2026-10-01T18:47:44-07:00:** follow `docs/FORECAST_LEAD_ROUTING.md`. When source research finds an exact outcome probability, save the standard `forecastCapture` beside that MODEL finding/attempt, or in `forecastEvidence.pendingCaptures`; do not leave its point only in prose or mark it INELIGIBLE solely for unknown model time/interval. Controller start/checkpoint/prepare imports real typed captures and derives current forecast reviews. Checkpoint the capture, read the exported exact review, assess BET then LEAN, and checkpoint the actual decision. Complete `FORECAST_CAPTURE_REVIEW` items before concluding a positive forecast-supported price is PASS. Reuse the already-read event field and current official facts; do not start redundant whole-slate retrieval. A genuine unusable-source rejection needs source-linked factual grounds and a separate directional objection. Preparation defers only the affected unfinished selection; clear unfavorable prices and unsupported score context retain their existing route. All five Main lanes inherit this rule.
 

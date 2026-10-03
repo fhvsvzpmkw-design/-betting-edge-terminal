@@ -1,0 +1,64 @@
+name: Game Day coverage regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/odds-refresh-worker-source.yml'
+      - 'tools/apply-crypto-watch-priority.mjs'
+      - 'tools/opinion-review.mjs'
+      - 'tools/candidate-assessment.mjs'
+      - 'tools/report-evidence-repair.mjs'
+      - 'tools/report-evidence-gate.mjs'
+      - 'tools/selection-continuity.mjs'
+      - 'tools/event-research-plan.mjs'
+      - 'tests/odds-worker-*.test.mjs'
+      - 'tests/opinion-review.test.mjs'
+      - 'tests/game-day-history-replay.test.mjs'
+      - 'tests/candidate-assessment.test.mjs'
+      - 'BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md'
+      - 'docs/GAME_DAY_COVERAGE_REPAIR.md'
+      - '.github/workflows/game-day-coverage-regression.yml'
+  pull_request:
+    paths:
+      - 'tools/odds-refresh-worker-source.yml'
+      - 'tools/apply-crypto-watch-priority.mjs'
+      - 'tools/opinion-review.mjs'
+      - 'tools/candidate-assessment.mjs'
+      - 'tools/report-evidence-repair.mjs'
+      - 'tools/report-evidence-gate.mjs'
+      - 'tools/selection-continuity.mjs'
+      - 'tools/event-research-plan.mjs'
+      - 'tests/odds-worker-*.test.mjs'
+      - 'tests/opinion-review.test.mjs'
+      - 'tests/game-day-history-replay.test.mjs'
+      - 'tests/candidate-assessment.test.mjs'
+      - 'BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md'
+      - 'docs/GAME_DAY_COVERAGE_REPAIR.md'
+      - '.github/workflows/game-day-coverage-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify acquisition without live odds requests
+        run: |
+          node tests/odds-worker-primary-recovery.test.mjs
+          node tests/odds-worker-major-sport-retention.test.mjs
+      - name: Verify directional judgment and immutable history
+        run: |
+          node --test tests/opinion-review.test.mjs tests/candidate-assessment.test.mjs tests/forecast-lean.test.mjs tests/forecast-lead-routing.test.mjs
+          node tests/game-day-history-replay.test.mjs
+          node tests/event-research-plan.test.mjs
+          node tools/selection-continuity.mjs self-test

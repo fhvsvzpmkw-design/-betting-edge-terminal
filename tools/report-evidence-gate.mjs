@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {validateMarketAssessment} from './market-price-assessment.mjs';
 import {validateCardEvidenceBundle, validateRecommendationCardEvidence} from './card-evidence-identity.mjs';
 import {validateForecastLean,validateForecastLeanDirections} from './forecast-lean.mjs';
+import {inspectOpinionReview} from './opinion-review.mjs';
 
 // Historical reports remain immutable. This adds evidence requirements for the
 // next scheduled lane; it does not supply a model, a fair, or a betting threshold.
@@ -203,6 +204,13 @@ export function validateReportEvidence(report, sidecar) {
   ensure(!errors.length, `Report evidence contains ${errors.length} recommendation defect(s):\n- ${errors.join('\n- ')}`);
   validateCardEvidenceBundle(report, sidecar);
   validateForecastLeanDirections(report);
+  for (const rec of report.recs) {
+    const receipt = sidecar.primaryAnalysis?.receipts?.find(row => row.state === 'EVALUATED' && row.quote?.selectionKey === rec.feed?.selectionKey);
+    const forecasts = (rec.forecastReview?.records || []).filter(row => row.eligibility === 'ELIGIBLE_EXACT' &&
+      row.comparison?.priceDecimal === Number(rec.feed?.priceDecimal)).map(row => ({recordId:row.recordId,...row.comparison}));
+    const opinion = inspectOpinionReview({report, receipt:receipt ? {...receipt,decision:rec} : {decision:rec}, forecastComparisons:forecasts});
+    ensure(opinion.complete, `${rec.feed?.selectionKey} directional review incomplete: ${opinion.missing.join(', ')}`);
+  }
   return {enforced: true, checked: report.recs.length};
 }
 

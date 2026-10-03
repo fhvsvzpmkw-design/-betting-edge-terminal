@@ -299,3 +299,26 @@ test('no fabricated source attempts, frozen protection and forward activation', 
   assert.equal(absent.state, 'UNIVERSE_UNAVAILABLE');
   assert.equal(absent.counts, undefined);
 });
+
+test('forward preparation routes same-key prior LEAN removal even without a positive current shortlist',()=>{
+  const args=fixture();
+  args.report.ts='2026-10-03T11:40:00-07:00';
+  const receipt=args.sidecar.primaryAnalysis.receipts[0], selection=args.universe.selections[0];
+  const prior={row:{state:'EVALUATED',quote:structuredClone(receipt.quote),decision:{...structuredClone(receipt.decision),status:'LEAN'}},
+    reportTs:'2026-10-03T08:18:24-07:00'};
+  // An intervening incomplete run keeps the last real opinion available, but
+  // never claims that its research is a current completed decision.
+  args.priorReceipts=new Map([[selection.selectionId,{row:{state:'BLOCKED'},reportTs:'2026-10-03T09:46:24-07:00',researchHistory:[prior]}]]);
+  const before=JSON.stringify(args.report);
+  const review=buildCandidateAssessment(args);
+  assert.equal(review.selections[0].opinionReview.required,true);
+  assert.equal(review.selections[0].reviewRequired,true);
+  assert.equal(review.selections[0].reviewState,'UNFINISHED');
+  assert.equal(JSON.stringify(args.report),before);
+  const prepared=finalizeCandidateAssessmentDraft({...args,draft:true});
+  assert.deepEqual(prepared.deferredSelectionIds,[selection.selectionId]);
+  assert.equal(receipt.state,'BLOCKED');
+  assert.equal(receipt.candidateDraft.decision.status,'PASS');
+  assert.equal(args.report.recs.some(rec=>rec.feed.selectionKey===receipt.quote.selectionKey),false);
+  assert.equal(args.report.recs.length,5);
+});

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { activeReportScope, isPlayerPropRecommendation } from './major-sport-market-coverage-gate.mjs';
 import { totalEventSide, totalLineageApplies } from './total-lineage.mjs';
 import { moneylineEventSide, moneylineApplies } from './moneyline-lineage.mjs';
+import {inspectOpinionReview} from './opinion-review.mjs';
 
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const RESOLVED = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
@@ -91,6 +92,11 @@ export function auditSelectionContinuity({ previous, report, sidecar = null, sco
       } else if (Number.isFinite(stake) && stake !== 0) {
         violations.push(`${key} resolved to ${nextStatus} with non-zero stake`);
       }
+      const receipt = sidecar?.primaryAnalysis?.receipts?.find(row => row.state === 'EVALUATED' && row.quote?.selectionKey === key);
+      const opinionReview = inspectOpinionReview({report,
+        receipt:receipt ? {...receipt, decision:current} : {decision:current, quote:{selectionKey:key, eventId:current.feed?.eventId, priceDecimal:current.feed?.priceDecimal}},
+        prior:{reportTs:previous.ts, row:{state:'EVALUATED', decision:rec, quote:{priceDecimal:rec.feed?.priceDecimal ?? null}}}});
+      if (!opinionReview.complete) violations.push(`${key} LEAN -> PASS directional review incomplete: ${opinionReview.missing.join(', ')}`);
       diagnostics.push({ selectionKey: key, priorStatus, nextStatus, state: 'RE_EVALUATED' });
       continue;
     }

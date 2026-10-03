@@ -42,16 +42,17 @@ jobs:
           const API_BASE = 'https://api.odds-api.io/v3';
           const API_KEY = process.env.ODDS_API_KEY;
           const BOOKMAKERS = ['Bet365', 'DraftKings'];
+          const PRIMARY_MARKETS = 'ML,Spread,Totals';
 
           const TARGET_SPORTS = [
-            'football',              // soccer
             'american-football',     // NFL / NCAA / CFL
-            'basketball',
             'baseball',
             'ice-hockey',
-            'tennis',
+            'basketball',
             'boxing',
-            'mma'
+            'mma',
+            'football',              // soccer, after primary major sports
+            'tennis'
           ];
 
           const SCHEDULE_SLOTS = {
@@ -79,8 +80,12 @@ jobs:
 
           const HORIZON_HOURS = 30;
           const PROP_HORIZON_HOURS = 8;
-          const EVENTS_PAGE_SIZE = 200;
+          // Provider contract: /events uses limit + skip, not page. Larger
+          // discovery pages preserve the odds-request reserve on Saturday.
+          const EVENTS_PAGE_SIZE = 5000;
           const MAX_EVENT_PAGES = 4;
+          const DISCOVERY_REQUEST_CEILING = REQUEST_BUDGET -
+            CORE_REQUEST_TARGET * BOOKMAKERS.length - DEEP_REQUEST_TARGET - SAFETY_RESERVE;
           const MAX_MARKET_AGE_MINUTES = 90;
           // Retention is historical context; executable coverage remains <=30m.
           // Age is the last successful observation, not the last price change.
@@ -184,13 +189,14 @@ jobs:
               attempts = 2,
               optional = false,
               stage = 'api',
-              observation = false
+              observation = false,
+              requestCeiling = REQUEST_BUDGET
             } = options;
 
             let lastError;
 
             for (let attempt = 0; attempt < attempts; attempt++) {
-              const ceiling = optional ? OPTIONAL_STOP_AT : REQUEST_BUDGET;
+              const ceiling = Math.min(requestCeiling, optional ? OPTIONAL_STOP_AT : REQUEST_BUDGET);
 
               if (requestsUsed >= ceiling) {
                 const error = new Error(
@@ -420,7 +426,7 @@ jobs:
             return (now.getTime() - timestamp) / 60000;
           }
 
-          function filterFreshMarketsFromEvent(event, now, diagnostics) {
+          function filterFreshMarketsFromEvent(event, now, diagnostics, primaryOnly = true) {
             if (!event || typeof event !== 'object') return event;
 
             const copy = {
@@ -432,6 +438,10 @@ jobs:
               if (!Array.isArray(markets)) continue;
 
               const fresh = markets.filter(market => {
+                if (primaryOnly && !['ml', 'spread', 'totals'].includes(canonicalMarketKey(market?.name || market?.marketKey || ''))) {
+                  diagnostics.disabledMarketsRemoved = (diagnostics.disabledMarketsRemoved || 0) + 1;
+                  return false;
+                }
                 const okay =
                   marketAgeMinutes(market, now) <= MAX_MARKET_AGE_MINUTES;
 
@@ -683,12 +693,16 @@ jobs:
             if (sport === 'baseball') score += 15;
             if (sport === 'ice-hockey') score += 15;
             if (sport === 'american-football') score += 15;
+            // Prefer discovered betting boards over unpriced amateur fixtures
+            // when the provider's catalogue exceeds the fixed core capacity.
+            if (Number(event.bookmakerCount) > 0) score += 100;
 
             return score;
           }
 
-          function propEligible(event) {
-            return isMajorLeague(event);
+          function primaryRecoveryEligible(event, coreEventMap) {
+            return CORE_RECOVERY_CATEGORIES.has(categoryKey(event)) &&
+              coreGapCount(coreEventMap.get(String(event.id)), new Date()) > 0;
           }
 
           function deepPriorityScore(event, now) {
@@ -766,6 +780,10 @@ jobs:
               .digest('hex');
           }
 
+          function isCollegeSoccer(event) {
+            return sportSlug(event) === 'football' && /\bncaa\b|\bcollege\b|\bnaia\b|\bnjcaa\b/.test(leagueText(event));
+          }
+
           function categoryKey(event) {
             const sport = sportSlug(event);
             const text = leagueText(event);
@@ -838,7 +856,20 @@ jobs:
               selected.push(item.event);
             }
 
-            // Guaranteed representation first.
+            // Preserve the separately enabled exact Crypto watch priority.
+            for (const items of byCategory.values()) for (const item of items) {
+              if (typeof cryptoWatchMatch === 'function' && cryptoWatchMatch(item.event)) take(item);
+            }
+            // Price the primary major-sport board before ancillary categories.
+            // A 30-game NCAAF minimum must not become Saturday's effective cap.
+            const primary = [...byCategory.entries()]
+              .filter(([category]) => CORE_RECOVERY_CATEGORIES.has(category))
+              .flatMap(([, items]) => items)
+              .sort((a, b) => b.score - a.score ||
+                String(a.event.date || '').localeCompare(String(b.event.date || '')));
+            for (const item of primary) take(item);
+
+            // Guaranteed ancillary representation within remaining capacity.
             for (const [category, minimum] of Object.entries(CORE_CATEGORY_MINIMUMS)) {
               const items = byCategory.get(category) || [];
               for (const item of items.slice(0, minimum)) take(item);
@@ -871,8 +902,15 @@ jobs:
 
           async function discoverSport(sport, now, to, diagnostics) {
             const merged = new Map();
+            const pages = [];
+            let complete = false;
+            let stopReason = 'PAGE_LIMIT';
 
             for (let page = 1; page <= MAX_EVENT_PAGES; page++) {
+              if (requestsUsed >= DISCOVERY_REQUEST_CEILING) {
+                stopReason = 'ODDS_REQUEST_RESERVE';
+                break;
+              }
               const rows = await fetchJson(
                 apiUrl('/events', {
                   sport,
@@ -880,10 +918,11 @@ jobs:
                   from: now.toISOString(),
                   to: to.toISOString(),
                   limit: EVENTS_PAGE_SIZE,
-                  page
+                  skip: (page - 1) * EVENTS_PAGE_SIZE
                 }),
                 {
-                  stage: `events:${sport}:p${page}`
+                  stage: `events:${sport}:p${page}`,
+                  requestCeiling: DISCOVERY_REQUEST_CEILING
                 }
               );
 
@@ -893,16 +932,26 @@ jobs:
               for (const event of list) {
                 if (!event?.id) continue;
 
+                if (isCollegeSoccer(event)) {
+                  diagnostics.collegeSoccerExcluded = (diagnostics.collegeSoccerExcluded || 0) + 1;
+                  continue;
+                }
+
                 if (!merged.has(String(event.id))) {
                   merged.set(String(event.id), event);
                   added++;
                 }
               }
 
-              if (list.length < EVENTS_PAGE_SIZE || added === 0) break;
+              pages.push({skip:(page - 1) * EVENTS_PAGE_SIZE, returned:list.length, added});
+              if (list.length < EVENTS_PAGE_SIZE) { complete = true; stopReason = 'EXHAUSTED'; break; }
+              // A full page of excluded events can still precede eligible ones.
+              if (added === 0 && list.some(event => event?.id && !isCollegeSoccer(event))) { stopReason = 'REPEATED_PAGE'; break; }
             }
 
             diagnostics.eventCandidatesBySport[sport] = merged.size;
+            diagnostics.eventDiscovery ||= {};
+            diagnostics.eventDiscovery[sport] = {complete, stopReason, pages};
             return [...merged.values()];
           }
 
@@ -1123,6 +1172,11 @@ jobs:
             const coreSelected = selectBalancedCore(candidates, now);
 
             snapshot.diagnostics.coreCandidatesSelected = coreSelected.length;
+            const selectedIds = new Set(coreSelected.map(event => String(event.id)));
+            snapshot.diagnostics.primaryEventsNotPriced = candidates
+              .filter(event => CORE_RECOVERY_CATEGORIES.has(categoryKey(event)) && !selectedIds.has(String(event.id)))
+              .map(event => ({eventId:String(event.id), category:categoryKey(event),
+                home:event.home, away:event.away, date:event.date, reason:'CORE_CAPACITY'}));
 
             for (const event of coreSelected) {
               const key = categoryKey(event);
@@ -1164,7 +1218,7 @@ jobs:
                 const requestStart = requestsUsed;
                 try {
                   const { payload: odds, observedAt } = await fetchJson(
-                    apiUrl('/odds/multi', { eventIds, bookmakers: bookmaker }),
+                    apiUrl('/odds/multi', { eventIds, bookmakers: bookmaker, markets: PRIMARY_MARKETS }),
                     { attempts: 3, stage: `odds-multi:${bookmaker}`, observation: true }
                   );
 
@@ -1240,19 +1294,21 @@ jobs:
               }
             }
 
-            // PASS 3: reuse the same six supplemental calls for urgent primary
-            // gaps first. Crypto watch boosts remain dominant; returned props
-            // remain available to other consumers of the shared feed.
+            // PASS 3: supplemental calls repair primary game-market gaps only.
+            // Player props are disabled; exact enabled Crypto watches retain
+            // their separate combat-market acquisition.
             const deepQueue = candidates
               .filter(event => {
                 const hours = eventHoursAway(event, now);
 
-                if (hours < 0 || hours > PROP_HORIZON_HOURS) {
+                const watched = typeof cryptoWatchMatch === 'function' && Boolean(cryptoWatchMatch(event));
+                const deepHorizon = watched ? HORIZON_HOURS : PROP_HORIZON_HOURS;
+                if (hours < 0 || hours > deepHorizon) {
                   snapshot.diagnostics.deepEventsSkippedHorizon++;
                   return false;
                 }
 
-                return propEligible(event);
+                return watched || primaryRecoveryEligible(event, coreEventMap);
               })
               .map(event => ({
                 event,
@@ -1303,7 +1359,8 @@ jobs:
                 const { payload: responseEvent, observedAt } = await fetchJson(
                   apiUrl('/odds', {
                     eventId: event.id,
-                    bookmakers: BOOKMAKERS.join(',')
+                    bookmakers: BOOKMAKERS.join(','),
+                    markets: typeof cryptoWatchMatch === 'function' && cryptoWatchMatch(event) ? undefined : PRIMARY_MARKETS
                   }),
                   {
                     optional: true,
@@ -1335,8 +1392,8 @@ jobs:
 
                 const raw = observeReturnedEvent(responseEvent, observedAt, BOOKMAKERS);
                 // Full requested-book responses replace prior primary scope,
-                // including omitted markets. Supplemental props still pass the
-                // fingerprint quarantine before any collection exposes them.
+                // including omitted markets. Disabled props never enter the
+                // primary collection, even if a provider ignores our filter.
                 const primaryOnly = { ...raw, bookmakers: {} };
                 for (const [book, markets] of Object.entries(raw.bookmakers || {})) {
                   if (!Array.isArray(markets)) continue;
@@ -1354,11 +1411,9 @@ jobs:
                   Object.assign(recoveryResult, { outcome: 'MERGED', recovered, after });
                 }
 
-                const fresh = filterFreshMarketsFromEvent(
-                  raw,
-                  new Date(),
-                  snapshot.diagnostics
-                );
+                // Only the independent, enabled combat watch has deep markets.
+                if (!(typeof cryptoWatchMatch === 'function' && cryptoWatchMatch(event))) continue;
+                const fresh = filterFreshMarketsFromEvent(raw, new Date(), snapshot.diagnostics, false);
 
                 const markets = deepMarkets(fresh);
 
@@ -1438,9 +1493,6 @@ jobs:
               snapshot.diagnostics.deepEventsWithMarkets++;
               snapshot.diagnostics.deepMarketsPublished += _marketCount;
 
-              if (sportSlug(item) === 'baseball') {
-                snapshot.baseballProps.push(published);
-              }
             }
 
             const completedAt = new Date();
@@ -1463,7 +1515,7 @@ jobs:
             snapshot.events = [
               ...new Map(
                 snapshot.events
-                  .filter(event => event?.id)
+                  .filter(event => event?.id && !isCollegeSoccer(event))
                   .map(event => [
                     String(event.id),
                     filterFreshMarketsFromEvent(
@@ -1569,13 +1621,17 @@ jobs:
               maxDeepEvents: MAX_DEEP_EVENTS,
               propHorizonHours: PROP_HORIZON_HOURS,
               coreQuoteMaxAgeMinutes: CORE_QUOTE_MAX_AGE_MINUTES,
+              enabledPrimaryMarkets: PRIMARY_MARKETS.split(','),
+              playerProps: 'DISABLED_NOT_REQUESTED',
+              collegeSoccer: 'EXCLUDED_BEFORE_PRICING',
+              dedicatedPlayerPropRequests: 0,
               quoteAgeBasis: 'observedAt',
               providerChangeTimestamp: 'updatedAt',
               fullBookScopeTimestamp: 'bookmakerObservedAt',
-              supplementalPriority: 'Crypto exact fight watch; major-sport missing/stale primary recovery; ordinary deep markets',
+              supplementalPriority: 'Crypto exact fight watch; major-sport missing/stale primary recovery only',
               supplementalPrimarySnapshotsMerged: true,
               strategy:
-                'broad discovery; separate sequential Bet365/DraftKings core pulls; merged by exact event identity; deep markets by league/start-time priority'
+                'primary major sports before ancillary games; college soccer excluded; sequential Bet365/DraftKings primary game markets only; disabled player props not requested'
             };
 
             snapshot.complete =

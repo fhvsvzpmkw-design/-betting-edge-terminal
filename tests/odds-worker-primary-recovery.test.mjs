@@ -60,8 +60,9 @@ async function run({ candidates, main, supplemental, watches = [], multiFailures
       if (url.pathname.endsWith('/sports')) data = [...new Set(candidates.map(e => e.sport.slug))].map(slug => ({ slug }));
       else if (url.pathname.endsWith('/events')) {
         const rows = candidates.filter(e => e.sport.slug === url.searchParams.get('sport'));
-        const offset = (Number(url.searchParams.get('page')) - 1) * 200;
-        data = rows.slice(offset, offset + 200);
+        assert.equal(url.searchParams.has('page'), false, 'provider pagination uses skip');
+        const offset = Number(url.searchParams.get('skip'));
+        data = rows.slice(offset, offset + Number(url.searchParams.get('limit')));
       } else if (url.pathname.endsWith('/odds/multi')) {
         if (multiFailures-- > 0) return { ok: false, status: 503, statusText: 'Service Unavailable', text: async () => 'offline retry-budget fixture' };
         const ids = url.searchParams.get('eventIds').split(',');
@@ -106,7 +107,7 @@ const result = await run({
   }
 });
 const supplementIds = result.calls.filter(url => url.pathname.endsWith('/odds')).map(url => url.searchParams.get('eventId'));
-assert.equal(supplementIds.length, 6, 'supplemental request ceiling remains six');
+assert.equal(supplementIds.length, 5, 'only exact combat watch and four primary gaps need supplemental requests');
 assert.equal(supplementIds[0], 'fight', 'Crypto exact fight watch must retain precedence and 30-hour horizon');
 for (const id of ['recover', 'incomplete', 'stale', 'missing']) assert.ok(supplementIds.includes(id), `gap ${id} must outrank complete urgent events`);
 const repaired = result.feed.events.find(e => e.id === 'recover');
@@ -163,7 +164,8 @@ const duplicates = await run({
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
   supplemental: e => ({ ...e, bookmakers: { Bet365: [...completeMarkets(), market('Player Props', 1, { odds: [{ label: 'Identical suspicious player payload', over: '2.00' }] })] } })
 });
-assert.equal(duplicates.feed.diagnostics.duplicateDeepRejects, 2);
+assert.equal(duplicates.calls.filter(url => url.pathname.endsWith('/odds')).length, 0, 'complete games never trigger player-prop calls');
+assert.equal(duplicates.feed.diagnostics.duplicateDeepRejects, 0);
 assert.equal(duplicates.feed.deepMarkets.length, 0);
 assert.ok(duplicates.feed.events.every(e => Object.values(e.bookmakers).every(markets => markets.every(m => m.name !== 'Player Props'))), 'quarantined supplemental props must never leak through primary events');
 
@@ -175,13 +177,13 @@ const unchanged = await run({
 assert.equal(unchanged.calls.filter(url => url.pathname.endsWith('/odds')).length, 0);
 assert.equal(unchanged.feed.events[0].bookmakers.Bet365[0].updatedAt, stamp(240));
 assert.equal(unchanged.feed.events[0].bookmakers.Bet365[0].observedAt, new Date(now + 3000).toISOString(), 'only local receipt time is trusted, not provider-supplied observedAt');
-assert.equal(unchanged.feed.events[0].bookmakers.Bet365.filter(m => m.name === 'Player Props').length, 2, 'broad core props are independently retained, including duplicate market names');
+assert.equal(unchanged.feed.events[0].bookmakers.Bet365.filter(m => m.name === 'Player Props').length, 0, 'disabled props are stripped if the provider ignores the request filter');
 assert.equal(unchanged.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.Bet365, 'AVAILABLE');
 assert.equal(unchanged.feed.diagnostics.staleMarketsRemoved, 0);
 
 const omitted = await run({
   candidates: [event('omitted')],
-  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
+  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
   supplemental: e => ({ ...e, bookmakers: { Bet365: [market('ML', 240)] } })
 });
 assert.deepEqual(omitted.feed.events[0].bookmakers.Bet365.map(m => m.name), ['ML']);
@@ -191,7 +193,7 @@ assert.equal(omitted.feed.events[0].bookmakerObservedAt.DraftKings, new Date(now
 
 const withdrawn = await run({
   candidates: [event('withdrawn')],
-  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
+  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
   supplemental: e => ({ ...e, bookmakers: {} })
 });
 assert.equal(withdrawn.feed.events.length, 1, 'retain full-response scope tombstones even when no priced markets remain');
@@ -210,7 +212,7 @@ await assert.rejects(run({
 
 const partial = await run({
   candidates: [event('partial')],
-  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
+  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
   supplemental: e => ({ ...e, partial: true, bookmakers: { Bet365: [market('ML', 240)] } })
 });
 const partialEvent = partial.feed.events[0];
@@ -221,7 +223,7 @@ assert.equal(partialEvent.bookmakerObservedAt.Bet365, new Date(now + 3000).toISO
 
 const failed = await run({
   candidates: [event('failed')],
-  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
+  main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
   supplemental: () => new Error('offline supplemental failure')
 });
 assert.equal(failed.feed.events[0].bookmakers.Bet365[0].observedAt, new Date(now + 3000).toISOString(), 'failed request cannot restamp retained core quotes');
@@ -289,5 +291,34 @@ assert.equal(budget.feed.diagnostics.coreMarketAvailability.length, 340);
 assert.ok(budget.feed.diagnostics.coreMarketAvailability.some(row => Object.values(row.acquisition).includes('NOT_ATTEMPTED_BUDGET')), 'unattempted selected games must remain explicitly visible');
 assert.ok(budget.feed.diagnostics.coreMarketAvailability.some(row => Object.values(row.acquisition).includes('REQUEST_FAILED')), 'failed batches must remain explicitly visible');
 assert.equal(budget.feed.requestsUsed, budget.calls.length);
+
+// Real provider pagination: late FBS games must not vanish behind the first
+// page, and imminent soccer must not reduce college football to its minimum.
+const footballBoard = Array.from({length: 5000}, (_, i) => event(`unpriced-football-${i}`, 25, 'american-football', 'NCAA Division III'));
+const florida = {...event('florida-mizzou', 4, 'american-football', 'NCAA FBS'), home:'Missouri Tigers', away:'Florida Gators', bookmakerCount:2};
+const fbs = Array.from({length: 60}, (_, i) => ({...event(`fbs-${i}`, 3+i/100, 'american-football', 'NCAA FBS'), bookmakerCount:2}));
+const soccer = Array.from({length: 220}, (_, i) => event(`soccer-${i}`, 0.1, 'football', 'England Premier League'));
+const collegeSoccer = Array.from({length: 5000}, (_, i) => event(`college-soccer-${i}`, 0.1, 'football', i%2 ? 'USA - NCAA, Women' : 'USA - NCAA'));
+const saturday = await run({
+  candidates:[...footballBoard, florida, ...fbs, ...collegeSoccer, ...soccer],
+  main:(e,book)=>({...e,bookmakers:{[book]:[...completeMarkets(),market('Player Props')]}}),
+  supplemental:()=>{throw Error('No supplemental calls needed for complete primary games');}
+});
+const pricedIds = new Set(saturday.calls.filter(url=>url.pathname.endsWith('/odds/multi')).flatMap(url=>url.searchParams.get('eventIds').split(',')));
+for (const e of [florida,...fbs]) assert.ok(pricedIds.has(e.id), `priced FBS event ${e.id} must survive late discovery and ancillary urgency`);
+assert.ok([...pricedIds].every(id=>!id.startsWith('college-soccer-')));
+assert.equal(saturday.feed.diagnostics.collegeSoccerExcluded, 5000);
+assert.ok(saturday.feed.events.every(e=>!e.id.startsWith('college-soccer-')));
+assert.ok(saturday.calls.some(url=>url.pathname.endsWith('/events') && url.searchParams.get('sport')==='football' && url.searchParams.get('skip')==='5000'), 'a page containing only excluded college soccer must not truncate professional soccer discovery');
+assert.ok(saturday.feed.diagnostics.eventDiscovery['american-football'].complete);
+assert.ok(saturday.feed.diagnostics.primaryEventsNotPriced.length > 0, 'finite capacity omissions remain visible');
+assert.ok(saturday.feed.requestsUsed <= 90);
+assert.deepEqual(saturday.feed.baseballProps, []);
+for (const url of [...result.calls,...saturday.calls]) {
+  if (url.pathname.endsWith('/odds/multi') || (url.pathname.endsWith('/odds') && url.searchParams.get('eventId') !== 'fight')) {
+    assert.equal(url.searchParams.get('markets'),'ML,Spread,Totals', 'disabled player props must not be requested upstream');
+  }
+}
+assert.equal(result.calls.find(url=>url.pathname.endsWith('/odds') && url.searchParams.get('eventId')==='fight').searchParams.has('markets'), false, 'independently enabled combat watch retains deep market scope');
 
 console.log('ODDS WORKER CORE RECOVERY: PASS // production Crypto overlay, local observation timestamps, old unchanged prices, complete/partial/failure receipts, omission/suspension, real retention age, quota ceiling');

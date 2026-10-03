@@ -7,6 +7,7 @@ import {compareRecordedFair} from './native-fair-review.mjs';
 import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
 import {FORECAST_LEAN_FROM,validateForecastLean} from './forecast-lean.mjs';
 import {inspectForecastLeadReview} from './forecast-lead-routing.mjs';
+import {inspectOpinionReview} from './opinion-review.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -234,7 +235,7 @@ function completion(report, selection, receipt, best, options, forecast, review)
 }
 
 /** Pure, forward-compatible review. Inventory, not published cards, is denominator. */
-export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, limit = 8, developmentReplay = false} = {}) {
+export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, priorReceipts = new Map(), limit = 8, developmentReplay = false} = {}) {
   const inventory = universe?.selections || universe;
   if (!Array.isArray(inventory)) return {schema: 1, version: CANDIDATE_ASSESSMENT_VERSION, state: 'UNIVERSE_UNAVAILABLE',
     asOf: report?.ts, mode: 'REVIEW_ONLY', selections: [], markets: [], shortlist: [], unfinished: [],
@@ -255,6 +256,16 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const researchReceipt = receipt?.state === 'BLOCKED' && receipt?.candidateDraft ? {...receipt,
       decision: receipt.candidateDraft.decision, evidence: receipt.candidateDraft.evidence} : receipt;
     const reviewed = completion(report, selection, researchReceipt, best, options, forecast, review);
+    const assessed = options.find(option => sameQuote(option.quote, researchReceipt?.quote));
+    const priorEntries = priorReceipts instanceof Map ? priorReceipts.get(selection.selectionId) : null;
+    const prior = priorEntries && [...list(priorEntries.researchHistory),priorEntries].filter(entry => entry.row?.state === 'EVALUATED').at(-1);
+    const opinionReview = inspectOpinionReview({report, receipt:researchReceipt,
+      forecastComparisons:assessed?.forecastComparisons, prior});
+    reviewed.opinionReview = opinionReview;
+    if (!opinionReview.complete) {
+      reviewed.reviewState = 'UNFINISHED';
+      reviewed.missingResearch = unique([...reviewed.missingResearch,...opinionReview.missing]);
+    }
     const forecastLeadReview = inspectForecastLeadReview({report,sidecar,selection,receipt:researchReceipt,
       forecast,feed,developmentReplay});
     reviewed.forecastLeadReview = forecastLeadReview;
@@ -269,7 +280,7 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const quarterbackFollowUp=inspectQuarterbackFollowUp({report,selection,receipt:researchReceipt});
     reviewed.quarterbackFollowUp=quarterbackFollowUp;
     if(!quarterbackFollowUp.complete){reviewed.reviewState='UNFINISHED';reviewed.missingResearch=unique([...reviewed.missingResearch,...quarterbackFollowUp.missing]);}
-    reviewed.reviewRequired=best.promising || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required;
+    reviewed.reviewRequired=best.promising || forecastLeadReview.required || grahamReview.required || quarterbackFollowUp.required || opinionReview.required;
     reviewed.assessedPriceCondition = displayCondition(reviewed.priceCondition, receipt?.quote);
     for (const option of options) option.priceCondition = displayCondition(conditionFor(sameQuote(review?.quote, option.quote) ? review : null, option, researchReceipt).value, option.quote);
     reviewed.priceCondition = best.priceCondition || reviewed.assessedPriceCondition;

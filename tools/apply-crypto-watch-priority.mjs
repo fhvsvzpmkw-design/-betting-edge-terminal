@@ -39,14 +39,8 @@ replaceStringOnce(
 );
 
 replaceRegexOnce(
-  /([ \t]*)if \(sport === 'american-football'\) score \+= 15;\n\n([ \t]*)return score;/,
-  (match, ifIndent, returnIndent) =>
-    `${ifIndent}if (sport === 'american-football') score += 15;\n\n` +
-    `${returnIndent}// Crypto Specials fight-week targets receive a dominant ranking boost only\n` +
-    `${returnIndent}// after they enter the shared 30-hour horizon. Exact fighter-pair identity is\n` +
-    `${returnIndent}// required; unrelated boxing/MMA events never inherit this priority.\n` +
-    `${returnIndent}score += cryptoWatchBoost(event);\n\n` +
-    `${returnIndent}return score;`,
+  /([ \t]*)if \(Number\(event\.bookmakerCount\) > 0\) score \+= 100;/,
+  (match, indent) => `${match}\n${indent}score += cryptoWatchBoost(event);`,
   'core priority boost'
 );
 
@@ -95,23 +89,10 @@ replaceRegexOnce(
 );
 
 replaceRegexOnce(
-  /([ \t]*)if \(hours < 0 \|\| hours > PROP_HORIZON_HOURS\) \{\n([ \t]*)snapshot\.diagnostics\.deepEventsSkippedHorizon\+\+;\n([ \t]*)return false;\n([ \t]*)\}\n\n([ \t]*)return propEligible\(event\);/,
-  (match, ifIndent, childIndent, returnFalseIndent, closeIndent, returnIndent) =>
-    `${ifIndent}const watched = Boolean(cryptoWatchMatch(event));\n` +
-    `${ifIndent}const deepHorizon = watched ? HORIZON_HOURS : PROP_HORIZON_HOURS;\n\n` +
-    `${ifIndent}if (hours < 0 || hours > deepHorizon) {\n` +
-    `${childIndent}snapshot.diagnostics.deepEventsSkippedHorizon++;\n` +
-    `${returnFalseIndent}return false;\n` +
-    `${closeIndent}}\n\n` +
-    `${returnIndent}return watched || propEligible(event);`,
-  'watched deep-market horizon'
-);
-
-replaceRegexOnce(
-  /([ \t]*)strategy:\n([ \t]*)'broad discovery; separate sequential Bet365\/DraftKings core pulls; merged by exact event identity; deep markets by league\/start-time priority'/,
+  /([ \t]*)strategy:\n([ \t]*)'primary major sports before ancillary games; college soccer excluded; sequential Bet365\/DraftKings primary game markets only; disabled player props not requested'/,
   (match, strategyIndent, valueIndent) =>
     `${strategyIndent}strategy:\n` +
-    `${valueIndent}'broad discovery; Crypto fight-watch exact-pair priority inside 30 hours; separate sequential Bet365/DraftKings core pulls; merged by exact event identity; watched combat deep markets may enter at 30 hours while ordinary deep markets remain 8 hours'`,
+    `${valueIndent}'primary major sports before ancillary games; college soccer excluded; Crypto exact-pair watch priority inside 30 hours; sequential Bet365/DraftKings primary game markets only; disabled player props not requested; watched combat deep markets enabled'`,
   'request policy description'
 );
 
