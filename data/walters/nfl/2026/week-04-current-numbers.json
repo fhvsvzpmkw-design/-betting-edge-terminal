@@ -8,7 +8,7 @@
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS",
   "createdAt": "2026-09-29T04:34:24-07:00",
-  "updatedAt": "2026-10-04T20:28:16.792Z",
+  "updatedAt": "2026-10-04T20:43:18Z",
   "lastResearchAt": "2026-10-03T16:51:30-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-04-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -930,9 +930,9 @@
       "away": "NYJ",
       "home": "CHI",
       "startTimePacific": "2026-10-04T10:00:00-07:00",
-      "grahamFairHome": -12,
-      "grahamExactFairHome": -12.032,
-      "grahamAsOf": "2026-10-04T20:28:16.792Z",
+      "grahamFairHome": -9,
+      "grahamExactFairHome": -9.112,
+      "grahamAsOf": "2026-10-04T20:43:18Z",
       "numberStatus": "READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS",
       "informationStatus": "WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE",
       "adjustments": [
@@ -990,9 +990,40 @@
             "https://www.newyorkjets.com/team/depth-chart",
             "data/walters/nfl/player-values/by-team-v1/nyj.json"
           ]
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "NYJ",
+          "homeTeam": "CHI",
+          "awayStarter": "Geno Smith",
+          "homeStarter": "Tyson Bagent",
+          "awayTeamQbDelta": -0.33,
+          "homeTeamQbDelta": -3.25,
+          "pointsToHomeSpread": 2.92,
+          "reason": "Governed Walters QB differential: NYJ -0.33 minus CHI -3.25 equals +2.92 points to the home-spread coordinate. CHI uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.chicagobears.com/news/game-recap-bears-ground-jets-improve-to-3-1",
+            "https://www.foxsports.com/articles/nfl/case-keenum-starts-at-quarterback-for-the-bears-before-tyson-bagent-takes-over-after-1-play",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
+          ],
+          "effectiveAt": "2026-10-04T20:43:18Z",
+          "marketViewed": false
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base -8.750; home field -2.082; other governed +0.000; pre-personnel exact -10.832; personnel -1.200; matchup +0.000; exact Graham home fair -12.032; displayed -12.0.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -8.750; home field -2.082; other governed +2.920; pre-personnel exact -7.912; personnel -1.200; matchup +0.000; exact Graham home fair -9.112; displayed -9.0.",
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
@@ -1005,7 +1036,17 @@
         "https://www.chicagobears.com/team/depth-chart",
         "https://www.windycitygridiron.com/chicago-bears-injuries/124262/bears-vs-jets-injury-report-braxton-jones-out-for-chicago-n-y-down-4-starters",
         "data/walters/nfl/player-values/by-team-v1/chi.json",
-        "data/walters/nfl/carried-rating-audit-staging.json"
+        "data/walters/nfl/carried-rating-audit-staging.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.chicagobears.com/news/game-recap-bears-ground-jets-improve-to-3-1",
+        "https://www.foxsports.com/articles/nfl/case-keenum-starts-at-quarterback-for-the-bears-before-tyson-bagent-takes-over-after-1-play",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+        "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
       ],
       "neutralBaseHome": -8.749788,
       "ratingCarryForward": {
@@ -1053,18 +1094,16 @@
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -8.75,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -10.832,
+        "otherGovernedPointsToHomeSpread": 2.92,
+        "prePersonnelExactFairHome": -7.912,
         "personnelPointsToHomeSpread": -1.2,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -12.032,
-        "displayedFairHome": -12,
+        "exactFairHome": -9.112,
+        "displayedFairHome": -9,
         "arithmeticVerified": true
       },
-      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
-      "qbPerformanceFailClosedTeams": [
-        "CHI"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "weeklyRatingInput": {
         "state": "COMPLETE",
         "sourceWeek": 3,
@@ -1079,10 +1118,41 @@
         "applicationStatus": "APPLIED",
         "marketViewed": false
       },
-      "priorGrahamFairHome": -10,
+      "priorGrahamFairHome": -12,
       "personnelProductionId": "walters-personnel-production-v1",
       "personnelLastAppliedAt": "2026-10-02T16:56:59-07:00",
-      "personnelEstimateCases": []
+      "personnelEstimateCases": [],
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -12.032,
+      "qbPerformancePointsToHomeSpread": 2.92,
+      "qbPerformanceAwayTeamDelta": -0.33,
+      "qbPerformanceHomeTeamDelta": -3.25,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-04T20:43:18Z",
+      "qbPriorEstimateTeams": [
+        "CHI"
+      ],
+      "qbPriorEstimates": [
+        {
+          "team": "CHI",
+          "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+          "value": 6,
+          "confidence": "LOW",
+          "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+          "evidenceDropbacks": 0,
+          "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+          "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+          "starterEvidence": {
+            "kind": "OFFICIAL",
+            "team": "CHI",
+            "playerId": "22900",
+            "url": "https://www.chicagobears.com/news/game-recap-bears-ground-jets-improve-to-3-1",
+            "observedAt": "2026-10-04T20:43:18Z",
+            "finding": "Chicago's October 4 official club report identifies Tyson Bagent as its quarterback against the Jets and calls this his first start since 2023. Bagent is the primary quarterback for Week 4; Caleb Williams did not play. This evidence is observed after kickoff and supports a current-board correction only."
+          }
+        }
+      ]
     },
     {
       "gameKey": "2026-W04-JAX-CIN",
@@ -2879,7 +2949,7 @@
       "grahamFairHome": -2.5,
       "grahamExactFairHome": -2.324,
       "grahamAsOf": "2026-10-04T20:28:16.792Z",
-      "numberStatus": "READY",
+      "numberStatus": "READY_WITH_PERSONNEL_MODEL_ESTIMATES",
       "informationStatus": "WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE",
       "adjustments": [
         {
@@ -3094,13 +3164,11 @@
     "productionAuthority": true,
     "grahamWritesAllowed": true,
     "approvedTeamCount": 32,
-    "currentResolvedTeamCount": 31,
+    "currentResolvedTeamCount": 32,
     "permanentlyExcludedTeams": [],
-    "currentFailClosedTeams": [
-      "CHI"
-    ],
-    "failClosedGameCount": 1,
-    "lastAppliedAt": "2026-10-02T11:38:58-07:00",
+    "currentFailClosedTeams": [],
+    "failClosedGameCount": 0,
+    "lastAppliedAt": "2026-10-04T20:43:18Z",
     "marketViewed": false,
     "postActivationCanaryState": "PENDING"
   },

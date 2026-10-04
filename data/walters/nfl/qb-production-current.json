@@ -5,7 +5,7 @@
   "state": "OPERATIONAL_SCOPED",
   "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
   "activatedAt": "2026-09-02T19:16:51-07:00",
-  "lastAppliedAt": "2026-10-02T11:38:58-07:00",
+  "lastAppliedAt": "2026-10-04T20:43:18Z",
   "productionAuthority": true,
   "grahamWritesAllowed": true,
   "embeddedBaselineWritesAllowed": false,
@@ -278,9 +278,17 @@
     {
       "team": "CHI",
       "teamName": "Chicago",
-      "bindingStatus": "FAIL_CLOSED_UNRESOLVED_STARTER",
-      "currentStarterStatus": "WEEK4_STARTER_UNRESOLVED",
-      "currentStarterPlayer": null,
+      "bindingStatus": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "currentStarterStatus": "CONFIRMED_NAMED_STARTER",
+      "currentStarterPlayer": {
+        "playerId": "22900",
+        "gsisId": "00-0038416",
+        "playerName": "Tyson Bagent",
+        "candidateValue": 6,
+        "candidateStatus": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "confidence": "LOW",
+        "evidenceDropbacks": 0
+      },
       "embeddedBaselineStatus": "RESOLVED_SINGLE_QB",
       "embeddedBaselinePlayer": {
         "playerId": "14500",
@@ -289,23 +297,41 @@
         "priorValue": 9.25,
         "valueAuthority": "STAGE2_PRIOR_FOR_NAMED_BASELINE_QB"
       },
-      "approvedProductionStarterValue": null,
+      "approvedProductionStarterValue": 6,
       "embeddedBaselineQbValue": 9.25,
-      "teamQbDelta": null,
-      "gameContributionEligible": false,
-      "sampleTreatment": "STAGE3_PERFORMANCE_CANDIDATE",
+      "teamQbDelta": -3.25,
+      "gameContributionEligible": true,
+      "sampleTreatment": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
       "evidence": {
-        "researchFinding": "Case Keenum started and won Week 3 after Caleb Williams was ruled out and Tyson Bagent was only cleared from concussion protocol on Sunday. Chicago has not named its Week 4 starter against the Jets, so keep the existing fail-closed binding current.",
+        "researchFinding": "Resolve the stale September 30 Chicago binding with officially observed Week 4 quarterback identity. The Bears' October 4 club report confirms Tyson Bagent's quarterback role against the Jets; Case Keenum's opening-play cameo is documented separately by contemporaneous AP reporting and does not make Keenum the primary QB. Use Bagent's existing frozen 6.0 Graham prior against the unchanged Caleb Williams 9.25 embedded baseline through the governed calculator. This is a post-kickoff correction published October 4, not a claim that the adjustment was available in an issued pregame report; no Week 4 result or performance enters the QB value.",
         "sourceRefs": [
-          "https://www.chicagobears.com/news/game-recap-case-keenum-defense-lead-bears-to-dominant-victory-over-eagles",
-          "https://www.chicagobears.com/news/",
-          "data/walters/nfl/qb-production/production-contract-v1.json"
+          "https://www.chicagobears.com/news/game-recap-bears-ground-jets-improve-to-3-1",
+          "https://www.foxsports.com/articles/nfl/case-keenum-starts-at-quarterback-for-the-bears-before-tyson-bagent-takes-over-after-1-play",
+          "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+          "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
         ]
       },
       "activatedAt": "2026-09-02T19:16:51-07:00",
-      "lastUpdatedAt": "2026-09-30T11:41:22-07:00",
+      "lastUpdatedAt": "2026-10-04T20:43:18Z",
       "marketViewed": false,
-      "failClosedCode": "CALEB_WILLIAMS_STATUS_AND_BAGENT_KEENUM_ORDER_UNRESOLVED"
+      "failClosedCode": null,
+      "priorEstimate": {
+        "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+        "value": 6,
+        "confidence": "LOW",
+        "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+        "evidenceDropbacks": 0,
+        "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+        "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+        "starterEvidence": {
+          "kind": "OFFICIAL",
+          "team": "CHI",
+          "playerId": "22900",
+          "url": "https://www.chicagobears.com/news/game-recap-bears-ground-jets-improve-to-3-1",
+          "observedAt": "2026-10-04T20:43:18Z",
+          "finding": "Chicago's October 4 official club report identifies Tyson Bagent as its quarterback against the Jets and calls this his first start since 2023. Bagent is the primary quarterback for Week 4; Caleb Williams did not play. This evidence is observed after kickoff and supports a current-board correction only."
+        }
+      }
     },
     {
       "team": "CIN",
@@ -1432,7 +1458,8 @@
     "graham-delta-1645-qb-2026-w03-20260925T165400-0700",
     "graham-daily-review-qb-2026-w04-20260930T114122-0700",
     "vigscope-debug-qb-20260930-jalon-prior-v1",
-    "graham-daily-review-qb-2026-w04-20261002T113858-0700"
+    "graham-daily-review-qb-2026-w04-20261002T113858-0700",
+    "graham-manual-chi-qb-resolution-2026-w04-20261004T134318-0700"
   ],
   "bindingUpdates": [
     {
@@ -1584,6 +1611,15 @@
         "WAS"
       ],
       "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false
+    },
+    {
+      "batchId": "graham-manual-chi-qb-resolution-2026-w04-20261004T134318-0700",
+      "effectiveAt": "2026-10-04T20:43:18Z",
+      "teams": [
+        "CHI"
+      ],
+      "sourceTask": "USER_AUTHORIZED_CHICAGO_QB_RESOLUTION",
       "marketViewed": false
     }
   ],
