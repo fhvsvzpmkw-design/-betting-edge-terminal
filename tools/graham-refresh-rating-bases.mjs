@@ -56,7 +56,8 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     games.push({gameKey:g.gameKey,neutralDelta:delta,before,after:{neutralBaseHome:neutral,exactFairHome:g.grahamExactFairHome,displayedFairHome:g.grahamFairHome}});
   }
   if(receipt.state==='COMPLETE'){
-    if(receipt.blockedGames.length||receipt.gamesUpdated!==result.games.length||receipt.teamsUpdated!==result.games.length*2)fail('COMPLETE_RECEIPT_COVERAGE_INVALID');
+    const finals=staging.priorWeekCompletion?.finals;
+    if(receipt.blockedGames.length||!Array.isArray(finals)||!finals.length||new Set(finals.map(g=>g.gameKey)).size!==finals.length||receipt.gamesProcessed!==finals.length||receipt.gamesUpdated!==finals.length||receipt.teamsUpdated!==finals.length*2)fail('COMPLETE_RECEIPT_COVERAGE_INVALID');
     for(const g of result.games){
       const away=byTeam.get(g.away),home=byTeam.get(g.home);
       if(g.ratingCarryForward.awayRating!==away.currentRating||g.ratingCarryForward.homeRating!==home.currentRating||Math.abs(g.neutralBaseHome-decimalSum(away.currentRating,-home.currentRating))>1e-9)fail('COMPLETE_RECEIPT_STALE_BASE:'+g.gameKey);
@@ -72,7 +73,7 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     result.ratingBaseRefresh={schema:1,state:'APPLIED',effectiveAt,sourceAuditId:staging.auditId,powerBlobSha,sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,games,marketViewed:false,scope:'Mechanical propagation of published weekly carried ratings only; existing initial baseline research and all current-week overlays preserved.'};
     synchronizeGrahamFairBoard({games:result.games.filter(g=>games.some(c=>c.gameKey===g.gameKey))},{write:true,policy});
   }
-  return {board:result,games};
+  return {board:result,games,changed:JSON.stringify(result)!==JSON.stringify(board)};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   if(process.argv.slice(2).some(a=>a!=='--write'))fail('USAGE: node tools/graham-refresh-rating-bases.mjs [--write]');
@@ -81,7 +82,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
   const h4=read('data/walters/nfl/home-field/home-field-production-current.json'),qb=read('data/walters/nfl/qb-production-current.json');
   if(h4.state!=='OPERATIONAL_SCOPED'||h4.productionAuthority!==true||h4.marketViewed!==false||qb.state!=='OPERATIONAL_SCOPED'||qb.authorityToken!=='APPROVED_WALTERS_QB_PERFORMANCE'||qb.productionAuthority!==true||qb.marketViewed!==false)fail('PRODUCTION_AUTHORITY_REQUIRED');
   const result=refreshRatingBases({board:read(active.paths.currentNumbers),power,staging:read('data/walters/nfl/carried-rating-audit-staging.json'),active,policy:read('data/walters/nfl/graham-fair-decomposition-policy-v1.json'),effectiveAt:new Date().toISOString(),powerBlobSha:createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex')});
-  if(process.argv.includes('--write')&&result.games.length){
+  if(process.argv.includes('--write')&&result.changed){
     if(!fs.readFileSync(powerPath).equals(bytes)||JSON.stringify(resolveGrahamActiveWeek().manifest)!==JSON.stringify(active.manifest))fail('INPUT_CHANGED_DURING_REFRESH');
     fs.writeFileSync(active.paths.currentNumbers,JSON.stringify(result.board,null,2)+'\n');
   }

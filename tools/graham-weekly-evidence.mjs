@@ -39,14 +39,25 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
     if(!list(ids).length||!ids.every(id=>list(sources.get(id)?.gameKeys).includes(key)))fail('GAME_SPECIFIC_SOURCE_REQUIRED:'+key);
   };
   const estimatedPlayers=historicalValueEstimates({bundle,registry,calibration,supplementalPlayers,sourceCheck});
+  // Official name changes must resolve to one frozen identity, never a new value.
+  const aliases=list(bundle.playerAliases);
+  const aliasNames=new Set();
+  for(const a of aliases){
+    const p=list(registry.players).find(p=>String(p.eaPlayerId)===String(a.eaPlayerId));
+    if(!p||norm(p.player)!==norm(a.frozenPlayer)||!nonempty(a.player)||norm(a.player)===norm(p.player)||aliasNames.has(norm(a.player))||!nonempty(a.rationale)||!list(a.gameKeys).length||list(registry.players).some(p=>norm(p.player)===norm(a.player)))fail('HISTORICAL_ALIAS_INVALID');
+    aliasNames.add(norm(a.player));
+    for(const key of a.gameKeys){sourceCheck(a.sourceIds,key);if(!a.sourceIds.every(id=>sources.get(id)?.kind==='OFFICIAL'))fail('HISTORICAL_ALIAS_OFFICIAL_SOURCE_REQUIRED');}
+  }
+  let lookupGameKey=null;
   const lookup=(name,id,allowQb=false)=>{
     const found=[...list(registry.players),...supplementalPlayers,...estimatedPlayers].filter(p=>id?String(p.eaPlayerId)===String(id):norm(p.player)===norm(name));
-    if(found.length!==1||norm(found[0].player)!==norm(name))fail('LOCKED_PLAYER_IDENTITY:'+name);
+    if(found.length!==1||!(norm(found[0].player)===norm(name)||aliases.some(a=>norm(a.player)===norm(name)&&String(a.eaPlayerId)===String(found[0].eaPlayerId)&&a.gameKeys.includes(lookupGameKey))))fail('LOCKED_PLAYER_IDENTITY:'+name);
     const p=found[0];if(p.valueStatus==='HISTORICAL_ESTIMATE')return p;
     if(p.valueStatus!=='CALIBRATED'||!exact(p.waltersPoints)||!exact(p.maddenOvr)||(p.position==='QB'&&!allowQb)||playerValue(calibration,{position:p.position,maddenOvr:p.maddenOvr})!==p.waltersPoints)fail('LOCKED_PLAYER_VALUE:'+name);return p;
   };
   const results=[];
   for(const g of list(bundle.games)){
+    lookupGameKey=g.gameKey;
     const game=prior.games.find(p=>p.gameKey===g.gameKey);
     if(!game||g.away!==game.away||g.home!==game.home||Date.parse(bundle.recordedAt)<=Date.parse(game.startTimePacific))fail('HISTORICAL_GAME_IDENTITY:'+g.gameKey);
     if(g.state==='BLOCKED'){

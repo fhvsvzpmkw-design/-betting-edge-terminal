@@ -1,0 +1,61 @@
+name: Graham rating base refresh
+on:
+  workflow_run:
+    workflows: [Graham carried-rating audit, Graham baseline recovery, Graham research ledger sync]
+    branches: [main]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graham-rating-base-refresh.yml
+      - tools/graham-refresh-rating-bases.mjs
+      - tools/test-graham-rating-base-refresh.mjs
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: graham-personnel-production
+  cancel-in-progress: false
+jobs:
+  refresh:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify rating refresh regressions
+        run: node tools/test-graham-rating-base-refresh.mjs
+      - name: Propagate published learning into the active board
+        run: |
+          set -euo pipefail
+          git config user.name betting-edge-bot
+          git config user.email actions@users.noreply.github.com
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            node --input-type=module - <<'NODE' > /tmp/graham-refresh-eligible
+          import fs from 'node:fs';
+          import {resolveGrahamActiveWeek} from './tools/graham-active-week.mjs';
+          import {baselineComplete} from './tools/graham-baseline-recovery.mjs';
+          const active=resolveGrahamActiveWeek(),read=p=>JSON.parse(fs.readFileSync(p));
+          const s=read('data/walters/nfl/carried-rating-audit-staging.json'),b=read(active.paths.currentNumbers);
+          console.log(s.state==='APPLIED'&&s.auditType==='WALTERS_WEEKLY_90_10'&&s.season===active.season&&s.targetWeek===active.week&&baselineComplete(b.baselineStatus)?'yes':'no');
+          NODE
+            if [ "$(cat /tmp/graham-refresh-eligible)" != yes ]; then exit 0; fi
+            ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
+            node tools/graham-refresh-rating-bases.mjs --write
+            node tools/graham-fair-decomposition.mjs --path "$ACTIVE_NUMBERS"
+            node tools/validate-walters-qb-performance-production.mjs
+            git add -- "$ACTIVE_NUMBERS"
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Refresh active Graham fairs from published weekly ratings'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo 'Concurrent writes prevented rating-base publication.' >&2
+          exit 1

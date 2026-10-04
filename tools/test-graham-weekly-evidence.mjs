@@ -15,6 +15,14 @@ let count=0;
 function check(name,fn){fn();count++;console.log('PASS '+name);}
 function blocked(change,pattern){const f=structuredClone(fixture);change(f);const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'BLOCKED');assert.ok(g.blockers.some(b=>pattern.test(b.code)),JSON.stringify(g.blockers));}
 check('locked one-for-one loss is recomputed for paired teams',()=>{const g=evaluateWeeklyEvidence(fixture).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].injuryLoss,1.2);assert.equal(g.teams[1].injuryLoss,0);});
+check('official name alias preserves one frozen identity and value',()=>{
+ const f=structuredClone(fixture),p=registry.players.find(p=>p.player==='Tyler Smith');
+ f.bundle.playerAliases=[{player:'Synthetic Legal Name',frozenPlayer:p.player,eaPlayerId:p.eaPlayerId,gameKeys:[gameKey],sourceIds,rationale:'Synthetic official identity proof'}];
+ f.personnel.currentCases.smith.player='Synthetic Legal Name';Object.assign(f.bundle.games[0].teams[0].cases[0],{player:'Synthetic Legal Name',eaPlayerId:p.eaPlayerId});
+ assert.equal(evaluateWeeklyEvidence(f).games[0].teams[0].injuryLoss,1.2);
+ f.bundle.sources[0].kind='REPORTING';assert.throws(()=>evaluateWeeklyEvidence(f),/ALIAS_OFFICIAL/);
+ f.bundle.sources[0].kind='OFFICIAL';f.bundle.playerAliases[0].frozenPlayer='Someone else';assert.throws(()=>evaluateWeeklyEvidence(f),/ALIAS_INVALID/);
+});
 check('omitted prior case blocks game',()=>blocked(f=>f.bundle.games[0].teams[0].cases=[],/PRIOR_CASE/));
 check('unsupported zero coverage blocks game',()=>blocked(f=>f.bundle.games[0].teams[1].allAbsencesReviewed=false,/COVERAGE/));
 check('missing player cannot become zero',()=>blocked(f=>f.bundle.games[0].teams[0].cases[0].replacements=[{player:'Unknown player'}],/LOCKED_PLAYER/));

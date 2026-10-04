@@ -1,6 +1,16 @@
 # Graham weekly 90/10 authority
 
-Version 1.6 — approved broader historical estimates, 2026-09-22.
+Version 1.7 — completion recovery, 2026-10-04.
+
+## v1.7 — required completion and retry handoff
+
+On October 4 the user directed immediate resolution of Week 4 blocks and required completed, accurate customer information before Sunday. This supersedes the older once-on-Tuesday/no-schedule-change restriction below for recovery only. The existing 90/10 task remains the owner of completed-game learning and retains its Tuesday 10:00 Vancouver run. It also checks at 06:00 and 10:00 Vancouver Tuesday through Sunday. A complete matching receipt is a no-op; otherwise continue game-specific evidence recovery, not repeated staging of unchanged evidence. Finish the historical update by Saturday 18:00 Vancouver, before Sunday games. Resolve available evidence through the existing documented estimates; never mark unresolved research complete or backdate publication.
+
+After a successful carried-rating publication, the separate `Graham rating base refresh` workflow propagates the source-bound result into an already completed active baseline and then refreshes the terminal. Preserve current overlays, pregame publications and original baseline timestamps. A pending initial baseline must finish research before this handoff is eligible. This does not move research ownership into a calculator.
+
+Use `node tools/graham-weekly-completion.mjs --strict` to verify publication readiness: active-week identity, full prior-slate receipt, matching applied staging, every team's latest carried rating in the active board and no unresolved current personnel/QB inputs. Passing a research review alone is not passing this gate. The scheduled completion check continues through the weekend; a failed check must trigger targeted recovery on the next task attempt. Report exact published counts and remaining limitations without calling partial work completed.
+
+Official source-bound legal-name aliases may resolve one unchanged frozen player identity. The alias must cite official identity evidence, preserve the EA ID/name/value, identify its games, and cannot override another registry identity or introduce a player value.
 
 ## v1.6 — broader estimation authority
 

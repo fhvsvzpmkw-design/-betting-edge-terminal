@@ -1,0 +1,41 @@
+name: Graham weekly completion check
+on:
+  schedule:
+    # Hourly checkpoint; the strict deadline is Saturday 18:00 Vancouver.
+    - cron: '15 * * * *'
+  workflow_run:
+    workflows: [Graham rating base refresh, Graham QB performance production, Graham personnel production]
+    branches: [main]
+    types: [completed]
+  push:
+    branches: [main]
+    paths: [tools/graham-weekly-completion.mjs, tools/test-graham-weekly-completion.mjs, .github/workflows/graham-weekly-completion.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: graham-weekly-completion
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tools/test-graham-weekly-completion.mjs
+      - name: Inspect complete customer numeric inputs
+        run: |
+          node tools/graham-weekly-completion.mjs > /tmp/graham-weekly-completion.json
+          cat /tmp/graham-weekly-completion.json >> "$GITHUB_STEP_SUMMARY"
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const status=JSON.parse(fs.readFileSync('/tmp/graham-weekly-completion.json'));
+          const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Vancouver',weekday:'short',hour:'numeric',hourCycle:'h23'}).formatToParts(new Date());
+          const get=k=>parts.find(p=>p.type===k)?.value;
+          const deadline=(get('weekday')==='Sat'&&Number(get('hour'))>=18)||get('weekday')==='Sun';
+          if(deadline&&status.state!=='COMPLETE')throw Error('CUSTOMER_COMPLETION_DEADLINE_MISSED: targeted historical/current-input recovery required; research timestamps do not establish numeric completion.');
+          NODE

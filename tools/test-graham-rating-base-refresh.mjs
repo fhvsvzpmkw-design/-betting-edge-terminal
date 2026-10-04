@@ -26,4 +26,15 @@ test('complete receipt cannot mask an unchanged stale base or incomplete coverag
  const c=structuredClone(f);Object.assign(c.power.weekly90_10,{state:'COMPLETE',gamesUpdated:16,teamsUpdated:32,blockedGames:[]});c.staging.result.receipt=structuredClone(c.power.weekly90_10);c.board.games[0].neutralBaseHome+=1;assert.throws(()=>refreshRatingBases(c),/COMPLETE_RECEIPT_STALE_BASE/);
  c.power.weekly90_10.teamsUpdated=30;c.staging.result.receipt=structuredClone(c.power.weekly90_10);assert.throws(()=>refreshRatingBases(c),/COMPLETE_RECEIPT_COVERAGE/);
 });
+test('source-week byes do not require the next schedule to have the same game count',()=>{
+ const c=structuredClone(f);c.staging.priorWeekCompletion.finals=c.staging.priorWeekCompletion.finals.slice(0,14);
+ Object.assign(c.power.weekly90_10,{state:'COMPLETE',gamesProcessed:14,gamesUpdated:14,teamsUpdated:28,blockedGames:[]});c.staging.result.receipt=structuredClone(c.power.weekly90_10);
+ const r=refreshRatingBases(c);assert.equal(r.board.games.length,16);assert.equal(r.board.baselineStatus,'TUESDAY_BASELINE_COMPLETE');
+});
+test('metadata completion is persisted even when rating bases already match',()=>{
+ const c=structuredClone(f);c.board=structuredClone(r.board);
+ Object.assign(c.power.weekly90_10,{state:'COMPLETE',gamesUpdated:16,teamsUpdated:32,blockedGames:[]});c.staging.result.receipt=structuredClone(c.power.weekly90_10);
+ const done=refreshRatingBases(c);assert.equal(done.games.length,0);assert.equal(done.changed,true);assert.equal(done.board.baselineStatus,'TUESDAY_BASELINE_COMPLETE');
+ assert.equal(refreshRatingBases({...c,board:done.board}).changed,false);
+});
 console.log(`RATING BASE REFRESH: ${n} PASS`);
