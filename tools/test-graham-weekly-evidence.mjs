@@ -103,6 +103,26 @@ check('full recovery binds fifteen distinct game pairs and all thirty remaining 
  const r=loadWeeklyEvidence(process.cwd(),{path,blobSha:gitBlob(bytes)},{season:2026,sourceWeek:2,effectiveAt:bundle.recordedAt});
  assert.equal(r.readyGames,15);assert.equal(r.blockedGames,0);assert.equal(new Set(r.games.flatMap(g=>g.teams.map(t=>t.team))).size,30);assert.ok(r.games.every(g=>g.gameKey!=='2026-W02-CLE-TB'));
 });
+function capacityFixture(){
+ const f=structuredClone(fixture);f.personnel.currentCases={};f.bundle.estimationPolicy='graham-historical-value-estimates-v1';
+ const p=registry.players.find(p=>p.player==='Tyler Smith'),r=registry.players.find(p=>p.player===c.replacements[0].player);
+ f.bundle.games[0].teams[0].cases=[{...structuredClone(c),caseKey:'capacity',newlyIdentified:true,eaPlayerId:p.eaPlayerId,resolution:'CAPACITY_LIMITED_LOSS_ESTIMATE',modelId:'graham-capacity-limited-loss-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic bounded duty redistribution',capacityRationale:'Synthetic complete reserve inventory exhausted',capacityInventoryComplete:true,capacitySourceIds:sourceIds,availableCandidatesReviewed:[{player:r.player,eaPlayerId:r.eaPlayerId}]},{caseKey:'unavailable-reserve',newlyIdentified:true,player:r.player,eaPlayerId:r.eaPlayerId,resolution:'ZERO_CALIBRATED_LOSS',availabilityStatus:'IR',rationale:'Synthetic injured reserve',sourceIds,estimateAcknowledged:true,assumptionRationale:'Frozen zero-valued baseline'}];
+ return f;
+}
+check('exhausted replacement capacity retains a bounded loss and null replacement',()=>{
+ const f=capacityFixture(),g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');
+ const m=g.teams[0].cases[0].modelEstimate;assert.equal(m.injuryLoss,.6);assert.equal(m.replacementValue,null);assert.deepEqual(m.injuryLossRange,[0,1.2]);assert.equal(m.classification,'GRAHAM_MODEL_ESTIMATE');
+});
+check('capacity midpoint is weighted only by explicitly declared historical exposure',()=>{
+ const f=capacityFixture(),c=f.bundle.games[0].teams[0].cases[0];c.availabilityStatus='PARTIAL_GAME';
+ c.exposure={modelId:'graham-historical-time-exposure-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic second-half absence',activeEffectivenessConvention:'NORMAL_WHILE_ACTIVE_ESTIMATE',gameDurationSeconds:3600,durationSourceIds:sourceIds,unavailableIntervals:[{startEarliest:1800,startLatest:1800,endEarliest:3600,endLatest:3600,rationale:'Synthetic documented interval',sourceIds}]};
+ const m=evaluateWeeklyEvidence(f).games[0].teams[0].cases[0].modelEstimate;assert.equal(m.injuryLoss,.3);assert.deepEqual(m.injuryLossRange,[0,.6]);
+});
+check('capacity estimate rejects available reserves, missing identity and incomplete acknowledgment',()=>{
+ for(const change of [f=>f.bundle.games[0].teams[0].cases.pop(),f=>f.bundle.games[0].teams[0].cases[0].availableCandidatesReviewed=[{player:'Unknown reserve'}],f=>delete f.bundle.games[0].teams[0].cases[0].estimateAcknowledged,f=>delete f.bundle.games[0].teams[0].cases[0].capacityInventoryComplete]){
+  const f=capacityFixture();change(f);assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');
+ }
+});
 console.log(`WEEKLY HISTORICAL EVIDENCE: ${count} PASS`);
 
 // Current-week routing and additive Week 2 evidence share this existing CI entrypoint.

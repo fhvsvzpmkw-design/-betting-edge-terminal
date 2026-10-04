@@ -123,6 +123,23 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             modelEstimate={modelId:'graham-zero-imputed-baseline-v1',classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,injuryLoss:0,rawTeamContributionDelta:0,healthyValue:0,replacementValue:null,assumptionRationale:c.assumptionRationale,valueProvenance:p.valueProvenance,limitation:'Point estimate is zero under the explicitly imputed healthy baseline and nonnegative replacement floor. This is not calibrated zero; cohort sensitivity remains in value provenance. No fictional replacement identity or assignment is asserted.'};
           }else if(c.resolution==='ACTIVE_FULL'){
             if(c.availabilityStatus!=='ACTIVE_FULL')fail('FULL_AVAILABILITY_NOT_ESTABLISHED');
+          }else if(c.resolution==='CAPACITY_LIMITED_LOSS_ESTIMATE'){
+            // Bound an additional vacancy when all documented healthy reserves
+            // already cover distinct simultaneous roles. No missing value is zero.
+            if(bundle.estimationPolicy!=='graham-historical-value-estimates-v1'||c.modelId!=='graham-capacity-limited-loss-v1'||c.estimateAcknowledged!==true||c.baselineDoubleCountReviewed!==true||!nonempty(c.assumptionRationale)||!nonempty(c.capacityRationale)||!['OUT','IR','PARTIAL_GAME'].includes(c.availabilityStatus))fail('CAPACITY_LOSS_DECLARATION_REQUIRED');
+            if(p.valueStatus!=='CALIBRATED'||c.capacityInventoryComplete!==true)fail('CAPACITY_CALIBRATED_BASELINE_AND_COMPLETE_INVENTORY_REQUIRED');
+            sourceCheck(c.capacitySourceIds,g.gameKey);
+            const candidates=list(c.availableCandidatesReviewed).map(r=>lookup(r.player,r.eaPlayerId));
+            if(!candidates.length||new Set(candidates.map(r=>String(r.eaPlayerId))).size!==candidates.length||candidates.some(r=>group(r.position)!==group(p.position)||String(r.eaPlayerId)===String(p.eaPlayerId)))fail('CAPACITY_CANDIDATE_REVIEW_REQUIRED');
+            for(const r of candidates){
+              const unavailable=cs.some(other=>other!==c&&norm(other.player)===norm(r.player)&&['IR','OUT','PARTIAL_GAME'].includes(other.availabilityStatus));
+              const allocated=cs.some(other=>other!==c&&list(other.replacements).some(x=>String(x.eaPlayerId)===String(r.eaPlayerId)));
+              if(!unavailable&&!allocated)fail('UNALLOCATED_AVAILABLE_CAPACITY');
+            }
+            const exposure=c.availabilityStatus==='PARTIAL_GAME'?historicalExposure(c.exposure,ids=>sourceCheck(ids,g.gameKey)):null;
+            const ratio=exposure?.fraction??1;
+            const loss=round(p.waltersPoints*ratio/2);
+            modelEstimate={modelId:c.modelId,classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,healthyValue:p.waltersPoints,replacementValue:null,injuryLoss:loss,rawTeamContributionDelta:-loss,injuryLossRange:[0,round(p.waltersPoints*(exposure?.fractionRange?.max??ratio))],assumptionRationale:c.assumptionRationale,capacityRationale:c.capacityRationale,...(exposure?{exposure}:{}),limitation:'Midpoint of bounded incremental vacancy loss when distinct healthy replacement capacity is exhausted. No fabricated player, replacement rating, measured workload or calibrated zero; range is model sensitivity, not a confidence interval.'};
           }else{
             if(!['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(c.availabilityStatus)&&!(['PARTIAL_VALUE_INVARIANT','PARTIAL_TIME_EXPOSURE'].includes(c.resolution)&&c.availabilityStatus==='PARTIAL_GAME'))fail('HISTORICAL_AVAILABILITY_UNRESOLVED');
             if(c.baselineDoubleCountReviewed!==true||!nonempty(c.roleRationale))fail('REPLACEMENT_ROLE_REVIEW_REQUIRED');
