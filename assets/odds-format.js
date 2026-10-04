@@ -41,6 +41,10 @@
     s=s.replace(new RegExp('\\bdecimal(?:\\s+odds)?\\s*[:=]?\\s*'+number+'(?!\\d|\\.\\d|%)','gi'),(_,n)=>format(n));
     s=s.replace(new RegExp('(?<![\\d.+\\-−])'+number+'\\s+decimal(?:\\s+odds)?\\b','gi'),(_,n)=>format(n));
     s=s.replace(new RegExp('\\b(odds|priced?|price)\\s*(?:of|at|[:=])?\\s*'+number+'(?!\\d|\\.\\d|%)','gi'),(_,label,n)=>`${label} ${format(n)}`);
+    // Report rationales also put the executable number before its odds label,
+    // e.g. "recorded DraftKings 1.72 price". Require that explicit label so
+    // percentages, signed point lines, money and ordinary decimals stay intact.
+    s=s.replace(/(?<![\d.+\-−$])(\d+(?:\.\d+)?)(?!\d|\.\d|%)\s+(price|odds)\b/gi,(_,n,label)=>`${format(n)} ${label}`);
     // Bare narrative odds are converted only when bound to this record's
     // structured price and introduced as a price, not a point/probability value.
     s=s.replace(/\b(break[- ]even(?:\s+rate)?|quoted|offered|available)\s+at\s+(\d+(?:\.\d+)?)(?!\d|\.\d|%)\b(?!\s*(?:pp\b|probability|percentage|points?\b|runs?\b|goals?\b|units?\b|percent\b|seconds?\b|minutes?\b))/gi,(all,label,n)=>known.some(d=>d===Number(n)||Number(d.toFixed(3))===Number(n))?`${label} at ${format(n)}`:all);

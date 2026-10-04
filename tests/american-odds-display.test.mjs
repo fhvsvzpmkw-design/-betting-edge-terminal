@@ -9,6 +9,10 @@ assert.equal(Odds.price(270),'+270');assert.equal(Odds.price('-110'),'-110');ass
 assert.equal(Odds.text('+270 at decimal 3.7'),'+270');
 assert.equal(Odds.text('Price at 3.7. Odds 1.91.'),'Price +270. Odds -110.');
 assert.equal(Odds.text('Price at 3.7%.'),'Price at 3.7%.');
+assert.equal(Odds.text('recorded DraftKings 1.72 price'),'recorded DraftKings -139 price');
+assert.equal(Odds.text('recorded Bet365 1.64 price'),'recorded Bet365 -156 price');
+assert.equal(Odds.text('At 2 odds; 2.2 price.'),'At +100 odds; +120 price.');
+assert.equal(Odds.text('66.2% price support; -1.5 price line; $1.72 price; 0.49 probability points.'),'66.2% price support; -1.5 price line; $1.72 price; 0.49 probability points.');
 assert.equal(Odds.text('+270 (3.7)'),'+270');
 assert.equal(Odds.text('+100 (2); decimal odds 2.'),'+100; +100.');
 assert.equal(Odds.text('Approximately 1.004 decimal.',[1.0044]),'Approximately -22727.','known exact odds take precedence over rounded narrative prices');
@@ -27,7 +31,7 @@ assert.equal(Odds.text(view.analysis,[3.7]),view.analysis,'formatting is idempot
 const browser={};vm.runInNewContext(fs.readFileSync('assets/odds-format.js','utf8'),browser);
 assert.equal(browser.VigScopeOddsFormat.fromDecimal(3.7),Odds.fromDecimal(3.7),'browser and producer use the same formatter');
 for(const entry of ['runner.html','runner-app.html','runner-core.html','index.html']){
- const html=fs.readFileSync(entry,'utf8');assert.match(html,/<script src="\.\/assets\/odds-format\.js\?v=american-only-20261002"><\/script>/);
+ const html=fs.readFileSync(entry,'utf8');assert.match(html,/<script src="\.\/assets\/odds-format\.js\?v=american-only-20261004"><\/script>/);
  assert.ok(html.indexOf('assets/odds-format.js')<html.indexOf('</head>'),'formatter loads before renderers');
 }
 assert.doesNotMatch(fs.readFileSync('assets/game-intelligence.js','utf8'),/'DECIMAL'|priceDecimal\?\.toFixed|`decimal \$/);
@@ -68,6 +72,18 @@ assert.match(cards[0],/[+-]\d{3,}/);
 assert.equal(context.oddsApi.displayPrice('3.7'),'+270');
 assert.equal(context.oddsApi.displayPrice('+10000'),'+10000');
 assert.equal(context.oddsApi.pickReason(example),'Break-even rate at +270.');
+for(const [team,book,decimal,american,point] of [['Milwaukee Brewers','DraftKings',1.72,'-139',66.2],['Los Angeles Dodgers','Bet365',1.64,'-156',66.7]]){
+ const rationale=`PROVISIONAL LEAN — ESPN’s ${point}% whole-game point supports ${team} at the recorded ${book} ${decimal} price after the current official personnel review.`;
+ const rec={...example,title:team,book,price:american,feed:{priceDecimal:decimal},analysis:rationale,marketAssessment:{decisionRationale:rationale}};
+ const frozen=JSON.stringify(rec),expected=rationale.replace(`${decimal} price`,`${american} price`);
+ assert.equal(context.oddsApi.pickReason(rec),expected,'collapsed lean reason uses American odds');
+ const renderedCard=context.oddsApi.card(d,rec).textContent;
+ assert.ok(renderedCard.includes(expected),'real lean renderer formats the exact reported sentence');
+ assert.ok(!renderedCard.includes(`${decimal} price`),'expanded lean analysis also uses American odds');
+ assert.ok(renderedCard.includes(`${point}%`),'forecast probability is preserved');
+ assert.equal(JSON.stringify(rec),frozen,'issued snapshot remains immutable');
+ assert.equal(Odds.text(expected),expected,'American price text is idempotent');
+}
 assert.equal(JSON.stringify(run),runBefore,'all actual renderers preserve issued records');
 console.log(`Rendered cards (${cards.length}), Exclusive shortlist and Game Intelligence: PASS`);
 console.log('American odds: conversion, units, immutable records, browser/producer parity and entrypoints PASS');
