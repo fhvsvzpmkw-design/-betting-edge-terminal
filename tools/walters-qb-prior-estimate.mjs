@@ -12,10 +12,10 @@ export function confirmedStarterPrior({candidate,item,policy,effectiveAt}) {
     || candidate.sampleReliability !== 0) fail('FROZEN_PRIOR_ONLY_CANDIDATE_REQUIRED');
   const evidence = item.starterEvidence;
   let host;try{host=new URL(evidence?.url).hostname;}catch{}
-  if (item.currentStarterStatus !== 'CONFIRMED_NAMED_STARTER' || evidence?.kind !== 'OFFICIAL'
+  const officialNews=evidence?.kind==='OFFICIAL'&&/^https:\/\/[^/]+\/(?:news|team)\//.test(evidence.url||'')&&['www.nfl.com',policy.officialTeamHosts?.[item.team]].includes(host);
+  const officialGamebook=policy.officialGamebookStarterEvidenceAllowed===true&&evidence?.kind==='OFFICIAL_GAMEBOOK'&&host==='static.www.nfl.com'&&/^https:\/\/static\.www\.nfl\.com\/image\/upload\/.+\/gamecenter\/.+\.pdf$/.test(evidence.url||'')&&/^https:\/\/www\.nfl\.com\/games\/.+-2026-reg-\d+(?:\?|$)/.test(evidence.discoveryUrl||'')&&/^2026-W\d{2}-[A-Z]{2,3}-[A-Z]{2,3}$/.test(evidence.gameKey||'')&&evidence.gameKey.split('-').slice(-2).includes(item.team)&&Number(evidence.gameKey.match(/-W(\d{2})-/)?.[1])===Number(evidence.discoveryUrl.match(/-2026-reg-(\d+)/)?.[1])&&/^[0-9a-f]{64}$/.test(evidence.sourceDocumentSha256||'')&&evidence.finding?.includes(candidate.playerName);
+  if (item.currentStarterStatus !== 'CONFIRMED_NAMED_STARTER' || (!officialNews&&!officialGamebook)
     || evidence.team !== item.team || String(evidence.playerId) !== String(candidate.playerId)
-    || !/^https:\/\/[^/]+\/(?:news|team)\//.test(evidence.url || '')
-    || !['www.nfl.com',policy.officialTeamHosts?.[item.team]].includes(host)
     || !item.sourceRefs?.includes(evidence.url) || !evidence.finding?.trim()
     || !Number.isFinite(Date.parse(evidence.observedAt)) || Date.parse(evidence.observedAt) > Date.parse(effectiveAt)) fail('CONFIRMED_OFFICIAL_STARTER_EVIDENCE_REQUIRED');
   return {method:PRIOR_ESTIMATE_METHOD,value:candidate.priorValue,confidence:'LOW',sourceStatus:candidate.status,

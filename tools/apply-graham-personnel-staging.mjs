@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus} from './graham-current-personnel-estimates.mjs';
+import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus, synchronizePersonnelBoardStatus} from './graham-current-personnel-estimates.mjs';
+import {loadCurrentValueEstimates} from './graham-current-value-estimates.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/personnel-staging.json');
@@ -44,9 +45,11 @@ if((ledger.processedBatchIds||[]).includes(input.batchId)){
   process.exit(0);
 }
 
-const registryById=new Map(registry.players.map(p=>[String(p.eaPlayerId),p]));
+const currentValues=loadCurrentValueEstimates({root:ROOT,input,registry,calibration:cal,production:prod});
+const allPlayers=[...registry.players,...currentValues];
+const registryById=new Map(allPlayers.map(p=>[String(p.eaPlayerId),p]));
 const registryByName=new Map();
-for(const p of registry.players){const k=normalizeName(p.player);const a=registryByName.get(k)||[];a.push(p);registryByName.set(k,a);}
+for(const p of allPlayers){const k=normalizeName(p.player);const a=registryByName.get(k)||[];a.push(p);registryByName.set(k,a);}
 function playerLookup(name,id){
   if(id){const p=registryById.get(String(id));if(!p)throw new Error(`PLAYER_ID_NOT_FOUND:${id}`);return p;}
   const arr=registryByName.get(normalizeName(name))||[];
@@ -132,7 +135,12 @@ for(const gameKey of affectedGames){
     if(material.length>=2){
       if(group==='RECEIVER')multiplier=Number(cal.clusterRules.RECEIVER.multiplier);
       else if(group==='DEFENSIVE_LINE')multiplier=Number(cal.clusterRules.DEFENSIVE_LINE.multiplier);
-      else if(['OFFENSIVE_LINE','DEFENSIVE_BACK','LINEBACKER','RUNNING_BACK'].includes(group))blocked=true;
+      else if(['OFFENSIVE_LINE','DEFENSIVE_BACK','LINEBACKER','RUNNING_BACK'].includes(group)){
+        // A reviewed linear estimate is explicit; there is no invented
+        // nonlinear cluster penalty or duplicated reserve credit.
+        const reviewed=prod.currentWeekReplacementEstimates.reviewedLinearClustersAllowed===true&&arr.every(c=>c.clusterReview?.method==='REVIEWED_LINEAR_ESTIMATE'&&c.clusterReview.estimateAcknowledged===true&&c.clusterReview.inventoryComplete===true&&c.clusterReview.rationale?.trim()&&arr.every(a=>c.clusterReview.caseKeys?.includes(a.caseKey))&&c.clusterReview.sourceRefs?.length&&c.clusterReview.sourceRefs.every(ref=>c.sourceRefs.includes(ref)));
+        blocked=!reviewed;
+      }
     }
     if(blocked){blockedGroups.push({team,group,caseKeys:arr.map(c=>c.caseKey),failClosedCode:'REVIEW_REQUIRED_CLUSTER_CONTEXT'});for(const c of arr)handled.add(c.caseKey);continue;}
     const raw=arr.reduce((s,c)=>s+Number(c.rawTeamContributionDelta),0);const final=round(raw*multiplier,3);
@@ -175,6 +183,7 @@ const sweep={
 research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=input.effectiveAt;
 numbers.updatedAt=input.effectiveAt;numbers.lastResearchAt=input.effectiveAt;numbers.personnelProduction={state:'OPERATIONAL',productionId:prod.productionId,calibrationId:cal.calibrationId,lastBatchId:input.batchId,lastAppliedAt:input.effectiveAt,marketViewed:false};
 
+synchronizePersonnelBoardStatus(numbers);
 write(ledgerPath,ledger);write(researchPath,research);write(numbersPath,numbers);
 const vLedger=read(ledgerPath),vResearch=read(researchPath),vNumbers=read(numbersPath);
 if(!vLedger.processedBatchIds.includes(input.batchId))throw new Error('PERSONNEL_LEDGER_READBACK_FAILED');

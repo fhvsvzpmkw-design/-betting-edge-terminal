@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
-import {synchronizePersonnelInputStatus} from './graham-current-personnel-estimates.mjs';
+import {synchronizePersonnelInputStatus,synchronizePersonnelBoardStatus} from './graham-current-personnel-estimates.mjs';
 import {productionQbScope, validateProductionQbScope} from './walters-qb-production-scope.mjs';
 import {confirmedStarterPrior,validatePriorEstimateBinding,PRIOR_ESTIMATE_METHOD} from './walters-qb-prior-estimate.mjs';
 
@@ -351,6 +351,10 @@ function applyStaging(production, staging, contract) {
         marketViewed: false,
       });
     } else if (['RESOLVED_CURRENT_STARTER','RESOLVED_CURRENT_STARTER_PRIOR_ESTIMATE'].includes(item.bindingStatus)) {
+      if (item.starterEvidence?.kind === 'OFFICIAL_GAMEBOOK') {
+        const game = readJson(active.absolutePaths.currentNumbers).games.find(g => g.gameKey === item.starterEvidence.gameKey);
+        if (!game || ![game.away,game.home].includes(item.team)) fail('STAGING_GAMEBOOK_ACTIVE_GAME_MISMATCH');
+      }
       const candidate = candidateLookup(registry, item);
       const priorEstimate = item.bindingStatus === 'RESOLVED_CURRENT_STARTER_PRIOR_ESTIMATE'
         ? confirmedStarterPrior({candidate,item,policy:contract.priorFallbackPolicy,effectiveAt:staging.effectiveAt}) : null;
@@ -589,6 +593,7 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     postActivationCanaryState: production.postActivationCanary.state,
   };
   for (const game of board.games) synchronizePersonnelInputStatus(game);
+  synchronizePersonnelBoardStatus(board);
   synchronizeGrahamFairBoard(board, {write: true});
   return gameResults;
 }

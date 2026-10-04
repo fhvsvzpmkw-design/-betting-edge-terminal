@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {currentPersonnelEstimate,assertDistinctPersonnelReplacements,synchronizePersonnelInputStatus} from '../tools/graham-current-personnel-estimates.mjs';
+import {currentPersonnelEstimate,assertDistinctPersonnelReplacements,synchronizePersonnelInputStatus,synchronizePersonnelBoardStatus} from '../tools/graham-current-personnel-estimates.mjs';
 
 const policy={currentWeekReplacementEstimates:{state:'OPERATIONAL',modelId:'graham-replacement-role-estimate-v1',allowedMethods:['PRIMARY_REPLACEMENT','WEIGHTED_COMMITTEE','EQUAL_SHARE_COMMITTEE']},productionRules:{resolvedStatuses:['OUT','IR']}};
 const player=(id,value,position='WR')=>({eaPlayerId:id,player:id,waltersPoints:value,position,valueStatus:'CALIBRATED'});
@@ -45,4 +45,18 @@ test('readiness retains unresolved and unrelated gates and exposes estimates',()
  synchronizePersonnelInputStatus(game);assert.equal(game.numberStatus,'READY_WITH_PERSONNEL_MODEL_ESTIMATES');
  game.qbPerformanceFailClosedTeams=['SEA'];synchronizePersonnelInputStatus(game);assert.equal(game.numberStatus,'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS');
  game.numberStatus='READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT';synchronizePersonnelInputStatus(game);assert.equal(game.numberStatus,'READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT');
+});
+test('calibrated zero loss needs no invented replacement and rejects a nonzero baseline',()=>{
+ const x=setup();x.options.production.currentWeekReplacementEstimates.zeroCalibratedLossAllowed=true;
+ x.options.production.currentWeekReplacementEstimates.allowedMethods.push('ZERO_CALIBRATED_LOSS');
+ Object.assign(x.c.replacementModel,{resolution:'ZERO_CALIBRATED_LOSS',replacements:[]});x.p.waltersPoints=0;
+ const r=currentPersonnelEstimate(x.c,x.p,x.options);assert.equal(r.injuryLoss,0);assert.equal(r.replacementValue,null);
+ x.p.waltersPoints=.2;assert.throws(()=>currentPersonnelEstimate(x.c,x.p,x.options),/ZERO_LOSS_PROOF/);
+});
+
+test('board status clears only current personnel/QB metadata and retains other gates',()=>{
+ const b={state:'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS',games:[{numberStatus:'READY_WITH_PERSONNEL_MODEL_ESTIMATES'}]};
+ synchronizePersonnelBoardStatus(b);assert.equal(b.state,'INFORMATION_REVIEW_CURRENT_FAIR');
+ b.games[0].numberStatus='READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS';synchronizePersonnelBoardStatus(b);assert.equal(b.state,'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS');
+ b.state='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED';b.games[0].numberStatus='READY';synchronizePersonnelBoardStatus(b);assert.equal(b.state,'INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED');
 });

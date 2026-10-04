@@ -1,4 +1,4 @@
-import {replacementEstimate, REPLACEMENT_MODEL_ID} from './graham-replacement-model.mjs';
+import {replacementEstimate, reconciledRoleChainEstimate, REPLACEMENT_MODEL_ID} from './graham-replacement-model.mjs';
 
 const requiredText = value => typeof value === 'string' && value.trim().length > 0;
 const family = position => {
@@ -11,7 +11,8 @@ const family = position => {
 };
 
 // Reuse the accepted Graham estimation convention inside the existing writer.
-// This adapter does not authorize QB, impairment, or displaced-role estimates.
+// This adapter excludes QB and impairment; only the explicitly gated,
+// source-bound single-vacancy role chain can reconcile displaced duties.
 export function currentPersonnelEstimate(c, player, {lookup, production}) {
   const policy = production.currentWeekReplacementEstimates;
   if (policy?.state !== 'OPERATIONAL' || policy.modelId !== REPLACEMENT_MODEL_ID) throw Error('CURRENT_ESTIMATE_NOT_OPERATIONAL');
@@ -25,19 +26,28 @@ export function currentPersonnelEstimate(c, player, {lookup, production}) {
   sourceCheck(c.availabilitySourceRefs);
   sourceCheck(c.roleSourceRefs);
   if (!requiredText(c.reopenOn)) throw Error('CURRENT_ESTIMATE_REOPEN_TRIGGER_REQUIRED');
+  if(model.resolution==='ZERO_CALIBRATED_LOSS') {
+    if(policy.zeroCalibratedLossAllowed!==true||player.valueStatus!=='CALIBRATED'||player.waltersPoints!==0||model.estimateAcknowledged!==true||!requiredText(model.assumptionRationale)||model.replacements?.length)throw Error('CURRENT_ZERO_LOSS_PROOF_REQUIRED');
+    return {modelId:REPLACEMENT_MODEL_ID,classification:'GRAHAM_MODEL_ESTIMATE',method:model.resolution,healthyValue:0,replacementValue:null,injuryLoss:0,rawTeamContributionDelta:0,injuryLossRange:{min:0,max:0},assumptionRationale:model.assumptionRationale,scope:'CURRENT_WEEK_TEMPORARY_PERSONNEL',reopenOn:c.reopenOn,limitation:'Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.'};
+  }
   const replacements = (model.replacements || []).map(item => {
     if (!item.eaPlayerId || item.availabilityStatus !== 'ACTIVE' || !requiredText(item.roleRationale)) throw Error('CURRENT_ESTIMATE_REPLACEMENT_ROLE_REQUIRED');
     sourceCheck(item.sourceRefs);
     const replacement = lookup(item.player, item.eaPlayerId);
     if (replacement.position === 'QB' || family(replacement.position) !== family(player.position)) throw Error('CURRENT_ESTIMATE_ROLE_FAMILY_MISMATCH');
-    if (replacement.valueStatus !== 'CALIBRATED' || typeof replacement.waltersPoints !== 'number') throw Error('CURRENT_ESTIMATE_LOCKED_VALUE_MISSING');
+    if (!['CALIBRATED','CURRENT_ESTIMATE'].includes(replacement.valueStatus) || typeof replacement.waltersPoints !== 'number') throw Error('CURRENT_ESTIMATE_LOCKED_VALUE_MISSING');
     return replacement;
   });
   if (new Set(replacements.map(p => String(p.eaPlayerId))).size !== replacements.length || replacements.some(p => String(p.eaPlayerId) === String(player.eaPlayerId))) throw Error('CURRENT_ESTIMATE_DUPLICATE_OR_ABSENT_REPLACEMENT');
-  if (player.valueStatus !== 'CALIBRATED' || typeof player.waltersPoints !== 'number') throw Error('CURRENT_ESTIMATE_LOCKED_VALUE_MISSING');
-  const estimate = replacementEstimate(model, player.waltersPoints, replacements, {sourceCheck});
+  if (!['CALIBRATED','CURRENT_ESTIMATE'].includes(player.valueStatus) || typeof player.waltersPoints !== 'number') throw Error('CURRENT_ESTIMATE_LOCKED_VALUE_MISSING');
+  if(model.resolution==='RECONCILED_ROLE_CHAIN'&&policy.reconciledRoleChainsAllowed!==true)throw Error('CURRENT_ROLE_CHAIN_POLICY_REQUIRED');
+  const estimate = model.resolution==='RECONCILED_ROLE_CHAIN'
+    ? reconciledRoleChainEstimate(model,player,replacements,{lookup,sourceCheck})
+    : replacementEstimate(model, player.waltersPoints, replacements, {sourceCheck});
+  const valueEstimates=[player,...replacements].filter(p=>p.valueProvenance).map(p=>({player:p.player,eaPlayerId:p.eaPlayerId,...p.valueProvenance}));
   return {...estimate, scope:'CURRENT_WEEK_TEMPORARY_PERSONNEL',
-    limitation:'Replacement allocation is a labelled Graham estimate using frozen values. It is not confirmed workload or an empirical confidence interval. QB, playing impairment, displaced roles and unsupported clusters remain separate.',
+    ...(valueEstimates.length?{valueEstimates}:{}),
+    limitation:'Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.',
     reopenOn:c.reopenOn};
 }
 
@@ -46,7 +56,7 @@ export function assertDistinctPersonnelReplacements(cases) {
   const unavailable = new Set(cases.filter(c => ['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(c.availabilityStatus)).map(c => `${c.gameKey}|${c.team}|${c.playerEaId}`));
   for (const c of cases) {
     if (c.valueStatus !== 'NUMERIC_ELIGIBLE' || c.availabilityStatus === 'ACTIVE_FULL') continue;
-    const ids = c.replacementEstimate?.weights?.map(p => p.eaPlayerId) || (c.replacementEaId ? [c.replacementEaId] : []);
+    const ids = c.replacementEstimate?.reservedPlayers?.map(p=>p.eaPlayerId) || c.replacementEstimate?.weights?.map(p => p.eaPlayerId) || (c.replacementEaId ? [c.replacementEaId] : []);
     for (const id of ids) {
       const key = `${c.gameKey}|${c.team}|${id}`;
       if (unavailable.has(key)) throw Error(`CURRENT_ESTIMATE_REPLACEMENT_UNAVAILABLE:${key}`);
@@ -64,4 +74,11 @@ export function synchronizePersonnelInputStatus(game) {
   } else {
     game.numberStatus = game.personnelEstimateCases?.length ? 'READY_WITH_PERSONNEL_MODEL_ESTIMATES' : 'READY';
   }
+}
+
+export function synchronizePersonnelBoardStatus(board) {
+  if (!['INFORMATION_REVIEW_CURRENT_FAIR','INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS'].includes(board.state)) return;
+  if (!board.games?.length || board.games.some(g => !['READY','READY_WITH_PERSONNEL_MODEL_ESTIMATES','READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS'].includes(g.numberStatus))) return;
+  board.state = board.games.some(g => g.numberStatus === 'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS')
+    ? 'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS' : 'INFORMATION_REVIEW_CURRENT_FAIR';
 }
