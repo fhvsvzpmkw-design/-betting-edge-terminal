@@ -38,7 +38,10 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
       if(c){if(c.currentRating!==team.currentRating||c.priorRating!==stored||team.history.at(-1)?.auditId!==staging.auditId)fail('INTERVENING_OR_UNBOUND_RATING:'+team.abbr);}
       else if(stored!==team.currentRating)fail('UNRELATED_STALE_RATING:'+team.abbr);
     }
-    if(Math.abs(decimalSum(g.ratingCarryForward.awayRating,-g.ratingCarryForward.homeRating)-g.neutralBaseHome)>1e-9)fail('OLD_NEUTRAL_MISMATCH');
+    const oldNeutral=decimalSum(g.ratingCarryForward.awayRating,-g.ratingCarryForward.homeRating);
+    // Existing boards quantized this cache to millipoints. Accept only that
+    // exact legacy representation, while requiring exact new rating bases.
+    if(Math.abs(oldNeutral-g.neutralBaseHome)>1e-9&&!(round(g.neutralBaseHome)===g.neutralBaseHome&&Math.abs(oldNeutral-g.neutralBaseHome)<=0.0005+1e-9))fail('OLD_NEUTRAL_MISMATCH');
     const delta=decimalSum(neutral,-g.neutralBaseHome),before={neutralBaseHome:g.neutralBaseHome,exactFairHome:g.grahamExactFairHome,displayedFairHome:g.grahamFairHome};
     g.neutralBaseHome=neutral;
     for(const field of ['personnelBaselineExactFairHome','homeFieldNonLocationExactFairHome']){

@@ -37,4 +37,10 @@ test('metadata completion is persisted even when rating bases already match',()=
  const done=refreshRatingBases(c);assert.equal(done.games.length,0);assert.equal(done.changed,true);assert.equal(done.board.baselineStatus,'TUESDAY_BASELINE_COMPLETE');
  assert.equal(refreshRatingBases({...c,board:done.board}).changed,false);
 });
+test('legacy millipoint cache accepts source-exact old ratings without accepting drift',()=>{
+ const c=structuredClone(f),g=c.board.games.find(g=>g.gameKey==='2026-W03-CAR-CLE');
+ g.neutralBaseHome=Number(g.neutralBaseHome.toFixed(3));
+ assert.ok(refreshRatingBases(c).games.length);
+ g.neutralBaseHome+=0.001;assert.throws(()=>refreshRatingBases(c),/OLD_NEUTRAL_MISMATCH|GRAHAM_FAIR_EXACT_MISMATCH/);
+});
 console.log(`RATING BASE REFRESH: ${n} PASS`);
