@@ -12,7 +12,7 @@
     "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
     "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
   },
-  "recordedAt": "2026-10-06T13:08:02.097Z",
+  "recordedAt": "2026-10-06T13:19:38.100Z",
   "estimationPolicy": "graham-historical-value-estimates-v1",
   "sources": [
     {
@@ -1096,6 +1096,16 @@
       ],
       "kind": "OFFICIAL",
       "checkedAt": "2026-10-04T20:46:03.133416+00:00"
+    },
+    {
+      "id": "w04-src-106",
+      "url": "https://static.www.nfl.com/image/upload/v1791201127/gamecenter/aa6b512d-4feb-11f1-abca-2c54536568a9.pdf",
+      "finding": "Official final Week 4 DET-CAR gamebook supplies the final score, starters, substitutions, DNPs and inactives and establishes three in-game availability events: DET Rock Ya-Sin was listed return questionable with 6:21 remaining in Q3 and OUT with 1:57 remaining in Q3; CAR Michael Freeling was injured with 4:28 remaining in Q3 and listed OUT with 14:43 remaining in Q4; CAR Jaelan Phillips was listed OUT with 3:00 remaining in Q4. These official timing bounds identify historical cases for governed review; no exposure, replacement value or injury loss is inferred from the gamebook alone.",
+      "gameKeys": [
+        "2026-W04-DET-CAR"
+      ],
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-06T13:19:38.100Z"
     }
   ],
   "games": [
@@ -3299,13 +3309,14 @@
         "w04-src-079",
         "w04-src-080",
         "w04-src-081",
-        "w04-src-082"
+        "w04-src-082",
+        "w04-src-106"
       ],
       "blockers": [
         {
-          "code": "FINAL_GAMEBOOK_AND_PAIRED_COVERAGE_PENDING",
-          "finding": "4 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. No final official gamebook capture is bound for this matchup, so complete inactive/DNP, in-game injury, QB, specialist, participation and cluster coverage is not established for both teams.",
-          "nextAction": "Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+          "code": "IN_GAME_EXPOSURE_AND_PAIRED_COVERAGE_PENDING",
+          "finding": "4 governed pregame individual role estimates remain CASE_ESTIMATE_ONLY. The bound final gamebook additionally identifies three unresolved in-game cases: DET Rock Ya-Sin, CAR Michael Freeling and CAR Jaelan Phillips. Their timing/exposure, replacement identity, role allocation and governed loss have not been computed, and complete inactive/DNP, QB, specialist, participation and cluster coverage is not yet established for both teams.",
+          "nextAction": "Create source-bound historical case reviews for Rock Ya-Sin, Michael Freeling and Jaelan Phillips using the official gamebook timing intervals; bind supported replacement identities and role allocation under graham-replacement-role-estimate-v1; then reconcile all pregame cases plus explicit QB loss/no-loss, exclusions, participation, specialist and cluster coverage, rerun tools/graham-weekly-evidence.mjs, and stage READY only if both team totals pass."
         }
       ],
       "caseReviews": [
@@ -3513,7 +3524,7 @@
     }
   ],
   "modelConvention": "graham-replacement-role-estimate-v1",
-  "scope": "Additive Week 4 historical recovery audit. Retains governed individual role estimates as CASE_ESTIMATE_ONLY while preserving all games as BLOCKED until complete paired final-game evidence produces recomputed injury totals. No score, market price, current-week fair or bet is produced.",
+  "scope": "Additive Week 4 historical recovery audit. Retains governed individual role estimates as CASE_ESTIMATE_ONLY while preserving all games as BLOCKED until complete paired final-game evidence produces recomputed injury totals. No score, market price, current-week fair or bet is produced. The 2026-10-06 DET-CAR final gamebook recovery adds official in-game timing evidence for three unresolved historical cases; their losses remain uncomputed.",
   "supersedesForResearch": "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-04-current-availability-recovery.json",
   "valueSupplements": [
     {
