@@ -12,7 +12,8 @@ const STYLE_ID='runnerPreferenceFrameworkStyle';
 const LAST_VIEW_KEY='bettingEdge.preferences.lastView';
 const LAST_HISTORY_KEY='bettingEdge.preferences.lastHistoryView';
 const DETAIL_LAST_KEY='bettingEdge.preferences.recommendationDetailLastState';
-const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','lou-vega'];
+const SYNDICATE_SLOT_COUNT=8;
+const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','lou-vega',null,null,null,null];
 
 let prefs=null,syndicates=null,hotlineShells=null,lastDoc=null,observer=null;
 
@@ -48,9 +49,12 @@ function counts(){
   for(const module of prefs?.modules||[]){if(Object.hasOwn(out,module.state))out[module.state]++}
   return out;
 }
+function normalizedSyndicateAssignments(source){
+  return Array.from({length:SYNDICATE_SLOT_COUNT},(_,i)=>source[i]==null?null:String(source[i]));
+}
 function defaultSyndicateAssignments(){
-  const source=Array.isArray(syndicates?.defaults)&&syndicates.defaults.length===4?syndicates.defaults:SYNDICATE_FALLBACK;
-  return source.map(v=>v==null?null:String(v));
+  const source=Array.isArray(syndicates?.defaults)&&[4,SYNDICATE_SLOT_COUNT].includes(syndicates.defaults.length)?syndicates.defaults:SYNDICATE_FALLBACK;
+  return normalizedSyndicateAssignments(source);
 }
 function enabledSyndicateProfiles(){
   return (Array.isArray(syndicates?.profiles)?syndicates.profiles:[])
@@ -66,14 +70,16 @@ function readSyndicateAssignments(){
   const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
   try{
     const raw=JSON.parse(localStorage.getItem(key)||'null');
-    if(Array.isArray(raw)&&raw.length===4)return raw.map(v=>v==null?null:String(v));
+    if(Array.isArray(raw)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.length))return normalizedSyndicateAssignments(raw);
   }catch{}
   return defaultSyndicateAssignments();
 }
 function writeSyndicateAssignments(assignments){
   const module=moduleById('syndicate_load');
   const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
-  try{localStorage.setItem(key,JSON.stringify(assignments));return true}catch{return false}
+  const normalized=normalizedSyndicateAssignments(assignments);
+  try{if(window.top)window.top.__vigwireSyndicateAssignments=normalized.slice()}catch{}
+  try{localStorage.setItem(key,JSON.stringify(normalized));return true}catch{return false}
 }
 function choiceControl(module){
   const value=readChoice(module);
@@ -215,7 +221,7 @@ function reloadSyndicateFrames(d){
 }
 function saveSyndicateFromControls(d){
   const selects=[...d.querySelectorAll('[data-pref-syndicate-slot]')].sort((a,b)=>Number(a.dataset.prefSyndicateSlot)-Number(b.dataset.prefSyndicateSlot));
-  if(selects.length!==4)return;
+  if(selects.length!==SYNDICATE_SLOT_COUNT)return;
   const assignments=selects.map(s=>s.value||null);
   const nonempty=assignments.filter(Boolean);
   if(new Set(nonempty).size!==nonempty.length){render(d,true);return}
@@ -383,3 +389,4 @@ Promise.all([
   window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});
 }).catch(e=>console.warn('Preferences framework unavailable',e));
 })();
+
