@@ -45,7 +45,7 @@ export function recoverBaseline({active, board, ledger, events, power, policy, e
   for (const game of result.games) {
     const away = ratings.get(game.away), home = ratings.get(game.home);
     if (![away,home].every(Number.isFinite) || game.ratingCarryForward?.awayRating !== away
-      || game.ratingCarryForward?.homeRating !== home || Math.abs(game.neutralBaseHome - Number((away-home).toFixed(3))) > 1e-9) fail('CURRENT_CARRIED_RATING_MISMATCH:' + game.gameKey);
+      || game.ratingCarryForward?.homeRating !== home || Math.abs(Number(Number(game.neutralBaseHome).toFixed(3)) - Number((away-home).toFixed(3))) > 1e-9) fail('CURRENT_CARRIED_RATING_MISMATCH:' + game.gameKey);
     const change = sweep.matchupChanges.find(item => item.gameKey === game.gameKey);
     if (change.currentExactFairHome !== game.grahamExactFairHome || change.currentDisplayedFairHome !== game.grahamFairHome) fail('REVIEWED_FAIR_CHANGED:' + game.gameKey);
     game.weeklyRatingInput = {state:receipt.state,sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,
