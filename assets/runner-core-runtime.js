@@ -19,6 +19,10 @@ let originalRun=null;
 let refreshBusy=false;
 let statusFilter='ALL';
 let sportFilter='ALL';
+let marketFilter='ALL';
+let bookFilter='ALL';
+let pickSearch='';
+let pickSort='CALL';
 const priorChangesCache=new Map();
 const issuedSessionCatalog=new Map();
 
@@ -218,8 +222,7 @@ function coverageReasonText(reason,coverage){
 }
 function noPublishedCardsText(run){
   if((run?.recs||[]).length){
-    if(statusFilter==='ALL'&&sportFilter==='ALL')return 'No published selections match ALL. Choose ALL to see the published cards.';
-    return `No ${sportFilter==='ALL'?'':sportFilter+' '}${statusFilter==='ALL'?'':statusFilter+' '}cards match these filters. Choose ALL statuses or ALL SPORTS to broaden the view.`;
+    return 'No selections match these filters. Use Clear Filters to see all published selections.';
   }
   const state=coverageSummaryState(run),c=run?.coverageSummary?.selections;
   if(state==='VALID')return `No cards published. ${c.evaluated} documented decisions; ${c.blocked} selections blocked by evidence; ${c.unavailable} without usable odds. Reviewed decisions and published cards are counted separately.`;
@@ -912,22 +915,41 @@ function sessionStrip(d,run){
   });
   return strip
 }
-function filterTools(d,run,container){
+function filterTools(d,run,container,view='board'){
+  const prefix=view==='market'?'runnerMarket':'runner';
   const tools=el(d,'div','runnerTools');
-  tools.id='runnerPickFilters';tools.setAttribute('aria-label','Filter published selections');
+  tools.id=prefix+'PickFilters';tools.setAttribute('role','group');tools.setAttribute('aria-label','Filter published selections');
+  const calls=el(d,'div','runnerFilterCalls'),counts=pickCounts(run);
   ['ALL','BET','LEAN','WAIT','PASS'].forEach(k=>{
-    const b=el(d,'button','filterBtn'+(statusFilter===k?' active':''),k);
-    b.type='button';b.id='runnerStatus'+k;b.setAttribute('aria-pressed',String(statusFilter===k));
+    const b=el(d,'button','filterBtn'+(statusFilter===k?' active':''),`${k} (${counts[k]||0})`);
+    b.type='button';b.id=prefix+'Status'+k;b.setAttribute('aria-pressed',String(statusFilter===k));
     b.onclick=()=>setPickFilter(d,run,k,sportFilter,b.id);
-    tools.appendChild(b)
+    calls.appendChild(b)
   });
-  const label=el(d,'label','runnerSportLabel','SPORT');label.htmlFor='runnerSportFilter';
-  const select=el(d,'select','runnerSportSelect');select.id='runnerSportFilter';
-  ['ALL',...runSports(run)].forEach(s=>{const option=el(d,'option','',s==='ALL'?'ALL SPORTS':s);option.value=s;option.selected=s===sportFilter;select.appendChild(option)});
-  select.onchange=()=>setPickFilter(d,run,statusFilter,select.value,select.id);
-  label.appendChild(select);tools.appendChild(label);
+  tools.appendChild(calls);
+  const fields=el(d,'div','runnerFilterFields');
+  function dropdown(name,labelText,options,value,change){
+    const label=el(d,'label','runnerFilterField');label.htmlFor=prefix+name+'Filter';
+    label.appendChild(el(d,'span','key',labelText));
+    const select=el(d,'select','runnerFilterSelect');select.id=label.htmlFor;
+    options.forEach(([key,text])=>{const option=el(d,'option','',text);option.value=key;select.appendChild(option)});select.value=value;
+    select.onchange=()=>{change(select.value);refreshPickFilters(d,run,select.id)};
+    label.appendChild(select);fields.appendChild(label)
+  }
+  dropdown('Sport','SPORT / LEAGUE',[['ALL','ALL SPORTS'],...runSports(run).map(s=>[s,s])],sportFilter,v=>sportFilter=v);
+  dropdown('Market','MARKET TYPE',[['ALL','ALL MARKETS'],...runMarkets(run).map(s=>[s,pickMarketLabel(s)])],marketFilter,v=>marketFilter=v);
+  dropdown('Book','SPORTSBOOK',[['ALL','ALL BOOKS'],...runBooks(run).map(s=>[s,s])],bookFilter,v=>bookFilter=v);
+  const searchLabel=el(d,'label','runnerFilterField runnerSearchField');searchLabel.htmlFor=prefix+'TeamSearch';
+  searchLabel.appendChild(el(d,'span','key','TEAM / MATCHUP'));
+  const search=el(d,'input','runnerFilterSearch');search.id=searchLabel.htmlFor;search.type='search';search.placeholder='Search teams or matchup…';search.value=pickSearch;
+  search.oninput=()=>{pickSearch=search.value;refreshPickFilters(d,run,search.id)};
+  searchLabel.appendChild(search);fields.appendChild(searchLabel);
+  dropdown('Sort','SORT BY',[['CALL','CALL PRIORITY'],['EDGE','HIGHEST EDGE'],['START','GAME START TIME'],['MOVE','LARGEST PRICE MOVE']],pickSort,v=>pickSort=v);
+  const clear=el(d,'button','filterBtn runnerClearFilters','CLEAR FILTERS');clear.type='button';clear.id=prefix+'ClearFilters';
+  clear.onclick=()=>{statusFilter=sportFilter=marketFilter=bookFilter='ALL';pickSearch='';pickSort='CALL';refreshPickFilters(d,run,clear.id)};
+  fields.appendChild(clear);tools.appendChild(fields);
   const showing=filteredPicks(run).length,total=(run.recs||[]).length;
-  const summary=el(d,'div','runnerFilterSummary',`Showing ${showing} of ${total} published cards${sportFilter!=='ALL'?' • '+sportFilter:''}${statusFilter!=='ALL'?' • '+statusFilter:''}`);
+  const summary=el(d,'div','runnerFilterSummary',`Showing ${showing} of ${total} published ${view==='market'?'selections':'cards'}`);
   summary.setAttribute('role','status');tools.appendChild(summary);
   container.appendChild(tools)
 }
@@ -937,13 +959,50 @@ function recSport(rec){
   return ({AMERICANFOOTBALL_NFL:'NFL',AMERICANFOOTBALL_NCAAF:'NCAAF',BASKETBALL_NBA:'NBA',BASKETBALL_WNBA:'WNBA',BASKETBALL_NCAAB:'NCAAB',BASEBALL_MLB:'MLB',ICEHOCKEY_NHL:'NHL'})[value]||value||'OTHER';
 }
 function runSports(run){return [...new Set((run?.recs||[]).map(recSport))].sort()}
+function pickStatus(rec){return String(rec?.status||'WAIT').toUpperCase()}
+function pickMarket(rec){
+  const raw=String(rec?.coreAssessment?.context?.marketDetail||rec?.feed?.market||rec?.coreAssessment?.context?.marketClass||rec?.feed?.marketKey||'').toLowerCase();
+  if(/prop|player/.test(raw))return 'OTHER';
+  if(/moneyline|money_line|^ml$|^h2h$/.test(raw))return 'ML';
+  if(/run_line|run line/.test(raw))return 'RUN';
+  if(/puck_line|puck line/.test(raw))return 'PUCK';
+  if(/spread|handicap/.test(raw))return recSport(rec)==='MLB'?'RUN':recSport(rec)==='NHL'?'PUCK':'SPREAD';
+  if(/total|over_under/.test(raw))return 'TOTAL';
+  return 'OTHER';
+}
+function pickMarketLabel(key){return ({ML:'MONEYLINE',SPREAD:'SPREAD',RUN:'RUN LINE',PUCK:'PUCK LINE',TOTAL:'TOTAL',OTHER:'OTHER'})[key]||key}
+function runMarkets(run){return [...new Set((run?.recs||[]).map(pickMarket))].sort((a,b)=>pickMarketLabel(a).localeCompare(pickMarketLabel(b)))}
+function runBooks(run){return [...new Set((run?.recs||[]).map(r=>String(r.book||'').trim()).filter(Boolean))].sort()}
+function picksMatchingFilters(run,includeStatus=true){
+  const query=normName(pickSearch);
+  return (run?.recs||[]).filter(r=>(sportFilter==='ALL'||recSport(r)===sportFilter)&&(!includeStatus||statusFilter==='ALL'||pickStatus(r)===statusFilter)&&(marketFilter==='ALL'||pickMarket(r)===marketFilter)&&(bookFilter==='ALL'||String(r.book||'').trim()===bookFilter)&&(!query||normName([r.title,r.meta,pickMeta(r)].filter(Boolean).join(' ')).includes(query)));
+}
+function pickCounts(run){return picksMatchingFilters(run,false).reduce((out,r)=>{const key=pickStatus(r);out.ALL++;out[key]=(out[key]||0)+1;return out},{ALL:0,BET:0,LEAN:0,WAIT:0,PASS:0})}
+function pickEdge(rec){
+  const match=String(rec?.edge||'').replace(/−/g,'-').match(/([+-]?\d+(?:\.\d+)?)\s*(?:probability points?|percentage points?|pp\b)/i);
+  return match?Number(match[1]):null;
+}
+function pickStart(rec){
+  const raw=rec?.feed?.eventDate||String(rec?.meta||'').split('|').map(x=>x.trim()).find(x=>/^\d{4}-\d\d-\d\dT/.test(x));
+  const value=Date.parse(raw);return Number.isFinite(value)?value:null;
+}
+function pickMovement(rec){const move=moveSignal(rec);return ['MOVE','REPRICE'].includes(move.source)?move.magnitude:null}
 function filteredPicks(run){
   const rank={BET:0,LEAN:1,WAIT:2,PASS:3};
-  return (run?.recs||[]).filter(r=>(sportFilter==='ALL'||recSport(r)===sportFilter)&&(statusFilter==='ALL'||String(r.status||'WAIT').toUpperCase()===statusFilter)).slice().sort((a,b)=>(rank[a.status]??4)-(rank[b.status]??4));
+  const metric=pickSort==='EDGE'?pickEdge:pickSort==='START'?pickStart:pickSort==='MOVE'?pickMovement:null;
+  return picksMatchingFilters(run).slice().sort((a,b)=>{
+    if(metric){const av=metric(a),bv=metric(b);if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;if(av!==null&&bv!==null&&av!==bv)return pickSort==='START'?av-bv:bv-av;return 0}
+    return (rank[pickStatus(a)]??4)-(rank[pickStatus(b)]??4);
+  });
 }
 function setPickFilter(d,run,status,sport,focusId,scroll=false){
-  statusFilter=status;sportFilter=sport;apply(run);
-  d.getElementById(focusId)?.focus({preventScroll:true});
+  statusFilter=status;sportFilter=sport;refreshPickFilters(d,run,focusId,scroll);
+}
+function refreshPickFilters(d,run,focusId,scroll=false){
+  const before=d.getElementById(focusId),selection=before?.type==='search'?[before.selectionStart,before.selectionEnd]:null;
+  apply(run);
+  const next=d.getElementById(focusId);next?.focus({preventScroll:true});
+  if(selection&&next)next.setSelectionRange(...selection);
   if(scroll)d.getElementById('runnerPickFilters')?.scrollIntoView({block:'start',behavior:'auto'});
   document.dispatchEvent(new CustomEvent('vigscope-app-ready'));
 }
@@ -1120,7 +1179,7 @@ function hideStaticMarket(market){[...market.children].forEach(x=>{if(x.id!=='ru
 function apply(run){
   const frame=$('#app'),d=frame.contentDocument;if(!d)return;
   injectStyle(d);
-  if(!d.getElementById('runnerPicksUiStyles')){const link=el(d,'link');link.id='runnerPicksUiStyles';link.rel='stylesheet';link.href='./assets/runner-picks-ui.css?v=20261001';d.head.appendChild(link)}
+  if(!d.getElementById('runnerPicksUiStyles')){const link=el(d,'link');link.id='runnerPicksUiStyles';link.rel='stylesheet';link.href='./assets/runner-picks-ui.css?v=shared-filters-20261006';d.head.appendChild(link)}
   const archive=d.getElementById('runArchive');if(archive)archive.style.display='none';
   const terminalTitle=d.querySelector('.top .title');if(terminalTitle)terminalTitle.textContent='VIGSCOPE TERMINAL UI v1.3';
   const build=d.querySelector('.top .small.muted');if(build)build.textContent='CHATGPT LIVE-RUNNER // v1.3 UI';
@@ -1145,12 +1204,14 @@ function apply(run){
   if(run.__error){const e=$('#err');e.textContent='VigScope runner payload error: '+run.__error;e.style.display='block';return}
   setStats(d,run);
   if(sportFilter!=='ALL'&&!runSports(run).includes(sportFilter))sportFilter='ALL';
+  if(marketFilter!=='ALL'&&!runMarkets(run).includes(marketFilter))marketFilter='ALL';
+  if(bookFilter!=='ALL'&&!runBooks(run).includes(bookFilter))bookFilter='ALL';
 
   const board=d.getElementById('board');
   if(board){
     ['runnerLive','runnerPrior','runnerBaseLabel'].forEach(id=>{const x=d.getElementById(id);if(x)x.remove()});
     hideStaticBoard(board);
-    const box=el(d,'div');box.id='runnerLive';
+    const box=el(d,'div');box.id='runnerLive';box.dataset.pickSort=pickSort;
 
     const head=el(d,'div','runnerHead'),left=el(d,'div'),right=el(d,'div','runnerHeadRight');
     const issuedTime=el(d,'time','runnerIssuedTime muted',`ISSUED ${vancouverClock(run.ts)} PT`);issuedTime.dateTime=run.ts;
@@ -1165,8 +1226,8 @@ function apply(run){
     const coverage=coveragePanel(d,issuedMeterRun);if(coverage)box.appendChild(coverage);
     box.appendChild(sessionStrip(d,run));
 
-    const counts=el(d,'div','runnerCounts'),cc=sportFilter==='ALL'?run.counts||{}:(run.recs||[]).filter(r=>recSport(r)===sportFilter).reduce((out,r)=>{const k=String(r.status||'').toLowerCase();out[k]=(out[k]||0)+1;return out},{});
-    [['BET',cc.bet],['LEAN',cc.lean],['WAIT',cc.wait],['PASS',cc.pass]].forEach(([k,v])=>{
+    const counts=el(d,'div','runnerCounts'),cc=pickCounts(run);
+    [['BET',cc.BET],['LEAN',cc.LEAN],['WAIT',cc.WAIT],['PASS',cc.PASS]].forEach(([k,v])=>{
       const q=el(d,'button','runnerCount filterBtn');q.type='button';q.id='runnerCount'+k;q.setAttribute('aria-pressed',String(statusFilter===k));q.setAttribute('aria-label',`${k}: ${txt(v,0)} ${sportFilter==='ALL'?'':sportFilter+' '}cards. Filter ${k}.`);
       q.onclick=()=>setPickFilter(d,run,statusFilter===k?'ALL':k,sportFilter,q.id,true);
       q.append(el(d,'div','callName '+cls(k),k),el(d,'b',cls(k),txt(v,0)));counts.appendChild(q)
@@ -1217,16 +1278,21 @@ function apply(run){
     hideStaticMarket(market);
     const m=el(d,'div','box');m.id='runnerMarket';
     m.append(el(d,'div','sectiontitle','CURRENT RUN // MARKET SNAPSHOT'),el(d,'div','small muted',[txt(run.label||run.slot,''),txt(run.ts,'')].filter(Boolean).join(' // ')));
+    filterTools(d,run,m,'market');
     const wrap=el(d,'div','scroll'),table=el(d,'table','runnerMarketTable'),thead=el(d,'thead'),trh=el(d,'tr');
     ['CALL','MARKET','BOOK / PRICE','BET AT / PLAY TO','STATE','FAIR / EDGE','MOVE'].forEach(x=>trh.appendChild(el(d,'th','',x)));thead.appendChild(trh);
     const tb=el(d,'tbody');
-    (Array.isArray(run.recs)?run.recs:[]).forEach(issued=>{
+    const recs=filteredPicks(run);
+    recs.forEach(issued=>{
       const r=OddsFormat?OddsFormat.record(issued):issued;
       const tr=el(d,'tr');
       const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
-      [txt(r.status),txt(r.title),[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      tr.appendChild(el(d,'td','',txt(r.status)));
+      const selection=el(d,'td','');selection.append(el(d,'div','',txt(r.title)),el(d,'div','runnerMarketMeta',pickMeta(r)));tr.appendChild(selection);
+      [[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
       tb.appendChild(tr)
     });
+    if(!recs.length){const row=el(d,'tr'),cell=el(d,'td','runnerNoCards',noPublishedCardsText(run));cell.colSpan=7;row.appendChild(cell);tb.appendChild(row)}
     table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m)
   }
 }

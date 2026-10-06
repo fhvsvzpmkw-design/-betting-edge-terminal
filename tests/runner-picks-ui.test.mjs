@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
-const instrumented=source.replace('\nactiveRun=payload();','\nglobalThis.picksApi={recSport,runSports,filteredPicks,pickMeta,pickReason,compareRunPicks,fetchPriorChangeRun,setFilters:(status,sport)=>{statusFilter=status;sportFilter=sport}};\nactiveRun=payload();');
+const instrumented=source.replace('\nactiveRun=payload();','\nglobalThis.picksApi={recSport,runSports,filteredPicks,pickMeta,pickReason,pickMarket,pickCounts,pickMovement,compareRunPicks,fetchPriorChangeRun,setFilters:(status,sport,market="ALL",book="ALL",search="",sort="CALL")=>{statusFilter=status;sportFilter=sport;marketFilter=market;bookFilter=book;pickSearch=search;pickSort=sort}};\nactiveRun=payload();');
 const archive=JSON.parse(fs.readFileSync('run-history.json','utf8'));
 const reads=[];
 const context={console,Intl,Date,URLSearchParams,TextDecoder,TextEncoder,Uint8Array,
@@ -25,6 +25,28 @@ assert.equal(mixed.recs[0].status,'PASS','view ordering must not reorder report 
 assert.equal(api.runSports(mixed).join(','),'NFL,NHL');
 assert.equal(api.recSport({feed:{sportKey:'icehockey_nhl'}}),'NHL');
 assert.equal(api.recSport({meta:'WNBA | Away @ Home'}),'WNBA');
+const picks={recs:[nfl,{...nhl,book:'DraftKings'},other,rec('MLB','3','spread','away',1.5,'WAIT')]},unchanged=JSON.stringify(picks);
+assert.equal(api.pickMarket(picks.recs[3]),'RUN');
+assert.equal(api.pickMarket(rec('NHL','4','spread','home',-1.5)),'PUCK');
+assert.equal(api.pickMarket(rec('NFL','5','totals','under',42.5)),'TOTAL');
+api.setFilters('LEAN','NFL','SPREAD','Bet365','Away @ Home');
+assert.equal(api.filteredPicks(picks).length,1,'all five filters intersect');
+assert.equal(api.pickCounts(picks).ALL,2,'call counts include all statuses matching the other filters');
+assert.equal(api.pickCounts(picks).PASS,1);
+assert.equal(api.pickCounts(picks).BET,0,'zero call counts remain visible');
+api.setFilters('ALL','ALL','ML','DraftKings');assert.equal(api.filteredPicks(picks)[0].status,'BET');
+api.setFilters('ALL','ALL','ALL','ALL','no such team');assert.equal(api.filteredPicks(picks).length,0);
+api.setFilters('ALL','ALL');assert.equal(api.filteredPicks(picks).length,4,'clearing all filters restores the full list');
+const ranked={recs:[{...nfl,edge:'-2.528 probability points',feed:{...nfl.feed,eventDate:'2026-10-02T04:00:00Z'},move:'NEW SELECTION — current -110'},
+ {...nhl,edge:'+1.25 pp',feed:{...nhl.feed,eventDate:'2026-10-02T02:00:00Z'},move:'Bet365 -110 → -120'},
+ {...other,edge:'UNKNOWN',feed:{...other.feed,eventDate:''},meta:'NFL | Away @ Home',move:'Price worsened'}]};
+api.setFilters('ALL','ALL','ALL','ALL','','EDGE');assert.equal(api.filteredPicks(ranked)[0].edge,'+1.25 pp');assert.equal(api.filteredPicks(ranked).at(-1).edge,'UNKNOWN');
+api.setFilters('ALL','ALL','ALL','ALL','','START');assert.equal(api.filteredPicks(ranked)[0].status,'BET');assert.equal(api.filteredPicks(ranked).at(-1).edge,'UNKNOWN');
+api.setFilters('ALL','ALL','ALL','ALL','','MOVE');assert.equal(api.filteredPicks(ranked)[0].move,'Bet365 -110 → -120');
+assert.equal(api.pickMovement(ranked.recs[0]),null,'a first snapshot is not measured movement');
+assert.equal(api.pickMovement(ranked.recs[2]),null,'qualitative movement receives no invented magnitude');
+assert.equal(JSON.stringify(picks),unchanged,'filters and sorting leave issued report records untouched');
+api.setFilters('ALL','ALL');
 assert.match(api.pickMeta(nfl),/Oct 1.*5:00.*PT/,'UTC kickoff is displayed in Pacific time');
 assert.equal(api.pickReason({analysis:'Edge is 2.16 probability points. Full personnel review follows.'}),'Edge is 2.16 probability points.','decimal points must not truncate the reason');
 const prior={recs:[nfl,nhl,other]},saved=JSON.stringify(prior);

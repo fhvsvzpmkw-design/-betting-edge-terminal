@@ -187,7 +187,7 @@ $('prev').onclick=()=>{page--;render()};$('next').onclick=()=>{page++;render()};
 </script>
 <script src="./assets/quote-observation.js"></script>
 <script src="./assets/game-intelligence.js?v=american-only-20261004"></script>
-<script src="./assets/runner-core-runtime.js?v=american-only-20261004"></script>
+<script src="./assets/runner-core-runtime.js?v=shared-filters-20261006"></script>
 <script src="./assets/event-timing-badges.js?v=report-handoff-1"></script>
 <script>
 (()=>{
@@ -265,6 +265,7 @@ function setSyndicatePageOpen(d,open){
 }
 function sortRecommendationCards(d){
   const live=d.getElementById('runnerLive');if(!live)return;
+  if(live.dataset.pickSort&&live.dataset.pickSort!=='CALL')return;
   const cards=[...live.children].filter(x=>x.classList&&x.classList.contains('runnerCard'));if(cards.length<2)return;
   const rank={BET:0,LEAN:1,WAIT:2,PASS:3};
   const ordered=cards.map((card,index)=>{const status=String(card.querySelector('.callBadge')?.textContent||'PASS').trim().toUpperCase();return{card,index,rank:rank[status]??4}}).sort((a,b)=>a.rank-b.rank||a.index-b.index).map(x=>x.card);

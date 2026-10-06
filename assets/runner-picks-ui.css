@@ -1,12 +1,18 @@
-/* Published picks: status/sport filters, concise cards and accessible controls. */
+/* Shared published-pick controls for VigScope cards and the Market table. */
 #runnerLive .runnerCount{font:inherit;cursor:pointer;touch-action:manipulation}
 #runnerVigPicks .runnerCount[aria-pressed="true"]{background:#073047!important;box-shadow:inset 0 0 0 2px var(--cyan)!important}
-#runnerLive button:focus-visible,#runnerLive select:focus-visible{outline:3px solid var(--yellow)!important;outline-offset:3px}
-#runnerLive #runnerPickFilters{gap:8px;align-items:center;scroll-margin-top:110px}
-#runnerLive #runnerPickFilters .filterBtn,#runnerLive .runnerSportSelect{min-height:44px;padding:10px 13px;font-size:12px;font-family:inherit}
-#runnerLive .runnerSportLabel{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted);margin-left:auto}
-#runnerLive .runnerSportSelect{max-width:100%;border:1px solid var(--cyan);background:#020912;color:var(--text);border-radius:0}
-#runnerLive .runnerFilterSummary{flex-basis:100%;font-size:12px;line-height:1.5;color:var(--muted)}
+#runnerLive button:focus-visible,#runnerLive select:focus-visible,.runnerTools :is(button,select,input):focus-visible{outline:3px solid var(--yellow)!important;outline-offset:3px}
+:is(#runnerLive,#runnerMarket) .runnerTools{display:grid;gap:10px;margin-top:12px;padding:12px;border:1px solid var(--line);background:#020b14;scroll-margin-top:110px}
+.runnerFilterCalls{display:flex;flex-wrap:wrap;gap:8px}
+.runnerTools .filterBtn{min-height:44px;padding:10px 13px;font-size:12px;font-family:inherit;touch-action:manipulation}
+.runnerFilterFields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end}
+.runnerFilterField{display:grid;gap:6px;min-width:0}
+.runnerFilterField .key{line-height:1.4}
+.runnerTools :is(.runnerFilterSelect,.runnerFilterSearch){width:100%;min-width:0;min-height:44px;padding:10px;font:inherit;font-size:12px;border:1px solid var(--cyan);border-radius:0;background:#020912;color:var(--text)}
+.runnerTools .runnerFilterSearch::placeholder{color:var(--muted)}
+.runnerTools .runnerClearFilters{border-color:var(--cyan);color:var(--cyan)}
+.runnerFilterSummary{font-size:12px;line-height:1.5;color:var(--muted)}
+.runnerMarketMeta{font-size:10px;line-height:1.5;color:var(--muted);margin-top:6px}
 #runnerLive .runnerIssuedTime{display:block;font-size:12px;line-height:1.5;margin-top:5px}
 #runnerLive .runnerChanges{margin:12px 0;padding:12px;border:1px solid #285368;background:#020b14;overflow-wrap:anywhere}
 #runnerLive .runnerChanges .sectiontitle{font-size:12px}
@@ -40,8 +46,9 @@
 #board #runnerLive .runnerRefreshBtn{min-height:44px!important;padding:10px 12px!important;font-size:12px!important;line-height:1.3!important}
 #board #runnerLive .runnerRefreshStatus{font-size:11px!important;line-height:1.5!important}
 @media(max-width:720px){
-  #runnerLive .runnerSportLabel{margin-left:0;flex-basis:100%;justify-content:space-between}
-  #runnerLive .runnerSportSelect{flex:1;min-width:0}
+  .runnerFilterFields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .runnerSearchField{grid-column:1/-1;grid-row:1}
+  .runnerClearFilters{grid-column:1/-1}
   #board #runnerLive>.runnerUtilityDock>.runnerRefresh{grid-template-columns:1fr!important}
   #runnerLive .runnerCard .runnerTop{grid-template-columns:minmax(0,1fr) 95px}
   #runnerLive .runnerCard .bigExec{font-size:28px}
@@ -51,7 +58,7 @@
   #runnerLive .runnerChangePreview[data-preview-index="1"],#runnerLive .runnerChangePreview[data-preview-index="2"]{display:none}
 }
 @media(max-width:400px){
-  #runnerLive #runnerPickFilters{gap:6px}
-  #runnerLive #runnerPickFilters .filterBtn{padding:10px 9px;font-size:11px}
+  .runnerFilterCalls{gap:6px}
+  .runnerTools .filterBtn{padding:10px 9px;font-size:11px}
   #runnerLive .runnerCard{padding:11px}
 }
