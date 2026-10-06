@@ -51,7 +51,9 @@ vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../assets/res
 const index={cards,coverage:{cards:5,selections:5,completeCards:4,unresolvedCards:1},issuedBetAnalytics:{netCad:12,roiPct:25,pricedBets:2},decisionValueShadowV2:{byStatus:[{status:'LEAN',shadowRoiPct:25,priced:2,grades:{WIN:1,LOSS:1}}]}};
 const before=JSON.stringify(index);const desk=context.VigScopeValueDesk;
 desk.setComparison(real);desk.render(doc,index);
-assert.match(engine.innerHTML,/25–20–3/);assert.match(engine.innerHTML,/LATEST SAVED PRE-KICKOFF QUOTES/);
+const displayedGraham=A.summary(A.strategyRows(real.rows,'graham')).grades;
+assert.ok(engine.innerHTML.includes(`${displayedGraham.WIN}–${displayedGraham.LOSS}–${displayedGraham.PUSH}`),'display reflects the current saved ATS population');
+assert.match(engine.innerHTML,/LATEST SAVED PRE-KICKOFF QUOTES/);
 assert.match(engine.innerHTML,/awaiting_observation/);assert.match(engine.innerHTML,/First-half moneyline/);
 assert.match(engine.innerHTML,/American|AMERICAN/);assert.doesNotMatch(engine.innerHTML,/resultsTitle/);
 assert.match(engine.innerHTML,/\+115/);assert.doesNotMatch(engine.innerHTML,/>2\.15</);
