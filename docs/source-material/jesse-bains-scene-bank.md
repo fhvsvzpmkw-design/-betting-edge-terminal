@@ -274,6 +274,8 @@ Poker may be running in the back, but the Betting Edge sheet has created no new 
 
 ## House Note rotation
 
+Write the selected detail from inside the Delphoria world. Never introduce it with a game title, publisher, walkthrough, source-game chronology or canon explanation. These labels are production guidance only; the published sheet must remain in character.
+
 Each issue may contain exactly one concise **DELPHORIA HOUSE NOTE** chosen from:
 
 1. cocktail-lounge route into the gambling environment;
@@ -304,3 +306,4 @@ Do not repeat the same House Note in consecutive editions.
 The PQ1 VGA Hotel Delphoria walkthrough establishes the front-desk arrival, bartender/lounge interaction, repeated telephone use, access to a gambling room, poker play, elevator/private-room movement, interaction with Bains and the undercover surveillance context. PQ2 and the existing Police Quest reference pack supply the later reputation/manhunt pressure and the rule that the Delphoria case remains part of Bains' serious history.
 
 This file keeps only concise derived scene patterns and source-grounded facts. It does not reproduce game dialogue or walkthrough instructions.
+

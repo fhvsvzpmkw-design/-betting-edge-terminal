@@ -17,6 +17,12 @@ const readJson = relative => JSON.parse(read(relative));
 const gitBlobSha = text => crypto.createHash('sha1').update(`blob ${Buffer.byteLength(text)}\0`).update(text).digest('hex');
 const when = value => new Intl.DateTimeFormat('en-US', { timeZone:'America/Vancouver', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', hour12:true }).format(new Date(value)) + ' PT';
 
+export function validatePublicationCopy(edition) {
+  const copy = [edition.story, edition.edgeStory, edition.houseNote, edition.backRoom, edition.lastWord, edition.noBetLine,
+    ...Object.values(edition.selectionNotes || {}).map(note => [note.desk, note.jesse, note.phone])].flat(Infinity).filter(Boolean).join('\n');
+  assert(!/\bPolice\s+Quest\b|\bPQ\s*(?:[1-4]|I{1,3}|IV)\b|\bSierra\b|\b(?:video|computer)\s+game\b/i.test(copy), 'Published Jesse copy must stay inside the Delphoria world; game and source references belong only in production notes');
+}
+
 // A forecast percentage is never an edge. Calls and their original ordering belong to the report.
 export function selectBoard(report) {
   assert(Array.isArray(report.recs) && Number.isFinite(Date.parse(report.ts)), 'A completed report with an issue time is required');
@@ -53,6 +59,7 @@ function edgeBoard(rows) {
 }
 
 export function renderHotline(edition, report, shell) {
+  validatePublicationCopy(edition);
   const board = selectBoard(report);
   const fills = {
     BASE: './', COUNTER_DATE: `${edition.date} // COUNTER COPY`,
@@ -89,6 +96,7 @@ function build(editionPath) {
   immutable(archivePath,html.replace('<base href="./">','<base href="../../">'));
   const indexPath = 'syndicates/death-angel/archive/index.json', index = readJson(indexPath);
   const issue = {id:edition.id,characterId:'jesse-bains',profileId:'jesse-bains',displayName:'JESSE BAINS',publication:'THE SPORTS DESK AT THE HOTEL DELPHORIA',date:edition.date,label:report.label,issuedAt:edition.publishedAt,reportTimestamp:report.ts,sourceReport:edition.sourceReport,sourceBlobSha:edition.sourceBlobSha,path:`${edition.date}/${edition.id}.html`,shellId:'delphoria-house-board',shellVersion:4};
+  if (edition.correctionOf) issue.correctsEdition = edition.correctionOf;
   const existing = index.issues.find(item => item.id === issue.id || item.path === issue.path);
   if (existing) assert(JSON.stringify(existing) === JSON.stringify(issue), 'Archive index issue is immutable');
   else index.issues.push(issue);

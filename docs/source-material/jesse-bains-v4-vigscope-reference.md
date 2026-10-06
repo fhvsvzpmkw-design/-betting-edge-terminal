@@ -8,7 +8,7 @@ THE SPORTS DESK AT THE HOTEL DELPHORIA remains the publication. Death Angel rema
 
 Jesse is the feared criminal power figure first and gambler second. He is never a bookmaker, line-maker, quant or independent analyst. Use the existing `jesse-bains-canon-language-guide.md` and `jesse-bains-scene-bank.md`: PQ1/PQ2 identity, controlled economical menace, short practical reactions, implied non-graphic danger and late-1980s language.
 
-Keep the low-rent counter, carbon slips, crooked stamps, cheap yellowed paper, cocktail lounge, back-room poker, worn elevator, private rooms and penthouse atmosphere. Rotate two to four scene modules per edition. A Delphoria House Note contains one specific Police Quest / Delphoria canon detail; it is not a betting recap or generic biography. Fiction is atmosphere, never evidence. Current teams and prices live in an edition, never in permanent identity.
+Keep the low-rent counter, carbon slips, crooked stamps, cheap yellowed paper, cocktail lounge, back-room poker, worn elevator, private rooms and penthouse atmosphere. Rotate two to four scene modules per edition. A Delphoria House Note contains one specific setting detail, written from inside the Delphoria world. It is not a betting recap, generic biography or explanation of its source. Police Quest, PQ1/PQ2, Sierra, walkthroughs and game-canon commentary are internal production references only and must never appear in published copy. Fiction is atmosphere, never evidence. Current teams and prices live in an edition, never in permanent identity.
 
 ## Factual authority and order
 
@@ -30,3 +30,7 @@ node tests/jesse-hotline.test.mjs
 Use a new edition id. Keep previous issued HTML and edition records immutable. The builder checks the report blob identity, fills static HTML, archives it with working relative artwork links, updates the archive index, the current-edition pointer and character continuity. No research, wager execution or scheduled refresh is created by loading the character.
 
 The page must have no runtime fetch, polling, observers, timers or automatic DOM regeneration. Preserve the masthead, artwork, section order, shell and world during normal edition updates. `data/jesse/current-edition.json` identifies the current issued record. The older v3 instructions apply only to historical v3 editions.
+
+## Publication checks
+
+Before publishing, the builder rejects source-game references in all authored public copy. House and Back Room sections have exactly two grid children: the approved illustration and one complete text container holding the heading and every paragraph. Use a zero-minimum flexible text column so paragraphs remain readable on tablet and stack across the full width on phones. Validate these sections in a rendered layout as well as checking source content and archive continuity.

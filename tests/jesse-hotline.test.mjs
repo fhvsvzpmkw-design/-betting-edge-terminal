@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import {selectBoard,renderHotline} from '../tools/build-jesse-hotline.mjs';
+import {selectBoard,renderHotline,validatePublicationCopy} from '../tools/build-jesse-hotline.mjs';
 const read = file => fs.readFileSync(file,'utf8'), json = file => JSON.parse(read(file));
 const pointer=json('data/jesse/current-edition.json'),edition=json(pointer.path),raw=read(edition.sourceReport),report=JSON.parse(raw);
 assert.equal(crypto.createHash('sha1').update(`blob ${Buffer.byteLength(raw)}\0`).update(raw).digest('hex'),edition.sourceBlobSha,'Edition must pin the exact stored report');
@@ -14,6 +14,16 @@ assert.ok(!/fetch\(|<script\b|MutationObserver|IntersectionObserver|setInterval\
 assert.ok(html.includes('data-update-mode="manual-static"'));
 assert.ok(html.indexOf('id="top-bets"')<html.indexOf('id="top-leans"')&&html.indexOf('id="top-leans"')<html.indexOf('id="five-edges"'),'BETs and LEANs must lead the five-edge file');
 for(const asset of ['delphoria-logo.png?v=2','delphoria-hero.png?v=2','delphoria-house-badge.png?v=2','delphoria-phone-badge.png?v=2'])assert.ok(html.includes(asset),'Keep the approved artwork');
+assert.ok(!/Police\s+Quest|\bPQ[1-4]\b|\bSierra\b/i.test(html),'Published Hotline must not name its game source');
+for(const reference of ['In Police Quest, the lounge…','PQ1 supplies the scene.','Sierra’s game sets the tone.']){
+ assert.throws(()=>validatePublicationCopy({...edition,houseNote:reference}),/inside the Delphoria world/,'Source references must be stopped before publication');
+}
+for(const grid of ['house-grid','back-grid']){
+ const block=html.match(new RegExp(`<div class="${grid}"><img[^>]+><div class="section-copy">([\\s\\S]*?)<\\/div><\\/div>`));
+ assert.ok(block,`${grid}: the image and one complete text container must own the two columns`);
+ assert.ok(block[1].startsWith('<h2>')&&block[1].includes('<p>'),`${grid}: heading and paragraphs must stay together`);
+ assert.equal((block[1].match(/<p>/g)||[]).length,grid==='house-grid'?1:edition.backRoom.length,'All paragraphs must remain inside the wide text column');
+}
 
 // Opposing calls, a large forecast percentage, negative edges and closed events catch the old ranking errors.
 const synthetic = (key,status,edge,eventDate='2026-10-07T01:00:00Z') => ({selectionKey:key,status,edge:'ESPN published 99.90% for this exact selection.',feed:{eventDate},benchmarkComparison:{edgeProbabilityPoints:edge}});
@@ -28,7 +38,7 @@ assert.equal(board.expiredCount,2);
 assert.equal(board.unmeasuredCount,2);
 
 // This approved current edition has no BETs, three LEANs and two positive comparisons in its top five.
-if(edition.id==='2026-10-06-delphoria-v4'){
+if(edition.sourceReport==='data/history/runs/2026-10-06/final_morning-095000.json'){
  const current=selectBoard(report);
  assert.equal(current.bets.length,0);assert.ok(html.includes('The drawer stays shut.'));
  assert.deepEqual(current.leans.map(x=>x.selectionKey),['75065656|ml|home||','75065682|ml|home||','75065682|totals|over||6']);

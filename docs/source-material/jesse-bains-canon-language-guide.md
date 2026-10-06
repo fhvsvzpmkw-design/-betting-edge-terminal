@@ -221,3 +221,8 @@ See `police-quest-series-reference-index.md` for the durable source map.
 ## Production boundary
 
 This guide controls fictional character presentation only. The authoritative Betting Edge report controls all bets, leans, waits, passes, prices, fair values, stakes and risk.
+
+
+## Published-copy boundary
+
+Source games, publisher names, walkthroughs and canon analysis belong only in these internal production notes. Published Hotline stories and the Delphoria House Note speak from inside Jesse’s world. Do not print Police Quest, PQ1/PQ2, Sierra, or phrases explaining what a game establishes. Use the grounded hotel detail naturally, without naming its source.
