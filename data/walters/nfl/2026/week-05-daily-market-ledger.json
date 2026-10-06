@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "ledgerId": "graham-mercer-nfl-2026-week-05-daily-market-v1",
+  "title": "GRAHAM MERCER // WEEK 5 DAILY MARKET COMPARISON",
+  "publication": "THE PRIVATE LINE",
+  "season": 2026,
+  "week": 5,
+  "state": "BOARD_INITIALIZED",
+  "timezone": "America/Vancouver",
+  "createdAt": "2026-10-06T04:26:26-07:00",
+  "updatedAt": "2026-10-06T04:26:26-07:00",
+  "ratingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
+  "waltersInterfacePath": "core/walters-intelligence-interface-v1.4.json",
+  "purpose": "Preserve one auditable Graham-vs-Pinnacle spread comparison for each active Week 5 matchup on each review day without allowing the market to overwrite Graham's independently built fair number.",
+  "marketBenchmark": {
+    "bookmaker": "Pinnacle",
+    "role": "SHARP_MARKET_BENCHMARK_ONLY",
+    "preferredAcquisition": "OddsPapi v4 filtered with bookmakers=pinnacle",
+    "liveEndpoint": "GET /v4/odds",
+    "historicalRecoveryEndpoint": "GET /v4/historical-odds",
+    "executionAuthority": false,
+    "substitutionRule": "If Pinnacle is unavailable, record PINNACLE_UNAVAILABLE for that capture. Do not silently substitute Bet365, DraftKings, consensus, or another book.",
+    "sourceRefs": [
+      "https://oddspapi.io/en/docs/get-odds",
+      "https://oddspapi.io/en/docs/get-historical-odds"
+    ]
+  },
+  "capturePolicy": {
+    "weeklyBaselineDay": "TUESDAY_AFTER_MNF",
+    "dailyReviewRule": "From the Tuesday weekly baseline until each game's kickoff, preserve a daily comparison after Graham's independent number for that day is finalized.",
+    "gameDayRule": "A game-day capture is allowed and should be separately timestamped. A later capture never overwrites an earlier daily snapshot.",
+    "closeRule": "When available, preserve the final pre-kickoff Pinnacle spread as a distinct CLOSE snapshot for later calibration.",
+    "marketIsolationRule": "Graham's fair number must be completed before the Pinnacle field is exposed to the comparison step.",
+    "noMoveRule": "If Graham's number does not change, still preserve the day's comparison so market movement can be measured against a stable Graham number.",
+    "missedCaptureRule": "If an expected daily snapshot was missed, OddsPapi historical odds may be used to backfill only when the recovered Pinnacle observation can be timestamped and clearly marked BACKFILL.",
+    "immutabilityRule": "Snapshots are append-only. Correct errors by appending a CORRECTION event referencing the bad sequence; do not rewrite prior daily observations."
+  },
+  "signConvention": {
+    "grahamFairHome": "Negative means home favorite; positive means home underdog.",
+    "pinnacleSpreadHome": "Negative means home favorite; positive means home underdog.",
+    "grahamHomeStrengthGap": "pinnacleSpreadHome - grahamFairHome. Positive means Graham rates the home team stronger than Pinnacle by that many points; negative means Graham rates the away team stronger."
+  },
+  "requiredSnapshotFields": [
+    "sequence",
+    "type",
+    "reviewDate",
+    "capturedAt",
+    "grahamFairHome",
+    "grahamAsOf",
+    "pinnacleSpreadHome",
+    "pinnacleObservedAt",
+    "pinnacleStatus",
+    "sourceRefs",
+    "grahamHomeStrengthGap"
+  ],
+  "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
+  "marketViewed": false,
+  "rolloverProvenance": {
+    "authority": "GRAHAM_WEEK_ROLLOVER",
+    "fromSeason": 2026,
+    "fromWeek": 4,
+    "activatedAt": "2026-10-06T04:26:26-07:00",
+    "marketPricesUsedForConstruction": false
+  },
+  "games": [
+    {
+      "gameKey": "2026-W05-TB-DAL",
+      "away": "TB",
+      "home": "DAL",
+      "startTimePacific": "2026-10-08T17:15:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-PHI-JAX",
+      "away": "PHI",
+      "home": "JAX",
+      "startTimePacific": "2026-10-11T06:30:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-CIN-MIA",
+      "away": "CIN",
+      "home": "MIA",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-LV-NE",
+      "away": "LV",
+      "home": "NE",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-MIN-NO",
+      "away": "MIN",
+      "home": "NO",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-CLE-NYJ",
+      "away": "CLE",
+      "home": "NYJ",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-IND-PIT",
+      "away": "IND",
+      "home": "PIT",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-HOU-TEN",
+      "away": "HOU",
+      "home": "TEN",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-NYG-WAS",
+      "away": "NYG",
+      "home": "WAS",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-CHI-GB",
+      "away": "CHI",
+      "home": "GB",
+      "startTimePacific": "2026-10-11T10:00:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-DEN-LAC",
+      "away": "DEN",
+      "home": "LAC",
+      "startTimePacific": "2026-10-11T13:05:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-DET-ARI",
+      "away": "DET",
+      "home": "ARI",
+      "startTimePacific": "2026-10-11T13:25:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-SF-SEA",
+      "away": "SF",
+      "home": "SEA",
+      "startTimePacific": "2026-10-11T13:25:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-BAL-ATL",
+      "away": "BAL",
+      "home": "ATL",
+      "startTimePacific": "2026-10-11T17:20:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    },
+    {
+      "gameKey": "2026-W05-BUF-LAR",
+      "away": "BUF",
+      "home": "LAR",
+      "startTimePacific": "2026-10-12T17:15:00-07:00",
+      "status": "SCHEDULED",
+      "dailySnapshots": []
+    }
+  ]
+}
