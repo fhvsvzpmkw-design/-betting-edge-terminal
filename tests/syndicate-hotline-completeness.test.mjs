@@ -53,6 +53,19 @@ for(const profile of roster){
   assert(liveText.includes("cache:'no-store'"),`${id}: live desk must bypass stale ledger cache`);
   continue;
  }
+ if(id==='jesse-bains' && character.authority?.mode==='vigscope-report-authoritative'){
+  assert(character.authority.source==='run-history.json' && character.authority.bettingAuthority===false,'Jesse: governed report authority required');
+  assert(character.hotlineStyle?.shell?.id==='delphoria-house-board' && character.hotlineStyle.shell.version===4,'Jesse: v4 house board required');
+  assert(character.continuity.automaticReportUpdates===false,'Jesse: editions must be issued manually');
+  const pointer=readJson(character.authority.currentEdition),edition=readJson(pointer.path),report=readJson(edition.sourceReport);
+  assert(character.continuity.lastEditionSeen.id===edition.id && report.ts===character.continuity.lastReportSeen.timestamp,'Jesse: edition/report continuity mismatch');
+  for(const zone of ['top-bets','top-leans','counter-board'])assert(liveText.includes(`data-zone="${zone}"`),`Jesse: missing ${zone}`);
+  assert(liveText.includes('data-update-mode="manual-static"') && !/fetch\(|<script\b|setInterval\(|MutationObserver/.test(liveText),'Jesse: static issued HTML required');
+  assert(liveText.includes('SOURCE AUTHORITY: BETTING EDGE / VIGSCOPE ISSUED REPORT.') && liveText.includes(edition.sourceReport),'Jesse: report provenance missing');
+  const archived=read(character.continuity.lastEditionSeen.archivePath);
+  assert(liveText.replace('<base href="./">','<base href="../../">')===archived,'Jesse: live/archive mismatch');
+  continue;
+ }
  if(character?.authority?.mode==='graham-terminal-authoritative'){
   assert(character.authority.source==='data/walters/nfl/current-week-terminal.json',`${id}: Graham terminal authority source mismatch`);
   assert(character.authority.scope==='NFL_ONLY',`${id}: Graham derivative must remain NFL-only`);
