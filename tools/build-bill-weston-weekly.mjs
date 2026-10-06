@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import '../assets/value-analytics.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CURRENT = 'data/characters/bill-weston/current-edition.json';
@@ -17,6 +18,69 @@ const kickoff = v => new Intl.DateTimeFormat('en-US', { timeZone:'America/Vancou
 const numeric = v => typeof v === 'number' && Number.isFinite(v);
 export const spread = (g, n) => !numeric(n) ? 'UNAVAILABLE' : n === 0 ? 'PICK' : `${n < 0 ? g.home : g.away} −${Math.abs(n)}`;
 const paragraphs = values => values.map(v => `<p>${encode(v)}</p>`).join('\n');
+const analytics = globalThis.VigScopeValueAnalytics;
+const record = s => `${s.grades.WIN}–${s.grades.LOSS}–${s.grades.PUSH}`;
+const percent = n => numeric(n) ? `${n.toFixed(1)}%` : 'UNAVAILABLE';
+const signed = n => `${n > 0 ? '+' : n < 0 ? '−' : ''}${Math.abs(n).toFixed(2)}`;
+const table = (heads, rows) => `<div class="performance-scroll"><table class="performance-table"><thead><tr>${heads.map(h => `<th scope="col">${encode(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+export function performanceSummaries(p, week = null) {
+  const rows = p.rows.filter(r => week === null || r.week === week);
+  return Object.fromEntries(['graham','favorites','dogs'].map(key => [key, analytics.summary(analytics.strategyRows(rows,key))]));
+}
+
+export function validatePerformance(e) {
+  const p = e.performance;
+  if (!p) return; // Preserve the schema of previously issued editions.
+  assert(p.path === 'data/history/graham-pinnacle-value.json', 'Verified Graham Value source required');
+  assert(/^[a-f0-9]{40}$/.test(p.commit) && /^[a-f0-9]{64}$/.test(p.sha256), 'Pinned performance provenance required');
+  assert(p.season === e.season && p.throughWeek === e.week - 1, 'Performance must cover the previous completed week');
+  assert(Date.parse(p.generatedAt) <= Date.parse(e.issuedAt), 'Performance chronology mismatch');
+  assert(Array.isArray(p.rows) && p.rows.length && new Set(p.rows.map(r => r.gameKey)).size === p.rows.length, 'Unique performance games required');
+  for (const r of p.rows) {
+    assert(r.season === p.season && r.week >= 1 && r.week <= p.throughWeek, 'Performance season/week mismatch');
+    assert(r.gameKey === `${r.season}-W${String(r.week).padStart(2,'0')}-${r.away}-${r.home}`, 'Performance game identity mismatch');
+    assert(r.resultState === 'FINAL' && numeric(r.homeScore) && numeric(r.awayScore), 'Verified final performance scores required');
+    assert(numeric(r.grahamHomeFair) && numeric(r.pinnacleHomeLine) && ['home','away'].includes(r.valueSide) && ['home','away'].includes(r.favoriteSide), 'Performance comparison inputs required');
+    const expectedSide = r.grahamHomeFair < r.pinnacleHomeLine ? 'home' : r.grahamHomeFair > r.pinnacleHomeLine ? 'away' : r.favoriteSide;
+    assert(r.valueSide === expectedSide && r.favoriteSide === (r.pinnacleHomeLine <= 0 ? 'home' : 'away'), 'Performance selection mismatch');
+    assert(Date.parse(r.grahamAsOf) <= Date.parse(r.startTime) && Date.parse(r.pinnacleObservedAt) <= Date.parse(r.startTime), 'Performance requires saved pre-kickoff numbers');
+    assert(/^https:\/\//.test(r.resultSource), 'Performance result source required');
+  }
+  assert.deepEqual(p.strategies, performanceSummaries(p), 'Performance totals mismatch');
+  assert(p.coverage.settled === p.rows.length && p.coverage.pending === 0, 'Completed performance coverage mismatch');
+  for (const [key, field] of [['graham','grahamHomeFair'],['pinnacle','pinnacleHomeLine']]) assert.deepEqual(p.accuracy[key], analytics.predictionAccuracy(p.rows,field), 'Performance accuracy mismatch');
+  assert(e.performanceMemo?.length, 'Weston performance read required');
+}
+
+function performanceCurve(p) {
+  const series = ['graham','favorites','dogs'].map(key => ({key, ...analytics.curve(analytics.strategyRows(p.rows,key))}));
+  const values = series.flatMap(s => s.points.map(x => x.value));
+  const low = Math.floor(Math.min(0,...values)) - 1, high = Math.ceil(Math.max(0,...values)) + 1;
+  const x = i => 48 + i / p.rows.length * 628, y = value => 176 - (value - low) / (high - low) * 146;
+  const colors = ['#244b72','#8a463c','#80703e'];
+  const lines = series.map((s,i) => `<polyline fill="none" stroke="${colors[i]}" stroke-width="2.5" points="${s.points.map((v,j) => `${x(j).toFixed(2)},${y(v.value).toFixed(2)}`).join(' ')}"/>`).join('');
+  const ticks = [low,0,high].map(n => `<line x1="48" x2="676" y1="${y(n)}" y2="${y(n)}" stroke="#b8ae9b" stroke-dasharray="3 4"/><text x="39" y="${y(n)+4}" text-anchor="end">${n}u</text>`).join('');
+  return `<figure class="performance-curve"><figcaption>ILLUSTRATIVE RETURN CURVE // 1u RISK AT −110</figcaption><svg viewBox="0 0 704 214" role="img" aria-labelledby="atsCurveTitle"><title id="atsCurveTitle">Cumulative illustrative units across ${p.rows.length} settled games: Graham ${signed(p.strategies.graham.netUnits)}, favourites ${signed(p.strategies.favorites.netUnits)}, underdogs ${signed(p.strategies.dogs.netUnits)}.</title>${ticks}${lines}<text x="48" y="202">START</text><text x="676" y="202" text-anchor="end">${p.rows.length} GAMES</text></svg><div class="performance-legend"><span>BLUE // GRAHAM</span><span>RED // FAVOURITES</span><span>GOLD // UNDERDOGS</span></div></figure>`;
+}
+
+export function renderPerformance(e) {
+  const p = e.performance;
+  if (!p) return '<p>Performance was not captured in this edition.</p>';
+  const latest = performanceSummaries(p,p.throughWeek);
+  const names = {graham:'GRAHAM COMPARISON',favorites:'PINNACLE FAVOURITES',dogs:'PINNACLE UNDERDOGS'};
+  const metric = (label,value,note) => `<div class="performance-stat"><small>${encode(label)}</small><b>${encode(value)}</b><span>${encode(note)}</span></div>`;
+  const comparison = table(['COMPARISON',`WEEK ${p.throughWeek} W–L–P`,'ATS WIN %','SEASON W–L–P','ATS WIN %'],Object.keys(names).map(k => [encode(names[k]),record(latest[k]),percent(latest[k].winPct),record(p.strategies[k]),percent(p.strategies[k].winPct)]));
+  const weeks = [...new Set(p.rows.map(r => r.week))].sort((a,b) => a-b);
+  const weekly = table(['WEEK','GRAHAM W–L–P','FAVOURITES W–L–P','UNDERDOGS W–L–P','GRAHAM ATS %'],weeks.map(w => {const s=performanceSummaries(p,w);return [w,record(s.graham),record(s.favorites),record(s.dogs),percent(s.graham.winPct)];}));
+  const ledger = rows => table(['GAME / FINAL','SAVED GRAHAM NUMBER','GRAHAM COMPARISON / RESULT','FAVOURITE','UNDERDOG'],analytics.strategyRows(rows).map(r => {
+    const favorite = analytics.strategyRows([r],'favorites')[0], dog = analytics.strategyRows([r],'dogs')[0];
+    const line = r.selectedLine === 0 ? 'PICK' : `${r.selectedLine > 0 ? '+' : '−'}${Math.abs(r.selectedLine)}`;
+    return [`<a href="${encode(r.resultSource)}" target="_blank" rel="noopener">${encode(`W${r.week} // ${r.away} ${r.awayScore} AT ${r.home} ${r.homeScore}`)}</a>`,encode(spread(r,r.grahamHomeFair)),`<b>${encode(`${r.selectedTeam} ${line} // ${r.grade}`)}</b><small class="performance-quote">${encode(stamp(r.pinnacleObservedAt))} // saved pre-kickoff</small>`,encode(`${favorite.selectedTeam} // ${favorite.grade}`),encode(`${dog.selectedTeam} // ${dog.grade}`)];
+  }));
+  const returns = table(['ILLUSTRATIVE ONLY // −110','SEASON NET','SEASON ROI','MAX CURVE DECLINE'],Object.keys(names).map(k => [encode(names[k]),`${signed(p.strategies[k].netUnits)}u`,percent(p.strategies[k].roiPct),`${analytics.curve(analytics.strategyRows(p.rows,k)).drawdown.toFixed(2)}u`]));
+  return `<section class="performance" data-performance-through-week="${p.throughWeek}"><div class="performance-stats">${metric('GRAHAM // SEASON',record(p.strategies.graham),`${percent(p.strategies.graham.winPct)} ATS // pushes excluded`)}${metric(`LAST WEEK // WEEK ${p.throughWeek}`,record(latest.graham),`${percent(latest.graham.winPct)} ATS // ${latest.graham.complete} games`)}${metric('COMPLETED SAMPLE',String(p.rows.length),`NFL games // Weeks ${weeks[0]}–${p.throughWeek}`)}</div><div class="performance-read"><b>WESTON’S PERFORMANCE READ</b>${paragraphs(e.performanceMemo)}</div><h3>THE SAME GAMES. THREE COMPARISONS.</h3>${comparison}<h3>WEEK-BY-WEEK RECORD</h3>${weekly}${performanceCurve(p)}${returns}<p class="performance-caption">Return figures use a standardized 1u risk at −110 on every comparison, including pushes in the risk denominator. They are illustrative, not issued wagers or actual account returns.</p><details class="performance-log"><summary>LAST WEEK’S RESULTS // WEEK ${p.throughWeek} // ${latest.graham.complete} GAMES</summary>${ledger(p.rows.filter(r => r.week === p.throughWeek))}</details><details class="performance-log"><summary>EARLIER RESULTS // WEEKS ${weeks[0]}–${p.throughWeek-1} // ${p.rows.length-latest.graham.complete} GAMES</summary>${ledger(p.rows.filter(r => r.week < p.throughWeek))}</details><p class="performance-caption">All three records use the same settled games and latest saved pre-kickoff Pinnacle spreads. The Graham comparison takes the side favoured by its fair against that saved spread; an identical line follows the favourite, or home at pick’em. No recorded closing quotes are present in this snapshot. ATS wins exclude pushes. Margin accuracy: Graham MAE ${p.accuracy.graham.mae.toFixed(2)} / RMSE ${p.accuracy.graham.rmse.toFixed(2)} pts; Pinnacle MAE ${p.accuracy.pinnacle.mae.toFixed(2)} / RMSE ${p.accuracy.pinnacle.rmse.toFixed(2)} pts.</p><p class="performance-caption">VALUE RECORD UPDATED ${encode(stamp(p.generatedAt))} // ${p.rows.length} settled, ${p.coverage.pending} pending in this completed sample. Week ${e.week} remains ahead. <a href="../../runner.html" target="_blank" rel="noopener">OPEN VIGSCOPE // VALUE TAB</a></p></section>`;
+}
 
 export function validateEdition(e) {
   assert(e.schema === 1 && /^\d{4}-w\d{2}-[a-z0-9-]+$/.test(e.id), 'Invalid edition identity');
@@ -37,6 +101,7 @@ export function validateEdition(e) {
     assert(r && r.read?.trim() && r.note?.trim(), `Missing Weston read: ${g.gameKey}`);
   }
   for (const section of ['openingMemo','changeMemo','closingWatchlist']) assert(e[section]?.length, `${section} required`);
+  validatePerformance(e);
 }
 
 export function renderEdition(e, template, baseHref = './') {
@@ -57,6 +122,7 @@ export function renderEdition(e, template, baseHref = './') {
     FEED_ISSUED:encode(stamp(e.issuedAt)), ISSUE_COUNTS:encode(`${games.length} GAMES // NO ORDER`),
     WESTON_METHOD:`<b>GRAHAM'S NUMBERS. WESTON'S READ.</b>${paragraphs(e.openingMemo)}`,
     RECONCILIATION:`<p>${encode(e.scheduleMemo)}</p>${table}`,
+    PERFORMANCE:renderPerformance(e),
     CHANGE_MEMO:paragraphs(e.changeMemo), WINDOW_ENTRIES:entries,
     FINAL_DISPOSITION:`<b>FINAL DESK DISPOSITION // NO ORDER</b>${paragraphs(e.closingWatchlist)}<div class="note">${encode(e.signature)}</div>`,
     AUTHORITY_FOOTER:`Dated guest edition: ${encode(stamp(e.issuedAt))}. Graham board captured ${encode(stamp(e.source.generatedAt))}; information review ${encode(stamp(e.source.lastResearchAt))}. Numbers belong to Graham Mercer’s Private Line. Pinnacle is a benchmark at the printed observation time; gaps and margin notes are review priorities, not executable orders. MKT Δ is the saved change in Pinnacle's home spread from the day's retained baseline; 0 means unchanged, unavailable means no usable comparison. The issued execution report retains betting authority.<br><a href="../../syndicates/generated/graham-mercer/hotline.html">Graham’s current Private Line</a> // <a href="../../${encode(e.editionPath)}">This edition’s source record</a><br>HOTLINE SHELL: PRIVATE SHEET v3. Full-week guest fax; refresh the edition, preserve the page.`

@@ -11,7 +11,7 @@ const roster=(manifest.profiles||[]).filter(p=>p?.characterId&&p?.characterFile&
 assert(roster.length>=5,'expected at least five Syndicate profiles');
 const required={
 'eddie-numbers':['MUDDY NUMBERS','LEDGER DESK','ACTUAL CAD DOLLARS','MUDDY LEDGER // LAST 10 TICKETS','<canvas','MUDDY METERS','THE WALK TO THE CAGE','EDDIE:'],
-'bill-weston':['The Week’s Schedule','Edition Change Memo','Full-Week Game Files','FINAL DESK DISPOSITION'],
+'bill-weston':['VigScope Value // Graham ATS','data-zone="performance"','Edition Change Memo','Full-Week Game Files','FINAL DESK DISPOSITION'],
 'larry-lombardo':["Larry's Opening Come-On","Today's Rejections",'NARRATOR CORRECTION','LOUNGE LIZARD NOTE','CAB-FARE CHECK','VISITOR COUNTER','UNDER CONSTRUCTION','LAST CALL'],
 'jesse-bains':['Sports Desk','Hotel Delphoria','The Evening at the Delphoria','House Board','JESSE SAYS','PHONE SLIP','Delphoria House Note','Back Room','Last Word'],
 'lou-vega':['VEGAS BY THE SLICE','data-zone="menu-board"','COUPON BOOK','OPEN TENPLAY','data-zone="lou-counter"','data-zone="quick-start"']};
