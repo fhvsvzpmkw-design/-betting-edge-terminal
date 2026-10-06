@@ -1,6 +1,12 @@
 # Bill Weston’s weekly Private Sheet
 
-Bill reviews Graham Mercer’s Private Line across the active NFL week. Preserve the complete premium guest fax, five lounge assets, cream paper, typed hierarchy and blue handwritten notes. Stable character/profile/path and the v3 visual shell remain unchanged.
+Bill reviews Graham Mercer’s Private Line across the active NFL week. Preserve the complete premium guest fax, five lounge assets, cream paper, typed hierarchy and blue handwritten notes. Keep the stable character/profile/path and v3 fax style. The Private Sheet image spans the full title area; issue metadata sits below it.
+
+## Performance on the guest sheet
+
+The front of each new weekly edition includes the full Graham performance comparison from VigScope Value, replacing the kickoff-window overview. Keep every kickoff beside its game file. Freeze the current verified `data/history/graham-pinnacle-value.json` with its commit, exact file hash and generated timestamp alongside the Graham board snapshot. Include previous-week and season W–L–P and ATS win percentages, the same-game Pinnacle favourite/underdog comparisons, week-by-week records, the standardized return curve and drawdown, margin accuracy, and all settled game results with original number/quote times and final-score links. The public snapshot contains only the fields needed for those comparisons.
+
+Bill comments on the result and what still needs attention going forward. Never describe a comparison selection as an issued bet or a standardized return as actual account profit. Return figures remain explicitly illustrative at 1u risk and −110 throughout; pushes stay in the risk denominator and outside ATS win percentage. Retain latest-saved-pregame wording unless real closing quotes exist. Keep future games outside the completed performance sample. The frozen guest edition does not change when the live Value page updates.
 
 ## Bill’s voice
 
@@ -20,13 +26,13 @@ A requested voice-only rewrite is a new immutable editorial edition of the same 
 
 One full opening edition after Graham’s Tuesday baseline. A second, late-week edition is useful only when material personnel information, a changed fair number, a meaningful market change or a schedule correction warrants a revised read. A quiet week needs one edition. Daily Betting Edge reports do not trigger Bill updates.
 
-The first edition covers all 16 Week 1 games. Future editions cover every game in the active-week Graham snapshot, in kickoff order. A late-week refresh retains already-started games as closed historical files; it must never offer their old quotes as current opportunities. Keep the opening memo, schedule workload, change memo, a substantive read and handwritten note per game, and a closing watchlist.
+The first edition covers all 16 Week 1 games. Future editions cover every game in the active-week Graham snapshot, in kickoff order. A late-week refresh retains already-started games as closed historical files; it must never offer their old quotes as current opportunities. Keep the opening memo, performance record and Weston performance read, change memo, a substantive read and handwritten note per game, and a closing watchlist.
 
 ## Source and issue workflow
 
 1. Read this document, Bill’s profile and previous edition. Read the current main-branch `data/walters/nfl/current-week-terminal.json`; verify its season/week against `data/walters/nfl/active-week.json`. Do not switch to Betting Edge cards or independently rebuild Graham’s numbers.
 2. Save a new immutable `data/characters/bill-weston/editions/<season>-w<week>-<edition>.json`. Copy the previous edition schema. Record the source commit, SHA-256 of the exact terminal file, generated/research timestamps and the public game fields used by the fax. Preserve each game’s fair number, original fair timestamp, provisional status, Pinnacle observation/status, home-coordinate gap and saved market delta. Do not expose internal research paths or restricted methodology.
-3. Write fresh original `reviews` for every game key and the four editorial sections. Attribute the fair to **GRAHAM NUMBER**. Pinnacle is a timestamped benchmark. Bill adds interpretation, questions and priorities; he does not issue BET/LEAN/WAIT labels, invent buying thresholds or create stakes. No new injury assertion without current source evidence. Highlight what changed since the previous edition; close started games explicitly.
+3. Capture the verified completed performance sample in `performance` and write `performanceMemo`. The builder recomputes its records, returns and accuracy using the same Value analytics. Write fresh original `reviews` for every game key and the editorial sections. Attribute the fair to **GRAHAM NUMBER**. Pinnacle is a timestamped benchmark. Bill adds interpretation, questions and priorities; he does not issue BET/LEAN/WAIT labels, invent buying thresholds or create stakes. No new injury assertion without current source evidence. Highlight what changed since the previous edition; close started games explicitly.
 4. Use a new actual Pacific `issuedAt` with explicit offset and unique edition ID. Set `editionPath` to that file. Point `data/characters/bill-weston/current-edition.json` at it, then run `node tools/build-bill-weston-weekly.mjs`. The builder preserves the visual shell, renders the full live fax, saves its immutable archive and advances character continuity.
 5. Run `node tools/build-bill-weston-weekly.mjs --check` and `node tests/bill-weston-weekly.test.mjs`, then the existing Syndicate completeness check. Commit the edition, pointer, live fax, archive/index and profile together. Use a PR, wait for checks, merge and verify Pages deployment. A failed or unavailable source leaves the last issued edition in place.
 
