@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-06T11:16:00-07:00",
+  "updatedAt": "2026-10-06T16:45:42-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -21,7 +21,8 @@
     "marketViewed": false
   },
   "processedBatchIds": [
-    "graham-tuesday-baseline-2026-w05-20261006T111600-0700-personnel"
+    "graham-tuesday-baseline-2026-w05-20261006T111600-0700-personnel",
+    "graham-delta-1645-2026-w05-20261006T164542-0700-personnel"
   ],
   "events": [
     {
@@ -704,6 +705,133 @@
       "healthyWaltersPoints": 0.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "RECEIVER"
+    },
+    {
+      "caseKey": "2026-W05-ARI-Paris-Johnson-Jr",
+      "gameKey": "2026-W05-DET-ARI",
+      "team": "ARI",
+      "side": "HOME",
+      "player": "Paris Johnson Jr",
+      "playerEaId": "22699",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+      "replacementPlayer": "Jayden Williams",
+      "replacementEaId": "16379",
+      "personnelEventId": "2026-W05-ARI-Paris-Johnson-Jr-delta-20261006T164542-0700",
+      "reason": "Arizona officially placed Paris Johnson Jr. on injured reserve and reported that coach Mike LaFleur named rookie Jayden Williams as Johnson's replacement in the starting lineup. The governed one-for-one calculator owns the locked-value subtraction.",
+      "sourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve",
+        "data/walters/nfl/player-values/by-team-v1/ari.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jayden Williams",
+          "Jedrick Wills Jr"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_NUMERIC"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261006T164542-0700-personnel",
+      "effectiveAt": "2026-10-06T16:45:42-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "LT",
+      "maddenOvr": 86,
+      "healthyWaltersPoints": 1.2,
+      "replacementRegistryPosition": "LT",
+      "replacementMaddenOvr": 65,
+      "replacementWaltersPoints": 0,
+      "rawTeamContributionDelta": -1.2,
+      "clusterGroup": "OFFENSIVE_LINE",
+      "failClosedCode": null
+    },
+    {
+      "caseKey": "2026-W05-ARI-Hunter-Long",
+      "gameKey": "2026-W05-DET-ARI",
+      "team": "ARI",
+      "side": "HOME",
+      "player": "Hunter Long",
+      "playerEaId": "21563",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "2026-W05-ARI-Hunter-Long-delta-20261006T164542-0700",
+      "reason": "Arizona officially placed Hunter Long on injured reserve and promoted Teagan Quitoriano into the roster vacancy. Long's immutable frozen Walters value is exactly 0.0, so the approved ZERO_CALIBRATED_LOSS path records the absence without fabricating a role share or replacement value.",
+      "sourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/ari.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve"
+      ],
+      "roleSourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve"
+      ],
+      "reopenOn": "A source-bound player-value correction above zero or a separately governed current-value amendment.",
+      "replacementModel": {
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Hunter Long's immutable frozen healthy value is exactly 0.0. The governed nonnegative injury-loss floor therefore yields zero without assigning any unverified replacement value.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Teagan Quitoriano"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "MULTIROLE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261006T164542-0700-personnel",
+      "effectiveAt": "2026-10-06T16:45:42-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Hunter Long's immutable frozen healthy value is exactly 0.0. The governed nonnegative injury-loss floor therefore yields zero without assigning any unverified replacement value.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "A source-bound player-value correction above zero or a separately governed current-value amendment.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   ],
   "currentCases": {
@@ -714,27 +842,49 @@
       "side": "HOME",
       "player": "Paris Johnson Jr",
       "playerEaId": "22699",
-      "availabilityStatus": "OUT_SEASON",
-      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
-      "failClosedCode": "REVIEW_REQUIRED_REPLACEMENT_VALUE",
-      "personnelEventId": "2026-W05-ARI-Paris-Johnson-Jr-tuesday-20261006T111600-0700",
-      "reason": "Arizona confirmed Paris Johnson Jr. will miss the remainder of the season after a torn biceps. The Week 5 replacement role is not yet source-complete, so no numeric personnel move is authorized.",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+      "replacementPlayer": "Jayden Williams",
+      "replacementEaId": "16379",
+      "personnelEventId": "2026-W05-ARI-Paris-Johnson-Jr-delta-20261006T164542-0700",
+      "reason": "Arizona officially placed Paris Johnson Jr. on injured reserve and reported that coach Mike LaFleur named rookie Jayden Williams as Johnson's replacement in the starting lineup. The governed one-for-one calculator owns the locked-value subtraction.",
       "sourceRefs": [
-        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-monday-oct-5",
-        "data/walters/nfl/player-values/by-team-v1/ari.json"
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve",
+        "data/walters/nfl/player-values/by-team-v1/ari.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
       ],
-      "batchId": "graham-tuesday-baseline-2026-w05-20261006T111600-0700-personnel",
-      "effectiveAt": "2026-10-06T11:16:00-07:00",
-      "sourceTask": "TUESDAY_BASELINE",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jayden Williams",
+          "Jedrick Wills Jr"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_NUMERIC"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261006T164542-0700-personnel",
+      "effectiveAt": "2026-10-06T16:45:42-07:00",
+      "sourceTask": "DELTA_1645",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "valueStatus": "NUMERIC_ELIGIBLE",
       "registryPosition": "LT",
       "maddenOvr": 86,
       "healthyWaltersPoints": 1.2,
-      "rawTeamContributionDelta": null,
-      "clusterGroup": "OFFENSIVE_LINE"
+      "replacementRegistryPosition": "LT",
+      "replacementMaddenOvr": 65,
+      "replacementWaltersPoints": 0,
+      "rawTeamContributionDelta": -1.2,
+      "clusterGroup": "OFFENSIVE_LINE",
+      "failClosedCode": null
     },
     "2026-W05-ATL-Jake-Matthews": {
       "caseKey": "2026-W05-ATL-Jake-Matthews",
@@ -1387,8 +1537,84 @@
       "healthyWaltersPoints": 0.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "RECEIVER"
+    },
+    "2026-W05-ARI-Hunter-Long": {
+      "caseKey": "2026-W05-ARI-Hunter-Long",
+      "gameKey": "2026-W05-DET-ARI",
+      "team": "ARI",
+      "side": "HOME",
+      "player": "Hunter Long",
+      "playerEaId": "21563",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "2026-W05-ARI-Hunter-Long-delta-20261006T164542-0700",
+      "reason": "Arizona officially placed Hunter Long on injured reserve and promoted Teagan Quitoriano into the roster vacancy. Long's immutable frozen Walters value is exactly 0.0, so the approved ZERO_CALIBRATED_LOSS path records the absence without fabricating a role share or replacement value.",
+      "sourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/ari.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve"
+      ],
+      "roleSourceRefs": [
+        "https://www.azcardinals.com/news/hunter-long-paris-johnson-jr-placed-on-injured-reserve"
+      ],
+      "reopenOn": "A source-bound player-value correction above zero or a separately governed current-value amendment.",
+      "replacementModel": {
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Hunter Long's immutable frozen healthy value is exactly 0.0. The governed nonnegative injury-loss floor therefore yields zero without assigning any unverified replacement value.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Teagan Quitoriano"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "MULTIROLE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261006T164542-0700-personnel",
+      "effectiveAt": "2026-10-06T16:45:42-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Hunter Long's immutable frozen healthy value is exactly 0.0. The governed nonnegative injury-loss floor therefore yields zero without assigning any unverified replacement value.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "A source-bound player-value correction above zero or a separately governed current-value amendment.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   },
-  "lastBatchId": "graham-tuesday-baseline-2026-w05-20261006T111600-0700-personnel",
-  "lastBatchSourceTask": "TUESDAY_BASELINE"
+  "lastBatchId": "graham-delta-1645-2026-w05-20261006T164542-0700-personnel",
+  "lastBatchSourceTask": "DELTA_1645"
 }
