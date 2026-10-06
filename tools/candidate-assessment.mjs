@@ -8,6 +8,7 @@ import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
 import {FORECAST_LEAN_FROM,validateForecastLean} from './forecast-lean.mjs';
 import {inspectForecastLeadReview} from './forecast-lead-routing.mjs';
 import {inspectOpinionReview} from './opinion-review.mjs';
+import {aggregateForecastComparisons} from './forecast-aggregation.mjs';
 
 export const CANDIDATE_ASSESSMENT_FROM = '2026-09-15T18:15:00-07:00';
 export const CANDIDATE_ASSESSMENT_VERSION = 'candidate-assessment-v1';
@@ -92,13 +93,17 @@ function compareQuote(report, selection, quote, observer, forecast, records, rec
     const raw = records.get(record.recordId);
     const comparison = raw ? forecastPriceComparison(raw, quote.priceDecimal) : close(record.comparison?.priceDecimal, quote.priceDecimal) ? record.comparison : null;
     return comparison ? {recordId: record.recordId, sourceId: record.sourceId, modelFamily: record.modelFamily,
-      marketDependence: record.marketDependence, probability: record.probability, ...comparison,
+      marketDependence: record.marketDependence, probability: record.probability,
+      eventId:String(selection.eventId),sport:selection.sport,startTime:selection.startTime||selection.eventDate,
+      marketDetail:record.marketDetail,period:record.period,side:record.side,line:record.line??null,
+      pushProbability:raw?.pushProbability ?? null,settlement:raw?.settlement ?? null,...comparison,
       referenceBreakEvenPriceDecimal: comparison.breakEvenProbability * quote.priceDecimal / record.probability} : null;
   }).filter(Boolean).sort((a, b) => b.edgeProbabilityPoints - a.edgeProbabilityPoints);
   const scores = [market?.edgeProbabilityPoints, ...forecasts.map(row => row.edgeProbabilityPoints)].filter(finite);
   const nativeFairComparison = compareRecordedFair(report, selection, quote, receipt);
   const grahamFairHandoff = compareGrahamFair({report,selection,quote,feed,inputs:grahamInputs});
-  return {quote, grahamFairHandoff, marketComparison: market, marketUnavailable, forecastComparisons: forecasts, nativeFairComparison,
+  return {quote, grahamFairHandoff, marketComparison: market, marketUnavailable, forecastComparisons: forecasts,
+    forecastAggregation:aggregateForecastComparisons(forecasts),nativeFairComparison,
     forecastComparison: forecasts[0] || null, score: scores.length ? Math.max(...scores) : null,
     promising: scores.some(score => score > 1e-8) || nativeFairComparison?.supportsPointReview === true || grahamFairHandoff?.supportsPointReview === true};
 }

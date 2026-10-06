@@ -10,6 +10,10 @@ on:
     paths:
       - tools/game-intelligence.mjs
       - tools/collect-game-intelligence.mjs
+      - tools/forecast-aggregation.mjs
+      - tools/event-research-plan.mjs
+      - tests/forecast-source-expansion.test.mjs
+      - assets/game-intelligence.js
       - tools/official-personnel.mjs
       - tools/build-game-board.mjs
       - tools/grade-game-intelligence.mjs
@@ -49,7 +53,7 @@ jobs:
         if: steps.due.outputs.run == 'true'
         run: |
           node tests/official-personnel.test.mjs
-          node --test tests/game-intelligence.test.mjs
+          node --test tests/game-intelligence.test.mjs tests/forecast-source-expansion.test.mjs tests/candidate-assessment.test.mjs tests/event-research-plan.test.mjs
           node tools/collect-game-intelligence.mjs
           cp data/game-intelligence/current.json /tmp/game-intelligence-candidate.json
       - name: Publish collection, source results and game board

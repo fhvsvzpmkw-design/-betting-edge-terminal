@@ -14,11 +14,15 @@ import {mlbScheduleUrl,parseOfficialMlb} from './official-personnel.mjs';
 
 export const ROUTES={NFL:'football/nfl',NCAAF:'football/college-football',CFL:'football/cfl',MLB:'baseball/mlb',NBA:'basketball/nba',WNBA:'basketball/wnba',NHL:'hockey/nhl'};
 export const NFELO_URL='https://raw.githubusercontent.com/greerreNFL/nfelo/main/output_data/nfelo_games.csv';
+export const BET_BETTER_FROM='2026-10-06T17:05:06Z';
+export const BET_BETTER_SPORTS=['NFL','NCAAF','MLB','NBA','WNBA','NHL'];
+export const betBetterUrl=sport=>`https://betbetter.world/predicted-scores/${sport.toLowerCase()}?format=csv`;
 const time=x=>Date.parse(x||'');
 const date=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
 const norm=x=>String(x||'').toLowerCase().replace(/^la /,'los angeles ').replace(/[^a-z0-9]/g,'');
 const json=x=>JSON.stringify(x,null,2)+'\n';
 export function parseCsv(text) {
+  text=text.replace(/^\uFEFF/,'');
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++) {
     const c=text[i];
@@ -31,6 +35,43 @@ export function parseCsv(text) {
   if(field||row.length){row.push(field.replace(/\r$/,''));rows.push(row);}
   const header=rows.shift()||[];
   return rows.filter(r=>r.length===header.length).map(r=>Object.fromEntries(header.map((key,i)=>[key,r[i]])));
+}
+function betBetterKickoff(row) {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(row.date_utc||'')||!/^\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/.test(row.time_utc||''))return null;
+  const value=`${row.date_utc}T${row.time_utc}${/(?:Z|[+-]\d{2}:\d{2})$/.test(row.time_utc)?'':'Z'}`;
+  return Number.isFinite(time(value))?new Date(value).toISOString():null;
+}
+function betBetterTeam(label,team,sport) {
+  if(sport==='NFL')return teamAbbr(label)===teamAbbr(team);
+  const clean=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  return clean(label)!==''&&clean(label)===clean(team);
+}
+export function parseBetBetter(rows,event,observedAt,registry) {
+  if(!BET_BETTER_SPORTS.includes(event.sport)||time(observedAt)>=time(event.startTime))return [];
+  const matches=list(rows).filter(row=>row.locked!==true&&row.locked!=='true'&&
+    time(betBetterKickoff(row))===time(event.startTime)&&betBetterTeam(row.away_team,event.away,event.sport)&&betBetterTeam(row.home_team,event.home,event.sport));
+  if(matches.length!==1)return [];
+  const row=matches[0],margin=number(row.home_margin),total=number(row.total),p=number(row.home_win_prob);
+  // The documented score export omits unpriced rows. A fixture shell or locked
+  // pick is not a model. Never fill its probability with 50% or a book price.
+  if(margin===null||total===null||total<0)return [];
+  const url=`https://betbetter.world/predicted-scores/${event.sport.toLowerCase()}`,output=[],inputUrl=betBetterUrl(event.sport);
+  const make=fields=>makeRecord(event,'bet_better',registry.sources.bet_better,observedAt,{url,inputUrl,
+    evidenceRef:`${inputUrl}#${digest(row)}`,attribution:'Bet Better — https://betbetter.world',licence:'CC BY 4.0',sourceValues:row,...fields});
+  const homeScore=number(row.pred_home_score),awayScore=number(row.pred_away_score);
+  if(homeScore!==null&&homeScore<0||awayScore!==null&&awayScore<0)return [];
+  if(homeScore!==null&&awayScore!==null&&
+    (Math.abs(homeScore-awayScore-margin)>.11||Math.abs(homeScore+awayScore-total)>.11))return [];
+  const spreadDetail={MLB:'full_game_primary_run_line',NHL:'full_game_primary_puck_line'}[event.sport]||'full_game_primary_spread';
+  output.push(make({kind:'SCORE_CONTEXT',marketDetail:spreadDetail,side:'home',line:null,
+    projection:{homeSpread:-margin,...(homeScore!==null&&awayScore!==null?{homeScore,awayScore}:{})},sourceField:'home_margin',
+    limitation:'Published home winning margin is negated to the home handicap convention. Native points only; no cover probability is inferred.'}));
+  output.push(make({kind:'SCORE_CONTEXT',marketDetail:'full_game_primary_total',side:'over',line:null,
+    projection:{total},sourceField:'total',limitation:'Published projected combined score only; not an exact Over/Under probability or uncertainty interval.'}));
+  if(p!==null&&p>0&&p<1)output.push(make({kind:'OUTCOME_PROBABILITY',marketDetail:'full_game_moneyline',side:'home',line:null,
+    probability:p,probabilityBasis:'UNKNOWN',settlement:null,sourceField:'home_win_prob',
+    limitation:'Published home-win probability is preserved as supplied. Full-game overtime/tie/refund interpretation, model time and current personnel require an actual source/applicability review; no away complement is invented.'}));
+  return output;
 }
 export function matchEspnEvent(event,rows) {
   const matches=list(rows).filter(row=>{
@@ -211,8 +252,30 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
       cache.nfelo=observedAt;sources.push({sourceId:'nfelo',state:count?'COLLECTED':'NO_EXACT_EVENT',records:count,checkedAt:observedAt,url:NFELO_URL});
     }catch(error){sources.push({sourceId:'nfelo',state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url:NFELO_URL});}
   }
-  for(const sourceId of ['dimers','dratings','moneypuck','fangraphs','stats_insider','dunks_threes','puckcast','oddstrader'])
-    if(registry.sources[sourceId])sources.push({sourceId,state:'RESEARCH_OR_LICENSED_IMPORT',reason:registry.sources[sourceId].collection?.reason||'No verified automated feed configured. Use a permitted source capture; do not infer coverage from the source name.'});
+  if(registry.sources.bet_better&&time(at)>=time(BET_BETTER_FROM))await pool([...new Set(events.filter(event=>BET_BETTER_SPORTS.includes(event.sport)).map(event=>event.sport))],async sport=>{
+    const key=`bet_better:${sport}`,url=betBetterUrl(sport),sportEvents=events.filter(event=>event.sport===sport);
+    const complete=sportEvents.every(event=>records.some(row=>row.sourceId==='bet_better'&&sameEvent(row,event)));
+    if(!force&&complete&&cache[key]&&time(at)-time(cache[key])<15*60000){sources.push({sourceId:'bet_better',scope:sport,state:'CACHED',checkedAt:cache[key],url});return;}
+    try {
+      const csv=await get(url,'csv'),rows=parseCsv(csv),observedAt=clock();
+      const header=csv.split(/\r?\n/,1)[0].replace(/^\uFEFF/,'').split(',').map(field=>field.replace(/^"|"$/g,''));
+      if(new Set(header).size!==header.length||!['date_utc','time_utc','away_team','home_team','home_margin','total','home_win_prob'].every(field=>header.includes(field)))throw Error('Documented Bet Better score-export columns are unavailable');
+      let count=0;
+      for(const event of sportEvents){
+        const parsed=parseBetBetter(rows,event,observedAt,registry);
+        for(let i=records.length-1;i>=0;i--)if(records[i].sourceId==='bet_better'&&sameEvent(records[i],event))records.splice(i,1);
+        records.push(...parsed);count+=parsed.length;
+        sources.push({sourceId:'bet_better',scope:sport,eventId:event.eventId,state:parsed.length?'COLLECTED':'NO_EXACT_EVENT',
+          records:parsed.length,checkedAt:observedAt,url,reason:parsed.length?null:'No unique priced row with exact ordered teams and UTC kickoff. Empty, locked and mismatched rows are not forecasts.'});
+      }
+      cache[key]=observedAt;sources.push({sourceId:'bet_better',scope:sport,state:count?'COLLECTED':'NO_EXACT_EVENT',records:count,checkedAt:observedAt,url});
+    }catch(error){sources.push({sourceId:'bet_better',scope:sport,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
+  });
+  for(const [sourceId,source] of Object.entries(registry.sources)){
+    if(['espn','nfelo','bet_better'].includes(sourceId)||source.collection?.sports&&!events.some(event=>source.collection.sports.includes(event.sport)))continue;
+    sources.push({sourceId,state:'RESEARCH_OR_LICENSED_IMPORT',reason:source.collection?.reason||'No verified automated feed configured. Use a permitted source capture; do not infer coverage from the source name.',
+      automatedReuse:source.automatedReuse||'NO_API_OR_LICENSE_ASSUMED',urls:source.routes||Object.values(source.sportBoards||{})});
+  }
   const capture={schema:1,collectedAt:clock(),feedGeneratedAt:feed.generatedAt,records,facts,quoteHistory,sources,requestCache:cache,
     acquisition:{requests:requests.length,oddsApiRequests:0,modelCalls:0,receipts:requests}};
   capture.snapshotId=digest(capture);

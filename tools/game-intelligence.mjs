@@ -9,6 +9,7 @@ import {forecastCandidate, forecastMarketClass, forecastPriceComparison} from '.
 import {teamAbbr} from './graham-market-utils.mjs';
 import {exactMarketReference,marketComparison} from './market-price-assessment.mjs';
 import {loadGrahamHandoffInputs} from './graham-fair-handoff.mjs';
+import {aggregateForecastComparisons,summarizeProjectionContext} from './forecast-aggregation.mjs';
 
 export const INTELLIGENCE_FROM = '2026-09-27T12:00:00-07:00';
 export const list = x => Array.isArray(x) ? x : [];
@@ -111,7 +112,7 @@ export function summarizeModels(records,asOf) {
   const latest=new Map();
   for(const row of records) {
     if(time(row.observedAt)>time(asOf)||time(row.observedAt)>=time(row.startTime)) continue;
-    const key=[row.sourceId,row.kind,row.marketDetail,row.side,row.line??''].join('|');
+    const key=[row.eventId,row.sport,row.startTime,row.period,row.sourceId,row.kind,row.marketDetail,row.side,row.line??''].join('|');
     if(!latest.has(key)||time(row.observedAt)>time(latest.get(key).observedAt))latest.set(key,row);
   }
   const rows=[...latest.values()].map(row=>({...row,
@@ -120,7 +121,7 @@ export function summarizeModels(records,asOf) {
   const groups=new Map();
   for(const row of rows.filter(r=>r.kind==='OUTCOME_PROBABILITY'&&r.freshness==='RECENT_CAPTURE'&&
     ['UNCONDITIONAL','CONDITIONAL_ON_NO_PUSH'].includes(r.probabilityBasis)&&r.settlement)) {
-    const key=[row.marketDetail,row.side,row.line??'',row.probabilityBasis||'UNKNOWN',JSON.stringify(row.settlement||null)].join('|');
+    const key=[row.eventId,row.sport,row.startTime,row.period,row.marketDetail,row.side,row.line??'',row.probabilityBasis||'UNKNOWN',row.pushProbability??'',JSON.stringify(row.settlement||null)].join('|');
     if(!groups.has(key)) groups.set(key,[]);
     groups.get(key).push(row);
   }
@@ -137,7 +138,7 @@ export function summarizeModels(records,asOf) {
       disagreementPoints:(values.at(-1)-values[0])*100,kind:'DESCRIPTIVE_MODEL_RANGE',
       limitation:'Describes published model values. It is not a calibrated fair value, confidence interval or count of independent models.'};
   });
-  return {rows,consensus};
+  return {rows,consensus,projectionContext:summarizeProjectionContext(rows.filter(r=>r.freshness==='RECENT_CAPTURE'))};
 }
 
 // The full catalogue is pinned in the report, but do not resend it for every
@@ -193,6 +194,12 @@ export function buildGameIntelligence({report,sidecar={},feed,universe,forecastC
                 comparison:review?.eligibility==='ELIGIBLE_EXACT'?forecastPriceComparison(r,c.priceDecimal):null};
             })};
       });
+      for(const quote of comparisons)quote.forecastAggregation=aggregateForecastComparisons(quote.forecasts.filter(row=>row.comparison).map(row=>{
+        const raw=models.rows.find(record=>record.recordId===row.recordId);
+        return {...row,...row.comparison,eventId:raw.eventId,sport:raw.sport,startTime:raw.startTime,period:raw.period,
+          marketDetail:raw.marketDetail,side:raw.side,line:raw.line??null,modelFamily:raw.modelFamily,marketDependence:raw.marketDependence,
+          pushProbability:raw.pushProbability??null,settlement:raw.settlement};
+      }));
       return {selectionId:selection.selectionId,marketDetail:candidate.marketDetail,side:candidate.side,quotes:comparisons,
         marketComparison:assessed?.marketComparison||null,nativeFairComparison:assessed?.nativeFairComparison||null,
         status:assessed?.status||null,reviewState:assessed?.reviewState||'UNASSESSED'};
@@ -200,12 +207,13 @@ export function buildGameIntelligence({report,sidecar={},feed,universe,forecastC
     const internal=list(inputs.internalModels).filter(r=>sameEvent(r,event));
     const familyCount=unique(models.rows.map(r=>r.modelFamily)).length;
     return {...event,label:`${event.away} @ ${event.home}`,priceSnapshotAt:feed.generatedAt,externalModels:models.rows,consensus:models.consensus,
+      projectionContext:models.projectionContext,
       internalModels:internal,facts,markets,
       knowledgeIds:list(inputs.knowledge).filter(k=>list(k.sports).includes('Cross-Sport')||list(k.sports).includes(event.sport)).map(k=>k.id),
       summary:{sources:unique(models.rows.map(r=>r.sourceId)).length,modelFamilies:familyCount,internalFamilies:internal.length?1:0,
         exactReviewed:list(forecastCoverage?.selections).filter(r=>String(r.eventId)===id&&r.coverage==='EXACT_ELIGIBLE').length,
         completed:plan?.completed||0,available:selections.length},
-      nextAction:'Review source timing and personnel once for this game; explain agreement and conflict for the exact available market and price.'};
+      nextAction:'Review the combined forecasts, native projections, Graham fair, personnel and prices once for this game. Explain agreement and contrary evidence at the exact contract; assess BET first, then LEAN, WAIT or PASS under existing qualification rules.'};
   }).sort((a,b)=>time(a.startTime)-time(b.startTime)||a.eventId.localeCompare(b.eventId));
   return {schema:1,version:'2026-09-27.1',asOf:report.ts,collectedAt:inputs.collectedAt,snapshotId:inputs.snapshotId,
     decisionAuthority:false,sources:inputs.sources,games,knowledge:inputs.knowledge,

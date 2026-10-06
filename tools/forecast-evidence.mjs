@@ -50,7 +50,8 @@ export function forecastRoutes(sport, marketDetail, registry = loadForecastSourc
     const urls = source.sportBoards?.[sport] ? [source.sportBoards[sport]] : list(source.routes).map(url => url.replaceAll('{sport}', source.sportSlugs?.[sport] || sport.toLowerCase()));
     return {sourceId, publisher: source.publisher, modelFamily: source.modelFamily, marketDependence: source.marketDependence,
       role: list(route.exact).includes(sourceId) ? 'EXACT_CANDIDATE' : list(route.provisional).includes(sourceId) ? 'PROVISIONAL_CANDIDATE' : 'SCORE_CONTEXT',
-      urls, notes: source.notes, automatedReuse: source.automatedReuse || 'NO_API_OR_LICENSE_ASSUMED'};
+      urls, notes: source.notes, collectionMode:source.collection?.mode||null,
+      usageUrl:source.usageUrl||null,automatedReuse: source.automatedReuse || 'NO_API_OR_LICENSE_ASSUMED'};
   });
   return {key, ...route, sources};
 }

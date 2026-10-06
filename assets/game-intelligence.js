@@ -3,7 +3,7 @@
   const list=x=>Array.isArray(x)?x:[];
   const odds=root.VigScopeOddsFormat;
   const pct=x=>typeof x==='number'?(x*100).toFixed(1)+'%':'—';
-  const names={espn:'ESPN',mlb_official:'MLB official',nfelo:'nfelo',dimers:'Dimers',dratings:'DRatings',moneypuck:'MoneyPuck',fangraphs:'FanGraphs',stats_insider:'Stats Insider',dunks_threes:'Dunks & Threes',puckcast:'PuckCast',oddstrader:'OddsTrader'};
+  const names={espn:'ESPN',mlb_official:'MLB official',nfelo:'nfelo',dimers:'Dimers',dratings:'DRatings',moneypuck:'MoneyPuck',fangraphs:'FanGraphs',stats_insider:'Stats Insider',dunks_threes:'Dunks & Threes',puckcast:'PuckCast',oddstrader:'OddsTrader',prediction_tracker:'The Prediction Tracker',bet_better:'Bet Better',playerwon:'PlayerWon',covers_oddsshark:'Covers / OddsShark',the_margin:'The Margin',podium_oracle:'Podium Oracle'};
   const market=x=>/moneyline/.test(x)?'Moneyline':/spread|run_line|puck_line/.test(x)?'Spread':/total/.test(x)?'Total':x;
   const signed=n=>typeof n==='number'?(n>0?'+':'')+n:'—';
   const clock=x=>{try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(x))+' PT';}catch{return 'Time unavailable';}};
@@ -31,12 +31,18 @@
     details.append(rows.length?table(d,['SOURCE','MARKET / LINE','SIDE','PUBLISHED VALUE','OBSERVED'],rows):node(d,'div','No captured outside prediction for this game yet.','gi-meta'));
     const ranges=list(g.consensus).filter(c=>c.families>1);
     for(const c of ranges)details.append(node(d,'div',`${market(c.marketDetail)} ${g[c.side]||c.side}${c.line!=null?' '+signed(c.line):''}: ${pct(c.min)}–${pct(c.max)} across ${c.families} families; median ${pct(c.median)}. Descriptive range, not a confidence interval.`,'gi-meta'));
+    for(const c of list(g.projectionContext))details.append(node(d,'div',`${c.unit==='home_spread_points'?g.home+' projected spread':'Projected total'}: ${signed(c.min)} to ${signed(c.max)} across ${c.families} model families. Published point context; outcome probabilities require separate evidence.`,'gi-meta'));
     if(g.internalModels?.length){details.append(node(d,'h3','GRAHAM / WALTERS'));for(const m of g.internalModels){details.append(node(d,'div',`${g.home} ${signed(m.homeFairPoints)} · ${clock(m.observedAt)}`));details.append(node(d,'p',m.summary));if(m.numberStatus?.includes('UNRESOLVED')||m.unresolved?.qb?.length||m.unresolved?.personnel?.length||m.unresolved?.groups?.length)details.append(node(d,'div','Personnel or quarterback inputs remain unresolved. A preserved fair requires current review.','gi-warning'));if(m.weeklyRatingInput&&m.weeklyRatingInput.state!=='COMPLETE')details.append(node(d,'div','Historical weekly rating inputs remain incomplete.','gi-warning'));if(m.qbPriorEstimates?.length)details.append(node(d,'div','This fair includes a frozen quarterback prior estimate without a qualifying NFL performance sample.','gi-warning'));}}
     details.append(node(d,'h3','AVAILABLE PRICES'));
     details.append(node(d,'div',`Odds snapshot ${clock(g.priceSnapshotAt)}. Verify an executable current price before acting.`,'gi-meta'));
     const quotes=list(g.markets).flatMap(m=>list(m.quotes).map(q=>[market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book||'—',odds?odds.fromDecimal(q.priceDecimal):'—',pct(q.breakEvenProbability),
       `${clock(q.observedAt||q.changedAt)}${q.priceState==='REFRESH_REQUIRED'?' · Refresh required':''}`]));
     details.append(table(d,['MARKET','SIDE','LINE','BOOK','AMERICAN ODDS','BREAK-EVEN','OBSERVED'],quotes));
+    const agreement=list(g.markets).flatMap(m=>list(m.quotes).flatMap(q=>list(q.forecastAggregation?.groups).map(c=>[
+      market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book||'—',
+      `${c.supportingFamilies} support · ${c.opposingFamilies} oppose${c.mixedFamilies?' · '+c.mixedFamilies+' mixed':''}`,
+      `${pct(c.minProbability)}–${pct(c.maxProbability)}`])));
+    if(agreement.length){details.append(node(d,'h3','MODEL AGREEMENT AT THE PRICE'));details.append(table(d,['MARKET','SIDE','LINE','BOOK','MODEL FAMILIES','PUBLISHED RANGE'],agreement));details.append(node(d,'p','Possible BETs are assessed first, then LEAN, WAIT or PASS. Agreement alone does not establish an edge, confidence bounds or a stake. Related models count together.','gi-meta'));}
     const benchmarks=list(g.markets).flatMap(m=>list(m.quotes).filter(q=>q.benchmark).map(q=>[market(m.marketDetail),g[m.side]||m.side,q.line!=null?signed(q.line):'—',q.book,pct(q.benchmark.benchmarkNoVigProbability),q.benchmark.edgeProbabilityPoints.toFixed(2)+' pp']));
     if(benchmarks.length){details.append(node(d,'h3','PINNACLE PRICE COMPARISON'));details.append(table(d,['MARKET','SIDE','LINE','EXECUTION BOOK','NO-VIG REFERENCE','PRICE DIFFERENCE'],benchmarks));}
     else details.append(node(d,'div','A current exact Pinnacle comparison is unavailable in this snapshot.','gi-meta'));
@@ -45,7 +51,7 @@
     if(g.facts?.length){const f=node(d,'details');f.append(node(d,'summary',`EVENT RESEARCH · ${g.facts.length} observations`));const grid=node(d,'div',undefined,'gi-grid');for(const fact of g.facts){const box=node(d,'div',undefined,'gi-fact');box.append(node(d,'b',fact.kind||'RESEARCH'),node(d,'div',factText(fact)),sourceLink(d,clock(fact.observedAt),fact.url));grid.append(box);}f.append(grid);details.append(f);}
     const relevant=list(knowledge).filter(k=>list(g.knowledgeIds).includes(k.id));
     if(relevant.length){const k=node(d,'details');k.append(node(d,'summary',`KNOWLEDGE BASE · ${relevant.length} research references`));k.append(node(d,'p','These principles need an explicit connection to the game. They are not extra model votes.','gi-meta'));for(const item of relevant){const p=node(d,'p');p.append(node(d,'b',item.topic+' · '),d.createTextNode(item.guidance||item.finding));k.append(p);}details.append(k);}
-    if(g.externalModels?.length){const limits=node(d,'details');limits.append(node(d,'summary','MODEL NOTES'));for(const r of g.externalModels)limits.append(node(d,'p',`${names[r.sourceId]||r.sourceId}: ${r.limitation||'Review applicability.'}`));details.append(limits);}
+    if(g.externalModels?.length){const limits=node(d,'details');limits.append(node(d,'summary','MODEL NOTES'));for(const r of g.externalModels){const p=node(d,'p',`${names[r.sourceId]||r.sourceId}: ${r.limitation||'Review applicability.'}`);if(r.licence==='CC BY 4.0')p.append(d.createTextNode(' · '),sourceLink(d,'CC BY 4.0; field adaptation described above','https://creativecommons.org/licenses/by/4.0/'));limits.append(p);}details.append(limits);}
     return details;
   }
   function render(d,intelligence){

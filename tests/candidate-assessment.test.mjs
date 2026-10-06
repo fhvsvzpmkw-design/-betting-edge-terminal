@@ -215,6 +215,27 @@ test('forecast supporting a price can rank candidate even when Pinnacle is unfav
   assert.equal(row.reviewState, 'UNFINISHED');
 });
 
+test('price aggregation retains supporting and opposing models and both dispositions are required before completion',()=>{
+  const args=fixture(),{selection,receipt}=reviewed(args);
+  const records=[['support','FAMILY_A',.7],['oppose','FAMILY_B',.3]].map(([recordId,modelFamily,probability])=>({
+    recordId,modelFamily,sourceId:recordId,side:selection.side,marketDetail:selection.marketDetail,period:'FULL_GAME',
+    eligibility:'ELIGIBLE_EXACT',probability,marketDependence:'UNCLEAR',comparison:{priceDecimal:receipt.quote.priceDecimal,
+      probabilityBasis:'CONDITIONAL_ON_NO_PUSH',breakEvenProbability:1/receipt.quote.priceDecimal,
+      edgeProbabilityPoints:(probability-1/receipt.quote.priceDecimal)*100,direction:probability>1/receipt.quote.priceDecimal?'SUPPORTS_PRICE':'OPPOSES_PRICE'}}));
+  args.forecastCoverage.selections=[{selectionId:selection.selectionId,eligibleExactRecordIds:records.map(r=>r.recordId),records}];
+  let row=buildCandidateAssessment(args).selections[0];
+  assert.equal(row.forecastAggregation.groups[0].supportingFamilies,1);
+  assert.equal(row.forecastAggregation.groups[0].opposingFamilies,1);
+  assert.equal(row.forecastAggregation.betReviewRequired,true);
+  assert.equal(row.status,'PASS','aggregation never changes the producer decision');
+  assert.equal(row.reviewState,'UNFINISHED');
+  receipt.candidateAssessment.forecastDispositions=[{recordId:'support',disposition:'REJECTED',rationale:'The documented model assumptions do not justify adopting a betting fair.'}];
+  row=buildCandidateAssessment(args).selections[0];
+  assert.ok(row.missingResearch.includes('FORECAST_DISPOSITION_REQUIRED:oppose'));
+  receipt.candidateAssessment.forecastDispositions.push({recordId:'oppose',disposition:'CONTEXT',rationale:'The opposing model remains visible in the exact-price assessment; no independent fair adopted.'});
+  assert.equal(buildCandidateAssessment(args).selections[0].reviewState,'COMPLETE');
+});
+
 test('exact line grouping does not pair opposite lines and stale observer cannot rank reference', () => {
   const args = fixture();
   const spread = args.universe.selections.find(row => row.side === 'home' && row.marketClass === 'spread');
