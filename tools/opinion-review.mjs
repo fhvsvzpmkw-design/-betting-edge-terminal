@@ -1,5 +1,6 @@
 // A failed BET check is not a directional rejection. This gate requires a
 // review of that distinction; it never creates or carries a recommendation.
+import {forecastLeanDefault} from './forecast-lean.mjs';
 export const OPINION_REVIEW_FROM = '2026-10-03T11:34:58-07:00';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
@@ -11,6 +12,7 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
   const decision = receipt?.decision;
   const quote = receipt?.quote;
   const supported = list(forecastComparisons).filter(row => row.direction === 'SUPPORTS_PRICE');
+  const leanDefault = forecastLeanDefault(report, decision, supported);
   const earlier = prior?.row?.decision;
   const sameEvent = earlier?.feed?.selectionKey === quote?.selectionKey &&
     Number.isFinite(time(earlier?.feed?.eventDate)) && time(earlier.feed.eventDate) === time(decision?.feed?.eventDate);
@@ -18,7 +20,8 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
   const required = time(report?.ts) >= time(OPINION_REVIEW_FROM) && decision?.status === 'PASS' && (supported.length > 0 || priorLean);
   const baseline = priorLean ? {reportTs:prior.reportTs, selectionKey:quote.selectionKey,
     status:'LEAN', priceDecimal:prior.row.quote?.priceDecimal ?? null} : null;
-  if (!required) return {required:false, complete:true, missing:[], priorDecision:baseline};
+  if (!required) return {required:false, complete:true, missing:[], priorDecision:baseline,
+    ...(leanDefault.active ? {leanDefault} : {})};
   const review = receipt?.candidateAssessment?.decision?.directionalReview;
   const missing = [];
   const checked = time(review?.checkedAt || receipt?.candidateAssessment?.checkedAt);
@@ -36,6 +39,22 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
       (!text(review?.dependency) || !text(review?.forecastAssumption) || !text(review?.directionalImpact) ||
        !list(review?.sourceIds).some(id => ['OFFICIAL','REPORTING'].includes(sources.get(id)?.kind))))
     missing.push('PERSONNEL_DIRECTIONAL_MATERIALITY_REQUIRED');
+  if (leanDefault.applies) {
+    const exception = review?.leanDefaultException;
+    const exceptionSources = list(exception?.sourceIds);
+    const applicableSources = exceptionSources.length > 0 && exceptionSources.every(id =>
+      sources.has(id) && ['MODEL','OFFICIAL','REPORTING'].includes(sources.get(id)?.kind));
+    if (!['INVALIDATED_FORECAST_ASSUMPTION','MATERIAL_CONTRARY_EVIDENCE'].includes(exception?.basis) ||
+        !text(exception?.rationale) || !text(exception?.directionalImpact) || !applicableSources ||
+        leanDefault.qualifyingRecordIds.some(id => !list(exception?.forecastRecordIds).includes(id)))
+      missing.push('MEANINGFUL_FORECAST_LEAN_DEFAULT_EXCEPTION_REQUIRED');
+    if (exception?.basis === 'INVALIDATED_FORECAST_ASSUMPTION' &&
+        (!text(exception?.forecastAssumption) || !text(exception?.observedConflict)))
+      missing.push('ACTUAL_FORECAST_ASSUMPTION_CONFLICT_REQUIRED');
+    const sensitivity = decision?.personnelEvidence?.decisionSensitivity || receipt?.evidence?.personnelEvidence?.decisionSensitivity;
+    if (review?.reasonKind === 'PERSONNEL_DEPENDENCY' && /NO MATERIAL PERSONNEL SENSITIVITY/i.test(sensitivity || ''))
+      missing.push('PERSONNEL_DIRECTIONAL_SENSITIVITY_CONTRADICTION');
+  }
   if (priorLean) {
     const recorded = review?.previousDecision;
     if (recorded?.reportTs !== baseline.reportTs || recorded?.selectionKey !== baseline.selectionKey || recorded?.status !== 'LEAN' ||
@@ -44,6 +63,7 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
       missing.push('UNCHANGED_PRICE_CANNOT_EXPLAIN_LEAN_REMOVAL');
   }
   return {required:true, complete:missing.length === 0, missing, priorDecision:baseline,
+    ...(leanDefault.active ? {leanDefault} : {}),
     supportingForecastRecordIds:supported.map(row => row.recordId),
-    instruction:'Review the exact positive point and earlier opinion. Separate BET eligibility from directional preference; assess a visible zero-stake provisional LEAN. Record a source-linked directional objection or correct the actual decision. No automatic LEAN or BET.'};
+    instruction:leanDefault.applies ? leanDefault.instruction : 'Review the exact positive point and earlier opinion. Separate BET eligibility from directional preference; assess a visible zero-stake provisional LEAN. Record a source-linked directional objection or correct the actual decision. No automatic LEAN or BET.'};
 }

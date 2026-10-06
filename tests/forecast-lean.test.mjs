@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import {FORECAST_LEAN_FROM,createForecastLean,validateForecastLean,validateForecastLeanDirections} from '../tools/forecast-lean.mjs';
+import {FORECAST_LEAN_FROM,FORECAST_LEAN_DEFAULT_FROM,createForecastLean,validateForecastLean,validateForecastLeanDirections} from '../tools/forecast-lean.mjs';
 import {evaluateForecast,validateBoundForecastLean,buildForecastCoverage} from '../tools/forecast-evidence.mjs';
 import {exactMarketReference,marketComparison} from '../tools/market-price-assessment.mjs';
 import {evaluate,matchCondition} from '../tools/core-handicap-framework.mjs';
@@ -145,6 +145,36 @@ test('report-sidecar drift is rejected and candidate completion retains provisio
   assert.ok(unreviewed.selections[0].missingResearch.includes('FORECAST_SUPPORTED_PASS_REQUIRES_DIRECTIONAL_REVIEW'));
   receipt.candidateAssessment.decision.directionalReview={state:'REJECTED',rationale:'Synthetic source review identifies a starter assumption capable of reversing this model preference; no directional preference survives that conflict.'};
   assert.equal(buildCandidateAssessment({...pass,forecastCoverage}).selections[0].reviewState,'COMPLETE');
+});
+test('forward default defers generic PASS and accepts an authored provisional LEAN through publication',()=>{
+  // Rebase only this synthetic fixture, never an issued historical report.
+  let serialized=JSON.stringify(fixture());
+  for (const [oldValue,newValue] of [[FORECAST_LEAN_FROM,FORECAST_LEAN_DEFAULT_FROM],
+    ['2026-10-01T18:55:00Z','2026-10-06T22:50:00Z'],['2026-10-01T18:50:00Z','2026-10-06T22:45:00Z'],
+    ['2026-10-01T22:00:00Z','2026-10-07T02:00:00Z']]) serialized=serialized.replaceAll(oldValue,newValue);
+  const f=JSON.parse(serialized),r=f.sidecar.primaryAnalysis.receipts[0];
+  r.candidateAssessment={schema:1,selectionId:f.selections[0].selectionId,checkedAt:f.report.ts,quote:structuredClone(r.quote),
+    forecastDispositions:[{recordId:f.raw.recordId,disposition:'CONTEXT',rationale:'Synthetic point considered for opinion; no independent fair adopted.'}],
+    personnel:{state:'REVIEW_COMPLETED_UNRESOLVED',sourceIds:['info'],rationale:'Synthetic current applicability review.',
+      materialityExplanation:'Named synthetic starter is unconfirmed.',remainingUncertainty:'Final starting lineup.',decisionImpact:'Opinion can be provisional; BET remains blocked.'},
+    decision:{status:'PASS',rationale:'Synthetic generic uncertainty rejection.',
+      betEligibility:{state:'NOT_APPLICABLE',rationale:'Unquantified forecast uncertainty.'},
+      directionalReview:{state:'REJECTED',reasonKind:'PERSONNEL_DEPENDENCY',sourceIds:['info'],forecastRecordIds:[f.raw.recordId],
+        rationale:'Synthetic lineup is unconfirmed.',dependency:'Starting lineup',forecastAssumption:'Synthetic forecast baseline',
+        directionalImpact:'Synthetic lineup uncertainty.',provisionalAlternative:{considered:true,rationale:'Synthetic generic rejection.'}}},
+    priceCondition:{state:'NO_PRICE_ONLY_CHANGE',rationale:'Complete BET assumptions before risk.'}};
+  let forecastCoverage=buildForecastCoverage({report:f.report,sidecar:f.sidecar,universe:f.universe});
+  const rejected=buildCandidateAssessment({...f,forecastCoverage}).selections[0];
+  assert.equal(rejected.reviewState,'UNFINISHED');
+  assert.ok(rejected.missingResearch.includes('MEANINGFUL_FORECAST_LEAN_DEFAULT_EXCEPTION_REQUIRED'));
+  assert.equal(rejected.opinionReview.leanDefault.recommendedStatus,'LEAN');
+  lean(f);
+  const reviewed=f.sidecar.primaryAnalysis.receipts[0].candidateAssessment;
+  reviewed.decision.status='LEAN';reviewed.decision.rationale=f.report.recs[0].analysis;delete reviewed.decision.directionalReview;
+  forecastCoverage=buildForecastCoverage({report:f.report,sidecar:f.sidecar,universe:f.universe});
+  assert.equal(buildCandidateAssessment({...f,forecastCoverage}).selections[0].reviewState,'COMPLETE');
+  assert.equal(validatePrimaryAnalysis(f.report,f.sidecar,{inventory:f.universe,framework,observer:f.observer}).primaryEvaluated,2);
+  assert.deepEqual(validateReportEvidence(f.report,f.sidecar),{enforced:true,checked:2});
 });
 test('today historical counts and forecast points remain unchanged',()=>{
   for (const name of ['open-062600','main-081230','final_morning-094212']) {

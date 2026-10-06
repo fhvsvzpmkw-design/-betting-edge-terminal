@@ -1,10 +1,29 @@
 // A reviewed published probability can support an opinion without becoming
 // an independently validated fair or acquiring BET/staking authority.
 export const FORECAST_LEAN_FROM = '2026-10-01T12:00:00-07:00';
+export const FORECAST_LEAN_DEFAULT_FROM = '2026-10-06T15:53:55-07:00';
+export const FORECAST_LEAN_DEFAULT_MIN_POINTS = 1;
 const text = v => typeof v === 'string' && v.trim().length > 0;
 const list = v => Array.isArray(v) ? v : [];
 const close = (a,b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b)<1e-8;
 const ensure = (ok,msg) => {if (!ok) throw new Error(`Forecast LEAN: ${msg}`);};
+
+// Producer guidance only: current exact forecast comparisons still come from
+// the bound-record/applicability validators. This does not create a decision.
+export function forecastLeanDefault(report, decision, comparisons = []) {
+  const active = Date.parse(report?.ts) >= Date.parse(FORECAST_LEAN_DEFAULT_FROM);
+  const exact = list(comparisons).filter(row => row.direction === 'SUPPORTS_PRICE' &&
+    Number.isFinite(row.edgeProbabilityPoints) && row.edgeProbabilityPoints >= FORECAST_LEAN_DEFAULT_MIN_POINTS &&
+    close(row.priceDecimal, Number(decision?.feed?.priceDecimal)));
+  const applies = active && decision?.marketAssessment?.basis === 'QUALIFIED_PINNACLE' && exact.length > 0;
+  return {active, applies, minimumEdgeProbabilityPoints:FORECAST_LEAN_DEFAULT_MIN_POINTS,
+    qualifyingRecordIds:applies ? exact.map(row => row.recordId) : [],
+    recommendedStatus:applies ? 'LEAN' : null,
+    provisional:applies && (decision?.marketAssessment?.informationReview?.state === 'UNRESOLVED' ||
+      decision?.coreAssessment?.context?.personnelSensitivity === 'UNRESOLVED'),
+    decisionAuthority:false,
+    instruction:applies ? 'Default to a sourced zero-stake LEAN, visibly provisional when assumptions remain unresolved. A PASS needs a specific evidenced exception; Pinnacle disagreement, market dependence, missing intervals and ordinary unconfirmed lineups are limitations, not sufficient rejection reasons.' : null};
+}
 
 export function validateForecastLean(report, rec, ids = new Map(list(rec?.sourceEvidence).map(s=>[s.id,s]))) {
   const a=rec?.forecastLean;

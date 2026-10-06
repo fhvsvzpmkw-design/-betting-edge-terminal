@@ -12,6 +12,32 @@ No numeric LEAN/BET quota applies. Opposing cards continue to receive full cover
 
 ## Authoring
 
+### Meaningful forecast default from October 6, 2026
+
+Effective for new reports at/after `2026-10-06T15:53:55-07:00`, after BET assessment default to LEAN when a current eligible exact outcome probability exceeds break-even at the selected executable price by at least **1.00 probability point**, on an otherwise completed qualified market assessment. This is a product opinion threshold, not an estimated model error, calibrated profit bound or BET threshold. The producer still authors and sources the preference through `createForecastLean`; no advisory helper changes a card automatically.
+
+Use **PROVISIONAL LEAN**, $0 and NO BET when applicable starter/lineup/model assumptions remain unresolved; name the dependency and required recheck. Show contrary Pinnacle prices and known market dependence. Neither of those facts, a missing published interval nor ordinary lack of final lineups alone cancels the directional preference. Check which personnel/goaltending assumptions the forecast incorporates before treating an injury list as a second adverse adjustment. Preserve conflicting exact forecasts and choose one defensible opinion side per contract; material contrary forecast evidence may justify the exception below. Gaps below 1.00 point retain judgment and can remain PASS.
+
+For a forecast-supported PASS meeting this default, add the following to the existing source-linked `candidateAssessment.decision.directionalReview`:
+
+```json
+{
+  "leanDefaultException": {
+    "basis": "INVALIDATED_FORECAST_ASSUMPTION",
+    "sourceIds": ["actual-model-or-personnel-source-id"],
+    "forecastRecordIds": ["each-qualifying-exact-forecast-id"],
+    "forecastAssumption": "The actual assumption used by the supporting forecast",
+    "observedConflict": "The sourced observation contradicting that assumption",
+    "rationale": "Why the directional preference is no longer credible",
+    "directionalImpact": "How the conflict defeats even a provisional opinion"
+  }
+}
+```
+
+This is a schema example, not evidence. `MATERIAL_CONTRARY_EVIDENCE` is the other permitted basis; it requires actual contrary MODEL/OFFICIAL/REPORTING sources and the same rationale, directional impact and qualifying record bindings. A MARKET source alone cannot override this default. Ordinary uncertainty and unsupported claims about a provider's assumptions are not invalidated assumptions. Source identity/time/event, original forecast applicability, price freshness and all existing publication checks still apply. Personnel-based rejections cannot coexist with `NO MATERIAL PERSONNEL SENSITIVITY`; correct the assessment and its derived copies rather than deleting an inconvenient fact. The guard returns incomplete review for an unsupported PASS; it never fabricates an automatic LEAN.
+
+October 6's issued 15:25 report is unchanged: Ottawa +102 supported by 1.80 points and Chicago +124 supported by 1.53 points illustrate the future default; Vegas -167 supported by 0.39 point illustrates a below-threshold judgment case. None of these arithmetic points establishes a BET or settled profit.
+
 Use `createForecastLean` in `tools/forecast-lean.mjs` on an **unfrozen draft** with an already complete qualified market assessment and current `forecastReview`. It requires producer judgment:
 
 ```js
