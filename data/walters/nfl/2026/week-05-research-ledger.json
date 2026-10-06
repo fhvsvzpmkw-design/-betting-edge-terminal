@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-06T16:50:37-07:00",
+  "updatedAt": "2026-10-06T16:54:38-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -2568,6 +2568,128 @@
         "numericEligible": 6,
         "failedClosed": 1,
         "gamesRecomputed": 6,
+        "carriedRatingMoves": 0,
+        "marketViewed": false,
+        "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 4,
+      "type": "PERSONNEL_PRODUCTION_BATCH",
+      "startedAt": "2026-10-06T16:54:38-07:00",
+      "completedAt": "2026-10-06T16:54:38-07:00",
+      "scope": "Governed Walters personnel production batch graham-delta-1645-2026-w05-20261006T165438-0700-personnel-repair. Current availability/replacement evidence only; market prices not viewed.",
+      "sourcesChecked": [
+        {
+          "source": "Personnel production evidence",
+          "url": "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season",
+          "checkedAt": "2026-10-06T16:54:38-07:00",
+          "purpose": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload."
+        },
+        {
+          "source": "Personnel production evidence",
+          "url": "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26",
+          "checkedAt": "2026-10-06T16:54:38-07:00",
+          "purpose": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload."
+        },
+        {
+          "source": "Personnel production evidence",
+          "url": "data/walters/nfl/player-values/by-team-v1/bal.json",
+          "checkedAt": "2026-10-06T16:54:38-07:00",
+          "purpose": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload."
+        },
+        {
+          "source": "Personnel production evidence",
+          "url": "data/walters/nfl/player-values/player-values-access-v1.json",
+          "checkedAt": "2026-10-06T16:54:38-07:00",
+          "purpose": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "BAL",
+          "player": "Durham Smythe",
+          "availabilityStatus": "IR",
+          "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+          "valueStatus": "NUMERIC_ELIGIBLE",
+          "failClosedCode": null,
+          "reason": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload.",
+          "sourceRefs": [
+            "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season",
+            "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26",
+            "data/walters/nfl/player-values/by-team-v1/bal.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ],
+          "replacementEstimate": {
+            "modelId": "graham-replacement-role-estimate-v1",
+            "classification": "GRAHAM_MODEL_ESTIMATE",
+            "method": "ZERO_CALIBRATED_LOSS",
+            "healthyValue": 0,
+            "replacementValue": null,
+            "injuryLoss": 0,
+            "rawTeamContributionDelta": 0,
+            "injuryLossRange": {
+              "min": 0,
+              "max": 0
+            },
+            "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative loss floor yields zero without assigning a replacement.",
+            "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+            "reopenOn": "A source-bound player-value correction above zero or separately governed current-value amendment.",
+            "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+          }
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W05-BAL-ATL",
+          "priorPublishedFairHome": 5,
+          "baselineExactFairHome": 4.798,
+          "priorPersonnelOverlay": 0,
+          "newPersonnelOverlay": 0,
+          "newExactFairHome": 4.798,
+          "newPublishedFairHome": 5,
+          "applied": [
+            {
+              "team": "BAL",
+              "side": "AWAY",
+              "clusterGroup": "RECEIVER",
+              "clusterMultiplier": 1,
+              "caseKeys": [
+                "2026-W05-BAL-Durham-Smythe"
+              ],
+              "rawTeamContributionDelta": 0,
+              "finalTeamContributionDelta": 0,
+              "pointsToHomeSpread": 0
+            }
+          ],
+          "blockedGroups": [],
+          "unresolvedCases": [
+            {
+              "caseKey": "2026-W05-ATL-Jake-Matthews",
+              "player": "Jake Matthews",
+              "failClosedCode": "REVIEW_REQUIRED_AVAILABILITY",
+              "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
+            },
+            {
+              "caseKey": "2026-W05-ATL-Za-Darius-Smith",
+              "player": "Za'Darius Smith",
+              "failClosedCode": "REVIEW_REQUIRED_AVAILABILITY",
+              "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
+            }
+          ]
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_PERSONNEL_ONLY",
+        "role": "INDEPENDENT_COMPARISON_ONLY"
+      },
+      "summary": {
+        "casesSubmitted": 1,
+        "newEventsRecorded": 1,
+        "numericEligible": 1,
+        "failedClosed": 0,
+        "gamesRecomputed": 1,
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"

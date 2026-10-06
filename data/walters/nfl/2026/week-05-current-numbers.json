@@ -8,8 +8,8 @@
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-06T16:50:37-07:00",
-  "lastResearchAt": "2026-10-06T16:50:37-07:00",
+  "updatedAt": "2026-10-06T16:54:38-07:00",
+  "lastResearchAt": "2026-10-06T16:54:38-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-05-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-05-daily-market-ledger.json",
@@ -2547,7 +2547,7 @@
       "startTimePacific": "2026-10-11T17:20:00-07:00",
       "grahamFairHome": 5,
       "grahamExactFairHome": 4.798,
-      "grahamAsOf": "2026-10-06T16:50:37-07:00",
+      "grahamAsOf": "2026-10-06T16:54:38-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
       "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
@@ -2594,6 +2594,27 @@
           ],
           "effectiveAt": "2026-10-06T04:26:26-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "BAL",
+          "side": "AWAY",
+          "clusterGroup": "RECEIVER",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-BAL-Durham-Smythe"
+          ],
+          "rawTeamContributionDelta": 0,
+          "finalTeamContributionDelta": 0,
+          "pointsToHomeSpread": 0,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season",
+            "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26",
+            "data/walters/nfl/player-values/by-team-v1/bal.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
         }
       ],
       "researchSummary": "Governed fair decomposition: neutral/team base +7.300; home field -2.082; other governed -0.420; pre-personnel exact +4.798; personnel +0.000; matchup +0.000; exact Graham home fair +4.798; displayed +5.0.",
@@ -2614,7 +2635,8 @@
         "data/walters/nfl/2026/week-05-research-ledger.json",
         "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season",
         "data/walters/nfl/player-values/by-team-v1/bal.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26"
       ],
       "neutralBaseHome": 7.299508,
       "ratingCarryForward": {
@@ -2640,12 +2662,6 @@
           "player": "Za'Darius Smith",
           "failClosedCode": "REVIEW_REQUIRED_AVAILABILITY",
           "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
-        },
-        {
-          "caseKey": "2026-W05-BAL-Durham-Smythe",
-          "player": "Durham Smythe",
-          "failClosedCode": "CURRENT_ESTIMATE_SOURCE_NOT_BOUND",
-          "resolutionStatus": "RESOLVED_MODEL_ESTIMATE"
         }
       ],
       "personnelBlockedGroups": [],
@@ -2686,8 +2702,29 @@
       "qbPriorEstimates": [],
       "priorGrahamFairHome": 5,
       "personnelProductionId": "walters-personnel-production-v1",
-      "personnelLastAppliedAt": "2026-10-06T16:50:37-07:00",
-      "personnelEstimateCases": [],
+      "personnelLastAppliedAt": "2026-10-06T16:54:38-07:00",
+      "personnelEstimateCases": [
+        {
+          "caseKey": "2026-W05-BAL-Durham-Smythe",
+          "player": "Durham Smythe",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "replacementValue": null,
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative loss floor yields zero without assigning a replacement.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "reopenOn": "A source-bound player-value correction above zero or separately governed current-value amendment.",
+          "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
+          "applied": true
+        }
+      ],
       "weeklyRatingInput": {
         "state": "PARTIAL_BLOCKED",
         "sourceWeek": 4,
@@ -2867,8 +2904,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-delta-1645-2026-w05-20261006T165037-0700-personnel",
-    "lastAppliedAt": "2026-10-06T16:50:37-07:00",
+    "lastBatchId": "graham-delta-1645-2026-w05-20261006T165438-0700-personnel-repair",
+    "lastAppliedAt": "2026-10-06T16:54:38-07:00",
     "marketViewed": false
   },
   "baselineRecovery": {

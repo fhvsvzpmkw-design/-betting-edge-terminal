@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-06T16:50:37-07:00",
+  "updatedAt": "2026-10-06T16:54:38-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -23,7 +23,8 @@
   "processedBatchIds": [
     "graham-tuesday-baseline-2026-w05-20261006T111600-0700-personnel",
     "graham-delta-1645-2026-w05-20261006T164542-0700-personnel",
-    "graham-delta-1645-2026-w05-20261006T165037-0700-personnel"
+    "graham-delta-1645-2026-w05-20261006T165037-0700-personnel",
+    "graham-delta-1645-2026-w05-20261006T165438-0700-personnel-repair"
   ],
   "events": [
     {
@@ -1561,6 +1562,84 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Washington publishes a different return allocation, McCaffrey's availability changes, or Lane's offensive role is separately reconciled."
       }
+    },
+    {
+      "caseKey": "2026-W05-BAL-Durham-Smythe",
+      "gameKey": "2026-W05-BAL-ATL",
+      "team": "BAL",
+      "side": "AWAY",
+      "player": "Durham Smythe",
+      "playerEaId": "13291",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "2026-W05-BAL-Durham-Smythe-delta-repair-20261006T165438-0700",
+      "reason": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload.",
+      "sourceRefs": [
+        "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season",
+        "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26",
+        "data/walters/nfl/player-values/by-team-v1/bal.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season"
+      ],
+      "roleSourceRefs": [
+        "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26"
+      ],
+      "reopenOn": "A source-bound player-value correction above zero or separately governed current-value amendment.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative loss floor yields zero without assigning a replacement.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Matt Hibner",
+          "Josh Cuevas"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "MULTIROLE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261006T165438-0700-personnel-repair",
+      "effectiveAt": "2026-10-06T16:54:38-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 70,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative loss floor yields zero without assigning a replacement.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "A source-bound player-value correction above zero or separately governed current-value amendment.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   ],
   "currentCases": {
@@ -2706,10 +2785,11 @@
       "playerEaId": "13291",
       "availabilityStatus": "IR",
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "personnelEventId": "2026-W05-BAL-Durham-Smythe-delta-20261006T165037-0700",
+      "personnelEventId": "2026-W05-BAL-Durham-Smythe-delta-repair-20261006T165438-0700",
       "reason": "Baltimore reported that MRI confirmation of Durham Smythe's torn Achilles will end his season. His frozen Walters value is exactly 0.0, so the governed ZERO_CALIBRATED_LOSS path records the material absence without inventing workload.",
       "sourceRefs": [
         "https://www.baltimoreravens.com/news/durham-smythe-torn-achilles-ravens-tight-end-out-for-season",
+        "https://www.baltimoreravens.com/news/transcript-press-conferences-10-4-26",
         "data/walters/nfl/player-values/by-team-v1/bal.json",
         "data/walters/nfl/player-values/player-values-access-v1.json"
       ],
@@ -2743,15 +2823,36 @@
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
-      "batchId": "graham-delta-1645-2026-w05-20261006T165037-0700-personnel",
-      "effectiveAt": "2026-10-06T16:50:37-07:00",
+      "batchId": "graham-delta-1645-2026-w05-20261006T165438-0700-personnel-repair",
+      "effectiveAt": "2026-10-06T16:54:38-07:00",
       "sourceTask": "DELTA_1645",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
-      "failClosedCode": "CURRENT_ESTIMATE_SOURCE_NOT_BOUND",
-      "rawTeamContributionDelta": null
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "TE",
+      "maddenOvr": 70,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative loss floor yields zero without assigning a replacement.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "A source-bound player-value correction above zero or separately governed current-value amendment.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     },
     "2026-W05-HOU-Jaylin-Smith": {
       "caseKey": "2026-W05-HOU-Jaylin-Smith",
@@ -2956,6 +3057,6 @@
       }
     }
   },
-  "lastBatchId": "graham-delta-1645-2026-w05-20261006T165037-0700-personnel",
+  "lastBatchId": "graham-delta-1645-2026-w05-20261006T165438-0700-personnel-repair",
   "lastBatchSourceTask": "DELTA_1645"
 }
