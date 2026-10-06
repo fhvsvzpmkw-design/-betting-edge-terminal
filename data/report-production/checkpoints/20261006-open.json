@@ -1,8 +1,14 @@
 {
   "schema": 1,
-  "state": "READY",
-  "phase": "1",
-  "candidateId": "2026-10-06T06:14:54-07:00|1",
+  "identity": {
+    "candidateId": "2026-10-06T06:14:54-07:00|1",
+    "slot": "open",
+    "ts": "2026-10-06T06:14:54-07:00",
+    "canonicalSlot": 1,
+    "feedBlobSha": "7fc5a2b3096433352981c85566a8e299ea4cc545"
+  },
+  "phase": "STAGED",
+  "revision": 10,
   "report": {
     "ts": "2026-10-06T06:14:54-07:00",
     "slot": "open",
@@ -182514,5 +182520,284 @@
       ]
     },
     "candidateAssessmentVersion": "candidate-assessment-v1"
+  },
+  "events": [
+    {
+      "command": "start",
+      "at": "2026-10-06T13:04:14.055Z",
+      "revision": 1,
+      "phase": "DRAFT",
+      "durationMs": 189
+    },
+    {
+      "command": "retime",
+      "at": "2026-10-06T13:07:59.974Z",
+      "revision": 2,
+      "phase": "DRAFT",
+      "durationMs": 21
+    },
+    {
+      "command": "checkpoint",
+      "at": "2026-10-06T13:11:16.829Z",
+      "revision": 3,
+      "phase": "DRAFT",
+      "durationMs": 160
+    },
+    {
+      "command": "prepare",
+      "at": "2026-10-06T13:11:20.040Z",
+      "revision": 4,
+      "phase": "PREPARED",
+      "durationMs": 3047
+    },
+    {
+      "command": "checkpoint",
+      "at": "2026-10-06T13:14:42.733Z",
+      "revision": 5,
+      "phase": "DRAFT",
+      "durationMs": 205
+    },
+    {
+      "command": "retime",
+      "at": "2026-10-06T13:14:54.779Z",
+      "revision": 6,
+      "phase": "DRAFT",
+      "durationMs": 38
+    },
+    {
+      "command": "checkpoint",
+      "at": "2026-10-06T13:14:55.561Z",
+      "revision": 7,
+      "phase": "DRAFT",
+      "durationMs": 178
+    },
+    {
+      "command": "prepare",
+      "at": "2026-10-06T13:14:59.479Z",
+      "revision": 8,
+      "phase": "PREPARED",
+      "durationMs": 3752
+    },
+    {
+      "command": "freeze",
+      "at": "2026-10-06T13:15:10.090Z",
+      "revision": 9,
+      "phase": "FROZEN",
+      "durationMs": 3236
+    },
+    {
+      "command": "stage",
+      "at": "2026-10-06T13:15:13.807Z",
+      "revision": 10,
+      "phase": "STAGED",
+      "durationMs": 3461
+    }
+  ],
+  "preparation": {
+    "candidateDeferrals": {
+      "selectionIds": [
+        "MLB|75065656|full_game_moneyline|home",
+        "MLB|75065682|full_game_moneyline|home"
+      ],
+      "failures": []
+    },
+    "cardEvidenceDeferrals": {
+      "selectionIds": [],
+      "failures": []
+    },
+    "warnings": [
+      "Recommendation 2: MODEL source finding is rendered from forecastReview; retain substantive interpretation in decisionExplanation.",
+      "Recommendation 8: MODEL source finding is rendered from forecastReview; retain substantive interpretation in decisionExplanation."
+    ],
+    "forecastRouting": {
+      "applied": true,
+      "imported": []
+    },
+    "diagnostics": {
+      "schema": 1,
+      "mode": "diagnose",
+      "state": "PASS",
+      "receipts": [
+        {
+          "gate": "personnel-semantic-gate.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 126
+        },
+        {
+          "gate": "major-sport-market-coverage-gate.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 435
+        },
+        {
+          "gate": "report-evidence-gate.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 114
+        },
+        {
+          "gate": "report-event-eligibility.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 88
+        },
+        {
+          "gate": "report-sidecar-contract.mjs",
+          "command": "check",
+          "state": "PASS",
+          "durationMs": 117
+        },
+        {
+          "gate": "core-assessment-trace-gate.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 83
+        },
+        {
+          "gate": "core-v14-publication-gate.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 119
+        },
+        {
+          "gate": "pinnacle-benchmark-publication-gate.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 162
+        },
+        {
+          "gate": "selection-continuity.mjs",
+          "command": "audit",
+          "state": "PASS",
+          "durationMs": 129
+        },
+        {
+          "gate": "moneyline-lineage.mjs",
+          "command": "audit",
+          "state": "PASS",
+          "durationMs": 209
+        },
+        {
+          "gate": "selection-availability.mjs",
+          "command": "audit",
+          "state": "PASS",
+          "durationMs": 127
+        },
+        {
+          "gate": "spread-lineage.mjs",
+          "command": "audit",
+          "state": "PASS",
+          "durationMs": 180
+        },
+        {
+          "gate": "total-lineage.mjs",
+          "command": "audit",
+          "state": "PASS",
+          "durationMs": 161
+        },
+        {
+          "gate": "report-publication.mjs",
+          "command": "validate",
+          "state": "PASS",
+          "durationMs": 658
+        }
+      ]
+    }
+  },
+  "validation": {
+    "schema": 1,
+    "mode": "validate",
+    "state": "PASS",
+    "receipts": [
+      {
+        "gate": "personnel-semantic-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 148
+      },
+      {
+        "gate": "major-sport-market-coverage-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 456
+      },
+      {
+        "gate": "report-evidence-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 160
+      },
+      {
+        "gate": "report-event-eligibility.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 109
+      },
+      {
+        "gate": "report-sidecar-contract.mjs",
+        "command": "check",
+        "state": "PASS",
+        "durationMs": 142
+      },
+      {
+        "gate": "core-assessment-trace-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 109
+      },
+      {
+        "gate": "core-v14-publication-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 131
+      },
+      {
+        "gate": "pinnacle-benchmark-publication-gate.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 223
+      },
+      {
+        "gate": "selection-continuity.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 144
+      },
+      {
+        "gate": "moneyline-lineage.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 217
+      },
+      {
+        "gate": "selection-availability.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 127
+      },
+      {
+        "gate": "spread-lineage.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 179
+      },
+      {
+        "gate": "total-lineage.mjs",
+        "command": "audit",
+        "state": "PASS",
+        "durationMs": 163
+      },
+      {
+        "gate": "report-publication.mjs",
+        "command": "validate",
+        "state": "PASS",
+        "durationMs": 714
+      }
+    ]
+  },
+  "frozen": {
+    "blobSha": "d040075b26cfadde7517c3f63effc0be06d2e417",
+    "bytes": 9459608
   }
 }
