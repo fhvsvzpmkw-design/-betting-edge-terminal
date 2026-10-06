@@ -12,7 +12,7 @@ const STYLE_ID='runnerPreferenceFrameworkStyle';
 const LAST_VIEW_KEY='bettingEdge.preferences.lastView';
 const LAST_HISTORY_KEY='bettingEdge.preferences.lastHistoryView';
 const DETAIL_LAST_KEY='bettingEdge.preferences.recommendationDetailLastState';
-const SYNDICATE_FALLBACK=['eddie-numbers','lou-vega',null,null];
+const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','lou-vega'];
 
 let prefs=null,syndicates=null,hotlineShells=null,lastDoc=null,observer=null;
 
