@@ -17,6 +17,15 @@ export const NFELO_URL='https://raw.githubusercontent.com/greerreNFL/nfelo/main/
 export const BET_BETTER_FROM='2026-10-06T17:05:06Z';
 export const BET_BETTER_SPORTS=['NFL','NCAAF','MLB','NBA','WNBA','NHL'];
 export const betBetterUrl=sport=>`https://betbetter.world/predicted-scores/${sport.toLowerCase()}?format=csv`;
+export const MONEYPUCK_FROM='2026-10-06T17:55:00Z';
+export const moneyPuckDailyUrl=day=>{
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(day))throw Error('MoneyPuck source date required');
+  return `https://moneypuck.com/moneypuck/dates/${day.replaceAll('-','')}.htm`;
+};
+export const moneyPuckCsvUrl=id=>{
+  if(!/^\d{10}$/.test(String(id)))throw Error('MoneyPuck game ID required');
+  return `https://moneypuck.com/moneypuck/predictions/${id}.csv`;
+};
 const time=x=>Date.parse(x||'');
 const date=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
 const norm=x=>String(x||'').toLowerCase().replace(/^la /,'los angeles ').replace(/[^a-z0-9]/g,'');
@@ -45,6 +54,62 @@ function betBetterTeam(label,team,sport) {
   if(sport==='NFL')return teamAbbr(label)===teamAbbr(team);
   const clean=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
   return clean(label)!==''&&clean(label)===clean(team);
+}
+const plainHtml=value=>String(value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/\s+/g,' ').trim();
+export function parseMoneyPuckDaily(html) {
+  const output=[];
+  for(const match of String(html).matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)){
+    const cells=[...match[1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(m=>m[1]);
+    if(cells.length!==5||!/^Preview$/i.test(plainHtml(cells[2]).replace(/\d{2}:\d{2}\s+[AP]M\s+ET/gi,'').trim()))continue;
+    const ids=[...new Set([...cells[2].matchAll(/href=['"]preview\.htm\?id=(\d{10})['"]/gi)].map(m=>m[1]))];
+    const kickoff=plainHtml(cells[2]).match(/\b(\d{2}:\d{2}\s+[AP]M)\s+ET\b/i);
+    const teams=[cells[1],cells[3]].map(cell=>{
+      const images=[...cell.matchAll(/<img\b[^>]*>/gi)];if(images.length!==1)return null;
+      const image=images[0][0],label=image.match(/\balt=['"]([^'"]+)['"]/i)?.[1],code=image.match(/\/logos\/([A-Z]{2,3})\.png['"]/i)?.[1];
+      return label&&code?{label,code:code.toUpperCase()}:null;
+    });
+    const percentages=[cells[0],cells[4]].map(cell=>{
+      const values=[...cell.matchAll(/<h2\b[^>]*>\s*(\d+(?:\.\d+)?)%\s*<\/h2>/gi)];
+      return values.length===1?number(values[0][1]):null;
+    });
+    if(ids.length!==1||!kickoff||teams.some(t=>!t)||percentages.some(p=>p===null||p<0||p>100)||Math.abs(percentages[0]+percentages[1]-100)>.11)continue;
+    output.push({sourceGameId:ids[0],away:teams[0].label,home:teams[1].label,awayCode:teams[0].code,homeCode:teams[1].code,
+      easternTime:kickoff[1].toUpperCase().replace(/\s+/g,' '),awayPercent:percentages[0],homePercent:percentages[1]});
+  }
+  return output;
+}
+export function matchMoneyPuckEvent(event,rows,day) {
+  if(event.sport!=='NHL'||!Number.isFinite(time(event.startTime))||date(event.startTime)!==day)return null;
+  const easternTime=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:true}).format(new Date(event.startTime)).replace(/\s+/g,' ');
+  const clean=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const matches=list(rows).filter(row=>clean(row.home)===clean(event.home)&&clean(row.away)===clean(event.away)&&row.easternTime===easternTime);
+  return matches.length===1?matches[0]:null;
+}
+export function parseMoneyPuck(rows,event,boardRow,day,observedAt,registry) {
+  if(!boardRow||!matchMoneyPuckEvent(event,[boardRow],day)||time(observedAt)>=time(event.startTime)||!Number.isFinite(time(observedAt)))return [];
+  if(rows.length!==1)return [];
+  const row=rows[0];
+  if(String(row.gameID)!==boardRow.sourceGameId||row.homeTeamCode!==boardRow.homeCode||row.roadTeamCode!==boardRow.awayCode)return [];
+  const values={};
+  for(const side of ['Home','Away'])for(const type of ['InReg','InOT','Overall']){
+    const field=`preGame${side}TeamWin${type}Score`,p=number(row[field]);if(p===null||p<0||p>1)return [];values[field]=p;
+  }
+  const home=values.preGameHomeTeamWinOverallScore,away=values.preGameAwayTeamWinOverallScore;
+  if(Math.abs(home+away-1)>1e-7||Math.abs(home*100-boardRow.homePercent)>.051||Math.abs(away*100-boardRow.awayPercent)>.051||
+    ['Home','Away'].some(side=>Math.abs(values[`preGame${side}TeamWinOverallScore`]-values[`preGame${side}TeamWinInRegScore`]-values[`preGame${side}TeamWinInOTScore`])>1e-7))return [];
+  const model=number(row.preGameMoneyPuckHomeWinPrediction),market=number(row.preGameBettingOddsHomeWinPrediction);
+  const observedBlend=model!==null&&market!==null&&Math.abs(home-(model+market)/2)<1e-7;
+  const inputUrl=moneyPuckCsvUrl(boardRow.sourceGameId),boardUrl=moneyPuckDailyUrl(day);
+  return ['home','away'].map(side=>makeRecord(event,'moneypuck',registry.sources.moneypuck,observedAt,{
+    kind:'OUTCOME_PROBABILITY',marketDetail:'full_game_moneyline',side,line:null,probability:side==='home'?home:away,
+    probabilityBasis:'UNCONDITIONAL',pushProbability:0,settlement:{includesOvertime:true,pushRule:'NO_PUSH'},
+    url:inputUrl,inputUrl,boardUrl,sourceGameId:boardRow.sourceGameId,sourceValues:row,sourceBoardValues:boardRow,
+    sourceField:`preGame${side==='home'?'Home':'Away'}TeamWinOverallScore`,attribution:'MoneyPuck.com — https://www.moneypuck.com/',
+    marketBlendObservation:{modelHomeField:'preGameMoneyPuckHomeWinPrediction',modelHomeProbability:model,
+      bookmakerHomeField:'preGameBettingOddsHomeWinPrediction',bookmakerHomeProbability:market,
+      observedEqualWeightBlend:observedBlend,authority:'Observed source arithmetic; not a claim of independent model confirmation.'},
+    evidenceRef:`${inputUrl}#${digest(row)}`,
+    limitation:'Published overall win fields include regulation and OT components and both actual sides sum to one. The displayed forecast includes market input (equal-weight model/book blend observed in the verified October 6 sample); raw components stay separate. Model calculation time is not supplied. Current goalie, personnel and book settlement applicability still require report-time review.'}));
 }
 export function parseBetBetter(rows,event,observedAt,registry) {
   if(!BET_BETTER_SPORTS.includes(event.sport)||time(observedAt)>=time(event.startTime))return [];
@@ -189,7 +254,7 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
   const quoteHistory=[...quoteGroups.values()].flatMap(group=>[...group.values()].sort((a,b)=>time(b.observedAt)-time(a.observedAt)).slice(0,2));
   const requests=[],sources=[],cache=previousUsable?{...prior.requestCache}:{};
   async function get(url,format='json') {
-    const response=await fetchImpl(url,{headers:{Accept:format==='json'?'application/json':'text/csv','User-Agent':'VigWireLabs-GameIntelligence/1.0'},signal:AbortSignal.timeout(20000)});
+    const response=await fetchImpl(url,{headers:{Accept:format==='json'?'application/json':format==='html'?'text/html':'text/csv','User-Agent':'VigWireLabs-GameIntelligence/1.0'},signal:AbortSignal.timeout(20000)});
     requests.push({url,status:response.status,checkedAt:clock()});
     if(!response.ok)throw Error(`HTTP ${response.status}`);
     const bytes=await response.text();
@@ -219,6 +284,31 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
       sources.push({sourceId:'espn',eventId:event.eventId,state:parsed.records.length?'COLLECTED':'CONTEXT_ONLY',records:parsed.records.length,facts:parsed.facts.length,checkedAt:observedAt});
     }catch(error){sources.push({sourceId:'espn',eventId:event.eventId,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message});}
   });
+  // Verified public daily previews identify the exact native game CSV. The
+  // current user-authorized deployment is non-commercial. One shared date
+  // request, at most three concurrent game requests; no access bypass/fallback.
+  const moneyPuckActive=registry.sources.moneypuck?.collection?.mode==='PUBLIC_NON_COMMERCIAL_FORECAST_CSV'&&
+    registry.projectUse?.mode==='NON_COMMERCIAL'&&time(at)>=time(MONEYPUCK_FROM);
+  if(moneyPuckActive)await pool([...new Set(events.filter(e=>e.sport==='NHL').map(e=>date(e.startTime)))],async day=>{
+    const dayEvents=events.filter(e=>e.sport==='NHL'&&date(e.startTime)===day),key=`moneypuck:${day}`,url=moneyPuckDailyUrl(day);
+    const complete=dayEvents.every(e=>['home','away'].every(side=>records.some(r=>r.sourceId==='moneypuck'&&sameEvent(r,e)&&r.side===side)));
+    if(!force&&complete&&cache[key]&&time(at)-time(cache[key])<15*60000){sources.push({sourceId:'moneypuck',scope:day,state:'CACHED',checkedAt:cache[key],url});return;}
+    try{
+      const board=parseMoneyPuckDaily(await get(url,'html'));let count=0;
+      await pool(dayEvents,async event=>{
+        const match=matchMoneyPuckEvent(event,board,day);
+        if(!match){sources.push({sourceId:'moneypuck',eventId:event.eventId,scope:day,state:'NO_EXACT_EVENT',checkedAt:clock(),url,reason:'No unique pregame preview with exact ordered teams and Eastern kickoff.'});return;}
+        const inputUrl=moneyPuckCsvUrl(match.sourceGameId);
+        try{
+          const rows=parseCsv(await get(inputUrl,'csv')),observedAt=clock(),parsed=parseMoneyPuck(rows,event,match,day,observedAt,registry);
+          if(!parsed.length)throw Error('Native CSV identity, full-game probability components or daily display check failed');
+          for(let i=records.length-1;i>=0;i--)if(records[i].sourceId==='moneypuck'&&sameEvent(records[i],event))records.splice(i,1);
+          records.push(...parsed);count+=parsed.length;sources.push({sourceId:'moneypuck',eventId:event.eventId,scope:day,state:'COLLECTED',records:parsed.length,checkedAt:observedAt,url:inputUrl,boardUrl:url});
+        }catch(error){sources.push({sourceId:'moneypuck',eventId:event.eventId,scope:day,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url:inputUrl});}
+      });
+      if(count===dayEvents.length*2)cache[key]=clock();
+    }catch(error){sources.push({sourceId:'moneypuck',scope:day,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
+  },1);
   // One official schedule request serves every MLB side on that date. Keep
   // original source clocks independent from the latest executable price clock.
   const mlbDays=[...new Set(events.filter(e=>e.sport==='MLB').map(e=>date(e.startTime)))];
@@ -272,7 +362,7 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
     }catch(error){sources.push({sourceId:'bet_better',scope:sport,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
   });
   for(const [sourceId,source] of Object.entries(registry.sources)){
-    if(['espn','nfelo','bet_better'].includes(sourceId)||source.collection?.sports&&!events.some(event=>source.collection.sports.includes(event.sport)))continue;
+    if(['espn','nfelo','bet_better'].includes(sourceId)||sourceId==='moneypuck'&&moneyPuckActive||source.collection?.sports&&!events.some(event=>source.collection.sports.includes(event.sport)))continue;
     sources.push({sourceId,state:'RESEARCH_OR_LICENSED_IMPORT',reason:source.collection?.reason||'No verified automated feed configured. Use a permitted source capture; do not infer coverage from the source name.',
       automatedReuse:source.automatedReuse||'NO_API_OR_LICENSE_ASSUMED',urls:source.routes||Object.values(source.sportBoards||{})});
   }
