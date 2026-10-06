@@ -85,7 +85,7 @@ assert.match(document.getElementById('runnerVigScope').textContent,/PARKED: PRIC
 assert.equal(cluster.querySelectorAll('.instrument')[1].querySelector('.instrumentRead b').textContent,'50','unmeasured pressure uses a clearly parked neutral display');
 assert.equal(counts.textContent,'0000','no PASS cards may be synthesized');
 assert.equal(JSON.stringify(report),immutable,'rendering may never rewrite the report');
-assert.match(api.noPublishedCardsText({...report,recs:[{status:'PASS'}]}),/No published selections match ALL/,'filter-empty text is distinct from zero cards');
+assert.match(api.noPublishedCardsText({...report,recs:[{status:'PASS'}]}),/No selections match these filters.*Clear Filters/,'filter-empty text is distinct from zero cards and names the shared reset control');
 
 for(const mutate of [r=>{r.instrumentTelemetry.calculationVersion=2;},r=>{delete r.instrumentTelemetry.source.coverageAuthorityBlobSha;},r=>{r.instrumentTelemetry.source.state='UNAVAILABLE';},r=>{r.instrumentTelemetry.movement.comparisons[0].book='Other';},r=>{r.instrumentTelemetry.movement.comparisons[0].baselineTs=feed.generatedAt;},r=>{r.instrumentTelemetry.pressure.rawConfidence=100;},r=>{r.coverageSummary.source.feedBlobSha='d'.repeat(40);}]){const bad=structuredClone(report);mutate(bad);assert.equal(api.telemetryIntegrityState(bad),'ERROR');assert.equal(api.deriveInstrumentReadings(bad).heat.label,'INTEGRITY ERROR');}
 const missing=structuredClone(report);delete missing.coverageSummary;assert.equal(api.coverageSummaryState(missing),'MISSING');assert.match(api.coveragePanel(document,missing).textContent,/COVERAGE UNVERIFIED/);
