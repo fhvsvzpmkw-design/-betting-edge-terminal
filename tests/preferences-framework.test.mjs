@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import vm from 'node:vm';
 
 function assert(condition,message){if(!condition)throw new Error(message)}
 const prefs=JSON.parse(fs.readFileSync('data/preferences.json','utf8'));
@@ -62,4 +63,20 @@ assert(!bootstrap.includes('schedule-profile-ui.js'),'retired seasonal schedule 
 assert(framework.includes("const BUTTON_ID='runnerPreferencesF6'"),'preferences framework must own its menu button');
 assert(framework.includes("const PANEL_ID='runnerPreferencesPanel'"),'preferences framework must own its panel');
 
+// A saved older roster must migrate when the published default order changes.
+const syndicates=JSON.parse(fs.readFileSync('data/syndicates.json','utf8'));
+const saved=new Map([['bettingEdge.syndicateSlots.v4',JSON.stringify(['eddie-numbers','larry-luck','vic-fremont','jesse-bains','alex-daventry',null,null,null])]]);
+const top={__vigwireSyndicateAssignments:['eddie-numbers','larry-luck','vic-fremont','jesse-bains',null,null,null,null]};
+const context={window:{top},localStorage:{getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,String(value))}};
+const prefix=framework.slice(0,framework.indexOf('function choiceControl('));
+vm.runInNewContext(prefix+'syndicates='+JSON.stringify(syndicates)+';globalThis.assignmentApi={readSyndicateAssignments,writeSyndicateAssignments};})();',context);
+const migrated=context.assignmentApi.readSyndicateAssignments();
+assert(JSON.stringify(migrated)===JSON.stringify([...syndicates.defaults.slice(0,4),'alex-daventry',null,null,null]),'Older saved roster must migrate to Eddie / Graham / Bill / Lou and keep new-slot choices');
+assert(JSON.stringify(top.__vigwireSyndicateAssignments)===JSON.stringify(migrated),'Default-order migration must replace a stale open-session roster');
+assert(saved.get('bettingEdge.syndicateSlots.defaultOrderRevision')===String(syndicates.defaultOrderRevision),'Default-order migration must be recorded');
+const chosen=['lou-vega','graham-mercer','vic-fremont','eddie-numbers','alex-daventry',null,null,null];
+context.assignmentApi.writeSyndicateAssignments(chosen);
+assert(JSON.stringify(context.assignmentApi.readSyndicateAssignments())===JSON.stringify(chosen),'An intentional choice made after migration must remain saved');
+
 console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + UNBOUNDED EVALUATED CARD OUTPUT');
+

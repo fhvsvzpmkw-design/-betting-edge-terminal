@@ -13,6 +13,7 @@ const LAST_VIEW_KEY='bettingEdge.preferences.lastView';
 const LAST_HISTORY_KEY='bettingEdge.preferences.lastHistoryView';
 const DETAIL_LAST_KEY='bettingEdge.preferences.recommendationDetailLastState';
 const SYNDICATE_SLOT_COUNT=8;
+const SYNDICATE_ORDER_KEY='bettingEdge.syndicateSlots.defaultOrderRevision';
 const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','lou-vega',null,null,null,null];
 
 let prefs=null,syndicates=null,hotlineShells=null,lastDoc=null,observer=null;
@@ -52,6 +53,14 @@ function counts(){
 function normalizedSyndicateAssignments(source){
   return Array.from({length:SYNDICATE_SLOT_COUNT},(_,i)=>source[i]==null?null:String(source[i]));
 }
+function syndicateOrderRevision(){return String(syndicates?.defaultOrderRevision||1)}
+function migrateSyndicateOrder(source,defaults){
+  const next=normalizedSyndicateAssignments(source);
+  defaults.slice(0,4).forEach((id,i)=>next[i]=id);
+  const used=new Set(next.slice(0,4).filter(Boolean));
+  for(let i=4;i<SYNDICATE_SLOT_COUNT;i++){if(next[i]&&used.has(next[i]))next[i]=null;else if(next[i])used.add(next[i]);}
+  return next;
+}
 function defaultSyndicateAssignments(){
   const source=Array.isArray(syndicates?.defaults)&&[4,SYNDICATE_SLOT_COUNT].includes(syndicates.defaults.length)?syndicates.defaults:SYNDICATE_FALLBACK;
   return normalizedSyndicateAssignments(source);
@@ -68,18 +77,24 @@ function syndicateCharacterLabel(id){
 function readSyndicateAssignments(){
   const module=moduleById('syndicate_load');
   const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
+  const defaults=defaultSyndicateAssignments();
+  let assignments=defaults;
   try{
     const raw=JSON.parse(localStorage.getItem(key)||'null');
-    if(Array.isArray(raw)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.length))return normalizedSyndicateAssignments(raw);
+    if(Array.isArray(raw)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.length))assignments=normalizedSyndicateAssignments(raw);
+    if(localStorage.getItem(SYNDICATE_ORDER_KEY)===syndicateOrderRevision())return assignments;
   }catch{}
-  return defaultSyndicateAssignments();
+  assignments=migrateSyndicateOrder(assignments,defaults);
+  writeSyndicateAssignments(assignments);
+  return assignments;
 }
 function writeSyndicateAssignments(assignments){
   const module=moduleById('syndicate_load');
   const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
   const normalized=normalizedSyndicateAssignments(assignments);
-  try{if(window.top)window.top.__vigwireSyndicateAssignments=normalized.slice()}catch{}
-  try{localStorage.setItem(key,JSON.stringify(normalized));return true}catch{return false}
+  const revision=syndicateOrderRevision();
+  try{if(window.top){window.top.__vigwireSyndicateAssignments=normalized.slice();window.top.__vigwireSyndicateOrderRevision=revision}}catch{}
+  try{localStorage.setItem(key,JSON.stringify(normalized));localStorage.setItem(SYNDICATE_ORDER_KEY,revision);return true}catch{return false}
 }
 function choiceControl(module){
   const value=readChoice(module);
@@ -389,4 +404,5 @@ Promise.all([
   window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});
 }).catch(e=>console.warn('Preferences framework unavailable',e));
 })();
+
 
