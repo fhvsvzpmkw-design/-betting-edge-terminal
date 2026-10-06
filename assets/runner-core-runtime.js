@@ -22,7 +22,7 @@ let sportFilter='ALL';
 let marketFilter='ALL';
 let bookFilter='ALL';
 let pickSearch='';
-let pickSort='CALL';
+let pickSort='EDGE';
 const priorChangesCache=new Map();
 const issuedSessionCatalog=new Map();
 
@@ -946,7 +946,7 @@ function filterTools(d,run,container,view='board'){
   searchLabel.appendChild(search);fields.appendChild(searchLabel);
   dropdown('Sort','SORT BY',[['CALL','CALL PRIORITY'],['EDGE','HIGHEST EDGE'],['START','GAME START TIME'],['MOVE','LARGEST PRICE MOVE']],pickSort,v=>pickSort=v);
   const clear=el(d,'button','filterBtn runnerClearFilters','CLEAR FILTERS');clear.type='button';clear.id=prefix+'ClearFilters';
-  clear.onclick=()=>{statusFilter=sportFilter=marketFilter=bookFilter='ALL';pickSearch='';pickSort='CALL';refreshPickFilters(d,run,clear.id)};
+  clear.onclick=()=>{statusFilter=sportFilter=marketFilter=bookFilter='ALL';pickSearch='';pickSort='EDGE';refreshPickFilters(d,run,clear.id)};
   fields.appendChild(clear);tools.appendChild(fields);
   const showing=filteredPicks(run).length,total=(run.recs||[]).length;
   const summary=el(d,'div','runnerFilterSummary',`Showing ${showing} of ${total} published ${view==='market'?'selections':'cards'}`);
