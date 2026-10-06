@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
-const instrumented=source.replace('\nactiveRun=payload();','\nglobalThis.picksApi={recSport,runSports,filteredPicks,pickMeta,pickReason,pickMarket,pickCounts,pickMovement,compareRunPicks,fetchPriorChangeRun,setFilters:(status,sport,market="ALL",book="ALL",search="",sort="EDGE")=>{statusFilter=status;sportFilter=sport;marketFilter=market;bookFilter=book;pickSearch=search;pickSort=sort}};\nactiveRun=payload();');
+const instrumented=source.replace('\nactiveRun=payload();','\nglobalThis.picksApi={recSport,runSports,filteredPicks,pickMeta,pickReason,pickMarket,pickCounts,pickMovement,compareRunPicks,fetchPriorChangeRun,setFilters:(status,sport,market="ALL",book="ALL",search="",sort="CALL")=>{statusFilter=status;sportFilter=sport;marketFilter=market;bookFilter=book;pickSearch=search;pickSort=sort}};\nactiveRun=payload();');
 const archive=JSON.parse(fs.readFileSync('run-history.json','utf8'));
 const reads=[];
 const context={console,Intl,Date,URLSearchParams,TextDecoder,TextEncoder,Uint8Array,
@@ -18,7 +18,7 @@ const rec=(sport,eventId,marketKey,side,line,status='PASS',price='-110',book='Be
   feed:{eventId,marketKey,side,line,selectionKey:`${eventId}|${marketKey}|${side}||${line??''}`,eventDate:'2026-10-02T00:00:00Z'}});
 const nfl=rec('NFL','1','spread','home',3,'LEAN'),nhl=rec('NHL','2','ml','home',null,'BET'),other=rec('NFL','1','spread','away',3);
 const mixed={recs:[other,nfl,nhl]};
-assert.equal(api.filteredPicks({recs:[{...nhl,edge:'-2.528 probability points'},{...nfl,edge:'+1.25 pp'},{...other,edge:'UNKNOWN'}]}).map(r=>r.status).join(','),'LEAN,BET,PASS','initial view uses highest signed edge and leaves unknown edges last');
+assert.equal(api.filteredPicks({recs:[{...nhl,edge:'-2.528 probability points'},{...nfl,edge:'+1.25 pp'},{...other,edge:'UNKNOWN'}]}).map(r=>r.status).join(','),'BET,LEAN,PASS','initial view prioritizes calls ahead of signed edge');
 api.setFilters('LEAN','NFL');assert.equal(api.filteredPicks(mixed).length,1);assert.equal(api.filteredPicks(mixed)[0].status,'LEAN');
 api.setFilters('BET','NFL');assert.equal(api.filteredPicks(mixed).length,0,'sport and status intersect, including honest empty views');
 api.setFilters('ALL','ALL','ALL','ALL','','CALL');assert.equal(api.filteredPicks(mixed).map(r=>r.status).join(','),'BET,LEAN,PASS');
