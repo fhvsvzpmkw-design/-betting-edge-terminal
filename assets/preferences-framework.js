@@ -14,7 +14,7 @@ const LAST_HISTORY_KEY='bettingEdge.preferences.lastHistoryView';
 const DETAIL_LAST_KEY='bettingEdge.preferences.recommendationDetailLastState';
 const SYNDICATE_SLOT_COUNT=8;
 const SYNDICATE_ORDER_KEY='bettingEdge.syndicateSlots.defaultOrderRevision';
-const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','lou-vega',null,null,null,null];
+const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','guy-laflame','lou-vega',null,null,null];
 
 let prefs=null,syndicates=null,hotlineShells=null,lastDoc=null,observer=null;
 
@@ -53,12 +53,15 @@ function counts(){
 function normalizedSyndicateAssignments(source){
   return Array.from({length:SYNDICATE_SLOT_COUNT},(_,i)=>source[i]==null?null:String(source[i]));
 }
-function syndicateOrderRevision(){return String(syndicates?.defaultOrderRevision||1)}
+function syndicateOrderRevision(){return String(syndicates?.defaultOrderRevision||2)}
 function migrateSyndicateOrder(source,defaults){
   const next=normalizedSyndicateAssignments(source);
-  defaults.slice(0,4).forEach((id,i)=>next[i]=id);
-  const used=new Set(next.slice(0,4).filter(Boolean));
-  for(let i=4;i<SYNDICATE_SLOT_COUNT;i++){if(next[i]&&used.has(next[i]))next[i]=null;else if(next[i])used.add(next[i]);}
+  const count=defaults.reduce((n,id,i)=>id==null?n:i+1,0);
+  const displaced=next.slice(4,count).filter(Boolean);
+  defaults.slice(0,count).forEach((id,i)=>next[i]=id);
+  const used=new Set(next.slice(0,count).filter(Boolean));
+  for(let i=count;i<SYNDICATE_SLOT_COUNT;i++){if(next[i]&&used.has(next[i]))next[i]=null;else if(next[i])used.add(next[i]);}
+  for(const id of displaced){const free=next.findIndex((value,i)=>i>=count&&!value);if(!used.has(id)&&free>=0){next[free]=id;used.add(id);}}
   return next;
 }
 function defaultSyndicateAssignments(){

@@ -4,7 +4,7 @@ This directory stores the editable personality and continuity layer for Syndicat
 
 ## Boundaries
 
-- `data/syndicates.json` remains the lightweight roster and four-slot manifest.
+- `data/syndicates.json` remains the lightweight roster and eight-slot manifest.
 - Each roster profile may point to a `characterFile` in this directory.
 - The character file does not control Betting Edge recommendations, prices, status, stake, risk, odds freshness, or report authority.
 - Hotline pages remain independent presentation files and can be updated without a runner change.
@@ -59,6 +59,10 @@ Another example:
 That can update voice traits while preserving his stable setting, visual identity, and continuity.
 
 ## Hotline issue archive
+
+Guy Laflame’s Blue Line reads the shared saved NHL board on open and refresh. It ranks one full-game moneyline per game by the matched MoneyPuck published forecast minus the best captured price’s break-even probability. The Pinnacle comparison and last issued VigScope call remain separate. His default slot is F4; Lou Vega moves to F5. The default-order revision migrates older saved loads once and preserves later choices.
+
+To deliberately capture a dated Blue Line edition, run `node tools/build-guy-hotline.mjs` from the repository root. It writes the current edition, appends the archive index and preserves existing issued copies. `--preview` updates only the live fallback HTML. Runtime feed refreshes do not rewrite archived editions.
 
 Each character keeps one live Hotline page plus immutable issued copies beside it.
 
