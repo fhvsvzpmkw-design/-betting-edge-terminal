@@ -4,7 +4,7 @@
   "publication": "THE PRIVATE LINE",
   "season": 2026,
   "week": 5,
-  "generatedAt": "2026-10-07T23:54:25.528Z",
+  "generatedAt": "2026-10-07T23:56:38.516Z",
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10",
@@ -159,10 +159,47 @@
       "neutralBaseHome": -4.5,
       "espnNeutralHome": -1.5,
       "grahamFairHome": -10,
-      "grahamAsOf": "2026-10-07T16:52:05-07:00",
+      "grahamAsOf": "2026-10-07T16:54:31-07:00",
       "numberStatus": "READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT",
-      "grahamMove": 0.5,
+      "grahamMove": 0,
       "personnelEstimateCases": [
+        {
+          "caseKey": "2026-W05-DAL-Cobie-Durant",
+          "player": "Cobie Durant",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "PRIMARY_REPLACEMENT",
+          "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+          "healthyValue": 0.9,
+          "replacementValue": 1.2,
+          "replacementValueRatio": {
+            "numerator": 1.2,
+            "denominator": 1
+          },
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "upgradeExcluded": true,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "weights": [
+            {
+              "player": "Joey Porter",
+              "eaPlayerId": "22706",
+              "lockedValue": 1.2,
+              "additionalRoleUnits": 1,
+              "weight": 1
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "Dallas reported Porter as a high-level outside starter for the injured cornerback room and documented his Week 4 debut; using him for Durant's additional vacated outside-corner duties is a labelled primary-role estimate.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+          "reopenOn": "Dallas changes the Week 5 outside-corner allocation, Joey Porter Jr. becomes unavailable, or Cobie Durant returns.",
+          "applied": true
+        },
         {
           "caseKey": "2026-W05-DAL-Drew-Shelton",
           "player": "Drew Shelton",
@@ -196,12 +233,6 @@
           "player": "SirVocea Dennis",
           "failClosedCode": "REVIEW_REQUIRED_MULTROLE_REPLACEMENT",
           "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
-        },
-        {
-          "caseKey": "2026-W05-DAL-Cobie-Durant",
-          "player": "Cobie Durant",
-          "failClosedCode": "MODEL_PRIMARY_ROLE_REQUIRED",
-          "resolutionStatus": "RESOLVED_MODEL_ESTIMATE"
         }
       ],
       "personnelBlockedGroups": [],
@@ -265,6 +296,35 @@
           "marketViewed": false
         },
         {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "TB",
+          "homeTeam": "DAL",
+          "awayStarter": "Jalon Daniels",
+          "homeStarter": "Dak Prescott",
+          "awayTeamQbDelta": -2.5,
+          "homeTeamQbDelta": -0.16,
+          "pointsToHomeSpread": -2.34,
+          "reason": "Governed Walters QB differential: TB -2.50 minus DAL -0.16 equals -2.34 points to the home-spread coordinate. TB uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "valuationMethods": {
+            "away": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-07T11:42:16-07:00",
+          "marketViewed": false
+        },
+        {
           "type": "PERSONNEL_CALIBRATED_PRODUCTION",
           "team": "TB",
           "side": "AWAY",
@@ -311,6 +371,30 @@
           "type": "PERSONNEL_CALIBRATED_PRODUCTION",
           "team": "DAL",
           "side": "HOME",
+          "clusterGroup": "DEFENSIVE_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-DAL-Cobie-Durant"
+          ],
+          "rawTeamContributionDelta": 0,
+          "finalTeamContributionDelta": 0,
+          "pointsToHomeSpread": 0,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.dallascowboys.com/team/injury-report/week/REG-5",
+            "https://www.dallascowboys.com/news/cowboys-agree-to-terms-on-trade-for-steelers-cb-joey-porter-jr",
+            "https://www.dallascowboys.com/news/updates-october-2026",
+            "https://www.dallascowboys.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/dal.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json",
+            "data/walters/nfl/player-values/player-values-2026-v1.json"
+          ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "DAL",
+          "side": "HOME",
           "clusterGroup": "OFFENSIVE_LINE",
           "clusterMultiplier": 1,
           "caseKeys": [
@@ -327,35 +411,6 @@
             "data/walters/nfl/player-values/by-team-v1/dal.json",
             "data/walters/nfl/player-values/player-values-access-v1.json"
           ]
-        },
-        {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "TB",
-          "homeTeam": "DAL",
-          "awayStarter": "Jalon Daniels",
-          "homeStarter": "Dak Prescott",
-          "awayTeamQbDelta": -2.5,
-          "homeTeamQbDelta": -0.16,
-          "pointsToHomeSpread": -2.34,
-          "reason": "Governed Walters QB differential: TB -2.50 minus DAL -0.16 equals -2.34 points to the home-spread coordinate. TB uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
-          "valuationMethods": {
-            "away": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
-            "home": "STAGE3_PERFORMANCE_CANDIDATE"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "https://www.buccaneers.com/news/baker-mayfield-three-weeks-minimum-thumb-injury-update",
-            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-          ],
-          "effectiveAt": "2026-10-07T11:42:16-07:00",
-          "marketViewed": false
         }
       ],
       "proposedWager": null,
