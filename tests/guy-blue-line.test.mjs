@@ -56,7 +56,7 @@ test('slot host and preferences both migrate Guy to four, Lou to five and preser
   const old=['eddie-numbers','graham-mercer','vic-fremont','lou-vega','alex-daventry','larry-luck',null,'jesse-bains'];
   for(const [file,fn,nextFn,normalizer] of [['syndicates/slot-host.html','migrateDefaultOrder','loadAssignments','normalizedAssignments'],['assets/preferences-framework.js','migrateSyndicateOrder','defaultSyndicateAssignments','normalizedSyndicateAssignments']]){
     const source=fs.readFileSync(file,'utf8'),start=source.indexOf('function '+fn+'('),end=source.indexOf('\nfunction '+nextFn+'(',start);
-    const context={};vm.runInNewContext(`const SYNDICATE_SLOT_COUNT=8;function ${normalizer}(source){return Array.from({length:8},(_,i)=>source[i]??null)}\n`+source.slice(start,end)+`\nglobalThis.migrate=${fn}`,context);
+    const context={window:{VigwireSyndicateRoster:require('../assets/syndicate-roster.js')}};vm.runInNewContext(`const SYNDICATE_SLOT_COUNT=8;function ${normalizer}(source){return Array.from({length:8},(_,i)=>source[i]??null)}\n`+source.slice(start,end)+`\nglobalThis.migrate=${fn}`,context);
     assert.deepEqual(Array.from(context.migrate(old,defaults)),[...defaults.slice(0,5),'larry-luck','alex-daventry','jesse-bains']);
     assert.deepEqual(Array.from(context.migrate(defaults,defaults)),defaults);
   }

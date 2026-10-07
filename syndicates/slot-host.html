@@ -32,6 +32,7 @@ body.hotlineFullscreen{display:block;overflow:hidden}body.hotlineFullscreen .syn
 <div id="content"></div>
 <button id="shareHotline" class="shareHotline" type="button" aria-label="Share hotline" hidden><img id="shareHotlineArt" alt="Share Hotline"></button>
 <button id="fullscreenClose" class="fullscreenClose" type="button" aria-label="Close full screen hotline">CLOSE ×</button>
+<script src="../assets/syndicate-roster.js?v=1"></script>
 <script>
 const MANIFEST='../data/syndicates.json';
 const SYNDICATE_SLOT_COUNT=8;
@@ -55,25 +56,16 @@ const content=document.getElementById('content');
 const shareHotline=document.getElementById('shareHotline');
 const shareHotlineArt=document.getElementById('shareHotlineArt');
 const fullscreenClose=document.getElementById('fullscreenClose');
-let currentProfile=null,currentTarget=null,currentFrameUrl=null,profiles=[],assignments=[],defaultOrderRevision='2';
+let currentProfile=null,currentTarget=null,currentFrameUrl=null,profiles=[],assignments=[],rosterManifest=null;
 shareHotlineArt.src=`${SHARE_ASSET}?v=${Date.now()}`;
 slotName.textContent=`F${slotIndex+1} // SYNDICATE SLOT`;
 function initials(label,index){const v=String(label||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();return v||String(index+1).padStart(2,'0')}
 function normalizeProfile(p,i){const label=String(p&&(p.name||p.label)||`PROFILE ${i+1}`);return{id:String(p&&p.id||`profile-${i+1}`),label,subtitle:String(p&&(p.title||p.subtitle||p.tagline)||'PRIVATE WIRE'),status:String(p&&p.status||'LIVE'),enabled:Boolean(p&&p.enabled!==false&&p.url),url:p&&p.url?String(p.url):null,avatar:String(p&&(p.fallback||p.avatar||p.initials)||initials(label,i)),avatarUrl:p&&(p.headshot||p.avatarUrl)?String(p.headshot||p.avatarUrl):null,avatarAlt:String(p&&(p.headshotAlt||p.avatarAlt)||`${label} headshot`),avatarPosition:String(p&&(p.headshotPosition||p.avatarPosition)||'50% 32%'),accent:String(p&&p.accent||'#c9a43b')}}
 function normalizedAssignments(source){return Array.from({length:SYNDICATE_SLOT_COUNT},(_,i)=>source[i]==null?null:String(source[i]))}
 function normalizedDefaults(raw){const source=Array.isArray(raw&&raw.defaults)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.defaults.length)?raw.defaults:FALLBACK_DEFAULTS;return normalizedAssignments(source)}
-function migrateDefaultOrder(source,defaults){
-  const next=normalizedAssignments(source);
-  const count=defaults.reduce((n,id,i)=>id==null?n:i+1,0);
-  const displaced=next.slice(4,count).filter(Boolean);
-  defaults.slice(0,count).forEach((id,i)=>next[i]=id);
-  const used=new Set(next.slice(0,count).filter(Boolean));
-  for(let i=count;i<SYNDICATE_SLOT_COUNT;i++){if(next[i]&&used.has(next[i]))next[i]=null;else if(next[i])used.add(next[i]);}
-  for(const id of displaced){const free=next.findIndex((value,i)=>i>=count&&!value);if(!used.has(id)&&free>=0){next[free]=id;used.add(id);}}
-  return next;
-}
-function loadAssignments(defaults){let source=defaults;try{const raw=window.top&&window.top.__vigwireSyndicateAssignments;if(Array.isArray(raw)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.length)){source=normalizedAssignments(raw);if(window.top.__vigwireSyndicateOrderRevision===defaultOrderRevision)return source}}catch(e){}try{const raw=JSON.parse(localStorage.getItem(SLOT_STORAGE_KEY)||'null');if(Array.isArray(raw)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.length)){source=normalizedAssignments(raw);if(localStorage.getItem(SLOT_ORDER_KEY)===defaultOrderRevision)return source}}catch(e){}return migrateDefaultOrder(source,defaults)}
-function saveAssignments(a){const normalized=normalizedAssignments(a);try{if(window.top){window.top.__vigwireSyndicateAssignments=normalized.slice();window.top.__vigwireSyndicateOrderRevision=defaultOrderRevision}}catch(e){}try{localStorage.setItem(SLOT_STORAGE_KEY,JSON.stringify(normalized));localStorage.setItem(SLOT_ORDER_KEY,defaultOrderRevision)}catch(e){}}
+function migrateDefaultOrder(source,defaults){return window.VigwireSyndicateRoster.migrate(source,defaults)}
+function loadAssignments(){return window.VigwireSyndicateRoster.read(rosterManifest,window)}
+function saveAssignments(a){return window.VigwireSyndicateRoster.write(a,rosterManifest,window)}
 function resolveProjectUrl(path){return new URL(path,new URL('../',location.href)).href}
 function emptyProfile(index){return{id:null,label:`EMPTY ${index+1}`,subtitle:'SLOT AVAILABLE',status:'OPEN',enabled:false,url:null,avatar:String(index+1).padStart(2,'0'),avatarUrl:null,avatarAlt:'Empty syndicate slot',avatarPosition:'50% 32%',accent:'#53636b'}}
 function updateLoadedCount(){loadedCount.textContent=`${assignments.filter(Boolean).length} / ${SYNDICATE_SLOT_COUNT}`}
@@ -96,9 +88,8 @@ function bindHotlineTap(frame){frame.addEventListener('load',()=>{try{const d=fr
 async function shareCurrentHotline(){if(!currentProfile||!currentTarget)return;const data={title:`${currentProfile.label} Hotline`,text:`${currentProfile.label} — ${currentProfile.subtitle}`,url:currentTarget};try{const nav=(window.top&&window.top.navigator)||navigator;if(nav&&nav.share){await nav.share(data);return}}catch(err){if(err&&err.name==='AbortError')return}try{const topWin=(window.top&&window.top)||window;topWin.open(currentTarget,'_blank','noopener')}catch(err){window.open(currentTarget,'_blank','noopener')}}
 function renderProfile(profile){exitFullscreen();if(profile&&profile.enabled&&profile.url){const target=resolveProjectUrl(profile.url),existing=currentPreviewFrame();if(currentProfile&&currentProfile.id===profile.id&&currentTarget===target&&existing){currentProfile=profile;manageButton.textContent='CHANGE CHARACTER';currentName.textContent=`${profile.label} // ${profile.subtitle}`;shareHotline.hidden=false;return}content.innerHTML='';currentProfile=profile;currentTarget=target;currentFrameUrl=target+(target.includes('?')?'&':'?')+'v='+LOAD_TOKEN;manageButton.textContent='CHANGE CHARACTER';currentName.textContent=`${profile.label} // ${profile.subtitle}`;const frame=document.createElement('iframe');frame.className='frame';frame.title=profile.label;frame.src=currentFrameUrl;bindHotlineTap(frame);content.appendChild(frame);shareHotline.hidden=false;return}content.innerHTML='';currentProfile=null;currentTarget=null;currentFrameUrl=null;shareHotline.hidden=true;currentName.textContent='EMPTY // SLOT AVAILABLE';manageButton.textContent='CHOOSE CHARACTER';const blank=document.createElement('div');blank.className='empty';blank.innerHTML='<b>EMPTY SYNDICATE SLOT</b><span>THIS LINE IS OPEN // SELECT A SAVED CHARACTER FROM YOUR LIBRARY</span>';const choose=document.createElement('button');choose.type='button';choose.textContent='CHOOSE CHARACTER';choose.addEventListener('click',openLibrary);blank.appendChild(choose);content.appendChild(blank)}
 manageButton.addEventListener('click',()=>libraryPanel.hidden?openLibrary():closeLibrary());libraryClose.addEventListener('click',closeLibrary);shareHotline.addEventListener('click',e=>{e.stopPropagation();shareCurrentHotline()});fullscreenClose.addEventListener('click',exitFullscreen);document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!libraryPanel.hidden)closeLibrary();else exitFullscreen()}});
-async function boot(){const res=await fetch(`${MANIFEST}?v=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error(`manifest ${res.status}`);const raw=await res.json();profiles=(Array.isArray(raw.profiles)?raw.profiles:Array.isArray(raw.slots)?raw.slots:[]).map(normalizeProfile);const defaults=normalizedDefaults(raw);defaultOrderRevision=String(raw.defaultOrderRevision||2);assignments=loadAssignments(defaults);assignments=assignments.map(id=>profiles.some(p=>p.id===id)?id:null);saveAssignments(assignments);refreshParentTabs();updateLoadedCount();renderProfile(profiles.find(p=>p.id===assignments[slotIndex]))}
+async function boot(){const res=await fetch(`${MANIFEST}?v=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error(`manifest ${res.status}`);const raw=await res.json();rosterManifest=raw;assignments=loadAssignments();profiles=raw.profiles.map(normalizeProfile);refreshParentTabs();updateLoadedCount();renderProfile(profiles.find(p=>p.id===assignments[slotIndex]))}
 boot().catch(err=>{currentName.textContent='LOAD FAILED';shareHotline.hidden=true;content.innerHTML=`<div class="empty"><b>SYNDICATE LOAD FAILED</b><span>${String(err.message||err)}</span></div>`});
 </script>
 </body>
 </html>
-

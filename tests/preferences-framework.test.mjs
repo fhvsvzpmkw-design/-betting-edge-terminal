@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {createRequire} from 'node:module';
+const roster=createRequire(import.meta.url)('../assets/syndicate-roster.js');
 
 function assert(condition,message){if(!condition)throw new Error(message)}
 const prefs=JSON.parse(fs.readFileSync('data/preferences.json','utf8'));
@@ -49,7 +51,7 @@ assert(byId.recommendation_detail.options.some(x=>x.value==='remember'),'recomme
 assert(byId.syndicate_load.storageKey==='bettingEdge.syndicateSlots.v4','syndicate preference must reuse the existing slot storage');
 
 for(const token of [
-  'bettingEdge.syndicateSlots.v4',
+  'VigwireSyndicateRoster',
   'data-pref-choice',
   'data-pref-syndicate-slot',
   'applyHistoryLanding',
@@ -58,7 +60,7 @@ for(const token of [
 ]) assert(framework.includes(token),`preferences runtime missing ${token}`);
 
 assert(bootstrap.includes('bettingEdge.preferences.meterPresentation'),'VigScope bootstrap must honor saved meter preference before renderer load');
-assert(bootstrap.includes('preferences-framework.js?v=4'),'preferences framework cache version must be v4');
+assert(bootstrap.includes('preferences-framework.js?v=5'),'preferences framework cache version must be v5');
 assert(!bootstrap.includes('schedule-profile-ui.js'),'retired seasonal schedule UI must not load');
 assert(framework.includes("const BUTTON_ID='runnerPreferencesF6'"),'preferences framework must own its menu button');
 assert(framework.includes("const PANEL_ID='runnerPreferencesPanel'"),'preferences framework must own its panel');
@@ -67,7 +69,8 @@ assert(framework.includes("const PANEL_ID='runnerPreferencesPanel'"),'preference
 const syndicates=JSON.parse(fs.readFileSync('data/syndicates.json','utf8'));
 const saved=new Map([['bettingEdge.syndicateSlots.v4',JSON.stringify(['eddie-numbers','larry-luck','vic-fremont','jesse-bains','alex-daventry',null,null,null])]]);
 const top={__vigwireSyndicateAssignments:['eddie-numbers','larry-luck','vic-fremont','jesse-bains',null,null,null,null]};
-const context={window:{top},localStorage:{getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,String(value))}};
+const storage={getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,String(value))};
+const context={window:{top,localStorage:storage,VigwireSyndicateRoster:roster},localStorage:storage};
 const prefix=framework.slice(0,framework.indexOf('function choiceControl('));
 vm.runInNewContext(prefix+'syndicates='+JSON.stringify(syndicates)+';globalThis.assignmentApi={readSyndicateAssignments,writeSyndicateAssignments};})();',context);
 const migrated=context.assignmentApi.readSyndicateAssignments();
@@ -79,4 +82,3 @@ context.assignmentApi.writeSyndicateAssignments(chosen);
 assert(JSON.stringify(context.assignmentApi.readSyndicateAssignments())===JSON.stringify(chosen),'An intentional choice made after migration must remain saved');
 
 console.log('F6 ACTIVE PREFERENCES OK // METER + SYNDICATE + STARTUP + HISTORY LANDING + RECOMMENDATION DETAIL + UNBOUNDED EVALUATED CARD OUTPUT');
-
