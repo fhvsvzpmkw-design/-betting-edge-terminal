@@ -83,7 +83,7 @@
   guyValueStyle.rel='stylesheet';guyValueStyle.href=`./assets/guy-value.css?v=1&b=${UI_CACHE_BUST}`;
   document.head.appendChild(guyValueStyle);
   guyValue.id='guyValueLoader';
-  guyValue.src=`./assets/guy-value.js?v=1&b=${UI_CACHE_BUST}`;
+  guyValue.src=`./assets/guy-value.js?v=2&b=${UI_CACHE_BUST}`;
   guyValue.async=false;
   document.head.appendChild(guyValue);
 
