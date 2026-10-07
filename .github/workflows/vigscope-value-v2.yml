@@ -4,6 +4,10 @@ on:
     paths:
       - 'assets/results-value-desk-v2.js'
       - 'assets/value-analytics.js'
+      - 'assets/guy-value.js'
+      - 'assets/guy-value.css'
+      - 'tools/track-guy-value.mjs'
+      - 'tests/guy-value.test.mjs'
       - 'assets/report-dashboard-vigscope.js'
       - 'tools/build-graham-pinnacle-value.mjs'
       - 'tools/build-results-index.mjs'
@@ -21,6 +25,7 @@ jobs:
         with:
           node-version: 22
       - run: |
+          node --test tests/guy-value.test.mjs
           node tests/vigscope-value-v2.test.mjs
           node tests/results-performance-populations.test.mjs
           node tools/build-results-index.mjs

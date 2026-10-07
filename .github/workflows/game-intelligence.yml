@@ -19,6 +19,10 @@ on:
       - tools/official-personnel.mjs
       - tools/build-game-board.mjs
       - tools/grade-game-intelligence.mjs
+      - tools/track-guy-value.mjs
+      - assets/guy-blue-line.js
+      - assets/guy-value.js
+      - tests/guy-value.test.mjs
       - research/forecast-source-registry.json
       - .github/workflows/game-intelligence.yml
   schedule:
@@ -56,6 +60,7 @@ jobs:
         run: |
           node tests/official-personnel.test.mjs
           node --test tests/game-intelligence.test.mjs tests/forecast-source-expansion.test.mjs tests/moneypuck-collection.test.mjs tests/candidate-assessment.test.mjs tests/event-research-plan.test.mjs
+          node --test tests/guy-value.test.mjs
           node tools/collect-game-intelligence.mjs
           cp data/game-intelligence/current.json /tmp/game-intelligence-candidate.json
       - name: Publish collection, source results and game board
@@ -76,7 +81,8 @@ jobs:
           NODE
             node tools/grade-game-intelligence.mjs
             node tools/build-game-board.mjs
-            git add -- data/game-intelligence
+            node tools/track-guy-value.mjs
+            git add -- data/game-intelligence data/characters/guy-laflame/value-ledger.json
             if git diff --cached --quiet; then exit 0; fi
             git commit -m 'Refresh shared game intelligence and prospective source tracking'
             if git push origin HEAD:main; then exit 0; fi

@@ -78,9 +78,18 @@
   valueAnalytics.async=false;
   document.head.appendChild(valueAnalytics);
 
+  const guyValue=document.createElement('script');
+  const guyValueStyle=document.createElement('link');
+  guyValueStyle.rel='stylesheet';guyValueStyle.href=`./assets/guy-value.css?v=1&b=${UI_CACHE_BUST}`;
+  document.head.appendChild(guyValueStyle);
+  guyValue.id='guyValueLoader';
+  guyValue.src=`./assets/guy-value.js?v=1&b=${UI_CACHE_BUST}`;
+  guyValue.async=false;
+  document.head.appendChild(guyValue);
+
   const resultsDesk=document.createElement('script');
   resultsDesk.id='resultsDeskUiLoader';
-  resultsDesk.src=`./assets/results-value-desk-v2.js?v=1&b=${UI_CACHE_BUST}`;
+  resultsDesk.src=`./assets/results-value-desk-v2.js?v=2&b=${UI_CACHE_BUST}`;
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 
