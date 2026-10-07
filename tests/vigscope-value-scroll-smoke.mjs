@@ -20,6 +20,8 @@ try{
  await page.waitForFunction(()=>document.body.dataset.primaryView==='engine',{timeout:10000});
  const initial=await page.evaluate(()=>({view:document.body.dataset.primaryView,title:document.querySelector('#engine .resultsTitle')?.textContent,proof:document.querySelectorAll('.whyProofCard').length,pizza:!!document.querySelector('#resultsPizzaValueBox'),shadow:!!document.querySelector('#resultsDecisionValueBox'),archive:!!document.querySelector('#resultsCardLog'),filters:!!document.querySelector('#valueHistoryFilters'),graham:document.querySelector('.comparisonTable').innerText,iframe:document.querySelectorAll('iframe').length}));
  assert.equal(initial.view,'engine');assert.equal(initial.title,undefined);assert.equal(initial.proof,6);assert.ok(initial.pizza&&initial.shadow&&initial.archive&&initial.filters);assert.equal(initial.iframe,0);assert.ok(initial.graham.includes(`${expectedGraham.WIN}–${expectedGraham.LOSS}–${expectedGraham.PUSH}`),'display reflects the current saved ATS population');assert.equal(requests.length,1,'one shared history request');
+ assert.match(await page.$eval('#resultsGuyValue',e=>e.innerText),/GUY’S BLUE LINE/);
+ assert.match(await page.$eval('#resultsGuyValue',e=>e.innerText),/Flat 1u risk/);
  await page.select('#gWeek','1');
  assert.match(await page.$eval('.comparisonTable',e=>e.innerText),/7–8–1/);
  await page.select('#gWeek','ALL');await page.click('[data-strategy="dogs"]');

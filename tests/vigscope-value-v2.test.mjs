@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import A from '../assets/value-analytics.js';
+import GuyValue from '../assets/guy-value.js';
 import O from '../assets/odds-format.js';
 import {buildComparison} from '../tools/build-graham-pinnacle-value.mjs';
 
@@ -46,11 +47,11 @@ assert.equal(firstThree.filter(r=>r.quoteKind==='RECORDED_CLOSE').length,0);
 
 const engine={innerHTML:'',dataset:{},classList:{add(){}},querySelectorAll:()=>[],querySelector:()=>null};
 const doc={getElementById:id=>id==='engine'?engine:id==='runnerResultsDeskStyle'?{}:null,head:{appendChild(){}},createElement:()=>({})};
-const context={VigScopeValueAnalytics:A,VigScopeOddsFormat:O,document:doc,window:{addEventListener(){}},setInterval(){},clearInterval(){},Intl,Date,console,localStorage:{getItem:()=>null}};
+const context={VigScopeValueAnalytics:A,VigScopeOddsFormat:O,GuyValue,document:doc,window:{addEventListener(){}},setInterval(){},clearInterval(){},Intl,Date,console,localStorage:{getItem:()=>null}};
 vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../assets/results-value-desk-v2.js',import.meta.url),'utf8'),context);
 const index={cards,coverage:{cards:5,selections:5,completeCards:4,unresolvedCards:1},issuedBetAnalytics:{netCad:12,roiPct:25,pricedBets:2},decisionValueShadowV2:{byStatus:[{status:'LEAN',shadowRoiPct:25,priced:2,grades:{WIN:1,LOSS:1}}]}};
 const before=JSON.stringify(index);const desk=context.VigScopeValueDesk;
-desk.setComparison(real);desk.render(doc,index);
+desk.setComparison(real);desk.setGuyRecord({schema:1,characterId:'guy-laflame',startedAt:'2026-10-07T00:50:00Z',entries:[]});desk.render(doc,index);
 const displayedGraham=A.summary(A.strategyRows(real.rows,'graham')).grades;
 assert.ok(engine.innerHTML.includes(`${displayedGraham.WIN}–${displayedGraham.LOSS}–${displayedGraham.PUSH}`),'display reflects the current saved ATS population');
 assert.match(engine.innerHTML,/LATEST SAVED PRE-KICKOFF QUOTES/);
@@ -58,6 +59,8 @@ assert.match(engine.innerHTML,/awaiting_observation/);assert.match(engine.innerH
 assert.match(engine.innerHTML,/American|AMERICAN/);assert.doesNotMatch(engine.innerHTML,/resultsTitle/);
 assert.match(engine.innerHTML,/\+115/);assert.doesNotMatch(engine.innerHTML,/>2\.15</);
 assert.ok(engine.innerHTML.indexOf('PIZZA PLAYS')<engine.innerHTML.indexOf('GRAHAM × PINNACLE'));
+assert.match(engine.innerHTML,/GUY’S BLUE LINE \/\/ MONEYPUCK VALUE/);assert.match(engine.innerHTML,/New record — collecting results/);
+assert.ok(engine.innerHTML.indexOf('GRAHAM × PINNACLE')<engine.innerHTML.indexOf('GUY’S BLUE LINE'));
 desk.state.grade='OPEN';assert.equal(desk.cardLogRows(index).length,1);
 desk.state.grade='ALL';desk.state.status='LEAN';assert.equal(desk.cardLogRows(index).length,5);
 assert.equal(JSON.stringify(index),before,'display and filtering preserve archive inputs');

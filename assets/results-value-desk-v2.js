@@ -1,8 +1,8 @@
 (()=>{
   'use strict';
   const A=globalThis.VigScopeValueAnalytics,O=globalThis.VigScopeOddsFormat;
-  const INDEX_URL='./data/history/results-index.json',GRAHAM_URL='./data/history/graham-pinnacle-value.json';
-  let cached=null,graham=null,loading=false;
+  const INDEX_URL='./data/history/results-index.json',GRAHAM_URL='./data/history/graham-pinnacle-value.json',GUY_URL='./data/characters/guy-laflame/value-ledger.json';
+  let cached=null,graham=null,guy=null,loading=false;
   const state={start:'',end:'',sport:'ALL',status:'ALL',lane:'ALL',scope:'cards',grade:'ALL',page:0,size:10,gWeek:'ALL',gSide:'ALL',gGap:'ALL',strategy:'graham',gPage:0};
   const PIN_KEY='vigscope.value.followed.v1',pins=new Set(),reportCache=new Map();
   try{for(const key of JSON.parse(localStorage.getItem(PIN_KEY)||'[]'))if(typeof key==='string')pins.add(key);}catch{}
@@ -88,7 +88,7 @@
   }
   function render(d,index){
     cached=index;const engine=d.getElementById('engine');if(!engine)return;ensureStyle(d);const open=new Set([...engine.querySelectorAll('details[id]')].filter(x=>x.open).map(x=>x.id)),had=engine.dataset.valueRendered==='1',runs=latestRuns(index);
-    engine.classList.add('resultsDesk');engine.innerHTML=hero(index,runs)+pizza(index)+grahamSection()+proof(index)+watchlist(runs)+shadowDetails(index)+audit(index)+historicalControls(index)+performance(index)+cardLog(index)+`<p class="resultsFoot">INDEX UPDATED ${clock(index.generatedAt)} • All historical records remain saved. Performance is rebuilt from immutable issued reports and verified observations.</p>`;
+    engine.classList.add('resultsDesk');engine.innerHTML=hero(index,runs)+pizza(index)+grahamSection()+(globalThis.GuyValue?.render(guy,{hotlineHref:'syndicates/generated/guy-laflame/hotline.html'})||'')+proof(index)+watchlist(runs)+shadowDetails(index)+audit(index)+historicalControls(index)+performance(index)+cardLog(index)+`<p class="resultsFoot">INDEX UPDATED ${clock(index.generatedAt)} • All historical records remain saved. Performance is rebuilt from immutable issued reports and verified observations.</p>`;
     engine.dataset.valueRendered='1';if(had)for(const detail of engine.querySelectorAll('details[id]'))detail.open=open.has(detail.id);
     const redraw=()=>render(d,cached);
     for(const [id,key]of [['valueStart','start'],['valueEnd','end'],['valueSport','sport'],['valueStatus','status'],['valueLane','lane'],['valueGrade','grade'],['valueSize','size'],['gWeek','gWeek'],['gSide','gSide'],['gGap','gGap']])engine.querySelector('#'+id)?.addEventListener('change',e=>{state[key]=key==='size'&&e.target.value!=='ALL'?Number(e.target.value):e.target.value;state.page=0;state.gPage=0;redraw();d.getElementById(id)?.focus({preventScroll:true});});
@@ -101,11 +101,11 @@
     engine.querySelectorAll('[data-archive-card]').forEach(details=>details.addEventListener('toggle',()=>openAnalysis(details,index)));
   }
   async function load(d){if(loading)return;loading=true;const engine=d.getElementById('engine');if(!cached)engine.innerHTML='<p class="resultsNote">Loading the saved Value history…</p>';try{
-    const [index,comparison]=await Promise.all([fetch(`${INDEX_URL}?v=${Date.now()}`,{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Results history unavailable');return r.json();}),fetch(`${GRAHAM_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
-    graham=comparison?.schema===1?comparison:null;render(d,index);
+    const [index,comparison,record]=await Promise.all([fetch(`${INDEX_URL}?v=${Date.now()}`,{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Results history unavailable');return r.json();}),fetch(`${GRAHAM_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),fetch(`${GUY_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
+    graham=comparison?.schema===1?comparison:null;guy=record?.schema===1&&record?.characterId==='guy-laflame'?record:null;render(d,index);
   }catch(e){if(!cached)engine.innerHTML=`<p class="resultsNote">${esc(e.message)}. Reload to try again.</p>`;}finally{loading=false;}}
   function install(d){if(!d?.getElementById('engine'))return false;ensureStyle(d);const engine=d.getElementById('engine');if(engine.dataset.resultsDeskInstalled!=='1'){engine.dataset.resultsDeskInstalled='1';load(d);}return true;}
   let tries=0;const timer=setInterval(()=>{tries++;const d=appDoc();if(d&&install(d)||tries>250)clearInterval(timer);},40);
   window.addEventListener('pageshow',()=>{const d=appDoc();if(d&&cached)load(d);});
-  globalThis.VigScopeValueDesk=Object.freeze({render,cardLogRows,reportChanges,latestRuns,state,setComparison:value=>{graham=value;}});
+  globalThis.VigScopeValueDesk=Object.freeze({render,cardLogRows,reportChanges,latestRuns,state,setComparison:value=>{graham=value;},setGuyRecord:value=>{guy=value;}});
 })();

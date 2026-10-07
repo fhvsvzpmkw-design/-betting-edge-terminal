@@ -71,6 +71,8 @@
       try{const history=await read('run-history.json');const latest=list(history.runs).filter(r=>day(r.ts)===day(board.asOf)&&/^data\/history\/runs\/\d{4}-\d{2}-\d{2}\/[a-z0-9_-]+\.json$/.test(r.path)).sort((a,b)=>time(b.ts)-time(a.ts))[0];if(latest){const candidate=await read(latest.path);if(candidate.ts===latest.ts&&Array.isArray(candidate.recs))report=candidate;}}catch{}
       const state=selectBoard(board,{report});
       container.innerHTML=render(state);
+      const record=document.getElementById('guyDailyPick');
+      if(record&&root.GuyValue){let ledger=null;try{ledger=await read('data/characters/guy-laflame/value-ledger.json');}catch{}record.outerHTML=root.GuyValue.render(ledger,{id:'guyDailyPick',history:false,valueHref:'runner.html'});}
       const today=day(new Date().toISOString());
       notice.textContent=state.date!==today?`Saved ${state.date} rundown. Today’s NHL board has not arrived yet.`:'Recorded pregame prices and captured forecasts. Refresh loads the latest saved rundown.';
     }catch{notice.textContent='The refreshed feed is unavailable. The dated saved rundown below remains on the sheet.';}
