@@ -19,7 +19,7 @@ test('recover the legacy empty first four without losing optional characters; pe
   assert.deepEqual(roster.read(manifest,e.context),expected);
 });
 test('fresh storage and damaged records load the published five members',()=>{
-  for(const source of [null,[],{slot:1},['unknown','unknown','unknown','unknown','unknown',null,null,null]]){
+  for(const source of [null,[],{slot:1},[null,null,null,null],['unknown','unknown','unknown','unknown','unknown',null,null,null]]){
     const e=environment(source,'3');assert.deepEqual(roster.read(manifest,e.context),defaults);
   }
 });

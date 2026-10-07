@@ -35,7 +35,7 @@
     // Persistent choices take precedence over an older open-tab copy.
     const source=validSource(stored)?stored:validSource(session)?session:wanted;
     const savedRevision=validSource(stored)?storedRevision:validSource(session)?sessionRevision:current;
-    return validate(String(savedRevision)===current?source:migrate(source,wanted),manifest);
+    return validate(String(savedRevision)===current&&source.length===COUNT?source:migrate(source,wanted),manifest);
   }
   function write(source,manifest,context){
     const assignments=validate(source,manifest),current=revision(manifest);
