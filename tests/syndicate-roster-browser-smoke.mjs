@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 const browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
+let page;
 try{
-  const page=await browser.newPage(),errors=[];
+  page=await browser.newPage();const errors=[];
   page.on('pageerror',e=>errors.push(String(e)));
   await page.evaluateOnNewDocument(()=>{
     if(location.pathname.endsWith('/runner.html')&&!sessionStorage.getItem('syndicateRecoverySeeded')){
@@ -13,7 +14,7 @@ try{
     }
   });
   await page.setViewport({width:1024,height:900,deviceScaleFactor:1});
-  const ready=async()=>page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'||document.querySelector('#runnerSyndicateF5')&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
+  const ready=async()=>page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).display==='none'||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
   const loaded=async()=>page.waitForFunction(()=>document.querySelector('.syndicateFrame')?.contentDocument?.querySelector('#loadedCount')?.textContent==='5 / 8',{timeout:30000});
   const names=async()=>page.$$eval('.syndicateTab .syndicateName',els=>els.map(e=>e.textContent));
   const expected=['EDDIE NUMBERS','GRAHAM MERCER','BILL WESTON','GUY LAFLAME','LOU VEGA','EMPTY 6','EMPTY 7','EMPTY 8'];
@@ -49,4 +50,7 @@ try{
   assert.equal(saved[0],'');assert.equal(saved[3],'guy-laflame');assert.equal(saved[4],'lou-vega');assert.equal(saved[5],'jesse-bains');
   assert.deepEqual(errors,[]);
   console.log('SYNDICATE ROSTER BROWSER: PASS // legacy recovery, first paint, Guy four/Lou five, custom member, deliberate empty, reload, Preferences, three widths');
+}catch(error){
+  if(page){console.error(await page.evaluate(()=>({view:document.body.dataset.primaryView,load:document.getElementById('runnerSyndicateF5')?.textContent,slots:[...document.querySelectorAll('.syndicateTab .syndicateName')].map(e=>e.textContent),host:document.querySelector('.syndicateFrame')?.contentDocument?.body?.innerText?.slice(0,800)})));fs.mkdirSync('.qa',{recursive:true});await page.screenshot({path:'.qa/syndicate-failure.png',fullPage:true});}
+  throw error;
 }finally{await browser.close();}
