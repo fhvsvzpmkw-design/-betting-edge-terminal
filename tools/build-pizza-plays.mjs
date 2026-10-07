@@ -134,9 +134,10 @@ function latestReportPath() {
   const history = JSON.parse(fs.readFileSync(HISTORY_PATH, 'utf8'));
   const runs = Array.isArray(history) ? history : Array.isArray(history?.runs) ? history.runs : [];
   const candidates = runs
-    .filter(run => run?.path && fs.existsSync(run.path))
+    .filter(run => run?.path)
     .sort((a, b) => Date.parse(b?.ts || 0) - Date.parse(a?.ts || 0));
   if (!candidates.length) throw new Error('No published Betting Edge report was found in run-history.json');
+  if (!fs.existsSync(candidates[0].path)) throw new Error(`Latest published report is missing: ${candidates[0].path}`);
   return candidates[0].path;
 }
 
@@ -192,8 +193,16 @@ const args = process.argv.slice(2);
 if (args.includes('--self-test')) {
   selfTest();
 } else if (args.includes('--check')) {
-  validate(JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')));
-  console.log('Pizza Plays output validation OK');
+  const output = validate(JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')));
+  const reportPath = latestReportPath();
+  const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+  const expected = validate(buildFromReport(report, reportPath));
+  if (JSON.stringify(output) !== JSON.stringify(expected)) throw new Error(`Pizza Plays does not match the latest published report: ${reportPath}`);
+  const archived = archivePath(output);
+  if (!fs.existsSync(archived) || fs.readFileSync(archived, 'utf8') !== `${JSON.stringify(output, null, 2)}\n`) {
+    throw new Error(`Pizza Plays immutable archive is missing or differs: ${archived}`);
+  }
+  console.log(`Pizza Plays output, latest-report binding and immutable archive validation OK: ${reportPath}`);
 } else {
   const reportFlag = args.indexOf('--report');
   const reportPath = reportFlag >= 0 && args[reportFlag + 1] ? args[reportFlag + 1] : latestReportPath();

@@ -10,6 +10,7 @@ on:
       - run-history.json
       - data/history/runs/**
       - tools/build-pizza-plays.mjs
+      - tests/pizza-publication.test.mjs
       - .github/workflows/pizza-plays.yml
   workflow_dispatch:
 
@@ -21,7 +22,9 @@ jobs:
   publish:
     if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.name == 'Report history staged publication' || (github.event.workflow_run.name == 'Report history publication' && github.event.workflow_run.event == 'workflow_dispatch'))) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # The full Value rebuild takes about three minutes per attempt. Allow the
+    # existing three-attempt race recovery to finish before cancelling the job.
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:
@@ -35,7 +38,9 @@ jobs:
         with:
           node-version: '22'
       - name: Verify Pizza Plays builder
-        run: node tools/build-pizza-plays.mjs --self-test
+        run: |
+          node tools/build-pizza-plays.mjs --self-test
+          node tests/pizza-publication.test.mjs
       - name: Build and publish Pizza Plays with VigScope Value
         run: |
           set -euo pipefail
@@ -71,3 +76,8 @@ jobs:
             echo "Push raced another repository update; rebuilding Pizza and results analytics from current main."
           done
           test "$published" -eq 1
+      - name: Verify published Pizza Plays matches the latest report
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          node tools/build-pizza-plays.mjs --check
