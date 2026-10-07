@@ -18,6 +18,9 @@ on:
       - assets/results-desk-ui.js
       - assets/game-window-intelligence.js
       - assets/preferences-framework.js
+      - assets/syndicate-roster.js
+      - tests/syndicate-roster.test.mjs
+      - tests/syndicate-roster-browser-smoke.mjs
       - assets/guy-blue-line.js
       - tools/build-guy-hotline.mjs
       - tests/guy-blue-line.test.mjs
@@ -55,6 +58,9 @@ on:
       - assets/results-desk-ui.js
       - assets/game-window-intelligence.js
       - assets/preferences-framework.js
+      - assets/syndicate-roster.js
+      - tests/syndicate-roster.test.mjs
+      - tests/syndicate-roster-browser-smoke.mjs
       - assets/guy-blue-line.js
       - tools/build-guy-hotline.mjs
       - tests/guy-blue-line.test.mjs
@@ -96,6 +102,7 @@ jobs:
         run: |
           node --check assets/runner-core-runtime.js
           node --check assets/preferences-framework.js
+          node --check assets/syndicate-roster.js
           node --check assets/report-dashboard-vigscope.js
           node --check assets/game-window-intelligence.js
           node --check assets/menu-order-controller.js
@@ -116,8 +123,25 @@ jobs:
       - name: Run permanent Main Betting Edge schedule regression
         run: node tests/main-schedule.test.mjs
       - name: Run F6 preferences framework regression
-        run: node tests/preferences-framework.test.mjs
+        run: |
+          node tests/preferences-framework.test.mjs
+          node --test tests/syndicate-roster.test.mjs
       - name: Run Blue Line ranking and edition regression
         run: node --test tests/guy-blue-line.test.mjs tests/guy-value.test.mjs
       - name: Run Syndicate Hotline completeness regression
         run: node tests/syndicate-hotline-completeness.test.mjs
+      - name: Install browser test dependency
+        run: npm install --no-save puppeteer-core@24
+      - name: Verify Syndicate recovery and saved choices in the browser
+        run: |
+          export CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          python3 -m http.server 8765 >/tmp/syndicate-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID"' EXIT
+          node tests/syndicate-roster-browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: syndicate-roster-screenshots
+          path: .qa/syndicate-*.png
+          include-hidden-files: true

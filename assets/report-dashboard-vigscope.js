@@ -41,7 +41,7 @@
   // safe local UI controls.
   const preferences=document.createElement('script');
   preferences.id='preferencesFrameworkLoader';
-  preferences.src=`./assets/preferences-framework.js?v=4&b=${UI_CACHE_BUST}`;
+  preferences.src=`./assets/preferences-framework.js?v=5&b=${UI_CACHE_BUST}`;
   preferences.async=false;
   document.head.appendChild(preferences);
 

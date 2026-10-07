@@ -53,16 +53,9 @@ function counts(){
 function normalizedSyndicateAssignments(source){
   return Array.from({length:SYNDICATE_SLOT_COUNT},(_,i)=>source[i]==null?null:String(source[i]));
 }
-function syndicateOrderRevision(){return String(syndicates?.defaultOrderRevision||2)}
+function syndicateOrderRevision(){return window.VigwireSyndicateRoster.revision(syndicates)}
 function migrateSyndicateOrder(source,defaults){
-  const next=normalizedSyndicateAssignments(source);
-  const count=defaults.reduce((n,id,i)=>id==null?n:i+1,0);
-  const displaced=next.slice(4,count).filter(Boolean);
-  defaults.slice(0,count).forEach((id,i)=>next[i]=id);
-  const used=new Set(next.slice(0,count).filter(Boolean));
-  for(let i=count;i<SYNDICATE_SLOT_COUNT;i++){if(next[i]&&used.has(next[i]))next[i]=null;else if(next[i])used.add(next[i]);}
-  for(const id of displaced){const free=next.findIndex((value,i)=>i>=count&&!value);if(!used.has(id)&&free>=0){next[free]=id;used.add(id);}}
-  return next;
+  return window.VigwireSyndicateRoster.migrate(source,defaults);
 }
 function defaultSyndicateAssignments(){
   const source=Array.isArray(syndicates?.defaults)&&[4,SYNDICATE_SLOT_COUNT].includes(syndicates.defaults.length)?syndicates.defaults:SYNDICATE_FALLBACK;
@@ -78,26 +71,12 @@ function syndicateCharacterLabel(id){
   return String(p?.name||p?.label||id||'UNKNOWN CHARACTER');
 }
 function readSyndicateAssignments(){
-  const module=moduleById('syndicate_load');
-  const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
-  const defaults=defaultSyndicateAssignments();
-  let assignments=defaults;
-  try{
-    const raw=JSON.parse(localStorage.getItem(key)||'null');
-    if(Array.isArray(raw)&&[4,SYNDICATE_SLOT_COUNT].includes(raw.length))assignments=normalizedSyndicateAssignments(raw);
-    if(localStorage.getItem(SYNDICATE_ORDER_KEY)===syndicateOrderRevision())return assignments;
-  }catch{}
-  assignments=migrateSyndicateOrder(assignments,defaults);
-  writeSyndicateAssignments(assignments);
-  return assignments;
+  if(!syndicates?.profiles?.length)return defaultSyndicateAssignments();
+  return window.VigwireSyndicateRoster.read(syndicates,window);
 }
 function writeSyndicateAssignments(assignments){
-  const module=moduleById('syndicate_load');
-  const key=module?.storageKey||'bettingEdge.syndicateSlots.v4';
-  const normalized=normalizedSyndicateAssignments(assignments);
-  const revision=syndicateOrderRevision();
-  try{if(window.top){window.top.__vigwireSyndicateAssignments=normalized.slice();window.top.__vigwireSyndicateOrderRevision=revision}}catch{}
-  try{localStorage.setItem(key,JSON.stringify(normalized));localStorage.setItem(SYNDICATE_ORDER_KEY,revision);return true}catch{return false}
+  if(!syndicates?.profiles?.length)return false;
+  try{window.VigwireSyndicateRoster.write(assignments,syndicates,window);return true}catch{return false}
 }
 function choiceControl(module){
   const value=readChoice(module);
@@ -105,6 +84,7 @@ function choiceControl(module){
   return `<label class="prefControlLabel"><span>CURRENT</span><select class="prefSelect" data-pref-choice="${esc(module.id)}">${options}</select></label>`;
 }
 function syndicateControl(){
+  if(!syndicates?.profiles?.length)return '<div class="prefShellEmpty">CHARACTER LIBRARY UNAVAILABLE // RELOAD TO TRY AGAIN</div>';
   const profiles=enabledSyndicateProfiles();
   const assignments=readSyndicateAssignments();
   return `<div class="prefSyndicateGrid">${assignments.map((current,index)=>{
@@ -407,5 +387,4 @@ Promise.all([
   window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});
 }).catch(e=>console.warn('Preferences framework unavailable',e));
 })();
-
 
