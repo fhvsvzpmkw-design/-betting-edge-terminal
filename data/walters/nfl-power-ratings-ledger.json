@@ -7,7 +7,7 @@
   "sport": "NFL",
   "season": 2026,
   "createdAt": "2026-08-30T13:23:00-07:00",
-  "updatedAt": "2026-10-08T05:16:00.000Z",
+  "updatedAt": "2026-10-08T13:16:00.000Z",
   "authority": {
     "owner": "Graham Mercer",
     "waltersInterface": "core/walters-intelligence-interface-v1.4.json",
@@ -1423,10 +1423,10 @@
       "team": "Seattle",
       "abbr": "SEA",
       "seedRating": 29.5,
-      "currentRating": 30.252978,
-      "priorRating": 31.48582,
-      "lastDelta": -1.232842,
-      "lastUpdatedAt": "2026-10-04T20:21:20.199Z",
+      "currentRating": 29.621639,
+      "priorRating": 30.252978,
+      "lastDelta": -0.631339,
+      "lastUpdatedAt": "2026-10-08T13:16:00.000Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "PRESEASON_SEED",
       "sourceRefs": [
@@ -1438,7 +1438,12 @@
         "data/walters/nfl/2026/week-03-weekly-evidence/2026-10-04-full-slate-recovery.json",
         "data/walters/nfl/2026/week-03-current-numbers.json",
         "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
-        "https://www.nfl.com/schedules/2026/by-week/week-3"
+        "https://www.nfl.com/schedules/2026/by-week/week-3",
+        "data/walters/nfl/2026/week-04-current-numbers.json",
+        "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+        "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
+        "data/walters/nfl/2026/week-04-personnel-ledger.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
       ],
       "history": [
         {
@@ -3194,6 +3199,580 @@
                   "roleAllocationRange": {
                     "min": 0.5,
                     "max": 0.5
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequence": 3,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w04-to-w05-lac-sea-recovery-20261008131600000",
+          "fromRating": 30.252978,
+          "priorRating": 30.252978,
+          "delta": -0.631339,
+          "toRating": 29.621639,
+          "currentRating": 29.621639,
+          "effectiveAt": "2026-10-08T13:16:00.000Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W04-LAC-SEA: TGPL 23.939588; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 4,
+          "targetWeek": 5,
+          "gameKey": "2026-W04-LAC-SEA",
+          "opponent": "LAC",
+          "kickoff": "2026-10-04T13:25:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": 7,
+            "opponentOldRating": 21.151588,
+            "teamInjuryLoss": 0.362,
+            "opponentInjuryLoss": 2.492,
+            "teamLocationAdvantage": 2.082
+          },
+          "tgpl": 23.939588,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-04-current-numbers.json",
+            "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+            "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
+            "data/walters/nfl/2026/week-04-personnel-ledger.json",
+            "https://www.nfl.com/schedules/2026/by-week/week-4"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+            "blobSha": "6879b25bf457e566f0fcb4021fbd1bf41205cebc"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "LAC",
+              "estimates": [
+                {
+                  "caseKey": "2026-W04-LAC-Dalvin-Tomlinson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Justin Eboigbe",
+                      "eaPlayerId": "14873",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Derwin-James-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "EQUAL_SHARE_COMMITTEE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.45,
+                  "replacementValueRatio": {
+                    "numerator": 0.9,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 1.25,
+                  "rawTeamContributionDelta": -1.25,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.8,
+                    "max": 1.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Tony Jefferson",
+                      "eaPlayerId": "9879",
+                      "lockedValue": 0.9,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "R.J. Mickens",
+                      "eaPlayerId": "15336",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Candidate identity is established but shares are unknown, so the approved equal-share convention is used.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Kayode-Awosika",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Charlie-Kolar",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Brenen-Thompson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Marquez Valdes-Scantling",
+                      "eaPlayerId": "13366",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Donte-Jackson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.309,
+                  "rawTeamContributionDelta": -0.309,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.618
+                  },
+                  "weights": [
+                    {
+                      "player": "Cam Hart",
+                      "eaPlayerId": "14960",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.44166666666666665,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.8833333333333333
+                    },
+                    "unavailableSnapEstimate": {
+                      "playedSnaps": 7,
+                      "teamSnaps": 60,
+                      "injuryIndependentlyReported": true,
+                      "healthyEverySnapRole": true,
+                      "confoundingSubstitutionsAcknowledged": true,
+                      "rationale": "Jackson was a starting cornerback, the gamebook independently reports his return as questionable, and the official participation table records 7 of 60 defensive snaps; ordinary substitutions remain a confounder.",
+                      "sourceIds": [
+                        "lac-sea-gamebook"
+                      ]
+                    },
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use missing snaps only as an upper bound for the independently reported injury; the midpoint does not treat every missed snap as injury-caused or infer active impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Independently reported injury plus a normally every-snap role; missing snaps set an upper bound. Midpoint does not attribute every missed snap to injury or measure active impairment."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  }
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Joe-Alt",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.38,
+                  "rawTeamContributionDelta": -0.38,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.761
+                  },
+                  "weights": [
+                    {
+                      "player": "Travis Burke",
+                      "eaPlayerId": "16280",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.31690140845070425,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.6338028169014085
+                    },
+                    "unavailableSnapEstimate": {
+                      "playedSnaps": 26,
+                      "teamSnaps": 71,
+                      "injuryIndependentlyReported": true,
+                      "healthyEverySnapRole": true,
+                      "confoundingSubstitutionsAcknowledged": true,
+                      "rationale": "Alt was the starting right tackle, the gamebook independently reports him questionable and then out, and the official participation table records 26 of 71 offensive snaps; ordinary substitutions remain a confounder.",
+                      "sourceIds": [
+                        "lac-sea-gamebook"
+                      ]
+                    },
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use missing snaps only as an upper bound for the independently reported injury; the midpoint does not treat every missed snap as injury-caused or infer active impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Independently reported injury plus a normally every-snap role; missing snaps set an upper bound. Midpoint does not attribute every missed snap to injury or measure active impairment."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  }
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Ladd-McConkey",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.323,
+                  "rawTeamContributionDelta": -0.323,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.296,
+                    "max": 0.35
+                  },
+                  "weights": [
+                    {
+                      "player": "Tre' Harris",
+                      "eaPlayerId": "15058",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.46152777777777776,
+                    "fractionRange": {
+                      "min": 0.4230555555555556,
+                      "max": 0.5
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1800,
+                        "startLatest": 2077,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "rationale": "No departure play is printed; halftime and the 10:23 Q3 return-questionable update bound the start, and the 7:58 Q3 update records him out.",
+                        "sourceIds": [
+                          "lac-sea-gamebook"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use the explicit halftime-to-status-update start range and official out status; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  }
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Trevor-Penning",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Rashawn-Slater",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.23,
+                  "rawTeamContributionDelta": -0.23,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.23,
+                    "max": 0.23
+                  },
+                  "weights": [
+                    {
+                      "player": "Logan Taylor",
+                      "eaPlayerId": "16252",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The official depth chart and gamebook establish Logan Taylor as an active offensive-line reserve; this is an explicit same-position-group additional-duty estimate, not an observed assignment.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.135,
+                    "fractionRange": {
+                      "min": 0.135,
+                      "max": 0.135
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3114,
+                        "startLatest": 3114,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "rationale": "Official 8:06 Q4 play records the injury and no later return before regulation ended.",
+                        "sourceIds": [
+                          "lac-sea-gamebook"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.7,
+                    "max": 1.7
+                  }
+                }
+              ]
+            },
+            {
+              "team": "SEA",
+              "estimates": [
+                {
+                  "caseKey": "2026-W04-SEA-Jadarian-Price",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Emanuel Wilson",
+                      "eaPlayerId": "23335",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-SEA-Ty-Okada",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Rodney Thomas II",
+                      "eaPlayerId": "22492",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-SEA-Chazz-Surratt",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-SEA-Leonard-Williams",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.162,
+                  "rawTeamContributionDelta": -0.162,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.162,
+                    "max": 0.162
+                  },
+                  "weights": [
+                    {
+                      "player": "Rylie Mills",
+                      "eaPlayerId": "15215",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.135,
+                    "fractionRange": {
+                      "min": 0.135,
+                      "max": 0.135
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3114,
+                        "startLatest": 3114,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "rationale": "Official 8:06 Q4 play records the injury, the 7:05 Q4 update lists return questionable, and no later return is recorded.",
+                        "sourceIds": [
+                          "lac-sea-gamebook"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.2,
+                    "max": 1.2
                   }
                 }
               ]
@@ -22103,10 +22682,10 @@
       "team": "LA Chargers",
       "abbr": "LAC",
       "seedRating": 24.5,
-      "currentRating": 21.151588,
-      "priorRating": 20.71432,
-      "lastDelta": 0.437268,
-      "lastUpdatedAt": "2026-10-04T20:21:20.199Z",
+      "currentRating": 21.782927,
+      "priorRating": 21.151588,
+      "lastDelta": 0.631339,
+      "lastUpdatedAt": "2026-10-08T13:16:00.000Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
@@ -22130,7 +22709,12 @@
         "data/walters/nfl/2026/week-03-weekly-evidence/2026-10-04-full-slate-recovery.json",
         "data/walters/nfl/2026/week-03-current-numbers.json",
         "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
-        "https://www.nfl.com/schedules/2026/by-week/week-3"
+        "https://www.nfl.com/schedules/2026/by-week/week-3",
+        "data/walters/nfl/2026/week-04-current-numbers.json",
+        "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+        "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
+        "data/walters/nfl/2026/week-04-personnel-ledger.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-4"
       ],
       "history": [
         {
@@ -23625,6 +24209,580 @@
                   "roleAllocationRange": {
                     "min": 0.4,
                     "max": 0.4
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequence": 6,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w04-to-w05-lac-sea-recovery-20261008131600000",
+          "fromRating": 21.151588,
+          "priorRating": 21.151588,
+          "delta": 0.631339,
+          "toRating": 21.782927,
+          "currentRating": 21.782927,
+          "effectiveAt": "2026-10-08T13:16:00.000Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W04-LAC-SEA: TGPL 27.464978; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 4,
+          "targetWeek": 5,
+          "gameKey": "2026-W04-LAC-SEA",
+          "opponent": "SEA",
+          "kickoff": "2026-10-04T13:25:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": -7,
+            "opponentOldRating": 30.252978,
+            "teamInjuryLoss": 2.492,
+            "opponentInjuryLoss": 0.362,
+            "teamLocationAdvantage": -2.082
+          },
+          "tgpl": 27.464978,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-04-current-numbers.json",
+            "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+            "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
+            "data/walters/nfl/2026/week-04-personnel-ledger.json",
+            "https://www.nfl.com/schedules/2026/by-week/week-4"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+            "blobSha": "6879b25bf457e566f0fcb4021fbd1bf41205cebc"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "LAC",
+              "estimates": [
+                {
+                  "caseKey": "2026-W04-LAC-Dalvin-Tomlinson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Justin Eboigbe",
+                      "eaPlayerId": "14873",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Derwin-James-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "EQUAL_SHARE_COMMITTEE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.45,
+                  "replacementValueRatio": {
+                    "numerator": 0.9,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 1.25,
+                  "rawTeamContributionDelta": -1.25,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.8,
+                    "max": 1.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Tony Jefferson",
+                      "eaPlayerId": "9879",
+                      "lockedValue": 0.9,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "R.J. Mickens",
+                      "eaPlayerId": "15336",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Candidate identity is established but shares are unknown, so the approved equal-share convention is used.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Kayode-Awosika",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Charlie-Kolar",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Brenen-Thompson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Marquez Valdes-Scantling",
+                      "eaPlayerId": "13366",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Donte-Jackson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.309,
+                  "rawTeamContributionDelta": -0.309,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.618
+                  },
+                  "weights": [
+                    {
+                      "player": "Cam Hart",
+                      "eaPlayerId": "14960",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.44166666666666665,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.8833333333333333
+                    },
+                    "unavailableSnapEstimate": {
+                      "playedSnaps": 7,
+                      "teamSnaps": 60,
+                      "injuryIndependentlyReported": true,
+                      "healthyEverySnapRole": true,
+                      "confoundingSubstitutionsAcknowledged": true,
+                      "rationale": "Jackson was a starting cornerback, the gamebook independently reports his return as questionable, and the official participation table records 7 of 60 defensive snaps; ordinary substitutions remain a confounder.",
+                      "sourceIds": [
+                        "lac-sea-gamebook"
+                      ]
+                    },
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use missing snaps only as an upper bound for the independently reported injury; the midpoint does not treat every missed snap as injury-caused or infer active impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Independently reported injury plus a normally every-snap role; missing snaps set an upper bound. Midpoint does not attribute every missed snap to injury or measure active impairment."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  }
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Joe-Alt",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.38,
+                  "rawTeamContributionDelta": -0.38,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.761
+                  },
+                  "weights": [
+                    {
+                      "player": "Travis Burke",
+                      "eaPlayerId": "16280",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.31690140845070425,
+                    "fractionRange": {
+                      "min": 0,
+                      "max": 0.6338028169014085
+                    },
+                    "unavailableSnapEstimate": {
+                      "playedSnaps": 26,
+                      "teamSnaps": 71,
+                      "injuryIndependentlyReported": true,
+                      "healthyEverySnapRole": true,
+                      "confoundingSubstitutionsAcknowledged": true,
+                      "rationale": "Alt was the starting right tackle, the gamebook independently reports him questionable and then out, and the official participation table records 26 of 71 offensive snaps; ordinary substitutions remain a confounder.",
+                      "sourceIds": [
+                        "lac-sea-gamebook"
+                      ]
+                    },
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use missing snaps only as an upper bound for the independently reported injury; the midpoint does not treat every missed snap as injury-caused or infer active impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Independently reported injury plus a normally every-snap role; missing snaps set an upper bound. Midpoint does not attribute every missed snap to injury or measure active impairment."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  }
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Ladd-McConkey",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.323,
+                  "rawTeamContributionDelta": -0.323,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.296,
+                    "max": 0.35
+                  },
+                  "weights": [
+                    {
+                      "player": "Tre' Harris",
+                      "eaPlayerId": "15058",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.46152777777777776,
+                    "fractionRange": {
+                      "min": 0.4230555555555556,
+                      "max": 0.5
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1800,
+                        "startLatest": 2077,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "rationale": "No departure play is printed; halftime and the 10:23 Q3 return-questionable update bound the start, and the 7:58 Q3 update records him out.",
+                        "sourceIds": [
+                          "lac-sea-gamebook"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use the explicit halftime-to-status-update start range and official out status; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  }
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Trevor-Penning",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-LAC-Rashawn-Slater",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.23,
+                  "rawTeamContributionDelta": -0.23,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.23,
+                    "max": 0.23
+                  },
+                  "weights": [
+                    {
+                      "player": "Logan Taylor",
+                      "eaPlayerId": "16252",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The official depth chart and gamebook establish Logan Taylor as an active offensive-line reserve; this is an explicit same-position-group additional-duty estimate, not an observed assignment.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.135,
+                    "fractionRange": {
+                      "min": 0.135,
+                      "max": 0.135
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3114,
+                        "startLatest": 3114,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "rationale": "Official 8:06 Q4 play records the injury and no later return before regulation ended.",
+                        "sourceIds": [
+                          "lac-sea-gamebook"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.7,
+                    "max": 1.7
+                  }
+                }
+              ]
+            },
+            {
+              "team": "SEA",
+              "estimates": [
+                {
+                  "caseKey": "2026-W04-SEA-Jadarian-Price",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Emanuel Wilson",
+                      "eaPlayerId": "23335",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-SEA-Ty-Okada",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Rodney Thomas II",
+                      "eaPlayerId": "22492",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W04-SEA-Chazz-Surratt",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W04-SEA-Leonard-Williams",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.162,
+                  "rawTeamContributionDelta": -0.162,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.162,
+                    "max": 0.162
+                  },
+                  "weights": [
+                    {
+                      "player": "Rylie Mills",
+                      "eaPlayerId": "15215",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.135,
+                    "fractionRange": {
+                      "min": 0.135,
+                      "max": 0.135
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3114,
+                        "startLatest": 3114,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "rationale": "Official 8:06 Q4 play records the injury, the 7:05 Q4 update lists return questionable, and no later return is recorded.",
+                        "sourceIds": [
+                          "lac-sea-gamebook"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.2,
+                    "max": 1.2
                   }
                 }
               ]
@@ -53279,7 +54437,7 @@
     "sourceWeek": 4,
     "targetWeek": 5,
     "state": "PARTIAL_BLOCKED",
-    "appliedAt": "2026-10-08T05:16:00.000Z",
+    "appliedAt": "2026-10-08T13:16:00.000Z",
     "formulaIds": [
       "BW-R016",
       "BW-R017",
@@ -53287,8 +54445,8 @@
     ],
     "marketViewed": false,
     "gamesProcessed": 16,
-    "gamesUpdated": 3,
-    "teamsUpdated": 6,
+    "gamesUpdated": 4,
+    "teamsUpdated": 8,
     "blockedGames": [
       {
         "gameKey": "2026-W04-PIT-CLE",
@@ -53454,22 +54612,6 @@
         "gameKey": "2026-W04-MIA-MIN",
         "away": "MIA",
         "home": "MIN",
-        "reasons": [
-          "FINAL_GAMEBOOK_BOUND_PAIRED_COVERAGE_PENDING: 3 governed individual role estimate(s) remain CASE_ESTIMATE_ONLY. The official final gamebook is now bound, but its inactive/DNP, in-game injury, explicit QB loss/no-loss, specialist, participation and cluster evidence has not yet been fully reconciled for both teams.",
-          "RECOVERY_ACTION: Review the bound official gamebook line by line; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; recompute both governed team totals; then run tools/graham-weekly-evidence.mjs and stage READY only if both sides pass."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
-          "data/walters/nfl/2026/week-04-current-numbers.json",
-          "data/walters/nfl/2026/week-04-personnel-ledger.json",
-          "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
-          "https://www.nfl.com/schedules/2026/by-week/week-4"
-        ]
-      },
-      {
-        "gameKey": "2026-W04-LAC-SEA",
-        "away": "LAC",
-        "home": "SEA",
         "reasons": [
           "FINAL_GAMEBOOK_BOUND_PAIRED_COVERAGE_PENDING: 3 governed individual role estimate(s) remain CASE_ESTIMATE_ONLY. The official final gamebook is now bound, but its inactive/DNP, in-game injury, explicit QB loss/no-loss, specialist, participation and cluster evidence has not yet been fully reconciled for both teams.",
           "RECOVERY_ACTION: Review the bound official gamebook line by line; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; recompute both governed team totals; then run tools/graham-weekly-evidence.mjs and stage READY only if both sides pass."
@@ -54771,6 +55913,219 @@
           "data/walters/nfl/2026/week-04-current-numbers.json",
           "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-den-sf-complete-reconciliation.json",
           "https://static.www.nfl.com/image/upload/v1791201117/gamecenter/aa6b4cf4-4feb-11f1-abca-2c54536568a9.pdf",
+          "data/walters/nfl/2026/week-04-personnel-ledger.json",
+          "https://www.nfl.com/schedules/2026/by-week/week-4"
+        ],
+        "marketViewed": false
+      },
+      {
+        "auditId": "walters-weekly-90-10-2026-w04-to-w05-lac-sea-recovery-20261008131600000",
+        "appliedAt": "2026-10-08T13:16:00.000Z",
+        "newGamesUpdated": 1,
+        "newTeamsUpdated": 2,
+        "alreadyAppliedGames": [
+          "2026-W04-KC-LV",
+          "2026-W04-DEN-SF",
+          "2026-W04-ATL-NO"
+        ],
+        "blockedGames": [
+          {
+            "gameKey": "2026-W04-PIT-CLE",
+            "away": "PIT",
+            "home": "CLE",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 4 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-IND-WAS",
+            "away": "IND",
+            "home": "WAS",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 7 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-TEN-BAL",
+            "away": "TEN",
+            "home": "BAL",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 2 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-NE-BUF",
+            "away": "NE",
+            "home": "BUF",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 3 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-NYJ-CHI",
+            "away": "NYJ",
+            "home": "CHI",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 5 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-JAX-CIN",
+            "away": "JAX",
+            "home": "CIN",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 2 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-DAL-HOU",
+            "away": "DAL",
+            "home": "HOU",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 4 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-ARI-NYG",
+            "away": "ARI",
+            "home": "NYG",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 1 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-LAR-PHI",
+            "away": "LAR",
+            "home": "PHI",
+            "reasons": [
+              "FINAL_GAMEBOOK_BOUND_PAIRED_COVERAGE_PENDING: 7 governed individual role estimate(s) remain CASE_ESTIMATE_ONLY. The official final gamebook is now bound, but its inactive/DNP, in-game injury, explicit QB loss/no-loss, specialist, participation and cluster evidence has not yet been fully reconciled for both teams.",
+              "RECOVERY_ACTION: Review the bound official gamebook line by line; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; recompute both governed team totals; then run tools/graham-weekly-evidence.mjs and stage READY only if both sides pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-GB-TB",
+            "away": "GB",
+            "home": "TB",
+            "reasons": [
+              "FINAL_PAIRED_COVERAGE_NOT_CERTIFIED: 5 governed individual role estimate(s) are retained as CASE_ESTIMATE_ONLY. The available gamebook capture was explicitly limited to availability/starter identity and did not review in-game injuries, every inactive/DNP exclusion, QB loss/no-loss, specialists, participation or clusters for both teams.",
+              "RECOVERY_ACTION: Capture and review the final official gamebook for both teams; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; then run tools/graham-weekly-evidence.mjs and stage READY only if both governed injury totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-MIA-MIN",
+            "away": "MIA",
+            "home": "MIN",
+            "reasons": [
+              "FINAL_GAMEBOOK_BOUND_PAIRED_COVERAGE_PENDING: 3 governed individual role estimate(s) remain CASE_ESTIMATE_ONLY. The official final gamebook is now bound, but its inactive/DNP, in-game injury, explicit QB loss/no-loss, specialist, participation and cluster evidence has not yet been fully reconciled for both teams.",
+              "RECOVERY_ACTION: Review the bound official gamebook line by line; reconcile every archived case plus newly identified inactive, reserve-list and in-game absence; bind explicit QB loss/no-loss, coverage exclusions, participation, specialist and cluster reviews; recompute both governed team totals; then run tools/graham-weekly-evidence.mjs and stage READY only if both sides pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          },
+          {
+            "gameKey": "2026-W04-DET-CAR",
+            "away": "DET",
+            "home": "CAR",
+            "reasons": [
+              "IN_GAME_EXPOSURE_AND_PAIRED_COVERAGE_PENDING: 4 governed pregame individual role estimates remain CASE_ESTIMATE_ONLY. The bound final gamebook additionally identifies three unresolved in-game cases: DET Rock Ya-Sin, CAR Michael Freeling and CAR Jaelan Phillips. Their timing/exposure, replacement identity, role allocation and governed loss have not been computed, and complete inactive/DNP, QB, specialist, participation and cluster coverage is not yet established for both teams.",
+              "RECOVERY_ACTION: Create source-bound historical case reviews for Rock Ya-Sin, Michael Freeling and Jaelan Phillips using the official gamebook timing intervals; bind supported replacement identities and role allocation under graham-replacement-role-estimate-v1; then reconcile all pregame cases plus explicit QB loss/no-loss, exclusions, participation, specialist and cluster coverage, rerun tools/graham-weekly-evidence.mjs, and stage READY only if both team totals pass."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-06-final-gamebooks-recovery-audit.json",
+              "data/walters/nfl/2026/week-04-current-numbers.json",
+              "data/walters/nfl/2026/week-04-personnel-ledger.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+              "https://www.nfl.com/schedules/2026/by-week/week-4"
+            ]
+          }
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/2026/week-04-current-numbers.json",
+          "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
+          "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
           "data/walters/nfl/2026/week-04-personnel-ledger.json",
           "https://www.nfl.com/schedules/2026/by-week/week-4"
         ],
