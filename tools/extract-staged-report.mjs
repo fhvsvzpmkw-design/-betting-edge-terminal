@@ -6,6 +6,7 @@ import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {scheduleMetadataForReport} from './main-schedule.mjs';
 import {parseReportDocument} from './report-document-transport.mjs';
+import {validateProducerExecution} from './report-producer-progress.mjs';
 export const blobSha=bytes=>createHash('sha1').update(`blob ${Buffer.byteLength(bytes)}\0`).update(bytes).digest('hex');
 export function validateStagedBundle(bundle,{root=process.cwd()}={}){
   if(bundle?.schema!==1||bundle.state!=='READY'||!bundle.report||bundle.sidecar?.schema!==3)throw new Error('Invalid staged report envelope');
@@ -14,6 +15,7 @@ export function validateStagedBundle(bundle,{root=process.cwd()}={}){
   if(!Number.isFinite(Date.parse(report.ts))||sidecar.provenance?.canonicalSlot!==canonicalSlot)throw new Error('Invalid staged report identity');
   if(bundle.candidateId!==`${report.ts}|${canonicalSlot}`||![String(canonicalSlot),'FROZEN'].includes(String(bundle.phase)))throw new Error('Staged candidateId/phase differ from report identity');
   if(sidecar.reportReference?.ts!==report.ts||sidecar.reportReference?.feedGeneratedAt!==report.feedGeneratedAt)throw new Error('Staged report/sidecar identity mismatch');
+  validateProducerExecution(bundle);
   return bundle;
 }
 export function extractStagedReport({root=process.cwd(),commit,outputDir}){

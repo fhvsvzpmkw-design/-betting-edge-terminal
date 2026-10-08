@@ -6,8 +6,10 @@ on:
     paths:
       - tools/report-run.mjs
       - tools/report-document-transport.mjs
+      - tools/report-producer-progress.mjs
       - tools/extract-staged-report.mjs
       - tests/report-document-transport.test.mjs
+      - tests/report-producer-progress.test.mjs
       - tests/report-pipeline.test.mjs
       - tests/report-run-replay.test.mjs
       - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
@@ -29,6 +31,7 @@ jobs:
         run: node tests/report-document-transport.test.mjs
       - name: Controller and shared authority regressions
         run: |
+          node tests/report-producer-progress.test.mjs
           node tests/report-pipeline.test.mjs
           node tests/scheduled-report-authority.test.mjs
       - name: Replay through the real publisher gates and durable readback

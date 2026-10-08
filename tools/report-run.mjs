@@ -14,6 +14,7 @@ import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gat
 import {execFileSync} from 'node:child_process';
 import {isDeepStrictEqual} from 'node:util';
 import {serializeReportDocument,parseReportDocument} from './report-document-transport.mjs';
+import {producerExecutionFor} from './report-producer-progress.mjs';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -57,7 +58,11 @@ function summary(state){
     preparation:state.preparation||null,lastEvent:state.events.at(-1)||null,
     publication:state.publication||null};
 }
-function bundleFor(state){return {schema:1,state:'READY',phase:String(state.identity.canonicalSlot),candidateId:state.identity.candidateId,report:state.report,sidecar:state.sidecar};}
+function bundleFor(state){
+  const producerExecution=producerExecutionFor(state);
+  return {schema:1,state:'READY',phase:String(state.identity.canonicalSlot),candidateId:state.identity.candidateId,report:state.report,sidecar:state.sidecar,
+    ...(producerExecution?{producerExecution}:{})};
+}
 function bindGameInputs(root,report,sidecar){
   if(sidecar.gameIntelligenceInputs)return;
   let bytes;
@@ -165,8 +170,8 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     }
     if(command==='freeze'){
       if(state.phase!=='PREPARED')throw new Error('Prepare and review deferrals before freeze');
-      state.validation=temporaryDraft(state,files=>pipeline({root,...files,mode:'validate'}));
       validateStagedBundle(bundleFor(state),{root});
+      state.validation=temporaryDraft(state,files=>pipeline({root,...files,mode:'validate'}));
       const bytes=serializeReportDocument(bundleFor(state),'STAGED_REPORT');state.frozen={blobSha:blobSha(bytes),bytes:Buffer.byteLength(bytes),serializedBundle:bytes};state.phase='FROZEN';
     }
     if(command==='stage'){

@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-08.2
+**Operating revision:** 2026-10-08.3
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -149,6 +149,8 @@ Resolve `data/walters/nfl/active-week.json`, active current-numbers board, QB pr
 If the governed canary remains pending, identify the first published NFL-bearing report for FIRST_NFL_BEARING_BETTING_EDGE_READBACK and verify its exact board binding. The report producer cannot edit QB production, roll back the board or rewrite History.
 
 ## 8. One resumable producer
+
+For new reports at/after `2026-10-08T14:30:43-07:00`, freeze and exact-trigger extraction enforce a saved event-review trace. Every event with an EVALUATED decision must have an actual `checkpoint --event-id` record, and an available board requires at least one saved event review before freeze. Source collection or an initial draft alone cannot satisfy this check. The controller embeds `producerExecution` automatically; do not manufacture trace entries. Empty slates retain their normal path, and genuine unfinished selections do not veto unrelated reviewed decisions. This is producer execution verification, not a decision, BET or card-count quota.
 
 `tools/report-run.mjs` owns producer state. Use `docs/REPORT_RUN_CONTROLLER.md` for the command sequence. After constructing the exact initial draft and source bindings, `start` a uniquely named checkpoint at `data/report-production/checkpoints/<run-id>.json`. Then execute the existing event-review loop before final preparation: read `next`, read `next --event-id <id>`, export the draft outside the repository, review the preserved event facts and captured forecasts, complete the supported exact selection decisions, and `checkpoint` that event with the expected revision. Repeat across the available event queue, reusing the shared event research. Source collection, inventory construction and writing RESEARCH_INCOMPLETE receipts do not perform this loop. Do not move directly from an unassessed initial draft to freeze merely because an incomplete or zero-BET report can pass publication validation. Zero BETs is permitted after actual assessments; it is not an instruction to skip them. Keep genuinely unresolved selections separately blocked, publish unrelated completed decisions, and retain the existing empty-slate and freshness-failure behavior. No decision or pick quota is introduced.
 
