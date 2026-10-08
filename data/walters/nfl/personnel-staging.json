@@ -1,14 +1,38 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-delta-1645-2026-w05-20261007T165431-0700-personnel-repair",
+  "batchId": "graham-delta-1645-2026-w05-20261008T164150-0700-personnel",
   "season": 2026,
   "week": 5,
-  "startedAt": "2026-10-07T16:48:31-07:00",
-  "effectiveAt": "2026-10-07T16:54:31-07:00",
+  "startedAt": "2026-10-08T16:41:50-07:00",
+  "effectiveAt": "2026-10-08T16:46:09-07:00",
   "marketViewed": false,
   "sourceTask": "DELTA_1645",
   "cases": [
+    {
+      "caseKey": "2026-W05-DAL-Tyler-Smith-RETURN",
+      "gameKey": "2026-W05-TB-DAL",
+      "team": "DAL",
+      "side": "HOME",
+      "player": "Tyler Smith",
+      "playerEaId": "22445",
+      "availabilityStatus": "ACTIVE_FULL",
+      "resolutionStatus": "RESOLVED_ACTIVE",
+      "personnelEventId": "2026-W05-DAL-Tyler-Smith-return-delta-20261008T164609-0700",
+      "reason": "Dallas officially activated Tyler Smith from injured reserve and reported that he will suit up against Tampa Bay after a full Wednesday practice and medical clearance. Record the verified active-full return without inventing an impairment percentage.",
+      "sourceRefs": [
+        "https://www.dallascowboys.com/news/tyler-smith-officially-activated-from-ir-for-cowboys-vs-buccaneers",
+        "https://www.dallascowboys.com/news/updates-october-2026",
+        "data/walters/nfl/player-values/by-team-v1/dal.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.dallascowboys.com/news/tyler-smith-officially-activated-from-ir-for-cowboys-vs-buccaneers"
+      ],
+      "roleSourceRefs": [
+        "https://www.dallascowboys.com/news/updates-october-2026"
+      ]
+    },
     {
       "caseKey": "2026-W05-DAL-Cobie-Durant",
       "gameKey": "2026-W05-TB-DAL",
@@ -17,12 +41,12 @@
       "player": "Cobie Durant",
       "playerEaId": "22278",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "personnelEventId": "2026-W05-DAL-Cobie-Durant-delta-repair-20261007T165431-0700",
-      "reason": "Dallas officially ruled Cobie Durant out for Week 5. The club reported Joey Porter Jr. as a high-level outside starter for the injured cornerback room; Porter debuted in Week 4 and was a full participant this week. Use Porter as the reported primary replacement estimate, with the frozen source-bound value from the exact registry fallback.",
+      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
+      "failClosedCode": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+      "personnelEventId": "2026-W05-DAL-Cobie-Durant-reopen-delta-20261008T164609-0700",
+      "reason": "Cobie Durant remains out, but the previously estimated primary replacement Joey Porter Jr. was ruled inactive shortly before kickoff because of illness. Dallas elevated Reddy Steward and its depth chart also lists Shavon Revel Jr. and Ameer Speed in the outside-corner chain; no source establishes a complete non-overlapping allocation across the now depleted secondary. Reopen the case and fail closed.",
       "sourceRefs": [
-        "https://www.dallascowboys.com/team/injury-report/week/REG-5",
-        "https://www.dallascowboys.com/news/cowboys-agree-to-terms-on-trade-for-steelers-cb-joey-porter-jr",
+        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys",
         "https://www.dallascowboys.com/news/updates-october-2026",
         "https://www.dallascowboys.com/team/depth-chart",
         "data/walters/nfl/player-values/by-team-v1/dal.json",
@@ -30,36 +54,125 @@
         "data/walters/nfl/player-values/player-values-2026-v1.json"
       ],
       "availabilitySourceRefs": [
-        "https://www.dallascowboys.com/team/injury-report/week/REG-5"
+        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys"
       ],
       "roleSourceRefs": [
-        "https://www.dallascowboys.com/news/cowboys-agree-to-terms-on-trade-for-steelers-cb-joey-porter-jr",
-        "https://www.dallascowboys.com/news/updates-october-2026"
+        "https://www.dallascowboys.com/news/updates-october-2026",
+        "https://www.dallascowboys.com/team/depth-chart"
       ],
-      "reopenOn": "Dallas changes the Week 5 outside-corner allocation, Joey Porter Jr. becomes unavailable, or Cobie Durant returns.",
+      "reopenOn": "Dallas documents the distinct outside-corner allocation for Durant's vacated duties with Porter unavailable, or Durant returns.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Reddy Steward",
+          "Shavon Revel Jr",
+          "Ameer Speed"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      }
+    },
+    {
+      "caseKey": "2026-W05-DAL-Joey-Porter",
+      "gameKey": "2026-W05-TB-DAL",
+      "team": "DAL",
+      "side": "HOME",
+      "player": "Joey Porter",
+      "playerEaId": "22706",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
+      "failClosedCode": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+      "personnelEventId": "2026-W05-DAL-Joey-Porter-delta-20261008T164609-0700",
+      "reason": "Joey Porter Jr. was ruled inactive shortly before kickoff because of illness. Dallas elevated Reddy Steward, but current official roster/depth evidence does not establish one distinct replacement for Porter's baseline corner duties while Cobie Durant is also out. The defensive-back allocation remains a reviewed cluster and fails closed.",
+      "sourceRefs": [
+        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys",
+        "https://www.dallascowboys.com/news/updates-october-2026",
+        "https://www.dallascowboys.com/team/depth-chart",
+        "data/walters/nfl/player-values/player-values-2026-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/dal.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys"
+      ],
+      "roleSourceRefs": [
+        "https://www.dallascowboys.com/news/updates-october-2026",
+        "https://www.dallascowboys.com/team/depth-chart"
+      ],
+      "reopenOn": "Dallas documents the distinct outside-corner allocation with Durant and Porter unavailable, or Porter returns.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Reddy Steward",
+          "Shavon Revel Jr",
+          "Ameer Speed"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      }
+    },
+    {
+      "caseKey": "2026-W05-PIT-Michael-Pittman",
+      "gameKey": "2026-W05-IND-PIT",
+      "team": "PIT",
+      "side": "HOME",
+      "player": "Michael Pittman",
+      "playerEaId": "21081",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "2026-W05-PIT-Michael-Pittman-delta-20261008T164609-0700",
+      "reason": "Pittsburgh reported that Michael Pittman Jr. re-injured his foot and will miss multiple weeks. The official depth chart lists Germie Bernard directly behind Pittman, and the team specifically identified Bernard as prepared to take on the vacated work. Apply the approved labelled primary-replacement estimate, retaining the pre-final-designation source qualification.",
+      "sourceRefs": [
+        "https://www.steelers.com/news/week-5-injury-report-colts",
+        "https://www.steelers.com/news/week-5-blog-being-more-efficient",
+        "https://www.steelers.com/team/depth-chart/",
+        "data/walters/nfl/player-values/by-team-v1/pit.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.steelers.com/news/week-5-injury-report-colts"
+      ],
+      "roleSourceRefs": [
+        "https://www.steelers.com/news/week-5-blog-being-more-efficient",
+        "https://www.steelers.com/team/depth-chart/"
+      ],
+      "reopenOn": "Pittman's official availability changes, Pittsburgh documents a different primary receiver allocation, or Pittman returns.",
       "replacementModel": {
         "modelId": "graham-replacement-role-estimate-v1",
         "resolution": "PRIMARY_REPLACEMENT",
         "estimateAcknowledged": true,
-        "assumptionRationale": "Dallas reported Porter as a high-level outside starter for the injured cornerback room and documented his Week 4 debut; using him for Durant's additional vacated outside-corner duties is a labelled primary-role estimate.",
+        "assumptionRationale": "Pittsburgh's official depth chart places Germie Bernard directly behind Pittman and the team highlighted Bernard as prepared for the added work after announcing Pittman's multi-week absence.",
         "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
         "baselineDutiesDisplaced": false,
-        "baselineRationale": "Only Durant's vacated Week 5 outside-corner duties are credited; Porter's separate baseline participation is preserved and the injury-loss floor prevents an upgrade from being counted.",
+        "baselineRationale": "Only Pittman's vacated Week 5 receiver duties are credited to Bernard; Bernard's existing baseline role is preserved and counted once.",
         "baselineSourceIds": [
-          "https://www.dallascowboys.com/news/cowboys-agree-to-terms-on-trade-for-steelers-cb-joey-porter-jr",
-          "https://www.dallascowboys.com/news/updates-october-2026"
+          "https://www.steelers.com/news/week-5-blog-being-more-efficient",
+          "https://www.steelers.com/team/depth-chart/"
         ],
         "replacements": [
           {
-            "player": "Joey Porter",
-            "eaPlayerId": "22706",
+            "player": "Germie Bernard",
+            "eaPlayerId": "1832",
             "availabilityStatus": "ACTIVE",
-            "roleRationale": "Dallas described Porter as a high-level outside starter, documented his Week 4 debut, and listed him as a full participant throughout the Week 5 report.",
+            "roleRationale": "The official depth chart lists Bernard second at Pittman's receiver position, and the team identified him as prepared to handle the additional work.",
             "sourceRefs": [
-              "https://www.dallascowboys.com/news/cowboys-agree-to-terms-on-trade-for-steelers-cb-joey-porter-jr",
-              "https://www.dallascowboys.com/news/updates-october-2026",
-              "https://www.dallascowboys.com/team/injury-report/week/REG-5",
-              "data/walters/nfl/player-values/player-values-2026-v1.json"
+              "https://www.steelers.com/news/week-5-blog-being-more-efficient",
+              "https://www.steelers.com/team/depth-chart/",
+              "data/walters/nfl/player-values/by-team-v1/pit.json"
             ]
           }
         ],
@@ -71,9 +184,9 @@
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Joey Porter",
-          "Shavon Revel Jr",
-          "Ameer Speed"
+          "Germie Bernard",
+          "Roman Wilson",
+          "Ben Skowronek"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
