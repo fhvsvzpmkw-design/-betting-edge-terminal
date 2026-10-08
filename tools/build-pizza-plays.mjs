@@ -7,6 +7,7 @@ const ARCHIVE_ROOT = 'data/history/pizza-plays';
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const STATUS_WEIGHT = { BET: 300, LEAN: 200, WAIT: 100 };
 const TRACKING_UNIT_BASE = 0.03;
+const RANKING_VERSION = 2;
 
 function text(value, fallback = '') {
   const s = String(value ?? '').trim();
@@ -30,11 +31,49 @@ function cardScore(rec, index) {
   return (STATUS_WEIGHT[status] || 0) + edgePct(rec) - index / 1000;
 }
 
-function chooseCard(report) {
+function probabilityGap(rec) {
+  const forecast = rec?.forecastLean;
+  if (forecast?.basis === 'REVIEWED_FORECAST_POINT') {
+    const rawPrice = rec?.feed?.priceDecimal;
+    const price = rawPrice === null || rawPrice === undefined || rawPrice === '' ? null : Number(rawPrice);
+    const probability = forecast.probability;
+    if (forecast.schema !== 1 || !forecast.selectionKey || forecast.selectionKey !== rec?.feed?.selectionKey ||
+        !Number.isFinite(price) || price <= 1 || !Number.isFinite(probability) || probability <= 0 || probability >= 1) return null;
+    // Use the same exact forecast/quote gap as VigScope Call Priority. This
+    // orders existing calls; it does not establish independent fair or EV.
+    return (probability - 1 / price) * 100;
+  }
+  const match = text(rec?.edge).replace(/−/g, '-').match(/([+-]?\d+(?:\.\d+)?)\s*(?:probability points?|percentage points?|pp\b)/i);
+  return match ? Number(match[1]) : null;
+}
+
+function chooseCard(report, rankingVersion = RANKING_VERSION) {
   const ranked = (Array.isArray(report?.recs) ? report.recs : [])
-    .map((rec, index) => ({ rec, index, status: text(rec?.status).toUpperCase(), score: cardScore(rec, index), edgePct: edgePct(rec) }))
-    .filter(item => ACTIVE.has(item.status))
-    .sort((a, b) => b.score - a.score || a.index - b.index);
+    .map((rec, index) => ({ rec, index, status: text(rec?.status).toUpperCase(), score: cardScore(rec, index), edgePct: edgePct(rec), gap: probabilityGap(rec) }))
+    .filter(item => ACTIVE.has(item.status));
+  if (rankingVersion === 1) {
+    ranked.sort((a, b) => b.score - a.score || a.index - b.index);
+    return ranked[0] || null;
+  }
+  const hasGap = status => ranked.some(item => item.status === status && item.gap !== null);
+  for (const item of ranked) {
+    const useGap = hasGap(item.status);
+    const legacyEv = text(item.rec?.edge).replace(/−/g, '-').match(/([+-]?\d+(?:\.\d+)?)\s*%\s*EV/i);
+    // Retain EV-only legacy boards without mixing EV percentages with
+    // probability points. Invalid reviewed forecasts cannot fall back to text.
+    item.metric = useGap ? item.gap : item.rec?.forecastLean ? null : legacyEv ? Number(legacyEv[1]) : null;
+    item.metricKind = item.metric === null ? 'UNMEASURED' : useGap ? 'PROBABILITY_POINTS' : 'LEGACY_EV_PERCENT';
+    item.publishedEV = legacyEv ? Number(legacyEv[1]) : null;
+    item.score = STATUS_WEIGHT[item.status] + (item.metric ?? 0);
+  }
+  ranked.sort((a, b) => {
+    const priority = STATUS_WEIGHT[b.status] - STATUS_WEIGHT[a.status];
+    if (priority) return priority;
+    if (a.metric === null && b.metric !== null) return 1;
+    if (a.metric !== null && b.metric === null) return -1;
+    if (a.metric !== null && b.metric !== null && a.metric !== b.metric) return b.metric - a.metric;
+    return a.index - b.index;
+  });
   return ranked[0] || null;
 }
 
@@ -58,8 +97,8 @@ function trackingSnapshot(report) {
   };
 }
 
-function buildFromReport(report, reportPath) {
-  const item = chooseCard(report);
+function buildFromReport(report, reportPath, rankingVersion = RANKING_VERSION) {
+  const item = chooseCard(report, rankingVersion);
   const base = {
     schema: 3,
     title: 'Pizza Plays',
@@ -84,6 +123,10 @@ function buildFromReport(report, reportPath) {
       note: 'Pizza Plays is a Lou Two Slice overlay. It does not calculate, recommend, or display stake sizing, and it never changes the VigScope status, target price, fair value, or ledger.'
     }
   };
+  if (rankingVersion === RANKING_VERSION) {
+    base.selectionRule.rankingVersion = RANKING_VERSION;
+    base.selectionRule.withinStatus = 'Higher measured probability-point gap first; unknown gaps last; exact ties retain issued report order. EV-only legacy boards retain published EV ordering when no comparable probability-point gap is available.';
+  }
 
   if (!item) {
     return {
@@ -108,7 +151,8 @@ function buildFromReport(report, reportPath) {
       vigScopeStatus: status,
       sourceOrdinal: item.index + 1,
       score: Number(item.score.toFixed(3)),
-      publishedEdgePct: item.edgePct,
+      publishedEdgePct: rankingVersion === 1 ? item.edgePct : item.publishedEV,
+      ...(rankingVersion === RANKING_VERSION ? { rankingMetric: { kind: item.metricKind, value: item.metric } } : {}),
       title: text(rec?.title, 'UNTITLED VIGSCOPE CARD'),
       meta: text(rec?.meta),
       book: text(rec?.book, '—'),
@@ -146,6 +190,18 @@ function archivePath(output) {
   const match = reportPath.match(/^data\/history\/runs\/(\d{4}-\d{2}-\d{2})\/([^/]+\.json)$/);
   if (!match) throw new Error(`Pizza source report path is not archiveable: ${reportPath}`);
   return path.join(ARCHIVE_ROOT, match[1], match[2]);
+}
+
+function issuedRankingVersion(reportPath) {
+  const target = archivePath({ source: { reportPath } });
+  let issued = fs.existsSync(target) ? JSON.parse(fs.readFileSync(target, 'utf8')) : null;
+  if (!issued && fs.existsSync(OUTPUT_PATH)) {
+    const current = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+    if (current?.source?.reportPath === reportPath) issued = current;
+  }
+  const version = issued ? issued?.selectionRule?.rankingVersion ?? 1 : RANKING_VERSION;
+  if (![1, RANKING_VERSION].includes(version)) throw new Error(`Unknown issued Pizza ranking version: ${version}`);
+  return version;
 }
 
 function validate(output) {
@@ -196,7 +252,7 @@ if (args.includes('--self-test')) {
   const output = validate(JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')));
   const reportPath = latestReportPath();
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-  const expected = validate(buildFromReport(report, reportPath));
+  const expected = validate(buildFromReport(report, reportPath, issuedRankingVersion(reportPath)));
   if (JSON.stringify(output) !== JSON.stringify(expected)) throw new Error(`Pizza Plays does not match the latest published report: ${reportPath}`);
   const archived = archivePath(output);
   if (!fs.existsSync(archived) || fs.readFileSync(archived, 'utf8') !== `${JSON.stringify(output, null, 2)}\n`) {
@@ -207,8 +263,8 @@ if (args.includes('--self-test')) {
   const reportFlag = args.indexOf('--report');
   const reportPath = reportFlag >= 0 && args[reportFlag + 1] ? args[reportFlag + 1] : latestReportPath();
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-  const output = validate(buildFromReport(report, reportPath));
-  fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(output, null, 2)}\n`);
+  const output = validate(buildFromReport(report, reportPath, issuedRankingVersion(reportPath)));
   const archived = writeImmutableArchive(output);
+  fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(output, null, 2)}\n`);
   console.log(`Pizza Plays built from ${reportPath}: ${output.status}${output.play ? ` // ${output.play.title}` : ''} // tracking unit $${output.tracking.unitCad.toFixed(4)} // archive ${archived}`);
 }
