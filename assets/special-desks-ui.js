@@ -104,6 +104,22 @@ function ensureStyle(d){
     @media(max-width:560px){.cryptoValueStrip{gap:8px}.cryptoValueCell small{font-size:10px}.cryptoValueCell .cryptoPriceLabel{font-size:12px}.cryptoActionLine span{margin-top:0}}
     @media(max-width:720px){#${PIZZA_PANEL},#${CRYPTO_PANEL}{margin-left:7px;margin-right:7px;padding:11px}.specialHead{min-height:42px;padding:8px 9px;margin-bottom:11px}.deskSectionBar{margin-top:12px}.deskSectionBar span{display:none}.pizzaPick h3{font-size:24px!important}}
 
+    #${PIZZA_PANEL}{min-height:0}
+    .pizzaCompact{margin-top:0;gap:0}.pizzaCompact .pizzaPick{box-sizing:border-box;min-width:0;padding:16px;font-size:16px}
+    .pizzaCompact .pizzaPickHead{display:flex;gap:14px;align-items:flex-start}.pizzaCompact .pizzaIdentity{flex:1;min-width:0}
+    .pizzaCompact .pizzaLouTag{border:0;background:transparent;padding:0;font-size:11px;letter-spacing:.08em;box-shadow:none!important;color:#d59665}
+    .pizzaCompact .pizzaPick h3{margin:7px 0 0;font-size:24px!important;line-height:1.25;overflow-wrap:anywhere}
+    .pizzaMarketLabel{margin-top:5px;color:#c5a38b;font-size:13px;text-transform:capitalize;line-height:1.4}
+    .pizzaCompact .pizzaSourceState{min-width:0;margin:0;text-align:right}.pizzaCompact .pizzaSourceState strong{border:1px solid #ad6631;padding:5px 8px;font-size:13px;letter-spacing:.06em}.pizzaCompact .pizzaSourceState span{font-size:9px;white-space:nowrap}
+    .pizzaCompact .pizzaEventMeta{margin-top:12px;padding:0 0 10px;border:0;border-bottom:1px solid #4c2817;background:transparent;font-size:12px;font-weight:600;gap:5px 14px;box-shadow:none;overflow-wrap:anywhere}.pizzaStart{color:#f0cba8}
+    .pizzaCompact .pizzaMarketStrip{display:flex;flex-wrap:wrap;gap:10px 30px;padding:0;margin-top:12px;border:0;background:transparent;box-shadow:none}
+    .pizzaCompact .pizzaMarketCell small{font-size:10px;margin-bottom:4px}.pizzaCompact .pizzaMarketCell strong{font-size:24px;line-height:1.25}
+    .pizzaBrief{margin-top:14px}.pizzaBrief small{display:block;margin-bottom:4px;color:#f1a366;font-size:10px;font-weight:900;letter-spacing:.08em}.pizzaBrief p{margin:0;color:#ecd3bd;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+    .pizzaCaution{padding-top:11px;border-top:1px solid #442617}.pizzaCaution p{color:#c4a58f;font-size:13px}
+    .pizzaDetails{margin-top:14px;border-top:1px solid #5c341d}.pizzaDetails summary{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none;color:#dfa779;font-size:11px;font-weight:900;letter-spacing:.07em}.pizzaDetails summary::-webkit-details-marker{display:none}.pizzaDetails summary:before{content:'+';font-size:16px}.pizzaDetails[open] summary:before{content:'−'}.pizzaDetails summary:focus-visible{outline:2px solid #ffb36f;outline-offset:2px}
+    .pizzaDetailBody{padding:2px 0 10px}.pizzaDetailRow{margin-bottom:14px;overflow-wrap:anywhere}.pizzaDetailRow:last-child{margin-bottom:0}.pizzaDetailRow small{display:block;color:#cf9263;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.pizzaDetailRow p{margin:4px 0 0;color:#bfa08a;font-size:13px;line-height:1.55}
+    .pizzaCompact .pizzaTimestamp{margin-top:1px;text-align:left;color:#ad8b72;font-size:9px;line-height:1.5}
+    @media(max-width:560px){.pizzaCompact .pizzaPick{padding:12px}.pizzaCompact .pizzaPick h3{font-size:21px!important}.pizzaCompact .pizzaMarketCell strong{font-size:22px}.pizzaBrief p{font-size:14px}.pizzaCaution p{font-size:12px}.pizzaCompact .pizzaEventMeta{display:grid;font-size:11px}.pizzaCompact .pizzaSourceState span{font-size:8px}.pizzaCompact .pizzaMarketStrip{gap:10px 22px}}
     `;d.head.appendChild(s)
 }
 function itemCard(item,kind){
@@ -124,31 +140,72 @@ function ptDateTime(value){
   return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}).format(d).toUpperCase();
 }
 function priceText(v){return globalThis.VigScopeOddsFormat?.text(String(v??'').trim())||String(v??'').trim()||'—'}
+function pizzaHasValue(value){
+  return !!String(value??'').trim()&&!/^(?:—|-|none|n\/a|no bet|no published fair-value note\.?|no additional caution was published on the source card\.?|the card remains live on the current (?:VigScope )?report\.?)$/i.test(String(value).trim());
+}
+function pizzaSentences(value){
+  return String(value||'').trim().split(/(?<=[.!?])\s+(?=[A-Z])/).filter(s=>s&&!/\b[A-Z]+(?:_[A-Z]+)+\b/.test(s));
+}
+function pizzaExcerpt(value,limit=240){
+  const sentence=pizzaSentences(value)[0]||'';
+  if(sentence.length<=limit)return sentence;
+  return sentence.slice(0,limit-1).replace(/\s+\S*$/,'').replace(/[,;:]$/,'')+'…';
+}
+function pizzaRead(play){
+  const value=String(play?.whyThisOne||play?.lousRead||'')
+    .replace(/^Highest-ranked live VigScope card after Lou's status-and-edge sort\.\s*/i,'')
+    .replace(/^Lou[^.]*\.\s*/i,'');
+  return pizzaExcerpt(value);
+}
+function pizzaCaution(play){
+  const notes=[play?.watchOut,play?.vigScopeNote].filter(Boolean).join(' ');
+  const sentences=pizzaSentences(notes);
+  const recheck=sentences.find(s=>/^(?:confirm|recheck|wait for|verify)\b/i.test(s));
+  const conflict=/Pinnacle[^.]*\bdisagree|unfavorable[^.]*Pinnacle/i.test(notes)?'Pinnacle disagrees with this selection.':'';
+  const caution=[conflict,recheck?pizzaExcerpt(recheck,180):''].filter(Boolean).join(' ');
+  return caution||pizzaExcerpt(play?.watchOut||play?.vigScopeNote,220);
+}
+function pizzaMarketLabel(play){
+  const feed=play?.feed||{};
+  const market=String(feed.market||({ml:'Moneyline',spread:'Spread',total:'Total',rl:'Run line',pl:'Puck line'})[feed.marketKey]||'').replace(/_/g,' ');
+  const line=feed.line===null||feed.line===undefined?'':String(feed.line);
+  return [market,line].filter(Boolean).join(' · ');
+}
+function pizzaDetailsHtml(play,data){
+  const notes=play?.watchOut||play?.vigScopeNote;
+  const rows=[
+    ['Full read',play?.lousRead||play?.whyThisOne],
+    [/market reference/i.test(play?.fair||'')?'Market reference':'Fair value',play?.fair],
+    ['Published edge',play?.edge],
+    ['Target price',play?.targetPrice],
+    ['Movement',play?.movement],
+    ['Full report notes',notes],
+    ['Sources',play?.sourceNote]
+  ].filter(([,value])=>pizzaHasValue(value));
+  if(play?.vigScopeNote&&notes&&!String(notes).includes(play.vigScopeNote))rows.push(['VigScope note',play.vigScopeNote]);
+  return `<details class="pizzaDetails"><summary>VIEW DETAILS</summary><div class="pizzaDetailBody">${rows.map(([label,value])=>`<div class="pizzaDetailRow"><small>${esc(label)}</small><p>${esc(priceText(value))}</p></div>`).join('')}<div class="pizzaDetailRow"><small>SOURCE CARD</small><p>${esc(data?.source?.reportLabel||'')} · Card ${Number(play?.sourceOrdinal)||1}</p></div></div></details>`;
+}
 function pizzaPanelHtml(data){
   const play=globalThis.VigScopeOddsFormat?globalThis.VigScopeOddsFormat.record(data?.play):data?.play;const source=data?.source||{};const live=String(data?.status||'').toUpperCase()==='PLAY'&&play;
   const reportLabel=esc(source.reportLabel||source.slot||'CURRENT REPORT');
   const badge=live?`ONE SLICE // ${reportLabel}`:`OVEN CLOSED // ${reportLabel}`;
   const head=`<div class="specialHead deskStatusRail pizzaHead"><div class="specialBadge pizzaBadge">${badge}</div></div>`;
   if(!live){return `${head}<div class="specialEmpty"><strong>LOU KEEPS THE DOUGH IN THE DRAWER</strong><span>${esc(data?.reason||'Every current VigScope card is PASS. No Pizza Play is forced.')}</span></div>`}
-  const eventStart=ptDateTime(play?.feed?.eventDate);const sourceOrdinal=Number(play?.sourceOrdinal)||1;
-  const eventMeta=[play?.meta?`<span><b>EVENT //</b> ${esc(play.meta)}</span>`:'',eventStart?`<span><b>START //</b> ${esc(eventStart)} PT</span>`:''].filter(Boolean).join('');
-  return `${head}<div class="deskSectionBar"><b>PRIMARY PLAY</b><span>${reportLabel}</span></div><div class="pizzaBoard"><article class="pizzaPick">
-    <div class="pizzaPickHead"><div class="pizzaIdentity"><span class="pizzaLouTag">LOU TWO SLICE // ONE PLAY</span><h3>${esc(play?.title||'UNTITLED VIGSCOPE CARD')}</h3></div><div class="pizzaSourceState"><small>VIGSCOPE CARD STATUS</small><strong>${esc(play?.vigScopeStatus||'—')}</strong><span>CARD ${sourceOrdinal} // ${reportLabel}</span></div></div>
-    <div class="pizzaMarketStrip">
-      <div class="pizzaMarketCell"><small>BOOK / PRICE</small><strong>${esc(play?.book||'—')} // ${esc(priceText(play?.price))}</strong></div>
-      <div class="pizzaMarketCell target"><small>TARGET PRICE</small><strong>${esc(priceText(play?.targetPrice))}</strong></div>
-      <div class="pizzaMarketCell"><small>FAIR VALUE</small><strong>${esc(priceText(play?.fair))}</strong></div>
-      <div class="pizzaMarketCell edge"><small>PUBLISHED EDGE</small><strong>${esc(priceText(play?.edge))}</strong></div>
-    </div>
-    ${eventMeta?`<div class="pizzaEventMeta">${eventMeta}</div>`:''}
-    <div class="pizzaExplainGrid">
-      <div class="pizzaExplain"><small>WHY THIS ONE</small><strong>${esc(play?.whyThisOne||'Highest-ranked live VigScope card.')}</strong></div>
-      <div class="pizzaExplain"><small>THE EDGE</small><strong>${esc(play?.edgeRead||[play?.fair,play?.edge].filter(Boolean).join(' // '))}</strong></div>
-      <div class="pizzaExplain lou"><small>LOU'S READ</small><strong>${esc(play?.lousRead||'Lou makes this his one Pizza Play.')}</strong></div>
-      <div class="pizzaExplain watch"><small>WATCH OUT</small><strong>${esc(play?.watchOut||play?.vigScopeNote||'Respect the original VigScope conditions.')}</strong></div>
-    </div>
-    <div class="pizzaSourceNote"><b>VIGSCOPE NOTE //</b> ${esc(play?.vigScopeNote||'')} ${play?.sourceNote?`<br><b>SOURCE //</b> ${esc(play.sourceNote)}`:''}${data?.selectionRule?.note?`<br><b>RULE //</b> ${esc(data.selectionRule.note)}`:''}</div>
-    ${data?.generatedAt?`<div class="pizzaTimestamp">BUILT FROM ${esc(data.generatedAt)} // AMERICA/VANCOUVER</div>`:''}
+  const eventStart=ptDateTime(play?.feed?.eventDate);
+  const event=String(play?.meta||'').split(/\s*\|\s*/).filter(part=>!/^\d{4}-\d{2}-\d{2}T/.test(part)).join(' · ');
+  const market=pizzaMarketLabel(play),read=pizzaRead(play),caution=pizzaCaution(play);
+  const target=priceText(play?.targetPrice),edge=priceText(play?.edge);
+  const hasTarget=/[+\-−]\d{3,}/.test(target)&&pizzaHasValue(target);
+  const numericEdge=edge.match(/^([+\-−]?\d+(?:\.\d+)?%\s*(?:point\s*)?EV)\b/i);
+  const status=String(play?.vigScopeStatus||'').toUpperCase();
+  return `<div class="pizzaBoard pizzaCompact"><article class="pizzaPick">
+    <div class="pizzaPickHead"><div class="pizzaIdentity"><span class="pizzaLouTag">LOU TWO SLICE</span><h3>${esc(play?.title||'UNTITLED VIGSCOPE CARD')}</h3>${market?`<div class="pizzaMarketLabel">${esc(market)}</div>`:''}</div><div class="pizzaSourceState"><strong>${esc(status)}</strong>${status==='LEAN'||status==='WAIT'?'<span>OPINION ONLY</span>':''}</div></div>
+    ${event||eventStart?`<div class="pizzaEventMeta">${event?`<span>${esc(event)}</span>`:''}${eventStart?`<span class="pizzaStart">${esc(eventStart)} PT</span>`:''}</div>`:''}
+    <div class="pizzaMarketStrip"><div class="pizzaMarketCell"><small>${esc(play?.book||'BOOK PRICE')}</small><strong>${esc(priceText(play?.price))}</strong></div>${hasTarget?`<div class="pizzaMarketCell target"><small>PLAY TO</small><strong>${esc(target)}</strong></div>`:''}${numericEdge?`<div class="pizzaMarketCell edge"><small>PUBLISHED EDGE</small><strong>${esc(numericEdge[1])}</strong></div>`:''}</div>
+    ${pizzaHasValue(read)?`<div class="pizzaBrief"><small>LOU'S READ</small><p>${esc(read)}</p></div>`:''}
+    ${pizzaHasValue(caution)?`<div class="pizzaBrief pizzaCaution"><small>WATCH OUT</small><p>${esc(caution)}</p></div>`:''}
+    ${pizzaDetailsHtml(play,data)}
+    <div class="pizzaTimestamp">${reportLabel}${source.reportTs||data?.generatedAt?` · ISSUED ${esc(ptDateTime(source.reportTs||data.generatedAt))} PT`:''}</div>
   </article></div>`;
 }
 function fallbackEvent(card){
