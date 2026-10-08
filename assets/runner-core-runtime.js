@@ -979,6 +979,14 @@ function picksMatchingFilters(run,includeStatus=true){
 }
 function pickCounts(run){return picksMatchingFilters(run,false).reduce((out,r)=>{const key=pickStatus(r);out.ALL++;out[key]=(out[key]||0)+1;return out},{ALL:0,BET:0,LEAN:0,WAIT:0,PASS:0})}
 function pickEdge(rec){
+  const forecast=rec?.forecastLean;
+  if(forecast?.basis==='REVIEWED_FORECAST_POINT'){
+    const price=decimalOdds(rec?.feed?.priceDecimal),probability=forecast.probability;
+    if(forecast.schema!==1||!forecast.selectionKey||forecast.selectionKey!==rec?.feed?.selectionKey||!price||!Number.isFinite(probability)||probability<=0||probability>=1)return null;
+    // Rank the reviewed forecast gap against the exact issued quote, in the
+    // same signed probability-point units as other cards. This is UI ordering.
+    return (probability-1/price)*100;
+  }
   const match=String(rec?.edge||'').replace(/−/g,'-').match(/([+-]?\d+(?:\.\d+)?)\s*(?:probability points?|percentage points?|pp\b)/i);
   return match?Number(match[1]):null;
 }

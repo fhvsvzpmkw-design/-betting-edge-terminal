@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source=fs.readFileSync('assets/runner-core-runtime.js','utf8');
-const instrumented=source.replace('\nactiveRun=payload();','\nglobalThis.picksApi={recSport,runSports,filteredPicks,pickMeta,pickReason,pickMarket,pickCounts,pickMovement,compareRunPicks,fetchPriorChangeRun,setFilters:(status,sport,market="ALL",book="ALL",search="",sort="CALL")=>{statusFilter=status;sportFilter=sport;marketFilter=market;bookFilter=book;pickSearch=search;pickSort=sort}};\nactiveRun=payload();');
+const instrumented=source.replace('\nactiveRun=payload();','\nglobalThis.picksApi={recSport,runSports,filteredPicks,pickEdge,pickMeta,pickReason,pickMarket,pickCounts,pickMovement,compareRunPicks,fetchPriorChangeRun,setFilters:(status,sport,market="ALL",book="ALL",search="",sort="CALL")=>{statusFilter=status;sportFilter=sport;marketFilter=market;bookFilter=book;pickSearch=search;pickSort=sort}};\nactiveRun=payload();');
 const archive=JSON.parse(fs.readFileSync('run-history.json','utf8'));
 const reads=[];
 const context={console,Intl,Date,URLSearchParams,TextDecoder,TextEncoder,Uint8Array,
@@ -42,6 +42,30 @@ const ranked={recs:[{...nfl,edge:'-2.528 probability points',feed:{...nfl.feed,e
  {...nhl,edge:'+1.25 pp',feed:{...nhl.feed,eventDate:'2026-10-02T02:00:00Z'},move:'Bet365 -110 → -120'},
  {...other,edge:'UNKNOWN',feed:{...other.feed,eventDate:''},meta:'NFL | Away @ Home',move:'Price worsened'}]};
 api.setFilters('ALL','ALL','ALL','ALL','','EDGE');assert.equal(api.filteredPicks(ranked)[0].edge,'+1.25 pp');assert.equal(api.filteredPicks(ranked).at(-1).edge,'UNKNOWN');
+const forecastPick=(probability,priceDecimal)=>({...nhl,status:'LEAN',edge:`MoneyPuck published ${(probability*100).toFixed(2)}% for this exact selection. This is a forecast point, not an independently established fair or profit estimate.`,feed:{...nhl.feed,priceDecimal},forecastLean:{schema:1,basis:'REVIEWED_FORECAST_POINT',selectionKey:nhl.feed.selectionKey,probability}});
+const forecast=forecastPick(0.4457965615899814,2.5),lowerGap=forecastPick(0.9,1.1);
+assert.ok(Math.abs(api.pickEdge(forecast)-4.57965615899814)<1e-10,'forecast ordering uses the full stored probability and exact quote');
+assert.ok(api.pickEdge(lowerGap)<0,'a high win probability alone is not a positive edge');
+const forecastRanked={recs:[{...other,edge:'-2.528 probability points'},lowerGap,{...nfl,status:'PASS',edge:'+0.798 pp'},forecast]},forecastBefore=JSON.stringify(forecastRanked);
+assert.equal(api.filteredPicks(forecastRanked).map(api.pickEdge).map(v=>v.toFixed(3)).join(','),'4.580,0.798,-0.909,-2.528','forecast and market gaps share a signed descending order');
+assert.ok(api.pickEdge(forecastPick(0.4457965615899814,3))>api.pickEdge(forecast),'the same forecast ranks higher at a better quote');
+for(const probability of [null,undefined,NaN,Infinity,0,1,-0.1,1.1,'0.4458'])assert.equal(api.pickEdge(forecastPick(probability,2.5)),null,'invalid forecasts remain unranked');
+for(const priceDecimal of [null,undefined,NaN,Infinity,0,1,''])assert.equal(api.pickEdge(forecastPick(0.4458,priceDecimal)),null,'missing or invalid quotes cannot create an edge');
+assert.equal(api.pickEdge({...forecast,forecastLean:{...forecast.forecastLean,selectionKey:'wrong-side'}}),null,'forecast must bind to this exact selection');
+assert.equal(api.pickEdge({...forecast,forecastLean:{...forecast.forecastLean,selectionKey:''},feed:{...forecast.feed,selectionKey:''}}),null,'empty identities cannot bind a forecast');
+assert.equal(api.pickEdge({...forecast,forecastLean:{...forecast.forecastLean,schema:2}}),null,'unknown forecast schemas remain unranked');
+assert.equal(api.pickEdge({...forecast,edge:'not a percentage'}),api.pickEdge(forecast),'narrative wording cannot change a structured forecast gap');
+assert.equal(api.filteredPicks({...forecastRanked,recs:[...forecastRanked.recs,{...other,edge:'UNKNOWN'}]}).at(-1).edge,'UNKNOWN','unranked cards remain below measured negative edges');
+assert.equal(JSON.stringify(forecastRanked),forecastBefore,'forecast sorting preserves issued probabilities, quotes, calls and all report data');
+const reported=JSON.parse(fs.readFileSync('data/history/runs/2026-10-08/final_morning-094758.json','utf8')),reportedBefore=JSON.stringify(reported),reportedLeans=reported.recs.filter(r=>r.status==='LEAN');
+assert.equal(reportedLeans.length,6,'regression reproduces the reported six-LEAN snapshot');
+assert.ok(reportedLeans.every(r=>Number.isFinite(api.pickEdge(r))&&api.pickEdge(r)>0),'all six reviewed forecast leans have a measured positive gap');
+const ordered=api.filteredPicks(reported);
+assert.equal(ordered.slice(0,2).map(r=>r.title).join(','),'Philadelphia Flyers,San Jose Sharks','forecast leans outrank the smaller PASS gaps in the actual issued report');
+assert.ok(ordered.filter(r=>api.pickEdge(r)<0).every(r=>ordered.indexOf(r)>Math.max(...reportedLeans.map(lean=>ordered.indexOf(lean)))),'positive forecast leans precede every negative edge');
+assert.equal(JSON.stringify(reported),reportedBefore,'the issued regression snapshot remains unchanged');
+api.setFilters('ALL','ALL','ALL','ALL','','CALL');
+assert.equal(api.filteredPicks(reported).slice(0,6).map(r=>r.status).join(','),'LEAN,LEAN,LEAN,LEAN,LEAN,LEAN','Call Priority retains the existing call order');
 api.setFilters('ALL','ALL','ALL','ALL','','START');assert.equal(api.filteredPicks(ranked)[0].status,'BET');assert.equal(api.filteredPicks(ranked).at(-1).edge,'UNKNOWN');
 api.setFilters('ALL','ALL','ALL','ALL','','MOVE');assert.equal(api.filteredPicks(ranked)[0].move,'Bet365 -110 → -120');
 assert.equal(api.pickMovement(ranked.recs[0]),null,'a first snapshot is not measured movement');
