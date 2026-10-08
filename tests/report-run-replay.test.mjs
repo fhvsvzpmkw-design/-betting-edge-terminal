@@ -4,6 +4,7 @@ import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 const source=process.cwd(),temp=fs.mkdtempSync(path.join(os.tmpdir(),'full-controller-replay-'));
+const {parseReportDocument}=await import('../tools/report-document-transport.mjs');
 const git=(args,cwd=source)=>execFileSync('git',args,{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']});
 try{
  git(['worktree','add','--detach',temp,'HEAD']);
@@ -31,7 +32,7 @@ try{
  a=runCommand({...base,command:'prepare',expectedRevision:a.revision});
  a=runCommand({...base,command:'freeze',expectedRevision:a.revision});
  a=runCommand({...base,command:'stage',expectedRevision:a.revision});
- const bundle=JSON.parse(fs.readFileSync(path.join(temp,'data/history/staging/report-bundle.json')));
+ const bundle=parseReportDocument(fs.readFileSync(path.join(temp,'data/history/staging/report-bundle.json')),'STAGED_REPORT');
  if(!bundle.report.gameIntelligence||!bundle.sidecar.gameIntelligenceInputs)throw Error('Game dossier was lost before publication');
  for(const[p,v]of [[report,bundle.report],[sidecar,bundle.sidecar]])fs.writeFileSync(p,JSON.stringify(v));
  execFileSync(process.execPath,['tools/report-publication.mjs','publish','--report',report,'--sidecar',sidecar],{cwd:temp,stdio:'pipe'});

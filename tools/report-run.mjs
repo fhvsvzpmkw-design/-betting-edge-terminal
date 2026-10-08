@@ -13,6 +13,7 @@ import {bindIntelligence,projectGameIntelligence} from './game-intelligence.mjs'
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
 import {execFileSync} from 'node:child_process';
 import {isDeepStrictEqual} from 'node:util';
+import {serializeReportDocument,parseReportDocument} from './report-document-transport.mjs';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -47,9 +48,12 @@ function temporaryDraft(state,callback){
 }
 function summary(state){
   return {schema:1,run:state.identity,phase:state.phase,revision:state.revision,
-    counts:state.report.counts,research:{available:state.sidecar.primaryAnalysis?.receipts?.length??null,evaluated:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='EVALUATED').length??null,blocked:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED').length??null},checkpointBytes:Buffer.byteLength(json(state)),
+    counts:state.report.counts,research:{available:state.sidecar.primaryAnalysis?.receipts?.length??null,evaluated:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='EVALUATED').length??null,blocked:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED').length??null,
+      unfinished:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED'&&row.blocker?.reason==='RESEARCH_INCOMPLETE').length??null},
+    checkpointBytes:Buffer.byteLength(serializeReportDocument(state,'REPORT_CHECKPOINT')),checkpointDecodedBytes:Buffer.byteLength(json(state)),
     validation:state.validation?{state:state.validation.state,gates:state.validation.receipts?.length}:null,
     frozen:state.frozen?{blobSha:state.frozen.blobSha,bytes:state.frozen.bytes}:null,
+    savedEventReviews:[...new Set(state.events.filter(event=>event.command==='checkpoint'&&event.eventId).map(event=>event.eventId))],
     preparation:state.preparation||null,lastEvent:state.events.at(-1)||null,
     publication:state.publication||null};
 }
@@ -71,8 +75,11 @@ function bindGameInputs(root,report,sidecar){
 }
 function sealedBytes(state){
   if(!['FROZEN','STAGED','PUBLISHED'].includes(state.phase)||!state.frozen)throw new Error('Run is not frozen');
-  const bytes=json(bundleFor(state));
+  // Keep the original serialized bytes, including compression, across retries
+  // and runtimes. Older checkpoints retain their original plain-JSON seal.
+  const bytes=state.frozen.serializedBundle??json(bundleFor(state));
   if(blobSha(bytes)!==state.frozen.blobSha||Buffer.byteLength(bytes)!==state.frozen.bytes)throw new Error('Frozen candidate bytes changed');
+  if(!isDeepStrictEqual(parseReportDocument(bytes,'STAGED_REPORT'),bundleFor(state)))throw new Error('Frozen candidate bytes changed');
   return bytes;
 }
 export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar,expectedRevision,eventId,outputDir,at,pipeline=runPipeline}){
@@ -87,7 +94,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
   let lock;
   if(mutating)lock=fs.openSync(`${file}.lock`,'wx');
   try{
-    let state=fs.existsSync(file)?read(file):null;
+    let state=fs.existsSync(file)?parseReportDocument(fs.readFileSync(file),'REPORT_CHECKPOINT'):null;
     if(command==='start'){
       if(state)throw new Error('Run already exists; resume it with status/next');
       if(!report||!sidecar)throw new Error('start requires complete local draft files');
@@ -127,6 +134,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       let r=read(path.resolve(report)),s=read(path.resolve(sidecar));
       if(state.sidecar.gameIntelligenceInputs&&!isDeepStrictEqual(s.gameIntelligenceInputs,state.sidecar.gameIntelligenceInputs))throw Error('Pinned game inputs changed; export the saved draft or start a newly bound actual-time run');
       if(JSON.stringify(identity(r,s,root))!==JSON.stringify(state.identity))throw new Error('Cannot change run identity or feed binding; start a new run');
+      if(eventId&&!s.primaryAnalysis?.receipts?.some(row=>String(row.quote?.eventId??row.decision?.feed?.eventId??row.selectionId?.split('|')[1])===String(eventId)))throw Error('Checkpoint event is not in the bound selection receipts');
       ({report:r,sidecar:s}=captureForecastEvidenceDraft({root,report:r,sidecar:s}));
       state.report=r;state.sidecar=s;state.phase='DRAFT';delete state.validation;delete state.preparation;
     }
@@ -159,7 +167,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       if(state.phase!=='PREPARED')throw new Error('Prepare and review deferrals before freeze');
       state.validation=temporaryDraft(state,files=>pipeline({root,...files,mode:'validate'}));
       validateStagedBundle(bundleFor(state),{root});
-      const bytes=json(bundleFor(state));state.frozen={blobSha:blobSha(bytes),bytes:Buffer.byteLength(bytes)};state.phase='FROZEN';
+      const bytes=serializeReportDocument(bundleFor(state),'STAGED_REPORT');state.frozen={blobSha:blobSha(bytes),bytes:Buffer.byteLength(bytes),serializedBundle:bytes};state.phase='FROZEN';
     }
     if(command==='stage'){
       if(!['FROZEN','STAGED'].includes(state.phase))throw new Error('Only a frozen candidate may be staged');
@@ -187,8 +195,9 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
         readbackAt:new Date().toISOString()};state.phase='PUBLISHED';
     }
     state.revision++;
-    state.events.push({command,at:new Date().toISOString(),revision:state.revision,phase:state.phase,durationMs:Date.now()-commandStarted});
-    atomic(file,json(state));
+    state.events.push({command,at:new Date().toISOString(),revision:state.revision,phase:state.phase,durationMs:Date.now()-commandStarted,
+      ...(command==='checkpoint'&&eventId?{eventId:String(eventId)}:{})});
+    atomic(file,serializeReportDocument(state,'REPORT_CHECKPOINT'));
     return {...summary(state),checkpoint:within(root,file),...(command==='stage'?{stagingPath:'data/history/staging/report-bundle.json',requiresRemoteCommitAndWorkflowSuccess:true}:{})};
   }finally{if(lock!==undefined){fs.closeSync(lock);fs.unlinkSync(`${file}.lock`);}}
 }

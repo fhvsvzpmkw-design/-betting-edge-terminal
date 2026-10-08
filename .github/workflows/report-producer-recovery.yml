@@ -1,0 +1,35 @@
+name: Report producer transfer and recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/report-run.mjs
+      - tools/report-document-transport.mjs
+      - tools/extract-staged-report.mjs
+      - tests/report-document-transport.test.mjs
+      - tests/report-pipeline.test.mjs
+      - tests/report-run-replay.test.mjs
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
+      - .github/workflows/report-producer-recovery.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Full-size lossless transfer, failed retry and exact-trigger extraction
+        run: node tests/report-document-transport.test.mjs
+      - name: Controller and shared authority regressions
+        run: |
+          node tests/report-pipeline.test.mjs
+          node tests/scheduled-report-authority.test.mjs
+      - name: Replay through the real publisher gates and durable readback
+        run: node tests/report-run-replay.test.mjs

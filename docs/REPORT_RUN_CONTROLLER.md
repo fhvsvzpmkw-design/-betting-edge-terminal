@@ -27,7 +27,7 @@ In the work plan, `completionState` describes completed decisions only. Read `re
 ```
 node tools/report-run.mjs export --checkpoint <checkpoint> --output-dir /tmp/betting-edge-draft
 # Perform real research and edit the exported draft report and sidecar.
-node tools/report-run.mjs checkpoint --checkpoint <checkpoint> --expected-revision <revision> --report /tmp/betting-edge-draft/report.json --sidecar /tmp/betting-edge-draft/sidecar.json
+node tools/report-run.mjs checkpoint --checkpoint <checkpoint> --expected-revision <revision> --event-id <event-id> --report /tmp/betting-edge-draft/report.json --sidecar /tmp/betting-edge-draft/sidecar.json
 ```
 
 Keep event facts and their original sources together; all exact selection decisions still require their own binding. The existing evidence assembler synchronizes derived copies. Commit the checkpoint's complete serialized bytes after each event using the connected repository; verify the returned blob SHA. Read current remote checkpoint before resuming. A checkpoint commit is not a publication trigger. For new reports from the noon September 27 cutover, stored advisory audits contain counts and diagnostics rather than duplicated full research queues. Original source evidence, exact decisions and candidate assessments remain available; regenerate detailed advisory views in code. Never print the full checkpoint into conversation; commands emit compact status and event work plans.
@@ -56,6 +56,14 @@ node tools/report-run.mjs stage --checkpoint <checkpoint> --expected-revision <r
 Use the new revision returned by each mutation. Preparation changes only unfrozen drafts using existing evidence assembly and normalization. Freeze runs every candidate gate in the shared pipeline and seals the exact staging bytes with a Git blob hash. Stage revalidates current history/policy and writes `data/history/staging/report-bundle.json`. Commit only those exact bytes for publication; verify the remote blob matches the seal. Persist the updated checkpoint separately or in the same commit. Frozen retries use identical bytes. Never change a frozen candidate to suppress a failed gate.
 
 The staged publisher reads the bundle from the commit that triggered that workflow. Only it writes report History. The old `report-history.yml` publisher is retired and now verifies History only.
+
+### Large-document transfer
+
+The controller automatically compresses checkpoints and staging documents over 256 KiB when compression reduces their size. `BETTING_EDGE_GZIP_JSON_V1` carries gzip/base64 bytes, their original length and SHA-256. Reading a checkpoint or extracting the exact triggering staging commit verifies integrity before restoring the full ordinary document. Legacy plain JSON remains readable. Issued reports and sidecars retain their ordinary schemas.
+
+Commit the complete file written by the controller without decoding it. Verify its Git blob SHA; `status` reports transferred `checkpointBytes` separately from `checkpointDecodedBytes`, and the frozen receipt reports the exact staging blob and byte size. Use controller `export` to inspect the full draft locally. Do not print or reconstruct large documents through the conversation. A frozen checkpoint keeps one sealed candidate copy and restores its full report/sidecar on read; retries reuse the original serialized bytes across runtimes.
+
+A connector size/transfer failure does not authorize removing selections, decisions or evidence, or replacing the candidate with a smaller market subset. Preserve the saved checkpoint and sealed candidate; retry the exact files with authenticated Git or the Git-data API. If transfer remains unavailable, report the publication failure and retained work truthfully. Research gaps remain selection-specific and separate from transport failures.
 
 ## Confirm publication
 

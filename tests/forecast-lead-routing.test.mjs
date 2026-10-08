@@ -11,6 +11,7 @@ import {derivePrimarySelectionInventory} from '../tools/major-sport-market-cover
 import {buildEventResearchPlan,buildResearchWorkPlan} from '../tools/event-research-plan.mjs';
 import {prepareEvidenceDraft,captureForecastEvidenceDraft} from '../tools/report-evidence-repair.mjs';
 import {runCommand} from '../tools/report-run.mjs';
+import {parseReportDocument} from '../tools/report-document-transport.mjs';
 
 function fixture() {
   // Synthetic observation and applicability; never a live recommendation.
@@ -191,11 +192,11 @@ test('shared checkpoint intake exposes a captured point before preparation final
   const base={root:process.cwd(),checkpoint};
   try {
     let state=runCommand({...base,command:'start',report:rfile,sidecar:sfile});
-    const stored=JSON.parse(fs.readFileSync(path.resolve(checkpoint)));
+    const stored=parseReportDocument(fs.readFileSync(path.resolve(checkpoint)),'REPORT_CHECKPOINT');
     assert.equal(stored.sidecar.forecastEvidence.records[0].recordId,raw.recordId);
     const next=runCommand({...base,command:'next',eventId:receipt.quote.eventId});
     assert.ok(next.workPlan.events[0].selections.some(row=>row.selectionId===receipt.selectionId));
     state=runCommand({...base,command:'checkpoint',report:rfile,sidecar:sfile,expectedRevision:state.revision});
-    assert.equal(JSON.parse(fs.readFileSync(path.resolve(checkpoint))).sidecar.forecastEvidence.records.length,1);
+    assert.equal(parseReportDocument(fs.readFileSync(path.resolve(checkpoint)),'REPORT_CHECKPOINT').sidecar.forecastEvidence.records.length,1);
   } finally {fs.rmSync(dir,{recursive:true,force:true});fs.rmSync(path.resolve(checkpoint),{force:true});}
 });
