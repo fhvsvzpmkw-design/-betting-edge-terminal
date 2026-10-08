@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-06.2
+**Operating revision:** 2026-10-08.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -150,7 +150,9 @@ If the governed canary remains pending, identify the first published NFL-bearing
 
 ## 8. One resumable producer
 
-`tools/report-run.mjs` owns producer state. Use `docs/REPORT_RUN_CONTROLLER.md` for the command sequence. After constructing the exact initial draft and source bindings, `start` a uniquely named checkpoint at `data/report-production/checkpoints/<run-id>.json`. Use `next` for the compact full queue and `next --event-id <id>` for one event. Export drafts outside the repository, complete actual research/decisions, and `checkpoint` them after each event with the expected revision. Persist the exact checkpoint through the connected repository so another execution can resume; this path never triggers publication. Read current remote state before resuming. Never reconstruct completed work from prose summaries.
+`tools/report-run.mjs` owns producer state. Use `docs/REPORT_RUN_CONTROLLER.md` for the command sequence. After constructing the exact initial draft and source bindings, `start` a uniquely named checkpoint at `data/report-production/checkpoints/<run-id>.json`. Then execute the existing event-review loop before final preparation: read `next`, read `next --event-id <id>`, export the draft outside the repository, review the preserved event facts and captured forecasts, complete the supported exact selection decisions, and `checkpoint` that event with the expected revision. Repeat across the available event queue, reusing the shared event research. Source collection, inventory construction and writing RESEARCH_INCOMPLETE receipts do not perform this loop. Do not move directly from an unassessed initial draft to freeze merely because an incomplete or zero-BET report can pass publication validation. Zero BETs is permitted after actual assessments; it is not an instruction to skip them. Keep genuinely unresolved selections separately blocked, publish unrelated completed decisions, and retain the existing empty-slate and freshness-failure behavior. No decision or pick quota is introduced.
+
+Persist the exact checkpoint through the connected repository after each completed event so another execution can resume; this path never triggers publication. Read current remote state before resuming. Never reconstruct completed work from prose summaries.
 
 The checkpoint stores the current complete draft and phase atomically. It does not grant analytical clearance. `prepare` performs shared evidence assembly and derived-field normalization; inspect its deferrals before `freeze`. Before final preparation, use `retime` to advance an unfrozen draft to actual issuance time and reconcile event eligibility without changing source clocks. Freeze invokes the single validation plan in `tools/report-pipeline.mjs`. `stage` revalidates, serializes the sealed bytes and writes only the staging bundle. Resume a failed stage with the same frozen bytes. Frozen candidates cannot be edited; a changed issue time/feed/analysis starts a new actual-time candidate. Do not backdate the new candidate.
 
