@@ -1,0 +1,923 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 4,
+  "recordedAt": "2026-10-08T01:01:06.000Z",
+  "marketViewed": false,
+  "inputCommit": "e2f660c548f036d458221ee967b007c4ed9b4e0a",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-04-personnel-ledger.json": "4472518229ba92e0bf12beba64b8360c7be443cf",
+    "data/walters/nfl/2026/week-04-current-numbers.json": "3588412091facd2c15cf8ce0f81a7c5809c9e408",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive Week 4 historical paired reconciliation for JAX-CIN only. No market price, current-week fair or bet is produced.",
+  "publicationCheck": {
+    "state": "BLOCKED",
+    "classification": "INTERVENING_RATING_CHANGE",
+    "checkedAt": "2026-10-08T01:05:00.000Z",
+    "updaterResult": "GRAHAM_CARRIED_RATING_AUDIT:INTERVENING_CARRIED_RATING_UPDATE_REQUIRES_RECONCILIATION",
+    "gameKey": "2026-W04-JAX-CIN",
+    "kickoff": "2026-10-04T10:00:00-07:00",
+    "dependency": {
+      "description": "The governed Week 3-to-4 update for both teams was published after this Week 4 kickoff. The Week 4 board binds that update, while the append-only ledger's timestamp-frozen pregame lookup returns the earlier Week 2-to-3 ratings. Authority v1.8 forbids overwriting the intervening rating change or guessing a rebase.",
+      "interveningEffectiveAt": "2026-10-04T20:21:20.199Z",
+      "ledgerBlobSha": "dd4abeeb5dca4981fbaf276ec314565371e61115",
+      "updaterBlobSha": "1fca33e06064c6034483be553632309064f155ae",
+      "teams": [
+        {
+          "team": "JAX",
+          "week4BoardFrozenRating": 28.017688,
+          "ledgerRatingAtKickoff": 25.41252,
+          "interveningHistorySequence": 3,
+          "interveningSourceWeek": 3,
+          "interveningTargetWeek": 4,
+          "interveningGameKey": "2026-W03-NE-JAX"
+        },
+        {
+          "team": "CIN",
+          "week4BoardFrozenRating": 24.977818,
+          "ledgerRatingAtKickoff": 25.50682,
+          "interveningHistorySequence": 3,
+          "interveningSourceWeek": 3,
+          "interveningTargetWeek": 4,
+          "interveningGameKey": "2026-W03-CIN-PIT"
+        }
+      ]
+    },
+    "nextAction": "A separately governed forward chronological reconciliation must define how the late Week 3 updates and this completed Week 4 result are replayed without rewriting append-only history. Until that owner/action exists, retain the paired injury evidence as READY but do not stage or publish the numerical rating update."
+  },
+  "sources": [
+    {
+      "id": "jax-cin-gamebook",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1791145251/gamecenter/aa4b5943-4feb-11f1-abca-2c54536568a9.pdf",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official final gamebook supplies the final score, starters, active/inactive roster, DNP list, specialists, and exact recorded injury/return clocks."
+    },
+    {
+      "id": "jax-cin-bengals-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.bengals.com/news/bengals-jaguars-inactives-week-4-2026",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official final inactive list confirms Bryan Cook, Kyle Dugger, Swayze Bozeman, Myles Hinton, Colbie Young, B.J. Hill and Landon Robinson inactive."
+    },
+    {
+      "id": "jax-cin-bengals-injury",
+      "kind": "OFFICIAL",
+      "url": "https://www.bengals.com/news/jaguars-bengals-injury-report-week-4-2026",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official final injury report supplies the injury designations and full/limited participation for both teams."
+    },
+    {
+      "id": "jax-cin-bengals-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.bengals.com/team/depth-chart",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official depth chart binds Bryan Cook to PJ Jules, B.J. Hill to Kris Jenkins Jr., Ja Marr Chase to Mitchell Tinsley, and the active defensive-back reserve set."
+    },
+    {
+      "id": "jax-cin-jaguars-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.jaguars.com/news/in-and-out-2026-week-4-montaric-brown-inactive-for-jaguars-vs-bengals",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official team inactives report identifies Montaric Brown as a starting cornerback unavailable with a hamstring injury and lists the six other inactive reserves."
+    },
+    {
+      "id": "jax-cin-jaguars-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.jaguars.com/news/jaguars-reveal-first-depth-chart-of-the-2026-regular-season",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official depth chart supplies the Week 4 safety and cornerback role chain, including Eric Murray, Rayuan Lane III, Antonio Johnson and Caleb Ransaw."
+    },
+    {
+      "id": "jax-cin-jaguars-postgame",
+      "kind": "OFFICIAL",
+      "url": "https://www.jaguars.com/news/game-report-2026-week-4-jaguars-22-bengals-17",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Official postgame report confirms Montaric Brown missed the game, Caleb Ransaw left in the first quarter and did not return, and Eric Murray left in the third quarter and did not return."
+    },
+    {
+      "id": "jax-cin-followup",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1791145251/gamecenter/aa4b5943-4feb-11f1-abca-2c54536568a9.pdf",
+      "checkedAt": "2026-10-08T01:01:06.000Z",
+      "gameKeys": [
+        "2026-W04-JAX-CIN"
+      ],
+      "finding": "Hash-verified additive follow-up extracted the exact gamebook injury-event leads and preserves the source capture SHA-256 beb704059833b9372ed3180ae38b9260667a417b98733b4c13a9893df76b1bb5."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W04-JAX-CIN",
+      "away": "JAX",
+      "home": "CIN",
+      "state": "READY",
+      "sourceIds": [
+        "jax-cin-gamebook",
+        "jax-cin-bengals-inactives",
+        "jax-cin-bengals-injury",
+        "jax-cin-bengals-depth",
+        "jax-cin-jaguars-inactives",
+        "jax-cin-jaguars-depth",
+        "jax-cin-jaguars-postgame",
+        "jax-cin-followup"
+      ],
+      "teams": [
+        {
+          "team": "JAX",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Official final gamebook, inactive list, final injury report, depth chart and postgame report were reconciled across all inactive/DNP identities and each recorded in-game injury. Montaric Brown, Caleb Ransaw and Eric Murray receive source-bound role treatment; zero-valued and healthy-scratch reserves are explicitly retained.",
+          "sourceIds": [
+            "jax-cin-gamebook",
+            "jax-cin-jaguars-inactives",
+            "jax-cin-bengals-injury",
+            "jax-cin-jaguars-depth",
+            "jax-cin-jaguars-postgame",
+            "jax-cin-followup"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Trevor Lawrence completed the game without injury-driven replacement; Quinn Ewers was an unused backup with no lost starting duty.",
+            "sourceIds": [
+              "jax-cin-gamebook",
+              "jax-cin-jaguars-postgame"
+            ]
+          },
+          "cases": [
+            {
+              "player": "Montaric Brown",
+              "eaPlayerId": "22256",
+              "caseKey": "2026-W04-JAX-Montaric-Brown",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-jaguars-inactives",
+                "jax-cin-jaguars-postgame"
+              ],
+              "rationale": "Official team reporting identifies Brown as the prior three-game starting cornerback and the final gamebook starts active reserve Jarrian Jones in the secondary.",
+              "roleRationale": "Use the source-listed active defensive-back starter Jarrian Jones for Brown additional vacant corner duty; the upgrade floor is retained.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-jaguars-depth"
+              ],
+              "assumptionRationale": "Documented active starter assignment is used as a Graham added-duty estimate without claiming snap share.",
+              "replacements": [
+                {
+                  "player": "Jarrian Jones",
+                  "eaPlayerId": "14956"
+                }
+              ],
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-jaguars-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Christian Braswell",
+              "eaPlayerId": "22223",
+              "caseKey": "2026-W04-JAX-Christian-Braswell",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Official sources list the reserve corner inactive with a knee designation; his exact frozen calibrated value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Caleb Ransaw",
+              "eaPlayerId": "15330",
+              "caseKey": "2026-W04-JAX-Caleb-Ransaw",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-postgame",
+                "jax-cin-followup"
+              ],
+              "rationale": "Official reporting confirms a first-quarter knee injury with no return; the gamebook update at 2:18 Q1 bounds the latest possible departure.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "roleRationale": "Rayuan Lane III is the source-listed active safety reserve and is assigned only Ransaw additional vacant duty.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-depth",
+                "jax-cin-jaguars-postgame"
+              ],
+              "assumptionRationale": "Use the documented active safety reserve as a Graham added-duty estimate; the imprecise first-quarter departure retains a full explicit range.",
+              "replacements": [
+                {
+                  "player": "Rayuan Lane III",
+                  "eaPlayerId": "15352"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Use the explicit first-quarter bound and no-return endpoint; active time is valued normally and elapsed time is not snap share.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "jax-cin-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 0,
+                    "startLatest": 762,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "The injury occurred in the first quarter and the official 2:18 Q1 update is the latest supported start; official reporting says he did not return.",
+                    "sourceIds": [
+                      "jax-cin-gamebook",
+                      "jax-cin-jaguars-postgame",
+                      "jax-cin-followup"
+                    ]
+                  }
+                ]
+              },
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-depth",
+                "jax-cin-jaguars-postgame"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Eric Murray",
+              "eaPlayerId": "17713",
+              "caseKey": "2026-W04-JAX-Eric-Murray",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-postgame",
+                "jax-cin-followup"
+              ],
+              "rationale": "The gamebook records Murray injured at 8:48 Q3 and official reporting confirms no return.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "roleRationale": "Antonio Johnson remained the documented starting safety after Murray exit and is assigned the added safety duty while retaining his baseline role; no separate proficiency penalty is introduced.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-depth",
+                "jax-cin-jaguars-postgame"
+              ],
+              "assumptionRationale": "Use the documented active starting safety for the added duty; replacement upgrade is excluded by the governed injury-loss floor.",
+              "replacements": [
+                {
+                  "player": "Antonio Johnson",
+                  "eaPlayerId": "22709"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Use the exact injury clock and official no-return report; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "jax-cin-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2172,
+                    "startLatest": 2172,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Injured at 8:48 Q3 and did not return before regulation ended.",
+                    "sourceIds": [
+                      "jax-cin-gamebook",
+                      "jax-cin-jaguars-postgame",
+                      "jax-cin-followup"
+                    ]
+                  }
+                ]
+              },
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-depth",
+                "jax-cin-jaguars-postgame"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "C.J. Williams",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            },
+            {
+              "player": "Daniel Faalele",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            },
+            {
+              "player": "Jalen Huskey",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            },
+            {
+              "player": "Jack Kiser",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            },
+            {
+              "player": "Wesley Williams",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "LeQuint Allen Jr.",
+              "finding": "Active after limited practice and no injury-driven lost duty recorded.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Nate Boerkircher",
+              "finding": "Full participant, active, and no injury-driven lost duty recorded.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "DaVon Hamilton",
+              "finding": "Full participant and active starter with no injury exit.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Jarrian Jones",
+              "finding": "Full participant and active starter; used only as Brown additional-duty replacement.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Jakobi Meyers",
+              "finding": "Full participant and active starter with no injury exit.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Albert Regis",
+              "finding": "Active reserve with no injury-driven lost duty.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Cole Van Lanen",
+              "finding": "Full participant and active starter with no injury exit.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Cam Little",
+              "finding": "Kicker completed normal game duty.",
+              "sourceIds": [
+                "jax-cin-gamebook"
+              ]
+            },
+            {
+              "player": "Logan Cooke",
+              "finding": "Punter/holder completed normal game duty.",
+              "sourceIds": [
+                "jax-cin-gamebook"
+              ]
+            },
+            {
+              "player": "Ross Matiscik",
+              "finding": "Long snapper completed normal game duty.",
+              "sourceIds": [
+                "jax-cin-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Brown full-game corner vacancy and the two safety injury intervals are source-bound distinct duties. Use additive replacement-aware losses with no extra multiplier.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-jaguars-depth",
+                "jax-cin-jaguars-postgame"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "CIN",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Official final gamebook, inactive list, injury report and depth chart were reconciled across every archived case, all inactives/DNPs, active report players, and the Chase and Higgins in-game injuries. Distinct replacement capacity is retained, including the brief simultaneous top-receiver interval.",
+          "sourceIds": [
+            "jax-cin-gamebook",
+            "jax-cin-bengals-inactives",
+            "jax-cin-bengals-injury",
+            "jax-cin-bengals-depth",
+            "jax-cin-followup"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Joe Burrow completed the game without injury-driven replacement; Joe Flacco was an unused backup with no lost starting duty.",
+            "sourceIds": [
+              "jax-cin-gamebook",
+              "jax-cin-bengals-injury"
+            ]
+          },
+          "cases": [
+            {
+              "player": "Bryan Cook",
+              "eaPlayerId": "22234",
+              "caseKey": "2026-W04-CIN-Bryan-Cook",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Official sources list Cook inactive and the depth chart binds PJ Jules directly behind him.",
+              "roleRationale": "Assign PJ Jules only Cook additional vacant safety duty.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "assumptionRationale": "Use the direct source-listed safety replacement without claiming exact snap share.",
+              "replacements": [
+                {
+                  "player": "PJ Jules",
+                  "eaPlayerId": "4719"
+                }
+              ],
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Kyle Dugger",
+              "eaPlayerId": "21161",
+              "caseKey": "2026-W04-CIN-Kyle-Dugger",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Official injury report rules Dugger out; active defensive-back reserve Josh Newton is assigned the distinct additional vacancy duty because PJ Jules is already allocated to Cook.",
+              "roleRationale": "Use the game-active defensive-back reserve Josh Newton for the distinct Dugger vacancy; incumbent starter duties remain credited once.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "assumptionRationale": "This is a documented available-depth assignment across the defensive-back unit, not an observed snap-share claim.",
+              "replacements": [
+                {
+                  "player": "Josh Newton",
+                  "eaPlayerId": "14940"
+                }
+              ],
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Swayze Bozeman",
+              "eaPlayerId": "4743",
+              "caseKey": "2026-W04-CIN-Swayze-Bozeman",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Official sources list the reserve linebacker inactive with a groin designation; his exact frozen calibrated value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "B.J. Hill",
+              "eaPlayerId": "13160",
+              "caseKey": "2026-W04-CIN-B-J-Hill",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Official sources list Hill inactive and the depth chart binds Kris Jenkins Jr. as the available defensive-tackle replacement.",
+              "roleRationale": "Assign Jenkins only Hill additional vacant interior-line duty.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "assumptionRationale": "Use the source-listed active defensive-tackle reserve without claiming workload share.",
+              "replacements": [
+                {
+                  "player": "Kris Jenkins Jr",
+                  "eaPlayerId": "14767"
+                }
+              ],
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Colbie Young",
+              "eaPlayerId": "16338",
+              "caseKey": "2026-W04-CIN-Colbie-Young",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Official sources rule the reserve receiver out; his exact frozen calibrated value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Ja'Marr Chase",
+              "eaPlayerId": "21586",
+              "caseKey": "2026-W04-CIN-Ja-Marr-Chase",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-followup"
+              ],
+              "rationale": "The official gamebook records Chase injured at 12:11 Q2, questionable at 10:03 Q2 and out at halftime with no return.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "roleRationale": "Official depth lists Mitchell Tinsley directly behind Chase; assign only Chase additional vacant receiving duty.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth"
+              ],
+              "assumptionRationale": "Use the documented active reserve receiver while preserving all incumbent baseline duties.",
+              "replacements": [
+                {
+                  "player": "Mitchell Tinsley",
+                  "eaPlayerId": "22787"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Use exact official game-clock exposure; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "jax-cin-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1069,
+                    "startLatest": 1069,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Injured at 12:11 Q2 and ruled out at halftime with no return.",
+                    "sourceIds": [
+                      "jax-cin-gamebook",
+                      "jax-cin-followup"
+                    ]
+                  }
+                ]
+              },
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "estimateAcknowledged": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "The replacement retains existing baseline duties; only the additional vacant-role duty is valued.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "player": "Tee Higgins",
+              "eaPlayerId": "20962",
+              "caseKey": "2026-W04-CIN-Tee-Higgins",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-followup"
+              ],
+              "rationale": "The gamebook records Higgins injured at 5:47 Q4 and returned at 4:51 Q4 while Chase was already out.",
+              "resolution": "CAPACITY_LIMITED_LOSS_ESTIMATE",
+              "modelId": "graham-capacity-limited-loss-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Tinsley is already allocated to Chase and Young is injured inactive, exhausting the documented receiver-depth candidates for the brief additional Higgins vacancy.",
+              "roleSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Bound the incremental brief vacancy from zero to Higgins frozen healthy value and use the midpoint; no missing replacement value is set to zero.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Existing receiver baseline roles remain credited once and Tinsley is not reused across simultaneous vacancies.",
+              "baselineSourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Use the exact official injury and return clocks; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "jax-cin-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3253,
+                    "startLatest": 3253,
+                    "endEarliest": 3309,
+                    "endLatest": 3309,
+                    "rationale": "Injured at 5:47 Q4 and returned at 4:51 Q4.",
+                    "sourceIds": [
+                      "jax-cin-gamebook",
+                      "jax-cin-followup"
+                    ]
+                  }
+                ]
+              },
+              "replacementValue": null,
+              "capacityRationale": "Official depth and final inactives leave Mitchell Tinsley and Colbie Young as the relevant reserve candidates; Tinsley is already allocated to Chase and Young is unavailable, so no unused distinct receiver reserve remains for the brief simultaneous vacancy.",
+              "capacitySourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ],
+              "availableCandidatesReviewed": [
+                {
+                  "player": "Mitchell Tinsley",
+                  "eaPlayerId": "22787"
+                },
+                {
+                  "player": "Colbie Young",
+                  "eaPlayerId": "16338"
+                }
+              ],
+              "capacityInventoryComplete": true
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Myles Hinton",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            },
+            {
+              "player": "Landon Robinson",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-inactives",
+                "jax-cin-bengals-injury"
+              ],
+              "rationale": "Inactive reserve with no final injury designation and no identified established Week 4 duty lost to injury."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Jonathan Allen",
+              "finding": "Rest DNP followed by full participation; active starter with no gamebook injury exit.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Jordan Battle",
+              "finding": "Full participant and active starter with no injury-driven lost duty.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Dexter Lawrence II",
+              "finding": "Rest DNP; active starter with no injury-driven lost duty.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Dalton Risner",
+              "finding": "Full participant and active starter with no injury-driven lost duty.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "DJ Turner II",
+              "finding": "Active starter with no recorded injury-driven lost duty.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-injury"
+              ]
+            },
+            {
+              "player": "Evan McPherson",
+              "finding": "Kicker completed normal game duty.",
+              "sourceIds": [
+                "jax-cin-gamebook"
+              ]
+            },
+            {
+              "player": "Ryan Rehkow",
+              "finding": "Punter/holder completed normal game duty.",
+              "sourceIds": [
+                "jax-cin-gamebook"
+              ]
+            },
+            {
+              "player": "William Wagner",
+              "finding": "Long snapper completed normal game duty.",
+              "sourceIds": [
+                "jax-cin-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "topReceiverClusterReviewed": true,
+          "receiverClusterReview": {
+            "eligible": true,
+            "estimateAcknowledged": true,
+            "simultaneousAbsence": true,
+            "topExpectedReceivers": [
+              "Ja'Marr Chase",
+              "Tee Higgins"
+            ],
+            "rationale": "Chase and Higgins are the two highest-valued expected Cincinnati receiving options and were simultaneously unavailable from the Higgins injury at 5:47 Q4 until his recorded return at 4:51 Q4; apply the preserved calibrated receiver multiplier.",
+            "sourceIds": [
+              "jax-cin-gamebook",
+              "jax-cin-bengals-depth",
+              "jax-cin-followup"
+            ]
+          },
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Cook and Dugger are distinct safety vacancies with distinct active replacements; use additive losses without an extra defensive-back multiplier.",
+              "sourceIds": [
+                "jax-cin-gamebook",
+                "jax-cin-bengals-depth",
+                "jax-cin-bengals-inactives"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
