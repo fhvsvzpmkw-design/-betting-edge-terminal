@@ -1,0 +1,959 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 4,
+  "recordedAt": "2026-10-08T13:13:16.000Z",
+  "marketViewed": false,
+  "inputCommit": "4b3966aaeb88c9bd7cae34d58b3b9cc43fc9b7ac",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-04-personnel-ledger.json": "4472518229ba92e0bf12beba64b8360c7be443cf",
+    "data/walters/nfl/2026/week-04-current-numbers.json": "3588412091facd2c15cf8ce0f81a7c5809c9e408",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive Week 4 historical paired reconciliation for LAC-SEA only. No market price, current-week fair or bet is produced.",
+  "sources": [
+    {
+      "id": "lac-sea-gamebook",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Hash-verified official final gamebook supplies the 30-23 final, lineups, inactive/DNP lists, specialists, participation and recorded injury/return clocks; SHA-256 f399b50bc930d3e6e8f0c52067068945f805b687899b0ff42e2976b130e96123."
+    },
+    {
+      "id": "lac-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.chargers.com/news/seahawks-week-4-inactives-derwin-james",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Los Angeles identifies James, Tomlinson, Awosika, Kolar and Thompson as injury-driven inactives, Harkey as the other inactive and Uiagalelei as emergency third quarterback; it confirms McConkey and Jackson active."
+    },
+    {
+      "id": "lac-injury",
+      "kind": "OFFICIAL",
+      "url": "https://www.chargers.com/news/seahawks-injury-report-week-4",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Los Angeles final injury report supplies the Week 4 statuses used to distinguish injury absences from active players and non-injury scratches."
+    },
+    {
+      "id": "lac-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.chargers.com/app/depth-chart",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Official depth chart binds Tomlinson to Eboigbe, James to Jefferson/Mickens, Jackson to Hart, Alt to Burke, McConkey to Harris, Thompson to Valdes-Scantling and the active offensive-line reserve set."
+    },
+    {
+      "id": "sea-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.seahawks.com/news/seahawks-vs-chargers-week-4-inactives",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Seattle confirms Okada and Surratt as injury-driven inactives, explicitly names Rodney Thomas II to start for Okada, identifies Price on injured reserve, and lists the remaining inactive identities."
+    },
+    {
+      "id": "sea-injury",
+      "kind": "OFFICIAL",
+      "url": "https://www.seahawks.com/news/week-4-injury-report-seahawks-vs-chargers",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Seattle final injury report rules out Price, lists Okada and Surratt questionable before their inactive status, and confirms the other listed players available."
+    },
+    {
+      "id": "sea-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.seahawks.com/team/depth-chart/",
+      "checkedAt": "2026-10-08T13:13:16.000Z",
+      "gameKeys": [
+        "2026-W04-LAC-SEA"
+      ],
+      "finding": "Official depth chart binds Williams to Mills and the active defensive-line and running-back depth used with Seattle’s explicit starter reporting."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W04-LAC-SEA",
+      "away": "LAC",
+      "home": "SEA",
+      "state": "READY",
+      "sourceIds": [
+        "lac-sea-gamebook",
+        "lac-inactives",
+        "lac-injury",
+        "lac-depth",
+        "sea-inactives",
+        "sea-injury",
+        "sea-depth"
+      ],
+      "teams": [
+        {
+          "team": "LAC",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final official gamebook, inactives, injury report and depth chart were reconciled across the three archived cases, every inactive/DNP identity and every recorded in-game injury. Frozen identities and the preserved Derwin James committee are retained; partial-game cases use source-bound exposure estimates.",
+          "sourceIds": [
+            "lac-sea-gamebook",
+            "lac-inactives",
+            "lac-injury",
+            "lac-depth",
+            "sea-inactives",
+            "sea-injury",
+            "sea-depth"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Justin Herbert completed the game without injury-driven replacement; Trey Lance was an unused backup and DJ Uiagalelei was the inactive emergency third quarterback.",
+            "sourceIds": [
+              "lac-sea-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "player": "Dalvin Tomlinson",
+              "eaPlayerId": "12595",
+              "caseKey": "2026-W04-LAC-Dalvin-Tomlinson",
+              "newlyIdentified": false,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Justin Eboigbe",
+                  "eaPlayerId": "14873"
+                }
+              ]
+            },
+            {
+              "player": "Derwin James Jr",
+              "eaPlayerId": "13080",
+              "caseKey": "2026-W04-LAC-Derwin-James-Jr",
+              "newlyIdentified": false,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth"
+              ],
+              "rationale": "Official inactive status is reconciled to the preserved approved equal-share safety committee.",
+              "resolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Tony Jefferson and R.J. Mickens are the documented available safety-depth candidates for the additional vacancy; unknown allocation is explicitly equal-share.",
+              "roleSourceIds": [
+                "lac-inactives",
+                "lac-depth",
+                "lac-sea-gamebook"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Candidate identity is established but shares are unknown, so the approved equal-share convention is used.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are allocated; candidate baseline duties remain counted once.",
+              "baselineSourceIds": [
+                "lac-inactives",
+                "lac-depth",
+                "lac-sea-gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Tony Jefferson",
+                  "eaPlayerId": "9879"
+                },
+                {
+                  "player": "R.J. Mickens",
+                  "eaPlayerId": "15336"
+                }
+              ]
+            },
+            {
+              "player": "Kayode Awosika",
+              "eaPlayerId": "21821",
+              "caseKey": "2026-W04-LAC-Kayode-Awosika",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Official final game-day status is reconciled to the frozen identity.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Charlie Kolar",
+              "eaPlayerId": "22096",
+              "caseKey": "2026-W04-LAC-Charlie-Kolar",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Official final game-day status is reconciled to the frozen identity.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Brenen Thompson",
+              "eaPlayerId": "10176",
+              "caseKey": "2026-W04-LAC-Brenen-Thompson",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "lac-sea-gamebook"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "lac-sea-gamebook"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Marquez Valdes-Scantling",
+                  "eaPlayerId": "13366"
+                }
+              ]
+            },
+            {
+              "player": "Donte Jackson",
+              "eaPlayerId": "13169",
+              "caseKey": "2026-W04-LAC-Donte-Jackson",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Cam Hart",
+                  "eaPlayerId": "14960"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableSnapEstimate": {
+                  "playedSnaps": 7,
+                  "teamSnaps": 60,
+                  "injuryIndependentlyReported": true,
+                  "healthyEverySnapRole": true,
+                  "confoundingSubstitutionsAcknowledged": true,
+                  "rationale": "Jackson was a starting cornerback, the gamebook independently reports his return as questionable, and the official participation table records 7 of 60 defensive snaps; ordinary substitutions remain a confounder.",
+                  "sourceIds": [
+                    "lac-sea-gamebook"
+                  ]
+                },
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use missing snaps only as an upper bound for the independently reported injury; the midpoint does not treat every missed snap as injury-caused or infer active impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "lac-sea-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Joe Alt",
+              "eaPlayerId": "14694",
+              "caseKey": "2026-W04-LAC-Joe-Alt",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Travis Burke",
+                  "eaPlayerId": "16280"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableSnapEstimate": {
+                  "playedSnaps": 26,
+                  "teamSnaps": 71,
+                  "injuryIndependentlyReported": true,
+                  "healthyEverySnapRole": true,
+                  "confoundingSubstitutionsAcknowledged": true,
+                  "rationale": "Alt was the starting right tackle, the gamebook independently reports him questionable and then out, and the official participation table records 26 of 71 offensive snaps; ordinary substitutions remain a confounder.",
+                  "sourceIds": [
+                    "lac-sea-gamebook"
+                  ]
+                },
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use missing snaps only as an upper bound for the independently reported injury; the midpoint does not treat every missed snap as injury-caused or infer active impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "lac-sea-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Ladd McConkey",
+              "eaPlayerId": "14651",
+              "caseKey": "2026-W04-LAC-Ladd-McConkey",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Tre' Harris",
+                  "eaPlayerId": "15058"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1800,
+                    "startLatest": 2077,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "No departure play is printed; halftime and the 10:23 Q3 return-questionable update bound the start, and the 7:58 Q3 update records him out.",
+                    "sourceIds": [
+                      "lac-sea-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the explicit halftime-to-status-update start range and official out status; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "lac-sea-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Trevor Penning",
+              "eaPlayerId": "22103",
+              "caseKey": "2026-W04-LAC-Trevor-Penning",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to the frozen identity.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Rashawn Slater",
+              "eaPlayerId": "21541",
+              "caseKey": "2026-W04-LAC-Rashawn-Slater",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available offensive-line reserve is assigned only the additional vacant-role duty after the exact departure; no positional proficiency adjustment is invented.",
+              "roleSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official depth chart and gamebook establish Logan Taylor as an active offensive-line reserve; this is an explicit same-position-group additional-duty estimate, not an observed assignment.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-sea-gamebook",
+                "lac-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Logan Taylor",
+                  "eaPlayerId": "16252"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3114,
+                    "startLatest": 3114,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Official 8:06 Q4 play records the injury and no later return before regulation ended.",
+                    "sourceIds": [
+                      "lac-sea-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "lac-sea-gamebook"
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "DJ Uiagalelei",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Inactive emergency third quarterback; the established starter completed the game."
+            },
+            {
+              "player": "Alex Harkey",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "lac-inactives",
+                "lac-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Inactive without a final injury designation or established injury-driven lost duty."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Trey Lance",
+              "finding": "Active unused backup quarterback; no starter duty was lost.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "Elijah Molden",
+              "finding": "Questionable pregame, active starter with no recorded injury exit.",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ]
+            },
+            {
+              "player": "Cameron Dicker",
+              "finding": "Kicker completed normal game duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "JK Scott",
+              "finding": "Punter/holder completed normal game duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "Josh Harris",
+              "finding": "Long snapper completed normal game duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "James and Jackson are distinct safety/corner duties with distinct active depth replacements and separate availability/exposure evidence; use additive replacement-aware losses without an extra multiplier.",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ]
+            },
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Alt and Slater have distinct tackle vacancies, distinct active replacement identities and separate exposure evidence; Penning and Awosika are zero-calibrated. Use additive losses without an extra multiplier.",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ]
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "rationale": "McConkey was unavailable for a bounded portion, but Thompson was reserve depth and not one of the two highest-valued expected receiving options; the top-two simultaneous-absence trigger is not satisfied.",
+            "sourceIds": [
+              "lac-sea-gamebook",
+              "lac-inactives",
+              "lac-injury",
+              "lac-depth",
+              "sea-inactives",
+              "sea-injury",
+              "sea-depth"
+            ]
+          }
+        },
+        {
+          "team": "SEA",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final official gamebook, inactives, injury report and depth chart were reconciled across the archived Price case, every inactive/DNP identity and the recorded Williams injury. Okada’s named starter and all frozen player/value identities are preserved.",
+          "sourceIds": [
+            "lac-sea-gamebook",
+            "lac-inactives",
+            "lac-injury",
+            "lac-depth",
+            "sea-inactives",
+            "sea-injury",
+            "sea-depth"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Sam Darnold completed the game without injury-driven replacement; Drew Lock was an unused backup and Jalen Milroe was the inactive emergency third quarterback.",
+            "sourceIds": [
+              "lac-sea-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "player": "Jadarian Price",
+              "eaPlayerId": "16368",
+              "caseKey": "2026-W04-SEA-Jadarian-Price",
+              "newlyIdentified": false,
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Emanuel Wilson",
+                  "eaPlayerId": "23335"
+                }
+              ]
+            },
+            {
+              "player": "Ty Okada",
+              "eaPlayerId": "23381",
+              "caseKey": "2026-W04-SEA-Ty-Okada",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Seattle explicitly named Rodney Thomas II as the starter in Okada’s place; only the additional vacant-role duty is valued.",
+              "roleSourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth",
+                "lac-sea-gamebook"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth",
+                "lac-sea-gamebook"
+              ],
+              "primaryEvidence": "NAMED_STARTER",
+              "replacements": [
+                {
+                  "player": "Rodney Thomas II",
+                  "eaPlayerId": "22492"
+                }
+              ]
+            },
+            {
+              "player": "Chazz Surratt",
+              "eaPlayerId": "21478",
+              "caseKey": "2026-W04-SEA-Chazz-Surratt",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Official final game-day status is reconciled to the frozen identity.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Leonard Williams",
+              "eaPlayerId": "2527",
+              "caseKey": "2026-W04-SEA-Leonard-Williams",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "sea-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented game-available depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "lac-sea-gamebook",
+                "sea-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed workload share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "lac-sea-gamebook",
+                "sea-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Rylie Mills",
+                  "eaPlayerId": "15215"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3114,
+                    "startLatest": 3114,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Official 8:06 Q4 play records the injury, the 7:05 Q4 update lists return questionable, and no later return is recorded.",
+                    "sourceIds": [
+                      "lac-sea-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "lac-sea-gamebook"
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Jalen Milroe",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "sea-inactives",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Inactive emergency third quarterback; the established starter completed the game."
+            },
+            {
+              "player": "Avery Smith",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Montorie Foster Jr.",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Nick Kallerup",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Brandon Pili",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "sea-inactives",
+                "sea-injury",
+                "lac-sea-gamebook"
+              ],
+              "rationale": "Full practice participant before appearing on the final inactive list, with no game designation or established injury-driven lost duty."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Drew Lock",
+              "finding": "Active unused backup quarterback; no starter duty was lost.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "Olu Oluwatimi",
+              "finding": "Active DNP reserve with no injury designation or established lost duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "Julian Love",
+              "finding": "Cleared the final injury report, active starter with no recorded injury exit.",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ]
+            },
+            {
+              "player": "George Holani",
+              "finding": "Cleared the final injury report and completed active running-back duty.",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ]
+            },
+            {
+              "player": "Jarran Reed",
+              "finding": "Cleared the final injury report and completed active defensive-line duty.",
+              "sourceIds": [
+                "lac-sea-gamebook",
+                "lac-inactives",
+                "lac-injury",
+                "lac-depth",
+                "sea-inactives",
+                "sea-injury",
+                "sea-depth"
+              ]
+            },
+            {
+              "player": "Jason Myers",
+              "finding": "Kicker completed normal game duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "Michael Dickson",
+              "finding": "Punter/holder completed normal game duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            },
+            {
+              "player": "Chris Stoll",
+              "finding": "Long snapper completed normal game duty.",
+              "sourceIds": [
+                "lac-sea-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "clusterReviews": []
+        }
+      ]
+    }
+  ]
+}
