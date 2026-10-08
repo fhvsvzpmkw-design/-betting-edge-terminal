@@ -1,6 +1,20 @@
 # Graham weekly 90/10 authority
 
-Version 1.7 — completion recovery, 2026-10-04.
+Version 1.8 — earlier preparation and explicit unfinished work, 2026-10-07.
+
+## v1.8 — faster weekly closeout
+
+The user directed faster handling during the week on October 7. This amendment supersedes the retry cadence and dated recovery routing examples below; it does not change the Walters formula, historical evidence requirements, paired application, numerical writers or market isolation. The existing task runs daily at 06:00, 10:00, 18:00 and 22:00 America/Vancouver. Its primary completion target remains Tuesday before the 11:00 baseline. Any exception continues through the next available run, with the Saturday 18:00 customer deadline retained as a final safeguard, not the normal working target.
+
+Use one checklist per completed game: verified final result, frozen kickoff ratings with preserved H4, and reconciled injury loss for both teams. Read the existing receipt and additive evidence first. Reuse supported case estimates and identity/value bindings; research only the missing checklist items. Close every supported paired game in the run and submit them together through the existing staging/workflow. There is no one-game-per-run quota. An unresolved game must not prevent another validated game from being applied once.
+
+Preparation may begin as each game in the active week's slate becomes FINAL, before Tuesday rollover. Save additive source-bound game-day reconciliation under that game's own season/week evidence directory, using actual capture time. Include final inactive/DNP coverage, reported in-game injuries, quarterback duty loss, replacement roles and required cluster review in the same pass. Do not wait until the whole slate ends to start research. Before rollover, this is evidence preparation only: do not apply the active week's learning, advance the manifest or alter carried ratings. Once rollover activates the next week and the entire source slate is FINAL, validate the saved bundles and publish through the existing updater. Recheck mutable sources or missing facts; do not rebuild already bound historical facts merely because the task ran again.
+
+For incomplete games, persist precise team/player/input blockers and the next source or calculator action in the existing additive evidence bundle. Classify the cause as SOURCE_NOT_YET_AVAILABLE, AVAILABLE_EVIDENCE_NOT_RECONCILED, REPLACEMENT_OR_VALUE_UNRESOLVED, IDENTITY_CONFLICT, INTERVENING_RATING_CHANGE or PUBLICATION_FAILURE, with actual findings. A generic request to redo the full gamebook is not an adequate checkpoint once specific missing items are known. On the next run, resume those items first. Do not commit an unchanged partial staging receipt or call source capture a completed rating update. If no item can advance, give a short no-op with the exact missing information; do not disable the task.
+
+Report three separate outcomes: historical learning applied/expected games, published ratings propagated to the current board, and current-week personnel/QB readiness. Current-week injury news cannot block a supported historical 90/10 transaction. Historical completion cannot certify live availability. After publication, verify the automatic separate rating-base refresh and terminal readback; repair a failed handoff through its existing owner, without creating another task or calculator.
+
+At the next rollover, unfinished learning from the week preceding the active week must be resolved before advancing again. The newly completed active slate needs prepared evidence, not an already applied update before its own rollover. This prevents another week from hiding a known unresolved dependency while preserving the existing rollover-then-learning order. See the explicit handoff gate in `GRAHAM_WEEK_ROLLOVER_AUTHORITY.md`.
 
 ## v1.7 — required completion and retry handoff
 
