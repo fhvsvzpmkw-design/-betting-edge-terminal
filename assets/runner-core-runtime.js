@@ -997,8 +997,12 @@ function pickStart(rec){
 function pickMovement(rec){const move=moveSignal(rec);return ['MOVE','REPRICE'].includes(move.source)?move.magnitude:null}
 function filteredPicks(run){
   const rank={BET:0,LEAN:1,WAIT:2,PASS:3};
-  const metric=pickSort==='EDGE'?pickEdge:pickSort==='START'?pickStart:pickSort==='MOVE'?pickMovement:null;
+  const metric=pickSort==='CALL'||pickSort==='EDGE'?pickEdge:pickSort==='START'?pickStart:pickSort==='MOVE'?pickMovement:null;
   return picksMatchingFilters(run).slice().sort((a,b)=>{
+    if(pickSort==='CALL'){
+      const priority=(rank[pickStatus(a)]??4)-(rank[pickStatus(b)]??4);
+      if(priority)return priority;
+    }
     if(metric){const av=metric(a),bv=metric(b);if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;if(av!==null&&bv!==null&&av!==bv)return pickSort==='START'?av-bv:bv-av;return 0}
     return (rank[pickStatus(a)]??4)-(rank[pickStatus(b)]??4);
   });

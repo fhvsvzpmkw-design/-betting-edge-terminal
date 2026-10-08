@@ -22,6 +22,23 @@ assert.equal(api.filteredPicks({recs:[{...nhl,edge:'-2.528 probability points'},
 api.setFilters('LEAN','NFL');assert.equal(api.filteredPicks(mixed).length,1);assert.equal(api.filteredPicks(mixed)[0].status,'LEAN');
 api.setFilters('BET','NFL');assert.equal(api.filteredPicks(mixed).length,0,'sport and status intersect, including honest empty views');
 api.setFilters('ALL','ALL','ALL','ALL','','CALL');assert.equal(api.filteredPicks(mixed).map(r=>r.status).join(','),'BET,LEAN,PASS');
+const callRanked={recs:[
+ {...other,title:'pass-high',edge:'+99 pp'},
+ {...nfl,title:'lean-low',edge:'-1 pp'},
+ {...nhl,title:'bet-missing',edge:'UNKNOWN'},
+ {...nhl,title:'bet-low',edge:'-2 pp'},
+ {...nhl,title:'bet-high',edge:'+2 pp'},
+ {...nhl,title:'bet-tie',edge:'+2 pp'},
+ {...nfl,title:'lean-high',edge:'+4 pp'},
+ {...nfl,title:'lean-missing',edge:'UNKNOWN'},
+ {...other,status:'WAIT',title:'wait-low',edge:'-1 pp'},
+ {...other,status:'WAIT',title:'wait-high',edge:'+3 pp'},
+ {...other,status:'WAIT',title:'wait-missing',edge:'UNKNOWN'},
+ {...other,title:'pass-low',edge:'-2 pp'},
+ {...other,title:'pass-missing',edge:'UNKNOWN'}
+]},callBefore=JSON.stringify(callRanked);
+assert.equal(api.filteredPicks(callRanked).map(r=>r.title).join(','),'bet-high,bet-tie,bet-low,bet-missing,lean-high,lean-low,lean-missing,wait-high,wait-low,wait-missing,pass-high,pass-low,pass-missing','Call Priority groups calls first, then signed descending edge, keeping equal edges stable and unknown edges last within their group');
+assert.equal(JSON.stringify(callRanked),callBefore,'combined ordering cannot mutate issued records');
 assert.equal(mixed.recs[0].status,'PASS','view ordering must not reorder report data');
 assert.equal(api.runSports(mixed).join(','),'NFL,NHL');
 assert.equal(api.recSport({feed:{sportKey:'icehockey_nhl'}}),'NHL');
@@ -65,7 +82,9 @@ assert.equal(ordered.slice(0,2).map(r=>r.title).join(','),'Philadelphia Flyers,S
 assert.ok(ordered.filter(r=>api.pickEdge(r)<0).every(r=>ordered.indexOf(r)>Math.max(...reportedLeans.map(lean=>ordered.indexOf(lean)))),'positive forecast leans precede every negative edge');
 assert.equal(JSON.stringify(reported),reportedBefore,'the issued regression snapshot remains unchanged');
 api.setFilters('ALL','ALL','ALL','ALL','','CALL');
-assert.equal(api.filteredPicks(reported).slice(0,6).map(r=>r.status).join(','),'LEAN,LEAN,LEAN,LEAN,LEAN,LEAN','Call Priority retains the existing call order');
+assert.equal(api.filteredPicks(reported).slice(0,6).map(r=>r.status).join(','),'LEAN,LEAN,LEAN,LEAN,LEAN,LEAN','Call Priority keeps all six LEAN calls above PASS');
+assert.equal(api.filteredPicks(reported).slice(0,6).map(r=>r.title).join(','),'Philadelphia Flyers,San Jose Sharks,Carolina Hurricanes,Montreal Canadiens,Chicago White Sox,Colorado Avalanche','Call Priority ranks forecast leans by highest edge within the LEAN group');
+assert.equal(JSON.stringify(reported),reportedBefore,'combined call and edge sorting preserves the issued snapshot');
 api.setFilters('ALL','ALL','ALL','ALL','','START');assert.equal(api.filteredPicks(ranked)[0].status,'BET');assert.equal(api.filteredPicks(ranked).at(-1).edge,'UNKNOWN');
 api.setFilters('ALL','ALL','ALL','ALL','','MOVE');assert.equal(api.filteredPicks(ranked)[0].move,'Bet365 -110 → -120');
 assert.equal(api.pickMovement(ranked.recs[0]),null,'a first snapshot is not measured movement');
