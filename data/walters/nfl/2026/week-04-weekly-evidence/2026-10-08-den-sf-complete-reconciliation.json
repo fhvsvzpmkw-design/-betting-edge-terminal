@@ -1,0 +1,1028 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 4,
+  "recordedAt": "2026-10-08T05:12:00.000Z",
+  "marketViewed": false,
+  "inputCommit": "5c11ba0c5d9c911ef09a37e4e63bddbea2b52d1c",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-04-personnel-ledger.json": "4472518229ba92e0bf12beba64b8360c7be443cf",
+    "data/walters/nfl/2026/week-04-current-numbers.json": "3588412091facd2c15cf8ce0f81a7c5809c9e408",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive Week 4 historical paired reconciliation for DEN-SF only. No market price, current-week fair or bet is produced.",
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+      "commit": "bf60eaf5dfd443edff5e13e5896cc30b6193dc44",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "estimateAcknowledged": true,
+      "rationale": "Reuse the source-bound official EA Week 1 identity/value for James Thompson Jr without overwriting the locked registry.",
+      "eaPlayerIds": [
+        "1843"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "den-sf-gamebook",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1791201117/gamecenter/aa6b4cf4-4feb-11f1-abca-2c54536568a9.pdf",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "Hash-verified official final gamebook supplies the 24-14 final, lineups, inactive/DNP lists, specialists and recorded injury/return clocks; SHA-256 7e69946358337d3254131adecb8999aa2800058d3b899289720423dd247da621."
+    },
+    {
+      "id": "den-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.denverbroncos.com/news/broncos-announce-inactives-for-week-4-game-vs-49ers",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "Denver identifies Dondrea Tillman as its only injury-driven inactive and the four other inactive players as non-injury absences."
+    },
+    {
+      "id": "den-injury",
+      "kind": "OFFICIAL",
+      "url": "https://www.denverbroncos.com/news/injury-report-olb-dondrea-tillman-lone-player-ruled-out-for-broncos-week-4-game-vs-49ers",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "Denver final injury report rules out Tillman and confirms the other listed players available without a game designation."
+    },
+    {
+      "id": "den-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.denverbroncos.com/team/depth-chart/depth-chart-main",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "Official depth chart binds Patrick Surtain II to Jahdae Barron, Riley Moss to Kris Abrams-Draine and the active receiver depth used for Pat Bryant II additional duty."
+    },
+    {
+      "id": "sf-inactives",
+      "kind": "OFFICIAL",
+      "url": "https://www.49ers.com/news/romello-height-mike-evans-and-more-available-vs-broncos-inactives-for-week-4-denvssf",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "San Francisco final inactives confirm Nick Bosa, James Thompson Jr and the healthy scratches, while Romello Height and the questionable players were active."
+    },
+    {
+      "id": "sf-injury",
+      "kind": "OFFICIAL",
+      "url": "https://www.49ers.com/news/three-players-ruled-out-vs-broncos-in-week-4-mike-evans-questionable-ahead-of-denvssf",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "San Francisco final injury report rules out Nick Bosa, James Thompson Jr and Mykel Williams and documents the active questionable/depth set."
+    },
+    {
+      "id": "sf-depth",
+      "kind": "OFFICIAL",
+      "url": "https://www.49ers.com/team/depth-chart",
+      "checkedAt": "2026-10-08T05:12:00.000Z",
+      "gameKeys": [
+        "2026-W04-DEN-SF"
+      ],
+      "finding": "Official depth chart binds Bosa to Romello Height, the active edge committee, Marques Sigle to Malik Mustapha, and the active defensive-back and running-back reserves."
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W04-DEN-SF",
+      "away": "DEN",
+      "home": "SF",
+      "state": "READY",
+      "sourceIds": [
+        "den-sf-gamebook",
+        "den-inactives",
+        "den-injury",
+        "den-depth",
+        "sf-inactives",
+        "sf-injury",
+        "sf-depth"
+      ],
+      "teams": [
+        {
+          "team": "DEN",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final official gamebook, inactives, injury report and depth chart were reconciled across every inactive/DNP identity and recorded in-game injury. Tillman is zero-calibrated; Surtain, Moss and Bryant retain source-bound exposure and additional-duty replacement treatment.",
+          "sourceIds": [
+            "den-sf-gamebook",
+            "den-inactives",
+            "den-injury",
+            "den-depth",
+            "sf-inactives",
+            "sf-injury",
+            "sf-depth"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Bo Nix completed the game without injury-driven replacement; Jarrett Stidham was an unused backup and Sam Ehlinger was the inactive third quarterback.",
+            "sourceIds": [
+              "den-sf-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "player": "Dondrea Tillman",
+              "eaPlayerId": "1397",
+              "caseKey": "2026-W04-DEN-Dondrea-Tillman",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "den-inactives",
+                "den-injury",
+                "den-sf-gamebook"
+              ],
+              "rationale": "Official final injury status and gamebook availability are reconciled to the frozen identity.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Patrick Surtain II",
+              "eaPlayerId": "21764",
+              "caseKey": "2026-W04-DEN-Patrick-Surtain-II",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Jahdae Barron",
+                  "eaPlayerId": "15277"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1762,
+                    "startLatest": 1762,
+                    "endEarliest": 2445,
+                    "endLatest": 2445,
+                    "rationale": "Official play at 0:38 Q2 records the injury and the 4:15 Q3 update records him out.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Exact official departure and out-update clocks bound the unavailable interval; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "den-sf-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Riley Moss",
+              "eaPlayerId": "22218",
+              "caseKey": "2026-W04-DEN-Riley-Moss",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Kris Abrams-Draine",
+                  "eaPlayerId": "14954"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1800,
+                    "startLatest": 1963,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "No earlier departure clock is printed; the official 12:17 Q3 return-questionable update bounds the start after halftime and the 4:15 Q3 update records him out.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the explicit halftime-to-status-update start range and official out status; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "den-sf-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Pat Bryant II",
+              "eaPlayerId": "15074",
+              "caseKey": "2026-W04-DEN-Pat-Bryant-II",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Troy Franklin",
+                  "eaPlayerId": "14647"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2532,
+                    "startLatest": 2532,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Official play at 2:48 Q3 records the injury and the later return-questionable update has no recorded return.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the exact injury clock and no recorded return; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "den-sf-gamebook"
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Sam Ehlinger",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ],
+              "rationale": "Inactive third quarterback; the established starter completed the game."
+            },
+            {
+              "player": "Kage Casey",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury"
+              ],
+              "rationale": "Inactive with no final injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Dallen Bentley",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury"
+              ],
+              "rationale": "Inactive with no final injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Tyler Onyedim",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury"
+              ],
+              "rationale": "Inactive with no final injury designation; Denver explicitly dressed six other defensive linemen."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Zach Allen",
+              "finding": "Rest designation cleared; active starter with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "J.K. Dobbins",
+              "finding": "Full participant and active with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Marvin Mims Jr",
+              "finding": "Full participant and active with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Jaylen Waddle",
+              "finding": "Full participant and active with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Wil Lutz",
+              "finding": "Kicker completed normal game duty.",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ]
+            },
+            {
+              "player": "Jeremy Crawshaw",
+              "finding": "Punter/holder completed normal game duty.",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ]
+            },
+            {
+              "player": "Mitchell Fraboni",
+              "finding": "Long snapper completed normal game duty.",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Surtain and Moss are distinct cornerback duties with distinct active depth replacements and separate official exposure bounds; use additive replacement-aware losses without an extra multiplier.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "SF",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final official gamebook, inactives, injury report and depth chart were reconciled across every inactive/DNP identity and recorded injury. Archived Bosa/Williams estimates are retained, Thompson uses the pinned EA supplement, and the Sigle/Juszczyk/Stout intervals use explicit gamebook timing.",
+          "sourceIds": [
+            "den-sf-gamebook",
+            "den-inactives",
+            "den-injury",
+            "den-depth",
+            "sf-inactives",
+            "sf-injury",
+            "sf-depth"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Brock Purdy completed the game without injury-driven replacement; Mac Jones was an unused backup and Kurtis Rourke was the inactive third quarterback.",
+            "sourceIds": [
+              "den-sf-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "player": "Nick Bosa",
+              "eaPlayerId": "20565",
+              "caseKey": "2026-W04-SF-Nick-Bosa",
+              "newlyIdentified": false,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Romello Height",
+                  "eaPlayerId": "1861"
+                }
+              ]
+            },
+            {
+              "player": "Mykel Williams",
+              "eaPlayerId": "15199",
+              "caseKey": "2026-W04-SF-Mykel-Williams",
+              "newlyIdentified": false,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "sf-injury"
+              ],
+              "rationale": "Official final injury report rules Williams out; preserve the archived equal-share active edge committee.",
+              "resolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Khalid Kareem and Ogbo Okoronkwo are the documented available edge-depth candidates for the additional vacancy; unknown allocation is explicitly equal-share.",
+              "roleSourceIds": [
+                "sf-depth",
+                "den-sf-gamebook"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Candidate identity is established but shares are unknown, so the approved equal-share convention is used.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are allocated; candidate baseline duties remain counted once.",
+              "baselineSourceIds": [
+                "sf-depth",
+                "den-sf-gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Khalid Kareem",
+                  "eaPlayerId": "21283"
+                },
+                {
+                  "player": "Ogbo Okoronkwo",
+                  "eaPlayerId": "13090"
+                }
+              ]
+            },
+            {
+              "player": "James Thompson Jr",
+              "eaPlayerId": "1843",
+              "caseKey": "2026-W04-SF-James-Thompson-Jr",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "sf-inactives",
+                "sf-injury",
+                "den-sf-gamebook"
+              ],
+              "rationale": "Official final injury status and gamebook availability are reconciled to the frozen identity.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The exact frozen healthy value is calibrated at zero and the non-QB replacement curve is nonnegative; no missing value is assigned zero."
+            },
+            {
+              "player": "Marques Sigle",
+              "eaPlayerId": "15350",
+              "caseKey": "2026-W04-SF-Marques-Sigle",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Malik Mustapha",
+                  "eaPlayerId": "14962"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1864,
+                    "startLatest": 1864,
+                    "endEarliest": 2445,
+                    "endLatest": 2445,
+                    "rationale": "Official 13:56 Q3 injury and 4:15 Q3 return clocks.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  },
+                  {
+                    "startEarliest": 3455,
+                    "startLatest": 3455,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Official 2:25 Q4 second injury with no later return before regulation ended.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Exact gamebook intervals; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "den-sf-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Kyle Juszczyk",
+              "eaPlayerId": "1599",
+              "caseKey": "2026-W04-SF-Kyle-Juszczyk",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Kaelon Black",
+                  "eaPlayerId": "16320"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2757,
+                    "startLatest": 2757,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "rationale": "Official 14:03 Q4 injury and later out update; no return recorded.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Exact injury clock and official out status; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "den-sf-gamebook"
+                ]
+              }
+            },
+            {
+              "player": "Upton Stout",
+              "eaPlayerId": "15327",
+              "caseKey": "2026-W04-SF-Upton-Stout",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-depth"
+              ],
+              "rationale": "Official final game-day status is reconciled to a documented active same-group replacement role.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The documented active depth option is assigned only the additional vacant-role duty; existing baseline duties remain valued normally.",
+              "roleSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Source-listed game-available depth supplies an explicit Graham additional-duty estimate without claiming observed snap share.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only additional vacancy duties are valued; the replacement keeps all baseline duties and is not reused for another vacancy.",
+              "baselineSourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Jack Jones",
+                  "eaPlayerId": "21787"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2700,
+                    "startLatest": 3068,
+                    "endEarliest": 3473,
+                    "endLatest": 3473,
+                    "rationale": "No departure play is printed; the 8:52 Q4 questionable update bounds the start after the quarter began and the 2:07 Q4 update records his return.",
+                    "sourceIds": [
+                      "den-sf-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the explicit quarter/status bound and exact return update; active time is valued normally.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "den-sf-gamebook"
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Kurtis Rourke",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-inactives"
+              ],
+              "rationale": "Inactive third quarterback; the established starter completed the game."
+            },
+            {
+              "player": "Ephesians Prysock",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-inactives"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Tatum Bethune",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-inactives"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Enrique Cruz Jr.",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-inactives"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            },
+            {
+              "player": "Jordan James",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "sf-inactives"
+              ],
+              "rationale": "Inactive without an injury designation or established injury-driven lost duty."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Mike Evans",
+              "finding": "Questionable pregame, active and completed offensive duty without a recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Dre Greenlaw",
+              "finding": "Questionable pregame, active starter with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Keion White",
+              "finding": "Questionable pregame, active starter with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Jaden Dugger",
+              "finding": "Questionable pregame, active reserve with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Romello Height",
+              "finding": "Active starter and used only for Bosa additional vacancy duty.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Trent Williams",
+              "finding": "Full participant Friday and active starter with no recorded injury exit.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "player": "Eddy Pineiro",
+              "finding": "Kicker completed normal game duty.",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ]
+            },
+            {
+              "player": "Corliss Waitman",
+              "finding": "Punter/holder completed normal game duty.",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ]
+            },
+            {
+              "player": "Jon Weeks",
+              "finding": "Long snapper completed normal game duty.",
+              "sourceIds": [
+                "den-sf-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Bosa and Williams are distinct edge vacancies with non-overlapping active replacement assignments; Thompson is a zero-calibrated interior absence. Use additive losses without an unsupported extra multiplier.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Sigle and Stout have distinct safety/nickel duties, separate active replacements and non-overlapping official exposure intervals.",
+              "sourceIds": [
+                "den-sf-gamebook",
+                "den-inactives",
+                "den-injury",
+                "den-depth",
+                "sf-inactives",
+                "sf-injury",
+                "sf-depth"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
