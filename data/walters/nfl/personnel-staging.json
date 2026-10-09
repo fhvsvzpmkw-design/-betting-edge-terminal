@@ -1,37 +1,229 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-delta-1645-2026-w05-20261008T164150-0700-personnel",
+  "batchId": "graham-thursday-pregame-2026-w05-20261009T000354464Z-personnel",
   "season": 2026,
   "week": 5,
-  "startedAt": "2026-10-08T16:41:50-07:00",
-  "effectiveAt": "2026-10-08T16:46:09-07:00",
+  "startedAt": "2026-10-09T00:03:54.464Z",
+  "effectiveAt": "2026-10-09T00:03:54.464Z",
   "marketViewed": false,
-  "sourceTask": "DELTA_1645",
+  "sourceTask": "MANUAL_THURSDAY_PREGAME_CLOSEOUT",
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "eaPlayerIds": [
+        "4817"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Byte-identical binding of the existing September 21 official EA missing-identity capture, scoped to Week 5 Garnes only. Preserve frozen values and all original capture timestamps."
+    }
+  ],
   "cases": [
     {
-      "caseKey": "2026-W05-DAL-Tyler-Smith-RETURN",
+      "caseKey": "2026-W05-TB-Antoine-Winfield-Jr",
       "gameKey": "2026-W05-TB-DAL",
-      "team": "DAL",
-      "side": "HOME",
-      "player": "Tyler Smith",
-      "playerEaId": "22445",
-      "availabilityStatus": "ACTIVE_FULL",
-      "resolutionStatus": "RESOLVED_ACTIVE",
-      "personnelEventId": "2026-W05-DAL-Tyler-Smith-return-delta-20261008T164609-0700",
-      "reason": "Dallas officially activated Tyler Smith from injured reserve and reported that he will suit up against Tampa Bay after a full Wednesday practice and medical clearance. Record the verified active-full return without inventing an impairment percentage.",
+      "team": "TB",
+      "side": "AWAY",
+      "player": "Antoine Winfield Jr",
+      "playerEaId": "21017",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+      "replacementPlayer": "Ifeatu Melifonwu",
+      "replacementEaId": "21471",
+      "personnelEventId": "graham-thursday-pregame-2026-w05-20261009T000354464Z-personnel-21017",
+      "reason": "Retain the accepted Winfield/Melifonwu one-for-one value difference and attach the complete concurrent Tampa Bay defensive-back inventory including Morrison/Garnes. No replacement is shared.",
       "sourceRefs": [
-        "https://www.dallascowboys.com/news/tyler-smith-officially-activated-from-ir-for-cowboys-vs-buccaneers",
-        "https://www.dallascowboys.com/news/updates-october-2026",
-        "data/walters/nfl/player-values/by-team-v1/dal.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
+        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-oct-7",
+        "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
+      ],
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Ifeatu Melifonwu",
+          "Miles Killebrew"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_NUMERIC"
+      },
+      "clusterReview": {
+        "method": "REVIEWED_LINEAR_ESTIMATE",
+        "estimateAcknowledged": true,
+        "inventoryComplete": true,
+        "caseKeys": [
+          "2026-W05-TB-Antoine-Winfield-Jr",
+          "2026-W05-TB-Benjamin-Morrison"
+        ],
+        "sourceRefs": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
+        ],
+        "rationale": "Complete current ledger DB inventory: Winfield/Melifonwu and Morrison/Garnes are disjoint safety/reserve-corner duties. Retain McCollum, Parrish and Tykee Smith baseline roles. Linear sum is an acknowledged model assumption; no unsupported nonlinear secondary penalty."
+      }
+    },
+    {
+      "caseKey": "2026-W05-TB-Benjamin-Morrison",
+      "gameKey": "2026-W05-TB-DAL",
+      "team": "TB",
+      "side": "AWAY",
+      "player": "Benjamin Morrison",
+      "playerEaId": "15290",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "graham-thursday-pregame-2026-w05-20261009T000354464Z-personnel-15290",
+      "reason": "Confirmed inactive Morrison has a source-bound replacement identity and value. Reuse the immutable September 21 official EA capture for Garnes, converted through the frozen curve; the prior missing-value conclusion overlooked this accepted supplement.",
+      "sourceRefs": [
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+        "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
       ],
       "availabilitySourceRefs": [
-        "https://www.dallascowboys.com/news/tyler-smith-officially-activated-from-ir-for-cowboys-vs-buccaneers"
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action"
       ],
       "roleSourceRefs": [
-        "https://www.dallascowboys.com/news/updates-october-2026"
-      ]
+        "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety"
+      ],
+      "reopenOn": "Official availability, documented replacement allocation, or source-bound player value changes; reopen the paired inventory rather than reuse an unavailable or duplicate replacement.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Garnes is the next available reserve at Morrison's printed CB depth position, behind retained starter Zyon McCollum. Allocate Morrison's additional reserve duties only as a documented depth assumption.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "McCollum retains his starting duties. Garnes replaces only Morrison's vacated additional reserve corner duties; there is no credit for McCollum's existing role.",
+        "baselineSourceIds": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety"
+        ],
+        "replacements": [
+          {
+            "player": "Ayden Garnes",
+            "eaPlayerId": "4817",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Garnes is the next available reserve at Morrison's printed CB depth position, behind retained starter Zyon McCollum. Allocate Morrison's additional reserve duties only as a documented depth assumption.",
+            "sourceRefs": [
+              "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+              "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Ayden Garnes"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "clusterReview": {
+        "method": "REVIEWED_LINEAR_ESTIMATE",
+        "estimateAcknowledged": true,
+        "inventoryComplete": true,
+        "caseKeys": [
+          "2026-W05-TB-Antoine-Winfield-Jr",
+          "2026-W05-TB-Benjamin-Morrison"
+        ],
+        "sourceRefs": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
+        ],
+        "rationale": "Complete current ledger DB inventory: Winfield/Melifonwu and Morrison/Garnes are disjoint safety/reserve-corner duties. Retain McCollum, Parrish and Tykee Smith baseline roles. Linear sum is an acknowledged model assumption; no unsupported nonlinear secondary penalty."
+      }
+    },
+    {
+      "caseKey": "2026-W05-TB-SirVocea-Dennis",
+      "gameKey": "2026-W05-TB-DAL",
+      "team": "TB",
+      "side": "AWAY",
+      "player": "SirVocea Dennis",
+      "playerEaId": "23003",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "graham-thursday-pregame-2026-w05-20261009T000354464Z-personnel-23003",
+      "reason": "Dennis is confirmed inactive. Use the approved documented reserve-depth estimate for active nonstarter Rozeboom's additional duties, preserving both starters and Rozeboom's existing work. Equal frozen 0.2 values produce zero estimated loss; this does not assert zero football impact.",
+      "sourceRefs": [
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+        "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action"
+      ],
+      "roleSourceRefs": [
+        "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety"
+      ],
+      "reopenOn": "Official availability, documented replacement allocation, or source-bound player value changes; reopen the paired inventory rather than reuse an unavailable or duplicate replacement.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "The current depth chart lists Rozeboom as the other active off-ball reserve behind retained starter Alex Anzalone. Estimate that he handles Dennis's additional reserve/three-linebacker-package duties; this is not a confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Trotter and Anzalone retain starting roles. Rozeboom's existing seven Week 4 snaps and baseline reserve work are preserved, not credited a second time. Only Dennis's vacant additional linebacker duties are assigned to Rozeboom; Trotter receives no replacement credit.",
+        "baselineSourceIds": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety"
+        ],
+        "replacements": [
+          {
+            "player": "Christian Rozeboom",
+            "eaPlayerId": "21358",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "The current depth chart lists Rozeboom as the other active off-ball reserve behind retained starter Alex Anzalone. Estimate that he handles Dennis's additional reserve/three-linebacker-package duties; this is not a confirmed workload.",
+            "sourceRefs": [
+              "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+              "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Josiah Trotter",
+          "Christian Rozeboom"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      }
     },
     {
       "caseKey": "2026-W05-DAL-Cobie-Durant",
@@ -41,42 +233,86 @@
       "player": "Cobie Durant",
       "playerEaId": "22278",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
-      "failClosedCode": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
-      "personnelEventId": "2026-W05-DAL-Cobie-Durant-reopen-delta-20261008T164609-0700",
-      "reason": "Cobie Durant remains out, but the previously estimated primary replacement Joey Porter Jr. was ruled inactive shortly before kickoff because of illness. Dallas elevated Reddy Steward and its depth chart also lists Shavon Revel Jr. and Ameer Speed in the outside-corner chain; no source establishes a complete non-overlapping allocation across the now depleted secondary. Reopen the case and fail closed.",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "graham-thursday-pregame-2026-w05-20261009T000354464Z-personnel-22278",
+      "reason": "With Durant and Porter both confirmed inactive, the current Dallas chart supplies two distinct chains: Bland/Durant/Carson and Porter/Revel/Speed. Use active Carson for Durant's reserve vacancy and preserve Bland's baseline; the former Porter credit is removed.",
       "sourceRefs": [
-        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys",
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
         "https://www.dallascowboys.com/news/updates-october-2026",
         "https://www.dallascowboys.com/team/depth-chart",
         "data/walters/nfl/player-values/by-team-v1/dal.json",
         "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/player-values/player-values-2026-v1.json"
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
       ],
       "availabilitySourceRefs": [
-        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys"
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action"
       ],
       "roleSourceRefs": [
         "https://www.dallascowboys.com/news/updates-october-2026",
         "https://www.dallascowboys.com/team/depth-chart"
       ],
-      "reopenOn": "Dallas documents the distinct outside-corner allocation for Durant's vacated duties with Porter unavailable, or Durant returns.",
+      "reopenOn": "Official availability, documented replacement allocation, or source-bound player value changes; reopen the paired inventory rather than reuse an unavailable or duplicate replacement.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Carson is listed directly behind Durant on the Bland/Durant/Carson CB depth chain and is absent from the final game-day inactive list. Estimate only Durant's vacated reserve duties.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "DaRon Bland retains his starting corner role. Carson is reserved exclusively for Durant's additional duties. Porter/Revel is a separate depth chain, so neither Revel nor Steward is double credited here.",
+        "baselineSourceIds": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.dallascowboys.com/news/updates-october-2026",
+          "https://www.dallascowboys.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Caelen Carson",
+            "eaPlayerId": "14945",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Carson is listed directly behind Durant on the Bland/Durant/Carson CB depth chain and is absent from the final game-day inactive list. Estimate only Durant's vacated reserve duties.",
+            "sourceRefs": [
+              "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+              "https://www.dallascowboys.com/news/updates-october-2026",
+              "https://www.dallascowboys.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
+          "Caelen Carson",
           "Reddy Steward",
           "Shavon Revel Jr",
           "Ameer Speed"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
-        "replacementClassification": "COMMITTEE",
+        "replacementClassification": "ONE_FOR_ONE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "clusterReview": {
+        "method": "REVIEWED_LINEAR_ESTIMATE",
+        "estimateAcknowledged": true,
+        "inventoryComplete": true,
+        "caseKeys": [
+          "2026-W05-DAL-Cobie-Durant",
+          "2026-W05-DAL-Joey-Porter"
+        ],
+        "sourceRefs": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.dallascowboys.com/news/updates-october-2026",
+          "https://www.dallascowboys.com/team/depth-chart",
+          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
+        ],
+        "rationale": "Complete current ledger DB inventory: Porter/Revel and Durant/Carson are distinct assignments on separate printed depth rows. Bland, Downs, Bell and Hooker retain baseline roles. No third vacancy or shared replacement is added. Steward and Speed receive no duplicate credit. Linear sum is an acknowledged assumption; no nonlinear penalty."
       }
     },
     {
@@ -87,96 +323,52 @@
       "player": "Joey Porter",
       "playerEaId": "22706",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
-      "failClosedCode": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
-      "personnelEventId": "2026-W05-DAL-Joey-Porter-delta-20261008T164609-0700",
-      "reason": "Joey Porter Jr. was ruled inactive shortly before kickoff because of illness. Dallas elevated Reddy Steward, but current official roster/depth evidence does not establish one distinct replacement for Porter's baseline corner duties while Cobie Durant is also out. The defensive-back allocation remains a reviewed cluster and fails closed.",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "graham-thursday-pregame-2026-w05-20261009T000354464Z-personnel-22706",
+      "reason": "Porter's late illness inactive reopens the corner group. Apply the approved documented available-depth estimate using active Revel directly behind Porter, paired with Carson's distinct Durant assignment and an acknowledged linear cluster review.",
       "sourceRefs": [
-        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys",
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
         "https://www.dallascowboys.com/news/updates-october-2026",
         "https://www.dallascowboys.com/team/depth-chart",
-        "data/walters/nfl/player-values/player-values-2026-v1.json",
         "data/walters/nfl/player-values/by-team-v1/dal.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
       ],
       "availabilitySourceRefs": [
-        "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys"
+        "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action"
       ],
       "roleSourceRefs": [
         "https://www.dallascowboys.com/news/updates-october-2026",
         "https://www.dallascowboys.com/team/depth-chart"
       ],
-      "reopenOn": "Dallas documents the distinct outside-corner allocation with Durant and Porter unavailable, or Porter returns.",
-      "closureReview": {
-        "availabilityVerified": true,
-        "rosterChecked": true,
-        "roleEvidenceChecked": true,
-        "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Reddy Steward",
-          "Shavon Revel Jr",
-          "Ameer Speed"
-        ],
-        "unavailablePlayerValueChecked": true,
-        "candidateValuesChecked": true,
-        "replacementClassification": "COMMITTEE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
-      }
-    },
-    {
-      "caseKey": "2026-W05-PIT-Michael-Pittman",
-      "gameKey": "2026-W05-IND-PIT",
-      "team": "PIT",
-      "side": "HOME",
-      "player": "Michael Pittman",
-      "playerEaId": "21081",
-      "availabilityStatus": "OUT",
-      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "personnelEventId": "2026-W05-PIT-Michael-Pittman-delta-20261008T164609-0700",
-      "reason": "Pittsburgh reported that Michael Pittman Jr. re-injured his foot and will miss multiple weeks. The official depth chart lists Germie Bernard directly behind Pittman, and the team specifically identified Bernard as prepared to take on the vacated work. Apply the approved labelled primary-replacement estimate, retaining the pre-final-designation source qualification.",
-      "sourceRefs": [
-        "https://www.steelers.com/news/week-5-injury-report-colts",
-        "https://www.steelers.com/news/week-5-blog-being-more-efficient",
-        "https://www.steelers.com/team/depth-chart/",
-        "data/walters/nfl/player-values/by-team-v1/pit.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
-      ],
-      "availabilitySourceRefs": [
-        "https://www.steelers.com/news/week-5-injury-report-colts"
-      ],
-      "roleSourceRefs": [
-        "https://www.steelers.com/news/week-5-blog-being-more-efficient",
-        "https://www.steelers.com/team/depth-chart/"
-      ],
-      "reopenOn": "Pittman's official availability changes, Pittsburgh documents a different primary receiver allocation, or Pittman returns.",
+      "reopenOn": "Official availability, documented replacement allocation, or source-bound player value changes; reopen the paired inventory rather than reuse an unavailable or duplicate replacement.",
       "replacementModel": {
         "modelId": "graham-replacement-role-estimate-v1",
         "resolution": "PRIMARY_REPLACEMENT",
         "estimateAcknowledged": true,
-        "assumptionRationale": "Pittsburgh's official depth chart places Germie Bernard directly behind Pittman and the team highlighted Bernard as prepared for the added work after announcing Pittman's multi-week absence.",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Revel is the first active reserve directly behind inactive Porter on the official site's Porter/Revel/Speed CB depth row. Estimate the added Porter duties as documented available depth, not a confirmed starting assignment.",
         "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
         "baselineDutiesDisplaced": false,
-        "baselineRationale": "Only Pittman's vacated Week 5 receiver duties are credited to Bernard; Bernard's existing baseline role is preserved and counted once.",
+        "baselineRationale": "Revel's existing reserve duties are preserved once. Only Porter's vacant corner duties receive replacement credit. Carson is reserved for Durant on Bland's separate chain; Bland's starter work remains intact. Steward/Speed remain unused depth, not duplicate credits.",
         "baselineSourceIds": [
-          "https://www.steelers.com/news/week-5-blog-being-more-efficient",
-          "https://www.steelers.com/team/depth-chart/"
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.dallascowboys.com/news/updates-october-2026",
+          "https://www.dallascowboys.com/team/depth-chart"
         ],
         "replacements": [
           {
-            "player": "Germie Bernard",
-            "eaPlayerId": "1832",
+            "player": "Shavon Revel Jr",
+            "eaPlayerId": "15282",
             "availabilityStatus": "ACTIVE",
-            "roleRationale": "The official depth chart lists Bernard second at Pittman's receiver position, and the team identified him as prepared to handle the additional work.",
+            "roleRationale": "Revel is the first active reserve directly behind inactive Porter on the official site's Porter/Revel/Speed CB depth row. Estimate the added Porter duties as documented available depth, not a confirmed starting assignment.",
             "sourceRefs": [
-              "https://www.steelers.com/news/week-5-blog-being-more-efficient",
-              "https://www.steelers.com/team/depth-chart/",
-              "data/walters/nfl/player-values/by-team-v1/pit.json"
+              "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+              "https://www.dallascowboys.com/news/updates-october-2026",
+              "https://www.dallascowboys.com/team/depth-chart"
             ]
           }
-        ],
-        "primaryEvidence": "REPORTED_PRIMARY"
+        ]
       },
       "closureReview": {
         "availabilityVerified": true,
@@ -184,9 +376,9 @@
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Germie Bernard",
-          "Roman Wilson",
-          "Ben Skowronek"
+          "Shavon Revel Jr",
+          "Ameer Speed",
+          "Reddy Steward"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
@@ -194,6 +386,22 @@
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "clusterReview": {
+        "method": "REVIEWED_LINEAR_ESTIMATE",
+        "estimateAcknowledged": true,
+        "inventoryComplete": true,
+        "caseKeys": [
+          "2026-W05-DAL-Cobie-Durant",
+          "2026-W05-DAL-Joey-Porter"
+        ],
+        "sourceRefs": [
+          "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+          "https://www.dallascowboys.com/news/updates-october-2026",
+          "https://www.dallascowboys.com/team/depth-chart",
+          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json"
+        ],
+        "rationale": "Complete current ledger DB inventory: Porter/Revel and Durant/Carson are distinct assignments on separate printed depth rows. Bland, Downs, Bell and Hooker retain baseline roles. No third vacancy or shared replacement is added. Steward and Speed receive no duplicate credit. Linear sum is an acknowledged assumption; no nonlinear penalty."
       }
     }
   ]
