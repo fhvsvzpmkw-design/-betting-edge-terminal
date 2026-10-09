@@ -31,6 +31,10 @@ on:
       - 'tests/selection-availability.test.mjs'
       - 'tools/spread-lineage.mjs'
       - 'tools/report-publication.mjs'
+      - 'tools/game-intelligence.mjs'
+      - 'tools/novig-market-data.mjs'
+      - 'tools/build-game-board.mjs'
+      - 'tests/novig-market-data.test.mjs'
       - 'tools/personnel-semantic-gate.mjs'
       - '.github/workflows/report-history-staged.yml'
       - '.github/workflows/core-v14-consolidation-validation.yml'
@@ -52,7 +56,7 @@ jobs:
           node-version: '22'
       - name: Validate shared game intelligence
         run: |
-          node --test tests/game-intelligence.test.mjs
+          node --test tests/game-intelligence.test.mjs tests/novig-market-data.test.mjs
           node --check assets/game-intelligence.js
       - name: Validate resumable producer and scheduler recovery
         run: |

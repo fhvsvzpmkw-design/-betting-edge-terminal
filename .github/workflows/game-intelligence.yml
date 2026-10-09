@@ -20,6 +20,8 @@ on:
       - tools/build-game-board.mjs
       - tools/grade-game-intelligence.mjs
       - tools/track-guy-value.mjs
+      - tools/novig-market-data.mjs
+      - tests/novig-market-data.test.mjs
       - assets/guy-blue-line.js
       - assets/guy-value.js
       - tests/guy-value.test.mjs
@@ -63,6 +65,11 @@ jobs:
           node --test tests/guy-value.test.mjs
           node tools/collect-game-intelligence.mjs
           cp data/game-intelligence/current.json /tmp/game-intelligence-candidate.json
+      - name: Collect optional Novig NHL moneyline observations
+        if: steps.due.outputs.run == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        run: node tools/novig-market-data.mjs --candidate /tmp/novig-candidate.json
       - name: Publish collection, source results and game board
         if: steps.due.outputs.run == 'true'
         run: |
@@ -79,10 +86,20 @@ jobs:
           const current=fs.existsSync('data/game-intelligence/current.json')?JSON.parse(fs.readFileSync('data/game-intelligence/current.json')):null;
           if(!current||Date.parse(current.collectedAt)<=Date.parse(capture.collectedAt))saveCapture(process.cwd(),capture);
           NODE
+            # Preserve the captured Novig bytes across publication collisions.
+            # Missing or invalid optional data never prevents the core board.
+            node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {saveNovigCapture} from './tools/novig-market-data.mjs';
+          try {
+            if(fs.existsSync('/tmp/novig-candidate.json'))saveNovigCapture(process.cwd(),JSON.parse(fs.readFileSync('/tmp/novig-candidate.json')));
+          } catch(error) { console.warn('Optional Novig snapshot skipped: '+error.message); }
+          NODE
             node tools/grade-game-intelligence.mjs
             node tools/build-game-board.mjs
             node tools/track-guy-value.mjs
             git add -- data/game-intelligence data/characters/guy-laflame/value-ledger.json
+            if [ -d data/novig ]; then git add -- data/novig; fi
             if git diff --cached --quiet; then exit 0; fi
             git commit -m 'Refresh shared game intelligence and prospective source tracking'
             if git push origin HEAD:main; then exit 0; fi

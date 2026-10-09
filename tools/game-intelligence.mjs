@@ -10,6 +10,7 @@ import {teamAbbr} from './graham-market-utils.mjs';
 import {exactMarketReference,marketComparison} from './market-price-assessment.mjs';
 import {loadGrahamHandoffInputs} from './graham-fair-handoff.mjs';
 import {aggregateForecastComparisons,summarizeProjectionContext} from './forecast-aggregation.mjs';
+import {loadNovigCapture,novigReference,compareNovigPrice} from './novig-market-data.mjs';
 
 export const INTELLIGENCE_FROM = '2026-09-27T12:00:00-07:00';
 export const list = x => Array.isArray(x) ? x : [];
@@ -95,6 +96,14 @@ export function bindIntelligence({root,report,sidecar,feed,universe,liveBoard=fa
     sources:list(capture?.sources),records,facts,quoteHistory:list(capture?.quoteHistory),internalModels:internalModels(root,events,report.ts,sidecar),
     knowledge:knowledge(root,unique(events.map(e=>e.sport))),
     limitation:'Original observation times are preserved. Report decisions must assess current event, personnel and exact quote applicability.'};
+  // Optional exchange observations are pinned separately from forecasts and
+  // never enter forecastEvidence, consensus, candidate authority or gate rules.
+  const novig=loadNovigCapture(root,report.ts);
+  if(novig)inputs.novigMarketData={...novig,
+    observations:novig.observations.filter(row=>events.some(e=>sameEvent(row,e)&&row.home===e.home&&row.away===e.away)).map(({raw,...row})=>row),
+    eventStates:novig.eventStates.filter(row=>events.some(e=>sameEvent(row,e))),
+    acquisition:{requests:novig.acquisition.requests,oddsApiRequests:0,modelCalls:0,authenticated:false},
+    capturePath:`data/novig/captures/${novig.collectedAt.slice(0,10)}-${novig.snapshotId}.json`};
   sidecar.gameIntelligenceInputs=inputs;
   // Feed the existing assessment path, not a parallel model-decision engine.
   sidecar.forecastEvidence ||= {schema:1,records:[],attempts:[],revalidations:[]};
@@ -185,6 +194,9 @@ export function buildGameIntelligence({report,sidecar={},feed,universe,forecastC
           movement:previous?{from:previous.observedAt,to:observedAt||changedAt,previousLine:previous.line,previousPrice:previous.priceDecimal,
             lineChange:c.line===null?null:c.line-previous.line,priceChangeAtSameLine:c.line===previous.line?quote.priceDecimal-previous.priceDecimal:null}:null,
           benchmark,benchmarkUnavailable,
+          ...(event.sport==='NHL'&&c.marketDetail==='full_game_moneyline'?{supplementalMarketReferences:[
+            compareNovigPrice(novigReference(inputs.novigMarketData,event,c.side,report.ts),quote,report.ts)
+          ].filter(Boolean)}:{}),
           breakEvenProbability:1/quote.priceDecimal,
           forecasts:models.rows.filter(r=>r.kind==='OUTCOME_PROBABILITY'&&r.marketDetail===c.marketDetail&&r.side===c.side&&
             (c.marketClass==='moneyline'||r.line===c.line)).map(r=>{

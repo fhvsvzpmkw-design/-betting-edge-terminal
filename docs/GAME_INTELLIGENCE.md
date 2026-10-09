@@ -12,7 +12,7 @@ Agreement is described by exact event, period, side, line and probability/settle
 
 `node tools/collect-game-intelligence.mjs` collects once per board or event and writes an immutable compact capture plus `data/game-intelligence/current.json`. It reads the existing feed to identify events. It never requests sportsbook odds or calls a language model. ESPN game summaries are cached for one hour, or 15 minutes within two hours of kickoff; nfelo's board is cached for 30 minutes. All selections and report lanes share these observations. Request receipts show actual collection cost. A failed request preserves the original observation and its age, and reports the failure.
 
-The `Game intelligence aggregation` workflow runs after a successful odds workflow and once at 03:40 Vancouver time for source-result recovery. It builds the board and prospective source scorecard. Concurrency and current-snapshot time checks prevent an older collection from overwriting a newer one. Publication retries reuse captured bytes. This workflow writes only `data/game-intelligence/**`.
+The `Game intelligence aggregation` workflow runs after a successful odds workflow and once at 03:40 Vancouver time for source-result recovery. It builds the board and prospective source scorecard. Concurrency and current-snapshot time checks prevent an older collection from overwriting a newer one. Publication retries reuse captured bytes. Its optional Novig trial also writes `data/novig/**`; see [Novig market data](NOVIG_MARKET_DATA.md). NHL exchange observations are pinned separately from forecasts and have no decision authority.
 
 | Source | Connected data | Limitations |
 | --- | --- | --- |

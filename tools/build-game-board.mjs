@@ -4,9 +4,15 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {bindIntelligence,buildGameIntelligence,readOptional} from './game-intelligence.mjs';
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
+import {loadNovigCapture} from './novig-market-data.mjs';
 export function buildBoard(root=process.cwd(),at=null){
   const feed=readOptional(path.join(root,'data/live-odds.json')),capture=readOptional(path.join(root,'data/game-intelligence/current.json'));
-  const report={ts:at||capture?.collectedAt||new Date().toISOString(),feedGeneratedAt:feed.generatedAt};
+  const now=new Date().toISOString(),novig=loadNovigCapture(root,now);
+  // Optional collection finishes after forecast collection. The board must
+  // represent both captures without advancing either source's own clock.
+  const boardAt=[capture?.collectedAt,novig?.collectedAt].filter(t=>Number.isFinite(Date.parse(t))&&Date.parse(t)<=Date.parse(now))
+    .sort((a,b)=>Date.parse(a)-Date.parse(b)).at(-1)||now;
+  const report={ts:at||boardAt,feedGeneratedAt:feed.generatedAt};
   const universe=derivePrimarySelectionInventory(report,feed,readOptional(path.join(root,'data/major-sport-market-coverage-v1.json'))),sidecar={};
   bindIntelligence({root,report,sidecar,feed,universe,liveBoard:true});
   const observer=readOptional(path.join(root,'data/oddspapi-observer.json'));
