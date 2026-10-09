@@ -1,0 +1,838 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-09T05:07:26.489Z",
+  "season": 2026,
+  "sourceWeek": 5,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Pre-rollover source-bound final paired preparation for 2026-W05-TB-DAL. This prepares historical learning only; it does not advance the active manifest, apply ratings, write current-week overlays, construct fairs or issue a bet.",
+  "marketViewed": false,
+  "inputCommit": "7e5fd98eaf301ea47bab08d1151091310f2d457c",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "c29ddd77a2e37c3fb4d1ac6add090402ca81cd1c",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "740c65de0337a5df8c443462fa55f572e38c0a39",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+      "commit": "008dc914db78e7a8e76765128fb98fc0367b4833",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "eaPlayerIds": [
+        "4817",
+        "23272"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Reuse the pinned official EA Week 1 capture for Ayden Garnes and Ameer Speed without changing the frozen production registry; both identities and original capture timestamps remain immutable."
+    }
+  ],
+  "sources": [
+    {
+      "id": "tb-dal-gamebook",
+      "url": "https://static.www.nfl.com/image/upload/gamecenter/aa6b58bf-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official final gamebook: TB 24, DAL 16; final lineups, substitutions, inactive/DNP inventories, specialists, quarterback participation and every printed injury/return update.",
+      "checkedAt": "2026-10-09T05:07:26.489Z",
+      "sourceDocumentSha256": "1f51deb7071ae76a77c7a111c77bb7ad298986758aa54237a4a742e973fa0a98",
+      "sourceDocumentBytes": 327506
+    },
+    {
+      "id": "tb-dal-gamecenter",
+      "url": "https://www.nfl.com/games/buccaneers-at-cowboys-2026-reg-5",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official NFL game center independently reports FINAL, Tampa Bay 24 and Dallas 16.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "tb-dal-inactives",
+      "url": "https://www.nfl.com/news/week-5-thursday-night-inactives-tampa-bay-buccaneers-at-dallas-cowboys",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official NFL final inactive lists for both teams.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "tb-dal-injury-report",
+      "url": "https://www.nfl.com/injuries/league/2026/reg5",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official final Week 5 injury report distinguishes designated injuries from healthy scratches and confirms the listed practice/game statuses.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "tb-inactives",
+      "url": "https://www.buccaneers.com/news/bucs-cowboys-inactives-rueben-bain-jr-ko-kieft-return-action",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official Tampa Bay inactive report identifies Mayfield, Dennis, Morrison and Winfield as injury-driven absences and confirms Bain and Kieft active.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "tb-depth",
+      "url": "https://www.buccaneers.com/news/bucs-release-week-five-depth-chart-ifeatu-melifonwu-next-up-at-safety",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official Tampa Bay Week 5 depth evidence for Melifonwu, Garnes, Rozeboom and active offensive-line reserves.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "dal-updates",
+      "url": "https://www.dallascowboys.com/news/updates-october-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official Dallas updates identify Porter as a late illness inactive and preserve the documented current depth assignments.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "dal-depth",
+      "url": "https://www.dallascowboys.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official Dallas depth evidence for the Durant/Carson and Porter/Revel/Speed corner chains plus the linebacker inventory.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "dal-roster",
+      "url": "https://www.dallascowboys.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official Dallas roster identifies No. 11 as Alijah Clark and confirms the game-available relief identities.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    },
+    {
+      "id": "ea-ameer-speed",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/ameer-speed/23272",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-TB-DAL"
+      ],
+      "finding": "Official EA Madden NFL 27 page confirms Ameer Speed, CB, EA player 23272, 65 OVR. The evaluator uses the earlier pinned Week 1 capture with the same immutable identity/value.",
+      "checkedAt": "2026-10-09T05:07:26.489Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-TB-DAL",
+      "away": "TB",
+      "home": "DAL",
+      "state": "READY",
+      "sourceIds": [
+        "tb-dal-gamebook",
+        "tb-dal-gamecenter",
+        "tb-dal-inactives",
+        "tb-dal-injury-report"
+      ],
+      "final": {
+        "awayScore": 24,
+        "homeScore": 16,
+        "status": "FINAL",
+        "sourceIds": [
+          "tb-dal-gamebook",
+          "tb-dal-gamecenter"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-08T17:15:00-07:00",
+        "awayRating": 20.872922,
+        "homeRating": 25.421438,
+        "homeLocationAdvantagePoints": 2.082,
+        "ledgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "chronologicalHandoffPreview": {
+        "procedure": "LATE_PRIOR_WEEK_HANDOFF_V1",
+        "requiredAtApplication": true,
+        "lateTransactionAuditId": "walters-weekly-90-10-2026-w04-to-w05-full-closeout-20261009005244462",
+        "publishedAt": "2026-10-09T00:52:44.462Z",
+        "kickoffObservedBeforePublication": true,
+        "rationale": "The Week 4 closeout published after this Week 5 kickoff. Preserve the observed kickoff ratings and original history; bind the exact immediately preceding Week 4 transaction by SHA when Week 5 is eligible to apply."
+      },
+      "teams": [
+        {
+          "team": "TB",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final gamebook, final injury report, club inactives and depth evidence reconcile every TB inactive/DNP identity, the Wirfs injury/return interval, the injury-driven quarterback replacement, specialists and the defensive-back cluster.",
+          "sourceIds": [
+            "tb-dal-gamebook",
+            "tb-dal-inactives",
+            "tb-dal-injury-report",
+            "tb-inactives",
+            "tb-depth"
+          ],
+          "qbAvailability": {
+            "state": "HISTORICAL_REPLACEMENT_ESTIMATE",
+            "estimateAcknowledged": true,
+            "lossCause": "INJURY_UNAVAILABILITY",
+            "rationale": "Baker Mayfield was inactive with a thumb injury and Jalon Daniels started and handled all recorded TB quarterback plays.",
+            "baselineRationale": "Official club and gamebook evidence establish Mayfield as the unavailable injury-driven healthy starter.",
+            "replacementRationale": "The final gamebook lists Daniels as starter and Stick as DNP.",
+            "sourceIds": [
+              "tb-dal-gamebook",
+              "tb-inactives"
+            ],
+            "baselineSourceIds": [
+              "tb-inactives",
+              "tb-dal-gamebook"
+            ],
+            "replacementSourceIds": [
+              "tb-dal-gamebook"
+            ],
+            "healthyCandidates": [
+              {
+                "player": "Baker Mayfield",
+                "eaPlayerId": "13117"
+              }
+            ],
+            "replacement": {
+              "player": "Jalon Daniels",
+              "eaPlayerId": "16312"
+            },
+            "exposure": {
+              "modelId": "graham-historical-time-exposure-v1",
+              "estimateAcknowledged": true,
+              "unavailableIntervals": [
+                {
+                  "startEarliest": 0,
+                  "startLatest": 0,
+                  "endEarliest": 3600,
+                  "endLatest": 3600,
+                  "rationale": "Mayfield was inactive and Daniels handled the complete recorded quarterback duty.",
+                  "sourceIds": [
+                    "tb-dal-gamebook",
+                    "tb-inactives"
+                  ]
+                }
+              ],
+              "gameDurationSeconds": 3600,
+              "assumptionRationale": "Use the complete regulation interval for the source-confirmed injury replacement; value active play normally.",
+              "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+              "durationSourceIds": [
+                "tb-dal-gamebook"
+              ]
+            }
+          },
+          "cases": [
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "Antoine Winfield Jr",
+              "eaPlayerId": "21017",
+              "caseKey": "2026-W05-TB-Antoine-Winfield-Jr",
+              "team": "TB",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "tb-inactives"
+              ],
+              "rationale": "Archived Week 5 case confirmed by the final gamebook and club inactive report.",
+              "resolution": "ONE_FOR_ONE",
+              "roleRationale": "Melifonwu started at safety for inactive Winfield; existing baseline duties remain credited once.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Ifeatu Melifonwu",
+                  "eaPlayerId": "21471"
+                }
+              ]
+            },
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "Benjamin Morrison",
+              "eaPlayerId": "15290",
+              "caseKey": "2026-W05-TB-Benjamin-Morrison",
+              "team": "TB",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "tb-inactives"
+              ],
+              "rationale": "Archived Week 5 case confirmed inactive.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Garnes is the documented active depth option for Morrison additional corner duties.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Assign only Morrison additional reserve duties to active Garnes; no starting role is invented.",
+              "baselineRationale": "McCollum and Parrish retain their baseline roles; Garnes receives only additional vacancy duties.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Ayden Garnes",
+                  "eaPlayerId": "4817"
+                }
+              ]
+            },
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "SirVocea Dennis",
+              "eaPlayerId": "23003",
+              "caseKey": "2026-W05-TB-SirVocea-Dennis",
+              "team": "TB",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "tb-inactives"
+              ],
+              "rationale": "Archived Week 5 case confirmed inactive.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Rozeboom started and is assigned only Dennis additional linebacker duties.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use documented active depth for the additional vacancy without measuring workload.",
+              "baselineRationale": "Trotter and Anzalone retain baseline roles; Rozeboom baseline reserve work is credited once.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Christian Rozeboom",
+                  "eaPlayerId": "21358"
+                }
+              ]
+            },
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "Tristan Wirfs",
+              "eaPlayerId": "20971",
+              "caseKey": "2026-W05-TB-Tristan-Wirfs",
+              "newlyIdentified": true,
+              "team": "TB",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ],
+              "rationale": "Gamebook reports return questionable at 8:32 Q4 and an actual return at 5:26 Q4; questionable is not treated as a return.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Chukwuma and Skule are the two active listed tackle reserves; shares are not reported, so use the approved equal-share committee.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Candidate identity is established but relief shares are unknown; both frozen values are zero and no positional proficiency penalty is invented.",
+              "baselineRationale": "Goedeke and all other starting linemen retain baseline duties; the committee receives only Wirfs additional unavailable duty.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "tb-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Benjamin Chukwuma",
+                  "eaPlayerId": "4713"
+                },
+                {
+                  "player": "Justin Skule",
+                  "eaPlayerId": "20732"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3084,
+                    "startLatest": 3088,
+                    "endEarliest": 3274,
+                    "endLatest": 3274,
+                    "rationale": "The 8:36 Q4 fourth-down play and 8:32 status update bound departure; the 5:26 update records actual return.",
+                    "sourceIds": [
+                      "tb-dal-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the tight play-to-status departure bound and explicit return; do not infer active impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "tb-dal-gamebook"
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "E.Stick",
+              "gamebookPosition": "QB",
+              "gamebookStatus": "DNP",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Unused reserve quarterback; the injury-driven starter replacement is handled separately.",
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ]
+            },
+            {
+              "player": "L.Haggard",
+              "gamebookStatus": "INACTIVE",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive identity absent from the final injury designations and not a continuing injury case; exclude as unused depth, not a zero-valued injury.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            },
+            {
+              "player": "B.Schrauth",
+              "gamebookStatus": "INACTIVE",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive identity absent from the final injury designations and not a continuing injury case; exclude as unused depth, not a zero-valued injury.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            },
+            {
+              "player": "D.Capehart",
+              "gamebookStatus": "INACTIVE",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive identity absent from the final injury designations and not a continuing injury case; exclude as unused depth, not a zero-valued injury.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "participationReviews": [
+            {
+              "player": "TB final game-day unit",
+              "finding": "Every inactive/DNP identity, the complete QB duty, all specialists and the Wirfs questionable/actual-return sequence were reviewed. Active participation is not treated as medical impairment.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            }
+          ],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ],
+              "rationale": "Winfield/Melifonwu and Morrison/Garnes are distinct roles; no replacement is shared and no extra discretionary multiplier is added."
+            }
+          ]
+        },
+        {
+          "team": "DAL",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final gamebook, final injury report, club updates, roster and depth evidence reconcile every DAL inactive/DNP identity, Clark/Revel/Lamb/Barham injury sequences, specialists and all concurrent defensive-back and linebacker roles.",
+          "sourceIds": [
+            "tb-dal-gamebook",
+            "tb-dal-inactives",
+            "tb-dal-injury-report",
+            "dal-updates",
+            "dal-depth",
+            "dal-roster"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Dak Prescott started and handled every recorded Dallas quarterback play; Howell was DNP and no injury-driven relief occurred.",
+            "sourceIds": [
+              "tb-dal-gamebook"
+            ]
+          },
+          "cases": [
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "DeMarvion Overshown",
+              "eaPlayerId": "22997",
+              "caseKey": "2026-W05-DAL-DeMarvion-Overshown",
+              "team": "DAL",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "tb-dal-injury-report"
+              ],
+              "rationale": "Archived injury-driven inactive case; Barham started but was unavailable for the exact 5:26-to-1:16 Q4 interval.",
+              "resolution": "WEIGHTED_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Barham handled the vacancy except during his documented injury interval, with active substitute Shemar James assigned the additional relief duty.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use elapsed documented availability as role units to reconcile the nested relief without a duplicate whole-game Barham loss; elapsed time is not snap share.",
+              "baselineRationale": "Winters and all other linebackers retain baseline roles. Barham and James receive only the additional Overshown vacancy duty for disjoint elapsed intervals.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "roleUnitType": "DOCUMENTED_ROLE_SHARES",
+              "replacements": [
+                {
+                  "player": "Jaishawn Barham",
+                  "eaPlayerId": "16331",
+                  "observedRoleUnits": 3350,
+                  "baselineRoleUnits": 0,
+                  "unitsSourceIds": [
+                    "tb-dal-gamebook"
+                  ]
+                },
+                {
+                  "player": "Shemar James",
+                  "eaPlayerId": "15276",
+                  "observedRoleUnits": 250,
+                  "baselineRoleUnits": 0,
+                  "unitsSourceIds": [
+                    "tb-dal-gamebook"
+                  ]
+                }
+              ]
+            },
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "Cobie Durant",
+              "eaPlayerId": "22278",
+              "caseKey": "2026-W05-DAL-Cobie-Durant",
+              "team": "DAL",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "tb-dal-injury-report"
+              ],
+              "rationale": "Archived injury-driven inactive case.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Carson is the distinct active depth option on the Durant chain.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Assign only Durant additional vacancy duties to Carson.",
+              "baselineRationale": "Bland and the other starting corners retain baseline duties; Carson is not reused for Porter.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Caelen Carson",
+                  "eaPlayerId": "14945"
+                }
+              ]
+            },
+            {
+              "player": "Drew Shelton",
+              "eaPlayerId": "16216",
+              "caseKey": "2026-W05-DAL-Drew-Shelton",
+              "team": "DAL",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "tb-dal-injury-report"
+              ],
+              "rationale": "Archived injury-driven inactive case.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Shelton immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without assigning a missing value."
+            },
+            {
+              "player": "Tyler Smith",
+              "eaPlayerId": "22445",
+              "caseKey": "2026-W05-DAL-Tyler-Smith-RETURN",
+              "team": "DAL",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ],
+              "rationale": "Archived return case; final gamebook lists Smith as the starting left guard and no injury-driven lost duty is reported.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "Joey Porter",
+              "eaPlayerId": "22706",
+              "caseKey": "2026-W05-DAL-Joey-Porter",
+              "team": "DAL",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-inactives",
+                "dal-updates"
+              ],
+              "rationale": "Archived late illness inactive; Revel started but was unavailable from 6:01 Q3 until his actual 15:00 Q4 return.",
+              "resolution": "WEIGHTED_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Revel handled the Porter vacancy except during his exact injury interval, with active same-chain reserve Speed assigned the additional relief duty.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth",
+                "ea-ameer-speed"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use exact elapsed availability as role units to reconcile the nested relief without a duplicate whole-game Revel loss; Speed value is source-bound, not invented.",
+              "baselineRationale": "Bland, Steward and Carson retain distinct baseline or Durant duties. Revel and Speed receive only the additional Porter vacancy duty for disjoint intervals.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "roleUnitType": "DOCUMENTED_ROLE_SHARES",
+              "replacements": [
+                {
+                  "player": "Shavon Revel Jr",
+                  "eaPlayerId": "15282",
+                  "observedRoleUnits": 3239,
+                  "baselineRoleUnits": 0,
+                  "unitsSourceIds": [
+                    "tb-dal-gamebook"
+                  ]
+                },
+                {
+                  "player": "Ameer Speed",
+                  "eaPlayerId": "23272",
+                  "observedRoleUnits": 361,
+                  "baselineRoleUnits": 0,
+                  "unitsSourceIds": [
+                    "tb-dal-gamebook"
+                  ]
+                }
+              ]
+            },
+            {
+              "player": "Alijah Clark",
+              "eaPlayerId": "15355",
+              "caseKey": "2026-W05-DAL-Alijah-Clark",
+              "newlyIdentified": true,
+              "team": "DAL",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "dal-roster"
+              ],
+              "rationale": "Gamebook says return questionable at 6:10 Q2 and later explicitly out at 13:21 Q3; questionable is not treated as a return.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Clark immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without assigning a missing value or ignoring the material absence."
+            },
+            {
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "player": "CeeDee Lamb",
+              "eaPlayerId": "20932",
+              "caseKey": "2026-W05-DAL-CeeDee-Lamb",
+              "newlyIdentified": true,
+              "team": "DAL",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ],
+              "rationale": "Gamebook says return questionable at 8:32 Q4 and records actual return at 6:19 Q4; the earlier 11:32 Q3 target bounds the latest confirmed participation.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "roleRationale": "Flournoy, Turpin and Mingo are the active listed receiver relief candidates; exact shares are unknown.",
+              "roleSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Candidate identity is established but shares are unknown; use the approved equal-share committee without claiming snap allocation.",
+              "baselineRationale": "Pickens and all receiver baseline duties remain credited once; the committee receives only Lamb additional unavailable duty.",
+              "baselineSourceIds": [
+                "tb-dal-gamebook",
+                "dal-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Ryan Flournoy",
+                  "eaPlayerId": "1124"
+                },
+                {
+                  "player": "KaVontae Turpin",
+                  "eaPlayerId": "22599"
+                },
+                {
+                  "player": "Jonathan Mingo",
+                  "eaPlayerId": "22770"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2008,
+                    "startLatest": 3088,
+                    "endEarliest": 3221,
+                    "endLatest": 3221,
+                    "rationale": "Last confirmed Lamb target at 11:32 Q3 and the 8:32 Q4 status update bound departure; the 6:19 Q4 update records actual return.",
+                    "sourceIds": [
+                      "tb-dal-gamebook"
+                    ]
+                  }
+                ],
+                "gameDurationSeconds": 3600,
+                "assumptionRationale": "Use the explicit last-participation/status bound and actual return; do not treat questionable as return or infer active impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "tb-dal-gamebook"
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "S.Howell",
+              "gamebookPosition": "QB",
+              "gamebookStatus": "DNP",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Unused reserve quarterback; Prescott handled all recorded quarterback duty.",
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ]
+            },
+            {
+              "player": "C.Brown",
+              "gamebookStatus": "INACTIVE",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive identity absent from final injury designation and not a continuing injury case; exclude as unused depth, not a zero-valued injury.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            },
+            {
+              "player": "A.Cornelius",
+              "gamebookStatus": "INACTIVE",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive identity absent from final injury designation and not a continuing injury case; exclude as unused depth, not a zero-valued injury.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            },
+            {
+              "player": "J.Houston",
+              "gamebookStatus": "INACTIVE",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive identity absent from final injury designation and not a continuing injury case; exclude as unused depth, not a zero-valued injury.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "participationReviews": [
+            {
+              "player": "DAL nested relief timelines",
+              "finding": "Revel actual-return and Barham actual-return intervals are incorporated once inside the Porter and Overshown weighted committees; no duplicate whole-game loss is added. Clark questionable was not treated as a return, and Lamb uses the later explicit return.",
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ]
+            },
+            {
+              "player": "DAL final game-day unit",
+              "finding": "Every inactive/DNP identity, both quarterbacks, all specialists and every printed injury/return line were reviewed.",
+              "sourceIds": [
+                "tb-dal-gamebook",
+                "tb-dal-injury-report"
+              ]
+            }
+          ],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ],
+              "rationale": "Durant/Carson and Porter/Revel-Speed are distinct chains; Clark is a calibrated-zero partial case. Baseline starters are retained once and no extra discretionary multiplier is added."
+            },
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "tb-dal-gamebook"
+              ],
+              "rationale": "Shelton is a calibrated-zero inactive and Smith is an active-full return; both material statuses are recorded without a discretionary multiplier."
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "tb-dal-gamebook"
+            ],
+            "rationale": "The two highest-valued expected Dallas receiving options were not simultaneously absent; Lamb is the sole governed partial receiver loss."
+          }
+        }
+      ]
+    }
+  ]
+}
