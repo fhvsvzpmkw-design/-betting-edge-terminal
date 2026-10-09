@@ -8,6 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {individualDelta,clusterMultiplier,playerValue} from './walters-personnel-calibration.mjs';
 import {historicalValueEstimates} from './graham-historical-value-estimates.mjs';
 import {historicalExposure,exposureWeightedLoss} from './graham-historical-exposure.mjs';
+import {historicalQbTimeline} from './graham-historical-qb-timeline.mjs';
 export const WEEKLY_EVIDENCE_FROM='2026-09-20T20:30:00-07:00';
 const list=x=>Array.isArray(x)?x:[], nonempty=x=>typeof x==='string'&&x.trim().length>0;
 const fail=x=>{throw Error(x);};
@@ -88,7 +89,9 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
         sourceCheck(t.sourceIds,g.gameKey);
         const qb=t.qbAvailability;let qbEstimate=null;
         if(!nonempty(qb?.rationale))fail('GOVERNED_QB_GAME_DAY_LOSS_REQUIRED');sourceCheck(qb.sourceIds,g.gameKey);
-        if(qb.state==='HISTORICAL_REPLACEMENT_ESTIMATE'){
+        if(qb.state==='HISTORICAL_REPLACEMENT_TIMELINE_ESTIMATE'){
+          qbEstimate=historicalQbTimeline(qb,{lookup,sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
+        }else if(qb.state==='HISTORICAL_REPLACEMENT_ESTIMATE'){
           if(qb.estimateAcknowledged!==true||qb.lossCause!=='INJURY_UNAVAILABILITY'||!nonempty(qb.baselineRationale)||!nonempty(qb.replacementRationale))fail('QB_REPLACEMENT_DECLARATION_REQUIRED');
           sourceCheck(qb.baselineSourceIds,g.gameKey);sourceCheck(qb.replacementSourceIds,g.gameKey);
           const healthy=list(qb.healthyCandidates).map(p=>lookup(p.player,p.eaPlayerId,true));
@@ -127,7 +130,8 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             // Bound an additional vacancy when all documented healthy reserves
             // already cover distinct simultaneous roles. No missing value is zero.
             if(bundle.estimationPolicy!=='graham-historical-value-estimates-v1'||c.modelId!=='graham-capacity-limited-loss-v1'||c.estimateAcknowledged!==true||c.baselineDoubleCountReviewed!==true||!nonempty(c.assumptionRationale)||!nonempty(c.capacityRationale)||!['OUT','IR','PARTIAL_GAME'].includes(c.availabilityStatus))fail('CAPACITY_LOSS_DECLARATION_REQUIRED');
-            if(p.valueStatus!=='CALIBRATED'||c.capacityInventoryComplete!==true)fail('CAPACITY_CALIBRATED_BASELINE_AND_COMPLETE_INVENTORY_REQUIRED');
+            const supportedBaseline=p.valueStatus==='CALIBRATED'||(p.valueStatus==='HISTORICAL_ESTIMATE'&&p.valueProvenance?.type==='INDEPENDENT_MADDEN_27');
+            if(!supportedBaseline||c.capacityInventoryComplete!==true)fail('CAPACITY_SOURCE_BOUND_BASELINE_AND_COMPLETE_INVENTORY_REQUIRED');
             sourceCheck(c.capacitySourceIds,g.gameKey);
             const candidates=list(c.availableCandidatesReviewed).map(r=>lookup(r.player,r.eaPlayerId));
             if(!candidates.length||new Set(candidates.map(r=>String(r.eaPlayerId))).size!==candidates.length||candidates.some(r=>group(r.position)!==group(p.position)||String(r.eaPlayerId)===String(p.eaPlayerId)))fail('CAPACITY_CANDIDATE_REVIEW_REQUIRED');
@@ -250,13 +254,21 @@ export function loadWeeklyEvidence(root,binding,expected){
   }
   return evaluateWeeklyEvidence({bundle,...inputs,supplementalPlayers});
 }
+export function createWeeklyEvidenceVerifier(root,input){
+  // One immutable evidence bundle can contain the entire slate. Validate its
+  // Git bindings once per audit, while checking each submitted total every time.
+  const cache=new Map(),expected={season:input.season,sourceWeek:input.sourceWeek,effectiveAt:input.effectiveAt};
+  return game=>{
+    const binding=game.gameDayEvidence?.evidenceBinding,key=JSON.stringify([binding?.path,binding?.blobSha]);
+    if(!cache.has(key))cache.set(key,loadWeeklyEvidence(root,binding,expected));
+    const resolved=cache.get(key).games.find(g=>g.gameKey===game.gameKey);
+    if(resolved?.state!=='READY')fail('HISTORICAL_GAME_INPUTS_NOT_READY:'+game.gameKey);
+    for(const team of game.teams){const evidence=resolved.teams.find(t=>t.team===team.team);if(!evidence||evidence.injuryLoss!==team.teamInjuryLoss)fail('HISTORICAL_INJURY_TOTAL_MISMATCH:'+team.team);}
+    return resolved;
+  };
+}
 export function verifyWeeklyGameEvidence(root,input,game){
-  const binding=game.gameDayEvidence?.evidenceBinding;
-  const result=loadWeeklyEvidence(root,binding,{season:input.season,sourceWeek:input.sourceWeek,effectiveAt:input.effectiveAt});
-  const resolved=result.games.find(g=>g.gameKey===game.gameKey);
-  if(resolved?.state!=='READY')fail('HISTORICAL_GAME_INPUTS_NOT_READY:'+game.gameKey);
-  for(const team of game.teams){const evidence=resolved.teams.find(t=>t.team===team.team);if(!evidence||evidence.injuryLoss!==team.teamInjuryLoss)fail('HISTORICAL_INJURY_TOTAL_MISMATCH:'+team.team);}
-  return resolved;
+  return createWeeklyEvidenceVerifier(root,input)(game);
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   try{const file=process.argv[2];if(!file)fail('Usage: node tools/graham-weekly-evidence.mjs EVIDENCE_JSON');const bytes=fs.readFileSync(file),bundle=JSON.parse(bytes);console.log(JSON.stringify(loadWeeklyEvidence(process.cwd(),{path:file,blobSha:gitBlob(bytes)},{season:bundle.season,sourceWeek:bundle.sourceWeek,effectiveAt:bundle.recordedAt}),null,2));}catch(e){console.error(e.message);process.exitCode=1;}

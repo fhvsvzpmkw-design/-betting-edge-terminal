@@ -1,7 +1,7 @@
 import './test-graham-historical-value-estimates.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {evaluateWeeklyEvidence,loadWeeklyEvidence,gitBlob,boundJson,verifyWeeklyGameEvidence} from './graham-weekly-evidence.mjs';
+import {evaluateWeeklyEvidence,loadWeeklyEvidence,gitBlob,boundJson,verifyWeeklyGameEvidence,createWeeklyEvidenceVerifier} from './graham-weekly-evidence.mjs';
 const read=p=>JSON.parse(fs.readFileSync(p));
 const calibration=read('data/walters/nfl/personnel-calibration-v1.json');
 const registry=read('data/walters/nfl/player-values/player-values-2026-v1.json');
@@ -33,6 +33,11 @@ check('missing baseline review rejected',()=>blocked(f=>f.bundle.games[0].teams[
 check('unrelated source cannot prove game',()=>{const f=structuredClone(fixture);f.bundle.sources[0].gameKeys=['other'];assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');});
 check('reversed game identity rejected',()=>{const f=structuredClone(fixture);f.bundle.games[0].away='NYG';assert.throws(()=>evaluateWeeklyEvidence(f),/GAME_IDENTITY/);});
 check('forged governed total without binding rejected',()=>assert.throws(()=>verifyWeeklyGameEvidence(process.cwd(),{season:2026,sourceWeek:1,effectiveAt:'2026-09-21T04:00:00Z'},{gameKey,teams:[],gameDayEvidence:{teams:[{team:'DAL',state:'GOVERNED',injuryLoss:0}]}}),/EVIDENCE_PATH/));
+check('audit-local evidence reuse still rejects altered totals and blob bindings',()=>{
+ const path='data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-jax-cin-complete-reconciliation.json',bytes=fs.readFileSync(path),bundle=JSON.parse(bytes),binding={path,blobSha:gitBlob(bytes)},input={season:2026,sourceWeek:4,effectiveAt:bundle.recordedAt};
+ const verified=loadWeeklyEvidence(process.cwd(),binding,input).games[0],game={gameKey:verified.gameKey,teams:verified.teams.map(t=>({team:t.team,teamInjuryLoss:t.injuryLoss})),gameDayEvidence:{evidenceBinding:binding}},verify=createWeeklyEvidenceVerifier(process.cwd(),input);
+ assert.equal(verify(game).state,'READY');assert.equal(verify(game).state,'READY');game.teams[0].teamInjuryLoss+=.1;assert.throws(()=>verify(game),/TOTAL_MISMATCH/);game.teams[0].teamInjuryLoss-=.1;game.gameDayEvidence.evidenceBinding={path,blobSha:'0'.repeat(40)};assert.throws(()=>verify(game),/BLOB_MISMATCH/);
+});
 check('exact archived audit replays and keeps ten explicit blockers',()=>{
  const path='data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-recovery-audit.json';const bytes=fs.readFileSync(path);const b=JSON.parse(bytes);
  const out=loadWeeklyEvidence(process.cwd(),{path,blobSha:gitBlob(bytes)},{season:2026,sourceWeek:1,effectiveAt:b.recordedAt});assert.equal(out.readyGames,0);assert.equal(out.blockedGames,10);
@@ -117,6 +122,12 @@ check('capacity midpoint is weighted only by explicitly declared historical expo
  const f=capacityFixture(),c=f.bundle.games[0].teams[0].cases[0];c.availabilityStatus='PARTIAL_GAME';
  c.exposure={modelId:'graham-historical-time-exposure-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic second-half absence',activeEffectivenessConvention:'NORMAL_WHILE_ACTIVE_ESTIMATE',gameDurationSeconds:3600,durationSourceIds:sourceIds,unavailableIntervals:[{startEarliest:1800,startLatest:1800,endEarliest:3600,endLatest:3600,rationale:'Synthetic documented interval',sourceIds}]};
  const m=evaluateWeeklyEvidence(f).games[0].teams[0].cases[0].modelEstimate;assert.equal(m.injuryLoss,.3);assert.deepEqual(m.injuryLossRange,[0,.6]);
+});
+check('capacity accepts a source-bound independent baseline and rejects a cohort imputation',()=>{
+ const f=capacityFixture(),row={player:'Synthetic reserve guard',identity:'estimate:synthetic-reserve-guard',position:'LG',method:'INDEPENDENT_MADDEN_27',maddenOvr:72,ratingVersion:'MADDEN_NFL_27',provider:'Synthetic independent fixture',estimateAcknowledged:true,rationale:'Synthetic source-bound historical baseline',gameKeys:[gameKey],sourceIds,roleSourceIds:sourceIds};
+ f.bundle.valueEstimates=[row];Object.assign(f.bundle.games[0].teams[0].cases[0],{player:row.player,eaPlayerId:row.identity});
+ const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].cases[0].modelEstimate.injuryLoss,.1);assert.equal(g.teams[0].cases[0].valueProvenance.type,'INDEPENDENT_MADDEN_27');
+ Object.assign(row,{method:'POSITION_GROUP_MEDIAN',officialAndIndependentSearchCompleted:true,searchFinding:'Synthetic absent rating'});assert.equal(evaluateWeeklyEvidence(f).games[0].state,'BLOCKED');
 });
 check('capacity estimate rejects available reserves, missing identity and incomplete acknowledgment',()=>{
  for(const change of [f=>f.bundle.games[0].teams[0].cases.pop(),f=>f.bundle.games[0].teams[0].cases[0].availableCandidatesReviewed=[{player:'Unknown reserve'}],f=>delete f.bundle.games[0].teams[0].cases[0].estimateAcknowledged,f=>delete f.bundle.games[0].teams[0].cases[0].capacityInventoryComplete]){

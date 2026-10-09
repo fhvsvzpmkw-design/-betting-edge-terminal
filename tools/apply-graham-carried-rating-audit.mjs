@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import {verifyWeeklyGameEvidence,WEEKLY_EVIDENCE_FROM} from './graham-weekly-evidence.mjs';
+import {createHash} from 'node:crypto';
+import {createWeeklyEvidenceVerifier,WEEKLY_EVIDENCE_FROM} from './graham-weekly-evidence.mjs';
 import {resolveGrahamActiveWeek,grahamWeekPaths} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
 
@@ -42,7 +43,34 @@ function weeklyCalculation(t){
   const newRating=exactSum(exactProduct('0.9',t.oldRating),exactProduct('0.1',tgpl));
   return {tgpl,newRating,delta:exactSum(newRating,-Number(t.oldRating))};
 }
+const eventDigest=e=>createHash('sha256').update(JSON.stringify(e)).digest('hex');
+// A delayed immediately preceding weekly transaction is a chronological
+// dependency, not permission to discard unrelated carried-rating changes.
+function latePriorWeekHandoff(g,ledgerTeams,byTeam,input,observed,kickoff){
+  const handoff=g.chronologicalHandoff;
+  if(handoff?.mode!=='LATE_PRIOR_WEEK_HANDOFF_V1'||handoff.estimateAcknowledged!==true||!handoff.rationale?.trim()||handoff.teams?.length!==2)fail('INTERVENING_CARRIED_RATING_UPDATE_REQUIRES_RECONCILIATION');
+  const events=ledgerTeams.map((team,i)=>{
+    const post=(team.history||[]).filter(e=>Date.parse(e.effectiveAt)>kickoff);
+    const e=post[0],binding=handoff.teams.find(b=>b.team===team.abbr);
+    if(post.length!==1||!e||e.type!=='WALTERS_WEEKLY_90_10'||e.season!==input.season||e.sourceWeek!==input.sourceWeek-1||e.targetWeek!==input.sourceWeek||e.toRating!==team.currentRating||e.fromRating!==observed[i]||Date.parse(e.effectiveAt)>=Date.parse(input.effectiveAt)||!e.gameDayEvidenceBinding||binding?.observedKickoffRating!==observed[i]||binding?.eventSha256!==eventDigest(e))fail('LATE_PRIOR_WEEK_HANDOFF_INELIGIBLE:'+team.abbr);
+    const opp=byTeam.get(e.opponent),paired=(opp?.history||[]).filter(p=>p.type===e.type&&p.season===e.season&&p.sourceWeek===e.sourceWeek&&p.targetWeek===e.targetWeek&&p.gameKey===e.gameKey);
+    if(paired.length!==1||binding.pairedEventSha256!==eventDigest(paired[0]))fail('LATE_PRIOR_WEEK_PAIR_BINDING:'+team.abbr);
+    const p=paired[0];
+    if(p.opponent!==team.abbr||p.auditId!==e.auditId||p.effectiveAt!==e.effectiveAt)fail('LATE_PRIOR_WEEK_PAIR_IDENTITY:'+team.abbr);
+    const ts=[e,p].map(ev=>{
+      if(ev.marketViewed!==false||!['BW-R016','BW-R017','BW-R018'].every(id=>ev.formulaIds?.includes(id))||!ev.sourceRefs?.length||!ev.gameDayEvidenceBinding)fail('LATE_PRIOR_WEEK_PAIR_AUTHORITY');
+      const t={oldRating:ev.fromRating,...ev.tgplInputs},c=weeklyCalculation(t);
+      if(ev.tgpl!==c.tgpl||ev.toRating!==c.newRating||ev.delta!==c.delta)fail('LATE_PRIOR_WEEK_PAIR_ARITHMETIC');
+      return t;
+    });
+    const [a,b]=ts;
+    if(a.oldRating!==b.opponentOldRating||b.oldRating!==a.opponentOldRating||a.scoreMargin!==-b.scoreMargin||a.teamInjuryLoss!==b.opponentInjuryLoss||b.teamInjuryLoss!==a.opponentInjuryLoss||a.teamLocationAdvantage!==-b.teamLocationAdvantage)fail('LATE_PRIOR_WEEK_PAIR_SNAPSHOT');
+    return e;
+  });
+  return {ratings:events.map(e=>e.toRating),provenance:{...structuredClone(handoff),publicationTiming:'FORWARD_RECOVERY_AFTER_GAME; NOT_AVAILABLE_AT_KICKOFF',observedKickoffRatings:ledgerTeams.map((t,i)=>({team:t.abbr,rating:observed[i]})),logicalPriorWeekRatings:ledgerTeams.map((t,i)=>({team:t.abbr,rating:events[i].toRating})),priorWeekEvents:events.map(e=>({gameKey:e.gameKey,sequence:e.sequence,auditId:e.auditId,effectiveAt:e.effectiveAt,eventSha256:eventDigest(e)}))}};
+}
 function weeklyUpdate(input,power,active,prior){
+  const verifyGameEvidence=createWeeklyEvidenceVerifier(ROOT,input);
   const formulas=['BW-R016','BW-R017','BW-R018'];
   if(input.season!==active.season||input.targetWeek!==active.week||input.sourceWeek!==active.week-1||active.week<2)fail('WEEKLY_WEEK_MISMATCH');
   if(!formulas.every(x=>input.formulaIds?.includes(x)))fail('FORMULA_IDS_INVALID');
@@ -93,11 +121,13 @@ function weeklyUpdate(input,power,active,prior){
         const b=g||oldBlocked.get(p.gameKey);
         blockedGames.push({gameKey:p.gameKey,away:p.away,home:p.home,reasons:b?.reasons?.length?b.reasons:['REQUIRED_GAME_DAY_INPUTS_NOT_SUBMITTED'],sourceRefs:unique(b?.sourceRefs||[])});continue;
       }
-      const verifiedGame=Date.parse(input.effectiveAt)>=Date.parse(WEEKLY_EVIDENCE_FROM)?verifyWeeklyGameEvidence(ROOT,input,g):null;
+      const verifiedGame=Date.parse(input.effectiveAt)>=Date.parse(WEEKLY_EVIDENCE_FROM)?verifyGameEvidence(g):null;
       const kickoff=Date.parse(p.startTimePacific);
       if(!Number.isFinite(kickoff)||kickoff>=Date.parse(input.effectiveAt))fail('PREGAME_KICKOFF_UNVERIFIED');
-      const old=ledgerTeams.map(t=>frozen(t,kickoff));
-      if(ledgerTeams.some((t,i)=>Number(t.currentRating)!==old[i]||(t.history||[]).some(e=>Date.parse(e.effectiveAt)>kickoff)))fail('INTERVENING_CARRIED_RATING_UPDATE_REQUIRES_RECONCILIATION');
+      const observed=ledgerTeams.map(t=>frozen(t,kickoff));
+      const intervening=ledgerTeams.some((t,i)=>Number(t.currentRating)!==observed[i]||(t.history||[]).some(e=>Date.parse(e.effectiveAt)>kickoff));
+      const handoff=intervening?latePriorWeekHandoff(g,ledgerTeams,byTeam,input,observed,kickoff):null;
+      const old=handoff?.ratings||observed;
       if(!Array.isArray(g.teams)||g.teams.length!==2||new Set(g.teams.map(t=>t.team)).size!==2)fail('READY_TEAMS_INVALID');
       const evidence=g.gameDayEvidence;
       if(evidence?.season!==active.season||evidence.sourceWeek!==input.sourceWeek||evidence.gameKey!==p.gameKey||evidence.coverage!=='FINAL_GAME_DAY'||evidence.marketViewed!==false||!evidence.sourceRefs?.length)fail('GOVERNED_GAME_DAY_EVIDENCE_REQUIRED');
@@ -118,7 +148,8 @@ function weeklyUpdate(input,power,active,prior){
         const team=u.ledgerTeam,t=u.t,sourceRefs=unique([...(t.sourceRefs||[]),...(g.sourceRefs||[]),...evidence.sourceRefs,...evidence.teams.find(e=>e.team===t.team).sourceRefs,...completion.sourceRefs]);
         const e={sequence:(team.history||[]).length?Math.max(...team.history.map(e=>Number(e.sequence)||0))+1:0,type:'WALTERS_WEEKLY_90_10',auditId:input.auditId,fromRating:t.oldRating,priorRating:t.oldRating,delta:u.delta,toRating:u.newRating,currentRating:u.newRating,effectiveAt:input.effectiveAt,reason:`Walters weekly arithmetic with evidence-bound injury inputs from ${p.gameKey}: TGPL ${u.tgpl}; 90% frozen pregame rating plus 10% TGPL.`,season:active.season,sourceWeek:input.sourceWeek,targetWeek:input.targetWeek,gameKey:p.gameKey,opponent:t.opponent,kickoff:p.startTimePacific,tgplInputs:{scoreMargin:t.scoreMargin,opponentOldRating:t.opponentOldRating,teamInjuryLoss:t.teamInjuryLoss,opponentInjuryLoss:t.opponentInjuryLoss,teamLocationAdvantage:t.teamLocationAdvantage},tgpl:u.tgpl,formulaIds:formulas,sourceRefs,marketViewed:false};
         if(evidence.evidenceBinding)e.gameDayEvidenceBinding=structuredClone(evidence.evidenceBinding);
-        if(verifiedGame?.teams.some(t=>t.cases.some(c=>c.modelEstimate)))e.gameDayModelEstimates=verifiedGame.teams.map(t=>({team:t.team,estimates:t.cases.filter(c=>c.modelEstimate).map(c=>({caseKey:c.caseKey,...c.modelEstimate}))}));
+        if(handoff){e.chronologicalHandoff=handoff.provenance;e.reason=`Walters weekly arithmetic from ${p.gameKey}: TGPL ${u.tgpl}; 90% logical prior-week rating plus 10% TGPL. Forward recovery reconciles the explicitly bound late prior-week transaction; observed kickoff ratings and original history are preserved.`;}
+        if(verifiedGame?.teams.some(t=>t.qbEstimate||t.cases.some(c=>c.modelEstimate)))e.gameDayModelEstimates=verifiedGame.teams.map(t=>({team:t.team,estimates:t.cases.filter(c=>c.modelEstimate).map(c=>({caseKey:c.caseKey,...c.modelEstimate})),...(t.qbEstimate?{qbEstimate:t.qbEstimate}:{})}));
         team.priorRating=t.oldRating;team.currentRating=u.newRating;team.lastDelta=u.delta;team.lastUpdatedAt=input.effectiveAt;team.lastUpdateType='WALTERS_WEEKLY_90_10';team.sourceRefs=unique([...(team.sourceRefs||[]),...sourceRefs]);team.history=[...(team.history||[]),e];
         ratingChanges.push({team:t.team,gameKey:p.gameKey,priorRating:t.oldRating,tgpl:u.tgpl,delta:u.delta,currentRating:u.newRating,tgplInputs:e.tgplInputs,sourceRefs});
       }
@@ -164,6 +195,29 @@ if(process.argv[2]==='--self-test'){
   test('complete replay preserves all team fields',()=>{const x=fixture();run(x);const before=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'test-2',resume:true,games:[]};assert.equal(run(x).ratingChanges.length,0);assert.equal(JSON.stringify(x.power.teams),before);});
   test('prior history survives recovery receipt',()=>{const x=fixture();run(x);x.input={...x.input,auditId:'test-2',resume:true,games:[]};run(x);assert.equal(x.power.weekly90_10.attempts.length,2);});
   test('intervening carried rating fails only affected game',()=>{const x=fixture();x.power.teams[0].currentRating=11;x.power.teams[0].history.push({type:'DURABLE',sequence:1,toRating:11,effectiveAt:'2026-09-15T08:00:00-07:00'});const r=run(x);assert.equal(r.ratingChanges.length,2);assert.match(r.blockedGames[0].reasons[0],/INTERVENING/);assert.equal(x.power.teams[0].currentRating,11);});
+  const delayedFixture=()=>{
+    const x=fixture();x.active.week=3;x.prior.week=2;x.input.sourceWeek=2;x.input.targetWeek=3;x.input.priorWeekCompletion.week=2;x.input.effectiveAt='2026-09-17T10:00:00-07:00';
+    x.prior.games.forEach((p,i)=>{const key=`2026-W02-${p.away}-${p.home}`;p.gameKey=key;p.startTimePacific='2026-09-16T10:00:00-07:00';x.input.games[i].gameKey=key;x.input.games[i].gameDayEvidence.gameKey=key;x.input.games[i].gameDayEvidence.sourceWeek=2;x.input.games[i].gameDayEvidence.teams.forEach(t=>t.sourceRefs=['data/walters/nfl/2026/week-02-personnel-ledger.json']);x.input.priorWeekCompletion.finals[i].gameKey=key;});
+    for(const g of x.input.games){
+      const es=[g.away,g.home].map((abbr,i)=>{
+        const t={oldRating:10,opponentOldRating:10,scoreMargin:i?-4:4,teamInjuryLoss:0,opponentInjuryLoss:0,teamLocationAdvantage:0},c=weeklyCalculation(t);
+        const e={sequence:1,type:'WALTERS_WEEKLY_90_10',season:2026,sourceWeek:1,targetWeek:2,gameKey:`2026-W01-${g.away}-${g.home}`,opponent:i?g.away:g.home,auditId:'late-prior',effectiveAt:'2026-09-16T11:00:00-07:00',fromRating:10,toRating:c.newRating,tgpl:c.tgpl,delta:c.delta,tgplInputs:t,formulaIds:x.input.formulaIds,marketViewed:false,sourceRefs:['bound-prior-source'],gameDayEvidenceBinding:{path:'prior-bound-evidence',blobSha:'a'.repeat(40)}};
+        const team=x.power.teams.find(t=>t.abbr===abbr);team.currentRating=e.toRating;team.history.push(e);return e;
+      });
+      g.chronologicalHandoff={mode:'LATE_PRIOR_WEEK_HANDOFF_V1',estimateAcknowledged:true,rationale:'Explicit forward chronological recovery of the sole delayed preceding weekly transaction.',teams:[g.away,g.home].map((team,i)=>({team,observedKickoffRating:10,eventSha256:eventDigest(es[i]),pairedEventSha256:eventDigest(es[1-i])}))};
+      g.teams.forEach((t,i)=>{t.oldRating=es[i].toRating;t.opponentOldRating=es[1-i].toRating;});
+    }
+    return x;
+  };
+  test('bound delayed preceding weekly pair is applied once without rewriting history',()=>{const x=delayedFixture(),before=x.power.teams.map(t=>structuredClone(t.history)),r=run(x);assert.equal(r.state,'COMPLETE');assert.equal(r.ratingChanges.length,4);x.power.teams.forEach((t,i)=>assert.deepEqual(t.history.slice(0,before[i].length),before[i]));assert.equal(x.power.teams[0].currentRating,11.2282);assert.equal(x.power.teams[0].history.at(-1).chronologicalHandoff.observedKickoffRatings[0].rating,10);const applied=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'replay',resume:true,games:[]};assert.equal(run(x).ratingChanges.length,0);assert.equal(JSON.stringify(x.power.teams),applied);});
+  for(const [label,change] of [
+    ['manual transaction',x=>x.power.teams[0].history.at(-1).type='DURABLE'],
+    ['wrong prior week',x=>x.power.teams[0].history.at(-1).sourceWeek=0],
+    ['extra transaction',x=>x.power.teams[0].history.push({...x.power.teams[0].history.at(-1),sequence:2})],
+    ['changed prior event',x=>x.power.teams[0].history.at(-1).tgpl=999],
+    ['changed counterparty event',x=>x.power.teams[1].history.at(-1).delta=999],
+    ['unbound handoff',x=>delete x.input.games[0].chronologicalHandoff]
+  ])test(`delayed handoff rejects ${label} without a one-sided write`,()=>{const x=delayedFixture();change(x);const before=JSON.stringify(x.power.teams.slice(0,2)),r=run(x);assert.equal(r.blockedGames.length,1);assert.equal(JSON.stringify(x.power.teams.slice(0,2)),before);});
   test('one-sided history never double-updates opponent',()=>{const x=fixture();run(x);x.power.teams[0].history.pop();const before=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'test-2',resume:true,games:[]};const r=run(x);assert.match(r.blockedGames[0].reasons[0],/ONE_SIDED/);assert.equal(JSON.stringify(x.power.teams),before);});
   test('invalid game identity rejected',()=>{const x=fixture();x.input.games[0].away='Z';assert.throws(()=>run(x),/INVALID_OR_DUPLICATE_GAME/);});
   test('incomplete prior week rejected',()=>{const x=fixture();x.input.priorWeekCompletion.finals[0].state='PENDING';assert.throws(()=>run(x),/FINAL_IDENTITY_UNVERIFIED/);});

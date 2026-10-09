@@ -12,6 +12,8 @@ on:
       - tools/graham-historical-value-estimates.mjs
       - tools/test-graham-historical-value-estimates.mjs
       - tools/graham-historical-exposure.mjs
+      - tools/graham-historical-qb-timeline.mjs
+      - tools/test-graham-historical-qb-timeline.mjs
       - tools/test-graham-historical-exposure.mjs
       - tools/graham-weekly-evidence.mjs
       - tools/graham-replacement-model.mjs
@@ -56,6 +58,7 @@ jobs:
           node tools/apply-graham-carried-rating-audit.mjs --self-test
           node tools/test-graham-weekly-evidence.mjs
           node tools/test-graham-replacement-model.mjs
+          node tools/test-graham-historical-qb-timeline.mjs
   apply:
     if: github.event_name != 'pull_request'
     needs: validate
