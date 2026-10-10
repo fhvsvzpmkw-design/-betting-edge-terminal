@@ -6,6 +6,7 @@ import {execFileSync} from 'node:child_process';
 import {runPipeline,CANDIDATE_GATES} from '../tools/report-pipeline.mjs';
 import {extractStagedReport,validateStagedBundle,blobSha} from '../tools/extract-staged-report.mjs';
 import {runCommand} from '../tools/report-run.mjs';
+import {parseReportDocument,serializeReportDocument} from '../tools/report-document-transport.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'pipeline-test-'));
 const write=(p,v)=>{fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,JSON.stringify(v,null,2)+'\n');};
 try{
@@ -51,13 +52,14 @@ try{
   runCommand({root:temp,checkpoint:timeCheckpoint,command:'start',report:r,sidecar:s});
   const advanced=runCommand({root:temp,checkpoint:timeCheckpoint,command:'retime',expectedRevision:1,at:'2026-09-27T15:18:00-07:00'});
   assert.equal(advanced.run.ts,'2026-09-27T15:18:00-07:00');assert.equal(advanced.phase,'DRAFT');
-  const saved=JSON.parse(fs.readFileSync(path.join(temp,timeCheckpoint)));
+  const saved=parseReportDocument(fs.readFileSync(path.join(temp,timeCheckpoint)),'REPORT_CHECKPOINT');
   assert.equal(saved.report.feedGeneratedAt,report.feedGeneratedAt,'retime cannot restamp source feed');
   assert.deepEqual(saved.report.recs,report.recs);
   assert.throws(()=>runCommand({root:temp,checkpoint:timeCheckpoint,command:'retime',expectedRevision:2,at:report.ts}),/advance/);
 
   // A prepared checkpoint fixture isolates the state machine from analytical fixtures.
-  const state=JSON.parse(fs.readFileSync(path.join(temp,checkpoint)));state.phase='PREPARED';write(path.join(temp,checkpoint),state);
+  const state=parseReportDocument(fs.readFileSync(path.join(temp,checkpoint)),'REPORT_CHECKPOINT');state.phase='PREPARED';
+  fs.writeFileSync(path.join(temp,checkpoint),serializeReportDocument(state,'REPORT_CHECKPOINT'));
   const passing=()=>({state:'PASS',receipts:[{gate:'test',state:'PASS'}]});
   assert.throws(()=>runCommand({...base,command:'freeze',expectedRevision:1,pipeline:()=>{throw new Error('not qualified');}}),/not qualified/);
   assert.equal(runCommand({...base,command:'status'}).phase,'PREPARED');
@@ -67,7 +69,8 @@ try{
   const stage=path.join(temp,'data/history/staging/report-bundle.json');const frozen=fs.readFileSync(stage);
   assert.equal(blobSha(frozen),out.frozen.blobSha);
   runCommand({...base,command:'stage',expectedRevision:3,pipeline:passing});assert.deepEqual(fs.readFileSync(stage),frozen,'retry uses identical bytes');
-  const tampered=JSON.parse(fs.readFileSync(path.join(temp,checkpoint)));tampered.report.bankroll=200;write(path.join(temp,checkpoint),tampered);
+  const tampered=parseReportDocument(fs.readFileSync(path.join(temp,checkpoint)),'REPORT_CHECKPOINT');tampered.report.bankroll=200;
+  fs.writeFileSync(path.join(temp,checkpoint),serializeReportDocument(tampered,'REPORT_CHECKPOINT'));
   assert.throws(()=>runCommand({...base,command:'stage',expectedRevision:4,pipeline:passing}),/Frozen candidate bytes changed/);
   assert.throws(()=>runCommand({...base,checkpoint:'data/history/runs/evil.json',command:'start',report:r,sidecar:s}),/Checkpoint must/);
   const utcCheckpoint='data/report-production/checkpoints/utc-time.json';
@@ -75,7 +78,7 @@ try{
   write(r,utcReport);write(s,utcSidecar);
   runCommand({root:temp,checkpoint:utcCheckpoint,command:'start',report:r,sidecar:s});
   assert.equal(runCommand({root:temp,checkpoint:utcCheckpoint,command:'retime',expectedRevision:1,at:'2026-09-27T22:18:00Z'}).phase,'DRAFT');
-  const bundle=JSON.parse(frozen);validateStagedBundle(bundle,{root:temp});
+  const bundle=parseReportDocument(frozen,'STAGED_REPORT');validateStagedBundle(bundle,{root:temp});
   assert.throws(()=>validateStagedBundle({...bundle,candidateId:'wrong'},{root:temp}),/candidateId/);
   const git=args=>execFileSync('git',args,{cwd:temp,encoding:'utf8'}).trim();
   git(['init','-q']);git(['config','user.name','Test']);git(['config','user.email','test@example.invalid']);git(['add','.']);git(['commit','-qm','candidate A']);const first=git(['rev-parse','HEAD']);
