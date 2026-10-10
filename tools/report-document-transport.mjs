@@ -5,7 +5,7 @@ import {gzipSync,gunzipSync} from 'node:zlib';
 import {isDeepStrictEqual} from 'node:util';
 
 export const TRANSPORT_FORMAT='BETTING_EDGE_GZIP_JSON_V1';
-export const MAX_DOCUMENT_BYTES=64*1024*1024;
+export const MAX_DOCUMENT_BYTES=256*1024*1024;
 export const COMPRESSION_THRESHOLD=256*1024;
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
