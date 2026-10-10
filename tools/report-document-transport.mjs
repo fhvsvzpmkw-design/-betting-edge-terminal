@@ -12,20 +12,20 @@ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 
 export function serializeReportDocument(value,documentType){
   if(!['REPORT_CHECKPOINT','STAGED_REPORT'].includes(documentType))throw Error('Unknown report document type');
-  let bytes=Buffer.from(json(value));
-  if(bytes.length>MAX_DOCUMENT_BYTES)throw Error('Report document exceeds the supported decoded size');
-  if(bytes.length<COMPRESSION_THRESHOLD)return bytes.toString('utf8');
   // A frozen checkpoint already contains the exact sealed report and sidecar.
   // Store that single authoritative copy and restore the ordinary in-memory
   // checkpoint on read, rather than duplicating the whole candidate again.
+  let wire=value;
   if(documentType==='REPORT_CHECKPOINT'&&value.frozen?.serializedBundle &&
     ['FROZEN','STAGED','PUBLISHED'].includes(value.phase)){
     const bundle=parseReportDocument(value.frozen.serializedBundle,'STAGED_REPORT');
     if(isDeepStrictEqual(bundle.report,value.report)&&isDeepStrictEqual(bundle.sidecar,value.sidecar)){
-      const wire={...value,draftFromFrozenBundle:true};delete wire.report;delete wire.sidecar;
-      bytes=Buffer.from(json(wire));
+      wire={...value,draftFromFrozenBundle:true};delete wire.report;delete wire.sidecar;
     }
   }
+  let bytes=Buffer.from(json(wire));
+  if(bytes.length>MAX_DOCUMENT_BYTES)throw Error('Report document exceeds the supported decoded size');
+  if(bytes.length<COMPRESSION_THRESHOLD)return bytes.toString('utf8');
   const packed=json({schema:1,format:TRANSPORT_FORMAT,documentType,encoding:'gzip-base64',
     decodedBytes:bytes.length,sha256:hash(bytes),data:gzipSync(bytes,{level:9}).toString('base64')});
   return Buffer.byteLength(packed)<bytes.length?packed:bytes.toString('utf8');
