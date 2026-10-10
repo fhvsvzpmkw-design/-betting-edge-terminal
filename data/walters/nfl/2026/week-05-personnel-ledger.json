@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-09T17:08:00-07:00",
+  "updatedAt": "2026-10-09T17:01:30-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -33,7 +33,8 @@
     "graham-daily-review-2026-w05-20261009T112709-0700-personnel",
     "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-london",
     "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-late",
-    "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min"
+    "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min",
+    "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction"
   ],
   "events": [
     {
@@ -5756,6 +5757,271 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Jackson returns, Huber becomes unavailable, or Minnesota changes the announced left-side line pairing."
       }
+    },
+    {
+      "caseKey": "2026-W05-MIN-Christian-Darrisaw",
+      "gameKey": "2026-W05-MIN-NO",
+      "team": "MIN",
+      "side": "AWAY",
+      "player": "Christian Darrisaw",
+      "playerEaId": "21534",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction-01",
+      "reason": "Minnesota ruled Darrisaw out and its official game preview states that Ryan Van Demark is up in the new left-tackle/left-guard pairing.",
+      "sourceRefs": [
+        "https://www.vikings.com/news/saints-injury-report-week-5-2026-nfl-season",
+        "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+        "https://www.vikings.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/min.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.vikings.com/news/saints-injury-report-week-5-2026-nfl-season"
+      ],
+      "roleSourceRefs": [
+        "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+        "https://www.vikings.com/team/depth-chart"
+      ],
+      "reopenOn": "Darrisaw becomes available, Van Demark becomes unavailable, or Minnesota changes the announced left-side line pairing.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "NAMED_STARTER",
+        "assumptionRationale": "The official game preview names Ryan Van Demark in the new left-tackle/left-guard pairing after Darrisaw was ruled out.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Ryan Van Demark retains existing baseline duties; only Christian Darrisaw's additional vacated duties are assigned.",
+        "baselineSourceIds": [
+          "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+          "https://www.vikings.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Ryan Van Demark",
+            "eaPlayerId": "22446",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Minnesota explicitly identifies Van Demark as the left tackle in the replacement pairing.",
+            "sourceRefs": [
+              "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+              "https://www.vikings.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "clusterReview": {
+        "method": "REVIEWED_LINEAR_ESTIMATE",
+        "estimateAcknowledged": true,
+        "inventoryComplete": true,
+        "caseKeys": [
+          "2026-W05-MIN-Christian-Darrisaw",
+          "2026-W05-MIN-Donovan-Jackson"
+        ],
+        "sourceRefs": [
+          "https://www.vikings.com/news/saints-injury-report-week-5-2026-nfl-season",
+          "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+          "https://www.vikings.com/team/depth-chart"
+        ],
+        "rationale": "Complete current Minnesota left-side line inventory: Ryan Van Demark receives only Darrisaw's left-tackle duties and Joe Huber receives only Jackson's left-guard duties. The assignments are distinct, preserve baseline duties, and use no unsupported nonlinear penalty."
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Ryan Van Demark"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction",
+      "effectiveAt": "2026-10-09T17:01:30-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "LT",
+      "maddenOvr": 90,
+      "healthyWaltersPoints": 1.7,
+      "rawTeamContributionDelta": -1.7,
+      "clusterGroup": "OFFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+        "healthyValue": 1.7,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 1.7,
+        "rawTeamContributionDelta": -1.7,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1.7,
+          "max": 1.7
+        },
+        "weights": [
+          {
+            "player": "Ryan Van Demark",
+            "eaPlayerId": "22446",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "The official game preview names Ryan Van Demark in the new left-tackle/left-guard pairing after Darrisaw was ruled out.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Darrisaw becomes available, Van Demark becomes unavailable, or Minnesota changes the announced left-side line pairing."
+      }
+    },
+    {
+      "caseKey": "2026-W05-MIN-Donovan-Jackson",
+      "gameKey": "2026-W05-MIN-NO",
+      "team": "MIN",
+      "side": "AWAY",
+      "player": "Donovan Jackson",
+      "playerEaId": "15123",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "personnelEventId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction-02",
+      "reason": "Minnesota placed Jackson on injured reserve and continues to identify Joe Huber as the left guard in the same replacement pairing. This republishes the existing supported loss only to complete the two-case line inventory.",
+      "sourceRefs": [
+        "https://www.vikings.com/news/donovan-jackson-guard-injured-reserve-roster-moves",
+        "https://www.vikings.com/news/kevin-oconnell-updates-donovan-jackson-injury-dolphins",
+        "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+        "https://www.vikings.com/team/depth-chart",
+        "https://www.vikings.com/news/saints-injury-report-week-5-2026-nfl-season",
+        "data/walters/nfl/player-values/by-team-v1/min.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.vikings.com/news/donovan-jackson-guard-injured-reserve-roster-moves"
+      ],
+      "roleSourceRefs": [
+        "https://www.vikings.com/news/kevin-oconnell-updates-donovan-jackson-injury-dolphins",
+        "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+        "https://www.vikings.com/team/depth-chart"
+      ],
+      "reopenOn": "Jackson returns, Huber becomes unavailable, or Minnesota changes the announced left-side line pairing.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "NAMED_STARTER",
+        "assumptionRationale": "Huber's in-game replacement work and the official Week 5 preview identify him as the left guard for Jackson's vacated duties.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Joe Huber retains existing baseline duties; only Donovan Jackson's additional vacated duties are assigned.",
+        "baselineSourceIds": [
+          "https://www.vikings.com/news/kevin-oconnell-updates-donovan-jackson-injury-dolphins",
+          "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+          "https://www.vikings.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Joe Huber",
+            "eaPlayerId": "15135",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Minnesota identifies Huber as the left guard in the replacement pairing after he replaced Jackson in-game.",
+            "sourceRefs": [
+              "https://www.vikings.com/news/kevin-oconnell-updates-donovan-jackson-injury-dolphins",
+              "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+              "https://www.vikings.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "clusterReview": {
+        "method": "REVIEWED_LINEAR_ESTIMATE",
+        "estimateAcknowledged": true,
+        "inventoryComplete": true,
+        "caseKeys": [
+          "2026-W05-MIN-Christian-Darrisaw",
+          "2026-W05-MIN-Donovan-Jackson"
+        ],
+        "sourceRefs": [
+          "https://www.vikings.com/news/saints-injury-report-week-5-2026-nfl-season",
+          "https://www.vikings.com/news/saints-week-5-game-preview-2026",
+          "https://www.vikings.com/team/depth-chart"
+        ],
+        "rationale": "Complete current Minnesota left-side line inventory: Ryan Van Demark receives only Darrisaw's left-tackle duties and Joe Huber receives only Jackson's left-guard duties. The assignments are distinct, preserve baseline duties, and use no unsupported nonlinear penalty."
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Joe Huber"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction",
+      "effectiveAt": "2026-10-09T17:01:30-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "LG",
+      "maddenOvr": 75,
+      "healthyWaltersPoints": 0.2,
+      "rawTeamContributionDelta": -0.2,
+      "clusterGroup": "OFFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+        "healthyValue": 0.2,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 0.2,
+        "rawTeamContributionDelta": -0.2,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.2,
+          "max": 0.2
+        },
+        "weights": [
+          {
+            "player": "Joe Huber",
+            "eaPlayerId": "15135",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Huber's in-game replacement work and the official Week 5 preview identify him as the left guard for Jackson's vacated duties.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Jackson returns, Huber becomes unavailable, or Minnesota changes the announced left-side line pairing."
+      }
     }
   ],
   "currentCases": {
@@ -6147,7 +6413,7 @@
       "playerEaId": "21534",
       "availabilityStatus": "OUT",
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "personnelEventId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-01",
+      "personnelEventId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction-01",
       "reason": "Minnesota ruled Darrisaw out and its official game preview states that Ryan Van Demark is up in the new left-tackle/left-guard pairing.",
       "sourceRefs": [
         "https://www.vikings.com/news/saints-injury-report-week-5-2026-nfl-season",
@@ -6220,8 +6486,8 @@
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
-      "batchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min",
-      "effectiveAt": "2026-10-09T17:08:00-07:00",
+      "batchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction",
+      "effectiveAt": "2026-10-09T17:01:30-07:00",
       "sourceTask": "DELTA_1645",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
@@ -6277,7 +6543,7 @@
       "playerEaId": "15123",
       "availabilityStatus": "IR",
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "personnelEventId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-02",
+      "personnelEventId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction-02",
       "reason": "Minnesota placed Jackson on injured reserve and continues to identify Joe Huber as the left guard in the same replacement pairing. This republishes the existing supported loss only to complete the two-case line inventory.",
       "sourceRefs": [
         "https://www.vikings.com/news/donovan-jackson-guard-injured-reserve-roster-moves",
@@ -6355,8 +6621,8 @@
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "RESOLVED_MODEL_ESTIMATE"
       },
-      "batchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min",
-      "effectiveAt": "2026-10-09T17:08:00-07:00",
+      "batchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction",
+      "effectiveAt": "2026-10-09T17:01:30-07:00",
       "sourceTask": "DELTA_1645",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
@@ -9854,6 +10120,6 @@
       "clusterGroup": "RECEIVER"
     }
   },
-  "lastBatchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min",
+  "lastBatchId": "graham-delta-1645-2026-w05-20261009T164315-0700-personnel-min-clock-correction",
   "lastBatchSourceTask": "DELTA_1645"
 }
