@@ -4,7 +4,7 @@
   "publication": "THE PRIVATE LINE",
   "season": 2026,
   "week": 5,
-  "generatedAt": "2026-10-09T23:56:57.013Z",
+  "generatedAt": "2026-10-10T00:00:36.025Z",
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE",
@@ -1141,12 +1141,89 @@
       "homeRating": 27.130902,
       "neutralBaseHome": -5,
       "espnNeutralHome": -6,
-      "grahamFairHome": -7,
-      "grahamAsOf": "2026-10-09T00:55:58.203Z",
-      "numberStatus": "READY",
-      "grahamMove": -1,
-      "personnelEstimateCases": [],
-      "personnelUnresolvedCases": [],
+      "grahamFairHome": -6.5,
+      "grahamAsOf": "2026-10-09T17:04:00-07:00",
+      "numberStatus": "READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS",
+      "grahamMove": 0.5,
+      "personnelEstimateCases": [
+        {
+          "caseKey": "2026-W05-NE-Mack-Hollins",
+          "player": "Mack Hollins",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "PRIMARY_REPLACEMENT",
+          "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+          "healthyValue": 0.5,
+          "replacementValue": 0,
+          "replacementValueRatio": {
+            "numerator": 0,
+            "denominator": 1
+          },
+          "injuryLoss": 0.5,
+          "rawTeamContributionDelta": -0.5,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 0.5,
+            "max": 0.5
+          },
+          "weights": [
+            {
+              "player": "Efton Chism III",
+              "eaPlayerId": "4663",
+              "lockedValue": 0,
+              "additionalRoleUnits": 1,
+              "weight": 1
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "The official Patriots analysis says Efton Chism III stepped into Hollins' outside-receiver role after the injury and is part of the four-receiver group for Week 5.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+          "reopenOn": "Hollins becomes available, Chism becomes unavailable, or New England publishes a different direct role assignment.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-NE-Karon-Prunty",
+          "player": "Karon Prunty",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "replacementValue": null,
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "assumptionRationale": "Karon Prunty's immutable frozen healthy value is exactly 0.0; the governed nonnegative loss floor therefore yields zero.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "reopenOn": "A source-bound value correction above zero or a separately governed current-value amendment.",
+          "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
+          "applied": true
+        }
+      ],
+      "personnelUnresolvedCases": [
+        {
+          "caseKey": "2026-W05-NE-Reggie-Gilliam",
+          "player": "Reggie Gilliam",
+          "failClosedCode": "REVIEW_REQUIRED_REPLACEMENT_VALUE",
+          "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
+        },
+        {
+          "caseKey": "2026-W05-NE-Christian-Gonzalez",
+          "player": "Christian Gonzalez",
+          "failClosedCode": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+          "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
+        },
+        {
+          "caseKey": "2026-W05-NE-Carlton-Davis-III",
+          "player": "Carlton Davis III",
+          "failClosedCode": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+          "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
+        }
+      ],
       "personnelBlockedGroups": [],
       "qbPerformanceFailClosedTeams": [],
       "qbPriorEstimateTeams": [],
@@ -1165,8 +1242,8 @@
         "applicationStatus": "APPLIED",
         "marketViewed": false
       },
-      "informationStatus": "WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE",
-      "researchSummary": "Governed fair decomposition: neutral/team base -4.957; home field -2.082; other governed -0.210; pre-personnel exact -7.249; personnel +0.000; matchup +0.000; exact Graham home fair -7.249; displayed -7.0.",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
+      "researchSummary": "Governed fair decomposition: neutral/team base -4.957; home field -2.082; other governed -0.210; pre-personnel exact -7.249; personnel +0.500; matchup +0.000; exact Graham home fair -6.749; displayed -6.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1182,6 +1259,48 @@
           "venueClass": "DOMESTIC_HOME",
           "effectiveAt": "2026-10-06T04:26:26-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "NE",
+          "side": "HOME",
+          "clusterGroup": "RECEIVER",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-NE-Mack-Hollins"
+          ],
+          "rawTeamContributionDelta": -0.5,
+          "finalTeamContributionDelta": -0.5,
+          "pointsToHomeSpread": 0.5,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.patriots.com/news/injury-report-analysis-patriots-rule-out-six-players-for-sunday-s-week-5-matchup-vs-the-raiders",
+            "data/walters/nfl/player-values/by-team-v1/ne.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "NE",
+          "side": "HOME",
+          "clusterGroup": "DEFENSIVE_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-NE-Karon-Prunty"
+          ],
+          "rawTeamContributionDelta": 0,
+          "finalTeamContributionDelta": 0,
+          "pointsToHomeSpread": 0,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.patriots.com/news/injury-report-analysis-patriots-rule-out-six-players-for-sunday-s-week-5-matchup-vs-the-raiders",
+            "data/walters/nfl/player-values/by-team-v1/ne.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
         },
         {
           "type": "QB_PERFORMANCE_PRODUCTION",
@@ -1207,7 +1326,7 @@
             "core/staging/walters-nfl-seed-dataset-2026.json",
             "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
           ],
-          "effectiveAt": "2026-10-06T04:26:26-07:00",
+          "effectiveAt": "2026-10-09T11:34:26-07:00",
           "marketViewed": false
         }
       ],
@@ -1233,7 +1352,7 @@
       "pinnacleMoneylineAwayLimit": 7500,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 3,
+      "grahamHomeStrengthGap": 2.5,
       "officialDailySequence": 3,
       "officialDailyCapturedAt": "2026-10-09T12:55:39.182Z"
     },
@@ -1420,10 +1539,10 @@
       "homeRating": 19.4918108,
       "neutralBaseHome": 1,
       "espnNeutralHome": 0,
-      "grahamFairHome": -1.5,
-      "grahamAsOf": "2026-10-09T00:55:58.203Z",
+      "grahamFairHome": -0.5,
+      "grahamAsOf": "2026-10-09T17:04:00-07:00",
       "numberStatus": "READY_WITH_PERSONNEL_MODEL_ESTIMATES",
-      "grahamMove": 0.5,
+      "grahamMove": 1,
       "personnelEstimateCases": [
         {
           "caseKey": "2026-W05-NYJ-Braiden-McGregor",
@@ -1442,6 +1561,137 @@
           "assumptionRationale": "McGregor's immutable frozen healthy value is 0.0; the nonnegative loss floor yields zero without assigning a replacement.",
           "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
           "reopenOn": "A source-bound player-value correction above zero or a separately governed current-value amendment.",
+          "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-NYJ-Breece-Hall",
+          "player": "Breece Hall",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "PRIMARY_REPLACEMENT",
+          "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+          "healthyValue": 1.2,
+          "replacementValue": 0.2,
+          "replacementValueRatio": {
+            "numerator": 0.2,
+            "denominator": 1
+          },
+          "injuryLoss": 1,
+          "rawTeamContributionDelta": -1,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 1,
+            "max": 1
+          },
+          "weights": [
+            {
+              "player": "Braelon Allen",
+              "eaPlayerId": "14631",
+              "lockedValue": 0.2,
+              "additionalRoleUnits": 1,
+              "weight": 1
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "The official Jets depth chart lists Braelon Allen immediately behind Breece Hall at running back.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+          "reopenOn": "Hall becomes available, Allen becomes unavailable, or the Jets change the documented running-back order.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-NYJ-Adonai-Mitchell",
+          "player": "Adonai Mitchell",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "PRIMARY_REPLACEMENT",
+          "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+          "healthyValue": 0.2,
+          "replacementValue": 0,
+          "replacementValueRatio": {
+            "numerator": 0,
+            "denominator": 1
+          },
+          "injuryLoss": 0.2,
+          "rawTeamContributionDelta": -0.2,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 0.2,
+            "max": 0.2
+          },
+          "weights": [
+            {
+              "player": "Isaiah Williams",
+              "eaPlayerId": "14669",
+              "lockedValue": 0,
+              "additionalRoleUnits": 1,
+              "weight": 1
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "The official Jets depth chart places Isaiah Williams directly behind Adonai Mitchell at the applicable receiver slot.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+          "reopenOn": "Mitchell becomes available, Williams becomes unavailable, or the Jets change the documented receiver order.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-NYJ-Dylan-Parham",
+          "player": "Dylan Parham",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "PRIMARY_REPLACEMENT",
+          "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+          "healthyValue": 0.2,
+          "replacementValue": 0.2,
+          "replacementValueRatio": {
+            "numerator": 0.2,
+            "denominator": 1
+          },
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "weights": [
+            {
+              "player": "Jordan Meredith",
+              "eaPlayerId": "22624",
+              "lockedValue": 0.2,
+              "additionalRoleUnits": 1,
+              "weight": 1
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "The official Jets depth chart lists Jordan Meredith directly behind Dylan Parham on the interior line; Meredith is bound through the verified full-registry fallback.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+          "reopenOn": "Parham becomes available, Meredith becomes unavailable, or the Jets change the documented line order.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-NYJ-Kiko-Mauigoa",
+          "player": "Kiko Mauigoa",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "replacementValue": null,
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "assumptionRationale": "Kiko Mauigoa's immutable frozen healthy value is exactly 0.0; the governed nonnegative loss floor therefore yields zero.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "reopenOn": "A source-bound value correction above zero or a separately governed current-value amendment.",
           "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
           "applied": true
         }
@@ -1465,8 +1715,8 @@
         "applicationStatus": "APPLIED",
         "marketViewed": false
       },
-      "informationStatus": "WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE",
-      "researchSummary": "Governed fair decomposition: neutral/team base +0.778; home field -2.082; other governed -0.320; pre-personnel exact -1.624; personnel +0.000; matchup +0.000; exact Graham home fair -1.624; displayed -1.5.",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
+      "researchSummary": "Governed fair decomposition: neutral/team base +0.778; home field -2.082; other governed -0.320; pre-personnel exact -1.624; personnel +1.200; matchup +0.000; exact Graham home fair -0.424; displayed -0.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -1480,33 +1730,6 @@
           "homeFieldProductionId": "walters-nfl-home-field-production-v1",
           "calibrationId": "walters-nfl-home-field-calibration-v1",
           "venueClass": "DOMESTIC_HOME",
-          "effectiveAt": "2026-10-06T04:26:26-07:00",
-          "marketViewed": false
-        },
-        {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "CLE",
-          "homeTeam": "NYJ",
-          "awayStarter": "Deshaun Watson",
-          "homeStarter": "Geno Smith",
-          "awayTeamQbDelta": -0.65,
-          "homeTeamQbDelta": -0.33,
-          "pointsToHomeSpread": -0.32,
-          "reason": "Governed Walters QB differential: CLE -0.65 minus NYJ -0.33 equals -0.32 points to the home-spread coordinate.",
-          "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "STAGE3_PERFORMANCE_CANDIDATE"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-          ],
           "effectiveAt": "2026-10-06T04:26:26-07:00",
           "marketViewed": false
         },
@@ -1532,6 +1755,118 @@
             "data/walters/nfl/player-values/player-values-access-v1.json",
             "data/walters/nfl/player-values/player-values-2026-v1.json"
           ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "NYJ",
+          "side": "HOME",
+          "clusterGroup": "RUNNING_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-NYJ-Breece-Hall"
+          ],
+          "rawTeamContributionDelta": -1,
+          "finalTeamContributionDelta": -1,
+          "pointsToHomeSpread": 1,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.newyorkjets.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/nyj.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "NYJ",
+          "side": "HOME",
+          "clusterGroup": "RECEIVER",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-NYJ-Adonai-Mitchell"
+          ],
+          "rawTeamContributionDelta": -0.2,
+          "finalTeamContributionDelta": -0.2,
+          "pointsToHomeSpread": 0.2,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.newyorkjets.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/nyj.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "NYJ",
+          "side": "HOME",
+          "clusterGroup": "OFFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-NYJ-Dylan-Parham"
+          ],
+          "rawTeamContributionDelta": 0,
+          "finalTeamContributionDelta": 0,
+          "pointsToHomeSpread": 0,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.newyorkjets.com/team/depth-chart",
+            "data/walters/nfl/player-values/player-values-2026-v1.json",
+            "data/walters/nfl/player-values/by-team-v1/nyj.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "NYJ",
+          "side": "HOME",
+          "clusterGroup": "LINEBACKER",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-NYJ-Kiko-Mauigoa"
+          ],
+          "rawTeamContributionDelta": 0,
+          "finalTeamContributionDelta": 0,
+          "pointsToHomeSpread": 0,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.newyorkjets.com/team/players-roster/francisco-mauigoa/",
+            "data/walters/nfl/player-values/by-team-v1/nyj.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "CLE",
+          "homeTeam": "NYJ",
+          "awayStarter": "Deshaun Watson",
+          "homeStarter": "Geno Smith",
+          "awayTeamQbDelta": -0.65,
+          "homeTeamQbDelta": -0.33,
+          "pointsToHomeSpread": -0.32,
+          "reason": "Governed Walters QB differential: CLE -0.65 minus NYJ -0.33 equals -0.32 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-09T11:34:26-07:00",
+          "marketViewed": false
         }
       ],
       "proposedWager": null,
@@ -1556,7 +1891,7 @@
       "pinnacleMoneylineAwayLimit": 15000,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": -1,
+      "grahamHomeStrengthGap": -2,
       "officialDailySequence": 3,
       "officialDailyCapturedAt": "2026-10-09T12:55:39.182Z"
     },
@@ -1896,7 +2231,7 @@
       "neutralBaseHome": -0.5,
       "espnNeutralHome": -0.5,
       "grahamFairHome": -3.5,
-      "grahamAsOf": "2026-10-09T11:34:26-07:00",
+      "grahamAsOf": "2026-10-09T17:04:00-07:00",
       "numberStatus": "READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS",
       "grahamMove": 0,
       "personnelEstimateCases": [
@@ -1943,6 +2278,12 @@
           "caseKey": "2026-W05-NYG-Braxton-Berrios",
           "player": "Braxton Berrios",
           "failClosedCode": "REVIEW_REQUIRED_SPECIALIST_VALUE",
+          "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
+        },
+        {
+          "caseKey": "2026-W05-WAS-Stefon-Diggs",
+          "player": "Stefon Diggs",
+          "failClosedCode": "REVIEW_REQUIRED_REPLACEMENT_UNAVAILABLE",
           "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
         }
       ],
@@ -2069,8 +2410,8 @@
       "homeRating": 24.7154316,
       "neutralBaseHome": 4,
       "espnNeutralHome": -1.5,
-      "grahamFairHome": -1,
-      "grahamAsOf": "2026-10-09T00:55:58.203Z",
+      "grahamFairHome": -1.5,
+      "grahamAsOf": "2026-10-09T17:04:00-07:00",
       "numberStatus": "READY_WITH_PERSONNEL_MODEL_ESTIMATES",
       "grahamMove": -0.5,
       "personnelEstimateCases": [
@@ -2117,6 +2458,43 @@
           "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
           "reopenOn": "Green Bay names a primary replacement, publishes measured role allocation, or a candidate's availability changes.",
           "applied": true
+        },
+        {
+          "caseKey": "2026-W05-CHI-Kyle-Monangai",
+          "player": "Kyle Monangai",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "PRIMARY_REPLACEMENT",
+          "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+          "healthyValue": 0.5,
+          "replacementValue": 0,
+          "replacementValueRatio": {
+            "numerator": 0,
+            "denominator": 1
+          },
+          "injuryLoss": 0.5,
+          "rawTeamContributionDelta": -0.5,
+          "upgradeExcluded": false,
+          "injuryLossRange": {
+            "min": 0.5,
+            "max": 0.5
+          },
+          "weights": [
+            {
+              "player": "Roschon Johnson",
+              "eaPlayerId": "22747",
+              "lockedValue": 0,
+              "additionalRoleUnits": 1,
+              "weight": 1
+            }
+          ],
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "assumptionRationale": "Chicago lists Roschon Johnson directly behind D'Andre Swift and Kyle Monangai; with Monangai out, Johnson is the source-bound next active back for Monangai's additional duties.",
+          "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+          "reopenOn": "Monangai becomes available or Chicago changes the documented running-back order.",
+          "applied": true
         }
       ],
       "personnelUnresolvedCases": [],
@@ -2162,8 +2540,8 @@
         "applicationStatus": "APPLIED",
         "marketViewed": false
       },
-      "informationStatus": "WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE",
-      "researchSummary": "Governed fair decomposition: neutral/team base +4.054; home field -2.082; other governed -3.410; pre-personnel exact -1.438; personnel +0.650; matchup +0.000; exact Graham home fair -0.788; displayed -1.0.",
+      "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
+      "researchSummary": "Governed fair decomposition: neutral/team base +4.054; home field -2.082; other governed -3.410; pre-personnel exact -1.438; personnel +0.150; matchup +0.000; exact Graham home fair -1.288; displayed -1.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -2203,6 +2581,27 @@
           ]
         },
         {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "CHI",
+          "side": "AWAY",
+          "clusterGroup": "RUNNING_BACK",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-CHI-Kyle-Monangai"
+          ],
+          "rawTeamContributionDelta": -0.5,
+          "finalTeamContributionDelta": -0.5,
+          "pointsToHomeSpread": -0.5,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.chicagobears.com/team/depth-chart",
+            "data/walters/nfl/player-values/by-team-v1/chi.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json"
+          ]
+        },
+        {
           "type": "QB_PERFORMANCE_PRODUCTION",
           "productionId": "walters-qb-performance-production-v1",
           "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -2229,7 +2628,7 @@
             "core/staging/walters-nfl-seed-dataset-2026.json",
             "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
           ],
-          "effectiveAt": "2026-10-06T11:14:30-07:00",
+          "effectiveAt": "2026-10-09T11:34:26-07:00",
           "marketViewed": false
         }
       ],
@@ -2255,7 +2654,7 @@
       "pinnacleMoneylineAwayLimit": 9157,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": 2,
+      "grahamHomeStrengthGap": 2.5,
       "officialDailySequence": 3,
       "officialDailyCapturedAt": "2026-10-09T12:55:39.182Z"
     },
