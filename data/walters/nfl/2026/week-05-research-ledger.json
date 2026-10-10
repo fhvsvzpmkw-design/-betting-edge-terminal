@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-10T11:42:00-07:00",
+  "updatedAt": "2026-10-10T11:52:00-07:00",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -10930,6 +10930,622 @@
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 24,
+      "type": "MAIN_DAILY_SWEEP",
+      "runEventId": "graham-daily-review-2026-w05-20261010T113349-0700",
+      "sourceTaskKey": "DAILY_REVIEW",
+      "completionResult": "MATERIAL_CHANGE",
+      "startedAt": "2026-10-10T11:33:49-07:00",
+      "completedAt": "2026-10-10T11:52:00-07:00",
+      "scope": "Full Saturday Week 5 review across all 30 active teams and 15 games from the latest VERIFIED Friday Delta cutoff through completion. Reused resolved evidence, prioritized the London opener and exact unfinished personnel/QB inputs, reconciled official Saturday transactions and designations, reviewed outdoor weather, and preserved market isolation.",
+      "sourcesChecked": [
+        {
+          "source": "NFL Week 5 final status report",
+          "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "League-wide final designations and first-kickoff priority review."
+        },
+        {
+          "source": "NFL Saturday roundup",
+          "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-oct-10",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Saturday transactions, elevations and newly reported availability."
+        },
+        {
+          "source": "Seattle final injury report",
+          "url": "https://www.seahawks.com/news/week-5-injury-report-seahawks-vs-49ers",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Leonard Williams active closure and Seattle/San Francisco status reconciliation."
+        },
+        {
+          "source": "Atlanta final injury report",
+          "url": "https://www.atlantafalcons.com/news/falcons-injury-report-vs-ravens-za-darius-smith-jake-matthews",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Jake Matthews and Za'Darius Smith final designations."
+        },
+        {
+          "source": "Buffalo depth chart",
+          "url": "https://www.buffalobills.com/team/depth-chart",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Source-bound Ed Oliver replacement-role evidence and receiver-cluster review."
+        },
+        {
+          "source": "Indianapolis Saturday transaction",
+          "url": "https://www.colts.com/news/colts-elevate-wr-nick-westbrook-ikhine-to-active-roster-from-practice-squad-place-de-arden-key-on-ir",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Arden Key injured-reserve confirmation and elevation context."
+        },
+        {
+          "source": "Giants final status and travel update",
+          "url": "https://www.giants.com/news/giants-vs-commanders-week-5-injury-report-malik-nabers-andrew-thomas-cam-skattebo",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Golston/Pinnock availability and replacement review."
+        },
+        {
+          "source": "Walters governed player-value shards",
+          "url": "data/walters/nfl/player-values/player-values-access-v1.json",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Exact remote shard read-back for SEA, BUF, IND, NYG, PIT, CIN and ATL."
+        },
+        {
+          "source": "Outdoor weather forecast review",
+          "url": "weather://2026-10-11/outdoor-week-5",
+          "checkedAt": "2026-10-10T11:52:00-07:00",
+          "purpose": "Rain/temperature review for London, Miami, Foxborough, Cleveland, Pittsburgh, Nashville, Landover, Green Bay and Seattle; no governed numeric threshold established."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "ARI",
+          "finding": "Arizona stated that Marvin Harrison Jr. trade discussions remained unresolved; no completed transaction or supported lineup/value change was available.",
+          "result": "NO_NUMERIC_CHANGE_PENDING_TRANSACTION",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-oct-10"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "ATL",
+          "finding": "Jake Matthews and Za'Darius Smith remain questionable; final availability and supported replacement allocation are still pending.",
+          "result": "FAIL_CLOSED_CURRENT_AVAILABILITY",
+          "sourceRefs": [
+            "https://www.atlantafalcons.com/news/falcons-injury-report-vs-ravens-za-darius-smith-jake-matthews"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "BAL",
+          "finding": "Tyler Huntley remains the official Week 5 starter with Lamar Jackson out; the governed QB value was already applied Friday and exact remote read-back was preserved.",
+          "result": "QB_CURRENT_RECONCILED_NO_REPLAY",
+          "sourceRefs": [
+            "https://www.nfl.com/news/tyler-huntley-to-start-for-ravens-vs-falcons-with-lamar-jackson-out",
+            "data/walters/nfl/qb-production-current.json"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "BUF",
+          "finding": "Ed Oliver was ruled out and the official depth chart binds DeWayne Carter directly behind him; the personnel writer applied a 0.9-point Buffalo loss. DJ Moore and Joshua Palmer remain fail-closed.",
+          "result": "PERSONNEL_PRODUCTION_APPLIED_WITH_OPEN_CASES",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-oct-10",
+            "https://www.buffalobills.com/team/depth-chart"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "CHI",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "CIN",
+          "finding": "Ja'Marr Chase and Tee Higgins remain questionable; the concurrent receiver allocation is unresolved and no impairment percentage was invented.",
+          "result": "FAIL_CLOSED_CURRENT_AVAILABILITY",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "CLE",
+          "finding": "Saturday elevations were reviewed; no new supported rating, QB, or personnel-number change was established.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-oct-10"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "DAL",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "DEN",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "DET",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "GB",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "HOU",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "IND",
+          "finding": "Arden Key was placed on injured reserve; the pass-rush replacement allocation remains non-disjoint and fail-closed.",
+          "result": "FAIL_CLOSED_REPLACEMENT_VALUE",
+          "sourceRefs": [
+            "https://www.colts.com/news/colts-elevate-wr-nick-westbrook-ikhine-to-active-roster-from-practice-squad-place-de-arden-key-on-ir"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "JAX",
+          "finding": "The London opener was prioritized; no additional supported Jacksonville rating, QB, or personnel-number change was found after the verified Friday cutoff.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "LAC",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "LAR",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "LV",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "MIA",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "MIN",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "NE",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "NO",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "NYG",
+          "finding": "Chauncey Golston and Jason Pinnock were ruled out. The writer resolved Golston against Darius Alexander at zero net loss and preserved Pinnock fail-closed.",
+          "result": "PERSONNEL_PRODUCTION_APPLIED_WITH_OPEN_CASE",
+          "sourceRefs": [
+            "https://www.giants.com/news/giants-vs-commanders-week-5-injury-report-malik-nabers-andrew-thomas-cam-skattebo",
+            "https://www.giants.com/team/depth-chart"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "NYJ",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "PHI",
+          "finding": "The first Sunday kickoff was prioritized. Drew Kendall, Marquise Brown and DeVonta Smith remain without a complete, source-bound replacement/value closure; the published fair was preserved.",
+          "result": "FAIL_CLOSED_FIRST_KICKOFF",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.philadelphiaeagles.com/team/players-roster/"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "PIT",
+          "finding": "Yahya Black was added as questionable Saturday; final availability is pending, while Derrick Harmon remains an unresolved defensive-line cluster input.",
+          "result": "FAIL_CLOSED_CURRENT_AVAILABILITY",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-oct-10"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "SEA",
+          "finding": "Leonard Williams practiced fully, carries no designation and was closed active. Zach Charbonnet remains an unresolved backfield-cluster input.",
+          "result": "PERSONNEL_ACTIVE_CLOSURE_WITH_OPEN_CASE",
+          "sourceRefs": [
+            "https://www.seahawks.com/news/week-5-injury-report-seahawks-vs-49ers"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "SF",
+          "finding": "Nick Bosa and Kyle Juszczyk remain out; the pass-rush and role allocations remain fail-closed without unsupported shares.",
+          "result": "FAIL_CLOSED_CURRENT_AVAILABILITY",
+          "sourceRefs": [
+            "https://www.49ers.com/news/49ers-week-5-status-report-bosa-juszczyk-out-vs-seahawks"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "TB",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "TEN",
+          "finding": "No new supported rating, named-QB, or personnel-number change was found after the latest verified Friday cutoff; resolved evidence was reused.",
+          "result": "NO_NUMERIC_CHANGE",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        },
+        {
+          "team": "WAS",
+          "finding": "Jayden Daniels remains the confirmed starter; the governed QB value was already applied Friday. Stefon Diggs remains a separate unresolved receiver-replacement case.",
+          "result": "QB_CURRENT_RECONCILED_WITH_OPEN_PERSONNEL_CASE",
+          "sourceRefs": [
+            "https://www.commanders.com/news/jayden-daniels-cleared-to-play-vs-giants",
+            "data/walters/nfl/qb-production-current.json"
+          ],
+          "owner": "SUNDAY_PREGAME"
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W05-BUF-LAR",
+          "priorExactFairHome": -5.632,
+          "priorPublishedFairHome": -5.5,
+          "newExactFairHome": -6.532,
+          "newPublishedFairHome": -6.5,
+          "changeReason": "Ed Oliver out; DeWayne Carter is the source-bound direct depth replacement. The governed personnel writer applied a 0.9-point Buffalo loss.",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-saturday-oct-10",
+            "https://www.buffalobills.com/team/depth-chart",
+            "data/walters/nfl/2026/week-05-personnel-ledger.json"
+          ]
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_NO_NEW_WARRANT",
+        "role": "INDEPENDENT_COMPARISON_ONLY"
+      },
+      "summary": {
+        "teamsReviewed": 30,
+        "gamesReviewed": 15,
+        "materialInformationChanged": true,
+        "carriedRatingMoves": 0,
+        "fairNumberChanges": 1,
+        "displayedFairNumberChanges": 1,
+        "currentAvailabilityFairNumberChanges": 1,
+        "personnelBatchesSubmitted": 1,
+        "personnelCasesSubmitted": 12,
+        "personnelNumericFinalCases": 3,
+        "personnelFailClosedFinalCases": 9,
+        "qbBatchesSubmitted": 0,
+        "qbCasesSubmitted": 0,
+        "qbCurrentReconciled": true,
+        "qbFailClosedTeams": [],
+        "weatherAdjustments": 0,
+        "betsCreated": 0,
+        "historicalLearning": {
+          "state": "COMPLETE",
+          "owner": "GRAHAM_WALTERS_90_10",
+          "sourceWeek": 4,
+          "targetWeek": 5,
+          "gamesApplied": 16,
+          "gamesExpected": 16,
+          "blockedGames": [],
+          "publicationVerified": true,
+          "rolloverHandoffGate": "CLOSED_COMPLETE",
+          "readyHistoricalPairsAwaitingChronologicalPublication": 0,
+          "newGamesAppliedDuringCoverage": 0
+        },
+        "ratingPropagation": {
+          "state": "COMPLETE",
+          "owner": "GRAHAM_RATING_BASE_REFRESH",
+          "gamesVerified": 15,
+          "gamesExpected": 15,
+          "unpropagatedGames": [],
+          "sourceBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc"
+        },
+        "currentAvailability": {
+          "state": "INCOMPLETE",
+          "owner": "CURRENT_WEEK_RESEARCH_AND_PRODUCTION",
+          "openGameCount": 9,
+          "openCaseCount": 22,
+          "openCases": [
+            {
+              "caseKey": "2026-W05-PHI-Drew-Kendall",
+              "gameKey": "2026-W05-PHI-JAX",
+              "team": "Drew",
+              "player": "Drew Kendall",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-PHI-Marquise-Brown",
+              "gameKey": "2026-W05-PHI-JAX",
+              "team": "Marquise",
+              "player": "Marquise Brown",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-PHI-DeVonta-Smith",
+              "gameKey": "2026-W05-PHI-JAX",
+              "team": "DeVonta",
+              "player": "DeVonta Smith",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-CIN-Ja-Marr-Chase",
+              "gameKey": "2026-W05-CIN-MIA",
+              "team": "Ja",
+              "player": "Ja'Marr Chase",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-CIN-Tee-Higgins",
+              "gameKey": "2026-W05-CIN-MIA",
+              "team": "Tee",
+              "player": "Tee Higgins",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-NE-Reggie-Gilliam",
+              "gameKey": "2026-W05-LV-NE",
+              "team": "Reggie",
+              "player": "Reggie Gilliam",
+              "missingFact": "REVIEW_REQUIRED_REPLACEMENT_VALUE",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-NE-Christian-Gonzalez",
+              "gameKey": "2026-W05-LV-NE",
+              "team": "Christian",
+              "player": "Christian Gonzalez",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-NE-Carlton-Davis-III",
+              "gameKey": "2026-W05-LV-NE",
+              "team": "Carlton",
+              "player": "Carlton Davis III",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-IND-Arden-Key",
+              "gameKey": "2026-W05-IND-PIT",
+              "team": "Arden",
+              "player": "Arden Key",
+              "missingFact": "REVIEW_REQUIRED_REPLACEMENT_VALUE",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-PIT-Derrick-Harmon",
+              "gameKey": "2026-W05-IND-PIT",
+              "team": "Derrick",
+              "player": "Derrick Harmon",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-PIT-Yahya-Black",
+              "gameKey": "2026-W05-IND-PIT",
+              "team": "Yahya",
+              "player": "Yahya Black",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-NYG-Braxton-Berrios",
+              "gameKey": "2026-W05-NYG-WAS",
+              "team": "Braxton",
+              "player": "Braxton Berrios",
+              "missingFact": "REVIEW_REQUIRED_SPECIALIST_VALUE",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-WAS-Stefon-Diggs",
+              "gameKey": "2026-W05-NYG-WAS",
+              "team": "Stefon",
+              "player": "Stefon Diggs",
+              "missingFact": "REVIEW_REQUIRED_REPLACEMENT_UNAVAILABLE",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-NYG-Jason-Pinnock",
+              "gameKey": "2026-W05-NYG-WAS",
+              "team": "Jason",
+              "player": "Jason Pinnock",
+              "missingFact": "REVIEW_REQUIRED_BASELINE_ROLE",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-LAC-Rashawn-Slater",
+              "gameKey": "2026-W05-DEN-LAC",
+              "team": "Rashawn",
+              "player": "Rashawn Slater",
+              "missingFact": "REVIEW_REQUIRED_REPLACEMENT_VALUE",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-SF-Kyle-Juszczyk",
+              "gameKey": "2026-W05-SF-SEA",
+              "team": "Kyle",
+              "player": "Kyle Juszczyk",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-SF-Nick-Bosa",
+              "gameKey": "2026-W05-SF-SEA",
+              "team": "Nick",
+              "player": "Nick Bosa",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-SEA-Zach-Charbonnet",
+              "gameKey": "2026-W05-SF-SEA",
+              "team": "Zach",
+              "player": "Zach Charbonnet",
+              "missingFact": "REVIEW_REQUIRED_CLUSTER_CONTEXT",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-ATL-Jake-Matthews",
+              "gameKey": "2026-W05-BAL-ATL",
+              "team": "Jake",
+              "player": "Jake Matthews",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-ATL-Za-Darius-Smith",
+              "gameKey": "2026-W05-BAL-ATL",
+              "team": "Za",
+              "player": "Za'Darius Smith",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-BUF-DJ-Moore",
+              "gameKey": "2026-W05-BUF-LAR",
+              "team": "DJ",
+              "player": "DJ Moore",
+              "missingFact": "REVIEW_REQUIRED_AVAILABILITY",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Recheck official inactive/activation status and run the governed personnel writer before kickoff."
+            },
+            {
+              "caseKey": "2026-W05-BUF-Joshua-Palmer",
+              "gameKey": "2026-W05-BUF-LAR",
+              "team": "Joshua",
+              "player": "Joshua Palmer",
+              "missingFact": "REVIEW_REQUIRED_RECEIVER_CLUSTER",
+              "owner": "SUNDAY_PREGAME",
+              "nextAction": "Bind a source-supported, non-overlapping replacement/value allocation or preserve fail-closed before kickoff."
+            }
+          ]
+        },
+        "previousVerifiedRunEventId": "graham-delta-1645-2026-w05-20261009T164315-0700",
+        "coverageStart": "2026-10-09T17:05:06-07:00",
+        "coverageEnd": "2026-10-10T11:52:00-07:00",
+        "missedDayCatchUp": false,
+        "unresolvedCoverageGaps": [],
+        "marketViewed": false,
+        "note": "Historical learning, rating propagation and current-week availability are reported independently. A VERIFIED research receipt does not imply every current availability input is numerically resolved."
       }
     }
   ]
