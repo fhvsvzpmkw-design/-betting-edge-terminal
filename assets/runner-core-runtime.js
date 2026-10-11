@@ -25,6 +25,10 @@ let pickSearch='';
 let pickSort='CALL';
 const priorChangesCache=new Map();
 const issuedSessionCatalog=new Map();
+const indexedSessionCatalog=new Map();
+const sessionIndexCache=new Map();
+const sessionReportCache=new Map();
+let sessionSelectionVersion=0;
 
 function deepClone(v){try{return JSON.parse(JSON.stringify(v))}catch(e){return v}}
 function b64u(v){try{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const bin=atob(v);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}catch(e){return null}}
@@ -82,7 +86,7 @@ function historyFamilyKey(run){const label=txt(run&&run.repriceBaseLabel||run&&r
 function mergedPriorRuns(run){
   const currentKey=runKey(run),day=localDateKey(run.ts),embedded=Array.isArray(run.prior_runs)?run.prior_runs:[];
   const exact=new Map();
-  [...embedded,...catalogRuns(),...safeHistory()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;if(!exact.has(k))exact.set(k,normalizeRun(x))});
+  [...embedded,...catalogRuns(),...safeHistory(),...indexedSessionCatalog.values()].forEach(x=>{if(!x)return;const k=runKey(x);if(!k||k===currentKey)return;if(day&&localDateKey(x.ts)!==day)return;if(!exact.has(k))exact.set(k,normalizeRun(x))});
   const grouped=new Map();
   [...exact.values()].forEach(x=>{const k=historyFamilyKey(x),prior=grouped.get(k);if(!prior){grouped.set(k,{...x,snapshotCount:1});return}const newer=String(x.ts||'')>String(prior.ts||'')?x:prior;grouped.set(k,{...newer,snapshotCount:(prior.snapshotCount||1)+1})});
   return [...grouped.values()].sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')))
@@ -867,50 +871,108 @@ function sessionWindowApplicable(key,day,now=new Date()){
   if(day>current.day)return false;
   return current.minutes>=minutes
 }
-function sessionRuns(run){
+function sessionCandidates(run){
   const day=localDateKey(run?.ts),map=new Map();
   const embedded=Array.isArray(run?.prior_runs)?run.prior_runs:[];
-  [run,...catalogRuns(),...embedded,...safeHistory()].forEach(x=>{
+  [run,...issuedSessionCatalog.values(),...embedded,...safeHistory()].forEach(x=>{
     const key=sessionKey(x);
     if(!x||x.__error||!key)return;
     if(day&&localDateKey(x.ts)!==day)return;
     if(day&&!sessionWindowApplicable(key,day))return;
-    const k=runKey(x);if(!map.has(k))map.set(k,normalizeRun(x))
+    const k=runKey(x);if(!map.has(k))map.set(k,x)
   });
   return [...map.values()]
 }
+function sessionRuns(run){return sessionCandidates(run).map(normalizeRun)}
 function newestSessionRun(run,key){
-  return sessionRuns(run)
+  const selected=sessionCandidates(run)
     .filter(x=>sessionKey(x)===key)
-    .sort((a,b)=>(Date.parse(b.ts)||0)-(Date.parse(a.ts)||0))[0]||null
+    .sort((a,b)=>(Date.parse(b.ts)||0)-(Date.parse(a.ts)||0))[0];
+  return selected?normalizeRun(selected):null
+}
+function indexedSessionEntries(run){
+  const day=localDateKey(run?.ts);
+  return [...indexedSessionCatalog.values()].filter(x=>localDateKey(x.ts)===day&&sessionWindowApplicable(sessionKey(x),day))
+}
+function sessionChoice(run,key){
+  // Availability needs only identity fields; do not clone every multi-MB
+  // issued report for each time button. Clone the selected report on opening.
+  const issued=sessionCandidates(run).filter(x=>sessionKey(x)===key).sort((a,b)=>Date.parse(b.ts)-Date.parse(a.ts))[0];
+  const entry=indexedSessionEntries(run).filter(x=>sessionKey(x)===key).sort((a,b)=>Date.parse(b.ts)-Date.parse(a.ts))[0];
+  return entry&&(!issued||Date.parse(entry.ts)>Date.parse(issued.ts))?{entry}:issued?{run:issued}:null
+}
+function loadSessionIndex(run){
+  const day=localDateKey(run?.ts);if(!day)return Promise.resolve([]);
+  if(!sessionIndexCache.has(day)){
+    const pending=(async()=>{
+      const response=await fetch(`${RUN_HISTORY_URL}?t=${Date.now()}`,{cache:'no-store'});
+      if(!response.ok)throw new Error('Report history unavailable');
+      const index=await response.json(),entries=[];
+      for(const entry of Array.isArray(index.runs)?index.runs:[]){
+        const key=sessionKey(entry);
+        if(!key||!Number.isFinite(Date.parse(entry.ts))||localDateKey(entry.ts)!==day||!sessionWindowApplicable(key,day))continue;
+        if(!/^data\/history\/runs\/\d{4}-\d{2}-\d{2}\/[a-z_]+-\d{6}\.json$/.test(entry.path||''))continue;
+        entries.push(entry);
+      }
+      entries.forEach(entry=>indexedSessionCatalog.set(runKey(entry),deepClone(entry)));
+      return entries
+    })().catch(error=>{sessionIndexCache.delete(day);throw error});
+    sessionIndexCache.set(day,pending);
+  }
+  return sessionIndexCache.get(day)
+}
+function loadIndexedSession(entry){
+  if(!sessionReportCache.has(entry.path)){
+    const pending=(async()=>{
+      const response=await fetch(`./${entry.path}?t=${Date.now()}`,{cache:'no-store'});
+      if(!response.ok)throw new Error('Archived report unavailable');
+      const run=await response.json();
+      if(run.ts!==entry.ts||run.slot!==entry.slot||!Array.isArray(run.recs)||
+        (entry.feedGeneratedAt&&run.feedGeneratedAt!==entry.feedGeneratedAt)||
+        (Number.isFinite(entry.recCount)&&run.recs.length!==entry.recCount))throw new Error('Archived report identity mismatch');
+      return rememberIssuedRun(run,true)
+    })().catch(error=>{sessionReportCache.delete(entry.path);throw error});
+    sessionReportCache.set(entry.path,pending);
+  }
+  return sessionReportCache.get(entry.path).then(deepClone)
 }
 function isLatestSessionRun(run){
   const current=withoutComparison(run),day=localDateKey(current&&current.ts);
-  const candidates=sessionRuns(current).filter(x=>!day||localDateKey(x&&x.ts)===day);
+  const candidates=[...sessionCandidates(current),...indexedSessionEntries(current)].filter(x=>!day||localDateKey(x&&x.ts)===day);
   candidates.push(current);
   candidates.sort((a,b)=>(Date.parse(b&&b.ts)||0)-(Date.parse(a&&a.ts)||0));
   const latest=candidates[0]||current;
   return String(current&&current.ts||'')===String(latest&&latest.ts||'')&&String(current&&current.slot||'')===String(latest&&latest.slot||'')
 }
-function selectSession(run,key){
-  const selected=newestSessionRun(run,key);if(!selected)return;
-  saveCurrentRun(activeRun);
-  activeRun=normalizeRun(selected);
-  originalRun=deepClone(activeRun);
-  statusFilter='ALL';
-  updateRunnerHash(activeRun);
-  apply(activeRun);
-  recoverActiveRunIfNeeded()
+async function selectSession(run,key,button){
+  const choice=sessionChoice(run,key);if(!choice)return;
+  const version=++sessionSelectionVersion;
+  if(button){button.disabled=true;button.title=`Loading ${key} report…`}
+  try{
+    const selected=choice.run||await loadIndexedSession(choice.entry);
+    if(version!==sessionSelectionVersion)return;
+    saveCurrentRun(activeRun);
+    activeRun=normalizeRun(selected);
+    originalRun=deepClone(activeRun);
+    statusFilter='ALL';
+    updateRunnerHash(activeRun);
+    apply(activeRun);
+    recoverActiveRunIfNeeded();
+    const error=$('#err');if(error)error.style.display='none'
+  }catch(e){
+    if(version===sessionSelectionVersion){const error=$('#err');if(error){error.textContent=`Could not load ${key} report. Select the time again to retry.`;error.style.display='block'}}
+    console.warn('Archived session load failed',e)
+  }finally{if(button){button.disabled=false;button.title=`Load latest ${key} run`}}
 }
 function sessionStrip(d,run){
   const strip=el(d,'div','sessionStrip');
   const active=sessionKey(run);
   ['06:00','08:00','09:30','15:15','18:15'].forEach(t=>{
-    const available=Boolean(newestSessionRun(run,t));
+    const available=Boolean(sessionChoice(run,t));
     const q=el(d,'button','sessionChip'+(t===active?' active':'')+(!available?' unavailable':''),t);
     q.type='button';q.disabled=!available;
     q.title=available?`Load latest ${t} run`:`No ${t} run available for this betting day`;
-    if(available)q.onclick=()=>selectSession(run,t);
+    if(available)q.onclick=()=>selectSession(run,t,q);
     strip.appendChild(q)
   });
   return strip
@@ -1064,14 +1126,10 @@ function compareRunPicks(current,prior,sport='ALL'){
   return changes.sort((a,b)=>(rank[a.rec.status]??4)-(rank[b.rec.status]??4)||Number(b.statusChanged)-Number(a.statusChanged));
 }
 async function fetchPriorChangeRun(run){
-  const response=await fetch(`${RUN_HISTORY_URL}?t=${Date.now()}`,{cache:'no-store'});if(!response.ok)throw new Error('History unavailable');
-  const index=await response.json(),day=vancouverSessionNow(new Date(run.ts)).day;
-  const entry=(index.runs||[]).filter(x=>Number.isFinite(Date.parse(x.ts))&&Date.parse(x.ts)<Date.parse(run.ts)&&vancouverSessionNow(new Date(x.ts)).day===day).sort((a,b)=>Date.parse(b.ts)-Date.parse(a.ts))[0];
+  const entries=await loadSessionIndex(run);
+  const entry=entries.filter(x=>Date.parse(x.ts)<Date.parse(run.ts)).sort((a,b)=>Date.parse(b.ts)-Date.parse(a.ts))[0];
   if(!entry)return null;
-  if(!/^data\/history\/runs\/\d{4}-\d{2}-\d{2}\/[a-z_]+-\d{6}\.json$/.test(entry.path))throw new Error('History path unavailable');
-  const res=await fetch(`./${entry.path}?t=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error('Earlier report unavailable');
-  const prior=await res.json();if(prior.ts!==entry.ts||prior.slot!==entry.slot||!Array.isArray(prior.recs))throw new Error('Earlier report identity mismatch');
-  return normalizeRun(prior);
+  return loadIndexedSession(entry);
 }
 function changesPanel(d,run){
   const panel=el(d,'section','runnerChanges');panel.id='runnerChanges';panel.setAttribute('aria-label','Changes since the previous issued report');
@@ -1173,7 +1231,7 @@ function priorSection(d,run){
       const item=el(d,'details','runnerPriorItem');
       item.appendChild(el(d,'summary','',txt(p.label||p.slot,'PRIOR RUN')));
       const grouped=p.snapshotCount>1?` // ${p.snapshotCount} SNAPSHOTS GROUPED`:'';
-      item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')+grouped),el(d,'div','runnerPriorSummary',txt(p.summary,'No summary supplied.')));
+      item.append(el(d,'div','runnerPriorMeta',txt(p.ts,'')+grouped),el(d,'div','runnerPriorSummary',txt(p.summary,'Open this report with its time button above.')));
       const c=p.counts||{};
       item.appendChild(el(d,'div','runnerPriorMeta','BET '+txt(c.bet,0)+' // LEAN '+txt(c.lean,0)+' // WAIT '+txt(c.wait,0)+' // PASS '+txt(c.pass,0)));
       list.appendChild(item)
@@ -1320,5 +1378,12 @@ if(activeRun&&!activeRun.__error){
   saveCurrentRun(originalRun);
   recoverActiveRunIfNeeded()
 }
-$('#app').addEventListener('load',()=>{try{apply(activeRun)}catch(e){const x=$('#err');x.textContent='VigScope runner error: '+e.message;x.style.display='block';console.error(e)}});
+$('#app').addEventListener('load',()=>{
+  try{
+    apply(activeRun);
+    // Discover available sessions after the current report has rendered. The
+    // index is small; full archived reports are fetched only when needed.
+    if(activeRun&&!activeRun.__error){const day=localDateKey(activeRun.ts);loadSessionIndex(activeRun).then(()=>{if(activeRun&&localDateKey(activeRun.ts)===day)apply(activeRun)}).catch(e=>console.warn('Same-day history unavailable',e))}
+  }catch(e){const x=$('#err');x.textContent='VigScope runner error: '+e.message;x.style.display='block';console.error(e)}
+});
 })();

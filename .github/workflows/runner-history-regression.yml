@@ -40,6 +40,7 @@ on:
       - tests/main-schedule.test.mjs
       - tests/syndicate-hotline-completeness.test.mjs
       - tests/runner-history-session-applicability.test.js
+      - tests/runner-archive-navigation.test.mjs
       - tests/runner-session-strip-applicability.test.js
       - .github/workflows/runner-history-regression.yml
   pull_request:
@@ -80,6 +81,7 @@ on:
       - tests/main-schedule.test.mjs
       - tests/syndicate-hotline-completeness.test.mjs
       - tests/runner-history-session-applicability.test.js
+      - tests/runner-archive-navigation.test.mjs
       - tests/runner-session-strip-applicability.test.js
       - .github/workflows/runner-history-regression.yml
   workflow_dispatch:
@@ -116,6 +118,8 @@ jobs:
         run: node tests/runner-history-session-applicability.test.js
       - name: Run large-report handoff regression
         run: node tests/runner-report-handoff.test.mjs
+      - name: Run fresh-device archive navigation regression
+        run: node tests/runner-archive-navigation.test.mjs
       - name: Run runner session strip regression
         run: node tests/runner-session-strip-applicability.test.js
       - name: Run published-pick filters and report comparison regression
