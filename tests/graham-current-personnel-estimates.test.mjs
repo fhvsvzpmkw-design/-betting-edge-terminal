@@ -51,7 +51,8 @@ test('calibrated zero loss needs no invented replacement and rejects a nonzero b
  x.options.production.currentWeekReplacementEstimates.allowedMethods.push('ZERO_CALIBRATED_LOSS');
  Object.assign(x.c.replacementModel,{resolution:'ZERO_CALIBRATED_LOSS',replacements:[]});x.p.waltersPoints=0;
  const r=currentPersonnelEstimate(x.c,x.p,x.options);assert.equal(r.injuryLoss,0);assert.equal(r.replacementValue,null);
- x.p.waltersPoints=.2;assert.throws(()=>currentPersonnelEstimate(x.c,x.p,x.options),/ZERO_LOSS_PROOF/);
+ x.p.valueStatus='CURRENT_ESTIMATE';const current=currentPersonnelEstimate(x.c,x.p,x.options);assert.equal(current.injuryLoss,0);
+ x.p.valueStatus='CALIBRATED';x.p.waltersPoints=.2;assert.throws(()=>currentPersonnelEstimate(x.c,x.p,x.options),/ZERO_LOSS_PROOF/);
 });
 
 test('board status clears only current personnel/QB metadata and retains other gates',()=>{

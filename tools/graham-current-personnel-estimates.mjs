@@ -27,7 +27,7 @@ export function currentPersonnelEstimate(c, player, {lookup, production}) {
   sourceCheck(c.roleSourceRefs);
   if (!requiredText(c.reopenOn)) throw Error('CURRENT_ESTIMATE_REOPEN_TRIGGER_REQUIRED');
   if(model.resolution==='ZERO_CALIBRATED_LOSS') {
-    if(policy.zeroCalibratedLossAllowed!==true||player.valueStatus!=='CALIBRATED'||player.waltersPoints!==0||model.estimateAcknowledged!==true||!requiredText(model.assumptionRationale)||model.replacements?.length)throw Error('CURRENT_ZERO_LOSS_PROOF_REQUIRED');
+    if(policy.zeroCalibratedLossAllowed!==true||!['CALIBRATED','CURRENT_ESTIMATE'].includes(player.valueStatus)||player.waltersPoints!==0||model.estimateAcknowledged!==true||!requiredText(model.assumptionRationale)||model.replacements?.length)throw Error('CURRENT_ZERO_LOSS_PROOF_REQUIRED');
     return {modelId:REPLACEMENT_MODEL_ID,classification:'GRAHAM_MODEL_ESTIMATE',method:model.resolution,healthyValue:0,replacementValue:null,injuryLoss:0,rawTeamContributionDelta:0,injuryLossRange:{min:0,max:0},assumptionRationale:model.assumptionRationale,scope:'CURRENT_WEEK_TEMPORARY_PERSONNEL',reopenOn:c.reopenOn,limitation:'Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.'};
   }
   const replacements = (model.replacements || []).map(item => {
