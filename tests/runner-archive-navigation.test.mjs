@@ -47,6 +47,7 @@ app.listeners.get('load')();
 assert.equal(app.renders.length,1,'current report renders before history completes');
 assert.equal(app.renders[0].ts,current.ts);
 await app.api.loadSessionIndex(current);await Promise.resolve();
+assert.equal(app.renders.length,1,'background navigation discovery must not rebuild the report or disturb the open view');
 assert.deepEqual(app.reads,['run-history.json'],'availability reads only the small index, not multi-MB reports');
 assert.equal(app.api.catalogRuns().length,1,'index metadata must never become an issued report');
 const strip=app.api.sessionStrip(app.document,current);

@@ -977,6 +977,13 @@ function sessionStrip(d,run){
   });
   return strip
 }
+function refreshSessionNavigation(run){
+  const d=$('#app')?.contentDocument;if(!d)return;
+  const strip=d.querySelector('#runnerLive .sessionStrip');if(strip)strip.replaceWith(sessionStrip(d,run));
+  const prior=d.getElementById('runnerPrior');if(prior)prior.replaceWith(priorSection(d,run));
+  const refresh=d.querySelector('#runnerLive .runnerRefresh');
+  if(refresh&&!isLatestSessionRun(run))refresh.replaceChildren(el(d,'div','runnerRefreshStatus','HISTORICAL REPORT // ISSUED SNAPSHOT FROZEN // Reprice is available only on the newest same-day report.'));
+}
 function filterTools(d,run,container,view='board'){
   const prefix=view==='market'?'runnerMarket':'runner';
   const tools=el(d,'div','runnerTools');
@@ -1383,7 +1390,7 @@ $('#app').addEventListener('load',()=>{
     apply(activeRun);
     // Discover available sessions after the current report has rendered. The
     // index is small; full archived reports are fetched only when needed.
-    if(activeRun&&!activeRun.__error){const day=localDateKey(activeRun.ts);loadSessionIndex(activeRun).then(()=>{if(activeRun&&localDateKey(activeRun.ts)===day)apply(activeRun)}).catch(e=>console.warn('Same-day history unavailable',e))}
+    if(activeRun&&!activeRun.__error){const day=localDateKey(activeRun.ts);loadSessionIndex(activeRun).then(()=>{if(activeRun&&localDateKey(activeRun.ts)===day)refreshSessionNavigation(activeRun)}).catch(e=>console.warn('Same-day history unavailable',e))}
   }catch(e){const x=$('#err');x.textContent='VigScope runner error: '+e.message;x.style.display='block';console.error(e)}
 });
 })();
