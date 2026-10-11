@@ -51,6 +51,10 @@ const context={VigScopeValueAnalytics:A,VigScopeOddsFormat:O,GuyValue,document:d
 vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../assets/results-value-desk-v2.js',import.meta.url),'utf8'),context);
 const index={cards,coverage:{cards:5,selections:5,completeCards:4,unresolvedCards:1},issuedBetAnalytics:{netCad:12,roiPct:25,pricedBets:2},decisionValueShadowV2:{byStatus:[{status:'LEAN',shadowRoiPct:25,priced:2,grades:{WIN:1,LOSS:1}}]}};
 const before=JSON.stringify(index);const desk=context.VigScopeValueDesk;
+assert.equal(desk.state.status,'LEAN','historical decisions default to LEAN');
+assert.equal(desk.cardLogRows({cards:[...cards,earlier]}).length,5,'default archive sample excludes other decisions');
+desk.state.status='ALL';assert.equal(desk.cardLogRows({cards:[...cards,earlier]}).length,6,'all decisions remain selectable');
+desk.state.status='LEAN';
 desk.setComparison(real);desk.setGuyRecord({schema:1,characterId:'guy-laflame',startedAt:'2026-10-07T00:50:00Z',entries:[]});desk.render(doc,index);
 const displayedGraham=A.summary(A.strategyRows(real.rows,'graham')).grades;
 assert.ok(engine.innerHTML.includes(`${displayedGraham.WIN}–${displayedGraham.LOSS}–${displayedGraham.PUSH}`),'display reflects the current saved ATS population');
