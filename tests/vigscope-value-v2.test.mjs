@@ -52,9 +52,13 @@ vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../assets/res
 const index={cards,coverage:{cards:5,selections:5,completeCards:4,unresolvedCards:1},issuedBetAnalytics:{netCad:12,roiPct:25,pricedBets:2},decisionValueShadowV2:{byStatus:[{status:'LEAN',shadowRoiPct:25,priced:2,grades:{WIN:1,LOSS:1}}]}};
 const before=JSON.stringify(index);const desk=context.VigScopeValueDesk;
 assert.equal(desk.state.status,'LEAN','historical decisions default to LEAN');
-assert.equal(desk.cardLogRows({cards:[...cards,earlier]}).length,5,'default archive sample excludes other decisions');
-desk.state.status='ALL';assert.equal(desk.cardLogRows({cards:[...cards,earlier]}).length,6,'all decisions remain selectable');
-desk.state.status='LEAN';
+assert.equal(desk.state.scope,'unique','log defaults to final unique selections');
+const logSample={cards:[...cards,earlier,{...earlier,cardId:'other-wait',selectionKey:'other-wait'}]};
+assert.equal(desk.cardLogRows(logSample).length,5,'default archive sample excludes other decisions');
+assert.equal(desk.cardLogRows(logSample).find(c=>c.selectionKey==='home').cardId,'win','unique log uses the latest appearance');
+desk.state.status='ALL';assert.equal(desk.cardLogRows(logSample).length,6,'all decisions remain selectable with repeated selections counted once');
+desk.state.scope='cards';assert.equal(desk.cardLogRows(logSample).length,7,'every issued card remains selectable');
+desk.state.scope='unique';desk.state.status='LEAN';
 desk.setComparison(real);desk.setGuyRecord({schema:1,characterId:'guy-laflame',startedAt:'2026-10-07T00:50:00Z',entries:[]});desk.render(doc,index);
 const displayedGraham=A.summary(A.strategyRows(real.rows,'graham')).grades;
 assert.ok(engine.innerHTML.includes(`${displayedGraham.WIN}–${displayedGraham.LOSS}–${displayedGraham.PUSH}`),'display reflects the current saved ATS population');

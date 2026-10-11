@@ -22,6 +22,10 @@ try{
  assert.equal(initial.view,'engine');assert.equal(initial.title,undefined);assert.equal(initial.proof,6);assert.ok(initial.pizza&&initial.shadow&&initial.archive&&initial.filters);assert.equal(initial.iframe,0);assert.ok(initial.graham.includes(`${expectedGraham.WIN}–${expectedGraham.LOSS}–${expectedGraham.PUSH}`),'display reflects the current saved ATS population');assert.equal(requests.length,1,'one shared history request');
  assert.equal(await page.$eval('#valueStatus',e=>e.value),'LEAN','historical decisions default to LEAN');
  assert.ok(await page.$$eval('#resultsCardLog tbody tr',rows=>rows.length>0&&rows.every(r=>r.cells[2].textContent==='LEAN')),'default card log contains only LEAN decisions');
+ assert.equal(await page.$eval('#resultsCardLog [data-scope].active',e=>e.dataset.scope),'unique','log defaults to final unique selections');
+ assert.equal(await page.$eval('#resultsCardLog h2',e=>e.textContent),'UNIQUE SELECTION LOG');
+ await page.click('#resultsCardLog [data-scope="cards"]');
+ assert.equal(await page.$eval('#resultsCardLog [data-scope].active',e=>e.dataset.scope),'cards','every issued card remains selectable');
  await page.select('#valueStatus','ALL');
  assert.equal(await page.$eval('#valueStatus',e=>e.value),'ALL','all decisions remain selectable');
  assert.match(await page.$eval('#resultsGuyValue',e=>e.innerText),/GUY’S BLUE LINE/);

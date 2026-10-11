@@ -3,7 +3,7 @@
   const A=globalThis.VigScopeValueAnalytics,O=globalThis.VigScopeOddsFormat;
   const INDEX_URL='./data/history/results-index.json',GRAHAM_URL='./data/history/graham-pinnacle-value.json',GUY_URL='./data/characters/guy-laflame/value-ledger.json';
   let cached=null,graham=null,guy=null,loading=false;
-  const state={start:'',end:'',sport:'ALL',status:'LEAN',lane:'ALL',scope:'cards',grade:'ALL',page:0,size:10,gWeek:'ALL',gLogWeek:'LATEST',gSide:'ALL',gGap:'ALL',strategy:'graham'};
+  const state={start:'',end:'',sport:'ALL',status:'LEAN',lane:'ALL',scope:'unique',grade:'ALL',page:0,size:10,gWeek:'ALL',gLogWeek:'LATEST',gSide:'ALL',gGap:'ALL',strategy:'graham'};
   const PIN_KEY='vigscope.value.followed.v1',pins=new Set(),reportCache=new Map();
   try{for(const key of JSON.parse(localStorage.getItem(PIN_KEY)||'[]'))if(typeof key==='string')pins.add(key);}catch{}
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
