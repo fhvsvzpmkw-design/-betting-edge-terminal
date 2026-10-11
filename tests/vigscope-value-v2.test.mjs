@@ -79,6 +79,8 @@ assert.equal(desk.historyWeeks([{...cards[0],date:'2026-10-04'},{...cards[1],dat
 desk.state.gLogWeek='1';desk.state.gWeek='2';desk.render(doc,index);
 const gameLog=engine.innerHTML.split('id="grahamGameLog"')[1].split('</section>')[0];
 assert.match(gameLog,/W1 •/);assert.doesNotMatch(gameLog,/W2 •/,'ledger week is independent of the comparison week');
+assert.equal((gameLog.match(/W1 •/g)||[]).length,real.rows.filter(r=>r.week===1).length,'every game in the selected week is displayed');
+assert.doesNotMatch(gameLog,/data-gpage/,'the weekly ledger no longer paginates');
 desk.state.gLogWeek='LATEST';desk.state.gWeek='ALL';
 desk.state.grade='OPEN';assert.equal(desk.cardLogRows(index).length,1);
 desk.state.grade='ALL';desk.state.status='LEAN';assert.equal(desk.cardLogRows(index).length,5);
