@@ -35,9 +35,12 @@ try{
  assert.ok(await page.$$eval('#grahamGameLog tbody tr',rows=>rows.every(r=>r.innerText.startsWith('W1 •'))));
  await page.click('[data-gpage="1"]');
  assert.match(await page.$eval('#grahamGameLog .valuePager',e=>e.innerText),/11–16 of 16/);
+ const ledgerPosition=await page.evaluate(()=>({top:document.querySelector('#grahamGameLog > summary').getBoundingClientRect().top,headerBottom:document.querySelector('main.term > header.top').getBoundingClientRect().bottom}));
+ assert.ok(ledgerPosition.top>=ledgerPosition.headerBottom,`ledger heading hidden under the fixed header: ${JSON.stringify(ledgerPosition)}`);
  await page.select('#gLogWeek','LATEST');
  assert.match(await page.$eval('#grahamGameLog .valuePager',e=>e.innerText),/1–10/,'week selection resets pagination');
  await page.click('#grahamGameLog > summary');
+ assert.equal(await page.$eval('#grahamGameLog',e=>e.open),false,'ledger collapse control remains reachable after pagination');
  await page.select('#gWeek','1');
  assert.match(await page.$eval('.comparisonTable',e=>e.innerText),/7–8–1/);
  await page.select('#gWeek','ALL');await page.click('[data-strategy="dogs"]');
