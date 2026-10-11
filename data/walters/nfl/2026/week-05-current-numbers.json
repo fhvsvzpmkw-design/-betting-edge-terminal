@@ -8,8 +8,8 @@
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS",
   "createdAt": "2026-10-06T04:26:26-07:00",
-  "updatedAt": "2026-10-10T16:53:00-07:00",
-  "lastResearchAt": "2026-10-10T16:53:00-07:00",
+  "updatedAt": "2026-10-11T07:06:42-07:00",
+  "lastResearchAt": "2026-10-11T07:06:42-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-05-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-05-daily-market-ledger.json",
@@ -1372,7 +1372,7 @@
       "startTimePacific": "2026-10-11T10:00:00-07:00",
       "grahamFairHome": -4,
       "grahamExactFairHome": -3.949,
-      "grahamAsOf": "2026-10-10T16:53:00-07:00",
+      "grahamAsOf": "2026-10-11T07:06:42-07:00",
       "numberStatus": "READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS",
       "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
@@ -1389,6 +1389,33 @@
           "calibrationId": "walters-nfl-home-field-calibration-v1",
           "venueClass": "DOMESTIC_HOME",
           "effectiveAt": "2026-10-06T04:26:26-07:00",
+          "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "LV",
+          "homeTeam": "NE",
+          "awayStarter": "Kirk Cousins",
+          "homeStarter": "Drake Maye",
+          "awayTeamQbDelta": -0.05,
+          "homeTeamQbDelta": 0.16,
+          "pointsToHomeSpread": -0.21,
+          "reason": "Governed Walters QB differential: LV -0.05 minus NE 0.16 equals -0.21 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-09T11:34:26-07:00",
           "marketViewed": false
         },
         {
@@ -1421,7 +1448,8 @@
           "caseKeys": [
             "2026-W05-NE-Christian-Gonzalez",
             "2026-W05-NE-Carlton-Davis-III",
-            "2026-W05-NE-Karon-Prunty"
+            "2026-W05-NE-Karon-Prunty",
+            "2026-W05-NE-Channing-Canada"
           ],
           "rawTeamContributionDelta": -2.8,
           "finalTeamContributionDelta": -2.8,
@@ -1432,35 +1460,9 @@
             "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
             "https://www.patriots.com/news/roster-analysis-patriots-place-mack-hollins-and-reggie-gilliam-on-injured-reserve-in-a-flurry-of-roster-moves-ahead-of-sunday-s-game-vs-the-raiders",
             "data/walters/nfl/player-values/by-team-v1/ne.json",
-            "data/walters/nfl/player-values/player-values-access-v1.json"
+            "data/walters/nfl/player-values/player-values-access-v1.json",
+            "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json"
           ]
-        },
-        {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "LV",
-          "homeTeam": "NE",
-          "awayStarter": "Kirk Cousins",
-          "homeStarter": "Drake Maye",
-          "awayTeamQbDelta": -0.05,
-          "homeTeamQbDelta": 0.16,
-          "pointsToHomeSpread": -0.21,
-          "reason": "Governed Walters QB differential: LV -0.05 minus NE 0.16 equals -0.21 points to the home-spread coordinate.",
-          "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "STAGE3_PERFORMANCE_CANDIDATE"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-          ],
-          "effectiveAt": "2026-10-09T11:34:26-07:00",
-          "marketViewed": false
         }
       ],
       "researchSummary": "Governed fair decomposition: neutral/team base -4.957; home field -2.082; other governed -0.210; pre-personnel exact -7.249; personnel +3.300; matchup +0.000; exact Graham home fair -3.949; displayed -4.0.",
@@ -1502,12 +1504,6 @@
           "player": "Reggie Gilliam",
           "failClosedCode": "REVIEW_REQUIRED_CROSS_POSITION_ROLE",
           "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
-        },
-        {
-          "caseKey": "2026-W05-NE-Channing-Canada",
-          "player": "Channing Canada",
-          "failClosedCode": "CURRENT_ZERO_LOSS_PROOF_REQUIRED",
-          "resolutionStatus": "RESOLVED_MODEL_ESTIMATE"
         }
       ],
       "personnelBlockedGroups": [],
@@ -1558,9 +1554,9 @@
         "applicationStatus": "APPLIED",
         "marketViewed": false
       },
-      "priorGrahamFairHome": -6.5,
+      "priorGrahamFairHome": -4,
       "personnelProductionId": "walters-personnel-production-v1",
-      "personnelLastAppliedAt": "2026-10-10T16:53:00-07:00",
+      "personnelLastAppliedAt": "2026-10-11T07:06:42-07:00",
       "personnelEstimateCases": [
         {
           "caseKey": "2026-W05-NE-Mack-Hollins",
@@ -1688,6 +1684,26 @@
             "max": 0
           },
           "assumptionRationale": "Karon Prunty's immutable frozen healthy value is exactly 0.0; record zero calibrated loss within the complete four-corner inventory.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "reopenOn": "A source-bound value correction above zero or a separately governed current-value amendment.",
+          "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-NE-Channing-Canada",
+          "player": "Channing Canada",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "replacementValue": null,
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "assumptionRationale": "The accepted official EA Week 1 capture supplies Canada's missing immutable identity and zero-point calibrated value; record zero calibrated loss within the complete four-corner inventory.",
           "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
           "reopenOn": "A source-bound value correction above zero or a separately governed current-value amendment.",
           "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
@@ -3785,7 +3801,7 @@
       "startTimePacific": "2026-10-11T13:25:00-07:00",
       "grahamFairHome": -2.5,
       "grahamExactFairHome": -2.617,
-      "grahamAsOf": "2026-10-10T16:53:00-07:00",
+      "grahamAsOf": "2026-10-11T07:06:42-07:00",
       "numberStatus": "READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS",
       "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
@@ -3803,28 +3819,6 @@
           "venueClass": "DOMESTIC_HOME",
           "effectiveAt": "2026-10-06T04:26:26-07:00",
           "marketViewed": false
-        },
-        {
-          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
-          "team": "SF",
-          "side": "AWAY",
-          "clusterGroup": "DEFENSIVE_LINE",
-          "clusterMultiplier": 1,
-          "caseKeys": [
-            "2026-W05-SF-Nick-Bosa"
-          ],
-          "rawTeamContributionDelta": -1.35,
-          "finalTeamContributionDelta": -1.35,
-          "pointsToHomeSpread": -1.35,
-          "productionId": "walters-personnel-production-v1",
-          "calibrationId": "walters-nfl-personnel-calibration-v1",
-          "sourceRefs": [
-            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
-            "https://www.49ers.com/news/49ers-announce-roster-moves-ahead-of-sfvssea",
-            "https://www.49ers.com/news/juszczyk-and-three-more-ruled-out-vs-seahawks-in-week-5-williams-questionable-ahead-of-sfvssea",
-            "data/walters/nfl/player-values/by-team-v1/sf.json",
-            "data/walters/nfl/player-values/player-values-access-v1.json"
-          ]
         },
         {
           "type": "QB_PERFORMANCE_PRODUCTION",
@@ -3855,6 +3849,30 @@
           ],
           "effectiveAt": "2026-10-09T11:34:26-07:00",
           "marketViewed": false
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "SF",
+          "side": "AWAY",
+          "clusterGroup": "DEFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W05-SF-Nick-Bosa",
+            "2026-W05-SF-James-Thompson-Jr"
+          ],
+          "rawTeamContributionDelta": -1.35,
+          "finalTeamContributionDelta": -1.35,
+          "pointsToHomeSpread": -1.35,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+            "https://www.49ers.com/news/49ers-announce-roster-moves-ahead-of-sfvssea",
+            "https://www.49ers.com/news/juszczyk-and-three-more-ruled-out-vs-seahawks-in-week-5-williams-questionable-ahead-of-sfvssea",
+            "data/walters/nfl/player-values/by-team-v1/sf.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json",
+            "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json"
+          ]
         }
       ],
       "researchSummary": "Governed fair decomposition: neutral/team base -0.095; home field -2.082; other governed +0.910; pre-personnel exact -1.267; personnel -1.350; matchup +0.000; exact Graham home fair -2.617; displayed -2.5.",
@@ -3908,12 +3926,6 @@
           "player": "Zach Charbonnet",
           "failClosedCode": "REVIEW_REQUIRED_BACKFIELD_ALLOCATION",
           "resolutionStatus": "UNRESOLVED_FAIL_CLOSED"
-        },
-        {
-          "caseKey": "2026-W05-SF-James-Thompson-Jr",
-          "player": "James Thompson Jr",
-          "failClosedCode": "CURRENT_ZERO_LOSS_PROOF_REQUIRED",
-          "resolutionStatus": "RESOLVED_MODEL_ESTIMATE"
         }
       ],
       "personnelBlockedGroups": [],
@@ -3938,7 +3950,7 @@
         "displayedFairHome": -2.5,
         "arithmeticVerified": true
       },
-      "priorGrahamFairHome": -1.5,
+      "priorGrahamFairHome": -2.5,
       "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -3952,7 +3964,7 @@
       "qbPriorEstimateTeams": [],
       "qbPriorEstimates": [],
       "personnelProductionId": "walters-personnel-production-v1",
-      "personnelLastAppliedAt": "2026-10-10T16:53:00-07:00",
+      "personnelLastAppliedAt": "2026-10-11T07:06:42-07:00",
       "personnelEstimateCases": [
         {
           "caseKey": "2026-W05-SF-Nick-Bosa",
@@ -3996,6 +4008,26 @@
           "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
           "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
           "reopenOn": "Bosa becomes available or San Francisco changes the active defensive-line rotation.",
+          "applied": true
+        },
+        {
+          "caseKey": "2026-W05-SF-James-Thompson-Jr",
+          "player": "James Thompson Jr",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "classification": "GRAHAM_MODEL_ESTIMATE",
+          "method": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "replacementValue": null,
+          "injuryLoss": 0,
+          "rawTeamContributionDelta": 0,
+          "injuryLossRange": {
+            "min": 0,
+            "max": 0
+          },
+          "assumptionRationale": "James Thompson Jr.'s accepted official EA Week 1 capture converts to a zero-point calibrated healthy value; the nonnegative loss floor yields zero.",
+          "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+          "reopenOn": "A source-bound value correction above zero or separately governed current-value amendment.",
+          "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
           "applied": true
         }
       ],
@@ -4516,8 +4548,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-delta-1645-2026-w05-20261010T164520-0700-personnel",
-    "lastAppliedAt": "2026-10-10T16:53:00-07:00",
+    "lastBatchId": "graham-sunday-pregame-2026-w05-20261011T065946-0700-personnel-zero-closeout",
+    "lastAppliedAt": "2026-10-11T07:06:42-07:00",
     "marketViewed": false
   },
   "baselineRecovery": {
