@@ -121,6 +121,17 @@ for(const file of ['assets/runner-core-runtime.js','runner-core.html']){
     assert.equal(rendered.find(n=>n.tag==='h3').textContent,expected[i],file+' renders the signed line on the card');
     assert.equal(rendered.find(n=>n.className==='bigExec').textContent,r.price);
   }
+  const timingCards=recs.map(r=>api.card(doc,r));
+  for(const card of timingCards){
+    card.querySelector=selector=>nodes(card).find(n=>selector==='h3'?n.tag==='h3':n.className===selector.slice(1));
+    card.querySelectorAll=()=>[];
+    card.querySelector('.runnerMeta').insertAdjacentElement=(_position,badge)=>{card.timingBadge=badge};
+  }
+  const timingDocument={...doc,getElementById:id=>id==='runnerLive'?{querySelectorAll:()=>timingCards}:null};
+  const timingContext={window:{BettingEdgeSelectionLabel:labels,BettingEdgeRunnerPayload:()=>report},document:{getElementById:()=>({contentDocument:timingDocument,addEventListener(){}}),addEventListener(){}},Intl,Date,URLSearchParams};
+  const timing=fs.readFileSync('assets/event-timing-badges.js','utf8').replace('  function enhance(){','  window.enhanceForTest=enhance;\n  function enhance(){');
+  vm.runInNewContext(timing,timingContext);timingContext.window.enhanceForTest();
+  for(const [i,card] of timingCards.entries())assert.equal(card.timingBadge?.dataset.eventTime,String(Date.parse(recs[i].feed.eventDate)),'corrected labels retain their exact start-time badges');
   api.apply(report);
   const tableText=nodes(market).map(n=>n.textContent).join('\n');
   for(const title of expected)assert.ok(tableText.includes(title),file+' market table retains complete labels');

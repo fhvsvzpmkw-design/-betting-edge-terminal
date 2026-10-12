@@ -112,7 +112,7 @@
     const recs=Array.isArray(run?.recs)?run.recs:[];
     const byTitle=new Map();
     recs.forEach(rec=>{
-      const title=String(rec?.title||'').trim();
+      const title=String(window.BettingEdgeSelectionLabel?window.BettingEdgeSelectionLabel.title(rec):rec?.title||'').trim();
       if(!title)return;
       if(!byTitle.has(title))byTitle.set(title,[]);
       byTitle.get(title).push(rec)
