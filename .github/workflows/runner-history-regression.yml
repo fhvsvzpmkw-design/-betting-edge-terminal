@@ -13,6 +13,10 @@ on:
       - assets/runner-picks-ui.css
       - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
+      - assets/menu-home-style.js
+      - assets/menu-home-style.css
+      - assets/menu-home/**
+      - tests/menu-home-*.mjs
       - assets/menu-order-controller.js
       - assets/primary-nav-shell.js
       - assets/results-desk-ui.js
@@ -54,6 +58,10 @@ on:
       - assets/runner-picks-ui.css
       - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
+      - assets/menu-home-style.js
+      - assets/menu-home-style.css
+      - assets/menu-home/**
+      - tests/menu-home-*.mjs
       - assets/menu-order-controller.js
       - assets/primary-nav-shell.js
       - assets/results-desk-ui.js
@@ -106,12 +114,15 @@ jobs:
           node --check assets/preferences-framework.js
           node --check assets/syndicate-roster.js
           node --check assets/report-dashboard-vigscope.js
+          node --check assets/menu-home-style.js
           node --check assets/game-window-intelligence.js
           node --check assets/menu-order-controller.js
           node --check assets/primary-nav-shell.js
           node --check assets/results-desk-ui.js
       - name: Run F8 navigation theme authority regression
         run: node tests/f8-nav-theme-authority.test.mjs
+      - name: Run main menu lifecycle and legacy CSS regression
+        run: node tests/menu-home-style.test.mjs
       - name: Run personnel information ordering regression
         run: node tests/personnel-information-ordering.test.mjs
       - name: Run short-link history regression
@@ -136,16 +147,23 @@ jobs:
         run: node tests/syndicate-hotline-completeness.test.mjs
       - name: Install browser test dependency
         run: npm install --no-save puppeteer-core@24
-      - name: Verify Syndicate recovery and saved choices in the browser
+      - name: Verify Syndicate recovery and main menu layout in the browser
         run: |
           export CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           python3 -m http.server 8765 >/tmp/syndicate-server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID"' EXIT
           node tests/syndicate-roster-browser-smoke.mjs
+          node tests/menu-home-browser-smoke.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: syndicate-roster-screenshots
           path: .qa/syndicate-*.png
+          include-hidden-files: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: menu-home-screenshots
+          path: .qa/menu-*.png
           include-hidden-files: true
