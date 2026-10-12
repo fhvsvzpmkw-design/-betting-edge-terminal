@@ -2,7 +2,7 @@
   'use strict';
 
   // Presentation only. The canonical menu keeps every button and click/key handler.
-  const VERSION='20261012-menu-2';
+  const VERSION='20261012-menu-3';
   const STYLE_ID='vigMenuHomeStyle';
   const BRAND_SRC='/site-assets/product-badges/vigscope-small.png';
   const ART_BASE='./assets/menu-home/';
@@ -34,8 +34,8 @@
     const roomy=landscape&&height>=560&&tileHeight>=tileWidth*.62;
     let icon,font;
     if(landscape&&!roomy){
-      icon=Math.floor(Math.min(128,Math.max(24,Math.min(tileHeight-20,tileWidth*.36))));
-      font=Math.min(28,Math.max(13,Math.min((tileWidth-icon-26)/6.1,(tileHeight-18)/2.2)));
+      icon=Math.floor(Math.min(128,Math.max(24,Math.min(tileHeight-20,tileWidth*(tileWidth<165?.25:.36)))));
+      font=Math.min(28,Math.max(tileWidth<165?12.5:13,Math.min((tileWidth-icon-26)/6.1,(tileHeight-18)/2.2)));
     }else{
       font=Math.min(30,Math.max(16,Math.min((tileWidth-20)/6.1,tileHeight*.18)));
       icon=Math.floor(Math.min(roomy?172:142,tileWidth*.64,Math.max(24,tileHeight-font*2.15-24)));

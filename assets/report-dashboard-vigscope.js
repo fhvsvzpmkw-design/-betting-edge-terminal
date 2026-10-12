@@ -75,7 +75,7 @@
   // Existing buttons, function keys, and secondary-screen styling stay authoritative.
   const menuHome=document.createElement('script');
   menuHome.id='menuHomeStyleLoader';
-  menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-2&b=${UI_CACHE_BUST}`;
+  menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-3&b=${UI_CACHE_BUST}`;
   menuHome.async=false;
   document.head.appendChild(menuHome);
 
