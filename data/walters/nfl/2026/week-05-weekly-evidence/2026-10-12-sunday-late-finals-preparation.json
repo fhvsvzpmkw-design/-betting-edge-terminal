@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-12T01:09:19.000Z",
+  "season": 2026,
+  "sourceWeek": 5,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Pre-rollover additive preparation for DEN-LAC and DET-ARI after both games became officially FINAL. Final scores and frozen kickoff rating/H4 snapshots are preserved; exact pregame and in-game personnel inputs remain fail-closed. This does not advance the active manifest, publish ratings, write current-week overlays, construct fairs or issue a bet.",
+  "marketViewed": false,
+  "inputCommit": "6bd893cdcb7f62fe7a23bdea165233969b207080",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "7cef72fde7b87d7a788d33f56416bab59dbade2f",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "7b3bafa1155d559f168b4859332e2450a8e3966c",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "sources": [
+    {
+      "id": "nfl-week5-schedule-late-finals",
+      "url": "https://www.nfl.com/schedules/2026/by-week/week-5",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-DEN-LAC", "2026-W05-DET-ARI"],
+      "finding": "Official NFL Week 5 schedule reports Denver 23-Los Angeles Chargers 17 and Detroit 45-Arizona 21 FINAL. SF-SEA remained live and the night/Monday games had not started at capture time.",
+      "checkedAt": "2026-10-12T01:09:19.000Z"
+    },
+    {
+      "id": "nfl-week5-sunday-inactives-late",
+      "url": "https://www.nfl.com/news/nfl-week-5-inactives-players-ruled-out-sunday-2026-season",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-DEN-LAC", "2026-W05-DET-ARI"],
+      "finding": "Official final inactive lists identify the game-day inactive inventories for DEN/LAC and DET/ARI, including Moss, Surtain, Johnston, James, Jackson, Alt, Bartch, Ya-Sin and Wingard.",
+      "checkedAt": "2026-10-12T01:09:19.000Z"
+    },
+    {
+      "id": "nfl-week5-final-injury-report-late",
+      "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-DEN-LAC", "2026-W05-DET-ARI"],
+      "finding": "Official final designations establish injury-driven pregame absences: DEN Riley Moss and Patrick Surtain II; LAC Quentin Johnston, Brenen Thompson, Joe Alt, Kayode Awosika, Trevor Penning, Donte Jackson and Derwin James; DET Ben Bartch, Cade Mays, Rock Ya-Sin and Brian Branch; ARI Isaiah Adams and Andrew Wingard.",
+      "checkedAt": "2026-10-12T01:09:19.000Z"
+    },
+    {
+      "id": "nfl-week5-sunday-injury-updates-late",
+      "url": "https://www.nfl.com/news/notable-injuries-news-sunday-week-5-games-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-DEN-LAC", "2026-W05-DET-ARI"],
+      "finding": "Official Sunday injury monitor reports Denver S Talanoa Hufanga ruled out with an ankle injury. No DET-ARI in-game injury closure is asserted from the absence of a monitor entry; final gamebook review remains required.",
+      "checkedAt": "2026-10-12T01:09:19.000Z"
+    },
+    {
+      "id": "den-lac-gamecenter",
+      "url": "https://www.nfl.com/games/broncos-at-chargers-2026-reg-5",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-DEN-LAC"],
+      "finding": "Official game center reports Denver 23, Los Angeles Chargers 17, FINAL.",
+      "checkedAt": "2026-10-12T01:09:19.000Z"
+    },
+    {
+      "id": "det-ari-gamecenter",
+      "url": "https://www.nfl.com/games/lions-at-cardinals-2026-reg-5",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-DET-ARI"],
+      "finding": "Official game center reports Detroit 45, Arizona 21, FINAL.",
+      "checkedAt": "2026-10-12T01:09:19.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-DEN-LAC",
+      "away": "DEN",
+      "home": "LAC",
+      "state": "BLOCKED",
+      "sourceIds": ["nfl-week5-schedule-late-finals", "den-lac-gamecenter", "nfl-week5-sunday-inactives-late", "nfl-week5-final-injury-report-late", "nfl-week5-sunday-injury-updates-late"],
+      "final": {"awayScore": 23, "homeScore": 17, "status": "FINAL", "sourceIds": ["nfl-week5-schedule-late-finals", "den-lac-gamecenter"]},
+      "frozenKickoff": {"startTimePacific": "2026-10-11T13:05:00-07:00", "awayRating": 26.4700956, "homeRating": 21.782927, "homeLocationAdvantagePoints": 2.082, "venueClass": "DOMESTIC_HOME", "ledgerBlobSha": "5a4ef6e4e77441c74b09bc3e6503242c93585e20", "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd", "preservedH4": true, "marketViewed": false},
+      "checklist": {"verifiedFinalResult": "COMPLETE", "frozenKickoffRatingsAndH4": "COMPLETE", "pairedGameDayInjuryLoss": "BLOCKED"},
+      "blockers": [
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "Final injury/inactive evidence identifies DEN CB Riley Moss and CB Patrick Surtain II, plus LAC WR Quentin Johnston, WR Brenen Thompson, OT Joe Alt, G Kayode Awosika, OL Trevor Penning, CB Donte Jackson and S Derwin James as injury-driven pregame absences. The saved ledger contains only the continuing LAC Rashawn Slater case, so the listed identities, frozen values, replacements and group safeguards remain unadopted.", "nextAction": "Bind each exact player identity/value, distinguish roster-list status from final inactive/DNP participation, establish disjoint game-active replacements and run offensive-line, receiver and defensive-back cluster review.", "owner": "GRAHAM_WALTERS_90_10"},
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "DEN S Talanoa Hufanga was ruled out in-game with an ankle injury; exact lost interval and relief role are not yet bound.", "nextAction": "Reconcile the final gamebook play/status clock and safety participation, then apply the approved partial-time method without inferring active impairment.", "owner": "GRAHAM_WALTERS_90_10"},
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "Complete inactive/DNP, specialist, quarterback-duty and every printed injury/return sequence has not yet been assembled into one paired evaluator-ready record.", "nextAction": "Merge the saved Slater estimate with all new cases and final gamebook coverage, then run tools/graham-weekly-evidence.mjs.", "owner": "GRAHAM_WALTERS_90_10"}
+      ]
+    },
+    {
+      "gameKey": "2026-W05-DET-ARI",
+      "away": "DET",
+      "home": "ARI",
+      "state": "BLOCKED",
+      "sourceIds": ["nfl-week5-schedule-late-finals", "det-ari-gamecenter", "nfl-week5-sunday-inactives-late", "nfl-week5-final-injury-report-late", "nfl-week5-sunday-injury-updates-late"],
+      "final": {"awayScore": 45, "homeScore": 21, "status": "FINAL", "sourceIds": ["nfl-week5-schedule-late-finals", "det-ari-gamecenter"]},
+      "frozenKickoff": {"startTimePacific": "2026-10-11T13:25:00-07:00", "awayRating": 24.584183, "homeRating": 16.854341, "homeLocationAdvantagePoints": 2.082, "venueClass": "DOMESTIC_HOME", "ledgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc", "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd", "preservedH4": true, "marketViewed": false},
+      "checklist": {"verifiedFinalResult": "COMPLETE", "frozenKickoffRatingsAndH4": "COMPLETE", "pairedGameDayInjuryLoss": "BLOCKED"},
+      "blockers": [
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "Final injury/inactive evidence identifies DET G Ben Bartch, C Cade Mays, CB Rock Ya-Sin and S Brian Branch, plus ARI OL Isaiah Adams and S Andrew Wingard as injury-driven pregame absences. None appears in the saved currentCases snapshot for this game; only ARI Paris Johnson Jr. and Hunter Long have reusable estimates.", "nextAction": "Bind exact frozen identities/values, final game-active replacements and disjoint offensive-line/defensive-back duties for every newly identified absence.", "owner": "GRAHAM_WALTERS_90_10"},
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "No additional DET-ARI in-game loss is inferred from the absence of a league injury-monitor entry. Complete final gamebook inactive/DNP, quarterback, specialist and printed injury/return coverage is still unreconciled.", "nextAction": "Review the official final gamebook in full, retain any healthy/transactional exclusions explicitly, combine the two saved Arizona cases, and run the paired evaluator.", "owner": "GRAHAM_WALTERS_90_10"}
+      ]
+    }
+  ]
+}
