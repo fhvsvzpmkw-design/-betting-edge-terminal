@@ -38,6 +38,7 @@ jobs:
           node tools/grade-issued-card-history.mjs --self-test
           node tests/card-grading-recovery.test.mjs
           node tests/verify-issued-results-spread-sign.test.js
+          node tests/card-grading-publish.test.mjs
           node --check tools/repair-card-observation-identities.mjs
           node tools/repair-card-observation-identities.mjs --self-test
           node - <<'NODE'
@@ -131,14 +132,7 @@ jobs:
         run: |
           git config user.name 'betting-edge-bot'
           git config user.email 'betting-edge-bot@users.noreply.github.com'
-          node - <<'NODE'
-          const fs=require('fs'),cp=require('child_process');
-          const paths=JSON.parse(fs.readFileSync('/tmp/card-grading-paths.json','utf8'));
-          cp.execFileSync('git',['add','--',...paths],{stdio:'inherit'});
-          NODE
-          git commit -F /tmp/card-grading-commit.txt
-          git pull --rebase origin main
-          git push origin main
+          node tools/publish-card-grading.mjs
       - name: Independently read back committed outputs
         if: steps.scope.outputs.active == 'true'
         run: |
@@ -147,16 +141,20 @@ jobs:
           const fs=require('fs'),cp=require('child_process'),assert=require('assert/strict');
           const req=JSON.parse(fs.readFileSync('data/history/grading/request.json','utf8'));
           const p=`data/history/grading/receipts/${req.requestId}.json`;
-          const remote=JSON.parse(cp.execFileSync('git',['show',`origin/main:${p}`],{encoding:'utf8',maxBuffer:16*1024*1024}));
+          const published=cp.execFileSync('git',['log','-1','--format=%H','origin/main','--',p],{encoding:'utf8'}).trim();
+          assert.ok(published,'Published receipt commit missing');
+          const remote=JSON.parse(cp.execFileSync('git',['show',`${published}:${p}`],{encoding:'utf8',maxBuffer:16*1024*1024}));
           assert.equal(remote.requestId,req.requestId); assert.equal(remote.targetDate,req.targetDate);
           for(const [file,sha] of Object.entries(remote.outputBlobs)) {
-            const actual=cp.execFileSync('git',['rev-parse',`origin/main:${file}`],{encoding:'utf8'}).trim();
+            const actual=cp.execFileSync('git',['rev-parse',`${published}:${file}`],{encoding:'utf8'}).trim();
             assert.equal(actual,sha,`Remote readback mismatch: ${file}`);
           }
           if (remote.identityCleanup?.state === 'VERIFIED') {
-            const audit=JSON.parse(cp.execFileSync('git',['show',`origin/main:${remote.identityCleanup.auditPath}`],{encoding:'utf8',maxBuffer:16*1024*1024}));
+            const audit=JSON.parse(cp.execFileSync('git',['show',`${published}:${remote.identityCleanup.auditPath}`],{encoding:'utf8',maxBuffer:16*1024*1024}));
             assert.equal(audit.state,'VERIFIED'); assert.equal(audit.gradesChanged,0);
             for (const [file,sha] of Object.entries(audit.sourceBlobs)) assert.equal(cp.execFileSync('git',['rev-parse',`origin/main:${file}`],{encoding:'utf8'}).trim(),sha,'Immutable source readback mismatch');
           }
+          const current=JSON.parse(cp.execFileSync('git',['show','origin/main:data/history/results-index.json'],{encoding:'utf8',maxBuffer:128*1024*1024}));
+          assert.equal((current.cards||[]).filter(x=>String(x.date||'')<=req.targetDate && x.completionState!=='complete').length,remote.historicalCoverage.unresolvedCards,'Latest index lost historical settlements');
           console.log('DURABLE GRADING READBACK VERIFIED'); console.log(JSON.stringify({requestId:remote.requestId,state:remote.state,target:remote.target,coverage:remote.coverage,historicalCoverage:remote.historicalCoverage,backlogHealth:remote.backlogHealth,olderRemainingCards:remote.olderRemainingCards,identityCleanup:remote.identityCleanup},null,2));
           NODE
