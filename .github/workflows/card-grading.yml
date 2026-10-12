@@ -6,6 +6,8 @@ on:
     paths:
       - 'data/history/grading/request.json'
   workflow_dispatch:
+  schedule:
+    - cron: "0 10,11 * * *"
 
 permissions:
   contents: write
@@ -26,10 +28,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Prepare native daily request or preserve explicit request
+        id: scope
+        run: node tools/prepare-card-grading-request.mjs
       - name: Validate request and historical grader
+        if: steps.scope.outputs.active == 'true'
         run: |
           node --check tools/grade-issued-card-history.mjs
           node tools/grade-issued-card-history.mjs --self-test
+          node tests/card-grading-recovery.test.mjs
+          node tests/verify-issued-results-spread-sign.test.js
           node --check tools/repair-card-observation-identities.mjs
           node tools/repair-card-observation-identities.mjs --self-test
           node - <<'NODE'
@@ -43,19 +51,24 @@ jobs:
             assert.deepEqual(request, submitted, 'Request superseded: do not process another request under this run');
           }
           assert.ok(!fs.existsSync(`data/history/grading/receipts/${request.requestId}.json`), 'Request already has a durable receipt; use a new requestId for an additional pass');
-          assert.equal(cp.execFileSync('git', ['status', '--porcelain'], {encoding:'utf8'}).trim(), '', 'Clean checkout required');
+          const changes = cp.execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).split('\n').filter(Boolean).map(x=>x.slice(3));
+          assert.deepEqual(changes, process.env.GITHUB_EVENT_NAME === 'schedule' ? [file] : [], 'Unexpected checkout changes');
           NODE
       - name: Apply explicitly requested source-pinned identity cleanup
+        if: steps.scope.outputs.active == 'true'
         run: node tools/repair-card-observation-identities.mjs --request data/history/grading/request.json
       - name: Grade requested day and older missing or unresolved observations
+        if: steps.scope.outputs.active == 'true'
         run: node tools/grade-issued-card-history.mjs data/history/grading/request.json
       - name: Rebuild downstream results index
+        if: steps.scope.outputs.active == 'true'
         run: |
           node tools/build-results-index.mjs
           node tools/add-results-player-value.mjs
           node tools/add-results-shadow-v2.mjs
           node tools/repair-card-observation-identities.mjs --check-index
       - name: Reconcile settlements and prepare durable receipt
+        if: steps.scope.outputs.active == 'true'
         run: |
           node - <<'NODE'
           const fs = require('fs'), cp = require('child_process'), assert = require('assert/strict');
@@ -95,10 +108,15 @@ jobs:
           }
           const older = (idx.unresolved||[]).filter(x=>String(x.date||'')<runtime.targetDate);
           const receiptPath = `data/history/grading/receipts/${runtime.requestId}.json`;
+          const historicalCards = (idx.cards||[]).filter(x=>String(x.date||'')<=runtime.targetDate);
+          const historicalPending = historicalCards.filter(x=>x.completionState!=='complete');
+          const historicalCoverage = {throughDate:runtime.targetDate,cards:historicalCards.length,completeCards:historicalCards.length-historicalPending.length,unresolvedCards:historicalPending.length,unresolvedSelections:new Set(historicalPending.map(x=>x.selectionKey||x.cardId)).size,unresolvedEvents:new Set(historicalPending.map(x=>x.eventId||x.cardId)).size};
+          const backlogHealth = {state:historicalPending.length?'REVIEW_REQUIRED':'CLEAR',quotaDeferredEvents:runtime.quotaDeferredEvents,allPendingEventsAttempted:runtime.pendingEventsAttempted,exceptions:runtime.unresolvedEvents};
+          const requestPaths = process.env.GITHUB_EVENT_NAME === 'schedule' ? ['data/history/grading/request.json'] : [];
           const cleanupPaths = [...cleanup.observationPaths,...(cleanup.auditPath?[cleanup.auditPath]:[])];
-          const outputPaths = [...new Set([...runtime.observationPaths,...cleanupPaths,'data/history/results-index.json'])].sort();
+          const outputPaths = [...new Set([...runtime.observationPaths,...cleanupPaths,...requestPaths,'data/history/results-index.json'])].sort();
           const outputBlobs = Object.fromEntries(outputPaths.map(p=>[p,cp.execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim()]));
-          const receipt = {schema:1,state:tally.unresolved||older.length?'PARTIAL_UNRESOLVED':'COMPLETE',requestId:runtime.requestId,targetDate:runtime.targetDate,preparedAt:new Date().toISOString(),workflowRunId:process.env.GITHUB_RUN_ID,workflowRunAttempt:process.env.GITHUB_RUN_ATTEMPT,triggerCommit:process.env.GITHUB_SHA,inputCommit:cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),runtime,identityCleanup:cleanup,target:tally,targetIndex:dateStats,coverage:idx.coverage,olderRemainingCards:older.length,olderRemainingEvents:new Set(older.map(x=>String(x.eventId||x.cardId))).size,targetObservations,outputBlobs,isolation:'Only historical observations, downstream results index, an explicitly requested historical correction audit, and this receipt. No live odds, issued reports, report production or betting ledger changes.'};
+          const receipt = {schema:1,state:tally.unresolved||older.length?'PARTIAL_UNRESOLVED':'COMPLETE',requestId:runtime.requestId,targetDate:runtime.targetDate,preparedAt:new Date().toISOString(),workflowRunId:process.env.GITHUB_RUN_ID,workflowRunAttempt:process.env.GITHUB_RUN_ATTEMPT,triggerCommit:process.env.GITHUB_SHA,inputCommit:cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),runtime,identityCleanup:cleanup,target:tally,targetIndex:dateStats,coverage:idx.coverage,historicalCoverage,backlogHealth,olderRemainingCards:older.length,olderRemainingEvents:new Set(older.map(x=>String(x.eventId||x.cardId))).size,targetObservations,outputBlobs,isolation:'Only historical observations, downstream results index, an explicitly requested historical correction audit, and this receipt. No live odds, issued reports, report production or betting ledger changes.'};
           fs.mkdirSync('data/history/grading/receipts',{recursive:true}); fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
           fs.writeFileSync('/tmp/card-grading-paths.json',JSON.stringify([...outputPaths,receiptPath]));
           const allowed = new Set([...outputPaths,receiptPath]);
@@ -109,6 +127,7 @@ jobs:
           fs.writeFileSync('/tmp/card-grading-commit.txt',message); console.log(JSON.stringify(receipt,null,2));
           NODE
       - name: Commit only verified historical outputs
+        if: steps.scope.outputs.active == 'true'
         run: |
           git config user.name 'betting-edge-bot'
           git config user.email 'betting-edge-bot@users.noreply.github.com'
@@ -121,6 +140,7 @@ jobs:
           git pull --rebase origin main
           git push origin main
       - name: Independently read back committed outputs
+        if: steps.scope.outputs.active == 'true'
         run: |
           git fetch origin main
           node - <<'NODE'
@@ -138,5 +158,5 @@ jobs:
             assert.equal(audit.state,'VERIFIED'); assert.equal(audit.gradesChanged,0);
             for (const [file,sha] of Object.entries(audit.sourceBlobs)) assert.equal(cp.execFileSync('git',['rev-parse',`origin/main:${file}`],{encoding:'utf8'}).trim(),sha,'Immutable source readback mismatch');
           }
-          console.log('DURABLE GRADING READBACK VERIFIED'); console.log(JSON.stringify({requestId:remote.requestId,state:remote.state,target:remote.target,coverage:remote.coverage,olderRemainingCards:remote.olderRemainingCards,identityCleanup:remote.identityCleanup},null,2));
+          console.log('DURABLE GRADING READBACK VERIFIED'); console.log(JSON.stringify({requestId:remote.requestId,state:remote.state,target:remote.target,coverage:remote.coverage,historicalCoverage:remote.historicalCoverage,backlogHealth:remote.backlogHealth,olderRemainingCards:remote.olderRemainingCards,identityCleanup:remote.identityCleanup},null,2));
           NODE

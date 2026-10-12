@@ -151,7 +151,7 @@ function gradeFromScore(rec, event) {
   if (market === 'ml' || market === 'moneyline') {
     if (!['home', 'away', 'draw'].includes(side)) return { grade: null, reason: 'unsupported_moneyline_side' };
     if (side === 'draw') return { grade: home === away ? 'WIN' : 'LOSS', method: 'final_score' };
-    if (home === away) return { grade: 'LOSS', method: 'final_score' };
+    if (home === away) return event.twoWayMoneylineTie ? {grade:null,reason:'moneyline_tie_rule_not_verified'} : { grade: 'LOSS', method: 'final_score' };
     const winner = home > away ? 'home' : 'away';
     return { grade: winner === side ? 'WIN' : 'LOSS', method: 'final_score' };
   }
@@ -206,13 +206,15 @@ function exactSelectionGrade(rec, event) {
   const key = rec?.feed?.selectionKey;
   if (!key) return null;
   const rows = Array.isArray(event?.selectionOutcomes) ? event.selectionOutcomes : [];
-  const match = rows.find((row) => row?.selectionKey === key);
+  const book = String(rec?.feed?.book || rec?.book || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const match = rows.find((row) => row?.selectionKey === key && (!row.book || row.book === book));
   const grade = String(match?.grade || '').toUpperCase();
   if (!match || !GRADES.has(grade)) return null;
   return {
     grade,
     method: 'exact_selection_verification',
     basis: match.basis || null,
+    ruleSource: match.ruleSource || null,
     observedValue: match.observedValue ?? null,
     components: Array.isArray(match.components) ? match.components : null
   };
@@ -393,7 +395,7 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
       hypothetical: !official,
       verifiedAt,
       eventId: eventId || null,
-      finalScore: Number.isFinite(Number(event.homeScore)) && Number.isFinite(Number(event.awayScore)) ? {
+      finalScore: event.homeScore !== null && event.homeScore !== undefined && event.awayScore !== null && event.awayScore !== undefined && Number.isFinite(Number(event.homeScore)) && Number.isFinite(Number(event.awayScore)) ? {
         home: event.home || null,
         away: event.away || null,
         homeScore: Number(event.homeScore),
@@ -402,6 +404,7 @@ result.recommendations = (issued.recs || []).map((rec, index) => {
       settlementMethod: graded.method,
       line: graded.line ?? null,
       basis: graded.basis ?? null,
+      settlementRuleSource: graded.ruleSource ?? null,
       observedValue: graded.observedValue ?? null,
       settlementComponents: graded.components ?? null,
       source: source ? {

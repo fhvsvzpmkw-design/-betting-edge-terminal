@@ -154,31 +154,15 @@ Normal retry guidance:
 
 Quota-deferred items use `next_backlog_pass` and must not increment verification attempts merely because they were skipped by the cap.
 
-## Daily 05:00 Result Closure
+## Daily historical result closure
 
-A separate task runs at **05:00 America/Vancouver**, before the morning odds/report sequence.
+Controlled by `CARD_GRADING_AUTHORITY.md` version 1.1 and the existing `card-grading.yml` workflow. Native execution runs at 03:00 America/Vancouver; the continuing ChatGPT task verifies it and supplies fallback recovery at 03:30.
 
-It builds two independent event buckets:
+Each pass attempts every pending past issued event, deduplicated by exact event ID. Previous-day and older backlog counts remain separate, with no fixed 20/10 quotas. Cache result requests by exact provider/league/date so one final result may close all matching cards without repeating broad board retrieval. Genuine exceptions cannot monopolize a quota or hide newer unresolved events. Receipts must distinguish historical backlog from current-day cards and report exact unresolved identities and reasons.
 
-### Bucket A — previous Vancouver day
+Match full-game identities from issued metadata (`at` or `@`) and exact immutable issued snapshots where display names are missing; never infer a game from a placeholder or silently overwrite a conflicting identity. College football includes FBS and FCS. CFL uses its official scoreboard when ESPN does not cover it. Official unplayed cancellations require exact-selection void verification. Tied NFL/CFL two-way full-game moneylines require the issued book's verified refund rule; spreads and totals use the verified final score.
 
-Issued BET / LEAN / WAIT / PASS cards from the previous Vancouver calendar day whose event start has passed.
-
-Quota: up to **20 unique events**.
-
-### Bucket B — older unresolved backlog
-
-Older cards explicitly still UNRESOLVED.
-
-Quota: up to **10 unique events**.
-
-The quotas are independent. Maximum targeted verification is 30 unique events when both buckets are full.
-
-Deduplicate by exact `rec.feed.eventId`. If one event appears on multiple cards/runs, one verified final may close all matching cards. If an event qualifies in both buckets, count it only in Bucket A.
-
-Backlog order is oldest-first, with `verification_deferred_event_cap` items prioritized over same-age genuine verification failures/ambiguities so cap-deferred work gets the next available pass.
-
-The 05:00 audit is independent of the current MLB/Summer **05:50 odds pulse → 06:00 report**. Its failure must not alter live odds, rerun handicapping or block a Betting Edge report.
+This remains independent of live odds and report production. No live refresh, re-handicap, issuance edit or bankroll write is permitted.
 
 ## Core v1.4 compatibility
 
