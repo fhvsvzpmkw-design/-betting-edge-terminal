@@ -1,0 +1,41 @@
+name: Verify selection labels
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - assets/selection-label.js
+      - assets/runner-core-runtime.js
+      - runner.html
+      - runner-core.html
+      - tools/selection-label-gate.mjs
+      - tools/primary-lineage.mjs
+      - tools/report-pipeline.mjs
+      - tools/report-publication.mjs
+      - tests/selection-labels.test.mjs
+      - tests/fixtures/selection-labels-20261012.json
+      - .github/workflows/selection-labels.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact selection labels, blocked conflicts and rendered cards
+        run: node tests/selection-labels.test.mjs
+      - name: Shared pipeline and current publisher regressions
+        run: |
+          node tests/report-pipeline.test.mjs
+          node tools/report-publication.mjs self-test
+          node tools/spread-lineage.mjs self-test
+          node tools/primary-lineage-continuity-test.mjs
+      - name: Report handoff and mobile card filters
+        run: |
+          node tests/runner-report-handoff.test.mjs
+          node tests/runner-picks-ui.test.mjs
+          node tests/scheduled-report-authority.test.mjs

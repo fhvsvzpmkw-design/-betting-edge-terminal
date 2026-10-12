@@ -166,6 +166,8 @@ The checkpoint stores the current complete draft and phase atomically. It does n
 
 ### Prepare, validate and freeze details
 
+**Selection labels, forward from 2026-10-12T11:58:55-07:00:** every displayed primary selection must identify its market and exact side/line. Use the shared `assets/selection-label.js` formatter: moneyline is explicit, spreads/run lines/puck lines show the bettor-facing signed handicap, and totals show Over/Under plus the exact total. Provider spread `hdp`/selection-key lines are home-oriented; negate them only for the away selection. Draft preparation fills omitted market labels from the structured selection and synchronizes title copies before freeze. An explicitly conflicting team, market, sign or number must be resolved against the bound quote, never silently corrected. `selection-label-gate.mjs` is mandatory in the shared validation plan and the publisher, including new cards with no prior lineage. Publication must reject incomplete/conflicting labels. Issued History remains immutable; the runner derives complete display labels from its existing exact selection data.
+
 Read bankroll from the authoritative ledger projection with its blob SHA. Use actual Vancouver issuance time, exact bound feed, Core 1.5 provenance, real counts/risk and all completed decisions. Publisher owns meters and completion display metadata; do not invent them.
 
 Run shared preparation on unfrozen local drafts:

@@ -8,6 +8,7 @@ import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
 import {validateCardEvidenceBundle} from './card-evidence-identity.mjs';
 import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
 import {attachPublicationEvidenceAudit, validateCandidateCompletion} from './report-evidence-repair.mjs';
+import {validateSelectionLabels} from './selection-label-gate.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -369,6 +370,7 @@ function loadIndex(root){
 }
 function readPublicationBundle(reportFile,sidecarFile,{root=process.cwd(),collectRecommendationErrors=false}={}){
   const report = validateReport(readJson(reportFile));
+  validateSelectionLabels(report);
   validateReportMarketScope(report);
   const paths = expectedPaths(report);
   const sidecar = validateSidecar(normalizePublicationSidecar(readJson(sidecarFile),report),report,paths.reportPath,{strict:true,collectRecommendationErrors});

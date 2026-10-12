@@ -18,6 +18,7 @@ html,body{margin:0;width:100%;height:100%;background:#01040a;overflow:hidden}
 <div id="err"></div>
 <iframe id="app" title="VigScope Core v1.5"></iframe>
 <script src="./assets/quote-observation.js"></script>
+<script src="./assets/selection-label.js?v=selection-label-20261012"></script>
 <script>
 const $=s=>document.querySelector(s);
 $('#app').src='./index.html?build='+Date.now();
@@ -28,6 +29,7 @@ const FEED_URL='./data/live-odds.json';
 const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const QuoteObservation=globalThis.BettingEdgeQuoteObservation;
 const OddsFormat=globalThis.VigScopeOddsFormat;
+const SelectionLabel=globalThis.BettingEdgeSelectionLabel;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
 let activeRun=null;
 let originalRun=null;
@@ -572,18 +574,20 @@ function priceWatchMeta(r){
   const target=txt(w.target,'').trim();if(!target)return null;
   return {target,reason:txt(w.reason,'').trim()}
 }
+function selectionDisplay(rec){return SelectionLabel?SelectionLabel.describe(rec):['ml','spread','totals'].includes(rec?.feed?.marketKey)?{title:'SELECTION NOT VERIFIED',problem:'Selection label formatter unavailable'}:{title:txt(rec?.title,'Untitled market')}}
 function card(d,r){
   if(OddsFormat)r=OddsFormat.record(r);
+  const label=selectionDisplay(r),identityProblem=label.problem;
   const c=el(d,'div','runnerCard');c.style.borderColor=border(r.status);
   const top=el(d,'div','runnerTop'),l=el(d,'div');
   const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
   const badges=el(d,'div','runnerBadgeRow');badges.appendChild(badge);
   if(watch)badges.appendChild(el(d,'span','priceWatchBadge','PRICE WATCH'));
-  l.append(badges,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',txt(r.meta,'')));
+  l.append(badges,el(d,'h3','',label.title),el(d,'div','runnerMeta',txt(r.meta,'')));
   if(watch)l.appendChild(el(d,'div','runnerMeta priceWatchTarget',`WATCH TARGET: ${watch.target}${watch.reason?` // ${watch.reason}`:''}`));
   const rr=el(d,'div','execution');
   const snapshotTime=displayPriceTime(r.price);
-  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',displayPrice(r.price)));
+  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',identityProblem?'PRICE NOT VERIFIED':displayPrice(r.price)));
   const state=isEventStartedClosed(r)?'EVENT STARTED/CLOSED':txt(r.priceState,'ISSUED SNAPSHOT');
   const stateLabel=snapshotTime&&state==='ISSUED SNAPSHOT'?`${state} • ${snapshotTime}`:state;
   rr.appendChild(el(d,'div','priceState '+(state==='UPDATED'?'updated':state==='REFRESH UNRESOLVED'?'unresolved':''),stateLabel));
@@ -748,7 +752,7 @@ function apply(run){
       const r=OddsFormat?OddsFormat.record(issued):issued;
       const tr=el(d,'tr');
       const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
-      [txt(r.status),txt(r.title),[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      [txt(r.status),selectionDisplay(r).title,[r.book,selectionDisplay(r).problem?'PRICE NOT VERIFIED':displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
       tb.appendChild(tr)
     });
     table.append(thead,tb);wrap.appendChild(table);m.appendChild(wrap);market.prepend(m)

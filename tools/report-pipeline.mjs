@@ -6,10 +6,12 @@ import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 export const NORMALIZERS = Object.freeze([
+  ['selection-label-gate.mjs','normalize'],
   ['report-sidecar-contract.mjs','normalize'],
   ['pinnacle-benchmark-publication-gate.mjs','normalize']
 ]);
 export const CANDIDATE_GATES = Object.freeze([
+  ['selection-label-gate.mjs','validate'],
   ['personnel-semantic-gate.mjs','validate'],
   ['major-sport-market-coverage-gate.mjs','validate'],
   ['report-evidence-gate.mjs','validate'],

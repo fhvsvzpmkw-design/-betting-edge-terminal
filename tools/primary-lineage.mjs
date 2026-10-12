@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import {selectionLabelViolations} from './selection-label-gate.mjs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import quoteObservation from '../assets/quote-observation.js';
@@ -168,12 +169,13 @@ export function auditPrimaryLineage({ root = process.cwd(), report, sidecar = nu
   ensure(spec, 'Unsupported primary movement market');
   ensure(ms(report?.ts) !== null, 'Report ts is invalid');
   if (!lineageApplies(report, market)) return { ok: true, enforced: false, diagnostics: [], violations: [] };
+  const labelViolations = selectionLabelViolations(report);
   const tracked = priorSelections(root, report, market);
-  if (!tracked.length) return { ok: true, enforced: true, diagnostics: [], violations: [] };
+  if (!tracked.length) return { ok: labelViolations.length === 0, enforced: true, diagnostics: [], violations: labelViolations };
   feed ||= loadFeed(root, report, sidecar, feedFile);
   ensure(feed?.generatedAt === report.feedGeneratedAt, 'Bound feed generatedAt does not match report feedGeneratedAt');
   ensure(age(feed.generatedAt, report.ts) <= 75, 'Report feed is older than 75 minutes at issuance');
-  const events = mergedFeedEvents(feed), currentBySide = new Map(), diagnostics = [], violations = [];
+  const events = mergedFeedEvents(feed), currentBySide = new Map(), diagnostics = [], violations = [...labelViolations];
   for (const rec of report.recs || []) {
     const key = lineageEventSide(rec, market);
     if (!key) continue;

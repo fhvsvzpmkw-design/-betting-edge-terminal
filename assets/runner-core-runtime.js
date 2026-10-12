@@ -7,6 +7,7 @@ const FEED_URL='./data/live-odds.json';
 const REPRICE_QUOTE_MAX_AGE_MINUTES=30;
 const QuoteObservation=globalThis.BettingEdgeQuoteObservation;
 const OddsFormat=globalThis.VigScopeOddsFormat;
+const SelectionLabel=globalThis.BettingEdgeSelectionLabel;
 const BOOK_PRIORITY=['Bet365','DraftKings'];
 const VIG_METER_CALIBRATION_ID='vigscope-meter-calibration-v1';
 const VIG_METER_TELEMETRY_CUTOVER='2026-09-02T08:43:00-07:00';
@@ -1044,7 +1045,7 @@ function runMarkets(run){return [...new Set((run?.recs||[]).map(pickMarket))].so
 function runBooks(run){return [...new Set((run?.recs||[]).map(r=>String(r.book||'').trim()).filter(Boolean))].sort()}
 function picksMatchingFilters(run,includeStatus=true){
   const query=normName(pickSearch);
-  return (run?.recs||[]).filter(r=>(sportFilter==='ALL'||recSport(r)===sportFilter)&&(!includeStatus||statusFilter==='ALL'||pickStatus(r)===statusFilter)&&(marketFilter==='ALL'||pickMarket(r)===marketFilter)&&(bookFilter==='ALL'||String(r.book||'').trim()===bookFilter)&&(!query||normName([r.title,r.meta,pickMeta(r)].filter(Boolean).join(' ')).includes(query)));
+  return (run?.recs||[]).filter(r=>(sportFilter==='ALL'||recSport(r)===sportFilter)&&(!includeStatus||statusFilter==='ALL'||pickStatus(r)===statusFilter)&&(marketFilter==='ALL'||pickMarket(r)===marketFilter)&&(bookFilter==='ALL'||String(r.book||'').trim()===bookFilter)&&(!query||normName([pickTitle(r),r.title,r.meta,pickMeta(r)].filter(Boolean).join(' ')).includes(query)));
 }
 function pickCounts(run){return picksMatchingFilters(run,false).reduce((out,r)=>{const key=pickStatus(r);out.ALL++;out[key]=(out[key]||0)+1;return out},{ALL:0,BET:0,LEAN:0,WAIT:0,PASS:0})}
 function pickEdge(rec){
@@ -1100,6 +1101,8 @@ function pickMeta(rec){
   let time='';if(Number.isFinite(Date.parse(ts)))time=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}).format(new Date(ts))+' PT';
   return [recSport(rec),matchup,time].filter(Boolean).join(' • ');
 }
+function selectionDisplay(rec){return SelectionLabel?SelectionLabel.describe(rec):['ml','spread','totals'].includes(rec?.feed?.marketKey)?{title:'SELECTION NOT VERIFIED',problem:'Selection label formatter unavailable'}:{title:txt(rec?.title,'Untitled market')}}
+function pickTitle(rec){return selectionDisplay(rec).title}
 function changeIdentity(rec){
   const f=rec?.feed||{},key=String(f.selectionKey||rec?.selectionKey||'');
   // Canonical keys retain participant/period identity; only the final line segment is removed.
@@ -1120,7 +1123,7 @@ function compareRunPicks(current,prior,sport='ALL'){
     else{
       if(rec.status!==old.status)labels.push(`${old.status} → ${rec.status}`);
       const a=pickLine(old),b=pickLine(rec);
-      if(a!==null&&b!==null&&a!==b)labels.push(`LINE CHANGED: ${old.title} → ${rec.title}`);
+      if(a!==null&&b!==null&&a!==b)labels.push(`LINE CHANGED: ${pickTitle(old)} → ${pickTitle(rec)}`);
       else if(a===b&&rec.book===old.book){
         const from=displayPrice(old.price),to=displayPrice(rec.price),p=americanProb(americanFromText(from)),q=americanProb(americanFromText(to));
         if(p!==null&&q!==null&&Math.abs(p-q)>=.005)labels.push(`PRICE: ${from} → ${to} (${rec.book})`);
@@ -1148,10 +1151,10 @@ function changesPanel(d,run){
     if(!changes.length){panel.appendChild(el(d,'div','runnerChangesNote','No new selections, status changes, line changes or meaningful price moves in comparable selections.'));return}
     const details=el(d,'details','runnerChangesList');
     details.appendChild(el(d,'summary','',`${changes.length} changed selections • ${changes.filter(x=>x.newSelection).length} new • ${changes.filter(x=>x.statusChanged).length} status changes`));
-    const list=el(d,'ul');for(const change of changes){const item=el(d,'li');item.append(el(d,'b',cls(change.rec.status),`${change.rec.status} • ${change.rec.title}`),el(d,'div','',change.labels.join(' • ')));list.appendChild(item)}
+    const list=el(d,'ul');for(const change of changes){const item=el(d,'li');item.append(el(d,'b',cls(change.rec.status),`${change.rec.status} • ${pickTitle(change.rec)}`),el(d,'div','',change.labels.join(' • ')));list.appendChild(item)}
     details.appendChild(list);panel.appendChild(details);
     const highlights=changes.filter(x=>x.statusChanged||x.newSelection||x.labels.some(label=>/^(LINE CHANGED|PRICE:)/.test(label))).slice(0,3);
-    highlights.forEach((change,index)=>{const preview=el(d,'div','runnerChangePreview',`${change.rec.status} • ${change.rec.title} — ${change.labels.map(label=>label.startsWith('LINE CHANGED:')?'LINE CHANGED':label).join(' • ')}`);preview.dataset.previewIndex=String(index);panel.appendChild(preview)});
+    highlights.forEach((change,index)=>{const preview=el(d,'div','runnerChangePreview',`${change.rec.status} • ${pickTitle(change.rec)} — ${change.labels.map(label=>label.startsWith('LINE CHANGED:')?'LINE CHANGED':label).join(' • ')}`);preview.dataset.previewIndex=String(index);panel.appendChild(preview)});
   };
   render(null,'LOADING');const key=runKey(run);
   if(!priorChangesCache.has(key))priorChangesCache.set(key,fetchPriorChangeRun(run).then(prior=>({prior,state:'READY'})).catch(()=>({prior:null,state:'ERROR'})));
@@ -1171,18 +1174,19 @@ function card(d,r){
   const watch=priceWatchMeta(r),badge=el(d,'div','callBadge '+cls(r.status),txt(r.status,'WAIT'));
   const badges=el(d,'div','runnerBadgeRow');badges.appendChild(badge);
   if(watch)badges.appendChild(el(d,'span','priceWatchBadge','PRICE WATCH'));
-  l.append(badges,el(d,'h3','',txt(r.title,'Untitled market')),el(d,'div','runnerMeta',pickMeta(r)));
+  const label=selectionDisplay(r),identityProblem=label.problem;
+  l.append(badges,el(d,'h3','',pickTitle(r)),el(d,'div','runnerMeta',pickMeta(r)));
   if(watch)l.appendChild(el(d,'div','runnerMeta priceWatchTarget',`WATCH TARGET: ${watch.target}${watch.reason?` // ${watch.reason}`:''}`));
   const rr=el(d,'div','execution');
   const snapshotTime=displayPriceTime(r.price);
-  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',displayPrice(r.price)));
+  rr.append(el(d,'div','book',txt(r.book,'PRICE SOURCE')),el(d,'b','bigExec',identityProblem?'PRICE NOT VERIFIED':displayPrice(r.price)));
   const state=isEventStartedClosed(r)?'EVENT STARTED/CLOSED':txt(r.priceState,'ISSUED SNAPSHOT');
   const stateLabel=snapshotTime&&state==='ISSUED SNAPSHOT'?`${state} • ${snapshotTime}`:state;
   rr.appendChild(el(d,'div','priceState '+(state==='UPDATED'?'updated':state==='REFRESH UNRESOLVED'?'unresolved':''),stateLabel));
   top.append(l,rr);c.appendChild(top);
-  c.appendChild(el(d,'div','runnerPickReason',pickReason(r)));
+  c.appendChild(el(d,'div','runnerPickReason',identityProblem?`Selection identity requires review: ${identityProblem}.`:pickReason(r)));
   const status=String(r.status||'WAIT').toUpperCase(),target=r.playTo||r.betAt;
-  if(['BET','LEAN','WAIT'].includes(status)&&target)c.appendChild(el(d,'div','runnerPickAction',`${status==='WAIT'?'WATCH FOR':'PLAY TO'}: ${target}${status==='BET'?' • STAKE '+txt(r.stake,'$0'):''}`));
+  if(!identityProblem&&['BET','LEAN','WAIT'].includes(status)&&target)c.appendChild(el(d,'div','runnerPickAction',`${status==='WAIT'?'WATCH FOR':'PLAY TO'}: ${target}${status==='BET'?' • STAKE '+txt(r.stake,'$0'):''}`));
   const expanded=el(d,'div','runnerExpanded');expanded.hidden=true;
 
   if(r.priceComparison){
@@ -1365,8 +1369,9 @@ function apply(run){
       const tr=el(d,'tr');
       const playTo=txt(r.playTo||r.betAt,String(r.status||'WAIT').toUpperCase()==='PASS'?'NO BET':'NOT SET');
       tr.appendChild(el(d,'td','',txt(r.status)));
-      const selection=el(d,'td','');selection.append(el(d,'div','',txt(r.title)),el(d,'div','runnerMarketMeta',pickMeta(r)));tr.appendChild(selection);
-      [[r.book,displayPrice(r.price)].filter(Boolean).join(' // '),playTo,txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
+      const selection=el(d,'td','');selection.append(el(d,'div','',pickTitle(r)),el(d,'div','runnerMarketMeta',pickMeta(r)));tr.appendChild(selection);
+      const identityProblem=selectionDisplay(r).problem;
+      [[r.book,identityProblem?'PRICE NOT VERIFIED':displayPrice(r.price)].filter(Boolean).join(' // '),identityProblem?'NO BET':playTo,identityProblem?'SELECTION NOT VERIFIED':txt(r.priceState,'LAST VERIFIED'),[r.fair,r.edge].filter(Boolean).join(' // '),txt(r.move)].forEach(v=>tr.appendChild(el(d,'td','',v)));
       tb.appendChild(tr)
     });
     if(!recs.length){const row=el(d,'tr'),cell=el(d,'td','runnerNoCards',noPublishedCardsText(run));cell.colSpan=7;row.appendChild(cell);tb.appendChild(row)}
