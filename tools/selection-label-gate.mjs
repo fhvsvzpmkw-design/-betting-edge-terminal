@@ -11,7 +11,9 @@ const enforced=report=>Date.parse(report?.ts)>=Date.parse(SELECTION_LABEL_FROM);
 export function selectionLabelViolations(report){
   if(!enforced(report))return [];
   return (report.recs||[]).flatMap((rec,index)=>{
-    const problem=labels.titleProblem(rec);
+    // Customer-visible labels are derived from this identity, so freely written
+    // title disagreements are repairable text, not a reason to block a report.
+    const problem=labels.describe(rec).problem;
     return problem?[`Recommendation ${index+1}: ${problem}`]:[];
   });
 }
@@ -24,21 +26,19 @@ export function validateSelectionLabels(report){
 }
 export function normalizeSelectionLabels(report,sidecar){
   if(!enforced(report))return {report,sidecar};
-  // Validate every proposed change before changing any copy. Explicitly wrong
-  // side/line/name/market text is a conflict, not something to silently repair.
+  // Rebuild all title copies from the exact selection before freeze. Text-only
+  // mistakes are repaired automatically; conflicting selection data still fails.
   if(!Array.isArray(report.recs)||sidecar?.recommendations?.length!==report.recs.length)throw Error('Selection labels require aligned report and sidecar recommendations');
   const replacements=[];
   for(const [index,rec] of report.recs.entries()){
     const item=sidecar.recommendations[index],info=labels.describe(rec);
-    if(item.title!==rec.title)throw Error(`Recommendation ${index+1}: sidecar title differs from report`);
+    if(!item||typeof item!=='object'||Array.isArray(item))throw Error(`Recommendation ${index+1}: invalid sidecar recommendation`);
     if(!info.applicable)continue;
-    const problem=labels.titleProblem(rec,{allowMissing:true});
-    if(problem)throw Error(`Recommendation ${index+1}: ${problem}`);
+    if(info.problem)throw Error(`Recommendation ${index+1}: ${info.problem}`);
     const key=rec.feed.selectionKey;
-    const receipts=(sidecar.primaryAnalysis?.receipts||[]).filter(r=>r.state==='EVALUATED'&&r.decision?.feed?.selectionKey===key);
-    for(const receipt of receipts)for(const copy of [receipt.decision,receipt.evidence])
-      if(copy?.title!==undefined&&copy.title!==rec.title&&copy.title!==info.title)throw Error(`Recommendation ${index+1}: receipt title disagrees with the issued selection`);
-    replacements.push({index,title:info.title,receipts});
+    const itemKey=item.feed?.selectionKey||item.selectionKey||item.cardEvidence?.selectionKey;
+    if(itemKey&&itemKey!==key)throw Error(`Recommendation ${index+1}: sidecar selection identity differs from report`);
+    replacements.push({index,title:info.title});
   }
   const result=structuredClone({report,sidecar});
   for(const replacement of replacements){
@@ -46,7 +46,7 @@ export function normalizeSelectionLabels(report,sidecar){
     result.report.recs[index].title=title;result.sidecar.recommendations[index].title=title;
     for(const receipt of result.sidecar.primaryAnalysis?.receipts||[])
       if(receipt.state==='EVALUATED'&&receipt.decision?.feed?.selectionKey===key)
-        for(const copy of [receipt.decision,receipt.evidence])if(copy&&Object.hasOwn(copy,'title'))copy.title=title;
+        for(const copy of [receipt.decision,receipt.evidence])if(copy)copy.title=title;
   }
   validateSelectionLabels(result.report);return result;
 }

@@ -34,7 +34,7 @@ assert.equal(labels.title(pk),'Visitors +0 — Spread');
 
 const report={ts:SELECTION_LABEL_FROM,slot:'evening',label:'TEST',feedGeneratedAt:'2026-10-12T18:55:00Z',bankroll:523.38,risk:0,counts:{bet:0,lean:0,wait:0,pass:5},recs};
 const sidecar={recommendations:recs.map((r,i)=>({ordinal:i+1,title:r.title,status:r.status})),primaryAnalysis:{receipts:recs.map(r=>({state:'EVALUATED',decision:structuredClone(r),evidence:{title:r.title,feed:structuredClone(r.feed)}}))}};
-assert.throws(()=>validateSelectionLabels(report),/visible title/,'forward publication rejects the actual incomplete titles');
+assert.equal(validateSelectionLabels(report).checked,5,'incomplete text does not block a valid selection; its visible label is derived');
 const before=JSON.stringify({report,sidecar}),prepared=normalizeSelectionLabels(report,sidecar);
 assert.equal(JSON.stringify({report,sidecar}),before,'draft normalization must not mutate its source');
 assert.deepEqual(prepared.report.recs.map(r=>r.title),expected);
@@ -53,9 +53,23 @@ assert.ok(CANDIDATE_GATES[0][0]==='selection-label-gate.mjs');
 
 for(const title of ['Los Angeles Dodgers +1.5','Milwaukee Brewers -1.5','Los Angeles Dodgers Moneyline','Los Angeles Dodgers -2.5','Los Angeles Dodgers 1.5']){
   const conflict=structuredClone(prepared);conflict.report.recs[1].title=title;conflict.sidecar.recommendations[1].title=title;
-  assert.throws(()=>validateSelectionLabels(conflict.report),/visible title/);
-  assert.throws(()=>normalizeSelectionLabels(conflict.report,conflict.sidecar),/visible title/,'normalization cannot silently repair an explicit conflict');
+  assert.equal(validateSelectionLabels(conflict.report).checked,5,'text-only disagreements cannot block a report');
+  const fixed=normalizeSelectionLabels(conflict.report,conflict.sidecar);
+  assert.equal(fixed.report.recs[1].title,expected[1],'wrong team/market/sign/number text is repaired from the unchanged exact selection');
+  assert.equal(fixed.sidecar.recommendations[1].title,expected[1]);
+  assert.equal(fixed.sidecar.primaryAnalysis.receipts[1].decision.title,expected[1]);
 }
+const drifted=structuredClone(prepared);
+drifted.report.recs[1].title='';drifted.sidecar.recommendations[1].title='Wrong text';
+drifted.sidecar.primaryAnalysis.receipts[1].decision.title='Wrong team +2.5';
+drifted.sidecar.primaryAnalysis.receipts[1].evidence.title='Moneyline';
+const repaired=normalizeSelectionLabels(drifted.report,drifted.sidecar);
+assert.equal(repaired.report.recs[1].title,expected[1]);
+assert.equal(repaired.sidecar.recommendations[1].title,expected[1]);
+assert.equal(repaired.sidecar.primaryAnalysis.receipts[1].decision.title,expected[1]);
+assert.equal(repaired.sidecar.primaryAnalysis.receipts[1].evidence.title,expected[1]);
+const wrongBinding=structuredClone(drifted);wrongBinding.sidecar.recommendations[1].selectionKey='different|spread|away||1.5';
+assert.throws(()=>normalizeSelectionLabels(wrongBinding.report,wrongBinding.sidecar),/selection identity/,'text repair cannot attach a different selection');
 for(const [field,value] of [['line',-1.5],['selectionKey','75060876|spread|home||1.5'],['selectionKey','75060876|spread|away||'],['selectionKey','wrong|spread|away||1.5']]){
   const bad=structuredClone(dodgers);bad.feed[field]=value;
   assert.ok(labels.describe(bad).problem,'invalid identity must fail closed');
@@ -66,15 +80,17 @@ assert.ok(labels.titleProblem({...total,title:'Florida Panthers @ Buffalo Sabres
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'selection-label-test-'));
 try{
   fs.writeFileSync(path.join(temp,'run-history.json'),JSON.stringify({runs:[]}));
-  const audit=auditPrimaryLineage({root:temp,report,feed:{}},'spread');
-  assert.equal(audit.ok,false,'modern lineage cannot skip label validation when there are no tracked prior cards');
-  assert.match(audit.violations.join(';'),/Los Angeles Dodgers -1.5/);
+  assert.equal(auditPrimaryLineage({root:temp,report,feed:{}},'spread').ok,true,'text correction does not depend on prior lineage');
+  const invalid=structuredClone(report);invalid.recs[1].feed.line=-1.5;
+  const audit=auditPrimaryLineage({root:temp,report:invalid,feed:{}},'spread');
+  assert.equal(audit.ok,false,'modern lineage still rejects inconsistent underlying identity without a prior card');
+  assert.match(audit.violations.join(';'),/recorded handicap/);
   const r=path.join(temp,'report.json'),s=path.join(temp,'sidecar.json');
-  fs.writeFileSync(r,JSON.stringify(report));fs.writeFileSync(s,JSON.stringify(sidecar));
+  fs.writeFileSync(r,JSON.stringify(invalid));fs.writeFileSync(s,JSON.stringify(sidecar));
   for(const command of ['validate','publish']){
     const result=spawnSync(process.execPath,['tools/report-publication.mjs',command,'--report',r,'--sidecar',s,'--root',temp],{encoding:'utf8'});
-    assert.notEqual(result.status,0,'direct publisher must reject a missing handicap');
-    assert.match(result.stderr,/visible title must identify/);
+    assert.notEqual(result.status,0,'direct publisher must reject conflicting underlying handicap data');
+    assert.match(result.stderr,/recorded handicap/);
     assert.equal(fs.existsSync(path.join(temp,'data/history/runs')),false,'failed labels must not create issued history');
   }
 }finally{fs.rmSync(temp,{recursive:true,force:true});}
@@ -119,4 +135,4 @@ for(const file of ['assets/runner-core-runtime.js','runner-core.html']){
 }
 const shell=fs.readFileSync('runner.html','utf8');
 assert.ok(shell.indexOf('assets/selection-label.js')<shell.indexOf('assets/runner-core-runtime.js'),'formatter loads before the renderer');
-console.log('SELECTION LABELS: affected cards, moneyline/total/spread identity, sign conflicts, no-prior lineage, direct publisher rejection, draft copies, UI/market tables and immutable history PASS');
+console.log('SELECTION LABELS: affected cards, automatic text correction, exact identity, no-prior lineage, direct publisher identity checks, draft copies, UI/market tables and immutable history PASS');
