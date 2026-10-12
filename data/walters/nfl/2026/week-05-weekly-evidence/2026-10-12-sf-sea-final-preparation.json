@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-12T01:12:15.000Z",
+  "season": 2026,
+  "sourceWeek": 5,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Pre-rollover additive preparation for SF-SEA after the official game center reported FINAL. The final, frozen kickoff rating/H4 snapshot and exact outstanding personnel inputs are preserved without advancing the active manifest, publishing ratings, writing current-week overlays, constructing fairs or issuing a bet.",
+  "marketViewed": false,
+  "inputCommit": "6bd893cdcb7f62fe7a23bdea165233969b207080",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "7cef72fde7b87d7a788d33f56416bab59dbade2f",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "7b3bafa1155d559f168b4859332e2450a8e3966c",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "sources": [
+    {
+      "id": "sf-sea-gamecenter",
+      "url": "https://www.nfl.com/games/49ers-at-seahawks-2026-reg-5",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-SF-SEA"],
+      "finding": "Official game center reports San Francisco 32, Seattle 29, FINAL.",
+      "checkedAt": "2026-10-12T01:12:15.000Z"
+    },
+    {
+      "id": "nfl-week5-sunday-inactives-sf-sea",
+      "url": "https://www.nfl.com/news/nfl-week-5-inactives-players-ruled-out-sunday-2026-season",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-SF-SEA"],
+      "finding": "Official final inactive lists identify SF Nick Bosa, Kyle Juszczyk, Marques Sigle and James Thompson Jr., plus SEA Zach Charbonnet, Julian Neal, Chazz Surratt and Irvin Charles, among the exact game-day inactive inventories. George Holani was not inactive.",
+      "checkedAt": "2026-10-12T01:12:15.000Z"
+    },
+    {
+      "id": "nfl-week5-final-injury-report-sf-sea",
+      "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-SF-SEA"],
+      "finding": "Official final designations identify injury-driven OUT cases for SF Nick Bosa, Kyle Juszczyk, Marques Sigle and James Thompson Jr.; SEA Zach Charbonnet, Julian Neal, Chazz Surratt and Irvin Charles. George Holani was questionable pregame and active by the final inactive decision.",
+      "checkedAt": "2026-10-12T01:12:15.000Z"
+    },
+    {
+      "id": "nfl-week5-sunday-injury-updates-sf-sea",
+      "url": "https://www.nfl.com/news/notable-injuries-news-sunday-week-5-games-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-SF-SEA"],
+      "finding": "Official Sunday monitor identifies SF Dre Greenlaw's first-half removal as an ejection, not injury loss, and says SEA LB Drake Thomas was questionable to return with an ankle injury. Questionable-to-return wording does not establish a return.",
+      "checkedAt": "2026-10-12T01:12:15.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-SF-SEA",
+      "away": "SF",
+      "home": "SEA",
+      "state": "BLOCKED",
+      "sourceIds": ["sf-sea-gamecenter", "nfl-week5-sunday-inactives-sf-sea", "nfl-week5-final-injury-report-sf-sea", "nfl-week5-sunday-injury-updates-sf-sea"],
+      "final": {"awayScore": 32, "homeScore": 29, "status": "FINAL", "sourceIds": ["sf-sea-gamecenter"]},
+      "frozenKickoff": {"startTimePacific": "2026-10-11T13:25:00-07:00", "awayRating": 29.5262844, "homeRating": 29.621639, "homeLocationAdvantagePoints": 2.082, "venueClass": "DOMESTIC_HOME", "ledgerBlobSha": "5a4ef6e4e77441c74b09bc3e6503242c93585e20", "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd", "preservedH4": true, "marketViewed": false},
+      "checklist": {"verifiedFinalResult": "COMPLETE", "frozenKickoffRatingsAndH4": "COMPLETE", "pairedGameDayInjuryLoss": "BLOCKED", "savedAvailabilityClosures": ["SEA George Holani ACTIVE_NOT_INACTIVE", "SF Dre Greenlaw EJECTION_NOT_INJURY_LOSS"]},
+      "blockers": [
+        {"code": "REPLACEMENT_OR_VALUE_UNRESOLVED", "finding": "SF FB Kyle Juszczyk remains an archived 1.2-point OUT case without a governed cross-position fullback/lead-blocker assignment. SEA RB Zach Charbonnet remains an archived 0.9-point OUT case whose backfield allocation can now use Holani's confirmed game-day activation but has not yet been adopted.", "nextAction": "Bind the exact SF lead-blocker replacement under the approved cross-position method; reconcile the SEA active backfield with Holani and other available backs using documented primary/committee duties and frozen values.", "owner": "GRAHAM_WALTERS_90_10"},
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "SF S Marques Sigle and SEA CB Julian Neal, LB Chazz Surratt and WR Irvin Charles are injury-driven final inactive cases absent from the saved currentCases snapshot. Saved Nick Bosa and James Thompson Jr. estimates remain reusable.", "nextAction": "Bind each newly identified exact frozen identity/value, establish disjoint game-active replacements and apply the applicable defensive-back, linebacker and receiver group safeguards.", "owner": "GRAHAM_WALTERS_90_10"},
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "SEA LB Drake Thomas was questionable to return with an ankle injury. No return is established, so the unavailable interval remains open from the gamebook departure through game end unless an explicit return is sourced.", "nextAction": "Locate the final gamebook departure clock and any explicit later participation/return; if none exists, bind the interval through 0:00 and reconcile the relief role without duplicating other linebacker cases.", "owner": "GRAHAM_WALTERS_90_10"},
+        {"code": "AVAILABLE_EVIDENCE_NOT_RECONCILED", "finding": "Complete final inactive/DNP, specialist, quarterback-duty and every printed injury/return sequence has not yet been assembled into a paired evaluator-ready record. Greenlaw's ejection must remain excluded from injury loss.", "nextAction": "Merge saved and new cases, explicit exclusions and full final gamebook coverage, then run tools/graham-weekly-evidence.mjs.", "owner": "GRAHAM_WALTERS_90_10"}
+      ]
+    }
+  ]
+}
