@@ -1,4 +1,8 @@
-/* This theme is active only on the main menu. Section screens retain their CSS. */
+/* This theme is active only on the main menu. Section screens retain their CSS.
+ * :is() includes the real specialty IDs so these menu-only declarations outrank
+ * legacy ID selectors, including their hover/loaded states, in either load order.
+ * Named areas align the original hit targets with the separate artwork layer.
+ */
 body.vigMenuStyled.runnerMenuHome{
   margin:0!important;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)!important;
@@ -17,9 +21,11 @@ body.vigMenuStyled.runnerMenuHome main.term{
   min-height:0!important;
   margin:0 auto!important;
   overflow:hidden!important;
-  border:1px solid #315367!important;
+  border:1px solid #68d8f5!important;
+  border-radius:12px!important;
+  box-sizing:border-box!important;
   background:radial-gradient(ellipse at 50% 0%,#0b2835 0%,#030d14 38%,#01060b 100%)!important;
-  box-shadow:inset 0 0 0 2px #02121d,inset 0 0 45px #0007!important;
+  box-shadow:inset 0 0 0 2px #02121d,inset 0 0 18px #30bce52b,0 0 12px #00b7ff26!important;
 }
 body.vigMenuStyled.runnerMenuHome main.term:after{display:none!important}
 body.vigMenuStyled.runnerMenuHome main.term>:not(header.top):not(.runnerNavPad){display:none!important}
@@ -33,7 +39,9 @@ body.vigMenuStyled.runnerMenuHome main.term>header.top{
   gap:0!important;
   min-height:0!important;
   height:var(--vig-menu-header,64px)!important;
-  padding:3px var(--vig-menu-pad,12px) 0!important;
+  padding:5px var(--vig-menu-pad,12px) 0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
   margin:0!important;
   border:0!important;
   background:transparent!important;
@@ -47,13 +55,17 @@ body.vigMenuStyled.runnerMenuHome #vigMenuBrand{
   width:100%;
   height:100%;
   min-width:0;
+  min-height:0;
+  overflow:hidden;
 }
 body.vigMenuStyled.runnerMenuHome #vigMenuBrand img{
   display:block;
-  width:auto;
-  max-width:min(92%,460px);
+  width:100%;
+  max-width:520px;
   height:100%;
+  min-height:0;
   object-fit:contain;
+  object-position:center;
 }
 body.vigMenuStyled.runnerMenuHome .vigMenuBrandFallback{display:none;font:bold 28px Arial,sans-serif;color:#58ff88}
 body.vigMenuStyled.runnerMenuHome .vigMenuBrandError img{display:none!important}
@@ -62,6 +74,7 @@ body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad{
   display:block!important;
   min-height:0!important;
   height:100%!important;
+  box-sizing:border-box!important;
   margin:0!important;
   padding:var(--vig-menu-pad,12px)!important;
   overflow:hidden!important;
@@ -71,19 +84,19 @@ body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs{
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   grid-template-rows:repeat(4,minmax(0,1fr)) var(--vig-menu-prefs,44px)!important;
+  grid-template-areas:"board market" "history syndicate" "pizza crypto" "meat engine" "preferences preferences"!important;
   gap:var(--vig-menu-gap,8px)!important;
   height:100%!important;
   min-height:0!important;
   margin:0!important;
   padding:0!important;
+  box-sizing:border-box!important;
 }
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]{
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6){
   --menu-rgb:57,231,255;
   --menu-text:#b9f5ff;
   position:relative!important;
   display:block!important;
-  grid-column:auto!important;
-  grid-row:auto!important;
   min-width:0!important;
   min-height:0!important;
   width:100%!important;
@@ -91,63 +104,95 @@ body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-i
   margin:0!important;
   padding:6px!important;
   overflow:hidden!important;
-  border:1px solid rgba(var(--menu-rgb),.86)!important;
+  border:2px solid rgb(var(--menu-rgb))!important;
+  box-sizing:border-box!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
   border-radius:12px!important;
   color:var(--menu-text)!important;
-  background:radial-gradient(ellipse at 20% 4%,rgba(var(--menu-rgb),.42),transparent 72%),linear-gradient(150deg,#17252b,#041019 45%,#01070c)!important;
-  box-shadow:inset 0 1px 0 #ffffff82,inset 0 0 0 2px #01060bab,inset 0 0 0 3px rgba(var(--menu-rgb),.31),inset 0 -5px 8px #0009,0 2px 6px #000a,0 0 8px rgba(var(--menu-rgb),.2)!important;
+  background:
+    repeating-linear-gradient(135deg,#ffffff05 0 1px,transparent 1px 4px),
+    radial-gradient(ellipse at 50% 120%,rgba(var(--menu-rgb),.62),transparent 58%),
+    radial-gradient(ellipse at 96% 0%,rgba(var(--menu-rgb),.68),transparent 48%),
+    radial-gradient(ellipse at 0% 5%,rgba(var(--menu-rgb),.48),transparent 48%),
+    linear-gradient(145deg,rgba(var(--menu-rgb),.22),#01070c 42%,#000308 70%,rgba(var(--menu-rgb),.18))!important;
+  box-shadow:
+    inset 0 0 0 1px #e9ffffb8,
+    inset 0 0 0 4px #00101bbb,
+    inset 0 0 0 5px rgba(var(--menu-rgb),.65),
+    inset 0 7px 14px rgba(var(--menu-rgb),.52),
+    inset 0 -7px 16px rgba(var(--menu-rgb),.5),
+    inset 8px 0 18px rgba(var(--menu-rgb),.26),
+    inset -8px 0 18px rgba(var(--menu-rgb),.25),
+    0 3px 5px #000c,0 0 10px rgba(var(--menu-rgb),.34)!important;
   text-shadow:none!important;
   text-align:center!important;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
   transition:filter 120ms ease,box-shadow 120ms ease;
 }
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="board"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="board"]{--menu-rgb:53,255,129;--menu-text:#9dffb6}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="market"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="market"]{--menu-rgb:57,231,255;--menu-text:#b2f7ff}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="history"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="history"]{--menu-rgb:66,144,255;--menu-text:#a6d4ff}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="syndicate"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="syndicate"]{--menu-rgb:255,208,84;--menu-text:#ffe6a0}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="pizza"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="pizza"]{--menu-rgb:255,154,73;--menu-text:#ffe0a2}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="crypto"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="crypto"]{--menu-rgb:194,137,255;--menu-text:#e4caff}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="meat"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="meat"]{--menu-rgb:255,99,114;--menu-text:#ffc0c1}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="engine"],body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="engine"]{--menu-rgb:147,191,236;--menu-text:#d2e9ff}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="preferences"]{
-  --menu-rgb:128,175,214;
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="board"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="board"]{grid-area:board!important;--menu-rgb:74,255,44;--menu-text:#c3ffb4}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="market"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="market"]{grid-area:market!important;--menu-rgb:0,217,255;--menu-text:#c6fbff}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="history"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="history"]{grid-area:history!important;--menu-rgb:42,126,255;--menu-text:#c3e6ff}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="syndicate"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="syndicate"]{grid-area:syndicate!important;--menu-rgb:255,204,30;--menu-text:#fff0a9}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="pizza"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="pizza"]{grid-area:pizza!important;--menu-rgb:255,137,18;--menu-text:#ffe4a6}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="crypto"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="crypto"]{grid-area:crypto!important;--menu-rgb:192,45,255;--menu-text:#f1cfff}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="meat"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="meat"]{grid-area:meat!important;--menu-rgb:255,47,65;--menu-text:#ffd0cf}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="engine"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6),body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="engine"]{grid-area:engine!important;--menu-rgb:75,202,255;--menu-text:#d1f5ff}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id="preferences"]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6){
+  grid-area:preferences!important;
+  --menu-rgb:101,190,239;
   --menu-text:#d2e9ff;
-  grid-column:1/-1!important;
   padding:3px 8px!important;
   border-radius:10px!important;
 }
 body.vigMenuStyled.runnerMenuHome .vigMenuOverlay{
-  position:absolute;
-  inset:0;
+  position:absolute!important;
+  inset:0!important;
   z-index:2;
-  display:grid;
+  display:grid!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  padding:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
   grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(4,minmax(0,1fr)) var(--vig-menu-prefs,44px);
+  grid-template-areas:"board market" "history syndicate" "pizza crypto" "meat engine" "preferences preferences";
   gap:var(--vig-menu-gap,8px);
   pointer-events:none;
 }
-body.vigMenuStyled.runnerMenuHome .vigMenuTile{padding:7px;box-sizing:border-box}
-body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"]{--menu-rgb:128,175,214;--menu-text:#d2e9ff;grid-column:1/-1;padding:4px 9px}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]>:not(.vigMenuFace){display:none!important}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:before{
+body.vigMenuStyled.runnerMenuHome .vigMenuTile{padding:9px;box-sizing:border-box;overflow:hidden}
+body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"]{grid-area:preferences!important;--menu-rgb:101,190,239;--menu-text:#d2e9ff;padding:4px 9px}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6)>:not(.vigMenuFace){display:none!important}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6):before{
   content:"";
   position:absolute;
-  inset:4px 4px auto;
-  height:40%;
-  border-radius:8px 8px 35% 35%;
-  background:linear-gradient(160deg,#ffffff2b,transparent 70%);
+  inset:5px;
+  border:1px solid #dfffff55;
+  border-radius:7px;
+  background:
+    linear-gradient(135deg,#fff9 0%,#fff1 8%,transparent 18%) top left/42% 42% no-repeat,
+    linear-gradient(225deg,#fffc 0%,#ffffff1f 11%,transparent 42%) top right/40% 35% no-repeat,
+    linear-gradient(180deg,#ffffff52,transparent) top/100% 12px no-repeat;
+  box-shadow:inset 0 -1px 0 rgba(var(--menu-rgb),.95);
   pointer-events:none;
 }
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:after{
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6):after{
   content:"";
   position:absolute;
-  left:13px;right:13px;bottom:4px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(var(--menu-rgb),.8),transparent);
+  inset:2px;
+  border-radius:8px;
+  background:
+    radial-gradient(ellipse at 50% 0%,#fff 0%,rgba(var(--menu-rgb),.72) 20%,transparent 66%) top center/56% 5px no-repeat,
+    radial-gradient(ellipse at 50% 100%,#ffffffc4 0%,rgba(var(--menu-rgb),.72) 20%,transparent 66%) bottom center/76% 5px no-repeat;
+  opacity:.85;
   pointer-events:none;
 }
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:active{filter:brightness(1.16);box-shadow:inset 0 2px 8px #000d,inset 0 0 0 2px rgba(var(--menu-rgb),.45)!important}
-body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:focus-visible{outline:2px solid #fff!important;outline-offset:-5px!important}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6):active{filter:brightness(1.16);box-shadow:inset 0 2px 8px #000d,inset 0 0 0 2px rgba(var(--menu-rgb),.45)!important}
+body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6):focus-visible{outline:2px solid #fff!important;outline-offset:-5px!important}
 body.vigMenuStyled.runnerMenuHome .vigMenuFace{
   position:relative;
   z-index:1;
@@ -168,7 +213,7 @@ body.vigMenuStyled.runnerMenuHome .vigMenuArt{
   height:var(--vig-menu-art,70px);
   max-height:100%;
   line-height:1;
-  filter:drop-shadow(0 3px 3px #0009);
+  filter:drop-shadow(0 4px 3px #000d) drop-shadow(0 0 5px rgba(var(--menu-rgb),.25));
 }
 body.vigMenuStyled.runnerMenuHome .vigMenuArt img{
   position:absolute;inset:0;
@@ -188,18 +233,22 @@ body.vigMenuStyled.runnerMenuHome .vigMenuName{
   color:var(--menu-text);
   text-transform:uppercase;
   overflow-wrap:normal;
-  text-shadow:0 2px 0 #000b,0 0 9px rgba(var(--menu-rgb),.23);
+  text-shadow:0 2px 0 #000,0 3px 2px #000c,0 0 10px rgba(var(--menu-rgb),.38);
 }
-body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"]{flex-direction:row;gap:12px}
+body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"]{grid-area:preferences!important;flex-direction:row;gap:12px}
 body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"] .vigMenuArt{flex:0 0 26px;width:26px;height:26px}
 body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"] .vigMenuEmoji{font-size:25px}
 body.vigMenuStyled.runnerMenuHome .vigMenuTile[data-vig-menu-id="preferences"] .vigMenuName{font-size:clamp(16px,2.5vw,24px)}
 body.vigMenuStyled.runnerMenuHome.vigMenuLandscape main.term .runnerNavPad .tabs{
   grid-template-columns:repeat(4,minmax(0,1fr))!important;
   grid-template-rows:repeat(2,minmax(0,1fr)) var(--vig-menu-prefs,32px)!important;
+  grid-template-areas:"board market history syndicate" "pizza crypto meat engine" "preferences preferences preferences preferences"!important;
 }
 body.vigMenuStyled.runnerMenuHome.vigMenuLandscape .vigMenuFace{flex-direction:row;gap:6px}
-body.vigMenuStyled.runnerMenuHome.vigMenuLandscape .vigMenuOverlay{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr)) var(--vig-menu-prefs,32px)}
+body.vigMenuStyled.runnerMenuHome.vigMenuLandscape .vigMenuOverlay{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr)) var(--vig-menu-prefs,32px);grid-template-areas:"board market history syndicate" "pizza crypto meat engine" "preferences preferences preferences preferences"}
 body.vigMenuStyled.runnerMenuHome.vigMenuLandscape .vigMenuName{flex:1;min-width:0;text-align:left}
 body.vigMenuStyled.runnerMenuHome.vigMenuLandscape .vigMenuTile[data-vig-menu-id="preferences"] .vigMenuName{flex:0 1 auto;text-align:center}
-@media(prefers-reduced-motion:reduce){body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]{transition:none}}
+@media(prefers-reduced-motion:reduce){body.vigMenuStyled.runnerMenuHome main.term .runnerNavPad .tabs>.btn[data-menu-id]:is([data-view],#runnerSyndicateF5,#runnerPizzaF6,#runnerCryptoF7,#runnerSeasonPreviewF6,#runnerPreferencesF6){transition:none}}
+body.vigMenuStyled.runnerMenuHome.vigMenuLandscape.vigMenuRoomy .vigMenuFace{flex-direction:column;gap:4px}
+body.vigMenuStyled.runnerMenuHome.vigMenuLandscape.vigMenuRoomy .vigMenuName{flex:0 1 auto;text-align:center}
+body.vigMenuStyled.runnerMenuHome.vigMenuLandscape.vigMenuRoomy .vigMenuTile[data-vig-menu-id="preferences"]{flex-direction:row;gap:12px}

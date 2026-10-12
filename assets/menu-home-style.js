@@ -2,7 +2,7 @@
   'use strict';
 
   // Presentation only. The canonical menu keeps every button and click/key handler.
-  const VERSION='20261012-menu-1';
+  const VERSION='20261012-menu-2';
   const STYLE_ID='vigMenuHomeStyle';
   const BRAND_SRC='/site-assets/product-badges/vigscope-small.png';
   const ART_BASE='./assets/menu-home/';
@@ -23,23 +23,24 @@
 
   function layoutForViewport(width,height){
     width=Math.max(1,Number(width)||1);height=Math.max(1,Number(height)||1);
-    const landscape=width>height&&width>=580;
+    const landscape=width>height&&width>=480;
     const columns=landscape?4:2,rows=landscape?2:4;
     const padding=width<360?6:width<650?8:12;
-    const gap=height<350?6:8;
-    const header=Math.round(Math.min(landscape?62:82,Math.max(landscape?30:40,height*(landscape?0.13:0.095))));
-    const preferences=height<350?32:height<600?38:44;
+    const gap=height<350?6:width>=650?10:8;
+    const header=Math.round(Math.min(landscape?70:104,Math.max(landscape?30:46,height*0.13)));
+    const preferences=height<600?44:48;
     const tileHeight=(height-header-padding*2-preferences-gap*rows-2)/rows;
     const tileWidth=(Math.min(width,1440)-padding*2-gap*(columns-1)-2)/columns;
+    const roomy=landscape&&height>=560&&tileHeight>=tileWidth*.62;
     let icon,font;
-    if(landscape){
-      icon=Math.floor(Math.min(128,Math.max(24,Math.min(tileHeight-16,tileWidth*.36))));
-      font=Math.min(28,Math.max(13,Math.min((tileWidth-icon-22)/6.1,(tileHeight-12)/2.2)));
+    if(landscape&&!roomy){
+      icon=Math.floor(Math.min(128,Math.max(24,Math.min(tileHeight-20,tileWidth*.36))));
+      font=Math.min(28,Math.max(13,Math.min((tileWidth-icon-26)/6.1,(tileHeight-18)/2.2)));
     }else{
-      font=Math.min(30,Math.max(16,Math.min((tileWidth-16)/6.1,tileHeight*.19)));
-      icon=Math.floor(Math.min(142,Math.max(24,tileHeight-font*2.15-20)));
+      font=Math.min(30,Math.max(16,Math.min((tileWidth-20)/6.1,tileHeight*.18)));
+      icon=Math.floor(Math.min(roomy?172:142,tileWidth*.64,Math.max(24,tileHeight-font*2.15-24)));
     }
-    return {landscape,columns,rows,padding,gap,header,preferences,tileHeight,tileWidth,icon,font:Math.round(font*10)/10};
+    return {landscape,roomy,columns,rows,padding,gap,header,preferences,tileHeight,tileWidth,icon,font:Math.round(font*10)/10};
   }
 
   function menuOpen(){
@@ -63,6 +64,7 @@
     const values={height,pad:fit.padding,gap:fit.gap,header:fit.header,prefs:fit.preferences,art:fit.icon,font:fit.font};
     for(const [key,value] of Object.entries(values))style.setProperty('--vig-menu-'+key,value+'px');
     document.body.classList.toggle('vigMenuLandscape',fit.landscape);
+    document.body.classList.toggle('vigMenuRoomy',fit.roomy);
   }
   function faceFor(id){
     const existing=overlay.querySelector('.vigMenuTile[data-vig-menu-id="'+id+'"]');
@@ -108,7 +110,7 @@
     setViewport();
   }
   function unmount(){
-    document.body.classList.remove('vigMenuStyled','vigMenuLandscape');
+    document.body.classList.remove('vigMenuStyled','vigMenuLandscape','vigMenuRoomy');
     if(overlay){overlay.remove();overlay=null}
     grid?.querySelectorAll('.btn[data-menu-id]').forEach(button=>{
       const original=originals.get(button);if(!original)return;

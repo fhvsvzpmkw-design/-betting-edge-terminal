@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import './menu-home-cascade.test.mjs';
 
 const source=fs.readFileSync('assets/menu-home-style.js','utf8');
 const css=fs.readFileSync('assets/menu-home-style.css','utf8');
@@ -139,6 +140,7 @@ for(let i=0;i<9;i++){
   assert.equal(app.routed.at(-1),order[i]);
   assert.equal(app.body.classList.contains('vigMenuStyled'),false,'section must never inherit the menu theme');
   assert.equal(app.body.classList.contains('vigMenuLandscape'),false);
+  assert.equal(app.body.classList.contains('vigMenuRoomy'),false);
   assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,0,'secondary controls retain original markup');
   assert.deepEqual(app.top.children,[app.originalHeader]);
   app.buttons.forEach((button,j)=>{
@@ -169,22 +171,28 @@ late.buttons.forEach((button,i)=>button.setAttribute('data-menu-id',order[i]));
 late.intervals.forEach(fn=>fn());late.drain();
 assert.equal(late.grid.querySelectorAll('.vigMenuFace').length,9,'boot waits for canonical buttons rather than creating replacements');
 
-const sizes=[[320,480],[375,550],[390,650],[414,700],[768,1024],[375,720],[844,220],[844,300],[896,330],[1024,768],[1366,768],[1440,900]];
+const sizes=[[320,480],[375,550],[390,650],[414,700],[768,1024],[375,720],[568,220],[667,280],[844,220],[844,300],[896,330],[1024,768],[1366,768],[1440,900]];
 const results=sizes.map(([width,height])=>{
   const fit=app.context.testAPI.layoutForViewport(width,height);
-  assert.equal(fit.columns,width>height&&width>=580?4:2);
+  assert.equal(fit.columns,width>height&&width>=480?4:2);
   assert.ok(fit.tileHeight>=44&&fit.tileWidth>=44,'buttons retain a useful touch target');
+  assert.ok(fit.preferences>=44,'Preferences retains the same minimum touch height');
   const total=fit.header+fit.padding*2+fit.preferences+fit.gap*fit.rows+fit.tileHeight*fit.rows+2;
   assert.ok(Math.abs(total-height)<.01,'eight tiles and Preferences fit the available height');
   const textHeight=fit.font*2.14;
   assert.ok(textHeight+12<fit.tileHeight,'two-line labels fit');
-  if(!fit.landscape)assert.ok(fit.icon+textHeight+16<=fit.tileHeight+.2,'portrait artwork and two-line label fit together');
+  if(!fit.landscape||fit.roomy)assert.ok(fit.icon+textHeight+22<=fit.tileHeight+.2,'portrait artwork and two-line label fit together');
   return {width,height,columns:fit.columns,rows:fit.rows,tileHeight:+fit.tileHeight.toFixed(1),font:fit.font};
 });
 app.context.innerWidth=844;app.context.innerHeight=300;app.context.visualViewport.width=844;app.context.visualViewport.height=280;
 app.context.listeners.get('resize')();app.drain();
 assert.equal(app.body.classList.contains('vigMenuLandscape'),true);
 assert.equal(app.document.documentElement.style.values.get('--vig-menu-height'),'280px','fit uses the shorter actual browser viewport');
+app.context.innerWidth=1024;app.context.innerHeight=768;app.context.visualViewport.width=1024;app.context.visualViewport.height=768;
+app.context.listeners.get('resize')();app.drain();
+assert.equal(app.body.classList.contains('vigMenuRoomy'),true,'tablet landscape uses the space for centered artwork and labels');
+app.buttons[0].click();app.drain();
+assert.equal(app.body.classList.contains('vigMenuRoomy'),false,'tablet layout must be cleared on secondary screens');
 
 const artwork=Object.values(app.context.VigScopeMenuHome.artwork).filter(Boolean);
 assert.equal(new Set(artwork).size,8,'each graphic can be replaced independently');
@@ -195,5 +203,5 @@ for(const [,selector] of css.replace(/\/\*[\s\S]*?\*\//g,'').matchAll(/([^{}]+)\
 }
 assert.doesNotMatch(source,/fetch\(|localStorage|BettingEdgeRunnerPayload|\.onclick\s*=/,'menu appearance cannot fetch or change report data, storage, or routes');
 assert.equal((loader.match(/menuHomeStyleLoader/g)||[]).length,1);
-console.log('Menu style: PASS // 9 existing button handlers, section cleanup/return, direct Syndicate entry, delayed bootstrap, image fallback, observer settling, 8 independent assets, 12 viewport fits');
+console.log(`Menu style: PASS // 9 existing button handlers, section cleanup/return, direct Syndicate entry, delayed bootstrap, image fallback, observer settling, 8 independent assets, ${sizes.length} viewport fits`);
 console.log(JSON.stringify(results));
