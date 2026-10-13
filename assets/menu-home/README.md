@@ -24,32 +24,34 @@ To replace one graphic, replace its file, preserve transparency, and increment
 sync with the stylesheet, script, and artwork preload URLs in `runner.html`, plus
 the compatibility loader in `report-dashboard-vigscope.js`.
 
-The original buttons and artwork share named CSS grid areas: two columns and
-four rows in portrait, four columns and two rows in landscape, with Preferences
-across the final row. Short landscape screens put the icons beside the labels;
-roomier tablet screens center them above. The menu-only CSS explicitly outranks
-legacy specialty-button ID rules without changing those rules or section screens.
+The main menu is a standalone `nav#vigMainMenu` containing nine real buttons.
+Each button owns its frame, artwork and label. The original navigation pad is
+retired from the home screen and retained only for the existing secondary-screen
+controls. New buttons delegate to those established handlers; keyboard authority
+and the secondary screens remain unchanged.
 
-The theme runs only while `runnerMenuHome` is active and no secondary screen is
-loaded. Its pointer-transparent
-artwork layer sits beside the existing buttons, leaving their contents, handlers,
-function keys, and secondary-screen rendering unchanged. Leaving the menu removes
-the layer, theme classes, and temporary accessibility labels.
+The same prepared menu buttons and decoded images are retained between visits.
+Returning calls `VigScopeMenuHome.show()` synchronously in the existing navigation
+transition. Body state changes also synchronize presentation immediately. The
+menu is hidden on a secondary screen rather than removed and rebuilt.
 
 `runner.html` loads the stylesheet, script, and graphics from its head. The
-startup guard hides the original terminal until the new menu and artwork are
-ready, and the existing splash then fades using its original timing. Failed
-artwork uses the native emoji fallback. A stylesheet failure or ten-second
-startup timeout releases the application rather than leaving a blank screen.
+startup guard hides the terminal until the new menu and artwork are ready, then
+the existing splash fades. Artwork failures use the native emoji fallback. CSS
+failures use the same standalone buttons with basic isolated styling; missing
+menu code produces a reload message rather than revealing the old home menu.
 
 Validation: `node tests/menu-home-style.test.mjs` and
 `node tests/f8-nav-theme-authority.test.mjs`.
 The menu test includes the actual legacy CSS selectors in both stylesheet load
 orders, with normal, hover, and pressed states, to catch frame/artwork drift.
 The existing browser CI runs `tests/menu-home-browser-smoke.mjs`, including six
-viewport fits and startup with delayed menu code and artwork.
+viewport fits, startup with delayed resources, and all nine section return paths
+in both orientations. Return checks detect old-navigation frames, graphic reloads,
+new image requests, and recreated main-menu buttons.
 
 Rollback: remove the menu startup block, menu-ready reveal check, and menu-ready
 event listener from `runner.html`, plus the compatibility loader from
-`report-dashboard-vigscope.js`. No report, ledger, schedule, or section renderer
+`report-dashboard-vigscope.js` and the `VigScopeMenuHome.show()` presentation call
+in `primary-nav-shell.js`. No report, ledger, schedule, or section renderer
 needs to be reverted.

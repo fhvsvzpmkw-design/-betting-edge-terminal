@@ -1,8 +1,8 @@
 (()=>{
   'use strict';
 
-  // Presentation only. The canonical menu keeps every button and click/key handler.
-  const VERSION='20261012-menu-5';
+  // The main menu owns real buttons. Existing controls keep section routing and keys.
+  const VERSION='20261012-menu-6';
   const STYLE_ID='vigMenuHomeStyle';
   const ART_BASE='./assets/menu-home/';
   const ITEMS={
@@ -18,8 +18,7 @@
   };
   const ORDER=Object.keys(ITEMS);
   const SECTION_CLASSES=['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
-  const originals=new WeakMap();
-  let ready=false,attached=false,scheduled=false,startupSettled=false,grid=null,overlay=null;
+  let ready=false,attached=false,scheduled=false,startupSettled=false,grid=null,menu=null;
   const pendingArt=new Set();
 
   function layoutForViewport(width,height){
@@ -71,10 +70,20 @@
     document.body.classList.toggle('vigMenuRoomy',fit.roomy);
   }
   function faceFor(id){
-    const existing=overlay.querySelector('.vigMenuTile[data-vig-menu-id="'+id+'"]');
+    const existing=menu.querySelector('.vigMenuTile[data-vig-menu-id="'+id+'"]');
     if(existing)return existing;
     const item=ITEMS[id];
-    const face=document.createElement('span');face.className='vigMenuFace vigMenuTile';face.setAttribute('data-vig-menu-id',id);
+    const button=document.createElement('button');button.type='button';button.className='vigMenuButton vigMenuTile';button.setAttribute('data-vig-menu-id',id);
+    button.setAttribute('aria-label',item.name);
+    button.setAttribute('aria-keyshortcuts',grid.querySelector('.btn[data-menu-id="'+id+'"]').getAttribute('aria-keyshortcuts')||'');
+    button.addEventListener('click',()=>{
+      if(!menuOpen())return;
+      const target=grid.querySelector('.btn[data-menu-id="'+id+'"]');
+      if(!target)return;
+      document.documentElement.dataset.primaryNavUserActivated='1';
+      target.click();
+    });
+    const face=document.createElement('span');face.className='vigMenuFace';
     const art=document.createElement('span');art.className='vigMenuArt';
     const fallback=document.createElement('span');fallback.className='vigMenuEmoji';fallback.textContent=item.emoji;
     art.appendChild(fallback);
@@ -87,34 +96,26 @@
       art.appendChild(image);
     }
     const name=document.createElement('span');name.className='vigMenuName';name.textContent=item.name;
-    face.appendChild(art);face.appendChild(name);overlay.appendChild(face);
-    return face;
+    face.appendChild(art);face.appendChild(name);button.appendChild(face);menu.appendChild(button);
+    return button;
+  }
+  function prepare(){
+    if(!menu){
+      menu=document.createElement('nav');menu.id='vigMainMenu';menu.hidden=true;
+      menu.setAttribute('aria-label','Main menu');
+      document.querySelector('main.term').appendChild(menu);
+    }
+    ORDER.forEach(faceFor);
   }
   function mount(){
-    const buttons=ORDER.map(id=>grid.querySelector('.btn[data-menu-id="'+id+'"]'));
-    if(buttons.some(button=>!button))return;
-    // Specialty renderers compare their buttons' complete innerHTML. A separate,
-    // pointer-transparent artwork layer leaves those contents byte-for-byte intact.
-    if(!overlay||overlay.parentElement!==grid){
-      overlay=document.createElement('div');overlay.className='vigMenuOverlay';overlay.setAttribute('aria-hidden','true');grid.appendChild(overlay);
-    }
-    buttons.forEach((button,i)=>{
-      if(!originals.has(button))originals.set(button,{ariaLabel:button.getAttribute('aria-label')});
-      faceFor(ORDER[i]);
-      button.setAttribute('aria-label',ITEMS[ORDER[i]].name);
-    });
+    prepare();
     if(!document.body.classList.contains('vigMenuStyled'))document.body.classList.add('vigMenuStyled');
     setViewport();
+    menu.hidden=false;
   }
   function unmount(){
-    document.body.classList.remove('vigMenuStyled','vigMenuLandscape','vigMenuRoomy');
-    if(overlay){overlay.remove();overlay=null}
-    grid?.querySelectorAll('.btn[data-menu-id]').forEach(button=>{
-      const original=originals.get(button);if(!original)return;
-      if(original.ariaLabel===null)button.removeAttribute('aria-label');else button.setAttribute('aria-label',original.ariaLabel);
-      originals.delete(button);
-    });
-    pendingArt.clear();
+    if(menu)menu.hidden=true;
+    if(document.body.classList.contains('vigMenuStyled'))document.body.classList.remove('vigMenuStyled','vigMenuLandscape','vigMenuRoomy');
   }
   function finishStartup(status='ready'){
     if(startupSettled)return;
@@ -124,12 +125,13 @@
   }
   function sync(){
     if(!attached||!ready)return;
+    prepare();
     if(menuOpen()){
       mount();
       // Reveal the finished menu rather than the original labels or loading icons.
-      if(pendingArt.size===0)finishStartup();
+      if(pendingArt.size===0)finishStartup(document.body.classList.contains('vigMenuFallback')?'fallback':'ready');
     }else{
-      if(document.body.classList.contains('vigMenuStyled')||overlay)unmount();
+      unmount();
       if(SECTION_CLASSES.some(name=>document.body.classList.contains(name)))finishStartup();
     }
   }
@@ -138,7 +140,7 @@
     grid=document.querySelector('.runnerNavPad .tabs');
     if(!grid||ORDER.some(id=>!grid.querySelector('.btn[data-menu-id="'+id+'"]')))return false;
     attached=true;
-    const stateObserver=new MutationObserver(schedule);
+    const stateObserver=new MutationObserver(sync);
     stateObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
     const menuObserver=new MutationObserver(()=>{if(menuOpen())schedule()});
     menuObserver.observe(grid,{childList:true,subtree:true});
@@ -150,7 +152,7 @@
   function boot(){
     let sheet=document.getElementById(STYLE_ID);
     const loaded=()=>{ready=true;schedule()};
-    const failed=()=>{ready=false;finishStartup('fallback')};
+    const failed=()=>{ready=true;document.body.classList.add('vigMenuFallback');schedule()};
     if(!sheet){
       sheet=document.createElement('link');sheet.id=STYLE_ID;sheet.rel='stylesheet';
       sheet.addEventListener('load',loaded);sheet.addEventListener('error',failed);
@@ -167,7 +169,7 @@
     document.addEventListener('vigscope-app-ready',()=>{attach();schedule()});
   }
 
-  // Read-only artwork map supports replacing one graphic without touching routing.
-  window.VigScopeMenuHome={version:VERSION,get ready(){return startupSettled},artwork:Object.fromEntries(ORDER.map(id=>[id,ITEMS[id].art?ART_BASE+ITEMS[id].art:null])),refresh:schedule};
+  // Keep artwork and the main menu prepared; original section controls own routing.
+  window.VigScopeMenuHome={version:VERSION,get ready(){return startupSettled},show:sync,artwork:Object.fromEntries(ORDER.map(id=>[id,ITEMS[id].art?ART_BASE+ITEMS[id].art:null])),refresh:schedule};
   boot();
 })();

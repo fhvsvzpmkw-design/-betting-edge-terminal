@@ -60,7 +60,7 @@ function fixture(startOnMenu=true,complete=true,preloaded=false){
     }
     querySelectorAll(selector){return this.all().filter(child=>child.matches(selector))}
     querySelector(selector){return this.querySelectorAll(selector)[0]||null}
-    click(){this.onclick?.({target:this,currentTarget:this})}
+    click(){this.emit('click');this.onclick?.({target:this,currentTarget:this})}
   }
   const html=new Element('html'),head=new Element('head'),body=new Element('body');
   html.dataset.vigMenuStartup='pending';
@@ -83,7 +83,7 @@ function fixture(startOnMenu=true,complete=true,preloaded=false){
   if(startOnMenu)body.classList.add('runnerMenuHome');else body.classList.add('section-open');
   document={head,body,documentElement:html,createElement:tag=>new Element(tag),listeners:new Map(),events:[],
     getElementById:id=>[html,...html.all()].find(element=>element.id===id)||null,
-    querySelector:selector=>selector==='.runnerNavPad .tabs'?grid:selector==='main.term>header.top'?top:null,
+    querySelector:selector=>selector==='.runnerNavPad .tabs'?grid:selector==='main.term>header.top'?top:selector==='main.term'?term:null,
     addEventListener(name,fn){this.listeners.set(name,fn)},
     dispatchEvent(event){this.events.push(event.type);this.listeners.get(event.type)?.(event)}
   };
@@ -118,7 +118,7 @@ function fixture(startOnMenu=true,complete=true,preloaded=false){
       const run=frames.splice(0);run.forEach(fn=>fn());
     }
   }
-  return {context,document,body,top,grid,buttons,callbacks,routed,originalHeader,drain,intervals};
+  return {context,document,body,top,grid,buttons,callbacks,routed,originalHeader,drain,intervals,get menu(){return document.getElementById('vigMainMenu')}};
 }
 
 const app=fixture();
@@ -126,11 +126,11 @@ app.drain();
 assert.equal(app.body.classList.contains('vigMenuStyled'),false,'failed or unfinished CSS must retain the working original menu');
 app.document.getElementById('vigMenuHomeStyle').emit('load');app.drain();
 assert.equal(app.body.classList.contains('vigMenuStyled'),true);
-assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,9,'all nine selections visible in the menu presentation');
+assert.equal(app.menu.querySelectorAll('.vigMenuFace').length,9,'all nine selections visible in the menu presentation');
 assert.equal(app.top.children[0],app.originalHeader,'original header is retained, not rebuilt');
 assert.equal(app.document.getElementById('vigMenuBrand'),null,'the main menu must not add a top badge');
 assert.equal(app.context.VigScopeMenuHome.ready,false,'startup waits for artwork rather than revealing loading emoji');
-const initialImages=app.grid.all().filter(element=>element.tagName==='img');
+const initialImages=app.menu.all().filter(element=>element.tagName==='img');
 assert.equal(initialImages.length,8);
 for(const image of initialImages.slice(0,-1))image.emit('load');app.drain();
 assert.equal(app.document.documentElement.dataset.vigMenuStartup,'pending');
@@ -140,7 +140,9 @@ assert.equal(app.context.VigScopeMenuHome.ready,true);
 assert.equal(app.document.events.filter(type=>type==='vigscope-menu-ready').length,1);
 app.buttons.forEach((button,i)=>{
   assert.equal(button.children.length,1,'original complete button contents must remain intact while the artwork is visible');
-  assert.equal(button.getAttribute('aria-label'),labels[i]);
+  assert.equal(button.getAttribute('aria-label'),i===3?'Original syndicate label':null,'the original secondary controls retain their accessibility labels');
+  assert.equal(app.menu.children[i].getAttribute('aria-label'),labels[i]);
+  assert.equal(app.menu.children[i].tagName,'button','each main-menu selection is its own real button');
   assert.equal(button.onclick,app.callbacks[i],'existing click handler is preserved');
   assert.equal(button.listeners.has('click'),false,'presentation must not add a competing click handler');
   assert.equal(button.getAttribute('aria-keyshortcuts'),i<8?'F'+(i+1):'Tab');
@@ -148,14 +150,15 @@ app.buttons.forEach((button,i)=>{
 assert.equal(app.context.listeners.has('keydown'),false,'function-key authority stays with existing modules');
 assert.equal(app.document.listeners.has('click'),false,'no new routing or event interception');
 
-// Opening every existing section removes all menu artwork and theme state.
+// The new buttons delegate to existing section controls and keep their images prepared.
 for(let i=0;i<9;i++){
-  app.buttons[i].click();app.drain();
+  app.menu.children[i].click();app.drain();
   assert.equal(app.routed.at(-1),order[i]);
   assert.equal(app.body.classList.contains('vigMenuStyled'),false,'section must never inherit the menu theme');
   assert.equal(app.body.classList.contains('vigMenuLandscape'),false);
   assert.equal(app.body.classList.contains('vigMenuRoomy'),false);
-  assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,0,'secondary controls retain original markup');
+  assert.equal(app.menu.hidden,true,'the standalone main menu is absent from the visible secondary screen');
+  assert.deepEqual(app.menu.all().filter(element=>element.tagName==='img'),initialImages,'artwork is not recreated between visits');
   assert.deepEqual(app.top.children,[app.originalHeader]);
   app.buttons.forEach((button,j)=>{
     assert.equal(button.children.length,1);
@@ -163,21 +166,28 @@ for(let i=0;i<9;i++){
     assert.equal(button.getAttribute('aria-label'),j===3?'Original syndicate label':null);
     assert.equal(button.onclick,app.callbacks[j]);
   });
-  app.body.classList.remove('section-open');app.body.classList.add('runnerMenuHome');app.drain();
-  assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,9,'returning to menu restores the new appearance');
+  app.body.classList.remove('section-open');app.body.classList.add('runnerMenuHome');
+  app.context.VigScopeMenuHome.show();
+  assert.equal(app.body.classList.contains('vigMenuStyled'),true,'the menu is prepared synchronously before any animation frame');
+  assert.equal(app.menu.hidden,false);
+  app.drain();
+  assert.equal(app.menu.querySelectorAll('.vigMenuFace').length,9,'returning to menu restores the new appearance');
 }
 
-// Existing renderers can refresh labels; add artwork without replacing buttons.
-const face=app.grid.querySelector('.vigMenuTile[data-vig-menu-id="pizza"]');face.remove();app.drain();
-assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,9);
+// Existing section renderers can refresh controls without touching the new menu.
+const face=app.menu.querySelector('.vigMenuTile[data-vig-menu-id="pizza"]');
+app.buttons[4].appendChild(app.document.createElement('span'));app.drain();
+assert.equal(app.menu.querySelectorAll('.vigMenuFace').length,9);
+assert.equal(app.menu.querySelector('.vigMenuTile[data-vig-menu-id="pizza"]'),face);
 assert.equal(app.buttons[4].onclick,app.callbacks[4]);
-const art=app.grid.querySelector('.vigMenuTile[data-vig-menu-id="board"]').querySelector('.vigMenuArt'),image=art.children.find(child=>child.tagName==='img');
+const art=app.menu.querySelector('.vigMenuTile[data-vig-menu-id="board"]').querySelector('.vigMenuArt'),image=art.children.find(child=>child.tagName==='img');
 image.emit('load');assert.equal(art.classList.contains('vigMenuArtReady'),true);
 image.emit('error');assert.equal(art.classList.contains('vigMenuArtReady'),false,'image failure leaves the classic emoji fallback available');
 
 // A direct Syndicate entry starts and remains on its existing secondary screen.
 const direct=fixture(false);direct.document.getElementById('vigMenuHomeStyle').emit('load');direct.drain();
-assert.equal(direct.grid.querySelectorAll('.vigMenuFace').length,0);
+assert.equal(direct.menu.hidden,true);
+assert.equal(direct.menu.children.length,9,'prepare the standalone menu without altering a direct section entry');
 assert.equal(direct.body.classList.contains('vigMenuStyled'),false);
 direct.body.classList.add('runnerSyndicateLoaded');direct.drain();
 assert.equal(direct.context.VigScopeMenuHome.ready,true,'a direct secondary-screen entry must not wait for unused menu artwork');
@@ -186,8 +196,10 @@ const early=fixture(true,true,true);early.drain();
 assert.equal(early.body.classList.contains('vigMenuStyled'),true,'reuse the stylesheet loaded in the document head');
 assert.equal(early.document.head.children.filter(element=>element.id==='vigMenuHomeStyle').length,1);
 const failed=fixture();failed.document.getElementById('vigMenuHomeStyle').emit('error');failed.drain();
-assert.equal(failed.document.documentElement.dataset.vigMenuStartup,'fallback','failed CSS must release the splash into the working original UI');
-assert.equal(failed.body.classList.contains('vigMenuStyled'),false);
+for(const image of failed.menu.all().filter(element=>element.tagName==='img'))image.emit('error');failed.drain();
+assert.equal(failed.document.documentElement.dataset.vigMenuStartup,'fallback');
+assert.equal(failed.body.classList.contains('vigMenuFallback'),true,'failed CSS uses the same standalone buttons');
+assert.equal(failed.menu.hidden,false);
 
 let releaseStartup;const startupRoot={dataset:{}},startupEvents=[];
 const startupListeners=new Map();
@@ -203,7 +215,7 @@ assert.deepEqual(startupEvents,['vigscope-menu-ready']);
 const late=fixture(true,false);late.document.getElementById('vigMenuHomeStyle').emit('load');late.drain();
 late.buttons.forEach((button,i)=>button.setAttribute('data-menu-id',order[i]));
 late.intervals.forEach(fn=>fn());late.drain();
-assert.equal(late.grid.querySelectorAll('.vigMenuFace').length,9,'boot waits for canonical buttons rather than creating replacements');
+assert.equal(late.menu.querySelectorAll('.vigMenuFace').length,9,'boot waits for canonical buttons rather than creating replacements');
 
 const sizes=[[320,480],[375,550],[390,650],[414,700],[768,1024],[375,720],[568,220],[667,280],[844,220],[844,300],[896,330],[1024,768],[1366,768],[1440,900]];
 const results=sizes.map(([width,height])=>{
@@ -236,7 +248,7 @@ for(const state of ['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPiz
   app.body.classList.add(state);app.drain();
   assert.equal(app.body.classList.contains('runnerMenuHome'),true,'presentation must not rewrite the original state authority');
   assert.equal(app.body.classList.contains('vigMenuStyled'),false,`${state}: section state takes priority over a lingering menu class`);
-  assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,0);
+  assert.equal(app.menu.hidden,true);
   assert.deepEqual(app.top.children,[app.originalHeader]);
   app.body.classList.remove(state);app.drain();
   assert.equal(app.body.classList.contains('vigMenuStyled'),true,'closing the section restores the menu');
@@ -258,5 +270,7 @@ assert.ok(runner.includes(`href="./assets/menu-home-style.css?v=${menuVersion}"`
 for(const path of artwork)assert.ok(runner.includes(`as="image" href="${path}?v=${menuVersion}"`),'preload the same individually replaceable artwork URLs');
 assert.match(runner,/function reveal\(\)\{if\(!coreLoaded\|\|!timerDone\|\|document\.documentElement\.dataset\.vigMenuStartup==='pending'\)return;/,'the existing splash must wait for the finished menu');
 assert.match(runner,/document\.addEventListener\('vigscope-menu-ready',reveal\)/);
-console.log(`Menu style: PASS // 9 existing button handlers, section cleanup/return, direct Syndicate entry, delayed bootstrap, image fallback, observer settling, 8 independent assets, ${sizes.length} viewport fits`);
+assert.doesNotMatch(source,/vigMenuOverlay/,'the main menu must not be an overlay on the original navigation');
+assert.match(fs.readFileSync('assets/primary-nav-shell.js','utf8'),/d\.defaultView\?\.VigScopeMenuHome\?\.show\(\)/,'return transitions render the standalone menu immediately');
+console.log(`Menu style: PASS // 9 existing button handlers, standalone button delegation, synchronous return, retained artwork, direct Syndicate entry, delayed bootstrap, image fallback, observer settling, 8 independent assets, ${sizes.length} viewport fits`);
 console.log(JSON.stringify(results));

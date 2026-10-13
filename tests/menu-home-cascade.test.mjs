@@ -47,7 +47,7 @@ assert.deepEqual(specificity('body.runnerMenuHome #runnerSyndicateF5:hover'),[1,
 function node(tag,classes,attrs={},parent=null){return {tag,classes:new Set(classes.split(/\s+/)),attrs,parent}}
 const body=node('body','vigMenuStyled runnerMenuHome');
 const term=node('main','term',{},body),pad=node('section','runnerNavPad',{},term),tabs=node('div','tabs',{},pad);
-const layer=node('div','vigMenuOverlay',{},tabs);
+const mainMenu=node('nav','',{id:'vigMainMenu'},term);
 function compoundMatches(selector,element,states){
   let okay=true;
   selector=replaceFunctions(selector,(name,args)=>{
@@ -110,29 +110,27 @@ function cascade(all,element,states){
 let checks=0;
 for(const all of [[...rules(menu),...legacy],[...legacy,...rules(menu)]]){
   for(const id of Object.keys(ids)){
-    const attrs={'data-menu-id':id,id:ids[id]};if(!ids[id])attrs['data-view']=id;
-    const button=node('button','btn loaded',attrs,tabs),face=node('span','vigMenuFace vigMenuTile',{'data-vig-menu-id':id},layer);
+    const attrs={'data-vig-menu-id':id};
+    const button=node('button','vigMenuButton vigMenuTile',attrs,mainMenu);
     for(const states of [new Set(),new Set(['hover']),new Set(['active'])]){
-      const target=cascade(all,button,states),art=cascade(all,face,states);
+      const target=cascade(all,button,states);
       for(const key of ['grid-row-start','grid-column-start','grid-row-end','grid-column-end']){
-        assert.equal(target.get(key)?.value,id,`${id} ${key} must defeat the legacy full-width span`);
-        assert.equal(art.get(key)?.value,id,`${id} artwork must occupy the same area as its hit target`);
+        assert.equal(target.get(key)?.value,id,`${id} ${key} belongs to the standalone main-menu button`);
       }
       assert.equal(target.get('display')?.value,'block');
-      assert.equal(target.get('--menu-rgb')?.value,art.get('--menu-rgb')?.value);
+      assert.ok(target.get('--menu-rgb')?.value,'each real main-menu button owns its color');
       assert.match(target.get('background')?.value||'',/repeating-linear-gradient/,'legacy dark fills cannot replace the menu surfaces');
       checks++;
     }
   }
   for(const orientation of ['', 'vigMenuLandscape', 'vigMenuLandscape vigMenuRoomy']){
     body.classes=new Set(`vigMenuStyled runnerMenuHome ${orientation}`.split(/\s+/));
-    const target=cascade(all,tabs,new Set()),art=cascade(all,layer,new Set());
-    for(const key of ['grid-template-areas','grid-template-columns','grid-template-rows','gap']){
-      assert.equal(target.get(key)?.value,art.get(key)?.value,`${orientation||'portrait'}: button and artwork grids must match`);
-    }
-    assert.equal(art.get('position')?.value,'absolute','the artwork must not introduce an extra grid row');
-    assert.equal(art.get('height')?.value,'100%');
+    const target=cascade(all,mainMenu,new Set());
+    assert.equal(target.get('display')?.value,'grid');
+    assert.equal(target.get('height')?.value,'100%');
+    assert.ok(target.get('grid-template-areas')?.value.includes('preferences'));
+    assert.ok(target.get('grid-template-columns')?.value.startsWith(`repeat(${orientation?4:2},`));
   }
   body.classes=new Set(['vigMenuStyled','runnerMenuHome']);
 }
-console.log(`Menu CSS cascade: PASS // ${checks} button/load-order/state combinations against the existing styles`);
+console.log(`Standalone menu CSS: PASS // ${checks} button/load-order/state combinations isolated from the existing section styles`);

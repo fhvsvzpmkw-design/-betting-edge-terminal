@@ -67,7 +67,7 @@
   // public navigation contract does not need a disruptive route migration.
   const primaryNav=document.createElement('script');
   primaryNav.id='primaryNavShellLoader';
-  primaryNav.src=`./assets/primary-nav-shell.js?v=8&b=${UI_CACHE_BUST}`;
+  primaryNav.src=`./assets/primary-nav-shell.js?v=9&b=${UI_CACHE_BUST}`;
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
@@ -76,7 +76,7 @@
   if(!document.getElementById('menuHomeStyleLoader')){
     const menuHome=document.createElement('script');
     menuHome.id='menuHomeStyleLoader';
-    menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-5&b=${UI_CACHE_BUST}`;
+    menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-6&b=${UI_CACHE_BUST}`;
     menuHome.async=false;
     document.head.appendChild(menuHome);
   }

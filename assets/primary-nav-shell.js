@@ -154,6 +154,8 @@ function enterMenu(d){
   clearPrimaryActive(d);
   d.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));
   d.body.classList.add(MENU_CLASS);
+  // Render the standalone menu in this transition, before any browser frame.
+  d.defaultView?.VigScopeMenuHome?.show();
   try{d.defaultView?.scrollTo({top:0,left:0,behavior:'auto'})}catch{}
 }
 function closeShell(d){

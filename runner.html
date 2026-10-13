@@ -9,6 +9,21 @@
 <title>VigScope Terminal UI v1.5</title>
 <style id="vigMenuBootGuard">
 html[data-vig-menu-startup="pending"] main.term{visibility:hidden!important}
+/* Retire the original home presentation; section controls retain their layout. */
+body.runnerMenuHome:not(.runnerPrimaryViewLoaded):not(.runnerSyndicateLoaded):not(.runnerPizzaLoaded):not(.runnerCryptoLoaded):not(.runnerSeasonPreviewsLoaded):not(.runnerPreferencesLoaded) main.term>:not(#vigMainMenu){display:none!important}
+#vigMainMenu[hidden]{display:none!important}
+body.vigMenuFallback #vigMainMenu{position:fixed;inset:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr)) 44px;gap:8px;padding:8px;background:#01060b;overflow:hidden}
+body.vigMenuFallback .vigMenuButton{min-width:0;min-height:0;padding:6px;color:#c6f3ff;background:#071a25;border:2px solid #48c9eb;border-radius:12px}
+body.vigMenuFallback .vigMenuFace{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:4px}
+body.vigMenuFallback .vigMenuArt{max-width:100%;max-height:70%;overflow:hidden}
+body.vigMenuFallback .vigMenuArt img{display:none;max-width:70px;max-height:70px}
+body.vigMenuFallback .vigMenuArtReady img{display:block}
+body.vigMenuFallback .vigMenuArtReady .vigMenuEmoji{display:none}
+body.vigMenuFallback .vigMenuName{font:bold 16px Arial,sans-serif}
+body.vigMenuFallback [data-vig-menu-id="preferences"]{grid-column:1/-1}
+body.vigMenuFallback [data-vig-menu-id="preferences"] .vigMenuFace{flex-direction:row}
+@media(orientation:landscape){body.vigMenuFallback #vigMainMenu{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr)) 44px}}
+
 </style>
 <script id="vigMenuBootGuardRuntime">
 (()=>{
@@ -23,16 +38,16 @@ html[data-vig-menu-startup="pending"] main.term{visibility:hidden!important}
   document.addEventListener('vigscope-menu-ready',()=>clearTimeout(timer),{once:true});
 })();
 </script>
-<link id="vigMenuHomeStyle" rel="stylesheet" href="./assets/menu-home-style.css?v=20261012-menu-5" onerror="this.dataset.failed='1'">
-<link rel="preload" as="image" href="./assets/menu-home/board.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/market.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/history.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/syndicate.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/pizza.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/crypto.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/meat.webp?v=20261012-menu-5">
-<link rel="preload" as="image" href="./assets/menu-home/value.webp?v=20261012-menu-5">
-<script id="menuHomeStyleLoader" defer src="./assets/menu-home-style.js?v=20261012-menu-5"></script>
+<link id="vigMenuHomeStyle" rel="stylesheet" href="./assets/menu-home-style.css?v=20261012-menu-6" onerror="this.dataset.failed='1'">
+<link rel="preload" as="image" href="./assets/menu-home/board.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/market.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/history.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/syndicate.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/pizza.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/crypto.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/meat.webp?v=20261012-menu-6">
+<link rel="preload" as="image" href="./assets/menu-home/value.webp?v=20261012-menu-6">
+<script id="menuHomeStyleLoader" defer src="./assets/menu-home-style.js?v=20261012-menu-6"></script>
 <script>
 // Preserve old Syndicate links while loading the same report as normal VigScope entry.
 if(location.hash==='#syndicate'){const target=new URL('/vigscope',location.origin);target.searchParams.set('view','syndicate');location.replace(target.href)}
@@ -258,7 +273,7 @@ const core=document.getElementById('core'),splash=document.getElementById('splas
 let coreLoaded=false,timerDone=false,started=false,hierarchyObserver=null,hierarchyFrame=null;
 const syndicateSlotVersions=new Map();
 window.addEventListener('pageshow',event=>{if(!event.persisted)return;const fresh=new URL(location.href);fresh.searchParams.set('_fresh',String(Date.now()));location.replace(fresh.pathname+fresh.search+fresh.hash)});
-function reveal(){if(!coreLoaded||!timerDone||document.documentElement.dataset.vigMenuStartup==='pending')return;core.classList.add('ready');splash.classList.add('fade');setTimeout(()=>splash.remove(),FADE_MS+80)}
+function reveal(){if(!coreLoaded||!timerDone||document.documentElement.dataset.vigMenuStartup==='pending')return;if(document.documentElement.dataset.vigMenuStartup==='fallback'&&!window.VigScopeMenuHome?.ready){splash.classList.add('asset-error');document.getElementById('fallback').textContent='VIGSCOPE MENU COULD NOT LOAD // RELOAD TO RETRY';return;}core.classList.add('ready');splash.classList.add('fade');setTimeout(()=>splash.remove(),FADE_MS+80)}
 function startWhenVisible(){if(started)return;try{const host=window.frameElement;if(host){const style=getComputedStyle(host);if(Number.parseFloat(style.opacity||'1')<=.01||style.visibility==='hidden'){requestAnimationFrame(startWhenVisible);return}}}catch(e){}started=true;setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS)}
 function innerAppFrame(){try{return core.contentDocument&&core.contentDocument.getElementById('app')}catch(e){return null}}
 function scheduleHierarchyPatch(){if(hierarchyFrame)return;hierarchyFrame=requestAnimationFrame(()=>{hierarchyFrame=null;applyHierarchyPatch()})}

@@ -7,6 +7,7 @@ let page;
 try{
   page=await browser.newPage();const errors=[];
   page.on('pageerror',error=>errors.push(String(error)));
+  let artworkRequests=0;page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/assets/menu-home/'))artworkRequests++});
   await page.evaluateOnNewDocument(()=>{
     window.menuBootCheck={frames:0,legacyFrames:0,earlyFadeFrames:0};
     const check=()=>{
@@ -39,14 +40,15 @@ try{
       const rect=element=>{const r=element.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}};
       return {width:innerWidth,height:innerHeight,scrollHeight:document.documentElement.scrollHeight,scrollWidth:document.documentElement.scrollWidth,
         headerDisplay:getComputedStyle(document.querySelector('main.term>header.top')).display,badge:!!document.getElementById('vigMenuBrand'),
-        buttons:[...document.querySelectorAll('.tabs>.btn[data-menu-id]')].map(button=>{
-          const id=button.dataset.menuId,face=document.querySelector(`.vigMenuTile[data-vig-menu-id="${id}"]`),name=face.querySelector('.vigMenuName'),art=face.querySelector('.vigMenuArt'),box=rect(button);
+        oldNavDisplay:getComputedStyle(document.querySelector('.runnerNavPad')).display,
+        buttons:[...document.querySelectorAll('#vigMainMenu>.vigMenuButton')].map(button=>{
+          const id=button.dataset.vigMenuId,face=button.querySelector('.vigMenuFace'),name=face.querySelector('.vigMenuName'),art=face.querySelector('.vigMenuArt'),box=rect(button);
           return {id,box,face:rect(face),name:rect(name),art:rect(art),textWidth:name.scrollWidth,textBoxWidth:name.clientWidth,display:getComputedStyle(button).display,
-            hit:document.elementFromPoint(box.x+box.width/2,box.y+box.height/2)?.closest('.btn')===button};
+            hit:document.elementFromPoint(box.x+box.width/2,box.y+box.height/2)?.closest('.vigMenuButton')===button};
         })};
     });
     assert.equal(layout.buttons.length,9);
-    assert.equal(layout.headerDisplay,'none');assert.equal(layout.badge,false);
+    assert.equal(layout.headerDisplay,'none');assert.equal(layout.badge,false);assert.equal(layout.oldNavDisplay,'none','the original navigation cannot be the main-menu surface');
     assert.ok(layout.buttons[0].box.y<16,'the buttons must start at the top edge rather than reserving a header row');
     assert.ok(layout.scrollHeight<=height+1&&layout.scrollWidth<=width+1,`${width}x${height}: menu must fit without scrolling`);
     for(const button of layout.buttons){
@@ -54,20 +56,52 @@ try{
       assert.notEqual(button.display,'none');assert.ok(button.hit,`${button.id}: artwork must leave the original button clickable`);
       assert.ok(box.width>=44&&box.height>=44,`${button.id}: touch target is too small`);
       assert.ok(box.x>=0&&box.y>=0&&box.right<=width+1&&box.bottom<=height+1,`${button.id}: button must be fully on screen`);
-      for(const key of ['x','y','width','height'])assert.ok(Math.abs(box[key]-face[key])<1,`${width}x${height}: ${button.id} frame/artwork drift (${key})`);
+      assert.ok(face.x>=box.x&&face.y>=box.y&&face.right<=box.right&&face.bottom<=box.bottom,'each real button contains its own artwork and title');
       for(const content of [button.art,button.name])assert.ok(content.x>=box.x-1&&content.y>=box.y-1&&content.right<=box.right+1&&content.bottom<=box.bottom+1,`${width}x${height}: ${button.id} graphic and title must fit inside its button`);
       assert.ok(button.textWidth<=button.textBoxWidth+1,`${width}x${height}: ${button.id} title must not overflow its text box`);
     }
     await page.screenshot({path:`.qa/menu-${width}x${height}.png`});
     console.log(`MENU BROWSER ${width}x${height}: PASS // 9 aligned, clickable targets; labels/graphics fit; no scrolling`);
   }
-  await page.click('.tabs>.btn[data-menu-id="board"]');
-  await page.waitForFunction(()=>document.body.classList.contains('runnerPrimaryViewLoaded')&&!document.body.classList.contains('vigMenuStyled')&&!document.querySelector('.vigMenuOverlay'));
-  assert.match(await page.$eval('.tabs>.btn[data-menu-id="board"]',button=>button.innerHTML),/PRESS \[F1\] TO RETURN TO MENU/);
-  await page.click('.tabs>.btn[data-menu-id="board"]');await ready();
-  await page.click('#runnerPreferencesF6');
-  await page.waitForFunction(()=>document.body.classList.contains('runnerPreferencesLoaded')&&!document.body.classList.contains('vigMenuStyled')&&!document.querySelector('.vigMenuOverlay'));
-  await page.click('#runnerPreferencesF6');await ready();
+  const requestsBeforeReturn=artworkRequests;
+  await page.evaluate(()=>{
+    window.preparedMenuArt=[...document.querySelectorAll('#vigMainMenu img')];
+    window.preparedMenuButtons=[...document.querySelectorAll('#vigMainMenu>.vigMenuButton')];
+    window.returnCheck={frames:0,legacyFrames:0,loadingArtFrames:0};
+    const inspect=()=>{
+      const state=window.returnCheck,body=document.body,menu=document.getElementById('vigMainMenu'),nav=document.querySelector('.runnerNavPad');
+      const section=['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'].some(name=>body.classList.contains(name));
+      state.frames++;
+      if(body.classList.contains('runnerMenuHome')&&!section){
+        if(getComputedStyle(nav).display!=='none'&&nav.getBoundingClientRect().height>0)state.legacyFrames++;
+        if(menu&&!menu.hidden&&[...menu.querySelectorAll('.vigMenuArt img')].some(image=>!image.parentElement.classList.contains('vigMenuArtReady')))state.loadingArtFrames++;
+      }
+      if(!state.done)requestAnimationFrame(inspect);
+    };
+    requestAnimationFrame(inspect);
+  });
+  const sections={board:'runnerPrimaryViewLoaded',market:'runnerPrimaryViewLoaded',history:'runnerPrimaryViewLoaded',syndicate:'runnerSyndicateLoaded',pizza:'runnerPizzaLoaded',crypto:'runnerCryptoLoaded',meat:'runnerSeasonPreviewsLoaded',engine:'runnerPrimaryViewLoaded',preferences:'runnerPreferencesLoaded'};
+  for(const [width,height] of [[390,650],[1194,650]]){
+    await page.setViewport({width,height,deviceScaleFactor:1});
+    for(const [id,section] of Object.entries(sections)){
+      await page.click(`#vigMainMenu>[data-vig-menu-id="${id}"]`);
+      await page.waitForFunction((section)=>document.body.classList.contains(section)&&!document.body.classList.contains('vigMenuStyled')&&document.getElementById('vigMainMenu').hidden,{},section);
+      if(id==='board')assert.match(await page.$eval('.tabs>.btn[data-menu-id="board"]',button=>button.innerHTML),/PRESS \[F1\] TO RETURN TO MENU/);
+      await page.click(`.tabs>.btn[data-menu-id="${id}"]`);await ready();
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const result=await page.evaluate(()=>({
+        legacy:window.returnCheck.legacyFrames,loading:window.returnCheck.loadingArtFrames,
+        retainedArt:window.preparedMenuArt.every((image,i)=>document.querySelectorAll('#vigMainMenu img')[i]===image),
+        retainedButtons:window.preparedMenuButtons.every((button,i)=>document.querySelectorAll('#vigMainMenu>.vigMenuButton')[i]===button)
+      }));
+      assert.equal(result.legacy,0,`${id}: returning may not show the old navigation`);
+      assert.equal(result.loading,0,`${id}: prepared artwork must not reload on return`);
+      assert.ok(result.retainedArt&&result.retainedButtons,'the new main menu must remain prepared between visits');
+      assert.equal(artworkRequests,requestsBeforeReturn,'no artwork requests on menu return');
+      console.log(`MENU RETURN ${width}x${height} ${id}: PASS // actual standalone buttons; zero legacy/loading frames; no rebuild or image requests`);
+    }
+  }
+  await page.evaluate(()=>{window.returnCheck.done=true});
 
   // Delay beyond the existing three-second splash minimum. Neither the old
   // layout nor half-loaded graphics may become visible while resources arrive.
@@ -88,7 +122,7 @@ try{
     console.log(`MENU STARTUP ${path}: PASS // delayed resource; splash held; zero legacy menu frames`);
   }
   assert.deepEqual(errors,[]);
-  console.log('MENU HOME BROWSER: PASS // six full-screen viewport fits, no header, no old-menu flash with slow script/artwork, existing Board/Preferences entry and return');
+  console.log('MENU HOME BROWSER: PASS // six full-screen viewport fits, no header, no old-menu flash with slow script/artwork, all nine section returns in both orientations without rebuilding or old-menu frames');
 }catch(error){
   if(page){fs.mkdirSync('.qa',{recursive:true});await page.screenshot({path:'.qa/menu-failure.png'});console.error(await page.evaluate(()=>({classes:document.body.className,width:innerWidth,height:innerHeight})));}
   throw error;
