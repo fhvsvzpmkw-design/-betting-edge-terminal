@@ -194,6 +194,19 @@ assert.equal(app.body.classList.contains('vigMenuRoomy'),true,'tablet landscape 
 app.buttons[0].click();app.drain();
 assert.equal(app.body.classList.contains('vigMenuRoomy'),false,'tablet layout must be cleared on secondary screens');
 
+// The real Preferences transition can retain runnerMenuHome alongside its
+// loaded class. Every secondary state must override that stale home marker.
+app.body.classList.remove('section-open');app.body.classList.add('runnerMenuHome');app.drain();
+for(const state of ['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded']){
+  app.body.classList.add(state);app.drain();
+  assert.equal(app.body.classList.contains('runnerMenuHome'),true,'presentation must not rewrite the original state authority');
+  assert.equal(app.body.classList.contains('vigMenuStyled'),false,`${state}: section state takes priority over a lingering menu class`);
+  assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,0);
+  assert.deepEqual(app.top.children,[app.originalHeader]);
+  app.body.classList.remove(state);app.drain();
+  assert.equal(app.body.classList.contains('vigMenuStyled'),true,'closing the section restores the menu');
+}
+
 const artwork=Object.values(app.context.VigScopeMenuHome.artwork).filter(Boolean);
 assert.equal(new Set(artwork).size,8,'each graphic can be replaced independently');
 for(const path of artwork){assert.ok(fs.statSync(path).size<50000,'menu artwork is mobile-sized')}

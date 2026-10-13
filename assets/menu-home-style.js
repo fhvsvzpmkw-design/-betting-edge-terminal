@@ -2,7 +2,7 @@
   'use strict';
 
   // Presentation only. The canonical menu keeps every button and click/key handler.
-  const VERSION='20261012-menu-3';
+  const VERSION='20261012-menu-4';
   const STYLE_ID='vigMenuHomeStyle';
   const BRAND_SRC='/site-assets/product-badges/vigscope-small.png';
   const ART_BASE='./assets/menu-home/';
@@ -18,6 +18,7 @@
     preferences:{name:'Preferences',emoji:'⚙️',art:null}
   };
   const ORDER=Object.keys(ITEMS);
+  const SECTION_CLASSES=['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
   const originals=new WeakMap();
   let ready=false,attached=false,scheduled=false,grid=null,top=null,brand=null,overlay=null;
 
@@ -44,7 +45,10 @@
   }
 
   function menuOpen(){
-    return document.body.classList.contains('runnerMenuHome');
+    const state=document.body.classList;
+    // Some legacy transitions briefly retain the home class while opening a desk.
+    // The section's state takes priority; its original screen owns presentation.
+    return state.contains('runnerMenuHome')&&!SECTION_CLASSES.some(name=>state.contains(name));
   }
   function schedule(){
     if(scheduled)return;
