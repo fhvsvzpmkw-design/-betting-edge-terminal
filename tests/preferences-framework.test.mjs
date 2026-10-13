@@ -60,7 +60,7 @@ for(const token of [
 ]) assert(framework.includes(token),`preferences runtime missing ${token}`);
 
 assert(bootstrap.includes('bettingEdge.preferences.meterPresentation'),'VigScope bootstrap must honor saved meter preference before renderer load');
-assert(bootstrap.includes('preferences-framework.js?v=5'),'preferences framework cache version must be v5');
+assert(bootstrap.includes('preferences-framework.js?v=6'),'preferences framework cache version must be v6');
 assert(!bootstrap.includes('schedule-profile-ui.js'),'retired seasonal schedule UI must not load');
 assert(framework.includes("const BUTTON_ID='runnerPreferencesF6'"),'preferences framework must own its menu button');
 assert(framework.includes("const PANEL_ID='runnerPreferencesPanel'"),'preferences framework must own its panel');

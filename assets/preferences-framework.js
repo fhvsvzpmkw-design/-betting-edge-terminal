@@ -140,11 +140,15 @@ function ensureShell(d){
     tabs.appendChild(button);
   }
   let panel=d.getElementById(PANEL_ID);
+  // The tabs exist before the hierarchy patch assigns runnerNavPad.
+  // Use their container so the Preferences panel never hides the whole terminal.
+  const nav=d.querySelector('.runnerNavPad')||tabs.parentElement;
   if(!panel){
     panel=d.createElement('section');
     panel.id=PANEL_ID;
-    const nav=d.querySelector('.runnerNavPad');
     nav?nav.insertAdjacentElement('afterend',panel):d.body.prepend(panel);
+  }else if(nav&&panel.parentElement!==nav.parentElement){
+    nav.insertAdjacentElement('afterend',panel);
   }
   if(button.dataset.preferencesBound!=='1'){
     button.dataset.preferencesBound='1';

@@ -86,6 +86,7 @@ try{
     for(const [id,section] of Object.entries(sections)){
       await page.click(`#vigMainMenu>[data-vig-menu-id="${id}"]`);
       await page.waitForFunction((section)=>document.body.classList.contains(section)&&!document.body.classList.contains('vigMenuStyled')&&document.getElementById('vigMainMenu').hidden,{},section);
+      if(id==='preferences')assert.ok(await page.evaluate(()=>document.getElementById('runnerPreferencesPanel').parentElement===document.querySelector('main.term')),'Preferences must share the terminal container with its return control');
       if(id==='board')assert.match(await page.$eval('.tabs>.btn[data-menu-id="board"]',button=>button.innerHTML),/PRESS \[F1\] TO RETURN TO MENU/);
       await page.waitForFunction(id=>{
         const button=document.querySelector(`.tabs>.btn[data-menu-id="${id}"]`),box=button?.getBoundingClientRect();
