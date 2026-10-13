@@ -736,7 +736,7 @@ function injectStyle(d){
   .runnerMarketTable td:first-child{font-weight:1000;font-size:13px}
   .runnerMarketTable td:nth-child(3){font-weight:950;font-size:13px;color:var(--cyan)}
   @media(orientation:portrait){
-    .top{padding-top:max(34px,calc(13px + env(safe-area-inset-top)))!important}
+    .top{padding-top:calc(13px + env(safe-area-inset-top,0px))!important}
   }
   @media(max-width:760px){
     .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}

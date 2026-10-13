@@ -91,7 +91,7 @@ try{
     requestAnimationFrame(inspect);
   });
   const sections={board:'runnerPrimaryViewLoaded',market:'runnerPrimaryViewLoaded',history:'runnerPrimaryViewLoaded',syndicate:'runnerSyndicateLoaded',pizza:'runnerPizzaLoaded',crypto:'runnerCryptoLoaded',meat:'runnerSeasonPreviewsLoaded',engine:'runnerPrimaryViewLoaded',preferences:'runnerPreferencesLoaded'};
-  for(const [width,height] of [[390,650],[1194,650]]){
+  for(const [width,height] of [[390,650],[834,1000],[1194,650]]){
     await page.setViewport({width,height,deviceScaleFactor:1});
     for(const [id,section] of Object.entries(sections)){
       await page.click(`#vigMainMenu>[data-vig-menu-id="${id}"]`);
@@ -102,6 +102,17 @@ try{
         const button=document.querySelector(`.tabs>.btn[data-menu-id="${id}"]`),box=button?.getBoundingClientRect();
         return box?.width>0&&box.height>0&&getComputedStyle(button).visibility!=='hidden';
       },{timeout:5000},id);
+      const spacing=await page.evaluate(id=>{
+        const header=document.querySelector('main.term>header.top'),nav=document.querySelector('.runnerNavPad');
+        const button=nav.querySelector(`.btn[data-menu-id="${id}"]`);
+        const h=header.getBoundingClientRect(),b=button.getBoundingClientRect();
+        return {headerTop:h.top,headerPadding:parseFloat(getComputedStyle(header).paddingTop),navPadding:parseFloat(getComputedStyle(nav).paddingTop),gap:b.top-h.bottom};
+      },id);
+      assert.ok(Math.abs(spacing.headerTop)<1,`${width}x${height} ${id}: the section header starts at the screen top`);
+      assert.equal(spacing.headerPadding,13,`${width}x${height} ${id}: sections share the standard header inset without portrait compensation`);
+      assert.equal(spacing.navPadding,8,`${width}x${height} ${id}: sections share the same gap above the return control`);
+      assert.ok(Math.abs(spacing.gap-8)<1,`${width}x${height} ${id}: the visible return control follows the header by eight pixels`);
+      console.log(`SECTION TOP SPACING ${width}x${height} ${id}: PASS // consistent header inset and return gap`);
       await page.evaluate(()=>{window.returnCheck.lastReturn=null});
       await page.click(`.tabs>.btn[data-menu-id="${id}"]`);
       if(!['board','market','history','engine'].includes(id)){
