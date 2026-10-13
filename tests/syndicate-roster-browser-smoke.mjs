@@ -14,7 +14,7 @@ try{
     }
   });
   await page.setViewport({width:1024,height:900,deviceScaleFactor:1});
-  const ready=async()=>page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).display==='none'||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
+  const ready=async()=>page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'&&window.VigScopeMenuHome?.ready&&document.body.classList.contains('vigMenuStyled')&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).display==='none'||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
   const loaded=async()=>page.waitForFunction(()=>document.querySelector('.syndicateFrame')?.contentDocument?.querySelector('#loadedCount')?.textContent==='5 / 8',{timeout:30000});
   const names=async()=>page.$$eval('.syndicateTab .syndicateName',els=>els.map(e=>e.textContent));
   const expected=['EDDIE NUMBERS','GRAHAM MERCER','BILL WESTON','GUY LAFLAME','LOU VEGA','EMPTY 6','EMPTY 7','EMPTY 8'];
@@ -23,7 +23,7 @@ try{
     window.syndicatePaints=[];
     new MutationObserver(()=>{const names=[...document.querySelectorAll('.syndicateTab .syndicateName')].map(e=>e.textContent);if(names.length===8)window.syndicatePaints.push(names)}).observe(document.body,{subtree:true,childList:true});
   });
-  await page.click('#runnerSyndicateF5');await loaded();
+  await page.click('#vigMainMenu>[data-vig-menu-id="syndicate"]');await loaded();
   assert.deepEqual(await names(),expected);
   assert.ok((await page.evaluate(()=>window.syndicatePaints)).every(row=>JSON.stringify(row)===JSON.stringify(expected)),'the first five must never flash to empty');
   fs.mkdirSync('.qa',{recursive:true});
@@ -42,9 +42,9 @@ try{
   host=page.frames().find(f=>f.url().includes('slot-host.html?slot=1'));
   await host.click('#manageButton');await host.click('.emptyCard');
   await page.waitForFunction(()=>document.querySelector('[data-syndicate-tab="0"] .syndicateName')?.textContent==='EMPTY 1');
-  await page.reload({waitUntil:'domcontentloaded',timeout:60000});await ready();await page.click('#runnerSyndicateF5');await loaded();
+  await page.reload({waitUntil:'domcontentloaded',timeout:60000});await ready();await page.click('#vigMainMenu>[data-vig-menu-id="syndicate"]');await loaded();
   const custom=[...expected];custom[0]='EMPTY 1';custom[5]='JESSE BAINS';assert.deepEqual(await names(),custom);
-  await page.click('#runnerSyndicateF5');await page.click('#runnerPreferencesF6');
+  await page.click('#runnerSyndicateF5');await ready();await page.click('#vigMainMenu>[data-vig-menu-id="preferences"]');
   await page.waitForSelector('[data-pref-syndicate-slot="5"]');
   const saved=await page.$$eval('[data-pref-syndicate-slot]',els=>els.map(e=>e.value));
   assert.equal(saved[0],'');assert.equal(saved[3],'guy-laflame');assert.equal(saved[4],'lou-vega');assert.equal(saved[5],'jesse-bains');
