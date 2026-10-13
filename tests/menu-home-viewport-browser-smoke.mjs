@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 
+const shortLinkStyles=[...fs.readFileSync('r.html','utf8').matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(match=>match[1]).join('\n');
+assert.ok(shortLinkStyles,'use the shipped short-link host styles');
+
 const browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
 let page;
 try{
@@ -20,7 +23,7 @@ try{
     if(framed){
       await page.setRequestInterception(true);
       page.on('request',request=>{
-        if(new URL(request.url()).pathname==='/menu-viewport-host.html')return request.respond({status:200,contentType:'text/html',body:'<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01040a}#app{width:100%;height:100%;border:0;display:block}</style></head><body><iframe id="app" src="/runner.html"></iframe></body></html>'});
+        if(new URL(request.url()).pathname==='/menu-viewport-host.html')return request.respond({status:200,contentType:'text/html',body:`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${shortLinkStyles}</style></head><body><iframe id="app" class="ready" src="/runner.html"></iframe></body></html>`});
         return request.continue();
       });
     }
@@ -32,6 +35,7 @@ try{
     await ready();
     fs.mkdirSync('.qa',{recursive:true});
     const scenarios=[
+      {name:'portrait-fullscreen',width:834,height:1080,rect:{width:834,height:1080,top:0,left:0,cachedHeight:null}},
       {name:'portrait-bars',width:834,height:1080,rect:{width:834,height:980,top:50,left:0,cachedHeight:null}},
       {name:'landscape',width:1194,height:750,rect:{width:1194,height:650,top:0,left:0,cachedHeight:null}},
       {name:'portrait-after-rotation',width:834,height:1080,rect:{width:834,height:1010,top:24,left:0,cachedHeight:930}},
@@ -60,7 +64,8 @@ try{
       assert.equal(result.buttons.length,9);
       for(const button of result.buttons){assert.ok(button.top>=expected.top&&button.left>=expected.left&&button.bottom<=expected.top+expected.height&&button.right<=expected.left+expected.width);assert.ok(button.hit,'every selection remains visible and clickable')}
       if(framed){
-        const host=await page.$eval('#app',frame=>{const r=frame.getBoundingClientRect();return {top:r.top,height:r.height,pinned:frame.classList.contains('vigMenuHostViewport')}});
+        const host=await page.$eval('#app',frame=>{const r=frame.getBoundingClientRect();const style=getComputedStyle(frame);return {top:r.top,height:r.height,pinned:frame.classList.contains('vigMenuHostViewport'),transform:style.transform,paddingBottom:style.paddingBottom}});
+        assert.equal(host.transform,'none','splash Ready styling must not move the published app frame');assert.equal(host.paddingBottom,'0px','splash Ready spacing must not shrink the app frame');
         assert.equal(host.pinned,true);assert.ok(Math.abs(host.top-scenario.rect.top)<1&&Math.abs(host.height-scenario.rect.height)<1);
       }
       await page.screenshot({path:`.qa/menu-viewport-${framed?'framed':'direct'}-${scenario.name}.png`});
