@@ -104,7 +104,7 @@ function fixture(startOnMenu=true,complete=true,preloaded=false){
   });
   specialtyObserver.observe(pad,{childList:true,subtree:true});
   const context={document,MutationObserver,CustomEvent:class{constructor(type){this.type=type}},console,WeakMap,Math,Object,Number,parseFloat,
-    innerWidth:414,innerHeight:700,visualViewport:{width:414,height:700,addEventListener(){}},
+    innerWidth:414,innerHeight:700,visualViewport:{width:414,height:700,offsetTop:0,offsetLeft:0,listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn)}},
     requestAnimationFrame:fn=>{frames.push(fn);return frames.length},setInterval:fn=>{intervals.push(fn);return intervals.length},clearInterval(){},
     getComputedStyle:()=>({paddingTop:'0',paddingBottom:'0',paddingLeft:'0',paddingRight:'0'}),listeners:new Map(),
     addEventListener(name,fn){this.listeners.set(name,fn)}
@@ -236,6 +236,13 @@ app.context.innerWidth=844;app.context.innerHeight=300;app.context.visualViewpor
 app.context.listeners.get('resize')();app.drain();
 assert.equal(app.body.classList.contains('vigMenuLandscape'),true);
 assert.equal(app.document.documentElement.style.values.get('--vig-menu-height'),'280px','fit uses the shorter actual browser viewport');
+app.context.visualViewport.offsetTop=54;app.context.visualViewport.offsetLeft=8;
+app.context.visualViewport.listeners.get('scroll')();app.drain();
+assert.equal(app.document.documentElement.style.values.get('--vig-menu-top'),'54px','the menu follows the visible origin after Safari pans the viewport');
+assert.equal(app.document.documentElement.style.values.get('--vig-menu-left'),'8px');
+app.context.visualViewport.height=340;app.context.visualViewport.listeners.get('resize')();app.drain();
+assert.equal(app.document.documentElement.style.values.get('--vig-menu-height'),'340px','the visible viewport may grow before innerHeight catches up after rotation');
+app.context.visualViewport.offsetTop=0;app.context.visualViewport.offsetLeft=0;
 app.context.innerWidth=1024;app.context.innerHeight=768;app.context.visualViewport.width=1024;app.context.visualViewport.height=768;
 app.context.listeners.get('resize')();app.drain();
 assert.equal(app.body.classList.contains('vigMenuRoomy'),true,'tablet landscape uses the space for centered artwork and labels');

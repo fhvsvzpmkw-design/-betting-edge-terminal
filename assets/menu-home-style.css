@@ -3,6 +3,10 @@
  * Each illustrated main-menu button owns its frame, artwork and label.
  */
 body.vigMenuStyled.runnerMenuHome{
+  position:fixed!important;
+  top:var(--vig-menu-top,0px)!important;
+  left:var(--vig-menu-left,0px)!important;
+  width:var(--vig-menu-width,100vw)!important;
   margin:0!important;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)!important;
   height:var(--vig-menu-height,100dvh)!important;
@@ -12,9 +16,12 @@ body.vigMenuStyled.runnerMenuHome{
   box-sizing:border-box!important;
 }
 body.vigMenuStyled.runnerMenuHome main.term{
+  position:fixed!important;
+  top:calc(var(--vig-menu-top,0px) + env(safe-area-inset-top,0px))!important;
+  left:calc(var(--vig-menu-left,0px) + env(safe-area-inset-left,0px))!important;
   display:grid!important;
   grid-template-rows:minmax(0,1fr)!important;
-  width:100%!important;
+  width:calc(var(--vig-menu-width,100vw) - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px))!important;
   max-width:none!important;
   height:calc(var(--vig-menu-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important;
   min-height:0!important;

@@ -76,7 +76,7 @@
   if(!document.getElementById('menuHomeStyleLoader')){
     const menuHome=document.createElement('script');
     menuHome.id='menuHomeStyleLoader';
-    menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-6&b=${UI_CACHE_BUST}`;
+    menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-7&b=${UI_CACHE_BUST}`;
     menuHome.async=false;
     document.head.appendChild(menuHome);
   }

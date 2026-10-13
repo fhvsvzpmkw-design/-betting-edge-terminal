@@ -2,7 +2,7 @@
   'use strict';
 
   // The main menu owns real buttons. Existing controls keep section routing and keys.
-  const VERSION='20261012-menu-6';
+  const VERSION='20261012-menu-7';
   const STYLE_ID='vigMenuHomeStyle';
   const ART_BASE='./assets/menu-home/';
   const ITEMS={
@@ -20,6 +20,7 @@
   const SECTION_CLASSES=['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
   let ready=false,attached=false,scheduled=false,startupSettled=false,grid=null,menu=null;
   const pendingArt=new Set();
+  let hostFrame=null,hostWindow=null;
 
   function layoutForViewport(width,height){
     width=Math.max(1,Number(width)||1);height=Math.max(1,Number(height)||1);
@@ -54,17 +55,61 @@
     scheduled=true;
     requestAnimationFrame(()=>{scheduled=false;sync()});
   }
+  function viewportRect(w){
+    const view=w.visualViewport;
+    return {
+      width:Math.max(1,Number(view?.width)||w.innerWidth),
+      height:Math.max(1,Number(view?.height)||w.innerHeight),
+      top:Math.max(0,Number(view?.offsetTop)||0),
+      left:Math.max(0,Number(view?.offsetLeft)||0)
+    };
+  }
+  function visibleViewport(){
+    // An iframe's visual viewport cannot describe Safari's outer browser bars.
+    // Pin the existing report frame while the main menu is active, then restore
+    // its original layout when a secondary screen opens.
+    try{
+      const frame=window.frameElement,host=frame?.ownerDocument?.defaultView;
+      if(frame&&host&&host!==window){
+        const view=viewportRect(host),d=frame.ownerDocument;
+        if(!d.getElementById('vigMenuHostViewportStyle')){
+          const style=d.createElement('style');style.id='vigMenuHostViewportStyle';
+          style.textContent='iframe.vigMenuHostViewport{position:fixed!important;inset:auto!important;top:var(--vig-menu-host-top,0px)!important;left:var(--vig-menu-host-left,0px)!important;width:var(--vig-menu-host-width,100%)!important;height:var(--vig-menu-host-height,100dvh)!important;margin:0!important}';
+          d.head.appendChild(style);
+        }
+        if(hostWindow!==host){
+          hostWindow=host;
+          host.addEventListener('resize',schedule,{passive:true});
+          host.addEventListener('orientationchange',schedule,{passive:true});
+          host.visualViewport?.addEventListener('resize',schedule,{passive:true});
+          host.visualViewport?.addEventListener('scroll',schedule,{passive:true});
+        }
+        hostFrame=frame;frame.classList.add('vigMenuHostViewport');
+        for(const [key,value] of Object.entries(view))frame.style.setProperty('--vig-menu-host-'+key,value+'px');
+        return {width:view.width,height:view.height,top:0,left:0};
+      }
+    }catch{}
+    return viewportRect(window);
+  }
+  function releaseHostViewport(){
+    if(hostFrame)hostFrame.classList.remove('vigMenuHostViewport');
+    if(hostWindow){
+      hostWindow.removeEventListener('resize',schedule);
+      hostWindow.removeEventListener('orientationchange',schedule);
+      hostWindow.visualViewport?.removeEventListener('resize',schedule);
+      hostWindow.visualViewport?.removeEventListener('scroll',schedule);
+    }
+    hostFrame=null;hostWindow=null;
+  }
   function setViewport(){
     if(!menuOpen()||!document.body.classList.contains('vigMenuStyled'))return;
-    const view=window.visualViewport;
-    const height=Math.min(window.innerHeight,view?.height||window.innerHeight);
-    const width=Math.min(window.innerWidth,view?.width||window.innerWidth);
+    const {width,height,top,left}=visibleViewport();
     const computed=window.getComputedStyle(document.body);
     const vertical=(parseFloat(computed.paddingTop)||0)+(parseFloat(computed.paddingBottom)||0);
     const horizontal=(parseFloat(computed.paddingLeft)||0)+(parseFloat(computed.paddingRight)||0);
     const fit=layoutForViewport(width-horizontal,height-vertical);
     const style=document.documentElement.style;
-    const values={height,pad:fit.padding,gap:fit.gap,prefs:fit.preferences,art:fit.icon,font:fit.font};
+    const values={height,width,top,left,pad:fit.padding,gap:fit.gap,prefs:fit.preferences,art:fit.icon,font:fit.font};
     for(const [key,value] of Object.entries(values))style.setProperty('--vig-menu-'+key,value+'px');
     document.body.classList.toggle('vigMenuLandscape',fit.landscape);
     document.body.classList.toggle('vigMenuRoomy',fit.roomy);
@@ -115,6 +160,7 @@
   }
   function unmount(){
     if(menu)menu.hidden=true;
+    releaseHostViewport();
     if(document.body.classList.contains('vigMenuStyled'))document.body.classList.remove('vigMenuStyled','vigMenuLandscape','vigMenuRoomy');
   }
   function finishStartup(status='ready'){
@@ -145,8 +191,11 @@
     const menuObserver=new MutationObserver(()=>{if(menuOpen())schedule()});
     menuObserver.observe(grid,{childList:true,subtree:true});
     window.addEventListener('resize',schedule,{passive:true});
+    window.addEventListener('orientationchange',schedule,{passive:true});
     window.visualViewport?.addEventListener('resize',schedule,{passive:true});
+    window.visualViewport?.addEventListener('scroll',schedule,{passive:true});
     window.addEventListener('pageshow',schedule,{passive:true});
+    window.addEventListener('pagehide',releaseHostViewport,{passive:true});
     schedule();return true;
   }
   function boot(){
