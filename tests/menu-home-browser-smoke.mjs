@@ -87,6 +87,10 @@ try{
       await page.click(`#vigMainMenu>[data-vig-menu-id="${id}"]`);
       await page.waitForFunction((section)=>document.body.classList.contains(section)&&!document.body.classList.contains('vigMenuStyled')&&document.getElementById('vigMainMenu').hidden,{},section);
       if(id==='board')assert.match(await page.$eval('.tabs>.btn[data-menu-id="board"]',button=>button.innerHTML),/PRESS \[F1\] TO RETURN TO MENU/);
+      await page.waitForFunction(id=>{
+        const button=document.querySelector(`.tabs>.btn[data-menu-id="${id}"]`),box=button?.getBoundingClientRect();
+        return box?.width>0&&box.height>0&&getComputedStyle(button).visibility!=='hidden';
+      },{timeout:5000},id);
       await page.click(`.tabs>.btn[data-menu-id="${id}"]`);await ready();
       await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       const result=await page.evaluate(()=>({
@@ -124,6 +128,15 @@ try{
   assert.deepEqual(errors,[]);
   console.log('MENU HOME BROWSER: PASS // six full-screen viewport fits, no header, no old-menu flash with slow script/artwork, all nine section returns in both orientations without rebuilding or old-menu frames');
 }catch(error){
-  if(page){fs.mkdirSync('.qa',{recursive:true});await page.screenshot({path:'.qa/menu-failure.png'});console.error(await page.evaluate(()=>({classes:document.body.className,width:innerWidth,height:innerHeight})));}
+  if(page){fs.mkdirSync('.qa',{recursive:true});await page.screenshot({path:'.qa/menu-failure.png'});console.error(await page.evaluate(()=>{
+    const inspect=element=>{
+      if(!element)return null;
+      const style=getComputedStyle(element),box=element.getBoundingClientRect();
+      return {tag:element.tagName,id:element.id,classes:element.className,inline:element.getAttribute('style'),display:style.display,visibility:style.visibility,box:{x:box.x,y:box.y,width:box.width,height:box.height}};
+    };
+    const button=document.getElementById('runnerPreferencesF6'),ancestors=[];
+    for(let element=button;element;element=element.parentElement)ancestors.push(inspect(element));
+    return {classes:document.body.className,width:innerWidth,height:innerHeight,scroll:scrollY,preferences:ancestors,children:[...document.querySelector('main.term').children].map(inspect)};
+  }));}
   throw error;
 }finally{await browser.close();}
