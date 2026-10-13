@@ -17,6 +17,13 @@ const SYNDICATE_ORDER_KEY='bettingEdge.syndicateSlots.defaultOrderRevision';
 const SYNDICATE_FALLBACK=['eddie-numbers','graham-mercer','vic-fremont','guy-laflame','lou-vega',null,null,null];
 
 let prefs=null,syndicates=null,hotlineShells=null,lastDoc=null,observer=null;
+const GROUPS=[
+  {id:'appearance',title:'Appearance',icon:'🎨',modules:['meter_presentation','card_view'],reset:'Reset appearance'},
+  {id:'navigation',title:'Navigation',icon:'🧭',modules:['startup_screen','history_landing','recommendation_detail']},
+  {id:'syndicate',title:'Syndicate lineup',icon:'💵',modules:['syndicate_load','hotline_shells'],reset:'Restore default lineup'},
+  {id:'research',title:'Research depth',icon:'🔎',modules:['meat_desk_analysis','crypto_specials_analysis']}
+];
+const feedback=new Map();
 
 function appDoc(){
   try{
@@ -28,7 +35,6 @@ function appDoc(){
 function esc(v){
   return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function stateDef(id){return prefs?.states?.[id]||{label:String(id||'').toUpperCase(),meaning:''}}
 function moduleById(id){return (prefs?.modules||[]).find(m=>m.id===id)||null}
 function safeGet(key,fallback=''){
   try{const v=localStorage.getItem(key);return v===null?fallback:v}catch{return fallback}
@@ -44,11 +50,6 @@ function readChoice(module){
 function writeChoice(module,value){
   if(!validChoice(module,value))return false;
   return safeSet(module.storageKey,value);
-}
-function counts(){
-  const out={active:0,display_only:0,reserved:0};
-  for(const module of prefs?.modules||[]){if(Object.hasOwn(out,module.state))out[module.state]++}
-  return out;
 }
 function normalizedSyndicateAssignments(source){
   return Array.from({length:SYNDICATE_SLOT_COUNT},(_,i)=>source[i]==null?null:String(source[i]));
@@ -81,7 +82,7 @@ function writeSyndicateAssignments(assignments){
 function choiceControl(module){
   const value=readChoice(module);
   const options=(module.options||[]).map(o=>`<option value="${esc(o.value)}"${o.value===value?' selected':''}>${esc(o.label)}</option>`).join('');
-  return `<label class="prefControlLabel"><span>CURRENT</span><select class="prefSelect" data-pref-choice="${esc(module.id)}">${options}</select></label>`;
+  return `<label class="prefControlLabel"><span>Selected</span><select class="prefSelect" aria-label="${esc(module.title)}" data-pref-choice="${esc(module.id)}">${options}</select></label>`;
 }
 function syndicateControl(){
   if(!syndicates?.profiles?.length)return '<div class="prefShellEmpty">CHARACTER LIBRARY UNAVAILABLE // RELOAD TO TRY AGAIN</div>';
@@ -95,20 +96,31 @@ function syndicateControl(){
         return `<option value="${esc(p.id)}"${p.id===current?' selected':''}${used?' disabled':''}>${esc(p.label)}</option>`;
       })
     ].join('');
-    return `<label class="prefControlLabel prefSlotControl"><span>F${index+1}</span><select class="prefSelect" data-pref-syndicate-slot="${index}">${opts}</select></label>`;
+    return `<label class="prefControlLabel prefSlotControl"><span>Slot ${index+1}</span><select class="prefSelect" aria-label="Syndicate slot ${index+1}" data-pref-syndicate-slot="${index}">${opts}</select></label>`;
   }).join('')}</div>`;
 }
+function currentHotlineShells(){
+  const current=new Map();
+  for(const shell of Array.isArray(hotlineShells?.shells)?hotlineShells.shells:[]){
+    if(!shell.characterId||shell.defaultForCharacter!==true)continue;
+    const previous=current.get(shell.characterId);
+    if(!previous||Number(shell.version)>Number(previous.version))current.set(shell.characterId,shell);
+  }
+  const profiles=(syndicates?.profiles||[]).filter(profile=>profile.enabled!==false&&profile.url);
+  const order=[...defaultSyndicateAssignments().filter(Boolean),...profiles.map(profile=>profile.id)];
+  const rank=new Map();
+  order.forEach(id=>{const profile=profiles.find(profile=>profile.id===id),character=profile?.characterId||id;if(!rank.has(character))rank.set(character,rank.size)});
+  return [...current.values()].sort((a,b)=>(rank.get(a.characterId)??999)-(rank.get(b.characterId)??999));
+}
 function hotlineShellDisplay(){
-  const shells=Array.isArray(hotlineShells?.shells)?hotlineShells.shells:[];
-  if(!shells.length)return '<div class="prefShellEmpty">SHELL REGISTRY UNAVAILABLE</div>';
-  return `<div class="prefShellGrid">${shells.map(shell=>{
+  const shells=currentHotlineShells();
+  if(!shells.length)return '<div class="prefShellEmpty">Hotline designs are unavailable. Reload to try again.</div>';
+  return `<details class="prefShellDetails"><summary>View current hotline designs <span>${shells.length} members</span></summary><div class="prefShellGrid">${shells.map(shell=>{
     const character=syndicateCharacterLabel(shell.characterId);
-    const state=String(shell.status||'unknown').toUpperCase();
-    return `<div class="prefShellRow">
+    return `<div class="prefShellRow" data-pref-shell-character="${esc(shell.characterId)}">
       <div><b class="prefShellCharacter">${esc(character)}</b><span class="prefShellName">${esc(shell.name||shell.id)}</span></div>
-      <div class="prefShellMeta"><span>v${esc(shell.version??'—')}</span><span class="prefShellState shell-${esc(String(shell.status||'unknown').toLowerCase())}">${esc(state)}</span></div>
     </div>`;
-  }).join('')}</div>`;
+  }).join('')}</div></details>`;
 }
 function moduleControl(module){
   if(module.kind==='manifest'&&module.id==='hotline_shells')return hotlineShellDisplay();
@@ -117,15 +129,34 @@ function moduleControl(module){
   if(module.kind==='syndicate')return syndicateControl();
   return '';
 }
+function effectLabel(id){
+  return ({meter_presentation:'Applies now.',card_view:'Applies now.',startup_screen:'Applies next time you open VigScope.',history_landing:'Applies next time you open Bet History.',recommendation_detail:'Applies now.',syndicate_load:'Used on your next Syndicate visit.',meat_desk_analysis:'Used for your next manual Meat Desk review.',crypto_specials_analysis:'Used for your next manual Crypto Specials review.'})[id]||'';
+}
+function feedbackHtml(id){
+  const state=feedback.get(id);
+  return `<p class="prefSaveStatus${state?.error?' prefSaveError':''}" data-pref-status="${esc(id)}" role="status" aria-live="polite">${esc(state?.message||'')}</p>`;
+}
+function showFeedback(d,id,message,error=false){
+  feedback.set(id,{message,error});
+  const status=d.querySelector(`[data-pref-status="${CSS.escape(id)}"]`);
+  if(status){status.classList.toggle('prefSaveError',error);status.textContent=message}
+}
 function moduleCard(module){
-  const state=stateDef(module.state);
   const control=moduleControl(module);
-  return `<article class="prefModuleCard state-${esc(module.state)}" data-preference-module="${esc(module.id)}">
-    <div class="prefModuleHead"><b>${esc(module.title)}</b><span class="prefStateBadge">${esc(state.label)}</span></div>
+  return `<article class="prefModuleCard" data-preference-module="${esc(module.id)}">
+    <div class="prefModuleHead"><b>${esc(module.title)}</b></div>
     <p>${esc(module.summary)}</p>
     ${control?`<div class="prefModuleControl">${control}</div>`:''}
-    <div class="prefModulePolicy">${esc(module.controlPolicy||state.meaning)}</div>
+    ${effectLabel(module.id)?`<p class="prefEffect">${esc(effectLabel(module.id))}</p>`:''}
+    ${feedbackHtml(module.id)}
   </article>`;
+}
+function groupedControls(){
+  return GROUPS.map(group=>`<section class="prefGroup" data-pref-group="${group.id}" aria-labelledby="prefGroup-${group.id}">
+    <div class="prefGroupHead"><h3 id="prefGroup-${group.id}"><span aria-hidden="true">${group.icon}</span> ${group.title}</h3>${group.reset?`<button type="button" class="prefReset" data-pref-reset="${group.id}">${group.reset}</button>`:''}</div>
+    <div class="prefModuleGrid">${group.modules.map(moduleById).filter(module=>module&&module.state!=='reserved').map(moduleCard).join('')}</div>
+    ${feedbackHtml(group.id)}
+  </section>`).join('');
 }
 function ensureShell(d){
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');
@@ -180,22 +211,43 @@ function ensureStyle(d){
   s.textContent=`
     #${PANEL_ID}{display:none;margin:0 12px 14px;padding:0;border:0;background:transparent}
     body.runnerPreferencesLoaded #${PANEL_ID}{display:block}
-    #${OVERVIEW_ID}{margin:12px 0;border:1px solid #2d566b;background:linear-gradient(180deg,#020b12,#01070b);padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .prefFrameworkHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:11px}
-    .prefFrameworkHead b{color:#9feaff;font-size:14px;font-weight:900;letter-spacing:.08em}.prefFrameworkHead span{color:#8ba5b1;font-size:10.5px;line-height:1.5;max-width:680px;text-align:right}
-    .prefStateCounts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:11px}
-    .prefStateCount{border:1px solid #203b49;background:#02070b;padding:9px 10px}.prefStateCount small{display:block;color:#7f99a5;font-size:9.5px;font-weight:900;letter-spacing:.09em}.prefStateCount b{display:block;margin-top:3px;font-size:18px;color:#d9f5ff}.prefStateCount.active b{color:#8effaa}.prefStateCount.display b{color:#f5dd83}.prefStateCount.reserved b{color:#8ca2ae}
-    .prefModuleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-    .prefModuleCard{min-width:0;border:1px solid #284552;background:#02080c;padding:11px}.prefModuleCard.state-active{border-color:#347b4a}.prefModuleCard.state-display_only{border-color:#75652e}.prefModuleCard.state-reserved{border-color:#394b54;opacity:.86}
-    .prefModuleHead{display:flex;justify-content:space-between;gap:9px;align-items:center}.prefModuleHead b{color:#dff6ff;font-size:12.5px;font-weight:900;letter-spacing:.06em}.prefStateBadge{flex:0 0 auto;border:1px solid #475b65;padding:4px 6px;color:#a1b6c0;background:#04090c;font-size:9px;font-weight:950;letter-spacing:.07em}.state-active .prefStateBadge{border-color:#438858;color:#8effaa}.state-display_only .prefStateBadge{border-color:#8b7631;color:#ffe07a}.state-reserved .prefStateBadge{color:#91a2aa}
-    .prefModuleCard p{margin:8px 0 7px;color:#a1b6c0;font-size:11px;line-height:1.55}.prefModulePolicy{border-top:1px solid #1b313b;padding-top:7px;color:#78909b;font-size:10px;line-height:1.5}
-    .prefModuleControl{margin:9px 0;padding:9px;border:1px solid #1f3d48;background:#010609}
-    .prefControlLabel{display:grid;grid-template-columns:92px minmax(0,1fr);gap:9px;align-items:center;color:#8da4ae;font-size:10px;font-weight:900;letter-spacing:.06em}
-    .prefSelect{width:100%;min-width:0;min-height:36px;border:1px solid #3a6475;background:#04111a;color:#d9f6ff;padding:8px 9px;font:900 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .prefSyndicateGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prefSlotControl{grid-template-columns:28px minmax(0,1fr)}
-    .prefShellGrid{display:grid;gap:7px}.prefShellRow{display:flex;align-items:center;justify-content:space-between;gap:9px;border:1px solid #403b22;background:#070903;padding:8px 9px}.prefShellCharacter{display:block;color:#f4e4a2;font-size:11px;letter-spacing:.05em}.prefShellName{display:block;margin-top:3px;color:#95aab4;font-size:9.5px}.prefShellMeta{display:flex;align-items:center;gap:6px;flex:0 0 auto;color:#aebdc4;font-size:9px;font-weight:900}.prefShellState{border:1px solid #71622f;padding:3px 5px;color:#f4d66f;letter-spacing:.06em}.prefShellState.shell-editable{border-color:#2f7486;color:#78dff3}.prefShellEmpty{color:#9eb1ba;font-size:10px;letter-spacing:.07em}
-    .prefFrameworkRule{margin-top:11px;padding:9px 10px;border-left:3px solid #43c8ff;background:#031019;color:#93abb5;font-size:10.5px;line-height:1.5}.prefFrameworkRule b{color:#bceeff}
-    @media(max-width:760px){.prefModuleGrid,.prefStateCounts{grid-template-columns:1fr}.prefFrameworkHead span{text-align:left}.prefSyndicateGrid{grid-template-columns:1fr}.prefControlLabel{grid-template-columns:78px minmax(0,1fr)}}
+    #${OVERVIEW_ID}{margin:12px 0;padding:0;color:#d9f6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .prefFrameworkHead{margin:0 0 16px;padding:4px 0}
+    .prefFrameworkHead h2{margin:0;color:#c6f3ff;font-size:22px;line-height:1.3}
+    .prefFrameworkHead p{margin:7px 0 0;color:#8da6b1;font-size:11.5px;line-height:1.5}
+    .prefGroup{--pref-accent:#66d9ff;margin:12px 0;padding:12px;border:1px solid #254653;border-radius:12px;background:linear-gradient(160deg,#07131c,#02080d)}
+    .prefGroup[data-pref-group="appearance"]{--pref-accent:#83eea7}
+    .prefGroup[data-pref-group="syndicate"]{--pref-accent:#f0d47b}
+    .prefGroup[data-pref-group="research"]{--pref-accent:#d4a2ff}
+    .prefGroupHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+    .prefGroupHead h3{margin:0;color:var(--pref-accent);font-size:16px;line-height:1.35}
+    .prefGroupHead h3 span{margin-right:3px}
+    .prefReset{min-height:44px;max-width:100%;padding:9px 11px;border:1px solid #416273;border-radius:8px;background:#06141e;color:#bfe6f3;font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+    .prefReset:hover{border-color:var(--pref-accent);color:var(--pref-accent)}
+    .prefReset:focus-visible,.prefSelect:focus-visible,.prefShellDetails summary:focus-visible{outline:2px solid var(--pref-accent);outline-offset:3px}
+    .prefModuleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .prefModuleCard{min-width:0;border:1px solid #1e3743;border-radius:9px;background:#020a10;padding:12px}
+    .prefModuleHead b{color:#d4eef7;font-size:13px;line-height:1.4}
+    .prefModuleCard p{margin:8px 0;color:#8fa6b1;font-size:11px;line-height:1.5}
+    .prefModuleControl{margin:11px 0 4px}
+    .prefControlLabel{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:center;color:#9bb3be;font-size:10.5px;font-weight:700}
+    .prefSelect{width:100%;min-width:0;min-height:44px;border:1px solid #3a6475;border-radius:7px;background:#04111a;color:#d9f6ff;padding:9px 8px;font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .prefSyndicateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .prefSlotControl{grid-template-columns:44px minmax(0,1fr)}
+    .prefEffect{border-top:1px solid #172f3c;padding-top:8px}
+    .prefSaveStatus,.prefModuleCard .prefSaveStatus{margin:9px 0 0;color:#8effaa;font-size:11px;line-height:1.5}
+    .prefSaveStatus:empty{display:none}
+    .prefSaveError,.prefModuleCard .prefSaveError{color:#ffd48a}
+    .prefShellDetails summary{min-height:44px;padding:11px 9px;border:1px solid #574d2c;border-radius:7px;background:#0b110f;color:#f1dda0;font-size:11px;line-height:1.5;cursor:pointer}
+    .prefShellDetails summary span{display:inline-block;margin-left:8px;color:#9eaa9e;font-size:10px}
+    .prefShellGrid{display:grid;gap:7px;margin-top:10px}
+    .prefShellRow{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;border:1px solid #393822;border-radius:6px;background:#060b0c;padding:9px}
+    .prefShellRow>div:first-child{min-width:0}
+    .prefShellCharacter{display:block;color:#e9deac;font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+    .prefShellName{display:block;margin-top:4px;color:#94a8b0;font-size:9.5px;line-height:1.4;overflow-wrap:anywhere}
+    .prefShellMeta{flex:0 0 auto;color:#9fb2ba;font-size:10px;white-space:nowrap}
+    .prefShellEmpty{color:#9eb1ba;font-size:11px;line-height:1.5}
+    @media(max-width:760px){.prefModuleGrid,.prefSyndicateGrid{grid-template-columns:1fr}.prefGroup{padding:10px}.prefModuleCard{padding:10px}.prefControlLabel{grid-template-columns:64px minmax(0,1fr)}.prefSlotControl{grid-template-columns:52px minmax(0,1fr)}}
   `;
   d.head.appendChild(s);
 }
@@ -226,18 +278,38 @@ function saveSyndicateFromControls(d){
   if(selects.length!==SYNDICATE_SLOT_COUNT)return;
   const assignments=selects.map(s=>s.value||null);
   const nonempty=assignments.filter(Boolean);
-  if(new Set(nonempty).size!==nonempty.length){render(d,true);return}
-  writeSyndicateAssignments(assignments);
+  if(new Set(nonempty).size!==nonempty.length){render(d,true);showFeedback(d,'syndicate_load','Each member can occupy one slot.',true);return}
+  if(!writeSyndicateAssignments(assignments)){showFeedback(d,'syndicate_load','Could not save the lineup. Please try again.',true);return}
   render(d,true);
   reloadSyndicateFrames(d);
+  showFeedback(d,'syndicate_load',lineupSaveMessage(assignments));
+}
+function lineupSaveMessage(assignments){
+  return safeGet('bettingEdge.syndicateSlots.v4')===JSON.stringify(assignments)?'Saved on this device.':'Lineup applied for this visit; device storage is unavailable.';
+}
+function resetAppearance(d){
+  const modules=['meter_presentation','card_view'].map(moduleById).filter(Boolean);
+  if(modules.some(module=>!writeChoice(module,module.default))){showFeedback(d,'appearance','Could not save all appearance settings. Please try again.',true);return}
+  const meter=moduleById('meter_presentation');
+  if(meter)setMeterPresentation(d,meter.default);
+  const card=moduleById('card_view'),control=d.querySelector('[data-pref-choice="card_view"]');
+  if(card&&control){control.value=card.default;control.dispatchEvent(new d.defaultView.Event('change',{bubbles:true}))}
+  render(d,true);
+  showFeedback(d,'appearance','Default appearance restored. Saved on this device.');
+}
+function resetSyndicateLineup(d){
+  const assignments=defaultSyndicateAssignments();
+  if(!writeSyndicateAssignments(assignments)){showFeedback(d,'syndicate','Could not restore the lineup. Please try again.',true);return}
+  render(d,true);reloadSyndicateFrames(d);
+  showFeedback(d,'syndicate','Default lineup restored. '+lineupSaveMessage(assignments));
 }
 function resolveStartupValue(){
   const module=moduleById('startup_screen');
-  if(!module)return 'board';
+  if(!module)return 'menu';
   const value=readChoice(module);
   if(value!=='last_used')return value;
-  const last=safeGet(LAST_VIEW_KEY,'board');
-  return ['board','market','history','engine'].includes(last)?last:'board';
+  const last=safeGet(LAST_VIEW_KEY,'menu');
+  return ['menu','board','market','history','engine'].includes(last)?last:'menu';
 }
 function resolveHistoryValue(){
   const module=moduleById('history_landing');
@@ -271,10 +343,18 @@ function applyDetailDefaults(d,force=false){
 }
 function applyStartup(d){
   if(d.documentElement.dataset.prefStartupApplied==='1')return;
-  d.documentElement.dataset.prefStartupApplied='1';
   const value=resolveStartupValue();
+  const state=d.documentElement.dataset;
+  if(value==='menu'||state.primaryNavUserActivated==='1'||new URLSearchParams(location.hash.slice(1)).get('view')==='syndicate'){state.prefStartupApplied='1';return}
+  // Intentional saved navigation runs after the shell's boot-time tab reset.
+  if(!state.primaryNavShellBound){
+    state.prefStartupAttempts=String(Number(state.prefStartupAttempts||0)+1);
+    if(Number(state.prefStartupAttempts)<180)setTimeout(()=>applyStartup(d),50);
+    return;
+  }
+  state.prefStartupApplied='1';
   const button=d.querySelector(`.btn[data-view="${CSS.escape(value)}"]`);
-  if(button&&!button.classList.contains('active'))button.click();
+  if(button&&!button.classList.contains('active')){state.primaryNavUserActivated='1';button.click()}
   if(value==='history')setTimeout(()=>applyHistoryLanding(d),0);
 }
 function bindRuntime(d){
@@ -315,14 +395,28 @@ function bindControls(d){
       const module=moduleById(choice.dataset.prefChoice);
       if(!module||module.state!=='active'||module.editable===false)return;
       const value=choice.value;
-      if(!writeChoice(module,value))return;
+      if(!writeChoice(module,value)){showFeedback(d,module.id,'Could not save on this device. Please try again.',true);return}
       if(module.id==='meter_presentation')setMeterPresentation(d,value);
       if(module.id==='recommendation_detail')applyDetailDefaults(d,true);
+      // Update the cache before status text changes so focus remains on the
+      // existing select instead of rebuilding the controls after every save.
+      box.dataset.key=preferenceRenderKey();
+      showFeedback(d,module.id,'Saved on this device.');
       return;
     }
     const slot=event.target.closest?.('[data-pref-syndicate-slot]');
     if(slot)saveSyndicateFromControls(d);
   });
+  box.addEventListener('click',event=>{
+    const button=event.target.closest?.('[data-pref-reset]');
+    if(!button)return;
+    if(button.dataset.prefReset==='appearance')resetAppearance(d);
+    if(button.dataset.prefReset==='syndicate')resetSyndicateLineup(d);
+  });
+}
+function preferenceRenderKey(){
+  const settings=(prefs.modules||[]).map(m=>m.kind==='choice'?[m.id,readChoice(m)]:m.kind==='syndicate'?[m.id,readSyndicateAssignments()]:m.kind==='manifest'?[m.id,hotlineShells?.updatedAt||'',currentHotlineShells()]:[m.id,m.state]);
+  return JSON.stringify([prefs.schema,prefs.modules,settings]);
 }
 function render(d,force=false){
   if(!prefs||!d?.body)return false;
@@ -337,22 +431,19 @@ function render(d,force=false){
     const head=panel.querySelector('.sp-head');
     head?head.insertAdjacentElement('afterend',box):panel.prepend(box);
   }
-  const c=counts();
-  const settings=(prefs.modules||[]).map(m=>m.kind==='choice'?[m.id,readChoice(m)]:m.kind==='syndicate'?[m.id,readSyndicateAssignments()]:m.kind==='manifest'?[m.id,hotlineShells?.updatedAt||'',hotlineShells?.shells?.length||0]:[m.id,m.state]);
-  const key=JSON.stringify([prefs.schema,prefs.modules,c,settings]);
+  const key=preferenceRenderKey();
   if(!force&&box.dataset.key===key&&box.innerHTML){bindControls(d);return true}
+  const detailsOpen=box.querySelector('.prefShellDetails')?.open;
+  const focused=d.activeElement;
+  const focusAttribute=['data-pref-choice','data-pref-syndicate-slot','data-pref-reset'].find(attribute=>focused?.hasAttribute(attribute));
+  const focusSelector=focusAttribute?`[${focusAttribute}="${CSS.escape(focused.getAttribute(focusAttribute))}"]`:null;
   box.dataset.key=key;
-  box.dataset.bound='0';
   box.innerHTML=`
-    <div class="prefFrameworkHead"><b>PREFERENCE MODULES</b><span>ACTIVE UI PREFERENCES ARE SAVED LOCALLY // OPERATING RULES AND ISSUED HISTORY REMAIN REPOSITORY-CONTROLLED</span></div>
-    <div class="prefStateCounts">
-      <div class="prefStateCount active"><small>ACTIVE</small><b>${c.active}</b></div>
-      <div class="prefStateCount display"><small>DISPLAY ONLY</small><b>${c.display_only}</b></div>
-      <div class="prefStateCount reserved"><small>RESERVED</small><b>${c.reserved}</b></div>
-    </div>
-    <div class="prefModuleGrid">${(prefs.modules||[]).map(moduleCard).join('')}</div>
-    <div class="prefFrameworkRule"><b>PREFERENCES RULE:</b> UI preferences may change presentation or landing behavior only. Pricing, identity, freshness, staking, the five-pull budget and the permanent Main Betting Edge schedule are not preference controls.</div>
+    <header class="prefFrameworkHead"><h2>Preferences</h2><p>Your choices are saved automatically on this device.</p></header>
+    ${groupedControls()}
   `;
+  if(detailsOpen)box.querySelector('.prefShellDetails').open=true;
+  if(focusSelector)box.querySelector(focusSelector)?.focus({preventScroll:true});
   bindControls(d);
   return true;
 }

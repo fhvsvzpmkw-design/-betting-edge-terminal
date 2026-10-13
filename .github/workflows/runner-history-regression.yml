@@ -41,6 +41,7 @@ on:
       - tests/f8-nav-theme-authority.test.mjs
       - tests/personnel-information-ordering.test.mjs
       - tests/preferences-framework.test.mjs
+      - tests/preferences-ui*.mjs
       - tests/main-schedule.test.mjs
       - tests/syndicate-hotline-completeness.test.mjs
       - tests/runner-history-session-applicability.test.js
@@ -86,6 +87,7 @@ on:
       - tests/f8-nav-theme-authority.test.mjs
       - tests/personnel-information-ordering.test.mjs
       - tests/preferences-framework.test.mjs
+      - tests/preferences-ui*.mjs
       - tests/main-schedule.test.mjs
       - tests/syndicate-hotline-completeness.test.mjs
       - tests/runner-history-session-applicability.test.js
@@ -155,6 +157,7 @@ jobs:
           trap 'kill "$SERVER_PID"' EXIT
           node tests/syndicate-roster-browser-smoke.mjs
           node tests/menu-home-browser-smoke.mjs
+          node tests/preferences-ui-browser-smoke.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -166,4 +169,10 @@ jobs:
         with:
           name: menu-home-screenshots
           path: .qa/menu-*.png
+          include-hidden-files: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: preferences-screenshots
+          path: .qa/preferences-*.png
           include-hidden-files: true

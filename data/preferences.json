@@ -1,7 +1,7 @@
 {
   "schema": 2,
-  "title": "PREFERENCES / OPERATIONS",
-  "description": "Terminal preference modules. Active UI preferences are stored locally in the browser; operating rules and issued history remain repository-controlled.",
+  "title": "PREFERENCES",
+  "description": "Display, navigation, Syndicate lineup and manual review preferences saved on this device.",
   "states": {
     "active": {
       "label": "ACTIVE",
@@ -19,11 +19,11 @@
   "modules": [
     {
       "id": "meter_presentation",
-      "title": "METER PRESENTATION",
+      "title": "Meter style",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose the existing Vig Scope input-meter renderer.",
+      "summary": "Choose how the VigScope meters are displayed.",
       "storageKey": "bettingEdge.preferences.meterPresentation",
       "default": "blocks",
       "options": [
@@ -40,11 +40,11 @@
     },
     {
       "id": "card_view",
-      "title": "CARD VIEW",
+      "title": "Card style",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose the visual presentation used by individual Betting Edge cards.",
+      "summary": "Choose the appearance of individual Betting Edge cards.",
       "storageKey": "bettingEdge.preferences.cardView",
       "default": "normal",
       "options": [
@@ -62,18 +62,18 @@
         },
         {
           "value": "vigscope",
-          "label": "VIG SCOPE"
+          "label": "VigScope"
         }
       ],
       "controlPolicy": "Presentation only. Normal remains the product default. All four card views use the same recommendation data, geometry and game-status placement and do not change the master Vig Scope panel."
     },
     {
       "id": "meat_desk_analysis",
-      "title": "MEAT DESK ANALYSIS",
+      "title": "Meat Desk review",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose the review depth used when a pending Meat Desk source is manually analyzed.",
+      "summary": "Choose the depth for your next manual source review.",
       "storageKey": "bettingEdge.preferences.meatDeskAnalysisMode",
       "default": "basic_readthrough",
       "options": [
@@ -94,11 +94,11 @@
     },
     {
       "id": "crypto_specials_analysis",
-      "title": "CRYPTO SPECIALS ANALYSIS",
+      "title": "Crypto Specials review",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose the review depth used when a pending Crypto Specials web page is manually analyzed.",
+      "summary": "Choose the depth for your next manual web-source review.",
       "storageKey": "bettingEdge.preferences.cryptoSpecialsAnalysisMode",
       "default": "basic_readthrough",
       "options": [
@@ -119,65 +119,69 @@
     },
     {
       "id": "syndicate_load",
-      "title": "SYNDICATE LOAD",
+      "title": "Saved lineup",
       "state": "active",
       "kind": "syndicate",
       "editable": true,
-      "summary": "Set the saved F1-F8 Hotline Unit assignments used when the Syndicate workspace loads.",
+      "summary": "Choose a member or leave a slot empty. Each member can appear once.",
       "storageKey": "bettingEdge.syndicateSlots.v4",
       "source": "data/syndicates.json",
       "controlPolicy": "Local UI preference. Character content and archived hotlines are unchanged."
     },
     {
       "id": "hotline_shells",
-      "title": "HOTLINE SHELLS",
+      "title": "Hotline appearance",
       "state": "display_only",
       "kind": "manifest",
       "editable": false,
-      "summary": "Show the approved visual shell, version and lock state for every saved Syndicate character.",
+      "summary": "The current approved design for each Syndicate member.",
       "source": "data/hotline-shells.json",
       "controlPolicy": "Repository-controlled presentation registry. Normal Hotline refreshes preserve the active approved shell. Shell installation, purchasing and switching are not enabled from F6 yet."
     },
     {
       "id": "startup_screen",
-      "title": "STARTUP SCREEN",
+      "title": "Startup screen",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose which existing terminal view opens when the runner loads.",
+      "summary": "Choose the view to use when VigScope opens.",
       "storageKey": "bettingEdge.preferences.startupScreen",
-      "default": "board",
+      "default": "menu",
       "options": [
         {
+          "value": "menu",
+          "label": "Main Menu"
+        },
+        {
           "value": "board",
-          "label": "BOARD"
+          "label": "VigScope"
         },
         {
           "value": "market",
-          "label": "MARKET"
+          "label": "Market"
         },
         {
           "value": "history",
-          "label": "BET HISTORY"
+          "label": "Bet History"
         },
         {
           "value": "engine",
-          "label": "ENGINE"
+          "label": "VigScope Value"
         },
         {
           "value": "last_used",
-          "label": "LAST USED"
+          "label": "Last used"
         }
       ],
       "controlPolicy": "Applies on the next runner load. It does not change report generation."
     },
     {
       "id": "history_landing",
-      "title": "HISTORY LANDING VIEW",
+      "title": "History landing page",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose the first Bet History subpage shown when F3 opens.",
+      "summary": "Choose which Bet History page opens first.",
       "storageKey": "bettingEdge.preferences.historyLanding",
       "default": "summary",
       "options": [
@@ -226,11 +230,11 @@
     },
     {
       "id": "recommendation_detail",
-      "title": "RECOMMENDATION DETAIL",
+      "title": "Recommendation details",
       "state": "active",
       "kind": "choice",
       "editable": true,
-      "summary": "Choose the default state of expandable recommendation analysis panels.",
+      "summary": "Choose whether recommendation analysis starts open or closed.",
       "storageKey": "bettingEdge.preferences.recommendationDetail",
       "default": "collapsed",
       "options": [
