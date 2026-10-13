@@ -6,12 +6,14 @@ import './menu-home-cascade.test.mjs';
 const source=fs.readFileSync('assets/menu-home-style.js','utf8');
 const css=fs.readFileSync('assets/menu-home-style.css','utf8');
 const loader=fs.readFileSync('assets/report-dashboard-vigscope.js','utf8');
+const runner=fs.readFileSync('runner.html','utf8');
+const menuVersion=source.match(/const VERSION='([^']+)'/)[1];
 const order=['board','market','history','syndicate','pizza','crypto','meat','engine','preferences'];
 const labels=['VigScope','Market','Bet History','Syndicate','Pizza Plays','Crypto Specials','Meat Desk','VigScope Value','Preferences'];
 
 // Exercise the shipped script against existing button identities and callbacks.
 // Mutation records intentionally include same-value class writes to detect loops.
-function fixture(startOnMenu=true,complete=true){
+function fixture(startOnMenu=true,complete=true,preloaded=false){
   const frames=[],observers=[],intervals=[];
   let document;
   const notify=(target,type,attributeName)=>{
@@ -27,7 +29,7 @@ function fixture(startOnMenu=true,complete=true){
   class Element{
     constructor(tag){
       this.tagName=tag;this.children=[];this.attrs=new Map();this.listeners=new Map();this.parentElement=null;
-      this.textContent='';this.style={values:new Map(),setProperty(key,value){this.values.set(key,value)}};
+      this.textContent='';this.dataset={};this.style={values:new Map(),setProperty(key,value){this.values.set(key,value)}};
       const owner=this;
       this.classList={
         contains(name){return String(owner.className).split(/\s+/).includes(name)},
@@ -61,6 +63,7 @@ function fixture(startOnMenu=true,complete=true){
     click(){this.onclick?.({target:this,currentTarget:this})}
   }
   const html=new Element('html'),head=new Element('head'),body=new Element('body');
+  html.dataset.vigMenuStartup='pending';
   html.appendChild(head);html.appendChild(body);
   const term=new Element('main');term.className='term';body.appendChild(term);
   const top=new Element('header');top.className='top';term.appendChild(top);
@@ -78,11 +81,13 @@ function fixture(startOnMenu=true,complete=true){
     callbacks.push(button.onclick);buttons.push(button);grid.appendChild(button);
   });
   if(startOnMenu)body.classList.add('runnerMenuHome');else body.classList.add('section-open');
-  document={head,body,documentElement:html,createElement:tag=>new Element(tag),listeners:new Map(),
+  document={head,body,documentElement:html,createElement:tag=>new Element(tag),listeners:new Map(),events:[],
     getElementById:id=>[html,...html.all()].find(element=>element.id===id)||null,
     querySelector:selector=>selector==='.runnerNavPad .tabs'?grid:selector==='main.term>header.top'?top:null,
-    addEventListener(name,fn){this.listeners.set(name,fn)}
+    addEventListener(name,fn){this.listeners.set(name,fn)},
+    dispatchEvent(event){this.events.push(event.type);this.listeners.get(event.type)?.(event)}
   };
+  if(preloaded){const sheet=new Element('link');sheet.id='vigMenuHomeStyle';sheet.sheet={};head.appendChild(sheet)}
   class MutationObserver{
     constructor(callback){this.callback=callback;this.watches=[];this.pending=false;observers.push(this)}
     observe(target,options){this.watches.push({target,options})}
@@ -97,7 +102,7 @@ function fixture(startOnMenu=true,complete=true){
     });
   });
   specialtyObserver.observe(pad,{childList:true,subtree:true});
-  const context={document,MutationObserver,console,WeakMap,Math,Object,Number,parseFloat,
+  const context={document,MutationObserver,CustomEvent:class{constructor(type){this.type=type}},console,WeakMap,Math,Object,Number,parseFloat,
     innerWidth:414,innerHeight:700,visualViewport:{width:414,height:700,addEventListener(){}},
     requestAnimationFrame:fn=>{frames.push(fn);return frames.length},setInterval:fn=>{intervals.push(fn);return intervals.length},clearInterval(){},
     getComputedStyle:()=>({paddingTop:'0',paddingBottom:'0',paddingLeft:'0',paddingRight:'0'}),listeners:new Map(),
@@ -123,7 +128,16 @@ app.document.getElementById('vigMenuHomeStyle').emit('load');app.drain();
 assert.equal(app.body.classList.contains('vigMenuStyled'),true);
 assert.equal(app.grid.querySelectorAll('.vigMenuFace').length,9,'all nine selections visible in the menu presentation');
 assert.equal(app.top.children[0],app.originalHeader,'original header is retained, not rebuilt');
-assert.equal(app.document.getElementById('vigMenuBrand').children[0].src,'/site-assets/product-badges/vigscope-small.png','reuse the authentic product badge');
+assert.equal(app.document.getElementById('vigMenuBrand'),null,'the main menu must not add a top badge');
+assert.equal(app.context.VigScopeMenuHome.ready,false,'startup waits for artwork rather than revealing loading emoji');
+const initialImages=app.grid.all().filter(element=>element.tagName==='img');
+assert.equal(initialImages.length,8);
+for(const image of initialImages.slice(0,-1))image.emit('load');app.drain();
+assert.equal(app.document.documentElement.dataset.vigMenuStartup,'pending');
+initialImages.at(-1).emit('load');app.drain();
+assert.equal(app.document.documentElement.dataset.vigMenuStartup,'ready');
+assert.equal(app.context.VigScopeMenuHome.ready,true);
+assert.equal(app.document.events.filter(type=>type==='vigscope-menu-ready').length,1);
 app.buttons.forEach((button,i)=>{
   assert.equal(button.children.length,1,'original complete button contents must remain intact while the artwork is visible');
   assert.equal(button.getAttribute('aria-label'),labels[i]);
@@ -165,6 +179,26 @@ image.emit('error');assert.equal(art.classList.contains('vigMenuArtReady'),false
 const direct=fixture(false);direct.document.getElementById('vigMenuHomeStyle').emit('load');direct.drain();
 assert.equal(direct.grid.querySelectorAll('.vigMenuFace').length,0);
 assert.equal(direct.body.classList.contains('vigMenuStyled'),false);
+direct.body.classList.add('runnerSyndicateLoaded');direct.drain();
+assert.equal(direct.context.VigScopeMenuHome.ready,true,'a direct secondary-screen entry must not wait for unused menu artwork');
+
+const early=fixture(true,true,true);early.drain();
+assert.equal(early.body.classList.contains('vigMenuStyled'),true,'reuse the stylesheet loaded in the document head');
+assert.equal(early.document.head.children.filter(element=>element.id==='vigMenuHomeStyle').length,1);
+const failed=fixture();failed.document.getElementById('vigMenuHomeStyle').emit('error');failed.drain();
+assert.equal(failed.document.documentElement.dataset.vigMenuStartup,'fallback','failed CSS must release the splash into the working original UI');
+assert.equal(failed.body.classList.contains('vigMenuStyled'),false);
+
+let releaseStartup;const startupRoot={dataset:{}},startupEvents=[];
+const startupListeners=new Map();
+vm.runInNewContext(runner.match(/<script id="vigMenuBootGuardRuntime">([\s\S]*?)<\/script>/)[1],{
+  document:{documentElement:startupRoot,addEventListener:(type,handler)=>startupListeners.set(type,handler),dispatchEvent:event=>{startupEvents.push(event.type);startupListeners.get(event.type)?.()}},
+  CustomEvent:class{constructor(type){this.type=type}},
+  setTimeout:(handler,ms)=>{assert.equal(ms,10000);releaseStartup=handler;return 1},clearTimeout:()=>{}
+});
+assert.equal(startupRoot.dataset.vigMenuStartup,'pending');releaseStartup();
+assert.equal(startupRoot.dataset.vigMenuStartup,'fallback','missing menu code cannot leave the app permanently hidden');
+assert.deepEqual(startupEvents,['vigscope-menu-ready']);
 
 const late=fixture(true,false);late.document.getElementById('vigMenuHomeStyle').emit('load');late.drain();
 late.buttons.forEach((button,i)=>button.setAttribute('data-menu-id',order[i]));
@@ -175,6 +209,7 @@ const sizes=[[320,480],[375,550],[390,650],[414,700],[768,1024],[375,720],[568,2
 const results=sizes.map(([width,height])=>{
   const fit=app.context.testAPI.layoutForViewport(width,height);
   assert.equal(fit.columns,width>height&&width>=480?4:2);
+  assert.equal(fit.header,0,'only the eight buttons and Preferences consume the menu viewport');
   assert.ok(fit.tileHeight>=44&&fit.tileWidth>=44,'buttons retain a useful touch target');
   assert.ok(fit.preferences>=44,'Preferences retains the same minimum touch height');
   const total=fit.header+fit.padding*2+fit.preferences+fit.gap*fit.rows+fit.tileHeight*fit.rows+2;
@@ -215,6 +250,13 @@ for(const [,selector] of css.replace(/\/\*[\s\S]*?\*\//g,'').matchAll(/([^{}]+)\
   assert.ok(clean.startsWith('body.vigMenuStyled.runnerMenuHome'),'all menu CSS is scoped away from secondary pages: '+clean);
 }
 assert.doesNotMatch(source,/fetch\(|localStorage|BettingEdgeRunnerPayload|\.onclick\s*=/,'menu appearance cannot fetch or change report data, storage, or routes');
-assert.equal((loader.match(/menuHomeStyleLoader/g)||[]).length,1);
+assert.match(loader,/if\(!document\.getElementById\('menuHomeStyleLoader'\)\)/,'the compatibility wrapper must not load the early menu script twice');
+assert.ok(runner.indexOf('id="vigMenuBootGuard"')<runner.indexOf('<body>'),'guard legacy content before it can paint');
+assert.ok(runner.indexOf('id="vigMenuHomeStyle"')<runner.indexOf('<body>'));
+assert.ok(runner.includes(`<script id="menuHomeStyleLoader" defer src="./assets/menu-home-style.js?v=${menuVersion}"></script>`));
+assert.ok(runner.includes(`href="./assets/menu-home-style.css?v=${menuVersion}"`));
+for(const path of artwork)assert.ok(runner.includes(`as="image" href="${path}?v=${menuVersion}"`),'preload the same individually replaceable artwork URLs');
+assert.match(runner,/function reveal\(\)\{if\(!coreLoaded\|\|!timerDone\|\|document\.documentElement\.dataset\.vigMenuStartup==='pending'\)return;/,'the existing splash must wait for the finished menu');
+assert.match(runner,/document\.addEventListener\('vigscope-menu-ready',reveal\)/);
 console.log(`Menu style: PASS // 9 existing button handlers, section cleanup/return, direct Syndicate entry, delayed bootstrap, image fallback, observer settling, 8 independent assets, ${sizes.length} viewport fits`);
 console.log(JSON.stringify(results));

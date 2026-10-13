@@ -71,13 +71,15 @@
   primaryNav.async=false;
   document.head.appendChild(primaryNav);
 
-  // Main-menu artwork and viewport fit are isolated from every loaded section.
-  // Existing buttons, function keys, and secondary-screen styling stay authoritative.
-  const menuHome=document.createElement('script');
-  menuHome.id='menuHomeStyleLoader';
-  menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-4&b=${UI_CACHE_BUST}`;
-  menuHome.async=false;
-  document.head.appendChild(menuHome);
+  // runner.html starts the menu presentation in the head, before legacy content
+  // can paint. Keep this compatibility loader for older cached shells only.
+  if(!document.getElementById('menuHomeStyleLoader')){
+    const menuHome=document.createElement('script');
+    menuHome.id='menuHomeStyleLoader';
+    menuHome.src=`./assets/menu-home-style.js?v=20261012-menu-5&b=${UI_CACHE_BUST}`;
+    menuHome.async=false;
+    document.head.appendChild(menuHome);
+  }
 
   // One Value renderer owns the summaries, filters and complete archive.
   const valueAnalytics=document.createElement('script');

@@ -2,9 +2,8 @@
   'use strict';
 
   // Presentation only. The canonical menu keeps every button and click/key handler.
-  const VERSION='20261012-menu-4';
+  const VERSION='20261012-menu-5';
   const STYLE_ID='vigMenuHomeStyle';
-  const BRAND_SRC='/site-assets/product-badges/vigscope-small.png';
   const ART_BASE='./assets/menu-home/';
   const ITEMS={
     board:{name:'VigScope',emoji:'📺',art:'board.webp'},
@@ -20,7 +19,8 @@
   const ORDER=Object.keys(ITEMS);
   const SECTION_CLASSES=['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'];
   const originals=new WeakMap();
-  let ready=false,attached=false,scheduled=false,grid=null,top=null,brand=null,overlay=null;
+  let ready=false,attached=false,scheduled=false,startupSettled=false,grid=null,overlay=null;
+  const pendingArt=new Set();
 
   function layoutForViewport(width,height){
     width=Math.max(1,Number(width)||1);height=Math.max(1,Number(height)||1);
@@ -28,10 +28,10 @@
     const columns=landscape?4:2,rows=landscape?2:4;
     const padding=width<360?6:width<650?8:12;
     const gap=height<350?6:width>=650?10:8;
-    const header=Math.round(Math.min(landscape?70:104,Math.max(landscape?30:46,height*0.13)));
+    const header=0;
     const preferences=height<600?44:48;
     const tileHeight=(height-header-padding*2-preferences-gap*rows-2)/rows;
-    const tileWidth=(Math.min(width,1440)-padding*2-gap*(columns-1)-2)/columns;
+    const tileWidth=(width-padding*2-gap*(columns-1)-2)/columns;
     const roomy=landscape&&height>=560&&tileHeight>=tileWidth*.62;
     let icon,font;
     if(landscape&&!roomy){
@@ -65,7 +65,7 @@
     const horizontal=(parseFloat(computed.paddingLeft)||0)+(parseFloat(computed.paddingRight)||0);
     const fit=layoutForViewport(width-horizontal,height-vertical);
     const style=document.documentElement.style;
-    const values={height,pad:fit.padding,gap:fit.gap,header:fit.header,prefs:fit.preferences,art:fit.icon,font:fit.font};
+    const values={height,pad:fit.padding,gap:fit.gap,prefs:fit.preferences,art:fit.icon,font:fit.font};
     for(const [key,value] of Object.entries(values))style.setProperty('--vig-menu-'+key,value+'px');
     document.body.classList.toggle('vigMenuLandscape',fit.landscape);
     document.body.classList.toggle('vigMenuRoomy',fit.roomy);
@@ -79,9 +79,10 @@
     const fallback=document.createElement('span');fallback.className='vigMenuEmoji';fallback.textContent=item.emoji;
     art.appendChild(fallback);
     if(item.art){
-      const image=document.createElement('img');image.alt='';image.decoding='async';image.draggable=false;
-      image.addEventListener('load',()=>art.classList.add('vigMenuArtReady'));
-      image.addEventListener('error',()=>art.classList.remove('vigMenuArtReady'));
+      const image=document.createElement('img');image.alt='';image.decoding='sync';image.draggable=false;
+      pendingArt.add(image);
+      image.addEventListener('load',()=>{art.classList.add('vigMenuArtReady');pendingArt.delete(image);schedule()});
+      image.addEventListener('error',()=>{art.classList.remove('vigMenuArtReady');pendingArt.delete(image);schedule()});
       image.src=ART_BASE+item.art+'?v='+VERSION;
       art.appendChild(image);
     }
@@ -102,14 +103,6 @@
       faceFor(ORDER[i]);
       button.setAttribute('aria-label',ITEMS[ORDER[i]].name);
     });
-    if(!brand){
-      brand=document.createElement('div');brand.id='vigMenuBrand';
-      const image=document.createElement('img');image.alt='VigScope — VigWire Labs';image.decoding='async';image.draggable=false;
-      image.setAttribute('fetchpriority','high');image.src=BRAND_SRC;
-      const fallback=document.createElement('span');fallback.className='vigMenuBrandFallback';fallback.textContent='VigScope';
-      image.addEventListener('error',()=>brand?.classList.add('vigMenuBrandError'));
-      brand.appendChild(image);brand.appendChild(fallback);top.appendChild(brand);
-    }
     if(!document.body.classList.contains('vigMenuStyled'))document.body.classList.add('vigMenuStyled');
     setViewport();
   }
@@ -121,16 +114,29 @@
       if(original.ariaLabel===null)button.removeAttribute('aria-label');else button.setAttribute('aria-label',original.ariaLabel);
       originals.delete(button);
     });
-    if(brand){brand.remove();brand=null}
+    pendingArt.clear();
+  }
+  function finishStartup(status='ready'){
+    if(startupSettled)return;
+    startupSettled=true;
+    document.documentElement.dataset.vigMenuStartup=status;
+    document.dispatchEvent(new CustomEvent('vigscope-menu-ready'));
   }
   function sync(){
     if(!attached||!ready)return;
-    if(menuOpen())mount();else if(document.body.classList.contains('vigMenuStyled')||brand)unmount();
+    if(menuOpen()){
+      mount();
+      // Reveal the finished menu rather than the original labels or loading icons.
+      if(pendingArt.size===0)finishStartup();
+    }else{
+      if(document.body.classList.contains('vigMenuStyled')||overlay)unmount();
+      if(SECTION_CLASSES.some(name=>document.body.classList.contains(name)))finishStartup();
+    }
   }
   function attach(){
     if(attached)return true;
-    grid=document.querySelector('.runnerNavPad .tabs');top=document.querySelector('main.term>header.top');
-    if(!grid||!top||ORDER.some(id=>!grid.querySelector('.btn[data-menu-id="'+id+'"]')))return false;
+    grid=document.querySelector('.runnerNavPad .tabs');
+    if(!grid||ORDER.some(id=>!grid.querySelector('.btn[data-menu-id="'+id+'"]')))return false;
     attached=true;
     const stateObserver=new MutationObserver(schedule);
     stateObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
@@ -143,12 +149,18 @@
   }
   function boot(){
     let sheet=document.getElementById(STYLE_ID);
+    const loaded=()=>{ready=true;schedule()};
+    const failed=()=>{ready=false;finishStartup('fallback')};
     if(!sheet){
       sheet=document.createElement('link');sheet.id=STYLE_ID;sheet.rel='stylesheet';
-      sheet.addEventListener('load',()=>{ready=true;schedule()});
+      sheet.addEventListener('load',loaded);sheet.addEventListener('error',failed);
       sheet.href='./assets/menu-home-style.css?v='+VERSION;
       document.head.appendChild(sheet);
-    }else{ready=!!sheet.sheet}
+    }else{
+      ready=!!sheet.sheet;
+      sheet.addEventListener('load',loaded);sheet.addEventListener('error',failed);
+      if(sheet.dataset?.failed==='1')failed();
+    }
     let attempts=0;
     const timer=setInterval(()=>{attempts++;if(attach()||attempts>=160)clearInterval(timer)},50);
     attach();
@@ -156,6 +168,6 @@
   }
 
   // Read-only artwork map supports replacing one graphic without touching routing.
-  window.VigScopeMenuHome={version:VERSION,artwork:Object.fromEntries(ORDER.map(id=>[id,ITEMS[id].art?ART_BASE+ITEMS[id].art:null])),refresh:schedule};
+  window.VigScopeMenuHome={version:VERSION,get ready(){return startupSettled},artwork:Object.fromEntries(ORDER.map(id=>[id,ITEMS[id].art?ART_BASE+ITEMS[id].art:null])),refresh:schedule};
   boot();
 })();

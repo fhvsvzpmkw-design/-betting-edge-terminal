@@ -7,6 +7,32 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>VigScope Terminal UI v1.5</title>
+<style id="vigMenuBootGuard">
+html[data-vig-menu-startup="pending"] main.term{visibility:hidden!important}
+</style>
+<script id="vigMenuBootGuardRuntime">
+(()=>{
+  const root=document.documentElement;
+  root.dataset.vigMenuStartup='pending';
+  // An asset failure must still leave the original application usable.
+  const timer=setTimeout(()=>{
+    if(root.dataset.vigMenuStartup!=='pending')return;
+    root.dataset.vigMenuStartup='fallback';
+    document.dispatchEvent(new CustomEvent('vigscope-menu-ready'));
+  },10000);
+  document.addEventListener('vigscope-menu-ready',()=>clearTimeout(timer),{once:true});
+})();
+</script>
+<link id="vigMenuHomeStyle" rel="stylesheet" href="./assets/menu-home-style.css?v=20261012-menu-5" onerror="this.dataset.failed='1'">
+<link rel="preload" as="image" href="./assets/menu-home/board.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/market.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/history.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/syndicate.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/pizza.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/crypto.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/meat.webp?v=20261012-menu-5">
+<link rel="preload" as="image" href="./assets/menu-home/value.webp?v=20261012-menu-5">
+<script id="menuHomeStyleLoader" defer src="./assets/menu-home-style.js?v=20261012-menu-5"></script>
 <script>
 // Preserve old Syndicate links while loading the same report as normal VigScope entry.
 if(location.hash==='#syndicate'){const target=new URL('/vigscope',location.origin);target.searchParams.set('view','syndicate');location.replace(target.href)}
@@ -232,7 +258,7 @@ const core=document.getElementById('core'),splash=document.getElementById('splas
 let coreLoaded=false,timerDone=false,started=false,hierarchyObserver=null,hierarchyFrame=null;
 const syndicateSlotVersions=new Map();
 window.addEventListener('pageshow',event=>{if(!event.persisted)return;const fresh=new URL(location.href);fresh.searchParams.set('_fresh',String(Date.now()));location.replace(fresh.pathname+fresh.search+fresh.hash)});
-function reveal(){if(!coreLoaded||!timerDone)return;core.classList.add('ready');splash.classList.add('fade');setTimeout(()=>splash.remove(),FADE_MS+80)}
+function reveal(){if(!coreLoaded||!timerDone||document.documentElement.dataset.vigMenuStartup==='pending')return;core.classList.add('ready');splash.classList.add('fade');setTimeout(()=>splash.remove(),FADE_MS+80)}
 function startWhenVisible(){if(started)return;try{const host=window.frameElement;if(host){const style=getComputedStyle(host);if(Number.parseFloat(style.opacity||'1')<=.01||style.visibility==='hidden'){requestAnimationFrame(startWhenVisible);return}}}catch(e){}started=true;setTimeout(()=>{timerDone=true;reveal()},SCREEN2_MS)}
 function innerAppFrame(){try{return core.contentDocument&&core.contentDocument.getElementById('app')}catch(e){return null}}
 function scheduleHierarchyPatch(){if(hierarchyFrame)return;hierarchyFrame=requestAnimationFrame(()=>{hierarchyFrame=null;applyHierarchyPatch()})}
@@ -330,6 +356,7 @@ function applyHierarchyPatch(){
   const headerRiskValue=bankroll&&bankroll.querySelector('.runnerNewRiskValue'),nextRisk=statValues[1]&&statValues[1].textContent||'$0.00';if(headerRiskValue&&headerRiskValue.textContent!==nextRisk)headerRiskValue.textContent=nextRisk;d.querySelectorAll('.runnerRiskMini').forEach(x=>x.remove());sortRecommendationCards(d);return true
 }
 function watchHierarchy(){const app=innerAppFrame();if(!app){setTimeout(watchHierarchy,50);return}const attach=()=>{let d=null;try{d=app.contentDocument}catch(e){return}if(!d||!d.body){setTimeout(attach,30);return}if(hierarchyObserver)hierarchyObserver.disconnect();applyHierarchyPatch();hierarchyObserver=new MutationObserver(scheduleHierarchyPatch);hierarchyObserver.observe(d.body,{subtree:true,childList:true})};app.addEventListener('load',attach);if(app.contentDocument&&app.contentDocument.readyState!=='loading')setTimeout(attach,0)}
+document.addEventListener('vigscope-menu-ready',reveal);
 art.addEventListener('error',()=>splash.classList.add('asset-error'),{once:true});coreLoaded=true;watchHierarchy();reveal();startWhenVisible();
 
 </script>
