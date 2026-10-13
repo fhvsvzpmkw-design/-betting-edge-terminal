@@ -18,6 +18,32 @@ Effective for new reports at/after `2026-10-06T15:53:55-07:00`, after BET assess
 
 Use **PROVISIONAL LEAN**, $0 and NO BET when applicable starter/lineup/model assumptions remain unresolved; name the dependency and required recheck. Show contrary Pinnacle prices and known market dependence. Neither of those facts, a missing published interval nor ordinary lack of final lineups alone cancels the directional preference. Check which personnel/goaltending assumptions the forecast incorporates before treating an injury list as a second adverse adjustment. Preserve conflicting exact forecasts and choose one defensible opinion side per contract; material contrary forecast evidence may justify the exception below. Gaps below 1.00 point retain judgment and can remain PASS.
 
+### NHL forecast price WAIT from October 13, 2026
+
+For new reports at/after `2026-10-13T07:07:42-07:00`, the user reaffirmed the one-point LEAN threshold and chose WAIT for smaller positive hockey gaps. In the NHL full-game moneyline forecast-point route:
+
+| Current exact forecast gap | Opinion treatment |
+| --- | --- |
+| Zero or negative | Does not qualify forecast price WAIT; assess other actual evidence through existing rules. |
+| Positive, below 1.00 probability point | Source-bound WAIT for a meaningful price/forecast gap. |
+| At least 1.00 probability point | Existing meaningful forecast LEAN default, including its actual evidenced exception process. |
+
+This replaces discretionary sub-one-point forecast LEANs for this specific sport/contract. It changes neither baseball nor supported independent-fair decisions. Guy Laflame can continue choosing and ranking a MoneyPuck side; his choices do not determine VigScope grades or betting authority.
+
+Use `createForecastWait(report, rec, judgment)` on an unfrozen draft with the same completed qualified market assessment and exact current forecast review required for a forecast LEAN. Supply the original forecast record ID, MODEL source IDs, preference rationale, uncertainty, Pinnacle/other-source conflict review, limitations and explicit provisional state. If personnel is unresolved, supply `recheckCondition` naming the actual dependency and required check; the helper preserves it as `personnelRecheckCondition`.
+
+The helper records `forecastWait` with `basis:REVIEWED_FORECAST_PRICE_WAIT`, the unchanged probability/record ID, exact current gap, `targetKind:LEAN_REASSESSMENT` and the 1.00-point target. The exact decimal price condition is `1 / (publishedProbability - 0.01)`. Its visible American odds round toward a better price so that a displayed target genuinely clears the threshold. A fresh applicable forecast can also increase the gap at the current quote. Targets are re-evaluation conditions; they are never play-to betting prices.
+
+The WAIT retains $0, NO BET, no adopted independent fair, unquantified uncertainty and blocked BET authority. Its `waitQualification.mode:FORECAST_PRICE_WAIT` deliberately records `actionableIfResolved:false`, `leanReassessmentIfResolved:true` and no claimed independent signals. `cardEvidence.waitCondition` identifies the exact trigger, original source and all remaining BET requirements. Preserve the original signed Pinnacle comparison and information/Core uncertainty. This explicitly authorized opinion route is the only exception here to ordinary independent-signal/HIGH-error WAIT requirements.
+
+No helper alters the original card, forecast, receipt, sidecar, counts or history. Bind the new card to its exact evaluated receipt, synchronize derived evidence/status/counts through the existing controller and retain the actual source/applicability review. The producer must assess new reports normally; crossing the price target does not auto-promote a saved WAIT. A fresh LEAN removes the old WAIT receipt/condition.
+
+Publication checks re-evaluate the immutable bound forecast and current exact applicability for both LEAN and WAIT. Source IDs, probability, timing, personnel, settlement, threshold arithmetic, displayed trigger, zero stake, absence of independent-fair claims, sidecar/receipt agreement and one opinion side per contract remain enforced. Earlier issued reports, including the October 13 06:19 report, retain original bytes.
+
+MoneyPuck's displayed probability has observed market influence. Retain that dependence and Pinnacle comparison; do not count them as two independent forecasts or introduce an arbitrary calibrated weighted fair. Proposed weights require separate validation before live betting use.
+
+Run `node --test tests/forecast-wait.test.mjs tests/forecast-lean.test.mjs tests/forecast-lean-default.test.mjs tests/forecast-evidence.test.mjs` plus the existing candidate, market, evidence, core, shared-pipeline and Guy regressions.
+
 For a forecast-supported PASS meeting this default, add the following to the existing source-linked `candidateAssessment.decision.directionalReview`:
 
 ```json

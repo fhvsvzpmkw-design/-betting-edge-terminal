@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import {pathToFileURL} from 'node:url';
 import {attachPublisherInstrumentTelemetry} from './vigscope-meter-telemetry.mjs';
 import {validateReportMarketScope} from './major-sport-market-coverage-gate.mjs';
 import {validateRecommendationEvidence} from './report-evidence-gate.mjs';
@@ -9,6 +10,7 @@ import {validateCardEvidenceBundle} from './card-evidence-identity.mjs';
 import {attachPublisherCoverageSummary, validateReportCoverageSummary} from './report-coverage-summary.mjs';
 import {attachPublicationEvidenceAudit, validateCandidateCompletion} from './report-evidence-repair.mjs';
 import {validateSelectionLabels} from './selection-label-gate.mjs';
+import {validateForecastWait} from './forecast-lean.mjs';
 
 const STRICT_BUNDLE_FROM = Date.parse('2026-08-17T15:15:00-07:00');
 // The 2026-08-22 18:15 lane remains the final same-day Contract v0.9 historical reference.
@@ -195,7 +197,12 @@ function normalizedSourceOrigin(value){
   const withoutProtocol=normalized.replace(/^https?:\/\//,'').replace(/^www\./,'');
   return withoutProtocol.includes('.') ? withoutProtocol.split('/')[0] : withoutProtocol.replace(/\/+$/,'');
 }
-function validateWaitQualification(qualification,index){
+function validateWaitQualification(qualification,index,{report,rec}={}){
+  if (rec?.forecastWait != null) {
+    assert(validateForecastWait(report,rec),`Sidecar recommendation ${index+1} requires a qualified forecast price WAIT`);
+    assert(JSON.stringify(qualification)===JSON.stringify(rec.waitQualification),`Sidecar recommendation ${index+1} forecast WAIT qualification drifted from the report`);
+    return;
+  }
   assert(qualification && typeof qualification==='object' && !Array.isArray(qualification),`Sidecar recommendation ${index+1} WAIT requires waitQualification before publication`);
   assert(qualification.actionableIfResolved===true,`Sidecar recommendation ${index+1} WAIT must be plausibly actionable if its blockers resolve`);
   assert(Array.isArray(qualification.blockers) && qualification.blockers.length>0,`Sidecar recommendation ${index+1} waitQualification.blockers must be a non-empty array`);
@@ -314,7 +321,7 @@ function validateSidecar(sidecar,report,reportPath,{strict=false,collectRecommen
         if(waitQualificationEnforced){
           const status=String(rec.status||'').toUpperCase();
           if(status==='WAIT'){
-            validateWaitQualification(item.waitQualification,i);
+            validateWaitQualification(item.waitQualification,i,{report,rec});
           }else{
             assert(!item.waitQualification,`Sidecar recommendation ${i+1} waitQualification is only valid for WAIT status`);
           }
@@ -845,5 +852,8 @@ function main(){
     die('Usage: report-publication.mjs validate --report FILE --sidecar FILE | publish --report FILE --sidecar FILE [--root DIR] | verify [--ts ISO] [--root DIR] | self-test');
   }
 }
-try{main();}
-catch(error){console.error(`REPORT HISTORY ERROR: ${error.message}`);process.exit(1);}
+export {validateWaitQualification};
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  try{main();}
+  catch(error){console.error(`REPORT HISTORY ERROR: ${error.message}`);process.exit(1);}
+}

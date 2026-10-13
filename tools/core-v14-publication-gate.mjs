@@ -5,6 +5,7 @@ import {resolveCoreRelease} from './core-release.mjs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {evaluate, loadProductionFramework, matchCondition, validateContext} from './core-handicap-framework.mjs';
+import {validateForecastWait} from './forecast-lean.mjs';
 
 const CORE_V14_FROM=Date.parse('2026-08-25T17:20:00-07:00');
 const PROD_PATH='core/core-v1.4-production.json';
@@ -67,7 +68,7 @@ function expectedResearchIds(framework,context){
   return [...new Set((framework.graduatedResearchRules||[]).filter(rule=>matchCondition(rule.when,context)).map(rule=>rule.priorId))].sort();
 }
 
-function validateCoreAssessment(runtime,assessment,rec,index,{recompute=true}={}){
+function validateCoreAssessment(runtime,assessment,rec,index,{recompute=true,report}={}){
   assert(assessment&&typeof assessment==='object'&&!Array.isArray(assessment),`Recommendation ${index+1} requires coreAssessment under Core 1.4`);
   assert(assessment.frameworkId===runtime.framework.frameworkId,`Recommendation ${index+1} coreAssessment.frameworkId mismatch`);
   assert(assessment.context&&typeof assessment.context==='object'&&!Array.isArray(assessment.context),`Recommendation ${index+1} coreAssessment.context is required`);
@@ -98,7 +99,7 @@ function validateCoreAssessment(runtime,assessment,rec,index,{recompute=true}={}
 
   const status=String(rec?.status||'').toUpperCase();
   if(status==='BET') assert(assessment.betEligibleByModelError===true,`Recommendation ${index+1} BET is blocked by Core 1.4 model-error gate`);
-  if(status==='WAIT'&&assessment.modelErrorState==='HIGH'){
+  if(status==='WAIT'&&assessment.modelErrorState==='HIGH'&&!validateForecastWait(report,rec)){
     assert(['MODERATE','STRONG'].includes(assessment.context.independentCurrentSupport),`Recommendation ${index+1} HIGH-error WAIT requires at least moderate independent current support`);
   }
 }
@@ -196,7 +197,7 @@ function validateBundle(runtime,report,sidecar,{compareCurrent=true,recompute=tr
     const item=sidecar.recommendations[i];
     const validateRecommendation=()=>{
       assert(String(item?.status||'').toUpperCase()===String(rec?.status||'').toUpperCase(),`Recommendation ${i+1} status mismatch between report and sidecar`);
-      validateCoreAssessment(runtime,item.coreAssessment,rec,i,{recompute});
+      validateCoreAssessment(runtime,item.coreAssessment,rec,i,{recompute,report});
       validateWaltersEvidence(runtime,item.waltersEvidence,item.coreAssessment,rec,i,sidecar.provenance.waltersMode);
     };
     if(!collectRecommendationErrors){
@@ -304,7 +305,8 @@ function main(){
   fail('Usage: core-v14-publication-gate.mjs validate --report FILE --sidecar FILE [--root DIR] | verify-history [--root DIR] | self-test [--root DIR]');
 }
 
-export {loadRuntime, validateBundle};
+export {loadRuntime, validateBundle, validateCoreAssessment};
 if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
   try{main()}catch(error){console.error(`CORE PUBLICATION GATE ERROR: ${error.message}`);process.exit(1)}
 }
+

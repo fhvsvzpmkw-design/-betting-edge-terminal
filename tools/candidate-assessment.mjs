@@ -5,7 +5,7 @@ import {forecastPriceComparison} from './forecast-evidence.mjs';
 import {compareGrahamFair, reviewGrahamHandoff} from './graham-fair-handoff.mjs';
 import {compareRecordedFair} from './native-fair-review.mjs';
 import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
-import {FORECAST_LEAN_FROM,validateForecastLean} from './forecast-lean.mjs';
+import {FORECAST_LEAN_FROM,validateForecastLean,validateForecastWait} from './forecast-lean.mjs';
 import {inspectForecastLeadReview} from './forecast-lead-routing.mjs';
 import {inspectOpinionReview} from './opinion-review.mjs';
 import {aggregateForecastComparisons} from './forecast-aggregation.mjs';
@@ -48,7 +48,10 @@ function sourceMap(receipt, report) {
 function sourceLinked(ids, sources, kinds = null) {
   return list(ids).length > 0 && ids.every(id => sources.has(id) && (!kinds || kinds.includes(sources.get(id).kind)));
 }
-function recordedWaitQualification(receipt) {
+function recordedWaitQualification(receipt, report) {
+  if (receipt?.decision?.forecastWait != null) {
+    try { return validateForecastWait(report, receipt.decision); } catch { return false; }
+  }
   const wait = receipt?.decision?.waitQualification;
   // Publication remains responsible for its existing non-market signal rules.
   // This completion check neither creates a WAIT nor bypasses that validator.
@@ -71,7 +74,7 @@ function personnelReview(receipt, review, report) {
   try { provisionalLean=receipt?.decision?.forecastLean?.provisional===true && validateForecastLean(report,receipt.decision,sources); } catch {}
   const completedUnresolved = p?.state === 'REVIEW_COMPLETED_UNRESOLVED' && text(p.rationale) && text(p.materialityExplanation) &&
     text(p.remainingUncertainty) && text(p.decisionImpact) && sourceLinked(p.sourceIds, sources, ['OFFICIAL', 'REPORTING']) &&
-    (receipt?.decision?.status === 'PASS' || provisionalLean || (receipt?.decision?.status === 'WAIT' && recordedWaitQualification(receipt)));
+    (receipt?.decision?.status === 'PASS' || provisionalLean || (receipt?.decision?.status === 'WAIT' && recordedWaitQualification(receipt, report)));
   return {resolved: p?.state !== 'REVIEW_COMPLETED_UNRESOLVED' && Boolean((explicit && distinction) || (marketResolved && !discrepancy)),
     producerComplete: Boolean((explicit && distinction) || completedUnresolved), discrepancy: Boolean(discrepancy),
     state: p?.state || (marketResolved ? 'RESOLVED' : 'UNRESOLVED'),
@@ -177,7 +180,7 @@ function completion(report, selection, receipt, best, options, forecast, review)
     close(existingMarket.referenceProbability, existingComparison?.benchmarkNoVigProbability) && close(rec.benchmarkComparison?.edgeProbabilityPoints, existingComparison?.edgeProbabilityPoints) &&
     current(existingMarket.informationReview?.checkedAt, report) && text(existingMarket.informationReview?.impact) &&
     sourceLinked(existingMarket.informationReview?.sourceIds, sources, ['OFFICIAL', 'REPORTING']) && text(existingMarket.decisionRationale) &&
-    recordedWaitQualification(receipt) && !exactIds.length;
+    recordedWaitQualification(receipt, report) && !exactIds.length;
   if (existingWaitComplete) return {reviewState: 'COMPLETE', completionBasis: 'EXISTING_QUALIFIED_MARKET_WAIT', missingResearch: [],
     technicalLeanEligible, personnel, forecastDispositions: [], priceCondition: condition.value, decisionRationale: existingMarket.decisionRationale};
   const existingFair = rec?.fairValueEvidence, core = rec?.coreAssessment;
@@ -382,3 +385,4 @@ export function finalizeCandidateAssessmentDraft(args = {}) {
   }
   return {review, deferredSelectionIds, deferFailures, applied: true};
 }
+

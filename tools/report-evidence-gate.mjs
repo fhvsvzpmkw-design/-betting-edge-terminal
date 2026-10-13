@@ -4,13 +4,13 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {validateMarketAssessment} from './market-price-assessment.mjs';
 import {validateCardEvidenceBundle, validateRecommendationCardEvidence} from './card-evidence-identity.mjs';
-import {validateForecastLean,validateForecastLeanDirections} from './forecast-lean.mjs';
+import {validateForecastLean,validateForecastWait,validateForecastLeanDirections} from './forecast-lean.mjs';
 import {inspectOpinionReview} from './opinion-review.mjs';
 
 // Historical reports remain immutable. This adds evidence requirements for the
 // next scheduled lane; it does not supply a model, a fair, or a betting threshold.
 export const REPORT_EVIDENCE_FROM = '2026-09-05T17:00:00-07:00';
-export const REPORT_EVIDENCE_FIELDS = Object.freeze(['sourceEvidence', 'sourceShortfall', 'fairValueEvidence', 'benchmarkComparison', 'marketAssessment', 'forecastLean']);
+export const REPORT_EVIDENCE_FIELDS = Object.freeze(['sourceEvidence', 'sourceShortfall', 'fairValueEvidence', 'benchmarkComparison', 'marketAssessment', 'forecastLean', 'forecastWait']);
 const SERIOUS = new Set(['BET', 'LEAN', 'WAIT']);
 const SOURCE_KINDS = new Set(['OFFICIAL', 'REPORTING', 'MODEL', 'MARKET']);
 const SHORTFALL_REASONS = new Set(['SOURCE_UNAVAILABLE', 'MARKET_UNAVAILABLE', 'QUOTE_STALE', 'IDENTITY_UNRESOLVED', 'EVENT_INELIGIBLE']);
@@ -185,6 +185,7 @@ export function validateRecommendationEvidence(report, rec, item, index) {
   }
   const ids = sourceEvidence(rec, item, sport, reportMs, label);
   validateForecastLean(report, rec, ids);
+  validateForecastWait(report, rec, ids);
   if (!validateMarketAssessment(report, rec, item, ids)) fairEvidence(rec, item, ids, label);
   benchmarkEvidence(rec, label);
   leanWording(rec, label);
@@ -223,3 +224,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(`REPORT EVIDENCE GATE OK ${JSON.stringify(result)}`);
   } catch (error) { console.error(`REPORT EVIDENCE ERROR: ${error.message}`); process.exit(1); }
 }
+

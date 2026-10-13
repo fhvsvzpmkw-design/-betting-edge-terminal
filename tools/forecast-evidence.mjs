@@ -171,7 +171,7 @@ export function evaluateForecast(record, candidate, {asOf, revalidations = [], r
 // The publisher replays the original record and current applicability review.
 // A producer-written ELIGIBLE_EXACT display field is not sufficient authority.
 export function validateBoundForecastLean({report, sidecar, selection, receipt, feed = null}) {
-  const rec=receipt?.decision, a=rec?.forecastLean;
+  const rec=receipt?.decision, a=rec?.forecastLean ?? rec?.forecastWait;
   if (a==null) return false;
   const records=list(sidecar.forecastEvidence?.records).filter(r=>r.recordId===a.forecastRecordId);
   if (records.length!==1) throw new Error('Forecast LEAN requires one immutable bound record');
@@ -313,3 +313,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(JSON.stringify({mode: 'ADVISORY_ONLY', publicationBlocking: false, state: 'UNAVAILABLE', warnings: [error.message]}));
   }
 }
+

@@ -3,7 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {AUTHORITY, QUALIFIED, qualifyMarket, isFullGameAlternateTotalMarket} from './pinnacle-sharp-benchmark.mjs';
-import {validateForecastLean} from './forecast-lean.mjs';
+import {validateForecastLean, validateForecastWait} from './forecast-lean.mjs';
 
 // Applies only to new assessments; issued reports keep their original evidence.
 export const MARKET_ASSESSMENT_FROM = '2026-09-07T18:31:00-07:00';
@@ -94,7 +94,7 @@ export function validateMarketAssessment(report, rec, item, ids) {
   ensure(review.sourceIds?.length > 0 && review.sourceIds.every(id => ['OFFICIAL', 'REPORTING'].includes(ids.get(id)?.kind)), `${label} requires roster/lineup/news source evidence`);
   ensure(['NO_MATERIAL_CONFLICT', 'MATERIAL_REVIEW_COMPLETED', 'UNRESOLVED'].includes(review.state) && nonEmpty(review.impact), `${label} requires information state and decision impact`);
   if (rec.status === 'LEAN' && !validateForecastLean(report, rec, ids)) ensure(rec.benchmarkComparison?.direction === 'FAVORABLE' && review.state !== 'UNRESOLVED', `${label} LEAN requires favorable price and resolved material information`);
-  if (rec.status === 'WAIT') ensure(rec.waitQualification?.actionableIfResolved === true && rec.waitQualification.independentSignals?.length > 0, `${label} WAIT requires the existing actionable trigger and independent signal`);
+  if (rec.status === 'WAIT' && !validateForecastWait(report, rec, ids)) ensure(rec.waitQualification?.actionableIfResolved === true && rec.waitQualification.independentSignals?.length > 0, `${label} WAIT requires the existing actionable trigger and independent signal`);
   const expected = marketComparison(Number(rec.feed.priceDecimal), b.noVigProbability);
   ensure(Object.keys(expected).every(key => typeof expected[key] === 'number' ? close(expected[key], rec.benchmarkComparison?.[key]) : expected[key] === rec.benchmarkComparison?.[key]), `${label} comparison must use the exact decimal execution price`);
   return true;
@@ -111,3 +111,4 @@ export function validateBoundMarketAssessment(report, rec, observer) {
   ensure(rec.marketAssessment.referenceGeneratedAt === reference.generatedAt, 'Market assessment reference timestamp differs from bound observer');
   return reference;
 }
+
