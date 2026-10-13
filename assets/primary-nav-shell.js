@@ -184,6 +184,7 @@ function bind(d){
   restoreAllMenuButtons(d);
   if(workspaceOpen(d))leaveMenu(d);else enterMenu(d);
 
+  const specialtyClicks=new WeakSet();
   d.addEventListener('click',e=>{
     const navButton=e.target.closest?.('.runnerNavPad .tabs>.btn,.tabs>.btn');if(!navButton)return;
     const view=navButton.dataset?.view;
@@ -206,12 +207,20 @@ function bind(d){
     if(e.isTrusted)d.documentElement.dataset.primaryNavUserActivated='1';
 
     // Syndicate, Pizza, Crypto, Meat and Preferences own their page logic.
-    // Remove the menu/shell before their handlers run, then return to the menu
-    // whenever they close.
+    // Remove the menu/shell before their handlers run. Complete any return
+    // below, after the desk's target and tabs handlers have finished.
+    specialtyClicks.add(e);
     leaveMenu(d);closeShell(d);
-    queueMicrotask(()=>syncMenu(d));
-    setTimeout(()=>syncMenu(d),180);
   },true);
+
+  d.addEventListener('click',e=>{
+    // The Syndicate handler replaces its label, detaching the clicked span.
+    // Remember the event in capture rather than searching its target again.
+    if(!specialtyClicks.has(e))return;
+    // A capture-phase microtask can run before the native desk closes.
+    // Bubbling restores the prepared menu in the same completed click.
+    syncMenu(d);
+  });
 
   d.addEventListener('keydown',e=>{
     const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;

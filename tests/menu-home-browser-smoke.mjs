@@ -67,13 +67,23 @@ try{
   await page.evaluate(()=>{
     window.preparedMenuArt=[...document.querySelectorAll('#vigMainMenu img')];
     window.preparedMenuButtons=[...document.querySelectorAll('#vigMainMenu>.vigMenuButton')];
-    window.returnCheck={frames:0,legacyFrames:0,loadingArtFrames:0};
+    window.returnCheck={frames:0,legacyFrames:0,loadingArtFrames:0,missingMenuFrames:0,lastReturn:null};
+    const sectionOpen=()=>['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'].some(name=>document.body.classList.contains(name));
+    window.addEventListener('click',event=>{
+      const button=event.composedPath().find(node=>node.matches?.('.runnerNavPad .tabs>.btn'));
+      if(!button||button.dataset.view||sectionOpen())return;
+      const menu=document.getElementById('vigMainMenu');
+      window.returnCheck.lastReturn={id:button.dataset.menuId,home:document.body.classList.contains('runnerMenuHome'),styled:document.body.classList.contains('vigMenuStyled'),visible:!!menu&&!menu.hidden&&getComputedStyle(menu).display!=='none'};
+    });
     const inspect=()=>{
       const state=window.returnCheck,body=document.body,menu=document.getElementById('vigMainMenu'),nav=document.querySelector('.runnerNavPad');
       const section=['runnerPrimaryViewLoaded','runnerSyndicateLoaded','runnerPizzaLoaded','runnerCryptoLoaded','runnerSeasonPreviewsLoaded','runnerPreferencesLoaded'].some(name=>body.classList.contains(name));
       state.frames++;
-      if(body.classList.contains('runnerMenuHome')&&!section){
+      // Count the neutral transition too: the old implementation waited 180ms
+      // before adding runnerMenuHome, which the previous check skipped.
+      if(!section){
         if(getComputedStyle(nav).display!=='none'&&nav.getBoundingClientRect().height>0)state.legacyFrames++;
+        if(!menu||menu.hidden||!body.classList.contains('vigMenuStyled'))state.missingMenuFrames++;
         if(menu&&!menu.hidden&&[...menu.querySelectorAll('.vigMenuArt img')].some(image=>!image.parentElement.classList.contains('vigMenuArtReady')))state.loadingArtFrames++;
       }
       if(!state.done)requestAnimationFrame(inspect);
@@ -92,14 +102,21 @@ try{
         const button=document.querySelector(`.tabs>.btn[data-menu-id="${id}"]`),box=button?.getBoundingClientRect();
         return box?.width>0&&box.height>0&&getComputedStyle(button).visibility!=='hidden';
       },{timeout:5000},id);
-      await page.click(`.tabs>.btn[data-menu-id="${id}"]`);await ready();
+      await page.evaluate(()=>{window.returnCheck.lastReturn=null});
+      await page.click(`.tabs>.btn[data-menu-id="${id}"]`);
+      if(!['board','market','history','engine'].includes(id)){
+        const returned=await page.evaluate(()=>window.returnCheck.lastReturn);
+        assert.deepEqual(returned,{id,home:true,styled:true,visible:true},`${id}: the prepared menu must be visible when the return click finishes, before a timer or frame`);
+      }
+      await ready();
       await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       const result=await page.evaluate(()=>({
-        legacy:window.returnCheck.legacyFrames,loading:window.returnCheck.loadingArtFrames,
+        legacy:window.returnCheck.legacyFrames,loading:window.returnCheck.loadingArtFrames,missing:window.returnCheck.missingMenuFrames,
         retainedArt:window.preparedMenuArt.every((image,i)=>document.querySelectorAll('#vigMainMenu img')[i]===image),
         retainedButtons:window.preparedMenuButtons.every((button,i)=>document.querySelectorAll('#vigMainMenu>.vigMenuButton')[i]===button)
       }));
       assert.equal(result.legacy,0,`${id}: returning may not show the old navigation`);
+      assert.equal(result.missing,0,`${id}: returning may not leave a frame waiting for the new menu`);
       assert.equal(result.loading,0,`${id}: prepared artwork must not reload on return`);
       assert.ok(result.retainedArt&&result.retainedButtons,'the new main menu must remain prepared between visits');
       assert.equal(artworkRequests,requestsBeforeReturn,'no artwork requests on menu return');

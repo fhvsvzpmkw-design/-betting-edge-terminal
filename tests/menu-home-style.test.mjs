@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import './menu-home-cascade.test.mjs';
+import './primary-nav-return.test.mjs';
 
 const source=fs.readFileSync('assets/menu-home-style.js','utf8');
 const css=fs.readFileSync('assets/menu-home-style.css','utf8');
@@ -264,6 +265,7 @@ for(const [,selector] of css.replace(/\/\*[\s\S]*?\*\//g,'').matchAll(/([^{}]+)\
 assert.doesNotMatch(source,/fetch\(|localStorage|BettingEdgeRunnerPayload|\.onclick\s*=/,'menu appearance cannot fetch or change report data, storage, or routes');
 assert.match(loader,/if\(!document\.getElementById\('menuHomeStyleLoader'\)\)/,'the compatibility wrapper must not load the early menu script twice');
 assert.ok(runner.indexOf('id="vigMenuBootGuard"')<runner.indexOf('<body>'),'guard legacy content before it can paint');
+assert.match(runner,/body:not\(\.runnerPrimaryViewLoaded\):not\(\.runnerSyndicateLoaded\):not\(\.runnerPizzaLoaded\):not\(\.runnerCryptoLoaded\):not\(\.runnerSeasonPreviewsLoaded\):not\(\.runnerPreferencesLoaded\) main\.term>:not\(#vigMainMenu\)\{display:none!important\}/,'old home content must also stay hidden during a return with no home or section marker');
 assert.ok(runner.indexOf('id="vigMenuHomeStyle"')<runner.indexOf('<body>'));
 assert.ok(runner.includes(`<script id="menuHomeStyleLoader" defer src="./assets/menu-home-style.js?v=${menuVersion}"></script>`));
 assert.ok(runner.includes(`href="./assets/menu-home-style.css?v=${menuVersion}"`));
