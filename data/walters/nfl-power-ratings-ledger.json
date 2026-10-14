@@ -7,7 +7,7 @@
   "sport": "NFL",
   "season": 2026,
   "createdAt": "2026-08-30T13:23:00-07:00",
-  "updatedAt": "2026-10-13T17:09:27.000Z",
+  "updatedAt": "2026-10-14T01:16:00.000Z",
   "authority": {
     "owner": "Graham Mercer",
     "waltersInterface": "core/walters-intelligence-interface-v1.4.json",
@@ -4966,10 +4966,10 @@
       "team": "Baltimore",
       "abbr": "BAL",
       "seedRating": 28.5,
-      "currentRating": 28.0432686,
-      "priorRating": 28.280142,
-      "lastDelta": -0.2368734,
-      "lastUpdatedAt": "2026-10-09T00:52:44.462Z",
+      "currentRating": 28.78370526,
+      "priorRating": 28.0432686,
+      "lastDelta": 0.74043666,
+      "lastUpdatedAt": "2026-10-14T01:16:00.000Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "PRESEASON_SEED",
       "sourceRefs": [
@@ -4989,7 +4989,13 @@
         "https://www.nfl.com/schedules/2026/by-week/week-3",
         "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-09-all-remaining-complete-reconciliation.json",
         "data/walters/nfl/2026/week-04-current-numbers.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-4"
+        "https://www.nfl.com/schedules/2026/by-week/week-4",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+        "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+        "data/walters/nfl/2026/week-05-current-numbers.json",
+        "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+        "https://www.nfl.com/injuries/league/2026/reg5",
+        "https://www.nfl.com/schedules/2026/by-week/week-5"
       ],
       "history": [
         {
@@ -7487,6 +7493,602 @@
                 "sourceIds": [
                   "closeout-TEN-BAL",
                   "bal-qb-postgame"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "sequence": 5,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w05-to-w06-bal-atl-20261014011600000",
+          "fromRating": 28.0432686,
+          "priorRating": 28.0432686,
+          "delta": 0.74043666,
+          "toRating": 28.78370526,
+          "currentRating": 28.78370526,
+          "effectiveAt": "2026-10-14T01:16:00.000Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W05-BAL-ATL: TGPL 35.4476352; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 5,
+          "targetWeek": 6,
+          "gameKey": "2026-W05-BAL-ATL",
+          "opponent": "ATL",
+          "kickoff": "2026-10-11T17:20:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": 7,
+            "opponentOldRating": 23.1646352,
+            "teamInjuryLoss": 4.501,
+            "opponentInjuryLoss": 1.3,
+            "teamLocationAdvantage": -2.082
+          },
+          "tgpl": 35.4476352,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+            "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+            "data/walters/nfl/2026/week-05-current-numbers.json",
+            "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+            "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+            "https://www.nfl.com/injuries/league/2026/reg5",
+            "https://www.nfl.com/schedules/2026/by-week/week-5"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+            "blobSha": "1ed3d143665994ae29343830f1272ed1ac35764b"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "BAL",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-BAL-Durham-Smythe",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Trey-Hendrickson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.5,
+                  "rawTeamContributionDelta": -1.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.5,
+                    "max": 1.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Mike Green",
+                      "eaPlayerId": "15200",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Assign only Hendrickson's added vacancy duty to the officially identified primary replacement.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Andrew-Vorhees",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Vorhees's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Roger-Rosengarten",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 0.01,
+                  "rawTeamContributionDelta": -0.01,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.01,
+                    "max": 0.01
+                  },
+                  "weights": [
+                    {
+                      "player": "Chuma Edoga",
+                      "eaPlayerId": "20366",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "Carson Vinson",
+                      "eaPlayerId": "10652",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Edoga and Vinson are the two officially documented available reserve tackles; exact relief allocation is not reported, so use the approved equal-share additional-duty assumption.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.5,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.019885657469550087,
+                    "fractionRange": {
+                      "min": 0.019885657469550087,
+                      "max": 0.019885657469550087
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 450,
+                        "startLatest": 450,
+                        "endEarliest": 530,
+                        "endLatest": 530,
+                        "rationale": "Q1 7:30 injury play to Q1 6:10 explicit return.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval; do not infer continuing impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Matthew-Hibner",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Hibner's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without treating questionable as a return.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Kyle-Hamilton",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.075,
+                  "rawTeamContributionDelta": -0.075,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.075,
+                    "max": 0.075
+                  },
+                  "weights": [
+                    {
+                      "player": "Chandler Rivers",
+                      "eaPlayerId": "16276",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the documented next player on Hamilton's official DB depth chain for the temporary added duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.04424558786974894,
+                    "fractionRange": {
+                      "min": 0.04424558786974894,
+                      "max": 0.04424558786974894
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 2295,
+                        "startLatest": 2295,
+                        "endEarliest": 2473,
+                        "endLatest": 2473,
+                        "rationale": "Q3 6:45 injury play to Q3 3:47 explicit return.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval; do not infer continuing impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.7,
+                    "max": 1.7
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Broderick-Washington",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Washington's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without treating questionable as a return.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Travis-Jones",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.047,
+                  "rawTeamContributionDelta": -0.047,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.047,
+                    "max": 0.047
+                  },
+                  "weights": [
+                    {
+                      "player": "John Jenkins",
+                      "eaPlayerId": "1073",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the official nose-tackle depth replacement for Jones's temporary added vacancy duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.3,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.15659955257270694,
+                    "fractionRange": {
+                      "min": 0.15659955257270694,
+                      "max": 0.15659955257270694
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3393,
+                        "startLatest": 3393,
+                        "endEarliest": 4023,
+                        "endLatest": 4023,
+                        "rationale": "Q4 3:27 injury play to the explicit return after the OT 3:01 touchdown.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval over the bound elapsed duration; do not infer active impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.3,
+                    "max": 0.3
+                  }
+                }
+              ],
+              "qbEstimate": {
+                "modelId": "graham-historical-qb-replacement-v1",
+                "scaleLimitation": "Frozen Madden-derived historical replacement difference; not a performance-validated QB rating or a change to the active QB performance model.",
+                "classification": "GRAHAM_MODEL_ESTIMATE",
+                "healthyCandidates": [
+                  {
+                    "player": "Lamar Jackson",
+                    "eaPlayerId": "13092",
+                    "lockedValue": 9.25
+                  }
+                ],
+                "replacement": {
+                  "player": "Tyler Huntley",
+                  "eaPlayerId": "21029"
+                },
+                "injuryLoss": 2.25,
+                "rawTeamContributionDelta": -2.25,
+                "healthyValue": 9.25,
+                "replacementValue": 7,
+                "fullGameLoss": 2.25,
+                "exposure": {
+                  "modelId": "graham-historical-time-exposure-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "fraction": 1,
+                  "fractionRange": {
+                    "min": 1,
+                    "max": 1
+                  },
+                  "unavailableIntervals": [
+                    {
+                      "startEarliest": 0,
+                      "startLatest": 0,
+                      "endEarliest": 4023,
+                      "endLatest": 4023,
+                      "rationale": "Jackson was inactive and Huntley handled the complete recorded quarterback duty.",
+                      "sourceIds": [
+                        "bal-atl-gamebook-final",
+                        "ravens-active-role-report"
+                      ]
+                    }
+                  ],
+                  "gameDurationSeconds": 4023,
+                  "assumptionRationale": "Use the complete source-bound 4,023-second elapsed game interval once; value active play normally.",
+                  "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                  "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                },
+                "injuryLossRange": {
+                  "min": 2.25,
+                  "max": 2.25
+                },
+                "baselineRationale": "Official injury and club sources establish Jackson as the unavailable healthy incumbent.",
+                "replacementRationale": "Official club reporting names Huntley and the gamebook records all quarterback duty to Huntley.",
+                "sourceIds": [
+                  "bal-atl-gamebook-final",
+                  "nfl-week5-final-injury-report-bal-atl",
+                  "ravens-active-role-report"
+                ]
+              }
+            },
+            {
+              "team": "ATL",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-ATL-Za-Darius-Smith",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "EQUAL_SHARE_COMMITTEE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.1,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 0.1,
+                  "rawTeamContributionDelta": -0.1,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Bralen Trice",
+                      "eaPlayerId": "14754",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "Drake Jackson",
+                      "eaPlayerId": "22310",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The official active two-player candidate set is established but exact added-duty shares are not; use the approved equal-share assumption.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-ATL-Yasir-Abdullah",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Abdullah's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-ATL-A-J-Terrell-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.2,
+                  "rawTeamContributionDelta": -1.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  },
+                  "weights": [
+                    {
+                      "player": "C.J. Henderson",
+                      "eaPlayerId": "21004",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the club-identified primary outside-corner replacement for Terrell's distinct vacancy.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-ATL-Mike-Hughes",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Mike Ford Jr",
+                      "eaPlayerId": "13881",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the club-reported actual relief identity for the exact 12-second interval.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.002982848620432513,
+                    "fractionRange": {
+                      "min": 0.002982848620432513,
+                      "max": 0.002982848620432513
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3548,
+                        "startLatest": 3548,
+                        "endEarliest": 3560,
+                        "endLatest": 3560,
+                        "rationale": "Q4 0:52 injury play to Q4 0:40 explicit return update.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final",
+                          "falcons-hughes-relief"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval; equal frozen values yield zero point loss without omitting the injury.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0,
+                    "max": 0
+                  }
+                }
+              ],
+              "qbEstimate": {
+                "modelId": "graham-historical-qb-replacement-v1",
+                "scaleLimitation": "Frozen Madden-derived historical replacement difference; not a performance-validated QB rating or a change to the active QB performance model.",
+                "classification": "GRAHAM_MODEL_ESTIMATE",
+                "healthyCandidates": [
+                  {
+                    "player": "Michael Penix Jr",
+                    "eaPlayerId": "14608",
+                    "lockedValue": 7.5
+                  }
+                ],
+                "replacement": {
+                  "player": "Tua Tagovailoa",
+                  "eaPlayerId": "20916"
+                },
+                "injuryLoss": 0,
+                "rawTeamContributionDelta": 0,
+                "healthyValue": 7.5,
+                "replacementValue": 7.5,
+                "fullGameLoss": 0,
+                "exposure": {
+                  "modelId": "graham-historical-time-exposure-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "fraction": 0.014417101665423813,
+                  "fractionRange": {
+                    "min": 0.014417101665423813,
+                    "max": 0.014417101665423813
+                  },
+                  "unavailableIntervals": [
+                    {
+                      "startEarliest": 3581,
+                      "startLatest": 3581,
+                      "endEarliest": 3587,
+                      "endLatest": 3587,
+                      "rationale": "Q4 0:19 relief play to Penix's explicit Q4 0:13 return.",
+                      "sourceIds": [
+                        "bal-atl-gamebook-final"
+                      ]
+                    },
+                    {
+                      "startEarliest": 3971,
+                      "startLatest": 3971,
+                      "endEarliest": 4023,
+                      "endLatest": 4023,
+                      "rationale": "Atlanta's source-bound 0:52 overtime relief possession.",
+                      "sourceIds": [
+                        "bal-atl-gamebook-final",
+                        "falcons-penix-postgame"
+                      ]
+                    }
+                  ],
+                  "gameDurationSeconds": 4023,
+                  "assumptionRationale": "Use the two source-bound disjoint relief intervals once; the equal frozen values make the point loss invariant to the bounded exposure.",
+                  "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                  "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                },
+                "injuryLossRange": {
+                  "min": 0,
+                  "max": 0
+                },
+                "baselineRationale": "Penix started as the healthy incumbent and the gamebook records the injury-driven relief.",
+                "replacementRationale": "Tagovailoa is the only quarterback recorded in the two injury-relief intervals.",
+                "sourceIds": [
+                  "bal-atl-gamebook-final",
+                  "falcons-penix-postgame"
                 ]
               }
             }
@@ -60025,10 +60627,10 @@
       "team": "Atlanta",
       "abbr": "ATL",
       "seedRating": 21.5,
-      "currentRating": 23.1646352,
-      "priorRating": 20.980634,
-      "lastDelta": 2.1840012,
-      "lastUpdatedAt": "2026-10-07T13:12:37.097Z",
+      "currentRating": 22.42419854,
+      "priorRating": 23.1646352,
+      "lastDelta": -0.74043666,
+      "lastUpdatedAt": "2026-10-14T01:16:00.000Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
@@ -60054,7 +60656,13 @@
         "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-07-atl-no-complete-reconciliation.json",
         "https://static.www.nfl.com/image/upload/v1791287516/gamecenter/aa6b5517-4feb-11f1-abca-2c54536568a9.pdf",
         "data/walters/nfl/2026/week-04-personnel-ledger.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-4"
+        "https://www.nfl.com/schedules/2026/by-week/week-4",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+        "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+        "data/walters/nfl/2026/week-05-current-numbers.json",
+        "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+        "https://www.nfl.com/injuries/league/2026/reg5",
+        "https://www.nfl.com/schedules/2026/by-week/week-5"
       ],
       "history": [
         {
@@ -61912,6 +62520,602 @@
                   }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "sequence": 6,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w05-to-w06-bal-atl-20261014011600000",
+          "fromRating": 23.1646352,
+          "priorRating": 23.1646352,
+          "delta": -0.74043666,
+          "toRating": 22.42419854,
+          "currentRating": 22.42419854,
+          "effectiveAt": "2026-10-14T01:16:00.000Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W05-BAL-ATL: TGPL 15.7602686; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 5,
+          "targetWeek": 6,
+          "gameKey": "2026-W05-BAL-ATL",
+          "opponent": "BAL",
+          "kickoff": "2026-10-11T17:20:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": -7,
+            "opponentOldRating": 28.0432686,
+            "teamInjuryLoss": 1.3,
+            "opponentInjuryLoss": 4.501,
+            "teamLocationAdvantage": 2.082
+          },
+          "tgpl": 15.7602686,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+            "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+            "data/walters/nfl/2026/week-05-current-numbers.json",
+            "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+            "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+            "https://www.nfl.com/injuries/league/2026/reg5",
+            "https://www.nfl.com/schedules/2026/by-week/week-5"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+            "blobSha": "1ed3d143665994ae29343830f1272ed1ac35764b"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "BAL",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-BAL-Durham-Smythe",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Trey-Hendrickson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.5,
+                  "rawTeamContributionDelta": -1.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.5,
+                    "max": 1.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Mike Green",
+                      "eaPlayerId": "15200",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Assign only Hendrickson's added vacancy duty to the officially identified primary replacement.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Andrew-Vorhees",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Vorhees's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Roger-Rosengarten",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 0.01,
+                  "rawTeamContributionDelta": -0.01,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.01,
+                    "max": 0.01
+                  },
+                  "weights": [
+                    {
+                      "player": "Chuma Edoga",
+                      "eaPlayerId": "20366",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "Carson Vinson",
+                      "eaPlayerId": "10652",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Edoga and Vinson are the two officially documented available reserve tackles; exact relief allocation is not reported, so use the approved equal-share additional-duty assumption.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.5,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.019885657469550087,
+                    "fractionRange": {
+                      "min": 0.019885657469550087,
+                      "max": 0.019885657469550087
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 450,
+                        "startLatest": 450,
+                        "endEarliest": 530,
+                        "endLatest": 530,
+                        "rationale": "Q1 7:30 injury play to Q1 6:10 explicit return.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval; do not infer continuing impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Matthew-Hibner",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Hibner's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without treating questionable as a return.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Kyle-Hamilton",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.075,
+                  "rawTeamContributionDelta": -0.075,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.075,
+                    "max": 0.075
+                  },
+                  "weights": [
+                    {
+                      "player": "Chandler Rivers",
+                      "eaPlayerId": "16276",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the documented next player on Hamilton's official DB depth chain for the temporary added duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.7,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.04424558786974894,
+                    "fractionRange": {
+                      "min": 0.04424558786974894,
+                      "max": 0.04424558786974894
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 2295,
+                        "startLatest": 2295,
+                        "endEarliest": 2473,
+                        "endLatest": 2473,
+                        "rationale": "Q3 6:45 injury play to Q3 3:47 explicit return.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval; do not infer continuing impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.7,
+                    "max": 1.7
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Broderick-Washington",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Washington's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without treating questionable as a return.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-BAL-Travis-Jones",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.047,
+                  "rawTeamContributionDelta": -0.047,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.047,
+                    "max": 0.047
+                  },
+                  "weights": [
+                    {
+                      "player": "John Jenkins",
+                      "eaPlayerId": "1073",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the official nose-tackle depth replacement for Jones's temporary added vacancy duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.3,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.15659955257270694,
+                    "fractionRange": {
+                      "min": 0.15659955257270694,
+                      "max": 0.15659955257270694
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3393,
+                        "startLatest": 3393,
+                        "endEarliest": 4023,
+                        "endLatest": 4023,
+                        "rationale": "Q4 3:27 injury play to the explicit return after the OT 3:01 touchdown.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval over the bound elapsed duration; do not infer active impairment.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.3,
+                    "max": 0.3
+                  }
+                }
+              ],
+              "qbEstimate": {
+                "modelId": "graham-historical-qb-replacement-v1",
+                "scaleLimitation": "Frozen Madden-derived historical replacement difference; not a performance-validated QB rating or a change to the active QB performance model.",
+                "classification": "GRAHAM_MODEL_ESTIMATE",
+                "healthyCandidates": [
+                  {
+                    "player": "Lamar Jackson",
+                    "eaPlayerId": "13092",
+                    "lockedValue": 9.25
+                  }
+                ],
+                "replacement": {
+                  "player": "Tyler Huntley",
+                  "eaPlayerId": "21029"
+                },
+                "injuryLoss": 2.25,
+                "rawTeamContributionDelta": -2.25,
+                "healthyValue": 9.25,
+                "replacementValue": 7,
+                "fullGameLoss": 2.25,
+                "exposure": {
+                  "modelId": "graham-historical-time-exposure-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "fraction": 1,
+                  "fractionRange": {
+                    "min": 1,
+                    "max": 1
+                  },
+                  "unavailableIntervals": [
+                    {
+                      "startEarliest": 0,
+                      "startLatest": 0,
+                      "endEarliest": 4023,
+                      "endLatest": 4023,
+                      "rationale": "Jackson was inactive and Huntley handled the complete recorded quarterback duty.",
+                      "sourceIds": [
+                        "bal-atl-gamebook-final",
+                        "ravens-active-role-report"
+                      ]
+                    }
+                  ],
+                  "gameDurationSeconds": 4023,
+                  "assumptionRationale": "Use the complete source-bound 4,023-second elapsed game interval once; value active play normally.",
+                  "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                  "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                },
+                "injuryLossRange": {
+                  "min": 2.25,
+                  "max": 2.25
+                },
+                "baselineRationale": "Official injury and club sources establish Jackson as the unavailable healthy incumbent.",
+                "replacementRationale": "Official club reporting names Huntley and the gamebook records all quarterback duty to Huntley.",
+                "sourceIds": [
+                  "bal-atl-gamebook-final",
+                  "nfl-week5-final-injury-report-bal-atl",
+                  "ravens-active-role-report"
+                ]
+              }
+            },
+            {
+              "team": "ATL",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-ATL-Za-Darius-Smith",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "EQUAL_SHARE_COMMITTEE",
+                  "weightBasis": "EQUAL_ADDITIONAL_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.1,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 2
+                  },
+                  "injuryLoss": 0.1,
+                  "rawTeamContributionDelta": -0.1,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Bralen Trice",
+                      "eaPlayerId": "14754",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    },
+                    {
+                      "player": "Drake Jackson",
+                      "eaPlayerId": "22310",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 0.5
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The official active two-player candidate set is established but exact added-duty shares are not; use the approved equal-share assumption.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-ATL-Yasir-Abdullah",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Abdullah's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-ATL-A-J-Terrell-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.2,
+                  "rawTeamContributionDelta": -1.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  },
+                  "weights": [
+                    {
+                      "player": "C.J. Henderson",
+                      "eaPlayerId": "21004",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the club-identified primary outside-corner replacement for Terrell's distinct vacancy.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-ATL-Mike-Hughes",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_PRIMARY_ROLE",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Mike Ford Jr",
+                      "eaPlayerId": "13881",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Use the club-reported actual relief identity for the exact 12-second interval.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.002982848620432513,
+                    "fractionRange": {
+                      "min": 0.002982848620432513,
+                      "max": 0.002982848620432513
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 3548,
+                        "startLatest": 3548,
+                        "endEarliest": 3560,
+                        "endLatest": 3560,
+                        "rationale": "Q4 0:52 injury play to Q4 0:40 explicit return update.",
+                        "sourceIds": [
+                          "bal-atl-gamebook-final",
+                          "falcons-hughes-relief"
+                        ]
+                      }
+                    ],
+                    "gameDurationSeconds": 4023,
+                    "assumptionRationale": "Use the exact injury-play to actual-return interval; equal frozen values yield zero point loss without omitting the injury.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0,
+                    "max": 0
+                  }
+                }
+              ],
+              "qbEstimate": {
+                "modelId": "graham-historical-qb-replacement-v1",
+                "scaleLimitation": "Frozen Madden-derived historical replacement difference; not a performance-validated QB rating or a change to the active QB performance model.",
+                "classification": "GRAHAM_MODEL_ESTIMATE",
+                "healthyCandidates": [
+                  {
+                    "player": "Michael Penix Jr",
+                    "eaPlayerId": "14608",
+                    "lockedValue": 7.5
+                  }
+                ],
+                "replacement": {
+                  "player": "Tua Tagovailoa",
+                  "eaPlayerId": "20916"
+                },
+                "injuryLoss": 0,
+                "rawTeamContributionDelta": 0,
+                "healthyValue": 7.5,
+                "replacementValue": 7.5,
+                "fullGameLoss": 0,
+                "exposure": {
+                  "modelId": "graham-historical-time-exposure-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "fraction": 0.014417101665423813,
+                  "fractionRange": {
+                    "min": 0.014417101665423813,
+                    "max": 0.014417101665423813
+                  },
+                  "unavailableIntervals": [
+                    {
+                      "startEarliest": 3581,
+                      "startLatest": 3581,
+                      "endEarliest": 3587,
+                      "endLatest": 3587,
+                      "rationale": "Q4 0:19 relief play to Penix's explicit Q4 0:13 return.",
+                      "sourceIds": [
+                        "bal-atl-gamebook-final"
+                      ]
+                    },
+                    {
+                      "startEarliest": 3971,
+                      "startLatest": 3971,
+                      "endEarliest": 4023,
+                      "endLatest": 4023,
+                      "rationale": "Atlanta's source-bound 0:52 overtime relief possession.",
+                      "sourceIds": [
+                        "bal-atl-gamebook-final",
+                        "falcons-penix-postgame"
+                      ]
+                    }
+                  ],
+                  "gameDurationSeconds": 4023,
+                  "assumptionRationale": "Use the two source-bound disjoint relief intervals once; the equal frozen values make the point loss invariant to the bounded exposure.",
+                  "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                  "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                },
+                "injuryLossRange": {
+                  "min": 0,
+                  "max": 0
+                },
+                "baselineRationale": "Penix started as the healthy incumbent and the gamebook records the injury-driven relief.",
+                "replacementRationale": "Tagovailoa is the only quarterback recorded in the two injury-relief intervals.",
+                "sourceIds": [
+                  "bal-atl-gamebook-final",
+                  "falcons-penix-postgame"
+                ]
+              }
             }
           ]
         }
@@ -76857,7 +78061,7 @@
     "sourceWeek": 5,
     "targetWeek": 6,
     "state": "PARTIAL_BLOCKED",
-    "appliedAt": "2026-10-13T17:09:27.000Z",
+    "appliedAt": "2026-10-14T01:16:00.000Z",
     "formulaIds": [
       "BW-R016",
       "BW-R017",
@@ -76865,8 +78069,8 @@
     ],
     "marketViewed": false,
     "gamesProcessed": 15,
-    "gamesUpdated": 1,
-    "teamsUpdated": 2,
+    "gamesUpdated": 2,
+    "teamsUpdated": 4,
     "blockedGames": [
       {
         "gameKey": "2026-W05-PHI-JAX",
@@ -77048,24 +78252,6 @@
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
-          "data/walters/nfl/2026/week-05-final-facts-20261013.json",
-          "data/walters/nfl/2026/week-05-current-numbers.json",
-          "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
-        ]
-      },
-      {
-        "gameKey": "2026-W05-BAL-ATL",
-        "away": "BAL",
-        "home": "ATL",
-        "reasons": [
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: BAL Lamar Jackson's full 4,023-second injury replacement by Tyler Huntley is now source-complete, but the overtime exposure has not yet been promoted through the historical QB evaluator against the frozen 9.25-to-7.0 values. RECOVERY_ACTION: Create the complete BAL team section and evaluate one HISTORICAL_REPLACEMENT_ESTIMATE over 0-4,023 seconds; do not add a duplicate whole-game quarterback loss.",
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: ATL Penix-to-Tagovailoa clocks are exact. Tua covered Q4 0:19 until Penix's explicit Q4 0:13 return, then Atlanta's 0:52 overtime possession. Both frozen QB values are 7.5, but the material injury timeline still requires explicit governed zero-loss evaluation. RECOVERY_ACTION: Promote the two disjoint Penix-to-Tagovailoa intervals through the historical QB exposure evaluator over the 4,023-second game; preserve the explicit Penix return and avoid duplicate starter loss.",
-          "REPLACEMENT_OR_VALUE_UNRESOLVED: The gamebook newly binds five Baltimore partial-injury sequences: Rosengarten, Hibner, Hamilton, Broderick Washington and Travis Jones. Hibner and Washington have exact frozen zero values; Rosengarten, Hamilton and Jones require final additional-duty replacement selection, elapsed-time evaluation and disjoint offensive-line/defensive-front/defensive-back cluster review. RECOVERY_ACTION: Promote the exact gamebook intervals using approved documented-depth or supported committee assignments, record calibrated-zero cases explicitly, and run the full team evaluator. Treat each return-questionable line literally until an actual return appears.",
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: BAL Trey Hendrickson/Mike Green and ATL Za'Darius Smith/Trice-Jackson now pass reusable individual case review. BAL Andrew Vorhees is a frozen-zero inactive with Emery Jones Jr. starting; Cam Jurgens had not debuted. ATL Yasir Abdullah is on injured reserve. These cases still need promotion with full paired roster coverage and cluster safeguards. RECOVERY_ACTION: Adopt the passing individual case reviews into complete BAL and ATL team sections; explicitly close Vorhees, Jurgens and Abdullah, and carry only reserve-list cases whose final activation/role status has been verified.",
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: ATL Mike Hughes's Q4 0:52 injury and actual Q4 0:40 return are exact, while Jake Matthews, Divine Deablo and Samson Ebukam are confirmed active. Hughes still needs a governed short-interval replacement and defensive-back cluster review before Atlanta's complete injury loss can be certified. RECOVERY_ACTION: Bind the documented available corner relief candidate, evaluate only the 12-second injury interval, close active-full cases, and run the paired evidence evaluator."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-bal-atl-gamebook-reconciliation.json",
           "data/walters/nfl/2026/week-05-final-facts-20261013.json",
           "data/walters/nfl/2026/week-05-current-numbers.json",
           "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
@@ -77564,6 +78750,228 @@
           "data/walters/nfl/2026/week-05-current-numbers.json",
           "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
           "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "auditId": "walters-weekly-90-10-2026-w05-to-w06-bal-atl-20261014011600000",
+        "appliedAt": "2026-10-14T01:16:00.000Z",
+        "newGamesUpdated": 1,
+        "newTeamsUpdated": 2,
+        "alreadyAppliedGames": [
+          "2026-W05-TB-DAL"
+        ],
+        "blockedGames": [
+          {
+            "gameKey": "2026-W05-PHI-JAX",
+            "away": "PHI",
+            "home": "JAX",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: PHI OLB Jonathan Greenard was inactive with an ankle injury and JAX S Eric Murray was inactive with a concussion; neither identity is in the saved currentCases snapshot, so both are newly identified historical cases with no governed replacement/value adoption yet. RECOVERY_ACTION: Bind both exact identities and frozen values, establish game-active replacement roles from the final gamebook/depth evidence, and run cluster/double-count review.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: PHI RB Will Shipley (foot), LB Jalyx Hunt (ankle/knee) and DB Michael Carter II (abdomen) were ruled out in-game. The injury monitor establishes the exits but not complete source-bound lost intervals and disjoint replacement duties. Jeremiah Trotter Jr.'s opening-kickoff removal was an ejection, not injury loss. RECOVERY_ACTION: Reconcile the official final gamebook play/status clock and participation for each injury-driven exit, then apply the governed partial-time/replacement method without charging the ejection.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: All archived PHI/JAX Week 5 cases and the final inactive list are available, but full final inactive/DNP, specialist, quarterback-duty and in-game injury coverage has not yet been assembled into an evaluator-ready pair. RECOVERY_ACTION: Promote the saved case estimates and new cases into one complete paired final-game evidence record and run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-CIN-MIA",
+            "away": "CIN",
+            "home": "MIA",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior single Brents no-return premise is corrected: Brents returned from the first injury, then sustained a second injury at Q4 6:33 with no later printed return. Baker, Taaffe and Gordon also have explicit return intervals. Bozeman has an out update but no source-exact departure clock in the gamebook text. RECOVERY_ACTION: Bind exact frozen identities/values and disjoint additional-duty replacements for the second Brents interval and the other printed intervals; use a bounded start range rather than backdating Bozeman's departure; then run defensive-back and paired coverage checks.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Final, frozen kickoff ratings and literal gamebook timelines are bound, but the full paired inactive/DNP, specialist, quarterback-duty and replacement-role sections have not yet passed the evaluator. RECOVERY_ACTION: Promote the complete CIN and MIA team sections with all saved and newly identified cases, recompute governed totals and validate with tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-LV-NE",
+            "away": "LV",
+            "home": "NE",
+            "reasons": [
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: NE FB Reggie Gilliam remains an archived IR case with 0.9 healthy points but no governed cross-position fullback/lead-blocker assignment. RECOVERY_ACTION: Confirm Latu or another exact active identity in the fullback/lead-blocker duty, bind its frozen value, and adopt only through the approved cross-position role method.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: NE RB TreVeyon Henderson (ankle) and OT Will Campbell (knee) were ruled out in-game; exact exit/return coverage and replacement roles are not yet bound. RECOVERY_ACTION: Reconcile official final gamebook timing/participation and disjoint replacements, then calculate approved partial-time losses.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The saved New England secondary and receiver estimates are reusable, but complete paired LV/NE final-game coverage has not been evaluated. RECOVERY_ACTION: Merge archived estimates with final inactive/DNP/QB/specialist and in-game injury coverage and run the weekly evidence evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-MIN-NO",
+            "away": "MIN",
+            "home": "NO",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: MIN TE T.J. Hockenson sustained a concussion and was ruled out in the first quarter. Exact lost interval, relief identity and receiver-cluster implications remain unbound. RECOVERY_ACTION: Use the final gamebook to establish the injury clock and active tight-end relief, then apply the approved partial-time method and receiver eligibility review.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Christian Darrisaw and Donovan Jackson estimates are reusable, but complete paired MIN/NO inactive/DNP, specialist, quarterback-duty and in-game coverage has not yet passed the evaluator. RECOVERY_ACTION: Assemble and validate the complete paired game-day bundle."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-CLE-NYJ",
+            "away": "CLE",
+            "home": "NYJ",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior Joseph Ossai no-return premise is corrected: the gamebook records an actual Q3 10:25 return. Concepcion has an exact early-game injury/out sequence, while Howard and Sanders require literal second-sequence treatment and Sadiq requires a bounded start rather than an invented departure. RECOVERY_ACTION: Bind the exact frozen identities/values and disjoint replacements for Concepcion and every remaining interval; preserve Ossai's actual return and use bounded exposure where the gamebook supplies only a later status update.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs are complete, but saved Jets cases and complete CLE/NYJ inactive, specialist, quarterback and cluster coverage remain to be assembled. RECOVERY_ACTION: Combine the saved pregame estimates with the corrected timelines, recompute both team losses and run the paired evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-IND-PIT",
+            "away": "IND",
+            "home": "PIT",
+            "reasons": [
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: IND DE Arden Key remains an archived 0.2-point IR case without a source-bound active defensive-end allocation; PIT DL Derrick Harmon remains an archived 0.5-point IR case with unresolved defensive-line cluster context. RECOVERY_ACTION: Use final gamebook starters/participation and team role reporting to establish exact active replacements, frozen values and disjoint defensive-line duties for both cases.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: PIT WR Ben Skowronek (calf) and WR Roman Wilson (finger) were ruled out in-game; their intervals, replacement allocations and receiver-cluster treatment are not yet bound. RECOVERY_ACTION: Reconcile final gamebook clock/participation and active receiver duties, then apply approved partial-time and receiver-cluster rules.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Yahya Black's pending availability closes active because he is absent from the official inactive list, but the complete paired game-day bundle remains unvalidated. RECOVERY_ACTION: Assemble every archived/new case and final inactive/DNP, QB and specialist review, then run the weekly evidence evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-HOU-TEN",
+            "away": "HOU",
+            "home": "TEN",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior single Flott-out premise is corrected: Flott returned from the Q2 injury and later entered a distinct questionable/out sequence. Stingley has an explicit 14-second return interval; Pitre has an open fourth-quarter interval. Montgomery and Winston have status updates without source-exact departure plays. RECOVERY_ACTION: Use bounded exposure starts for status-only sequences, preserve the actual Flott and Stingley returns, bind disjoint active replacements and run defensive-back/front cluster review without duplicate whole-game loss.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs plus the saved Jaylin Smith zero-value estimate are reusable, but complete paired inactive/DNP, quarterback, specialist and role coverage is not evaluator-ready. RECOVERY_ACTION: Assemble both complete team sections, recompute governed totals and validate the pair."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-NYG-WAS",
+            "away": "NYG",
+            "home": "WAS",
+            "reasons": [
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: NYG Braxton Berrios remains an archived IR specialist case without governed return-role replacement value; NYG S Jason Pinnock remains out without a disjoint defensive/special-teams allocation. RECOVERY_ACTION: Bind the final active return inventory and a source-bound specialist method for Berrios; establish disjoint defensive and special-teams duties for Pinnock with exact frozen identities.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: NYG RT Jermaine Eluemunor (calf) did not return. Exact exit time, relief identity and offensive-line role chain are not yet reconciled. RECOVERY_ACTION: Use the overtime gamebook clock/participation and final line assignments to establish the partial interval and any governed role chain.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Washington and other Giants cases remain reusable, but the complete paired final-game coverage has not passed the evaluator. RECOVERY_ACTION: Merge all archived/new cases with final inactive/DNP, QB and specialist coverage and run the evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-CHI-GB",
+            "away": "CHI",
+            "home": "GB",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: CHI LB T.J. Edwards (hamstring) was ruled out in-game. Exact lost interval, relief identity and linebacker cluster context are not yet bound. RECOVERY_ACTION: Reconcile the official final gamebook clock/participation and a disjoint active linebacker replacement, then calculate the approved partial-time loss.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Kyle Monangai and Edgerrin Cooper estimates are reusable, but complete paired inactive/DNP, QB, specialist and in-game coverage remains unvalidated. RECOVERY_ACTION: Assemble the full paired game-day record and run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-DEN-LAC",
+            "away": "DEN",
+            "home": "LAC",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Final injury/inactive evidence identifies DEN CB Riley Moss and CB Patrick Surtain II, plus LAC WR Quentin Johnston, WR Brenen Thompson, OT Joe Alt, G Kayode Awosika, OL Trevor Penning, CB Donte Jackson and S Derwin James as injury-driven pregame absences. The saved ledger contains only the continuing LAC Rashawn Slater case, so the listed identities, frozen values, replacements and group safeguards remain unadopted. RECOVERY_ACTION: Bind each exact player identity/value, distinguish roster-list status from final inactive/DNP participation, establish disjoint game-active replacements and run offensive-line, receiver and defensive-back cluster review.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: DEN S Talanoa Hufanga was ruled out in-game with an ankle injury; exact lost interval and relief role are not yet bound. RECOVERY_ACTION: Reconcile the final gamebook play/status clock and safety participation, then apply the approved partial-time method without inferring active impairment.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Complete inactive/DNP, specialist, quarterback-duty and every printed injury/return sequence has not yet been assembled into one paired evaluator-ready record. RECOVERY_ACTION: Merge the saved Slater estimate with all new cases and final gamebook coverage, then run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-DET-ARI",
+            "away": "DET",
+            "home": "ARI",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The earlier no-additional-in-game-loss inference is retired. The official final gamebook contains five distinct printed injury sequences: White, Kennedy, Baker, Williams and Nolen. Baker and Nolen have explicit returns; Kennedy has an exact injury play; White and Williams require bounded starts where applicable. RECOVERY_ACTION: Bind frozen identities/values and disjoint replacements for all five sequences, then combine them with every pregame absence and perform offensive-line, defensive-back, linebacker and receiver/return-role safeguards.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs are complete, but the saved Arizona estimates and newly identified Detroit/Arizona pregame and in-game cases have not passed one complete paired evaluator record. RECOVERY_ACTION: Assemble complete DET and ARI coverage, recompute both governed totals and run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-SF-SEA",
+            "away": "SF",
+            "home": "SEA",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior Drake Thomas open-through-game-end premise is corrected: the gamebook records an actual Q4 14:11 return. Cowing and Kareem also have explicit returns; Samuel has an injury/out sequence. Greenlaw remains a non-injury ejection exclusion. RECOVERY_ACTION: Bind frozen values, exact exposure intervals and disjoint additional-duty replacements for Thomas, Samuel, Cowing and Kareem; preserve all actual returns and exclude the ejection.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: The archived Juszczyk and Charbonnet vacancies, newly identified pregame absences and the corrected in-game intervals still lack one complete disjoint role allocation and paired cluster review. RECOVERY_ACTION: Adopt supported primary or approved committee duties, reserve each added role once, assemble both team sections and run the evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-BUF-LAR",
+            "away": "BUF",
+            "home": "LAR",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Buffalo's concurrent DJ Moore and Joshua Palmer injury-driven inactive vacancies are now final, and Skyler Bell is confirmed active with two targets. The available evidence does not disjointly allocate Bell and the remaining active receiver duties between the two vacancy cases, so neither missing value is treated as zero and no overlapping replacement credit is invented. RECOVERY_ACTION: Complete one receiver-cluster review using the saved Moore/Palmer values and the established active candidate set; apply either supported role weights or the approved explicitly assumed equal-share committee while reserving each added duty once.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Dee Alford and Landon Jackson are final injury-driven inactives. Their frozen values and candidate sets are available, but the gamebook does not by itself establish Alford's nickel allocation or Jackson's added defensive-line duty allocation; both require promotion with defensive-back/defensive-line cluster safeguards. RECOVERY_ACTION: Use the saved official role sources and final activation inventory to select a documented primary or supported/equal-share committee for each added vacancy duty, then run the full Buffalo team evaluator without duplicating Oliver/Carter duties.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: The gamebook newly binds Buffalo Spencer Brown's 2,667-second absence and exact short partial-injury intervals for C.J. Gardner-Johnson, Terrel Bernard and Christian Benford, plus the Rams' Jaylen Watson interval. Frozen healthy values are available, but each interval still needs an approved additional-duty replacement binding and disjoint offensive-line/defensive-back cluster evaluation. Brown's return-questionable line is not treated as a return. RECOVERY_ACTION: Bind documented active replacements or supported committees, evaluate only the exact intervals over the 4,085-second game and preserve the actual-return clocks; do not duplicate inactive or baseline duties.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Ed Oliver's saved Oliver-to-Carter individual model review remains reusable and Quentin Lake is closed active. Oliver's 0.9 saved estimate still requires adoption inside complete Buffalo defensive-line coverage alongside inactive Landon Jackson; the remaining Rams inactive/DNP inventory and all zero-loss exclusions need explicit paired certification. RECOVERY_ACTION: Promote the passing Oliver case through the complete Buffalo team section, certify the full Los Angeles inactive/DNP inventory, recompute both governed team totals and run tools/graham-weekly-evidence.mjs before any READY state."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          }
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+          "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+          "data/walters/nfl/2026/week-05-current-numbers.json",
+          "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+          "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+          "https://www.nfl.com/injuries/league/2026/reg5"
         ],
         "marketViewed": false
       }
