@@ -1,91 +1,338 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
-  "runEventId": "graham-delta-1645-2026-w06-20261013T170837-0700",
-  "sourceTask": "DELTA_1645",
   "season": 2026,
   "week": 6,
-  "startedAt": "2026-10-13T17:08:37-07:00",
-  "effectiveAt": "2026-10-13T17:14:52-07:00",
+  "batchId": "graham-daily-review-2026-w06-20261014T113210-0700-personnel-01",
+  "effectiveAt": "2026-10-14T18:43:46Z",
+  "startedAt": "2026-10-14T11:32:10-07:00",
+  "sourceTask": "DAILY_REVIEW",
   "marketViewed": false,
-  "valueSupplements": [],
   "cases": [
     {
-      "caseKey": "2026-W06-CHI-Montez-Sweat",
-      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-chi-montez-sweat",
-      "gameKey": "2026-W06-CHI-ATL",
-      "team": "CHI",
-      "side": "AWAY",
-      "player": "Montez Sweat",
-      "playerEaId": "20411",
-      "availabilityStatus": "SUSPENDED",
-      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
-      "failClosedCode": "REVIEW_REQUIRED_DEFENSIVE_LINE_ROLE_ALLOCATION",
-      "reason": "Bears officially suspended Montez Sweat for Weeks 6-7 and activated Shemar Turner from PUP, but no source verifies Turner's full edge role. Booker already has defensive snaps and Odeyingbo has an injury issue. Calibrated Sweat 0.9, Turner/Booker/Davenport/Odeyingbo 0.2 each, Hardy 0.0. Do not displace a starter or double-credit a DL role.",
-      "sourceRefs": [
-        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026",
-        "https://www.reuters.com/sports/bears-de-montez-sweat-suspended-2-games-ped-violation--flm-2026-10-13/",
-        "https://www.chicagobears.com/team/players-roster/",
-        "https://www.chicagobears.com/team/players-roster/austin-booker/",
-        "data/walters/nfl/player-values/by-team-v1/chi.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
-      ],
+      "caseKey": "2026-W06-GB-Javon-Hargrave",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-gb-javon-hargrave",
+      "gameKey": "2026-W06-DAL-GB",
+      "team": "GB",
+      "side": "HOME",
+      "player": "Javon Hargrave",
+      "playerEaId": "17670",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Season-ending Achilles absence is confirmed in the current Week6 club matchup update. October13 depth lists Jonathan Ford directly behind Hargrave and the current roster binds Ford active. Use the acknowledged primary available-depth estimate; not confirmed workload.",
       "availabilitySourceRefs": [
-        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026"
+        "https://www.dallascowboys.com/news/impact-offseason-2026"
       ],
       "roleSourceRefs": [
-        "https://www.chicagobears.com/team/players-roster/",
-        "https://www.chicagobears.com/team/players-roster/austin-booker/"
+        "https://www.packers.com/team/depth-chart",
+        "https://www.packers.com/team/players-roster/"
       ],
-      "reopenOn": "Wednesday Chicago injury report and actual edge-depth allocation for Turner, Booker, Davenport, Odeyingbo; stage a supported disjoint replacement estimate through personnel production.",
+      "sourceRefs": [
+        "https://www.dallascowboys.com/news/impact-offseason-2026",
+        "https://www.packers.com/team/depth-chart",
+        "https://www.packers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/gb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "reopenOn": "Reopen on new final availability, a change in the current replacement identity or duties, or another simultaneous absence requiring whole-group review.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Allocate only Hargrave's additional vacant DT duties to the documented available depth reserve Ford; reopen on a different declared rotation.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Preserve the reserve's existing baseline rotation or specialist duties; allocate only the additional duties vacated by this unavailable player. No independent baseline starter is replaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.packers.com/team/depth-chart",
+          "https://www.packers.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Jonathan Ford",
+            "eaPlayerId": "22454",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Direct reserve in Hargrave's DT column; retain any existing rotational work.",
+            "sourceRefs": [
+              "https://www.packers.com/team/depth-chart",
+              "https://www.packers.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Shemar Turner",
-          "Austin Booker",
-          "Marcus Davenport",
-          "Dayo Odeyingbo",
-          "Daniel Hardy"
+          "Jonathan Ford"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      }
+    },
+    {
+      "caseKey": "2026-W06-GB-Edgerrin-Cooper",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-gb-edgerrin-cooper",
+      "gameKey": "2026-W06-DAL-GB",
+      "team": "GB",
+      "side": "HOME",
+      "player": "Edgerrin Cooper",
+      "playerEaId": "14902",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Reuse the saved source-supported McDuffie/Hopper equal-additional-duty assumption, revalidated by official Week5 platoon reporting and current Week6 active roster/depth. Cooper remains on IR. Equal allocation is a labelled Graham estimate, not measured shares.",
+      "availabilitySourceRefs": [
+        "https://www.packers.com/team/players-roster/",
+        "https://www.packers.com/news/lb-edgerrin-cooper-is-tough-one-to-lose-for-packers-oct-5-2026"
+      ],
+      "roleSourceRefs": [
+        "https://www.packers.com/news/game-notes-xavier-mckinney-leads-packers-5-takeaway-day-week-5-2026",
+        "https://www.packers.com/team/depth-chart",
+        "https://www.packers.com/team/players-roster/"
+      ],
+      "sourceRefs": [
+        "https://www.packers.com/team/players-roster/",
+        "https://www.packers.com/news/lb-edgerrin-cooper-is-tough-one-to-lose-for-packers-oct-5-2026",
+        "https://www.packers.com/news/game-notes-xavier-mckinney-leads-packers-5-takeaway-day-week-5-2026",
+        "https://www.packers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/gb.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "reopenOn": "Reopen on new final availability, a change in the current replacement identity or duties, or another simultaneous absence requiring whole-group review.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Official reporting identifies the McDuffie/Hopper platoon in Cooper's vacated linebacker spot; no complete shares are supplied, so preserve the approved equal allocation of additional vacant duties.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "McDuffie and Hopper retain all pre-existing rotation and specialist duties; only Cooper's additional vacated duties are shared. Zaire Franklin remains in his independent baseline role and receives no replacement credit.",
+        "baselineSourceIds": [
+          "https://www.packers.com/news/game-notes-xavier-mckinney-leads-packers-5-takeaway-day-week-5-2026",
+          "https://www.packers.com/team/depth-chart",
+          "https://www.packers.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Isaiah McDuffie",
+            "eaPlayerId": "21903",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official club reporting identifies him in Cooper's vacancy platoon; current roster active.",
+            "sourceRefs": [
+              "https://www.packers.com/news/game-notes-xavier-mckinney-leads-packers-5-takeaway-day-week-5-2026",
+              "https://www.packers.com/team/depth-chart",
+              "https://www.packers.com/team/players-roster/"
+            ]
+          },
+          {
+            "player": "Ty'Ron Hopper",
+            "eaPlayerId": "14910",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official club reporting identifies him in Cooper's vacancy platoon; current roster active.",
+            "sourceRefs": [
+              "https://www.packers.com/news/game-notes-xavier-mckinney-leads-packers-5-takeaway-day-week-5-2026",
+              "https://www.packers.com/team/depth-chart",
+              "https://www.packers.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Isaiah McDuffie",
+          "Ty'Ron Hopper"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
         "replacementClassification": "COMMITTEE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       }
     },
     {
-      "caseKey": "2026-W06-CAR-Cam-Jackson",
-      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-car-cam-jackson",
-      "gameKey": "2026-W06-CAR-PHI",
-      "team": "CAR",
+      "caseKey": "2026-W06-LAC-Rashawn-Slater",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-lac-rashawn-slater",
+      "gameKey": "2026-W06-LAC-KC",
+      "team": "LAC",
       "side": "AWAY",
-      "player": "Cam Jackson",
-      "playerEaId": "15207",
+      "player": "Rashawn Slater",
+      "playerEaId": "21541",
       "availabilityStatus": "IR",
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "Carolina officially placed Cam Jackson on IR Tuesday with a shoulder issue; frozen healthy Walters value is exactly zero. Team reports Wharton and others returning to practice but no assumed replacement workload.",
-      "sourceRefs": [
-        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne",
-        "data/walters/nfl/player-values/by-team-v1/car.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
-      ],
+      "reason": "Official ankle-surgery/IR evidence is preserved; the updated Week6 depth article names Travis Burke at LT. Reuse the previously accepted single-vacancy primary replacement model with current depth confirmation. Other OL roles are not credited to Burke.",
       "availabilitySourceRefs": [
-        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne"
+        "https://www.chargers.com/news/rashawn-slater-injury-update"
       ],
       "roleSourceRefs": [
-        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne"
+        "https://www.chargers.com/news/depth-chart-2026-season",
+        "https://www.chargers.com/team/players-roster/"
       ],
-      "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+      "sourceRefs": [
+        "https://www.chargers.com/news/rashawn-slater-injury-update",
+        "https://www.chargers.com/news/depth-chart-2026-season",
+        "https://www.chargers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/lac.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "reopenOn": "Reopen on new final availability, a change in the current replacement identity or duties, or another simultaneous absence requiring whole-group review.",
       "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Allocate only Slater's vacant left-tackle duties to Burke, who is the current listed starter after entering from reserve depth.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Preserve the reserve's existing baseline rotation or specialist duties; allocate only the additional duties vacated by this unavailable player. No independent baseline starter is replaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.chargers.com/news/depth-chart-2026-season",
+          "https://www.chargers.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Travis Burke",
+            "eaPlayerId": "16280",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Week6 listed LT replacing Slater; no duplicate role assigned.",
+            "sourceRefs": [
+              "https://www.chargers.com/news/depth-chart-2026-season",
+              "https://www.chargers.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Travis Burke"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      }
+    },
+    {
+      "caseKey": "2026-W06-ARI-Paris-Johnson-Jr",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-ari-paris-johnson-jr",
+      "gameKey": "2026-W06-ARI-LAR",
+      "team": "ARI",
+      "side": "AWAY",
+      "player": "Paris Johnson Jr",
+      "playerEaId": "22699",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Official roster evidence confirms Johnson remains unavailable on IR; current Cardinals depth lists Jayden Williams at LT. The separate Isaiah Adams RG vacancy is enumerated with frozen zero-loss proof. No two roles assigned to Williams.",
+      "availabilitySourceRefs": [
+        "https://www.azcardinals.com/news/cardinals-guard-isaiah-adams-placed-on-injured-reserve"
+      ],
+      "roleSourceRefs": [
+        "https://www.azcardinals.com/team/depth-chart",
+        "https://www.azcardinals.com/team/players-roster/"
+      ],
+      "sourceRefs": [
+        "https://www.azcardinals.com/news/cardinals-guard-isaiah-adams-placed-on-injured-reserve",
+        "https://www.azcardinals.com/team/depth-chart",
+        "https://www.azcardinals.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ari.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "reopenOn": "Reopen on new final availability, a change in the current replacement identity or duties, or another simultaneous absence requiring whole-group review.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Reuse the previously governed Johnson-to-Williams assignment with the current roster/depth revalidation; only additional LT duties counted.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Preserve the reserve's existing baseline rotation or specialist duties; allocate only the additional duties vacated by this unavailable player. No independent baseline starter is replaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.azcardinals.com/team/depth-chart",
+          "https://www.azcardinals.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Jayden Williams",
+            "eaPlayerId": "16379",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current Cardinals LT in Johnson's vacated position; no independent role is displaced.",
+            "sourceRefs": [
+              "https://www.azcardinals.com/team/depth-chart",
+              "https://www.azcardinals.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Jayden Williams"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      }
+    },
+    {
+      "caseKey": "2026-W06-ARI-Isaiah-Adams",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-ari-isaiah-adams",
+      "gameKey": "2026-W06-ARI-LAR",
+      "team": "ARI",
+      "side": "AWAY",
+      "player": "Isaiah Adams",
+      "playerEaId": "14716",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Official October10 IR move is still current on the Week6 roster. Enumerate this simultaneous RG absence alongside Paris Johnson; the frozen healthy value is calibrated zero, so no missing replacement value or extra OL penalty is invented.",
+      "availabilitySourceRefs": [
+        "https://www.azcardinals.com/news/cardinals-guard-isaiah-adams-placed-on-injured-reserve",
+        "https://www.azcardinals.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.azcardinals.com/news/cardinals-guard-isaiah-adams-placed-on-injured-reserve",
+        "https://www.azcardinals.com/team/depth-chart"
+      ],
+      "sourceRefs": [
+        "https://www.azcardinals.com/news/cardinals-guard-isaiah-adams-placed-on-injured-reserve",
+        "https://www.azcardinals.com/team/depth-chart",
+        "https://www.azcardinals.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ari.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "reopenOn": "Reopen on return, role change or other simultaneous OL loss.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
         "resolution": "ZERO_CALIBRATED_LOSS",
         "estimateAcknowledged": true,
-        "assumptionRationale": "Frozen calibrated healthy value for Cam Jackson is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "assumptionRationale": "Frozen Isaiah Adams healthy value is calibrated exactly zero and the nonnegative injury-loss floor proves zero; no missing replacement value is assigned zero.",
         "replacements": []
       },
       "closureReview": {
@@ -103,33 +350,58 @@
       }
     },
     {
-      "caseKey": "2026-W06-CLE-Raheim-Sanders",
-      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-cle-raheim-sanders",
-      "gameKey": "2026-W06-BAL-CLE",
-      "team": "CLE",
-      "side": "HOME",
-      "player": "Raheim Sanders",
-      "playerEaId": "15032",
-      "availabilityStatus": "IR",
+      "caseKey": "2026-W06-CHI-Montez-Sweat",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-chi-montez-sweat",
+      "gameKey": "2026-W06-CHI-ATL",
+      "team": "CHI",
+      "side": "AWAY",
+      "player": "Montez Sweat",
+      "playerEaId": "20411",
+      "availabilityStatus": "SUSPENDED",
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "Cleveland officially placed Raheim Sanders on IR with a hip injury and signed Audric Estime. Frozen Sanders healthy value is zero, so the existing zero-loss proof avoids assuming a replacement role/share.",
-      "sourceRefs": [
-        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/",
-        "data/walters/nfl/player-values/by-team-v1/cle.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
-      ],
+      "reason": "Montez Sweat is confirmed suspended. Current roster binds Austin Booker active and the last official depth chart identifies Booker as Sweat's immediate reserve. Apply the permitted documented-depth estimate of additional vacant duties while preserving Booker's existing rotation; do not infer that previous reserve snaps displaced a baseline starter. Shemar Turner's activation alone is not made a full-edge role assignment.",
       "availabilitySourceRefs": [
-        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/"
+        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026",
+        "https://www.chicagobears.com/team/players-roster/"
       ],
       "roleSourceRefs": [
-        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/"
+        "https://www.chicagobears.com/team/depth-chart",
+        "https://www.chicagobears.com/team/players-roster/"
       ],
-      "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+      "sourceRefs": [
+        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026",
+        "https://www.chicagobears.com/team/players-roster/",
+        "https://www.chicagobears.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/chi.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "reopenOn": "Reopen on new final availability, a change in the current replacement identity or duties, or another simultaneous absence requiring whole-group review.",
       "replacementModel": {
-        "resolution": "ZERO_CALIBRATED_LOSS",
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
         "estimateAcknowledged": true,
-        "assumptionRationale": "Frozen calibrated healthy value for Raheim Sanders is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
-        "replacements": []
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "assumptionRationale": "Acknowledged primary available-depth allocation to Booker based on the source-bound reserve chain; no definitive starter announcement or measured workload is claimed.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Preserve the reserve's existing baseline rotation or specialist duties; allocate only the additional duties vacated by this unavailable player. No independent baseline starter is replaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.chicagobears.com/team/depth-chart",
+          "https://www.chicagobears.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Austin Booker",
+            "eaPlayerId": "14875",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Sweat's direct listed edge reserve, currently active; allocate only added vacancy duties.",
+            "sourceRefs": [
+              "https://www.chicagobears.com/team/depth-chart",
+              "https://www.chicagobears.com/team/players-roster/"
+            ]
+          }
+        ]
       },
       "closureReview": {
         "availabilityVerified": true,
@@ -137,7 +409,87 @@
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Audric Estime"
+          "Austin Booker",
+          "Shemar Turner",
+          "Daniel Hardy"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      }
+    },
+    {
+      "caseKey": "2026-W06-DEN-Talanoa-Hufanga",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-den-talanoa-hufanga",
+      "gameKey": "2026-W06-SEA-DEN",
+      "team": "DEN",
+      "side": "HOME",
+      "player": "Talanoa Hufanga",
+      "playerEaId": "21488",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Current originating report says Hufanga is expected to miss multiple weeks; formal Wednesday game designation remains pending. This is a reported expected absence, not an official final OUT claim. Current role reporting identifies Devon Key as next man up after replacing Hufanga; the depth-chart Skinner alternative and Tycen Anderson were reviewed and have the same locked zero value. Surtain and Moss remain uncertain; no CB penalty or extra DB cluster factor is invented.",
+      "availabilitySourceRefs": [
+        "https://amp.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-oct-14",
+        "https://www.denverbroncos.com/news/injury-report-cb-riley-moss-remains-limited-practice-participant-ahead-of-week-6-game-vs-seahawks"
+      ],
+      "roleSourceRefs": [
+        "https://www.milehighreport.com/denver-broncos-injuries/188883/broncos-safety-talanoa-hufanga-could-be-out-2-3-weeks-with-ankle-injury",
+        "https://www.denverbroncos.com/team/depth-chart/",
+        "https://www.denverbroncos.com/team/players-roster/"
+      ],
+      "sourceRefs": [
+        "https://amp.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-oct-14",
+        "https://www.denverbroncos.com/news/injury-report-cb-riley-moss-remains-limited-practice-participant-ahead-of-week-6-game-vs-seahawks",
+        "https://www.milehighreport.com/denver-broncos-injuries/188883/broncos-safety-talanoa-hufanga-could-be-out-2-3-weeks-with-ankle-injury",
+        "https://www.denverbroncos.com/team/depth-chart/",
+        "https://www.denverbroncos.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/den.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "reopenOn": "Reopen on new final availability, a change in the current replacement identity or duties, or another simultaneous absence requiring whole-group review.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "primaryEvidence": "REPORTED_PRIMARY",
+        "assumptionRationale": "Use the currently reported primary safety replacement Key for Hufanga's additional duties. The official depth chart's Skinner alternative is disclosed; all reviewed reserve candidates are value-invariant at zero, while Brandon Jones's independent starter duties are excluded.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Preserve the reserve's existing baseline rotation or specialist duties; allocate only the additional duties vacated by this unavailable player. No independent baseline starter is replaced or credited twice.",
+        "baselineSourceIds": [
+          "https://www.milehighreport.com/denver-broncos-injuries/188883/broncos-safety-talanoa-hufanga-could-be-out-2-3-weeks-with-ankle-injury",
+          "https://www.denverbroncos.com/team/depth-chart/",
+          "https://www.denverbroncos.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Devon Key",
+            "eaPlayerId": "22623",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current role report identifies Key for the added safety vacancy; preserve special-teams and reserve baseline work.",
+            "sourceRefs": [
+              "https://www.milehighreport.com/denver-broncos-injuries/188883/broncos-safety-talanoa-hufanga-could-be-out-2-3-weeks-with-ankle-injury",
+              "https://www.denverbroncos.com/team/depth-chart/",
+              "https://www.denverbroncos.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "availabilityEvidenceStatus": "REPORTED_EXPECTED_ABSENCE_PENDING_FINAL_DESIGNATION",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Devon Key",
+          "JL Skinner",
+          "Tycen Anderson"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
