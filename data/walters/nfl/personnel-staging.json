@@ -1,58 +1,156 @@
 {
   "schema": 1,
   "state": "READY",
+  "productionId": "walters-personnel-production-v1",
   "season": 2026,
   "week": 6,
-  "batchId": "graham-daily-review-2026-w06-20261014T113210-0700-personnel-02",
-  "effectiveAt": "2026-10-14T18:50:49Z",
-  "startedAt": "2026-10-14T11:32:10-07:00",
+  "batchId": "graham-daily-review-2026-w06-20261014T120511-0700-personnel-01",
+  "effectiveAt": "2026-10-14T19:12:51Z",
   "sourceTask": "DAILY_REVIEW",
   "marketViewed": false,
   "cases": [
     {
-      "caseKey": "2026-W06-LAR-Alaric-Jackson",
-      "personnelEventId": "graham-daily-review-2026-w06-20261014T113210-0700-lar-alaric-jackson-appeal",
-      "gameKey": "2026-W06-ARI-LAR",
-      "team": "LAR",
+      "gameKey": "2026-W06-WAS-SF",
+      "team": "SF",
       "side": "HOME",
-      "player": "Alaric Jackson",
-      "playerEaId": "21997",
-      "availabilityStatus": "SUSPENDED",
-      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
-      "failClosedCode": "CURRENT_AVAILABILITY_SUSPENSION_APPEAL_PENDING",
-      "replacementPlayer": "David Quessenberry",
-      "replacementEaId": "1732",
-      "reason": "NFL announced two-game suspension after Tuesday's verified Delta cutoff. Updated originating report says Jackson plans to appeal. Quessenberry is the source-bound active reserve and current reported replacement with frozen value resolved, but Week6 suspension/appeal outcome is not final. Preserve the current fair; only availability/appeal disposition remains to close before any governed loss.",
       "sourceRefs": [
-        "https://www.nfl.com/news/rams-lt-alaric-jackson-suspended-two-games-for-striking-bradley-chubb-following-monday-night-s-game",
-        "https://www.therams.com/team/depth-chart",
-        "https://www.therams.com/team/players-roster/",
-        "https://www.latimes.com/sports/rams/story/2026-10-13/rams-alaric-jackson-suspended-two-games-for-punching-bills-player",
-        "data/walters/nfl/player-values/by-team-v1/lar.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json"
+        "https://www.nbcsportsbayarea.com/nfl/san-francisco-49ers/nfl-dre-greenlaws-suspension-upheld-appeal/1971125/",
+        "https://fieldlevelmedia.com/news/49ers-lb-dre-greenlaws-appeal-denied-will-miss-game-vs-commanders/",
+        "https://www.49ers.com/news/after-further-review-shanahan-on-49ers-win-over-seahawks-provides-injury-updates",
+        "https://sfstandard.com/2026/10/12/jaden-dugger-49ers-linebacker-dre-greenlaw-suspension/",
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/sf.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "tools/graham-replacement-model.mjs"
       ],
       "availabilitySourceRefs": [
-        "https://www.nfl.com/news/rams-lt-alaric-jackson-suspended-two-games-for-striking-bradley-chubb-following-monday-night-s-game"
+        "https://www.nbcsportsbayarea.com/nfl/san-francisco-49ers/nfl-dre-greenlaws-suspension-upheld-appeal/1971125/",
+        "https://fieldlevelmedia.com/news/49ers-lb-dre-greenlaws-appeal-denied-will-miss-game-vs-commanders/",
+        "https://www.49ers.com/news/after-further-review-shanahan-on-49ers-win-over-seahawks-provides-injury-updates"
       ],
       "roleSourceRefs": [
-        "https://www.therams.com/team/depth-chart",
-        "https://www.therams.com/team/players-roster/"
+        "https://www.49ers.com/news/after-further-review-shanahan-on-49ers-win-over-seahawks-provides-injury-updates",
+        "https://sfstandard.com/2026/10/12/jaden-dugger-49ers-linebacker-dre-greenlaw-suspension/",
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/"
       ],
-      "reopenOn": "DELTA_1645 or DAILY_REVIEW: verify the league appeal outcome/effective Week6 suspension, reuse already bound Jackson/Quessenberry identity/value/depth evidence and stage the supported current loss; do not redo generic replacement research.",
+      "marketViewed": false,
+      "caseKey": "2026-W06-SF-Dre-Greenlaw",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T120511-0700-sf-dre-greenlaw-appeal-denied",
+      "player": "Dre Greenlaw",
+      "playerEaId": "20475",
+      "availabilityStatus": "SUSPENDED",
+      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
+      "failClosedCode": "LINEBACKER_BASELINE_ROLE_CHAIN_OUTSIDE_CURRENT_ADAPTER",
+      "replacementPlayer": "Jaden Dugger",
+      "replacementEaId": "16324",
+      "reason": "October13 league appeal decision upheld Greenlaw's one-game suspension for Week6 Washington; prior pending-appeal availability is now resolved. Locked healthy1.200 and Dugger0.000/Gifford0.000 values are available; no value is missing. Current official depth lists Dugger as baseline SAM, Greenlaw WILL with Wallow reserve, and Warner MIKE. Wallow also expected absent multiple weeks. Current originating role report describes Dugger taking Greenlaw WILL and Gifford third-LB duties. That is a displaced linebacker-baseline chain, not an unchanged-duty primary replacement. Existing role-chain adapter permits OL/receiver only; do not pretend Dugger has no baseline or charge Wallow again. No numeric move pending a separately supported nondisplacing additional-duty allocation or governed linebacker chain permission.",
+      "reopenOn": "CURRENT_WEEK_RESEARCH_AND_PRODUCTION before October19 kickoff: reuse Greenlaw/Dugger/Gifford frozen IDs/values and confirmed suspension; establish a source-bound additional-duty allocation preserving Dugger's SAM baseline, or route exact LB role-chain limitation to existing personnel model/calibration owner. Do not redo suspension/value searches or put a baseline starter into the ordinary primary adapter.",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "David Quessenberry"
+          "Jaden Dugger",
+          "Luke Gifford",
+          "Tatum Bethune"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
-        "replacementClassification": "ONE_FOR_ONE",
+        "replacementClassification": "MULTIROLE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "clusterContext": {
+        "group": "LINEBACKER",
+        "reviewStatus": "COMPLETE_INVENTORY_NUMERIC_ALLOCATION_UNRESOLVED",
+        "currentCaseKeys": [
+          "2026-W06-SF-Dre-Greenlaw",
+          "2026-W06-SF-Garret-Wallow"
+        ],
+        "absences": [
+          {
+            "player": "Dre Greenlaw",
+            "status": "SUSPENDED_FINAL_AFTER_APPEAL",
+            "value": 1.2
+          },
+          {
+            "player": "Garret Wallow",
+            "status": "REPORTED_EXPECTED_MULTI_WEEK_ABSENCE_PENDING_FINAL_DESIGNATION",
+            "value": 0
+          }
+        ],
+        "baselineExcluded": [
+          {
+            "player": "Jaden Dugger",
+            "role": "SAM"
+          },
+          {
+            "player": "Fred Warner",
+            "role": "MIKE"
+          }
+        ],
+        "roleChain": "Dugger SAM->WILL; Gifford reserve->third LB; Wallow unavailable. Exact disjoint chain is not currently an enabled LB adapter."
+      }
+    },
+    {
+      "gameKey": "2026-W06-WAS-SF",
+      "team": "SF",
+      "side": "HOME",
+      "sourceRefs": [
+        "https://www.nbcsportsbayarea.com/nfl/san-francisco-49ers/nfl-dre-greenlaws-suspension-upheld-appeal/1971125/",
+        "https://fieldlevelmedia.com/news/49ers-lb-dre-greenlaws-appeal-denied-will-miss-game-vs-commanders/",
+        "https://www.49ers.com/news/after-further-review-shanahan-on-49ers-win-over-seahawks-provides-injury-updates",
+        "https://sfstandard.com/2026/10/12/jaden-dugger-49ers-linebacker-dre-greenlaw-suspension/",
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/sf.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "tools/graham-replacement-model.mjs"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.nbcsportsbayarea.com/nfl/san-francisco-49ers/nfl-dre-greenlaws-suspension-upheld-appeal/1971125/",
+        "https://fieldlevelmedia.com/news/49ers-lb-dre-greenlaws-appeal-denied-will-miss-game-vs-commanders/",
+        "https://www.49ers.com/news/after-further-review-shanahan-on-49ers-win-over-seahawks-provides-injury-updates"
+      ],
+      "roleSourceRefs": [
+        "https://www.49ers.com/news/after-further-review-shanahan-on-49ers-win-over-seahawks-provides-injury-updates",
+        "https://sfstandard.com/2026/10/12/jaden-dugger-49ers-linebacker-dre-greenlaw-suspension/",
+        "https://www.49ers.com/team/depth-chart",
+        "https://www.49ers.com/team/players-roster/"
+      ],
+      "marketViewed": false,
+      "caseKey": "2026-W06-SF-Garret-Wallow",
+      "personnelEventId": "graham-daily-review-2026-w06-20261014T120511-0700-sf-garret-wallow-zero-loss",
+      "player": "Garret Wallow",
+      "playerEaId": "21683",
+      "availabilityStatus": "OUT",
+      "availabilityEvidenceStatus": "REPORTED_EXPECTED_ABSENCE_PENDING_FINAL_DESIGNATION",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Current official Shanahan injury update says Wallow will miss at least a couple of weeks with hamstring injury. Report-qualified expected Week6 absence, not an invented final team OUT designation. Frozen healthy value is calibrated exactly zero, so existing nonnegative loss floor proves zero. Paired Greenlaw suspension/Wallow linebacker inventory reviewed; do not invent a replacement or duplicate added duties while Greenlaw displaced-role chain remains separately blocked.",
+      "reopenOn": "Reopen on formal current availability/return, value-source conflict or a different additional-duty allocation affecting simultaneous LB inventory; retain calibrated zero proof.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Wallow frozen healthy value is calibrated exactly0.000 and nonnegative loss floor proves0.000; no replacement identity/value is fabricated and no second charge for Greenlaw's vacancy is created.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
       }
     }
   ]
