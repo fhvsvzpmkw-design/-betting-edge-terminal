@@ -13,6 +13,10 @@ This is the common execution contract for the five existing Graham tasks. Resolv
 
 This consolidation preserves all task-specific football scope, source methodology, numeric permissions, calculator ownership and market isolation. It clarifies durable start/completion order and source access. It does not grant BET authority, expand calibration or resolve blocked weekly rating inputs. Where copied task text says to create a run ID at the completion step, reuse the single ID created at the start instead.
 
+## Scheduled execution authorization and failure recovery — October 14
+
+The user has already authorized each existing scheduled task's routine connected GitHub reads and task-specific governed runtime, evidence, staging, receipt and workflow writes in this repository on `main`. Continue those operations without asking for the same GitHub approval or asking whether to resume after access succeeds. Use the saved GitHub app-specific permission; a fresh execution workspace or a different global default does not revoke it. This does not expand any task's numeric authority or override a genuine platform-enforced connection requirement or denial. Report the exact denied/failed action and returned reason, retain saved evidence and follow the controlled-failure lifecycle when access permits. A permission request, transient error, source blocker or incomplete execution does not authorize pausing, disabling, deleting or rescheduling the recurring task. Do not disable it as error cleanup; only an explicit user instruction may change activation or timing.
+
 ## Research lifecycle — four research tasks only
 
 Applies to TUESDAY_BASELINE, DAILY_REVIEW, DELTA_1645 and SUNDAY_PREGAME. WEEK_ROLLOVER follows the separate mechanical activation order below.

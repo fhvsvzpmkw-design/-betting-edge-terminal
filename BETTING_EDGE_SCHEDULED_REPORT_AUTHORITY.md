@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-08.3
+**Operating revision:** 2026-10-14.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -18,6 +18,12 @@ For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer
 4. `BETTING_EDGE_CONTRACT.md` v1.0 remains OPERATIONAL. Its older universal independent-fair and research-first wording does not override the current status-specific market route or sequence here. There is no universal forecast-search completion gate or card quota.
 
 An actual authority/identity conflict must be resolved before using the affected input. Do not treat documented component version differences or explicitly superseded ordering as conflicts. Do not bypass a validator or edit evidence merely to make it pass.
+
+## Scheduled execution authorization and failure recovery — October 14
+
+The user has authorized recurring production in this connected repository on `main`, including the governed checkpoint, staging, receipt and workflow writes required by the existing report pipeline. Routine execution of this task is already authorized; do not ask the user to approve GitHub access, resume the run, save the checkpoint or publish a validated candidate again. Use the connected GitHub tools with the saved app-specific permission. A tool being newly exposed, a fresh execution workspace or the global default differing from GitHub's app-specific setting is not a revocation of that authorization.
+
+Verify actual access with a repository read, then proceed with the authorized producer sequence. Persist and remotely verify the complete initial controller checkpoint immediately after `start`, before broad event research, and continue saving each completed event. Repository access alone is not a saved run or a successful publication. If a call genuinely returns a connection requirement, approval denial or write error, respect it, retain saved work and report the exact action and returned reason; do not relabel a working connection as permission-denied or claim a stalled producer completed. A connection/approval failure, transient error, incomplete run or failed publication never authorizes changing this task's activation or schedule. Keep the recurring task enabled; only an explicit user instruction to pause, disable, delete or reschedule it permits such a change. Do not call the automation update tool to disable the task as error cleanup. These instructions do not override platform-enforced permissions or any analytical/publication gate.
 
 ## 1. Main schedule gate and Core production preflight
 

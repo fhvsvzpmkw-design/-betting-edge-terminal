@@ -14,6 +14,8 @@ node tools/report-run.mjs next --checkpoint data/report-production/checkpoints/<
 node tools/report-run.mjs next --checkpoint data/report-production/checkpoints/<run-id>.json --event-id <event-id>
 ```
 
+Persist the exact initial checkpoint to its connected repository path immediately after `start` and verify the remote blob before broad event research. This initial save and the existing per-event saves are routine writes already authorized by the user. Use the current scheduled authority's execution-authorization and failure-recovery rules; a connection/approval error does not authorize disabling the recurring task.
+
 Choose a unique run ID using the operating date, slot and actual issue clock. `start` refuses to overwrite an existing run. The status response gives the current revision. Mutations require `--expected-revision <current-revision>`; stale updates fail without replacing the checkpoint. The entire draft is saved atomically under one checkpoint. There is no model API call in these commands.
 
 The initial `report-inputs` view includes `pinnacleCoverage`: exact-reference counts by sport, skipped categories and collection errors. Event detail supplies failed match reasons at each executable quote. It uses the same exact-market matcher as assessment, including NHL settlement definitions and freshness. Inspect gaps before research; acquisition coverage is not completed analysis or issuance clearance.
