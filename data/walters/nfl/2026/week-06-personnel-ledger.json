@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-13T04:32:22-07:00",
-  "updatedAt": "2026-10-13T17:12:19-07:00",
+  "updatedAt": "2026-10-13T17:14:52-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -22,7 +22,8 @@
   },
   "processedBatchIds": [
     "graham-tuesday-baseline-2026-w06-20261013T110459-0700-personnel",
-    "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-01"
+    "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-01",
+    "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02"
   ],
   "events": [
     {
@@ -1972,6 +1973,214 @@
       "rawTeamContributionDelta": 0,
       "clusterGroup": "OFFENSIVE_LINE",
       "failClosedCode": null
+    },
+    {
+      "caseKey": "2026-W06-CHI-Montez-Sweat",
+      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-chi-montez-sweat",
+      "gameKey": "2026-W06-CHI-ATL",
+      "team": "CHI",
+      "side": "AWAY",
+      "player": "Montez Sweat",
+      "playerEaId": "20411",
+      "availabilityStatus": "SUSPENDED",
+      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
+      "failClosedCode": "REVIEW_REQUIRED_DEFENSIVE_LINE_ROLE_ALLOCATION",
+      "reason": "Bears officially suspended Montez Sweat for Weeks 6-7 and activated Shemar Turner from PUP, but no source verifies Turner's full edge role. Booker already has defensive snaps and Odeyingbo has an injury issue. Calibrated Sweat 0.9, Turner/Booker/Davenport/Odeyingbo 0.2 each, Hardy 0.0. Do not displace a starter or double-credit a DL role.",
+      "sourceRefs": [
+        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026",
+        "https://www.reuters.com/sports/bears-de-montez-sweat-suspended-2-games-ped-violation--flm-2026-10-13/",
+        "https://www.chicagobears.com/team/players-roster/",
+        "https://www.chicagobears.com/team/players-roster/austin-booker/",
+        "data/walters/nfl/player-values/by-team-v1/chi.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026"
+      ],
+      "roleSourceRefs": [
+        "https://www.chicagobears.com/team/players-roster/",
+        "https://www.chicagobears.com/team/players-roster/austin-booker/"
+      ],
+      "reopenOn": "Wednesday Chicago injury report and actual edge-depth allocation for Turner, Booker, Davenport, Odeyingbo; stage a supported disjoint replacement estimate through personnel production.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Shemar Turner",
+          "Austin Booker",
+          "Marcus Davenport",
+          "Dayo Odeyingbo",
+          "Daniel Hardy"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
+      "effectiveAt": "2026-10-13T17:14:52-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "EDGE",
+      "maddenOvr": 82,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
+    },
+    {
+      "caseKey": "2026-W06-CAR-Cam-Jackson",
+      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-car-cam-jackson",
+      "gameKey": "2026-W06-CAR-PHI",
+      "team": "CAR",
+      "side": "AWAY",
+      "player": "Cam Jackson",
+      "playerEaId": "15207",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Carolina officially placed Cam Jackson on IR Tuesday with a shoulder issue; frozen healthy Walters value is exactly zero. Team reports Wharton and others returning to practice but no assumed replacement workload.",
+      "sourceRefs": [
+        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne",
+        "data/walters/nfl/player-values/by-team-v1/car.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne"
+      ],
+      "roleSourceRefs": [
+        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne"
+      ],
+      "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+      "replacementModel": {
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Frozen calibrated healthy value for Cam Jackson is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
+      "effectiveAt": "2026-10-13T17:14:52-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 70,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Frozen calibrated healthy value for Cam Jackson is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    {
+      "caseKey": "2026-W06-CLE-Raheim-Sanders",
+      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-cle-raheim-sanders",
+      "gameKey": "2026-W06-BAL-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Raheim Sanders",
+      "playerEaId": "15032",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Cleveland officially placed Raheim Sanders on IR with a hip injury and signed Audric Estime. Frozen Sanders healthy value is zero, so the existing zero-loss proof avoids assuming a replacement role/share.",
+      "sourceRefs": [
+        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/",
+        "data/walters/nfl/player-values/by-team-v1/cle.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/"
+      ],
+      "roleSourceRefs": [
+        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/"
+      ],
+      "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+      "replacementModel": {
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Frozen calibrated healthy value for Raheim Sanders is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Audric Estime"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
+      "effectiveAt": "2026-10-13T17:14:52-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 69,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Frozen calibrated healthy value for Raheim Sanders is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   ],
   "currentCases": {
@@ -3887,8 +4096,216 @@
       "healthyWaltersPoints": 0.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "RECEIVER"
+    },
+    "2026-W06-CHI-Montez-Sweat": {
+      "caseKey": "2026-W06-CHI-Montez-Sweat",
+      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-chi-montez-sweat",
+      "gameKey": "2026-W06-CHI-ATL",
+      "team": "CHI",
+      "side": "AWAY",
+      "player": "Montez Sweat",
+      "playerEaId": "20411",
+      "availabilityStatus": "SUSPENDED",
+      "resolutionStatus": "UNRESOLVED_FAIL_CLOSED",
+      "failClosedCode": "REVIEW_REQUIRED_DEFENSIVE_LINE_ROLE_ALLOCATION",
+      "reason": "Bears officially suspended Montez Sweat for Weeks 6-7 and activated Shemar Turner from PUP, but no source verifies Turner's full edge role. Booker already has defensive snaps and Odeyingbo has an injury issue. Calibrated Sweat 0.9, Turner/Booker/Davenport/Odeyingbo 0.2 each, Hardy 0.0. Do not displace a starter or double-credit a DL role.",
+      "sourceRefs": [
+        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026",
+        "https://www.reuters.com/sports/bears-de-montez-sweat-suspended-2-games-ped-violation--flm-2026-10-13/",
+        "https://www.chicagobears.com/team/players-roster/",
+        "https://www.chicagobears.com/team/players-roster/austin-booker/",
+        "data/walters/nfl/player-values/by-team-v1/chi.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.chicagobears.com/news/chicago-bears-announce-roster-moves-october-13-2026"
+      ],
+      "roleSourceRefs": [
+        "https://www.chicagobears.com/team/players-roster/",
+        "https://www.chicagobears.com/team/players-roster/austin-booker/"
+      ],
+      "reopenOn": "Wednesday Chicago injury report and actual edge-depth allocation for Turner, Booker, Davenport, Odeyingbo; stage a supported disjoint replacement estimate through personnel production.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Shemar Turner",
+          "Austin Booker",
+          "Marcus Davenport",
+          "Dayo Odeyingbo",
+          "Daniel Hardy"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW"
+      },
+      "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
+      "effectiveAt": "2026-10-13T17:14:52-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "EDGE",
+      "maddenOvr": 82,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
+    },
+    "2026-W06-CAR-Cam-Jackson": {
+      "caseKey": "2026-W06-CAR-Cam-Jackson",
+      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-car-cam-jackson",
+      "gameKey": "2026-W06-CAR-PHI",
+      "team": "CAR",
+      "side": "AWAY",
+      "player": "Cam Jackson",
+      "playerEaId": "15207",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Carolina officially placed Cam Jackson on IR Tuesday with a shoulder issue; frozen healthy Walters value is exactly zero. Team reports Wharton and others returning to practice but no assumed replacement workload.",
+      "sourceRefs": [
+        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne",
+        "data/walters/nfl/player-values/by-team-v1/car.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne"
+      ],
+      "roleSourceRefs": [
+        "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne"
+      ],
+      "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+      "replacementModel": {
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Frozen calibrated healthy value for Cam Jackson is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
+      "effectiveAt": "2026-10-13T17:14:52-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "DT",
+      "maddenOvr": 70,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "DEFENSIVE_LINE",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Frozen calibrated healthy value for Cam Jackson is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
+    },
+    "2026-W06-CLE-Raheim-Sanders": {
+      "caseKey": "2026-W06-CLE-Raheim-Sanders",
+      "personnelEventId": "graham-delta-1645-2026-w06-20261013T170837-0700-cle-raheim-sanders",
+      "gameKey": "2026-W06-BAL-CLE",
+      "team": "CLE",
+      "side": "HOME",
+      "player": "Raheim Sanders",
+      "playerEaId": "15032",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Cleveland officially placed Raheim Sanders on IR with a hip injury and signed Audric Estime. Frozen Sanders healthy value is zero, so the existing zero-loss proof avoids assuming a replacement role/share.",
+      "sourceRefs": [
+        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/",
+        "data/walters/nfl/player-values/by-team-v1/cle.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
+      "availabilitySourceRefs": [
+        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/"
+      ],
+      "roleSourceRefs": [
+        "https://browns.1rmg.com/press-releases/browns-sign-rb-audric-estime-place-rb-raheim-sanders-on-injured-reserve-10-13-26/"
+      ],
+      "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+      "replacementModel": {
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Frozen calibrated healthy value for Raheim Sanders is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "replacements": []
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Audric Estime"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "COMMITTEE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE"
+      },
+      "batchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
+      "effectiveAt": "2026-10-13T17:14:52-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "RB",
+      "maddenOvr": 69,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RUNNING_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Frozen calibrated healthy value for Raheim Sanders is exactly zero Walters points; existing nonnegative injury-loss floor therefore proves zero calibrated loss without fabricating any replacement value.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if any additional unavailable player or confirmed changed workload produces a coupled cluster requiring reallocation.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   },
-  "lastBatchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-01",
+  "lastBatchId": "graham-delta-1645-2026-w06-20261013T170837-0700-personnel-02",
   "lastBatchSourceTask": "DELTA_1645"
 }
