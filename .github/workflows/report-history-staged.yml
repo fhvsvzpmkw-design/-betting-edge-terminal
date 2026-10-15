@@ -38,7 +38,7 @@ jobs:
         env:
           CANDIDATE_COMMIT: ${{ github.sha }}
           CANDIDATE_DIR: /tmp
-        run: node tools/extract-staged-report.mjs
+        run: node --default-to-experimental-regexp-engine tools/extract-staged-report.mjs
       - name: Normalize derived fields and validate candidate
         run: |
           node tools/report-pipeline.mjs normalize --report /tmp/report.json --sidecar /tmp/sidecar.json
