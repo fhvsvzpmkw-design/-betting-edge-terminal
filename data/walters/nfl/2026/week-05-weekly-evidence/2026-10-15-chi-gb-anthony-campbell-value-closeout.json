@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-15T13:05:18Z",
+  "season": 2026,
+  "sourceWeek": 5,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive CHI-GB historical value closeout for Anthony Campbell. This evidence resolves only his exact identity and historical healthy baseline; it does not mark the game READY, stage a rating change, alter the active manifest or current-week overlays, construct a fair, or issue a bet.",
+  "marketViewed": false,
+  "inputCommit": "68518ed4b6c58f745f2a90d4b5ce4c6cf7b47038",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "9742571a068351ad7a11af00cc035cdf06274e9a",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "valueEstimates": [
+    {
+      "player": "Anthony Campbell",
+      "identity": "estimate:anthony-campbell",
+      "position": "DT",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 64,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Week 4 ratings",
+      "estimateAcknowledged": true,
+      "rationale": "EA SPORTS' official player page binds Anthony Campbell to Green Bay at defensive tackle with Madden NFL 27 Week 4 OVR 64. The locked non-QB calibration maps OVR 64 to 0.0 Walters points. This is a source-bound historical estimate, not a missing value assigned zero, and it does not modify the frozen production registry.",
+      "sourceIds": [
+        "ea-anthony-campbell-week4"
+      ],
+      "roleSourceIds": [
+        "packers-chi-gb-final-inactives",
+        "packers-chi-gb-final-injury-report"
+      ],
+      "gameKeys": [
+        "2026-W05-CHI-GB"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "ea-anthony-campbell-week4",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/anthony-campbell/4801",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-CHI-GB"
+      ],
+      "finding": "EA SPORTS' official Madden NFL 27 Week 4 player page identifies Anthony Campbell, player ID 4801, as a Green Bay Packers defensive tackle with OVR 64. The frozen non-QB calibration maps that OVR to 0.0 Walters points.",
+      "checkedAt": "2026-10-15T13:05:18Z"
+    },
+    {
+      "id": "packers-chi-gb-final-inactives",
+      "url": "https://www.packers.com/news/packers-bears-week-5-inactives-oct-11-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-CHI-GB"
+      ],
+      "finding": "Green Bay's official final inactive list records Anthony Campbell as inactive against Chicago.",
+      "checkedAt": "2026-10-15T13:05:18Z"
+    },
+    {
+      "id": "packers-chi-gb-final-injury-report",
+      "url": "https://www.packers.com/news/packers-list-three-questionable-two-doubtful-vs-bears-week-5-injury-report",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-CHI-GB"
+      ],
+      "finding": "Green Bay's official final injury report lists Anthony Campbell with an ankle injury and a questionable game status; the final inactive source supplies the game-day closure.",
+      "checkedAt": "2026-10-15T13:05:18Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-CHI-GB",
+      "away": "CHI",
+      "home": "GB",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "ea-anthony-campbell-week4",
+        "packers-chi-gb-final-inactives",
+        "packers-chi-gb-final-injury-report"
+      ],
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_IN_PRIOR_ADDITIVE_EVIDENCE",
+        "frozenKickoffRatingsAndH4": "COMPLETE_IN_PRIOR_ADDITIVE_EVIDENCE",
+        "anthonyCampbellIdentityAndHistoricalValue": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED",
+        "resolvedFinding": "Anthony Campbell's exact historical estimate is 0.0 Walters points from official Madden NFL 27 Week 4 OVR 64. This closes the prior missing-value item without treating missing information as zero."
+      },
+      "blockers": [
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Chicago's T.J. Edwards, Dayo Odeyingbo and Tyrique Stevenson partial-game injury intervals, added-duty replacement identities and disjoint cluster allocations remain unadopted.",
+          "nextAction": "Bind each source-supported departure range, select the documented primary replacement or a supported/equal-share committee, and run the linebacker, defensive-line and defensive-back safeguards without treating questionable or doubtful wording as a return.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Green Bay's Skyy Moore, Benjamin St-Juste and Javon Hargrave partial-game injury intervals and receiver/return, defensive-back and defensive-line added duties remain unallocated.",
+          "nextAction": "Bind the available exposure ranges, allocate every added duty once from the final active inventory, and complete the three group reviews.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_ROLE_UNRESOLVED",
+          "finding": "Anthony Campbell's identity and 0.0 historical value are now source-bound and are no longer a missing-value blocker. Aaron Banks still needs a source-bound additional-duty line allocation, and Jager Burton's active/DNP role still needs literal closure.",
+          "nextAction": "Bind Banks' game-active line replacement and baseline-duty treatment, then classify Burton from final participation and role evidence before the line-group reviews can pass.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Chicago's injury-driven Caleb Williams full-game absence is established, but the Bagent-to-Keenum fourth-quarter performance replacement must not be relabelled as injury-driven relief and the governed historical quarterback section remains incomplete.",
+          "nextAction": "Represent Williams' full-game injury absence through the approved historical QB estimator with the exact same-value Bagent/Keenum distinction, or preserve the case blocked for the historical QB adapter owner.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The full paired CHI and GB final-game-day sections, all participation exclusions, specialists and cluster reviews have not yet been assembled and recomputed.",
+          "nextAction": "Promote every resolved and remaining case into one paired FINAL_GAME_DAY record, recompute both governed injury totals, and pass tools/graham-weekly-evidence.mjs before staging.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
