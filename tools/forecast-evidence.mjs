@@ -6,6 +6,7 @@ import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual} from 'node:util';
 import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gate.mjs';
+import {nhlCorroborationApplies,NHL_FORECAST_SOURCES,validateNhlCorroboration} from './nhl-forecast-corroboration.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const list = value => Array.isArray(value) ? value : [];
@@ -181,6 +182,26 @@ export function validateBoundForecastLean({report, sidecar, selection, receipt, 
     throw new Error(`Forecast LEAN bound record/applicability does not qualify: ${actual.reasons.join(', ')}`);
   const display=list(rec.forecastReview?.records).filter(r=>r.recordId===a.forecastRecordId);
   if (display.length!==1 || !isDeepStrictEqual(display[0],actual)) throw new Error('Forecast LEAN reviewed display differs from bound source replay');
+  if(nhlCorroborationApplies(report,rec)) {
+    // Replay every applicable approved source, including contrary versions.
+    // The producer cannot invent a second point or hide a disagreeing capture.
+    const approved=list(sidecar.forecastEvidence?.records).filter(r=>NHL_FORECAST_SOURCES[r.sourceId] &&
+      String(r.eventId)===candidate.eventId && r.sport===candidate.sport &&
+      r.marketDetail===candidate.marketDetail && r.period===candidate.period && r.side===candidate.side);
+    const replay=approved.map(raw=>evaluateForecast(raw,candidate,{asOf:report.ts,revalidations:sidecar.forecastEvidence?.revalidations}));
+    const ids=new Set();
+    for(const reviewed of replay.filter(r=>r.eligibility==='ELIGIBLE_EXACT')) {
+      if(ids.has(reviewed.recordId)) throw new Error('NHL corroboration requires unique immutable bound record IDs');
+      ids.add(reviewed.recordId);
+      const shown=list(rec.forecastReview?.records).filter(r=>r.recordId===reviewed.recordId);
+      if(shown.length!==1 || !isDeepStrictEqual(shown[0],reviewed))
+        throw new Error('NHL corroboration reviewed display differs from bound source replay or omits a current approved forecast');
+    }
+    const shown=list(rec.forecastReview?.records).filter(r=>NHL_FORECAST_SOURCES[r.sourceId] && r.eligibility==='ELIGIBLE_EXACT' &&
+      r.marketDetail===candidate.marketDetail && r.period===candidate.period && r.side===candidate.side);
+    if(shown.some(r=>!ids.has(r.recordId))) throw new Error('NHL corroboration cannot use an unbound or inapplicable second forecast');
+    validateNhlCorroboration(report,rec,a,{waiting:rec.forecastWait!=null});
+  }
   return true;
 }
 

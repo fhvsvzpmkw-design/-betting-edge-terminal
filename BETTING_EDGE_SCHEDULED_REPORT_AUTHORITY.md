@@ -2,13 +2,15 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-14.1
+**Operating revision:** 2026-10-15.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
 This is the single current operating sequence for all five Main report tasks. A task supplies `EXPECTED_REPORT_TIME` only. This consolidated edition replaces the accumulated ordering amendments; it is not another parallel workflow. Earlier editions remain in Git history and in issued provenance. Historical reports, decisions and source observations remain immutable.
 
 For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer ordering and the observed-forecast exception below. Earlier reports retain their original timing eligibility. Core 1.5 remains the production release. Component files named 1.4 are intentional dependencies, not an instruction to issue Core 1.4 reports.
+
+**NHL forecast corroboration — current from `2026-10-15T12:11:48-07:00`:** For NHL full-game moneyline forecast opinions, apply the October 15 section of `docs/FORECAST_DIRECTIONAL_LEANS.md` instead of the older single-point default below. LEAN requires two of MoneyPuck, DRatings and Dimers supporting the exact price, with an approved anchor at least 1.00 probability point above break-even. PuckCast remains research/comparison only. Use original provider records and retain contrary forecasts; two sources do not establish statistical independence. Supply `judgment.pinnacleReview` with an actual disagreement rationale and decision impact for an unfavorable signed Pinnacle gap. The existing builders bind and display both forecast points and this review; the publisher independently replays the original records and applicability. WAIT requires an actual concrete condition: the price-WAIT helper now computes a two-source/one-point reassessment price from two applicable approved forecasts, including when the lone positive anchor already clears one point. No second applicable approved point or defensible condition means a reviewed PASS or genuine research gap, not a manufactured WAIT. Use source-bound `INSUFFICIENT_CORROBORATION` where appropriate, and explain an earlier LEAN downgrade with its exact previous decision and the actual policy/source finding. Preserve $0/NO BET, independent-fair/BET requirements, other sport/market routes and historical bytes. This selectivity rule is not validated profitability or a numeric pick target. All five Main report tasks inherit it from authoritative main.
 
 ## Operating precedence
 

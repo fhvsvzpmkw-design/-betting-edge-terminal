@@ -6,7 +6,7 @@ const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
 const time = value => Date.parse(value || '');
 const reasons = new Set(['CONTRARY_EVIDENCE', 'FORECAST_ASSUMPTION_CONFLICT', 'PERSONNEL_DEPENDENCY',
-  'PRICE_NO_LONGER_SUPPORTED', 'REFERENCE_CHANGE', 'CORRECTED_PRIOR_ASSESSMENT']);
+  'PRICE_NO_LONGER_SUPPORTED', 'REFERENCE_CHANGE', 'CORRECTED_PRIOR_ASSESSMENT', 'INSUFFICIENT_CORROBORATION']);
 
 export function inspectOpinionReview({report, receipt, forecastComparisons = [], prior} = {}) {
   const decision = receipt?.decision;
@@ -27,6 +27,8 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
   const checked = time(review?.checkedAt || receipt?.candidateAssessment?.checkedAt);
   if (review?.state !== 'REJECTED' || !text(review?.rationale) || !reasons.has(review?.reasonKind) ||
       !(checked >= time(report.feedGeneratedAt) && checked <= time(report.ts))) missing.push('SOURCE_GROUNDED_DIRECTIONAL_REJECTION_REQUIRED');
+  if(review?.reasonKind==='INSUFFICIENT_CORROBORATION' &&
+    (!leanDefault.corroboration?.active || leanDefault.corroboration.eligible)) missing.push('NHL_CORROBORATION_REJECTION_INAPPLICABLE');
   const sources = new Map([...list(receipt?.evidence?.sourceEvidence), ...list(decision?.sourceEvidence)]
     .filter(source => text(source?.id) && String(source.eventId) === String(quote?.eventId) &&
       Number.isFinite(time(source.checkedAt || source.asOf)) && time(source.checkedAt || source.asOf) <= time(report.ts) &&
@@ -65,5 +67,5 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
   return {required:true, complete:missing.length === 0, missing, priorDecision:baseline,
     ...(leanDefault.active ? {leanDefault} : {}),
     supportingForecastRecordIds:supported.map(row => row.recordId),
-    instruction:leanDefault.applies ? leanDefault.instruction : 'Review the exact positive point and earlier opinion. Separate BET eligibility from directional preference; assess a visible zero-stake provisional LEAN. Record a source-linked directional objection or correct the actual decision. No automatic LEAN or BET.'};
+    instruction:leanDefault.applies || leanDefault.corroboration?.active ? leanDefault.instruction : 'Review the exact positive point and earlier opinion. Separate BET eligibility from directional preference; assess a visible zero-stake provisional LEAN. Record a source-linked directional objection or correct the actual decision. No automatic LEAN or BET.'};
 }

@@ -2,6 +2,8 @@
 
 **Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
 
+**NHL forecast corroboration — October 15:** For reports at/after `2026-10-15T12:11:48-07:00`, the NHL full-game moneyline forecast-opinion route requires two of MoneyPuck, DRatings and Dimers supporting the exact price, with at least one approved point at 1.00 probability point above break-even. PuckCast remains research/comparison. Preserve the signed Pinnacle comparison and a source-bound visible disagreement review when unfavorable. A price WAIT requires a concrete two-source/one-point reassessment condition; an uncorroborated opinion is not automatically WAIT. The current shared authority and `docs/FORECAST_DIRECTIONAL_LEANS.md` own the complete authoring, source-replay and PASS-review rules, superseding the prior single-point NHL default. Existing wagering gates, other market routes and issued records keep their original authority.
+
 **Document status:** OPERATIONAL — AUTHORITATIVE PRODUCTION CONTRACT  
 **Contract version:** 1.0  
 **Activated:** 2026-08-22  

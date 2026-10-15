@@ -63,6 +63,8 @@ When work remains at publication, keep its specific missing input, actual source
 
 Missing the new metadata alone must not invalidate an already supported market assessment. The finalizer checks for actual unanswered decision-sensitive work and retains valid market LEANs without imposing model adoption or a numerical range. A completed, concrete rejection can remain PASS. Machine validation checks traceable inputs and consistency; it cannot establish research quality from prose length.
 
+From `2026-10-15T12:11:48-07:00`, NHL full-game moneyline forecast opinions use the fixed MoneyPuck / DRatings / Dimers corroboration rule in `docs/FORECAST_DIRECTIONAL_LEANS.md`. A reviewed PASS can use `decision.directionalReview.reasonKind:INSUFFICIENT_CORROBORATION` only when that active rule is genuinely unmet. Bind the actual forecasts/sources, explain the contrary or missing corroboration and consider the provisional alternative. If an earlier same-price LEAN is withdrawn, keep `previousDecision` and explain the policy change plus current source finding in `changedFinding`; do not invent a price movement. A corroborated one-point forecast PASS still requires the existing substantive default exception. Missing work stays incomplete. WAIT needs its actual documented condition; the price-WAIT target must meet two-source corroboration and the one-point threshold together.
+
 ## Producer schema
 
 Write the object at `sidecar.primaryAnalysis.receipts[n].candidateAssessment`. It records the producer's decision; the derived `report.candidateAssessment` shortlist is a separate output. Existing decision, evidence, source, fair and publication requirements still apply.
