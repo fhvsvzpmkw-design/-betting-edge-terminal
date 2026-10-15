@@ -8,7 +8,7 @@
   "timezone": "America/Vancouver",
   "state": "PROVISIONAL_BASELINE_PENDING",
   "createdAt": "2026-10-13T04:32:22-07:00",
-  "updatedAt": "2026-10-15T23:53:15.201Z",
+  "updatedAt": "2026-10-15T23:54:56.497Z",
   "lastResearchAt": "2026-10-15T23:53:15.201Z",
   "researchLedgerPath": "data/walters/nfl/2026/week-06-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -1633,9 +1633,9 @@
       "away": "CAR",
       "home": "PHI",
       "startTimePacific": "2026-10-18T10:00:00-07:00",
-      "grahamFairHome": -3.5,
-      "grahamExactFairHome": -3.414,
-      "grahamAsOf": "2026-10-13T17:14:52-07:00",
+      "grahamFairHome": -1,
+      "grahamExactFairHome": -0.914,
+      "grahamAsOf": "2026-10-15T23:54:56.497Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "adjustments": [
@@ -1651,33 +1651,6 @@
           "homeFieldProductionId": "walters-nfl-home-field-production-v1",
           "calibrationId": "walters-nfl-home-field-calibration-v1",
           "venueClass": "DOMESTIC_HOME",
-          "effectiveAt": "2026-10-13T04:32:22-07:00",
-          "marketViewed": false
-        },
-        {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "CAR",
-          "homeTeam": "PHI",
-          "awayStarter": "Bryce Young",
-          "homeStarter": "Jalen Hurts",
-          "awayTeamQbDelta": 0,
-          "homeTeamQbDelta": 0,
-          "pointsToHomeSpread": 0,
-          "reason": "Governed Walters QB differential: CAR 0.00 minus PHI 0.00 equals +0.00 points to the home-spread coordinate.",
-          "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "STAGE3_PERFORMANCE_CANDIDATE"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-          ],
           "effectiveAt": "2026-10-13T04:32:22-07:00",
           "marketViewed": false
         },
@@ -1700,9 +1673,40 @@
             "data/walters/nfl/player-values/by-team-v1/car.json",
             "data/walters/nfl/player-values/player-values-access-v1.json"
           ]
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "CAR",
+          "homeTeam": "PHI",
+          "awayStarter": "Bryce Young",
+          "homeStarter": "Tanner McKee",
+          "awayTeamQbDelta": 0,
+          "homeTeamQbDelta": -2.5,
+          "pointsToHomeSpread": 2.5,
+          "reason": "Governed Walters QB differential: CAR 0.00 minus PHI -2.50 equals +2.50 points to the home-spread coordinate. PHI uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
+            "https://www.philadelphiaeagles.com/news/tanner-mckee-will-be-ready-for-his-moment-2026-nfl-week-6-carolina-panthers",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
+          ],
+          "effectiveAt": "2026-10-15T23:54:56.497Z",
+          "marketViewed": false
         }
       ],
-      "researchSummary": "Governed fair decomposition: neutral/team base -1.332; home field -2.082; other governed +0.000; pre-personnel exact -3.414; personnel +0.000; matchup +0.000; exact Graham home fair -3.414; displayed -3.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -1.332; home field -2.082; other governed +2.500; pre-personnel exact -0.914; personnel +0.000; matchup +0.000; exact Graham home fair -0.914; displayed -1.0.",
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
@@ -1718,7 +1722,11 @@
         "data/walters/nfl/player-values/player-values-access-v1.json",
         "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-monday-oct-5",
         "https://www.panthers.com/news/panthers-placed-defensive-tackle-cam-jackson-on-ir-among-other-moves-taylor-moton-turk-wharton-trevor-etienne",
-        "data/walters/nfl/player-values/by-team-v1/car.json"
+        "data/walters/nfl/player-values/by-team-v1/car.json",
+        "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
+        "https://www.philadelphiaeagles.com/news/tanner-mckee-will-be-ready-for-his-moment-2026-nfl-week-6-carolina-panthers",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+        "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
       ],
       "neutralBaseHome": -1.3322788,
       "ratingCarryForward": {
@@ -1772,28 +1780,47 @@
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -1.332,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -3.414,
+        "otherGovernedPointsToHomeSpread": 2.5,
+        "prePersonnelExactFairHome": -0.914,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -3.414,
-        "displayedFairHome": -3.5,
+        "exactFairHome": -0.914,
+        "displayedFairHome": -1,
         "arithmeticVerified": true
       },
-      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
       "qbPerformanceBaseExactFairHome": -3.414,
-      "qbPerformancePointsToHomeSpread": 0,
+      "qbPerformancePointsToHomeSpread": 2.5,
       "qbPerformanceAwayTeamDelta": 0,
-      "qbPerformanceHomeTeamDelta": 0,
+      "qbPerformanceHomeTeamDelta": -2.5,
       "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
-      "qbPerformanceLastAppliedAt": "2026-10-13T04:32:22-07:00",
-      "qbPerformanceFailClosedTeams": [
+      "qbPerformanceLastAppliedAt": "2026-10-15T23:54:56.497Z",
+      "qbPerformanceFailClosedTeams": [],
+      "qbPriorEstimateTeams": [
         "PHI"
       ],
-      "qbPriorEstimateTeams": [],
-      "qbPriorEstimates": [],
+      "qbPriorEstimates": [
+        {
+          "team": "PHI",
+          "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+          "value": 6,
+          "confidence": "LOW",
+          "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+          "evidenceDropbacks": 86,
+          "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+          "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+          "starterEvidence": {
+            "kind": "OFFICIAL",
+            "team": "PHI",
+            "playerId": "22712",
+            "url": "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
+            "observedAt": "2026-10-15T23:54:56.497Z",
+            "finding": "The official October 15 Week 6 Eagles injury report explicitly confirms: Quarterback Tanner McKee will start for the Eagles against the Carolina Panthers on Sunday with Jalen Hurts out."
+          }
+        }
+      ],
       "priorGrahamFairHome": -3.5,
       "personnelProductionId": "walters-personnel-production-v1",
       "personnelLastAppliedAt": "2026-10-13T17:14:52-07:00",
@@ -3242,16 +3269,15 @@
     "productionAuthority": true,
     "grahamWritesAllowed": true,
     "approvedTeamCount": 32,
-    "currentResolvedTeamCount": 28,
+    "currentResolvedTeamCount": 29,
     "permanentlyExcludedTeams": [],
     "currentFailClosedTeams": [
       "ATL",
       "BAL",
-      "CHI",
-      "PHI"
+      "CHI"
     ],
-    "failClosedGameCount": 3,
-    "lastAppliedAt": "2026-10-15T18:34:31.541Z",
+    "failClosedGameCount": 2,
+    "lastAppliedAt": "2026-10-15T23:54:56.497Z",
     "marketViewed": false,
     "postActivationCanaryState": "PENDING"
   },
