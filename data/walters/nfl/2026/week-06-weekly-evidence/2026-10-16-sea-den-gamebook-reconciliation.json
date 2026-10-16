@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-16T17:00:07.000Z",
+  "season": 2026,
+  "sourceWeek": 6,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive pre-rollover reconciliation for SEA-DEN after the official final gamebook became available. This retires the prior source-unavailable blocker, binds final participation, quarterback duty, specialist presence and the printed in-game injury/return sequences, and preserves the frozen kickoff ratings and H4. It does not change any rating, advance the active manifest, write current-week personnel/QB overlays, construct fairs or issue a bet. The pair remains blocked until the open Jaylen Waddle and Jonah Elliss duties and the complete paired team loss assembly are reconciled.",
+  "marketViewed": false,
+  "inputCommit": "4e8c71d20e745512362da4c5030b5c10c4c684d0",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-06-personnel-ledger.json": "f05c3c2f5c2c5c56d42a89c938e00bf84225a161",
+    "data/walters/nfl/2026/week-06-current-numbers.json": "8bc4400f4fcb6d827f8bab69623e1b35d867e475",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "priorEvidenceBindings": [
+    {
+      "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-final-preparation.json",
+      "commit": "b9bfcd9e6479c8ed0c58ec5ff885c4f1f2ff9581",
+      "blobSha": "b3416f599f4114cf29dad5335e5c82e4847fb30c",
+      "rationale": "Reuses the exact final, frozen kickoff ratings and preserved H4, official inactive inventories, and source-bound pregame cases without altering those immutable findings."
+    },
+    {
+      "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json",
+      "commit": "37d8b3dc78e8b95ed36300138a9d85343bb59d7e",
+      "blobSha": "e9727fe8beaeb3f5b96b67cba4eb395b39fe25b9",
+      "rationale": "Reuses the independently recorded exact 65:07 duration and offensive usage; the official gamebook now supersedes only that record's SOURCE_NOT_YET_AVAILABLE finding."
+    }
+  ],
+  "sources": [
+    {
+      "id": "nfl-sea-den-official-final-gamebook",
+      "url": "https://static.www.nfl.com/image/upload/v1792125522/gamecenter/aa94cffe-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W06-SEA-DEN"],
+      "finding": "The 19-page official NFL gamebook reports Denver 17, Seattle 14 after overtime; a 65:07 game duration; the initial lineups, substitutes, inactives and did-not-play lists; Sam Darnold and Bo Nix as the only passers; and the printed injury status sequence for Tyler Badie, Elijah Arroyo, Jaylen Waddle and Jonah Elliss.",
+      "checkedAt": "2026-10-16T16:45:00.000Z"
+    },
+    {
+      "id": "nfl-sea-den-official-game-center-gamebook-link",
+      "url": "https://www.nfl.com/games/seahawks-at-broncos-2026-reg-6",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W06-SEA-DEN"],
+      "finding": "The official NFL game center now exposes the Download Game Book link, retiring the source-unavailable blocker preserved in the earlier additive bundle.",
+      "checkedAt": "2026-10-16T16:45:00.000Z"
+    },
+    {
+      "id": "seahawks-sea-den-official-arroyo-injury-update",
+      "url": "https://www.seahawks.com/news/2026-week-6-seahawks-at-broncos-in-game-injury-updates",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W06-SEA-DEN"],
+      "finding": "Seattle's official in-game update identifies Elijah Arroyo's shoulder injury in the second quarter and says he was doubtful to return. The wording is not treated as a return.",
+      "checkedAt": "2026-10-16T16:48:00.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W06-SEA-DEN",
+      "away": "SEA",
+      "home": "DEN",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "nfl-sea-den-official-final-gamebook",
+        "nfl-sea-den-official-game-center-gamebook-link",
+        "seahawks-sea-den-official-arroyo-injury-update"
+      ],
+      "final": {
+        "awayScore": 14,
+        "homeScore": 17,
+        "status": "FINAL_OVERTIME",
+        "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-15T17:15:00-07:00",
+        "awayRating": 29.621639,
+        "homeRating": 26.4700956,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": 3.1515434,
+        "ratingLedgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc",
+        "powerLedgerBlobSha": "f8eaebe4a8eb8c9101d9194b048cbb25d2e61aab",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED"
+      },
+      "exactGameDuration": {
+        "seconds": 3907,
+        "display": "65:07",
+        "derivation": "35:38 SEA time of possession plus 29:29 DEN time of possession, as printed in the official gamebook",
+        "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+      },
+      "completedCoverage": [
+        {
+          "area": "QUARTERBACK_DUTY",
+          "finding": "Sam Darnold and Bo Nix are the only passers in the gamebook. Drew Lock and Jarrett Stidham are listed as did not play; Jalen Milroe and Sam Ehlinger are inactive emergency third quarterbacks. This supports source-exact NO_GAME_DAY_LOSS treatment for both quarterback rooms in the eventual complete paired bundle.",
+          "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+        },
+        {
+          "area": "SPECIALIST_PARTICIPATION",
+          "finding": "Seattle's Jason Myers, Michael Dickson and AJ Stoll and Denver's Wil Lutz, Jeremy Crawshaw and Mitchell Fraboni are listed among the game participants. Final gamebook participation closes the specialist-presence check; any specialist loss remains zero only through complete verified coverage, not by omission.",
+          "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+        },
+        {
+          "area": "PREGAME_ROLE_BINDINGS",
+          "finding": "The initial lineups and participants confirm Devon Key starting with Talanoa Hufanga inactive; Tyrice Knight starting with Drake Thomas inactive; Emanuel Wilson starting and George Holani participating with Jadarian Price on reserve and Zach Charbonnet inactive; and Kris Abrams-Draine participating in Denver's defensive-back group with Pat Surtain II inactive. These facts validate the saved candidate identities and actual game-day use while preserving each case's existing model label and avoiding unsupported one-for-one snap claims.",
+          "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+        }
+      ],
+      "individualCaseInputs": [
+        {
+          "team": "DEN",
+          "player": "Tyler Badie",
+          "eaPlayerId": 22052,
+          "position": "RB",
+          "frozenHealthyValue": 0.0,
+          "status": "CASE_ESTIMATE_ONLY",
+          "timeline": {
+            "lastConfirmedDuty": "Q1 3:46 remaining (elapsed 674 seconds)",
+            "firstPrintedStatus": "Q2 9:59 remaining (elapsed 1,201 seconds): return questionable",
+            "terminalPrintedStatus": "Q2 2:00 remaining: out of the game",
+            "explicitReturn": false,
+            "gameEndElapsedSeconds": 3907
+          },
+          "finding": "Badie's departure is bounded after his last confirmed first-quarter rush and before the first printed questionable update; the later printed status rules him out. The frozen value is zero, so this is a reusable zero-calibrated case input, not permission to omit him or to declare Denver's team loss complete.",
+          "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+        },
+        {
+          "team": "SEA",
+          "player": "Elijah Arroyo",
+          "eaPlayerId": 15119,
+          "position": "TE",
+          "frozenHealthyValue": 0.0,
+          "status": "CASE_ESTIMATE_ONLY",
+          "timeline": {
+            "injuryPlay": "Q2 2:34 remaining (elapsed 1,646 seconds)",
+            "firstPrintedStatus": "Q2 1:54 remaining: doubtful to return",
+            "explicitReturn": false,
+            "openIntervalThroughGameEndSeconds": 2261,
+            "gameEndElapsedSeconds": 3907
+          },
+          "finding": "The official gamebook places the shoulder injury during the Q2 2:34 play and records Arroyo as doubtful to return. There is no printed return and no later participation. The frozen value is zero, so this is a reusable zero-calibrated case input inside complete coverage, not a complete Seattle team loss.",
+          "sourceIds": [
+            "nfl-sea-den-official-final-gamebook",
+            "seahawks-sea-den-official-arroyo-injury-update"
+          ]
+        },
+        {
+          "team": "DEN",
+          "player": "Jaylen Waddle",
+          "eaPlayerId": 21760,
+          "position": "WR",
+          "frozenHealthyValue": 1.2,
+          "status": "BLOCKED",
+          "timeline": {
+            "lastConfirmedDutyBeforeAbsence": "Q2 2:36 remaining (elapsed 1,644 seconds)",
+            "firstPrintedStatus": "Q3 12:07 remaining (elapsed 1,973 seconds): return questionable",
+            "explicitReturn": "Q3 8:30 remaining (elapsed 2,190 seconds)",
+            "boundedUnavailableIntervalSeconds": {
+              "minimum": 217,
+              "maximum": 546
+            }
+          },
+          "finding": "The official gamebook explicitly records Waddle's return, and later fourth-quarter receptions confirm continued duty. The exact departure is only bounded, and the disjoint added receiving/blocking duties during the absence have not been allocated to a source-supported replacement or equal-share committee.",
+          "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+        },
+        {
+          "team": "DEN",
+          "player": "Jonah Elliss",
+          "eaPlayerId": 14764,
+          "position": "EDGE",
+          "frozenHealthyValue": 0.2,
+          "status": "BLOCKED",
+          "timeline": {
+            "printedStatus": "Start of overtime (elapsed 3,600 seconds): out of the game",
+            "explicitReturn": false,
+            "maximumOpenIntervalThroughGameEndSeconds": 307
+          },
+          "finding": "Elliss participated and recorded a sack before the gamebook marked him out at the start of overtime. The gamebook does not state the injury reason, exact departure play or disjoint relief duty, so no numerical impairment or replacement share is inferred.",
+          "sourceIds": ["nfl-sea-den-official-final-gamebook"]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Jaylen Waddle's departure is bounded and his Q3 8:30 return is explicit, but the source-supported added-duty receiver or equal-share committee for the absence has not been promoted through the full evaluator. His frozen 1.2 value cannot be converted into loss without that replacement allocation.",
+          "nextAction": "Bind the actual receiving and blocking replacement duty during the 217-to-546-second absence, preserve the explicit return and avoid duplicate whole-game loss, then promote the supported case through the full paired evaluator.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The official gamebook marks Jonah Elliss out at the start of overtime after earlier participation, but his exact departure, literal injury reason and disjoint EDGE relief duty remain unreconciled. This is available participation/status evidence that still requires role reconciliation, not a zero or an unavailable source.",
+          "nextAction": "Retrieve a source-bound departure/reason if published, identify the actual disjoint relief assignment for the overtime interval, and evaluate the frozen 0.2 value without inferring unsupported impairment.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The gamebook closes the prior source gap, final participants, quarterback duty, specialist presence and two zero-calibrated individual cases, but the complete paired FINAL_GAME_DAY inventory and governed SEA/DEN team totals have not yet been assembled and validated. Individual CASE_ESTIMATE_ONLY records are reusable inputs, not complete team losses, and no missing value is treated as zero.",
+          "nextAction": "Merge every saved pregame absence, activation, final participant and in-game interval exactly once; run the replacement and cluster safeguards; compute both governed team totals; and validate the complete pair with tools/graham-weekly-evidence.mjs before any READY state.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
