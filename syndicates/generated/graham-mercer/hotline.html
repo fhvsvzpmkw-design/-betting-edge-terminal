@@ -76,7 +76,12 @@ function render(data){
   const ratings=(data.ratings||[]).slice().sort((a,b)=>Number(b.currentRating)-Number(a.currentRating)||String(a.abbr).localeCompare(String(b.abbr)));
   $('ratings').innerHTML=ratings.length?ratings.map(r=>`<div class="rating"><span class="abbr">${r.abbr}</span><span class="rname">${r.team||''}</span><span class="rnum">${n(r.currentRating)}</span><span class="delta">${Number(r.lastDelta)?signed(r.lastDelta):'—'}</span></div>`).join(''):'<div class="error">POWER SHEET WILL POPULATE ON THE NEXT GRAHAM BUILD.</div>';
 }
-async function load(){try{const r=await fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);render(await r.json())}catch(e){$('board').innerHTML=`<div class="error">CURRENT SHEET UNAVAILABLE // ${String(e.message||e)}</div>`}}
+let loadRequestId=0,lastFeedTime=-Infinity;
+async function load(){const requestId=++loadRequestId;try{const r=await fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();if(requestId!==loadRequestId)return;const feedTime=Date.parse(data.generatedAt||'');if(Number.isFinite(feedTime)&&feedTime<lastFeedTime)return;render(data);if(Number.isFinite(feedTime))lastFeedTime=feedTime}catch(e){if(requestId===loadRequestId)$('board').innerHTML=`<div class="error">CURRENT SHEET UNAVAILABLE // ${String(e.message||e)}</div>`}}
+function refreshWhenVisible(){if(document.visibilityState!=='hidden')load()}
+document.addEventListener('visibilitychange',refreshWhenVisible);
+window.addEventListener('focus',refreshWhenVisible);
+window.addEventListener('pageshow',event=>{if(event.persisted)refreshWhenVisible()});
 load();setInterval(load,60000);
 </script>
 </body>
