@@ -109,4 +109,42 @@ const parsed=extractPinnacleHomeSpread({
 },'2026-09-01T20:02:00Z');
 assert.equal(parsed.homeSpread,-3.5,'headline Pinnacle rung should prefer the highest two-sided limit');
 
+// A suspended mobile page must pick up a personnel closeout on return, and a
+// delayed or stale response must never restore its earlier unresolved warning.
+const refreshSource=hotline.slice(hotline.indexOf('let loadRequestId='),hotline.indexOf('load();setInterval(load,60000)'));
+const pending=[],rendered=[],listeners={},board={innerHTML:''};
+const refreshDocument={visibilityState:'visible',addEventListener:(name,fn)=>{listeners[name]=fn}};
+const refreshContext={FEED:'/current-week-terminal.json',Date,Number,
+  document:refreshDocument,window:{addEventListener:(name,fn)=>{listeners[name]=fn}},
+  fetch:()=>new Promise((resolve,reject)=>pending.push({resolve,reject})),
+  render:data=>rendered.push(data),$:()=>board};
+vm.runInNewContext(refreshSource,refreshContext);
+const payload=(generatedAt,unresolved)=>({generatedAt,personnelUnresolvedCases:unresolved?['Riley Moss']:[]});
+const response=data=>({ok:true,json:async()=>data});
+const initialLoad=refreshContext.load();
+const resumedLoad=refreshContext.load();
+pending[1].resolve(response(payload('2026-10-15T23:57:10Z',false)));
+await resumedLoad;
+pending[0].resolve(response(payload('2026-10-15T18:39:12Z',true)));
+await initialLoad;
+assert.equal(rendered.length,1,'a delayed earlier response cannot replace a resolved personnel sheet');
+assert.equal(rendered[0].personnelUnresolvedCases.length,0);
+const cachedLoad=refreshContext.load();
+pending[2].resolve(response(payload('2026-10-15T18:39:12Z',true)));
+await cachedLoad;
+assert.equal(rendered.length,1,'a stale upstream feed cannot roll the published sheet backward');
+refreshDocument.visibilityState='hidden';listeners.visibilitychange();
+assert.equal(pending.length,3,'a hidden page does not start another refresh');
+refreshDocument.visibilityState='visible';listeners.visibilitychange();
+assert.equal(pending.length,4,'returning to the page refreshes immediately');
+listeners.focus();
+assert.equal(pending.length,5,'focusing the hotline refreshes immediately');
+listeners.pageshow({persisted:false});
+assert.equal(pending.length,5,'a first page load does not duplicate its initial fetch');
+listeners.pageshow({persisted:true});
+assert.equal(pending.length,6,'restoring a page from back-forward cache refreshes immediately');
+for(const request of pending.slice(3))request.resolve(response(payload('2026-10-15T23:57:10Z',false)));
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(board.innerHTML,'','superseded requests must not leave an error over the current sheet');
+
 console.log('GRAHAM TERMINAL AUTOMATION: PASS');
