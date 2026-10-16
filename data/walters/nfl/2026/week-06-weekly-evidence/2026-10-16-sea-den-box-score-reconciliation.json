@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-16T13:04:43.000Z",
+  "season": 2026,
+  "sourceWeek": 6,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive pre-rollover reconciliation for SEA-DEN using the official Seahawks final box score. This binds the exact overtime duration and observed offensive usage to the existing source-exact final preparation without changing any rating, advancing the active manifest, writing current-week personnel/QB overlays, constructing fairs or issuing a bet. The pair remains blocked until the official final gamebook supports complete paired participation, injury/return intervals, replacement duties, specialist coverage and governed team totals.",
+  "marketViewed": false,
+  "inputCommit": "4e8c71d20e745512362da4c5030b5c10c4c684d0",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-06-personnel-ledger.json": "f05c3c2f5c2c5c56d42a89c938e00bf84225a161",
+    "data/walters/nfl/2026/week-06-current-numbers.json": "8bc4400f4fcb6d827f8bab69623e1b35d867e475",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "priorEvidenceBinding": {
+    "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-final-preparation.json",
+    "commit": "b9bfcd9e6479c8ed0c58ec5ff885c4f1f2ff9581",
+    "blobSha": "b3416f599f4114cf29dad5335e5c82e4847fb30c",
+    "rationale": "Reuses the exact final, frozen kickoff ratings and preserved H4, official inactive inventories, reusable source-bound pregame inputs, and literal Elijah Arroyo injury wording already recorded for this game. This additive bundle does not alter those immutable findings."
+  },
+  "sources": [
+    {
+      "id": "seahawks-sea-den-official-box-score",
+      "url": "https://www.seahawks.com/game-day/2026/reg-week6/seahawks-at-broncos/box-score",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W06-SEA-DEN"],
+      "finding": "Seattle's official final box score reports Denver 17, Seattle 14 after overtime; team time of possession of 35:38 for Seattle and 29:29 for Denver, establishing an exact total game duration of 65:07 (3,907 seconds); Sam Darnold and Bo Nix as the only listed passers; Seattle rushing work for Emanuel Wilson (14 attempts), George Holani (5), Velus Jones Jr. (4), Darnold (2) and Rashid Shaheed (1); Denver rushing work for J.K. Dobbins (17), RJ Harvey (6), Bo Nix (4) and Tyler Badie (1); and receiving production for Jaylen Waddle (4 receptions).",
+      "checkedAt": "2026-10-16T12:58:00.000Z"
+    },
+    {
+      "id": "nfl-sea-den-gamecenter-no-gamebook",
+      "url": "https://www.nfl.com/games/seahawks-at-broncos-2026-reg-6",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W06-SEA-DEN"],
+      "finding": "The official NFL game center continues to report the final but did not expose an accessible Download Game Book link at this recording time. The box score resolves exact duration and observed statistical usage, not full starter/substitute/DNP participation or printed injury and return sequences.",
+      "checkedAt": "2026-10-16T12:59:00.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W06-SEA-DEN",
+      "away": "SEA",
+      "home": "DEN",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "seahawks-sea-den-official-box-score",
+        "nfl-sea-den-gamecenter-no-gamebook"
+      ],
+      "final": {
+        "awayScore": 14,
+        "homeScore": 17,
+        "status": "FINAL_OVERTIME",
+        "sourceIds": ["seahawks-sea-den-official-box-score"]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-15T17:15:00-07:00",
+        "awayRating": 29.621639,
+        "homeRating": 26.4700956,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": 3.1515434,
+        "ratingLedgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc",
+        "powerLedgerBlobSha": "f8eaebe4a8eb8c9101d9194b048cbb25d2e61aab",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED"
+      },
+      "exactGameDuration": {
+        "seconds": 3907,
+        "display": "65:07",
+        "derivation": "35:38 SEA time of possession plus 29:29 DEN time of possession",
+        "sourceIds": ["seahawks-sea-den-official-box-score"]
+      },
+      "reconciliationFindings": [
+        {
+          "area": "SEA_RUNNING_BACK_ROLES",
+          "finding": "Emanuel Wilson's 14 rushes and George Holani's 5 rushes establish actual game-day use by the previously identified candidate replacements for Jadarian Price and Zach Charbonnet. Velus Jones Jr. also recorded 4 rushes. This supports candidate identity and active use but does not by itself prove exact displaced-duty shares or complete snap allocation.",
+          "sourceIds": ["seahawks-sea-den-official-box-score"]
+        },
+        {
+          "area": "QUARTERBACK_USAGE",
+          "finding": "Sam Darnold and Bo Nix are the only passers listed in the official box score. This narrows the quarterback review but does not replace final gamebook participation needed for source-exact NO_GAME_DAY_LOSS certification.",
+          "sourceIds": ["seahawks-sea-den-official-box-score"]
+        },
+        {
+          "area": "DEN_SKILL_PARTICIPATION",
+          "finding": "Tyler Badie's 1 rushing attempt and Jaylen Waddle's 4 receptions establish active statistical participation. The box score does not establish any injury departure, return or missed-duty interval, so no injury loss is inferred from those rows.",
+          "sourceIds": ["seahawks-sea-den-official-box-score"]
+        },
+        {
+          "area": "SEA_ELIJAH_ARROYO",
+          "finding": "Elijah Arroyo has no receiving entry in the official box score. Absence from a receiving-stat row does not establish his snap interval, return status or replacement duties, and his frozen calibrated value of zero is not a substitute for complete coverage.",
+          "sourceIds": ["seahawks-sea-den-official-box-score"]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official final gamebook was still not exposed from the NFL game center. Exact total game duration is now resolved at 3,907 seconds, but complete starter/substitute/DNP participation and all printed injury/return sequences remain unavailable.",
+          "nextAction": "Retrieve and immutably bind the official final gamebook when exposed, then reconcile its literal participation and injury timeline without backdating this attempt.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The official box score establishes active use for Emanuel Wilson and George Holani, but it does not establish complete snap allocation or exact added-duty shares for the Zach Charbonnet and Jadarian Price reserve-list cases. Full paired inactive, reserve-list, DNP and role coverage is still incomplete; no missing value is treated as zero.",
+          "nextAction": "Use final participation and snap-role evidence to validate every SEA and DEN absence, activation and added duty once, then run the running-back, receiver, linebacker, defensive-back and specialist safeguards.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "The official second-quarter Elijah Arroyo shoulder report preserved in the prior bound evidence says doubtful to return, not returned. The box score resolves total duration but not his exact departure, any later return, or disjoint additional-duty tight-end assignments.",
+          "nextAction": "Bind Arroyo's exact departure and any explicit return or open interval through 3,907 seconds from the official gamebook, identify the actual additional-duty tight-end roles, and retain the zero-calibrated proof only inside complete team coverage.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Only Darnold and Nix are listed as passers, and Badie and Waddle have official statistical participation. Those facts do not certify complete quarterback duties or any injury departure/return interval. Secondary injury reporting is not promoted into a numerical loss without source-bound official timing, and paired specialist coverage remains open.",
+          "nextAction": "Certify quarterback NO_GAME_DAY_LOSS sections, every printed in-game injury/return sequence and both specialist units from the final gamebook, then recompute both governed team injury totals and run tools/graham-weekly-evidence.mjs before any READY state.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
