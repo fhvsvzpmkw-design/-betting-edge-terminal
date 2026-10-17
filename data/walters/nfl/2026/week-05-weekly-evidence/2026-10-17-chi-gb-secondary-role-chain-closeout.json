@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 5,
+  "recordedAt": "2026-10-17T17:00:56Z",
+  "scope": "Additive CHI-GB historical secondary-role closeout. It uses newly available Week 5 role reporting to close Kyler Gordon's persisted nickel-vacancy blocker and correct the previously estimated Tyrique Stevenson replacement identity through one disjoint role chain. It preserves the existing injury interval, frozen identities, values, H4 and prior evidence; leaves Benjamin St-Juste and final paired assembly blocked; and does not stage ratings, alter the active manifest or current-week overlays, construct a fair, or issue a bet.",
+  "inputCommit": "62e2b2fe027cad52ed92fb0377d555f970a85c2b",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "9742571a068351ad7a11af00cc035cdf06274e9a",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "priorEvidencePaths": [
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-17-chi-gb-continuing-reserve-reconciliation.json",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-16-chi-gb-partial-qb-role-reconciliation.json",
+    "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json"
+  ],
+  "priorEvidenceBindings": [
+    {
+      "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-17-chi-gb-continuing-reserve-reconciliation.json",
+      "commit": "137d423e0a7228dd0d30e7168045b06304a6d306",
+      "blob": "c02d5ff21c5c294a2026b7a5126589b0ef0398cb",
+      "treatment": "ADDITIVE_CONTINUATION"
+    },
+    {
+      "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-16-chi-gb-partial-qb-role-reconciliation.json",
+      "commit": "b7512d48d0a0c3868db72c1ae4437655541739ea",
+      "blob": "ed1a174e26f89715dd67bcc88d1efea146c9ca62",
+      "treatment": "ADDITIVE_CASE_CORRECTION"
+    },
+    {
+      "path": "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+      "commit": "905abf34eccf8336536b1a2a6fccb0ed379d2d4b",
+      "blob": "c1c314aa8443c5282c1f6d12027be30fb754c432",
+      "treatment": "IMMUTABLE_CONTINUING_CASE_REUSE"
+    }
+  ],
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "sources": [
+    {
+      "id": "chi-gb-official-gamebook-final-secondary-closeout",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/pqpptpb5ckujllxac1md",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-CHI-GB"
+      ],
+      "finding": "The official final gamebook confirms Green Bay's 31-7 final, Kyler Gordon inactive, and Malik Muhammad, Cam Lewis and Tyrique Stevenson as active Chicago participants. It preserves Stevenson's no-return injury sequence and does not establish an actual Benjamin St-Juste return.",
+      "checkedAt": "2026-10-17T17:00:56Z"
+    },
+    {
+      "id": "chi-week5-secondary-role-report-20261012",
+      "url": "https://www.si.com/nfl/bears/onsi/key-observations-from-bears-snap-count-in-their-week-5-loss-against-packers",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W05-CHI-GB"
+      ],
+      "finding": "Week 5 snap reporting records Malik Muhammad at 49 defensive snaps, Cam Lewis at 36 and Tyrique Stevenson at 31. It explicitly reports that after Stevenson's injury Muhammad moved outside and Lewis moved into the slot. The counts establish role identity only; they are not used as workload weights.",
+      "checkedAt": "2026-10-17T17:00:56Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-CHI-GB",
+      "state": "BLOCKED",
+      "away": "CHI",
+      "home": "GB",
+      "sourceIds": [
+        "chi-gb-official-gamebook-final-secondary-closeout",
+        "chi-week5-secondary-role-report-20261012"
+      ],
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_IN_PRIOR_ADDITIVE_EVIDENCE",
+        "frozenKickoffRatingsAndH4": "COMPLETE_IN_PRIOR_ADDITIVE_EVIDENCE",
+        "reserveListChronologyAndIdentity": "COMPLETE_IN_PRIOR_ADDITIVE_EVIDENCE",
+        "kylerGordonNickelVacancy": "COMPLETE",
+        "tyriqueStevensonPartialRoleChain": "COMPLETE_CORRECTED_ADDITIVELY",
+        "benjaminStJustePartial": "BLOCKED_CONFLICTING_PARTICIPATION_AND_SUCCESSOR_EVIDENCE",
+        "pairedGameDayInjuryLoss": "BLOCKED"
+      },
+      "newlyClosedCases": [
+        {
+          "caseKey": "2026-W05-CHI-Kyler-Gordon",
+          "team": "CHI",
+          "player": "Kyler Gordon",
+          "eaPlayerId": "22261",
+          "healthyValue": 0.9,
+          "availabilityStatus": "PUP_OUT",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "estimateAcknowledged": true,
+          "replacement": {
+            "player": "Malik Muhammad",
+            "eaPlayerId": "1867",
+            "value": 0.0,
+            "week5Role": "INITIAL_NICKEL_REPLACEMENT_THEN_RETAINED_OUTSIDE_IN_ROLE_CHAIN"
+          },
+          "replacementAwareLoss": 0.9,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineDoubleCountReviewed": true,
+          "baselineRationale": "Muhammad's existing contribution is retained once. His initial added nickel duty is assigned to Gordon's vacancy; when Stevenson leaves, Muhammad remains in the active set and shifts outside while Lewis enters the vacated slot through the separate Stevenson role chain.",
+          "assumptionRationale": "The immutable Week 2 Gordon-to-secondary estimate is advanced only after Week 5 reporting identifies the actual active role chain. Gordon's frozen 0.9 is compared with Muhammad's frozen 0.0 without using defensive snap counts as workload weights.",
+          "sourceIds": [
+            "chi-gb-official-gamebook-final-secondary-closeout",
+            "chi-week5-secondary-role-report-20261012"
+          ]
+        }
+      ],
+      "correctedPriorCase": {
+        "caseKey": "2026-W05-CHI-Tyrique-Stevenson",
+        "team": "CHI",
+        "player": "Tyrique Stevenson",
+        "eaPlayerId": "23038",
+        "healthyValue": 0.5,
+        "status": "PARTIAL_GAME",
+        "retiredReplacement": {
+          "player": "Josh Blackwell",
+          "eaPlayerId": "22644",
+          "value": 0.0,
+          "reason": "The earlier documented-depth estimate is superseded by later Week 5 role reporting; this additive correction does not rewrite the prior evidence file."
+        },
+        "resolution": "RECONCILED_ROLE_CHAIN",
+        "modelId": "graham-reconciled-role-chain-v1",
+        "estimateAcknowledged": true,
+        "retainedRoleMover": {
+          "player": "Malik Muhammad",
+          "eaPlayerId": "1867",
+          "value": 0.0,
+          "movement": "NICKEL_TO_OUTSIDE"
+        },
+        "incomingReplacement": {
+          "player": "Cam Lewis",
+          "eaPlayerId": "21412",
+          "value": 0.2,
+          "movement": "BENCH_TO_SLOT"
+        },
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineDoubleCountReviewed": true,
+        "baselineRationale": "Muhammad is retained and cancels across the role chain. Lewis enters once after Stevenson leaves and is not also credited to Gordon. Blackwell receives no added-duty credit.",
+        "assumptionRationale": "The source-supported position chain treats Stevenson as the single exiting identity and Lewis as the single incoming identity while Muhammad changes positions and cancels. No position-switch penalty or measured snap-share weighting is asserted.",
+        "unavailableInterval": {
+          "startEarliest": 1887,
+          "startLatest": 2180,
+          "assumedMidpoint": 2033.5,
+          "end": 3600,
+          "rationale": "Preserved unchanged from the prior official-gamebook reconciliation: last confirmed Stevenson duty at Q3 13:33 and first return-doubtful status at Q3 8:40; no return is recorded."
+        },
+        "replacementAwareLoss": 0.131,
+        "sensitivityRange": {
+          "min": 0.118,
+          "max": 0.143
+        },
+        "calculation": "round_once((0.5-0.2)*((3600-2033.5)/3600),3)=0.131",
+        "sourceIds": [
+          "chi-gb-official-gamebook-final-secondary-closeout",
+          "chi-week5-secondary-role-report-20261012"
+        ]
+      },
+      "resolvedSubtotalsOnly": {
+        "chiReserveLoss": 1.3,
+        "chiPartialGameLoss": 0.859,
+        "chiHistoricalQbLoss": 3.25,
+        "finding": "The reserve subtotal adds Gordon's 0.900 to the prior 0.400. The partial subtotal replaces Stevenson's prior 0.218 with 0.131 while preserving Edwards 0.602 and Odeyingbo 0.126. These are additive component subtotals, not a complete Chicago game-day injury total; other preserved cases and paired Green Bay coverage remain outside this summary."
+      },
+      "blockers": [
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Benjamin St-Juste remains source-bound to a special-teams-only Week 5 role and a return-questionable status after Q3 1:58 with no actual return. Available reports still conflict on six versus ten special-teams snaps and do not bind his exact injury play or the added-duty successor.",
+          "nextAction": "Resolve the participation conflict and successor duty through an authoritative participation source. Do not convert the status update into a departure time or treat return-questionable wording as a return.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The pair still requires one complete FINAL_GAME_DAY assembly combining every immutable pregame, reserve, partial-game and quarterback case with disjoint cluster coverage.",
+          "nextAction": "After St-Juste closes, assemble the full CHI and GB team sections, recompute complete injury totals, validate, preflight the current updater and stage only if READY.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ],
+      "teams": []
+    }
+  ],
+  "marketViewed": false
+}
