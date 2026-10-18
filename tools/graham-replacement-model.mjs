@@ -2,6 +2,8 @@
 export const REPLACEMENT_MODEL_ID='graham-replacement-role-estimate-v1';
 export const MODEL_RESOLUTIONS=['PRIMARY_REPLACEMENT','WEIGHTED_COMMITTEE','EQUAL_SHARE_COMMITTEE'];
 export const ROLE_CHAIN_MODEL_ID='graham-reconciled-role-chain-v1';
+export const CROSS_POSITION_PRIMARY_MODEL_ID='graham-source-confirmed-cross-position-primary-v1';
+export const CROSS_POSITION_PRIMARY_RESOLUTION='SOURCE_CONFIRMED_CROSS_POSITION_PRIMARY';
 const fail=code=>{throw Error(code);};
 const finite=x=>typeof x==='number'&&Number.isFinite(x);
 const text=x=>typeof x==='string'&&x.trim().length>0;
@@ -85,4 +87,18 @@ export function replacementEstimate(c,healthy,replacements,{sourceCheck=()=>{}}=
   // The 90/10 updater retains exact decimal arithmetic from that input onward.
   const injuryLoss=round(Math.max(0,healthy-effective));
   return {modelId:REPLACEMENT_MODEL_ID,classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,weightBasis,healthyValue:healthy,replacementValue:round(effective),replacementValueRatio:{numerator,denominator:total},injuryLoss,rawTeamContributionDelta:-injuryLoss,upgradeExcluded:effective>healthy,injuryLossRange:{min:round(Math.max(0,healthy-Math.max(...replacements.map(r=>r.waltersPoints)))),max:round(Math.max(0,healthy-Math.min(...replacements.map(r=>r.waltersPoints))))},weights:replacements.map((r,i)=>({player:r.player,eaPlayerId:r.eaPlayerId,lockedValue:r.waltersPoints,additionalRoleUnits:units[i],weight:units[i]/total})),baselineTreatment:c.baselineTreatment,assumptionRationale:c.assumptionRationale,precision:'Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.'};
+}
+
+// Narrow historical adapter for a source-confirmed primary duty performed by a
+// player whose locked roster position is in another calibrated group. Values
+// and identities stay frozen; no position-switch proficiency term is invented.
+export function sourceConfirmedCrossPositionPrimaryEstimate(c,absent,replacements,{sourceCheck=()=>{}}={}){
+  if(c.resolution!==CROSS_POSITION_PRIMARY_RESOLUTION||c.modelId!==CROSS_POSITION_PRIMARY_MODEL_ID||c.estimateAcknowledged!==true)fail('CROSS_POSITION_DECLARATION_REQUIRED');
+  if(c.primaryEvidence!=='REPORTED_PRIMARY'||replacements.length!==1||!text(c.vacantRole)||!text(c.reportedReplacementDuty)||c.positionSwitchPenaltyApplied!==false)fail('CROSS_POSITION_REPORTED_DUTY_REQUIRED');
+  if(!absent||!text(absent.position)||!text(replacements[0]?.position)||absent.position===replacements[0].position)fail('CROSS_POSITION_LOCKED_POSITIONS_REQUIRED');
+  const base=replacementEstimate({...c,modelId:REPLACEMENT_MODEL_ID,resolution:'PRIMARY_REPLACEMENT'},absent.waltersPoints,replacements,{sourceCheck});
+  return {...base,modelId:CROSS_POSITION_PRIMARY_MODEL_ID,method:CROSS_POSITION_PRIMARY_RESOLUTION,
+    weightBasis:'SOURCE_CONFIRMED_CROSS_POSITION_PRIMARY_DUTY',vacantRole:c.vacantRole,reportedReplacementDuty:c.reportedReplacementDuty,
+    lockedPositions:{absent:absent.position,replacement:replacements[0].position},positionSwitchPenaltyApplied:false,
+    limitation:'Source-confirmed historical added duty across locked position groups. Frozen identities and values are unchanged; no position-switch proficiency multiplier, inferred workload share or duplicate baseline duty is introduced.'};
 }

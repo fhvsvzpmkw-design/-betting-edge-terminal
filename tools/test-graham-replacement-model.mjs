@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {replacementEstimate,REPLACEMENT_MODEL_ID} from './graham-replacement-model.mjs';
+import {replacementEstimate,sourceConfirmedCrossPositionPrimaryEstimate,REPLACEMENT_MODEL_ID,CROSS_POSITION_PRIMARY_MODEL_ID,CROSS_POSITION_PRIMARY_RESOLUTION} from './graham-replacement-model.mjs';
 const registry=JSON.parse(fs.readFileSync('data/walters/nfl/player-values/player-values-2026-v1.json'));
 const names=['MarShawn Lloyd','Chris Brooks','Kaleb Johnson'];
 const rs=names.map(name=>registry.players.find(p=>p.player===name));
@@ -19,4 +19,10 @@ test('negative incremental role units fail',()=>assert.throws(()=>replacementEst
 test('equal method cannot silently discard submitted measured units',()=>assert.throws(()=>replacementEstimate({...base,replacements:base.replacements.map(r=>({...r,observedRoleUnits:10}))},1.7,rs),/WEIGHTED_METHOD/));
 test('primary choice requires documented role basis',()=>assert.throws(()=>replacementEstimate({...base,resolution:'PRIMARY_REPLACEMENT',replacements:[base.replacements[0]]},1.7,[rs[0]]),/PRIMARY_ROLE/));
 test('baseline and weighted source refs are checked',()=>assert.throws(()=>replacementEstimate(base,1.7,rs,{sourceCheck:()=>{throw Error('missing source');}}),/missing source/));
+test('source-confirmed cross-position primary retains locked values and no switch penalty',()=>{
+ const absent=registry.players.find(p=>p.player==='Reggie Gilliam'),replacement={player:'Tanner Arkin',eaPlayerId:'4812',position:'TE',waltersPoints:0};
+ const c={...base,modelId:CROSS_POSITION_PRIMARY_MODEL_ID,resolution:CROSS_POSITION_PRIMARY_RESOLUTION,primaryEvidence:'REPORTED_PRIMARY',vacantRole:'FULLBACK_H_BACK',reportedReplacementDuty:'FULLBACK_H_BACK_LEAD_BLOCKER',positionSwitchPenaltyApplied:false,replacements:[{player:replacement.player,eaPlayerId:replacement.eaPlayerId}]};
+ const r=sourceConfirmedCrossPositionPrimaryEstimate(c,absent,[replacement]);assert.equal(r.injuryLoss,.9);assert.deepEqual(r.lockedPositions,{absent:'FB',replacement:'TE'});assert.equal(r.positionSwitchPenaltyApplied,false);
+ delete c.positionSwitchPenaltyApplied;assert.throws(()=>sourceConfirmedCrossPositionPrimaryEstimate(c,absent,[replacement]),/REPORTED_DUTY/);
+});
 console.log(`GRAHAM REPLACEMENT MODEL: ${count} PASS`);

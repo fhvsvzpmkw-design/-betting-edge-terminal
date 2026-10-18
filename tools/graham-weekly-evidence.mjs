@@ -1,6 +1,6 @@
 // Historical input recovery uses existing locked values; it never writes old ledgers or fairs.
 import fs from 'node:fs';
-import {replacementEstimate,reconciledRoleChainEstimate,MODEL_RESOLUTIONS} from './graham-replacement-model.mjs';
+import {replacementEstimate,reconciledRoleChainEstimate,sourceConfirmedCrossPositionPrimaryEstimate,MODEL_RESOLUTIONS,CROSS_POSITION_PRIMARY_RESOLUTION} from './graham-replacement-model.mjs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -73,9 +73,10 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           sourceCheck(c.sourceIds,g.gameKey);sourceCheck(c.roleSourceIds,g.gameKey);
           if(c.baselineDoubleCountReviewed!==true||!nonempty(c.roleRationale))fail('REPLACEMENT_ROLE_REVIEW_REQUIRED');
           const p=lookup(c.player,c.eaPlayerId),rs=list(c.replacements).map(r=>lookup(r.player,r.eaPlayerId));
-          if(!rs.length||new Set(rs.map(r=>String(r.eaPlayerId))).size!==rs.length||rs.some(r=>group(r.position)!==group(p.position)||String(r.eaPlayerId)===String(p.eaPlayerId)))fail('CASE_REVIEW_REPLACEMENT_SET');
+          const crossPosition=c.resolution===CROSS_POSITION_PRIMARY_RESOLUTION;
+          if(!rs.length||new Set(rs.map(r=>String(r.eaPlayerId))).size!==rs.length||rs.some(r=>(!crossPosition&&group(r.position)!==group(p.position))||(crossPosition&&group(r.position)===group(p.position))||String(r.eaPlayerId)===String(p.eaPlayerId)))fail('CASE_REVIEW_REPLACEMENT_SET');
           const options={lookup,sourceCheck:ids=>sourceCheck(ids,g.gameKey)};
-          const estimate=c.resolution==='RECONCILED_ROLE_CHAIN'?reconciledRoleChainEstimate(c,p,rs,options):replacementEstimate(c,p.waltersPoints,rs,options);
+          const estimate=c.resolution==='RECONCILED_ROLE_CHAIN'?reconciledRoleChainEstimate(c,p,rs,options):crossPosition?sourceConfirmedCrossPositionPrimaryEstimate(c,p,rs,options):replacementEstimate(c,p.waltersPoints,rs,options);
           return {caseKey:c.caseKey,team:c.team,state:'CASE_ESTIMATE_ONLY',estimate,limitation:'Individual role estimate only; complete paired game-day coverage and team cluster checks still required.'};
         }catch(e){return {caseKey:c.caseKey,team:c.team,state:'BLOCKED',reason:e.message};}
       });
@@ -163,6 +164,9 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
               modelEstimate={modelId:'graham-partial-value-invariant-v1',method:c.resolution,healthyValue:p.waltersPoints,replacementValue:p.waltersPoints,injuryLoss:0,rawTeamContributionDelta:0,exposureRange:[0,1],assumptionRationale:c.assumptionRationale,activeEffectivenessConvention:c.activeEffectivenessConvention,proof:'Any unavailable fraction times max(0, healthy - equal-valued replacement) equals zero. Active play is valued normally absent reported continuing impairment; this is a modelling assumption, not a medical finding.'};
             }else if(c.resolution==='RECONCILED_ROLE_CHAIN'){
               modelEstimate=reconciledRoleChainEstimate(c,p,rs,{lookup,sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
+            }else if(c.resolution===CROSS_POSITION_PRIMARY_RESOLUTION){
+              if(bundle.estimationPolicy!=='graham-historical-value-estimates-v1')fail('CROSS_POSITION_POLICY_REQUIRED');
+              modelEstimate=sourceConfirmedCrossPositionPrimaryEstimate(c,p,rs,{sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
             }else if(MODEL_RESOLUTIONS.includes(c.resolution)){
               modelEstimate=replacementEstimate(c,p.waltersPoints,rs,{sourceCheck:ids=>sourceCheck(ids,g.gameKey)});
             }else if(c.resolution==='VALUE_INVARIANT_COMMITTEE'){
@@ -170,9 +174,10 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
               if(rs[0].waltersPoints>p.waltersPoints)fail('COMMITTEE_REPLACEMENT_EXCEEDS_HEALTHY');
             }else if(c.resolution!=='ONE_FOR_ONE')fail('UNSUPPORTED_HISTORICAL_RESOLUTION');
             const reserved=modelEstimate?.reservedPlayers?modelEstimate.reservedPlayers.map(r=>lookup(r.player,r.eaPlayerId)):rs;
+            const crossPosition=c.resolution===CROSS_POSITION_PRIMARY_RESOLUTION;
             for(const row of modelEstimate?.reconciledRoles?.before||[]){if(chainRoles.has(row.role))fail('CHAIN_SIMULTANEOUS_ROLE_OVERLAP');chainRoles.add(row.role);}
             for(const r of reserved){if(r.valueProvenance?.gameKeys&&!r.valueProvenance.gameKeys.includes(g.gameKey))fail('VALUE_ESTIMATE_WRONG_GAME');
-              if(String(r.eaPlayerId)===String(p.eaPlayerId)||group(r.position)!==group(p.position)||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');
+              if(String(r.eaPlayerId)===String(p.eaPlayerId)||(!crossPosition&&group(r.position)!==group(p.position))||(crossPosition&&group(r.position)===group(p.position))||replacements.has(String(r.eaPlayerId)))fail('REPLACEMENT_ROLE_OR_DOUBLE_COUNT');
               if((modelEstimate?.reservedPlayers||bundle.estimationPolicy==='graham-historical-value-estimates-v1')&&cs.some(other=>other!==c&&['IR','OUT','SUSPENDED','COMMISSIONER_EXEMPT'].includes(other.availabilityStatus)&&other.resolution!=='ACTIVE_FULL'&&String(lookup(other.player,other.eaPlayerId).eaPlayerId)===String(r.eaPlayerId)))fail('CHAIN_OCCUPANT_UNAVAILABLE_IN_OTHER_CASE');
               replacements.add(String(r.eaPlayerId));}
             for(const ex of list(c.excludedBaselineContributors)){if(!nonempty(ex.player)||!nonempty(ex.rationale)||rs.some(r=>norm(r.player)===norm(ex.player)))fail('BASELINE_EXCLUSION_INVALID');sourceCheck(ex.sourceIds,g.gameKey);}

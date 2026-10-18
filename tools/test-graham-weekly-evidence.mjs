@@ -49,6 +49,14 @@ check('approved primary model passes the full paired evidence evaluator',()=>{
  Object.assign(c,{resolution:'PRIMARY_REPLACEMENT',modelId:'graham-replacement-role-estimate-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic documented primary assumption',primaryEvidence:'NAMED_STARTER',baselineTreatment:'ADDITIONAL_DUTIES_ONLY',baselineDutiesDisplaced:false,baselineRationale:'Synthetic retained baseline duties',baselineSourceIds:sourceIds});
  const g=evaluateWeeklyEvidence(f).games[0];assert.equal(g.state,'READY');assert.equal(g.teams[0].injuryLoss,1.2);assert.equal(g.teams[0].valueBasis,'INCLUDES_GRAHAM_MODEL_ESTIMATE');assert.equal(g.teams[0].cases[0].modelEstimate.method,'PRIMARY_REPLACEMENT');
 });
+check('source-confirmed cross-position primary preserves locked identities without a switch penalty',()=>{
+ const f=structuredClone(fixture),c=f.bundle.games[0].teams[0].cases[0],replacement=registry.players.find(p=>p.player==='Jake Ferguson');
+ f.bundle.estimationPolicy='graham-historical-value-estimates-v1';
+ Object.assign(c,{resolution:'SOURCE_CONFIRMED_CROSS_POSITION_PRIMARY',modelId:'graham-source-confirmed-cross-position-primary-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic official report confirms the emergency added duty',primaryEvidence:'REPORTED_PRIMARY',vacantRole:'LG',reportedReplacementDuty:'EMERGENCY_LEFT_GUARD',positionSwitchPenaltyApplied:false,baselineTreatment:'ADDITIONAL_DUTIES_ONLY',baselineDutiesDisplaced:false,baselineRationale:'Synthetic retained tight-end baseline duties',baselineSourceIds:sourceIds,replacements:[{player:replacement.player,eaPlayerId:replacement.eaPlayerId}]});
+ const g=evaluateWeeklyEvidence(f).games[0],m=g.teams[0].cases[0].modelEstimate;
+ assert.equal(g.state,'READY');assert.equal(m.method,'SOURCE_CONFIRMED_CROSS_POSITION_PRIMARY');assert.deepEqual(m.lockedPositions,{absent:'LG',replacement:'TE'});assert.equal(m.positionSwitchPenaltyApplied,false);
+ c.resolution='PRIMARY_REPLACEMENT';c.modelId='graham-replacement-role-estimate-v1';assert.ok(evaluateWeeklyEvidence(f).games[0].blockers.some(b=>b.code==='REPLACEMENT_ROLE_OR_DOUBLE_COUNT'));
+});
 check('unequal committee estimate can reach a fully covered paired game',()=>{
  const f=structuredClone(fixture),c=f.bundle.games[0].teams[0].cases[0];
  Object.assign(c,{resolution:'EQUAL_SHARE_COMMITTEE',modelId:'graham-replacement-role-estimate-v1',estimateAcknowledged:true,assumptionRationale:'Synthetic equal incremental role allocation',baselineTreatment:'ADDITIONAL_DUTIES_ONLY',baselineDutiesDisplaced:false,baselineRationale:'Synthetic baseline retained',baselineSourceIds:sourceIds,replacements:[{player:c.replacements[0].player},{player:'Brandon Coleman'}]});
