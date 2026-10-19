@@ -5,7 +5,7 @@ The governed publisher accepts a small retry pointer at `data/history/staging/pu
 ## Before requesting a retry
 
 1. Read the original staging commit and its exact `data/history/staging/report-bundle.json` blob. Confirm its frozen READY envelope, `candidateId`, pinned feed and original report timestamp. A saved frozen checkpoint can verify the byte identity.
-2. Inspect the publisher runs for that candidate, including earlier request commits. If a matching run is queued or running, wait for its result. If it succeeded, verify authoritative History and controller read-back instead of creating another request. Never claim publication from staging alone.
+2. Inspect the publisher runs for that candidate, including earlier request commits, and its saved recovery receipt under `data/report-production/recovery-receipts/` when present. A later recovery review may identify a candidate blocker after the original infrastructure failure. If a matching run is queued or running, wait for its result. If it succeeded, verify authoritative History and controller read-back instead of creating another request. Never claim publication from staging alone.
 3. If a run failed, identify its failed step. Fix timeout, transfer, trigger or concurrent-push infrastructure before retrying. A failed candidate evidence, identity, freshness, eligibility or decision gate requires the normal draft correction and governed validation path; a retry pointer cannot repair the candidate or bypass that gate. Do not repeat the same failed candidate blindly.
 
 ## Request file
