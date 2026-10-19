@@ -22,6 +22,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import email.policy
+          from datetime import datetime, timedelta, timezone
           import hashlib
           import json
           import os
@@ -102,6 +103,91 @@ jobs:
           safe_bindings.sort(key=lambda item: (str(item["name"]), str(item["type"])))
           print("binding_names_and_types=" + json.dumps(safe_bindings))
 
+          def inspect_invocation_analytics():
+              # Read-only query based on Cloudflare's official Workers Metrics tutorial:
+              # https://developers.cloudflare.com/analytics/graphql-api/tutorials/querying-workers-metrics/
+              query = """
+              query SchedulerInvocations($accountTag: string, $datetimeStart: string, $datetimeEnd: string, $scriptName: string) {
+                viewer {
+                  accounts(filter: {accountTag: $accountTag}) {
+                    workersInvocationsAdaptive(limit: 1000, filter: {
+                      scriptName: $scriptName,
+                      datetime_geq: $datetimeStart,
+                      datetime_leq: $datetimeEnd
+                    }) {
+                      dimensions { datetime scriptName status }
+                      sum { requests errors subrequests }
+                    }
+                  }
+                }
+              }
+              """
+              end = datetime.now(timezone.utc)
+              variables = {
+                  "accountTag": account,
+                  "datetimeStart": (end - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                  "datetimeEnd": end.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                  "scriptName": worker,
+              }
+              request = urllib.request.Request(
+                  "https://api.cloudflare.com/client/v4/graphql",
+                  data=json.dumps({"query": query, "variables": variables}).encode("utf-8"),
+                  headers={
+                      "Authorization": "Bearer " + token,
+                      "Accept": "application/json",
+                      "Content-Type": "application/json",
+                  },
+                  method="POST",
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=60) as response:
+                      document = json.loads(response.read())
+                  if not isinstance(document, dict):
+                      print("analytics_unavailable_code=0")
+                      return
+                  if document.get("errors"):
+                      codes = []
+                      for error in document["errors"] if isinstance(document["errors"], list) else []:
+                          if not isinstance(error, dict):
+                              continue
+                          extension = error.get("extensions")
+                          code = error.get("code")
+                          if code is None and isinstance(extension, dict):
+                              code = extension.get("code")
+                          if isinstance(code, int) and not isinstance(code, bool):
+                              codes.append(code)
+                          elif isinstance(code, str) and re.fullmatch(r"[0-9]{1,10}", code):
+                              codes.append(int(code))
+                      print("analytics_unavailable_codes=" + json.dumps(sorted(set(codes)) or [0]))
+                      return
+                  accounts = document["data"]["viewer"]["accounts"]
+                  if not isinstance(accounts, list):
+                      print("analytics_unavailable_code=0")
+                      return
+                  safe_rows = []
+                  for entry in accounts:
+                      for row in entry.get("workersInvocationsAdaptive", []):
+                          dimensions = row.get("dimensions", {})
+                          sums = row.get("sum", {})
+                          stamp = dimensions.get("datetime")
+                          status = dimensions.get("status")
+                          safe_rows.append({
+                              "datetime": stamp if isinstance(stamp, str) and re.fullmatch(r"[0-9TZ:.+-]{1,40}", stamp) else None,
+                              "status": status if isinstance(status, str) and re.fullmatch(r"[A-Za-z_]{1,80}", status) else None,
+                              **{key: sums.get(key) if isinstance(sums.get(key), (int, float)) and not isinstance(sums.get(key), bool) else None
+                                 for key in ("requests", "errors", "subrequests")},
+                          })
+                  safe_rows.sort(key=lambda row: (str(row["datetime"]), str(row["status"])))
+                  print("worker_invocations_last24h=" + json.dumps(safe_rows))
+              except urllib.error.HTTPError as exc:
+                  print("analytics_unavailable_http_status=" + str(exc.code))
+              except Exception:
+                  # Analytics permission/schema failures must not block the inspection.
+                  # Never print response bodies, exception messages, or account details.
+                  print("analytics_unavailable_code=0")
+
+          inspect_invocation_analytics()
+
           script, content_type = get("", "deployed script", expect_json=False)
           print("deployed_response_sha256=" + hashlib.sha256(script).hexdigest())
           if "multipart/" in content_type.lower():
@@ -111,16 +197,39 @@ jobs:
               )
               if not message.is_multipart():
                   sys.exit("Cloudflare deployed script has an invalid multipart body.")
+              parts = [part for part in message.walk() if not part.is_multipart()]
+              metadata_modules = set()
+              for part in parts:
+                  part_name = str(part.get_param("name", header="content-disposition") or "")
+                  if part_name == "metadata":
+                      try:
+                          metadata = json.loads(part.get_payload(decode=True) or b"{}")
+                      except (ValueError, UnicodeError):
+                          sys.exit("Cloudflare deployed script has invalid metadata JSON.")
+                      if isinstance(metadata, dict):
+                          for key in ("main_module", "body_part"):
+                              if isinstance(metadata.get(key), str):
+                                  metadata_modules.add(metadata[key])
               sources = []
-              for part in message.walk():
-                  if part.is_multipart():
-                      continue
-                  filename = part.get_filename() or ""
-                  part_type = part.get_content_type()
-                  if "javascript" in part_type or filename.endswith((".js", ".mjs", ".cjs")):
+              part_summaries = []
+              for part in parts:
+                  filename = str(part.get_filename() or "")
+                  part_name = str(part.get_param("name", header="content-disposition") or "")
+                  module_name = filename or part_name
+                  part_type = part.get_content_type().lower()
+                  safe_name = module_name if re.fullmatch(r"[A-Za-z0-9_./ -]{1,120}", module_name) else "<omitted>"
+                  part_summaries.append({"name": safe_name, "type": part_type})
+                  is_js = (
+                      "javascript" in part_type
+                      or filename.lower().endswith((".js", ".mjs", ".cjs"))
+                      or part_name.lower().endswith((".js", ".mjs", ".cjs"))
+                      or module_name in metadata_modules
+                  )
+                  if is_js and part_name != "metadata":
                       payload = part.get_payload(decode=True)
                       if payload is not None:
                           sources.append(payload)
+              print("deployed_part_names_and_types=" + json.dumps(part_summaries))
               if not sources:
                   sys.exit("Cloudflare deployed multipart script contains no JavaScript modules.")
           elif "javascript" in content_type.lower() or "text/plain" in content_type.lower():
@@ -130,6 +239,9 @@ jobs:
 
           print("javascript_module_sha256=" + json.dumps(sorted(hashlib.sha256(source).hexdigest() for source in sources)))
           code = b"\n".join(sources).decode("utf-8", errors="replace")
+          reference_sha256 = "c2e06df9ae1258e403cd3d0e1cbedda2a16b284a8f2356bdfcf8ffeb5f5a35cf"
+          print("reference_repository_source_sha256=" + reference_sha256)
+          print("module_matches_reference_source=" + json.dumps(any(hashlib.sha256(source).hexdigest() == reference_sha256 for source in sources)))
           checks = {
               "scheduled_handler_syntax": bool(re.search(
                   r"\bscheduled\s*(?:\([^)]*\)\s*\{|:\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*=>))"
@@ -143,6 +255,13 @@ jobs:
               "workflow_dispatches_endpoint": "/dispatches" in code,
               "cron": "cron" in code,
               "odds": "odds" in code.lower(),
+              "github_actions_token_binding": "GITHUB_ACTIONS_TOKEN" in code,
+              "github_private_token_binding": "GITHUB_PRIVATE_TOKEN" in code,
+              "expected_odds_workflow_endpoint": "actions/workflows/odds-refresh.yml/dispatches" in code,
+              "expected_schedule_source": "data/main-schedule.json" in code,
+              "expected_cron_spec": "5,20,50 * * * *" in code,
+              "scheduled_slot_resolver": "resolveScheduledSlot" in code,
+              "vancouver_timezone": "America/Vancouver" in code,
           }
           print("deployed_code_markers=" + json.dumps(checks, sort_keys=True))
           PY
