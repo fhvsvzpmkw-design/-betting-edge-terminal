@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "state": "PUBLICATION_BLOCKED",
+  "requiredStatus": "PUBLICATION BLOCKED — CANDIDATE NOT STORED",
+  "statusScope": "Issued History was not written; the complete checkpoint and exact sealed staging candidate are durably saved on main.",
+  "purpose": "SAVED_OPEN_PUBLICATION_RECOVERY",
+  "verifiedAt": "2026-10-19T13:52:29Z",
+  "reportTimestamp": "2026-10-19T06:44:09.838-07:00",
+  "scheduledReportTime": "06:00",
+  "timezone": "America/Vancouver",
+  "preservedCandidate": {
+    "checkpointPath": "data/report-production/checkpoints/20261019-open-0600-061347.json",
+    "checkpointRevision": 43,
+    "checkpointPhase": "STAGED",
+    "checkpointBlobSha": "59529dbff3f8bd974cf6bfeba5b371015f2b7272",
+    "checkpointBytes": 1413132,
+    "checkpointCommit": "997114ec61315765e19f7ef69040ea10e5eb99b3",
+    "stagingPath": "data/history/staging/report-bundle.json",
+    "stagingBlobSha": "6141dfa0ce95fda7c3888b8096aac80838edd425",
+    "stagingBytes": 1425733,
+    "stagingCommit": "418584f18d4ed724f48f86d9cb24cb1a5c4dce4d",
+    "remoteBlobIdentityVerified": true,
+    "analyticalContentChanged": false,
+    "losslessCompressedTransport": true,
+    "candidateGates": {"state": "PASS", "count": 15},
+    "candidateDeferrals": 0,
+    "cardEvidenceDeferrals": 0
+  },
+  "publisher": {
+    "runId": 39262818343,
+    "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/39262818343",
+    "inputCommit": "418584f18d4ed724f48f86d9cb24cb1a5c4dce4d",
+    "conclusion": "failure",
+    "failedStep": "Require clean durable history before candidate publication",
+    "failedCommand": "node tools/report-pipeline.mjs history",
+    "failedGate": "report-publication.mjs verify",
+    "error": "spawnSync /opt/hostedtoolcache/node/22.23.3/x64/bin/node ETIMEDOUT",
+    "attempts": [
+      {"jobId": 118094628004, "conclusion": "failure", "gateDurationMs": 120097, "failureAt": "2026-10-19T13:48:10.5754556Z"},
+      {"jobId": 118096462060, "conclusion": "failure", "gateDurationMs": 120111, "failureAt": "2026-10-19T13:51:51.1877379Z"}
+    ],
+    "exactCandidateRetried": true,
+    "candidateExtractionReached": false,
+    "issuedHistoryWritten": false,
+    "independentPublishedReadback": "NOT_PERFORMED_NO_ISSUED_REPORT",
+    "classification": "PUBLISHER_EXECUTION_TIMEOUT_NOT_SELECTION_EVIDENCE_GAP_NOT_TRANSFER_LOSS"
+  },
+  "completedAnalysis": {
+    "events": 7,
+    "primarySelections": {"available": 42, "evaluated": 42, "blocked": 0, "unfinished": 0},
+    "counts": {"bet": 0, "lean": 3, "wait": 1, "pass": 38},
+    "riskCAD": 0,
+    "savedEventReviews": ["72909118", "72909120", "72909122", "75462404", "75060858", "71515924", "72909116"],
+    "provisionalLeans": [
+      {"selection": "Philadelphia Flyers moneyline", "book": "DraftKings", "americanPrice": "+195", "stakeCAD": 0},
+      {"selection": "Golden State Valkyries moneyline", "book": "DraftKings", "americanPrice": "-135", "stakeCAD": 0},
+      {"selection": "San Francisco 49ers -7.5", "book": "Bet365", "americanPrice": "-109", "stakeCAD": 0}
+    ],
+    "wait": {"selection": "Pittsburgh Penguins moneyline", "book": "Bet365", "americanPrice": "+160", "leanReassessmentPrice": "+165 or better", "automaticBet": false},
+    "remainingDependencies": [
+      "Final NHL goalies and scratches, including Flyers forward availability",
+      "WNBA Hayes/Williams availability and minutes; Gray hand response and final starters",
+      "MLB opener/bulk plan, probable starter confirmation, final lineups and official/feed first-pitch discrepancy",
+      "NFL final receiver/defensive availability; Daniels/Purdy currently expected, not newly confirmed",
+      "Graham baseline PROVISIONAL_BASELINE_PENDING; no numeric adoption",
+      "Historical quarterback canary lacks exact board blob binding; preserved as unverifiable"
+    ]
+  },
+  "ownedOddsPull": {
+    "requestId": "2026-10-19-open-primary-20261019T130949Z",
+    "collectorRunId": 39257815595,
+    "collectorConclusion": "success",
+    "feedGeneratedAt": "2026-10-19T13:11:00.913Z",
+    "feedBlobSha": "16c1a52f6ff77990aba983757060024e58147368",
+    "complete": true,
+    "providerErrors": [],
+    "matchingSlotReceiptVerified": true,
+    "additionalOddsPullRequested": false
+  },
+  "recoveryBoundary": {
+    "exactSavedCandidateRequired": true,
+    "noReducedReplacement": true,
+    "noDirectHistoryWrite": true,
+    "remainingWork": "Resolve the existing durable-History verification timeout, replay the exact sealed candidate through the staged publisher, then fetch main and complete controller readback.",
+    "recurringActivationOrScheduleChanged": false
+  }
+}
