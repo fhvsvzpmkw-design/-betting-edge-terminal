@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-18.2
+**Operating revision:** 2026-10-19.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -216,4 +216,7 @@ Serialize/parse the complete local file. Commit exact bytes through authenticate
 
 `.github/workflows/report-history-staged.yml` alone owns publication and durable read-back. It reads the candidate from the exact triggering commit, not whichever bundle happens to be newest when the job starts. `report-history.yml` is verification-only; its legacy publish path is retired. Inspect the run for the staging commit. A failed gate/transfer is `PUBLICATION BLOCKED — CANDIDATE NOT STORED`; incomplete execution is `PUBLICATION PENDING — CANDIDATE STAGED`. Neither permits a success claim or short link. Do not bypass it with a History write.
 
+If a preserved staging commit has no matching queued, running or successful publisher run, or an identified publication infrastructure failure has been fixed, follow `docs/REPORT_PUBLICATION_REQUEST.md`. Commit one unique schema-1 request at `data/history/staging/publication-request.json`, binding the original candidate commit, exact staged blob SHA and candidateId without changing frozen bytes. The publisher resolves the request from its exact triggering commit, requires the candidate commit to be an ancestor, and retains every normal validation and read-back gate. An unchanged old request never redirects a normal staging push. Failed candidate gates require normal correction rather than blind retries; this protocol never repeats an odds pull or authorizes direct History writes.
+
 After workflow SUCCESS, fetch authoritative main and run controller `readback` against the exact checkpoint. It verifies indexed decision/evidence identity and the shared read-back gates. Never run this against unpublished locally edited History. Read exact indexed report/sidecar from authoritative main. Then give the deterministic terminal link labeled `Open Betting Edge Terminal v1.5 — <report time>`. Report issued decisions/risk, completed versus pending counts and specific remaining limitations from those artifacts. Distinguish raw availability, source attempts, captured forecasts, adopted fairs and completed decisions. A published zero-card report with unfinished inventory is an incomplete analysis, not evidence that all opportunities were rejected. Profitability is measured by prospective results, prices and uncertainty; it cannot be inferred from more BET labels or publication success.
+

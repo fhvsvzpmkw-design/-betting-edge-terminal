@@ -86,7 +86,8 @@ try{
   const extracted=extractStagedReport({root:temp,commit:first,outputDir:path.join(temp,'extract')});
   assert.equal(extracted.blobSha,blobSha(frozen));assert.equal(JSON.parse(fs.readFileSync(path.join(temp,'extract/report.json'))).bankroll,100,'queued A must not publish latest B');
   const workflow=fs.readFileSync('.github/workflows/report-history-staged.yml','utf8');
-  assert.match(workflow,/CANDIDATE_COMMIT: \$\{\{ github.sha \}\}/);
+  assert.match(workflow,/TRIGGER_COMMIT: \$\{\{ github.sha \}\}/);
+  assert.match(workflow,/CANDIDATE_COMMIT: \$\{\{ steps.candidate.outputs.candidate_commit \}\}/);
   assert.equal((workflow.match(/report-pipeline.mjs validate/g)||[]).length,2,'same checks initially and after rebase');
   assert.match(workflow,/report-pipeline.mjs readback/);
   const legacy=fs.readFileSync('.github/workflows/report-history.yml','utf8');
@@ -101,3 +102,4 @@ const frozen=JSON.stringify(full),compact=compactEvidenceAudit(full);
 assert.equal(JSON.stringify(full),frozen);
 assert.deepEqual(compact.candidateAssessment,{available:2});assert.equal(compact.blockedReview.stillBlockedCount,2);
 assert.ok(JSON.stringify(compact).length<JSON.stringify(full).length/10);
+

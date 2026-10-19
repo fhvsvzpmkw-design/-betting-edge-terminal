@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Exact frozen report publication request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "requestId", "requestedAt", "candidateCommit", "candidateBlobSha", "candidateId"],
+  "properties": {
+    "schema": {"const": 1},
+    "requestId": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$"},
+    "requestedAt": {"type": "string", "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T[^\\r\\n]+(?:Z|[+-]\\d{2}:\\d{2})$"},
+    "candidateCommit": {"type": "string", "pattern": "^[a-fA-F0-9]{40}$"},
+    "candidateBlobSha": {"type": "string", "pattern": "^[a-fA-F0-9]{40}$"},
+    "candidateId": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[^\\r\\n]+$"}
+  }
+}

@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - data/history/staging/report-bundle.json
+      - data/history/staging/publication-request.json
 
 concurrency:
   group: betting-edge-report-history
@@ -32,11 +33,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Resolve exact publication candidate
+        id: candidate
+        env:
+          TRIGGER_COMMIT: ${{ github.sha }}
+          BEFORE_COMMIT: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: node --default-to-experimental-regexp-engine tools/resolve-report-publication.mjs
       - name: Require clean durable history before candidate publication
         run: node tools/report-pipeline.mjs history
       - name: Extract exact triggering candidate
         env:
-          CANDIDATE_COMMIT: ${{ github.sha }}
+          CANDIDATE_COMMIT: ${{ steps.candidate.outputs.candidate_commit }}
           CANDIDATE_DIR: /tmp
         run: node --default-to-experimental-regexp-engine tools/extract-staged-report.mjs
       - name: Normalize derived fields and validate candidate
@@ -118,3 +126,4 @@ jobs:
             echo "- Read-back: passed"
             echo "- Link: https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/r.html?id=$SHORT_ID"
           } >> "$GITHUB_STEP_SUMMARY"
+

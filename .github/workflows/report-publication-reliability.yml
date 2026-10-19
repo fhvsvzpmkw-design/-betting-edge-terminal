@@ -10,12 +10,20 @@ on:
       - tools/major-sport-market-coverage-gate.mjs
       - tools/report-coverage-summary.mjs
       - tools/coverage-validation-lookups.mjs
+      - tools/resolve-report-publication.mjs
+      - tools/extract-staged-report.mjs
+      - data/report-production/publication-request.schema.json
+      - docs/REPORT_PUBLICATION_REQUEST.md
+      - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
       - tools/odds-history-index.py
       - tools/publish-odds-history-index.sh
       - tests/report-history-verification.test.mjs
       - tests/coverage-validation-lookups.test.mjs
+      - tests/report-publication-request.test.mjs
+      - tests/report-pipeline.test.mjs
       - tests/odds-history-index-collision.py
       - .github/workflows/report-publication-reliability.yml
+      - .github/workflows/report-history-staged.yml
 
 permissions:
   contents: read
@@ -40,6 +48,7 @@ jobs:
           node --test tests/report-history-verification.test.mjs tests/coverage-validation-lookups.test.mjs tests/report-eligibility-wiring.test.mjs
           node tools/report-publication.mjs self-test
           node tests/report-pipeline.test.mjs
+          node --default-to-experimental-regexp-engine --test tests/report-publication-request.test.mjs
       - name: Concurrent snapshot-index publication regression
         run: |
           bash -n tools/publish-odds-history-index.sh
