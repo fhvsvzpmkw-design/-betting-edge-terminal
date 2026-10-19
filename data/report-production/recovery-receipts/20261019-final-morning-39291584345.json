@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "observedAt": "2026-10-19T17:13:58Z",
+  "status": "PUBLICATION BLOCKED — CANDIDATE NOT STORED",
+  "statusMeaning": "Not stored in issued History. The complete checkpoint and exact sealed candidate are durably saved and remotely hash-verified.",
+  "lane": {"date": "2026-10-19", "expectedReportTime": "09:30", "timezone": "America/Vancouver", "slot": "final_morning", "canonicalSlot": 3},
+  "authority": {"status": "OPERATIONAL", "version": "1.2", "operatingRevision": "2026-10-18.2", "blobSha": "88144cddb69c6cc994eb86012de1a6b4d7caebad"},
+  "candidateId": "2026-10-19T10:07:39.925-07:00|3",
+  "controller": {"phase": "STAGED", "revision": 32, "validationState": "PASS", "passingGates": 15, "candidateDeferrals": [], "cardEvidenceDeferrals": []},
+  "checkpoint": {
+    "path": "data/report-production/checkpoints/20261019-final-morning-0930-094425.json",
+    "commitSha": "c91b1cba8e2939ae23f8711491a25ee2d65b0eca",
+    "blobSha": "141b026d661a4b9d0cf8b28034ba32001ccb109f",
+    "encodedBytes": 1905004,
+    "decodedBytes": 17960620,
+    "remoteVerified": true
+  },
+  "sealedStaging": {
+    "path": "data/history/staging/report-bundle.json",
+    "commitSha": "c516ee9fbc07dd4e7970025016dd7ce671ad1b89",
+    "blobSha": "43b30ed1e8d50b17e57f2dd0c54adb74f4b98e8e",
+    "encodedBytes": 1922133,
+    "remoteVerified": true,
+    "completePayloadPreserved": true,
+    "transferFailure": false
+  },
+  "publisher": {
+    "workflow": ".github/workflows/report-history-staged.yml",
+    "runId": 39291584345,
+    "jobId": 118193303714,
+    "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/39291584345",
+    "headSha": "c516ee9fbc07dd4e7970025016dd7ce671ad1b89",
+    "conclusion": "failure",
+    "failedStep": "Require clean durable history before candidate publication",
+    "command": "node tools/report-pipeline.mjs history",
+    "gate": "report-publication.mjs verify",
+    "stepStartedAt": "2026-10-19T17:09:56.8921668Z",
+    "failureLoggedAt": "2026-10-19T17:11:57.1060851Z",
+    "durationMs": 120145,
+    "error": "Error: spawnSync /opt/hostedtoolcache/node/22.23.3/x64/bin/node ETIMEDOUT",
+    "candidateExtraction": "skipped",
+    "candidateValidation": "skipped",
+    "historyCommit": "skipped",
+    "remoteReadback": "skipped",
+    "classification": "Existing-History preflight timeout, before the candidate was extracted; not a candidate evidence failure or transfer failure.",
+    "retry": "Not repeated blindly: today's earlier Open and Main publishers also timed out at this existing-History verifier. Retain the exact sealed bytes for governed recovery after the verifier problem is addressed; recheck ordinary freshness and eligibility before any subsequent issue."
+  },
+  "durableReadback": {
+    "performed": false,
+    "published": false,
+    "reportPath": "data/history/runs/2026-10-19/final_morning-100739.json",
+    "remoteReportCheck": "GitHub contents API returned 404 on authoritative main at the recorded observation time.",
+    "terminalSuccessLinkDelivered": false
+  },
+  "odds": {
+    "requestId": "2026-10-19-final-morning-primary-20261019T163515710Z",
+    "collectorRunId": 39286646423,
+    "collectorConclusion": "success",
+    "generatedAt": "2026-10-19T16:36:16.042Z",
+    "feedBlobSha": "6501d06e8b7441945f2a748a17cad3cf14af209c",
+    "complete": true,
+    "providerErrors": [],
+    "slotReceiptMatched": true,
+    "additionalRequestsSubmitted": false
+  },
+  "analysis": {
+    "available": 42,
+    "evaluated": 40,
+    "evidenceBlocked": 2,
+    "unavailable": 0,
+    "decisions": {"BET": 0, "LEAN": 3, "WAIT": 2, "PASS": 35},
+    "newRiskCAD": 0,
+    "savedEventReviews": ["72909118", "72909120", "72909122", "75462404", "75060858", "71515924", "72909116"],
+    "pendingCapturedForecastReviews": 0,
+    "pendingSourceReviews": 0,
+    "quarterbackFollowUp": "Completed current team and targeted originating-reporter checks; Daniels and Purdy expected, not final game-starter declarations. Graham numeric clearance remains distinct.",
+    "leans": [
+      {"selection": "Philadelphia Flyers ML", "americanPrice": 195, "book": "Bet365", "status": "PROVISIONAL LEAN", "stakeCAD": 0, "recheck": "Goalies, final Flyers injury/forward status and lineup; material Pinnacle disagreement retained."},
+      {"selection": "Golden State Valkyries ML", "americanPrice": -135, "book": "DraftKings", "status": "PROVISIONAL LEAN", "stakeCAD": 0, "recheck": "Gray hand response, Hayes/Williams health and minutes, final starting units; DRatings/Pinnacle disagreement retained."},
+      {"selection": "San Francisco 49ers -7.5", "americanPrice": -109, "book": "Bet365", "status": "PROVISIONAL LEAN", "stakeCAD": 0, "recheck": "Expected quarterbacks, final inactive personnel; contrary Pinnacle/nfelo/Covers readings and provisional Graham baseline retained."}
+    ],
+    "waits": [
+      {"selection": "Toronto ML", "currentAmericanPrice": -135, "book": "Bet365", "reassessAmericanPrice": -125, "condition": "Or better; reassess applicable forecasts and unresolved personnel. Not automatic promotion or BET authorization."},
+      {"selection": "Pittsburgh ML", "currentAmericanPrice": 160, "book": "Bet365", "reassessAmericanPrice": 165, "condition": "Or better; reassess approved-source agreement, unconfirmed Silovs/Cossa goalie projections and final personnel. Not automatic promotion or BET authorization."}
+    ],
+    "unfinishedSelections": [
+      {"eventId": "75462404", "selection": "Atlanta +2.5", "americanPrice": -116, "book": "Bet365"},
+      {"eventId": "75462404", "selection": "Golden State -2.5", "americanPrice": -105, "book": "Bet365"}
+    ],
+    "unfinishedReason": "Exact Dimers cover points were found and reviewed. The selected 2.5-point spread lacks an exact qualified Pinnacle reference (observer line 2.0); the alternative supported-fair route lacks source-grounded uncertainty. No invented intervals or transfer from another contract.",
+    "otherLimitations": ["Published forecast model-generation times are unknown where sources do not disclose them.", "MLB probable pitchers are not confirmed starters and unpublished lineups remain unresolved.", "No independent fair was adopted and no stake was authorized."]
+  },
+  "safeguards": {"issuedHistoryWrittenDirectly": false, "frozenAnalyticalContentModified": false, "payloadReduced": false, "extraOddsPull": false, "automationActivationOrTimingChanged": false},
+  "nextStep": "Investigate or repair the existing-History verifier under appropriate change authority, then use the governed staged-publisher path with the complete preserved candidate and all ordinary freshness/identity/readback checks. The two WNBA spread evidence gaps remain separate analytical work."
+}
