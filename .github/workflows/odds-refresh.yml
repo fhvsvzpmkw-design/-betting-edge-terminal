@@ -80,7 +80,7 @@ jobs:
         id: gate
         if: steps.schedule.outputs.should_run == 'true'
         env:
-          GITHUB_EVENT_NAME: ${{ steps.schedule.outputs.effective_event_name || github.event_name }}
+          EFFECTIVE_EVENT_NAME: ${{ steps.schedule.outputs.effective_event_name || github.event_name }}
           TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
           SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
           REQUEST_TRIGGER_SOURCE: ${{ steps.schedule.outputs.request_trigger_source || '' }}

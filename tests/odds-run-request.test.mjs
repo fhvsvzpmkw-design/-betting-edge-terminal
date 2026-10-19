@@ -24,7 +24,7 @@ try{
   assert.equal(resolved.requestTriggerSource,'report-task-recovery');
   assert.equal(resolved.requestScheduledAt,pulse);
   assert.equal(shouldCollect({root,slot:resolved.slot}).execute,true,'late report request collects an unfulfilled lane');
-  const gateEnv={...process.env,GITHUB_EVENT_NAME:resolved.effectiveEventName,
+  const gateEnv={...process.env,GITHUB_EVENT_NAME:'push',EFFECTIVE_EVENT_NAME:resolved.effectiveEventName,
     REQUEST_TRIGGER_SOURCE:resolved.requestTriggerSource,REQUEST_SCHEDULED_AT:resolved.requestScheduledAt};
   const gate=()=>spawnSync(process.execPath,[gateTool,'check'],{cwd:root,encoding:'utf8',env:gateEnv});
   const dueGate=gate();
@@ -66,6 +66,10 @@ try{
   assert.equal(manual.effectiveEventName,'workflow_dispatch');
   assert.equal(manual.requestTriggerSource,'manual','established manual feed provenance remains compatible');
   assert.equal(shouldCollect({root,slot:manual.slot}).execute,true,'intentional manual request works outside the schedule');
+  const manualGate=spawnSync(process.execPath,[gateTool,'check'],{cwd:root,encoding:'utf8',
+    env:{...process.env,GITHUB_EVENT_NAME:'push',EFFECTIVE_EVENT_NAME:manual.effectiveEventName,REQUEST_TRIGGER_SOURCE:'manual',REQUEST_SCHEDULED_AT:''}});
+  assert.equal(manualGate.status,0,manualGate.stderr);
+  assert.match(manualGate.stdout,/execute=true\nreason=manual/,'manual request must work with GitHub actual event name fixed to push');
 
   const output=Object.fromEntries(requestOutputLines(resolved).split('\n').map(line=>line.split(/=(.*)/s).slice(0,2)));
   assert.equal(output.should_run,'true');
@@ -94,7 +98,7 @@ try{
 
   const workflow=fs.readFileSync('.github/workflows/odds-refresh.yml','utf8');
   assert.match(workflow,/push:\n\s+branches: \[main\]\n\s+paths:\n\s+- data\/odds-run-request\.json/);
-  assert.match(workflow,/GITHUB_EVENT_NAME: \$\{\{ steps\.schedule\.outputs\.effective_event_name \|\| github\.event_name \}\}/);
+  assert.match(workflow,/EFFECTIVE_EVENT_NAME: \$\{\{ steps\.schedule\.outputs\.effective_event_name \|\| github\.event_name \}\}/);
   assert.equal((workflow.match(/node tools\/odds-run-request\.mjs resolve/g)||[]).length,1,'request is resolved once');
   console.log('ODDS RUN REQUEST: frozen commit, validation, delayed recovery, durable dedup, manual override, safe outputs PASS');
 }finally{fs.rmSync(root,{recursive:true,force:true});}

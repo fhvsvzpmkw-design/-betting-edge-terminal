@@ -58,7 +58,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
       const scheduled=process.env.TRIGGER_MODE==='cloudflare_scheduled';
       const recovery=process.env.REQUEST_TRIGGER_SOURCE==='report-task-recovery';
       const now=recovery?new Date(process.env.REQUEST_SCHEDULED_AT):scheduled?new Date(process.env.SCHEDULED_AT):new Date();
-      const slot=resolveWorkflowSchedule({now,eventName:scheduled?'schedule':process.env.GITHUB_EVENT_NAME});
+      const eventName=recovery||scheduled?'schedule':process.env.EFFECTIVE_EVENT_NAME||process.env.GITHUB_EVENT_NAME;
+      const slot=resolveWorkflowSchedule({now,eventName});
       const feed=fs.existsSync('data/live-odds.json')?read('data/live-odds.json'):null;
       const result=shouldCollect({slot,feed});console.log(`execute=${result.execute}\nreason=${result.reason}`);
     }else throw new Error('Use odds-slot-state.mjs check|record');
