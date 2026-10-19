@@ -1,0 +1,259 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-19T05:08:00.000Z",
+  "season": 2026,
+  "sourceWeek": 6,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Pre-rollover additive preparation for DAL-GB after the official NFL game center reported FINAL. The exact final, frozen pre-kickoff rating/H4 snapshot, official final inactive inventories, reusable pregame contribution bindings and literal official in-game injury reporting are preserved under Week 6 with the actual recording time. The pair remains blocked pending the official final gamebook and complete paired game-day reconciliation. WAS-SF had not yet been played and is not included. This does not advance the active manifest, publish ratings, write current-week personnel/QB overlays, construct fairs or issue a bet.",
+  "marketViewed": false,
+  "inputCommit": "e6b2ec73d888f0ffc2195d37a1176717de1a2717",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-06-personnel-ledger.json": "1890fbd0a28fb1425de8eae9f21500d9e103c126",
+    "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "sources": [
+    {
+      "id": "nfl-dal-gb-gamecenter-final",
+      "url": "https://www.nfl.com/games/cowboys-at-packers-2026-reg-6",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-DAL-GB"
+      ],
+      "finding": "The official NFL game center reports Dallas 13, Green Bay 23, FINAL in regulation.",
+      "checkedAt": "2026-10-19T05:02:00.000Z"
+    },
+    {
+      "id": "nfl-week6-dal-gb-final-inactives",
+      "url": "https://www.nfl.com/news/nfl-week-6-inactives-players-ruled-out-sunday-2026-season",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-DAL-GB"
+      ],
+      "finding": "NFL.com's final inactive report lists Dallas players DeMarvion Overshown, Cobie Durant, Alijah Clark, Emari Demercado, James Houston, Drew Shelton and Camden Brown inactive, and Green Bay players Benjamin St. Juste, Jager Burton, Aaron Banks and Donovan Jennings inactive.",
+      "checkedAt": "2026-10-19T05:03:00.000Z"
+    },
+    {
+      "id": "nfl-week6-dal-gb-notable-injuries",
+      "url": "https://www.nfl.com/news/notable-injuries-news-sunday-week-6-games-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-DAL-GB"
+      ],
+      "finding": "NFL.com reports Dallas wide receiver KaVontae Turpin was ruled out with a rib injury, Dallas linebacker Dee Winters did not return with an ankle injury, and Green Bay cornerback Brandon Cisse did not return with a stinger. The roundup does not provide exact departure plays, later returns or complete relief-duty assignments.",
+      "checkedAt": "2026-10-19T05:04:00.000Z"
+    },
+    {
+      "id": "nfl-dal-gb-gamebook-guidance",
+      "url": "https://support.nfl.com/hc/en-us/articles/35869678028180-Game-Books",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-DAL-GB"
+      ],
+      "finding": "NFL support says final gamebook PDFs are exposed from game centers. At recording time, the DAL-GB game center reported FINAL but did not expose a Download Game Book link, so complete final participation and printed injury/return sequences could not yet be source-bound.",
+      "checkedAt": "2026-10-19T05:05:00.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W06-DAL-GB",
+      "away": "DAL",
+      "home": "GB",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "nfl-dal-gb-gamecenter-final",
+        "nfl-week6-dal-gb-final-inactives",
+        "nfl-week6-dal-gb-notable-injuries",
+        "nfl-dal-gb-gamebook-guidance"
+      ],
+      "final": {
+        "awayScore": 13,
+        "homeScore": 23,
+        "status": "FINAL_REGULATION",
+        "sourceIds": [
+          "nfl-dal-gb-gamecenter-final"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-18T17:20:00-07:00",
+        "awayRating": 25.7159746,
+        "homeRating": 24.7154316,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": 1.000543,
+        "ratingLedgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc",
+        "powerLedgerBlobSha": "f8eaebe4a8eb8c9101d9194b048cbb25d2e61aab",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED",
+        "finalInactiveInventories": "CAPTURED_NOT_YET_NUMERICALLY_RECONCILED",
+        "officialInGameInjuryReporting": "CAPTURED_NOT_YET_INTERVAL_RECONCILED"
+      },
+      "finalInactiveInventories": {
+        "DAL": [
+          "DeMarvion Overshown",
+          "Cobie Durant",
+          "Alijah Clark",
+          "Emari Demercado",
+          "James Houston",
+          "Drew Shelton",
+          "Camden Brown"
+        ],
+        "GB": [
+          "Benjamin St. Juste",
+          "Jager Burton",
+          "Aaron Banks",
+          "Donovan Jennings"
+        ]
+      },
+      "reusablePregameInputs": [
+        {
+          "team": "GB",
+          "clusterGroup": "DEFENSIVE_LINE",
+          "caseKeys": [
+            "2026-W06-GB-Javon-Hargrave",
+            "2026-W06-GB-Jonathan-Ford"
+          ],
+          "savedCurrentWeekContributionDelta": -0.7,
+          "historicalPromotionStatus": "REQUIRES_FINAL_ACTIVATION_GAME_DAY_ROLE_AND_CLUSTER_REVIEW"
+        },
+        {
+          "team": "GB",
+          "clusterGroup": "LINEBACKER",
+          "caseKeys": [
+            "2026-W06-GB-Edgerrin-Cooper"
+          ],
+          "savedCurrentWeekContributionDelta": -0.65,
+          "historicalPromotionStatus": "REQUIRES_FINAL_ACTIVATION_GAME_DAY_ROLE_AND_CLUSTER_REVIEW"
+        },
+        {
+          "team": "GB",
+          "clusterGroup": "RECEIVER",
+          "caseKeys": [
+            "2026-W06-GB-Skyy-Moore"
+          ],
+          "savedCurrentWeekContributionDelta": 0,
+          "historicalPromotionStatus": "REQUIRES_FINAL_ACTIVATION_GAME_DAY_ROLE_AND_CLUSTER_REVIEW"
+        },
+        {
+          "team": "GB",
+          "clusterGroup": "DEFENSIVE_BACK",
+          "caseKeys": [
+            "2026-W06-GB-Benjamin-St-Juste"
+          ],
+          "savedCurrentWeekContributionDelta": -0.5,
+          "historicalPromotionStatus": "REQUIRES_FINAL_ACTIVATION_GAME_DAY_ROLE_AND_CLUSTER_REVIEW"
+        },
+        {
+          "team": "DAL",
+          "clusterGroup": "OFFENSIVE_LINE",
+          "caseKeys": [
+            "2026-W06-DAL-Drew-Shelton"
+          ],
+          "savedCurrentWeekContributionDelta": 0,
+          "historicalPromotionStatus": "REQUIRES_FINAL_ACTIVATION_GAME_DAY_ROLE_AND_CLUSTER_REVIEW"
+        },
+        {
+          "team": "DAL",
+          "clusterGroup": "DEFENSIVE_BACK",
+          "caseKeys": [
+            "2026-W06-DAL-Cobie-Durant"
+          ],
+          "savedCurrentWeekContributionDelta": -0.9,
+          "historicalPromotionStatus": "REQUIRES_FINAL_ACTIVATION_GAME_DAY_ROLE_AND_CLUSTER_REVIEW"
+        }
+      ],
+      "observedInGameInjuries": [
+        {
+          "team": "DAL",
+          "player": "KaVontae Turpin",
+          "frozenEaPlayerId": "22599",
+          "frozenHealthyValue": 0.5,
+          "frozenValueStatus": "CALIBRATED",
+          "injury": "rib",
+          "reportedTiming": "UNSPECIFIED_IN_OFFICIAL_ROUNDUP",
+          "literalStatus": "RULED_OUT",
+          "returnEstablished": false,
+          "sourceIds": [
+            "nfl-week6-dal-gb-notable-injuries"
+          ],
+          "status": "INTERVAL_AND_REPLACEMENT_ROLE_UNRESOLVED"
+        },
+        {
+          "team": "DAL",
+          "player": "Dee Winters",
+          "frozenEaPlayerId": "23001",
+          "frozenHealthyValue": 0.5,
+          "frozenValueStatus": "CALIBRATED",
+          "injury": "ankle",
+          "reportedTiming": "UNSPECIFIED_IN_OFFICIAL_ROUNDUP",
+          "literalStatus": "DID_NOT_RETURN",
+          "returnEstablished": false,
+          "sourceIds": [
+            "nfl-week6-dal-gb-notable-injuries"
+          ],
+          "status": "INTERVAL_AND_REPLACEMENT_ROLE_UNRESOLVED"
+        },
+        {
+          "team": "GB",
+          "player": "Brandon Cisse",
+          "frozenEaPlayerId": "16349",
+          "frozenHealthyValue": 0.2,
+          "frozenValueStatus": "CALIBRATED",
+          "injury": "stinger",
+          "reportedTiming": "UNSPECIFIED_IN_OFFICIAL_ROUNDUP",
+          "literalStatus": "DID_NOT_RETURN",
+          "returnEstablished": false,
+          "sourceIds": [
+            "nfl-week6-dal-gb-notable-injuries"
+          ],
+          "status": "INTERVAL_AND_REPLACEMENT_ROLE_UNRESOLVED"
+        }
+      ],
+      "quarterbackReview": {
+        "DAL": {
+          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
+          "finding": "No reviewed official injury source identifies an injury-driven quarterback relief interval. Final gamebook participation is required before certifying NO_GAME_DAY_LOSS."
+        },
+        "GB": {
+          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
+          "finding": "No reviewed official injury source identifies an injury-driven quarterback relief interval. Final gamebook participation is required before certifying NO_GAME_DAY_LOSS."
+        }
+      },
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official final gamebook PDF was not exposed from the NFL DAL-GB game center at recording time. Complete starter/substitute/DNP participation and all printed injury and return sequences therefore cannot yet be certified.",
+          "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation/injury timeline without backdating this attempt.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The final inactive lists and saved current-week contribution bindings are available, but every inactive, DNP and continuing reserve-list case has not yet been assembled into complete paired historical team coverage. Saved current-week contributions are reusable inputs, not automatic historical adoption, and missing values are not treated as zero.",
+          "nextAction": "After the gamebook is available, bind every final inactive/DNP and reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run offensive-line, defensive-line, linebacker, defensive-back, receiver and special-teams safeguards.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Official reporting says KaVontae Turpin was ruled out with a rib injury, Dee Winters did not return with an ankle injury, and Brandon Cisse did not return with a stinger. The report does not establish source-exact departure/end intervals, later returns or complete additional-duty replacements. A rule-out or did-not-return status is not rewritten as a whole-game loss.",
+          "nextAction": "Use the official gamebook and source-bound injury timeline to bind each departure, any explicit return or the open interval through game end, and disjoint replacement duties; do not duplicate a whole-game inactive loss.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Neither quarterback room has complete gamebook-certified participation, and every specialist and printed injury/return sequence remains open. A completed research review is not a completed numerical update.",
+          "nextAction": "Certify both quarterback sections, specialist coverage and every printed injury/return sequence from the official gamebook, then recompute both governed team injury totals and run tools/graham-weekly-evidence.mjs before any READY state.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
