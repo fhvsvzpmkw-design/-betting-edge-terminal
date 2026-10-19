@@ -1,17 +1,19 @@
-# Connected odds workflow requests
+# Default report-start odds workflow
 
-The connected GitHub tools can start the existing `Refresh Betting Edge odds` workflow by committing `data/odds-run-request.json` on `main`. This is an additional entry point to `.github/workflows/odds-refresh.yml`, not another odds collector or a change to the report schedule. It avoids GitHub's delayed cron event and does not require a browser login. Actions runner availability still determines when the job starts.
+All five Main report tasks launch their normal odds pull through the connected GitHub tools by committing `data/odds-run-request.json` on `main`. This is the default entry point to the existing `Refresh Betting Edge odds` collector. Do not wait for a separate odds timer or a user to press Run workflow. GitHub cron is retired and legacy Cloudflare scheduled dispatches are rejected before collection.
 
-## Automatic report recovery
+The five report times remain 06:00, 08:00, 09:30, 15:15 and 18:15 America/Vancouver. Canonical pulse times in `data/main-schedule.json` remain slot identity anchors; the primary pull now starts with its report task. Keep actual request, start, save and issue timestamps. This avoids GitHub cron delay; report-task start time and Actions runner availability still affect completion.
 
-After resolving the current Main report lane and before binding report inputs, inspect `data/live-odds.json` and `data/odds-pull-receipts/<Vancouver-date>.json`. Use a normally eligible current feed when available. If the required lane's odds are missing, stale, or bound to another automatic lane, and that slot has not been fulfilled, request its existing primary pull automatically. Do not ask the user to press Run workflow. Never pull again merely because prices or selections are unattractive.
+## Default first step for each report
 
-Use a fresh `requestedAt` and a unique `requestId`. Resolve `scheduledAt` as that date's exact configured pulse in `America/Vancouver`, with its actual UTC offset. For example, the following is the request shape; all example values must be replaced with the actual lane/date/clock:
+After resolving the Main lane and before binding inputs or broad research, inspect `data/live-odds.json`, `data/odds-pull-receipts/<Vancouver-date>.json`, and the latest request and exact-slot Actions run. Reuse a normally usable feed for an already fulfilled slot, or an eligible fresh manual feed under the shared authority. Otherwise request this slot's primary pull once when it is unfulfilled and no matching request/run already exists. Do not wait to declare a missed pull first.
+
+Use a fresh `requestedAt` and a unique `requestId`. Resolve `scheduledAt` as that date's exact canonical pulse with the actual America/Vancouver UTC offset. The existing `scheduled_recovery` enum and `report-task-recovery` provenance remain compatibility names for this default method. Replace every example value with the actual lane/date/clock:
 
 ```json
 {
   "schema": 1,
-  "requestId": "2026-10-19-open-recovery-unique-id",
+  "requestId": "2026-10-19-open-primary-unique-id",
   "mode": "scheduled_recovery",
   "requestedAt": "2026-10-19T06:00:00-07:00",
   "scheduledAt": "2026-10-19T05:50:00-07:00",
@@ -20,16 +22,16 @@ Use a fresh `requestedAt` and a unique `requestId`. Resolve `scheduledAt` as tha
 }
 ```
 
-Create the file if absent; otherwise read its current blob SHA and replace it with the connected GitHub file tools. The workflow validates the exact request bytes at the triggering commit, not a later replacement. Requests must be at most 10 minutes old. Scheduled recovery must match one controlled current-day pulse and start within 75 minutes of it. The ordinary slot receipt and workflow concurrency gates suppress duplicate collection, preserving five primary slots per operating day. Existing quote freshness, exact identity, odds-provider quota, research and publication gates remain unchanged.
+Create the file if absent; otherwise fetch its current blob SHA and replace it with the connected GitHub file tool. The workflow validates exact request bytes from the triggering commit. Requests must be at most 10 minutes old when resolved; scheduled requests must match a current-day canonical pulse within 75 minutes. Concurrency and durable slot receipts suppress duplicate collection. Preserve the five primary slots, quote freshness, exact identity, provider budgets, research and publication gates.
 
-Inspect the Actions run for the exact request commit. Wait for completion in bounded checks; do not issue duplicate requests while a matching run is queued or running. Success requires independent readback of the saved feed and the matching slot receipt: verify the actual `generatedAt`, blob SHA, canonical slot, date and workflow run ID. A green skipped job or accepted request alone is not fresh odds. If deduplication skips collection, verify the existing fulfilled feed is usable. Rebuild the report input inventory only after this readback, then continue the normal controller sequence.
+Inspect the Actions run for the exact request commit and wait in bounded checks. Never submit another request while that run is queued or running. Independently verify saved feed bytes/blob SHA, actual `generatedAt`, date, canonical slot, provider errors/coverage, and matching slot receipt/workflow run ID before rebuilding report inputs. If deduplication skips collection, verify the fulfilled feed is usable. An accepted request, green skipped job or saved partial snapshot alone is not a complete pull.
 
-If collection or publication fails, retain the request and checkpoint, inspect the exact failed step, and report that failure. Do not fabricate freshness, change the report's lane, claim a report completed, or ask for a routine manual pull. Do not disable or reschedule report tasks. An expired recovery window remains an explicit odds-collection limitation.
+If collection or publication fails, preserve the request and checkpoint and inspect the actual failed step. A partial/HTTP429 snapshot or a failed run after API spending does not authorize automatic repeat collection; inspect provider diagnostics and its returned reset. Durable receipt absence after a failed job does not prove that no API requests were spent. Do not loop requests, manufacture freshness, change lanes or ask for a routine manual pull. Report the concrete limitation and keep the report task enabled.
 
 ## An explicitly requested manual pull
 
-An intentional on-demand pull uses the same validated request entry point with `mode: "manual"`, a fresh `requestedAt`, and a unique `requestId`. It has the existing manual Run workflow semantics, including valid manual provenance. This mode is reserved for an explicit on-demand request; scheduled report tasks use `scheduled_recovery` and its slot deduplication.
+An intentional on-demand pull uses `mode: "manual"`, a fresh `requestedAt` and a unique `requestId`, or the existing manual Run workflow button. It retains normal manual provenance and existing quota constraints. Report tasks use the slot-bound scheduled mode above.
 
 ## Verification status
 
-A successful connected-request test proves this trigger can start the collector and save a new snapshot. Punctual unattended operation remains unverified until actual scheduled report runs exercise the recovery without user action. This mechanism removes the need for a browser click; it does not guarantee exact report start times or repair Cloudflare dispatch authentication.
+The connected-request test started the workflow and saved a snapshot, but the October 18 test was partial after HTTP429. Tonight's existing 19:12 PT verification remains scheduled to check complete collection after the provider reset. Punctual unattended operation of the new primary path remains unverified until real scheduled report tasks exercise it. Do not claim an exact-time guarantee.

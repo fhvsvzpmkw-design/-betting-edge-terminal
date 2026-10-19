@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL — SCHEDULING LAYER  
 **Effective:** 2026-08-19  
-**Updated:** 2026-09-06 — permanent Main Betting Edge schedule
+**Updated:** 2026-10-18 — report-start requests are the default odds trigger
 **Timezone:** `America/Vancouver`  
 **Betting methodology authority:** `BETTING_EDGE_CONTRACT.md` v1.0 + Core v1.5 production manifest (from September 21 06:00; prior reports retain Core v1.4)
 **Schedule definition:** `data/main-schedule.json`
@@ -17,7 +17,7 @@ The canonical slot keys remain `open`, `main`, `final_morning`, `evening` and `l
 
 Every Vancouver operating day uses the permanent Main Betting Edge schedule. There is no seasonal selection, queued schedule state or terminal schedule control.
 
-The Main schedule supplies exactly five primary odds pulses and five report windows. The Odds-API spending target remains five primary pulls per operating day. Every configured primary odds pulse is scheduled 10 minutes before its corresponding report window.
+The Main schedule supplies exactly five primary odds slots and five report windows. The Odds-API spending target remains five primary pulls per operating day. Configured pulse times remain canonical identity anchors 10 minutes before each report; normal collection now starts as the first step of the corresponding report task.
 
 The schedule is repository-controlled and is not exposed as a Preferences option.
 
@@ -40,11 +40,13 @@ The staged publisher independently enforces the same rule and fails closed on `E
 
 ## Automatic odds scheduling
 
-Cloudflare Worker Cron remains the **single automatic odds scheduler**. It wakes at the configured minute marks, reads the permanent Vancouver-local Main schedule and dispatches the existing GitHub odds workflow only when that exact minute is a configured pulse. The Worker does not perform the quota-heavy odds collection itself.
+Each Main report task owns its **default report-start odds request**. After lane resolution and before binding inputs or broad research, it follows `docs/ODDS_RUN_REQUEST.md` to request that slot through the connected GitHub tools unless its input is already fulfilled. The request-file push starts the existing collector directly; the task verifies the saved feed and durable receipt before proceeding.
 
-The target odds workflow retains its serialization, canonical-slot duplicate protection and five-primary-pull cap. `workflow_dispatch` remains an intentional manual path. Connected GitHub requests at `data/odds-run-request.json` can also start this same workflow; report tasks automatically request an unfulfilled missed primary slot under `docs/ODDS_RUN_REQUEST.md`.
+The GitHub odds cron is retired. Legacy Cloudflare scheduled dispatches are rejected at the odds workflow boundary before collection; a still-deployed Worker timer cannot spend odds-provider requests through that retired entry point. Serialization, canonical-slot duplicate protection and the five-primary-slot cap remain. Explicit manual requests and the manual Run workflow button remain available. Report-task start time and Actions runner queues still affect actual completion.
 
 ## Permanent Main Betting Edge timing
+
+The left-hand times below remain canonical pulse identities. Each report task requests its normal pull at its right-hand report window; actual timestamps remain authoritative.
 
 - 05:50 odds → 06:00 report
 - 07:50 odds → 08:00 report
@@ -100,9 +102,9 @@ New report-history/index records should retain, when available:
 
 The legacy `scheduleProfileId`, `scheduleProfileLabel` and `scheduleProfileSchema` field names remain compatibility metadata for new report-history/index records; their Main schedule values are `main`, `MAIN BETTING EDGE` and `1`. Existing historical values remain untouched.
 
-Odds snapshots use `scheduleMeta` for corresponding schedule/pulse provenance. Automatic snapshots identify `triggerSource: cloudflare-cron`, `github-schedule-recovery` or `report-task-recovery`; intentional manual refreshes identify `triggerSource: manual`. Cloudflare remains the primary dispatcher. A GitHub scheduled recovery checks the same slot five minutes after its pulse; it collects only if the slot has not been fulfilled. Both share one workflow concurrency group and durable daily slot receipts in `data/odds-pull-receipts/`. A later manual feed cannot erase an already fulfilled slot. UTC recovery triggers cover both historical seasonal offsets; the America/Vancouver resolver determines the active lane. GitHub scheduling may itself be delayed, so this is recovery redundancy, not a punctuality guarantee. The five canonical slots and API budgets are unchanged.
+Odds snapshots use `scheduleMeta` for slot/pulse provenance. The default report-task request retains `triggerSource: report-task-recovery` and mode `scheduled_recovery` as compatibility names; their operational role is now primary. Historical `cloudflare-cron` and `github-schedule-recovery` records remain unchanged. Intentional manual refreshes retain `triggerSource: manual`. One workflow concurrency group and durable daily slot receipts in `data/odds-pull-receipts/` suppress duplicate collection. A later manual feed cannot erase a fulfilled slot. Never automatically repeat a partial/429 pull or a possibly quota-spending failed run merely because a complete feed or receipt is absent. The five canonical slots and API budgets remain unchanged.
 
-Manual refreshes remain valid report inputs under the normal freshness, exact-quote, identity and event-eligibility gates. Their null canonical slot/planned report time and `MANUAL` markers describe collection provenance, not a report-lane prohibition. The scheduled task resolves its own lane from its expected report time and this Main schedule, while retaining the source feed unchanged. Apply the manual-snapshot binding rule in `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` section 3.
+Manual refreshes remain valid report inputs under the normal freshness, exact-quote, identity and event-eligibility gates. Their null canonical slot/planned report time and `MANUAL` markers describe collection provenance, not a report-lane prohibition. The scheduled task resolves its own lane from its expected report time and this Main schedule, while retaining the source feed unchanged. Apply the manual-snapshot binding rule in `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` section 2.
 
 ## VigScope
 

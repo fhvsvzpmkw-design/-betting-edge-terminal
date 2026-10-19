@@ -5,16 +5,10 @@ on:
     branches: [main]
     paths:
       - data/odds-run-request.json
-  # Five minutes after each primary pulse. Paired UTC hours cover PST/PDT;
-  # the Vancouver resolver skips the inactive seasonal hour. No extra slot.
-  schedule:
-    - cron: '55 12,13,14,15 * * *'
-    - cron: '25 16,17 * * *'
-    - cron: '10 1,2,22,23 * * *'
   workflow_dispatch:
     inputs:
       trigger_mode:
-        description: Trigger source for this odds refresh
+        description: Trigger source (cloudflare_scheduled is retired and rejected)
         required: false
         default: manual
         type: choice
@@ -22,7 +16,7 @@ on:
           - manual
           - cloudflare_scheduled
       scheduled_at:
-        description: Cloudflare scheduled timestamp (ISO-8601; scheduled mode only)
+        description: Retired Cloudflare envelope; nonempty values are rejected
         required: false
         type: string
 
@@ -38,41 +32,43 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
+      - name: Accept report requests or explicit manual pulls only
+        id: entry
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
+          SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
+        run: |
+          case "${GITHUB_EVENT_NAME}" in
+            push)
+              ;;
+            workflow_dispatch)
+              if [ "${TRIGGER_MODE:-manual}" != "manual" ] || [ -n "${SCHEDULED_AT}" ]; then
+                echo "Retired automatic odds dispatch rejected. Scheduled report tasks own odds requests." >&2
+                exit 1
+              fi
+              ;;
+            *)
+              echo "Retired odds scheduler event rejected: ${GITHUB_EVENT_NAME}. Scheduled report tasks own odds requests." >&2
+              exit 1
+              ;;
+          esac
+
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
 
-      - name: Validate Cloudflare dispatch envelope
-        if: github.event_name == 'workflow_dispatch' && inputs.trigger_mode == 'cloudflare_scheduled'
-        env:
-          SCHEDULED_AT: ${{ inputs.scheduled_at }}
-        run: |
-          node <<'NODE'
-          const raw=String(process.env.SCHEDULED_AT||'').trim();
-          const scheduled=Date.parse(raw);
-          if(!raw||!Number.isFinite(scheduled)) throw new Error('Cloudflare scheduled dispatch requires a valid scheduled_at timestamp');
-          const ageMinutes=Math.abs(Date.now()-scheduled)/60000;
-          if(ageMinutes>35) throw new Error(`Cloudflare scheduled_at is outside the 35-minute dispatch window (${ageMinutes.toFixed(1)}m)`);
-          console.log(`Cloudflare dispatch envelope OK // scheduled_at=${raw} // age=${ageMinutes.toFixed(1)}m`);
-          NODE
-
       - name: Resolve permanent Main Betting Edge schedule
         id: schedule
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
-          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
-          SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
         run: |
           if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
             node tools/odds-run-request.mjs resolve >> "$GITHUB_OUTPUT"
           else
-            if [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
-              export EVENT_NAME=schedule
-            else
-              export EVENT_NAME="${GITHUB_EVENT_NAME}"
-            fi
+            export EVENT_NAME=workflow_dispatch
             node tools/main-schedule.mjs resolve-workflow >> "$GITHUB_OUTPUT"
           fi
 
@@ -81,8 +77,6 @@ jobs:
         if: steps.schedule.outputs.should_run == 'true'
         env:
           EFFECTIVE_EVENT_NAME: ${{ steps.schedule.outputs.effective_event_name || github.event_name }}
-          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
-          SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
           REQUEST_TRIGGER_SOURCE: ${{ steps.schedule.outputs.request_trigger_source || '' }}
           REQUEST_SCHEDULED_AT: ${{ steps.schedule.outputs.request_scheduled_at || '' }}
         run: node tools/odds-slot-state.mjs check >> "$GITHUB_OUTPUT"
@@ -141,8 +135,7 @@ jobs:
           PLANNED_PULSE: ${{ steps.schedule.outputs.planned_pulse_time }}
           PLANNED_REPORT: ${{ steps.schedule.outputs.planned_report_time }}
           FEATURED_VIG: ${{ steps.schedule.outputs.featured_vig_scope }}
-          TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
-          TRIGGER_SCHEDULED_AT: ${{ steps.schedule.outputs.request_scheduled_at || inputs.scheduled_at || '' }}
+          TRIGGER_SCHEDULED_AT: ${{ steps.schedule.outputs.request_scheduled_at || '' }}
           REQUEST_TRIGGER_SOURCE: ${{ steps.schedule.outputs.request_trigger_source || '' }}
         run: |
           node <<'NODE'
@@ -150,8 +143,7 @@ jobs:
           const p='data/live-odds.json';
           const j=JSON.parse(fs.readFileSync(p,'utf8'));
           const canonicalRaw=String(process.env.CANONICAL_SLOT||'').trim();
-          const triggerMode=String(process.env.TRIGGER_MODE||'');
-          const triggerSource=process.env.REQUEST_TRIGGER_SOURCE|| (triggerMode==='cloudflare_scheduled'?'cloudflare-cron':process.env.GITHUB_EVENT_NAME==='schedule'?'github-schedule-recovery':'manual');
+          const triggerSource=process.env.REQUEST_TRIGGER_SOURCE||'manual';
           j.scheduleMeta={
             schema:1,
             operatingDate:process.env.OPERATING_DATE||null,
@@ -234,9 +226,9 @@ jobs:
           if [ -n "${REQUEST_TRIGGER_SOURCE}" ]; then
             trigger_source="${REQUEST_TRIGGER_SOURCE}"
           elif [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
-            trigger_source="cloudflare-cron"
+            trigger_source="retired-cloudflare-rejected"
           elif [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
-            trigger_source="github-schedule-recovery"
+            trigger_source="retired-github-cron-rejected"
           else
             trigger_source="manual"
           fi
@@ -254,5 +246,5 @@ jobs:
             echo "- Crypto fight watch: exact-pair priority inside 30 hours"
             echo "- Pinnacle: official non-executable sharp benchmark via OddsPapi; 25-request reserve protected"
             echo "- Five-pull daily cap: unchanged"
-            echo "- Scheduled clock: Cloudflare primary; GitHub same-slot recovery with durable deduplication"
+            echo "- Automatic entry: scheduled report-task request; legacy scheduler dispatches rejected"
           } >> "$GITHUB_STEP_SUMMARY"

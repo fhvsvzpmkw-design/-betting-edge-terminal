@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-18.1
+**Operating revision:** 2026-10-18.2
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -37,10 +37,13 @@ Read schemas as needed for the chosen route: `docs/CANDIDATE_ASSESSMENT.md`, `do
 
 ## 2. Bind current executable prices
 
-### Automatic recovery of a missed primary odds pull — October 18
+### Default report-start odds pull — October 18
 
-The user has authorized automatic launch of the existing odds workflow when its scheduled input is missing. Before binding stale/missing odds and before broad research, follow `docs/ODDS_RUN_REQUEST.md`. Inspect the current feed and the day's slot receipts. If no ordinarily usable feed exists for this lane and its primary slot is unfulfilled, commit one validated `scheduled_recovery` request to `data/odds-run-request.json` through the connected GitHub tools. The push starts the existing collector without GitHub cron or a browser click. Inspect the run for that exact request commit and independently verify its published feed and durable slot receipt before rebuilding inventory. Preserve the five primary slots, same-slot duplicate gate, actual timestamps, quote freshness, odds-provider budgets and all analytical/publication gates. Do not use manual request mode from a report task or refresh merely to improve a result. A queued request or green skipped job is not collection success. Keep the report task enabled; state an actual failed collection or expired recovery window accurately. This current exception supersedes an older task-prompt prohibition on initiating a missed scheduled pull.
+Each of the five Main report tasks owns its normal odds pull. Immediately after resolving its lane and before binding inputs or broad research, follow `docs/ODDS_RUN_REQUEST.md`. Inspect the current feed, today's durable slot receipt and the latest request/run for that exact slot. If an already fulfilled slot has a normally usable feed, reuse it. A recent eligible manual feed may also fulfill the input need under the manual binding rule below; do not duplicate it. Otherwise, when this slot is unfulfilled and no matching run has already been requested, queued, started or failed, commit one validated `scheduled_recovery` request to `data/odds-run-request.json` through the connected GitHub tools. The existing enum and `report-task-recovery` provenance are retained for compatibility; this is now the primary report-start method, not a fallback waiting for another scheduler.
 
+The request push starts the existing collector directly. Do not wait for a Cloudflare timer, GitHub cron or user click. GitHub's odds cron is retired, and legacy Cloudflare scheduled dispatches are rejected before collection. Keep the existing five report times and canonical pulse identities; actual collection and issue times remain truthful. Inspect the exact request commit's Actions run and independently verify the saved feed, diagnostics and matching durable slot receipt before rebuilding inventory.
+
+Preserve same-slot deduplication, actual timestamps, normal freshness, odds-provider budgets and all analytical/publication gates. Do not use manual mode from a report task, refresh for unattractive prices, or submit another request while a matching run exists. A partial/429 feed or a failed run that may have spent API requests is not permission to repeat collection: inspect its diagnostics and provider reset first and report the concrete limitation. A queued request, skipped job or partial snapshot does not prove a complete pull. Keep report tasks enabled and state any real failure or expired request/slot window accurately. This default supersedes older missed-pull-only wording.
 
 Start with `node tools/report-inputs.mjs --at <actual-report-timestamp> --report-time <HH:MM> --root <repo-root>` for a compact inventory and exact source bindings; add `--event-id <id>` for one event's executable quotes and availability limitations. Process the full feed, observer and histories locally in code; do not print entire datasets into the conversation. This read-only projection runs the canonical inventory selector but is not issuance clearance: `validationState=NOT_RUN`. Existing feed provenance/freshness, evidence, Core and publication validators remain authoritative. Rebuild projections when bound bytes change. No extra odds pull is needed to build them.
 
