@@ -1,0 +1,148 @@
+name: Inspect odds scheduler deployment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/odds-scheduler-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read Cloudflare scheduler configuration
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import email.policy
+          import hashlib
+          import json
+          import os
+          import re
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from email.parser import BytesParser
+
+          token = os.environ.get("CF_API_TOKEN", "").strip()
+          account = os.environ.get("CF_ACCOUNT_ID", "").strip()
+          if not token or not account:
+              sys.exit("Required Cloudflare credentials are not configured.")
+
+          worker = "betting-edge-terminal"
+          base = (
+              "https://api.cloudflare.com/client/v4/accounts/"
+              + urllib.parse.quote(account, safe="")
+              + "/workers/scripts/"
+              + urllib.parse.quote(worker, safe="")
+          )
+
+          def get(path, label, expect_json=True):
+              request = urllib.request.Request(
+                  base + path,
+                  headers={"Authorization": "Bearer " + token},
+                  method="GET",
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=60) as response:
+                      payload = response.read()
+                      content_type = response.headers.get("Content-Type", "")
+              except urllib.error.HTTPError as exc:
+                  sys.exit(f"Cloudflare {label} request failed (HTTP {exc.code}).")
+              except Exception as exc:
+                  # Exception strings can contain URLs; print only their class.
+                  sys.exit(f"Cloudflare {label} request failed ({type(exc).__name__}).")
+
+              if expect_json or "application/json" in content_type.lower():
+                  try:
+                      document = json.loads(payload)
+                  except (ValueError, UnicodeError):
+                      sys.exit(f"Cloudflare {label} returned invalid JSON.")
+                  if not isinstance(document, dict) or document.get("success") is not True:
+                      # Never print an API response or error message verbatim.
+                      sys.exit(f"Cloudflare {label} returned an unsuccessful API result.")
+                  if expect_json:
+                      return document.get("result")
+                  sys.exit(f"Cloudflare {label} returned JSON instead of deployed code.")
+              return payload, content_type
+
+          schedules = get("/schedules", "schedules")
+          # Cloudflare currently returns {"schedules": [...]}; tolerate the list shape.
+          if isinstance(schedules, dict):
+              schedules = schedules.get("schedules")
+          if not isinstance(schedules, list):
+              sys.exit("Cloudflare schedules returned an unexpected result shape.")
+          crons = []
+          for item in schedules:
+              if not isinstance(item, dict) or not isinstance(item.get("cron"), str):
+                  sys.exit("Cloudflare schedules contained an invalid schedule.")
+              crons.append(item["cron"])
+          print("cron_specs=" + json.dumps(sorted(crons)))
+
+          settings = get("/settings", "settings")
+          if not isinstance(settings, dict):
+              sys.exit("Cloudflare settings returned an unexpected result shape.")
+          print("compatibility_date=" + json.dumps(settings.get("compatibility_date")))
+          bindings = settings.get("bindings", [])
+          if not isinstance(bindings, list):
+              sys.exit("Cloudflare settings contained an invalid bindings list.")
+          safe_bindings = []
+          for binding in bindings:
+              if not isinstance(binding, dict):
+                  sys.exit("Cloudflare settings contained an invalid binding.")
+              safe_bindings.append({"name": binding.get("name"), "type": binding.get("type")})
+          safe_bindings.sort(key=lambda item: (str(item["name"]), str(item["type"])))
+          print("binding_names_and_types=" + json.dumps(safe_bindings))
+
+          script, content_type = get("", "deployed script", expect_json=False)
+          print("deployed_response_sha256=" + hashlib.sha256(script).hexdigest())
+          if "multipart/" in content_type.lower():
+              message = BytesParser(policy=email.policy.default).parsebytes(
+                  ("Content-Type: " + content_type + "\r\nMIME-Version: 1.0\r\n\r\n").encode("ascii")
+                  + script
+              )
+              if not message.is_multipart():
+                  sys.exit("Cloudflare deployed script has an invalid multipart body.")
+              sources = []
+              for part in message.walk():
+                  if part.is_multipart():
+                      continue
+                  filename = part.get_filename() or ""
+                  part_type = part.get_content_type()
+                  if "javascript" in part_type or filename.endswith((".js", ".mjs", ".cjs")):
+                      payload = part.get_payload(decode=True)
+                      if payload is not None:
+                          sources.append(payload)
+              if not sources:
+                  sys.exit("Cloudflare deployed multipart script contains no JavaScript modules.")
+          elif "javascript" in content_type.lower() or "text/plain" in content_type.lower():
+              sources = [script]
+          else:
+              sys.exit("Cloudflare deployed script has an unsupported content type.")
+
+          print("javascript_module_sha256=" + json.dumps(sorted(hashlib.sha256(source).hexdigest() for source in sources)))
+          code = b"\n".join(sources).decode("utf-8", errors="replace")
+          checks = {
+              "scheduled_handler_syntax": bool(re.search(
+                  r"\bscheduled\s*(?:\([^)]*\)\s*\{|:\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*=>))"
+                  r"|addEventListener\s*\(\s*['\"]scheduled['\"]",
+                  code,
+              )),
+              "scheduled": "scheduled" in code,
+              "trigger_mode": "trigger_mode" in code,
+              "cloudflare_scheduled": "cloudflare_scheduled" in code,
+              "workflow_dispatch": "workflow_dispatch" in code,
+              "workflow_dispatches_endpoint": "/dispatches" in code,
+              "cron": "cron" in code,
+              "odds": "odds" in code.lower(),
+          }
+          print("deployed_code_markers=" + json.dumps(checks, sort_keys=True))
+          PY
