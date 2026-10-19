@@ -7,7 +7,9 @@ on:
     paths:
       - data/report-event-eligibility-v1.json
       - tools/report-event-eligibility.mjs
+      - tools/report-pipeline.mjs
       - tests/report-event-eligibility.test.mjs
+      - tests/report-eligibility-wiring.test.mjs
       - BETTING_EDGE_MAIN_SCHEDULE.md
       - .github/workflows/report-event-eligibility.yml
       - .github/workflows/report-history-staged.yml
@@ -33,11 +35,10 @@ jobs:
         run: node tools/report-event-eligibility.mjs self-test
       - name: Verify current 18:15 regression fixture
         run: node tests/report-event-eligibility.test.mjs
-      - name: Confirm publisher contains eligibility gate
-        run: |
-          grep -F 'node tools/report-event-eligibility.mjs validate --report /tmp/report.json' .github/workflows/report-history-staged.yml
-          grep -F 'node tools/report-event-eligibility.mjs validate --report "$REPORT_PATH"' .github/workflows/report-history-staged.yml
+      - name: Confirm publisher validates eligibility through the shared pipeline
+        run: node --test tests/report-eligibility-wiring.test.mjs
       - name: Confirm schedule authority requires same-day policy
         run: |
           grep -F 'data/report-event-eligibility-v1.json' BETTING_EDGE_MAIN_SCHEDULE.md
           grep -F 'Do not backfill an undersized board with next-day events.' BETTING_EDGE_MAIN_SCHEDULE.md
+

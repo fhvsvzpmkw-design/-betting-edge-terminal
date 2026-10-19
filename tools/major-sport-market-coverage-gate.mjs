@@ -11,6 +11,7 @@ import {marketAssessmentEnabled, loadBoundMarketObserver, validateBoundMarketAss
 import {validateBoundForecastLean} from './forecast-evidence.mjs';
 import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
 import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
+import {localDateKey, evaluatedDecisionLookup} from './coverage-validation-lookups.mjs';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
 const FEED_PATH = 'data/live-odds.json';
@@ -45,19 +46,6 @@ function explicitPrimaryRow(row) { return row?.primary === true || row?.isPrimar
 function gitBlobSha(buffer) {
   const header = Buffer.from(`blob ${buffer.length}\0`, 'utf8');
   return crypto.createHash('sha1').update(header).update(buffer).digest('hex');
-}
-
-function localDateKey(timestamp, timeZone) {
-  const date = new Date(timestamp);
-  if (!Number.isFinite(date.getTime())) return null;
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).formatToParts(date);
-  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
-  return values.year && values.month && values.day ? `${values.year}-${values.month}-${values.day}` : null;
 }
 
 function normalizedText(...values) {
@@ -671,9 +659,9 @@ export function validatePrimaryAnalysis(report, sidecar, { feed = null, policy =
   const missing = [...required.keys()].filter(key => !seen.has(key));
   ensure(!missing.length, `Primary analysis missing ${missing.length} required receipt(s): ${missing.slice(0, 8).join(', ')}`);
   // Every primary card also needs the matching independently recorded receipt.
+  const hasEvaluatedDecision = evaluatedDecisionLookup(analysis.receipts);
   for (const [index, card] of (report.recs || []).entries()) {
-    const receipt = analysis.receipts.find(item => item.state === 'EVALUATED' && exactObject(item.decision, card));
-    if (receipt) continue;
+    if (hasEvaluatedDecision(card)) continue;
     // A required continuity card can explain a now-unavailable quote. It is
     // neither an available selection nor a newly evaluated value decision.
     const context = card.coreAssessment?.context || {};
@@ -1197,3 +1185,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   try { main(); }
   catch (error) { console.error(`MAJOR SPORT COVERAGE GATE ERROR: ${error.message}`); process.exit(1); }
 }
+

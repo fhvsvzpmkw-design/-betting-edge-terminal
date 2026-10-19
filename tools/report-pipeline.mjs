@@ -27,6 +27,10 @@ export const CANDIDATE_GATES = Object.freeze([
   ['total-lineage.mjs','audit'],
   ['report-publication.mjs','validate']
 ]);
+export const CANDIDATE_GATE_TIMEOUT_MS=120000;
+// Durable History now holds over a gigabyte of evidence. Preserve the full
+// audit and give its three historical gates a distinct, bounded budget.
+export const HISTORY_GATE_TIMEOUT_MS=600000;
 export function runPipeline({root=process.cwd(), report, sidecar, mode='validate', execute=spawnSync}={}) {
   root=path.resolve(root);
   if (!['normalize','validate','diagnose','readback','history'].includes(mode)) throw new Error('Unknown pipeline mode');
@@ -44,7 +48,8 @@ export function runPipeline({root=process.cwd(), report, sidecar, mode='validate
     const started=Date.now();
     const args=[path.join(root,'tools',tool),command];
     if (mode!=='history') args.push('--report',files[0],'--sidecar',files[1]);
-    const result=execute(process.execPath,args,{cwd:root,encoding:'utf8',maxBuffer:16*1024*1024,timeout:120000});
+    const timeout=mode==='history'?HISTORY_GATE_TIMEOUT_MS:CANDIDATE_GATE_TIMEOUT_MS;
+    const result=execute(process.execPath,args,{cwd:root,encoding:'utf8',maxBuffer:16*1024*1024,timeout});
     const receipt={gate:tool,command,state:result.status===0?'PASS':'FAIL',durationMs:Date.now()-started};
     receipts.push(receipt);
     if (result.status!==0) {
@@ -69,3 +74,4 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
     if(result.state==='FAIL')process.exitCode=1;
   }catch(error){console.error(JSON.stringify({state:'FAIL',error:error.message,receipts:error.receipts||[]}));process.exitCode=1;}
 }
+

@@ -442,6 +442,11 @@ function rel(root,file){return path.relative(root,file).split(path.sep).join('/'
 function verifyIndex(root,{targetTs}={}){
   const {index} = loadIndex(root);
   const ids = new Set(), paths = new Set(), shortIds = new Set();
+  // Retain only paths, not evidence-heavy documents. The directory sweep still
+  // checks every orphan, while successfully verified bundles are parsed once.
+  const verifiedReports=new Set(),verifiedSidecars=new Set();
+  const entriesById=new Map();
+  for(const entry of index.runs)if(!entriesById.has(entry?.id))entriesById.set(entry?.id,entry);
   const errors=[];
   let targetFound = !targetTs;
   const capture=(scope,fn)=>{
@@ -488,27 +493,31 @@ function verifyIndex(root,{targetTs}={}){
           assert(entry.researchLibraryVersion===sidecar.provenance.researchLibraryVersion,`Index researchLibraryVersion does not match sidecar: ${entry.id}`);
         }
       }
+      verifiedReports.add(entry.path);
+      if(entry.researchFitPath)verifiedSidecars.add(entry.researchFitPath);
     });
   }
   if(!targetFound) errors.push(`target: Target report is not indexed: ${targetTs}`);
 
   const payloadFiles=walkJson(path.join(root,'data/history/runs'));
   for(const file of payloadFiles){
+    if(verifiedReports.has(rel(root,file)))continue;
     capture(`stored report ${rel(root,file)}`,()=>{
       const report=validateReport(verificationReport(readJson(file)));
       const reportPath=rel(root,file);
-      const entry=index.runs.find(item=>item.id===`${report.ts}|${report.slot}`);
+      const entry=entriesById.get(`${report.ts}|${report.slot}`);
       assert(entry,`Stored issued report is not indexed: ${reportPath}`);
       assert(entry.path===reportPath,`Stored issued report index path mismatch: ${reportPath}`);
     });
   }
   const sidecarFiles=walkJson(path.join(root,'data/history/research-fit'));
   for(const file of sidecarFiles){
+    if(verifiedSidecars.has(rel(root,file)))continue;
     capture(`stored sidecar ${rel(root,file)}`,()=>{
       const sidecar=readJson(file);
       const ref=sidecar.reportReference;
       assert(ref && typeof ref.ts==='string' && typeof ref.slot==='string',`Sidecar has invalid reportReference: ${rel(root,file)}`);
-      const entry=index.runs.find(item=>item.id===`${ref.ts}|${ref.slot}`);
+      const entry=entriesById.get(`${ref.ts}|${ref.slot}`);
       assert(entry,`Sidecar has no indexed report: ${rel(root,file)}`);
       assert(entry.researchFitPath===rel(root,file),`Sidecar is not linked by the matching index entry: ${rel(root,file)}`);
     });
@@ -852,8 +861,9 @@ function main(){
     die('Usage: report-publication.mjs validate --report FILE --sidecar FILE | publish --report FILE --sidecar FILE [--root DIR] | verify [--ts ISO] [--root DIR] | self-test');
   }
 }
-export {validateWaitQualification};
+export {validateWaitQualification,verifyIndex};
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try{main();}
   catch(error){console.error(`REPORT HISTORY ERROR: ${error.message}`);process.exit(1);}
 }
+

@@ -1,0 +1,48 @@
+name: Report publication reliability
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/report-publication.mjs
+      - tools/report-pipeline.mjs
+      - tools/major-sport-market-coverage-gate.mjs
+      - tools/report-coverage-summary.mjs
+      - tools/coverage-validation-lookups.mjs
+      - tools/odds-history-index.py
+      - tools/publish-odds-history-index.sh
+      - tests/report-history-verification.test.mjs
+      - tests/coverage-validation-lookups.test.mjs
+      - tests/odds-history-index-collision.py
+      - .github/workflows/report-publication-reliability.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-publication-reliability
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: History integrity, exact receipt matching and eligibility wiring
+        run: |
+          node --test tests/report-history-verification.test.mjs tests/coverage-validation-lookups.test.mjs tests/report-eligibility-wiring.test.mjs
+          node tools/report-publication.mjs self-test
+          node tests/report-pipeline.test.mjs
+      - name: Concurrent snapshot-index publication regression
+        run: |
+          bash -n tools/publish-odds-history-index.sh
+          python tests/odds-history-index-collision.py
+      - name: Verify complete production history with measured gate durations
+        run: node tools/report-pipeline.mjs history

@@ -7,7 +7,8 @@ import {primaryAnalysisRequired, validateCoverageAudit, describeResearchCompleti
 const BOOKS = ['Bet365', 'DraftKings'];
 const SPORTS = new Set(['MLB', 'NHL', 'NBA', 'WNBA', 'NBA_WNBA', 'NFL', 'NCAAF', 'CFL']);
 const keyFor = detail => detail.includes('moneyline') ? 'ml' : detail.includes('total') ? 'totals' : 'spread';
-const localDay = ts => new Intl.DateTimeFormat('en-CA', {timeZone:'America/Vancouver', year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date(ts));
+const localDayFormatter = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Vancouver', year:'numeric', month:'2-digit', day:'2-digit'});
+const localDay = ts => localDayFormatter.format(new Date(ts));
 const eventId = event => String(event.eventId || event.identity?.eventId || event.id || '');
 const eventLabel = (feed, id) => {
   const event = (feed.events || []).find(event => eventId(event) === String(id));
@@ -102,3 +103,4 @@ export function attachPublisherCoverageSummary({root, report, sidecar}) {
   }
   return expected;
 }
+
