@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-15.1
+**Operating revision:** 2026-10-18.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -36,6 +36,11 @@ Resolve the release with `node tools/core-release.mjs <report-timestamp>`. For t
 Read schemas as needed for the chosen route: `docs/CANDIDATE_ASSESSMENT.md`, `docs/REPORT_CARD_EVIDENCE.md`, `docs/REPORT_EVIDENCE_REQUIREMENTS.md`, `docs/FORECAST_EVIDENCE.md`, and `data/history/report-provenance-schema.json`. Do not repeatedly reread historical amendment narratives as research work.
 
 ## 2. Bind current executable prices
+
+### Automatic recovery of a missed primary odds pull — October 18
+
+The user has authorized automatic launch of the existing odds workflow when its scheduled input is missing. Before binding stale/missing odds and before broad research, follow `docs/ODDS_RUN_REQUEST.md`. Inspect the current feed and the day's slot receipts. If no ordinarily usable feed exists for this lane and its primary slot is unfulfilled, commit one validated `scheduled_recovery` request to `data/odds-run-request.json` through the connected GitHub tools. The push starts the existing collector without GitHub cron or a browser click. Inspect the run for that exact request commit and independently verify its published feed and durable slot receipt before rebuilding inventory. Preserve the five primary slots, same-slot duplicate gate, actual timestamps, quote freshness, odds-provider budgets and all analytical/publication gates. Do not use manual request mode from a report task or refresh merely to improve a result. A queued request or green skipped job is not collection success. Keep the report task enabled; state an actual failed collection or expired recovery window accurately. This current exception supersedes an older task-prompt prohibition on initiating a missed scheduled pull.
+
 
 Start with `node tools/report-inputs.mjs --at <actual-report-timestamp> --report-time <HH:MM> --root <repo-root>` for a compact inventory and exact source bindings; add `--event-id <id>` for one event's executable quotes and availability limitations. Process the full feed, observer and histories locally in code; do not print entire datasets into the conversation. This read-only projection runs the canonical inventory selector but is not issuance clearance: `validationState=NOT_RUN`. Existing feed provenance/freshness, evidence, Core and publication validators remain authoritative. Rebuild projections when bound bytes change. No extra odds pull is needed to build them.
 

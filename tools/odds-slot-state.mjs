@@ -3,12 +3,22 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {resolveWorkflowSchedule} from './main-schedule.mjs';
+import {resolveRecoverySlot} from './odds-run-request.mjs';
 import {blobSha} from './extract-staged-report.mjs';
 const read=file=>JSON.parse(fs.readFileSync(file));
 const receiptPath=date=>`data/odds-pull-receipts/${date}.json`;
 export function slotForFeed(feed,root=process.cwd()){
   const meta=feed?.scheduleMeta;
   if(!Number.isFinite(Date.parse(feed?.generatedAt)))return null;
+  if(meta?.triggerSource==='report-task-recovery'){
+    try{
+      const recovery=resolveRecoverySlot({scheduledAt:meta.triggerScheduledAt,operatingDate:meta.operatingDate,
+        canonicalSlot:meta.canonicalSlot,now:new Date(feed.generatedAt),root});
+      if(meta.slot!==recovery.slotName||meta.plannedPulseTime!==recovery.plannedPulseTime||
+        meta.plannedReportTime!==recovery.plannedReportTime)return null;
+      return recovery;
+    }catch{return null;}
+  }
   const slot=resolveWorkflowSchedule({now:new Date(feed.generatedAt),eventName:'schedule'},root);
   if(!slot.shouldRun)return null;
   if(meta?.triggerSource!=='manual' && (meta?.operatingDate!==slot.operatingDate||meta?.canonicalSlot!==slot.canonicalSlot))return null;
@@ -29,7 +39,10 @@ export function shouldCollect({root=process.cwd(),slot,feed=null}){
 }
 export function recordOddsSlot({root=process.cwd(),feedFile='data/live-odds.json'}){
   const bytes=fs.readFileSync(path.resolve(root,feedFile)),feed=JSON.parse(bytes),slot=slotForFeed(feed,root);
-  if(!slot)return {recorded:false,reason:'outside-main-pulse-window'};
+  if(!slot){
+    if(feed?.scheduleMeta?.triggerSource==='report-task-recovery')throw new Error('Recovery feed cannot be receipted against its validated Main pulse');
+    return {recorded:false,reason:'outside-main-pulse-window'};
+  }
   const relative=receiptPath(slot.operatingDate),file=path.join(root,relative);
   const receipt=fs.existsSync(file)?read(file):{schema:1,operatingDate:slot.operatingDate,slots:{}};
   if(receipt.schema!==1||receipt.operatingDate!==slot.operatingDate||!receipt.slots)throw new Error('Invalid odds slot receipt');
@@ -43,7 +56,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
     if(process.argv[2]==='record')console.log(JSON.stringify(recordOddsSlot({})));
     else if(process.argv[2]==='check'){
       const scheduled=process.env.TRIGGER_MODE==='cloudflare_scheduled';
-      const now=scheduled?new Date(process.env.SCHEDULED_AT):new Date();
+      const recovery=process.env.REQUEST_TRIGGER_SOURCE==='report-task-recovery';
+      const now=recovery?new Date(process.env.REQUEST_SCHEDULED_AT):scheduled?new Date(process.env.SCHEDULED_AT):new Date();
       const slot=resolveWorkflowSchedule({now,eventName:scheduled?'schedule':process.env.GITHUB_EVENT_NAME});
       const feed=fs.existsSync('data/live-odds.json')?read('data/live-odds.json'):null;
       const result=shouldCollect({slot,feed});console.log(`execute=${result.execute}\nreason=${result.reason}`);

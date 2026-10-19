@@ -1,6 +1,10 @@
 name: Refresh Betting Edge odds
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - data/odds-run-request.json
   # Five minutes after each primary pulse. Paired UTC hours cover PST/PDT;
   # the Vancouver resolver skips the inactive seasonal hour. No extra slot.
   schedule:
@@ -61,20 +65,26 @@ jobs:
           TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
           SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
         run: |
-          if [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
-            export EVENT_NAME=schedule
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            node tools/odds-run-request.mjs resolve >> "$GITHUB_OUTPUT"
           else
-            export EVENT_NAME="${GITHUB_EVENT_NAME}"
+            if [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
+              export EVENT_NAME=schedule
+            else
+              export EVENT_NAME="${GITHUB_EVENT_NAME}"
+            fi
+            node tools/main-schedule.mjs resolve-workflow >> "$GITHUB_OUTPUT"
           fi
-          node tools/main-schedule.mjs resolve-workflow >> "$GITHUB_OUTPUT"
 
       - name: Gate duplicate Main schedule slot
         id: gate
         if: steps.schedule.outputs.should_run == 'true'
         env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_NAME: ${{ steps.schedule.outputs.effective_event_name || github.event_name }}
           TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
           SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
+          REQUEST_TRIGGER_SOURCE: ${{ steps.schedule.outputs.request_trigger_source || '' }}
+          REQUEST_SCHEDULED_AT: ${{ steps.schedule.outputs.request_scheduled_at || '' }}
         run: node tools/odds-slot-state.mjs check >> "$GITHUB_OUTPUT"
 
       - name: Extract known-good odds worker
@@ -132,7 +142,8 @@ jobs:
           PLANNED_REPORT: ${{ steps.schedule.outputs.planned_report_time }}
           FEATURED_VIG: ${{ steps.schedule.outputs.featured_vig_scope }}
           TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
-          TRIGGER_SCHEDULED_AT: ${{ inputs.scheduled_at || '' }}
+          TRIGGER_SCHEDULED_AT: ${{ steps.schedule.outputs.request_scheduled_at || inputs.scheduled_at || '' }}
+          REQUEST_TRIGGER_SOURCE: ${{ steps.schedule.outputs.request_trigger_source || '' }}
         run: |
           node <<'NODE'
           const fs=require('node:fs');
@@ -140,7 +151,7 @@ jobs:
           const j=JSON.parse(fs.readFileSync(p,'utf8'));
           const canonicalRaw=String(process.env.CANONICAL_SLOT||'').trim();
           const triggerMode=String(process.env.TRIGGER_MODE||'');
-          const triggerSource=triggerMode==='cloudflare_scheduled'?'cloudflare-cron':process.env.GITHUB_EVENT_NAME==='schedule'?'github-schedule-recovery':'manual';
+          const triggerSource=process.env.REQUEST_TRIGGER_SOURCE|| (triggerMode==='cloudflare_scheduled'?'cloudflare-cron':process.env.GITHUB_EVENT_NAME==='schedule'?'github-schedule-recovery':'manual');
           j.scheduleMeta={
             schema:1,
             operatingDate:process.env.OPERATING_DATE||null,
@@ -218,8 +229,11 @@ jobs:
         if: always()
         env:
           TRIGGER_MODE: ${{ inputs.trigger_mode || '' }}
+          REQUEST_TRIGGER_SOURCE: ${{ steps.schedule.outputs.request_trigger_source || '' }}
         run: |
-          if [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
+          if [ -n "${REQUEST_TRIGGER_SOURCE}" ]; then
+            trigger_source="${REQUEST_TRIGGER_SOURCE}"
+          elif [ "${TRIGGER_MODE}" = "cloudflare_scheduled" ]; then
             trigger_source="cloudflare-cron"
           elif [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
             trigger_source="github-schedule-recovery"
