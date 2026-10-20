@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 6,
-  "generatedAt": "2026-10-20T21:11:13.693Z",
+  "generatedAt": "2026-10-20T21:14:40.647Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 12,
     "historicalExpected": 15,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 3,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 2,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 14,
     "ratingBasesBehind": 13,
@@ -96,7 +96,7 @@
             ]
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -225,6 +225,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 12,
         "gamesExpected": 15
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -380,12 +383,12 @@
       "gameKey": "2026-W05-NYG-WAS",
       "away": "NYG",
       "home": "WAS",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
-        "blobSha": "42a1f7e8dd97bfcb9c39b45f4ec19eade74ba989",
-        "recordedAt": "2026-10-12T00:56:34.000Z"
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-nyg-was-ready-reconciliation.json",
+        "blobSha": "5e354bde496ac9413020366d76224f241251d15f",
+        "recordedAt": "2026-10-20T21:13:20Z"
       },
       "checklist": {
         "verifiedFinalResult": {
@@ -401,35 +404,16 @@
           "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json"
         }
       },
-      "blockers": [
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "NYG Braxton Berrios remains an archived IR specialist case without governed return-role replacement value; NYG S Jason Pinnock remains out without a disjoint defensive/special-teams allocation.",
-          "nextAction": "Bind the final active return inventory and a source-bound specialist method for Berrios; establish disjoint defensive and special-teams duties for Pinnock with exact frozen identities.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "NYG RT Jermaine Eluemunor (calf) did not return. Exact exit time, relief identity and offensive-line role chain are not yet reconciled.",
-          "nextAction": "Use the overtime gamebook clock/participation and final line assignments to establish the partial interval and any governed role chain.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Saved Washington and other Giants cases remain reusable, but the complete paired final-game coverage has not passed the evaluator.",
-          "nextAction": "Merge all archived/new cases with final inactive/DNP, QB and specialist coverage and run the evaluator.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
+      "blockers": [],
       "firstSeenAt": "2026-10-12T00:56:34.000Z",
-      "lastEvidenceAt": "2026-10-12T00:56:34.000Z",
-      "unchangedSince": "2026-10-12T00:56:34.000Z",
-      "stalled": true,
-      "fingerprint": "5e549137ec9f959144aa89aff3328f4c0ad6c15793024b1a6a815e9f1c1da3b1",
-      "receiptBlockerSuperseded": false,
+      "lastEvidenceAt": "2026-10-20T21:13:20Z",
+      "unchangedSince": "2026-10-20T21:13:20Z",
+      "stalled": false,
+      "fingerprint": "008c2313fb574c4620e619c3e516df9b4cd38d2e45de1343764d087a7ca7a098",
+      "receiptBlockerSuperseded": true,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Bind the final active return inventory and a source-bound specialist method for Berrios; establish disjoint defensive and special-teams duties for Pinnock with exact frozen identities.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
     },
     {
       "gameKey": "2026-W05-SF-SEA",
@@ -2416,6 +2400,7 @@
         "2026-W06-TEN-IND",
         "2026-W06-NYJ-NE",
         "2026-W06-NO-NYG",
+        "2026-W06-CAR-PHI",
         "2026-W06-PIT-TB",
         "2026-W06-ARI-LAR",
         "2026-W06-LAC-KC",
@@ -2426,7 +2411,6 @@
     {
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
-        "2026-W05-NYG-WAS",
         "2026-W05-SF-SEA",
         "2026-W05-CHI-GB"
       ]
@@ -2444,7 +2428,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl-power-ratings-ledger.json": "c06fa1f9b805611198241c29febc1a6151439b12",
-    "data/walters/nfl/carried-rating-audit-staging.json": "351cdabf13698f72a92f237e7b0fdc55c590c639",
+    "data/walters/nfl/carried-rating-audit-staging.json": "1067ddc5b21e63ec9adae4ef24e46577f6e7e073",
     "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json": "634212078a0f17644380304a16c3b30804ad5256",
@@ -2484,6 +2468,7 @@
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-ready-reconciliation.json": "ddefa82fa0b21483777a75b398510fa3c76aedc7",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-injury-inventory-advance.json": "d4a8bc48714ed88267c3d7f7204f5e22d22551c4",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-ready-reconciliation.json": "2871d723603cecfadd65cef8e62535338e1567a6",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-nyg-was-ready-reconciliation.json": "5e354bde496ac9413020366d76224f241251d15f",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-phi-jax-ready-reconciliation.json": "7f61d20cea5e51cc70d3bb8c82204939f53893ce",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
