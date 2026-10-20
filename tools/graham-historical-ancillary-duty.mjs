@@ -25,8 +25,10 @@ export function specialistScoreImpactEstimate(c,{officialCheck,seenEvents}){
  officialCheck(c.sourceIds);officialCheck(c.replacementSourceIds);
  let possible=0;
  for(const e of c.events){
-  need(nonempty(e.eventId)&&!seenEvents.has(e.eventId)&&e.type==='MISSED_EXTRA_POINT'&&e.cause==='DOCUMENTED_REPLACEMENT_SNAP_ERROR'&&e.possiblePoints===1&&Number.isInteger(e.quarter)&&e.quarter>=1&&e.quarter<=4&&/^(?:0[0-9]|1[0-5]):[0-5][0-9]$/.test(e.clock||'')&&nonempty(e.rationale),'SPECIALIST_SCORE_EVENT_REQUIRED');
+  const snapError=e.type==='MISSED_EXTRA_POINT'&&e.cause==='DOCUMENTED_REPLACEMENT_SNAP_ERROR';
+  const forcedTry=e.type==='INJURY_FORCED_FAILED_TWO_POINT_TRY'&&e.cause==='DOCUMENTED_KICKER_UNAVAILABILITY'&&c.position==='K'&&c.replacementPosition==='P'&&e.directCausationConfirmed===true&&e.attemptSucceeded===false&&e.actualPoints===0&&e.normalAlternative==='EXTRA_POINT_KICK';
+  need(nonempty(e.eventId)&&!seenEvents.has(e.eventId)&&(snapError||forcedTry)&&e.possiblePoints===1&&Number.isInteger(e.quarter)&&e.quarter>=1&&e.quarter<=4&&/^(?:0[0-9]|1[0-5]):[0-5][0-9]$/.test(e.clock||'')&&nonempty(e.rationale),'SPECIALIST_SCORE_EVENT_REQUIRED');
   officialCheck(e.sourceIds);seenEvents.add(e.eventId);possible+=e.possiblePoints;
  }
- return {...c,classification:'GRAHAM_MODEL_ESTIMATE',injuryLoss:possible/2,injuryLossRange:{min:0,max:possible},uncertainty:'BOUNDED_SCORING_ASSUMPTION_OTHER_EFFECTS_UNQUANTIFIED',limitation:'Only documented replacement-error scoring opportunities are quantified, using the midpoint from zero to their possible score. Normal execution is not assumed certain. No Madden specialist value, inferred punting-distance effect or generic whole-game penalty is invented.'};
+ return {...c,classification:'GRAHAM_MODEL_ESTIMATE',injuryLoss:possible/2,injuryLossRange:{min:0,max:possible},uncertainty:'BOUNDED_SCORING_ASSUMPTION_OTHER_EFFECTS_UNQUANTIFIED',limitation:'Only directly documented replacement-error or injury-forced failed conversion opportunities are quantified, bounded by the one-point alternative and using its zero-to-one midpoint. Normal conversion is not certain. Speculative fourth-down/field-goal strategy, other specialist effects and whole-game ratings remain unquantified.'};
 }
