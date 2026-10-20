@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 6,
-  "generatedAt": "2026-10-20T20:56:31.252Z",
+  "generatedAt": "2026-10-20T20:57:36.486Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 10,
     "historicalExpected": 15,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 5,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 4,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 14,
     "ratingBasesBehind": 12,
@@ -129,7 +129,7 @@
             ]
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -258,6 +258,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 10,
         "gamesExpected": 15
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -409,6 +412,73 @@
     "marketViewed": false
   },
   "historicalGames": [
+    {
+      "gameKey": "2026-W05-BUF-LAR",
+      "away": "BUF",
+      "home": "LAR",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-buf-lar-ready-reconciliation.json",
+        "blobSha": "5145e74b9dba2fc954697c3b4098dcbbdc3d5e47",
+        "recordedAt": "2026-10-20T20:57:19Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        },
+        "officialGamebook": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        },
+        "savedAvailabilityClosures": {
+          "state": [
+            "LAR Quentin Lake ACTIVE_STARTER_NO_GAME_DAY_ABSENCE"
+          ],
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        },
+        "gamebookFacts": {
+          "state": [
+            "BUF DJ Moore, Joshua Palmer, Dee Alford, Ed Oliver and Landon Jackson were inactive after injury-report review; LAR Quentin Lake was active, started and participated through overtime.",
+            "BUF DeWayne Carter was active and recorded defensive production after Ed Oliver's absence, preserving the saved Oliver-to-Carter replacement candidate for final cluster review.",
+            "BUF Skyler Bell was active and recorded two targets after the concurrent Moore and Palmer absences; the gamebook does not disjointly allocate his added vacancy duty between those two receivers.",
+            "BUF Spencer Brown was injured at Q2 6:22, was only return-questionable at Q2 5:09, was later declared out and had no actual return. Tylan Grable was the active tackle/guard substitute and appeared after the injury.",
+            "LAR Jaylen Watson was injured at Q3 2:49 and explicitly returned at Q4 14:11, a 218-second exact interval.",
+            "BUF C.J. Gardner-Johnson was injured at Q3 1:14 and explicitly returned at Q4 11:23, a 291-second exact interval.",
+            "BUF Terrel Bernard was injured at Q4 10:46 and explicitly returned at Q4 10:03, a 43-second exact interval.",
+            "BUF Christian Benford was injured at Q4 10:03 and explicitly returned at Q4 1:32, a 511-second exact interval."
+          ],
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        },
+        "reusableGovernedInputs": {
+          "state": [
+            "BUF Ed Oliver to DeWayne Carter PRIMARY_REPLACEMENT estimate from the saved Week 5 personnel ledger, subject to final defensive-line cluster review with Landon Jackson and Spencer Brown's separate offensive-line segment.",
+            "BUF DJ Moore, Joshua Palmer, Dee Alford and Landon Jackson exact frozen identities/values from the Week 5 personnel ledger and player-value registry.",
+            "LAR Quentin Lake exact active-starter closure from the final gamebook."
+          ],
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-13T05:08:10.000Z",
+      "lastEvidenceAt": "2026-10-20T20:57:19Z",
+      "unchangedSince": "2026-10-20T20:57:19Z",
+      "stalled": false,
+      "fingerprint": "aabca3a67755406258099d5bb757ac9845c15df00e91be09740124b5f3b5911c",
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
     {
       "gameKey": "2026-W05-PHI-JAX",
       "away": "PHI",
@@ -594,98 +664,6 @@
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Bind frozen values, exact exposure intervals and disjoint additional-duty replacements for Thomas, Samuel, Cowing and Kareem; preserve all actual returns and exclude the ejection.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W05-BUF-LAR",
-      "away": "BUF",
-      "home": "LAR",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json",
-        "blobSha": "88b732bde07789ff17b08bf7e40b89e9bec377d2",
-        "recordedAt": "2026-10-13T05:08:10.000Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        },
-        "officialGamebook": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        },
-        "savedAvailabilityClosures": {
-          "state": [
-            "LAR Quentin Lake ACTIVE_STARTER_NO_GAME_DAY_ABSENCE"
-          ],
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        },
-        "gamebookFacts": {
-          "state": [
-            "BUF DJ Moore, Joshua Palmer, Dee Alford, Ed Oliver and Landon Jackson were inactive after injury-report review; LAR Quentin Lake was active, started and participated through overtime.",
-            "BUF DeWayne Carter was active and recorded defensive production after Ed Oliver's absence, preserving the saved Oliver-to-Carter replacement candidate for final cluster review.",
-            "BUF Skyler Bell was active and recorded two targets after the concurrent Moore and Palmer absences; the gamebook does not disjointly allocate his added vacancy duty between those two receivers.",
-            "BUF Spencer Brown was injured at Q2 6:22, was only return-questionable at Q2 5:09, was later declared out and had no actual return. Tylan Grable was the active tackle/guard substitute and appeared after the injury.",
-            "LAR Jaylen Watson was injured at Q3 2:49 and explicitly returned at Q4 14:11, a 218-second exact interval.",
-            "BUF C.J. Gardner-Johnson was injured at Q3 1:14 and explicitly returned at Q4 11:23, a 291-second exact interval.",
-            "BUF Terrel Bernard was injured at Q4 10:46 and explicitly returned at Q4 10:03, a 43-second exact interval.",
-            "BUF Christian Benford was injured at Q4 10:03 and explicitly returned at Q4 1:32, a 511-second exact interval."
-          ],
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        },
-        "reusableGovernedInputs": {
-          "state": [
-            "BUF Ed Oliver to DeWayne Carter PRIMARY_REPLACEMENT estimate from the saved Week 5 personnel ledger, subject to final defensive-line cluster review with Landon Jackson and Spencer Brown's separate offensive-line segment.",
-            "BUF DJ Moore, Joshua Palmer, Dee Alford and Landon Jackson exact frozen identities/values from the Week 5 personnel ledger and player-value registry.",
-            "LAR Quentin Lake exact active-starter closure from the final gamebook."
-          ],
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Buffalo's concurrent DJ Moore and Joshua Palmer injury-driven inactive vacancies are now final, and Skyler Bell is confirmed active with two targets. The available evidence does not disjointly allocate Bell and the remaining active receiver duties between the two vacancy cases, so neither missing value is treated as zero and no overlapping replacement credit is invented.",
-          "nextAction": "Complete one receiver-cluster review using the saved Moore/Palmer values and the established active candidate set; apply either supported role weights or the approved explicitly assumed equal-share committee while reserving each added duty once.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Dee Alford and Landon Jackson are final injury-driven inactives. Their frozen values and candidate sets are available, but the gamebook does not by itself establish Alford's nickel allocation or Jackson's added defensive-line duty allocation; both require promotion with defensive-back/defensive-line cluster safeguards.",
-          "nextAction": "Use the saved official role sources and final activation inventory to select a documented primary or supported/equal-share committee for each added vacancy duty, then run the full Buffalo team evaluator without duplicating Oliver/Carter duties.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "The gamebook newly binds Buffalo Spencer Brown's 2,667-second absence and exact short partial-injury intervals for C.J. Gardner-Johnson, Terrel Bernard and Christian Benford, plus the Rams' Jaylen Watson interval. Frozen healthy values are available, but each interval still needs an approved additional-duty replacement binding and disjoint offensive-line/defensive-back cluster evaluation. Brown's return-questionable line is not treated as a return.",
-          "nextAction": "Bind documented active replacements or supported committees, evaluate only the exact intervals over the 4,085-second game and preserve the actual-return clocks; do not duplicate inactive or baseline duties.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Ed Oliver's saved Oliver-to-Carter individual model review remains reusable and Quentin Lake is closed active. Oliver's 0.9 saved estimate still requires adoption inside complete Buffalo defensive-line coverage alongside inactive Landon Jackson; the remaining Rams inactive/DNP inventory and all zero-loss exclusions need explicit paired certification.",
-          "nextAction": "Promote the passing Oliver case through the complete Buffalo team section, certify the full Los Angeles inactive/DNP inventory, recompute both governed team totals and run tools/graham-weekly-evidence.mjs before any READY state.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-13T05:08:10.000Z",
-      "lastEvidenceAt": "2026-10-13T05:08:10.000Z",
-      "unchangedSince": "2026-10-13T05:08:10.000Z",
-      "stalled": true,
-      "fingerprint": "079f5ba9aa484a9a7d669f98908cd7d7b37e631946c199372881a584b82727ca",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete one receiver-cluster review using the saved Moore/Palmer values and the established active candidate set; apply either supported role weights or the approved explicitly assumed equal-share committee while reserving each added duty once.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -2494,6 +2472,7 @@
         "2026-W06-NYJ-NE",
         "2026-W06-NO-NYG",
         "2026-W06-PIT-TB",
+        "2026-W06-ARI-LAR",
         "2026-W06-LAC-KC",
         "2026-W06-BUF-LV",
         "2026-W06-DAL-GB"
@@ -2505,7 +2484,6 @@
         "2026-W05-PHI-JAX",
         "2026-W05-NYG-WAS",
         "2026-W05-SF-SEA",
-        "2026-W05-BUF-LAR",
         "2026-W05-CHI-GB"
       ]
     },
@@ -2522,7 +2500,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl-power-ratings-ledger.json": "048c99b85794d85bcc5b8e01c307153e97c24269",
-    "data/walters/nfl/carried-rating-audit-staging.json": "ffb12de81fbf56229196985fd1bd7266be092317",
+    "data/walters/nfl/carried-rating-audit-staging.json": "20bc31f3f78108bd9ebf296c126d51336a415746",
     "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json": "634212078a0f17644380304a16c3b30804ad5256",
@@ -2549,6 +2527,7 @@
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-18-chi-gb-st-juste-participation-reconciliation.json": "94fb3eaa0afd2cdc43d14b21348c10cffbd08e7a",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-18-lv-ne-cross-position-adapter-reconciliation.json": "8e318e957cb00e83db909db5c573c7c74ea8f8a4",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-18-lv-ne-role-partial-reconciliation.json": "4929ec5f544adb3f6753ba0c5ab6dac56ec5ecad",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-buf-lar-ready-reconciliation.json": "5145e74b9dba2fc954697c3b4098dcbbdc3d5e47",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-complete-candidate-inventory.json": "594236be6207e84acaf617f7395a7d1903033f5c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-identity-binding-advance.json": "c5caa2352a11e0598637f46a3a3c0897d3076608",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-ready-reconciliation.json": "1765e712bf5476f6d85d64f37be8550127017e95",
