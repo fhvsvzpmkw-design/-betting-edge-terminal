@@ -6,6 +6,7 @@ import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {loadCompletedResearchReview} from './graham-research-review.mjs';
 import {loadGrahamScheduleAuthority,validateGrahamBoardScheduleMetadata} from './graham-schedule-authority.mjs';
 import {loadWeeklyReadiness} from './graham-weekly-readiness.mjs';
+import {writeGrahamPublication} from './graham-publication.mjs';
 
 const ROOT=process.cwd();
 const ACTIVE=resolveGrahamActiveWeek({root:ROOT});
@@ -113,7 +114,8 @@ const out={
   ratings:(ratings.teams||[]).map(t=>({abbr:t.abbr,team:t.team,currentRating:t.currentRating,priorRating:t.priorRating,lastDelta:t.lastDelta,lastUpdatedAt:t.lastUpdatedAt,espnFpi:t.externalComparisons?.espnFpi||null}))
 };
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
-fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');
+const publicationChanged=writeGrahamPublication(OUT,out,{terminal:true});
+if(!publicationChanged)console.log('GRAHAM TERMINAL UNCHANGED // preserving last publication timestamp');
 const verify=JSON.parse(fs.readFileSync(OUT,'utf8'));
 if(Number(verify.season)!==ACTIVE.season||Number(verify.week)!==ACTIVE.week)throw new Error('Graham terminal active-week verification failed');
 if(verify.scheduleAuthority?.authorityId!==scheduleAuthority.authorityId||verify.scheduleAuthority?.state!=='SYNCHRONIZED')throw new Error('Graham terminal schedule authority verification failed');

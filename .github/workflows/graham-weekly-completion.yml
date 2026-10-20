@@ -12,6 +12,8 @@ on:
     paths:
       - tools/graham-weekly-completion.mjs
       - tools/graham-weekly-readiness.mjs
+      - tools/graham-publication.mjs
+      - tests/graham-publication.test.mjs
       - tools/graham-final-slate.mjs
       - tools/test-graham-weekly-completion.mjs
       - tests/graham-weekly-production.test.mjs
@@ -40,6 +42,7 @@ jobs:
           node-version: '22'
       - run: node tools/test-graham-weekly-completion.mjs
       - run: node tests/graham-weekly-production.test.mjs
+      - run: node --test tests/graham-publication.test.mjs
       - name: Persist the exact recovery queue
         run: |
           set -euo pipefail

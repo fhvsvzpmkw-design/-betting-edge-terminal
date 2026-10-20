@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {resolveGrahamActiveWeek,grahamWeekPaths} from './graham-active-week.mjs';
 import {weeklyCompletion} from './graham-weekly-completion.mjs';
 import {loadFinalSlate} from './graham-final-slate.mjs';
+import {writeGrahamPublication} from './graham-publication.mjs';
 
 export const READINESS_PATH='data/walters/nfl/weekly-readiness.json';
 const list=x=>Array.isArray(x)?x:[];
@@ -121,6 +122,6 @@ export function loadWeeklyReadiness({root=process.cwd(),effectiveAt=new Date().t
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   if(process.argv.slice(2).some(a=>a!=='--write'))throw Error('Usage: graham-weekly-readiness.mjs [--write]');
   const result=loadWeeklyReadiness();
-  if(process.argv.includes('--write'))fs.writeFileSync(READINESS_PATH,JSON.stringify(result,null,2)+'\n');
+  if(process.argv.includes('--write'))writeGrahamPublication(READINESS_PATH,result);
   console.log(JSON.stringify(result,null,2));
 }

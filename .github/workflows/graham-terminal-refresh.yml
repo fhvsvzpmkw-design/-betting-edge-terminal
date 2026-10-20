@@ -13,6 +13,8 @@ on:
       - tools/graham-active-week.mjs
       - tools/graham-fair-decomposition.mjs
       - tools/build-graham-current-week.mjs
+      - tools/graham-publication.mjs
+      - tests/graham-publication.test.mjs
       - tools/graham-research-review.mjs
       - tools/graham-weekly-readiness.mjs
       - tools/graham-final-slate.mjs
@@ -61,6 +63,7 @@ jobs:
           node --check tools/graham-fair-decomposition.mjs
           node --check tools/graham-schedule-authority.mjs
           node tests/graham-daily-pinnacle.test.mjs
+          node --test tests/graham-publication.test.mjs
           node tools/graham-schedule-authority.mjs --manifest
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
