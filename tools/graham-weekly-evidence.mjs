@@ -17,6 +17,17 @@ const exact=x=>typeof x==='number'&&Number.isFinite(x);
 const norm=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 export const gitBlob=bytes=>createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex');
 const round=x=>Number(x.toFixed(3));
+export function specialistArchiveKeys(team,archived,registry){
+  const keys=[];
+  for(const c of list(team.specialistCases)){
+    if(!nonempty(c.caseKey))continue;
+    const old=archived.find(a=>a.caseKey===c.caseKey);
+    const p=list(registry.players).find(p=>String(p.eaPlayerId)===String(old?.playerEaId||old?.eaPlayerId));
+    if(!old||norm(old.player)!==norm(c.player)||!p||norm(p.player)!==norm(c.player)||!['K','P','LS'].includes(p.position)||p.position!==c.position||keys.includes(c.caseKey))fail('SPECIALIST_ARCHIVE_IDENTITY');
+    keys.push(c.caseKey);
+  }
+  return keys;
+}
 export function boundJson(root,relative,sha) {
   if(!/^[0-9a-f]{40}$/.test(sha||'')||path.isAbsolute(relative)||relative.split('/').includes('..'))fail('INVALID_EVIDENCE_BINDING');
   let bytes;
@@ -103,7 +114,7 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
           qbEstimate={modelId:'graham-historical-qb-replacement-v1',scaleLimitation:'Frozen Madden-derived historical replacement difference; not a performance-validated QB rating or a change to the active QB performance model.',classification:'GRAHAM_MODEL_ESTIMATE',healthyCandidates:healthy.map(p=>({player:p.player,eaPlayerId:p.eaPlayerId,lockedValue:p.waltersPoints})),replacement:{player:relief.player,eaPlayerId:relief.eaPlayerId},...exposureWeightedLoss(healthy[0].waltersPoints,relief.waltersPoints,exposure),baselineRationale:qb.baselineRationale,replacementRationale:qb.replacementRationale,sourceIds:qb.sourceIds};
         }else if(qb.state!=='NO_GAME_DAY_LOSS')fail('GOVERNED_QB_GAME_DAY_LOSS_REQUIRED');
         const archived=Object.values(personnel.currentCases||{}).filter(c=>c.gameKey===g.gameKey&&c.team===abbr);
-        const cs=list(t.cases),keys=cs.map(c=>c.caseKey);
+        const cs=list(t.cases),keys=[...cs.map(c=>c.caseKey),...specialistArchiveKeys(t,archived,registry)];
         if(new Set(keys).size!==keys.length||archived.some(c=>!keys.includes(c.caseKey)))fail('PRIOR_CASE_OMITTED_OR_DUPLICATED');
         const exclusions=list(t.coverageExclusions);
         for(const ex of exclusions){

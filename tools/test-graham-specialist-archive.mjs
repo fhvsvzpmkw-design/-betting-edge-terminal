@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {specialistArchiveKeys} from './graham-weekly-evidence.mjs';
+const archived=[{caseKey:'w6-ls',player:'Ross Matiscik',playerEaId:'21400'}];
+const registry={players:[{eaPlayerId:'21400',player:'Ross Matiscik',position:'LS'}]};
+const good={player:'Ross Matiscik',position:'LS',caseKey:'w6-ls'};
+assert.deepEqual(specialistArchiveKeys({specialistCases:[good]},archived,registry),['w6-ls']);
+for(const patch of [{caseKey:'other'},{player:'Other Player'},{position:'K'}])assert.throws(()=>specialistArchiveKeys({specialistCases:[{...good,...patch}]},archived,registry),/SPECIALIST_ARCHIVE_IDENTITY/);
+assert.throws(()=>specialistArchiveKeys({specialistCases:[good,good]},archived,registry),/SPECIALIST_ARCHIVE_IDENTITY/);
+assert.throws(()=>specialistArchiveKeys({specialistCases:[good]},archived,{players:[{...registry.players[0],position:'CB'}]}),/SPECIALIST_ARCHIVE_IDENTITY/);
+assert.throws(()=>specialistArchiveKeys({specialistCases:[good]},[{...archived[0],playerEaId:'other'}],registry),/SPECIALIST_ARCHIVE_IDENTITY/);
+assert.deepEqual(specialistArchiveKeys({specialistCases:[{player:'Other Player',position:'LS'}]},archived,registry),[]);
+console.log('PASS specialist archive identity coverage: 8 checks');
