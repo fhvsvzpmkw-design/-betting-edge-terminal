@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 6,
-  "generatedAt": "2026-10-20T20:48:40.138Z",
+  "generatedAt": "2026-10-20T20:50:50.898Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 8,
     "historicalExpected": 15,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 7,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 6,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 14,
     "ratingBasesBehind": 9,
@@ -160,7 +160,7 @@
             ]
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -289,6 +289,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 8,
         "gamesExpected": 15
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -441,6 +444,42 @@
   },
   "historicalGames": [
     {
+      "gameKey": "2026-W05-DEN-LAC",
+      "away": "DEN",
+      "home": "LAC",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+        "blobSha": "04c1cc920fce9ec92db7de901389e6b83418e9c5",
+        "recordedAt": "2026-10-20T20:46:52Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-12T01:09:19.000Z",
+      "lastEvidenceAt": "2026-10-20T20:46:52Z",
+      "unchangedSince": "2026-10-20T20:46:52Z",
+      "stalled": false,
+      "fingerprint": "200af853cea6dbd8568cfe8b2f5175d66ed3e14b1e77cc0e05691cedaa1c245e",
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
+    {
       "gameKey": "2026-W05-PHI-JAX",
       "away": "PHI",
       "home": "JAX",
@@ -493,61 +532,6 @@
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Bind both exact identities and frozen values, establish game-active replacement roles from the final gamebook/depth evidence, and run cluster/double-count review.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W05-DEN-LAC",
-      "away": "DEN",
-      "home": "LAC",
-      "state": "RECONCILE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json",
-        "blobSha": "28853f610eba35ec8a5d040a48780b35449da11d",
-        "recordedAt": "2026-10-12T01:09:19.000Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Final injury/inactive evidence identifies DEN CB Riley Moss and CB Patrick Surtain II, plus LAC WR Quentin Johnston, WR Brenen Thompson, OT Joe Alt, G Kayode Awosika, OL Trevor Penning, CB Donte Jackson and S Derwin James as injury-driven pregame absences. The saved ledger contains only the continuing LAC Rashawn Slater case, so the listed identities, frozen values, replacements and group safeguards remain unadopted.",
-          "nextAction": "Bind each exact player identity/value, distinguish roster-list status from final inactive/DNP participation, establish disjoint game-active replacements and run offensive-line, receiver and defensive-back cluster review.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "DEN S Talanoa Hufanga was ruled out in-game with an ankle injury; exact lost interval and relief role are not yet bound.",
-          "nextAction": "Reconcile the final gamebook play/status clock and safety participation, then apply the approved partial-time method without inferring active impairment.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Complete inactive/DNP, specialist, quarterback-duty and every printed injury/return sequence has not yet been assembled into one paired evaluator-ready record.",
-          "nextAction": "Merge the saved Slater estimate with all new cases and final gamebook coverage, then run tools/graham-weekly-evidence.mjs.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-12T01:09:19.000Z",
-      "lastEvidenceAt": "2026-10-12T01:09:19.000Z",
-      "unchangedSince": "2026-10-12T01:09:19.000Z",
-      "stalled": true,
-      "fingerprint": "77cc5fb58e028fe1b78a2dd32f3122cf16abeea0cfde8bcbdef3856ad55c6982",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Bind each exact player identity/value, distinguish roster-list status from final inactive/DNP participation, establish disjoint game-active replacements and run offensive-line, receiver and defensive-back cluster review.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -2564,7 +2548,6 @@
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
         "2026-W05-PHI-JAX",
-        "2026-W05-DEN-LAC",
         "2026-W05-DET-ARI",
         "2026-W05-NYG-WAS",
         "2026-W05-SF-SEA",
@@ -2585,7 +2568,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl-power-ratings-ledger.json": "dc9543c1abdecb6a784ba0be1a6ac18f070c52ab",
-    "data/walters/nfl/carried-rating-audit-staging.json": "f64463136d05c865559d8bb10961b2c02bb5b563",
+    "data/walters/nfl/carried-rating-audit-staging.json": "6e78557f75c41e2d8331b963c881d33fbbfe6695",
     "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json": "634212078a0f17644380304a16c3b30804ad5256",
@@ -2617,6 +2600,7 @@
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-ready-reconciliation.json": "1765e712bf5476f6d85d64f37be8550127017e95",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cle-nyj-paired-inventory-recovery.json": "54cf53822ff5ebd12dc88ae125a10b1e9ff76d55",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cle-nyj-ready-reconciliation.json": "7a682bdc9da6af3cf84c5b8f1449f512bfdee4e2",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json": "04c1cc920fce9ec92db7de901389e6b83418e9c5",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-hou-ten-ready-reconciliation.json": "b876ef44eba041818c2be5fda5c61a6fb1cac0c0",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-gamebook-inventory-advance.json": "10ab106a5ac767adef53a93f156c9478ec9a939d",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-ready-reconciliation.json": "ddefa82fa0b21483777a75b398510fa3c76aedc7",
