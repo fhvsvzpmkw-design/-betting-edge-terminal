@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-20T21:30:58.936Z",
+  "generatedAt": "2026-10-20T21:35:57.252Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 0,
     "historicalExpected": 14,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 14,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 13,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
@@ -46,7 +46,7 @@
         "gamesApplied": 15,
         "gamesExpected": 15,
         "blockedGames": [],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -92,6 +92,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 15,
         "gamesExpected": 15
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -160,6 +163,51 @@
     "marketViewed": false
   },
   "historicalGames": [
+    {
+      "gameKey": "2026-W06-SEA-DEN",
+      "away": "SEA",
+      "home": "DEN",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-sea-den-ready-reconciliation.json",
+        "blobSha": "297032869d24eb8693c209363e35ee276cc914ff",
+        "recordedAt": "2026-10-20T21:33:59Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json"
+        },
+        "savedAvailabilityClosures": {
+          "state": [
+            "DEN Riley Moss ACTIVE_FULL",
+            "SEA Jaxon Smith-Njigba ACTIVE_FULL",
+            "SEA Leonard Williams ACTIVE_FULL",
+            "SEA Beau Stephens ACTIVE_FULL"
+          ],
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-final-preparation.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-16T05:07:30.000Z",
+      "lastEvidenceAt": "2026-10-20T21:33:59Z",
+      "unchangedSince": "2026-10-20T21:33:59Z",
+      "stalled": false,
+      "fingerprint": "96358de634d885d72f5280aa3734ca6825137b8fd4d08fd8c40bcce0bd90cdda",
+      "receiptBlockerSuperseded": false,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
     {
       "gameKey": "2026-W06-BUF-LV",
       "away": "BUF",
@@ -272,64 +320,6 @@
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Bind each final inactive/DNP and continuing reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run the applicable replacement and cluster safeguards.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W06-SEA-DEN",
-      "away": "SEA",
-      "home": "DEN",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json",
-        "blobSha": "a5a48c1b8a5fd1548264fea03327ecbc62ea2e56",
-        "recordedAt": "2026-10-17T01:06:59.000Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-role-reserve-closeout.json"
-        },
-        "savedAvailabilityClosures": {
-          "state": [
-            "DEN Riley Moss ACTIVE_FULL",
-            "SEA Jaxon Smith-Njigba ACTIVE_FULL",
-            "SEA Leonard Williams ACTIVE_FULL",
-            "SEA Beau Stephens ACTIVE_FULL"
-          ],
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-final-preparation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Seattle reserve cases Anthony Bradford, Bud Clark and Robbie Ouzts and Denver reserve cases Pat Bryant II and Jonah Coleman have positive frozen values but no promoted kickoff-effective baseline-duty and disjoint replacement calculation in the complete pair. Richman and Bailey now have source-bound OVR 63 historical baselines converting to zero points; their ZERO_IMPUTED_BASELINE_ESTIMATE classifications still require complete coverage and may not be represented as frozen-registry values.",
-          "nextAction": "Chronologically bind every positive-value reserve identity to the Week 6 kickoff, classify established baseline duty versus nonbaseline reserve status, and apply documented primary, role-chain or supported committee estimates with group safeguards. Retain the Richman and Bailey historical-value provenance when promoting their zero-baseline cases.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The Waddle 0.117 and Elliss 0.016 partial estimates now pass their replacement and exposure calculators, while the saved Hufanga, Surtain, Charbonnet, Price, Thomas, Surratt, Badie and Arroyo inputs remain reusable. They are individual CASE_ESTIMATE_ONLY inputs, not complete SEA or DEN team totals.",
-          "nextAction": "Promote all reusable and newly supported inputs exactly once after the reserve-list role/value work, then run running-back, receiver, offensive-line, defensive-back, linebacker/EDGE and specialist cluster reviews and validate a complete paired FINAL_GAME_DAY record.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-16T05:07:30.000Z",
-      "lastEvidenceAt": "2026-10-17T01:06:59.000Z",
-      "unchangedSince": "2026-10-17T01:06:59.000Z",
-      "stalled": true,
-      "fingerprint": "1b8a44dc51ed81dcf7de4fccbd3330752a6e9f6f898929ab25fadce306ef1661",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Chronologically bind every positive-value reserve identity to the Week 6 kickoff, classify established baseline duty versus nonbaseline reserve status, and apply documented primary, role-chain or supported committee estimates with group safeguards. Retain the Richman and Bailey historical-value provenance when promoting their zero-baseline cases.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -1097,7 +1087,6 @@
       "games": [
         "2026-W06-BUF-LV",
         "2026-W06-PIT-TB",
-        "2026-W06-SEA-DEN",
         "2026-W06-ARI-LAR",
         "2026-W06-BAL-CLE",
         "2026-W06-CAR-PHI",
@@ -1119,7 +1108,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-07-current-numbers.json": "fdd6be11cb28bd9e515a1ec4987c11a53b7479ed",
     "data/walters/nfl-power-ratings-ledger.json": "8688ffa57653711dbd0b04046a7f3bbc03f3398d",
-    "data/walters/nfl/carried-rating-audit-staging.json": "f544054f8382e829b61f6d1c529c7970191ef17a",
+    "data/walters/nfl/carried-rating-audit-staging.json": "49ba18e7137a22402a09a96ded7d56de21461421",
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
@@ -1130,6 +1119,7 @@
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json": "f34244e3e0107fe2706581d664b3b7ba448dfb3d",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json": "454733ed02ff04cc4a5ebe1e8de5f6d3728f452c",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json": "333c116c3df86642eaae5afe2805b4a9ceaf1083",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-sea-den-ready-reconciliation.json": "297032869d24eb8693c209363e35ee276cc914ff",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-final-preparation.json": "fe44c9f2acb22d5467aeeb9e1a5a4f76bcea5c07",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-gamebook-reconciliation.json": "1703f83c900819f3878d4aa63136c28a799a71fc"
   }
