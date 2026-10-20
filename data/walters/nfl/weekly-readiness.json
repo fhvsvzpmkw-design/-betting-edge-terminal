@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 6,
-  "generatedAt": "2026-10-20T20:29:03.220Z",
+  "generatedAt": "2026-10-20T20:36:11.724Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 5,
     "historicalExpected": 15,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 8,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 7,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 14,
     "ratingBasesBehind": 7,
@@ -206,7 +206,7 @@
             ]
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -335,6 +335,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 5,
         "gamesExpected": 15
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -490,12 +493,12 @@
       "gameKey": "2026-W05-HOU-TEN",
       "away": "HOU",
       "home": "TEN",
-      "state": "RECONCILE",
-      "workClass": "AVAILABLE_WORK",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
-        "blobSha": "e0553e99f829931dcfb6d594cba2642de764bd39",
-        "recordedAt": "2026-10-13T17:05:22.000Z"
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-hou-ten-ready-reconciliation.json",
+        "blobSha": "b876ef44eba041818c2be5fda5c61a6fb1cac0c0",
+        "recordedAt": "2026-10-20T20:34:50Z"
       },
       "checklist": {
         "verifiedFinalResult": {
@@ -532,29 +535,16 @@
           "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
         }
       },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The prior single Flott-out premise is corrected: Flott returned from the Q2 injury and later entered a distinct questionable/out sequence. Stingley has an explicit 14-second return interval; Pitre has an open fourth-quarter interval. Montgomery and Winston have status updates without source-exact departure plays.",
-          "nextAction": "Use bounded exposure starts for status-only sequences, preserve the actual Flott and Stingley returns, bind disjoint active replacements and run defensive-back/front cluster review without duplicate whole-game loss.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The final and frozen kickoff inputs plus the saved Jaylin Smith zero-value estimate are reusable, but complete paired inactive/DNP, quarterback, specialist and role coverage is not evaluator-ready.",
-          "nextAction": "Assemble both complete team sections, recompute governed totals and validate the pair.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
+      "blockers": [],
       "firstSeenAt": "2026-10-12T00:56:34.000Z",
-      "lastEvidenceAt": "2026-10-13T17:05:22.000Z",
-      "unchangedSince": "2026-10-13T17:05:22.000Z",
-      "stalled": true,
-      "fingerprint": "c2b143d951e8cbb25455cc007aa00bcd5def83681f84c875b548842a44f11b75",
-      "receiptBlockerSuperseded": false,
+      "lastEvidenceAt": "2026-10-20T20:34:50Z",
+      "unchangedSince": "2026-10-20T20:34:50Z",
+      "stalled": false,
+      "fingerprint": "04017ec84ea48fd9926068d704598d14cb86a8d785b89542ca573daf3f4b06f9",
+      "receiptBlockerSuperseded": true,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Use bounded exposure starts for status-only sequences, preserve the actual Flott and Stingley returns, bind disjoint active replacements and run defensive-back/front cluster review without duplicate whole-game loss.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
     },
     {
       "gameKey": "2026-W05-PHI-JAX",
@@ -2661,7 +2651,6 @@
     {
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
-        "2026-W05-HOU-TEN",
         "2026-W05-PHI-JAX",
         "2026-W05-DEN-LAC",
         "2026-W05-DET-ARI",
@@ -2684,7 +2673,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl-power-ratings-ledger.json": "28d44c45f39598534eb8f149e964bfdd131a5b49",
-    "data/walters/nfl/carried-rating-audit-staging.json": "6a6db1f5f1584ad85cafdbde9c91455e297ac853",
+    "data/walters/nfl/carried-rating-audit-staging.json": "a428e614f87be96db721cb18493c787df6b8db58",
     "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json": "634212078a0f17644380304a16c3b30804ad5256",
@@ -2715,6 +2704,7 @@
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-identity-binding-advance.json": "c5caa2352a11e0598637f46a3a3c0897d3076608",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cle-nyj-paired-inventory-recovery.json": "54cf53822ff5ebd12dc88ae125a10b1e9ff76d55",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cle-nyj-ready-reconciliation.json": "7a682bdc9da6af3cf84c5b8f1449f512bfdee4e2",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-hou-ten-ready-reconciliation.json": "b876ef44eba041818c2be5fda5c61a6fb1cac0c0",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-gamebook-inventory-advance.json": "10ab106a5ac767adef53a93f156c9478ec9a939d",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-injury-inventory-advance.json": "d4a8bc48714ed88267c3d7f7204f5e22d22551c4",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-ready-reconciliation.json": "2871d723603cecfadd65cef8e62535338e1567a6",
