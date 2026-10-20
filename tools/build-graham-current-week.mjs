@@ -46,9 +46,11 @@ const fixtures=marketStatus==='ok'&&Array.isArray(observer.fixtures)?observer.fi
 const games=(numbers.games||[]).map(game=>{
   const awayRating=ratingByAbbr.get(game.away)||null;
   const homeRating=ratingByAbbr.get(game.home)||null;
-  const awayCurrent=numeric(awayRating?.currentRating);
-  const homeCurrent=numeric(homeRating?.currentRating);
-  const neutralBaseHome=awayCurrent!==null&&homeCurrent!==null?roundHalf(awayCurrent-homeCurrent):null;
+  // Keep each issued game's displayed inputs bound to the fair that used them.
+  // The separate ratings table below continues to show the latest team ratings.
+  const awayCurrent=numeric(game.ratingCarryForward?.awayRating??awayRating?.currentRating);
+  const homeCurrent=numeric(game.ratingCarryForward?.homeRating??homeRating?.currentRating);
+  const neutralBaseHome=numeric(game.neutralBaseHome)??(awayCurrent!==null&&homeCurrent!==null?roundHalf(awayCurrent-homeCurrent):null);
   const awayFpi=numeric(awayRating?.externalComparisons?.espnFpi?.rating);
   const homeFpi=numeric(homeRating?.externalComparisons?.espnFpi?.rating);
   const espnNeutralHome=awayFpi!==null&&homeFpi!==null?roundHalf(awayFpi-homeFpi):null;
