@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-20T22:26:01.699Z",
+  "generatedAt": "2026-10-20T22:27:35.101Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 14,
@@ -12,7 +12,7 @@
     "stalledHistoricalGames": 0,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
-    "ratingBasesBehind": 0,
+    "ratingBasesBehind": 12,
     "initialBaseline": "INCOMPLETE"
   },
   "rollover": {
@@ -39,21 +39,34 @@
         "owner": "TUESDAY_BASELINE"
       },
       "historicalLearning": {
-        "state": "INCOMPLETE",
+        "state": "COMPLETE",
         "owner": "GRAHAM_WALTERS_90_10",
         "sourceWeek": 6,
         "targetWeek": 7,
         "gamesApplied": 14,
         "gamesExpected": 14,
         "blockedGames": [],
-        "publicationVerified": false
+        "publicationVerified": true
       },
       "ratingPropagation": {
-        "state": "COMPLETE",
+        "state": "INCOMPLETE",
         "owner": "GRAHAM_RATING_BASE_REFRESH",
-        "gamesVerified": 14,
+        "gamesVerified": 2,
         "gamesExpected": 14,
-        "unpropagatedGames": []
+        "unpropagatedGames": [
+          "2026-W07-NE-CHI",
+          "2026-W07-PIT-NO",
+          "2026-W07-SF-ATL",
+          "2026-W07-CIN-BAL",
+          "2026-W07-TB-CAR",
+          "2026-W07-MIA-NYJ",
+          "2026-W07-CLE-TEN",
+          "2026-W07-DEN-ARI",
+          "2026-W07-GB-DET",
+          "2026-W07-LAR-LV",
+          "2026-W07-KC-SEA",
+          "2026-W07-DAL-PHI"
+        ]
       },
       "currentAvailability": {
         "state": "INCOMPLETE",
@@ -74,7 +87,8 @@
         "code": "INITIAL_BASELINE_INCOMPLETE"
       },
       {
-        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-NE-CHI"
       },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
@@ -82,6 +96,50 @@
         "personnelCases": [],
         "blockedGroups": [],
         "qbStatus": "FAIL_CLOSED_GAME_PRESERVED"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-PIT-NO"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-SF-ATL"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-CIN-BAL"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-TB-CAR"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-MIA-NYJ"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-CLE-TEN"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-DEN-ARI"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-GB-DET"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-LAR-LV"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-KC-SEA"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-DAL-PHI"
       }
     ],
     "marketViewed": false
@@ -740,15 +798,20 @@
     }
   ],
   "activeWeekPreparation": [],
-  "processProblems": [],
+  "processProblems": [
+    {
+      "code": "BASELINE_PROPAGATION_CYCLE",
+      "finding": "A pending initial baseline and unpublished carried bases coexist; mechanical propagation must not wait for research completion."
+    }
+  ],
   "customerMessage": "Week 7: historical rating updates 14/14; baseline incomplete.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
   "inputBlobs": {
     "data/walters/nfl/2026/week-07-current-numbers.json": "f4b3dfd5449f8b4918220746129ba36cb35c99cc",
-    "data/walters/nfl-power-ratings-ledger.json": "afa498c652a6463978f4cb89eeb6b0fdf6b4c7d2",
-    "data/walters/nfl/carried-rating-audit-staging.json": "e09c157239e84168aaa5538918c4757301ad70bf",
+    "data/walters/nfl-power-ratings-ledger.json": "35f9e68433effb93eb0dbfe3dada714629581816",
+    "data/walters/nfl/carried-rating-audit-staging.json": "f560c50e770a8176e289b2a94e50e15870f018f3",
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
