@@ -5,13 +5,14 @@ import {fileURLToPath} from 'node:url';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {baselineComplete} from './graham-baseline-recovery.mjs';
 import {loadFinalSlate} from './graham-final-slate.mjs';
+import {HISTORICAL_CORRECTION,verifiedCorrectionPublication} from './graham-historical-input-correction.mjs';
 export function weeklyCompletion({active,board,power,staging}){
  const problems=[],receipt=power.weekly90_10;
  const identityMatches=board.season===active.season&&board.week===active.week;
  if(!identityMatches)problems.push({code:'ACTIVE_BOARD_IDENTITY'});
  if(!baselineComplete(board.baselineStatus))problems.push({code:'INITIAL_BASELINE_INCOMPLETE'});
  if(receipt?.season!==active.season||receipt?.sourceWeek!==active.week-1||receipt?.targetWeek!==active.week||receipt.state!=='COMPLETE'||receipt.marketViewed!==false||receipt.blockedGames?.length||receipt.gamesUpdated!==receipt.gamesProcessed||receipt.teamsUpdated!==receipt.gamesProcessed*2)problems.push({code:'WEEKLY_RATINGS_INCOMPLETE',gamesUpdated:receipt?.gamesUpdated??0,gamesExpected:receipt?.gamesProcessed??null});
- if(staging.state!=='APPLIED'||staging.auditType!=='WALTERS_WEEKLY_90_10'||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))problems.push({code:'WEEKLY_PUBLICATION_UNVERIFIED'});
+ if(staging.state!=='APPLIED'||(!['WALTERS_WEEKLY_90_10',HISTORICAL_CORRECTION].includes(staging.auditType))||(staging.auditType===HISTORICAL_CORRECTION&&!verifiedCorrectionPublication(power,staging))||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))problems.push({code:'WEEKLY_PUBLICATION_UNVERIFIED'});
  const teams=new Map(power.teams.map(t=>[t.abbr,t])),unpropagatedGames=[],currentUnresolvedGames=[];
  for(const g of board.games){
   const a=teams.get(g.away),h=teams.get(g.home);

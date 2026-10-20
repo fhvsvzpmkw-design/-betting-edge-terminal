@@ -44,7 +44,7 @@ jobs:
           import {resolveGrahamActiveWeek} from './tools/graham-active-week.mjs';
           const active=resolveGrahamActiveWeek(),read=p=>JSON.parse(fs.readFileSync(p));
           const s=read('data/walters/nfl/carried-rating-audit-staging.json'),b=read(active.paths.currentNumbers);
-          console.log(s.state==='APPLIED'&&s.auditType==='WALTERS_WEEKLY_90_10'&&s.season===active.season&&s.targetWeek===active.week?'yes':'no');
+          console.log(s.state==='APPLIED'&&['WALTERS_WEEKLY_90_10','WALTERS_HISTORICAL_INPUT_CORRECTION'].includes(s.auditType)&&s.season===active.season&&s.targetWeek===active.week?'yes':'no');
           NODE
             if [ "$(cat /tmp/graham-refresh-eligible)" != yes ]; then exit 0; fi
             ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"

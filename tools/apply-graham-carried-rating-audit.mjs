@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
-import {createWeeklyEvidenceVerifier,WEEKLY_EVIDENCE_FROM} from './graham-weekly-evidence.mjs';
+import {createWeeklyEvidenceVerifier,WEEKLY_EVIDENCE_FROM,loadWeeklyEvidence,boundJson,gitBlob} from './graham-weekly-evidence.mjs';
+import {historicalInputCorrection,HISTORICAL_CORRECTION} from './graham-historical-input-correction.mjs';
 import {resolveGrahamActiveWeek,grahamWeekPaths} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
 
@@ -257,6 +258,29 @@ const input=read(INPUT);
 if(input.schema!==1||input.state!=='READY'||input.marketViewed!==false)fail('INVALID_STAGING');
 if(!input.auditId||!input.effectiveAt||Number.isNaN(Date.parse(input.effectiveAt)))fail('INVALID_AUDIT_ID_OR_TIME');
 if(/\b(Pinnacle|Bet365|DraftKings|sportsbook consensus|line movement|market-implied rating)\b/i.test(JSON.stringify(input)))fail('MARKET_CONTAMINATION');
+
+if(input.auditType===HISTORICAL_CORRECTION){
+  const active=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
+  const bytes=fs.readFileSync(POWER),power=JSON.parse(bytes);
+  if(gitBlob(bytes)!==input.expectedPowerBlobSha)fail('CORRECTION_POWER_BLOB_DRIFT');
+  const facts=boundJson(ROOT,input.finalFactsBinding?.path,input.finalFactsBinding?.blobSha);
+  for(const f of facts.weeks||[]){
+    const schedule=boundJson(ROOT,f.scheduleBinding?.path,f.scheduleBinding?.blobSha);
+    if(schedule.season!==input.season||schedule.week!==f.sourceWeek||schedule.games.length!==f.games.length)fail('CORRECTION_SCHEDULE_IDENTITY');
+    for(const g of f.games){const s=schedule.games.find(s=>s.gameKey===g.gameKey);if(!s||['away','home','startTimePacific','homeFieldVenueClass','homeFieldAdvantagePoints'].some(k=>s[k]!==g[k]))fail('CORRECTION_SCHEDULE_BINDING:'+g.gameKey);}
+  }
+  const loadEvidence=(binding,sourceWeek,effectiveAt,gameKey)=>{
+    const bundle=boundJson(ROOT,binding.path,binding.blobSha);
+    const evaluated=loadWeeklyEvidence(ROOT,binding,{season:active.season,sourceWeek,effectiveAt});
+    const game=evaluated.games.find(g=>g.gameKey===gameKey);if(!game)fail('CORRECTION_EVIDENCE_GAME');return {bundle,game};
+  };
+  const result=historicalInputCorrection({input,power,active,facts,loadEvidence,calculate:weeklyCalculation,sum:exactSum});
+  if(!fs.readFileSync(POWER).equals(bytes)||JSON.stringify(resolveGrahamActiveWeek({root:ROOT,requireFiles:true}).manifest)!==JSON.stringify(active.manifest))fail('CORRECTION_INPUT_CHANGED');
+  input.state='APPLIED';input.appliedAt=input.effectiveAt;input.result=result;
+  write(POWER,power);write(INPUT,input);
+  if(JSON.stringify(read(POWER))!==JSON.stringify(power)||JSON.stringify(read(INPUT))!==JSON.stringify(input))fail('CORRECTION_EXACT_READBACK_FAILED');
+  console.log(`WALTERS HISTORICAL INPUT CORRECTION // ${result.ratingChanges.length} TEAMS // ORIGINAL EVENTS AND PREDICTIONS PRESERVED // MARKET VIEWED FALSE`);process.exit(0);
+}
 
 if(input.auditType==='WALTERS_WEEKLY_90_10'){
   if(Date.parse(input.effectiveAt)<Date.parse(WEEKLY_EVIDENCE_FROM))fail('NEW_WEEKLY_ATTEMPT_CANNOT_PREDATE_EVIDENCE_AUTHORITY');

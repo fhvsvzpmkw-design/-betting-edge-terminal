@@ -8,6 +8,8 @@ on:
   pull_request:
     paths:
       - .github/workflows/graham-carried-rating-audit.yml
+      - tools/graham-historical-input-correction.mjs
+      - tools/test-graham-historical-input-correction.mjs
       - tools/apply-graham-carried-rating-audit.mjs
       - tools/graham-historical-value-estimates.mjs
       - tools/test-graham-historical-value-estimates.mjs
@@ -60,6 +62,8 @@ jobs:
           node-version: '22'
       - name: Validate proposed weekly recovery code and evidence
         run: |
+          node tools/test-graham-historical-input-correction.mjs
+          node tools/test-graham-historical-ancillary-duty.mjs
           node tools/apply-graham-carried-rating-audit.mjs --self-test
           node tools/test-graham-weekly-evidence.mjs
           node tools/test-graham-replacement-model.mjs
@@ -91,6 +95,8 @@ jobs:
           node --check tools/graham-active-week.mjs
           node --check tools/graham-fair-decomposition.mjs
           node tools/graham-active-week.mjs --json >/tmp/graham-active-week.json
+          node tools/test-graham-historical-input-correction.mjs
+          node tools/test-graham-historical-ancillary-duty.mjs
           node tools/apply-graham-carried-rating-audit.mjs --self-test
           node - <<'NODE'
           const fs=require('node:fs');
@@ -110,7 +116,7 @@ jobs:
         run: |
           set -euo pipefail
           AUDIT_TYPE="$(node -p "require('./data/walters/nfl/carried-rating-audit-staging.json').auditType||''")"
-          if [ "$AUDIT_TYPE" = "WALTERS_WEEKLY_90_10" ]; then
+          if [ "$AUDIT_TYPE" = "WALTERS_WEEKLY_90_10" ] || [ "$AUDIT_TYPE" = "WALTERS_HISTORICAL_INPUT_CORRECTION" ]; then
             node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const before=JSON.parse(fs.readFileSync('/tmp/graham-audit-before.json','utf8'));
@@ -121,7 +127,7 @@ jobs:
           assert.equal(active.schema,1);assert.equal(active.state,'ACTIVE');assert.equal(active.authority,'GRAHAM_WEEK_ROLLOVER');
           assert.equal(active.season,staging.season);assert.equal(active.week,staging.targetWeek);
           assert.deepEqual(power.weekly90_10,staging.result.receipt);
-          assert.equal(power.weekly90_10.sourceWeek,staging.sourceWeek);assert.equal(power.weekly90_10.targetWeek,staging.targetWeek);
+          assert.equal(power.weekly90_10.sourceWeek,staging.targetWeek-1);assert.equal(power.weekly90_10.targetWeek,staging.targetWeek);
           const changed=new Set(staging.result.ratingChanges.map(c=>c.team));
           for(const old of before.teams){
             const now=power.teams.find(t=>t.abbr===old.abbr);assert.ok(now);assert.equal(now.seedRating,old.seedRating);
@@ -178,8 +184,8 @@ jobs:
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json'));
           const a=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json'));
           assert.equal(s.state,'APPLIED');assert.equal(s.marketViewed,false);
-          assert.equal(a.season,s.season);assert.equal(a.week,s.auditType==='WALTERS_WEEKLY_90_10'?s.targetWeek:s.week);
-          if(s.auditType==='WALTERS_WEEKLY_90_10')assert.deepEqual(JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json')).weekly90_10,s.result.receipt);
+          assert.equal(a.season,s.season);assert.equal(a.week,['WALTERS_WEEKLY_90_10','WALTERS_HISTORICAL_INPUT_CORRECTION'].includes(s.auditType)?s.targetWeek:s.week);
+          if(['WALTERS_WEEKLY_90_10','WALTERS_HISTORICAL_INPUT_CORRECTION'].includes(s.auditType))assert.deepEqual(JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json')).weekly90_10,s.result.receipt);
           NODE
           done
           echo 'Concurrent writes prevented carried-rating publication; no success claimed.' >&2
@@ -192,7 +198,7 @@ jobs:
             node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
           const fs=require('node:fs');
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json','utf8'));
-          const weekly=s.auditType==='WALTERS_WEEKLY_90_10';
+          const weekly=['WALTERS_WEEKLY_90_10','WALTERS_HISTORICAL_INPUT_CORRECTION'].includes(s.auditType);
           const displayWeek=weekly?s.targetWeek:s.week;
           console.log('## Graham carried-rating audit');
           console.log(`- Audit: ${s.auditId||'unknown'}`);

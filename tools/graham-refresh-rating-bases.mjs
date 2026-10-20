@@ -8,6 +8,7 @@ import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {deriveGrahamFairDecomposition,synchronizeGrahamFairBoard,roundHalf} from './graham-fair-decomposition.mjs';
 import {baselineComplete} from './graham-baseline-recovery.mjs';
 import {weeklyCalculation} from './apply-graham-carried-rating-audit.mjs';
+import {HISTORICAL_CORRECTION,verifiedCorrectionPublication} from './graham-historical-input-correction.mjs';
 const fail=s=>{throw Error('RATING_BASE_REFRESH:'+s);};
 const round=n=>Number(n.toFixed(3));
 function decimalSum(...values){
@@ -24,7 +25,8 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
   if(board.season!==active.season||board.week!==active.week||(!baselineComplete(board.baselineStatus)&&board.baselineStatus!=='PENDING_TUESDAY_GRAHAM_BASELINE'))fail('ACTIVE_BASELINE_IDENTITY_REQUIRED');
   const baselinePending=!baselineComplete(board.baselineStatus);
   const receipt=power.weekly90_10;
-  if(staging.state!=='APPLIED'||staging.auditType!=='WALTERS_WEEKLY_90_10'||staging.marketViewed!==false||receipt?.marketViewed!==false||receipt.sourceWeek!==active.week-1||receipt.targetWeek!==active.week||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))fail('APPLIED_WEEKLY_RECEIPT_REQUIRED');
+  const correction=staging.auditType===HISTORICAL_CORRECTION;
+  if(staging.state!=='APPLIED'||(!correction&&staging.auditType!=='WALTERS_WEEKLY_90_10')||(correction&&!verifiedCorrectionPublication(power,staging))||staging.marketViewed!==false||receipt?.marketViewed!==false||receipt.sourceWeek!==active.week-1||receipt.targetWeek!==active.week||JSON.stringify(staging.result?.receipt)!==JSON.stringify(receipt))fail('APPLIED_WEEKLY_RECEIPT_REQUIRED');
   if(!Number.isFinite(Date.parse(effectiveAt))||Date.parse(effectiveAt)<Date.parse(staging.appliedAt)||!/^[0-9a-f]{40}$/.test(powerBlobSha))fail('SOURCE_OR_TIME_INVALID');
   const changed=new Map((staging.result.ratingChanges||[]).map(c=>[c.team,c]));
   const byTeam=new Map(power.teams.map(t=>[t.abbr,t]));
@@ -35,7 +37,16 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
   const publishedChange=(team,stored)=>{
     if(team.currentRating===stored)return null;
     const direct=changed.get(team.abbr);
-    if(direct)return {...direct,sourceAuditId:staging.auditId};
+    if(direct){
+      if(correction){
+        const proof=power.historicalInputCorrections.find(c=>c.auditId===staging.auditId);
+        const replay=proof.replayProof.flatMap(g=>g.teams).find(t=>t.team===team.abbr);
+        const weekly=team.history.at(-2);
+        if(!replay||!weekly||createHash('sha256').update(JSON.stringify(weekly)).digest('hex')!==replay.eventSha256||weekly.toRating!==direct.priorRating||![replay.originalFromRating,replay.originalToRating].includes(stored))fail('CORRECTION_REPLAY_BASE_UNBOUND:'+team.abbr);
+        return {...direct,priorRating:stored,sourceAuditId:staging.auditId};
+      }
+      return {...direct,sourceAuditId:staging.auditId};
+    }
     const e=team.history?.at(-1),opponent=byTeam.get(e?.opponent);
     const pairs=opponent?.history?.filter(p=>p.type==='WALTERS_WEEKLY_90_10'&&p.season===active.season&&p.sourceWeek===receipt.sourceWeek&&p.targetWeek===receipt.targetWeek&&p.gameKey===e.gameKey)||[];
     const p=pairs[0];
