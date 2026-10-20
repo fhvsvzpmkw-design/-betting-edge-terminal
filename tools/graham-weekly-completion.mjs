@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {baselineComplete} from './graham-baseline-recovery.mjs';
+import {loadFinalSlate} from './graham-final-slate.mjs';
 export function weeklyCompletion({active,board,power,staging}){
  const problems=[],receipt=power.weekly90_10;
  const identityMatches=board.season===active.season&&board.week===active.week;
@@ -35,12 +36,20 @@ export function rolloverLearningHandoff(inputs){
  const {active}=inputs;
  if(active.week===1)return {schema:1,season:active.season,week:active.week,state:'NOT_APPLICABLE',sourceWeek:null,marketViewed:false};
  const status=weeklyCompletion(inputs),{historicalLearning,ratingPropagation}=status.components;
- return {schema:1,season:active.season,week:active.week,sourceWeek:active.week-1,state:historicalLearning.state==='COMPLETE'&&ratingPropagation.state==='COMPLETE'?'COMPLETE':'BLOCKED',historicalLearning,ratingPropagation,marketViewed:false};
+ const final=inputs.activeFinals;
+ const closedSlate=final?.state==='COMPLETE'&&final.gamesVerified===inputs.board.games.length&&final.gamesExpected===inputs.board.games.length;
+ // A completed week's published game predictions stay frozen. New-week bases
+ // consume the verified rating ledger directly; recalculating last week's
+ // display after kickoff is neither required nor evidence of a timely fair.
+ return {schema:1,season:active.season,week:active.week,sourceWeek:active.week-1,
+  state:historicalLearning.state==='COMPLETE'&&(closedSlate||ratingPropagation.state==='COMPLETE')?'COMPLETE':'BLOCKED',
+  historicalLearning,ratingPropagation,closedSlate,priorDisplayRefreshRequired:!closedSlate,marketViewed:false};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  if(process.argv.slice(2).some(a=>!['--strict','--rollover-handoff'].includes(a)))throw Error('Usage: graham-weekly-completion.mjs [--strict] [--rollover-handoff]');
  const active=resolveGrahamActiveWeek(),read=p=>JSON.parse(fs.readFileSync(p));
  const check=process.argv.includes('--rollover-handoff')?rolloverLearningHandoff:weeklyCompletion;
- const result=check({active,board:read(active.paths.currentNumbers),power:read('data/walters/nfl-power-ratings-ledger.json'),staging:read('data/walters/nfl/carried-rating-audit-staging.json')});
+ const board=read(active.paths.currentNumbers);
+ const result=check({active,board,power:read('data/walters/nfl-power-ratings-ledger.json'),staging:read('data/walters/nfl/carried-rating-audit-staging.json'),activeFinals:loadFinalSlate({board})});
  console.log(JSON.stringify(result,null,2));if(process.argv.includes('--strict')&&!['COMPLETE','NOT_APPLICABLE'].includes(result.state))process.exitCode=1;
 }

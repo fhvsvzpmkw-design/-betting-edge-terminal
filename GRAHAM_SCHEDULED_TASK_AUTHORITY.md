@@ -1,5 +1,7 @@
 # Graham scheduled task authority
 
+October 20 weekly-production replacement: read `GRAHAM_WEEKLY_PRODUCTION.md` and current `tools/graham-weekly-readiness.mjs` output before choosing unfinished work. The existing 90/10 automation coordinates separate governed learning, eligible rollover and initial-baseline phases without waiting for another weekly timer. The five task schedules and numerical writers stay unchanged. Use newest additive evidence; report six-hour stalls and the exact missing source or method decision. A completed active slate consumes the verified rating ledger at rollover without requiring hindsight changes to its old displayed fairs. This supersedes that obsolete display-propagation dependency while retaining the complete earlier-learning and final-slate gates. A provisional baseline does not prevent mechanical synchronization of already published rating inputs for games that have not started.
+
 Current-week replacement-estimate amendment: `GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md` and the operational personnel contract permit source-supported, explicitly labelled primary/weighted/equal-share non-QB estimates through the existing personnel writer. This supersedes older blanket committee restrictions only within that adapter; unresolved availability, displaced roles, clusters, QB and matchup permissions retain their existing gates.
 
 - Authority version: 1.0

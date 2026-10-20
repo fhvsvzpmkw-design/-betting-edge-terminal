@@ -1,5 +1,7 @@
 # Graham weekly 90/10 authority
 
+October 20 production coordination: `GRAHAM_WEEKLY_PRODUCTION.md` replaces the fragmented task-to-task recovery handoff. The existing automation first executes this historical-learning authority, then may continue as the separately governed rollover/initial-baseline coordinator when eligible. Each phase retains its own writer, source and runtime boundaries. Use `tools/graham-weekly-readiness.mjs` for the exact current queue and explicitly escalate unchanged six-hour blockers. Do not wait for a later Tuesday after a dependency clears. All numerical and evidence requirements below remain in force; completion still requires validated paired inputs and actual publication.
+
 Version 1.9 — verified chronological closeout, 2026-10-09.
 
 ## v1.9 — chronological dependency and publication completion

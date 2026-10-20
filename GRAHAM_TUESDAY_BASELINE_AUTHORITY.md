@@ -1,5 +1,7 @@
 # Graham Tuesday Baseline Authority
 
+October 20 weekly-production coordination: `GRAHAM_WEEKLY_PRODUCTION.md` permits the existing production coordinator to execute this full initial review as a distinct recovery phase immediately after eligible rollover and prior-slate learning, without waiting for another scheduled Tuesday. Use the existing runtime lifecycle, verify there is no live competing baseline run, record actual times, and preserve all research/source and partial-input limitations. Mechanical published-rating propagation into an unstarted provisional board does not claim this research completed.
+
 - Authority version: 1.0
 - Status: OPERATIONAL
 - Task key: `TUESDAY_BASELINE`

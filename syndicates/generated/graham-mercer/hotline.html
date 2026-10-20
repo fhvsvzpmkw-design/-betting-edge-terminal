@@ -27,6 +27,7 @@ main{max-width:1240px;margin:auto;padding:14px 12px 30px}.shell{border:1px solid
 <h1 class="private-line-sr-only">THE PRIVATE LINE — GRAHAM MERCER // THE MEMBER</h1>
 <div class="sub">NFL CURRENT-WEEK FAIR + VALUE TERMINAL</div>
 <div class="status" id="status"><span>LOADING CURRENT SHEET…</span></div>
+<p class="note" id="weeklyNotice" role="status" hidden></p>
 </header>
 <section class="section">
 <div class="section-head"><h2 id="weekTitle">CURRENT WEEK</h2><div>SPREAD: − HOME FAV / + HOME DOG &nbsp; // &nbsp; ML: AWAY / HOME</div></div>
@@ -68,7 +69,11 @@ function stamp(v){if(!v)return'PENDING';const d=new Date(v);if(!Number.isFinite(
 function marketStamp(data){const status=String(data.marketStatus||'').toLowerCase();if(status&&status!=='ok')return'UNAVAILABLE';return stamp(data.marketObservedAt)}
 function informationCell(g){const labels=[];if(g.qbPerformanceFailClosedTeams?.length)labels.push('Starter unresolved; fair preserved');if(g.qbPriorEstimateTeams?.length)labels.push('QB prior estimate');if(g.personnelEstimateCases?.length)labels.push('Personnel model estimate');if(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length)labels.push('Personnel unresolved');if(g.weeklyRatingInput&&g.weeklyRatingInput.state!=='COMPLETE')labels.push('Weekly ratings incomplete');return labels.join(' · ')||(String(g.numberStatus).startsWith('READY')?'Current review':'Review pending')}
 function numbersStamp(data){const times=(data.games||[]).map(g=>Date.parse(g.grahamAsOf||'')).filter(Number.isFinite);return times.length?stamp(new Date(Math.max(...times)).toISOString()):'PENDING'}
-function render(data){
+function render(data,readiness){
+  const notice=$('weeklyNotice');
+  const relevant=readiness?.season===data.season&&readiness.activeWeek===data.week&&readiness.state==='BLOCKED';
+  notice.hidden=!relevant;
+  notice.textContent=relevant?`${readiness.customerMessage} Status checked ${stamp(readiness.generatedAt)}.`:'';
   $('weekTitle').textContent=`NFL WEEK ${data.week} // ${data.games?.length||0} GAMES`;
   $('status').innerHTML=`<span>FEED <b>${stamp(data.generatedAt)}</b></span><span>NUMBERS <b>${numbersStamp(data)}</b></span><span>REVIEW <b>${stamp(data.lastResearchAt)}</b></span><span>PINNACLE <b>${marketStamp(data)}</b></span><span>STATE <b>${data.state||'UNKNOWN'}</b></span>`;
   const rows=(data.games||[]).map(g=>`<div class="row"><div class="game">${g.away} @ ${g.home}</div><div class="power">${n(g.awayRating)} / ${n(g.homeRating)}</div><div class="base">${line(g.neutralBaseHome,g.away,g.home)}</div><div class="graham">${line(g.grahamFairHome,g.away,g.home)}</div><div class="pinnacle">${line(g.pinnacleSpreadHome,g.away,g.home)}</div><div class="gap ${gapClass(g.grahamHomeStrengthGap)}">${signed(g.grahamHomeStrengthGap)}</div><div class="value">${valueCell(g)}</div><div class="moneyline">${moneylinePair(g)}</div><div>${signed(g.pinnacleMove)}</div><div class="form">${preferredForm(g)}</div><div class="info">${informationCell(g)}</div></div>`).join('');
@@ -77,7 +82,7 @@ function render(data){
   $('ratings').innerHTML=ratings.length?ratings.map(r=>`<div class="rating"><span class="abbr">${r.abbr}</span><span class="rname">${r.team||''}</span><span class="rnum">${n(r.currentRating)}</span><span class="delta">${Number(r.lastDelta)?signed(r.lastDelta):'—'}</span></div>`).join(''):'<div class="error">POWER SHEET WILL POPULATE ON THE NEXT GRAHAM BUILD.</div>';
 }
 let loadRequestId=0,lastFeedTime=-Infinity;
-async function load(){const requestId=++loadRequestId;try{const r=await fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();if(requestId!==loadRequestId)return;const feedTime=Date.parse(data.generatedAt||'');if(Number.isFinite(feedTime)&&feedTime<lastFeedTime)return;render(data);if(Number.isFinite(feedTime))lastFeedTime=feedTime}catch(e){if(requestId===loadRequestId)$('board').innerHTML=`<div class="error">CURRENT SHEET UNAVAILABLE // ${String(e.message||e)}</div>`}}
+async function load(){const requestId=++loadRequestId;try{const [r,readiness]=await Promise.all([fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'}),fetch(`../../../data/walters/nfl/weekly-readiness.json?t=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();if(requestId!==loadRequestId)return;const feedTime=Date.parse(data.generatedAt||'');if(Number.isFinite(feedTime)&&feedTime<lastFeedTime)return;render(data,readiness);if(Number.isFinite(feedTime))lastFeedTime=feedTime}catch(e){if(requestId===loadRequestId)$('board').innerHTML=`<div class="error">CURRENT SHEET UNAVAILABLE // ${String(e.message||e)}</div>`}}
 function refreshWhenVisible(){if(document.visibilityState!=='hidden')load()}
 document.addEventListener('visibilitychange',refreshWhenVisible);
 window.addEventListener('focus',refreshWhenVisible);

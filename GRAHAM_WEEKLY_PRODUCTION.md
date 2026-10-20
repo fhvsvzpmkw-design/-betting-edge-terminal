@@ -1,0 +1,32 @@
+# Graham weekly numbers production
+
+Version 2.0 — October 20, 2026. OPERATIONAL.
+
+The objective is accurate, verified current-week numbers at rollover. This process replaces the scattered recovery handoffs. It does not change the Walters 90/10 formula, the frozen value hierarchy, approved estimation methods, market isolation, append-only history or numerical writers.
+
+## One accountable production run
+
+The existing Graham Walters 90/10 automation is the weekly-production coordinator at its existing 06:00, 10:00, 18:00 and 22:00 Vancouver times. No new recurring task is required. During its learning phase it follows `GRAHAM_WEEKLY_90_10_AUTHORITY.md`. When a dependency clears, the same run continues through the separate rollover and initial-baseline authorities below instead of waiting for another Tuesday. Each phase uses its existing writer and completion boundary. This coordination is explicitly authorized by the user's October 20 request to replace the broken process.
+
+Read current `main`, resolve the active manifest, and run `node tools/graham-weekly-readiness.mjs`. Its persistent output, `data/walters/nfl/weekly-readiness.json`, is a read-only work queue, not permission to manufacture an input. It records the latest evidence for every game, preserves resolved checklist fields, distinguishes a saved READY declaration from a validated/applied pair, and identifies stalled work. Recheck the actual bytes rather than trusting a dated queue.
+
+## Work from evidence to completed numbers
+
+1. **Prepare as each game finishes.** Bind final scores, kickoff ratings/H4, official final game-day inventory, QB duty and replacement-aware injury cases under that game's own week. Prepare the newly completed active slate even while an earlier dependency is being resolved. Do not wait until Tuesday to start.
+2. **Close the historical queue.** Validate saved READY pairs first. Resume the exact missing facts from the newest additive evidence, retain supported earlier cases, and assemble complete paired team sections. Publish every newly supported pair together with the existing updater. There is no one-game quota. Source capture, a case subtotal and a BLOCKED record are not a completed game. Do not repeat an obsolete blocker from the rating receipt after newer evidence supersedes it.
+3. **Address unavailable facts explicitly.** Use an already approved, source-supported estimate when its conditions hold; preserve its classification and sensitivity. If the available sources cannot support a required player value, role or timing, retain the block and state the exact missing fact, football impact and required method/source decision. A special-teams-only role does not establish a defensive replacement effect. Do not spend successive runs asking for unknowable precision without surfacing the methodological gap. Missing values are never zero. Do not weaken a numerical gate to make the queue green.
+4. **Activate the next week when eligible.** Once the active slate is genuinely final and the earlier required learning is COMPLETE and independently read back, execute `GRAHAM_WEEK_ROLLOVER_AUTHORITY.md` as a distinct mechanical phase. Verify all next-week files before activating the manifest last; then verify QB production. Use the current carried-rating ledger directly. Do not recalculate a completed week's published predictions to satisfy a display-refresh dependency. This exception removes an unnecessary handoff; it does not waive historical learning or final-score verification.
+5. **Apply the newly completed slate, then establish the baseline.** After activation, re-resolve the source/target weeks, validate the prepared prior-slate bundles, and apply supported learning through the existing updater. Execute the full initial current-information review under `GRAHAM_TUESDAY_BASELINE_AUTHORITY.md` without waiting for its next scheduled clock. This is an authorized recovery phase with its own unique runtime and verified completion. Observe an existing live baseline runtime to avoid overlapping the scheduled worker. The existing partial-input policy may record a provisional board, but it cannot certify fully updated numbers.
+6. **Verify the actual customer publication.** Require the correct active week, exact carried-rating/fair decomposition, truthful baseline and personnel/QB state, successful QB/terminal/publication workflows and deployed-feed readback. If deployment or research is incomplete, say so. Never call a worker's completed execution a completed weekly board. Preserve original pregame publications and grading snapshots.
+
+## Mechanical rating propagation
+
+`graham-refresh-rating-bases.mjs` may synchronize already published rating inputs into an unstarted provisional board without asserting that research completed. It catches all missing source-week batches through their original paired, arithmetic-verified history, rather than only the last staging batch. It rejects unrelated/intervening changes. Started games remain frozen. A new week consumes the current ledger; it does not require hindsight changes to the old board.
+
+## Failure handling and deadlines
+
+Tuesday rollover/baseline is the normal delivery target. Saturday is not an acceptable normal recovery target. A blocked rollover is a production failure reported from Tuesday, with the expected week and exact unfinished inputs visible. Six hours of unchanged work requires explicit escalation in the existing run's output and queue. Keep the exact missing source or method decision visible until resolved; a new research timestamp does not reset the numerical backlog.
+
+At each phase, persist supported progress before continuing. Re-read current `main` and the active manifest before staging. Existing owner-specific validation and workflow/readback requirements remain in force. Do not silently disable, pause or reschedule a recurring task after failure. The coordinator keeps its existing schedule, while the five ordinary Graham task schedules retain their existing times. Retired Saturday and startup tasks remain retired.
+
+The private line displays a pending/blocked weekly-publication notice when the active slate has ended but the next week has not been published. That notice is a truthful status report, not an alternative to completing the numbers.

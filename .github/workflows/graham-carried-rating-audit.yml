@@ -59,6 +59,7 @@ jobs:
           node tools/test-graham-weekly-evidence.mjs
           node tools/test-graham-replacement-model.mjs
           node tools/test-graham-historical-qb-timeline.mjs
+          node tests/graham-weekly-production.test.mjs
   apply:
     if: github.event_name != 'pull_request'
     needs: validate
@@ -161,7 +162,21 @@ jobs:
             exit 0
           fi
           git commit -m "Apply Graham carried-rating audit"
-          git push origin HEAD:main
+          for attempt in 1 2 3 4; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main
+            git rebase origin/main
+            node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const s=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json'));
+          const a=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json'));
+          assert.equal(s.state,'APPLIED');assert.equal(s.marketViewed,false);
+          assert.equal(a.season,s.season);assert.equal(a.week,s.auditType==='WALTERS_WEEKLY_90_10'?s.targetWeek:s.week);
+          if(s.auditType==='WALTERS_WEEKLY_90_10')assert.deepEqual(JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json')).weekly90_10,s.result.receipt);
+          NODE
+          done
+          echo 'Concurrent writes prevented carried-rating publication; no success claimed.' >&2
+          exit 1
 
       - name: Summary
         if: always()

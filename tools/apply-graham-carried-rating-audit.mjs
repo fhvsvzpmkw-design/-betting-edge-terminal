@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
 import {createWeeklyEvidenceVerifier,WEEKLY_EVIDENCE_FROM} from './graham-weekly-evidence.mjs';
 import {resolveGrahamActiveWeek,grahamWeekPaths} from './graham-active-week.mjs';
 import {roundHalf, synchronizeGrahamFairBoard} from './graham-fair-decomposition.mjs';
@@ -36,7 +37,7 @@ function decimalText(d){const neg=d.n<0n;let x=(neg?-d.n:d.n).toString().padStar
 function exactNumber(d){const n=Number(decimalText(d)),r=dec(n);if(!Number.isFinite(n)||r.n*10n**BigInt(d.s)!==d.n*10n**BigInt(r.s))fail('EXACT_DECIMAL_NOT_REPRESENTABLE_IN_LEDGER');return n;}
 function exactSum(...vs){const ds=vs.map(dec),s=Math.max(...ds.map(x=>x.s));return exactNumber({n:ds.reduce((n,d)=>n+d.n*10n**BigInt(s-d.s),0n),s});}
 function exactProduct(a,b){const x=dec(a),y=dec(b);return exactNumber({n:x.n*y.n,s:x.s+y.s});}
-function weeklyCalculation(t){
+export function weeklyCalculation(t){
   for(const k of ['oldRating','opponentOldRating','scoreMargin','teamInjuryLoss','opponentInjuryLoss','teamLocationAdvantage'])if(!finite(t[k])||typeof t[k]==='boolean')fail(`INPUT_MISSING:${t.team}:${k}`);
   if(Number(t.teamInjuryLoss)<0||Number(t.opponentInjuryLoss)<0)fail(`NEGATIVE_INJURY_LOSS:${t.team}`);
   const tgpl=exactSum(t.scoreMargin,t.opponentOldRating,t.teamInjuryLoss,-Number(t.opponentInjuryLoss),-Number(t.teamLocationAdvantage));
@@ -169,6 +170,7 @@ function weeklyUpdate(input,power,active,prior){
   return {state,ratingChanges,successfulGames,alreadyAppliedGames,blockedGames,receipt,marketViewed:false};
 }
 
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
 if(process.argv[2]==='--self-test'){
   const assert=(await import('node:assert/strict')).default;
   let tests=0;const test=(name,f)=>{f();tests++;console.log(`PASS ${name}`);};
@@ -317,3 +319,5 @@ research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=input.effect
 write(POWER,power);write(researchPath,research);write(numbersPath,numbers);write(INPUT,input);
 const activeAfter=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});if(Number(activeAfter.season)!==Number(active.season)||Number(activeAfter.week)!==Number(active.week)||activeAfter.manifest.authority!=='GRAHAM_WEEK_ROLLOVER')fail('ACTIVE_WEEK_CHANGED_DURING_AUDIT');
 const vp=read(POWER),vr=read(researchPath),vn=read(numbersPath),vi=read(INPUT);if(vi.state!=='APPLIED'||vi.auditId!==input.auditId)fail('STAGING_READBACK_FAILED');for(const c of input.cases){const t=vp.teams.find(x=>x.abbr===c.team);if(!t||!close(t.currentRating,c.expectedPostRating)||t.history.at(-1)?.auditId!==input.auditId)fail(`POWER_READBACK_FAILED:${c.team}`);}if(vr.sweeps.at(-1)?.auditId!==input.auditId||vr.sweeps.at(-1)?.summary?.marketViewed!==false)fail('RESEARCH_READBACK_FAILED');if(vn.carriedRatingAudit?.auditId!==input.auditId||vn.carriedRatingAudit?.marketViewed!==false)fail('NUMBERS_READBACK_FAILED');for(const change of matchupChanges){const g=vn.games.find(x=>x.gameKey===change.gameKey);if(!g||!close(g.grahamExactFairHome,change.newExactFairHome)||!close(g.grahamFairHome,change.newDisplayedFairHome))fail(`GAME_READBACK_FAILED:${change.gameKey}`);}console.log(`GRAHAM CARRIED-RATING AUDIT APPLIED // ${input.auditId} // ${ratingChanges.length} RATINGS // ${matchupChanges.length} GAMES // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')} // MARKET VIEWED FALSE`);
+
+}

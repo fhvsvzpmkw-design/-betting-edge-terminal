@@ -1,41 +1,73 @@
 name: Graham weekly completion check
 on:
   schedule:
-    # Hourly checkpoint; the strict deadline is Saturday 18:00 Vancouver.
+    # Persist the exact backlog hourly; Tuesday is the normal deadline.
     - cron: '15 * * * *'
   workflow_run:
-    workflows: [Graham rating base refresh, Graham QB performance production, Graham personnel production]
+    workflows: [Graham carried-rating audit, Graham rating base refresh, Graham QB performance production, Graham personnel production, Graham research ledger sync]
     branches: [main]
     types: [completed]
   push:
     branches: [main]
-    paths: [tools/graham-weekly-completion.mjs, tools/test-graham-weekly-completion.mjs, .github/workflows/graham-weekly-completion.yml]
+    paths:
+      - tools/graham-weekly-completion.mjs
+      - tools/graham-weekly-readiness.mjs
+      - tools/graham-final-slate.mjs
+      - tools/test-graham-weekly-completion.mjs
+      - tests/graham-weekly-production.test.mjs
+      - .github/workflows/graham-weekly-completion.yml
+      - data/walters/nfl/active-week.json
+      - data/walters/nfl/20*/week-*-weekly-evidence/**
+      - data/walters/nfl/20*/week-*-final-facts-*.json
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: graham-weekly-completion
   cancel-in-progress: false
 jobs:
   verify:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: node tools/test-graham-weekly-completion.mjs
+      - run: node tests/graham-weekly-production.test.mjs
+      - name: Persist the exact recovery queue
+        run: |
+          set -euo pipefail
+          git config user.name betting-edge-bot
+          git config user.email actions@users.noreply.github.com
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/graham-weekly-readiness.mjs --write > /tmp/graham-weekly-readiness.json
+            git add data/walters/nfl/weekly-readiness.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Record Graham weekly readiness and unresolved recovery queue'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo 'Concurrent writes prevented readiness publication.' >&2
+          exit 1
       - name: Inspect complete customer numeric inputs
         run: |
           node tools/graham-weekly-completion.mjs > /tmp/graham-weekly-completion.json
           cat /tmp/graham-weekly-completion.json >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/graham-weekly-readiness.json >> "$GITHUB_STEP_SUMMARY"
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const status=JSON.parse(fs.readFileSync('/tmp/graham-weekly-completion.json'));
+          const readiness=JSON.parse(fs.readFileSync('/tmp/graham-weekly-readiness.json'));
+          if(readiness.rollover.required)throw Error(`WEEK_ROLLOVER_NOT_PUBLISHED: ${readiness.customerMessage}`);
           const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Vancouver',weekday:'short',hour:'numeric',hourCycle:'h23'}).formatToParts(new Date());
           const get=k=>parts.find(p=>p.type===k)?.value;
-          const deadline=(get('weekday')==='Sat'&&Number(get('hour'))>=18)||get('weekday')==='Sun';
+          const deadline=(get('weekday')==='Tue'&&Number(get('hour'))>=11)||['Wed','Thu','Fri','Sat','Sun'].includes(get('weekday'));
           if(deadline&&status.state!=='COMPLETE')throw Error('CUSTOMER_COMPLETION_DEADLINE_MISSED: targeted historical/current-input recovery required; research timestamps do not establish numeric completion.');
           NODE
