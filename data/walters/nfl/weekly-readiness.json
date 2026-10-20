@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-20T21:40:46.623Z",
+  "generatedAt": "2026-10-20T21:43:29.400Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 1,
     "historicalExpected": 14,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 13,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 12,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
@@ -164,7 +164,7 @@
             "sourceRefs": []
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -208,6 +208,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 1,
         "gamesExpected": 14
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -268,6 +271,52 @@
     "marketViewed": false
   },
   "historicalGames": [
+    {
+      "gameKey": "2026-W06-HOU-JAX",
+      "away": "HOU",
+      "home": "JAX",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-hou-jax-ready-reconciliation.json",
+        "blobSha": "f29eee66b4f9aa5dde3e941933922dcb1853ec61",
+        "recordedAt": "2026-10-20T21:42:05Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
+        },
+        "savedAvailabilityClosures": {
+          "state": [
+            "HOU David Montgomery OUT",
+            "HOU Jalen Pitre OUT",
+            "JAX Montaric Brown OUT",
+            "JAX Ross Matiscik OUT",
+            "JAX Eric Murray ACTIVE after clearing concussion protocol"
+          ],
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-18T17:12:04.000Z",
+      "lastEvidenceAt": "2026-10-20T21:42:05Z",
+      "unchangedSince": "2026-10-20T21:42:05Z",
+      "stalled": false,
+      "fingerprint": "866dcfdbc2e04ca9564aae8726096b40a2dc6b1ddec0c87fe6e75c66b3266dc9",
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
     {
       "gameKey": "2026-W06-BUF-LV",
       "away": "BUF",
@@ -994,83 +1043,6 @@
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
-      "gameKey": "2026-W06-HOU-JAX",
-      "away": "HOU",
-      "home": "JAX",
-      "state": "RECONCILE",
-      "workClass": "WAITING_SOURCE_OR_METHOD",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json",
-        "blobSha": "f34244e3e0107fe2706581d664b3b7ba448dfb3d",
-        "recordedAt": "2026-10-18T17:12:04.000Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
-        },
-        "savedAvailabilityClosures": {
-          "state": [
-            "HOU David Montgomery OUT",
-            "HOU Jalen Pitre OUT",
-            "JAX Montaric Brown OUT",
-            "JAX Ross Matiscik OUT",
-            "JAX Eric Murray ACTIVE after clearing concussion protocol"
-          ],
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "SOURCE_NOT_YET_AVAILABLE",
-          "finding": "The official final gamebook PDF was not exposed from the NFL HOU-JAX game center at recording time. Complete starter/substitute/DNP participation and all printed injury and return sequences therefore cannot yet be certified.",
-          "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation/injury timeline without backdating this attempt.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The final inactive lists are available and frozen pregame estimates are reusable, but every inactive, DNP and continuing reserve-list case has not yet been assembled into complete paired historical team coverage. Continuing IR cases Anton Harrison and Tank Dell require final activation and game-day role review before reuse.",
-          "nextAction": "After the gamebook is available, assemble every final inactive/DNP and reserve-list case for both teams, revalidate each documented role, reserve every added duty once, and run running-back, defensive-back, receiver, offensive-line and specialist safeguards.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Ross Matiscik was officially inactive and Jacob Bobenmoyer was elevated, but Matiscik's frozen specialist value remains null under INELIGIBLE_SPECIALIST_REVIEW_REQUIRED. Missing value is not zero and the historical specialist loss cannot be computed yet.",
-          "nextAction": "Apply only an authorized source-bound specialist value or method, then confirm Bobenmoyer's final game-day duty from the gamebook. Do not infer a neutral loss.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Azeez Al-Shaair and Reed Blankenship were reported as being evaluated for concussions during the first half. The reporting does not establish either return, exact departure/end intervals, or complete additional-duty replacements. Being evaluated or questionable to return is not a return.",
-          "nextAction": "Use the official gamebook and source-bound injury timeline to bind exact departure, any explicit later return or open interval through game end, and disjoint replacement duties; do not duplicate a whole-game inactive loss.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "Both starting quarterbacks appear in the official final game record and no reviewed source identifies injury-driven relief, but the final gamebook is required to certify complete quarterback-duty coverage. Complete paired specialist and every printed in-game injury/return review also remain open.",
-          "nextAction": "Certify both quarterback NO_GAME_DAY_LOSS sections, specialist coverage and every printed injury/return sequence from the official gamebook, then recompute both governed team injury totals and run tools/graham-weekly-evidence.mjs before any READY state.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-18T17:12:04.000Z",
-      "lastEvidenceAt": "2026-10-18T17:12:04.000Z",
-      "unchangedSince": "2026-10-18T17:12:04.000Z",
-      "stalled": true,
-      "fingerprint": "883a16aba72c4f740ec77cad93d37aefcabaf4384a7fd28c04cd896da429db8a",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation/injury timeline without backdating this attempt.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
       "gameKey": "2026-W06-DAL-GB",
       "away": "DAL",
       "home": "GB",
@@ -1201,7 +1173,6 @@
         "2026-W06-NYJ-NE",
         "2026-W06-TEN-IND",
         "2026-W06-WAS-SF",
-        "2026-W06-HOU-JAX",
         "2026-W06-DAL-GB"
       ]
     }
@@ -1213,7 +1184,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-07-current-numbers.json": "2e8a8a050d00d020aceadb7d7b9d50a3ef6a3850",
     "data/walters/nfl-power-ratings-ledger.json": "c8486a75f96640dcdffc29cbb1add0f7e4330d9b",
-    "data/walters/nfl/carried-rating-audit-staging.json": "f45d727272b754696c5c830514ff287425878d1f",
+    "data/walters/nfl/carried-rating-audit-staging.json": "dcc45058e0dccdf875755b4945968acd28528fba",
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
@@ -1224,6 +1195,7 @@
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-hou-jax-final-preparation.json": "f34244e3e0107fe2706581d664b3b7ba448dfb3d",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json": "454733ed02ff04cc4a5ebe1e8de5f6d3728f452c",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json": "333c116c3df86642eaae5afe2805b4a9ceaf1083",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-hou-jax-ready-reconciliation.json": "f29eee66b4f9aa5dde3e941933922dcb1853ec61",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-sea-den-ready-reconciliation.json": "297032869d24eb8693c209363e35ee276cc914ff",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-final-preparation.json": "fe44c9f2acb22d5467aeeb9e1a5a4f76bcea5c07",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-gamebook-reconciliation.json": "1703f83c900819f3878d4aa63136c28a799a71fc"
