@@ -69,9 +69,10 @@ function stamp(v){if(!v)return'PENDING';const d=new Date(v);if(!Number.isFinite(
 function marketStamp(data){const status=String(data.marketStatus||'').toLowerCase();if(status&&status!=='ok')return'UNAVAILABLE';return stamp(data.marketObservedAt)}
 function informationCell(g){const labels=[];if(g.qbPerformanceFailClosedTeams?.length)labels.push('Starter unresolved; fair preserved');if(g.qbPriorEstimateTeams?.length)labels.push('QB prior estimate');if(g.personnelEstimateCases?.length)labels.push('Personnel model estimate');if(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length)labels.push('Personnel unresolved');if(g.weeklyRatingInput&&g.weeklyRatingInput.state!=='COMPLETE')labels.push('Weekly ratings incomplete');return labels.join(' · ')||(String(g.numberStatus).startsWith('READY')?'Current review':'Review pending')}
 function numbersStamp(data){const times=(data.games||[]).map(g=>Date.parse(g.grahamAsOf||'')).filter(Number.isFinite);return times.length?stamp(new Date(Math.max(...times)).toISOString()):'PENDING'}
-function render(data,readiness){
+function render(data){
+  const readiness=data.weeklyReadiness;
   const notice=$('weeklyNotice');
-  const relevant=readiness?.season===data.season&&readiness.activeWeek===data.week&&readiness.state==='BLOCKED';
+  const relevant=readiness?.season===data.season&&readiness.activeWeek===data.week&&['BLOCKED','UNVERIFIED'].includes(readiness.state);
   notice.hidden=!relevant;
   notice.textContent=relevant?`${readiness.customerMessage} Status checked ${stamp(readiness.generatedAt)}.`:'';
   $('weekTitle').textContent=`NFL WEEK ${data.week} // ${data.games?.length||0} GAMES`;
@@ -82,7 +83,7 @@ function render(data,readiness){
   $('ratings').innerHTML=ratings.length?ratings.map(r=>`<div class="rating"><span class="abbr">${r.abbr}</span><span class="rname">${r.team||''}</span><span class="rnum">${n(r.currentRating)}</span><span class="delta">${Number(r.lastDelta)?signed(r.lastDelta):'—'}</span></div>`).join(''):'<div class="error">POWER SHEET WILL POPULATE ON THE NEXT GRAHAM BUILD.</div>';
 }
 let loadRequestId=0,lastFeedTime=-Infinity;
-async function load(){const requestId=++loadRequestId;try{const [r,readiness]=await Promise.all([fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'}),fetch(`../../../data/walters/nfl/weekly-readiness.json?t=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();if(requestId!==loadRequestId)return;const feedTime=Date.parse(data.generatedAt||'');if(Number.isFinite(feedTime)&&feedTime<lastFeedTime)return;render(data,readiness);if(Number.isFinite(feedTime))lastFeedTime=feedTime}catch(e){if(requestId===loadRequestId)$('board').innerHTML=`<div class="error">CURRENT SHEET UNAVAILABLE // ${String(e.message||e)}</div>`}}
+async function load(){const requestId=++loadRequestId;try{const r=await fetch(`${FEED}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();if(requestId!==loadRequestId)return;const feedTime=Date.parse(data.generatedAt||'');if(Number.isFinite(feedTime)&&feedTime<lastFeedTime)return;render(data);if(Number.isFinite(feedTime))lastFeedTime=feedTime}catch(e){if(requestId===loadRequestId)$('board').innerHTML=`<div class="error">CURRENT SHEET UNAVAILABLE // ${String(e.message||e)}</div>`}}
 function refreshWhenVisible(){if(document.visibilityState!=='hidden')load()}
 document.addEventListener('visibilitychange',refreshWhenVisible);
 window.addEventListener('focus',refreshWhenVisible);

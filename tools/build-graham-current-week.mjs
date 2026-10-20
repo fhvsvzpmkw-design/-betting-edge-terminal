@@ -5,6 +5,7 @@ import {matchNflFixture,extractPinnacleHomeSpread,extractPinnacleMoneyline} from
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {loadCompletedResearchReview} from './graham-research-review.mjs';
 import {loadGrahamScheduleAuthority,validateGrahamBoardScheduleMetadata} from './graham-schedule-authority.mjs';
+import {loadWeeklyReadiness} from './graham-weekly-readiness.mjs';
 
 const ROOT=process.cwd();
 const ACTIVE=resolveGrahamActiveWeek({root:ROOT});
@@ -21,6 +22,15 @@ function roundHalf(v){return Number.isFinite(v)?Math.round(v*2)/2:null}
 function latestSnapshot(game){const rows=Array.isArray(game?.dailySnapshots)?game.dailySnapshots:[];return rows.filter(s=>s.pinnacleStatus==='AVAILABLE'&&numeric(s.pinnacleSpreadHome)!==null).sort((a,b)=>Number(a.sequence||0)-Number(b.sequence||0)).at(-1)||null}
 
 const numbers=readJson(NUMBERS);
+let weeklyReadiness;
+try{
+  const status=loadWeeklyReadiness({root:ROOT});
+  weeklyReadiness={season:status.season,activeWeek:status.activeWeek,state:status.state,generatedAt:status.generatedAt,counts:status.counts,customerMessage:status.customerMessage};
+}catch{
+  // A reporting error must not become another dependency that prevents the
+  // existing terminal from updating. The verification gap stays explicit.
+  weeklyReadiness={season:ACTIVE.season,activeWeek:ACTIVE.week,state:'UNVERIFIED',generatedAt:new Date().toISOString(),customerMessage:'Weekly publication status could not be verified.'};
+}
 const researchReview=loadCompletedResearchReview({active:ACTIVE,root:ROOT});
 const scheduleAuthority=loadGrahamScheduleAuthority({root:ROOT});
 validateGrahamBoardScheduleMetadata(numbers,scheduleAuthority);
@@ -88,6 +98,7 @@ const out={
   schema:1,feedId:'graham-mercer-nfl-current-week-terminal-v1',publication:'THE PRIVATE LINE',season:numbers.season,week:numbers.week,
   generatedAt:new Date().toISOString(),timezone:'America/Vancouver',state:numbers.state,
   baselineStatus:numbers.baselineStatus,baselineRecovery:numbers.baselineRecovery||null,
+  weeklyReadiness,
   activeWeek:{authority:ACTIVE.manifest.authority,manifestPath:ACTIVE.manifestPath,season:ACTIVE.season,week:ACTIVE.week},
   lastResearchAt:researchReview?.completedAt||null,researchReview,marketStatus,marketObservedAt:marketStatus==='ok'?observer?.generatedAt||null:null,
   scheduleAuthority:numbers.scheduleAuthority,
