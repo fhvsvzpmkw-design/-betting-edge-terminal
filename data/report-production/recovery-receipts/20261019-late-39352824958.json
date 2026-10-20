@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "state": "FAILED_ATTEMPT_RECORDED",
+  "purpose": "LATE_EXACT_CANDIDATE_PUSH_RACE_RECOVERY",
+  "observedAt": "2026-10-20T01:36:22Z",
+  "reportTimestamp": "2026-10-19T18:19:14.655-07:00",
+  "checkpointPath": "data/report-production/checkpoints/20261019-late-1815-181753.json",
+  "candidateCommit": "0a1aef0d87e25c52490ef88e5faddde1027af269",
+  "candidateBlobSha": "a893337c64f8aa0d597f913f08e969f35c3dd32b",
+  "candidateId": "2026-10-19T18:19:14.655-07:00|5",
+  "publisher": {
+    "runId": 39352824958,
+    "jobId": 118400751977,
+    "conclusion": "failure",
+    "failedStep": "Commit payload, sidecar and index together",
+    "failure": "Three non-fast-forward pushes exhausted the publisher's bounded retry loop while unrelated Graham writers advanced main.",
+    "candidateAndHistoryGates": "PASS",
+    "issuedHistoryWritten": false,
+    "trace": [
+      "2026-10-20T01:23:52.9300661Z REPORT HISTORY VERIFY OK 263 runs target=2026-10-19T18:19:14.655-07:00",
+      "2026-10-20T01:23:52.9307259Z REPORT BUNDLE OK 261019l181914 data/history/runs/2026-10-19/late-181914.json",
+      "2026-10-20T01:26:56.6904603Z REPORT HISTORY VERIFY OK 263 runs target=2026-10-19T18:19:14.655-07:00",
+      "2026-10-20T01:26:56.6913276Z REPORT BUNDLE OK 261019l181914 data/history/runs/2026-10-19/late-181914.json",
+      "2026-10-20T01:26:57.7741036Z  ! [rejected]          HEAD -> main (fetch first)",
+      "2026-10-20T01:26:57.7753765Z Push raced another repository update; retrying from current main.",
+      "2026-10-20T01:29:59.8673680Z REPORT HISTORY VERIFY OK 263 runs target=2026-10-19T18:19:14.655-07:00",
+      "2026-10-20T01:29:59.8680596Z REPORT BUNDLE OK 261019l181914 data/history/runs/2026-10-19/late-181914.json",
+      "2026-10-20T01:30:00.8275978Z  ! [rejected]          HEAD -> main (fetch first)",
+      "2026-10-20T01:30:00.8289675Z Push raced another repository update; retrying from current main.",
+      "2026-10-20T01:33:03.2497531Z REPORT HISTORY VERIFY OK 263 runs target=2026-10-19T18:19:14.655-07:00",
+      "2026-10-20T01:33:03.2506691Z REPORT BUNDLE OK 261019l181914 data/history/runs/2026-10-19/late-181914.json",
+      "2026-10-20T01:33:04.2622840Z  ! [rejected]          HEAD -> main (fetch first)",
+      "2026-10-20T01:33:04.2635015Z Push raced another repository update; retrying from current main.",
+      "2026-10-20T01:33:04.2650174Z ##[error]Process completed with exit code 1."
+    ]
+  },
+  "resolution": {
+    "kind": "WAIT_FOR_COMPETING_WRITERS_TO_COMPLETE",
+    "currentGrahamUpdateChain": "COMPLETED_SUCCESSFULLY",
+    "quiescentHead": "621bdc7e02d75f9032fa9a2b9ee48c653341d7f7",
+    "lastCompetingWriteAt": "2026-10-20T01:31:33Z",
+    "matchingPublisherQueuedOrRunning": false,
+    "historicalQueuedRuntime": {
+      "runId": 37655516056,
+      "createdAt": "2026-10-07T16:54:30Z",
+      "status": "queued",
+      "changed": false
+    },
+    "nextAction": "One governed publication-request.json pointer to the exact original sealed candidate, retaining all ordinary gates; no workflow code or scheduling change."
+  },
+  "analysis": {
+    "available": 0,
+    "evaluated": 0,
+    "blocked": 0,
+    "unfinished": 0,
+    "counts": {
+      "bet": 0,
+      "lean": 0,
+      "wait": 0,
+      "pass": 0
+    },
+    "riskCAD": 0
+  },
+  "boundaries": {
+    "analyticalContentChanged": false,
+    "reportRetimed": false,
+    "newOddsPull": false,
+    "historyWrittenDirectly": false,
+    "activationOrScheduleChanged": false
+  }
+}
