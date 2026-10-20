@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-20T13:08:40.000Z",
+  "season": 2026,
+  "sourceWeek": 6,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive pre-rollover reconciliation for WAS-SF after the official final gamebook became available. This retires the prior source-unavailable blocker, binds the exact final, final participation, both quarterback rooms, specialist presence and every printed injury/return sequence, and preserves the frozen kickoff ratings and H4. It does not change a rating, advance the active manifest, write current-week personnel/QB overlays, construct fairs or issue a bet. The pair remains blocked until every inactive/DNP/reserve-list case and the open replacement duties are assembled into complete paired game-day injury losses.",
+  "marketViewed": false,
+  "inputCommit": "0649cb6529f44a3038a5e71e4e7e20552b0d19c3",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-06-personnel-ledger.json": "1890fbd0a28fb1425de8eae9f21500d9e103c126",
+    "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "priorEvidenceBindings": [
+    {
+      "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-final-preparation.json",
+      "commit": "fe2d7b529416df15e5aaed1e411a6d30734c6982",
+      "blobSha": "fe44c9f2acb22d5467aeeb9e1a5a4f76bcea5c07",
+      "rationale": "Reuses the exact final, frozen kickoff ratings and preserved H4, official inactive inventories and immutable pregame contribution bindings. The new official gamebook supersedes only the prior SOURCE_NOT_YET_AVAILABLE finding."
+    }
+  ],
+  "sources": [
+    {
+      "id": "49ers-was-sf-official-final-gamebook",
+      "url": "https://media.49ers.1rmg.com/wp-content/uploads/2026/04/19203937/Gamebook_Wk6_SF_vs._WASH_10-19-26.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-WAS-SF"
+      ],
+      "finding": "The 16-page official gamebook reports Washington 17, San Francisco 23 in regulation; the initial lineups, substitutes, did-not-play and inactive inventories; Jayden Daniels and Brock Purdy as the only passers; participating specialists; and printed injury sequences for Terry McLaurin, Mike Evans, Javon Kinlaw, Luke Gifford and Sam Cosmi.",
+      "checkedAt": "2026-10-20T13:03:00.000Z"
+    },
+    {
+      "id": "49ers-was-sf-official-media-center-gamebook-link",
+      "url": "https://49ers.1rmg.com/season/2026/regular-season/week-6/game-book/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-WAS-SF"
+      ],
+      "finding": "The official San Francisco 49ers media center now exposes the Week 6 Full Document gamebook link, retiring the precise source-unavailable blocker preserved in the earlier additive bundle.",
+      "checkedAt": "2026-10-20T13:03:00.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W06-WAS-SF",
+      "away": "WAS",
+      "home": "SF",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "49ers-was-sf-official-final-gamebook",
+        "49ers-was-sf-official-media-center-gamebook-link"
+      ],
+      "final": {
+        "awayScore": 17,
+        "homeScore": 23,
+        "status": "FINAL_REGULATION",
+        "sourceIds": [
+          "49ers-was-sf-official-final-gamebook"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-19T17:15:00-07:00",
+        "awayRating": 21.8849574,
+        "homeRating": 29.5262844,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": -7.641327,
+        "ratingLedgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc",
+        "powerLedgerBlobSha": "f8eaebe4a8eb8c9101d9194b048cbb25d2e61aab",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED",
+        "officialFinalGamebook": "COMPLETE",
+        "quarterbackDuty": "COMPLETE",
+        "specialistPresence": "COMPLETE",
+        "printedInjuryReturnSequences": "COMPLETE_NOT_YET_NUMERICALLY_RECONCILED"
+      },
+      "exactGameDuration": {
+        "seconds": 3600,
+        "display": "60:00",
+        "derivation": "The official gamebook reports a regulation final with no overtime; injury exposure uses regulation game-clock duration, not the printed 3:05 wall-clock time.",
+        "sourceIds": [
+          "49ers-was-sf-official-final-gamebook"
+        ]
+      },
+      "completedCoverage": [
+        {
+          "area": "QUARTERBACK_DUTY",
+          "finding": "Jayden Daniels and Brock Purdy are the only passers in the official gamebook. Washington's Athan Kaliakmanis and San Francisco's Mac Jones are listed as did not play; Marcus Mariota and emergency third quarterback Kurtis Rourke are inactive. This closes game-day quarterback participation without inferring a starter loss from an inactive backup.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        },
+        {
+          "area": "SPECIALIST_PARTICIPATION",
+          "finding": "Washington's Matt Gay replacement Desmond Stevens, Tress Way and Tyler Ott and San Francisco's Eddy Pineiro, Corliss Waitman and Jon Weeks are listed among participants and recorded kicking, punting or snapping duty. Presence is certified; a numerical specialist loss remains governed by complete case coverage rather than omission.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        },
+        {
+          "area": "PREGAME_ROLE_BINDINGS",
+          "finding": "The gamebook confirms Mike Evans, Gracen Halton, Mykel Williams, Siran Neal, Upton Stout and Kyle Juszczyk participated; Evans, Halton and Juszczyk were initial starters. It also confirms Deebo Samuel, Nick Bosa, Garret Wallow and Marques Sigle were inactive. These facts validate activation and game-day role inputs while preserving complete replacement and cluster review requirements.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        }
+      ],
+      "individualCaseInputs": [
+        {
+          "team": "WAS",
+          "player": "Terry McLaurin",
+          "eaPlayerId": "20435",
+          "position": "WR",
+          "frozenHealthyValue": 1.7,
+          "status": "BLOCKED",
+          "timeline": {
+            "injuryPlay": "Q1 2:16 remaining (elapsed 764 seconds)",
+            "terminalPrintedStatus": "Q1 0:37 remaining: out of the game",
+            "explicitReturn": false,
+            "openIntervalThroughGameEndSeconds": 2836,
+            "gameEndElapsedSeconds": 3600
+          },
+          "finding": "The gamebook identifies the exact injury play and later rules McLaurin out. It records no return. The disjoint receiving duties after departure and complete receiver-cluster treatment remain unallocated, so the 1.7 frozen value is not converted into a numerical team loss yet.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        },
+        {
+          "team": "SF",
+          "player": "Mike Evans",
+          "eaPlayerId": "10857",
+          "position": "WR",
+          "frozenHealthyValue": 1.7,
+          "status": "BLOCKED",
+          "timeline": {
+            "injuryPlay": "Q2 1:10 remaining (elapsed 1730 seconds)",
+            "terminalPrintedStatus": "Q3 13:41 remaining: out of the game",
+            "explicitReturn": false,
+            "openIntervalThroughGameEndSeconds": 1870,
+            "gameEndElapsedSeconds": 3600
+          },
+          "finding": "The gamebook identifies Evans' exact injury play and rules him out after halftime. It records no return. The disjoint receiving duties and complete receiver-cluster treatment remain unallocated, so the 1.7 frozen value is not converted into a numerical team loss yet.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        },
+        {
+          "team": "WAS",
+          "player": "Javon Kinlaw",
+          "eaPlayerId": "21133",
+          "position": "DT",
+          "frozenHealthyValue": 0.2,
+          "status": "BLOCKED",
+          "timeline": {
+            "injuryPlay": "Q2 0:18 remaining (elapsed 1782 seconds)",
+            "terminalPrintedStatus": "Start of Q3: out of the game",
+            "explicitReturn": false,
+            "openIntervalThroughGameEndSeconds": 1818,
+            "gameEndElapsedSeconds": 3600
+          },
+          "finding": "The gamebook identifies Kinlaw's exact injury play and rules him out at the start of the third quarter. It records no return. His disjoint defensive-line relief duty remains unallocated, so the 0.2 frozen value is not converted into a numerical team loss yet.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        },
+        {
+          "team": "SF",
+          "player": "Luke Gifford",
+          "eaPlayerId": "20836",
+          "position": "OLB",
+          "frozenHealthyValue": 0.0,
+          "status": "CASE_ESTIMATE_ONLY",
+          "timeline": {
+            "firstPrintedStatus": "Q3 13:35 remaining: return is questionable",
+            "explicitReturn": false,
+            "gameEndElapsedSeconds": 3600
+          },
+          "finding": "The gamebook lists Gifford as a defensive starter, later says only that his return is questionable and never prints a return. 'Return is questionable' is not a return. His frozen value is zero, so this is a reusable zero-calibrated case input inside complete coverage, not permission to omit him or declare San Francisco's team loss complete.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        },
+        {
+          "team": "WAS",
+          "player": "Sam Cosmi",
+          "eaPlayerId": "21533",
+          "position": "RG",
+          "frozenHealthyValue": 1.2,
+          "status": "BLOCKED",
+          "timeline": {
+            "injuryPlay": "Q3 1:29 remaining (elapsed 2611 seconds)",
+            "explicitReturn": "Q4 14:05 remaining (elapsed 2755 seconds)",
+            "boundedUnavailableIntervalSeconds": {
+              "minimum": 144,
+              "maximum": 144
+            }
+          },
+          "finding": "The gamebook explicitly records Cosmi's injury and return 144 game-clock seconds later. The exact returning identity is established, but the disjoint right-guard relief duty during the absence remains unallocated, so the 1.2 frozen value is not converted into a numerical team loss yet.",
+          "sourceIds": [
+            "49ers-was-sf-official-final-gamebook"
+          ]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The official gamebook is now available and closes the prior source gap, final participants, both quarterback rooms, specialist presence and all printed injury/return sequences. Every inactive, DNP and continuing reserve-list case has not yet been assembled into complete paired FINAL_GAME_DAY coverage, and saved current-week contributions are inputs rather than automatic historical adoption.",
+          "nextAction": "Bind every final inactive/DNP and reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run offensive-line, defensive-line, linebacker, defensive-back, receiver and specialist safeguards.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Exact gamebook intervals are now bound for Terry McLaurin, Mike Evans, Javon Kinlaw and Sam Cosmi, while Luke Gifford's printed 'return is questionable' is preserved literally and not treated as a return. The disjoint replacement/additional-duty allocations remain unresolved; no case is duplicated as a whole-game loss and no missing value is treated as zero.",
+          "nextAction": "Allocate source-supported disjoint relief duties for the four positive-value intervals, retain Gifford's zero-calibrated input inside complete coverage, run all cluster safeguards, compute both governed team totals and validate the complete pair before any READY state.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
