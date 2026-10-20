@@ -146,15 +146,26 @@ export function evaluateWeeklyEvidence({bundle,personnel,registry,calibration,pr
             sourceCheck(c.capacitySourceIds,g.gameKey);
             const candidates=list(c.availableCandidatesReviewed).map(r=>lookup(r.player,r.eaPlayerId));
             if(!candidates.length||new Set(candidates.map(r=>String(r.eaPlayerId))).size!==candidates.length||candidates.some(r=>group(r.position)!==group(p.position)||String(r.eaPlayerId)===String(p.eaPlayerId)))fail('CAPACITY_CANDIDATE_REVIEW_REQUIRED');
+            // A healthy common starter is already present on both sides of the
+            // counterfactual. Preserve that duty; do not spend its full value
+            // again as free relief for an additional reserve vacancy.
+            const retained=list(c.retainedBaselineContributors),retainedIds=new Set();
+            for(const row of retained){
+              const r=lookup(row.player,row.eaPlayerId),id=String(r.eaPlayerId);
+              if(retainedIds.has(id)||!candidates.some(x=>String(x.eaPlayerId)===id)||row.baselineStatus!=='HEALTHY_COMMON_STARTER'||row.baselineDutiesDisplaced!==false||row.additionalReliefCredit!==0||!nonempty(row.healthyExpectedRole)||!nonempty(row.rationale))fail('CAPACITY_RETAINED_BASELINE_REQUIRED');
+              sourceCheck(row.sourceIds,g.gameKey);
+              if(cs.some(other=>norm(other.player)===norm(r.player)&&other.resolution!=='ACTIVE_FULL')||cs.some(other=>list(other.replacements).some(x=>String(x.eaPlayerId)===id)))fail('CAPACITY_RETAINED_BASELINE_CONFLICT');
+              retainedIds.add(id);
+            }
             for(const r of candidates){
               const unavailable=cs.some(other=>other!==c&&norm(other.player)===norm(r.player)&&['IR','OUT','PARTIAL_GAME'].includes(other.availabilityStatus));
               const allocated=cs.some(other=>other!==c&&list(other.replacements).some(x=>String(x.eaPlayerId)===String(r.eaPlayerId)));
-              if(!unavailable&&!allocated)fail('UNALLOCATED_AVAILABLE_CAPACITY');
+              if(!unavailable&&!allocated&&!retainedIds.has(String(r.eaPlayerId)))fail('UNALLOCATED_AVAILABLE_CAPACITY');
             }
             const exposure=c.availabilityStatus==='PARTIAL_GAME'?historicalExposure(c.exposure,ids=>sourceCheck(ids,g.gameKey)):null;
             const ratio=exposure?.fraction??1;
             const loss=round(p.waltersPoints*ratio/2);
-            modelEstimate={modelId:c.modelId,classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,healthyValue:p.waltersPoints,replacementValue:null,injuryLoss:loss,rawTeamContributionDelta:-loss,injuryLossRange:[0,round(p.waltersPoints*(exposure?.fractionRange?.max??ratio))],assumptionRationale:c.assumptionRationale,capacityRationale:c.capacityRationale,...(exposure?{exposure}:{}),limitation:'Midpoint of bounded incremental vacancy loss when distinct healthy replacement capacity is exhausted. No fabricated player, replacement rating, measured workload or calibrated zero; range is model sensitivity, not a confidence interval.'};
+            modelEstimate={modelId:c.modelId,classification:'GRAHAM_MODEL_ESTIMATE',method:c.resolution,healthyValue:p.waltersPoints,replacementValue:null,injuryLoss:loss,rawTeamContributionDelta:-loss,injuryLossRange:[0,round(p.waltersPoints*(exposure?.fractionRange?.max??ratio))],assumptionRationale:c.assumptionRationale,capacityRationale:c.capacityRationale,...(retained.length?{retainedBaselineContributors:retained}:{}),...(exposure?{exposure}:{}),limitation:'Midpoint of bounded incremental vacancy loss when distinct healthy replacement capacity is exhausted. No fabricated player, replacement rating, measured workload or calibrated zero; range is model sensitivity, not a confidence interval.'};
           }else{
             if(!['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(c.availabilityStatus)&&!(['PARTIAL_VALUE_INVARIANT','PARTIAL_TIME_EXPOSURE','SPECIAL_TEAMS_ONLY_DUTY_ESTIMATE'].includes(c.resolution)&&c.availabilityStatus==='PARTIAL_GAME'))fail('HISTORICAL_AVAILABILITY_UNRESOLVED');
             if(c.baselineDoubleCountReviewed!==true||!nonempty(c.roleRationale))fail('REPLACEMENT_ROLE_REVIEW_REQUIRED');
