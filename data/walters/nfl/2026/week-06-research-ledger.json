@@ -9,7 +9,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-10-13T04:32:22-07:00",
-  "updatedAt": "2026-10-19T12:02:46-07:00",
+  "updatedAt": "2026-10-20T18:07:06Z",
   "purpose": "Preserve the information searches and evidence that justify Graham power-rating or matchup-number changes before market comparison.",
   "policy": {
     "appendOnly": true,
@@ -35648,6 +35648,480 @@
       "runEventId": "graham-daily-review-2026-w06-20261019T115159-0700",
       "sourceTaskKey": "DAILY_REVIEW",
       "completionResult": "NO_MATERIAL_CHANGE"
+    },
+    {
+      "sequence": 35,
+      "type": "FULL_WEEKLY_BASELINE_BLOCKED",
+      "runEventId": "graham-tuesday-baseline-2026-w06-20261020T110122-0700",
+      "sourceTaskKey": "TUESDAY_BASELINE",
+      "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
+      "startedAt": "2026-10-20T18:01:22.000Z",
+      "completedAt": "2026-10-20T18:07:06Z",
+      "scope": "Active 2026 Week 6 baseline eligibility and exact unfinished handoff verification. Active-week identity valid, but all 14 listed games have passed kickoff and the final game is officially FINAL. Week 7 is not activated because Week 5→6 historical learning/propagation remains incomplete. No past-game fair reconstruction or future-week creation; full 32-team football baseline NOT completed.",
+      "sourcesChecked": [
+        {
+          "source": "Authoritative main active resolver and scheduled/task authorities",
+          "url": "data/walters/nfl/active-week.json",
+          "checkedAt": "2026-10-20T18:07:06Z",
+          "purpose": "Exact active season/week and permitted task scope."
+        },
+        {
+          "source": "Remote-main weekly completion and strict rollover handoff",
+          "url": "tools/graham-weekly-completion.mjs",
+          "checkedAt": "2026-10-20T18:07:06Z",
+          "purpose": "Both strict commands failed; distinguish learning, propagation and current availability."
+        },
+        {
+          "source": "NFL official Week 6 schedule",
+          "url": "https://www.nfl.com/schedules/2026/by-week/week-6",
+          "checkedAt": "2026-10-20T18:07:06Z",
+          "purpose": "Current slate and last-game completion; no market used."
+        },
+        {
+          "source": "NFL official final game",
+          "url": "https://www.nfl.com/games/commanders-at-49ers-2026-reg-6",
+          "checkedAt": "2026-10-20T18:07:06Z",
+          "purpose": "October 19 final WAS17-SF23; not a rating input or new number."
+        },
+        {
+          "source": "Saved exact unfinished 90/10 dependency",
+          "url": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-gamebook-inventory-advance.json",
+          "blobSha": "10ab106a5ac767adef53a93f156c9478ec9a939d",
+          "checkedAt": "2026-10-20T18:07:06Z",
+          "purpose": "Route concrete completed checklist/missing role inputs to existing historical owner, not generic research."
+        },
+        {
+          "source": "Saved exact unfinished 90/10 dependency",
+          "url": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-17-chi-gb-secondary-role-chain-closeout.json",
+          "blobSha": "e43c72593a79099111767f2ce03bcdf2c9b78bc4",
+          "checkedAt": "2026-10-20T18:07:06Z",
+          "purpose": "Route concrete completed checklist/missing role inputs to existing historical owner, not generic research."
+        }
+      ],
+      "teamFindings": [],
+      "ratingChanges": [],
+      "matchupChanges": [],
+      "espnFpiCapture": {
+        "state": "NOT_REACHED",
+        "reason": "No new active upcoming-game baseline established; no independent FPI check used to bypass active-week/rollover boundaries."
+      },
+      "summary": {
+        "marketViewed": false,
+        "teamsReviewed": 0,
+        "gamesReviewed": 0,
+        "activeSlateScheduleGamesVerified": 14,
+        "upcomingActiveWeekGames": 0,
+        "coverageStart": "2026-10-20T18:01:22.000Z",
+        "coverageEnd": "2026-10-20T18:07:06Z",
+        "priorVerifiedRunEventId": "graham-daily-review-2026-w06-20261019T115159-0700",
+        "priorVerifiedCoverageScope": "WAS-SF only through 2026-10-19T12:02:46-07:00; not a full 32-team baseline.",
+        "missedDayCatchUp": false,
+        "unresolvedCoverageGaps": [
+          "Full 32-team current-information baseline not completed. Preliminary official-source searches for ARI/ATL/BAL/BUF/CAR/CHI/CIN/CLE are leads only and do not establish completed team coverage.",
+          "Sunday pregame coverage was never verified; Monday's verified catch-up covered only WAS-SF. Do not retrospectively assert complete Week 6 coverage.",
+          "Week 7 current personnel/QB review and fair construction require WEEK_ROLLOVER activation; TUESDAY_BASELINE cannot create/advance that week."
+        ],
+        "historicalLearning": {
+          "state": "INCOMPLETE",
+          "owner": "GRAHAM_WALTERS_90_10",
+          "sourceWeek": 5,
+          "targetWeek": 6,
+          "gamesApplied": 4,
+          "gamesExpected": 15,
+          "blockedGames": [
+            {
+              "gameKey": "2026-W05-PHI-JAX",
+              "away": "PHI",
+              "home": "JAX",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: PHI OLB Jonathan Greenard was inactive with an ankle injury and JAX S Eric Murray was inactive with a concussion; neither identity is in the saved currentCases snapshot, so both are newly identified historical cases with no governed replacement/value adoption yet. RECOVERY_ACTION: Bind both exact identities and frozen values, establish game-active replacement roles from the final gamebook/depth evidence, and run cluster/double-count review.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: PHI RB Will Shipley (foot), LB Jalyx Hunt (ankle/knee) and DB Michael Carter II (abdomen) were ruled out in-game. The injury monitor establishes the exits but not complete source-bound lost intervals and disjoint replacement duties. Jeremiah Trotter Jr.'s opening-kickoff removal was an ejection, not injury loss. RECOVERY_ACTION: Reconcile the official final gamebook play/status clock and participation for each injury-driven exit, then apply the governed partial-time/replacement method without charging the ejection.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: All archived PHI/JAX Week 5 cases and the final inactive list are available, but full final inactive/DNP, specialist, quarterback-duty and in-game injury coverage has not yet been assembled into an evaluator-ready pair. RECOVERY_ACTION: Promote the saved case estimates and new cases into one complete paired final-game evidence record and run tools/graham-weekly-evidence.mjs."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-CIN-MIA",
+              "away": "CIN",
+              "home": "MIA",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior single Brents no-return premise is corrected: Brents returned from the first injury, then sustained a second injury at Q4 6:33 with no later printed return. Baker, Taaffe and Gordon also have explicit return intervals. Bozeman has an out update but no source-exact departure clock in the gamebook text. RECOVERY_ACTION: Bind exact frozen identities/values and disjoint additional-duty replacements for the second Brents interval and the other printed intervals; use a bounded start range rather than backdating Bozeman's departure; then run defensive-back and paired coverage checks.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Final, frozen kickoff ratings and literal gamebook timelines are bound, but the full paired inactive/DNP, specialist, quarterback-duty and replacement-role sections have not yet passed the evaluator. RECOVERY_ACTION: Promote the complete CIN and MIA team sections with all saved and newly identified cases, recompute governed totals and validate with tools/graham-weekly-evidence.mjs."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-CLE-NYJ",
+              "away": "CLE",
+              "home": "NYJ",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior Joseph Ossai no-return premise is corrected: the gamebook records an actual Q3 10:25 return. Concepcion has an exact early-game injury/out sequence, while Howard and Sanders require literal second-sequence treatment and Sadiq requires a bounded start rather than an invented departure. RECOVERY_ACTION: Bind the exact frozen identities/values and disjoint replacements for Concepcion and every remaining interval; preserve Ossai's actual return and use bounded exposure where the gamebook supplies only a later status update.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs are complete, but saved Jets cases and complete CLE/NYJ inactive, specialist, quarterback and cluster coverage remain to be assembled. RECOVERY_ACTION: Combine the saved pregame estimates with the corrected timelines, recompute both team losses and run the paired evaluator."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-IND-PIT",
+              "away": "IND",
+              "home": "PIT",
+              "reasons": [
+                "REPLACEMENT_OR_VALUE_UNRESOLVED: IND DE Arden Key remains an archived 0.2-point IR case without a source-bound active defensive-end allocation; PIT DL Derrick Harmon remains an archived 0.5-point IR case with unresolved defensive-line cluster context. RECOVERY_ACTION: Use final gamebook starters/participation and team role reporting to establish exact active replacements, frozen values and disjoint defensive-line duties for both cases.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: PIT WR Ben Skowronek (calf) and WR Roman Wilson (finger) were ruled out in-game; their intervals, replacement allocations and receiver-cluster treatment are not yet bound. RECOVERY_ACTION: Reconcile final gamebook clock/participation and active receiver duties, then apply approved partial-time and receiver-cluster rules.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Yahya Black's pending availability closes active because he is absent from the official inactive list, but the complete paired game-day bundle remains unvalidated. RECOVERY_ACTION: Assemble every archived/new case and final inactive/DNP, QB and specialist review, then run the weekly evidence evaluator."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-HOU-TEN",
+              "away": "HOU",
+              "home": "TEN",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior single Flott-out premise is corrected: Flott returned from the Q2 injury and later entered a distinct questionable/out sequence. Stingley has an explicit 14-second return interval; Pitre has an open fourth-quarter interval. Montgomery and Winston have status updates without source-exact departure plays. RECOVERY_ACTION: Use bounded exposure starts for status-only sequences, preserve the actual Flott and Stingley returns, bind disjoint active replacements and run defensive-back/front cluster review without duplicate whole-game loss.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs plus the saved Jaylin Smith zero-value estimate are reusable, but complete paired inactive/DNP, quarterback, specialist and role coverage is not evaluator-ready. RECOVERY_ACTION: Assemble both complete team sections, recompute governed totals and validate the pair."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-NYG-WAS",
+              "away": "NYG",
+              "home": "WAS",
+              "reasons": [
+                "REPLACEMENT_OR_VALUE_UNRESOLVED: NYG Braxton Berrios remains an archived IR specialist case without governed return-role replacement value; NYG S Jason Pinnock remains out without a disjoint defensive/special-teams allocation. RECOVERY_ACTION: Bind the final active return inventory and a source-bound specialist method for Berrios; establish disjoint defensive and special-teams duties for Pinnock with exact frozen identities.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: NYG RT Jermaine Eluemunor (calf) did not return. Exact exit time, relief identity and offensive-line role chain are not yet reconciled. RECOVERY_ACTION: Use the overtime gamebook clock/participation and final line assignments to establish the partial interval and any governed role chain.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Washington and other Giants cases remain reusable, but the complete paired final-game coverage has not passed the evaluator. RECOVERY_ACTION: Merge all archived/new cases with final inactive/DNP, QB and specialist coverage and run the evaluator."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-CHI-GB",
+              "away": "CHI",
+              "home": "GB",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: CHI LB T.J. Edwards (hamstring) was ruled out in-game. Exact lost interval, relief identity and linebacker cluster context are not yet bound. RECOVERY_ACTION: Reconcile the official final gamebook clock/participation and a disjoint active linebacker replacement, then calculate the approved partial-time loss.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Kyle Monangai and Edgerrin Cooper estimates are reusable, but complete paired inactive/DNP, QB, specialist and in-game coverage remains unvalidated. RECOVERY_ACTION: Assemble the full paired game-day record and run tools/graham-weekly-evidence.mjs."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-DEN-LAC",
+              "away": "DEN",
+              "home": "LAC",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Final injury/inactive evidence identifies DEN CB Riley Moss and CB Patrick Surtain II, plus LAC WR Quentin Johnston, WR Brenen Thompson, OT Joe Alt, G Kayode Awosika, OL Trevor Penning, CB Donte Jackson and S Derwin James as injury-driven pregame absences. The saved ledger contains only the continuing LAC Rashawn Slater case, so the listed identities, frozen values, replacements and group safeguards remain unadopted. RECOVERY_ACTION: Bind each exact player identity/value, distinguish roster-list status from final inactive/DNP participation, establish disjoint game-active replacements and run offensive-line, receiver and defensive-back cluster review.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: DEN S Talanoa Hufanga was ruled out in-game with an ankle injury; exact lost interval and relief role are not yet bound. RECOVERY_ACTION: Reconcile the final gamebook play/status clock and safety participation, then apply the approved partial-time method without inferring active impairment.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Complete inactive/DNP, specialist, quarterback-duty and every printed injury/return sequence has not yet been assembled into one paired evaluator-ready record. RECOVERY_ACTION: Merge the saved Slater estimate with all new cases and final gamebook coverage, then run tools/graham-weekly-evidence.mjs."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-DET-ARI",
+              "away": "DET",
+              "home": "ARI",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The earlier no-additional-in-game-loss inference is retired. The official final gamebook contains five distinct printed injury sequences: White, Kennedy, Baker, Williams and Nolen. Baker and Nolen have explicit returns; Kennedy has an exact injury play; White and Williams require bounded starts where applicable. RECOVERY_ACTION: Bind frozen identities/values and disjoint replacements for all five sequences, then combine them with every pregame absence and perform offensive-line, defensive-back, linebacker and receiver/return-role safeguards.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs are complete, but the saved Arizona estimates and newly identified Detroit/Arizona pregame and in-game cases have not passed one complete paired evaluator record. RECOVERY_ACTION: Assemble complete DET and ARI coverage, recompute both governed totals and run tools/graham-weekly-evidence.mjs."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-SF-SEA",
+              "away": "SF",
+              "home": "SEA",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior Drake Thomas open-through-game-end premise is corrected: the gamebook records an actual Q4 14:11 return. Cowing and Kareem also have explicit returns; Samuel has an injury/out sequence. Greenlaw remains a non-injury ejection exclusion. RECOVERY_ACTION: Bind frozen values, exact exposure intervals and disjoint additional-duty replacements for Thomas, Samuel, Cowing and Kareem; preserve all actual returns and exclude the ejection.",
+                "REPLACEMENT_OR_VALUE_UNRESOLVED: The archived Juszczyk and Charbonnet vacancies, newly identified pregame absences and the corrected in-game intervals still lack one complete disjoint role allocation and paired cluster review. RECOVERY_ACTION: Adopt supported primary or approved committee duties, reserve each added role once, assemble both team sections and run the evaluator."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            },
+            {
+              "gameKey": "2026-W05-BUF-LAR",
+              "away": "BUF",
+              "home": "LAR",
+              "reasons": [
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Buffalo's concurrent DJ Moore and Joshua Palmer injury-driven inactive vacancies are now final, and Skyler Bell is confirmed active with two targets. The available evidence does not disjointly allocate Bell and the remaining active receiver duties between the two vacancy cases, so neither missing value is treated as zero and no overlapping replacement credit is invented. RECOVERY_ACTION: Complete one receiver-cluster review using the saved Moore/Palmer values and the established active candidate set; apply either supported role weights or the approved explicitly assumed equal-share committee while reserving each added duty once.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Dee Alford and Landon Jackson are final injury-driven inactives. Their frozen values and candidate sets are available, but the gamebook does not by itself establish Alford's nickel allocation or Jackson's added defensive-line duty allocation; both require promotion with defensive-back/defensive-line cluster safeguards. RECOVERY_ACTION: Use the saved official role sources and final activation inventory to select a documented primary or supported/equal-share committee for each added vacancy duty, then run the full Buffalo team evaluator without duplicating Oliver/Carter duties.",
+                "REPLACEMENT_OR_VALUE_UNRESOLVED: The gamebook newly binds Buffalo Spencer Brown's 2,667-second absence and exact short partial-injury intervals for C.J. Gardner-Johnson, Terrel Bernard and Christian Benford, plus the Rams' Jaylen Watson interval. Frozen healthy values are available, but each interval still needs an approved additional-duty replacement binding and disjoint offensive-line/defensive-back cluster evaluation. Brown's return-questionable line is not treated as a return. RECOVERY_ACTION: Bind documented active replacements or supported committees, evaluate only the exact intervals over the 4,085-second game and preserve the actual-return clocks; do not duplicate inactive or baseline duties.",
+                "AVAILABLE_EVIDENCE_NOT_RECONCILED: Ed Oliver's saved Oliver-to-Carter individual model review remains reusable and Quentin Lake is closed active. Oliver's 0.9 saved estimate still requires adoption inside complete Buffalo defensive-line coverage alongside inactive Landon Jackson; the remaining Rams inactive/DNP inventory and all zero-loss exclusions need explicit paired certification. RECOVERY_ACTION: Promote the passing Oliver case through the complete Buffalo team section, certify the full Los Angeles inactive/DNP inventory, recompute both governed team totals and run tools/graham-weekly-evidence.mjs before any READY state."
+              ],
+              "sourceRefs": [
+                "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json",
+                "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+                "data/walters/nfl/2026/week-05-current-numbers.json",
+                "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+              ]
+            }
+          ],
+          "publicationVerified": true
+        },
+        "ratingPropagation": {
+          "state": "INCOMPLETE",
+          "owner": "GRAHAM_RATING_BASE_REFRESH",
+          "gamesVerified": 0,
+          "gamesExpected": 14,
+          "unpropagatedGames": [
+            "2026-W06-SEA-DEN",
+            "2026-W06-HOU-JAX",
+            "2026-W06-CHI-ATL",
+            "2026-W06-BAL-CLE",
+            "2026-W06-TEN-IND",
+            "2026-W06-NYJ-NE",
+            "2026-W06-NO-NYG",
+            "2026-W06-CAR-PHI",
+            "2026-W06-PIT-TB",
+            "2026-W06-ARI-LAR",
+            "2026-W06-LAC-KC",
+            "2026-W06-BUF-LV",
+            "2026-W06-DAL-GB",
+            "2026-W06-WAS-SF"
+          ],
+          "actualCarriedBaseMismatchGames": [
+            "2026-W06-CHI-ATL",
+            "2026-W06-BAL-CLE",
+            "2026-W06-NYJ-NE",
+            "2026-W06-NO-NYG",
+            "2026-W06-PIT-TB",
+            "2026-W06-BUF-LV",
+            "2026-W06-DAL-GB"
+          ],
+          "reason": "Initial baseline remains pending; all 14 lack verified weeklyRatingInput propagation; seven game bases differ from latest published ratings. Preserve pregame history rather than rewriting completed-game fairs."
+        },
+        "currentAvailability": {
+          "state": "INCOMPLETE",
+          "owner": "CURRENT_WEEK_RESEARCH_AND_PRODUCTION",
+          "unresolvedGames": [
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-HOU-JAX",
+              "personnelCases": [
+                "2026-W06-JAX-Ross-Matiscik"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-CHI-ATL",
+              "personnelCases": [],
+              "blockedGroups": [],
+              "qbStatus": "FAIL_CLOSED_GAME_PRESERVED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-BAL-CLE",
+              "personnelCases": [
+                "2026-W06-CLE-Carson-Schwesinger",
+                "2026-W06-BAL-Cam-Jurgens"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-TEN-IND",
+              "personnelCases": [
+                "2026-W06-IND-Ashton-Dulin"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-NYJ-NE",
+              "personnelCases": [
+                "2026-W06-NE-TreVeyon-Henderson",
+                "2026-W06-NE-Will-Campbell",
+                "2026-W06-NE-A-J-Brown",
+                "2026-W06-NYJ-Kenyon-Sadiq"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-NO-NYG",
+              "personnelCases": [
+                "2026-W06-NYG-Jermaine-Eluemunor"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-PIT-TB",
+              "personnelCases": [
+                "2026-W06-PIT-Pat-Freiermuth"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-LAC-KC",
+              "personnelCases": [
+                "2026-W06-LAC-Bud-Dupree",
+                "2026-W06-LAC-Alec-Ingold"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            },
+            {
+              "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
+              "gameKey": "2026-W06-WAS-SF",
+              "personnelCases": [
+                "2026-W06-SF-Dre-Greenlaw",
+                "2026-W06-SF-Mike-Evans",
+                "2026-W06-SF-Christian-Kirk",
+                "2026-W06-SF-Gracen-Halton",
+                "2026-W06-SF-Mykel-Williams",
+                "2026-W06-SF-Upton-Stout",
+                "2026-W06-SF-Siran-Neal"
+              ],
+              "blockedGroups": [],
+              "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+            }
+          ],
+          "trackedPersonnelCases": 19,
+          "unresolvedQbTeams": [
+            "CHI"
+          ],
+          "classification": "UNRESOLVED_PRIOR_PREGAME_RECORDS_NOT_REVALIDATED_AS_CURRENT_AVAILABILITY",
+          "nextAction": "Existing historical/game-day evidence owner must bind final availability and role facts additively. Future-week current personnel must be researched only after activation; no postgame replay of pregame writer."
+        },
+        "rolloverLearningHandoff": {
+          "state": "BLOCKED",
+          "owner": "WEEK_ROLLOVER",
+          "sourceWeek": 5,
+          "targetWeek": 6,
+          "nextWeekNotActivated": 7,
+          "reason": "11 of 15 earlier learning games incomplete and propagation incomplete."
+        },
+        "savedEvidenceHandoff": {
+          "owner": "GRAHAM_WALTERS_90_10",
+          "exactHandoffs": [
+            {
+              "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-gamebook-inventory-advance.json",
+              "blobSha": "10ab106a5ac767adef53a93f156c9478ec9a939d",
+              "games": [
+                {
+                  "gameKey": "2026-W05-IND-PIT",
+                  "state": "BLOCKED",
+                  "blockers": [
+                    {
+                      "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+                      "finding": "Indianapolis' official final report and inactive list establish injury-driven absences for Darius Slayton (frozen 0.5), Ashton Dulin (0.2), Will Mallory (0.0) and Jaylon Carlies (0.0). Slayton's receiving replacement/cluster duty and Dulin's receiver/special-teams added duty remain unbound; the two zero-valued cases still need explicit zero-calibrated inclusion in the final team section.",
+                      "nextAction": "Bind Slayton's and Dulin's exact active replacement roles or complete supported committees without reusing baseline receiver or special-teams duty, add Mallory and Carlies as ZERO_CALIBRATED_LOSS, and classify Dalton Tucker as healthy inactive or injury-driven from a game-day source.",
+                      "owner": "GRAHAM_WALTERS_90_10"
+                    },
+                    {
+                      "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+                      "finding": "Pittsburgh's final sources establish injury-driven absences for Jamel Dean (frozen 1.2), DeShon Elliott (0.9), and Rico Dowdle (0.9). Official postgame reporting identifies Asante Samuel Jr. and Daylen Everette as the Dean-created starting corner set, but their frozen values and disjoint additional duties have not been assembled. Elliott's safety successor and Dowdle's added running-back duty also remain unbound.",
+                      "nextAction": "Complete the Dean two-corner cluster with frozen identities and nonduplicated duty; bind Elliott's actual game-day safety replacement; and use the official Dowdle/Warren role report plus the gamebook to reconcile only Dowdle-created additional duty. Then classify Drew Allar, Will Howard, Eli Heidenreich, Thomas Smith and Kevin Jobity Jr. as emergency-QB, reserve, injury-driven, or healthy inactive as applicable.",
+                      "owner": "GRAHAM_WALTERS_90_10"
+                    },
+                    {
+                      "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+                      "finding": "The complete FINAL_GAME_DAY team sections have not yet merged every archived case, newly identified inactive/DNP, reserve-list identity, specialist duty and the now-closed quarterback and in-game injury findings. The pair is therefore not evaluator-ready even though Key, Harmon, Black, Wilson and Skowronek are numerically closed.",
+                      "nextAction": "Assemble both full team inventories, reserve each replacement duty once, recompute complete team losses, and run tools/graham-weekly-evidence.mjs before any READY promotion or carried-rating staging.",
+                      "owner": "GRAHAM_WALTERS_90_10"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-17-chi-gb-secondary-role-chain-closeout.json",
+              "blobSha": "e43c72593a79099111767f2ce03bcdf2c9b78bc4",
+              "games": [
+                {
+                  "gameKey": "2026-W05-CHI-GB",
+                  "state": "BLOCKED",
+                  "blockers": [
+                    {
+                      "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+                      "finding": "Benjamin St-Juste remains source-bound to a special-teams-only Week 5 role and a return-questionable status after Q3 1:58 with no actual return. Available reports still conflict on six versus ten special-teams snaps and do not bind his exact injury play or the added-duty successor.",
+                      "nextAction": "Resolve the participation conflict and successor duty through an authoritative participation source. Do not convert the status update into a departure time or treat return-questionable wording as a return.",
+                      "owner": "GRAHAM_WALTERS_90_10"
+                    },
+                    {
+                      "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+                      "finding": "The pair still requires one complete FINAL_GAME_DAY assembly combining every immutable pregame, reserve, partial-game and quarterback case with disjoint cluster coverage.",
+                      "nextAction": "After St-Juste closes, assemble the full CHI and GB team sections, recompute complete injury totals, validate, preflight the current updater and stage only if READY.",
+                      "owner": "GRAHAM_WALTERS_90_10"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "readyPairCheck": {
+            "alreadyAppliedReadyPair": "2026-W05-LV-NE",
+            "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-ready-reconciliation.json",
+            "blobSha": "2871d723603cecfadd65cef8e62535338e1567a6",
+            "unpublishedReadyPairFound": false
+          },
+          "nextAction": "Resume newest source-bound IND-PIT inventory: Slayton/Dulin receiving-return duties; Dean/Elliott/Dowdle assignments and full paired inventory. CHI-GB retains St-Juste ST-snap/successor conflict. Submit all supported pairs under v1.9; never return READY evidence to generic research."
+        },
+        "governedState": {
+          "numericMoves": 0,
+          "ratingsChanged": false,
+          "fairsChanged": false,
+          "activeWeekChanged": false,
+          "personnelStagingWritten": false,
+          "qbStagingWritten": false,
+          "noBet": true
+        },
+        "note": "BLOCKED run recording only, not completed research or numerical publication. Authority and start workflow verified; both completion checkpoints failed. Existing week held by unfinished earlier learning; this task has no authority to advance it. All governed numbers preserved. No source-locked numeric work attempted; no market used. Recurring task activation/timing unchanged. Resume existing historical owner→separate verified propagation→rollover→full current baseline. Do not call this a successful 32-team baseline."
+      }
     }
   ]
 }
