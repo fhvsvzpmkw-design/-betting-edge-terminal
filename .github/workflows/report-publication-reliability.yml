@@ -7,6 +7,14 @@ on:
     paths:
       - tools/report-publication.mjs
       - tools/report-pipeline.mjs
+      - tools/report-run.mjs
+      - tools/report-snapshot.mjs
+      - tools/report-producer-progress.mjs
+      - tools/moneyline-lineage.mjs
+      - tools/spread-lineage.mjs
+      - tools/primary-lineage.mjs
+      - tools/market-price-assessment.mjs
+      - tools/pinnacle-benchmark-publication-gate.mjs
       - tools/major-sport-market-coverage-gate.mjs
       - tools/report-coverage-summary.mjs
       - tools/coverage-validation-lookups.mjs
@@ -21,6 +29,8 @@ on:
       - tests/coverage-validation-lookups.test.mjs
       - tests/report-publication-request.test.mjs
       - tests/report-pipeline.test.mjs
+      - tests/report-snapshot.test.mjs
+      - tests/report-producer-progress.test.mjs
       - tests/odds-history-index-collision.py
       - .github/workflows/report-publication-reliability.yml
       - .github/workflows/report-history-staged.yml
@@ -48,6 +58,8 @@ jobs:
           node --test tests/report-history-verification.test.mjs tests/coverage-validation-lookups.test.mjs tests/report-eligibility-wiring.test.mjs
           node tools/report-publication.mjs self-test
           node tests/report-pipeline.test.mjs
+          node --test tests/report-snapshot.test.mjs tests/report-producer-progress.test.mjs tests/scheduled-report-authority.test.mjs tests/moneyline-lineage.test.mjs tests/pinnacle-observation-freshness.test.mjs
+          node tools/spread-lineage.mjs self-test
           node --default-to-experimental-regexp-engine --test tests/report-publication-request.test.mjs
       - name: Concurrent snapshot-index publication regression
         run: |

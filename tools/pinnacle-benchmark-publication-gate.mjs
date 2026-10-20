@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import {snapshotReferenceAt} from './report-snapshot.mjs';
 import path from 'node:path';
 import {loadBoundMarketObserver} from './market-price-assessment.mjs';
 import {AUTHORITY,QUALIFIED,UNAVAILABLE,validateObserver} from './pinnacle-sharp-benchmark.mjs';
@@ -102,7 +103,7 @@ function validate(rt,report,sidecar){
     try{observer=loadBoundMarketObserver({provenance:{...p,pinnacleObserverPath:p.pinnacleObserverPath||rt.policy.observerPath}},rt.root);}
     catch(error){fail(`Pinnacle observer SHA mismatch: ${error.message}`);}
     check(officialObserverShape(observer),'Official Pinnacle observer authority/schema shape is invalid');
-    const result=validateObserver(observer,{observerFreshnessMinutes:rt.policy.rules.observerFreshnessMinutes,quoteFreshnessMinutes:rt.policy.rules.quoteFreshnessMinutes,futureClockSkewToleranceMinutes:rt.policy.rules.futureClockSkewToleranceMinutes,asOf:report.ts});
+    const result=validateObserver(observer,{observerFreshnessMinutes:rt.policy.rules.observerFreshnessMinutes,quoteFreshnessMinutes:rt.policy.rules.quoteFreshnessMinutes,futureClockSkewToleranceMinutes:rt.policy.rules.futureClockSkewToleranceMinutes,asOf:snapshotReferenceAt(report,sidecar)});
     check(result.ok,`Pinnacle observer validation failed: ${result.errors.join('; ')}`);
   }else{
     check(p.pinnacleBenchmarkState===UNAVAILABLE,'Non-ok Pinnacle observer must be explicitly unavailable');

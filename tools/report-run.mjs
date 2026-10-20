@@ -15,6 +15,7 @@ import {execFileSync} from 'node:child_process';
 import {isDeepStrictEqual} from 'node:util';
 import {serializeReportDocument,parseReportDocument} from './report-document-transport.mjs';
 import {producerExecutionFor} from './report-producer-progress.mjs';
+import {bindReportSnapshot} from './report-snapshot.mjs';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -49,6 +50,7 @@ function temporaryDraft(state,callback){
 }
 function summary(state){
   return {schema:1,run:state.identity,phase:state.phase,revision:state.revision,
+    oddsSnapshot:state.report.oddsSnapshot||null,
     counts:state.report.counts,research:{available:state.sidecar.primaryAnalysis?.receipts?.length??null,evaluated:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='EVALUATED').length??null,blocked:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED').length??null,
       unfinished:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED'&&row.blocker?.reason==='RESEARCH_INCOMPLETE').length??null},
     checkpointBytes:Buffer.byteLength(serializeReportDocument(state,'REPORT_CHECKPOINT')),checkpointDecodedBytes:Buffer.byteLength(json(state)),
@@ -106,6 +108,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       let r=read(path.resolve(report)),s=read(path.resolve(sidecar));
       bindGameInputs(root,r,s);
       ({report:r,sidecar:s}=captureForecastEvidenceDraft({root,report:r,sidecar:s}));
+      bindReportSnapshot(r,s,{startedAt:new Date(commandStarted).toISOString()});
       state={schema:1,identity:identity(r,s,root),phase:'DRAFT',revision:0,report:r,sidecar:s,events:[]};
     }else{
       if(state?.schema!==1||!Array.isArray(state.events))throw new Error('Run checkpoint is missing or invalid');
@@ -137,6 +140,11 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     if(command==='checkpoint'){
       if(!report||!sidecar)throw new Error('checkpoint requires updated draft files');
       let r=read(path.resolve(report)),s=read(path.resolve(sidecar));
+      if(state.report.oddsSnapshot){
+        if(r.oddsSnapshot&&!isDeepStrictEqual(r.oddsSnapshot,state.report.oddsSnapshot))throw Error('Pinned snapshot acceptance changed');
+        if(s.oddsSnapshot&&!isDeepStrictEqual(s.oddsSnapshot,state.sidecar.oddsSnapshot))throw Error('Pinned snapshot acceptance changed');
+        r.oddsSnapshot=state.report.oddsSnapshot;s.oddsSnapshot=state.sidecar.oddsSnapshot;
+      }
       if(state.sidecar.gameIntelligenceInputs&&!isDeepStrictEqual(s.gameIntelligenceInputs,state.sidecar.gameIntelligenceInputs))throw Error('Pinned game inputs changed; export the saved draft or start a newly bound actual-time run');
       if(JSON.stringify(identity(r,s,root))!==JSON.stringify(state.identity))throw new Error('Cannot change run identity or feed binding; start a new run');
       if(eventId&&!s.primaryAnalysis?.receipts?.some(row=>String(row.quote?.eventId??row.decision?.feed?.eventId??row.selectionId?.split('|')[1])===String(eventId)))throw Error('Checkpoint event is not in the bound selection receipts');
@@ -155,6 +163,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       state.sidecar.provenance.reportTimestamp=at;
       if(state.sidecar.grahamFairHandoffInputs)state.sidecar.grahamFairHandoffInputs.reportTs=at;
       state.identity=identity(state.report,state.sidecar,root);state.phase='DRAFT';delete state.validation;delete state.preparation;
+      bindReportSnapshot(state.report,state.sidecar,{startedAt:state.events.find(event=>event.command==='start')?.at});
     }
     if(command==='prepare'){
       const prepared=prepareEvidenceDraft({root,report:state.report,sidecar:state.sidecar});
@@ -189,9 +198,9 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       const entry=entries[0];
       if(!/^data\/history\/runs\/\d{4}-\d{2}-\d{2}\/[a-z_]+-\d{6}\.json$/.test(entry.path)||!/^data\/history\/research-fit\/\d{4}-\d{2}-\d{2}\/[a-z_]+-\d{6}\.json$/.test(entry.researchFitPath))throw new Error('Invalid indexed paths');
       const rfile=path.join(root,entry.path),sfile=path.join(root,entry.researchFitPath),issued=read(rfile),research=read(sfile);
-      for(const key of ['ts','slot','label','feedGeneratedAt','bankroll','risk','counts','recs'])
+      for(const key of ['ts','slot','label','feedGeneratedAt','oddsSnapshot','bankroll','risk','counts','recs'])
         if(JSON.stringify(issued[key])!==JSON.stringify(state.report[key]))throw new Error(`Published ${key} differs from frozen candidate`);
-      for(const key of ['recommendations','primaryAnalysis','forecastEvidence','gameIntelligenceInputs'])
+      for(const key of ['recommendations','primaryAnalysis','forecastEvidence','gameIntelligenceInputs','oddsSnapshot'])
         if(JSON.stringify(research[key])!==JSON.stringify(state.sidecar[key]))throw new Error(`Published evidence ${key} differs from frozen candidate`);
       if(research.provenance?.feedBlobSha!==state.identity.feedBlobSha)throw new Error('Published feed binding changed');
       pipeline({root,report:rfile,sidecar:sfile,mode:'readback'});
@@ -200,7 +209,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
         readbackAt:new Date().toISOString()};state.phase='PUBLISHED';
     }
     state.revision++;
-    state.events.push({command,at:new Date().toISOString(),revision:state.revision,phase:state.phase,durationMs:Date.now()-commandStarted,
+    state.events.push({command,at:new Date(command==='start'?commandStarted:Date.now()).toISOString(),revision:state.revision,phase:state.phase,durationMs:Date.now()-commandStarted,
       ...(command==='checkpoint'&&eventId?{eventId:String(eventId)}:{})});
     atomic(file,serializeReportDocument(state,'REPORT_CHECKPOINT'));
     return {...summary(state),checkpoint:within(root,file),...(command==='stage'?{stagingPath:'data/history/staging/report-bundle.json',requiresRemoteCommitAndWorkflowSuccess:true}:{})};

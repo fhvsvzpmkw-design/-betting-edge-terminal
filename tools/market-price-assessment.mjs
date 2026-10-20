@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {snapshotReferenceAt} from './report-snapshot.mjs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -30,7 +31,7 @@ export function loadBoundMarketObserver(sidecar, root) {
 // the exact full-game alternate total; never substitute another line or period.
 export function exactMarketReference(report, quote, observer) {
   ensure(observer?.schema === 3 && observer.mode === 'official-sharp-benchmark' && observer.status === 'ok' && observer.authoritative === true && observer.benchmarkAuthority === AUTHORITY && observer.executionAuthority === false, 'Market assessment requires an official available Pinnacle observer');
-  const age = (Date.parse(report.ts) - Date.parse(observer.generatedAt)) / 60000;
+  const age = (Date.parse(snapshotReferenceAt(report)) - Date.parse(observer.generatedAt)) / 60000;
   ensure(Number.isFinite(age) && age >= -5 && age <= 75, 'Market assessment Pinnacle observer is stale');
   const fixtures = (observer.fixtures || []).filter(f => String(f.primaryMatch?.eventId) === String(quote.eventId));
   ensure(fixtures.length === 1, 'Market assessment requires one exact matched event');

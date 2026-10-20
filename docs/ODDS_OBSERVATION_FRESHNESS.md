@@ -54,3 +54,7 @@ Required regression cases:
 - Legacy snapshots reproduce their original validation/meter behavior without backfilling observations.
 
 The next ordinary refresh/report supplies live acceptance: verify ordered collection/observation/completion timestamps, exact selection availability and limitations, meter/lineage agreement and normal durable publication. Recovery counts come from that run. This correction adds no task, schedule, paid API, request budget, prop analysis or betting-policy change.
+
+## Scheduled run acceptance — October 20, 2026
+
+For forward `RUN_BOUND_SNAPSHOT` reports, the 75-minute whole-feed and whole-Pinnacle-observer test uses the actual saved run-start acceptance in `oddsSnapshot`, not the later publication clock. Feed SHA, generatedAt, canonical lane and acceptance are pinned in report/sidecar and matched to the producer start at staged extraction. A snapshot already stale at acceptance cannot qualify. A valid accepted run can complete later using that snapshot, with actual issue time and original odds time displayed. Retiming cannot refresh acceptance. Event-start eligibility, exact identities, analytical checks and the 30-minute quote limits at feed generation remain unchanged. Reports without this forward binding retain their original rules.

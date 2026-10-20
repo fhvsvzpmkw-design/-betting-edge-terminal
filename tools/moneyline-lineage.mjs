@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import {snapshotReferenceAt} from './report-snapshot.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import quoteObservation from '../assets/quote-observation.js';
@@ -104,7 +105,7 @@ export function auditMoneylineLineage({ root = process.cwd(), report, sidecar = 
   if (!references.length && !currentBySide.size) return { ok: !violations.length, enforced: true, diagnostics, violations };
   feed ||= loadBoundFeed(root, report, sidecar, feedFile);
   ensure(feed?.generatedAt === report.feedGeneratedAt, 'Bound feed generatedAt does not match report feedGeneratedAt');
-  ensure(ageMinutes(feed.generatedAt, report.ts) <= 75, 'Report feed is older than 75 minutes at issuance');
+  ensure(ageMinutes(feed.generatedAt, snapshotReferenceAt(report,sidecar)) <= 75, 'Report feed is older than 75 minutes at acceptance/issuance');
   const events = mergedFeedEvents(feed);
   for (const key of new Set([...priorBySide.keys(), ...currentBySide.keys()])) {
     const prior = priorBySide.get(key), current = currentBySide.get(key), rec = current || prior.rec;

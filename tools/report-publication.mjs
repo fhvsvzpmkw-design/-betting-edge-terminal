@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import {validateReportSnapshot} from './report-snapshot.mjs';
 import path from 'node:path';
 import os from 'node:os';
 import {pathToFileURL} from 'node:url';
@@ -257,6 +258,7 @@ function validatePersonnelEvidence(evidence,index){
   }
 }
 function validateSidecar(sidecar,report,reportPath,{strict=false,collectRecommendationErrors=false}={}){
+  validateReportSnapshot(report,sidecar);
   assert(sidecar && typeof sidecar==='object' && !Array.isArray(sidecar),'Sidecar must be a JSON object');
   assert(sidecar.schema===2 || sidecar.schema===3,`Unsupported sidecar schema: ${sidecar.schema}`);
   const ref = sidecar.reportReference;

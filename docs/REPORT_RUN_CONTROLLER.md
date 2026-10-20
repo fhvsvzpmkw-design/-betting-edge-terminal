@@ -36,6 +36,8 @@ Keep event facts and their original sources together; all exact selection decisi
 
 Feed and lane are immutable within a run. Before final preparation, advance the unfrozen draft to actual issuance time with:
 
+From the October 20 correction, `oddsSnapshot` records the feed accepted at the actual saved run start, with exact SHA, generated time and lane. The 75-minute input test is made against that acceptance, so a valid scheduled run can finish after 75 minutes without a second pull. Event eligibility and actual issuance remain current. Retiming never resets snapshot acceptance. A resumed unfrozen older checkpoint uses its preserved original start, not the recovery clock. The publisher checks the binding against the producer start and sidecar provenance; source clocks, quote-age limits and every analytical gate remain intact.
+
 ```
 node tools/report-run.mjs retime --checkpoint <checkpoint> --expected-revision <revision> --at <actual-ISO-timestamp>
 ```

@@ -39,7 +39,9 @@ try{
   validateStagedBundle(partial,{root}); // An unreviewed blocker never vetoes a reviewed decision.
   const allBlocked=structuredClone(partial);allBlocked.sidecar.primaryAnalysis.receipts[0].state='BLOCKED';
   validateStagedBundle(allBlocked,{root}); // Completed searches may genuinely yield no decisions.
-  const empty=structuredClone(bundle);empty.sidecar.primaryAnalysis.receipts=[];delete empty.producerExecution;
+  const empty=structuredClone(bundle);empty.sidecar.primaryAnalysis.receipts=[];
+  validateStagedBundle(empty,{root}); // A bound empty slate still retains its actual snapshot acceptance.
+  delete empty.producerExecution;delete empty.report.oddsSnapshot;delete empty.sidecar.oddsSnapshot;
   validateStagedBundle(empty,{root});
   const corrupt=structuredClone(partial);corrupt.producerExecution.eventReviews[0].eventId='wrong-event';
   assert.throws(()=>validateStagedBundle(corrupt,{root}),/Invalid saved/);

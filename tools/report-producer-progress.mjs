@@ -1,15 +1,20 @@
 // Execution evidence for forward producer runs; no betting or completion quota.
+import {validateReportSnapshot} from './report-snapshot.mjs';
 export const EVENT_REVIEW_TRACE_FROM='2026-10-08T14:30:43-07:00';
 const eventOf=row=>String(row?.quote?.eventId??row?.decision?.feed?.eventId??row?.selectionId?.split('|')[1]??'');
 export const eventReviewTraceRequired=report=>Date.parse(report?.ts)>=Date.parse(EVENT_REVIEW_TRACE_FROM);
 
 export function producerExecutionFor(state){
   if(!eventReviewTraceRequired(state.report))return undefined;
-  return {schema:1,eventReviews:state.events.filter(event=>event.command==='checkpoint'&&event.eventId)
+  return {schema:1,...(state.report.oddsSnapshot?{startedAt:state.events.find(event=>event.command==='start')?.at}:{}),eventReviews:state.events.filter(event=>event.command==='checkpoint'&&event.eventId)
     .map(({eventId,at,revision})=>({eventId,at,revision}))};
 }
 
 export function validateProducerExecution(bundle){
+  if(bundle.report?.oddsSnapshot){
+    if(!bundle.producerExecution?.startedAt)throw Error('Save an actual event review and preserve the saved producer start for a bound snapshot');
+    validateReportSnapshot(bundle.report,bundle.sidecar,{startedAt:bundle.producerExecution.startedAt});
+  }
   if(!eventReviewTraceRequired(bundle.report))return;
   const receipts=bundle.sidecar.primaryAnalysis?.receipts;
   if(!Array.isArray(receipts))throw Error('Forward producer requires bound selection receipts');

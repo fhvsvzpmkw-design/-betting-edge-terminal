@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import {snapshotReferenceAt} from './report-snapshot.mjs';
 import {selectionLabelViolations} from './selection-label-gate.mjs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -174,7 +175,7 @@ export function auditPrimaryLineage({ root = process.cwd(), report, sidecar = nu
   if (!tracked.length) return { ok: labelViolations.length === 0, enforced: true, diagnostics: [], violations: labelViolations };
   feed ||= loadFeed(root, report, sidecar, feedFile);
   ensure(feed?.generatedAt === report.feedGeneratedAt, 'Bound feed generatedAt does not match report feedGeneratedAt');
-  ensure(age(feed.generatedAt, report.ts) <= 75, 'Report feed is older than 75 minutes at issuance');
+  ensure(age(feed.generatedAt, snapshotReferenceAt(report,sidecar)) <= 75, 'Report feed is older than 75 minutes at acceptance/issuance');
   const events = mergedFeedEvents(feed), currentBySide = new Map(), diagnostics = [], violations = [...labelViolations];
   for (const rec of report.recs || []) {
     const key = lineageEventSide(rec, market);

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'node:fs';
+import {snapshotReferenceAt} from './report-snapshot.mjs';
 import path from 'node:path';
 import os from 'node:os';
 import assert from 'node:assert/strict';
@@ -250,7 +251,7 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
   if (String(feed?.generatedAt || '') !== String(report?.feedGeneratedAt || '')) {
     die(`Resolved feed generatedAt ${feed?.generatedAt || 'unknown'} does not match report feedGeneratedAt ${report?.feedGeneratedAt || 'unknown'}`);
   }
-  if (!feedFresh(feed.generatedAt, report.ts)) die(`Report feed is older than ${FEED_MAX_AGE_MINUTES} minutes at issuance`);
+  if (!feedFresh(feed.generatedAt, snapshotReferenceAt(report,sidecar))) die(`Report feed is older than ${FEED_MAX_AGE_MINUTES} minutes at acceptance/issuance`);
 
   const events = allEvents(feed);
   const currentSpreads = new Map();
