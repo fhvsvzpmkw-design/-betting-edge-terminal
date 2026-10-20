@@ -1,0 +1,514 @@
+{
+  "schema": 1,
+  "publication": "THE PRIVATE LINE",
+  "timezone": "America/Vancouver",
+  "policy": {
+    "appendOnly": true,
+    "marketIsolation": "Research and Graham-number changes are completed before contemporaneous Pinnacle comparison is exposed.",
+    "noForcedMove": "A sweep may record NO_MATERIAL_CHANGE. Daily review does not require daily rating movement.",
+    "sourceRule": "Material changes require traceable current sources. Clubhouse context alone is never enough to move a number.",
+    "correctionRule": "Correct a bad entry by appending a CORRECTION sweep; do not rewrite prior research history."
+  },
+  "scheduledCadence": [
+    {
+      "day": "TUESDAY",
+      "timePacific": "11:00",
+      "type": "FULL_WEEKLY_BASELINE",
+      "scope": "Full weekly 32-team information baseline after Monday Night Football."
+    },
+    {
+      "day": "MONDAY/WEDNESDAY-FRIDAY",
+      "timePacific": "11:30",
+      "type": "MAIN_DAILY_SWEEP",
+      "scope": "Main information review, including the Saturday review function."
+    },
+    {
+      "day": "SATURDAY",
+      "timePacific": "11:30",
+      "type": "MAIN_WEEKEND_SWEEP",
+      "scope": "Main information review, including the Saturday review function."
+    },
+    {
+      "day": "SUNDAY",
+      "timePacific": "07:00",
+      "type": "PREGAME_SWEEP",
+      "scope": "Sunday pregame information review for active-week games awaiting kickoff."
+    },
+    {
+      "day": "TUESDAY-SATURDAY",
+      "timePacific": "16:45",
+      "type": "LATE_DAY_DELTA",
+      "scope": "Late-day change-only information delta."
+    }
+  ],
+  "scheduleAuthority": {
+    "schema": 1,
+    "authorityId": "graham-schedule-metadata-v1",
+    "state": "SYNCHRONIZED",
+    "manifestPath": "data/walters/nfl/graham-schedule-authority-v1.json",
+    "timezone": "America/Vancouver",
+    "timingMode": "exact_schedule",
+    "executionAuthority": "CHATGPT_SCHEDULED_TASKS",
+    "tasks": [
+      {
+        "taskKey": "WEEK_ROLLOVER",
+        "title": "Graham Week Rollover",
+        "days": [
+          "TU"
+        ],
+        "time": "04:30",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=4;BYMINUTE=30;BYSECOND=0",
+        "purpose": "Mechanical completion-gated active-week rollover."
+      },
+      {
+        "taskKey": "TUESDAY_BASELINE",
+        "title": "Graham Tuesday Baseline",
+        "days": [
+          "TU"
+        ],
+        "time": "11:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU;BYHOUR=11;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Full weekly 32-team information baseline after Monday Night Football."
+      },
+      {
+        "taskKey": "DAILY_REVIEW",
+        "title": "Graham Daily Review",
+        "days": [
+          "MO",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "11:30",
+        "rrule": "FREQ=WEEKLY;BYDAY=MO,WE,TH,FR,SA;BYHOUR=11;BYMINUTE=30;BYSECOND=0",
+        "purpose": "Main information review, including the Saturday review function."
+      },
+      {
+        "taskKey": "DELTA_1645",
+        "title": "Graham 16:45 Delta",
+        "days": [
+          "TU",
+          "WE",
+          "TH",
+          "FR",
+          "SA"
+        ],
+        "time": "16:45",
+        "rrule": "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR,SA;BYHOUR=16;BYMINUTE=45;BYSECOND=0",
+        "purpose": "Late-day change-only information delta."
+      },
+      {
+        "taskKey": "SUNDAY_PREGAME",
+        "title": "Graham Sunday Pregame",
+        "days": [
+          "SU"
+        ],
+        "time": "07:00",
+        "rrule": "FREQ=WEEKLY;BYDAY=SU;BYHOUR=7;BYMINUTE=0;BYSECOND=0",
+        "purpose": "Sunday pregame information review for active-week games awaiting kickoff."
+      }
+    ]
+  },
+  "requiredSweepFields": [
+    "sequence",
+    "type",
+    "startedAt",
+    "completedAt",
+    "scope",
+    "sourcesChecked",
+    "teamFindings",
+    "ratingChanges",
+    "matchupChanges",
+    "espnFpiCapture",
+    "summary"
+  ],
+  "ledgerId": "graham-mercer-nfl-2026-week-07-research-v1",
+  "title": "GRAHAM MERCER // WEEK 7 RESEARCH LEDGER",
+  "season": 2026,
+  "week": 7,
+  "state": "BASELINE_PENDING",
+  "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
+  "createdAt": "2026-10-20T21:24:40.453Z",
+  "updatedAt": "2026-10-20T21:24:40.453Z",
+  "purpose": "Preserve Week7 current-information research and independently constructed Graham fairs after completed Week6 and verified Week5 learning.",
+  "researchEventsDir": "data/walters/nfl/2026/week-07-research-events",
+  "rolloverProvenance": {
+    "authority": "GRAHAM_WEEK_ROLLOVER",
+    "fromSeason": 2026,
+    "fromWeek": 6,
+    "activatedAt": "2026-10-20T21:24:40.453Z",
+    "completionGate": "PASS_14_OF_14_FINAL",
+    "earlierLearningGate": "COMPLETE_15_OF_15_WEEK_05",
+    "completionFactsPath": "data/walters/nfl/2026/week-06-final-facts-20261020.json",
+    "carriedRatingSource": "data/walters/nfl-power-ratings-ledger.json",
+    "carriedRatingSourceBlobSha": "8688ffa57653711dbd0b04046a7f3bbc03f3398d",
+    "carriedRatingSourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+    "carriedTeamCount": 32,
+    "fullResearchBaselinePerformed": false,
+    "marketViewed": false
+  },
+  "carriedRatings": {
+    "source": "data/walters/nfl-power-ratings-ledger.json",
+    "sourceBlobSha": "8688ffa57653711dbd0b04046a7f3bbc03f3398d",
+    "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+    "teamCount": 32,
+    "teams": [
+      {
+        "team": "LA Rams",
+        "abbr": "LAR",
+        "currentRating": 29.81756678,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Seattle",
+        "abbr": "SEA",
+        "currentRating": 28.62080354,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Baltimore",
+        "abbr": "BAL",
+        "currentRating": 28.78370526,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Buffalo",
+        "abbr": "BUF",
+        "currentRating": 27.99405142,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "San Francisco",
+        "abbr": "SF",
+        "currentRating": 30.52711986,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Denver",
+        "abbr": "DEN",
+        "currentRating": 26.18377874,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "New England",
+        "abbr": "NE",
+        "currentRating": 29.68838308,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Philadelphia",
+        "abbr": "PHI",
+        "currentRating": 26.14549772,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Green Bay",
+        "abbr": "GB",
+        "currentRating": 27.46397256,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Chicago",
+        "abbr": "CHI",
+        "currentRating": 26.02130024,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Detroit",
+        "abbr": "DET",
+        "currentRating": 26.4812988,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Kansas City",
+        "abbr": "KC",
+        "currentRating": 26.5729832,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Houston",
+        "abbr": "HOU",
+        "currentRating": 25.3188688,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "LA Chargers",
+        "abbr": "LAC",
+        "currentRating": 22.06924386,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Cincinnati",
+        "abbr": "CIN",
+        "currentRating": 25.0350299,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Dallas",
+        "abbr": "DAL",
+        "currentRating": 23.98015278,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Jacksonville",
+        "abbr": "JAX",
+        "currentRating": 27.37914508,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Indianapolis",
+        "abbr": "IND",
+        "currentRating": 21.49690594,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Minnesota",
+        "abbr": "MIN",
+        "currentRating": 25.65016828,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Pittsburgh",
+        "abbr": "PIT",
+        "currentRating": 23.07670866,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Tampa Bay",
+        "abbr": "TB",
+        "currentRating": 22.00157822,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Washington",
+        "abbr": "WAS",
+        "currentRating": 21.71687096,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "New Orleans",
+        "abbr": "NO",
+        "currentRating": 19.81125852,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Carolina",
+        "abbr": "CAR",
+        "currentRating": 24.240263,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "NY Giants",
+        "abbr": "NYG",
+        "currentRating": 21.61417944,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Atlanta",
+        "abbr": "ATL",
+        "currentRating": 22.42419854,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Cleveland",
+        "abbr": "CLE",
+        "currentRating": 20.02937208,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Tennessee",
+        "abbr": "TEN",
+        "currentRating": 16.57668,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Las Vegas",
+        "abbr": "LV",
+        "currentRating": 19.61623172,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Miami",
+        "abbr": "MIA",
+        "currentRating": 16.9730291,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "NY Jets",
+        "abbr": "NYJ",
+        "currentRating": 19.73242872,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      },
+      {
+        "team": "Arizona",
+        "abbr": "ARI",
+        "currentRating": 14.9572252,
+        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceRefs": [
+          "data/walters/nfl-power-ratings-ledger.json"
+        ],
+        "marketViewed": false
+      }
+    ],
+    "marketViewed": false
+  },
+  "sweeps": [
+    {
+      "sequence": 0,
+      "type": "WEEK_ROLLOVER",
+      "startedAt": "2026-10-20T21:24:40.453Z",
+      "completedAt": "2026-10-20T21:24:40.453Z",
+      "scope": "Mechanical activation only; no full current-information baseline performed.",
+      "sourcesChecked": [
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl-power-ratings-ledger.json",
+        "data/walters/nfl/home-field/home-field-production-current.json",
+        "data/walters/nfl/2026/week-06-final-facts-20261020.json"
+      ],
+      "teamFindings": [],
+      "ratingChanges": [],
+      "matchupChanges": [],
+      "espnFpiCapture": {
+        "status": "NOT_PERFORMED_MECHANICAL_ROLLOVER"
+      },
+      "summary": {
+        "marketViewed": false,
+        "fullResearchBaselinePerformed": false,
+        "priorWeekFinalGames": 14,
+        "earlierLearningAppliedGames": 15,
+        "carriedTeams": 32,
+        "pending": [
+          "WEEK_06_LEARNING",
+          "FULL_CURRENT_INFORMATION_BASELINE",
+          "CURRENT_QB_PRODUCTION",
+          "CURRENT_PERSONNEL_REVIEW"
+        ]
+      }
+    }
+  ]
+}
