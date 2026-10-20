@@ -13,6 +13,8 @@ on:
       - tests/graham-current-value-estimates.test.mjs
       - tools/graham-replacement-model.mjs
       - tests/graham-current-personnel-estimates.test.mjs
+      - tests/graham-current-receiver-cluster.test.mjs
+      - tests/graham-personnel-failure-isolation.test.mjs
       - tools/validate-graham-personnel-closure.mjs
       - tools/graham-active-week.mjs
   workflow_dispatch:
@@ -62,7 +64,7 @@ jobs:
         run: node tools/validate-graham-personnel-closure.mjs data/walters/nfl/personnel-staging.json
 
       - name: Verify replacement estimate safeguards
-        run: node --test tests/graham-current-personnel-estimates.test.mjs tests/graham-current-value-estimates.test.mjs
+        run: node --test tests/graham-current-personnel-estimates.test.mjs tests/graham-current-value-estimates.test.mjs tests/graham-current-receiver-cluster.test.mjs tests/graham-personnel-failure-isolation.test.mjs
 
       - name: Apply governed personnel staging batch
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json

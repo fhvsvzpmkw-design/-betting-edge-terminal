@@ -16,7 +16,8 @@ const family = position => {
 export function currentPersonnelEstimate(c, player, {lookup, production}) {
   const policy = production.currentWeekReplacementEstimates;
   if (policy?.state !== 'OPERATIONAL' || policy.modelId !== REPLACEMENT_MODEL_ID) throw Error('CURRENT_ESTIMATE_NOT_OPERATIONAL');
-  if (!production.productionRules.resolvedStatuses.includes(c.availabilityStatus)) throw Error('CURRENT_ESTIMATE_AVAILABILITY_UNRESOLVED');
+  const zeroAvailabilityInvariant=c.availabilityStatus==='UNRESOLVED'&&policy.unresolvedAvailabilityZeroValueInvariantAllowed===true&&c.replacementModel?.resolution==='ZERO_CALIBRATED_LOSS'&&player.waltersPoints===0;
+  if (!production.productionRules.resolvedStatuses.includes(c.availabilityStatus)&&!zeroAvailabilityInvariant) throw Error('CURRENT_ESTIMATE_AVAILABILITY_UNRESOLVED');
   if (player.position === 'QB') throw Error('CURRENT_ESTIMATE_QB_FORBIDDEN');
   const model = c.replacementModel;
   if (!model || !policy.allowedMethods.includes(model.resolution)) throw Error('CURRENT_ESTIMATE_METHOD_NOT_ALLOWED');
@@ -81,4 +82,23 @@ export function synchronizePersonnelBoardStatus(board) {
   if (!board.games?.length || board.games.some(g => !['READY','READY_WITH_PERSONNEL_MODEL_ESTIMATES','READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS'].includes(g.numberStatus))) return;
   board.state = board.games.some(g => g.numberStatus === 'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS')
     ? 'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS' : 'INFORMATION_REVIEW_CURRENT_FAIR';
+}
+
+// A receiver multiplier requires simultaneous loss of both highest expected
+// receiving options. Several reserve absences alone do not meet that rule.
+export function currentReceiverClusterMultiplier(cases,{lookup,multiplier}) {
+ const material=cases.filter(c=>Number(c.rawTeamContributionDelta)<0);
+ if(material.length<2)return {multiplier:1,eligible:false};
+ const review=cases[0]?.receiverClusterReview;
+ if(!review||review.estimateAcknowledged!==true||review.inventoryComplete!==true||!review.rationale?.trim()||!review.sourceRefs?.length||!Array.isArray(review.expectedReceivers)||review.expectedReceivers.length<2||cases.some(c=>JSON.stringify(c.receiverClusterReview)!==JSON.stringify(review)||review.sourceRefs.some(r=>!c.sourceRefs.includes(r))))throw Error('CURRENT_RECEIVER_CLUSTER_REVIEW_REQUIRED');
+ const inventory=review.expectedReceivers.map(r=>{
+  const p=lookup(r.player,r.eaPlayerId);
+  if(!['WR','TE'].includes(p.position)||typeof p.waltersPoints!=='number'||!r.healthyExpectedRole?.trim()||!['ACTIVE_FULL','OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT','UNRESOLVED'].includes(r.availabilityStatus))throw Error('CURRENT_RECEIVER_CLUSTER_INVENTORY');
+  return {...r,value:p.waltersPoints};
+ });
+ if(new Set(inventory.map(r=>String(r.eaPlayerId))).size!==inventory.length||cases.some(c=>!inventory.some(r=>String(r.eaPlayerId)===String(c.playerEaId))))throw Error('CURRENT_RECEIVER_CLUSTER_INCOMPLETE');
+ const cutoff=inventory.map(r=>r.value).sort((a,b)=>b-a)[1],top=inventory.filter(r=>r.value>=cutoff);
+ const absent=new Set(cases.filter(c=>['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(c.availabilityStatus)).map(c=>String(c.playerEaId)));
+ const eligible=top.every(r=>absent.has(String(r.eaPlayerId)));
+ return {multiplier:eligible?multiplier:1,eligible,topExpectedReceivers:top.map(r=>({player:r.player,eaPlayerId:r.eaPlayerId,value:r.value})),rationale:review.rationale};
 }

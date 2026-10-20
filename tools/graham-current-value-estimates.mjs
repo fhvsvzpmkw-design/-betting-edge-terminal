@@ -19,7 +19,7 @@ export function loadCurrentValueEstimates({root,input,registry,calibration,produ
   for(const id of b.eaPlayerIds){
    const rows=capture.playersAbsentFromLockedRegistry.filter(p=>String(p.eaPlayerId)===String(id));
    if(rows.length!==1||[...registry.players,...result].some(p=>String(p.eaPlayerId)===String(id)||norm(p.player)===norm(rows[0].fullName)))fail('IDENTITY_OVERRIDE');
-   const consumers=input.cases.filter(c=>String(c.playerEaId)===String(id)||(c.replacementModel?.replacements||[]).some(r=>String(r.eaPlayerId)===String(id)));
+   const consumers=input.cases.filter(c=>String(c.playerEaId)===String(id)||(c.replacementModel?.replacements||[]).some(r=>String(r.eaPlayerId)===String(id))||(c.receiverClusterReview?.expectedReceivers||[]).some(r=>String(r.eaPlayerId)===String(id)));
    if(!consumers.length||consumers.some(c=>!c.sourceRefs.includes(b.path)))fail('SUPPLEMENT_CASE_BINDING');
    const p=rows[0];if(p.position==='QB'||!Number.isInteger(p.overall)||p.iteration!==capture.iteration)fail('NON_QB_SOURCE_VALUE');
    result.push({player:p.fullName,eaPlayerId:String(id),position:p.position,maddenOvr:p.overall,waltersPoints:playerValue(calibration,{position:p.position,maddenOvr:p.overall}),valueStatus:'CURRENT_ESTIMATE',valueProvenance:{type:'CURRENT_EA_SUPPLEMENT',...b,iteration:capture.iteration,capturedAt:capture.capturedAt,limitation:'Source-bound later EA capture converted with the frozen curve; not a rewrite of the frozen registry.'}});

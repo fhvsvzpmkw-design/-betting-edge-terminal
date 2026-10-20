@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus, synchronizePersonnelBoardStatus} from './graham-current-personnel-estimates.mjs';
+import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus, synchronizePersonnelBoardStatus, currentReceiverClusterMultiplier} from './graham-current-personnel-estimates.mjs';
 import {loadCurrentValueEstimates} from './graham-current-value-estimates.mjs';
 
 const ROOT=process.cwd();
@@ -105,8 +105,8 @@ for(const c of input.cases){
       event.valueStatus='NUMERIC_ELIGIBLE';event.registryPosition=r.player.position;event.maddenOvr=r.player.maddenOvr;event.healthyWaltersPoints=r.healthy;event.replacementPlayer=r.replacement?.player||c.replacementPlayer||null;event.replacementRegistryPosition=r.replacement?.position||null;event.replacementMaddenOvr=r.replacement?.maddenOvr??null;event.replacementWaltersPoints=r.replacementValue;event.rawTeamContributionDelta=r.rawDelta;event.clusterGroup=clusterGroup(r.player.position);event.failClosedCode=null;
     }catch(err){event.valueStatus='FAIL_CLOSED_NO_NUMERIC_MOVE';event.failClosedCode=String(err.message||err);event.rawTeamContributionDelta=null;}
   } else {
-    const p=playerLookup(c.player,c.playerEaId);
-    event.valueStatus='FAIL_CLOSED_NO_NUMERIC_MOVE';event.registryPosition=p.position;event.maddenOvr=p.maddenOvr;event.healthyWaltersPoints=p.waltersPoints;event.rawTeamContributionDelta=null;event.clusterGroup=clusterGroup(p.position);event.failClosedCode=c.failClosedCode||'REVIEW_REQUIRED_REPLACEMENT_VALUE';
+    let p;try{p=playerLookup(c.player,c.playerEaId);}catch(err){event.identityLookupFailure=String(err.message||err);}
+    event.valueStatus='FAIL_CLOSED_NO_NUMERIC_MOVE';event.registryPosition=p?.position||null;event.maddenOvr=p?.maddenOvr??null;event.healthyWaltersPoints=p?.waltersPoints??null;event.rawTeamContributionDelta=null;event.clusterGroup=p?clusterGroup(p.position):'UNRESOLVED_IDENTITY';event.failClosedCode=c.failClosedCode||event.identityLookupFailure||'REVIEW_REQUIRED_REPLACEMENT_VALUE';
   }
   ledger.currentCases[c.caseKey]=event;
   ledger.events=[...(ledger.events||[]),event];batchEvents.push(event);
@@ -133,7 +133,7 @@ for(const gameKey of affectedGames){
     const material=arr.filter(c=>Number(c.rawTeamContributionDelta)<0);
     let multiplier=1;let blocked=false;
     if(material.length>=2){
-      if(group==='RECEIVER')multiplier=Number(cal.clusterRules.RECEIVER.multiplier);
+      if(group==='RECEIVER'){try{multiplier=currentReceiverClusterMultiplier(arr,{lookup:playerLookup,multiplier:Number(cal.clusterRules.RECEIVER.multiplier)}).multiplier;}catch(err){blockedGroups.push({team,group,caseKeys:arr.map(c=>c.caseKey),failClosedCode:String(err.message||err)});for(const c of arr)handled.add(c.caseKey);continue;}}
       else if(group==='DEFENSIVE_LINE')multiplier=Number(cal.clusterRules.DEFENSIVE_LINE.multiplier);
       else if(['OFFENSIVE_LINE','DEFENSIVE_BACK','LINEBACKER','RUNNING_BACK'].includes(group)){
         // A reviewed linear estimate is explicit; there is no invented
@@ -159,6 +159,7 @@ for(const gameKey of affectedGames){
   game.personnelProductionId=prod.productionId;
   game.personnelLastAppliedAt=input.effectiveAt;
   game.personnelUnresolvedCases=cases.filter(c=>c.valueStatus!=='NUMERIC_ELIGIBLE').map(c=>({caseKey:c.caseKey,player:c.player,failClosedCode:c.failClosedCode,resolutionStatus:c.resolutionStatus}));
+  game.personnelNonmaterialAvailabilityCases=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&c.availabilityStatus==='UNRESOLVED'&&c.healthyWaltersPoints===0).map(c=>({caseKey:c.caseKey,player:c.player,availabilityStatus:'UNRESOLVED',pointLoss:0,limitation:'Availability remains unconfirmed; the approved calibrated-zero model has zero point loss for every availability outcome.'}));
   game.personnelBlockedGroups=blockedGroups;
   game.personnelEstimateCases=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&c.replacementEstimate).map(c=>({caseKey:c.caseKey,player:c.player,...c.replacementEstimate,applied:!blockedGroups.some(g=>g.caseKeys.includes(c.caseKey))}));
   synchronizePersonnelInputStatus(game);

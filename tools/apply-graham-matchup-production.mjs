@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
+import {currentReceiverClusterMultiplier} from './graham-current-personnel-estimates.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/matchup-production-staging.json');
@@ -145,7 +146,7 @@ for(const gameKey of affectedGames){
     const material=arr.filter(c=>Number(c.rawTeamContributionDelta)<0);
     let multiplier=1,blocked=false;
     if(material.length>=2){
-      if(group==='RECEIVER')multiplier=Number(cal.clusterRules.RECEIVER.multiplier);
+      if(group==='RECEIVER'){try{multiplier=currentReceiverClusterMultiplier(arr,{lookup,multiplier:Number(cal.clusterRules.RECEIVER.multiplier)}).multiplier;}catch(err){blockedGroups.push({team,group,caseKeys:arr.map(c=>c.caseKey),failClosedCode:String(err.message||err)});continue;}}
       else if(group==='DEFENSIVE_LINE')multiplier=Number(cal.clusterRules.DEFENSIVE_LINE.multiplier);
       else if(['OFFENSIVE_LINE','DEFENSIVE_BACK','LINEBACKER','RUNNING_BACK'].includes(group))blocked=true;
     }

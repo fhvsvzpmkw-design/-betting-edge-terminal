@@ -12,6 +12,11 @@ test('source-bound current supplements preserve locked identities and provenance
  assert.equal(values.find(p=>p.eaPlayerId==='11489').waltersPoints,1.2);
  assert.ok(values.every(p=>p.valueStatus==='CURRENT_ESTIMATE'&&p.valueProvenance.blobSha));
 });
+test('receiver-rank review can bind an official supplemental identity without inventing an injury case',()=>{
+ const a=setup();a.input.valueSupplements[0].eaPlayerIds=['1831'];a.input.valueSupplements[1].eaPlayerIds.push('10847');a.input.cases=a.input.cases.filter(c=>c.playerEaId!=='10852');const ranking={sourceRefs:[a.input.valueSupplements[1].path],receiverClusterReview:{expectedReceivers:[{eaPlayerId:'10847'}]}};a.input.cases.push(ranking);
+ assert.equal(loadCurrentValueEstimates(a).find(p=>p.eaPlayerId==='10847').player,'Brandin Cooks');
+ ranking.sourceRefs=[];assert.throws(()=>loadCurrentValueEstimates(a),/SUPPLEMENT_CASE_BINDING/);
+});
 test('supplements reject invalid authority, hashes, duplicates, timestamps and unbound cases',()=>{
  for(const mutate of [
   a=>a.production.currentWeekReplacementEstimates.sourceBoundValueEstimatesAllowed=false,

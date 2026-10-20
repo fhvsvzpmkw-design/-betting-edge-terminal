@@ -61,3 +61,9 @@ test('board status clears only current personnel/QB metadata and retains other g
  b.games[0].numberStatus='READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS';synchronizePersonnelBoardStatus(b);assert.equal(b.state,'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS');
  b.state='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED';b.games[0].numberStatus='READY';synchronizePersonnelBoardStatus(b);assert.equal(b.state,'INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED');
 });
+
+test('uncertain availability has invariant zero points only with explicit calibrated-zero policy',()=>{
+ const x=setup();Object.assign(x.options.production.currentWeekReplacementEstimates,{zeroCalibratedLossAllowed:true,unresolvedAvailabilityZeroValueInvariantAllowed:true});x.options.production.currentWeekReplacementEstimates.allowedMethods.push('ZERO_CALIBRATED_LOSS');x.c.availabilityStatus='UNRESOLVED';x.p.waltersPoints=0;Object.assign(x.c.replacementModel,{resolution:'ZERO_CALIBRATED_LOSS',replacements:[]});
+ const r=currentPersonnelEstimate(x.c,x.p,x.options);assert.equal(r.injuryLoss,0);assert.equal(r.replacementValue,null);assert.equal(x.c.availabilityStatus,'UNRESOLVED');
+ x.p.waltersPoints=.2;assert.throws(()=>currentPersonnelEstimate(x.c,x.p,x.options),/AVAILABILITY_UNRESOLVED/);x.p.waltersPoints=0;x.options.production.currentWeekReplacementEstimates.unresolvedAvailabilityZeroValueInvariantAllowed=false;assert.throws(()=>currentPersonnelEstimate(x.c,x.p,x.options),/AVAILABILITY_UNRESOLVED/);
+});
