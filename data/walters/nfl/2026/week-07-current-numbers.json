@@ -96,7 +96,7 @@
   "week": 7,
   "state": "PROVISIONAL_BASELINE_PENDING",
   "createdAt": "2026-10-20T21:24:40.453Z",
-  "updatedAt": "2026-10-20T21:39:25.756Z",
+  "updatedAt": "2026-10-20T21:46:47.371Z",
   "lastResearchAt": null,
   "researchLedgerPath": "data/walters/nfl/2026/week-07-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -768,27 +768,35 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -6.5,
-      "grahamExactFairHome": -6.377,
-      "grahamAsOf": "2026-10-20T21:25:39.748Z",
+      "grahamFairHome": -7,
+      "grahamExactFairHome": -7.088,
+      "grahamAsOf": "2026-10-20T21:46:47.371Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
-      "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
-      "neutralBaseHome": -3.70468936,
+      "informationStatus": "PUBLISHED_RATING_BASE_SYNCED_BASELINE_PENDING",
+      "neutralBaseHome": -4.416016988,
       "ratingCarryForward": {
         "awayRating": 21.61417944,
-        "homeRating": 25.3188688,
+        "homeRating": 26.030196428,
         "source": "data/walters/nfl-power-ratings-ledger.json",
-        "sourceBlobSha": "8688ffa57653711dbd0b04046a7f3bbc03f3398d",
-        "sourceUpdatedAt": "2026-10-20T21:19:03.341Z",
+        "sourceBlobSha": "63736f42104e7ba024fc2323ae9ff3a03400feb8",
+        "sourceUpdatedAt": "2026-10-20T21:42:05.489Z",
         "marketViewed": false
       },
       "weeklyRatingInput": {
-        "state": "PENDING_SOURCE_WEEK_06_LEARNING",
+        "state": "PARTIAL_BLOCKED",
         "sourceWeek": 6,
         "targetWeek": 7,
-        "appliedToFair": false,
-        "sourceBlobSha": "8688ffa57653711dbd0b04046a7f3bbc03f3398d",
-        "marketViewed": false
+        "appliedToFair": true,
+        "sourceBlobSha": "63736f42104e7ba024fc2323ae9ff3a03400feb8",
+        "marketViewed": false,
+        "awayCurrentRating": 21.61417944,
+        "homeCurrentRating": 26.030196428,
+        "awayUpdateState": "PRESERVED_BLOCKED",
+        "homeUpdateState": "UPDATED",
+        "blockedTeams": [
+          "NYG"
+        ],
+        "applicationStatus": "APPLIED"
       },
       "adjustments": [
         {
@@ -848,14 +856,15 @@
         "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
         "data/walters/nfl/2026/week-01-research-ledger.json",
         "core/staging/walters-nfl-seed-dataset-2026.json",
-        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "data/walters/nfl/carried-rating-audit-staging.json"
       ],
-      "personnelBaselineExactFairHome": -5.78668936,
+      "personnelBaselineExactFairHome": -6.498016988,
       "personnelOverlayPointsToHomeSpread": 0,
       "personnelUnresolvedCases": [],
       "personnelBlockedGroups": [],
       "matchupOverlayPointsToHomeSpread": 0,
-      "homeFieldNonLocationExactFairHome": -3.70468936,
+      "homeFieldNonLocationExactFairHome": -4.416016988,
       "homeFieldProductionId": "walters-nfl-home-field-production-v1",
       "homeFieldCalibrationId": "walters-nfl-home-field-calibration-v1",
       "homeFieldVenueClass": "DOMESTIC_HOME",
@@ -867,21 +876,21 @@
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
-        "neutralTeamBaseHome": -3.705,
+        "neutralTeamBaseHome": -4.416,
         "homeFieldPointsToHomeSpread": -2.082,
         "otherGovernedPointsToHomeSpread": -0.59,
-        "prePersonnelExactFairHome": -6.377,
+        "prePersonnelExactFairHome": -7.088,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -6.377,
-        "displayedFairHome": -6.5,
+        "exactFairHome": -7.088,
+        "displayedFairHome": -7,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -3.705; home field -2.082; other governed -0.590; pre-personnel exact -6.377; personnel +0.000; matchup +0.000; exact Graham home fair -6.377; displayed -6.5.",
-      "priorGrahamFairHome": -6,
+      "researchSummary": "Governed fair decomposition: neutral/team base -4.416; home field -2.082; other governed -0.590; pre-personnel exact -7.088; personnel +0.000; matchup +0.000; exact Graham home fair -7.088; displayed -7.0.",
+      "priorGrahamFairHome": -6.5,
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "qbPerformanceBaseExactFairHome": -5.787,
+      "qbPerformanceBaseExactFairHome": -6.498,
       "qbPerformancePointsToHomeSpread": -0.59,
       "qbPerformanceAwayTeamDelta": -1.08,
       "qbPerformanceHomeTeamDelta": -0.49,
@@ -1971,38 +1980,24 @@
   "ratingBaseRefresh": {
     "schema": 1,
     "state": "APPLIED",
-    "effectiveAt": "2026-10-20T21:39:25.756Z",
-    "sourceAuditId": "walters-weekly-90-10-2026-w06-to-w07-recovery-20261020213400518",
-    "powerBlobSha": "c8486a75f96640dcdffc29cbb1add0f7e4330d9b",
+    "effectiveAt": "2026-10-20T21:46:47.371Z",
+    "sourceAuditId": "walters-weekly-90-10-2026-w06-to-w07-recovery-20261020214205489",
+    "powerBlobSha": "63736f42104e7ba024fc2323ae9ff3a03400feb8",
     "sourceWeek": 6,
     "targetWeek": 7,
     "games": [
       {
-        "gameKey": "2026-W07-DEN-ARI",
-        "neutralDelta": 0.62250248,
+        "gameKey": "2026-W07-NYG-HOU",
+        "neutralDelta": -0.711327628,
         "before": {
-          "neutralBaseHome": 11.22655354,
-          "exactFairHome": 9.795,
-          "displayedFairHome": 10
+          "neutralBaseHome": -3.70468936,
+          "exactFairHome": -6.377,
+          "displayedFairHome": -6.5
         },
         "after": {
-          "neutralBaseHome": 11.84905602,
-          "exactFairHome": 10.417,
-          "displayedFairHome": 10.5
-        }
-      },
-      {
-        "gameKey": "2026-W07-KC-SEA",
-        "neutralDelta": 0.62250248,
-        "before": {
-          "neutralBaseHome": -2.04782034,
-          "exactFairHome": -4.03,
-          "displayedFairHome": -4
-        },
-        "after": {
-          "neutralBaseHome": -1.42531786,
-          "exactFairHome": -3.407,
-          "displayedFairHome": -3.5
+          "neutralBaseHome": -4.416016988,
+          "exactFairHome": -7.088,
+          "displayedFairHome": -7
         }
       }
     ],
