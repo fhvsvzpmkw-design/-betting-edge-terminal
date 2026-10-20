@@ -1,0 +1,1662 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-20T21:46:00Z",
+  "season": 2026,
+  "sourceWeek": 5,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "ADDITIVE_CORRECTION_TO_ALREADY_APPLIED_HISTORICAL_PAIR",
+  "marketViewed": false,
+  "inputCommit": "5692e84a89d258e6cdf8b1681c03c00470dbb125",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "9742571a068351ad7a11af00cc035cdf06274e9a",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "sources": [
+    {
+      "id": "bal-atl-gamebook-final",
+      "url": "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Official final gamebook reports Baltimore 30, Atlanta 23 in overtime; complete lineups, substitutions, inactive/DNP inventories, playtime, and every printed injury/return sequence. Source document SHA-256 de2f5f881a71f977e0cc69906b33f2ecbcd2734e0616027e181955f75b2e9f1f, 361235 bytes.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "nfl-week5-final-injury-report-bal-atl",
+      "url": "https://www.nfl.com/injuries/league/2026/reg5",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Official final Week 5 report identifies Lamar Jackson, Cam Jurgens and Trey Hendrickson out for Baltimore; Yasir Abdullah out and the final Atlanta questionable designations.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-active-role-report",
+      "url": "https://www.baltimoreravens.com/news/zay-flowers-marlon-humphrey-active-week-5-falcons-ravens",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Baltimore confirms Huntley for Jackson, Green for Hendrickson, Ioane at center, Jones at right guard, Jurgens not yet debuted, and Edoga elevated for tackle depth.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-tackle-depth",
+      "url": "https://www.baltimoreravens.com/news/ravens-practice-squad-elevations-kyle-hergel-chuma-edoga-falcons",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Baltimore elevated Chuma Edoga and identified Carson Vinson as the other available reserve tackle for the Falcons game.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-depth",
+      "url": "https://www.baltimoreravens.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Official depth chart lists Chandler Rivers directly behind Kyle Hamilton, John Jenkins behind Travis Jones at nose tackle, and Mike Green behind Trey Hendrickson at rush linebacker.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-reserve-review",
+      "url": "https://www.baltimoreravens.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Official roster review identifies the continuing reserve-list players; the final gamebook confirms none was activated for this game. No established Week 5 game-day duty is assigned to the listed reserve-only exclusions.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-edge-elevations",
+      "url": "https://www.atlantafalcons.com/news/falcons-place-yasir-abdullah-on-ir-sign-jammie-robinson",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Atlanta placed Yasir Abdullah on injured reserve and elevated Bralen Trice and Drake Jackson; the gamebook lists both edge players active.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-depth",
+      "url": "https://www.atlantafalcons.com/news/atlanta-falcons-week-5-depth-chart-vs-baltimore-ravens",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Official Week 5 depth chart lists Mike Ford Jr. directly behind Mike Hughes and preserves the distinct outside-corner and nickel chains.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-hughes-relief",
+      "url": "https://www.atlantafalcons.com/news/falcons-ravens-sunday-close-out-games-bijan-robinson",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Atlanta reports Mike Ford entered immediately after Mike Hughes was injured on the prior snap; the gamebook records Hughes's return after the next touchdown sequence.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-penix-postgame",
+      "url": "https://www.atlantafalcons.com/news/game-breakdown-what-happened-in-falcons-vs-ravens",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Atlanta confirms Penix's late rib injury and Tagovailoa's injury-driven relief; the official gamebook supplies the two disjoint relief intervals.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-terrell-ir",
+      "url": "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ],
+      "finding": "Atlanta placed A.J. Terrell Jr. on injured reserve and identified C.J. Henderson as the outside-corner replacement; the Week 5 gamebook confirms Henderson started.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "bal-roster",
+      "url": "https://www.baltimoreravens.com/team/players-roster/",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "bal-transactions",
+      "url": "https://www.baltimoreravens.com/team/transactions/2026",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "bal-depth",
+      "url": "https://www.baltimoreravens.com/team/depth-chart",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-roster",
+      "url": "https://www.atlantafalcons.com/team/players-roster/",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-transactions",
+      "url": "https://www.atlantafalcons.com/team/transactions/2026",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-depth",
+      "url": "https://www.atlantafalcons.com/team/depth-chart",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "gamebook",
+      "url": "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+      "finding": "Original final gamebook retained, including all active and inactive identities. Added reserve cases use this exact final available inventory; old evaluated cases and QB timeline preserved byte-for-byte.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-bertrand",
+      "url": "https://www.atlantafalcons.com/news/falcons-sign-josh-woods-53-man-roster-jd-bertrand-injured-reserve",
+      "finding": "OfficialAug31 JD Bertrand IR, JoshWoods signed as corresponding available linebacker.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-hand",
+      "url": "https://www.atlantafalcons.com/news/falcons-dashawn-hand-ir-nick-muse-khalil-herbert-drake-jackson",
+      "finding": "OfficialSept16 DaShawnHand IR. Other continuing IR/PUP/NFI reserve names retained in roster chronology.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-williams",
+      "url": "https://www.atlantafalcons.com/news/atlanta-falcons-depth-chart-carolina-panthers",
+      "finding": "OfficialSept15 depth update: CameronWilliams removed after IR the previous Saturday; unavailable before both games.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-pearce",
+      "url": "https://www.atlantafalcons.com/news/james-pearce-jr-suspension-nfl-eight-games-season",
+      "finding": "Official first-eight-games suspension announcedAug14, effectiveAug30, includesWeeks5/6. JalonWalker preseasonACL/IRAug6 separately retained.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-edge-roles",
+      "url": "https://www.atlantafalcons.com/news/kevin-stefanski-james-pearce-suspension-jalon-walker",
+      "finding": "Official preseason expected edge-depth response to both Walker and Pearce absence. Actual final gamebook CameronThomas/SamsonEbukam available. Assign distinct additional edge duties, no snap-derived weights.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "storm-value",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/storm-norton/13013",
+      "finding": "Official exactNFL27 StormNorton LT63. Missingfrozen; unchangedcurve0 and explicit retrospective source provenance.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "malone-official-search",
+      "url": "https://www.ea.com/games/madden-nfl/ratings",
+      "finding": "Exact DeAngeloMalone frozen and official currentNFL27 searches completed, no current rating returned. No old-season or UltimateTeam card adopted.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "malone-independent-search",
+      "url": "https://www.maddenratings.com/deangelo-malone",
+      "finding": "Exact NFL27 DeAngeloMalone page explicitly RatingUnavailable. Established NFL contributor retained with governed positional cohort estimate and sensitivity, never camp-only or missing-as-zero.",
+      "kind": "REPORTING",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "bal-center-irs",
+      "url": "https://www.baltimoreravens.com/news/jovaughn-gwyn-ethan-pocic-injured-reserve-kyle-hergel-ravens-titans",
+      "finding": "OfficialOct3 Gwyn/Pocic IR after prior Pinter IR. Ioane actualC, Hergel elevated availableG/C; retained starting-role and extra reserve duties distinct.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "id": "bal-jurgens-acquisition",
+      "url": "https://www.baltimoreravens.com/news/ravens-trade-cam-jurgens-center-pro-bowl-injuries-2026",
+      "finding": "OfficialOct7 center acquisition with injury availability not automatically restored; final gamebook inactive and Ioane startsC. Preserve new healthy incumbent value, current injury replacement comparison only.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-BAL-ATL",
+      "away": "BAL",
+      "home": "ATL",
+      "state": "READY",
+      "sourceIds": [
+        "bal-atl-gamebook-final",
+        "nfl-week5-final-injury-report-bal-atl",
+        "ravens-active-role-report",
+        "falcons-penix-postgame"
+      ],
+      "final": {
+        "awayScore": 30,
+        "homeScore": 23,
+        "status": "FINAL_OVERTIME",
+        "gameDurationSeconds": 4023,
+        "sourceIds": [
+          "bal-atl-gamebook-final"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-11T17:20:00-07:00",
+        "awayRating": 28.0432686,
+        "homeRating": 23.1646352,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "ledgerBlobSha": "438a493664e70e794e6e9ed5ec5c7d88982f79fc",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false
+      },
+      "teams": [
+        {
+          "team": "BAL",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "The final gamebook and official injury, active-role, depth and reserve sources reconcile every BAL inactive/DNP identity, continuing reserve item, full quarterback duty, specialists and every printed injury/return line. Questionable-return text is not treated as an actual return.",
+          "sourceIds": [
+            "bal-atl-gamebook-final",
+            "nfl-week5-final-injury-report-bal-atl",
+            "ravens-active-role-report",
+            "ravens-tackle-depth",
+            "ravens-depth",
+            "ravens-reserve-review"
+          ],
+          "qbAvailability": {
+            "state": "HISTORICAL_REPLACEMENT_ESTIMATE",
+            "estimateAcknowledged": true,
+            "lossCause": "INJURY_UNAVAILABILITY",
+            "rationale": "Lamar Jackson was injury-driven inactive and Tyler Huntley started and handled every recorded Baltimore quarterback play.",
+            "baselineRationale": "Official injury and club sources establish Jackson as the unavailable healthy incumbent.",
+            "replacementRationale": "Official club reporting names Huntley and the gamebook records all quarterback duty to Huntley.",
+            "sourceIds": [
+              "bal-atl-gamebook-final",
+              "nfl-week5-final-injury-report-bal-atl",
+              "ravens-active-role-report"
+            ],
+            "baselineSourceIds": [
+              "nfl-week5-final-injury-report-bal-atl",
+              "ravens-active-role-report"
+            ],
+            "replacementSourceIds": [
+              "bal-atl-gamebook-final",
+              "ravens-active-role-report"
+            ],
+            "healthyCandidates": [
+              {
+                "player": "Lamar Jackson",
+                "eaPlayerId": "13092"
+              }
+            ],
+            "replacement": {
+              "player": "Tyler Huntley",
+              "eaPlayerId": "21029"
+            },
+            "exposure": {
+              "modelId": "graham-historical-time-exposure-v1",
+              "estimateAcknowledged": true,
+              "gameDurationSeconds": 4023,
+              "assumptionRationale": "Use the complete source-bound 4,023-second elapsed game interval once; value active play normally.",
+              "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+              "durationSourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "unavailableIntervals": [
+                {
+                  "startEarliest": 0,
+                  "startLatest": 0,
+                  "endEarliest": 4023,
+                  "endLatest": 4023,
+                  "rationale": "Jackson was inactive and Huntley handled the complete recorded quarterback duty.",
+                  "sourceIds": [
+                    "bal-atl-gamebook-final",
+                    "ravens-active-role-report"
+                  ]
+                }
+              ]
+            }
+          },
+          "cases": [
+            {
+              "team": "BAL",
+              "player": "Durham Smythe",
+              "eaPlayerId": "13291",
+              "caseKey": "2026-W05-BAL-Durham-Smythe",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "ravens-reserve-review",
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "Archived continuing IR case; final activation and game-day role review confirms Smythe was not activated.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Smythe's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement."
+            },
+            {
+              "team": "BAL",
+              "player": "Trey Hendrickson",
+              "eaPlayerId": "12692",
+              "caseKey": "2026-W05-BAL-Trey-Hendrickson",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ],
+              "rationale": "Hendrickson was injury-driven inactive and Green started in the rush role.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Assign only Hendrickson's added vacancy duty to the officially identified primary replacement.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "All other Baltimore edge duties remain credited once; Green receives only the Hendrickson vacancy duty.",
+              "baselineSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth"
+              ],
+              "roleRationale": "The official depth chart and final lineup identify Mike Green as the primary rush replacement.",
+              "roleSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth",
+                "ravens-active-role-report"
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY",
+              "replacements": [
+                {
+                  "player": "Mike Green",
+                  "eaPlayerId": "15200"
+                }
+              ]
+            },
+            {
+              "team": "BAL",
+              "player": "Andrew Vorhees",
+              "eaPlayerId": "22854",
+              "caseKey": "2026-W05-BAL-Andrew-Vorhees",
+              "newlyIdentified": true,
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-active-role-report"
+              ],
+              "rationale": "Vorhees was injury-driven inactive and his immutable frozen healthy value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Vorhees's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement."
+            },
+            {
+              "team": "BAL",
+              "player": "Roger Rosengarten",
+              "eaPlayerId": "14733",
+              "caseKey": "2026-W05-BAL-Roger-Rosengarten",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "Rosengarten was injured on the Q1 7:30 play and explicitly returned at Q1 6:10.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Edoga and Vinson are the two officially documented available reserve tackles; exact relief allocation is not reported, so use the approved equal-share additional-duty assumption.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Stanley and the reserve tackles retain their baseline duties; the committee receives only Rosengarten's temporary vacant duty.",
+              "baselineSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-tackle-depth"
+              ],
+              "roleRationale": "Official game-day reporting establishes Edoga and Vinson as the active tackle reserve set.",
+              "roleSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-tackle-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Chuma Edoga",
+                  "eaPlayerId": "20366"
+                },
+                {
+                  "player": "Carson Vinson",
+                  "eaPlayerId": "10652"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "gameDurationSeconds": 4023,
+                "assumptionRationale": "Use the exact injury-play to actual-return interval; do not infer continuing impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "bal-atl-gamebook-final"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 450,
+                    "startLatest": 450,
+                    "endEarliest": 530,
+                    "endLatest": 530,
+                    "rationale": "Q1 7:30 injury play to Q1 6:10 explicit return.",
+                    "sourceIds": [
+                      "bal-atl-gamebook-final"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "team": "BAL",
+              "player": "Matthew Hibner",
+              "eaPlayerId": "10179",
+              "caseKey": "2026-W05-BAL-Matthew-Hibner",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "The gamebook records return-questionable at the start of Q2 and an actual return after the Q3 9:51 field goal; the material interval is recorded even though the frozen value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Hibner's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without treating questionable as a return."
+            },
+            {
+              "team": "BAL",
+              "player": "Kyle Hamilton",
+              "eaPlayerId": "22226",
+              "caseKey": "2026-W05-BAL-Kyle-Hamilton",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "Hamilton was injured on the Q3 6:45 play and explicitly returned after the Q3 3:47 play.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use the documented next player on Hamilton's official DB depth chain for the temporary added duty.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Starks, Hawkins and all other safety duties remain credited once; Rivers receives only Hamilton's temporary vacancy duty.",
+              "baselineSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth"
+              ],
+              "roleRationale": "Official depth lists Chandler Rivers directly behind Hamilton; the gamebook confirms Rivers active.",
+              "roleSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Chandler Rivers",
+                  "eaPlayerId": "16276"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "gameDurationSeconds": 4023,
+                "assumptionRationale": "Use the exact injury-play to actual-return interval; do not infer continuing impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "bal-atl-gamebook-final"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2295,
+                    "startLatest": 2295,
+                    "endEarliest": 2473,
+                    "endLatest": 2473,
+                    "rationale": "Q3 6:45 injury play to Q3 3:47 explicit return.",
+                    "sourceIds": [
+                      "bal-atl-gamebook-final"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "team": "BAL",
+              "player": "Broderick Washington",
+              "eaPlayerId": "21339",
+              "caseKey": "2026-W05-BAL-Broderick-Washington",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "The gamebook reports return-questionable after Q4 9:32 and no later actual return; the material absence is retained despite the frozen value being zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Washington's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without treating questionable as a return."
+            },
+            {
+              "team": "BAL",
+              "player": "Travis Jones",
+              "eaPlayerId": "22179",
+              "caseKey": "2026-W05-BAL-Travis-Jones",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "Jones was injured on the Q4 3:27 play and explicitly returned after the OT 3:01 touchdown.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use the official nose-tackle depth replacement for Jones's temporary added vacancy duty.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Madubuike, Campbell and other front duties remain credited once; Jenkins receives only Jones's temporary vacancy duty.",
+              "baselineSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth"
+              ],
+              "roleRationale": "Official depth lists John Jenkins directly behind Jones at nose tackle; the gamebook confirms Jenkins active.",
+              "roleSourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "John Jenkins",
+                  "eaPlayerId": "1073"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "gameDurationSeconds": 4023,
+                "assumptionRationale": "Use the exact injury-play to actual-return interval over the bound elapsed duration; do not infer active impairment.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "bal-atl-gamebook-final"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3393,
+                    "startLatest": 3393,
+                    "endEarliest": 4023,
+                    "endLatest": 4023,
+                    "rationale": "Q4 3:27 injury play to the explicit return after the OT 3:01 touchdown.",
+                    "sourceIds": [
+                      "bal-atl-gamebook-final"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "team": "BAL",
+              "player": "Jovaughn Gwyn",
+              "eaPlayerId": "23125",
+              "caseKey": "2026-W05-BAL-Jovaughn-Gwyn",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "bal-roster",
+                "bal-transactions",
+                "bal-center-irs",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "BAL",
+              "player": "Danny Pinter",
+              "eaPlayerId": "21337",
+              "caseKey": "2026-W05-BAL-Danny-Pinter",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "bal-roster",
+                "bal-transactions",
+                "bal-center-irs",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "BAL",
+              "player": "T.J. Tampa",
+              "eaPlayerId": "14936",
+              "caseKey": "2026-W05-BAL-T.J.-Tampa",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "bal-roster",
+                "bal-transactions",
+                "bal-center-irs",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "BAL",
+              "player": "Bilhal Kone",
+              "eaPlayerId": "15304",
+              "caseKey": "2026-W05-BAL-Bilhal-Kone",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "bal-roster",
+                "bal-transactions",
+                "bal-center-irs",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "BAL",
+              "player": "Adam Randall",
+              "eaPlayerId": "16272",
+              "caseKey": "2026-W05-BAL-Adam-Randall",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "bal-roster",
+                "bal-transactions",
+                "bal-center-irs",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "BAL",
+              "player": "Cam Jurgens",
+              "eaPlayerId": "22273",
+              "caseKey": "2026-W05-BAL-Cam-Jurgens",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "bal-jurgens-acquisition",
+                "bal-depth",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Newly acquired healthy center Jurgens unavailable; actual startingC Ioane exactfrozen0.5 equals Jurgens0.5. No obsolete Eagles duty or duplicate Pocic reserve role.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "bal-jurgens-acquisition",
+                "bal-depth",
+                "gamebook"
+              ],
+              "roleRationale": "Newly acquired healthy center Jurgens unavailable; actual startingC Ioane exactfrozen0.5 equals Jurgens0.5. No obsolete Eagles duty or duplicate Pocic reserve role.",
+              "roleSourceIds": [
+                "bal-jurgens-acquisition",
+                "bal-depth",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Olaivavega Ioane",
+                  "eaPlayerId": "16217"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "BAL",
+              "player": "Ethan Pocic",
+              "eaPlayerId": "12644",
+              "caseKey": "2026-W05-BAL-Ethan-Pocic",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "bal-center-irs",
+                "bal-depth",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Game-active available interior-line reserve Hergel fills only Pocic additional reserve-center insurance under documented-depth assumption. Ioane reserved current Jurgens vacancy, Jones startingRG remains common, other OL relief not duplicated.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "bal-center-irs",
+                "bal-depth",
+                "gamebook"
+              ],
+              "roleRationale": "Game-active available interior-line reserve Hergel fills only Pocic additional reserve-center insurance under documented-depth assumption. Ioane reserved current Jurgens vacancy, Jones startingRG remains common, other OL relief not duplicated.",
+              "roleSourceIds": [
+                "bal-center-irs",
+                "bal-depth",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Kyle Hergel",
+                  "eaPlayerId": "1407"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "J.Fagnano",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Unused reserve quarterback; Huntley handled all recorded duty.",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ]
+            },
+            {
+              "player": "E.Sarratt",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive not designated for injury and no established game-day duty was lost.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "A.Peebles",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive not designated for injury and no established game-day duty was lost.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "Ja'Kobi Lane",
+              "category": "CAMP_ROSTER_ONLY",
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Reserve-list identity was not activated and has no established Week 5 regular-season game-day duty in the official role/gamebook record.",
+              "rationale": "Continuing reserve-list player with no established Week 5 game-day baseline duty.",
+              "sourceIds": [
+                "ravens-reserve-review",
+                "bal-atl-gamebook-final"
+              ]
+            },
+            {
+              "player": "Skylar Thompson",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Reserve-list quarterback had no established Week 5 duty; the injury-driven starter replacement is evaluated separately.",
+              "sourceIds": [
+                "ravens-reserve-review",
+                "bal-atl-gamebook-final"
+              ]
+            },
+            {
+              "player": "Jahquez Robinson",
+              "category": "CAMP_ROSTER_ONLY",
+              "sourceIds": [
+                "bal-roster",
+                "bal-transactions"
+              ],
+              "rationale": "2026 rookie preseason reserve with no established NFL regular-season duty included in this healthy inventory; explicit role assessment.",
+              "estimateAcknowledged": true,
+              "establishedRegularSeasonRole": false,
+              "assumptionRationale": "Developmental or preseason-only projected role with no established regular-season duty included in this healthy game inventory. Explicit role assessment, not a missing value assigned zero."
+            }
+          ],
+          "specialistCases": [],
+          "participationReviews": [
+            {
+              "player": "BAL final game-day unit",
+              "finding": "Every inactive/DNP identity, complete QB duty, all specialists, reserve-list status and all printed injury/return lines were reviewed. Return-questionable wording was not treated as a return.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl",
+                "ravens-reserve-review"
+              ]
+            }
+          ],
+          "clusterReviews": [
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-tackle-depth"
+              ],
+              "rationale": "Vorhees is a calibrated-zero inactive and Rosengarten has one separately bounded tackle interval; no replacement receives duplicate duty credit."
+            },
+            {
+              "group": "DEFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "ravens-depth"
+              ],
+              "rationale": "Hendrickson/Green, Washington calibrated-zero and Jones/Jenkins are distinct source-bound front roles; sum their losses without an extra discretionary multiplier."
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "bal-atl-gamebook-final"
+            ],
+            "rationale": "Smythe is a calibrated-zero reserve-list case and the two highest-valued expected receiving options were not simultaneously absent."
+          }
+        },
+        {
+          "team": "ATL",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "The final gamebook, official injury report, Week 5 depth chart and club injury/role reports reconcile every ATL inactive/DNP identity, continuing IR case, quarterback relief, specialists and printed injury/return line.",
+          "sourceIds": [
+            "bal-atl-gamebook-final",
+            "nfl-week5-final-injury-report-bal-atl",
+            "falcons-edge-elevations",
+            "falcons-depth",
+            "falcons-hughes-relief",
+            "falcons-penix-postgame",
+            "falcons-terrell-ir"
+          ],
+          "qbAvailability": {
+            "state": "HISTORICAL_REPLACEMENT_ESTIMATE",
+            "estimateAcknowledged": true,
+            "lossCause": "INJURY_UNAVAILABILITY",
+            "rationale": "Penix suffered a source-confirmed rib injury; Tagovailoa handled two disjoint relief intervals. Both frozen values are 7.5, so the governed injury loss is zero without omitting the timeline.",
+            "baselineRationale": "Penix started as the healthy incumbent and the gamebook records the injury-driven relief.",
+            "replacementRationale": "Tagovailoa is the only quarterback recorded in the two injury-relief intervals.",
+            "sourceIds": [
+              "bal-atl-gamebook-final",
+              "falcons-penix-postgame"
+            ],
+            "baselineSourceIds": [
+              "bal-atl-gamebook-final",
+              "falcons-penix-postgame"
+            ],
+            "replacementSourceIds": [
+              "bal-atl-gamebook-final",
+              "falcons-penix-postgame"
+            ],
+            "healthyCandidates": [
+              {
+                "player": "Michael Penix Jr",
+                "eaPlayerId": "14608"
+              }
+            ],
+            "replacement": {
+              "player": "Tua Tagovailoa",
+              "eaPlayerId": "20916"
+            },
+            "exposure": {
+              "modelId": "graham-historical-time-exposure-v1",
+              "estimateAcknowledged": true,
+              "gameDurationSeconds": 4023,
+              "assumptionRationale": "Use the two source-bound disjoint relief intervals once; the equal frozen values make the point loss invariant to the bounded exposure.",
+              "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+              "durationSourceIds": [
+                "bal-atl-gamebook-final"
+              ],
+              "unavailableIntervals": [
+                {
+                  "startEarliest": 3581,
+                  "startLatest": 3581,
+                  "endEarliest": 3587,
+                  "endLatest": 3587,
+                  "rationale": "Q4 0:19 relief play to Penix's explicit Q4 0:13 return.",
+                  "sourceIds": [
+                    "bal-atl-gamebook-final"
+                  ]
+                },
+                {
+                  "startEarliest": 3971,
+                  "startLatest": 3971,
+                  "endEarliest": 4023,
+                  "endLatest": 4023,
+                  "rationale": "Atlanta's source-bound 0:52 overtime relief possession.",
+                  "sourceIds": [
+                    "bal-atl-gamebook-final",
+                    "falcons-penix-postgame"
+                  ]
+                }
+              ]
+            }
+          },
+          "cases": [
+            {
+              "team": "ATL",
+              "player": "Jake Matthews",
+              "eaPlayerId": "12349",
+              "caseKey": "2026-W05-ATL-Jake-Matthews",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ],
+              "rationale": "Archived pending case closes active: Matthews started, played 98 percent of offensive snaps and has no printed injury-driven lost duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "ATL",
+              "player": "Za'Darius Smith",
+              "eaPlayerId": "2554",
+              "caseKey": "2026-W05-ATL-Za-Darius-Smith",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl",
+                "falcons-edge-elevations"
+              ],
+              "rationale": "Archived injury-driven inactive case; both elevated edge candidates were active.",
+              "resolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official active two-player candidate set is established but exact added-duty shares are not; use the approved equal-share assumption.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "All existing edge duties remain credited once; Trice and Jackson receive only Smith's additional vacant duty.",
+              "baselineSourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-edge-elevations"
+              ],
+              "roleRationale": "Atlanta elevated Trice and Jackson for the depleted edge rotation and the final gamebook confirms both active.",
+              "roleSourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-edge-elevations"
+              ],
+              "replacements": [
+                {
+                  "player": "Bralen Trice",
+                  "eaPlayerId": "14754"
+                },
+                {
+                  "player": "Drake Jackson",
+                  "eaPlayerId": "22310"
+                }
+              ]
+            },
+            {
+              "team": "ATL",
+              "player": "Yasir Abdullah",
+              "eaPlayerId": "22984",
+              "caseKey": "2026-W05-ATL-Yasir-Abdullah",
+              "newlyIdentified": true,
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "falcons-edge-elevations",
+                "nfl-week5-final-injury-report-bal-atl",
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "Official IR and final game-day review establish the material absence; immutable frozen healthy value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Abdullah's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement."
+            },
+            {
+              "team": "ATL",
+              "player": "A.J. Terrell Jr",
+              "eaPlayerId": "21002",
+              "caseKey": "2026-W05-ATL-A-J-Terrell-Jr",
+              "newlyIdentified": true,
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "falcons-terrell-ir",
+                "bal-atl-gamebook-final"
+              ],
+              "rationale": "Continuing injury-driven IR absence; Henderson started at outside corner in the final gamebook.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use the club-identified primary outside-corner replacement for Terrell's distinct vacancy.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Hughes, Avieon Terrell and other secondary duties remain credited once; Henderson receives only A.J. Terrell's outside-corner vacancy duty.",
+              "baselineSourceIds": [
+                "falcons-terrell-ir",
+                "bal-atl-gamebook-final"
+              ],
+              "roleRationale": "The club identified Henderson for Terrell's outside role and the final gamebook confirms Henderson started.",
+              "roleSourceIds": [
+                "falcons-terrell-ir",
+                "bal-atl-gamebook-final"
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY",
+              "replacements": [
+                {
+                  "player": "C.J. Henderson",
+                  "eaPlayerId": "21004"
+                }
+              ]
+            },
+            {
+              "team": "ATL",
+              "player": "Mike Hughes",
+              "eaPlayerId": "13148",
+              "caseKey": "2026-W05-ATL-Mike-Hughes",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-hughes-relief"
+              ],
+              "rationale": "Hughes was injured on the Q4 0:52 play; Mike Ford entered for the next snap and Hughes explicitly returned after the Q4 0:40 touchdown/two-point sequence.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use the club-reported actual relief identity for the exact 12-second interval.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Henderson, Avieon Terrell and other secondary duties remain credited once; Ford receives only Hughes's temporary vacancy duty.",
+              "baselineSourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-depth"
+              ],
+              "roleRationale": "Atlanta's official recap says Ford entered immediately after Hughes's injury; the depth chart lists Ford directly behind Hughes.",
+              "roleSourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-depth",
+                "falcons-hughes-relief"
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY",
+              "replacements": [
+                {
+                  "player": "Mike Ford Jr",
+                  "eaPlayerId": "13881"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "gameDurationSeconds": 4023,
+                "assumptionRationale": "Use the exact injury-play to actual-return interval; equal frozen values yield zero point loss without omitting the injury.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "durationSourceIds": [
+                  "bal-atl-gamebook-final"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3548,
+                    "startLatest": 3548,
+                    "endEarliest": 3560,
+                    "endLatest": 3560,
+                    "rationale": "Q4 0:52 injury play to Q4 0:40 explicit return update.",
+                    "sourceIds": [
+                      "bal-atl-gamebook-final",
+                      "falcons-hughes-relief"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "team": "ATL",
+              "player": "JD Bertrand",
+              "eaPlayerId": "14915",
+              "caseKey": "2026-W05-ATL-JD-Bertrand",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-reserve-bertrand",
+                "atl-reserve-williams",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Trey Sermon",
+              "eaPlayerId": "21631",
+              "caseKey": "2026-W05-ATL-Trey-Sermon",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-reserve-bertrand",
+                "atl-reserve-williams",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Cameron Williams",
+              "eaPlayerId": "15166",
+              "caseKey": "2026-W05-ATL-Cameron-Williams",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-reserve-bertrand",
+                "atl-reserve-williams",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Beaux Collins",
+              "eaPlayerId": "15090",
+              "caseKey": "2026-W05-ATL-Beaux-Collins",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-reserve-bertrand",
+                "atl-reserve-williams",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Anterio Thompson",
+              "eaPlayerId": "10197",
+              "caseKey": "2026-W05-ATL-Anterio-Thompson",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-reserve-bertrand",
+                "atl-reserve-williams",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Storm Norton",
+              "eaPlayerId": "estimate:storm-norton",
+              "caseKey": "2026-W05-ATL-Storm-Norton",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-reserve-bertrand",
+                "atl-reserve-williams",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Da'Shawn Hand",
+              "eaPlayerId": "13241",
+              "caseKey": "2026-W05-ATL-Da'Shawn-Hand",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-reserve-hand",
+                "atl-depth",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Game-active reserve interior lineman Harrison covers only Hand reserve duty under documented-depth assumption; equal0.2 frozen values. Actual primary interior baselines retained.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "atl-reserve-hand",
+                "atl-depth",
+                "gamebook"
+              ],
+              "roleRationale": "Game-active reserve interior lineman Harrison covers only Hand reserve duty under documented-depth assumption; equal0.2 frozen values. Actual primary interior baselines retained.",
+              "roleSourceIds": [
+                "atl-reserve-hand",
+                "atl-depth",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Zach Harrison",
+                  "eaPlayerId": "22920"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "Jalon Walker",
+              "eaPlayerId": "15265",
+              "caseKey": "2026-W05-ATL-Jalon-Walker",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-reserve-edge-roles",
+                "atl-transactions",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual starting edge Thomas fills Walker-created primary pass-rush duty. Other side Ebukam assigned Pearce, Trice/Jackson retained for distinct older ZaDarius absence where applicable.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "atl-reserve-edge-roles",
+                "atl-transactions",
+                "gamebook"
+              ],
+              "roleRationale": "Actual starting edge Thomas fills Walker-created primary pass-rush duty. Other side Ebukam assigned Pearce, Trice/Jackson retained for distinct older ZaDarius absence where applicable.",
+              "roleSourceIds": [
+                "atl-reserve-edge-roles",
+                "atl-transactions",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Cameron Thomas",
+                  "eaPlayerId": "22312"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "James Pearce Jr",
+              "eaPlayerId": "15202",
+              "caseKey": "2026-W05-ATL-James-Pearce-Jr",
+              "availabilityStatus": "SUSPENDED",
+              "sourceIds": [
+                "atl-reserve-pearce",
+                "atl-reserve-edge-roles",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual available edge Ebukam fills distinct Pearce-created pass-rush duty, equal0.5 values. CameronThomas reserved Walker; no duplicate whole-unit pass-rush credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "atl-reserve-pearce",
+                "atl-reserve-edge-roles",
+                "gamebook"
+              ],
+              "roleRationale": "Actual available edge Ebukam fills distinct Pearce-created pass-rush duty, equal0.5 values. CameronThomas reserved Walker; no duplicate whole-unit pass-rush credit.",
+              "roleSourceIds": [
+                "atl-reserve-pearce",
+                "atl-reserve-edge-roles",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Samson Ebukam",
+                  "eaPlayerId": "12834"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "DeAngelo Malone",
+              "eaPlayerId": "estimate:deangelo-malone",
+              "caseKey": "2026-W05-ATL-DeAngelo-Malone",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-depth",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available edge reserve Ivey covers only Malone additional edge-depth insurance under documented-depth assumption. Walker/Pearce starters and older ZaDarius relief disjoint; estimated healthy baseline sensitivity retained.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-depth",
+                "gamebook"
+              ],
+              "roleRationale": "Available edge reserve Ivey covers only Malone additional edge-depth insurance under documented-depth assumption. Walker/Pearce starters and older ZaDarius relief disjoint; estimated healthy baseline sensitivity retained.",
+              "roleSourceIds": [
+                "atl-roster",
+                "atl-transactions",
+                "atl-depth",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Jared Ivey",
+                  "eaPlayerId": "15187"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "C.Rush",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Emergency third quarterback; Penix and Tagovailoa duty is evaluated explicitly.",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ]
+            },
+            {
+              "player": "J.Strand",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Unused reserve quarterback; Penix and Tagovailoa duty is evaluated explicitly.",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ]
+            },
+            {
+              "player": "M.DeWalt",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive absent from the final injury designations and no injury-driven lost duty is established.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "R.Longerbeam",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive absent from the final injury designations and no injury-driven lost duty is established.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "C.Harris",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive absent from the final injury designations and no injury-driven lost duty is established.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "E.Onianwa",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive absent from the final injury designations and no injury-driven lost duty is established.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "participationReviews": [
+            {
+              "player": "Jake Matthews",
+              "finding": "Active-full: started and played 63 of 64 offensive snaps; no injury-driven lost interval is reported.",
+              "sourceIds": [
+                "bal-atl-gamebook-final"
+              ]
+            },
+            {
+              "player": "Divine Deablo",
+              "finding": "Active-full: started and played every Atlanta defensive snap; no injury-driven lost interval is reported.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "Samson Ebukam",
+              "finding": "Active-full: active substitute with 58 defensive snaps; no injury-driven lost interval is reported.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "nfl-week5-final-injury-report-bal-atl"
+              ]
+            },
+            {
+              "player": "ATL final game-day unit",
+              "finding": "Every inactive/DNP identity, complete QB duty, all specialists, continuing A.J. Terrell IR role and printed Hughes injury/return interval were reviewed.",
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-terrell-ir",
+                "falcons-hughes-relief"
+              ]
+            }
+          ],
+          "clusterReviews": [
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "bal-atl-gamebook-final",
+                "falcons-depth",
+                "falcons-terrell-ir",
+                "falcons-hughes-relief"
+              ],
+              "rationale": "Terrell/Henderson is the continuing outside-corner chain and Hughes/Ford is a distinct 12-second outside-corner relief interval; no replacement is reused and nickel duties remain credited once."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "valueEstimates": [
+    {
+      "player": "Storm Norton",
+      "identity": "estimate:storm-norton",
+      "position": "LT",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 63,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "storm-value"
+      ],
+      "roleSourceIds": [
+        "atl-roster",
+        "atl-transactions"
+      ],
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    },
+    {
+      "player": "DeAngelo Malone",
+      "identity": "estimate:deangelo-malone",
+      "position": "EDGE",
+      "method": "POSITION_GROUP_MEDIAN",
+      "estimateAcknowledged": true,
+      "rationale": "Source-supported historical position-group estimate for an otherwise unrated non-QB. Frozen cohort sensitivity retained; no old rating or registry overwritten.",
+      "officialAndIndependentSearchCompleted": true,
+      "searchFinding": "Both frozen/official and independent currentNFL27 exact identity searches completed; independent page explicitly rating unavailable. Use frozen defensive-line cohort median with full sensitivity for established NFL edge reserve.",
+      "sourceIds": [
+        "malone-official-search",
+        "malone-independent-search"
+      ],
+      "roleSourceIds": [
+        "atl-roster",
+        "atl-transactions"
+      ],
+      "gameKeys": [
+        "2026-W05-BAL-ATL"
+      ]
+    }
+  ],
+  "correctionIntent": {
+    "state": "PENDING_GOVERNED_APPEND_ONLY_CORRECTION",
+    "sourceWeek": 5,
+    "targetWeek": 6,
+    "gameKey": "2026-W05-BAL-ATL",
+    "originalEvidencePath": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-bal-atl-ready-reconciliation.json",
+    "addedCaseKeys": [
+      "2026-W05-BAL-Jovaughn-Gwyn",
+      "2026-W05-BAL-Danny-Pinter",
+      "2026-W05-BAL-T.J.-Tampa",
+      "2026-W05-BAL-Bilhal-Kone",
+      "2026-W05-BAL-Adam-Randall",
+      "2026-W05-BAL-Cam-Jurgens",
+      "2026-W05-BAL-Ethan-Pocic",
+      "2026-W05-ATL-JD-Bertrand",
+      "2026-W05-ATL-Trey-Sermon",
+      "2026-W05-ATL-Cameron-Williams",
+      "2026-W05-ATL-Beaux-Collins",
+      "2026-W05-ATL-Anterio-Thompson",
+      "2026-W05-ATL-Storm-Norton",
+      "2026-W05-ATL-Da'Shawn-Hand",
+      "2026-W05-ATL-Jalon-Walker",
+      "2026-W05-ATL-James-Pearce-Jr",
+      "2026-W05-ATL-DeAngelo-Malone"
+    ],
+    "originalHistoricalEventsPreserved": true,
+    "owner": "GRAHAM_WALTERS_90_10"
+  }
+}

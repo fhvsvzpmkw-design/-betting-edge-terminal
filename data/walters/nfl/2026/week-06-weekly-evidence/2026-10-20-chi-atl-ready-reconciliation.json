@@ -1,0 +1,2514 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 6,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "marketViewed": false,
+  "inputCommit": "c6e9f83ec5861edf84ae69202696aa6c193302ca",
+  "inputBlobs": {
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/2026/week-06-personnel-ledger.json": "1890fbd0a28fb1425de8eae9f21500d9e103c126",
+    "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
+    "data/walters/nfl/personnel-production-current.json": "090dc9e60ccbbef12d35cc88e7705582c258c8ed",
+    "data/walters/nfl/matchup-production-current.json": "39bdfc22c00e0d383d5cb7e484e157496a9cb520"
+  },
+  "recordedAt": "2026-10-20T21:46:32Z",
+  "scope": "COMPLETE_PAIRED_FINAL_GAME_RECONCILIATION",
+  "sources": [
+    {
+      "id": "bal-atl-gamebook-final",
+      "url": "https://static.www.nfl.com/image/upload/gamecenter/aa94c94d-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official final gamebook reports Baltimore 30, Atlanta 23 in overtime; complete lineups, substitutions, inactive/DNP inventories, playtime, and every printed injury/return sequence. Source document SHA-256 de2f5f881a71f977e0cc69906b33f2ecbcd2734e0616027e181955f75b2e9f1f, 361235 bytes.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "nfl-week5-final-injury-report-bal-atl",
+      "url": "https://www.nfl.com/injuries/league/2026/reg5",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official final Week 5 report identifies Lamar Jackson, Cam Jurgens and Trey Hendrickson out for Baltimore; Yasir Abdullah out and the final Atlanta questionable designations.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-active-role-report",
+      "url": "https://www.baltimoreravens.com/news/zay-flowers-marlon-humphrey-active-week-5-falcons-ravens",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Baltimore confirms Huntley for Jackson, Green for Hendrickson, Ioane at center, Jones at right guard, Jurgens not yet debuted, and Edoga elevated for tackle depth.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-tackle-depth",
+      "url": "https://www.baltimoreravens.com/news/ravens-practice-squad-elevations-kyle-hergel-chuma-edoga-falcons",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Baltimore elevated Chuma Edoga and identified Carson Vinson as the other available reserve tackle for the Falcons game.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-depth",
+      "url": "https://www.baltimoreravens.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official depth chart lists Chandler Rivers directly behind Kyle Hamilton, John Jenkins behind Travis Jones at nose tackle, and Mike Green behind Trey Hendrickson at rush linebacker.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "ravens-reserve-review",
+      "url": "https://www.baltimoreravens.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official roster review identifies the continuing reserve-list players; the final gamebook confirms none was activated for this game. No established Week 5 game-day duty is assigned to the listed reserve-only exclusions.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-edge-elevations",
+      "url": "https://www.atlantafalcons.com/news/falcons-place-yasir-abdullah-on-ir-sign-jammie-robinson",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Atlanta placed Yasir Abdullah on injured reserve and elevated Bralen Trice and Drake Jackson; the gamebook lists both edge players active.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-depth",
+      "url": "https://www.atlantafalcons.com/news/atlanta-falcons-week-5-depth-chart-vs-baltimore-ravens",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official Week 5 depth chart lists Mike Ford Jr. directly behind Mike Hughes and preserves the distinct outside-corner and nickel chains.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-hughes-relief",
+      "url": "https://www.atlantafalcons.com/news/falcons-ravens-sunday-close-out-games-bijan-robinson",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Atlanta reports Mike Ford entered immediately after Mike Hughes was injured on the prior snap; the gamebook records Hughes's return after the next touchdown sequence.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-penix-postgame",
+      "url": "https://www.atlantafalcons.com/news/game-breakdown-what-happened-in-falcons-vs-ravens",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Atlanta confirms Penix's late rib injury and Tagovailoa's injury-driven relief; the official gamebook supplies the two disjoint relief intervals.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "falcons-terrell-ir",
+      "url": "https://www.atlantafalcons.com/news/falcons-place-aj-terrell-jr-on-injured-reserve",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Atlanta placed A.J. Terrell Jr. on injured reserve and identified C.J. Henderson as the outside-corner replacement; the Week 5 gamebook confirms Henderson started.",
+      "checkedAt": "2026-10-14T01:07:09.000Z"
+    },
+    {
+      "id": "bal-roster",
+      "url": "https://www.baltimoreravens.com/team/players-roster/",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "bal-transactions",
+      "url": "https://www.baltimoreravens.com/team/transactions/2026",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "bal-depth",
+      "url": "https://www.baltimoreravens.com/team/depth-chart",
+      "finding": "Complete final-game reserve inventory with dated pre-kickoff placements and available depth; all reserve categories retained, no later activation backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-bertrand",
+      "url": "https://www.atlantafalcons.com/news/falcons-sign-josh-woods-53-man-roster-jd-bertrand-injured-reserve",
+      "finding": "OfficialAug31 JD Bertrand IR, JoshWoods signed as corresponding available linebacker.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-hand",
+      "url": "https://www.atlantafalcons.com/news/falcons-dashawn-hand-ir-nick-muse-khalil-herbert-drake-jackson",
+      "finding": "OfficialSept16 DaShawnHand IR. Other continuing IR/PUP/NFI reserve names retained in roster chronology.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-williams",
+      "url": "https://www.atlantafalcons.com/news/atlanta-falcons-depth-chart-carolina-panthers",
+      "finding": "OfficialSept15 depth update: CameronWilliams removed after IR the previous Saturday; unavailable before both games.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-pearce",
+      "url": "https://www.atlantafalcons.com/news/james-pearce-jr-suspension-nfl-eight-games-season",
+      "finding": "Official first-eight-games suspension announcedAug14, effectiveAug30, includesWeeks5/6. JalonWalker preseasonACL/IRAug6 separately retained.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-reserve-edge-roles",
+      "url": "https://www.atlantafalcons.com/news/kevin-stefanski-james-pearce-suspension-jalon-walker",
+      "finding": "Official preseason expected edge-depth response to both Walker and Pearce absence. Actual final gamebook CameronThomas/SamsonEbukam available. Assign distinct additional edge duties, no snap-derived weights.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "storm-value",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/storm-norton/13013",
+      "finding": "Official exactNFL27 StormNorton LT63. Missingfrozen; unchangedcurve0 and explicit retrospective source provenance.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "malone-official-search",
+      "url": "https://www.ea.com/games/madden-nfl/ratings",
+      "finding": "Exact DeAngeloMalone frozen and official currentNFL27 searches completed, no current rating returned. No old-season or UltimateTeam card adopted.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "malone-independent-search",
+      "url": "https://www.maddenratings.com/deangelo-malone",
+      "finding": "Exact NFL27 DeAngeloMalone page explicitly RatingUnavailable. Established NFL contributor retained with governed positional cohort estimate and sensitivity, never camp-only or missing-as-zero.",
+      "kind": "REPORTING",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "bal-center-irs",
+      "url": "https://www.baltimoreravens.com/news/jovaughn-gwyn-ethan-pocic-injured-reserve-kyle-hergel-ravens-titans",
+      "finding": "OfficialOct3 Gwyn/Pocic IR after prior Pinter IR. Ioane actualC, Hergel elevated availableG/C; retained starting-role and extra reserve duties distinct.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "bal-jurgens-acquisition",
+      "url": "https://www.baltimoreravens.com/news/ravens-trade-cam-jurgens-center-pro-bowl-injuries-2026",
+      "finding": "OfficialOct7 center acquisition with injury availability not automatically restored; final gamebook inactive and Ioane startsC. Preserve new healthy incumbent value, current injury replacement comparison only.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:00Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "chi-gb-gamebook-final",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/pqpptpb5ckujllxac1md",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official final gamebook reports Green Bay 31, Chicago 7; complete lineups, substitutions, DNPs and inactives; Tyson Bagent starting for inactive Caleb Williams with Case Keenum later participating; and printed injury statuses for Skyy Moore, T.J. Edwards, Dayo Odeyingbo, Tyrique Stevenson and Benjamin St-Juste. Return-questionable and return-doubtful wording is not treated as an actual return.",
+      "checkedAt": "2026-10-14T05:13:28.326Z"
+    },
+    {
+      "id": "packers-chi-gb-game-center-final",
+      "url": "https://www.packers.com/game-day/2026/reg-week5/packers-vs-bears/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official Packers game center independently reports FINAL, Chicago 7 and Green Bay 31, and links the final gamebook.",
+      "checkedAt": "2026-10-14T05:13:28.326Z"
+    },
+    {
+      "id": "packers-chi-gb-final-injury-report",
+      "url": "https://www.packers.com/news/packers-list-three-questionable-two-doubtful-vs-bears-week-5-injury-report",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official final injury report binds injury-driven pregame statuses: CHI Caleb Williams questionable, Kyle Monangai and Keyshaun Elliott out; GB Aaron Banks and Jacob Monk doubtful, Chris Brooks and Savion Williams out, and Anthony Campbell and Javon Hargrave questionable. It also records active/no-game-status closures for the listed Bears and Packers participants.",
+      "checkedAt": "2026-10-14T05:13:28.326Z"
+    },
+    {
+      "id": "packers-chi-gb-final-inactives",
+      "url": "https://www.packers.com/news/packers-bears-week-5-inactives-oct-11-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official final inactives list CHI Caleb Williams, Kyle Monangai, Keyshaun Elliott, Jamree Kromah, Ozzy Trapilo and Jayden Loving; and GB Jacob Monk, Aaron Banks, Donovan Jennings and Anthony Campbell. Kevin Zeitler was active.",
+      "checkedAt": "2026-10-14T05:13:28.326Z"
+    },
+    {
+      "id": "packers-chi-gb-postgame-injuries",
+      "url": "https://www.packers.com/news/game-recap-5-takeaways-from-packers-victory-over-bears-week-5-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official club recap reports Javon Hargrave was carted off just after the fourth-quarter two-minute warning with an apparent Achilles injury, and confirms Skyy Moore left with an ankle injury and Benjamin St-Juste with a hamstring injury. It also reports Tyson Bagent was replaced by Case Keenum in the fourth quarter rather than documenting an injury-driven relief change.",
+      "checkedAt": "2026-10-14T05:13:28.326Z"
+    },
+    {
+      "id": "packers-depth-20261013",
+      "url": "https://www.packers.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Official Packers depth chart identifies the current source-bound position groups and primary depth candidates for Moore's receiver/return duties, Hargrave's defensive-tackle duty and St-Juste's cornerback duty. It is role evidence only and does not prove the Week 5 added-duty allocation by itself.",
+      "checkedAt": "2026-10-14T05:13:28.326Z"
+    },
+    {
+      "id": "ea-anthony-campbell-week4",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/anthony-campbell/4801",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "EA SPORTS' official Madden NFL 27 Week 4 player page identifies Anthony Campbell, player ID 4801, as a Green Bay Packers defensive tackle with OVR 64. The frozen non-QB calibration maps that OVR to 0.0 Walters points.",
+      "checkedAt": "2026-10-15T13:05:18Z"
+    },
+    {
+      "id": "chi-gb-official-gamebook-final",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/pqpptpb5ckujllxac1md",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The official final gamebook lists Laken Tomlinson as Green Bay's starting left guard and Travis Glover as the starting right guard, records Jager Burton as Did Not Play, and lists Aaron Banks, Jacob Monk and Anthony Campbell among Green Bay's inactives. The same gamebook supplies the final 31-7 result and final participation record.",
+      "checkedAt": "2026-10-15T17:08:55Z"
+    },
+    {
+      "id": "packers-chi-gb-postgame-line",
+      "url": "https://www.packers.com/news/game-recap-5-takeaways-from-packers-victory-over-bears-week-5-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Green Bay's official postgame recap says Laken Tomlinson started at left guard for the second consecutive game, directly binding him as Aaron Banks' game-active primary replacement rather than inferring an anonymous committee.",
+      "checkedAt": "2026-10-15T17:08:55Z"
+    },
+    {
+      "id": "ea-laken-tomlinson-week4",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/laken-tomlinson/2507",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "EA SPORTS' official Madden NFL 27 Week 4 player page identifies Laken Tomlinson as Green Bay's left guard with OVR 74. The frozen non-QB calibration maps OVR 74 to 0.2 Walters points.",
+      "checkedAt": "2026-10-15T17:08:55Z"
+    },
+    {
+      "id": "nfl-jager-burton-week5-log",
+      "url": "https://www.nfl.com/players/jager-burton/stats/logs/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The NFL's official player log records Jager Burton with zero games and zero starts in Week 5, consistent with the official gamebook's DNP entry.",
+      "checkedAt": "2026-10-15T17:08:55Z"
+    },
+    {
+      "id": "bears-depth-20261013",
+      "url": "https://www.chicagobears.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Chicago's official depth chart identifies Jack Sanborn as an active reserve linebacker, Daniel Hardy directly behind Dayo Odeyingbo, Clark Phillips behind Tyrique Stevenson and Josh Blackwell as the other active reserve boundary corner. The final gamebook records Phillips DNP and Sanborn, Hardy and Blackwell as substitutes, supporting labelled documented-depth estimates for only the vacated additional duties.",
+      "checkedAt": "2026-10-16T01:07:16Z"
+    },
+    {
+      "id": "packers-chi-gb-live-updates-final",
+      "url": "https://www.packers.com/news/packers-bears-in-game-updates-week-5-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Green Bay's official final game updates confirm Bagent started for the injured Caleb Williams, Keenum entered in the fourth quarter, Moore left injured, and the documented Melton/Golden receiving and return work occurred after Moore's departure.",
+      "checkedAt": "2026-10-16T01:07:16Z"
+    },
+    {
+      "id": "packers-chi-gb-postgame-recap",
+      "url": "https://www.packers.com/news/game-recap-5-takeaways-from-packers-victory-over-bears-week-5-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The official postgame recap describes Keenum replacing Bagent in the fourth quarter as a performance change rather than a second injury-driven quarterback loss, and confirms Hargrave's late injury departure.",
+      "checkedAt": "2026-10-16T01:07:16Z"
+    },
+    {
+      "id": "nfl-bagent-starts-for-williams",
+      "url": "https://www.nfl.com/news/bears-qb-tyson-bagent-to-start-vs-packers-in-place-of-injured-caleb-williams",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "NFL.com reports Tyson Bagent would start because Caleb Williams was injured and Case Keenum would be the second quarterback, binding Bagent as the primary injury replacement without relabelling the later performance benching.",
+      "checkedAt": "2026-10-16T01:07:16Z"
+    },
+    {
+      "id": "chi-gb-official-gamebook-final-20261017",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/pqpptpb5ckujllxac1md",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The final gamebook confirms the 31-7 final and Week 5 activation/role check. Chicago starters include Kalif Raymond, Theo Benedet and Xavier Woods; Neville Gallimore is a participating substitute. Green Bay starters include Barryn Sorrell and Anthony Belton; Skyy Moore is a participating substitute before his return-questionable/out sequence, and Bo Melton and Matthew Golden perform receiving/return duties afterward.",
+      "checkedAt": "2026-10-17T13:03:30Z"
+    },
+    {
+      "id": "chi-official-transactions-20261017-continued",
+      "url": "https://www.chicagobears.com/team/transactions/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Chicago's official transaction chronology confirms no pre-kickoff activation for the continued reserve cases. Noah Sewell's Oct. 10 activation is preserved separately; Shemar Turner's activation occurred Oct. 13 after the game.",
+      "checkedAt": "2026-10-17T13:03:30Z"
+    },
+    {
+      "id": "gb-official-transactions-20261017-continued",
+      "url": "https://www.packers.com/team/transactions/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Green Bay's official transaction chronology confirms no pre-kickoff activation for Zach Bako-Bewele, Jayden Reed, Micah Parsons or the other continued reserve cases.",
+      "checkedAt": "2026-10-17T13:03:30Z"
+    },
+    {
+      "id": "gb-official-bako-bewele-identity",
+      "url": "https://www.packers.com/team/players-roster/zach-bako-bewele/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The official biography binds Zach Bako-Bewele to the unchanged frozen Zach Tom identity, EA ID 22434. The existing 87 OVR and 1.2-point value are retained; no new calibration is created.",
+      "checkedAt": "2026-10-17T13:03:30Z"
+    },
+    {
+      "id": "chi-official-transactions-20261017",
+      "url": "https://www.chicagobears.com/team/transactions/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Chicago's official transaction log records the reserve placements relevant at the Oct. 11 kickoff: Jonathan Garvin on Aug. 4; Dallis Flowers on Aug. 7; Nephi Sewell on Aug. 25; Kyler Gordon, Noah Sewell and Shemar Turner on PUP and Brittain Brown, Tony Fields II, Jaylon Jones and Ray-Ray McCloud III on Reserve/Injured on Aug. 30; Coby Bryant and Hayden Large on Sept. 1; Braxton Jones on Oct. 3. It records Noah Sewell's Oct. 10 activation and Shemar Turner's later Oct. 13 activation. No pre-kickoff activation is recorded for the other named cases.",
+      "checkedAt": "2026-10-17T05:05:42Z"
+    },
+    {
+      "id": "chi-official-noah-activation-20261010",
+      "url": "https://www.chicagobears.com/news/roster-moves-chicago-bears-activate-noah-sewell-elevate-zavier-scott",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Chicago officially activated Noah Sewell from Reserve/PUP on Oct. 10, elevated Zavier Scott for the game, and downgraded Kyler Gordon and Shemar Turner to out. The final gamebook records Sewell and Scott as participants, so neither is treated as a reserve-list absence.",
+      "checkedAt": "2026-10-17T05:05:42Z"
+    },
+    {
+      "id": "gb-official-transactions-20261017",
+      "url": "https://www.packers.com/team/transactions/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Green Bay's official transaction log records Collin Oliver and Savion Williams on IR/designated for return and Luke Musgrave, Micah Parsons and Jordon Riley on PUP on Aug. 30; Zach Bako-Bewele on IR Sept. 28; Jayden Reed on IR Sept. 30; Warren Brinson on IR Oct. 3; Edgerrin Cooper on IR Oct. 6; and Chris Brooks on IR Oct. 10. No pre-kickoff activation is recorded for those cases.",
+      "checkedAt": "2026-10-17T05:05:42Z"
+    },
+    {
+      "id": "gb-official-initial-reserve-20260830",
+      "url": "https://www.packers.com/news/packers-announce-roster-moves-aug-30-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Green Bay's Aug. 30 roster announcement independently binds Oliver and Savion Williams to IR/designated for return and Musgrave, Parsons and Riley to PUP. A designation to return is not an activation or an actual return.",
+      "checkedAt": "2026-10-17T05:05:42Z"
+    },
+    {
+      "id": "st-juste-snaps-daily-gopher-20261015",
+      "url": "https://www.thedailygopher.com/minnesota-golden-gophers-football/41310/2026-minnesota-golden-gophers-in-the-nfl-week-5",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The Daily Gopher reports St-Juste played 10 special-teams snaps against Chicago and records no defensive statistic. This is useful role evidence but conflicts with the six special-teams snaps reported by Yahoo Sports and does not bind the exact injury play or added-duty successor.",
+      "checkedAt": "2026-10-17T05:05:42Z"
+    },
+    {
+      "id": "st-juste-snaps-yahoo-20261012",
+      "url": "https://sports.yahoo.com/articles/snaps-studs-duds-packers-statement-142601162.html",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Yahoo Sports reports St-Juste was limited to six special-teams snaps and identifies the other Packers cornerbacks' defensive snap totals. The special-teams total conflicts with the Daily Gopher report, so neither total is promoted as exact source-bound exposure.",
+      "checkedAt": "2026-10-17T05:05:42Z"
+    },
+    {
+      "id": "chi-gb-official-gamebook-final-secondary-closeout",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/pqpptpb5ckujllxac1md",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The official final gamebook confirms Green Bay's 31-7 final, Kyler Gordon inactive, and Malik Muhammad, Cam Lewis and Tyrique Stevenson as active Chicago participants. It preserves Stevenson's no-return injury sequence and does not establish an actual Benjamin St-Juste return.",
+      "checkedAt": "2026-10-17T17:00:56Z"
+    },
+    {
+      "id": "chi-week5-secondary-role-report-20261012",
+      "url": "https://www.si.com/nfl/bears/onsi/key-observations-from-bears-snap-count-in-their-week-5-loss-against-packers",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "Week 5 snap reporting records Malik Muhammad at 49 defensive snaps, Cam Lewis at 36 and Tyrique Stevenson at 31. It explicitly reports that after Stevenson's injury Muhammad moved outside and Lewis moved into the slot. The counts establish role identity only; they are not used as workload weights.",
+      "checkedAt": "2026-10-17T17:00:56Z"
+    },
+    {
+      "id": "chi-gb-official-gamebook-final-st-juste-literal",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/pqpptpb5ckujllxac1md",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The final gamebook identifies St-Juste as an active substitute and records only that his return was questionable after Q3 1:58. It does not record an actual return, exact injury play, special-teams snap total or successor duty.",
+      "checkedAt": "2026-10-18T01:05:55Z"
+    },
+    {
+      "id": "st-juste-snaps-daily-gopher-20261015-recheck",
+      "url": "https://www.thedailygopher.com/minnesota-golden-gophers-football/41310/2026-minnesota-golden-gophers-in-the-nfl-week-5",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The October 15 report states that St-Juste played ten special-teams snaps against Chicago and no defensive snaps or recorded statistic.",
+      "checkedAt": "2026-10-18T01:05:55Z"
+    },
+    {
+      "id": "packers-snap-table-pfr-nflverse-20261017",
+      "url": "https://nfcnorth.co/team/packers",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The current Packers weekly snap table lists St-Juste with ten Week 5 special-teams snaps (42 percent) and explicitly attributes its snap-count data to Pro Football Reference via nflverse. This independently matches the Daily Gopher total. The page also makes clear that it is a derived snap table, not official NFL play-participation evidence.",
+      "checkedAt": "2026-10-18T01:05:55Z"
+    },
+    {
+      "id": "st-juste-special-teams-role-depth-report-20260918",
+      "url": "https://www.acmepackingcompany.com/green-bay-packers-analysis/86672/what-the-packers-game-day-roster-could-look-like-week-2-new-york-jets",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "finding": "The roster analysis treats St-Juste as a special-teams ace and says J. Michael Sturdivant could replace those special-teams contributions if St-Juste were unavailable. It is prospective role evidence, not proof that Sturdivant assumed the Week 5 injury-created duty.",
+      "checkedAt": "2026-10-18T01:05:55Z"
+    },
+    {
+      "id": "gb-roster",
+      "url": "https://www.packers.com/team/players-roster/",
+      "finding": "Full dated active/reserve inventory. CHI Noah Sewell activated Oct10; Turner Oct13 and Gordon Oct17 after game. GB Ford/Hargrave/Moore later IR not backdated; Brinson/Cooper/Brooks already IR. Dated continued injury waivers retained unless release is sourced.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "gb-transactions",
+      "url": "https://www.packers.com/team/transactions/2026",
+      "finding": "Full dated active/reserve inventory. CHI Noah Sewell activated Oct10; Turner Oct13 and Gordon Oct17 after game. GB Ford/Hargrave/Moore later IR not backdated; Brinson/Cooper/Brooks already IR. Dated continued injury waivers retained unless release is sourced.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "gb-depth",
+      "url": "https://www.packers.com/team/depth-chart",
+      "finding": "Full dated active/reserve inventory. CHI Noah Sewell activated Oct10; Turner Oct13 and Gordon Oct17 after game. GB Ford/Hargrave/Moore later IR not backdated; Brinson/Cooper/Brooks already IR. Dated continued injury waivers retained unless release is sourced.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-haydenlarge",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/hayden-large/4792",
+      "finding": "Official exact-identity Madden NFL27 Hayden Large TE OVR57. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-dallisflowers",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/conferences-ratings/nfc-north/1?page=2",
+      "finding": "Official exact-identity Madden NFL27 Dallis Flowers CB OVR66. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-jonathangarvin",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/conferences-ratings/nfc-north/1?page=2",
+      "finding": "Official exact-identity Madden NFL27 Jonathan Garvin EDGE OVR66. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-nikolakalinic",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/nikola-kalinic/22676",
+      "finding": "Official exact-identity Madden NFL27 Nikola Kalinic TE OVR58. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-jmichaelsturdivant",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/positions-ratings/wide-receiver/WR?page=3&pageType=positions-ratings",
+      "finding": "Official exact-identity Madden NFL27 J. Michael Sturdivant WR OVR68. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-anthonycampbell",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/anthony-campbell/4801",
+      "finding": "Official exact-identity Madden NFL27 Anthony Campbell DT OVR64. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "value-lakentomlinson",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/laken-tomlinson/2507",
+      "finding": "Official exact-identity Madden NFL27 Laken Tomlinson LG OVR74. Missing frozen identity; unchanged curve and explicit retrospective estimate. Older official supplement agrees where applicable.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "jacobs-status",
+      "url": "https://www.nfl.com/news/nfl-places-packers-rb-josh-jacobs-commissioner-exempt-list",
+      "finding": "Official Aug30 Commissioner Exempt List placement; normal RB incumbent unavailable at Week5 kickoff. Removal effective Oct19 is later, not backdated.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "jaylon-release",
+      "url": "https://www.jaguars.com/news/roster-moves-jaguars-sign-cb-jaylon-jones-cb-alijah-huzzie",
+      "finding": "Former Bears Jaylon Jones signed JAX Oct6, confirming CHI duty ended before game; exact frozen22530 zero identity, not other23032 namesake.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "chi-settlements",
+      "url": "https://www.cbssports.com/fantasy/football/news/jaylon-jones-let-go-with-injury-settlement/",
+      "finding": "Bears Jones hamstring injury settlement Sep2 precedes Oct6 JAX signing. No continuing CHI IR case.",
+      "kind": "REPORTING",
+      "checkedAt": "2026-10-20T21:15:41Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "gamebook",
+      "url": "https://static.www.nfl.com/image/upload/v1792409927/gamecenter/aab577eb-4feb-11f1-abca-2c54536568a9.pdf",
+      "finding": "Final31\u201323 regulation. CalebWilliams/Penix complete QB duty without injury relief. Full roster/reserve, final inactives, DNP and all printed injuries/returns reviewed. CamLewis exactQ2 11:56injury to1:19return. JonahJackson doubtfulQ3 5:41,noreturn; normally every-snap RG50/77snaps, explicitly bounded missing-share method. ATLDeablo lastQ1 6:34tackle toQ2 2:00OUT, no actualreturn. JammieRobinson actualQ1 6:48injury to1:07return, healthy0; AvieonTerrell returnsQ2 0:47 andQ3 10:32, reliefBowman equal0.2. Daniels injuryQ3 8:48out; Bowman doubtfulQ4 9:34noreturn.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "chi-roster",
+      "url": "https://www.chicagobears.com/team/players-roster/",
+      "finding": "Full reserve categories and available depth checked with dated transactions and final gamebook. Activations and injury placements are applied only when effective before this kickoff; final injury absences and healthy scratches distinguished.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "chi-transactions",
+      "url": "https://www.chicagobears.com/team/transactions/2026",
+      "finding": "Full reserve categories and available depth checked with dated transactions and final gamebook. Activations and injury placements are applied only when effective before this kickoff; final injury absences and healthy scratches distinguished.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "chi-depth",
+      "url": "https://www.chicagobears.com/team/depth-chart/",
+      "finding": "Full reserve categories and available depth checked with dated transactions and final gamebook. Activations and injury placements are applied only when effective before this kickoff; final injury absences and healthy scratches distinguished.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-roster",
+      "url": "https://www.atlantafalcons.com/team/players-roster/",
+      "finding": "Full reserve categories and available depth checked with dated transactions and final gamebook. Activations and injury placements are applied only when effective before this kickoff; final injury absences and healthy scratches distinguished.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-transactions",
+      "url": "https://www.atlantafalcons.com/team/transactions/2026",
+      "finding": "Full reserve categories and available depth checked with dated transactions and final gamebook. Activations and injury placements are applied only when effective before this kickoff; final injury absences and healthy scratches distinguished.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-depth",
+      "url": "https://www.atlantafalcons.com/team/depth-chart/",
+      "finding": "Full reserve categories and available depth checked with dated transactions and final gamebook. Activations and injury placements are applied only when effective before this kickoff; final injury absences and healthy scratches distinguished.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "chi-final",
+      "url": "https://www.chicagobears.com/news/bears-announce-inactives-for-week-6-game-vs-falcons-2026",
+      "finding": "Monangai/Edwards/Elliott/Stevenson injury inactives. Sweat suspended Oct13, Dayo IR Oct17; KylerGordon activated Oct17 and Turner Oct13, both play. XavierWoods released Oct17, unavailable as Bryant relief.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "id": "atl-final",
+      "url": "https://www.atlantafalcons.com/news/atlanta-falcons-inactives-list-chicago-bears-week-6",
+      "finding": "C.J.Henderson inactive for injury. JammieRobinson active and returned after brief ST injury; others inactive healthy reserves. ZaDariusSmith active, MikeHughes no new missing duty.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:46:32Z",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W06-CHI-ATL",
+      "away": "CHI",
+      "home": "ATL",
+      "state": "READY",
+      "sourceIds": [
+        "gamebook"
+      ],
+      "blockers": [],
+      "teams": [
+        {
+          "team": "CHI",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final injury/inactive/DNP, reserve chronology, printed injuries/returns, QB and specialist duty reviewed together. Retain all archived cases and explicitly classify new absences and exclusions.",
+          "sourceIds": [
+            "gamebook",
+            "chi-roster",
+            "chi-transactions"
+          ],
+          "cases": [
+            {
+              "team": "CHI",
+              "player": "Brittain Brown",
+              "eaPlayerId": "22057",
+              "caseKey": "2026-W06-CHI-Brittain-Brown",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Tony Fields II",
+              "eaPlayerId": "21679",
+              "caseKey": "2026-W06-CHI-Tony-Fields-II",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Nephi Sewell",
+              "eaPlayerId": "22410",
+              "caseKey": "2026-W06-CHI-Nephi-Sewell",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Anthony Johnson Jr",
+              "eaPlayerId": "23070",
+              "caseKey": "2026-W06-CHI-Anthony-Johnson-Jr",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Hayden Large",
+              "eaPlayerId": "estimate:hayden-large",
+              "caseKey": "2026-W06-CHI-Hayden-Large",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Dallis Flowers",
+              "eaPlayerId": "estimate:dallis-flowers",
+              "caseKey": "2026-W06-CHI-Dallis-Flowers",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Jonathan Garvin",
+              "eaPlayerId": "estimate:jonathan-garvin",
+              "caseKey": "2026-W06-CHI-Jonathan-Garvin",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Nikola Kalinic",
+              "eaPlayerId": "estimate:nikola-kalinic",
+              "caseKey": "2026-W06-CHI-Nikola-Kalinic",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Keyshaun Elliott",
+              "eaPlayerId": "16356",
+              "caseKey": "2026-W06-CHI-Keyshaun-Elliott",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "CHI",
+              "player": "Kyle Monangai",
+              "eaPlayerId": "15035",
+              "caseKey": "2026-W06-CHI-Kyle-Monangai",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Primary game-active reserve Johnson fills Monangai unavailable RB duty; Swift common.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "roleRationale": "Primary game-active reserve Johnson fills Monangai unavailable RB duty; Swift common.",
+              "roleSourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Roschon Johnson",
+                  "eaPlayerId": "22747"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Braxton Jones",
+              "eaPlayerId": "22135",
+              "caseKey": "2026-W06-CHI-Braxton-Jones",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual starting LT Benedet fills Jones vacancy.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "roleRationale": "Actual starting LT Benedet fills Jones vacancy.",
+              "roleSourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Theo Benedet",
+                  "eaPlayerId": "4711"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Ray-Ray McCloud III",
+              "eaPlayerId": "13362",
+              "caseKey": "2026-W06-CHI-Ray-Ray-McCloud-III",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual WR starter and returner Raymond covers McCloud receiving/return duty at equal0.2 values.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "roleRationale": "Actual WR starter and returner Raymond covers McCloud receiving/return duty at equal0.2 values.",
+              "roleSourceIds": [
+                "gamebook",
+                "chi-transactions",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Kalif Raymond",
+                  "eaPlayerId": "12493"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Montez Sweat",
+              "eaPlayerId": "20411",
+              "caseKey": "2026-W06-CHI-Montez-Sweat",
+              "availabilityStatus": "SUSPENDED",
+              "sourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual starting edge Booker fills Sweat missing primary duty; Dayo relief Hardy distinct, Jarrett/Street/Lynch common.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "roleRationale": "Actual starting edge Booker fills Sweat missing primary duty; Dayo relief Hardy distinct, Jarrett/Street/Lynch common.",
+              "roleSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Austin Booker",
+                  "eaPlayerId": "14875"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Dayo Odeyingbo",
+              "eaPlayerId": "21692",
+              "caseKey": "2026-W06-CHI-Dayo-Odeyingbo",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available direct edge reserve Hardy fills whole-game Dayo absence. No Week5 partial exposure reused; Booker reserved Sweat.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "roleRationale": "Available direct edge reserve Hardy fills whole-game Dayo absence. No Week5 partial exposure reused; Booker reserved Sweat.",
+              "roleSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Daniel Hardy",
+                  "eaPlayerId": "22500"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "T.J. Edwards",
+              "eaPlayerId": "20591",
+              "caseKey": "2026-W06-CHI-TJ-Edwards",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual starting linebacker Jackson fills Edwards full absence; Bush/Sewell common, Sanborn retained other depth duties. No old partial Week5 interval carried forward.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "roleRationale": "Actual starting linebacker Jackson fills Edwards full absence; Bush/Sewell common, Sanborn retained other depth duties. No old partial Week5 interval carried forward.",
+              "roleSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "D'Marco Jackson",
+                  "eaPlayerId": "22203"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Tyrique Stevenson",
+              "eaPlayerId": "23038",
+              "caseKey": "2026-W06-CHI-Tyrique-Stevenson",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual available starting corner Muhammad fills only Stevenson primary duty. CamLewis common safety/DB role, Gordon active; no duplicate secondary credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "roleRationale": "Actual available starting corner Muhammad fills only Stevenson primary duty. CamLewis common safety/DB role, Gordon active; no duplicate secondary credit.",
+              "roleSourceIds": [
+                "chi-final",
+                "gamebook",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Malik Muhammad",
+                  "eaPlayerId": "1867"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Coby Bryant",
+              "eaPlayerId": "22211",
+              "caseKey": "2026-W06-CHI-Coby-Bryant",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "chi-transactions",
+                "chi-depth",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available direct safety reserve Hicks fills only Bryant additional duty under depth estimate. Prior Woods released before game; Thieneman/Lewis common baseline retained.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "chi-transactions",
+                "chi-depth",
+                "gamebook"
+              ],
+              "roleRationale": "Available direct safety reserve Hicks fills only Bryant additional duty under depth estimate. Prior Woods released before game; Thieneman/Lewis common baseline retained.",
+              "roleSourceIds": [
+                "chi-transactions",
+                "chi-depth",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Elijah Hicks",
+                  "eaPlayerId": "21795"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Cam Lewis",
+              "eaPlayerId": "21412",
+              "caseKey": "2026-W06-CHI-Cam-Lewis",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available reserve defensive back McCloud fills only Lewis interval. Muhammad reserved Stevenson and Hicks reserved Bryant; baseline primary secondary duties retained.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "chi-depth"
+              ],
+              "roleRationale": "Available reserve defensive back McCloud fills only Lewis interval. Muhammad reserved Stevenson and Hicks reserved Bryant; baseline primary secondary duties retained.",
+              "roleSourceIds": [
+                "gamebook",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Nick McCloud",
+                  "eaPlayerId": "21992"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1084,
+                    "startLatest": 1084,
+                    "endEarliest": 1721,
+                    "endLatest": 1721,
+                    "sourceIds": [
+                      "gamebook"
+                    ],
+                    "rationale": "ExactQ2 11:56 injury toQ2 1:19 actualreturn,637seconds."
+                  }
+                ]
+              }
+            },
+            {
+              "team": "CHI",
+              "player": "Jonah Jackson",
+              "eaPlayerId": "21113",
+              "caseKey": "2026-W06-CHI-Jonah-Jackson",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook",
+                "chi-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available direct reserve guard Newman fills normally every-snap RG injury absence. Other OL and Braxton vacancy separate.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "chi-depth"
+              ],
+              "roleRationale": "Available direct reserve guard Newman fills normally every-snap RG injury absence. Other OL and Braxton vacancy separate.",
+              "roleSourceIds": [
+                "gamebook",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Luke Newman",
+                  "eaPlayerId": "16145"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "gamebook"
+                ],
+                "unavailableSnapEstimate": {
+                  "playedSnaps": 50,
+                  "teamSnaps": 77,
+                  "injuryIndependentlyReported": true,
+                  "healthyEverySnapRole": true,
+                  "confoundingSubstitutionsAcknowledged": true,
+                  "rationale": "Official final appendix normally every-snap RG50of77; printed doubtful injury with no actualreturn. Missing27is ceiling, midpoint0..27/77 acknowledges other possible substitutions.",
+                  "sourceIds": [
+                    "gamebook"
+                  ]
+                }
+              }
+            },
+            {
+              "team": "CHI",
+              "player": "Kyler Gordon",
+              "eaPlayerId": "22261",
+              "caseKey": "2026-W06-CHI-Kyler-Gordon",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "chi-final",
+                "gamebook"
+              ],
+              "rationale": "Final availability active; no reported injury-driven missing duty.",
+              "newlyIdentified": true,
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "CHI",
+              "player": "Shemar Turner",
+              "eaPlayerId": "15205",
+              "caseKey": "2026-W06-CHI-Shemar-Turner",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "chi-final",
+                "gamebook"
+              ],
+              "rationale": "Final availability active; no reported injury-driven missing duty.",
+              "newlyIdentified": true,
+              "resolution": "ACTIVE_FULL"
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Jaylon Jones",
+              "category": "RELEASED_BEFORE_GAME",
+              "sourceIds": [
+                "chi-settlements",
+                "jaylon-release"
+              ],
+              "rationale": "Exact former CHI CB22530 released with Sep2 settlement and signed JAX Oct6."
+            },
+            {
+              "player": "Jedrick Wills Jr",
+              "category": "RELEASED_BEFORE_GAME",
+              "sourceIds": [
+                "chi-transactions"
+              ],
+              "rationale": "Dated August injury settlements before game; Eziomume later Oct19 PS signing not backdated."
+            },
+            {
+              "player": "K.C. Eziomume",
+              "category": "RELEASED_BEFORE_GAME",
+              "sourceIds": [
+                "chi-transactions"
+              ],
+              "rationale": "Dated August injury settlements before game; Eziomume later Oct19 PS signing not backdated."
+            },
+            {
+              "player": "Kyron Hudson",
+              "category": "RELEASED_BEFORE_GAME",
+              "sourceIds": [
+                "chi-transactions"
+              ],
+              "rationale": "Dated August injury settlements before game; Eziomume later Oct19 PS signing not backdated."
+            },
+            {
+              "player": "Gervarrius Owens",
+              "category": "RELEASED_BEFORE_GAME",
+              "sourceIds": [
+                "chi-transactions"
+              ],
+              "rationale": "Dated August injury settlements before game; Eziomume later Oct19 PS signing not backdated."
+            },
+            {
+              "player": "Tyson Bagent",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "CalebWilliams complete offensive QB duty; reserve/emergency unused."
+            },
+            {
+              "player": "Case Keenum",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "CalebWilliams complete offensive QB duty; reserve/emergency unused."
+            },
+            {
+              "player": "Jordan McFadden",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "chi-final",
+                "gamebook"
+              ],
+              "rationale": "Final inactive reserves without injury designation."
+            },
+            {
+              "player": "Jayden Loving",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "chi-final",
+                "gamebook"
+              ],
+              "rationale": "Final inactive reserves without injury designation."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "K/P/LS",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "finding": "Primary specialist roles filled, with no reviewed injury-driven substitution or missing duty."
+            }
+          ],
+          "specialistCases": [],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "sourceIds": [
+              "gamebook"
+            ],
+            "rationale": "Starting quarterback handled competitive game duty. Any injury-driven replacement is recorded separately below; unused backup/emergency roles create no loss."
+          },
+          "clusterReviews": [
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            },
+            {
+              "group": "LINEBACKER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            },
+            {
+              "group": "RUNNING_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "gamebook",
+              "chi-roster",
+              "chi-transactions"
+            ],
+            "rationale": "No simultaneous absence of both highest-valued expected receiving options; common healthy primary receivers remain available."
+          },
+          "topReceiverClusterReviewed": true
+        },
+        {
+          "team": "ATL",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Final injury/inactive/DNP, reserve chronology, printed injuries/returns, QB and specialist duty reviewed together. Retain all archived cases and explicitly classify new absences and exclusions.",
+          "sourceIds": [
+            "gamebook",
+            "atl-roster",
+            "atl-transactions"
+          ],
+          "cases": [
+            {
+              "team": "ATL",
+              "player": "JD Bertrand",
+              "eaPlayerId": "14915",
+              "caseKey": "2026-W06-ATL-JD-Bertrand",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Trey Sermon",
+              "eaPlayerId": "21631",
+              "caseKey": "2026-W06-ATL-Trey-Sermon",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Cameron Williams",
+              "eaPlayerId": "15166",
+              "caseKey": "2026-W06-ATL-Cameron-Williams",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Beaux Collins",
+              "eaPlayerId": "15090",
+              "caseKey": "2026-W06-ATL-Beaux-Collins",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Anterio Thompson",
+              "eaPlayerId": "10197",
+              "caseKey": "2026-W06-ATL-Anterio-Thompson",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Storm Norton",
+              "eaPlayerId": "estimate:storm-norton",
+              "caseKey": "2026-W06-ATL-Storm-Norton",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Da'Shawn Hand",
+              "eaPlayerId": "13241",
+              "caseKey": "2026-W06-ATL-Da'Shawn-Hand",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Game-active reserve interior lineman Harrison covers only Hand reserve duty under documented-depth assumption; equal0.2 frozen values. Actual primary interior baselines retained.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "roleRationale": "Game-active reserve interior lineman Harrison covers only Hand reserve duty under documented-depth assumption; equal0.2 frozen values. Actual primary interior baselines retained.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Zach Harrison",
+                  "eaPlayerId": "22920"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "Jalon Walker",
+              "eaPlayerId": "15265",
+              "caseKey": "2026-W06-ATL-Jalon-Walker",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual starting edge Thomas fills Walker-created primary pass-rush duty. Other side Ebukam assigned Pearce, Trice/Jackson retained for distinct older ZaDarius absence where applicable.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "roleRationale": "Actual starting edge Thomas fills Walker-created primary pass-rush duty. Other side Ebukam assigned Pearce, Trice/Jackson retained for distinct older ZaDarius absence where applicable.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Cameron Thomas",
+                  "eaPlayerId": "22312"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "James Pearce Jr",
+              "eaPlayerId": "15202",
+              "caseKey": "2026-W06-ATL-James-Pearce-Jr",
+              "availabilityStatus": "SUSPENDED",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual available edge Ebukam fills distinct Pearce-created pass-rush duty, equal0.5 values. CameronThomas reserved Walker; no duplicate whole-unit pass-rush credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "roleRationale": "Actual available edge Ebukam fills distinct Pearce-created pass-rush duty, equal0.5 values. CameronThomas reserved Walker; no duplicate whole-unit pass-rush credit.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Samson Ebukam",
+                  "eaPlayerId": "12834"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "DeAngelo Malone",
+              "eaPlayerId": "estimate:deangelo-malone",
+              "caseKey": "2026-W06-ATL-DeAngelo-Malone",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available edge reserve Ivey covers only Malone additional edge-depth insurance under documented-depth assumption. Walker/Pearce starters and older ZaDarius relief disjoint; estimated healthy baseline sensitivity retained.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "roleRationale": "Available edge reserve Ivey covers only Malone additional edge-depth insurance under documented-depth assumption. Walker/Pearce starters and older ZaDarius relief disjoint; estimated healthy baseline sensitivity retained.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Jared Ivey",
+                  "eaPlayerId": "15187"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "Yasir Abdullah",
+              "eaPlayerId": "22984",
+              "caseKey": "2026-W06-ATL-Yasir-Abdullah",
+              "newlyIdentified": true,
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "gamebook",
+                "atl-transactions",
+                "atl-depth"
+              ],
+              "rationale": "Official IR and final game-day review establish the material absence; immutable frozen healthy value is zero.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Abdullah's immutable frozen healthy value is 0.0; the nonnegative replacement floor proves zero without inventing a replacement."
+            },
+            {
+              "team": "ATL",
+              "player": "A.J. Terrell Jr",
+              "eaPlayerId": "21002",
+              "caseKey": "2026-W06-ATL-A.J.-Terrell-Jr",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "atl-roster",
+                "atl-depth",
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "C.J.Henderson also unavailable; available veteran corner Ford fills AJTerrell missing primary corner duty. Avieon/MikeHughes common secondary roles. No inactive Henderson relief credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "atl-roster",
+                "atl-depth",
+                "atl-final",
+                "gamebook"
+              ],
+              "roleRationale": "C.J.Henderson also unavailable; available veteran corner Ford fills AJTerrell missing primary corner duty. Avieon/MikeHughes common secondary roles. No inactive Henderson relief credit.",
+              "roleSourceIds": [
+                "atl-roster",
+                "atl-depth",
+                "atl-final",
+                "gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Mike Ford Jr",
+                  "eaPlayerId": "13881"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "ATL",
+              "player": "C.J. Henderson",
+              "eaPlayerId": "21004",
+              "caseKey": "2026-W06-ATL-C-J-Henderson",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final or continuing injury absence retained explicitly.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Jammie Robinson",
+              "eaPlayerId": "23045",
+              "caseKey": "2026-W06-ATL-Jammie-Robinson",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "Exact kickoff-cover injury and actualreturn retained; known healthy frozen zero proves zero without assigning defensive value to ST-only snaps.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Kendal Daniels",
+              "eaPlayerId": "16377",
+              "caseKey": "2026-W06-ATL-Kendal-Daniels",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "LiteralQ3 8:48injury and laterOUT, noreturn; frozen healthy0 proves zero missing-duty point loss.",
+              "newlyIdentified": true,
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable."
+            },
+            {
+              "team": "ATL",
+              "player": "Avieon Terrell",
+              "eaPlayerId": "16270",
+              "caseKey": "2026-W06-ATL-Avieon-Terrell",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PARTIAL_VALUE_INVARIANT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Equal frozen0.2 healthy/relief values prove zero for either documented interval including uncertain second start. Preserve both actualreturns and later independent Bowman vacancy.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "roleRationale": "Available direct nickel reserve Bowman fills both actual Terrell intervals. Both known healthy/relief0.2; both Terrell actual returns occur before Bowman later injury, no overlap with Longerbeam relief.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Billy Bowman Jr",
+                  "eaPlayerId": "15332"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "activeEffectivenessConvention": "NO_UNREPORTED_IMPAIRMENT"
+            },
+            {
+              "team": "ATL",
+              "player": "Divine Deablo",
+              "eaPlayerId": "21667",
+              "caseKey": "2026-W06-ATL-Divine-Deablo",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Actual available linebacker Woods fills Deablo vacancy. ChristianHarris inactive, Perkins reserved normal Daniels-role relief; no duplicate Ivey edge credit.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "roleRationale": "Actual available linebacker Woods fills Deablo vacancy. ChristianHarris inactive, Perkins reserved normal Daniels-role relief; no duplicate Ivey edge credit.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Josh Woods",
+                  "eaPlayerId": "13893"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 506,
+                    "startLatest": 1680,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "gamebook"
+                    ],
+                    "rationale": "LastQ1 6:34tackle toQ2 2:00OUT bounds departure; no invented exact start or later return."
+                  }
+                ]
+              }
+            },
+            {
+              "team": "ATL",
+              "player": "Billy Bowman Jr",
+              "eaPlayerId": "15332",
+              "caseKey": "2026-W06-ATL-Billy-Bowman-Jr",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "rationale": "Source-bound injury absence retained in the healthy role inventory.",
+              "newlyIdentified": true,
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Available reserve corner Longerbeam fills only Bowman later nickel-depth vacancy, after Avieon has returned; Ford reserved AJTerrell, no duplicate relief.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the additional vacancy duty is valued; preserve all common baseline assignments and distinct other absences. Documented-depth allocation is an explicit counterfactual assumption, not measured workload.",
+              "baselineSourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "roleRationale": "Available reserve corner Longerbeam fills only Bowman later nickel-depth vacancy, after Avieon has returned; Ford reserved AJTerrell, no duplicate relief.",
+              "roleSourceIds": [
+                "gamebook",
+                "atl-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Robert Longerbeam",
+                  "eaPlayerId": "15324"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1680,
+                    "startLatest": 3026,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "gamebook"
+                    ],
+                    "rationale": "LastQ2 2:00confirmed tackle toQ4 9:34doubtful bounds departure. No actualreturn; broad midpoint limitation explicit."
+                  }
+                ]
+              }
+            },
+            {
+              "team": "ATL",
+              "player": "Jake Matthews",
+              "eaPlayerId": "12349",
+              "caseKey": "2026-W06-ATL-Jake-Matthews",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final availability active; no reported injury-driven missing duty.",
+              "newlyIdentified": true,
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "ATL",
+              "player": "Mike Hughes",
+              "eaPlayerId": "13148",
+              "caseKey": "2026-W06-ATL-Mike-Hughes",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final availability active; no reported injury-driven missing duty.",
+              "newlyIdentified": true,
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "ATL",
+              "player": "Za'Darius Smith",
+              "eaPlayerId": "2554",
+              "caseKey": "2026-W06-ATL-Za'Darius-Smith",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final availability active; no reported injury-driven missing duty.",
+              "newlyIdentified": true,
+              "resolution": "ACTIVE_FULL"
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Tua Tagovailoa",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "Penix complete competitive QB duty; reserve/emergency unused."
+            },
+            {
+              "player": "Cooper Rush",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "Penix complete competitive QB duty; reserve/emergency unused."
+            },
+            {
+              "player": "Jack Strand",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "rationale": "Penix complete competitive QB duty; reserve/emergency unused."
+            },
+            {
+              "player": "Malcolm DeWalt IV",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final inactive reserves without injury designation; no inactive Jackson replacement credit."
+            },
+            {
+              "player": "Christian Harris",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final inactive reserves without injury designation; no inactive Jackson replacement credit."
+            },
+            {
+              "player": "Ethan Onianwa",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final inactive reserves without injury designation; no inactive Jackson replacement credit."
+            },
+            {
+              "player": "Drake Jackson",
+              "category": "HEALTHY_SCRATCH",
+              "sourceIds": [
+                "atl-final",
+                "gamebook"
+              ],
+              "rationale": "Final inactive reserves without injury designation; no inactive Jackson replacement credit."
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "K/P/LS",
+              "sourceIds": [
+                "gamebook"
+              ],
+              "finding": "Primary specialist roles filled, with no reviewed injury-driven substitution or missing duty."
+            }
+          ],
+          "specialistCases": [],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "sourceIds": [
+              "gamebook"
+            ],
+            "rationale": "Starting quarterback handled competitive game duty. Any injury-driven replacement is recorded separately below; unused backup/emergency roles create no loss."
+          },
+          "clusterReviews": [
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "atl-roster",
+                "atl-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "atl-roster",
+                "atl-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            },
+            {
+              "group": "LINEBACKER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "atl-roster",
+                "atl-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            },
+            {
+              "group": "RUNNING_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "sourceIds": [
+                "gamebook",
+                "atl-roster",
+                "atl-transactions"
+              ],
+              "rationale": "Distinct vacancy duties; each added-work replacement reserved once. Preserve other baseline duties. Use additive loss without an unsupported extra unit multiplier."
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "gamebook",
+              "atl-roster",
+              "atl-transactions"
+            ],
+            "rationale": "No simultaneous absence of both highest-valued expected receiving options; common healthy primary receivers remain available."
+          },
+          "topReceiverClusterReviewed": true
+        }
+      ],
+      "corrections": [
+        "All reserve types and actual activation/release chronology included. Week5 corrective reserve evidence reused only for continuing roles; this game has independent final availability and partial exposures."
+      ]
+    }
+  ],
+  "valueEstimates": [
+    {
+      "player": "Storm Norton",
+      "identity": "estimate:storm-norton",
+      "position": "LT",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 63,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "storm-value"
+      ],
+      "roleSourceIds": [
+        "atl-roster",
+        "atl-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "DeAngelo Malone",
+      "identity": "estimate:deangelo-malone",
+      "position": "EDGE",
+      "method": "POSITION_GROUP_MEDIAN",
+      "estimateAcknowledged": true,
+      "rationale": "Source-supported historical position-group estimate for an otherwise unrated non-QB. Frozen cohort sensitivity retained; no old rating or registry overwritten.",
+      "officialAndIndependentSearchCompleted": true,
+      "searchFinding": "Both frozen/official and independent currentNFL27 exact identity searches completed; independent page explicitly rating unavailable. Use frozen defensive-line cohort median with full sensitivity for established NFL edge reserve.",
+      "sourceIds": [
+        "malone-official-search",
+        "malone-independent-search"
+      ],
+      "roleSourceIds": [
+        "atl-roster",
+        "atl-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "Hayden Large",
+      "identity": "estimate:hayden-large",
+      "position": "TE",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 57,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-haydenlarge"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "chi-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "Dallis Flowers",
+      "identity": "estimate:dallis-flowers",
+      "position": "CB",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 66,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-dallisflowers"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "chi-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "Jonathan Garvin",
+      "identity": "estimate:jonathan-garvin",
+      "position": "EDGE",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 66,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-jonathangarvin"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "chi-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "Nikola Kalinic",
+      "identity": "estimate:nikola-kalinic",
+      "position": "TE",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 58,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-nikolakalinic"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "chi-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "J. Michael Sturdivant",
+      "identity": "estimate:j-michael-sturdivant",
+      "position": "WR",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 68,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-jmichaelsturdivant"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "gb-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "Anthony Campbell",
+      "identity": "estimate:anthony-campbell",
+      "position": "DT",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 64,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-anthonycampbell"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "gb-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    },
+    {
+      "player": "Laken Tomlinson",
+      "identity": "estimate:laken-tomlinson",
+      "position": "LG",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 74,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+      "sourceIds": [
+        "value-lakentomlinson"
+      ],
+      "roleSourceIds": [
+        "gamebook",
+        "gb-transactions"
+      ],
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ]
+    }
+  ],
+  "playerAliases": [
+    {
+      "player": "Zach Bako-Bewele",
+      "frozenPlayer": "Zach Tom",
+      "eaPlayerId": "22434",
+      "gameKeys": [
+        "2026-W06-CHI-ATL"
+      ],
+      "sourceIds": [
+        "gb-official-bako-bewele-identity"
+      ],
+      "rationale": "Official legal-name continuation of frozen identity and unchanged1.2 point value."
+    }
+  ]
+}

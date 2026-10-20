@@ -53,6 +53,10 @@ function latePriorWeekHandoff(g,ledgerTeams,byTeam,input,observed,kickoff){
   const events=ledgerTeams.map((team,i)=>{
     const post=(team.history||[]).filter(e=>Date.parse(e.effectiveAt)>kickoff);
     const e=post[0],binding=handoff.teams.find(b=>b.team===team.abbr);
+    if(!post.length){
+      if(team.currentRating!==observed[i]||binding?.observedKickoffRating!==observed[i]||binding?.mode!=='NO_LATE_PRIOR_WEEK_INPUT'||binding.eventSha256!==undefined||binding.pairedEventSha256!==undefined)fail('UNCHANGED_PRIOR_WEEK_HANDOFF_INELIGIBLE:'+team.abbr);
+      return null;
+    }
     if(post.length!==1||!e||e.type!=='WALTERS_WEEKLY_90_10'||e.season!==input.season||e.sourceWeek!==input.sourceWeek-1||e.targetWeek!==input.sourceWeek||e.toRating!==team.currentRating||e.fromRating!==observed[i]||Date.parse(e.effectiveAt)>=Date.parse(input.effectiveAt)||!e.gameDayEvidenceBinding||binding?.observedKickoffRating!==observed[i]||binding?.eventSha256!==eventDigest(e))fail('LATE_PRIOR_WEEK_HANDOFF_INELIGIBLE:'+team.abbr);
     const opp=byTeam.get(e.opponent),paired=(opp?.history||[]).filter(p=>p.type===e.type&&p.season===e.season&&p.sourceWeek===e.sourceWeek&&p.targetWeek===e.targetWeek&&p.gameKey===e.gameKey);
     if(paired.length!==1||binding.pairedEventSha256!==eventDigest(paired[0]))fail('LATE_PRIOR_WEEK_PAIR_BINDING:'+team.abbr);
@@ -68,7 +72,7 @@ function latePriorWeekHandoff(g,ledgerTeams,byTeam,input,observed,kickoff){
     if(a.oldRating!==b.opponentOldRating||b.oldRating!==a.opponentOldRating||a.scoreMargin!==-b.scoreMargin||a.teamInjuryLoss!==b.opponentInjuryLoss||b.teamInjuryLoss!==a.opponentInjuryLoss||a.teamLocationAdvantage!==-b.teamLocationAdvantage)fail('LATE_PRIOR_WEEK_PAIR_SNAPSHOT');
     return e;
   });
-  return {ratings:events.map(e=>e.toRating),provenance:{...structuredClone(handoff),publicationTiming:'FORWARD_RECOVERY_AFTER_GAME; NOT_AVAILABLE_AT_KICKOFF',observedKickoffRatings:ledgerTeams.map((t,i)=>({team:t.abbr,rating:observed[i]})),logicalPriorWeekRatings:ledgerTeams.map((t,i)=>({team:t.abbr,rating:events[i].toRating})),priorWeekEvents:events.map(e=>({gameKey:e.gameKey,sequence:e.sequence,auditId:e.auditId,effectiveAt:e.effectiveAt,eventSha256:eventDigest(e)}))}};
+  return {ratings:events.map((e,i)=>e?.toRating??observed[i]),provenance:{...structuredClone(handoff),publicationTiming:'FORWARD_RECOVERY_AFTER_GAME; NOT_AVAILABLE_AT_KICKOFF',observedKickoffRatings:ledgerTeams.map((t,i)=>({team:t.abbr,rating:observed[i]})),logicalPriorWeekRatings:ledgerTeams.map((t,i)=>({team:t.abbr,rating:events[i]?.toRating??observed[i]})),priorWeekEvents:events.filter(Boolean).map(e=>({gameKey:e.gameKey,sequence:e.sequence,auditId:e.auditId,effectiveAt:e.effectiveAt,eventSha256:eventDigest(e)}))}};
 }
 function weeklyUpdate(input,power,active,prior){
   const verifyGameEvidence=createWeeklyEvidenceVerifier(ROOT,input);
@@ -212,6 +216,24 @@ if(process.argv[2]==='--self-test'){
     return x;
   };
   test('bound delayed preceding weekly pair is applied once without rewriting history',()=>{const x=delayedFixture(),before=x.power.teams.map(t=>structuredClone(t.history)),r=run(x);assert.equal(r.state,'COMPLETE');assert.equal(r.ratingChanges.length,4);x.power.teams.forEach((t,i)=>assert.deepEqual(t.history.slice(0,before[i].length),before[i]));assert.equal(x.power.teams[0].currentRating,11.2282);assert.equal(x.power.teams[0].history.at(-1).chronologicalHandoff.observedKickoffRatings[0].rating,10);const applied=JSON.stringify(x.power.teams);x.input={...x.input,auditId:'replay',resume:true,games:[]};assert.equal(run(x).ratingChanges.length,0);assert.equal(JSON.stringify(x.power.teams),applied);});
+  const mixedFixture=()=>{
+    const x=delayedFixture(),ts=x.power.teams.slice(0,4),es=ts.map(t=>t.history.at(-1));
+    // Two prior-week pairs cross this week's pairings: A-C delayed, B-D timely.
+    for(let i=0;i<4;i++){
+      const opp=[2,3,0,1][i],positive=i===0||i===3,e=es[i];
+      e.opponent=ts[opp].abbr;e.gameKey=i===0||i===2?'prior-A-C':'prior-B-D';
+      e.effectiveAt=i===0||i===2?'2026-09-16T11:00:00-07:00':'2026-09-16T09:00:00-07:00';
+      e.tgplInputs.scoreMargin=positive?4:-4;const c=weeklyCalculation(e.tgplInputs);Object.assign(e,{tgpl:c.tgpl,toRating:c.newRating,delta:c.delta});ts[i].currentRating=e.toRating;
+    }
+    for(const g of x.input.games){
+      g.chronologicalHandoff.teams=[g.away,g.home].map(team=>{const i=ts.findIndex(t=>t.abbr===team),late=i===0||i===2;return late?{team,observedKickoffRating:10,eventSha256:eventDigest(es[i]),pairedEventSha256:eventDigest(es[[2,3,0,1][i]])}:{team,observedKickoffRating:es[i].toRating,mode:'NO_LATE_PRIOR_WEEK_INPUT'};});
+      g.teams.forEach(t=>{t.oldRating=ts.find(x=>x.abbr===t.team).currentRating;t.opponentOldRating=ts.find(x=>x.abbr===t.opponent).currentRating;});
+    }
+    return x;
+  };
+  test('mixed timely and delayed prior pairs retain both histories',()=>{const x=mixedFixture(),before=x.power.teams.map(t=>structuredClone(t.history)),r=run(x);assert.equal(r.state,'COMPLETE');assert.equal(r.ratingChanges.length,4);x.power.teams.forEach((t,i)=>assert.deepEqual(t.history.slice(0,before[i].length),before[i]));assert.equal(x.power.teams[0].history.at(-1).chronologicalHandoff.priorWeekEvents.length,1);});
+  test('unchanged side cannot conceal current rating drift',()=>{const x=mixedFixture();x.power.teams[1].currentRating=99;const before=JSON.stringify(x.power.teams.slice(0,2));assert.equal(run(x).blockedGames.length,1);assert.equal(JSON.stringify(x.power.teams.slice(0,2)),before);});
+  test('unchanged side requires explicit no-late-input binding',()=>{const x=mixedFixture();delete x.input.games[0].chronologicalHandoff.teams[1].mode;const before=JSON.stringify(x.power.teams.slice(0,2));assert.equal(run(x).blockedGames.length,1);assert.equal(JSON.stringify(x.power.teams.slice(0,2)),before);});
   for(const [label,change] of [
     ['manual transaction',x=>x.power.teams[0].history.at(-1).type='DURABLE'],
     ['wrong prior week',x=>x.power.teams[0].history.at(-1).sourceWeek=0],
