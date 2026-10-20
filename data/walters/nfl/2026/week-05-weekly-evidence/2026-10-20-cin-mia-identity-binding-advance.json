@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 5,
+  "recordedAt": "2026-10-20T20:14:00Z",
+  "scope": "Additive CIN-MIA frozen-identity binding advance. It uses Miami's official August 31 waiver-claim transaction to bind Reese Taylor and Justin Joly to the exact Denver identities already frozen in the production registry and closes both injury-driven Week 5 inactive cases at their existing calibrated 0.0 values. It reuses the complete paired candidate inventory immutably, preserves every positive-value UNRESOLVED role case and does not mark the pair READY, stage ratings, alter the active manifest or current-week overlays, construct a fair, consult a market, or issue a bet.",
+  "inputCommit": "f658080ba09eaf5046c3f9f4f99d8d3a6cecbf5c",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-05-personnel-ledger.json": "9742571a068351ad7a11af00cc035cdf06274e9a",
+    "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-complete-candidate-inventory.json": "594236be6207e84acaf617f7395a7d1903033f5c"
+  },
+  "marketViewed": false,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "priorEvidenceBindings": [
+    {
+      "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-complete-candidate-inventory.json",
+      "commit": "d469c26b2063739696dffe6783d5cb50344b0003",
+      "blob": "594236be6207e84acaf617f7395a7d1903033f5c",
+      "treatment": "IMMUTABLE_COMPLETE_CANDIDATE_INVENTORY"
+    }
+  ],
+  "sources": [
+    {
+      "id": "dolphins-aug31-waiver-claims",
+      "url": "https://www.miamidolphins.com/news/dolphins-make-roster-moves-x8672",
+      "kind": "OFFICIAL",
+      "gameKeys": ["2026-W05-CIN-MIA"],
+      "finding": "Miami's August 31 transaction notice states that the club claimed cornerback Reese Taylor and tight end Justin Joly off waivers from Denver, binding both Miami Week 5 identities to the exact Denver-tagged players in the frozen registry.",
+      "checkedAt": "2026-10-20T20:14:00Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W05-CIN-MIA",
+      "away": "CIN",
+      "home": "MIA",
+      "state": "BLOCKED",
+      "boundInventory": {
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-complete-candidate-inventory.json",
+        "blobSha": "594236be6207e84acaf617f7395a7d1903033f5c",
+        "coverage": "COMPLETE_PAIRED_CANDIDATE_INVENTORY"
+      },
+      "checklist": {
+        "pairedFinalInactiveInventory": "COMPLETE",
+        "pairedReserveInventory": "COMPLETE_IDENTITIES_ROLE_RECONCILIATION_OPEN",
+        "pairedParticipationInventory": "COMPLETE",
+        "pairedInGameInjuryTimeline": "COMPLETE_LITERAL",
+        "pairedQbDuty": "COMPLETE_NO_INJURY_LOSS",
+        "pairedSpecialistDuty": "COMPLETE_NO_INJURY_LOSS",
+        "miaReeseTaylorFrozenIdentity": "COMPLETE_OFFICIAL_TRANSACTION_BINDING",
+        "miaJustinJolyFrozenIdentity": "COMPLETE_OFFICIAL_TRANSACTION_BINDING",
+        "pairedGameDayInjuryLoss": "BLOCKED_EXPLICIT_POSITIVE_VALUE_ROLE_CASES"
+      },
+      "newlyReconciledFindings": [
+        {
+          "team": "MIA",
+          "player": "Reese Taylor",
+          "eaPlayerId": "4768",
+          "caseKey": "2026-W05-MIA-Reese-Taylor",
+          "availabilityStatus": "OUT_INACTIVE",
+          "healthyValue": 0.0,
+          "resolution": "ZERO_CALIBRATED_LOSS",
+          "replacementAwareLoss": 0.0,
+          "finding": "Miami officially claimed Reese Taylor from Denver on August 31. That transaction binds the Week 5 Miami inactive to EA player 4768 already frozen under Denver at 0.0; the value is reused, not inferred.",
+          "sourceIds": ["dolphins-aug31-waiver-claims", "data/walters/nfl/player-values/player-values-2026-v1.json"]
+        },
+        {
+          "team": "MIA",
+          "player": "Justin Joly",
+          "eaPlayerId": "16274",
+          "caseKey": "2026-W05-MIA-Justin-Joly",
+          "availabilityStatus": "OUT_INACTIVE",
+          "healthyValue": 0.0,
+          "resolution": "ZERO_CALIBRATED_LOSS",
+          "replacementAwareLoss": 0.0,
+          "finding": "Miami officially claimed Justin Joly from Denver on August 31. That transaction binds the Week 5 Miami inactive to EA player 16274 already frozen under Denver at 0.0; the value is reused, not inferred.",
+          "sourceIds": ["dolphins-aug31-waiver-claims", "data/walters/nfl/player-values/player-values-2026-v1.json"]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Cincinnati's complete candidate inventory leaves two positive-value cases open: Kyle Dugger (0.5) needs source-bound added safety duty, and Andrei Iosivas (0.2) needs a nonduplicated receiver-role allocation.",
+          "footballImpact": "These roles determine Cincinnati's complete game-day injury loss and therefore the paired 90/10 rating change.",
+          "nextAction": "Bind the actual added duties from official depth/film or use the authority-approved disjoint committee method, preserving existing replacement baselines. The gamebook shows P.J. Jules and Russ Yeast on special teams only, which does not by itself establish Dugger's defensive replacement effect.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "Miami's complete candidate inventory leaves positive-value whole-game and partial-game duties open for De'Von Achane (1.2), Darrell Baker Jr (0.2), Trey Moore (0.2), Jordyn Brooks (0.9 over 980 seconds), JuJu Brents (0.2 over separate 234- and 393-second intervals), and Ollie Gordon II (0.2 over 278 seconds). Reese Taylor and Justin Joly are now source-bound zero-calibrated closures.",
+          "footballImpact": "The remaining cases determine Miami's complete game-day injury loss; Achane and the Brooks/Brents intervals are materially positive.",
+          "nextAction": "Resolve the explicit per-case source or method decisions in the bound inventory, keep Achane and Gordon duty disjoint, reserve every replacement once and run the running-back and defensive-back cluster safeguards.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "CALCULATION_NOT_RUN_INVENTORY_CANDIDATE_ONLY",
+          "finding": "The paired identity inventory is complete and the two stale-team identities are now closed, but positive-value replacement reconciliation is not complete, so no complete team injury-loss totals or READY evaluator payload exist.",
+          "footballImpact": "Publishing a subtotal would misstate completion and could corrupt chronological carried ratings.",
+          "nextAction": "After the listed positive-value role cases close, promote both bound team inventories to FINAL_GAME_DAY, compute complete losses, run tools/graham-weekly-evidence.mjs and only then stage the pair with the current carried-rating updater.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
