@@ -37,13 +37,16 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
     const blockers=applied?[]:conflict?[{code:'PAIRED_HISTORY_CONFLICT',finding:'Missing, duplicate or mismatched paired weekly history.',nextAction:'Reconcile the original paired transaction; do not replay either side.',owner:'GRAHAM_WALTERS_90_10'}]:
       latest?.game.state==='READY'?[]:latest?list(latest.game.blockers):oldReasons.map(finding=>({code:'RECEIPT_ONLY_BLOCKER',finding,nextAction:'Bind the current missing input in a source-week evidence bundle.',owner:'GRAHAM_WALTERS_90_10'}));
     const state=applied?'APPLIED':conflict?'BLOCKED_HISTORY':latest?.game.state==='READY'?'VALIDATE_AND_PUBLISH':latest?'RECONCILE':'PREPARE';
+    const workClass=state==='APPLIED'?'DONE':state==='VALIDATE_AND_PUBLISH'?'READY_FOR_VALIDATION':
+      blockers.some(b=>['SOURCE_NOT_YET_AVAILABLE','METHOD_DECISION_REQUIRED'].includes(b.code))?'WAITING_SOURCE_OR_METHOD':
+      blockers.some(b=>['REPLACEMENT_OR_VALUE_UNRESOLVED','IDENTITY_CONFLICT','PAIRED_HISTORY_CONFLICT'].includes(b.code))?'TARGETED_RECONCILIATION':'AVAILABLE_WORK';
     const fingerprint=digest({state,checklist,blockers});
     const old=previous.find(p=>p.gameKey===game.gameKey);
     const firstSeenAt=old?.firstSeenAt||records.at(-1)?.bundle.recordedAt||effectiveAt;
     const lastEvidenceAt=latest?.bundle.recordedAt||null;
     const unchangedSince=old?.fingerprint===fingerprint?old.unchangedSince:(lastEvidenceAt||firstSeenAt);
     const stalled=state!=='APPLIED'&&Date.parse(effectiveAt)-Date.parse(unchangedSince)>=6*3600000;
-    rows.push({gameKey:game.gameKey,away:game.away,home:game.home,state,
+    rows.push({gameKey:game.gameKey,away:game.away,home:game.home,state,workClass,
       latestEvidence:latest?{path:latest.bundle.path,blobSha:latest.bundle.blobSha,recordedAt:lastEvidenceAt}:null,
       checklist,blockers,firstSeenAt,lastEvidenceAt,unchangedSince,stalled,fingerprint,
       receiptBlockerSuperseded:!applied&&!!receiptBlocked&&!!latest&&Date.parse(lastEvidenceAt)>Date.parse(receipt.appliedAt),
@@ -51,9 +54,10 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
         blockers[0]?.nextAction||'Complete the paired final-game inventory from the official gamebook, then validate supported estimates.',
       escalation:stalled?'UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient.':null});
   }
-  // Ready work first, then the oldest stalled dependency. There is no one-game quota.
-  const rank={VALIDATE_AND_PUBLISH:0,BLOCKED_HISTORY:1,RECONCILE:2,PREPARE:3,APPLIED:4};
-  return rows.sort((a,b)=>rank[a.state]-rank[b.state]||Number(b.stalled)-Number(a.stalled)||Date.parse(a.firstSeenAt)-Date.parse(b.firstSeenAt)||a.gameKey.localeCompare(b.gameKey));
+  // Work that can actually close a pair comes before a repeatedly unavailable
+  // source. The latter stays visible as an escalation, without starving the slate.
+  const rank={READY_FOR_VALIDATION:0,AVAILABLE_WORK:1,TARGETED_RECONCILIATION:2,WAITING_SOURCE_OR_METHOD:3,DONE:4};
+  return rows.sort((a,b)=>rank[a.workClass]-rank[b.workClass]||Number(b.stalled)-Number(a.stalled)||Date.parse(a.firstSeenAt)-Date.parse(b.firstSeenAt)||a.gameKey.localeCompare(b.gameKey));
 }
 
 export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,activeEvidence=[],activeFinals,effectiveAt,previous=null}){
