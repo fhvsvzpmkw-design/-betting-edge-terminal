@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 6,
-  "generatedAt": "2026-10-20T21:19:41.241Z",
+  "generatedAt": "2026-10-20T21:21:29.083Z",
   "state": "BLOCKED",
   "counts": {
-    "historicalApplied": 13,
+    "historicalApplied": 14,
     "historicalExpected": 15,
     "historicalReadyToValidate": 1,
-    "stalledHistoricalGames": 1,
+    "stalledHistoricalGames": 0,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 14,
     "ratingBasesBehind": 14,
@@ -46,24 +46,9 @@
         "owner": "GRAHAM_WALTERS_90_10",
         "sourceWeek": 5,
         "targetWeek": 6,
-        "gamesApplied": 13,
+        "gamesApplied": 14,
         "gamesExpected": 15,
         "blockedGames": [
-          {
-            "gameKey": "2026-W05-CHI-GB",
-            "away": "CHI",
-            "home": "GB",
-            "reasons": [
-              "AVAILABLE_EVIDENCE_NOT_RECONCILED: CHI LB T.J. Edwards (hamstring) was ruled out in-game. Exact lost interval, relief identity and linebacker cluster context are not yet bound. RECOVERY_ACTION: Reconcile the official final gamebook clock/participation and a disjoint active linebacker replacement, then calculate the approved partial-time loss.",
-              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Kyle Monangai and Edgerrin Cooper estimates are reusable, but complete paired inactive/DNP, QB, specialist and in-game coverage remains unvalidated. RECOVERY_ACTION: Assemble the full paired game-day record and run tools/graham-weekly-evidence.mjs."
-            ],
-            "sourceRefs": [
-              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
-              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
-              "data/walters/nfl/2026/week-05-current-numbers.json",
-              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
-            ]
-          },
           {
             "gameKey": "2026-W05-SF-SEA",
             "away": "SF",
@@ -207,7 +192,7 @@
       },
       {
         "code": "WEEKLY_RATINGS_INCOMPLETE",
-        "gamesUpdated": 13,
+        "gamesUpdated": 14,
         "gamesExpected": 15
       },
       {
@@ -364,11 +349,98 @@
   },
   "historicalGames": [
     {
+      "gameKey": "2026-W05-SF-SEA",
+      "away": "SF",
+      "home": "SEA",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-sf-sea-ready-reconciliation.json",
+        "blobSha": "c8c78d960b1a4986c3a723d3b43af68b6503cef4",
+        "recordedAt": "2026-10-20T21:19:02Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
+        },
+        "savedAvailabilityClosures": {
+          "state": [
+            "SEA George Holani ACTIVE_NOT_INACTIVE",
+            "SF Dre Greenlaw EJECTION_NOT_INJURY_LOSS"
+          ],
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
+        },
+        "final": {
+          "state": {
+            "state": "FINAL",
+            "awayScore": 32,
+            "homeScore": 29
+          },
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
+        },
+        "frozenKickoff": {
+          "state": {
+            "awayRating": 29.5262844,
+            "homeRating": 29.621639,
+            "homeFieldAdvantagePoints": 2.082,
+            "preserved": true
+          },
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
+        },
+        "pairedGameDayLoss": {
+          "state": "BLOCKED_ROLE_RECONCILIATION",
+          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-12T01:12:15.000Z",
+      "lastEvidenceAt": "2026-10-20T21:19:02Z",
+      "unchangedSince": "2026-10-20T21:19:02Z",
+      "stalled": false,
+      "fingerprint": "82840ae1aaaf4559bd3718cb59f1c483899a3f730ae0d85093a49725559e1986",
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
+    {
+      "gameKey": "2026-W05-TB-DAL",
+      "away": "TB",
+      "home": "DAL",
+      "state": "APPLIED",
+      "workClass": "DONE",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-09-tb-dal-final-preparation.json",
+        "blobSha": "c144253e5b87729577c216c604f6a739becdd755",
+        "recordedAt": "2026-10-09T05:07:26.489Z"
+      },
+      "checklist": {},
+      "blockers": [],
+      "firstSeenAt": "2026-10-09T05:07:26.489Z",
+      "lastEvidenceAt": "2026-10-09T05:07:26.489Z",
+      "unchangedSince": "2026-10-09T05:07:26.489Z",
+      "stalled": false,
+      "fingerprint": "77165326842523ece5ea22e6dd1fa003334a7f5227d95554a90b789b93a639e8",
+      "receiptBlockerSuperseded": false,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "PRESERVE_PAIRED_HISTORY",
+      "escalation": null
+    },
+    {
       "gameKey": "2026-W05-CHI-GB",
       "away": "CHI",
       "home": "GB",
-      "state": "VALIDATE_AND_PUBLISH",
-      "workClass": "READY_FOR_VALIDATION",
+      "state": "APPLIED",
+      "workClass": "DONE",
       "latestEvidence": {
         "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-chi-gb-ready-reconciliation.json",
         "blobSha": "522db6aba30da908b060a82e6c79e97ef5d93bfa",
@@ -525,107 +597,7 @@
       "lastEvidenceAt": "2026-10-20T21:15:41Z",
       "unchangedSince": "2026-10-20T21:15:41Z",
       "stalled": false,
-      "fingerprint": "bf9eaf18e6243b5e89338b6904bfbb74c20f882ad52241c3796fe056fe32011c",
-      "receiptBlockerSuperseded": true,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
-      "escalation": null
-    },
-    {
-      "gameKey": "2026-W05-SF-SEA",
-      "away": "SF",
-      "home": "SEA",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
-        "blobSha": "e0553e99f829931dcfb6d594cba2642de764bd39",
-        "recordedAt": "2026-10-13T17:05:22.000Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
-        },
-        "savedAvailabilityClosures": {
-          "state": [
-            "SEA George Holani ACTIVE_NOT_INACTIVE",
-            "SF Dre Greenlaw EJECTION_NOT_INJURY_LOSS"
-          ],
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sf-sea-final-preparation.json"
-        },
-        "final": {
-          "state": {
-            "state": "FINAL",
-            "awayScore": 32,
-            "homeScore": 29
-          },
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
-        },
-        "frozenKickoff": {
-          "state": {
-            "awayRating": 29.5262844,
-            "homeRating": 29.621639,
-            "homeFieldAdvantagePoints": 2.082,
-            "preserved": true
-          },
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
-        },
-        "pairedGameDayLoss": {
-          "state": "BLOCKED_ROLE_RECONCILIATION",
-          "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The prior Drake Thomas open-through-game-end premise is corrected: the gamebook records an actual Q4 14:11 return. Cowing and Kareem also have explicit returns; Samuel has an injury/out sequence. Greenlaw remains a non-injury ejection exclusion.",
-          "nextAction": "Bind frozen values, exact exposure intervals and disjoint additional-duty replacements for Thomas, Samuel, Cowing and Kareem; preserve all actual returns and exclude the ejection.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "The archived Juszczyk and Charbonnet vacancies, newly identified pregame absences and the corrected in-game intervals still lack one complete disjoint role allocation and paired cluster review.",
-          "nextAction": "Adopt supported primary or approved committee duties, reserve each added role once, assemble both team sections and run the evaluator.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-12T01:12:15.000Z",
-      "lastEvidenceAt": "2026-10-13T17:05:22.000Z",
-      "unchangedSince": "2026-10-13T17:05:22.000Z",
-      "stalled": true,
-      "fingerprint": "0ddccb508c2e5f155c968ded643cbfc28b6b476db1f937ac3cd576808fa77e5d",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Bind frozen values, exact exposure intervals and disjoint additional-duty replacements for Thomas, Samuel, Cowing and Kareem; preserve all actual returns and exclude the ejection.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W05-TB-DAL",
-      "away": "TB",
-      "home": "DAL",
-      "state": "APPLIED",
-      "workClass": "DONE",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-09-tb-dal-final-preparation.json",
-        "blobSha": "c144253e5b87729577c216c604f6a739becdd755",
-        "recordedAt": "2026-10-09T05:07:26.489Z"
-      },
-      "checklist": {},
-      "blockers": [],
-      "firstSeenAt": "2026-10-09T05:07:26.489Z",
-      "lastEvidenceAt": "2026-10-09T05:07:26.489Z",
-      "unchangedSince": "2026-10-09T05:07:26.489Z",
-      "stalled": false,
-      "fingerprint": "77165326842523ece5ea22e6dd1fa003334a7f5227d95554a90b789b93a639e8",
+      "fingerprint": "7a3fe23128d1076df19488b93ca2d638ccdea82dd50ac900606078832f17fd51",
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "PRESERVE_PAIRED_HISTORY",
@@ -2375,25 +2347,19 @@
       ]
     },
     {
-      "code": "STALLED_HISTORICAL_RECOVERY",
-      "games": [
-        "2026-W05-SF-SEA"
-      ]
-    },
-    {
       "code": "NEXT_WEEK_NOT_ACTIVATED",
       "expectedWeek": 7,
       "reason": "Historical learning still incomplete."
     }
   ],
-  "customerMessage": "Week 7 has not been published. Historical rating updates: 13/15; completed Week 6 evidence ready: 0/14.",
+  "customerMessage": "Week 7 has not been published. Historical rating updates: 14/15; completed Week 6 evidence ready: 0/14.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
   "inputBlobs": {
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
-    "data/walters/nfl-power-ratings-ledger.json": "f3d398283e06a1a30c5010f02fed783cc131ac44",
-    "data/walters/nfl/carried-rating-audit-staging.json": "0e41ed6521d29e32518dc4f6ea77361239688ad5",
+    "data/walters/nfl-power-ratings-ledger.json": "f8291ecbea70e0bc3d5e669860ab5b3c6f280b94",
+    "data/walters/nfl/carried-rating-audit-staging.json": "f996235bd733809d059afe1a48c9e0aa737d6176",
     "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json": "634212078a0f17644380304a16c3b30804ad5256",
@@ -2436,6 +2402,7 @@
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-ready-reconciliation.json": "2871d723603cecfadd65cef8e62535338e1567a6",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-nyg-was-ready-reconciliation.json": "5e354bde496ac9413020366d76224f241251d15f",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-phi-jax-ready-reconciliation.json": "7f61d20cea5e51cc70d3bb8c82204939f53893ce",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-sf-sea-ready-reconciliation.json": "c8c78d960b1a4986c3a723d3b43af68b6503cef4",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-final-preparation.json": "b3416f599f4114cf29dad5335e5c82e4847fb30c",
