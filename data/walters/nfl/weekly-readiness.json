@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 6,
-  "generatedAt": "2026-10-20T21:04:06.769Z",
+  "generatedAt": "2026-10-20T21:06:29.152Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 11,
     "historicalExpected": 15,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 4,
+    "historicalReadyToValidate": 1,
+    "stalledHistoricalGames": 3,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 14,
     "ratingBasesBehind": 12,
@@ -112,7 +112,7 @@
             ]
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -241,6 +241,9 @@
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 11,
         "gamesExpected": 15
+      },
+      {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
       },
       {
         "code": "FAIR_RATING_INPUT_STALE",
@@ -396,12 +399,12 @@
       "gameKey": "2026-W05-PHI-JAX",
       "away": "PHI",
       "home": "JAX",
-      "state": "RECONCILE",
-      "workClass": "AVAILABLE_WORK",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
-        "blobSha": "42a1f7e8dd97bfcb9c39b45f4ec19eade74ba989",
-        "recordedAt": "2026-10-12T00:56:34.000Z"
+        "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-phi-jax-ready-reconciliation.json",
+        "blobSha": "7f61d20cea5e51cc70d3bb8c82204939f53893ce",
+        "recordedAt": "2026-10-20T21:04:42Z"
       },
       "checklist": {
         "verifiedFinalResult": {
@@ -417,35 +420,16 @@
           "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json"
         }
       },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "PHI OLB Jonathan Greenard was inactive with an ankle injury and JAX S Eric Murray was inactive with a concussion; neither identity is in the saved currentCases snapshot, so both are newly identified historical cases with no governed replacement/value adoption yet.",
-          "nextAction": "Bind both exact identities and frozen values, establish game-active replacement roles from the final gamebook/depth evidence, and run cluster/double-count review.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "PHI RB Will Shipley (foot), LB Jalyx Hunt (ankle/knee) and DB Michael Carter II (abdomen) were ruled out in-game. The injury monitor establishes the exits but not complete source-bound lost intervals and disjoint replacement duties. Jeremiah Trotter Jr.'s opening-kickoff removal was an ejection, not injury loss.",
-          "nextAction": "Reconcile the official final gamebook play/status clock and participation for each injury-driven exit, then apply the governed partial-time/replacement method without charging the ejection.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "All archived PHI/JAX Week 5 cases and the final inactive list are available, but full final inactive/DNP, specialist, quarterback-duty and in-game injury coverage has not yet been assembled into an evaluator-ready pair.",
-          "nextAction": "Promote the saved case estimates and new cases into one complete paired final-game evidence record and run tools/graham-weekly-evidence.mjs.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
+      "blockers": [],
       "firstSeenAt": "2026-10-12T00:56:34.000Z",
-      "lastEvidenceAt": "2026-10-12T00:56:34.000Z",
-      "unchangedSince": "2026-10-12T00:56:34.000Z",
-      "stalled": true,
-      "fingerprint": "b0070158435e8b224f0f4c509ca891ba0b82fa7b4e589f3aac3e4e0aac1523bf",
-      "receiptBlockerSuperseded": false,
+      "lastEvidenceAt": "2026-10-20T21:04:42Z",
+      "unchangedSince": "2026-10-20T21:04:42Z",
+      "stalled": false,
+      "fingerprint": "008c2313fb574c4620e619c3e516df9b4cd38d2e45de1343764d087a7ca7a098",
+      "receiptBlockerSuperseded": true,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Bind both exact identities and frozen values, establish game-active replacement roles from the final gamebook/depth evidence, and run cluster/double-count review.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
     },
     {
       "gameKey": "2026-W05-NYG-WAS",
@@ -2461,7 +2445,6 @@
     {
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
-        "2026-W05-PHI-JAX",
         "2026-W05-NYG-WAS",
         "2026-W05-SF-SEA",
         "2026-W05-CHI-GB"
@@ -2480,7 +2463,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl-power-ratings-ledger.json": "66f7656de6a1e36b36b4482219e0500d9afe187c",
-    "data/walters/nfl/carried-rating-audit-staging.json": "16d185550a716c3a4f52eeaef140ae0ce9fe2e7a",
+    "data/walters/nfl/carried-rating-audit-staging.json": "b6be75043439ff7942a12218ad5481ac073659e5",
     "data/walters/nfl/2026/week-05-current-numbers.json": "35da1fa67de52ea484176710849265aed3f61d3c",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-personnel-closeout.json": "634212078a0f17644380304a16c3b30804ad5256",
@@ -2520,6 +2503,7 @@
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-ind-pit-ready-reconciliation.json": "ddefa82fa0b21483777a75b398510fa3c76aedc7",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-injury-inventory-advance.json": "d4a8bc48714ed88267c3d7f7204f5e22d22551c4",
     "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-lv-ne-ready-reconciliation.json": "2871d723603cecfadd65cef8e62535338e1567a6",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-phi-jax-ready-reconciliation.json": "7f61d20cea5e51cc70d3bb8c82204939f53893ce",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-final-preparation.json": "b3416f599f4114cf29dad5335e5c82e4847fb30c",
