@@ -99,9 +99,11 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
       g.weeklyRatingInput={...g.weeklyRatingInput,state:'COMPLETE',sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,awayCurrentRating:away.currentRating,homeCurrentRating:home.currentRating,awayUpdateState:'UPDATED',homeUpdateState:'UPDATED',blockedTeams:[],sourceBlobSha:powerBlobSha,appliedToFair:true,applicationStatus:'APPLIED',marketViewed:false};
       if(!baselinePending&&g.numberStatus==='READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT')g.numberStatus=(g.personnelUnresolvedCases?.length||g.personnelBlockedGroups?.length||String(g.qbPerformanceStatus).startsWith('FAIL_CLOSED'))?'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS':'READY';
     }
-    if(result.baselineStatus==='TUESDAY_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='TUESDAY_BASELINE_COMPLETE';
-    if(result.baselineStatus==='CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='CURRENT_BASELINE_COMPLETE';
-    if(result.state==='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED')result.state=result.games.some(g=>g.numberStatus==='READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS')?'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS':'INFORMATION_REVIEW_CURRENT_FAIR';
+    if(!frozenStartedGames.length){
+      if(result.baselineStatus==='TUESDAY_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='TUESDAY_BASELINE_COMPLETE';
+      if(result.baselineStatus==='CURRENT_BASELINE_COMPLETE_WITH_PARTIAL_BLOCKED_WEEKLY_90_10')result.baselineStatus='CURRENT_BASELINE_COMPLETE';
+      if(result.state==='INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED')result.state=result.games.some(g=>g.numberStatus==='READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS')?'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS':'INFORMATION_REVIEW_CURRENT_FAIR';
+    }
   }
   if(games.length){
     result.updatedAt=effectiveAt;
