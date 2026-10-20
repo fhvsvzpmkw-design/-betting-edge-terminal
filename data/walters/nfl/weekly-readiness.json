@@ -3,13 +3,13 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-20T21:58:24.326Z",
+  "generatedAt": "2026-10-20T22:04:22.061Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 7,
     "historicalExpected": 14,
-    "historicalReadyToValidate": 0,
-    "stalledHistoricalGames": 7,
+    "historicalReadyToValidate": 3,
+    "stalledHistoricalGames": 4,
     "activeWeekEvidenceReady": 0,
     "activeWeekEvidenceExpected": 0,
     "ratingBasesBehind": 0,
@@ -110,7 +110,7 @@
             "sourceRefs": []
           }
         ],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -147,6 +147,9 @@
         "gamesExpected": 14
       },
       {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
+      },
+      {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W07-NE-CHI",
         "personnelCases": [],
@@ -173,12 +176,12 @@
       "gameKey": "2026-W06-BUF-LV",
       "away": "BUF",
       "home": "LV",
-      "state": "RECONCILE",
-      "workClass": "AVAILABLE_WORK",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json",
-        "blobSha": "454733ed02ff04cc4a5ebe1e8de5f6d3728f452c",
-        "recordedAt": "2026-10-19T01:17:00.000Z"
+        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-buf-lv-ready-reconciliation.json",
+        "blobSha": "cdbb754712d9c1c5ae2e87199761cdbfa4cf9663",
+        "recordedAt": "2026-10-20T21:58:37Z"
       },
       "checklist": {
         "verifiedFinalResult": {
@@ -202,40 +205,87 @@
           "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json"
         }
       },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The official final and final inactive inventories for BUF-LV are available and frozen, but every inactive, DNP and continuing reserve-list case has not yet been assembled into complete paired historical team coverage. No missing value is treated as zero.",
-          "nextAction": "Bind each final inactive/DNP and continuing reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run the applicable replacement and cluster safeguards.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The official final gamebook has not yet been immutably bound and reconciled in this preparation. Complete starter/substitute participation, quarterback coverage, printed injury/return sequences and special-teams roles therefore remain uncertified.",
-          "nextAction": "Retrieve and bind the official final gamebook PDF from the NFL game center, then reconcile literal participation and injury/return timelines for both teams without backdating this attempt.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
+      "blockers": [],
       "firstSeenAt": "2026-10-19T01:17:00.000Z",
-      "lastEvidenceAt": "2026-10-19T01:17:00.000Z",
-      "unchangedSince": "2026-10-19T01:17:00.000Z",
-      "stalled": true,
-      "fingerprint": "91b82fb1696c42725f70ce2d5fff8b6cd8bb9f54c726808e0e44fd310579d33d",
-      "receiptBlockerSuperseded": false,
+      "lastEvidenceAt": "2026-10-20T21:58:37Z",
+      "unchangedSince": "2026-10-20T21:58:37Z",
+      "stalled": false,
+      "fingerprint": "f3099cb92c043f084f257773bc1091a2b8c78ecd1299c7909fc63f5367f8fa9b",
+      "receiptBlockerSuperseded": true,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Bind each final inactive/DNP and continuing reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run the applicable replacement and cluster safeguards.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
+    },
+    {
+      "gameKey": "2026-W06-NYJ-NE",
+      "away": "NYJ",
+      "home": "NE",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-nyj-ne-ready-reconciliation.json",
+        "blobSha": "f931554af0777eaf7cc5726fcc084a7a3339926c",
+        "recordedAt": "2026-10-20T21:57:43Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "finalInactiveInventories": {
+          "state": "COMPLETE_SOURCE_BOUND",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "officialInGameInjuryReporting": {
+          "state": "CAPTURED_NOT_YET_INTERVAL_RECONCILED",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json"
+        },
+        "officialFinalGamebook": {
+          "state": "COMPLETE_SOURCE_BOUND",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "quarterbackCoverage": {
+          "state": "COMPLETE_NO_GAME_DAY_LOSS",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "specialistCoverage": {
+          "state": "COMPLETE_NO_INJURY_LOSS",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        },
+        "literalInGameInjuryTimeline": {
+          "state": "COMPLETE_FOR_PRINTED_GAMEBOOK_EVENTS",
+          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
+        }
+      },
+      "blockers": [],
+      "firstSeenAt": "2026-10-19T01:17:00.000Z",
+      "lastEvidenceAt": "2026-10-20T21:57:43Z",
+      "unchangedSince": "2026-10-20T21:57:43Z",
+      "stalled": false,
+      "fingerprint": "7b3815769fa071590024842b21a76a07210db594d962803f5e6d4caccf3cf5ee",
+      "receiptBlockerSuperseded": true,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
     },
     {
       "gameKey": "2026-W06-PIT-TB",
       "away": "PIT",
       "home": "TB",
-      "state": "RECONCILE",
-      "workClass": "AVAILABLE_WORK",
+      "state": "VALIDATE_AND_PUBLISH",
+      "workClass": "READY_FOR_VALIDATION",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json",
-        "blobSha": "454733ed02ff04cc4a5ebe1e8de5f6d3728f452c",
-        "recordedAt": "2026-10-19T01:17:00.000Z"
+        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-pit-tb-ready-reconciliation.json",
+        "blobSha": "7f5df387102cdd5d22d22e55bf11d40740c87248",
+        "recordedAt": "2026-10-20T22:02:50Z"
       },
       "checklist": {
         "verifiedFinalResult": {
@@ -259,29 +309,16 @@
           "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json"
         }
       },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The official final and final inactive inventories for PIT-TB are available and frozen, but every inactive, DNP and continuing reserve-list case has not yet been assembled into complete paired historical team coverage. No missing value is treated as zero.",
-          "nextAction": "Bind each final inactive/DNP and continuing reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run the applicable replacement and cluster safeguards.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The official final gamebook has not yet been immutably bound and reconciled in this preparation. Complete starter/substitute participation, quarterback coverage, printed injury/return sequences and special-teams roles therefore remain uncertified.",
-          "nextAction": "Retrieve and bind the official final gamebook PDF from the NFL game center, then reconcile literal participation and injury/return timelines for both teams without backdating this attempt.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
+      "blockers": [],
       "firstSeenAt": "2026-10-19T01:17:00.000Z",
-      "lastEvidenceAt": "2026-10-19T01:17:00.000Z",
-      "unchangedSince": "2026-10-19T01:17:00.000Z",
-      "stalled": true,
-      "fingerprint": "f4e4cc4d0144acc2a53a6d8f98b951b81c2f47a2bfe93ac7970e25c393ed04dc",
-      "receiptBlockerSuperseded": false,
+      "lastEvidenceAt": "2026-10-20T22:02:50Z",
+      "unchangedSince": "2026-10-20T22:02:50Z",
+      "stalled": false,
+      "fingerprint": "f3099cb92c043f084f257773bc1091a2b8c78ecd1299c7909fc63f5367f8fa9b",
+      "receiptBlockerSuperseded": true,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Bind each final inactive/DNP and continuing reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run the applicable replacement and cluster safeguards.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
+      "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER",
+      "escalation": null
     },
     {
       "gameKey": "2026-W06-ARI-LAR",
@@ -413,91 +450,6 @@
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
       "nextAction": "Bind each final inactive/DNP and continuing reserve-list case to the frozen registry, revalidate activation and final game-day role, reserve every added duty once, and run the applicable replacement and cluster safeguards.",
-      "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
-    },
-    {
-      "gameKey": "2026-W06-NYJ-NE",
-      "away": "NYJ",
-      "home": "NE",
-      "state": "RECONCILE",
-      "workClass": "TARGETED_RECONCILIATION",
-      "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json",
-        "blobSha": "333c116c3df86642eaae5afe2805b4a9ceaf1083",
-        "recordedAt": "2026-10-19T14:04:00Z"
-      },
-      "checklist": {
-        "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "frozenKickoffRatingsAndH4": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "finalInactiveInventories": {
-          "state": "COMPLETE_SOURCE_BOUND",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "officialInGameInjuryReporting": {
-          "state": "CAPTURED_NOT_YET_INTERVAL_RECONCILED",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json"
-        },
-        "officialFinalGamebook": {
-          "state": "COMPLETE_SOURCE_BOUND",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "quarterbackCoverage": {
-          "state": "COMPLETE_NO_GAME_DAY_LOSS",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "specialistCoverage": {
-          "state": "COMPLETE_NO_INJURY_LOSS",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        },
-        "literalInGameInjuryTimeline": {
-          "state": "COMPLETE_FOR_PRINTED_GAMEBOOK_EVENTS",
-          "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json"
-        }
-      },
-      "blockers": [
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
-          "finding": "The official final gamebook, final inactives, quarterbacks, specialists and printed injury sequence are available and reconciled, but the complete paired inactive/DNP/continuing-reserve historical team assembly has not yet passed one evaluator-ready record. Reusable current-week estimates remain case inputs only until final activation, role and cluster review.",
-          "nextAction": "Merge the final NYJ and NE inactive/DNP inventories with every continuing reserve-list case, bind each source/value once, close activation and actual game-day role, reserve every added duty once, and run replacement and cluster safeguards for both teams.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Romeo Doubs has an exact 2,958-second unavailable interval, but no official source yet assigns his additional receiving duties exclusively among the active receiver candidates. Dre'Mont Jones has an exact 82-second injury-to-return interval, but no official source assigns his additional edge duty during that interval. Neither loss may use an invented split.",
-          "nextAction": "Use an official postgame snap/role source or an evaluator-authorized source-bound committee method to allocate only the additional Doubs and Jones duties; preserve every candidate's baseline work and do not infer impairment after Jones returned.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "EXACT_DEPARTURE_UNAVAILABLE",
-          "finding": "The official gamebook and lineup notes establish that Alijah Vera-Tucker left in the second quarter and identify the actual Brown/Pryor relief chain, but they do not identify his exact departure play. The printed Q2 1:23 'return is Questionable' item is only a status update. Kiko Mauigoa likewise has a questionable-return update without a source-bound departure play or actual return.",
-          "nextAction": "Locate an official play/snap participation source that binds the exact departure, or carry a transparently bounded interval only if the current authority/evaluator supports it. Never backdate either loss to a status update and never treat questionable wording as a return.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "PRE_ROLLOVER_PREPARATION_ONLY",
-          "finding": "Week 6 remains the active manifest week and the WAS-SF Monday game is not yet final, so no Week 6 historical rating publication is authorized in this run.",
-          "nextAction": "After the next-week rollover and complete prior-slate FINAL verification, validate all supported Week 6 pairs together through the carried-rating staging/workflow and independently read back remote main.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        }
-      ],
-      "firstSeenAt": "2026-10-19T01:17:00.000Z",
-      "lastEvidenceAt": "2026-10-19T14:04:00Z",
-      "unchangedSince": "2026-10-19T14:04:00Z",
-      "stalled": true,
-      "fingerprint": "472b168145e5aef105a163676b3b97adf7c48619f96ceba88e7f8c18db9f5eb4",
-      "receiptBlockerSuperseded": false,
-      "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Merge the final NYJ and NE inactive/DNP inventories with every continuing reserve-list case, bind each source/value once, close activation and actual game-day role, reserve every added duty once, and run replacement and cluster safeguards for both teams.",
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
@@ -959,11 +911,8 @@
     {
       "code": "STALLED_HISTORICAL_RECOVERY",
       "games": [
-        "2026-W06-BUF-LV",
-        "2026-W06-PIT-TB",
         "2026-W06-ARI-LAR",
         "2026-W06-LAC-KC",
-        "2026-W06-NYJ-NE",
         "2026-W06-WAS-SF",
         "2026-W06-DAL-GB"
       ]
@@ -976,7 +925,7 @@
   "inputBlobs": {
     "data/walters/nfl/2026/week-07-current-numbers.json": "fbf1beb043043e8915a04f76f3c8ab7f06820322",
     "data/walters/nfl-power-ratings-ledger.json": "ac804698573c5d65b16d6d319971b0612c1d76f7",
-    "data/walters/nfl/carried-rating-audit-staging.json": "25146982ce8f34412f6e745baa6b88607b6cac8c",
+    "data/walters/nfl/carried-rating-audit-staging.json": "7d26b2ecc384f9962b1cce7fc576e570f542bc85",
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-sea-den-box-score-reconciliation.json": "e9727fe8a975ae58faef6b2f2015da3bc9cc3098",
@@ -988,10 +937,13 @@
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-18-sunday-final-preparation.json": "454733ed02ff04cc4a5ebe1e8de5f6d3728f452c",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-19-nyj-ne-gamebook-reconciliation.json": "333c116c3df86642eaae5afe2805b4a9ceaf1083",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-bal-cle-ready-reconciliation.json": "23cb326ecc26f2c1ec29485c349c333e5a9e6072",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-buf-lv-ready-reconciliation.json": "cdbb754712d9c1c5ae2e87199761cdbfa4cf9663",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-car-phi-ready-reconciliation.json": "4692a45b6c99a8fd226af7376d79f1f9022f6246",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-chi-atl-ready-reconciliation.json": "604151ef3306ab529f7becda7c44b99d40bb0c04",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-hou-jax-ready-reconciliation.json": "f29eee66b4f9aa5dde3e941933922dcb1853ec61",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-no-nyg-ready-reconciliation.json": "b732e444036e9ad98d78cbc9e30a76a1a9d4bfc7",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-nyj-ne-ready-reconciliation.json": "f931554af0777eaf7cc5726fcc084a7a3339926c",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-pit-tb-ready-reconciliation.json": "7f5df387102cdd5d22d22e55bf11d40740c87248",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-sea-den-ready-reconciliation.json": "297032869d24eb8693c209363e35ee276cc914ff",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-ten-ind-ready-reconciliation.json": "3518684d067eb247c7ef0c7e6b230d9a007642a2",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-final-preparation.json": "fe44c9f2acb22d5467aeeb9e1a5a4f76bcea5c07",
