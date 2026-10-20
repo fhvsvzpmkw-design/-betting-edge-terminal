@@ -96,7 +96,7 @@
   "week": 7,
   "state": "PROVISIONAL_BASELINE_PENDING",
   "createdAt": "2026-10-20T21:24:40.453Z",
-  "updatedAt": "2026-10-20T22:28:14.833Z",
+  "updatedAt": "2026-10-20T22:44:44.101Z",
   "lastResearchAt": null,
   "researchLedgerPath": "data/walters/nfl/2026/week-07-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -146,9 +146,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": 1,
-      "grahamExactFairHome": 1.105,
-      "grahamAsOf": "2026-10-20T22:28:14.833Z",
+      "grahamFairHome": 2,
+      "grahamExactFairHome": 2.015,
+      "grahamAsOf": "2026-10-20T22:44:44.101Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "PUBLISHED_RATING_BASE_SYNCED_BASELINE_PENDING",
       "neutralBaseHome": 3.186597574,
@@ -189,6 +189,36 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "NE",
+          "homeTeam": "CHI",
+          "awayStarter": "Drake Maye",
+          "homeStarter": "Caleb Williams",
+          "awayTeamQbDelta": 0.16,
+          "homeTeamQbDelta": -0.75,
+          "pointsToHomeSpread": 0.91,
+          "reason": "Governed Walters QB differential: NE 0.16 minus CHI -0.75 equals +0.91 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.chicagobears.com/team/depth-chart",
+            "https://www.patriots.com/news/week-7-injury-report-patriots-at-bears",
+            "https://www.chicagobears.com/news/game-recap-bears-improve-to-4-2-with-road-victory-in-atlanta-2026-week-6"
+          ],
+          "effectiveAt": "2026-10-20T22:44:44.101Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
@@ -196,7 +226,16 @@
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
         "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
-        "data/walters/nfl/carried-rating-audit-staging.json"
+        "data/walters/nfl/carried-rating-audit-staging.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.chicagobears.com/team/depth-chart",
+        "https://www.patriots.com/news/week-7-injury-report-patriots-at-bears",
+        "https://www.chicagobears.com/news/game-recap-bears-improve-to-4-2-with-road-victory-in-atlanta-2026-week-6"
       ],
       "personnelBaselineExactFairHome": 1.104597574,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -210,25 +249,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
-      "qbPerformanceFailClosedTeams": [
-        "CHI"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 3.187,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": 1.105,
+        "otherGovernedPointsToHomeSpread": 0.91,
+        "prePersonnelExactFairHome": 2.015,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 1.105,
-        "displayedFairHome": 1,
+        "exactFairHome": 2.015,
+        "displayedFairHome": 2,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +3.187; home field -2.082; other governed +0.000; pre-personnel exact +1.105; personnel +0.000; matchup +0.000; exact Graham home fair +1.105; displayed +1.0.",
-      "priorGrahamFairHome": 1
+      "researchSummary": "Governed fair decomposition: neutral/team base +3.187; home field -2.082; other governed +0.910; pre-personnel exact +2.015; personnel +0.000; matchup +0.000; exact Graham home fair +2.015; displayed +2.0.",
+      "priorGrahamFairHome": 1,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": 1.105,
+      "qbPerformancePointsToHomeSpread": 0.91,
+      "qbPerformanceAwayTeamDelta": 0.16,
+      "qbPerformanceHomeTeamDelta": -0.75,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T22:44:44.101Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-PIT-NO",
@@ -608,8 +655,10 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
-      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
+      "qbPerformanceFailClosedTeams": [
+        "BAL"
+      ],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
@@ -747,8 +796,10 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
-      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
+      "qbPerformanceFailClosedTeams": [
+        "TB"
+      ],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
@@ -905,8 +956,10 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
-      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
+      "qbPerformanceFailClosedTeams": [
+        "NYG"
+      ],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
@@ -2042,13 +2095,15 @@
     "productionAuthority": true,
     "grahamWritesAllowed": true,
     "approvedTeamCount": 32,
-    "currentResolvedTeamCount": 31,
+    "currentResolvedTeamCount": 29,
     "permanentlyExcludedTeams": [],
     "currentFailClosedTeams": [
-      "CHI"
+      "BAL",
+      "NYG",
+      "TB"
     ],
-    "failClosedGameCount": 1,
-    "lastAppliedAt": "2026-10-20T21:25:39.748Z",
+    "failClosedGameCount": 3,
+    "lastAppliedAt": "2026-10-20T22:44:44.101Z",
     "marketViewed": false,
     "postActivationCanaryState": "PENDING"
   },
