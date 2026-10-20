@@ -1,4 +1,6 @@
 import './test-graham-historical-value-estimates.mjs';
+import './test-graham-roster-exit.mjs';
+import './test-graham-historical-ancillary-duty.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {evaluateWeeklyEvidence,loadWeeklyEvidence,gitBlob,boundJson,verifyWeeklyGameEvidence,createWeeklyEvidenceVerifier} from './graham-weekly-evidence.mjs';
