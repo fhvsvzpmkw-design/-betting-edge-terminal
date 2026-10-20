@@ -58,6 +58,9 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     // Published predictions remain as issued once the game starts. The next
     // week is built from the current rating ledger, not a rewritten old fair.
     if(Date.parse(g.startTimePacific)<=Date.parse(effectiveAt)){frozenStartedGames.push(g.gameKey);continue;}
+    const currentAway=byTeam.get(g.away),currentHome=byTeam.get(g.home);
+    if(!changed.has(g.away)&&!changed.has(g.home)&&currentAway&&currentHome&&
+       g.ratingCarryForward?.awayRating===currentAway.currentRating&&g.ratingCarryForward?.homeRating===currentHome.currentRating)continue;
     const d=deriveGrahamFairDecomposition(g,policy),away=byTeam.get(g.away),home=byTeam.get(g.home);
     if(!away||!home||![away.currentRating,home.currentRating,g.neutralBaseHome,g.ratingCarryForward?.awayRating,g.ratingCarryForward?.homeRating].every(Number.isFinite))fail('RATING_INPUT_MISSING');
     const neutral=decimalSum(away.currentRating,-home.currentRating);
