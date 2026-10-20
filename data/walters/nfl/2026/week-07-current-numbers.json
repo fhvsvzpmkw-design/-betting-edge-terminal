@@ -96,7 +96,7 @@
   "week": 7,
   "state": "PROVISIONAL_BASELINE_PENDING",
   "createdAt": "2026-10-20T21:24:40.453Z",
-  "updatedAt": "2026-10-20T21:24:40.453Z",
+  "updatedAt": "2026-10-20T21:25:39.748Z",
   "lastResearchAt": null,
   "researchLedgerPath": "data/walters/nfl/2026/week-07-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -203,9 +203,8 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
+      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
       "qbPerformanceFailClosedTeams": [
-        "NE",
         "CHI"
       ],
       "fairDecomposition": {
@@ -232,9 +231,9 @@
       "venue": "Stade de France, Saint-Denis, France",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": 3.5,
-      "grahamExactFairHome": 3.26545014,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": 3,
+      "grahamExactFairHome": 3.005,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": 3.26545014,
@@ -269,13 +268,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "PIT",
+          "homeTeam": "NO",
+          "awayStarter": "Aaron Rodgers",
+          "homeStarter": "Tyler Shough",
+          "awayTeamQbDelta": -0.75,
+          "homeTeamQbDelta": -0.49,
+          "pointsToHomeSpread": -0.26,
+          "reason": "Governed Walters QB differential: PIT -0.75 minus NO -0.49 equals -0.26 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": 3.26545014,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -289,25 +321,33 @@
       "homeFieldAdvantagePoints": 0,
       "homeFieldPointsToHomeSpread": 0,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "PIT",
-        "NO"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 3.265,
         "homeFieldPointsToHomeSpread": 0,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": 3.265,
+        "otherGovernedPointsToHomeSpread": -0.26,
+        "prePersonnelExactFairHome": 3.005,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 3.265,
-        "displayedFairHome": 3.5,
+        "exactFairHome": 3.005,
+        "displayedFairHome": 3,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +3.265; home field +0.000; other governed +0.000; pre-personnel exact +3.265; personnel +0.000; matchup +0.000; exact Graham home fair +3.265; displayed +3.5."
+      "researchSummary": "Governed fair decomposition: neutral/team base +3.265; home field +0.000; other governed -0.260; pre-personnel exact +3.005; personnel +0.000; matchup +0.000; exact Graham home fair +3.005; displayed +3.0.",
+      "priorGrahamFairHome": 3.5,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": 3.265,
+      "qbPerformancePointsToHomeSpread": -0.26,
+      "qbPerformanceAwayTeamDelta": -0.75,
+      "qbPerformanceHomeTeamDelta": -0.49,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-SF-ATL",
@@ -317,9 +357,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": 6,
-      "grahamExactFairHome": 6.02092132,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": 5.5,
+      "grahamExactFairHome": 5.691,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": 8.10292132,
@@ -354,13 +394,50 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "SF",
+          "homeTeam": "ATL",
+          "awayStarter": "Brock Purdy",
+          "homeStarter": "Michael Penix Jr",
+          "awayTeamQbDelta": 0.16,
+          "homeTeamQbDelta": 0.49,
+          "pointsToHomeSpread": -0.33,
+          "reason": "Governed Walters QB differential: SF 0.16 minus ATL 0.49 equals -0.33 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.atlantafalcons.com/news/falcons-injury-report-c-j-henderson-ruled-out-of-week-6-matchup-vs-bears",
+            "https://www.nfl.com/news/falcons-qb-michael-penix-jr-ribs-has-no-injury-designation-will-start-vs-bears"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.atlantafalcons.com/news/falcons-injury-report-c-j-henderson-ruled-out-of-week-6-matchup-vs-bears",
+        "https://www.nfl.com/news/falcons-qb-michael-penix-jr-ribs-has-no-injury-designation-will-start-vs-bears"
       ],
       "personnelBaselineExactFairHome": 6.02092132,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -374,25 +451,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "SF",
-        "ATL"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 8.103,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": 6.021,
+        "otherGovernedPointsToHomeSpread": -0.33,
+        "prePersonnelExactFairHome": 5.691,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 6.021,
-        "displayedFairHome": 6,
+        "exactFairHome": 5.691,
+        "displayedFairHome": 5.5,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +8.103; home field -2.082; other governed +0.000; pre-personnel exact +6.021; personnel +0.000; matchup +0.000; exact Graham home fair +6.021; displayed +6.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base +8.103; home field -2.082; other governed -0.330; pre-personnel exact +5.691; personnel +0.000; matchup +0.000; exact Graham home fair +5.691; displayed +5.5.",
+      "priorGrahamFairHome": 6,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": 6.021,
+      "qbPerformancePointsToHomeSpread": -0.33,
+      "qbPerformanceAwayTeamDelta": 0.16,
+      "qbPerformanceHomeTeamDelta": 0.49,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-CIN-BAL",
@@ -402,9 +487,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -6,
-      "grahamExactFairHome": -5.83067536,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": -4.5,
+      "grahamExactFairHome": -4.331,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -3.74867536,
@@ -439,13 +524,48 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "CIN",
+          "homeTeam": "BAL",
+          "awayStarter": "Joe Burrow",
+          "homeStarter": "Tyler Huntley",
+          "awayTeamQbDelta": -0.75,
+          "homeTeamQbDelta": -2.25,
+          "pointsToHomeSpread": 1.5,
+          "reason": "Governed Walters QB differential: CIN -0.75 minus BAL -2.25 equals +1.50 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://amp.nfl.com/news/ravens-qb-lamar-jackson-ankle-out-sunday-vs-browns-tyler-huntley-to-start-again"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://amp.nfl.com/news/ravens-qb-lamar-jackson-ankle-out-sunday-vs-browns-tyler-huntley-to-start-again"
       ],
       "personnelBaselineExactFairHome": -5.83067536,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -459,25 +579,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "CIN",
-        "BAL"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -3.749,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -5.831,
+        "otherGovernedPointsToHomeSpread": 1.5,
+        "prePersonnelExactFairHome": -4.331,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -5.831,
-        "displayedFairHome": -6,
+        "exactFairHome": -4.331,
+        "displayedFairHome": -4.5,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -3.749; home field -2.082; other governed +0.000; pre-personnel exact -5.831; personnel +0.000; matchup +0.000; exact Graham home fair -5.831; displayed -6.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base -3.749; home field -2.082; other governed +1.500; pre-personnel exact -4.331; personnel +0.000; matchup +0.000; exact Graham home fair -4.331; displayed -4.5.",
+      "priorGrahamFairHome": -6,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -5.831,
+      "qbPerformancePointsToHomeSpread": 1.5,
+      "qbPerformanceAwayTeamDelta": -0.75,
+      "qbPerformanceHomeTeamDelta": -2.25,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-TB-CAR",
@@ -487,9 +615,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -4.5,
-      "grahamExactFairHome": -4.32068478,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": -7,
+      "grahamExactFairHome": -6.821,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -2.23868478,
@@ -524,13 +652,52 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "TB",
+          "homeTeam": "CAR",
+          "awayStarter": "Jalon Daniels",
+          "homeStarter": "Bryce Young",
+          "awayTeamQbDelta": -2.5,
+          "homeTeamQbDelta": 0,
+          "pointsToHomeSpread": -2.5,
+          "reason": "Governed Walters QB differential: TB -2.50 minus CAR 0.00 equals -2.50 points to the home-spread coordinate. TB uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "valuationMethods": {
+            "away": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "https://www.buccaneers.com/news/october-2026-updates",
+            "docs/GRAHAM_QB_PRIOR_ESTIMATES.md",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "https://www.buccaneers.com/news/october-2026-updates",
+        "docs/GRAHAM_QB_PRIOR_ESTIMATES.md",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": -4.32068478,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -544,25 +711,54 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "TB",
-        "CAR"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -2.239,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -4.321,
+        "otherGovernedPointsToHomeSpread": -2.5,
+        "prePersonnelExactFairHome": -6.821,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -4.321,
-        "displayedFairHome": -4.5,
+        "exactFairHome": -6.821,
+        "displayedFairHome": -7,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -2.239; home field -2.082; other governed +0.000; pre-personnel exact -4.321; personnel +0.000; matchup +0.000; exact Graham home fair -4.321; displayed -4.5."
+      "researchSummary": "Governed fair decomposition: neutral/team base -2.239; home field -2.082; other governed -2.500; pre-personnel exact -6.821; personnel +0.000; matchup +0.000; exact Graham home fair -6.821; displayed -7.0.",
+      "priorGrahamFairHome": -4.5,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -4.321,
+      "qbPerformancePointsToHomeSpread": -2.5,
+      "qbPerformanceAwayTeamDelta": -2.5,
+      "qbPerformanceHomeTeamDelta": 0,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [
+        "TB"
+      ],
+      "qbPriorEstimates": [
+        {
+          "team": "TB",
+          "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+          "value": 6,
+          "confidence": "LOW",
+          "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+          "evidenceDropbacks": 0,
+          "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+          "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+          "starterEvidence": {
+            "kind": "OFFICIAL",
+            "team": "TB",
+            "playerId": "16312",
+            "url": "https://www.buccaneers.com/news/october-2026-updates",
+            "observedAt": "2026-10-16T18:37:29.809Z",
+            "finding": "Official October16 update says rookie Jalon Daniels will start for a third straight week Sunday against Pittsburgh; Mayfield ruled OUT."
+          }
+        }
+      ]
     },
     {
       "gameKey": "2026-W07-NYG-HOU",
@@ -572,9 +768,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -6,
-      "grahamExactFairHome": -5.78668936,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": -6.5,
+      "grahamExactFairHome": -6.377,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -3.70468936,
@@ -609,13 +805,50 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "NYG",
+          "homeTeam": "HOU",
+          "awayStarter": "Jameis Winston",
+          "homeStarter": "C.J. Stroud",
+          "awayTeamQbDelta": -1.08,
+          "homeTeamQbDelta": -0.49,
+          "pointsToHomeSpread": -0.59,
+          "reason": "Governed Walters QB differential: NYG -1.08 minus HOU -0.49 equals -0.59 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-wednesday-sept-23",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": -5.78668936,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -629,25 +862,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "NYG",
-        "HOU"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -3.705,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -5.787,
+        "otherGovernedPointsToHomeSpread": -0.59,
+        "prePersonnelExactFairHome": -6.377,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -5.787,
-        "displayedFairHome": -6,
+        "exactFairHome": -6.377,
+        "displayedFairHome": -6.5,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -3.705; home field -2.082; other governed +0.000; pre-personnel exact -5.787; personnel +0.000; matchup +0.000; exact Graham home fair -5.787; displayed -6.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base -3.705; home field -2.082; other governed -0.590; pre-personnel exact -6.377; personnel +0.000; matchup +0.000; exact Graham home fair -6.377; displayed -6.5.",
+      "priorGrahamFairHome": -6,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -5.787,
+      "qbPerformancePointsToHomeSpread": -0.59,
+      "qbPerformanceAwayTeamDelta": -1.08,
+      "qbPerformanceHomeTeamDelta": -0.49,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-IND-MIN",
@@ -658,8 +899,8 @@
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
       "grahamFairHome": -6,
-      "grahamExactFairHome": -6.23526234,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamExactFairHome": -6.075,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -4.15326234,
@@ -694,13 +935,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "IND",
+          "homeTeam": "MIN",
+          "awayStarter": "Daniel Jones",
+          "homeStarter": "Kyler Murray",
+          "awayTeamQbDelta": 0.16,
+          "homeTeamQbDelta": 0,
+          "pointsToHomeSpread": 0.16,
+          "reason": "Governed Walters QB differential: IND 0.16 minus MIN 0.00 equals +0.16 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-thursday-sept-3",
+            "https://www.vikings.com/news/kyler-murray-starting-quarterback-week-3-buccaneers-injury",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-thursday-sept-3",
+        "https://www.vikings.com/news/kyler-murray-starting-quarterback-week-3-buccaneers-injury",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
       ],
       "personnelBaselineExactFairHome": -6.23526234,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -714,25 +988,32 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "IND",
-        "MIN"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -4.153,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -6.235,
+        "otherGovernedPointsToHomeSpread": 0.16,
+        "prePersonnelExactFairHome": -6.075,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -6.235,
+        "exactFairHome": -6.075,
         "displayedFairHome": -6,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -4.153; home field -2.082; other governed +0.000; pre-personnel exact -6.235; personnel +0.000; matchup +0.000; exact Graham home fair -6.235; displayed -6.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base -4.153; home field -2.082; other governed +0.160; pre-personnel exact -6.075; personnel +0.000; matchup +0.000; exact Graham home fair -6.075; displayed -6.0.",
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -6.235,
+      "qbPerformancePointsToHomeSpread": 0.16,
+      "qbPerformanceAwayTeamDelta": 0.16,
+      "qbPerformanceHomeTeamDelta": 0,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-MIA-NYJ",
@@ -742,9 +1023,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -5,
-      "grahamExactFairHome": -4.84139962,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": -4.5,
+      "grahamExactFairHome": -4.511,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -2.75939962,
@@ -779,13 +1060,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "MIA",
+          "homeTeam": "NYJ",
+          "awayStarter": "Malik Willis",
+          "homeStarter": "Geno Smith",
+          "awayTeamQbDelta": 0,
+          "homeTeamQbDelta": -0.33,
+          "pointsToHomeSpread": 0.33,
+          "reason": "Governed Walters QB differential: MIA 0.00 minus NYJ -0.33 equals +0.33 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "FROZEN_STAGE2_PRIOR_RETAINED_ZERO_PERFORMANCE_DELTA",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": -4.84139962,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -799,25 +1113,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "MIA",
-        "NYJ"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -2.759,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -4.841,
+        "otherGovernedPointsToHomeSpread": 0.33,
+        "prePersonnelExactFairHome": -4.511,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -4.841,
-        "displayedFairHome": -5,
+        "exactFairHome": -4.511,
+        "displayedFairHome": -4.5,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -2.759; home field -2.082; other governed +0.000; pre-personnel exact -4.841; personnel +0.000; matchup +0.000; exact Graham home fair -4.841; displayed -5.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base -2.759; home field -2.082; other governed +0.330; pre-personnel exact -4.511; personnel +0.000; matchup +0.000; exact Graham home fair -4.511; displayed -4.5.",
+      "priorGrahamFairHome": -5,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -4.841,
+      "qbPerformancePointsToHomeSpread": 0.33,
+      "qbPerformanceAwayTeamDelta": 0,
+      "qbPerformanceHomeTeamDelta": -0.33,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-CLE-TEN",
@@ -828,8 +1150,8 @@
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
       "grahamFairHome": 1.5,
-      "grahamExactFairHome": 1.37069208,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamExactFairHome": 1.471,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": 3.45269208,
@@ -864,13 +1186,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "CLE",
+          "homeTeam": "TEN",
+          "awayStarter": "Deshaun Watson",
+          "homeStarter": "Cam Ward",
+          "awayTeamQbDelta": -0.65,
+          "homeTeamQbDelta": -0.75,
+          "pointsToHomeSpread": 0.1,
+          "reason": "Governed Walters QB differential: CLE -0.65 minus TEN -0.75 equals +0.10 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": 1.37069208,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -884,25 +1239,32 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "CLE",
-        "TEN"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 3.453,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": 1.371,
+        "otherGovernedPointsToHomeSpread": 0.1,
+        "prePersonnelExactFairHome": 1.471,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 1.371,
+        "exactFairHome": 1.471,
         "displayedFairHome": 1.5,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +3.453; home field -2.082; other governed +0.000; pre-personnel exact +1.371; personnel +0.000; matchup +0.000; exact Graham home fair +1.371; displayed +1.5."
+      "researchSummary": "Governed fair decomposition: neutral/team base +3.453; home field -2.082; other governed +0.100; pre-personnel exact +1.471; personnel +0.000; matchup +0.000; exact Graham home fair +1.471; displayed +1.5.",
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": 1.371,
+      "qbPerformancePointsToHomeSpread": 0.1,
+      "qbPerformanceAwayTeamDelta": -0.65,
+      "qbPerformanceHomeTeamDelta": -0.75,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-DEN-ARI",
@@ -912,9 +1274,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": 9,
-      "grahamExactFairHome": 9.14455354,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": 10,
+      "grahamExactFairHome": 9.795,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": 11.22655354,
@@ -949,13 +1311,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "DEN",
+          "homeTeam": "ARI",
+          "awayStarter": "Bo Nix",
+          "homeStarter": "Jacoby Brissett",
+          "awayTeamQbDelta": 0.32,
+          "homeTeamQbDelta": -0.33,
+          "pointsToHomeSpread": 0.65,
+          "reason": "Governed Walters QB differential: DEN 0.32 minus ARI -0.33 equals +0.65 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": 9.14455354,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -969,25 +1364,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "DEN",
-        "ARI"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 11.227,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": 9.145,
+        "otherGovernedPointsToHomeSpread": 0.65,
+        "prePersonnelExactFairHome": 9.795,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 9.145,
-        "displayedFairHome": 9,
+        "exactFairHome": 9.795,
+        "displayedFairHome": 10,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +11.227; home field -2.082; other governed +0.000; pre-personnel exact +9.145; personnel +0.000; matchup +0.000; exact Graham home fair +9.145; displayed +9.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base +11.227; home field -2.082; other governed +0.650; pre-personnel exact +9.795; personnel +0.000; matchup +0.000; exact Graham home fair +9.795; displayed +10.0.",
+      "priorGrahamFairHome": 9,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": 9.145,
+      "qbPerformancePointsToHomeSpread": 0.65,
+      "qbPerformanceAwayTeamDelta": 0.32,
+      "qbPerformanceHomeTeamDelta": -0.33,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-GB-DET",
@@ -997,9 +1400,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -1,
-      "grahamExactFairHome": -1.09932624,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": -0.5,
+      "grahamExactFairHome": -0.719,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": 0.98267376,
@@ -1034,13 +1437,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "GB",
+          "homeTeam": "DET",
+          "awayStarter": "Jordan Love",
+          "homeStarter": "Jared Goff",
+          "awayTeamQbDelta": 0.16,
+          "homeTeamQbDelta": -0.22,
+          "pointsToHomeSpread": 0.38,
+          "reason": "Governed Walters QB differential: GB 0.16 minus DET -0.22 equals +0.38 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": -1.09932624,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -1054,25 +1490,33 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "GB",
-        "DET"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 0.983,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -1.099,
+        "otherGovernedPointsToHomeSpread": 0.38,
+        "prePersonnelExactFairHome": -0.719,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -1.099,
-        "displayedFairHome": -1,
+        "exactFairHome": -0.719,
+        "displayedFairHome": -0.5,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +0.983; home field -2.082; other governed +0.000; pre-personnel exact -1.099; personnel +0.000; matchup +0.000; exact Graham home fair -1.099; displayed -1.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base +0.983; home field -2.082; other governed +0.380; pre-personnel exact -0.719; personnel +0.000; matchup +0.000; exact Graham home fair -0.719; displayed -0.5.",
+      "priorGrahamFairHome": -1,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -1.099,
+      "qbPerformancePointsToHomeSpread": 0.38,
+      "qbPerformanceAwayTeamDelta": 0.16,
+      "qbPerformanceHomeTeamDelta": -0.22,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-LAR-LV",
@@ -1083,8 +1527,8 @@
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
       "grahamFairHome": 8,
-      "grahamExactFairHome": 8.11933506,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamExactFairHome": 8.009,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": 10.20133506,
@@ -1119,13 +1563,46 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "LAR",
+          "homeTeam": "LV",
+          "awayStarter": "Matthew Stafford",
+          "homeStarter": "Kirk Cousins",
+          "awayTeamQbDelta": -0.16,
+          "homeTeamQbDelta": -0.05,
+          "pointsToHomeSpread": -0.11,
+          "reason": "Governed Walters QB differential: LAR -0.16 minus LV -0.05 equals -0.11 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
       ],
       "personnelBaselineExactFairHome": 8.11933506,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -1139,25 +1616,32 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "LAR",
-        "LV"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": 10.201,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": 8.119,
+        "otherGovernedPointsToHomeSpread": -0.11,
+        "prePersonnelExactFairHome": 8.009,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": 8.119,
+        "exactFairHome": 8.009,
         "displayedFairHome": 8,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base +10.201; home field -2.082; other governed +0.000; pre-personnel exact +8.119; personnel +0.000; matchup +0.000; exact Graham home fair +8.119; displayed +8.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base +10.201; home field -2.082; other governed -0.110; pre-personnel exact +8.009; personnel +0.000; matchup +0.000; exact Graham home fair +8.009; displayed +8.0.",
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": 8.119,
+      "qbPerformancePointsToHomeSpread": -0.11,
+      "qbPerformanceAwayTeamDelta": -0.16,
+      "qbPerformanceHomeTeamDelta": -0.05,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-KC-SEA",
@@ -1168,8 +1652,8 @@
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
       "grahamFairHome": -4,
-      "grahamExactFairHome": -4.12982034,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamExactFairHome": -4.03,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -2.04782034,
@@ -1204,13 +1688,52 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "KC",
+          "homeTeam": "SEA",
+          "awayStarter": "Patrick Mahomes",
+          "homeStarter": "Sam Darnold",
+          "awayTeamQbDelta": -0.65,
+          "homeTeamQbDelta": -0.75,
+          "pointsToHomeSpread": 0.1,
+          "reason": "Governed Walters QB differential: KC -0.65 minus SEA -0.75 equals +0.10 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
+            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
+        "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
       ],
       "personnelBaselineExactFairHome": -4.12982034,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -1224,25 +1747,32 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "KC",
-        "SEA"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -2.048,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -4.13,
+        "otherGovernedPointsToHomeSpread": 0.1,
+        "prePersonnelExactFairHome": -4.03,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -4.13,
+        "exactFairHome": -4.03,
         "displayedFairHome": -4,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -2.048; home field -2.082; other governed +0.000; pre-personnel exact -4.130; personnel +0.000; matchup +0.000; exact Graham home fair -4.130; displayed -4.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base -2.048; home field -2.082; other governed +0.100; pre-personnel exact -4.030; personnel +0.000; matchup +0.000; exact Graham home fair -4.030; displayed -4.0.",
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -4.13,
+      "qbPerformancePointsToHomeSpread": 0.1,
+      "qbPerformanceAwayTeamDelta": -0.65,
+      "qbPerformanceHomeTeamDelta": -0.75,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [],
+      "qbPriorEstimates": []
     },
     {
       "gameKey": "2026-W07-DAL-PHI",
@@ -1252,9 +1782,9 @@
       "venueClass": "DOMESTIC_HOME",
       "sourceUrl": "https://www.nfl.com/schedules/2026/by-week/week-7",
       "status": "SCHEDULED",
-      "grahamFairHome": -4,
-      "grahamExactFairHome": -4.24734494,
-      "grahamAsOf": "2026-10-20T21:24:40.453Z",
+      "grahamFairHome": -2,
+      "grahamExactFairHome": -1.907,
+      "grahamAsOf": "2026-10-20T21:25:39.748Z",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "CURRENT_INFORMATION_REVIEW_PENDING",
       "neutralBaseHome": -2.16534494,
@@ -1289,13 +1819,54 @@
             "data/walters/nfl/home-field/h4-current.json"
           ],
           "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "DAL",
+          "homeTeam": "PHI",
+          "awayStarter": "Dak Prescott",
+          "homeStarter": "Tanner McKee",
+          "awayTeamQbDelta": -0.16,
+          "homeTeamQbDelta": -2.5,
+          "pointsToHomeSpread": 2.34,
+          "reason": "Governed Walters QB differential: DAL -0.16 minus PHI -2.50 equals +2.34 points to the home-spread coordinate. PHI uses a labelled frozen-prior estimate without a qualifying NFL performance sample.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
+            "https://www.philadelphiaeagles.com/news/tanner-mckee-will-be-ready-for-his-moment-2026-nfl-week-6-carolina-panthers",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+            "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
+          ],
+          "effectiveAt": "2026-10-20T21:25:39.748Z",
+          "marketViewed": false
         }
       ],
       "sourceRefs": [
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/home-field/home-field-production-current.json",
         "data/walters/nfl/home-field/h4-current.json",
-        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json"
+        "data/walters/nfl/2026/week-07-schedule-facts-20261020.json",
+        "data/walters/nfl/qb-production/production-contract-v1.json",
+        "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+        "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+        "data/walters/nfl/2026/week-01-research-ledger.json",
+        "core/staging/walters-nfl-seed-dataset-2026.json",
+        "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+        "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
+        "https://www.philadelphiaeagles.com/news/tanner-mckee-will-be-ready-for-his-moment-2026-nfl-week-6-carolina-panthers",
+        "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json",
+        "docs/GRAHAM_QB_PRIOR_ESTIMATES.md"
       ],
       "personnelBaselineExactFairHome": -4.24734494,
       "personnelOverlayPointsToHomeSpread": 0,
@@ -1309,27 +1880,73 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-20T21:24:40.453Z",
-      "qbPerformanceStatus": "FAIL_CLOSED_PENDING_CURRENT_PRODUCTION",
-      "qbPerformanceFailClosedTeams": [
-        "DAL",
-        "PHI"
-      ],
+      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
+      "qbPerformanceFailClosedTeams": [],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
         "neutralTeamBaseHome": -2.165,
         "homeFieldPointsToHomeSpread": -2.082,
-        "otherGovernedPointsToHomeSpread": 0,
-        "prePersonnelExactFairHome": -4.247,
+        "otherGovernedPointsToHomeSpread": 2.34,
+        "prePersonnelExactFairHome": -1.907,
         "personnelPointsToHomeSpread": 0,
         "matchupPointsToHomeSpread": 0,
-        "exactFairHome": -4.247,
-        "displayedFairHome": -4,
+        "exactFairHome": -1.907,
+        "displayedFairHome": -2,
         "arithmeticVerified": true
       },
-      "researchSummary": "Governed fair decomposition: neutral/team base -2.165; home field -2.082; other governed +0.000; pre-personnel exact -4.247; personnel +0.000; matchup +0.000; exact Graham home fair -4.247; displayed -4.0."
+      "researchSummary": "Governed fair decomposition: neutral/team base -2.165; home field -2.082; other governed +2.340; pre-personnel exact -1.907; personnel +0.000; matchup +0.000; exact Graham home fair -1.907; displayed -2.0.",
+      "priorGrahamFairHome": -4,
+      "qbPerformanceProductionId": "walters-qb-performance-production-v1",
+      "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+      "qbPerformanceBaseExactFairHome": -4.247,
+      "qbPerformancePointsToHomeSpread": 2.34,
+      "qbPerformanceAwayTeamDelta": -0.16,
+      "qbPerformanceHomeTeamDelta": -2.5,
+      "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
+      "qbPerformanceLastAppliedAt": "2026-10-20T21:25:39.748Z",
+      "qbPriorEstimateTeams": [
+        "PHI"
+      ],
+      "qbPriorEstimates": [
+        {
+          "team": "PHI",
+          "method": "GRAHAM_FROZEN_QB_PRIOR_ESTIMATE_V1",
+          "value": 6,
+          "confidence": "LOW",
+          "sourceStatus": "BLOCKED_INSUFFICIENT_QB_SAMPLE",
+          "evidenceDropbacks": 86,
+          "limitation": "Labelled Graham estimate from the frozen player prior; no qualifying NFL performance sample. This is not an empirically calibrated probability or uncertainty interval.",
+          "reopenOn": "Official starter change or separately authorized performance-model recalibration",
+          "starterEvidence": {
+            "kind": "OFFICIAL",
+            "team": "PHI",
+            "playerId": "22712",
+            "url": "https://www.philadelphiaeagles.com/news/panthers-vs-eagles-injury-report-2026-nfl-week-6-saquon-barkley-devonta-smith",
+            "observedAt": "2026-10-15T23:54:56.497Z",
+            "finding": "The official October 15 Week 6 Eagles injury report explicitly confirms: Quarterback Tanner McKee will start for the Eagles against the Carolina Panthers on Sunday with Jalen Hurts out."
+          }
+        }
+      ]
     }
   ],
   "fairDecompositionPolicyId": "graham-fair-decomposition-v1",
-  "fairExplanationState": "SYNCHRONIZED"
+  "fairExplanationState": "SYNCHRONIZED",
+  "qbPerformanceProduction": {
+    "state": "OPERATIONAL_SCOPED",
+    "productionId": "walters-qb-performance-production-v1",
+    "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+    "productionAuthority": true,
+    "grahamWritesAllowed": true,
+    "approvedTeamCount": 32,
+    "currentResolvedTeamCount": 31,
+    "permanentlyExcludedTeams": [],
+    "currentFailClosedTeams": [
+      "CHI"
+    ],
+    "failClosedGameCount": 1,
+    "lastAppliedAt": "2026-10-20T21:25:39.748Z",
+    "marketViewed": false,
+    "postActivationCanaryState": "PENDING"
+  }
 }
