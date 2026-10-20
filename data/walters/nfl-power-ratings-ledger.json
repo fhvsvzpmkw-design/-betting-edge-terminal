@@ -7,7 +7,7 @@
   "sport": "NFL",
   "season": 2026,
   "createdAt": "2026-08-30T13:23:00-07:00",
-  "updatedAt": "2026-10-20T20:41:26.549Z",
+  "updatedAt": "2026-10-20T20:46:52.580Z",
   "authority": {
     "owner": "Graham Mercer",
     "waltersInterface": "core/walters-intelligence-interface-v1.4.json",
@@ -13165,10 +13165,10 @@
       "team": "Denver",
       "abbr": "DEN",
       "seedRating": 27,
-      "currentRating": 26.4700956,
-      "priorRating": 27.374322,
-      "lastDelta": -0.9042264,
-      "lastUpdatedAt": "2026-10-08T05:16:00.000Z",
+      "currentRating": 26.18377874,
+      "priorRating": 26.4700956,
+      "lastDelta": -0.28631686,
+      "lastUpdatedAt": "2026-10-20T20:46:52.580Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "PRESEASON_SEED",
       "sourceRefs": [
@@ -13185,7 +13185,11 @@
         "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-den-sf-complete-reconciliation.json",
         "https://static.www.nfl.com/image/upload/v1791201117/gamecenter/aa6b4cf4-4feb-11f1-abca-2c54536568a9.pdf",
         "data/walters/nfl/2026/week-04-personnel-ledger.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-4"
+        "https://www.nfl.com/schedules/2026/by-week/week-4",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+        "data/walters/nfl/2026/week-05-current-numbers.json",
+        "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-5"
       ],
       "history": [
         {
@@ -14817,6 +14821,860 @@
                     ],
                     "gameDurationSeconds": 3600,
                     "assumptionRationale": "Use the explicit quarter/status bound and exact return update; active time is valued normally.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0,
+                    "max": 0
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequence": 4,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w05-to-w06-recovery-20261020204652580",
+          "fromRating": 26.4700956,
+          "priorRating": 26.4700956,
+          "delta": -0.28631686,
+          "toRating": 26.18377874,
+          "currentRating": 26.18377874,
+          "effectiveAt": "2026-10-20T20:46:52.580Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W05-DEN-LAC: TGPL 23.606927; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 5,
+          "targetWeek": 6,
+          "gameKey": "2026-W05-DEN-LAC",
+          "opponent": "LAC",
+          "kickoff": "2026-10-11T13:05:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": 6,
+            "opponentOldRating": 21.782927,
+            "teamInjuryLoss": 3.066,
+            "opponentInjuryLoss": 9.324,
+            "teamLocationAdvantage": -2.082
+          },
+          "tgpl": 23.606927,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+            "data/walters/nfl/2026/week-05-current-numbers.json",
+            "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+            "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+            "https://www.nfl.com/schedules/2026/by-week/week-5"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+            "blobSha": "04c1cc920fce9ec92db7de901389e6b83418e9c5"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "DEN",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-DEN-Michael-Deiter",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Matt-Henningsen",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Frank-Crum",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Caleb-Lohner",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Nick-Gargiulo",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Levelle-Bailey",
+                  "modelId": "graham-zero-imputed-baseline-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "valueProvenance": {
+                    "type": "INDEPENDENT_MADDEN_27",
+                    "policy": "graham-historical-value-estimates-v1",
+                    "valueRange": [
+                      0,
+                      0
+                    ],
+                    "maddenOvr": 63,
+                    "ratingVersion": "MADDEN_NFL_27",
+                    "provider": "EA SPORTS official Madden NFL27",
+                    "limitation": "Independent rating source; range does not measure player-value uncertainty.",
+                    "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+                    "sourceIds": [
+                      "bailey-rating"
+                    ],
+                    "roleSourceIds": [
+                      "den-transactions",
+                      "den-roster"
+                    ],
+                    "gameKeys": [
+                      "2026-W05-DEN-LAC"
+                    ]
+                  },
+                  "limitation": "Point estimate is zero under the explicitly imputed healthy baseline and nonnegative replacement floor. This is not calibrated zero; cohort sensitivity remains in value provenance. No fictional replacement identity or assignment is asserted."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Patrick-Surtain-II",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 2.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 2,
+                  "rawTeamContributionDelta": -2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 2,
+                    "max": 2
+                  },
+                  "weights": [
+                    {
+                      "player": "Jahdae Barron",
+                      "eaPlayerId": "15277",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "One actual starting outside corner is reserved for this vacancy; Abrams-Draine covers the distinct Moss absence, while McMillian retains common nickel duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Riley-Moss",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.3,
+                  "rawTeamContributionDelta": -0.3,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.3,
+                    "max": 0.3
+                  },
+                  "weights": [
+                    {
+                      "player": "Kris Abrams-Draine",
+                      "eaPlayerId": "14954",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The other actual available outside corner fills Moss duty. Both relief values0.2 make the paired outside-corner allocation invariant to swapping the two names, without overlapping duties.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Talanoa-Hufanga",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.366,
+                  "rawTeamContributionDelta": -0.366,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.366,
+                    "max": 0.366
+                  },
+                  "weights": [
+                    {
+                      "player": "Devon Key",
+                      "eaPlayerId": "22623",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Available reserve safety Key fills only Hufanga injury duty. Brandon Jones common baseline and other defensive-back replacements remain separate.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.30527777777777776,
+                    "fractionRange": {
+                      "min": 0.30527777777777776,
+                      "max": 0.30527777777777776
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 2501,
+                        "startLatest": 2501,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "gamebook"
+                        ],
+                        "rationale": "Exact Q3 3:19 injury through end; later questionable/out updates are not returns."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Pat-Bryant-II",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Lil'Jordan Humphrey",
+                      "eaPlayerId": "20501",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Retain Bryant reserve receiving role and source-linked Humphrey promotion. Sutton, Waddle, Franklin and Mims retain baseline; no arbitrary receiver weights.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Jonah-Coleman",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Tyler Badie",
+                      "eaPlayerId": "22052",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The available reserve running back fills only Coleman reserve duty. Dobbins/Harvey retain their common roles, not free duplicated replacement credit.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                }
+              ]
+            },
+            {
+              "team": "LAC",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-LAC-Kayode-Awosika",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Trevor-Penning",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Trey-Pipkins-III",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Isaiah-World",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-KeAndre-Lambert-Smith",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Rodney-Shelley",
+                  "modelId": "graham-zero-imputed-baseline-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "valueProvenance": {
+                    "type": "INDEPENDENT_MADDEN_27",
+                    "policy": "graham-historical-value-estimates-v1",
+                    "valueRange": [
+                      0,
+                      0
+                    ],
+                    "maddenOvr": 65,
+                    "ratingVersion": "MADDEN_NFL_27",
+                    "provider": "EA SPORTS official Madden NFL27",
+                    "limitation": "Independent rating source; range does not measure player-value uncertainty.",
+                    "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+                    "sourceIds": [
+                      "shelley-rating"
+                    ],
+                    "roleSourceIds": [
+                      "lac-inactives",
+                      "lac-roster"
+                    ],
+                    "gameKeys": [
+                      "2026-W05-DEN-LAC"
+                    ]
+                  },
+                  "limitation": "Point estimate is zero under the explicitly imputed healthy baseline and nonnegative replacement floor. This is not calibrated zero; cohort sensitivity remains in value provenance. No fictional replacement identity or assignment is asserted."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Rashawn-Slater",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.7,
+                  "rawTeamContributionDelta": -1.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.7,
+                    "max": 1.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Travis Burke",
+                      "eaPlayerId": "16280",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Final gamebook resolves archived Burke succession to actual LT. Preserve this source-exact binding; Harkey separately fills RT and Slaughter C.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Joe-Alt",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.2,
+                  "rawTeamContributionDelta": -1.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Alex Harkey",
+                      "eaPlayerId": "1804",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual starting RT Harkey fills Alt. Burke is reserved for Slater; no duplicate tackle credit or artificial position-switch penalty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Tyler-Biadasz",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Jake Slaughter",
+                      "eaPlayerId": "16287",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual starting center Slaughter fills Biadasz; Logan Taylor plays LG in the separate zero-valued guard absence chain. Healthy starting guards retain their original values; no duplicate Slaughter credit for guard and center.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Denzel-Perryman",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.5,
+                  "rawTeamContributionDelta": -0.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Troy Dye",
+                      "eaPlayerId": "21274",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual available starting linebacker Dye supplies the additional unavailable inside-linebacker duty. Henley/Phillips retain common duty; no second case uses Dye.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Donte-Jackson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Cam Hart",
+                      "eaPlayerId": "14960",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Direct available corner depth Hart fills Jackson-created outside duty. Still/Molden preserve baseline; no duplicated Shelley loss from a missing rating.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Derwin-James-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.9,
+                  "replacementValueRatio": {
+                    "numerator": 0.9,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.8,
+                  "rawTeamContributionDelta": -0.8,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.8,
+                    "max": 0.8
+                  },
+                  "weights": [
+                    {
+                      "player": "Tony Jefferson",
+                      "eaPlayerId": "9879",
+                      "lockedValue": 0.9,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Direct available safety depth Jefferson fills James duty. Molden and other safety baseline duty retained.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-David-Njoku",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Oronde Gadsden",
+                      "eaPlayerId": "15122",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Gadsden supplies the additional receiving tight-end duty; Kolar and Rucci retain common TE assignments. This case is separate from the depleted WR unit.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Quentin-Johnston",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Marquez Valdes-Scantling",
+                      "eaPlayerId": "13366",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual starting available outside receiver MVS fills Johnston duty. Reserve Davis only for McConkey and Wease only for Harris; preserve all common baseline assignments.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Ladd-McConkey",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.9,
+                  "rawTeamContributionDelta": -0.9,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.9,
+                    "max": 0.9
+                  },
+                  "weights": [
+                    {
+                      "player": "Derius Davis",
+                      "eaPlayerId": "22819",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Emergency-only injury availability and DNP establish loss of normal receiving duty, despite active roster status. Named available same-position depth Davis fills only that vacancy under the documented-depth assumption, not an observed target-share claim.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Tre'-Harris",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.083,
+                  "rawTeamContributionDelta": -0.083,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.062,
+                    "max": 0.105
+                  },
+                  "weights": [
+                    {
+                      "player": "Theo Wease Jr",
+                      "eaPlayerId": "estimate:theo-wease-jr",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Available receiving depth Wease fills only Harris injury-created duty, preserving earlier common receiving work. MVS/Davis already allocated to separate whole-game receiver absences.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.4172222222222222,
+                    "fractionRange": {
+                      "min": 0.3086111111111111,
+                      "max": 0.5258333333333334
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1707,
+                        "startLatest": 2489,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "gamebook"
+                        ],
+                        "rationale": "Departure bounded from last confirmed active target Q2 1:33 to Q3 3:31 questionable update. Club confirms hamstring exit and no later return; midpoint is explicit, not backdated status time."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Brenen-Thompson",
+                  "modelId": "graham-capacity-limited-loss-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "CAPACITY_LIMITED_LOSS_ESTIMATE",
+                  "healthyValue": 0.2,
+                  "replacementValue": null,
+                  "injuryLoss": 0.1,
+                  "rawTeamContributionDelta": -0.1,
+                  "injuryLossRange": [
+                    0,
+                    0.2
+                  ],
+                  "assumptionRationale": "Approved midpoint of0..0.2 incremental reserve vacancy loss when the documented active receiver reserve capacity is committed. This is not a fabricated replacement rating or an assertion of measured workload; retain full sensitivity.",
+                  "capacityRationale": "Final active non-emergency WR set is Harris, MVS, Davis and Wease. Harris is independently injured; MVS/Davis/Wease are reserved once for Johnston/McConkey/Harris. Lambert-Smith remains IR. Kolar/Rucci retain tight-end baseline with no sourced conversion into this receiver reserve role, and Gadsden covers Njoku. Emergency-only McConkey cannot be presumed fully effective spare capacity. The full0..healthy bound acknowledges uncertain marginal reserve effect.",
+                  "limitation": "Midpoint of bounded incremental vacancy loss when distinct healthy replacement capacity is exhausted. No fabricated player, replacement rating, measured workload or calibrated zero; range is model sensitivity, not a confidence interval."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Bud-Dupree",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": true,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Akheem Mesidor",
+                      "eaPlayerId": "16336",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Available edge reserve Mesidor fills only Dupree added rotational duty. Equal-or-higher replacement value makes the loss floor zero for every bounded timing choice; other edge baseline duty is preserved.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.735,
+                    "fractionRange": {
+                      "min": 0.47,
+                      "max": 1
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 0,
+                        "startLatest": 1908,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "gamebook"
+                        ],
+                        "rationale": "Only injury status available by Q3 13:12; source does not identify earlier last active snap. Broad0..1908 departure bound is explicit; later out confirms persistence. Point loss zero throughout the range."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
                     "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
                     "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
                   },
@@ -33114,10 +33972,10 @@
       "team": "LA Chargers",
       "abbr": "LAC",
       "seedRating": 24.5,
-      "currentRating": 21.782927,
-      "priorRating": 21.151588,
-      "lastDelta": 0.631339,
-      "lastUpdatedAt": "2026-10-08T13:16:00.000Z",
+      "currentRating": 22.06924386,
+      "priorRating": 21.782927,
+      "lastDelta": 0.28631686,
+      "lastUpdatedAt": "2026-10-20T20:46:52.580Z",
       "lastUpdateType": "WALTERS_WEEKLY_90_10",
       "confidence": "CURRENT_RESEARCH_GOVERNED_LAYER_CLEAN",
       "sourceRefs": [
@@ -33146,7 +34004,11 @@
         "data/walters/nfl/2026/week-04-weekly-evidence/2026-10-08-lac-sea-complete-reconciliation.json",
         "https://static.www.nfl.com/image/upload/v1791201124/gamecenter/aa6b4255-4feb-11f1-abca-2c54536568a9.pdf",
         "data/walters/nfl/2026/week-04-personnel-ledger.json",
-        "https://www.nfl.com/schedules/2026/by-week/week-4"
+        "https://www.nfl.com/schedules/2026/by-week/week-4",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+        "data/walters/nfl/2026/week-05-current-numbers.json",
+        "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+        "https://www.nfl.com/schedules/2026/by-week/week-5"
       ],
       "history": [
         {
@@ -35215,6 +36077,860 @@
                   "roleAllocationRange": {
                     "min": 1.2,
                     "max": 1.2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequence": 7,
+          "type": "WALTERS_WEEKLY_90_10",
+          "auditId": "walters-weekly-90-10-2026-w05-to-w06-recovery-20261020204652580",
+          "fromRating": 21.782927,
+          "priorRating": 21.782927,
+          "delta": 0.28631686,
+          "toRating": 22.06924386,
+          "currentRating": 22.06924386,
+          "effectiveAt": "2026-10-20T20:46:52.580Z",
+          "reason": "Walters weekly arithmetic with evidence-bound injury inputs from 2026-W05-DEN-LAC: TGPL 24.6460956; 90% frozen pregame rating plus 10% TGPL.",
+          "season": 2026,
+          "sourceWeek": 5,
+          "targetWeek": 6,
+          "gameKey": "2026-W05-DEN-LAC",
+          "opponent": "DEN",
+          "kickoff": "2026-10-11T13:05:00-07:00",
+          "tgplInputs": {
+            "scoreMargin": -6,
+            "opponentOldRating": 26.4700956,
+            "teamInjuryLoss": 9.324,
+            "opponentInjuryLoss": 3.066,
+            "teamLocationAdvantage": 2.082
+          },
+          "tgpl": 24.6460956,
+          "formulaIds": [
+            "BW-R016",
+            "BW-R017",
+            "BW-R018"
+          ],
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+            "data/walters/nfl/2026/week-05-current-numbers.json",
+            "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+            "GRAHAM_WEEKLY_90_10_AUTHORITY.md",
+            "https://www.nfl.com/schedules/2026/by-week/week-5"
+          ],
+          "marketViewed": false,
+          "gameDayEvidenceBinding": {
+            "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
+            "blobSha": "04c1cc920fce9ec92db7de901389e6b83418e9c5"
+          },
+          "gameDayModelEstimates": [
+            {
+              "team": "DEN",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-DEN-Michael-Deiter",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Matt-Henningsen",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Frank-Crum",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Caleb-Lohner",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Nick-Gargiulo",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Levelle-Bailey",
+                  "modelId": "graham-zero-imputed-baseline-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "valueProvenance": {
+                    "type": "INDEPENDENT_MADDEN_27",
+                    "policy": "graham-historical-value-estimates-v1",
+                    "valueRange": [
+                      0,
+                      0
+                    ],
+                    "maddenOvr": 63,
+                    "ratingVersion": "MADDEN_NFL_27",
+                    "provider": "EA SPORTS official Madden NFL27",
+                    "limitation": "Independent rating source; range does not measure player-value uncertainty.",
+                    "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+                    "sourceIds": [
+                      "bailey-rating"
+                    ],
+                    "roleSourceIds": [
+                      "den-transactions",
+                      "den-roster"
+                    ],
+                    "gameKeys": [
+                      "2026-W05-DEN-LAC"
+                    ]
+                  },
+                  "limitation": "Point estimate is zero under the explicitly imputed healthy baseline and nonnegative replacement floor. This is not calibrated zero; cohort sensitivity remains in value provenance. No fictional replacement identity or assignment is asserted."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Patrick-Surtain-II",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 2.2,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 2,
+                  "rawTeamContributionDelta": -2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 2,
+                    "max": 2
+                  },
+                  "weights": [
+                    {
+                      "player": "Jahdae Barron",
+                      "eaPlayerId": "15277",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "One actual starting outside corner is reserved for this vacancy; Abrams-Draine covers the distinct Moss absence, while McMillian retains common nickel duty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Riley-Moss",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.3,
+                  "rawTeamContributionDelta": -0.3,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.3,
+                    "max": 0.3
+                  },
+                  "weights": [
+                    {
+                      "player": "Kris Abrams-Draine",
+                      "eaPlayerId": "14954",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The other actual available outside corner fills Moss duty. Both relief values0.2 make the paired outside-corner allocation invariant to swapping the two names, without overlapping duties.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Talanoa-Hufanga",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.366,
+                  "rawTeamContributionDelta": -0.366,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.366,
+                    "max": 0.366
+                  },
+                  "weights": [
+                    {
+                      "player": "Devon Key",
+                      "eaPlayerId": "22623",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Available reserve safety Key fills only Hufanga injury duty. Brandon Jones common baseline and other defensive-back replacements remain separate.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 1.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.30527777777777776,
+                    "fractionRange": {
+                      "min": 0.30527777777777776,
+                      "max": 0.30527777777777776
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 2501,
+                        "startLatest": 2501,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "gamebook"
+                        ],
+                        "rationale": "Exact Q3 3:19 injury through end; later questionable/out updates are not returns."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Pat-Bryant-II",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Lil'Jordan Humphrey",
+                      "eaPlayerId": "20501",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Retain Bryant reserve receiving role and source-linked Humphrey promotion. Sutton, Waddle, Franklin and Mims retain baseline; no arbitrary receiver weights.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-DEN-Jonah-Coleman",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.2,
+                  "rawTeamContributionDelta": -0.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Tyler Badie",
+                      "eaPlayerId": "22052",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "The available reserve running back fills only Coleman reserve duty. Dobbins/Harvey retain their common roles, not free duplicated replacement credit.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                }
+              ]
+            },
+            {
+              "team": "LAC",
+              "estimates": [
+                {
+                  "caseKey": "2026-W05-LAC-Kayode-Awosika",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Trevor-Penning",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Trey-Pipkins-III",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Isaiah-World",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-KeAndre-Lambert-Smith",
+                  "modelId": "graham-zero-calibrated-loss-v1",
+                  "method": "ZERO_CALIBRATED_LOSS",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "proof": "All calibrated non-QB replacement values are nonnegative; max(0, 0 - replacement) = 0. No missing player value is set to zero."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Rodney-Shelley",
+                  "modelId": "graham-zero-imputed-baseline-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "healthyValue": 0,
+                  "replacementValue": null,
+                  "assumptionRationale": "Known healthy point value is zero and the replacement floor is nonnegative. Missing ratings are not set to zero. Estimated value provenance is retained when applicable.",
+                  "valueProvenance": {
+                    "type": "INDEPENDENT_MADDEN_27",
+                    "policy": "graham-historical-value-estimates-v1",
+                    "valueRange": [
+                      0,
+                      0
+                    ],
+                    "maddenOvr": 65,
+                    "ratingVersion": "MADDEN_NFL_27",
+                    "provider": "EA SPORTS official Madden NFL27",
+                    "limitation": "Independent rating source; range does not measure player-value uncertainty.",
+                    "rationale": "Exact identity missing from frozen registry. Source-bound retrospective rating through unchanged conversion, without overwriting any frozen identity or value.",
+                    "sourceIds": [
+                      "shelley-rating"
+                    ],
+                    "roleSourceIds": [
+                      "lac-inactives",
+                      "lac-roster"
+                    ],
+                    "gameKeys": [
+                      "2026-W05-DEN-LAC"
+                    ]
+                  },
+                  "limitation": "Point estimate is zero under the explicitly imputed healthy baseline and nonnegative replacement floor. This is not calibrated zero; cohort sensitivity remains in value provenance. No fictional replacement identity or assignment is asserted."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Rashawn-Slater",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.7,
+                  "rawTeamContributionDelta": -1.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.7,
+                    "max": 1.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Travis Burke",
+                      "eaPlayerId": "16280",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Final gamebook resolves archived Burke succession to actual LT. Preserve this source-exact binding; Harkey separately fills RT and Slaughter C.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Joe-Alt",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 1.2,
+                  "rawTeamContributionDelta": -1.2,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 1.2,
+                    "max": 1.2
+                  },
+                  "weights": [
+                    {
+                      "player": "Alex Harkey",
+                      "eaPlayerId": "1804",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual starting RT Harkey fills Alt. Burke is reserved for Slater; no duplicate tackle credit or artificial position-switch penalty.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Tyler-Biadasz",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Jake Slaughter",
+                      "eaPlayerId": "16287",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual starting center Slaughter fills Biadasz; Logan Taylor plays LG in the separate zero-valued guard absence chain. Healthy starting guards retain their original values; no duplicate Slaughter credit for guard and center.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Denzel-Perryman",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.5,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.5,
+                  "rawTeamContributionDelta": -0.5,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.5,
+                    "max": 0.5
+                  },
+                  "weights": [
+                    {
+                      "player": "Troy Dye",
+                      "eaPlayerId": "21274",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual available starting linebacker Dye supplies the additional unavailable inside-linebacker duty. Henley/Phillips retain common duty; no second case uses Dye.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Donte-Jackson",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Cam Hart",
+                      "eaPlayerId": "14960",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Direct available corner depth Hart fills Jackson-created outside duty. Still/Molden preserve baseline; no duplicated Shelley loss from a missing rating.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Derwin-James-Jr",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 1.7,
+                  "replacementValue": 0.9,
+                  "replacementValueRatio": {
+                    "numerator": 0.9,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.8,
+                  "rawTeamContributionDelta": -0.8,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.8,
+                    "max": 0.8
+                  },
+                  "weights": [
+                    {
+                      "player": "Tony Jefferson",
+                      "eaPlayerId": "9879",
+                      "lockedValue": 0.9,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Direct available safety depth Jefferson fills James duty. Molden and other safety baseline duty retained.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-David-Njoku",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Oronde Gadsden",
+                      "eaPlayerId": "15122",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Gadsden supplies the additional receiving tight-end duty; Kolar and Rucci retain common TE assignments. This case is separate from the depleted WR unit.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Quentin-Johnston",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0.2,
+                  "replacementValueRatio": {
+                    "numerator": 0.2,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.7,
+                  "rawTeamContributionDelta": -0.7,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.7,
+                    "max": 0.7
+                  },
+                  "weights": [
+                    {
+                      "player": "Marquez Valdes-Scantling",
+                      "eaPlayerId": "13366",
+                      "lockedValue": 0.2,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Actual starting available outside receiver MVS fills Johnston duty. Reserve Davis only for McConkey and Wease only for Harris; preserve all common baseline assignments.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Ladd-McConkey",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PRIMARY_REPLACEMENT",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.9,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.9,
+                  "rawTeamContributionDelta": -0.9,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.9,
+                    "max": 0.9
+                  },
+                  "weights": [
+                    {
+                      "player": "Derius Davis",
+                      "eaPlayerId": "22819",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Emergency-only injury availability and DNP establish loss of normal receiving duty, despite active roster status. Named available same-position depth Davis fills only that vacancy under the documented-depth assumption, not an observed target-share claim.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Tre'-Harris",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0,
+                  "replacementValueRatio": {
+                    "numerator": 0,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0.083,
+                  "rawTeamContributionDelta": -0.083,
+                  "upgradeExcluded": false,
+                  "injuryLossRange": {
+                    "min": 0.062,
+                    "max": 0.105
+                  },
+                  "weights": [
+                    {
+                      "player": "Theo Wease Jr",
+                      "eaPlayerId": "estimate:theo-wease-jr",
+                      "lockedValue": 0,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Available receiving depth Wease fills only Harris injury-created duty, preserving earlier common receiving work. MVS/Davis already allocated to separate whole-game receiver absences.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0.2,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.4172222222222222,
+                    "fractionRange": {
+                      "min": 0.3086111111111111,
+                      "max": 0.5258333333333334
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 1707,
+                        "startLatest": 2489,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "gamebook"
+                        ],
+                        "rationale": "Departure bounded from last confirmed active target Q2 1:33 to Q3 3:31 questionable update. Club confirms hamstring exit and no later return; midpoint is explicit, not backdated status time."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0.2,
+                    "max": 0.2
+                  }
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Brenen-Thompson",
+                  "modelId": "graham-capacity-limited-loss-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "CAPACITY_LIMITED_LOSS_ESTIMATE",
+                  "healthyValue": 0.2,
+                  "replacementValue": null,
+                  "injuryLoss": 0.1,
+                  "rawTeamContributionDelta": -0.1,
+                  "injuryLossRange": [
+                    0,
+                    0.2
+                  ],
+                  "assumptionRationale": "Approved midpoint of0..0.2 incremental reserve vacancy loss when the documented active receiver reserve capacity is committed. This is not a fabricated replacement rating or an assertion of measured workload; retain full sensitivity.",
+                  "capacityRationale": "Final active non-emergency WR set is Harris, MVS, Davis and Wease. Harris is independently injured; MVS/Davis/Wease are reserved once for Johnston/McConkey/Harris. Lambert-Smith remains IR. Kolar/Rucci retain tight-end baseline with no sourced conversion into this receiver reserve role, and Gadsden covers Njoku. Emergency-only McConkey cannot be presumed fully effective spare capacity. The full0..healthy bound acknowledges uncertain marginal reserve effect.",
+                  "limitation": "Midpoint of bounded incremental vacancy loss when distinct healthy replacement capacity is exhausted. No fabricated player, replacement rating, measured workload or calibrated zero; range is model sensitivity, not a confidence interval."
+                },
+                {
+                  "caseKey": "2026-W05-LAC-Bud-Dupree",
+                  "modelId": "graham-replacement-role-estimate-v1",
+                  "classification": "GRAHAM_MODEL_ESTIMATE",
+                  "method": "PARTIAL_TIME_EXPOSURE",
+                  "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+                  "healthyValue": 0.2,
+                  "replacementValue": 0.5,
+                  "replacementValueRatio": {
+                    "numerator": 0.5,
+                    "denominator": 1
+                  },
+                  "injuryLoss": 0,
+                  "rawTeamContributionDelta": 0,
+                  "upgradeExcluded": true,
+                  "injuryLossRange": {
+                    "min": 0,
+                    "max": 0
+                  },
+                  "weights": [
+                    {
+                      "player": "Akheem Mesidor",
+                      "eaPlayerId": "16336",
+                      "lockedValue": 0.5,
+                      "additionalRoleUnits": 1,
+                      "weight": 1
+                    }
+                  ],
+                  "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                  "assumptionRationale": "Available edge reserve Mesidor fills only Dupree added rotational duty. Equal-or-higher replacement value makes the loss floor zero for every bounded timing choice; other edge baseline duty is preserved.",
+                  "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+                  "fullGameLoss": 0,
+                  "exposure": {
+                    "modelId": "graham-historical-time-exposure-v1",
+                    "classification": "GRAHAM_MODEL_ESTIMATE",
+                    "fraction": 0.735,
+                    "fractionRange": {
+                      "min": 0.47,
+                      "max": 1
+                    },
+                    "unavailableIntervals": [
+                      {
+                        "startEarliest": 0,
+                        "startLatest": 1908,
+                        "endEarliest": 3600,
+                        "endLatest": 3600,
+                        "sourceIds": [
+                          "gamebook"
+                        ],
+                        "rationale": "Only injury status available by Q3 13:12; source does not identify earlier last active snap. Broad0..1908 departure bound is explicit; later out confirms persistence. Point loss zero throughout the range."
+                      }
+                    ],
+                    "gameDurationSeconds": 3600,
+                    "assumptionRationale": "Elapsed game-time approximation with normal value while active; imprecise starts use explicit bounds and an assumed midpoint, not a medical impairment estimate.",
+                    "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                    "limitation": "Elapsed game time approximates lost role exposure; interval midpoint is an explicit estimate when timing is imprecise. This does not estimate medical impairment or infer injury from snap share."
+                  },
+                  "roleAllocationRange": {
+                    "min": 0,
+                    "max": 0
                   }
                 }
               ]
@@ -86501,7 +88217,7 @@
     "sourceWeek": 5,
     "targetWeek": 6,
     "state": "PARTIAL_BLOCKED",
-    "appliedAt": "2026-10-20T20:41:26.549Z",
+    "appliedAt": "2026-10-20T20:46:52.580Z",
     "formulaIds": [
       "BW-R016",
       "BW-R017",
@@ -86509,8 +88225,8 @@
     ],
     "marketViewed": false,
     "gamesProcessed": 15,
-    "gamesUpdated": 8,
-    "teamsUpdated": 16,
+    "gamesUpdated": 9,
+    "teamsUpdated": 18,
     "blockedGames": [
       {
         "gameKey": "2026-W05-PHI-JAX",
@@ -86554,22 +88270,6 @@
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
-          "data/walters/nfl/2026/week-05-final-facts-20261013.json",
-          "data/walters/nfl/2026/week-05-current-numbers.json",
-          "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
-        ]
-      },
-      {
-        "gameKey": "2026-W05-DEN-LAC",
-        "away": "DEN",
-        "home": "LAC",
-        "reasons": [
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: Final injury/inactive evidence identifies DEN CB Riley Moss and CB Patrick Surtain II, plus LAC WR Quentin Johnston, WR Brenen Thompson, OT Joe Alt, G Kayode Awosika, OL Trevor Penning, CB Donte Jackson and S Derwin James as injury-driven pregame absences. The saved ledger contains only the continuing LAC Rashawn Slater case, so the listed identities, frozen values, replacements and group safeguards remain unadopted. RECOVERY_ACTION: Bind each exact player identity/value, distinguish roster-list status from final inactive/DNP participation, establish disjoint game-active replacements and run offensive-line, receiver and defensive-back cluster review.",
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: DEN S Talanoa Hufanga was ruled out in-game with an ankle injury; exact lost interval and relief role are not yet bound. RECOVERY_ACTION: Reconcile the final gamebook play/status clock and safety participation, then apply the approved partial-time method without inferring active impairment.",
-          "AVAILABLE_EVIDENCE_NOT_RECONCILED: Complete inactive/DNP, specialist, quarterback-duty and every printed injury/return sequence has not yet been assembled into one paired evaluator-ready record. RECOVERY_ACTION: Merge the saved Slater estimate with all new cases and final gamebook coverage, then run tools/graham-weekly-evidence.mjs."
-        ],
-        "sourceRefs": [
-          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-late-finals-preparation.json",
           "data/walters/nfl/2026/week-05-final-facts-20261013.json",
           "data/walters/nfl/2026/week-05-current-numbers.json",
           "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
@@ -88338,6 +90038,125 @@
         ],
         "sourceRefs": [
           "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-cin-mia-ready-reconciliation.json",
+          "data/walters/nfl/2026/week-05-current-numbers.json",
+          "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+          "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+        ],
+        "marketViewed": false
+      },
+      {
+        "auditId": "walters-weekly-90-10-2026-w05-to-w06-recovery-20261020204652580",
+        "appliedAt": "2026-10-20T20:46:52.580Z",
+        "newGamesUpdated": 1,
+        "newTeamsUpdated": 2,
+        "alreadyAppliedGames": [
+          "2026-W05-TB-DAL",
+          "2026-W05-CIN-MIA",
+          "2026-W05-LV-NE",
+          "2026-W05-MIN-NO",
+          "2026-W05-CLE-NYJ",
+          "2026-W05-IND-PIT",
+          "2026-W05-HOU-TEN",
+          "2026-W05-BAL-ATL"
+        ],
+        "blockedGames": [
+          {
+            "gameKey": "2026-W05-PHI-JAX",
+            "away": "PHI",
+            "home": "JAX",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: PHI OLB Jonathan Greenard was inactive with an ankle injury and JAX S Eric Murray was inactive with a concussion; neither identity is in the saved currentCases snapshot, so both are newly identified historical cases with no governed replacement/value adoption yet. RECOVERY_ACTION: Bind both exact identities and frozen values, establish game-active replacement roles from the final gamebook/depth evidence, and run cluster/double-count review.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: PHI RB Will Shipley (foot), LB Jalyx Hunt (ankle/knee) and DB Michael Carter II (abdomen) were ruled out in-game. The injury monitor establishes the exits but not complete source-bound lost intervals and disjoint replacement duties. Jeremiah Trotter Jr.'s opening-kickoff removal was an ejection, not injury loss. RECOVERY_ACTION: Reconcile the official final gamebook play/status clock and participation for each injury-driven exit, then apply the governed partial-time/replacement method without charging the ejection.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: All archived PHI/JAX Week 5 cases and the final inactive list are available, but full final inactive/DNP, specialist, quarterback-duty and in-game injury coverage has not yet been assembled into an evaluator-ready pair. RECOVERY_ACTION: Promote the saved case estimates and new cases into one complete paired final-game evidence record and run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-NYG-WAS",
+            "away": "NYG",
+            "home": "WAS",
+            "reasons": [
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: NYG Braxton Berrios remains an archived IR specialist case without governed return-role replacement value; NYG S Jason Pinnock remains out without a disjoint defensive/special-teams allocation. RECOVERY_ACTION: Bind the final active return inventory and a source-bound specialist method for Berrios; establish disjoint defensive and special-teams duties for Pinnock with exact frozen identities.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: NYG RT Jermaine Eluemunor (calf) did not return. Exact exit time, relief identity and offensive-line role chain are not yet reconciled. RECOVERY_ACTION: Use the overtime gamebook clock/participation and final line assignments to establish the partial interval and any governed role chain.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Washington and other Giants cases remain reusable, but the complete paired final-game coverage has not passed the evaluator. RECOVERY_ACTION: Merge all archived/new cases with final inactive/DNP, QB and specialist coverage and run the evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-CHI-GB",
+            "away": "CHI",
+            "home": "GB",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: CHI LB T.J. Edwards (hamstring) was ruled out in-game. Exact lost interval, relief identity and linebacker cluster context are not yet bound. RECOVERY_ACTION: Reconcile the official final gamebook clock/participation and a disjoint active linebacker replacement, then calculate the approved partial-time loss.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Saved Kyle Monangai and Edgerrin Cooper estimates are reusable, but complete paired inactive/DNP, QB, specialist and in-game coverage remains unvalidated. RECOVERY_ACTION: Assemble the full paired game-day record and run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-sunday-early-finals-preparation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-DET-ARI",
+            "away": "DET",
+            "home": "ARI",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The earlier no-additional-in-game-loss inference is retired. The official final gamebook contains five distinct printed injury sequences: White, Kennedy, Baker, Williams and Nolen. Baker and Nolen have explicit returns; Kennedy has an exact injury play; White and Williams require bounded starts where applicable. RECOVERY_ACTION: Bind frozen identities/values and disjoint replacements for all five sequences, then combine them with every pregame absence and perform offensive-line, defensive-back, linebacker and receiver/return-role safeguards.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The final and frozen kickoff inputs are complete, but the saved Arizona estimates and newly identified Detroit/Arizona pregame and in-game cases have not passed one complete paired evaluator record. RECOVERY_ACTION: Assemble complete DET and ARI coverage, recompute both governed totals and run tools/graham-weekly-evidence.mjs."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-SF-SEA",
+            "away": "SF",
+            "home": "SEA",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: The prior Drake Thomas open-through-game-end premise is corrected: the gamebook records an actual Q4 14:11 return. Cowing and Kareem also have explicit returns; Samuel has an injury/out sequence. Greenlaw remains a non-injury ejection exclusion. RECOVERY_ACTION: Bind frozen values, exact exposure intervals and disjoint additional-duty replacements for Thomas, Samuel, Cowing and Kareem; preserve all actual returns and exclude the ejection.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: The archived Juszczyk and Charbonnet vacancies, newly identified pregame absences and the corrected in-game intervals still lack one complete disjoint role allocation and paired cluster review. RECOVERY_ACTION: Adopt supported primary or approved committee duties, reserve each added role once, assemble both team sections and run the evaluator."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-13-literal-gamebook-corrections.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          },
+          {
+            "gameKey": "2026-W05-BUF-LAR",
+            "away": "BUF",
+            "home": "LAR",
+            "reasons": [
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Buffalo's concurrent DJ Moore and Joshua Palmer injury-driven inactive vacancies are now final, and Skyler Bell is confirmed active with two targets. The available evidence does not disjointly allocate Bell and the remaining active receiver duties between the two vacancy cases, so neither missing value is treated as zero and no overlapping replacement credit is invented. RECOVERY_ACTION: Complete one receiver-cluster review using the saved Moore/Palmer values and the established active candidate set; apply either supported role weights or the approved explicitly assumed equal-share committee while reserving each added duty once.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Dee Alford and Landon Jackson are final injury-driven inactives. Their frozen values and candidate sets are available, but the gamebook does not by itself establish Alford's nickel allocation or Jackson's added defensive-line duty allocation; both require promotion with defensive-back/defensive-line cluster safeguards. RECOVERY_ACTION: Use the saved official role sources and final activation inventory to select a documented primary or supported/equal-share committee for each added vacancy duty, then run the full Buffalo team evaluator without duplicating Oliver/Carter duties.",
+              "REPLACEMENT_OR_VALUE_UNRESOLVED: The gamebook newly binds Buffalo Spencer Brown's 2,667-second absence and exact short partial-injury intervals for C.J. Gardner-Johnson, Terrel Bernard and Christian Benford, plus the Rams' Jaylen Watson interval. Frozen healthy values are available, but each interval still needs an approved additional-duty replacement binding and disjoint offensive-line/defensive-back cluster evaluation. Brown's return-questionable line is not treated as a return. RECOVERY_ACTION: Bind documented active replacements or supported committees, evaluate only the exact intervals over the 4,085-second game and preserve the actual-return clocks; do not duplicate inactive or baseline duties.",
+              "AVAILABLE_EVIDENCE_NOT_RECONCILED: Ed Oliver's saved Oliver-to-Carter individual model review remains reusable and Quentin Lake is closed active. Oliver's 0.9 saved estimate still requires adoption inside complete Buffalo defensive-line coverage alongside inactive Landon Jackson; the remaining Rams inactive/DNP inventory and all zero-loss exclusions need explicit paired certification. RECOVERY_ACTION: Promote the passing Oliver case through the complete Buffalo team section, certify the full Los Angeles inactive/DNP inventory, recompute both governed team totals and run tools/graham-weekly-evidence.mjs before any READY state."
+            ],
+            "sourceRefs": [
+              "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-12-buf-lar-gamebook-reconciliation.json",
+              "data/walters/nfl/2026/week-05-final-facts-20261013.json",
+              "data/walters/nfl/2026/week-05-current-numbers.json",
+              "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
+            ]
+          }
+        ],
+        "sourceRefs": [
+          "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-den-lac-ready-reconciliation.json",
           "data/walters/nfl/2026/week-05-current-numbers.json",
           "data/walters/nfl/2026/week-05-final-facts-20261013.json",
           "GRAHAM_WEEKLY_90_10_AUTHORITY.md"
