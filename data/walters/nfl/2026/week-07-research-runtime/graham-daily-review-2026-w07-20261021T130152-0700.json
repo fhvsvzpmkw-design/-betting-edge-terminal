@@ -7,14 +7,21 @@
   "season": 2026,
   "week": 7,
   "ledgerPath": "data/walters/nfl/2026/week-07-research-ledger.json",
-  "state": "RUN_STARTED",
-  "checkpoint": "STARTED",
+  "state": "BLOCKED_WITH_DURABLE_RECORD",
+  "checkpoint": "CONTROLLED_FAILURE",
   "startedAt": "2026-10-21T20:01:52.000Z",
-  "lastCheckpointAt": "2026-10-21T20:01:52.000Z",
+  "lastCheckpointAt": "2026-10-21T20:30:28.000Z",
   "staleAfter": "2026-10-21T21:01:52.000Z",
   "marketViewed": false,
-  "ledgerSweepPresent": false,
-  "completionResult": null,
+  "ledgerSweepPresent": true,
+  "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
   "completionReceipt": null,
-  "failure": null
+  "failure": {
+    "phase": "COMPLETION_RECEIPT",
+    "code": "REQUIRED_FPI_CAPTURE_MISSING",
+    "summary": "The source and numerical publication succeeded, but the first append-only research sweep omitted the required espnFpiCapture object and could not receive a verified completion receipt. Recovery continues in a new SHA-bound runtime without mutating the prior sweep.",
+    "automatic": false,
+    "failedWorkflowRunId": 39670551738,
+    "failedAction": "Verify exact active-week research sweep"
+  }
 }
