@@ -6,7 +6,10 @@ export const eventReviewTraceRequired=report=>Date.parse(report?.ts)>=Date.parse
 
 export function producerExecutionFor(state){
   if(!eventReviewTraceRequired(state.report))return undefined;
-  return {schema:1,...(state.report.oddsSnapshot?{startedAt:state.events.find(event=>event.command==='start')?.at}:{}),eventReviews:state.events.filter(event=>event.command==='checkpoint'&&event.eventId)
+  // Retiming can remove started events from the issued inventory. Keep the full
+  // checkpoint history, while binding this candidate's trace to its own events.
+  const available=new Set((state.sidecar.primaryAnalysis?.receipts||[]).map(eventOf));
+  return {schema:1,...(state.report.oddsSnapshot?{startedAt:state.events.find(event=>event.command==='start')?.at}:{}),eventReviews:state.events.filter(event=>event.command==='checkpoint'&&event.eventId&&available.has(String(event.eventId)))
     .map(({eventId,at,revision})=>({eventId,at,revision}))};
 }
 
