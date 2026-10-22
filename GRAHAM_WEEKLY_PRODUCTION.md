@@ -4,6 +4,8 @@ Version 2.0 — October 20, 2026. OPERATIONAL.
 
 The objective is accurate, verified current-week numbers at rollover. This process replaces the scattered recovery handoffs. It does not change the Walters 90/10 formula, the frozen value hierarchy, approved estimation methods, market isolation, append-only history or numerical writers.
 
+October 21 publication-readback correction: follow the market-safe readback amendment in `GRAHAM_SCHEDULED_TASK_AUTHORITY.md`. Use `tools/graham-independent-readback.mjs` to compare repository/deployed terminal bytes without exposing their price-bearing fields to independent research. A verified repository projection alone is not deployed publication, completed coverage or resolved availability. Preserve any previously blocked runtime and its last genuinely verified coverage baseline.
+
 ## One accountable production run
 
 The existing Graham Walters 90/10 automation is the weekly-production coordinator. Under the user's October 20 replacement-process instruction it checks hourly, on the hour in Vancouver, instead of leaving the former four daily processing windows. No new recurring task is required. A verified complete queue with no newly final game is a quick no-op, without reloading broad research or restaging an unchanged receipt. During its learning phase it follows `GRAHAM_WEEKLY_90_10_AUTHORITY.md`. When a dependency clears, the same run continues through the separate rollover and initial-baseline authorities below instead of waiting for another Tuesday. Each phase uses its existing writer and completion boundary.
