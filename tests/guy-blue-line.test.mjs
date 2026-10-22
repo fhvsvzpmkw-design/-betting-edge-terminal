@@ -71,8 +71,15 @@ test('deliberate editions are idempotent and retain older archive entries and co
     const g=game('archive',.6);quotes(g,'home',[['Book',2,0]]);const data=board([g]);
     const build=()=>{fs.writeFileSync(path.join(dir,'data/game-intelligence/board.json'),JSON.stringify(data));const r=spawnSync(process.execPath,[path.resolve('tools/build-guy-hotline.mjs')],{cwd:dir,encoding:'utf8'});assert.equal(r.status,0,r.stderr);};
     build();const first=JSON.parse(fs.readFileSync(path.join(dir,'data/characters/guy-laflame/current-edition.json')));const frozen=fs.readFileSync(path.join(dir,first.archivePath),'utf8');
-    build();data.games[0].markets[0].quotes[0].priceDecimal=2.2;build();
-    const index=JSON.parse(fs.readFileSync(path.join(dir,'syndicates/generated/guy-laflame/archive/index.json')));assert.equal(index.issues.length,2);assert.equal(fs.readFileSync(path.join(dir,first.archivePath),'utf8'),frozen);assert.ok(!frozen.includes('data-blue-line-live>'));assert.match(frozen,/<base href="\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/">/);
+    build();assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'data/characters/guy-laflame/current-edition.json'))).id,first.id,'unchanged data and presentation reuse their edition');
+    const templatePath=path.join(dir,'syndicates/generated/guy-laflame/shell.html');
+    fs.writeFileSync(templatePath,fs.readFileSync(templatePath,'utf8').replace('blue-line-masthead-logo-only.webp','blue-line-masthead-test.webp'));
+    build();const changed=JSON.parse(fs.readFileSync(path.join(dir,'data/characters/guy-laflame/current-edition.json')));
+    assert.notEqual(changed.id,first.id,'an artwork-only change needs a new immutable edition');
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir,changed.path))).state,JSON.parse(fs.readFileSync(path.join(dir,first.path))).state,'an artwork-only change preserves the recorded rundown');
+    build();assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'data/characters/guy-laflame/current-edition.json'))).id,changed.id);
+    data.games[0].markets[0].quotes[0].priceDecimal=2.2;build();
+    const index=JSON.parse(fs.readFileSync(path.join(dir,'syndicates/generated/guy-laflame/archive/index.json')));assert.equal(index.issues.length,3);assert.equal(fs.readFileSync(path.join(dir,first.archivePath),'utf8'),frozen);assert.ok(!frozen.includes('data-blue-line-live>'));assert.match(frozen,/<base href="\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/">/);
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
 

@@ -15,11 +15,12 @@ const html=shell.replace('{{DAILY_PICK_RECORD}}',value.render(ledger,{now:ledger
 const live='syndicates/generated/guy-laflame/hotline.html';
 fs.writeFileSync(live,html);
 if(!process.argv.includes('--preview')){
-  const digest=crypto.createHash('sha256').update(JSON.stringify(ledger?{state,valueLedger:ledger}:state)).digest('hex');
+  const shellSha256=crypto.createHash('sha256').update(shell).digest('hex');
+  const digest=crypto.createHash('sha256').update(JSON.stringify({shellSha256,data:ledger?{state,valueLedger:ledger}:state})).digest('hex');
   const id=`${state.date}-blue-line-${digest.slice(0,12)}`;
   const editionPath=`data/characters/guy-laflame/editions/${id}.json`;
   const archivePath=`syndicates/generated/guy-laflame/archive/${state.date}/${id}.html`;
-  const edition={schema:1,id,characterId:'guy-laflame',shellId:'guy-blue-line',shellVersion:1,source:'data/game-intelligence/board.json',sourceReport:latest?.path??null,state,...(ledger?{valueLedger:ledger}:{})};
+  const edition={schema:1,id,characterId:'guy-laflame',shellId:'guy-blue-line',shellVersion:1,shellSha256,source:'data/game-intelligence/board.json',sourceReport:latest?.path??null,state,...(ledger?{valueLedger:ledger}:{})};
   const archive=html.replace('<base href="../../../">','<base href="../../../../../">').replace(/<script data-blue-line-live>[\s\S]*?<\/script>/,'');
   for(const [file,text] of [[editionPath,JSON.stringify(edition,null,2)+'\n'],[archivePath,archive]]){
     if(fs.existsSync(file)&&fs.readFileSync(file,'utf8')!==text)throw Error(`Published Guy edition is immutable: ${file}`);
