@@ -15,18 +15,28 @@ const teamAliases = new Map([
   ['connecticuthuskies', 'uconnhuskies'], ['miamiohioredhawks', 'miamiohredhawks'],
   ['marshallherd', 'marshallthunderingherd'], ['umassminutemen','massachusettsminutemen'],
   ['appalachianstatemountaineers','appstatemountaineers'], ['stthomasmntommies','stthomastommies'],
-  ['southeasternlouisianalions','selouisianalions'], ['gramblingstatetigers','gramblingtigers']
+  ['southeasternlouisianalions','selouisianalions'], ['gramblingstatetigers','gramblingtigers'],
+  ['middletennesseestateblueraiders','middletennesseeblueraiders']
 ]);
 const norm = s => { const key = String(s || '').normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]/g, ''); return teamAliases.get(key) || key; };
+const normalizeLeague = value => ({CFB:'NCAAF', NBA_WNBA:'WNBA', NBA_NBA:'NBA', NFL_PRESEASON:'NFL', NHL_PRESEASON:'NHL'})[String(value || '').trim().toUpperCase()] || String(value || '').trim().toUpperCase();
+function teamDisplayName(value, league) {
+  const name = String(value || '').trim();
+  // Legacy cards appended their league to the matchup display. Remove only an
+  // explicit terminal decoration for this row's league; team matching stays exact.
+  const suffix = name.match(/\s*·\s*(NFL|NHL|MLB|NBA|WNBA|NCAAF|CFB|CFL)\s*$/i);
+  return suffix && normalizeLeague(suffix[1]) === league ? name.slice(0, suffix.index).trim() : name;
+}
 const realTeam = value => Boolean(norm(value)) && !['away', 'home', 'unknown', 'tbd'].includes(norm(value));
 const digest = p => createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const knownStatuses = new Set(['BET', 'LEAN', 'WAIT', 'PASS']);
 const routes = { NFL: 'football/nfl', NCAAF: 'football/college-football', CFB: 'football/college-football', CFL: 'football/cfl', NBA: 'basketball/nba', WNBA: 'basketball/wnba', NHL: 'hockey/nhl' };
-function vancouverDate(value = new Date()) {
-  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Vancouver', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(value)).map(p => [p.type, p.value]));
+function localDate(value, timeZone) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(value)).map(p => [p.type, p.value]));
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
+function vancouverDate(value = new Date()) { return localDate(value, 'America/Vancouver'); }
 function score(value) { return value !== null && value !== undefined && value !== '' && Number.isInteger(Number(value)) && Number(value) >= 0; }
 function uniqueMatch(candidates, start) {
   if (candidates.length === 1) return candidates[0];
@@ -49,20 +59,19 @@ function primaryScoreMarket(rec) {
 }
 export function eventInfo(group) {
   const away = new Map(), home = new Map(), dates = new Set(), fallbackDates = new Set(), sports = new Set(), starts = new Set();
-  const add = (map, value) => { if (realTeam(value)) map.set(norm(value), String(value).trim()); };
+  const add = (map, value, league) => { const name = teamDisplayName(value, league); if (realTeam(name)) map.set(norm(name), name); };
   for (const { rec, date } of group.identityRows || group.rows) {
     const f = rec.feed || {};
+    const league = normalizeLeague(rec.coreAssessment?.context?.sport || f.league || f.sport || String(rec.meta || '').split('|')[0]);
+    if (league) sports.add(league);
     const m = String(rec.meta || '').split('|').map(x => x.trim()).map(x => x.match(/^(.+?)\s+(?:at|@)\s+(.+)$/i)).find(Boolean);
-    if (m) { add(away, m[1]); add(home, m[2]); }
+    if (m) { add(away, m[1], league); add(home, m[2], league); }
     else if (['ml', 'moneyline'].includes(String(f.marketKey || f.market || '').toLowerCase())) {
       const title = String(rec.title || '').replace(/\s+moneyline$/i, '');
-      if (f.side === 'away') add(away, title);
-      if (f.side === 'home') add(home, title);
+      if (f.side === 'away') add(away, title, league);
+      if (f.side === 'home') add(home, title, league);
     }
-    add(away, f.away); add(home, f.home);
-    let league = String(rec.coreAssessment?.context?.sport || f.league || f.sport || String(rec.meta || '').split('|')[0] || '').trim().toUpperCase();
-    league = ({CFB:'NCAAF', NBA_WNBA:'WNBA', NBA_NBA:'NBA', NFL_PRESEASON:'NFL', NHL_PRESEASON:'NHL'})[league] || league;
-    if (league) sports.add(league);
+    add(away, f.away, league); add(home, f.home, league);
     const start = f.eventDate || f.commenceTime || null;
     if (start && !datePattern.test(start) && Number.isFinite(Date.parse(start))) { starts.add(start); dates.add(vancouverDate(start)); }
     else if (datePattern.test(String(start || ''))) dates.add(start);
@@ -70,7 +79,8 @@ export function eventInfo(group) {
   }
   const binding = group.historicalIdentity;
   if (binding) {
-    add(away, binding.away); add(home, binding.home);
+    const league = sports.size === 1 ? [...sports][0] : null;
+    add(away, binding.away, league); add(home, binding.home, league);
     if (binding.start && Number.isFinite(Date.parse(binding.start))) { starts.add(binding.start); dates.add(vancouverDate(binding.start)); }
   }
   if (!dates.size) for (const date of fallbackDates) dates.add(date);
@@ -118,7 +128,7 @@ async function fetchJson(url) {
   })());
   return cache.get(url);
 }
-export async function verify(group, getJson = fetchJson) {
+export async function verify(group, getJson = fetchJson, now = new Date()) {
   const unresolved = reason => ({ eventId: group.id, status: 'unresolved', unresolvedReason: reason });
   let info = eventInfo(group);
   if (!info && !group.historicalIdentity) { group.historicalIdentity = historicalIdentity(group); info = eventInfo(group); }
@@ -126,11 +136,14 @@ export async function verify(group, getJson = fetchJson) {
   try {
     let candidates = [], url;
     if (info.sport === 'MLB') {
-      url = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${info.date}&hydrate=linescore,team`;
+      url = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${info.date}&hydrate=linescore,team,venue(timezone)`;
       const data = await getJson(url);
       candidates = (data.dates || []).flatMap(d => d.games || []).filter(g => norm(g.teams?.away?.team?.name) === norm(info.away) && norm(g.teams?.home?.team?.name) === norm(info.home)).map(g => ({
         start: g.gameDate, final: g.status?.abstractGameState === 'Final', providerId: g.gamePk,
         cancelledUnplayed: /^cancelled$/i.test(g.status?.detailedState || '') && !g.linescore?.innings?.length,
+        postponedUnplayed: /^postponed$/i.test(g.status?.detailedState || '') && !g.linescore?.innings?.length && !Number(g.linescore?.currentInning || 0)
+          && g.teams.away.score == null && g.teams.home.score == null,
+        stadiumTimeZone: g.venue?.timeZone?.id,
         special: /shortened|suspend|forfeit|completed early/i.test(g.status?.detailedState || '') || Number(g.linescore?.currentInning || 0) < 9,
         away: g.teams.away.team.name, home: g.teams.home.team.name, awayScore: g.teams.away.score, homeScore: g.teams.home.score
       }));
@@ -169,7 +182,27 @@ export async function verify(group, getJson = fetchJson) {
     } else return {...unresolved('result_provider_unsupported'), identity:info};
     const match = uniqueMatch(candidates, info.start);
     if (!match) return {...unresolved(candidates.length > 1 ? 'identity_conflict' : 'result_not_verified'), identity:info, sourceUrl:url};
-    const source = {name:`${info.sport === 'MLB' ? 'MLB official' : info.sport === 'CFL' ? 'CFL official' : 'ESPN ' + info.sport} historical ${match.cancelledUnplayed ? 'unplayed cancellation' : 'final'} ${info.date}; event ${match.providerId}`, url:match.url || url};
+    const source = {name:`${info.sport === 'MLB' ? 'MLB official' : info.sport === 'CFL' ? 'CFL official' : 'ESPN ' + info.sport} historical ${match.cancelledUnplayed ? 'unplayed cancellation' : match.postponedUnplayed ? 'unplayed postponement' : 'final'} ${info.date}; event ${match.providerId}`, url:match.url || url};
+    if (match.postponedUnplayed) {
+      // Use the original dated schedule, never a mutable live-feed gamePk that
+      // may now identify the rescheduled game. A same-day delay cannot void yet.
+      if (!info.start || Date.parse(match.start) !== Date.parse(info.start) || !match.stadiumTimeZone
+          || localDate(now, match.stadiumTimeZone) <= localDate(info.start, match.stadiumTimeZone)) {
+        return {...unresolved('settlement_ambiguity'), identity:info, sourceUrl:url};
+      }
+      const rules = {
+        bet365: 'https://help.bet365.com/s/en-ca/sportsrules/baseball/general-rules',
+        draftkings: 'https://sportsbook.draftkings.com/help/sport-rules/baseball'
+      };
+      const selectionOutcomes = [...new Map(group.rows.filter(x => primaryScoreMarket(x.rec) && x.rec.feed?.selectionKey).map(x => {
+        const book = String(x.rec.feed.book || x.rec.book || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+        const ruleSource = rules[book];
+        return ruleSource ? [`${x.rec.feed.selectionKey}|${book}`, {selectionKey:x.rec.feed.selectionKey, book, grade:'VOID',
+          basis:'Official dated schedule confirms postponement before play; scheduled stadium-local date passed without a start; issued-book baseball rule returns the stake.', ruleSource}] : null;
+      }).filter(Boolean)).values()];
+      if (!selectionOutcomes.length) return {...unresolved('postponement_rule_not_verified'), identity:info, sourceUrl:url};
+      return {eventId:group.id, status:'settled', away:match.away, home:match.home, selectionOutcomes, source};
+    }
     if (match.cancelledUnplayed) return {eventId:group.id, status:'settled', away:match.away, home:match.home,
       selectionOutcomes:[...new Map(group.rows.filter(x => primaryScoreMarket(x.rec)).map(x => [x.rec.feed.selectionKey, {selectionKey:x.rec.feed.selectionKey, grade:'VOID', basis:'Officially cancelled before play; full-game stake returned.'}])).values()], source};
     if (!match.final) return {...unresolved('event_not_final'), identity:info, sourceUrl:url};
@@ -270,3 +303,4 @@ else if (process.argv[2]) main(process.argv[2]).catch(error => { console.error(e
 else { console.error('Usage: node tools/grade-issued-card-history.mjs <request.json> | --self-test'); process.exitCode = 1; }
 
 }
+
