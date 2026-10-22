@@ -1,14 +1,64 @@
 // A failed BET check is not a directional rejection. This gate requires a
 // review of that distinction; it never creates or carries a recommendation.
 import {forecastLeanDefault} from './forecast-lean.mjs';
+import {evaluateForecast} from './forecast-evidence.mjs';
+import {NHL_FORECAST_SOURCES} from './nhl-forecast-corroboration.mjs';
 export const OPINION_REVIEW_FROM = '2026-10-03T11:34:58-07:00';
+export const NHL_CORROBORATION_FOLLOW_UP_FROM = '2026-10-22T16:50:00-07:00';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
 const time = value => Date.parse(value || '');
 const reasons = new Set(['CONTRARY_EVIDENCE', 'FORECAST_ASSUMPTION_CONFLICT', 'PERSONNEL_DEPENDENCY',
   'PRICE_NO_LONGER_SUPPORTED', 'REFERENCE_CHANGE', 'CORRECTED_PRIOR_ASSESSMENT', 'INSUFFICIENT_CORROBORATION']);
+const failedLookupOutcomes = new Set(['INACCESSIBLE','STALE','WRONG_LINE','WRONG_MARKET','MISSING_PROBABILITY','INELIGIBLE','NOT_FOUND']);
+function originalProvider(sourceId, value) {
+  const source=NHL_FORECAST_SOURCES[sourceId];
+  try {
+    const url=new URL(value),host=url.hostname.toLowerCase();
+    return Boolean(source && ['http:','https:'].includes(url.protocol) && !url.username && !url.password &&
+      (host===source.host || host.endsWith(`.${source.host}`)));
+  } catch {return false;}
+}
 
-export function inspectOpinionReview({report, receipt, forecastComparisons = [], prior} = {}) {
+// An uncaptured second source is unfinished research, not proof that it cannot
+// corroborate. Apply this only to new one-source NHL forecast rejections. A
+// source registry notice, a FOUND marker without the point, or a repeat of the
+// first provider cannot finish the source lookup.
+function inspectCorroborationFollowUp({report,receipt,forecast,sidecar,review,sources,leanDefault}) {
+  const first=leanDefault.corroboration?.supportingSourceIds?.[0];
+  const required=time(report?.ts)>=time(NHL_CORROBORATION_FOLLOW_UP_FROM) &&
+    review?.reasonKind==='INSUFFICIENT_CORROBORATION' && leanDefault.corroboration?.active && Boolean(first);
+  if(!required) return {required:false,complete:true};
+  const quote=receipt?.quote,rec=receipt?.decision,start=time(rec?.feed?.eventDate);
+  const current=value=>Number.isFinite(time(value)) && time(value)>=time(report.feedGeneratedAt) &&
+    time(value)<=time(report.ts) && time(value)<start;
+  const linked=source=>list(review.sourceIds).includes(source.id) && source.kind==='MODEL';
+  const candidate={selectionId:receipt.selectionId,eventId:String(quote?.eventId),sport:'NHL',startTime:rec?.feed?.eventDate,
+    marketClass:'moneyline',marketDetail:'full_game_moneyline',period:'FULL_GAME',side:quote?.side,line:null,
+    priceDecimal:Number(quote?.priceDecimal)};
+  // With the original sidecar available, replay its immutable points instead
+  // of trusting a producer-written eligibility marker on the visible card.
+  const records=sidecar ? list(sidecar.forecastEvidence?.records).filter(raw=>String(raw.eventId)===candidate.eventId)
+    .map(raw=>evaluateForecast(raw,candidate,{asOf:report.ts,revalidations:sidecar.forecastEvidence?.revalidations}))
+    : list(forecast?.records);
+  const recordIds=records.filter(row=>row.sourceId!==first && originalProvider(row.sourceId,row.url) &&
+    row.modelFamily===NHL_FORECAST_SOURCES[row.sourceId]?.family && row.eligibility==='ELIGIBLE_EXACT' &&
+    current(row.revalidatedAt) && list(review.forecastRecordIds).includes(row.recordId) &&
+    [...sources.values()].some(source=>linked(source) && source.url===row.url)).map(row=>row.recordId);
+  const attempts=sidecar ? list(sidecar.forecastEvidence?.attempts) : list(forecast?.attempts);
+  const attemptIds=attempts.filter(attempt=>text(attempt.attemptId) &&
+    list(review.corroborationAttemptIds).includes(attempt.attemptId) &&
+    attempt.sourceId!==first && originalProvider(attempt.sourceId,attempt.url) &&
+    attempt.selectionId===receipt.selectionId &&
+    (attempt.eventId==null || String(attempt.eventId)===candidate.eventId) &&
+    failedLookupOutcomes.has(attempt.outcome) && text(attempt.finding) && current(attempt.checkedAt) &&
+    [...sources.values()].some(source=>linked(source) && source.url===attempt.url &&
+      time(source.checkedAt || source.asOf)===time(attempt.checkedAt))).map(attempt=>attempt.attemptId);
+  return {required:true,complete:recordIds.length>0 || attemptIds.length>0,
+    supportingSourceId:first,recordIds,attemptIds};
+}
+
+export function inspectOpinionReview({report, receipt, forecastComparisons = [], forecast, sidecar, prior} = {}) {
   const decision = receipt?.decision;
   const quote = receipt?.quote;
   const supported = list(forecastComparisons).filter(row => row.direction === 'SUPPORTS_PRICE');
@@ -33,6 +83,8 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
     .filter(source => text(source?.id) && String(source.eventId) === String(quote?.eventId) &&
       Number.isFinite(time(source.checkedAt || source.asOf)) && time(source.checkedAt || source.asOf) <= time(report.ts) &&
       text(source.finding || source.fact) && text(source.url)).map(source => [source.id, source]));
+  const corroborationFollowUp=inspectCorroborationFollowUp({report,receipt,forecast,sidecar,review,sources,leanDefault});
+  if(!corroborationFollowUp.complete) missing.push('NHL_CORROBORATION_FOLLOW_UP_REQUIRED');
   if (!list(review?.sourceIds).length || !review.sourceIds.every(id => sources.has(id))) missing.push('DIRECTIONAL_REJECTION_SOURCE_BINDING_REQUIRED');
   if (review?.provisionalAlternative?.considered !== true || !text(review?.provisionalAlternative?.rationale))
     missing.push('ZERO_STAKE_PROVISIONAL_ALTERNATIVE_REVIEW_REQUIRED');
@@ -65,6 +117,7 @@ export function inspectOpinionReview({report, receipt, forecastComparisons = [],
       missing.push('UNCHANGED_PRICE_CANNOT_EXPLAIN_LEAN_REMOVAL');
   }
   return {required:true, complete:missing.length === 0, missing, priorDecision:baseline,
+    ...(corroborationFollowUp.required ? {corroborationFollowUp} : {}),
     ...(leanDefault.active ? {leanDefault} : {}),
     supportingForecastRecordIds:supported.map(row => row.recordId),
     instruction:leanDefault.applies || leanDefault.corroboration?.active ? leanDefault.instruction : 'Review the exact positive point and earlier opinion. Separate BET eligibility from directional preference; assess a visible zero-stake provisional LEAN. Record a source-linked directional objection or correct the actual decision. No automatic LEAN or BET.'};

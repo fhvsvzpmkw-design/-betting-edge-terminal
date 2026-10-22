@@ -209,7 +209,7 @@ export function validateReportEvidence(report, sidecar) {
     const receipt = sidecar.primaryAnalysis?.receipts?.find(row => row.state === 'EVALUATED' && row.quote?.selectionKey === rec.feed?.selectionKey);
     const forecasts = (rec.forecastReview?.records || []).filter(row => row.eligibility === 'ELIGIBLE_EXACT' &&
       row.comparison?.priceDecimal === Number(rec.feed?.priceDecimal)).map(row => ({recordId:row.recordId,...row.comparison}));
-    const opinion = inspectOpinionReview({report, receipt:receipt ? {...receipt,decision:rec} : {decision:rec}, forecastComparisons:forecasts});
+    const opinion = inspectOpinionReview({report,sidecar, receipt:receipt ? {...receipt,decision:rec} : {decision:rec}, forecastComparisons:forecasts});
     ensure(opinion.complete, `${rec.feed?.selectionKey} directional review incomplete: ${opinion.missing.join(', ')}`);
   }
   return {enforced: true, checked: report.recs.length};

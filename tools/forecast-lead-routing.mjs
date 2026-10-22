@@ -3,6 +3,7 @@
 import {createHash} from 'node:crypto';
 import {importForecastCapture} from './import-forecast-evidence.mjs';
 import {forecastCandidate, loadForecastSourceRegistry} from './forecast-evidence.mjs';
+import {FORECAST_FOLLOW_UP_FROM} from './forecast-follow-ups.mjs';
 
 export const FORECAST_ROUTING_FROM = '2026-10-01T18:47:44-07:00';
 const list = value => Array.isArray(value) ? value : [];
@@ -22,7 +23,7 @@ function sourceIdFor(source, registry) {
   return null;
 }
 
-export function collectForecastLeads({report, sidecar, selection, receipt, feed, registry = loadForecastSourceRegistry()}) {
+export function collectForecastLeads({report, sidecar, selection, receipt, feed, forecastFollowUps = [], registry = loadForecastSourceRegistry()}) {
   const candidate = forecastCandidate(selection, {receipt, feed});
   const record = receipt?.decision || receipt?.candidateDraft?.decision;
   const event = list(feed?.events).find(row => String(row.eventId || row.id || row.identity?.eventId) === candidate.eventId);
@@ -60,20 +61,45 @@ export function collectForecastLeads({report, sidecar, selection, receipt, feed,
       supportsPrice:probability > 1 / candidate.priceDecimal,
       nextAction:'Preserve the original published field in forecastCapture, review event/personnel/settlement applicability, then assess BET and LEAN. Prose alone cannot issue a grade.'});
   }
+  // Known event research is loaded independently of the receipt. Omitting the
+  // second provider from the report must not make its outstanding lead vanish.
+  if (time(report?.ts) >= time(FORECAST_FOLLOW_UP_FROM)) {
+    const known = [...list(forecastFollowUps), ...list(sidecar.forecastEvidence?.followUps),
+      ...list(sidecar.forecastEvidence?.followUpInputs?.leads)];
+    for (const lead of known) {
+      if (!text(lead.leadId) || lead.sport !== candidate.sport || String(lead.eventId) !== candidate.eventId ||
+          time(lead.startTime) !== time(candidate.startTime) || lead.marketDetail !== candidate.marketDetail ||
+          lead.period !== candidate.period || lead.side !== candidate.side || (lead.line ?? null) !== candidate.line ||
+          !registry.sources?.[lead.sourceId] || !(lead.probability > 0 && lead.probability < 1) ||
+          !text(lead.url) || !text(lead.finding) || !Number.isFinite(time(lead.observedAt)) ||
+          time(lead.observedAt) > time(report.ts) || time(lead.createdAt || lead.observedAt) > time(report.ts) ||
+          time(report.ts) >= time(candidate.startTime)) continue;
+      leads.set(lead.leadId, {...structuredClone(lead), selectionId:candidate.selectionId, selectionKey:candidate.selectionKey,
+        sourceIds:[], fromKnownFollowUp:true, requiresReview:true,
+        authority:'UNVERIFIED_SOURCE_FIELD_REQUIRES_CAPTURE_REVIEW', supportsPrice:lead.probability > 1 / candidate.priceDecimal,
+        nextAction:'Revalidate this known original-provider lead for the exact event, settlement and personnel. Capture the current published point, including a changed or contrary point, or record a source-linked current rejection and decision impact. The earlier point alone cannot issue a grade.'});
+    }
+  }
   return [...leads.values()];
 }
 
-export function inspectForecastLeadReview({report, sidecar, selection, receipt, forecast, feed, registry, developmentReplay = false}) {
+export function inspectForecastLeadReview({report, sidecar, selection, receipt, forecast, feed, registry, forecastFollowUps = [], developmentReplay = false}) {
   if (!active(report, developmentReplay)) return {required:false, complete:true, leads:[], missing:[]};
-  const leads = collectForecastLeads({report, sidecar, selection, receipt, feed, registry});
+  const leads = collectForecastLeads({report, sidecar, selection, receipt, feed, registry, forecastFollowUps});
   const candidate = forecastCandidate(selection, {receipt, feed}), missing = [];
   const dispositions = list(receipt?.candidateAssessment?.forecastLeadDispositions);
   const sources = new Map(sourcesOf(receipt).map(source => [source.id, source]));
   const results = leads.map(lead => {
-    const records = list(sidecar.forecastEvidence?.records).filter(raw => raw.sourceId === lead.sourceId && raw.url === lead.url &&
+    const sameProvider = url => {
+      try {return new URL(url).hostname.replace(/^www\./,'') === new URL(lead.url).hostname.replace(/^www\./,'');} catch {return false;}
+    };
+    const records = list(sidecar.forecastEvidence?.records).filter(raw => raw.sourceId === lead.sourceId &&
+      (lead.fromKnownFollowUp ? sameProvider(raw.url) : raw.url === lead.url) &&
       raw.sport === candidate.sport && String(raw.eventId) === candidate.eventId && time(raw.startTime) === time(candidate.startTime) &&
       raw.marketDetail === candidate.marketDetail && raw.period === candidate.period && raw.side === candidate.side &&
-      (raw.line ?? null) === candidate.line && raw.probability === lead.probability && time(raw.observedAt) === time(lead.observedAt));
+      (raw.line ?? null) === candidate.line && (lead.fromKnownFollowUp
+        ? time(raw.observedAt) >= time(lead.observedAt) && time(raw.observedAt) <= time(report.ts)
+        : raw.probability === lead.probability && time(raw.observedAt) === time(lead.observedAt)));
     const captured = records.some(raw => list(forecast?.records).some(row => row.recordId === raw.recordId && row.eligibility === 'ELIGIBLE_EXACT'));
     if (captured) return {...lead, state:'CAPTURED', recordIds:records.map(raw => raw.recordId)};
     const reviews = dispositions.filter(row => row.leadId === lead.leadId);
@@ -83,15 +109,20 @@ export function inspectForecastLeadReview({report, sidecar, selection, receipt, 
       return source && String(source.eventId) === candidate.eventId && text(source.finding || source.fact) &&
         time(source.checkedAt || source.asOf) <= time(report.ts);
     });
+    const knownSourceCheck = !lead.fromKnownFollowUp || (text(review?.directionalImpact) && list(review?.sourceIds).some(id => {
+      const source = sources.get(id);
+      return ['MODEL','REPORTING'].includes(source?.kind) && sameProvider(source?.url) &&
+        time(source.checkedAt || source.asOf) >= Math.max(time(report.feedGeneratedAt), time(lead.observedAt));
+    }));
     const rejected = reviews.length === 1 && review.state === 'REJECTED' && text(review.rationale) &&
       time(review.checkedAt) >= time(report.feedGeneratedAt) && time(review.checkedAt) <= time(report.ts) &&
-      list(review.sourceIds).some(id => lead.sourceIds.includes(id)) && linked &&
+      (lead.fromKnownFollowUp || list(review.sourceIds).some(id => lead.sourceIds.includes(id))) && linked && knownSourceCheck &&
       ['EVENT_OR_MARKET_MISMATCH','STALE_ASSUMPTIONS','PERSONNEL_CONFLICT','SETTLEMENT_UNRESOLVED','SOURCE_UNVERIFIABLE','NO_DIRECTIONAL_PREFERENCE'].includes(review.objectionKind) &&
-      (!lead.supportsPrice || (review.directionalReview?.state === 'REJECTED' && text(review.directionalReview.rationale)));
-    if (!rejected && lead.supportsPrice) missing.push('FORECAST_CAPTURE_OR_SOURCE_REJECTION_REQUIRED:' + lead.leadId);
+      (!(lead.supportsPrice || lead.requiresReview) || (review.directionalReview?.state === 'REJECTED' && text(review.directionalReview.rationale)));
+    if (!rejected && (lead.supportsPrice || lead.requiresReview)) missing.push('FORECAST_CAPTURE_OR_SOURCE_REJECTION_REQUIRED:' + lead.leadId);
     return {...lead, state:rejected ? 'REJECTED' : 'REVIEW_REQUIRED', recordIds:records.map(raw => raw.recordId)};
   });
-  return {required:leads.some(lead => lead.supportsPrice), complete:missing.length === 0, leads:results, missing};
+  return {required:leads.some(lead => lead.supportsPrice || lead.requiresReview), complete:missing.length === 0, leads:results, missing};
 }
 
 export function routeForecastCaptures({report, sidecar, universe, feed, registry = loadForecastSourceRegistry(), developmentReplay = false}) {

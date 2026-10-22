@@ -11,6 +11,7 @@ import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gat
 import {loadBoundMarketObserver, exactMarketReference} from './market-price-assessment.mjs';
 import {buildForecastCoverage, attachForecastCoverage} from './forecast-evidence.mjs';
 import {routeForecastCaptures} from './forecast-lead-routing.mjs';
+import {loadForecastFollowUps,bindForecastFollowUps} from './forecast-follow-ups.mjs';
 import {assembleCardEvidence} from './assemble-card-evidence.mjs';
 import {reviewCardEvidence} from './review-card-evidence.mjs';
 import {buildCandidateAssessment, finalizeCandidateAssessmentDraft, candidateAssessmentRequired} from './candidate-assessment.mjs';
@@ -60,7 +61,7 @@ function loadContext(root, report, sidecar, feedFile) {
     universe = derivePrimarySelectionInventory(report, feed, policy);
   } catch (error) {warnings.push(`Forecast inventory unavailable: ${error.message}`);}
   try {observer = loadBoundMarketObserver(sidecar, root);} catch (error) {warnings.push(`Blocked-market reference review unavailable: ${error.message}`);}
-  const priorRecords = [], priorReceipts = new Map();
+  const priorRecords = [], priorFollowUps = [], priorReceipts = new Map();
   const index = optional(path.join(root, 'run-history.json'));
   for (const entry of list(index?.runs).filter(entry => entry.date === report.ts?.slice(0, 10) && Date.parse(entry.ts) < Date.parse(report.ts)).sort((a,b) => Date.parse(a.ts)-Date.parse(b.ts))) {
     if (!entry.researchFitPath) continue;
@@ -75,9 +76,11 @@ function loadContext(root, report, sidecar, feedFile) {
     }
     // Reuse still requires the forecast module's explicit current-run revalidation.
     for (const record of list(prior.forecastEvidence?.records)) priorRecords.push(record);
+    priorFollowUps.push(...list(prior.forecastEvidence?.followUps), ...list(prior.forecastEvidence?.followUpInputs?.leads));
   }
   const grahamInputs = list(universe?.selections).some(selection=>grahamHandoffRequired(report,selection)) ? loadGrahamHandoffInputs(root,report,sidecar) : null;
-  return {root, feed, universe, observer, grahamInputs, registry: registry || undefined, library, priorRecords, priorReceipts, warnings};
+  const forecastFollowUps=loadForecastFollowUps({root,report,sidecar,universe,priorFollowUps});
+  return {root, feed, universe, observer, grahamInputs, forecastFollowUps, registry: registry || undefined, library, priorRecords, priorReceipts, warnings};
 }
 
 export function reviewBlockedSelections(report, sidecar, {universe, observer, priorReceipts = new Map()} = {}) {
@@ -122,7 +125,8 @@ export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedF
   try {forecasts = buildForecastCoverage({report, sidecar, universe: ctx.universe, feed: ctx.feed, priorRecords: ctx.priorRecords, registry: ctx.registry, now: report.ts});}
   catch (error) {forecasts = {mode: 'ADVISORY_ONLY', publicationBlocking: false, warnings: [`Forecast review unavailable: ${error.message}`]};}
   const review = reviewCardEvidence(report, sidecar, {library: ctx.library});
-  const candidateAssessment = buildCandidateAssessment({report, sidecar, universe: ctx.universe, observer: ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs, priorReceipts:ctx.priorReceipts, forecastCoverage: forecasts});
+  const candidateAssessment = buildCandidateAssessment({report, sidecar, universe: ctx.universe, observer: ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs,
+    forecastFollowUps:ctx.forecastFollowUps?.leads, priorReceipts:ctx.priorReceipts, forecastCoverage: forecasts});
   const eventResearchPlan=buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts});
   const gameIntelligence=ctx.feed&&ctx.universe?buildGameIntelligence({report,sidecar,feed:ctx.feed,universe:ctx.universe,forecastCoverage:forecasts,candidateAssessment,eventResearchPlan,observer:ctx.observer}):null;
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
@@ -215,6 +219,8 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
   if (!candidateAssessmentRequired(report)) return null;
   const audit = buildEvidenceAudit({root, report, sidecar, feedFile});
   const candidate = audit.candidateAssessment;
+  if(candidate.selections.some(row=>row.forecastLeadReview?.leads?.some(lead=>lead.fromKnownFollowUp)) &&
+      !sidecar.forecastEvidence?.followUpInputs)throw new Error('Known forecast follow-ups must be pinned in shared draft preparation before freeze');
   if(candidate.selections.some(row=>row.grahamFairHandoff?.inputBinding) && !sidecar.grahamFairHandoffInputs)throw new Error('Graham handoff inputs must be pinned in shared draft preparation before freeze');
   if (candidate.state === 'UNIVERSE_UNAVAILABLE') throw new Error('Candidate review requires the same bound inventory as publication');
   const incomplete = candidate.selections.filter(row => (row.promising || row.reviewRequired) && row.state === 'EVALUATED' && row.reviewState === 'UNFINISHED');
@@ -227,7 +233,9 @@ export function validateCandidateCompletion({root = process.cwd(), report, sidec
 export function captureForecastEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
   const draftReport = structuredClone(report);
   const ctx = loadContext(root, draftReport, sidecar, feedFile);
-  const routed = routeForecastCaptures({report:draftReport,sidecar,
+  const boundSidecar=structuredClone(sidecar);
+  bindForecastFollowUps({root,report:draftReport,sidecar:boundSidecar,universe:ctx.universe,priorFollowUps:ctx.forecastFollowUps?.leads});
+  const routed = routeForecastCaptures({report:draftReport,sidecar:boundSidecar,
     universe:ctx.universe,feed:ctx.feed,registry:ctx.registry});
   if (routed.applied) attachForecastCoverage({report:draftReport,sidecar:routed.sidecar,
     universe:ctx.universe,feed:ctx.feed,priorRecords:ctx.priorRecords,registry:ctx.registry,now:report.ts});
@@ -237,6 +245,7 @@ export function captureForecastEvidenceDraft({root = process.cwd(), report, side
 export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, feedFile} = {}) {
   let draftReport = structuredClone(report), draftSidecar = structuredClone(sidecar);
   const ctx = loadContext(root, draftReport, draftSidecar, feedFile);
+  bindForecastFollowUps({root,report:draftReport,sidecar:draftSidecar,universe:ctx.universe,priorFollowUps:ctx.forecastFollowUps?.leads});
   const forecastRouting = routeForecastCaptures({report:draftReport,sidecar:draftSidecar,
     universe:ctx.universe,feed:ctx.feed,registry:ctx.registry});
   draftSidecar = forecastRouting.sidecar;
@@ -260,7 +269,8 @@ export function prepareEvidenceDraft({root = process.cwd(), report, sidecar, fee
   if (identityDeferrals.selectionIds.length) synchronizeCandidateDraft(draftReport, draftSidecar);
   const candidateForecasts = buildForecastCoverage({report:draftReport, sidecar:draftSidecar, universe:ctx.universe, feed:ctx.feed, priorRecords:ctx.priorRecords, registry:ctx.registry, now:report.ts});
   const candidates = finalizeCandidateAssessmentDraft({report:draftReport, sidecar:draftSidecar, universe:ctx.universe,
-    observer:ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs, priorReceipts:ctx.priorReceipts, forecastCoverage:candidateForecasts, draft:true});
+    observer:ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs, forecastFollowUps:ctx.forecastFollowUps?.leads,
+    priorReceipts:ctx.priorReceipts, forecastCoverage:candidateForecasts, draft:true});
   if (candidates.deferredSelectionIds.length) {
     synchronizeCandidateDraft(draftReport, draftSidecar);
     attachForecastCoverage({report:draftReport, sidecar:draftSidecar, universe:ctx.universe, feed:ctx.feed, priorRecords:ctx.priorRecords, registry:ctx.registry, now:report.ts});

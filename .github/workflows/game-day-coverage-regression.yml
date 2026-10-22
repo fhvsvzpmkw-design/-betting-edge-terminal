@@ -12,6 +12,13 @@ on:
       - 'tools/report-evidence-gate.mjs'
       - 'tools/selection-continuity.mjs'
       - 'tools/event-research-plan.mjs'
+      - 'tools/forecast-follow-ups.mjs'
+      - 'tools/forecast-lead-routing.mjs'
+      - 'data/report-production/forecast-follow-ups.json'
+      - 'tests/forecast-follow-ups.test.mjs'
+      - 'tests/known-forecast-follow-up-routing.test.mjs'
+      - 'tests/forecast-follow-up-pipeline.test.mjs'
+      - 'tests/nhl-corroboration-follow-up.test.mjs'
       - 'tests/odds-worker-*.test.mjs'
       - 'tests/opinion-review.test.mjs'
       - 'tests/game-day-history-replay.test.mjs'
@@ -29,6 +36,13 @@ on:
       - 'tools/report-evidence-gate.mjs'
       - 'tools/selection-continuity.mjs'
       - 'tools/event-research-plan.mjs'
+      - 'tools/forecast-follow-ups.mjs'
+      - 'tools/forecast-lead-routing.mjs'
+      - 'data/report-production/forecast-follow-ups.json'
+      - 'tests/forecast-follow-ups.test.mjs'
+      - 'tests/known-forecast-follow-up-routing.test.mjs'
+      - 'tests/forecast-follow-up-pipeline.test.mjs'
+      - 'tests/nhl-corroboration-follow-up.test.mjs'
       - 'tests/odds-worker-*.test.mjs'
       - 'tests/opinion-review.test.mjs'
       - 'tests/game-day-history-replay.test.mjs'
@@ -63,3 +77,5 @@ jobs:
           node tests/game-day-history-replay.test.mjs
           node tests/event-research-plan.test.mjs
           node tools/selection-continuity.mjs self-test
+      - name: Verify known source handoff and corroboration closeout
+        run: node --test tests/forecast-follow-ups.test.mjs tests/known-forecast-follow-up-routing.test.mjs tests/forecast-follow-up-pipeline.test.mjs tests/nhl-corroboration-follow-up.test.mjs

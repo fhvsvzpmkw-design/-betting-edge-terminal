@@ -243,7 +243,7 @@ function completion(report, selection, receipt, best, options, forecast, review)
 }
 
 /** Pure, forward-compatible review. Inventory, not published cards, is denominator. */
-export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, priorReceipts = new Map(), limit = 8, developmentReplay = false} = {}) {
+export function buildCandidateAssessment({report, sidecar, universe, observer, forecastCoverage, feed, grahamInputs, forecastFollowUps = [], priorReceipts = new Map(), limit = 8, developmentReplay = false} = {}) {
   const inventory = universe?.selections || universe;
   if (!Array.isArray(inventory)) return {schema: 1, version: CANDIDATE_ASSESSMENT_VERSION, state: 'UNIVERSE_UNAVAILABLE',
     asOf: report?.ts, mode: 'REVIEW_ONLY', selections: [], markets: [], shortlist: [], unfinished: [],
@@ -268,14 +268,14 @@ export function buildCandidateAssessment({report, sidecar, universe, observer, f
     const priorEntries = priorReceipts instanceof Map ? priorReceipts.get(selection.selectionId) : null;
     const prior = priorEntries && [...list(priorEntries.researchHistory),priorEntries].filter(entry => entry.row?.state === 'EVALUATED').at(-1);
     const opinionReview = inspectOpinionReview({report, receipt:researchReceipt,
-      forecastComparisons:assessed?.forecastComparisons, prior});
+      forecastComparisons:assessed?.forecastComparisons, forecast, sidecar, prior});
     reviewed.opinionReview = opinionReview;
     if (!opinionReview.complete) {
       reviewed.reviewState = 'UNFINISHED';
       reviewed.missingResearch = unique([...reviewed.missingResearch,...opinionReview.missing]);
     }
     const forecastLeadReview = inspectForecastLeadReview({report,sidecar,selection,receipt:researchReceipt,
-      forecast,feed,developmentReplay});
+      forecast,feed,forecastFollowUps,developmentReplay});
     reviewed.forecastLeadReview = forecastLeadReview;
     if (!forecastLeadReview.complete) {
       reviewed.reviewState = 'UNFINISHED';
