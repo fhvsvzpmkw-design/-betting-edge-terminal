@@ -1,6 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+function sameInstant(left,right) {
+  if(typeof left!=='string'||typeof right!=='string')return false;
+  const a=Date.parse(left),b=Date.parse(right);
+  return Number.isFinite(a)&&Number.isFinite(b)&&a===b;
+}
+
 // INFO describes completed research, independently of when a fair last changed.
 // Join the existing durable completion record to its exact active-week sweep.
 export function selectCompletedResearchReview({active, ledger, events}) {
@@ -26,7 +32,7 @@ export function selectCompletedResearchReview({active, ledger, events}) {
     if (matches.length !== 1) continue;
     const sweep = matches[0];
     if (sweep.sourceTaskKey !== event.taskKey || sweep.completionResult !== event.completionResult
-      || sweep.startedAt !== event.startedAt || sweep.summary?.marketViewed !== false) continue;
+      || !sameInstant(sweep.startedAt,event.startedAt) || sweep.summary?.marketViewed !== false) continue;
     const times = [event.startedAt, sweep.completedAt, receipt.verifiedAt, event.completedAt].map(Date.parse);
     if (times.some(time => !Number.isFinite(time)) || times.some((time, index) => index > 0 && time < times[index - 1])) continue;
     reviews.push({runEventId: event.runEventId, taskKey: event.taskKey, completedAt: sweep.completedAt, scope: sweep.scope || null});
