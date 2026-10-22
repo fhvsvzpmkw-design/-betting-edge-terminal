@@ -130,7 +130,7 @@
   "state": "ACTIVE",
   "baselineStatus": "FULL_CURRENT_REVIEW_RECORDED",
   "createdAt": "2026-10-20T21:24:40.453Z",
-  "updatedAt": "2026-10-22T23:05:53.431Z",
+  "updatedAt": "2026-10-22T23:49:53.000Z",
   "purpose": "Preserve Week7 current-information research and independently constructed Graham fairs after completed Week6 and verified Week5 learning.",
   "researchEventsDir": "data/walters/nfl/2026/week-07-research-events",
   "rolloverProvenance": {
@@ -23798,6 +23798,335 @@
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "schema": 1,
+      "season": 2026,
+      "week": 7,
+      "sequence": 15,
+      "type": "SCHEDULED_INFORMATION_DELTA",
+      "runEventId": "graham-delta-1645-2026-w07-20261022T164224-0700",
+      "sourceTaskKey": "DELTA_1645",
+      "completionResult": "MATERIAL_CHANGE",
+      "startedAt": "2026-10-22T23:42:24.000Z",
+      "completedAt": "2026-10-22T23:49:53.000Z",
+      "scope": "Full market-isolated Week 7 Thursday Delta across all 28 active teams and 14 games from the latest verified Daily Review coverage end. Reuses the governed NE-CHI game-day inactive publication already completed inside the coverage window, verifies repository and deployed football fields, ingests the official Thursday league report, and preserves practice-only or role-ambiguous inputs fail closed.",
+      "sourcesChecked": [
+        {
+          "source": "NFL official Week 7 all-game injury tracker",
+          "url": "https://www.nfl.com/injuries/",
+          "checkedAt": "2026-10-22T23:49:53.000Z",
+          "purpose": "Cover Thursday practice status for every active Week 7 team and identify exact QB/personnel deltas without viewing market data."
+        },
+        {
+          "source": "Tampa Bay Buccaneers official Thursday injury report",
+          "url": "https://www.buccaneers.com/news/buccaneers-panthers-injury-report-oct-22-week-7-2026",
+          "checkedAt": "2026-10-22T23:49:53.000Z",
+          "purpose": "Recheck Baker Mayfield and paired TB-CAR Thursday participation; no final starter decision was issued."
+        },
+        {
+          "source": "Baltimore Ravens official injury report",
+          "url": "https://www.baltimoreravens.com/team/injury-report/index-app",
+          "checkedAt": "2026-10-22T23:49:53.000Z",
+          "purpose": "Recheck Lamar Jackson and paired CIN-BAL Thursday participation; no final starter decision was issued."
+        },
+        {
+          "source": "Saved NE-CHI game-day inactive review",
+          "url": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-ne-chi-gameday-inactive-review.json",
+          "checkedAt": "2026-10-22T23:49:53.000Z",
+          "purpose": "Reuse resolved game-day evidence and exact fail-closed cases; do not repeat completed research."
+        },
+        {
+          "source": "Market-safe repository and deployed readback",
+          "url": "https://fhvsvzpmkw-design.github.io/-betting-edge-terminal/data/walters/nfl/current-week-terminal.json",
+          "checkedAt": "2026-10-22T23:49:53.000Z",
+          "purpose": "Verify only allowlisted football publication fields with tools/graham-independent-readback.mjs; raw market-bearing terminal bytes were not printed."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "NE-CHI",
+          "gameKey": "2026-W07-NE-CHI",
+          "summary": "Final inactive evidence closed five active cases and T.J. Edwards' one-for-one replacement. The governed personnel publication moved the displayed Chicago fair from -1.5 to -1; five numerical cases remain explicitly fail closed.",
+          "materiality": "MATERIAL_PERSONNEL_PUBLICATION_REUSED_AND_VERIFIED",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-ne-chi-gameday-inactive-review.json",
+            "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-delta-1645-164224.json"
+          ]
+        },
+        {
+          "team": "PIT-NO",
+          "gameKey": "2026-W07-PIT-NO",
+          "summary": "Thursday participation was captured; no final designation plus supported replacement role was eligible.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "SF-ATL",
+          "gameKey": "2026-W07-SF-ATL",
+          "summary": "Thursday participation was captured; practice rows do not establish replacement roles or effectiveness percentages.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "CIN-BAL",
+          "gameKey": "2026-W07-CIN-BAL",
+          "summary": "Lamar Jackson remained limited Thursday without an official Week 7 starter decision; Baltimore stays fail closed.",
+          "materiality": "MATERIAL_QB_PROGRESS_NO_STARTER_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.baltimoreravens.com/team/injury-report/index-app",
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "TB-CAR",
+          "gameKey": "2026-W07-TB-CAR",
+          "summary": "Baker Mayfield was full again Thursday, but Tampa Bay had not issued the final starter decision; the QB writer remains gated.",
+          "materiality": "MATERIAL_QB_PROGRESS_NO_STARTER_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.buccaneers.com/news/buccaneers-panthers-injury-report-oct-22-week-7-2026",
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "NYG-HOU",
+          "gameKey": "2026-W07-NYG-HOU",
+          "summary": "Both teams' Thursday participation is available; J.J. McCarthy remains the already-applied starter and no new personnel case had final replacement proof.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "IND-MIN",
+          "gameKey": "2026-W07-IND-MIN",
+          "summary": "Thursday participation was captured; no new final availability/replacement resolution was eligible.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "MIA-NYJ",
+          "gameKey": "2026-W07-MIA-NYJ",
+          "summary": "Thursday participation was captured; no new final availability/replacement resolution was eligible.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "CLE-TEN",
+          "gameKey": "2026-W07-CLE-TEN",
+          "summary": "Thursday participation was captured; no new final availability/replacement resolution was eligible.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "DEN-ARI",
+          "gameKey": "2026-W07-DEN-ARI",
+          "summary": "Carson Beck was a Thursday non-participant; practice status alone does not resolve the starter or authorize a QB change.",
+          "materiality": "MATERIAL_QB_PRACTICE_STATUS_NO_STARTER_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "GB-DET",
+          "gameKey": "2026-W07-GB-DET",
+          "summary": "Thursday participation was captured; no new final availability/replacement resolution was eligible.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "LAR-LV",
+          "gameKey": "2026-W07-LAR-LV",
+          "summary": "Puka Nacua was limited after leaving Thursday practice; no final designation or supported replacement allocation was available.",
+          "materiality": "MATERIAL_PRACTICE_INJURY_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "KC-SEA",
+          "gameKey": "2026-W07-KC-SEA",
+          "summary": "Thursday participation was captured; no new final availability/replacement resolution was eligible.",
+          "materiality": "THURSDAY_REPORT_RECORDED_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        },
+        {
+          "team": "DAL-PHI",
+          "gameKey": "2026-W07-DAL-PHI",
+          "summary": "Saquon Barkley returned as a limited participant; no final designation plus supported replacement allocation was available.",
+          "materiality": "MATERIAL_PRACTICE_PROGRESS_NO_FINAL_DECISION",
+          "carriedRatingAction": "NO_CARRIED_MOVE",
+          "delta": 0,
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/"
+          ]
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W07-NE-CHI",
+          "sourceTask": "GRAHAM_WEEKLY_RECOVERY",
+          "publicationStatus": "VERIFIED_REPOSITORY_AND_DEPLOYED",
+          "priorPublishedFairHome": -1.5,
+          "newPublishedFairHome": -1,
+          "priorExactFairHome": -1.685,
+          "newExactFairHome": -0.785,
+          "priorPersonnelOverlay": -3.2,
+          "newPersonnelOverlay": -2.3,
+          "carriedRatingChange": false,
+          "unresolvedCases": [
+            "Jeremiah Webb",
+            "Reggie Gilliam",
+            "Alijah Vera-Tucker",
+            "Nikola Kalinic",
+            "Ray-Ray McCloud III"
+          ]
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_INFORMATION_DELTA",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "reason": "Thursday practice and first-kickoff personnel evidence did not authorize a carried-rating rebuild.",
+        "marketViewed": false
+      },
+      "summary": {
+        "teamsReviewed": 28,
+        "gamesReviewed": 14,
+        "marketViewed": false,
+        "evidencePath": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-delta-1645-164224.json",
+        "priorVerifiedRunEventId": "graham-daily-review-2026-w07-20261022T112743-0700",
+        "coverageStart": "2026-10-22T18:36:00.000Z",
+        "coverageEnd": "2026-10-22T23:49:53.000Z",
+        "missedDayCatchUpRequired": false,
+        "catchUpComplete": true,
+        "coverageAdvanced": true,
+        "historicalLearning": {
+          "state": "COMPLETE",
+          "gamesApplied": 14,
+          "gamesExpected": 14
+        },
+        "ratingPropagation": {
+          "state": "COMPLETE",
+          "gamesVerified": 14,
+          "gamesExpected": 14
+        },
+        "currentAvailability": {
+          "state": "INCOMPLETE",
+          "unresolvedGames": 14,
+          "unresolvedCases": 107,
+          "neChiUnresolvedCases": 5
+        },
+        "baseline": {
+          "state": "COMPLETE",
+          "season": 2026,
+          "week": 7
+        },
+        "rolloverHandoffGate": {
+          "required": false,
+          "reason": "Historical learning and rating propagation are complete for all 14 Week 6-to-7 pairs; no unfinished earlier learning remains to hand off."
+        },
+        "materialFootballChange": true,
+        "numericArtifactsChanged": true,
+        "customerPublicationChanged": true,
+        "personnelWriterInvokedByThisRun": false,
+        "reusedPublication": {
+          "sourceTask": "GRAHAM_WEEKLY_RECOVERY",
+          "personnelCommit": "92106184a6dc6537b00eb1eab6bab5159e37cf8b",
+          "qbReconciliationCommit": "4fd9e7ba780e6a2a67737e9af16a43b217acdf74",
+          "terminalCommit": "927798276ace4cbfdf9dccd0447f20a03534c33a",
+          "repositoryReadback": "VERIFIED",
+          "deployedReadback": "VERIFIED"
+        },
+        "qbStatus": {
+          "BAL": "FAIL_CLOSED_GAME_PRESERVED",
+          "TB": "FAIL_CLOSED_GAME_PRESERVED",
+          "NYG": "OPERATIONAL_SCOPED_APPLIED"
+        },
+        "stalledInputs": [
+          {
+            "input": "BAL Week 7 starter identity",
+            "owner": "GRAHAM_QB_PERFORMANCE_PRODUCTION",
+            "nextAction": "Wait for the official Lamar Jackson/Tyler Huntley starter or final game-status decision; then use the existing QB writer."
+          },
+          {
+            "input": "TB Week 7 starter identity",
+            "owner": "GRAHAM_QB_PERFORMANCE_PRODUCTION",
+            "nextAction": "Wait for Tampa Bay's official Baker Mayfield/Jalon Daniels starter decision; then use the existing QB writer."
+          },
+          {
+            "input": "NE-CHI Jeremiah Webb",
+            "owner": "GOVERNED_VALUE_OWNER",
+            "nextAction": "Supply an immutable current-iteration identity/value capture or explicit no-baseline-role ruling."
+          },
+          {
+            "input": "NE-CHI Reggie Gilliam",
+            "owner": "CURRENT_PERSONNEL_ADAPTER",
+            "nextAction": "Bind a source-supported fullback/H-back allocation."
+          },
+          {
+            "input": "NE-CHI Alijah Vera-Tucker",
+            "owner": "CURRENT_PERSONNEL_ADAPTER",
+            "nextAction": "Resolve the whole-line role chain without duplicate reserve credit."
+          },
+          {
+            "input": "NE-CHI Nikola Kalinic",
+            "owner": "GOVERNED_VALUE_OWNER",
+            "nextAction": "Supply an immutable current-iteration identity/value capture or explicit ruling."
+          },
+          {
+            "input": "NE-CHI Ray-Ray McCloud III",
+            "owner": "CURRENT_PERSONNEL_ADAPTER",
+            "nextAction": "Bind a supported receiver/return allocation without duplicating baseline duties."
+          }
+        ],
+        "nextActions": [
+          "Friday final reports: prioritize exact unresolved quarterback identities and supported OUT/active personnel cases through existing governed writers.",
+          "Do not convert Thursday practice participation into effectiveness percentages or replacement allocations.",
+          "Keep the remaining 107 current-availability cases and all five NE-CHI numerical cases fail closed until their named owners resolve the exact missing input."
+        ],
+        "note": "Historical learning and rating propagation are complete and unchanged. Current availability remains incomplete. The NE-CHI numerical publication was performed by the existing weekly-recovery owner before this Delta started, then reused and independently verified here; research recording and verified customer publication are reported separately."
       }
     }
   ]
