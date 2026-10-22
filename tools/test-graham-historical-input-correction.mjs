@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {createHash} from 'node:crypto';
 import {historicalInputCorrection,correctionDigest,HISTORICAL_CORRECTION,verifiedCorrectionPublication} from './graham-historical-input-correction.mjs';
+import {applyCurrentRatingReview,CURRENT_RATING_REVIEW} from './graham-current-rating-review.mjs';
 import {weeklyCalculation} from './apply-graham-carried-rating-audit.mjs';
 import {refreshRatingBases} from './graham-refresh-rating-bases.mjs';
 const sum=(...xs)=>Number(xs.reduce((s,x)=>s+x,0).toFixed(12));
@@ -43,6 +45,21 @@ blocked('intervening durable transaction cannot be overwritten',x=>{const t=x.po
 blocked('wrong original evidence intent blocks',x=>{const load=x.loadEvidence;x.loadEvidence=(...a)=>{const j=load(...a);if(a[0].path==='corrected.json')j.bundle.correctionIntent.originalEvidencePath='wrong.json';return j;};},/CORRECTION_EVIDENCE_INTENT/);
 test('duplicate audit appends no second event',()=>{const x=fixture();apply(x);const before=JSON.stringify(x.power);assert.throws(()=>apply(x),/AUDIT_ALREADY_APPLIED/);assert.equal(JSON.stringify(x.power),before);});
 test('tampered correction proof cannot certify publication',()=>{const x=fixture();apply(x);x.power.historicalInputCorrections[0].replayProof[0].teams[0].correctedToRating+=1;assert.equal(verifiedCorrectionPublication(x.power,x.input),false);});
+const reviewedFixture=()=>{
+ const x=fixture();apply(x);
+ const policy=JSON.parse(fs.readFileSync('data/walters/nfl/graham-fair-decomposition-policy-v1.json'));
+ const rating=abbr=>x.power.teams.find(t=>t.abbr===abbr).currentRating,neutral=sum(rating('A'),-rating('C'));
+ const g={gameKey:'2026-W07-A-C',away:'A',home:'C',startTimePacific:'2026-10-25T13:00:00-07:00',neutralBaseHome:neutral,grahamExactFairHome:Number((neutral-2.082+.25+.125).toFixed(3)),grahamFairHome:0,homeFieldPointsToHomeSpread:-2.082,personnelOverlayPointsToHomeSpread:.25,matchupOverlayPointsToHomeSpread:.125,personnelBaselineExactFairHome:neutral-2.082+.125,homeFieldNonLocationExactFairHome:neutral+.25+.125,sourceRefs:[],adjustments:[],ratingCarryForward:{awayRating:rating('A'),homeRating:rating('C')}};
+ g.grahamFairHome=Math.round(g.grahamExactFairHome*2)/2;
+ const board={season:2026,week:7,baselineStatus:'CURRENT_BASELINE_COMPLETE',games:[g]};
+ const blob=value=>{const b=Buffer.from(JSON.stringify(value,null,2)+'\n');return createHash('sha1').update(Buffer.from(`blob ${b.length}\0`)).update(b).digest('hex');};
+ const plan={schema:1,type:CURRENT_RATING_REVIEW,state:'READY',auditId:'current-review-test',season:2026,week:7,effectiveAt:'2026-10-22T20:00:00Z',expectedPowerBlobSha:blob(x.power),expectedBoardBlobSha:blob(board),authorization:{source:'USER_REQUEST_2026_10_22',text:'Review current ratings and apply supported one-time adjustments.'},estimateAcknowledged:true,marketViewed:false,teams:x.power.teams.map(t=>({team:t.abbr,priorRating:t.currentRating,delta:t.abbr==='A'?.5:0,decision:t.abbr==='A'?'ADJUST':'HOLD',rationale:'Evidence-supported current-baseline review judgment.',sourceRefs:['review-evidence']}))};
+ const result=applyCurrentRatingReview({plan,power:x.power,board,active:x.active,policy});
+ x.power=result.power;return x;
+};
+test('verified current baseline review preserves historical completion certification',()=>{const x=reviewedFixture();assert.ok(verifiedCorrectionPublication(x.power,x.input));});
+test('unbound event after current review cannot certify historical publication',()=>{const x=reviewedFixture(),t=x.power.teams.find(t=>t.abbr==='A');t.history.push({...t.history.at(-1),auditId:'unbound-extra',sequence:99,fromRating:t.currentRating,delta:0,toRating:t.currentRating});assert.equal(verifiedCorrectionPublication(x.power,x.input),false);});
+test('current review cannot conceal altered original historical correction',()=>{const x=reviewedFixture(),t=x.power.teams.find(t=>t.abbr==='A');t.history.find(e=>e.type===HISTORICAL_CORRECTION).reason='altered preserved history';assert.equal(verifiedCorrectionPublication(x.power,x.input),false);});
 test('neutral refresh accepts source-week or next-week stored bases and preserves orthogonal layers',()=>{
  for(const useNext of [false,true]){
   const x=fixture(),policy=JSON.parse(fs.readFileSync('data/walters/nfl/graham-fair-decomposition-policy-v1.json'));

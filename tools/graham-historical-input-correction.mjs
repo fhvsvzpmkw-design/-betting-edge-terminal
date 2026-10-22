@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {verifyCurrentRatingReview} from './graham-current-rating-review.mjs';
 export const HISTORICAL_CORRECTION='WALTERS_HISTORICAL_INPUT_CORRECTION';
 export const correctionDigest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const fail=s=>{throw Error('HISTORICAL_INPUT_CORRECTION:'+s);};
@@ -12,7 +13,23 @@ export function verifiedCorrectionPublication(power,staging){
  if(correctionDigest(proof)!==proofSha256||entry.marketViewed!==false||!entry.originalEventsPreserved||!entry.priorPredictionsPreserved)return false;
  const receiptEntry=power.weekly90_10?.inputCorrections?.at(-1);
  if(receiptEntry?.auditId!==staging.auditId||receiptEntry.proofSha256!==proofSha256)return false;
- return ratingChanges.every(c=>{const t=power.teams.find(t=>t.abbr===c.team),e=t?.history?.at(-1);return t?.currentRating===c.currentRating&&e?.type===HISTORICAL_CORRECTION&&e.auditId===staging.auditId&&e.proofSha256===proofSha256&&e.fromRating===c.priorRating&&e.toRating===c.currentRating&&e.delta===c.delta;});
+ // This receipt certifies the preserved historical correction. A separately
+ // verified, forward-only current-rating review may establish a later baseline
+ // without invalidating that history or claiming the old correction again.
+ let reviewVerified;
+ return ratingChanges.every(c=>{
+  const t=power.teams.find(t=>t.abbr===c.team);
+  const matches=t?.history?.filter(e=>e.type===HISTORICAL_CORRECTION&&e.auditId===staging.auditId&&e.proofSha256===proofSha256)||[];
+  if(matches.length!==1)return false;
+  const e=matches[0];
+  if(e.fromRating!==c.priorRating||e.toRating!==c.currentRating||e.delta!==c.delta)return false;
+  const suffix=t.history.slice(t.history.indexOf(e)+1);
+  if(!suffix.length)return t.currentRating===c.currentRating;
+  if(reviewVerified===undefined)reviewVerified=verifyCurrentRatingReview(power,power.currentRatingReview);
+  const later=suffix[0];
+  return reviewVerified===true&&suffix.length===1&&later.type==='GRAHAM_ONE_TIME_CURRENT_RATING_REVIEW'&&
+   later.auditId===power.currentRatingReview.auditId&&later.fromRating===c.currentRating&&later.toRating===t.currentRating;
+ });
 }
 
 // Plan and verify the entire replay before appending any event. Old events,

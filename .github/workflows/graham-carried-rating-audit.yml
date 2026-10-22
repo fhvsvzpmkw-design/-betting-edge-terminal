@@ -7,6 +7,8 @@ on:
       - data/walters/nfl/carried-rating-audit-staging.json
   pull_request:
     paths:
+      - tools/graham-current-rating-review.mjs
+      - tools/test-graham-current-rating-review.mjs
       - .github/workflows/graham-carried-rating-audit.yml
       - tools/graham-historical-input-correction.mjs
       - tools/test-graham-historical-input-correction.mjs
@@ -62,6 +64,7 @@ jobs:
           node-version: '22'
       - name: Validate proposed weekly recovery code and evidence
         run: |
+          node tools/test-graham-current-rating-review.mjs
           node tools/test-graham-historical-input-correction.mjs
           node tools/test-graham-historical-ancillary-duty.mjs
           node tools/apply-graham-carried-rating-audit.mjs --self-test
@@ -91,6 +94,7 @@ jobs:
       - name: Validate governed audit code
         run: |
           set -euo pipefail
+          node tools/test-graham-current-rating-review.mjs
           node --check tools/apply-graham-carried-rating-audit.mjs
           node --check tools/graham-active-week.mjs
           node --check tools/graham-fair-decomposition.mjs
