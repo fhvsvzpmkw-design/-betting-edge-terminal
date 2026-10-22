@@ -8,6 +8,23 @@ import labels from '../assets/selection-label.js';
 // same identity-derived formatter; newly prepared reports freeze complete titles.
 export const SELECTION_LABEL_FROM='2026-10-12T11:58:55-07:00';
 const enforced=report=>Date.parse(report?.ts)>=Date.parse(SELECTION_LABEL_FROM);
+const copyFields=new Set(['analysis','support','contrary','rationale','decisionRationale','decisionExplanation','decisionImpact','application']);
+function repairCopy(holder,rec){
+  if(!holder||typeof holder!=='object')return;
+  for(const [key,value] of Object.entries(holder)){
+    if(copyFields.has(key)&&typeof value==='string')holder[key]=labels.repairText(rec,value);
+    else if(value&&typeof value==='object')repairCopy(value,rec);
+  }
+}
+function repairCandidateCopies(holder,rec,title){
+  if(!holder||typeof holder!=='object')return;
+  if(holder.quote?.selectionKey===rec.feed.selectionKey){
+    if('title' in holder)holder.title=title;
+    if('recordedTitle' in holder)holder.recordedTitle=title;
+    repairCopy(holder,rec);return;
+  }
+  for(const value of Object.values(holder))if(value&&typeof value==='object')repairCandidateCopies(value,rec,title);
+}
 export function selectionLabelViolations(report){
   if(!enforced(report))return [];
   return (report.recs||[]).flatMap((rec,index)=>{
@@ -31,22 +48,30 @@ export function normalizeSelectionLabels(report,sidecar){
   if(!Array.isArray(report.recs)||sidecar?.recommendations?.length!==report.recs.length)throw Error('Selection labels require aligned report and sidecar recommendations');
   const replacements=[];
   for(const [index,rec] of report.recs.entries()){
-    const item=sidecar.recommendations[index],info=labels.describe(rec);
+    const matches=(report.gameIntelligence?.games||[]).filter(game=>String(game.eventId)===String(rec.feed?.eventId));
+    const display=labels.withEventMetadata(rec,matches.length===1?matches[0]:null);
+    const item=sidecar.recommendations[index],info=labels.describe(display);
     if(!item||typeof item!=='object'||Array.isArray(item))throw Error(`Recommendation ${index+1}: invalid sidecar recommendation`);
     if(!info.applicable)continue;
     if(info.problem)throw Error(`Recommendation ${index+1}: ${info.problem}`);
     const key=rec.feed.selectionKey;
     const itemKey=item.feed?.selectionKey||item.selectionKey||item.cardEvidence?.selectionKey;
     if(itemKey&&itemKey!==key)throw Error(`Recommendation ${index+1}: sidecar selection identity differs from report`);
-    replacements.push({index,title:info.title});
+    replacements.push({index,title:info.title,display});
   }
   const result=structuredClone({report,sidecar});
   for(const replacement of replacements){
-    const {index,title}=replacement,key=report.recs[index].feed.selectionKey;
+    const {index,title,display}=replacement,key=report.recs[index].feed.selectionKey;
     result.report.recs[index].title=title;result.sidecar.recommendations[index].title=title;
+    if('meta' in display)result.report.recs[index].meta=display.meta;
+    if('meta' in result.sidecar.recommendations[index])result.sidecar.recommendations[index].meta=display.meta;
+    repairCopy(result.report.recs[index],display);repairCopy(result.sidecar.recommendations[index],display);
     for(const receipt of result.sidecar.primaryAnalysis?.receipts||[])
-      if(receipt.state==='EVALUATED'&&receipt.decision?.feed?.selectionKey===key)
-        for(const copy of [receipt.decision,receipt.evidence])if(copy)copy.title=title;
+      if(receipt.state==='EVALUATED'&&receipt.decision?.feed?.selectionKey===key){
+        for(const copy of [receipt.decision,receipt.evidence])if(copy){copy.title=title;if('meta' in copy)copy.meta=display.meta;repairCopy(copy,display);}
+        repairCopy(receipt.candidateAssessment,display);
+      }
+    for(const assessment of [result.report.candidateAssessment,result.sidecar.candidateAssessment])repairCandidateCopies(assessment,display,title);
   }
   validateSelectionLabels(result.report);return result;
 }
@@ -65,3 +90,4 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
     console.log('SELECTION LABELS OK');
   }catch(error){console.error('SELECTION LABEL ERROR: '+error.message);process.exitCode=1;}
 }
+

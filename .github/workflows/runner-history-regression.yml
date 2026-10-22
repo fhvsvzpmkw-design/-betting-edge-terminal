@@ -11,6 +11,11 @@ on:
       - runner.html
       - assets/runner-core-runtime.js
       - assets/runner-picks-ui.css
+      - assets/card-summary.js
+      - assets/selection-label.js
+      - tools/selection-label-gate.mjs
+      - tests/card-summary.test.cjs
+      - tests/selection-copy.test.mjs
       - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
       - assets/menu-home-style.js
@@ -57,6 +62,11 @@ on:
       - runner.html
       - assets/runner-core-runtime.js
       - assets/runner-picks-ui.css
+      - assets/card-summary.js
+      - assets/selection-label.js
+      - tools/selection-label-gate.mjs
+      - tests/card-summary.test.cjs
+      - tests/selection-copy.test.mjs
       - tests/runner-picks-ui.test.mjs
       - assets/report-dashboard-vigscope.js
       - assets/menu-home-style.js
@@ -113,6 +123,8 @@ jobs:
       - name: Syntax-check runner UI modules
         run: |
           node --check assets/runner-core-runtime.js
+          node --check assets/card-summary.js
+          node --check assets/selection-label.js
           node --check assets/preferences-framework.js
           node --check assets/syndicate-roster.js
           node --check assets/report-dashboard-vigscope.js
@@ -137,6 +149,10 @@ jobs:
         run: node tests/runner-session-strip-applicability.test.js
       - name: Run published-pick filters and report comparison regression
         run: node tests/runner-picks-ui.test.mjs
+      - name: Verify concise card evidence and exact selection copy
+        run: |
+          node --test tests/card-summary.test.cjs
+          node tests/selection-copy.test.mjs
       - name: Run permanent Main Betting Edge schedule regression
         run: node tests/main-schedule.test.mjs
       - name: Run F6 preferences framework regression
@@ -177,3 +193,4 @@ jobs:
           name: preferences-screenshots
           path: .qa/preferences-*.png
           include-hidden-files: true
+
