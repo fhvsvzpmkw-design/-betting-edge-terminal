@@ -82,7 +82,14 @@ export function renderPerformance(e) {
   return `<section class="performance" data-performance-through-week="${p.throughWeek}"><div class="performance-stats">${metric('GRAHAM // SEASON',record(p.strategies.graham),`${percent(p.strategies.graham.winPct)} ATS // pushes excluded`)}${metric(`LAST WEEK // WEEK ${p.throughWeek}`,record(latest.graham),`${percent(latest.graham.winPct)} ATS // ${latest.graham.complete} games`)}${metric('COMPLETED SAMPLE',String(p.rows.length),`NFL games // Weeks ${weeks[0]}–${p.throughWeek}`)}</div><div class="performance-read"><b>WESTON’S PERFORMANCE READ</b>${paragraphs(e.performanceMemo)}</div><h3>THE SAME GAMES. THREE COMPARISONS.</h3>${comparison}<h3>WEEK-BY-WEEK RECORD</h3>${weekly}${performanceCurve(p)}${returns}<p class="performance-caption">Return figures use a standardized 1u risk at −110 on every comparison, including pushes in the risk denominator. They are illustrative, not issued wagers or actual account returns.</p><details class="performance-log"><summary>LAST WEEK’S RESULTS // WEEK ${p.throughWeek} // ${latest.graham.complete} GAMES</summary>${ledger(p.rows.filter(r => r.week === p.throughWeek))}</details><details class="performance-log"><summary>EARLIER RESULTS // WEEKS ${weeks[0]}–${p.throughWeek-1} // ${p.rows.length-latest.graham.complete} GAMES</summary>${ledger(p.rows.filter(r => r.week < p.throughWeek))}</details><p class="performance-caption">All three records use the same settled games and latest saved pre-kickoff Pinnacle spreads. The Graham comparison takes the side favoured by its fair against that saved spread; an identical line follows the favourite, or home at pick’em. No recorded closing quotes are present in this snapshot. ATS wins exclude pushes. Margin accuracy: Graham MAE ${p.accuracy.graham.mae.toFixed(2)} / RMSE ${p.accuracy.graham.rmse.toFixed(2)} pts; Pinnacle MAE ${p.accuracy.pinnacle.mae.toFixed(2)} / RMSE ${p.accuracy.pinnacle.rmse.toFixed(2)} pts.</p><p class="performance-caption">VALUE RECORD UPDATED ${encode(stamp(p.generatedAt))} // ${p.rows.length} settled, ${p.coverage.pending} pending in this completed sample. Week ${e.week} remains ahead. <a href="../../runner.html" target="_blank" rel="noopener">OPEN VIGSCOPE // VALUE TAB</a></p></section>`;
 }
 
+export function editionShell(e) {
+  const shell = e.shell ?? {id:'private-sheet',version:3};
+  assert(shell.id === 'private-sheet' && [3,4].includes(shell.version), 'Unsupported Bill shell');
+  return shell;
+}
+
 export function validateEdition(e) {
+  editionShell(e);
   assert(e.schema === 1 && /^\d{4}-w\d{2}-[a-z0-9-]+$/.test(e.id), 'Invalid edition identity');
   assert(e.source.path === 'data/walters/nfl/current-week-terminal.json', 'Graham source required');
   assert(/^[a-f0-9]{40}$/.test(e.source.commit) && /^[a-f0-9]{64}$/.test(e.source.sha256), 'Pinned source provenance required');
@@ -125,7 +132,7 @@ export function renderEdition(e, template, baseHref = './') {
     PERFORMANCE:renderPerformance(e),
     CHANGE_MEMO:paragraphs(e.changeMemo), WINDOW_ENTRIES:entries,
     FINAL_DISPOSITION:`<b>FINAL DESK DISPOSITION // NO ORDER</b>${paragraphs(e.closingWatchlist)}<div class="note">${encode(e.signature)}</div>`,
-    AUTHORITY_FOOTER:`Dated guest edition: ${encode(stamp(e.issuedAt))}. Graham board captured ${encode(stamp(e.source.generatedAt))}; information review ${encode(stamp(e.source.lastResearchAt))}. Numbers belong to Graham Mercer’s Private Line. Pinnacle is a benchmark at the printed observation time; gaps and margin notes are review priorities, not executable orders. MKT Δ is the saved change in Pinnacle's home spread from the day's retained baseline; 0 means unchanged, unavailable means no usable comparison. The issued execution report retains betting authority.<br><a href="../../syndicates/generated/graham-mercer/hotline.html">Graham’s current Private Line</a> // <a href="../../${encode(e.editionPath)}">This edition’s source record</a><br>HOTLINE SHELL: PRIVATE SHEET v3. Full-week guest fax; refresh the edition, preserve the page.`
+    AUTHORITY_FOOTER:`Dated guest edition: ${encode(stamp(e.issuedAt))}. Graham board captured ${encode(stamp(e.source.generatedAt))}; information review ${encode(stamp(e.source.lastResearchAt))}. Numbers belong to Graham Mercer’s Private Line. Pinnacle is a benchmark at the printed observation time; gaps and margin notes are review priorities, not executable orders. MKT Δ is the saved change in Pinnacle's home spread from the day's retained baseline; 0 means unchanged, unavailable means no usable comparison. The issued execution report retains betting authority.<br><a href="../../syndicates/generated/graham-mercer/hotline.html">Graham’s current Private Line</a> // <a href="../../${encode(e.editionPath)}">This edition’s source record</a><br>HOTLINE SHELL: PRIVATE SHEET v${editionShell(e).version}. Full-week guest fax; refresh the edition, preserve the page.`
   };
   const html = template.replace(/\{\{([A-Z_]+)\}\}/g, (_,key) => { assert(key in values, `Unknown content zone ${key}`); return values[key]; });
   assert(!/\{\{[A-Z_]+\}\}/.test(html), 'Unfilled template');
@@ -137,7 +144,8 @@ export function build({check = false} = {}) {
   assert(/^data\/characters\/bill-weston\/editions\/[a-z0-9-]+\.json$/.test(pointer.path), 'Invalid edition path');
   const e = json(pointer.path);
   assert(e.editionPath === pointer.path, 'Edition path mismatch');
-  const template = read('syndicates/downtown-booth/shell-v3.html');
+  const shell = editionShell(e);
+  const template = read(`syndicates/downtown-booth/shell-v${shell.version}.html`);
   const live = renderEdition(e, template);
   const archiveRel = `${e.issuedAt.slice(0,10)}/${e.id}.html`;
   const archivePath = `${ARCHIVE}/${archiveRel}`;
@@ -145,7 +153,7 @@ export function build({check = false} = {}) {
   // Validate every immutable output before any mutation. Rebuilds never rewrite an issued opinion.
   if (fs.existsSync(path.join(ROOT,archivePath))) assert.equal(read(archivePath), archived, 'Archived edition is immutable; create a new edition ID');
   const index = json(`${ARCHIVE}/index.json`);
-  const entry = {id:`${e.id}|bill-weston`, characterId:'bill-weston', profileId:'vic-fremont', displayName:'BILL WESTON', publication:'PRIVATE SHEET', date:e.issuedAt.slice(0,10), session:e.id, label:e.label, issuedAt:e.issuedAt, sourceEdition:pointer.path, sourceCommit:e.source.commit, sourceSha256:e.source.sha256, path:archiveRel, shellId:'private-sheet', shellVersion:3};
+  const entry = {id:`${e.id}|bill-weston`, characterId:'bill-weston', profileId:'vic-fremont', displayName:'BILL WESTON', publication:'PRIVATE SHEET', date:e.issuedAt.slice(0,10), session:e.id, label:e.label, issuedAt:e.issuedAt, sourceEdition:pointer.path, sourceCommit:e.source.commit, sourceSha256:e.source.sha256, path:archiveRel, shellId:shell.id, shellVersion:shell.version};
   const existing = index.issues.find(x => x.id === entry.id);
   if (existing) assert.deepEqual(existing, entry, 'Archive metadata is immutable');
   if (check) {
@@ -158,6 +166,7 @@ export function build({check = false} = {}) {
   }
   const profile = json('data/characters/bill-weston.json');
   profile.updatedAt = e.issuedAt;
+  if (e.shell) profile.hotlineStyle.shell = {...profile.hotlineStyle.shell,id:shell.id,version:shell.version,path:`./syndicates/downtown-booth/shell-v${shell.version}.html`};
   profile.continuity.lastEditionSeen = {id:e.id,label:e.label,timestamp:e.issuedAt,season:e.season,week:e.week,sourceEdition:pointer.path,archivePath};
   profile.continuity.currentMood = e.currentMood;
   if (!existing) index.issues.push(entry);

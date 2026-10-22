@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { build, renderEdition, validateEdition, spread, performanceSummaries } from '../tools/build-bill-weston-weekly.mjs';
+import { build, renderEdition, validateEdition, spread, performanceSummaries, editionShell } from '../tools/build-bill-weston-weekly.mjs';
 
 const pointer = JSON.parse(fs.readFileSync('data/characters/bill-weston/current-edition.json','utf8'));
 const edition = JSON.parse(fs.readFileSync(pointer.path,'utf8'));
-const template = fs.readFileSync('syndicates/downtown-booth/shell-v3.html','utf8');
+const template = fs.readFileSync(`syndicates/downtown-booth/shell-v${editionShell(edition).version}.html`,'utf8');
 build({check:true});
 const original = JSON.stringify(edition);
 const html = renderEdition(edition,template);
@@ -22,6 +22,16 @@ assert(html.includes(`${latest.grades.WIN}–${latest.grades.LOSS}–${latest.gr
 assert(html.includes('ILLUSTRATIVE RETURN CURVE') && html.includes('not issued wagers or actual account returns'),'Standardized return disclosure missing');
 const mastheadCss=fs.readFileSync('assets/syndicates/bill-weston/private-sheet-fax.css','utf8');
 assert(/\.fax\{display:block/.test(mastheadCss) && /\.weston-masthead\{width:100%;max-width:none/.test(mastheadCss),'Masthead must span the full fax width');
+const letterheadTemplate=fs.readFileSync('syndicates/downtown-booth/shell-v4.html','utf8');
+const letterheadCss=fs.readFileSync('assets/syndicates/bill-weston/private-sheet-letterhead.css','utf8');
+assert(!letterheadTemplate.includes('private-sheet-masthead.png') && !letterheadTemplate.includes('weston-portrait'), 'Guest letterhead uses one lead image, not a banner and second portrait');
+assert(letterheadTemplate.includes('<h1>Bill Weston</h1>') && letterheadTemplate.includes('THE PRIVATE SHEET'), 'Printed guest letterhead required');
+assert(/aspect-ratio:1672\/941/.test(letterheadCss) && /height:auto/.test(letterheadCss) && /object-fit:contain/.test(letterheadCss), 'Lead photo must retain natural proportions on narrow screens');
+assert.deepEqual(editionShell({}),{id:'private-sheet',version:3},'Historical editions default to their original shell');
+assert.throws(()=>editionShell({shell:{id:'private-sheet',version:5}}),/Unsupported Bill shell/);
+const previous=JSON.parse(fs.readFileSync('data/characters/bill-weston/editions/2026-w05-tuesday-performance.json','utf8'));
+const previousTemplate=fs.readFileSync('syndicates/downtown-booth/shell-v3.html','utf8');
+assert.equal(renderEdition(previous,previousTemplate,'../../'),fs.readFileSync('syndicates/downtown-booth/archive/2026-10-06/2026-w05-tuesday-performance.html','utf8'),'Original issued v3 edition remains byte-identical');
 for (const [file,base] of [['syndicates/downtown-booth/wire.html','./'],[JSON.parse(fs.readFileSync('data/characters/bill-weston.json','utf8')).continuity.lastEditionSeen.archivePath,'../../']]) {
   for (const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {
     const target=match[1].split('?')[0];

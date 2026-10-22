@@ -30,9 +30,11 @@ function fixture(seed={}){
 
 const app=fixture();
 const current=JSON.parse(JSON.stringify(app.api.currentHotlineShells()));
-assert.equal(shells.shells.length,14,'the historical shell registry remains intact');
+const shellKeys=shells.shells.map(shell=>`${shell.id}@${shell.version}`);
+assert.equal(new Set(shellKeys).size,shellKeys.length,'shell versions must remain unique');
+for(const key of ["muddy-broadcast@1","muddy-ledger-desk@3","private-sheet@1","private-sheet@2","private-sheet@3","lizard-line@2","delphoria-counter-sheet@2","delphoria-nfl-book@3","crown-and-lance@1","vegas-by-the-slice@3","vegas-by-the-slice@4","graham-mercer-default@1","delphoria-house-board@4","guy-blue-line@1"])assert.ok(shellKeys.includes(key),`historical shell ${key} remains available`);
 assert.equal(current.length,8);assert.equal(new Set(current.map(shell=>shell.characterId)).size,8);
-assert.equal(current.find(shell=>shell.characterId==='bill-weston').version,3);
+assert.equal(current.find(shell=>shell.characterId==='bill-weston').version,4);
 assert.equal(current.find(shell=>shell.characterId==='jesse-bains').version,4);
 assert.deepEqual(current.slice(0,5).map(shell=>shell.characterId),['eddie-numbers','graham-mercer','bill-weston','guy-laflame','lou-vega']);
 app.api.setShells({...shells,shells:[...shells.shells,{...current[0],version:999,defaultForCharacter:false},{...current[0],version:2,defaultForCharacter:true}]});
