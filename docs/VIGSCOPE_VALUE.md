@@ -21,4 +21,9 @@ Choose home when Graham's home fair line is lower than Pinnacle's home line; oth
 
 The initial weeks 1–3 dataset has 48 settled games: Graham 25–20–3, favourites 22–23–3, dogs 23–22–3. None has a saved CLOSE receipt, so these are labelled latest saved pre-kickoff quotes. Weekly/side/gap filters, score-margin MAE/RMSE, cumulative returns, maximum curve decline and the source-linked game ledger are retained.
 
-The results-index workflow refreshes the comparison when weekly ledgers or final facts change. Rendering and filtering do not rewrite prices, decisions, stakes or settlement grades.
+The dedicated `graham-value-refresh.yml` workflow refreshes this comparison after the Graham terminal publishes, on direct ledger/final-fact changes, after historical grading, and on an hourly recovery check. This completion trigger handles ledger commits made with `GITHUB_TOKEN`, which do not launch downstream push workflows. The card-results index has a separate publisher and cannot overwrite the comparison.
+
+`publish-graham-value.mjs` rebuilds from the latest `main` on every publication retry, records input blob hashes in `sourceBlobs`, verifies the published output and input hashes against remote `main`, and fails if freshness cannot be established. Unchanged inputs/results do not create hourly timestamp-only commits. Rendering and filtering do not rewrite prices, decisions, stakes or settlement grades.
+
+Guy’s ledger remains owned by `game-intelligence.yml`, which grades source results, rebuilds the board, and calls `track-guy-value.mjs` inside its publication retry. Frozen daily selections are not recreated by the Graham comparison refresh.
+

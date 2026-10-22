@@ -1,0 +1,55 @@
+name: Refresh Graham Value comparison
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Refresh Graham NFL terminal
+      - Isolated historical card grading
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'data/walters/nfl/**/week-*-daily-market-ledger.json'
+      - 'data/walters/nfl/**/*final-facts*.json'
+      - 'tools/build-graham-pinnacle-value.mjs'
+      - 'tools/publish-graham-value.mjs'
+      - 'assets/value-analytics.js'
+      - 'tests/graham-value-publish.test.mjs'
+      - 'tests/vigscope-value-v2.test.mjs'
+      - '.github/workflows/graham-value-refresh.yml'
+  schedule:
+    # Recovery for missed completion events; no commit when inputs are unchanged.
+    - cron: '23 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: graham-value-comparison
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate comparison, late inputs and publication races
+        run: |
+          node tests/vigscope-value-v2.test.mjs
+          node --test tests/graham-value-publish.test.mjs
+      - name: Rebuild, publish and verify current source coverage
+        run: |
+          git config user.name 'betting-edge-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          node tools/publish-graham-value.mjs
