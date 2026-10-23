@@ -1,0 +1,1898 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "sourceWeek": 7,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "marketViewed": false,
+  "inputCommit": "63b94ac3127fb99d1985a09d9816b836a7f3350d",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "a4008adb4a4b9246c7bd44f411cab553b28f825d",
+    "data/walters/nfl/2026/week-07-current-numbers.json": "3208604992877b715bb7b4e6c71bb629550c7316",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "e733347372f2b40e7a5bb57145d9c2d612d0c041"
+  },
+  "recordedAt": "2026-10-23T05:10:00.000Z",
+  "scope": "Complete paired READY numerical evidence for the final NE–CHI game. All pregame cases, final participation, quarterback and specialist inventories, and four printed in-game injury intervals are evaluated together. No market input is used and no customer number is hand-calculated.",
+  "sources": [
+    {
+      "id": "official-gamebook",
+      "url": "https://static.clubs.nfl.com/image/upload/patriots/ljqhr0hqaxegvay37i11.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official final gamebook: CHI 30, NE 24; complete starters, substitutes, DNP, inactives, quarterback and specialist participation; printed injuries and explicit return entries.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "official-game-page",
+      "url": "https://www.patriots.com/game-day/2026/reg-week7/patriots-at-bears/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official Patriots game page confirms the corrected final score and game status.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "paired-gameday-inventory",
+      "url": "https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/blob/660ba9a3b8e1f5c2d6c13346345456cc3e1a192c/data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-ne-chi-gameday-inactive-review.json",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Bound complete paired pregame reserve, inactive, elevation, quarterback and specialist inventory.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "ne-roster",
+      "url": "https://www.patriots.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official roster and reserve categories reviewed with the final gamebook.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "ne-transactions",
+      "url": "https://www.patriots.com/team/transactions/2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official dated transactions establish continuing reserve absences.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "chi-roster",
+      "url": "https://www.chicagobears.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official roster and reserve categories reviewed with the final gamebook.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "chi-transactions",
+      "url": "https://www.chicagobears.com/team/transactions/2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official dated transactions establish continuing reserve absences.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "chi-depth",
+      "url": "https://www.chicagobears.com/team/depth-chart/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official depth chart reviewed with the final gamebook for additional-duty allocations.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "ne-line-depth",
+      "url": "https://www.patriots.com/news/game-observations-8-takeaways-from-the-patriots-victory-over-the-jets-in-week-6",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official prior-game observations establish Caleb Lomu as available offensive-line relief; Week 7 final participation confirms he remained an available substitute.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "ne-latu-role",
+      "url": "https://www.patriots.com/news/inactives-analysis-a-j-brown-will-campbell-treveyon-henderson-officially-active-for-week-6-matchup-vs-the-jets",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official club reporting identifies Cameron Latu as the likely primary lead blocker in the Gilliam role.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "latu-prior-fullback",
+      "url": "https://www.philadelphiaeagles.com/news/eagles-2026-training-camp-position-preview-tight-end",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official prior club source confirms Cameron Latu was used as a fullback in packages.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "webb-official-search",
+      "url": "https://www.ea.com/games/madden-nfl/ratings",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Exact official current Madden NFL 27 search completed for Jeremiah Webb with no current row; no older rating adopted.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "webb-independent-search",
+      "url": "https://www.maddenratings.com/jeremiah-webb",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Independent current identity search produced no usable current Madden NFL 27 value; missing value was not treated as zero.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "webb-role",
+      "url": "https://www.patriots.com/news/patriots-elevate-two-players-from-the-practice-squad-x7380",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official prior regular-season elevation establishes a role basis for the labeled historical estimate.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "value-nikola-kalinic",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/nikola-kalinic/26033",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Official exact-identity Madden NFL 27 page lists Nikola Kalinic, TE, 58 OVR.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "nahshon-official-search",
+      "url": "https://www.ea.com/games/madden-nfl/ratings",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Exact official current Madden NFL 27 search completed for Nahshon Muhammad with no current row; no prior-edition rating adopted.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    },
+    {
+      "id": "nahshon-independent-search",
+      "url": "https://www.maddenratings.com/nahshon-wright",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ],
+      "finding": "Independent current-rating search did not provide an exact current Madden NFL 27 value for Nahshon Muhammad; a frozen defensive-back cohort estimate is retained with sensitivity rather than treating the value as zero.",
+      "checkedAt": "2026-10-23T05:08:00.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-NE-CHI",
+      "away": "NE",
+      "home": "CHI",
+      "state": "READY",
+      "sourceIds": [
+        "official-gamebook",
+        "official-game-page",
+        "paired-gameday-inventory"
+      ],
+      "blockers": [],
+      "teams": [
+        {
+          "team": "NE",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Complete final inactive, reserve, starter, substitute, DNP, quarterback, specialist and printed injury inventories were reviewed together from the official final gamebook and the bound paired pregame record. Every archived case is retained and each newly printed injury is added.",
+          "sourceIds": [
+            "official-gamebook",
+            "official-game-page",
+            "paired-gameday-inventory",
+            "ne-roster",
+            "ne-transactions"
+          ],
+          "cases": [
+            {
+              "team": "NE",
+              "player": "Marcus Bryant",
+              "eaPlayerId": "16149",
+              "caseKey": "2026-W07-NE-Marcus-Bryant",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Julian Hill",
+              "eaPlayerId": "23351",
+              "caseKey": "2026-W07-NE-Julian-Hill",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Quintayvious Hutchins",
+              "eaPlayerId": "10166",
+              "caseKey": "2026-W07-NE-Quintayvious-Hutchins",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Khalil Jacobs",
+              "eaPlayerId": "4811",
+              "caseKey": "2026-W07-NE-Khalil-Jacobs",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Dell Pettus",
+              "eaPlayerId": "1351",
+              "caseKey": "2026-W07-NE-Dell-Pettus",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Mike Onwenu",
+              "eaPlayerId": "21205",
+              "caseKey": "2026-W07-NE-Mike-Onwenu",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Walter Rouse",
+                  "eaPlayerId": "15022"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "Harold Landry III",
+              "eaPlayerId": "13172",
+              "caseKey": "2026-W07-NE-Harold-Landry-III",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Elijah Ponder",
+                  "eaPlayerId": "4739"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "Jeremiah Webb",
+              "eaPlayerId": "estimate:jeremiah-webb",
+              "caseKey": "2026-W07-NE-Jeremiah-Webb",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "webb-official-search",
+                "webb-independent-search",
+                "webb-role"
+              ],
+              "rationale": "The prior approved historical role/value method is reused. Available receiver DeMario Douglas covers only Webb’s additional reserve receiving capacity under a documented-depth assumption; no game-day role or measured workload is invented.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The prior approved historical role/value method is reused. Available receiver DeMario Douglas covers only Webb’s additional reserve receiving capacity under a documented-depth assumption; no game-day role or measured workload is invented.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "webb-official-search",
+                "webb-independent-search",
+                "webb-role"
+              ],
+              "roleRationale": "The prior approved historical role/value method is reused. Available receiver DeMario Douglas covers only Webb’s additional reserve receiving capacity under a documented-depth assumption; no game-day role or measured workload is invented.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "webb-official-search",
+                "webb-independent-search",
+                "webb-role"
+              ],
+              "replacements": [
+                {
+                  "player": "DeMario Douglas",
+                  "eaPlayerId": "22797"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "Carlton Davis III",
+              "eaPlayerId": "13171",
+              "caseKey": "2026-W07-NE-Carlton-Davis-III",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "EQUAL_SHARE_COMMITTEE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official club reporting supplies the complete available corner group but not the added-duty split. Preserve Marcus Jones and Christian Gonzalez baseline starting duties and equally allocate only the vacant Carlton Davis duties to Charles Woods and Kindle Vildor.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Marcus Jones and Christian Gonzalez remain baseline starters; Woods and Vildor are the two remaining available corner reserves after Davis, Canada and Prunty were ruled out.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Charles Woods",
+                  "eaPlayerId": "1343"
+                },
+                {
+                  "player": "Kindle Vildor",
+                  "eaPlayerId": "21166"
+                }
+              ],
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Official club reporting supplies the complete available corner group but not the added-duty split. Preserve Marcus Jones and Christian Gonzalez baseline starting duties and equally allocate only the vacant Carlton Davis duties to Charles Woods and Kindle Vildor.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ]
+            },
+            {
+              "team": "NE",
+              "player": "Karon Prunty",
+              "eaPlayerId": "10194",
+              "caseKey": "2026-W07-NE-Karon-Prunty",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official final OUT status is confirmed and the frozen healthy value is calibrated zero; no replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Channing Canada",
+              "eaPlayerId": "4810",
+              "caseKey": "2026-W07-NE-Channing-Canada",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official final OUT status is confirmed and the frozen healthy value is calibrated zero; no replacement value is fabricated."
+            },
+            {
+              "team": "NE",
+              "player": "Mack Hollins",
+              "eaPlayerId": "12665",
+              "caseKey": "2026-W07-NE-Mack-Hollins",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Kyle Williams",
+                  "eaPlayerId": "15061"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "Greg Van Roten",
+              "eaPlayerId": "11842",
+              "caseKey": "2026-W07-NE-Greg-Van-Roten",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Matt Pryor",
+                  "eaPlayerId": "13470"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "Reggie Gilliam",
+              "eaPlayerId": "21398",
+              "caseKey": "2026-W07-NE-Reggie-Gilliam",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "ne-latu-role",
+                "latu-prior-fullback"
+              ],
+              "rationale": "Official club reporting previously identified Cameron Latu as the likely primary lead blocker in Gilliam’s fullback/H-back role; the final gamebook confirms Latu participated while Tanner Arkin did not. This is the approved cross-position projection, not a measured snap allocation.",
+              "resolution": "SOURCE_CONFIRMED_CROSS_POSITION_PRIMARY",
+              "modelId": "graham-source-confirmed-cross-position-primary-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official club reporting previously identified Cameron Latu as the likely primary lead blocker in Gilliam’s fullback/H-back role; the final gamebook confirms Latu participated while Tanner Arkin did not. This is the approved cross-position projection, not a measured snap allocation.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "ne-latu-role",
+                "latu-prior-fullback"
+              ],
+              "roleRationale": "Official club reporting previously identified Cameron Latu as the likely primary lead blocker in Gilliam’s fullback/H-back role; the final gamebook confirms Latu participated while Tanner Arkin did not. This is the approved cross-position projection, not a measured snap allocation.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "ne-latu-role",
+                "latu-prior-fullback"
+              ],
+              "replacements": [
+                {
+                  "player": "Cameron Latu",
+                  "eaPlayerId": "22827"
+                }
+              ],
+              "primaryEvidence": "REPORTED_PRIMARY",
+              "vacantRole": "FULLBACK_H_BACK",
+              "reportedReplacementDuty": "FULLBACK_H_BACK_LEAD_BLOCKER",
+              "positionSwitchPenaltyApplied": false
+            },
+            {
+              "team": "NE",
+              "player": "Romeo Doubs",
+              "eaPlayerId": "22076",
+              "caseKey": "2026-W07-NE-Romeo-Doubs",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Efton Chism III",
+                  "eaPlayerId": "4663"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "Ben Brown",
+              "eaPlayerId": "22126",
+              "caseKey": "2026-W07-NE-Ben-Brown",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official final OUT status is confirmed and the frozen healthy value is calibrated zero; the nonnegative loss floor supplies the invariant result without fabricating a replacement value."
+            },
+            {
+              "team": "NE",
+              "player": "Alijah Vera-Tucker",
+              "eaPlayerId": "21552",
+              "caseKey": "2026-W07-NE-Alijah-Vera-Tucker",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "ne-line-depth"
+              ],
+              "rationale": "The final gamebook establishes Walter Rouse and Matt Pryor in the starting line and Caleb Lomu as a participating reserve. Rouse and Pryor remain reserved to the distinct Onwenu and Van Roten vacancies; Lomu is the separate available offensive-line depth allocation for Vera-Tucker’s additional vacancy. This is a disjoint documented-depth estimate, not an inferred exact snap assignment.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The final gamebook establishes Walter Rouse and Matt Pryor in the starting line and Caleb Lomu as a participating reserve. Rouse and Pryor remain reserved to the distinct Onwenu and Van Roten vacancies; Lomu is the separate available offensive-line depth allocation for Vera-Tucker’s additional vacancy. This is a disjoint documented-depth estimate, not an inferred exact snap assignment.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "ne-line-depth"
+              ],
+              "roleRationale": "The final gamebook establishes Walter Rouse and Matt Pryor in the starting line and Caleb Lomu as a participating reserve. Rouse and Pryor remain reserved to the distinct Onwenu and Van Roten vacancies; Lomu is the separate available offensive-line depth allocation for Vera-Tucker’s additional vacancy. This is a disjoint documented-depth estimate, not an inferred exact snap assignment.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "ne-line-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Caleb Lomu",
+                  "eaPlayerId": "1822"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "NE",
+              "player": "A.J. Brown",
+              "eaPlayerId": "20495",
+              "caseKey": "2026-W07-NE-A-J-Brown",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "NE",
+              "player": "Morgan Moses",
+              "eaPlayerId": "12361",
+              "caseKey": "2026-W07-NE-Morgan-Moses",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "NE",
+              "player": "Kevin Byard III",
+              "eaPlayerId": "17752",
+              "caseKey": "2026-W07-NE-Kevin-Byard-III",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "official-gamebook"
+              ],
+              "rationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook"
+              ],
+              "roleRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "roleSourceIds": [
+                "official-gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Brenden Schooler",
+                  "eaPlayerId": "22640"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Literal elapsed regulation game time from the printed injury event to the printed return, or to game end when no later return is printed. Normal effectiveness is assumed while active; no medical impairment is inferred.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "official-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1191,
+                    "startLatest": 1191,
+                    "endEarliest": 1368,
+                    "endLatest": 1368,
+                    "sourceIds": [
+                      "official-gamebook"
+                    ],
+                    "rationale": "Exact printed game-clock boundary; no unreported return or impairment is inferred."
+                  }
+                ]
+              }
+            },
+            {
+              "team": "NE",
+              "player": "Christian Elliss",
+              "eaPlayerId": "22682",
+              "caseKey": "2026-W07-NE-Christian-Elliss",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "NE",
+              "player": "Craig Woodson",
+              "eaPlayerId": "15346",
+              "caseKey": "2026-W07-NE-Craig-Woodson",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "ne-roster",
+                "ne-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "NE",
+              "player": "Christian Barmore",
+              "eaPlayerId": "21765",
+              "caseKey": "2026-W07-NE-Christian-Barmore-in-game",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "official-gamebook"
+              ],
+              "rationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook"
+              ],
+              "roleRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "roleSourceIds": [
+                "official-gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Leonard Taylor III",
+                  "eaPlayerId": "14869"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "newlyIdentified": true,
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Literal elapsed regulation game time from the printed injury event to the printed return, or to game end when no later return is printed. Normal effectiveness is assumed while active; no medical impairment is inferred.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "official-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3494,
+                    "startLatest": 3494,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "official-gamebook"
+                    ],
+                    "rationale": "Exact printed game-clock boundary; no unreported return or impairment is inferred."
+                  }
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Tommy DeVito",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Healthy backup quarterback did not play; Drake Maye handled all quarterback duty.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Behren Morton",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Inactive emergency quarterback; Drake Maye handled all quarterback duty.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Dametrious Crownover",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Gamebook DNP with no lost starter or specialist duty.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Tanner Arkin",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Gamebook DNP; Gilliam’s projected added duty is assigned separately to Cameron Latu.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Joshua Farmer",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive with no distinct source-supported game-day duty loss.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Drake Maye",
+              "finding": "Official gamebook starter/substitute/DNP tables and complete quarterback, specialist and injury sequences were reviewed for the entire team.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "The listed starter handled every passing attempt; backup and emergency quarterback status is explicitly reconciled in coverage exclusions.",
+            "sourceIds": [
+              "official-gamebook"
+            ]
+          },
+          "clusterReviews": [
+            {
+              "group": "RECEIVER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "LINEBACKER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "RUNNING_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "rationale": "Complete receiver and tight-end inventory reviewed. The governed top-two simultaneous-absence condition is not established after preserving distinct healthy baseline roles, so no receiver multiplier is applied.",
+            "sourceIds": [
+              "official-gamebook",
+              "paired-gameday-inventory"
+            ]
+          },
+          "topReceiverClusterReviewed": true
+        },
+        {
+          "team": "CHI",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Complete final inactive, reserve, starter, substitute, DNP, quarterback, specialist and printed injury inventories were reviewed together from the official final gamebook and the bound paired pregame record. Every archived case is retained and each newly printed injury is added.",
+          "sourceIds": [
+            "official-gamebook",
+            "official-game-page",
+            "paired-gameday-inventory",
+            "chi-roster",
+            "chi-transactions"
+          ],
+          "cases": [
+            {
+              "team": "CHI",
+              "player": "Brittain Brown",
+              "eaPlayerId": "22057",
+              "caseKey": "2026-W07-CHI-Brittain-Brown",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Tony Fields II",
+              "eaPlayerId": "21679",
+              "caseKey": "2026-W07-CHI-Tony-Fields-II",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Nephi Sewell",
+              "eaPlayerId": "22410",
+              "caseKey": "2026-W07-CHI-Nephi-Sewell",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Anthony Johnson Jr",
+              "eaPlayerId": "23070",
+              "caseKey": "2026-W07-CHI-Anthony-Johnson-Jr",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Hayden Large",
+              "eaPlayerId": "4792",
+              "caseKey": "2026-W07-CHI-Hayden-Large",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Dallis Flowers",
+              "eaPlayerId": "22280",
+              "caseKey": "2026-W07-CHI-Dallis-Flowers",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Jonathan Garvin",
+              "eaPlayerId": "20989",
+              "caseKey": "2026-W07-CHI-Jonathan-Garvin",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Known frozen or bound official healthy value is zero and the existing nonnegative loss floor applies; no missing replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Nikola Kalinic",
+              "eaPlayerId": "estimate:nikola-kalinic",
+              "caseKey": "2026-W07-CHI-Nikola-Kalinic",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "value-nikola-kalinic"
+              ],
+              "rationale": "Official current Madden NFL 27 evidence supplies the exact 58 OVR estimate for the reserve tight end absent from the frozen registry.",
+              "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The source-bound 58 OVR estimate converts to a zero healthy point value under the unchanged calibration, and the replacement floor is nonnegative. Missing value is not set to zero."
+            },
+            {
+              "team": "CHI",
+              "player": "Keyshaun Elliott",
+              "eaPlayerId": "16356",
+              "caseKey": "2026-W07-CHI-Keyshaun-Elliott",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "CHI",
+              "player": "Kyle Monangai",
+              "eaPlayerId": "15035",
+              "caseKey": "2026-W07-CHI-Kyle-Monangai",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official depth chart and club injury update explicitly advance Roschon Johnson one spot while Monangai is out. Assign only Monangai's additional vacancy duties to Johnson and preserve D'Andre Swift's baseline role.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "D'Andre Swift remains the first-string baseline back. Roschon Johnson is the documented next available depth option for Monangai's second-string duties.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Roschon Johnson",
+                  "eaPlayerId": "22747"
+                }
+              ],
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "The official depth chart and club injury update explicitly advance Roschon Johnson one spot while Monangai is out. Assign only Monangai's additional vacancy duties to Johnson and preserve D'Andre Swift's baseline role.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ]
+            },
+            {
+              "team": "CHI",
+              "player": "Braxton Jones",
+              "eaPlayerId": "22135",
+              "caseKey": "2026-W07-CHI-Braxton-Jones",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Theo Benedet",
+                  "eaPlayerId": "4711"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Ray-Ray McCloud III",
+              "eaPlayerId": "13362",
+              "caseKey": "2026-W07-CHI-Ray-Ray-McCloud-III",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "chi-depth"
+              ],
+              "rationale": "The final gamebook confirms Kalif Raymond started at receiver and handled punts while Zavion Thomas handled kickoffs. Raymond covers only McCloud’s additional receiving/return vacancy at an equal locked value; Raymond and Thomas common baseline duties remain preserved.",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The final gamebook confirms Kalif Raymond started at receiver and handled punts while Zavion Thomas handled kickoffs. Raymond covers only McCloud’s additional receiving/return vacancy at an equal locked value; Raymond and Thomas common baseline duties remain preserved.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "chi-depth"
+              ],
+              "roleRationale": "The final gamebook confirms Kalif Raymond started at receiver and handled punts while Zavion Thomas handled kickoffs. Raymond covers only McCloud’s additional receiving/return vacancy at an equal locked value; Raymond and Thomas common baseline duties remain preserved.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory",
+                "chi-depth"
+              ],
+              "replacements": [
+                {
+                  "player": "Kalif Raymond",
+                  "eaPlayerId": "12493"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Dayo Odeyingbo",
+              "eaPlayerId": "21692",
+              "caseKey": "2026-W07-CHI-Dayo-Odeyingbo",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Daniel Hardy",
+                  "eaPlayerId": "22500"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "T.J. Edwards",
+              "eaPlayerId": "20591",
+              "caseKey": "2026-W07-CHI-T-J-Edwards",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ONE_FOR_ONE",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "roleRationale": "The official depth chart listed D’Marco Jackson directly behind Edwards and the final gamebook confirms Jackson started. Buddy Johnson participation is availability evidence only and is not credited as another defensive replacement.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "D'Marco Jackson",
+                  "eaPlayerId": "22203"
+                }
+              ]
+            },
+            {
+              "team": "CHI",
+              "player": "Coby Bryant",
+              "eaPlayerId": "22211",
+              "caseKey": "2026-W07-CHI-Coby-Bryant",
+              "availabilityStatus": "IR",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "baselineSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "roleRationale": "Current source-supported documented-depth allocation of only the missing player additional vacancy duties. Preserve all common baseline roles and distinct other absences; this is an acknowledged allocation assumption, not measured workload. Current roster verifies named replacements; old game evidence supplies role context only.",
+              "roleSourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "replacements": [
+                {
+                  "player": "Elijah Hicks",
+                  "eaPlayerId": "21795"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE"
+            },
+            {
+              "team": "CHI",
+              "player": "Jack Sanborn",
+              "eaPlayerId": "22195",
+              "caseKey": "2026-W07-CHI-Jack-Sanborn",
+              "availabilityStatus": "OUT",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Official final OUT status is confirmed and the frozen healthy value is calibrated zero; no replacement value is fabricated."
+            },
+            {
+              "team": "CHI",
+              "player": "Jonah Jackson",
+              "eaPlayerId": "21113",
+              "caseKey": "2026-W07-CHI-Jonah-Jackson",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "CHI",
+              "player": "Tyrique Stevenson",
+              "eaPlayerId": "23038",
+              "caseKey": "2026-W07-CHI-Tyrique-Stevenson",
+              "availabilityStatus": "ACTIVE_FULL",
+              "sourceIds": [
+                "official-gamebook",
+                "official-game-page",
+                "paired-gameday-inventory",
+                "chi-roster",
+                "chi-transactions"
+              ],
+              "rationale": "The official final gamebook and the bound complete pregame inventory establish the final availability and participation state. This case preserves its previously governed Week 7 valuation and applies no unreported impairment or duplicate baseline duty.",
+              "resolution": "ACTIVE_FULL"
+            },
+            {
+              "team": "CHI",
+              "player": "Nahshon Muhammad",
+              "eaPlayerId": "estimate:nahshon-muhammad",
+              "caseKey": "2026-W07-CHI-Nahshon-Muhammad-in-game",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "official-gamebook"
+              ],
+              "rationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook"
+              ],
+              "roleRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "roleSourceIds": [
+                "official-gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Josh Blackwell",
+                  "eaPlayerId": "22644"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "newlyIdentified": true,
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Literal elapsed regulation game time from the printed injury event to the printed return, or to game end when no later return is printed. Normal effectiveness is assumed while active; no medical impairment is inferred.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "official-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 2161,
+                    "startLatest": 2161,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "official-gamebook"
+                    ],
+                    "rationale": "Exact printed game-clock boundary; no unreported return or impairment is inferred."
+                  }
+                ]
+              }
+            },
+            {
+              "team": "CHI",
+              "player": "Cole Kmet",
+              "eaPlayerId": "20952",
+              "caseKey": "2026-W07-CHI-Cole-Kmet-in-game",
+              "availabilityStatus": "PARTIAL_GAME",
+              "sourceIds": [
+                "official-gamebook"
+              ],
+              "rationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "baselineDoubleCountReviewed": true,
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Only the unavailable player’s additional vacancy duty is valued. Common healthy baseline assignments and every other absence are preserved; the documented-depth allocation is an acknowledged counterfactual estimate, not a measured workload.",
+              "baselineSourceIds": [
+                "official-gamebook"
+              ],
+              "roleRationale": "The official gamebook prints the injury interval and documents the replacement as an available same-unit participant. The allocation is an additional-duty estimate only; no exact snap claim or unreported impairment is introduced.",
+              "roleSourceIds": [
+                "official-gamebook"
+              ],
+              "replacements": [
+                {
+                  "player": "Sam Roush",
+                  "eaPlayerId": "16405"
+                }
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "newlyIdentified": true,
+              "replacementResolution": "PRIMARY_REPLACEMENT",
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "assumptionRationale": "Literal elapsed regulation game time from the printed injury event to the printed return, or to game end when no later return is printed. Normal effectiveness is assumed while active; no medical impairment is inferred.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "official-gamebook"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 3254,
+                    "startLatest": 3254,
+                    "endEarliest": 3600,
+                    "endLatest": 3600,
+                    "sourceIds": [
+                      "official-gamebook"
+                    ],
+                    "rationale": "Exact printed game-clock boundary; no unreported return or impairment is inferred."
+                  }
+                ]
+              }
+            }
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Tyson Bagent",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Healthy backup quarterback did not play; Caleb Williams handled all quarterback duty.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Case Keenum",
+              "category": "BACKUP_QB_NO_LOST_DUTY",
+              "rationale": "Inactive emergency quarterback; Caleb Williams handled all quarterback duty.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Jordan McFadden",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive with no distinct source-supported game-day duty loss.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Jayden Loving",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive with no distinct source-supported game-day duty loss.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            },
+            {
+              "player": "Nick McCloud",
+              "category": "HEALTHY_SCRATCH",
+              "rationale": "Final inactive with no distinct source-supported game-day duty loss.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            }
+          ],
+          "participationReviews": [
+            {
+              "player": "Caleb Williams",
+              "finding": "Official gamebook starter/substitute/DNP tables and complete quarterback, specialist and injury sequences were reviewed for the entire team.",
+              "sourceIds": [
+                "official-gamebook"
+              ]
+            }
+          ],
+          "specialistCases": [],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "The listed starter handled every passing attempt; backup and emergency quarterback status is explicitly reconciled in coverage exclusions.",
+            "sourceIds": [
+              "official-gamebook"
+            ]
+          },
+          "clusterReviews": [
+            {
+              "group": "RECEIVER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "LINEBACKER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            },
+            {
+              "group": "RUNNING_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "All simultaneous cases in this position group were reviewed for unique replacements and preserved baseline roles. Losses are additive with no unsupported extra nonlinear multiplier.",
+              "sourceIds": [
+                "official-gamebook",
+                "paired-gameday-inventory"
+              ]
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "rationale": "Complete receiver and tight-end inventory reviewed. The governed top-two simultaneous-absence condition is not established after preserving distinct healthy baseline roles, so no receiver multiplier is applied.",
+            "sourceIds": [
+              "official-gamebook",
+              "paired-gameday-inventory"
+            ]
+          },
+          "topReceiverClusterReviewed": true
+        }
+      ],
+      "corrections": [
+        "Official final corrected to CHI 30, NE 24 before numerical evaluation."
+      ]
+    }
+  ],
+  "valueEstimates": [
+    {
+      "player": "Jeremiah Webb",
+      "identity": "estimate:jeremiah-webb",
+      "position": "WR",
+      "method": "POSITION_GROUP_MEDIAN",
+      "estimateAcknowledged": true,
+      "rationale": "Source-supported historical position-group estimate for an otherwise unrated non-QB. Frozen cohort sensitivity is retained; no registry identity or value is overwritten.",
+      "officialAndIndependentSearchCompleted": true,
+      "searchFinding": "Official and independent current Madden NFL 27 searches found no usable current rating. Preserve the established contributor using the frozen receiver-group median and full sensitivity; do not omit or set missing value to zero.",
+      "sourceIds": [
+        "webb-official-search",
+        "webb-independent-search"
+      ],
+      "roleSourceIds": [
+        "webb-role",
+        "paired-gameday-inventory"
+      ],
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ]
+    },
+    {
+      "player": "Nikola Kalinic",
+      "identity": "estimate:nikola-kalinic",
+      "position": "TE",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 58,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL 27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity is absent from the frozen registry. Apply the official current rating through the unchanged curve without overwriting the registry.",
+      "sourceIds": [
+        "value-nikola-kalinic"
+      ],
+      "roleSourceIds": [
+        "official-gamebook",
+        "paired-gameday-inventory"
+      ],
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ]
+    },
+    {
+      "player": "Nahshon Muhammad",
+      "identity": "estimate:nahshon-muhammad",
+      "position": "CB",
+      "method": "POSITION_GROUP_MEDIAN",
+      "estimateAcknowledged": true,
+      "rationale": "The gamebook establishes the starting defensive-back role and injury interval, while current searches provide no exact locked value. Use the frozen defensive-back cohort median with sensitivity; missing value is not zero.",
+      "officialAndIndependentSearchCompleted": true,
+      "searchFinding": "Official and independent current Madden NFL 27 searches found no exact current rating for the renamed identity. No prior-edition or similarly named player rating was adopted.",
+      "sourceIds": [
+        "nahshon-official-search",
+        "nahshon-independent-search"
+      ],
+      "roleSourceIds": [
+        "official-gamebook"
+      ],
+      "gameKeys": [
+        "2026-W07-NE-CHI"
+      ]
+    }
+  ],
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+      "commit": "63b94ac3127fb99d1985a09d9816b836a7f3350d",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "estimateAcknowledged": true,
+      "rationale": "Reuse the pinned official EA Week 1 capture for exact supplemental identities without overwriting the frozen registry.",
+      "eaPlayerIds": [
+        "4810",
+        "4811",
+        "4792",
+        "22280",
+        "20989"
+      ]
+    }
+  ]
+}
