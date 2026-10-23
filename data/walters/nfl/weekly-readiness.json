@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-23T03:04:29.338Z",
+  "generatedAt": "2026-10-23T04:10:12.054Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 14,
@@ -1163,73 +1163,70 @@
       "away": "NE",
       "home": "CHI",
       "state": "RECONCILE",
-      "workClass": "WAITING_SOURCE_OR_METHOD",
+      "workClass": "AVAILABLE_WORK",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json",
-        "blobSha": "18a4de5cb84c7a3a5495ee753706f518aa13a923",
-        "recordedAt": "2026-10-23T03:01:18.000Z"
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json",
+        "blobSha": "49f1136da490a3a6ff26ee56c8d5bec8cd27a6fe",
+        "recordedAt": "2026-10-23T04:08:01.000Z"
       },
       "checklist": {
         "verifiedFinalResult": {
-          "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "state": "COMPLETE_CORRECTED_OFFICIAL",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         },
         "frozenKickoffRatingsAndH4": {
           "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         },
         "pairedGameDayInjuryLoss": {
-          "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "state": "BLOCKED_NUMERICAL_ASSEMBLY",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         },
         "finalInactiveReserveAndElevationInventories": {
-          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "state": "COMPLETE_SOURCE_BOUND",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         },
         "quarterbackParticipation": {
-          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK_NO_GAME_DAY_LOSS",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         },
         "specialistParticipation": {
-          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         },
         "officialInGameInjuryReporting": {
-          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json"
+          "state": "COMPLETE_SOURCE_BOUND",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
+        },
+        "pairedParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json"
         }
       },
       "blockers": [
         {
-          "code": "SOURCE_NOT_YET_AVAILABLE",
-          "finding": "The official final gamebook PDF was not exposed from the NFL NE-CHI game center at recording time. Complete starter, substitute and DNP participation; every quarterback and specialist appearance; and all printed injury and return sequences therefore cannot yet be certified.",
-          "footballImpact": "Without exact participation and injury intervals, the governed whole-game and partial-game losses and disjoint replacement duties cannot be computed safely.",
-          "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation and injury timeline without backdating this attempt.",
+          "code": "NUMERICAL_ASSEMBLY_REQUIRED",
+          "finding": "The official final, complete paired participation inventory, quarterback review, specialist review and all four printed injury sequences are now assembled. The five carried pregame cases and four in-game injury intervals have not yet been evaluated together through the governed replacement/exposure updater.",
+          "footballImpact": "Until the paired calculation is run, offensive-line, lead-blocking, receiver/return, tight-end and partial-game defensive effects cannot be safely posted to both teams together.",
+          "nextAction": "Reuse the approved source-supported estimates and prior case structures, add the four gamebook injury intervals, enforce disjoint baseline and cluster safeguards, and run the existing paired updater and validation workflow.",
           "owner": "GRAHAM_WALTERS_90_10"
         },
         {
           "code": "AVAILABLE_EVIDENCE_NOT_ASSEMBLED",
-          "finding": "The complete paired pregame inventories are available and bound, but final participation and in-game injury evidence have not yet been assembled because the official gamebook is unavailable. An empty observedInGameInjuries array means no source-bound final injury sequence is yet available; it is not an assertion that no injuries occurred.",
-          "footballImpact": "Historical learning could omit a real injury interval or assign duplicate replacement credit if promoted now.",
-          "nextAction": "Add every official participant, DNP, injury and return sequence from the gamebook, then reconcile the already-bound candidate sections additively.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Five pregame cases remain unresolved: Alijah Vera-Tucker's distinct offensive-line duty chain, Reggie Gilliam's fullback allocation, Jeremiah Webb's immutable identity/value or no-role ruling, Nikola Kalinic's immutable identity/value, and Ray-Ray McCloud III's receiver/return allocation. Missing values are not zero, and special-teams availability alone does not establish a defensive replacement effect.",
-          "footballImpact": "The unresolved cases span offensive-line cohesion, lead blocking, receiver/return depth and tight-end depth; premature estimates could double-count duties or fabricate a role.",
-          "nextAction": "Use the gamebook for participation and role evidence, reuse approved source-supported estimates when eligible, and route only the remaining immutable-value or governed-method decisions to their existing owners.",
+          "finding": "Nikola Kalinic's official current 58 OVR and the gamebook participation supporting the prior Gilliam and McCloud methods are available and bound here. They are not yet claimed as numerical completion. Vera-Tucker's whole-line chain and Jeremiah Webb's missing immutable identity/value still require the already governed estimate/method decision.",
+          "footballImpact": "Using the available inputs without the paired updater could duplicate healthy baseline duties or silently turn a missing value into zero.",
+          "nextAction": "Apply only approved labelled estimates, retain unresolved inputs literally, and publish the pair only when every case and exposure passes the numerical gates.",
           "owner": "GRAHAM_WALTERS_90_10"
         }
       ],
       "firstSeenAt": "2026-10-23T00:15:56.338Z",
-      "lastEvidenceAt": "2026-10-23T03:01:18.000Z",
-      "unchangedSince": "2026-10-23T03:01:18.000Z",
+      "lastEvidenceAt": "2026-10-23T04:08:01.000Z",
+      "unchangedSince": "2026-10-23T04:08:01.000Z",
       "stalled": false,
-      "fingerprint": "69216dfedcfb96b42fd52426dffd28172b01a68b2fb4f0a05cecf68ac844c363",
+      "fingerprint": "05257297d59c5190f6590b7ff187744a185d91620368b757399458d08315da21",
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation and injury timeline without backdating this attempt.",
+      "nextAction": "Reuse the approved source-supported estimates and prior case structures, add the four gamebook injury intervals, enforce disjoint baseline and cluster safeguards, and run the existing paired updater and validation workflow.",
       "escalation": null
     }
   ],
@@ -1282,6 +1279,7 @@
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-daily-review-112743.json": "d876e3b23952d3017916b109ceb11241ac86193a",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-delta-1645-164224.json": "f5c1414e24dff59df84bd2c88abae7571317fff1",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-22-ne-chi-gameday-inactive-review.json": "bc7cde6bcd6b8e68ad62e53db6be980af53d4740",
-    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json": "18a4de5cb84c7a3a5495ee753706f518aa13a923"
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-final-preparation.json": "18a4de5cb84c7a3a5495ee753706f518aa13a923",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json": "49f1136da490a3a6ff26ee56c8d5bec8cd27a6fe"
   }
 }
