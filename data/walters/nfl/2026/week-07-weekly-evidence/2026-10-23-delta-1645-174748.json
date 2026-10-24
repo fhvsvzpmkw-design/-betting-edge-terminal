@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "week": 7,
+  "runEventId": "graham-delta-1645-2026-w07-20261023T174748-0700",
+  "taskKey": "DELTA_1645",
+  "recordedAt": "2026-10-24T00:51:30.000Z",
+  "state": "COMPLETE_MARKET_ISOLATED_CHANGE_ONLY_REVIEW",
+  "marketViewed": false,
+  "coverage": {
+    "priorVerifiedRunEventId": "graham-delta-1645-2026-w07-20261023T171833-0700",
+    "coverageStart": "2026-10-24T00:28:46.000Z",
+    "coverageEnd": "2026-10-24T00:51:30.000Z",
+    "teamsReviewed": 28,
+    "gamesReviewed": 14,
+    "missedDayCatchUpRequired": false,
+    "coverageComplete": true
+  },
+  "sources": [
+    {
+      "type": "OFFICIAL_LEAGUE_UPDATE",
+      "publisher": "NFL",
+      "url": "https://www.nfl.com/news/nfl-news-roundup-latest-league-updates-from-friday-oct-23",
+      "checkedAt": "2026-10-24T00:50:00.000Z",
+      "coverage": "Late Friday injury and transaction developments"
+    },
+    {
+      "type": "OFFICIAL_RESERVE_LIST",
+      "publisher": "NFL",
+      "url": "https://www.nfl.com/transactions/league/reserve-list/2026/10",
+      "checkedAt": "2026-10-24T00:50:00.000Z",
+      "coverage": "Additional reserve-list changes after the prior verified run"
+    },
+    {
+      "type": "OFFICIAL_TEAM_PRESS_CONFERENCE",
+      "publisher": "Baltimore Ravens",
+      "url": "https://www.baltimoreravens.com/news/transcript-press-conferences-10-23-26",
+      "checkedAt": "2026-10-24T00:50:00.000Z",
+      "coverage": "Lamar Jackson starter decision remains open"
+    },
+    {
+      "type": "OFFICIAL_TEAM_REPORT",
+      "publisher": "New Orleans Saints",
+      "url": "https://www.neworleanssaints.com/news/injury-report-pittsburgh-steelers-vs-new-orleans-saints-2026-nfl-week-7-friday",
+      "checkedAt": "2026-10-24T00:50:00.000Z",
+      "coverage": "First Sunday kickoff final designations"
+    }
+  ],
+  "findings": [
+    {
+      "gameKey": "2026-W07-PIT-NO",
+      "state": "UNCHANGED_UNRESOLVED",
+      "summary": "No new supported replacement/value input appeared after the final Friday report."
+    },
+    {
+      "gameKey": "2026-W07-CIN-BAL",
+      "state": "UNCHANGED_QB_FAIL_CLOSED",
+      "summary": "No official Lamar Jackson starter decision was available."
+    },
+    {
+      "gameKey": "2026-W07-KC-SEA",
+      "state": "UNCHANGED_AFTER_VERIFIED_PUBLICATION",
+      "summary": "No superseding evidence changed the Simmons-to-Benson resolution or Arroyo zero-loss status."
+    }
+  ],
+  "production": {
+    "personnelWriterRan": false,
+    "qbWriterRan": false,
+    "numericFairChanges": 0,
+    "carriedRatingChanges": 0,
+    "publicationStatus": "NOT_REQUIRED_NO_NUMERIC_CHANGE",
+    "marketFieldsExposed": false
+  },
+  "lifecycle": {
+    "historicalLearning": {
+      "state": "COMPLETE",
+      "gamesApplied": 14,
+      "gamesExpected": 14
+    },
+    "ratingPropagation": {
+      "state": "COMPLETE",
+      "gamesVerified": 14,
+      "gamesExpected": 14
+    },
+    "currentAvailability": {
+      "state": "INCOMPLETE",
+      "unresolvedCases": 85,
+      "unresolvedGames": 14
+    },
+    "baseline": {
+      "state": "COMPLETE",
+      "season": 2026,
+      "week": 7
+    }
+  },
+  "rolloverHandoffGate": {
+    "required": false,
+    "reason": "Earlier Week 6-to-7 learning and rating propagation are complete. The completed NE-CHI pair remains routed to GRAHAM_WALTERS_90_10 for its run-bound evaluator and chronological publication."
+  },
+  "stalledInputEscalation": {
+    "gameKey": "2026-W07-NE-CHI",
+    "state": "VALIDATE_AND_PUBLISH",
+    "owner": "GRAHAM_WALTERS_90_10",
+    "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER"
+  },
+  "nextActions": [
+    "PIT-NO: resolve the remaining cases only if supported replacement/value evidence arrives before the first Sunday kickoff.",
+    "CIN-BAL: wait for the official Lamar Jackson starter decision and use the existing QB writer if confirmed.",
+    "Continue exact-case replacement research for the remaining 85 unresolved current-availability cases; do not infer values from designations alone."
+  ]
+}
