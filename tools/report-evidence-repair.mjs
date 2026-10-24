@@ -11,6 +11,7 @@ import {derivePrimarySelectionInventory} from './major-sport-market-coverage-gat
 import {loadBoundMarketObserver, exactMarketReference} from './market-price-assessment.mjs';
 import {buildForecastCoverage, attachForecastCoverage} from './forecast-evidence.mjs';
 import {routeForecastCaptures} from './forecast-lead-routing.mjs';
+import {loadCheckpointResearchLeads} from './checkpoint-research-leads.mjs';
 import {loadForecastFollowUps,bindForecastFollowUps} from './forecast-follow-ups.mjs';
 import {assembleCardEvidence} from './assemble-card-evidence.mjs';
 import {reviewCardEvidence} from './review-card-evidence.mjs';
@@ -80,7 +81,9 @@ function loadContext(root, report, sidecar, feedFile) {
   }
   const grahamInputs = list(universe?.selections).some(selection=>grahamHandoffRequired(report,selection)) ? loadGrahamHandoffInputs(root,report,sidecar) : null;
   const forecastFollowUps=loadForecastFollowUps({root,report,sidecar,universe,priorFollowUps});
-  return {root, feed, universe, observer, grahamInputs, forecastFollowUps, registry: registry || undefined, library, priorRecords, priorReceipts, warnings};
+  const checkpointResearch=loadCheckpointResearchLeads({root,report,universe});
+  warnings.push(...checkpointResearch.warnings);
+  return {root, feed, universe, observer, grahamInputs, forecastFollowUps, checkpointResearch, registry: registry || undefined, library, priorRecords, priorReceipts, warnings};
 }
 
 export function reviewBlockedSelections(report, sidecar, {universe, observer, priorReceipts = new Map()} = {}) {
@@ -127,7 +130,8 @@ export function buildEvidenceAudit({root = process.cwd(), report, sidecar, feedF
   const review = reviewCardEvidence(report, sidecar, {library: ctx.library});
   const candidateAssessment = buildCandidateAssessment({report, sidecar, universe: ctx.universe, observer: ctx.observer, feed:ctx.feed, grahamInputs:ctx.grahamInputs,
     forecastFollowUps:ctx.forecastFollowUps?.leads, priorReceipts:ctx.priorReceipts, forecastCoverage: forecasts});
-  const eventResearchPlan=buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts});
+  const eventResearchPlan=buildEventResearchPlan({report, sidecar, candidateAssessment, forecastCoverage: forecasts, priorReceipts: ctx.priorReceipts,
+    checkpointResearch:ctx.checkpointResearch?.bySelection});
   const gameIntelligence=ctx.feed&&ctx.universe?buildGameIntelligence({report,sidecar,feed:ctx.feed,universe:ctx.universe,forecastCoverage:forecasts,candidateAssessment,eventResearchPlan,observer:ctx.observer}):null;
   return {schema: 1, version: EVIDENCE_REPAIR_VERSION, mode: 'ADVISORY_ONLY', publicationBlocking: false,
     reportTs: report.ts, forecastCoverage: forecasts,

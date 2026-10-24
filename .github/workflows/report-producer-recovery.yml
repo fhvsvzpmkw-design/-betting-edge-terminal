@@ -7,9 +7,16 @@ on:
       - tools/report-run.mjs
       - tools/report-document-transport.mjs
       - tools/report-producer-progress.mjs
+      - tools/report-run-health.mjs
+      - tools/checkpoint-research-leads.mjs
+      - tools/event-research-plan.mjs
+      - tools/report-evidence-repair.mjs
       - tools/extract-staged-report.mjs
       - tests/report-document-transport.test.mjs
       - tests/report-producer-progress.test.mjs
+      - tests/report-run-health.test.mjs
+      - tests/checkpoint-research-leads.test.mjs
+      - tests/event-research-plan.test.mjs
       - tests/report-pipeline.test.mjs
       - tests/report-run-replay.test.mjs
       - BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md
@@ -32,6 +39,9 @@ jobs:
       - name: Controller and shared authority regressions
         run: |
           node tests/report-producer-progress.test.mjs
+          node tests/report-run-health.test.mjs
+          node tests/checkpoint-research-leads.test.mjs
+          node tests/event-research-plan.test.mjs
           node tests/report-pipeline.test.mjs
           node tests/scheduled-report-authority.test.mjs
       - name: Replay through the real publisher gates and durable readback

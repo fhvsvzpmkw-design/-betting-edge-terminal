@@ -16,6 +16,7 @@ import {isDeepStrictEqual} from 'node:util';
 import {serializeReportDocument,parseReportDocument} from './report-document-transport.mjs';
 import {producerExecutionFor} from './report-producer-progress.mjs';
 import {bindReportSnapshot} from './report-snapshot.mjs';
+import {reportRunHealth} from './report-run-health.mjs';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -49,7 +50,7 @@ function temporaryDraft(state,callback){
   try{return callback({report,sidecar});}finally{fs.rmSync(dir,{recursive:true,force:true});}
 }
 function summary(state){
-  return {schema:1,run:state.identity,phase:state.phase,revision:state.revision,
+  return {schema:1,run:state.identity,phase:state.phase,revision:state.revision,completion:reportRunHealth(state),
     oddsSnapshot:state.report.oddsSnapshot||null,
     counts:state.report.counts,research:{available:state.sidecar.primaryAnalysis?.receipts?.length??null,evaluated:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='EVALUATED').length??null,blocked:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED').length??null,
       unfinished:state.sidecar.primaryAnalysis?.receipts?.filter(row=>row.state==='BLOCKED'&&row.blocker?.reason==='RESEARCH_INCOMPLETE').length??null},

@@ -20,6 +20,8 @@ Choose a unique run ID using the operating date, slot and actual issue clock. `s
 
 The initial `report-inputs` view includes `pinnacleCoverage`: exact-reference counts by sport, skipped categories and collection errors. Event detail supplies failed match reasons at each executable quote. It uses the same exact-market matcher as assessment, including NHL settlement definitions and freshness. Inspect gaps before research; acquisition coverage is not completed analysis or issuance clearance.
 
+The `completion` object in every controller response separates analysis, final validation and durable publication. EVALUATED counts are draft assessments until the exact frozen candidate passes its gates; saved event reviews never turn unfinished selections into completed analysis. The event detail preserves exact `missingResearch` codes. Same-day source observations from earlier committed, unpublished checkpoints appear as explicitly unissued leads with their original checkpoint path/blob; recheck applicability before use. No old grade, fair, stake or clearance is inherited, and this route never supplies published-decision lineage.
+
 `next` also exposes captured forecasts awaiting actual applicability review on events with completed market cards. `next --event-id` includes the latest immutable record IDs, probabilities, native units, original observation times and exact selection questions. Review the actual exported capture and append genuine revalidations or explicit shortfalls; the queue never creates eligibility. Decision completion and outstanding forecast review counts remain separate, and completed qualified cards may still publish.
 
 ## Work one event and save

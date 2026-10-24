@@ -81,7 +81,7 @@ const actionFor = route => ({
  * Source packages contain immutable review leads, not inherited personnel clearance,
  * probabilities, stances, card text, or current-run research-completion claims.
  */
-export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAssessment = {}, forecastCoverage = {}, priorReceipts = new Map()} = {}) {
+export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAssessment = {}, forecastCoverage = {}, priorReceipts = new Map(), checkpointResearch = new Map()} = {}) {
   const inventory = list(candidateAssessment.selections), receipts = list(sidecar.primaryAnalysis?.receipts);
   const expandedSourceReview = time(report.ts) >= time(SOURCE_AGGREGATION_FROM);
   const groups = new Map(), warnings = [], seen = new Set();
@@ -97,7 +97,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     const route = !identity || matches.length > 1 ? 'IDENTITY_REVIEW' : routeFor(row, receipt);
     if (!event.label && row.eventLabel) event.label = row.eventLabel;
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,
-      state:row.state, status:row.status || null, route, quote:row.quote || null, assessedQuote:row.assessedQuote || null,
+      state:row.state, status:row.status || null, route, reviewState:row.reviewState || null, missingResearch:list(row.missingResearch), quote:row.quote || null, assessedQuote:row.assessedQuote || null,
       exactOptions:list(row.options).map(option => ({quote:option.quote, marketComparison:option.marketComparison || null,
         forecastAggregation:option.forecastAggregation||null})),
       priceComparison:row.marketComparison || null, nativeFairComparison:row.nativeFairComparison || null, blocker:row.blocker || receipt?.blocker?.reason || null,
@@ -105,10 +105,10 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
       opinionReview:row.opinionReview || null,nextAction:actionFor(route), producerRoutingRationale:receipt?.researchRouting?.rationale || null});
     event.selections.at(-1).forecastCaptureReviews = list(row.forecastLeadReview?.leads).filter(lead => lead.state === 'REVIEW_REQUIRED');
     if (!identity || matches.length > 1) continue;
-    const collect = (record, priorReportPath = null) => {
+    const collect = (record, priorReportPath = null, checkpoint = null) => {
       for (const block of personnelBlocksOf(record)) for (const source of list(block?.officialSources)) {
         if (!currentOfficialPersonnelSource(source, report,event.sport)) continue;
-        const view={...personnelSourceView(source),priorReportPath,requiresCurrentApplicabilityReview:true};
+        const view={...personnelSourceView(source),priorReportPath,...(checkpoint?{priorCheckpointPath:checkpoint.checkpointPath,checkpointBlobSha:checkpoint.checkpointBlobSha,issued:false}:{}),requiresCurrentApplicabilityReview:true};
         event.personnelMap.set(JSON.stringify([view.url,view.asOf,view.fact]),view);
       }
       for (const source of sourcesOf(record)) {
@@ -119,6 +119,7 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
           event.sourceMap.set(source.id, {source:structuredClone(source), priorReportPath:null, requiresCurrentApplicabilityReview:true});
         } else if (existing && signature(existing.source) !== signature(source)) event.conflicts.add(source.id);
         else if (!existing) event.sourceMap.set(source.id, {source:structuredClone(source), priorReportPath,
+          ...(checkpoint?{priorCheckpointPath:checkpoint.checkpointPath,checkpointBlobSha:checkpoint.checkpointBlobSha,issued:false}:{}),
           requiresCurrentApplicabilityReview:true});
       }
     };
@@ -127,6 +128,9 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     for (const entry of prior ? [...list(prior.researchHistory), prior] : []) {
       const priorDate = entry?.row?.decision?.feed?.eventDate || entry?.row?.candidateDraft?.decision?.feed?.eventDate || entry?.row?.eventDate;
       if (time(priorDate) === time(row.eventDate)) collect(entry.row, entry.reportPath || null);
+    }
+    for(const entry of list(checkpointResearch.get(row.selectionId))) {
+      if(time(entry.row?.decision?.feed?.eventDate)===time(row.eventDate))collect(entry.row,null,entry);
     }
   }
   const events = [...groups.values()].map(event => {
@@ -231,13 +235,14 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
   const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0 || event.sourceReviewPending).map(event => ({
     eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,
     pending:event.pending, completed:event.completed,sourceReviewPending:event.sourceReviewPending===true,
-    sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath}) => ({
+    sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath,priorCheckpointPath,checkpointBlobSha,issued}) => ({
       id:source.id, url:source.url, observedAt:source.checkedAt || source.asOf,
-      finding:source.finding || source.fact, priorReportPath, requiresCurrentApplicabilityReview:true})),
+      finding:source.finding || source.fact, priorReportPath,
+      ...(priorCheckpointPath?{priorCheckpointPath,checkpointBlobSha,issued}:{}),requiresCurrentApplicabilityReview:true})),
     personnelFollowUp:event.personnelFollowUp || null,
     forecastReviews:list(event.forecastReviews),
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
-      selectionId:row.selectionId, route:row.route, quote:row.quote, comparison:row.priceComparison,
+      selectionId:row.selectionId, route:row.route, reviewState:row.reviewState,missingResearch:list(row.missingResearch),quote:row.quote, comparison:row.priceComparison,
       forecastAggregation:row.forecastAggregation||null,quarterbackFollowUp:row.quarterbackFollowUp || null,
       opinionReview:row.opinionReview || null,forecastCaptureReviews:list(row.forecastCaptureReviews), nextAction:row.nextAction})),
     forecastSources:list(event.forecastRetrieval?.nextSources).map(source => ({
