@@ -4,7 +4,7 @@
   "publication": "THE PRIVATE LINE",
   "season": 2026,
   "week": 7,
-  "generatedAt": "2026-10-24T00:17:32.882Z",
+  "generatedAt": "2026-10-24T00:27:23.325Z",
   "timezone": "America/Vancouver",
   "state": "INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS",
   "baselineStatus": "CURRENT_BASELINE_COMPLETE",
@@ -29,7 +29,7 @@
     "season": 2026,
     "activeWeek": 7,
     "state": "BLOCKED",
-    "generatedAt": "2026-10-24T00:17:32.601Z",
+    "generatedAt": "2026-10-24T00:27:23.133Z",
     "counts": {
       "historicalApplied": 14,
       "historicalExpected": 14,
@@ -10936,10 +10936,10 @@
       "homeRating": 28.03230106,
       "neutralBaseHome": -1.035891794,
       "espnNeutralHome": 2,
-      "grahamFairHome": -1.5,
-      "grahamAsOf": "2026-10-23T23:58:00.000Z",
+      "grahamFairHome": -2.5,
+      "grahamAsOf": "2026-10-24T00:18:33.000Z",
       "numberStatus": "READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS",
-      "grahamMove": 0,
+      "grahamMove": -1,
       "personnelEstimateCases": [
         {
           "caseKey": "2026-W07-KC-Jeff-Caldwell",
@@ -11463,9 +11463,9 @@
             "min": 0,
             "max": 0
           },
-          "assumptionRationale": "October19 official club coach report confirms significant multiweek shoulder absence, while IR transaction is still pending. Frozen EA15119 healthy71OVR maps to zero, so use existing invariant zero-loss proof, not a fabricated replacement.",
+          "assumptionRationale": "Official Reserve/Injured status confirms the absence. Frozen EA15119 healthy 71 OVR maps to zero, so the existing invariant zero-loss proof remains applicable and no missing replacement value is assigned zero.",
           "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
-          "reopenOn": "Recheck club transactions and next official Week7 injury report; change only this current case if the club revises the multiweek absence.",
+          "reopenOn": "Recheck only if the club activates Arroyo or revises the multiweek absence before kickoff.",
           "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero.",
           "applied": true
         }
@@ -11481,12 +11481,6 @@
           "caseKey": "2026-W07-KC-Rashee-Rice",
           "player": "Rashee Rice",
           "failClosedCode": "CURRENT_ADAPTER_REPLACEMENT_METHOD_UNRESOLVED",
-          "resolutionStatus": "FAIL_CLOSED_UNRESOLVED"
-        },
-        {
-          "caseKey": "2026-W07-KC-Josh-Simmons",
-          "player": "Josh Simmons",
-          "failClosedCode": "CURRENT_GAME_AVAILABILITY_NOT_CONFIRMED",
           "resolutionStatus": "FAIL_CLOSED_UNRESOLVED"
         },
         {
@@ -11515,7 +11509,7 @@
         "marketViewed": false
       },
       "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
-      "researchSummary": "Governed fair decomposition: neutral/team base -1.036; home field -2.082; other governed +0.100; pre-personnel exact -3.018; personnel +1.600; matchup +0.000; exact Graham home fair -1.418; displayed -1.5.",
+      "researchSummary": "Governed fair decomposition: neutral/team base -1.036; home field -2.082; other governed +0.100; pre-personnel exact -3.018; personnel +0.700; matchup +0.000; exact Graham home fair -2.318; displayed -2.5.",
       "adjustments": [
         {
           "type": "HOME_FIELD",
@@ -11530,36 +11524,6 @@
             "data/walters/nfl/home-field/home-field-production-current.json",
             "data/walters/nfl/home-field/h4-current.json"
           ],
-          "marketViewed": false
-        },
-        {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "KC",
-          "homeTeam": "SEA",
-          "awayStarter": "Patrick Mahomes",
-          "homeStarter": "Sam Darnold",
-          "awayTeamQbDelta": -0.65,
-          "homeTeamQbDelta": -0.75,
-          "pointsToHomeSpread": 0.1,
-          "reason": "Governed Walters QB differential: KC -0.65 minus SEA -0.75 equals +0.10 points to the home-spread coordinate.",
-          "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
-            "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
-            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
-            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
-          ],
-          "effectiveAt": "2026-10-20T22:44:44.101Z",
           "marketViewed": false
         },
         {
@@ -11631,6 +11595,27 @@
         },
         {
           "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "KC",
+          "side": "AWAY",
+          "clusterGroup": "OFFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W07-KC-Josh-Simmons"
+          ],
+          "rawTeamContributionDelta": -0.9,
+          "finalTeamContributionDelta": -0.9,
+          "pointsToHomeSpread": -0.9,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.nfl.com/transactions/league/reserve-list/2026/10",
+            "https://www.chiefs.com/team/depth-chart",
+            "https://www.chiefs.com/news/ot-kahlil-benson-earns-nfl-offensive-rookie-of-the-month-honors-for-september",
+            "https://www.chiefs.com/team/players-roster/"
+          ]
+        },
+        {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
           "team": "SEA",
           "side": "HOME",
           "clusterGroup": "RECEIVER",
@@ -11651,7 +11636,8 @@
             "https://www.seahawks.com/news/seahawks-hosted-virginia-mason-franciscan-health-patients-at-practice-for-crucial-catch-month-x0087",
             "https://www.seahawks.com/news/seahawks-guard-anthony-bradford-designated-for-return-to-practice",
             "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
-            "https://www.seahawks.com/news/zach-charbonnet-anthony-bradford-s-potential-return-other-seahawks-injury-updates"
+            "https://www.seahawks.com/news/zach-charbonnet-anthony-bradford-s-potential-return-other-seahawks-injury-updates",
+            "https://www.nfl.com/transactions/league/reserve-list/2026/10"
           ]
         },
         {
@@ -11748,6 +11734,36 @@
             "https://www.seahawks.com/news/seahawks-hosted-virginia-mason-franciscan-health-patients-at-practice-for-crucial-catch-month-x0087",
             "https://www.seahawks.com/news/seahawks-guard-anthony-bradford-designated-for-return-to-practice"
           ]
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "KC",
+          "homeTeam": "SEA",
+          "awayStarter": "Patrick Mahomes",
+          "homeStarter": "Sam Darnold",
+          "awayTeamQbDelta": -0.65,
+          "homeTeamQbDelta": -0.75,
+          "pointsToHomeSpread": 0.1,
+          "reason": "Governed Walters QB differential: KC -0.65 minus SEA -0.75 equals +0.10 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "FROZEN_STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json",
+            "https://www.nfl.com/news/sam-darnold-glute-seahawks-commanders",
+            "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+            "data/walters/nfl/qb-performance/candidates/qb-candidates-2026-stage3c-v1.json"
+          ],
+          "effectiveAt": "2026-10-23T18:41:00.000Z",
+          "marketViewed": false
         }
       ],
       "proposedWager": null,
@@ -11772,7 +11788,7 @@
       "pinnacleMoneylineAwayLimit": 7500,
       "pinnacleMoneylineSelectionMethod": "highest-two-sided-limit_then-mainline_then-freshness",
       "moneylineSelectorStatus": "MARKET_READY_AWAITING_SPREAD_QUALIFICATION",
-      "grahamHomeStrengthGap": -1,
+      "grahamHomeStrengthGap": 0,
       "officialDailySequence": 3,
       "officialDailyCapturedAt": "2026-10-23T13:08:47.155Z"
     },
