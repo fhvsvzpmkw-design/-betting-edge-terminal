@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "week": 7,
+  "runEventId": "graham-delta-1645-2026-w07-20261023T171833-0700",
+  "taskKey": "DELTA_1645",
+  "recordedAt": "2026-10-24T00:28:46.000Z",
+  "state": "COMPLETE_MARKET_ISOLATED_CHANGE_ONLY_REVIEW",
+  "marketViewed": false,
+  "coverage": {
+    "priorVerifiedRunEventId": "graham-delta-1645-2026-w07-20261023T164702-0700",
+    "coverageStart": "2026-10-23T23:59:00.000Z",
+    "coverageEnd": "2026-10-24T00:28:46.000Z",
+    "teamsReviewed": 28,
+    "gamesReviewed": 14,
+    "missedDayCatchUpRequired": false,
+    "coverageComplete": true
+  },
+  "sources": [
+    {
+      "type": "OFFICIAL_RESERVE_LIST",
+      "publisher": "NFL",
+      "url": "https://www.nfl.com/transactions/league/reserve-list/2026/10",
+      "checkedAt": "2026-10-24T00:18:33.000Z",
+      "coverage": "October 22 Reserve/Injured transactions for Josh Simmons and Elijah Arroyo"
+    },
+    {
+      "type": "OFFICIAL_TEAM_DEPTH",
+      "publisher": "Kansas City Chiefs",
+      "url": "https://www.chiefs.com/team/depth-chart",
+      "checkedAt": "2026-10-24T00:18:33.000Z",
+      "coverage": "Kahlil Benson listed directly behind Josh Simmons at left tackle"
+    },
+    {
+      "type": "OFFICIAL_TEAM_ROLE_REPORT",
+      "publisher": "Kansas City Chiefs",
+      "url": "https://www.chiefs.com/news/ot-kahlil-benson-earns-nfl-offensive-rookie-of-the-month-honors-for-september",
+      "checkedAt": "2026-10-24T00:18:33.000Z",
+      "coverage": "Benson started the first three current-season games at left tackle"
+    },
+    {
+      "type": "OFFICIAL_TEAM_REPORT",
+      "publisher": "Baltimore Ravens",
+      "url": "https://www.baltimoreravens.com/team/injury-report/index-app",
+      "checkedAt": "2026-10-24T00:18:33.000Z",
+      "coverage": "No later official Lamar Jackson starter decision"
+    },
+    {
+      "type": "OFFICIAL_TEAM_REPORT",
+      "publisher": "New Orleans Saints",
+      "url": "https://www.neworleanssaints.com/team/injury-report/",
+      "checkedAt": "2026-10-24T00:18:33.000Z",
+      "coverage": "First Sunday kickoff recheck"
+    }
+  ],
+  "personnelFindings": [
+    {
+      "caseKey": "2026-W07-KC-Josh-Simmons",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+      "replacementPlayer": "Kahlil Benson",
+      "healthyWaltersPoints": 0.9,
+      "replacementWaltersPoints": 0,
+      "rawTeamContributionDelta": -0.9
+    },
+    {
+      "caseKey": "2026-W07-SEA-Elijah-Arroyo",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0
+    }
+  ],
+  "quarterbackFindings": [
+    {
+      "gameKey": "2026-W07-CIN-BAL",
+      "team": "BAL",
+      "player": "Lamar Jackson",
+      "state": "FAIL_CLOSED_UNRESOLVED_STARTER",
+      "summary": "No later official starter confirmation was available; the existing governed QB binding and fair are preserved without guessing."
+    }
+  ],
+  "production": {
+    "personnelBatchId": "graham-week7-friday-delta-reserve-list-20261024T001833Z",
+    "casesResolved": 2,
+    "gamesRecomputed": 1,
+    "numericFairChanges": 1,
+    "carriedRatingChanges": 0,
+    "numericChanges": [
+      {
+        "gameKey": "2026-W07-KC-SEA",
+        "priorExactFairHome": -1.418,
+        "priorFairHome": -1.5,
+        "newExactFairHome": -2.318,
+        "newFairHome": -2.5,
+        "reason": "The governed personnel calculator applied the supported Josh Simmons-to-Kahlil Benson one-for-one replacement using frozen values."
+      }
+    ],
+    "publicationStatus": "VERIFIED_REPOSITORY_TERMINAL_PENDING_DEPLOYED_READBACK",
+    "currentNumbersBlobSha": "bc1cba0061fbc0d5fd4afe0a513fba38f02b124d",
+    "personnelLedgerBlobSha": "c62036295c59668364e04576fc7aff1b17898eac",
+    "repositoryTerminalGeneratedAt": "2026-10-24T00:27:23.325Z",
+    "deployedGeneratedAt": null,
+    "marketFieldsExposed": false
+  },
+  "lifecycle": {
+    "historicalLearning": {
+      "state": "COMPLETE",
+      "gamesApplied": 14,
+      "gamesExpected": 14
+    },
+    "ratingPropagation": {
+      "state": "COMPLETE",
+      "gamesVerified": 14,
+      "gamesExpected": 14
+    },
+    "currentAvailability": {
+      "state": "INCOMPLETE",
+      "unresolvedCases": 85,
+      "unresolvedGames": 14
+    },
+    "baseline": {
+      "state": "COMPLETE",
+      "season": 2026,
+      "week": 7
+    }
+  },
+  "rolloverHandoffGate": {
+    "required": false,
+    "reason": "Earlier Week 6-to-7 learning and rating propagation are complete. The completed NE-CHI pair remains routed to GRAHAM_WALTERS_90_10 for its run-bound evaluator and chronological publication."
+  },
+  "stalledInputEscalation": {
+    "gameKey": "2026-W07-NE-CHI",
+    "state": "VALIDATE_AND_PUBLISH",
+    "owner": "GRAHAM_WALTERS_90_10",
+    "nextAction": "RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER"
+  },
+  "nextActions": [
+    "PIT-NO: close the four remaining personnel cases only with supported replacement/value evidence before the first Sunday kickoff.",
+    "CIN-BAL: wait for the official Lamar Jackson starter decision and use the existing QB writer if confirmed.",
+    "Continue exact-case replacement research for the remaining 85 unresolved current-availability cases; do not infer values from designations alone."
+  ]
+}
