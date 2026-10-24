@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "week": 7,
+  "runEventId": "graham-delta-1645-2026-w07-20261023T190310-0700",
+  "taskKey": "DELTA_1645",
+  "recordedAt": "2026-10-24T02:06:30.000Z",
+  "state": "COMPLETE_MARKET_ISOLATED_CHANGE_ONLY_REVIEW",
+  "marketViewed": false,
+  "coverage": {
+    "priorVerifiedRunEventId": "graham-delta-1645-2026-w07-20261023T174748-0700",
+    "coverageStart": "2026-10-24T00:51:30.000Z",
+    "coverageEnd": "2026-10-24T02:06:30.000Z",
+    "teamsReviewed": 28,
+    "gamesReviewed": 14,
+    "missedDayCatchUpRequired": false,
+    "coverageComplete": true
+  },
+  "sources": [
+    {
+      "type": "OFFICIAL_LEAGUE_INJURY_REPORT",
+      "publisher": "NFL",
+      "url": "https://www.nfl.com/injuries/league/2026/REG7",
+      "checkedAt": "2026-10-24T02:05:00.000Z",
+      "coverage": "Current Week 7 league injury designations and practice participation"
+    },
+    {
+      "type": "OFFICIAL_TEAM_REPORT",
+      "publisher": "Philadelphia Eagles",
+      "url": "https://www.philadelphiaeagles.com/news/cowboys-vs-eagles-injury-report-2026-nfl-week-7-saquon-barkley-jalyx-hunt",
+      "publishedAt": "2026-10-23T17:55:00-07:00",
+      "checkedAt": "2026-10-24T02:05:00.000Z",
+      "coverage": "New Friday DAL-PHI participation update; article explicitly says the final practice is Saturday"
+    },
+    {
+      "type": "OFFICIAL_TEAM_REPORT",
+      "publisher": "Baltimore Ravens",
+      "url": "https://www.baltimoreravens.com/news/lamar-jackson-injury-report-ravens-bengals-jaylinn-hawkins-tavius-robinson-2026",
+      "checkedAt": "2026-10-24T02:05:00.000Z",
+      "coverage": "Lamar Jackson remains questionable with no starter decision"
+    },
+    {
+      "type": "OFFICIAL_TEAM_PRESS_CONFERENCE",
+      "publisher": "Baltimore Ravens",
+      "url": "https://www.baltimoreravens.com/news/transcript-press-conferences-10-23-26",
+      "checkedAt": "2026-10-24T02:05:00.000Z",
+      "coverage": "Tyler Huntley prepared to play but no official starter named"
+    }
+  ],
+  "findings": [
+    {
+      "gameKey": "2026-W07-DAL-PHI",
+      "state": "NEW_PARTICIPATION_EVIDENCE_NOT_FINAL",
+      "summary": "The official Friday update records Dallas DNPs Drew Shelton, KaVontae Turpin and Dee Winters; limited Broderick Jones and P.J. Locke; and full Cobie Durant. Philadelphia records DNPs Michael Carter, Dallas Goedert, Jonathan Greenard, DeVonta Smith, Nolan Smith and Dontayvion Wicks; limited Saquon Barkley, Landon Dickerson, A.J. Epenesa, Jalyx Hunt, Fred Johnson, Willie Lampkin, Moro Ojomo and Tyler Steen; and full Hollywood Brown and Jordan Davis. Because the clubs' final practice and game-status report are Saturday, this source is additive participation evidence, not final availability. Existing unresolved cases remain fail-closed."
+    },
+    {
+      "gameKey": "2026-W07-CIN-BAL",
+      "state": "UNCHANGED_QB_FAIL_CLOSED",
+      "summary": "Lamar Jackson remains officially questionable and Baltimore has not named Jackson or Tyler Huntley as the starter. The existing QB writer cannot run until an official starter decision is available."
+    }
+  ],
+  "production": {
+    "personnelWriterRan": false,
+    "qbWriterRan": false,
+    "numericFairChanges": 0,
+    "carriedRatingChanges": 0,
+    "publicationStatus": "NOT_REQUIRED_NO_NUMERIC_CHANGE",
+    "marketFieldsExposed": false
+  },
+  "lifecycle": {
+    "historicalLearning": {
+      "state": "COMPLETE",
+      "gamesApplied": 14,
+      "gamesExpected": 14
+    },
+    "ratingPropagation": {
+      "state": "COMPLETE",
+      "gamesVerified": 14,
+      "gamesExpected": 14
+    },
+    "completedSlateEvidence": {
+      "state": "READY",
+      "gamesReady": 1,
+      "gamesExpected": 1,
+      "gameKey": "2026-W07-NE-CHI"
+    },
+    "currentAvailability": {
+      "state": "INCOMPLETE",
+      "unresolvedCases": 85,
+      "unresolvedGames": 14
+    },
+    "baseline": {
+      "state": "COMPLETE",
+      "season": 2026,
+      "week": 7
+    }
+  },
+  "rolloverHandoffGate": {
+    "required": false,
+    "reason": "Week 7 is still active and the full 14-game slate is not final. The READY NE-CHI pair remains preserved for chronological Week 7-to-8 application."
+  },
+  "stalledInputEscalation": {
+    "gameKey": "2026-W07-CIN-BAL",
+    "state": "OFFICIAL_STARTER_DECISION_UNAVAILABLE",
+    "footballImpact": "The Jackson-versus-Huntley quarterback differential cannot be changed safely.",
+    "requiredDecision": "Obtain an official Baltimore starter decision, then run the existing QB writer.",
+    "durableEvidence": "Official Ravens Friday report and press-conference transcript retained above."
+  },
+  "nextActions": [
+    "DAL-PHI: ingest the official Saturday final game-status report, then reconcile the full paired candidate inventory and run only supported cases through the governed personnel writer.",
+    "CIN-BAL: wait for the official Lamar Jackson starter decision and use the existing QB writer if confirmed.",
+    "Continue exact-case replacement research for the remaining 85 unresolved current-availability cases; do not infer values from participation or designations alone."
+  ]
+}
