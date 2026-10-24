@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "week": 7,
+  "runEventId": "graham-delta-1645-2026-w07-20261023T164702-0700",
+  "taskKey": "DELTA_1645",
+  "recordedAt": "2026-10-23T23:59:00.000Z",
+  "state": "COMPLETE_MARKET_ISOLATED_FRIDAY_FINAL_STATUS_REVIEW",
+  "marketViewed": false,
+  "coverage": {
+    "priorVerifiedRunEventId": "graham-daily-review-2026-w07-20261023T113216-0700",
+    "coverageStart": "2026-10-23T18:42:00.000Z",
+    "coverageEnd": "2026-10-23T23:59:00.000Z",
+    "teamsReviewed": 28,
+    "gamesReviewed": 14,
+    "missedDayCatchUpRequired": false,
+    "coverageComplete": true
+  },
+  "sources": [
+    {"type":"OFFICIAL_ALL_GAME_FRIDAY_REPORT","publisher":"NFL","url":"https://www.nfl.com/injuries/league/2026/REG7","checkedAt":"2026-10-23T23:52:00.000Z","coverage":"All 28 active Week 7 teams and 14 games"},
+    {"type":"OFFICIAL_TEAM_REPORT","publisher":"Baltimore Ravens","url":"https://www.baltimoreravens.com/team/injury-report/index-app","checkedAt":"2026-10-23T23:52:00.000Z","coverage":"CIN-BAL final status, including Lamar Jackson, Cam Jurgens, Rashod Bateman and Ronnie Stanley"},
+    {"type":"OFFICIAL_TEAM_REPORT","publisher":"Minnesota Vikings","url":"https://www.vikings.com/team/injury-report/","checkedAt":"2026-10-23T23:52:00.000Z","coverage":"IND-MIN final status, including Christian Darrisaw, Jordan Addison and T.J. Hockenson"},
+    {"type":"OFFICIAL_TEAM_REPORT","publisher":"Kansas City Chiefs","url":"https://www.chiefs.com/team/injury-report/week/reg-7","checkedAt":"2026-10-23T23:52:00.000Z","coverage":"KC-SEA final status, including Rashee Rice"},
+    {"type":"OFFICIAL_QUARTERBACK_UPDATE","publisher":"NFL","url":"https://www.nfl.com/news/ravens-lamar-jackson-ankle-questionable-to-make-return-sunday-vs-bengals","checkedAt":"2026-10-23T23:52:00.000Z","coverage":"Lamar Jackson remained questionable with no confirmed Week 7 starter decision"}
+  ],
+  "resolvedActiveCases": ["BAL Cam Jurgens","BAL Rashod Bateman","BAL Ronnie Stanley","NYG Colton Hood","NYG Andrew Thomas","NYG Darnell Mooney","IND Ashton Dulin","MIN Christian Darrisaw","MIN Jordan Addison","MIN T.J. Hockenson","NYJ Adonai Mitchell","CLE Mason Graham","CLE Quinshon Judkins","ARI Josh Sweat","GB Brandon Cisse"],
+  "confirmedOutFailClosedCases": ["SF Nick Bosa","SF Marques Sigle","SF Deebo Samuel Sr","SF Mike Evans","ATL Divine Deablo","ATL Billy Bowman Jr","HOU David Montgomery","HOU Jalen Pitre","IND Tyler Warren","NYJ Joseph Ossai","CLE Mike Hall Jr","CLE Teven Jenkins","DEN Talanoa Hufanga","ARI Jeremiyah Love","ARI Andrew Wingard","ARI Walter Nolen III","KC Rashee Rice","SEA Drake Thomas"],
+  "quarterbackFindings": [{"gameKey":"2026-W07-CIN-BAL","team":"BAL","player":"Lamar Jackson","state":"FAIL_CLOSED_UNRESOLVED_STARTER","summary":"Official Friday reporting leaves Jackson questionable and does not confirm the Week 7 starter. The existing governed QB binding and fair are preserved without guessing."}],
+  "production": {
+    "activeBatchId": "graham-week7-friday-delta-final-active-20261023T235300Z",
+    "confirmedOutBatchId": "graham-week7-friday-delta-confirmed-outs-fail-closed-20261023T235800Z",
+    "activeCasesResolved": 15,
+    "confirmedOutCasesRecordedFailClosed": 18,
+    "gamesRecomputed": 12,
+    "numericFairChanges": 0,
+    "carriedRatingChanges": 0,
+    "publicationStatus": "PENDING_REMOTE_AND_DEPLOYED_READBACK"
+  },
+  "lifecycle": {
+    "historicalLearning": {"state":"COMPLETE","gamesApplied":14,"gamesExpected":14},
+    "ratingPropagation": {"state":"COMPLETE","gamesVerified":14,"gamesExpected":14},
+    "currentAvailability": {"state":"INCOMPLETE","unresolvedCases":86,"unresolvedGames":14},
+    "baseline": {"state":"COMPLETE","season":2026,"week":7}
+  },
+  "rolloverHandoffGate": {"required":false,"reason":"Earlier Week 6-to-7 learning and rating propagation are complete. The completed NE-CHI pair remains routed to GRAHAM_WALTERS_90_10 for its run-bound evaluator and chronological publication."},
+  "stalledInputEscalation": {"gameKey":"2026-W07-NE-CHI","state":"VALIDATE_AND_PUBLISH","owner":"GRAHAM_WALTERS_90_10","nextAction":"RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER"},
+  "nextActions": [
+    "Resolve every confirmed OUT case only after a supported one-for-one, committee or multirole replacement allocation is available; do not infer value from designation alone.",
+    "CIN-BAL: wait for the official Lamar Jackson starter decision and use the existing QB writer if confirmed.",
+    "Monday DAL-PHI: continue with the final game-status report because Friday practice participation is not final availability."
+  ]
+}
