@@ -1,4 +1,25 @@
 // Execution health is separate from gate success and betting grades.
+import {inspectCardEvidence} from './card-evidence-identity.mjs';
+import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
+
+// Reuse existing inspectors immediately after saving an event. This catches
+// a missing handoff before the same unfinished construction spans the slate.
+export function reportEventFeedback(state,eventId) {
+  const receipts=(state.sidecar?.primaryAnalysis?.receipts||[]).filter(row=>String(row.quote?.eventId??row.decision?.feed?.eventId??row.selectionId?.split('|')[1])===String(eventId));
+  const selections=receipts.map(row=>{
+    const missing=[];
+    if(row.state==='EVALUATED'){
+      const card=inspectCardEvidence(row.decision);
+      if(card.state!=='VALID')missing.push(`CARD_EVIDENCE_${card.state}`);
+      const quarterback=inspectQuarterbackFollowUp({report:state.report,receipt:row,selection:{sport:row.selectionId?.split('|')[0]}});
+      missing.push(...quarterback.missing);
+    }else if(row.blocker?.missing)missing.push(row.blocker.missing);
+    return {selectionId:row.selectionId,savedState:row.state,missingResearch:missing};
+  });
+  return {eventId:String(eventId),state:selections.some(row=>row.missingResearch.length)?'FOLLOW_UP_REQUIRED':'NO_INSPECTOR_SHORTFALL',
+    selections,nextAction:'Resolve these recorded shortfalls and inspect the full next event plan. This feedback does not validate or issue a decision.'};
+}
+
 export function reportRunHealth(state={}) {
   const receipts=state.sidecar?.primaryAnalysis?.receipts;
   const available=Array.isArray(receipts)?receipts.length:null;

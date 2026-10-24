@@ -16,7 +16,7 @@ import {isDeepStrictEqual} from 'node:util';
 import {serializeReportDocument,parseReportDocument} from './report-document-transport.mjs';
 import {producerExecutionFor} from './report-producer-progress.mjs';
 import {bindReportSnapshot} from './report-snapshot.mjs';
-import {reportRunHealth} from './report-run-health.mjs';
+import {reportRunHealth,reportEventFeedback} from './report-run-health.mjs';
 
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const read=file=>JSON.parse(fs.readFileSync(file));
@@ -213,7 +213,9 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     state.events.push({command,at:new Date(command==='start'?commandStarted:Date.now()).toISOString(),revision:state.revision,phase:state.phase,durationMs:Date.now()-commandStarted,
       ...(command==='checkpoint'&&eventId?{eventId:String(eventId)}:{})});
     atomic(file,serializeReportDocument(state,'REPORT_CHECKPOINT'));
-    return {...summary(state),checkpoint:within(root,file),...(command==='stage'?{stagingPath:'data/history/staging/report-bundle.json',requiresRemoteCommitAndWorkflowSuccess:true}:{})};
+    return {...summary(state),checkpoint:within(root,file),
+      ...(command==='checkpoint'&&eventId?{eventAssessment:reportEventFeedback(state,eventId)}:{}),
+      ...(command==='stage'?{stagingPath:'data/history/staging/report-bundle.json',requiresRemoteCommitAndWorkflowSuccess:true}:{})};
   }finally{if(lock!==undefined){fs.closeSync(lock);fs.unlinkSync(`${file}.lock`);}}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
