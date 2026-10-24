@@ -32,6 +32,13 @@ function personnelBlocksOf(record) {
 }
 function currentOfficialPersonnelSource(source, report, sport) {
   if (!source || !text(source.url) || !text(source.fact || source.finding)) return false;
+  // Reporting and model pages remain useful leads; they must not suppress the
+  // actual league/team check merely because a draft put them in officialSources.
+  try {
+    const host=new URL(source.url).hostname.toLowerCase();
+    if(source.sourceType==='REPORTING'||/\bespn\b/i.test(source.origin||'')||
+      ['espn.com','moneypuck.com','dratings.com','dimers.com','rotowire.com','covers.com'].some(domain=>host===domain||host.endsWith(`.${domain}`)))return false;
+  }catch{return false;}
   const observed = time(source.asOf || source.checkedAt), issued = time(report.ts);
   if (!Number.isFinite(observed) || !Number.isFinite(issued) || observed > issued) return false;
   // Odds observation and personnel observation are separate clocks. A new
