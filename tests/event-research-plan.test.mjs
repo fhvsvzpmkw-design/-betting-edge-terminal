@@ -133,6 +133,7 @@ assert.equal(work.completionState,'NO_COMPLETED_DECISIONS');
 assert.equal(work.decisionAuthority,false);
 assert.equal(work.events[0].sourceLeads[0].priorReportPath,'earlier.json');
 assert.equal(work.events[0].selections[0].route,'MARKET_PASS_REVIEW');
+assert.deepEqual(work.events[0].selections[0].recordedBlocker,{reason:'RESEARCH_INCOMPLETE'},'preserve the saved blocker even when the advisory review currently has no missing-field codes');
 assert.equal(work.events[0].personnelFollowUp.state,'CURRENT_OFFICIAL_CHECK_REQUIRED');
 assert.match(work.events[0].nextAction,/authoritative league\/team personnel check/);
 assert.equal(buildResearchWorkPlan(resumed).events[0].sourceLeadCount,1);

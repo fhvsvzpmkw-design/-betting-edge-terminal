@@ -249,7 +249,7 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
     personnelFollowUp:event.personnelFollowUp || null,
     forecastReviews:list(event.forecastReviews),
     selections:list(event.selections).filter(row => row.route !== 'COMPLETED').map(row => ({
-      selectionId:row.selectionId, route:row.route, reviewState:row.reviewState,missingResearch:list(row.missingResearch),quote:row.quote, comparison:row.priceComparison,
+      selectionId:row.selectionId, route:row.route, reviewState:row.reviewState,missingResearch:list(row.missingResearch),recordedBlocker:row.blocker||null,quote:row.quote, comparison:row.priceComparison,
       forecastAggregation:row.forecastAggregation||null,quarterbackFollowUp:row.quarterbackFollowUp || null,
       opinionReview:row.opinionReview || null,forecastCaptureReviews:list(row.forecastCaptureReviews), nextAction:row.nextAction})),
     forecastSources:list(event.forecastRetrieval?.nextSources).map(source => ({
