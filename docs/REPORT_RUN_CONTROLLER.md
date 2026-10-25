@@ -26,6 +26,10 @@ The `completion` object in every controller response separates analysis, final v
 
 ## Work one event and save
 
+`completion.continuationRequired` distinguishes unfinished producer reviews and undocumented blockers from recorded source shortfalls. Publication does not clear it. Read `remainingWork` by sport and the exact next event plan before stopping. `prepare` returns `preparation.workPlan`, including the next event, so fixing the first event's schema does not hide the unreviewed slate. These are diagnostics and routing instructions; all existing evidence and publication gates still apply.
+
+On Sunday before 10:00 PT, `nextEventId` prioritizes the unstarted early NFL group, then returns to the full queue. Within that group, initial current-candidate reviews precede residual dependencies in already reviewed games. Save each supported event, advance past its named remaining dependencies, and revisit those after the initial sweep. Do not treat a partial publication as a completed task; preserve the frozen candidate and use a new actual-time continuation when additional eligible work remains.
+
 In the work plan, `completionState` describes completed decisions only. Read `reviewCompletionState` and `capturedForecastReviewsPending` separately; completed market decisions can coexist with unperformed forecast reviews. Resolve or disclose that remaining review work before describing the event as fully reviewed. `SOURCE_ORIGIN_ATTRIBUTION` in the card review flags known ESPN reporting facts attached to another publisher or labelled official; correct the source in the current draft using the actually checked reporting URL and original time.
 
 ```

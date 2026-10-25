@@ -175,6 +175,10 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
       });
       state.preparation={candidateDeferrals:prepared.audit.candidateDeferrals,cardEvidenceDeferrals:prepared.audit.cardEvidenceDeferrals,warnings:prepared.audit.warnings};
       state.preparation.forecastRouting=prepared.audit.forecastRouting;
+      // Successful assembly is not completion of the rest of the slate. Return
+      // the next actual research work immediately, rather than inviting another
+      // prepare/freeze cycle on the same first event.
+      state.preparation.workPlan=buildResearchWorkPlan(prepared.audit.eventResearchPlan);
       state.preparation.diagnostics=temporaryDraft(state,files=>pipeline({root,...files,mode:'diagnose'}));
       state.phase='PREPARED';delete state.validation;
     }

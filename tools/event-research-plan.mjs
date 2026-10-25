@@ -1,10 +1,29 @@
 // Event-first research orchestration. Read-only: never creates a betting decision.
-export const EVENT_RESEARCH_VERSION = '2026-10-06.1';
+export const EVENT_RESEARCH_VERSION = '2026-10-25.1';
 export const EVENT_RESEARCH_FROM = '2026-09-20T18:15:00-07:00';
 export const SOURCE_AGGREGATION_FROM = '2026-10-06T17:05:06Z';
 const list = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' ? value.trim() : '';
 const time = value => typeof value === 'string' ? Date.parse(value) : NaN;
+const pacificClock = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Vancouver',
+  year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+function localClock(value) {
+  if (!Number.isFinite(time(value))) return null;
+  const parts = Object.fromEntries(pacificClock.formatToParts(new Date(value)).map(part => [part.type,part.value]));
+  return {date:`${parts.year}-${parts.month}-${parts.day}`,weekday:parts.weekday,minute:Number(parts.hour)*60+Number(parts.minute)};
+}
+function scheduleUrgency(event, asOf) {
+  const issued=localClock(asOf),kickoff=localClock(event.eventDate);
+  const unfinished=event.pending>0 || list(event.forecastReviews).length>0 || event.sourceReviewPending;
+  // Sunday's early NFL board must be reviewed before its 10:00 PT deadline.
+  // This orders existing research only; it cannot clear evidence or add picks.
+  if (unfinished && event.sport==='NFL' && issued?.weekday==='Sun' && issued.minute<600 &&
+      kickoff?.date===issued.date && kickoff.minute<=600 && time(event.eventDate)>time(asOf))
+    return {code:'SUNDAY_EARLY_NFL',deadline:event.eventDate,
+      minutesUntilStart:Math.floor((time(event.eventDate)-time(asOf))/60000)};
+  return {code:'STANDARD_START_TIME'};
+}
+const producerReviewPlaceholder = value => /(?:CURRENT_CANDIDATE_REVIEW_REQUIRED|PRODUCER_CANDIDATE_ASSESSMENT_REQUIRED)/.test(String(value || ''));
 const keyFor = row => text(row?.sport) && String(row?.eventId || '').trim() && Number.isFinite(time(row?.eventDate))
   ? JSON.stringify([row.sport, String(row.eventId), new Date(row.eventDate).toISOString()]) : null;
 const sourcesOf = receipt => [
@@ -103,7 +122,9 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     if (matches.length > 1) warnings.push(`Duplicate receipts for ${row.selectionId}; no research reuse or completion inferred.`);
     const route = !identity || matches.length > 1 ? 'IDENTITY_REVIEW' : routeFor(row, receipt);
     if (!event.label && row.eventLabel) event.label = row.eventLabel;
+    const recordedMissing=receipt?.blocker?.missing || row.blocker?.missing;
     event.selections.push({selectionId:row.selectionId, marketDetail:row.marketDetail, side:row.side,
+      producerReviewPending:row.state!=='EVALUATED' && producerReviewPlaceholder(recordedMissing || list(row.missingResearch).join(',')),
       state:row.state, status:row.status || null, route, reviewState:row.reviewState || null, missingResearch:list(row.missingResearch), quote:row.quote || null, assessedQuote:row.assessedQuote || null,
       exactOptions:list(row.options).map(option => ({quote:option.quote, marketComparison:option.marketComparison || null,
         forecastAggregation:option.forecastAggregation||null})),
@@ -202,11 +223,16 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     return {eventKey:event.eventKey, sport:event.sport, eventId:event.eventId, eventDate:event.eventDate,
       label:event.label || `${event.sport} event ${event.eventId}`, available:event.selections.length,
       completed:event.selections.length-pending.length, pending:pending.length,
+      producerReviewPending:pending.filter(row=>row.producerReviewPending).length,
       sharedResearchRequired:pending.length>0, personnelFollowUp, researchPackage:{state:'REVIEW_LEADS_ONLY', sources:[...event.sourceMap.values()],
         instructions:'Review current personnel, matchup, weather/rest and relevant forecast leads once for this event. Preserve source times; map the finding, application and limitation separately to each exact selection.'},
       sourceReviewPending:expandedSourceReview && sourceQueue.size>0,
       forecastRetrieval, forecastReviews, selections:event.selections};
-  }).sort((a,b) => (time(a.eventDate) || Infinity)-(time(b.eventDate) || Infinity) || a.eventKey.localeCompare(b.eventKey));
+  }).map(event => ({...event,scheduleUrgency:scheduleUrgency(event,report.ts)}))
+    .sort((a,b) => Number(b.scheduleUrgency.code==='SUNDAY_EARLY_NFL')-Number(a.scheduleUrgency.code==='SUNDAY_EARLY_NFL') ||
+      (a.scheduleUrgency.code==='SUNDAY_EARLY_NFL' && b.scheduleUrgency.code==='SUNDAY_EARLY_NFL'
+        ? Number(b.producerReviewPending>0)-Number(a.producerReviewPending>0) : 0) ||
+      (time(a.eventDate) || Infinity)-(time(b.eventDate) || Infinity) || a.eventKey.localeCompare(b.eventKey));
   const rows = events.flatMap(event => event.selections), pending = rows.filter(row => row.route !== 'COMPLETED');
   const routes = {};
   for (const row of rows) routes[row.route] = (routes[row.route] || 0) + 1;
@@ -215,12 +241,17 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
     const sport = sports[event.sport] ||= {available:0,completed:0,pending:0,events:0};
     sport.available += event.available; sport.completed += event.completed; sport.pending += event.pending; sport.events++;
   }
+  const earlyNfl=events.filter(event=>event.scheduleUrgency.code==='SUNDAY_EARLY_NFL');
+  const sundayNfl={state:earlyNfl.length?'EARLY_KICKOFF_REVIEW_REQUIRED':'NO_EARLY_KICKOFF_REVIEW',
+    events:earlyNfl.length,pendingSelections:earlyNfl.reduce((sum,event)=>sum+event.pending,0),
+    nextEventId:earlyNfl[0]?.eventId || null};
+  if(earlyNfl.length)warnings.push(`Sunday early NFL review remains unfinished: ${sundayNfl.pendingSelections} selections across ${earlyNfl.length} events before kickoff. Complete this queue before later games; generic candidate-review blockers are unfinished producer work.`);
   if (Number.isFinite(time(report.ts)) && new Intl.DateTimeFormat('en-US',{timeZone:'America/Vancouver',weekday:'long'}).format(new Date(report.ts)) === 'Saturday' &&
       sports.NCAAF?.available > 0 && sports.NCAAF.completed === 0)
     warnings.push('College Game Day coverage is unfinished: available NCAAF selections have zero completed decisions. Finish event reviews; missing cards do not establish no value.');
   return {schema:1, version:EVENT_RESEARCH_VERSION, effectiveFrom:EVENT_RESEARCH_FROM, asOf:report.ts,
     mode:'RESEARCH_ORCHESTRATION_ONLY', decisionAuthority:false, state:inventory.length ? 'FULL_INVENTORY_PLANNED' : 'NO_INVENTORY',
-    sports, counts:{available:rows.length, events:events.length, completed:rows.length-pending.length, pending:pending.length,
+    sports, sundayNfl, counts:{available:rows.length, events:events.length, completed:rows.length-pending.length, pending:pending.length,
       researchIncomplete:pending.filter(row => row.blocker?.reason === 'RESEARCH_INCOMPLETE' || row.blocker === 'RESEARCH_INCOMPLETE').length,
       eventScansPending:events.filter(event => event.pending>0).length, routes}, events,
     forecastReviewCounts:{events:events.filter(event=>event.forecastReviews.length).length,records:events.reduce((sum,event)=>sum+event.forecastReviews.length,0)},
@@ -240,8 +271,8 @@ export function buildEventResearchPlan({report = {}, sidecar = {}, candidateAsse
 export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
   const capturedReviews = list(plan.events).reduce((count,event) => count + list(event.forecastReviews).length,0);
   const events = list(plan.events).filter(event => event.pending > 0 || list(event.forecastReviews).length > 0 || event.sourceReviewPending).map(event => ({
-    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,
-    pending:event.pending, completed:event.completed,sourceReviewPending:event.sourceReviewPending===true,
+    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,scheduleUrgency:event.scheduleUrgency,
+    pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending || 0,sourceReviewPending:event.sourceReviewPending===true,
     sourceLeads:list(event.researchPackage?.sources).map(({source, priorReportPath,priorCheckpointPath,checkpointBlobSha,issued}) => ({
       id:source.id, url:source.url, observedAt:source.checkedAt || source.asOf,
       finding:source.finding || source.fact, priorReportPath,
@@ -260,20 +291,21 @@ export function buildResearchWorkPlan(plan = {}, {eventId = null} = {}) {
   }));
   if (eventId !== null && !events.some(event => String(event.eventId) === String(eventId))) throw new Error('No pending event matches --event-id');
   const outputEvents = eventId !== null ? events.filter(event => String(event.eventId) === String(eventId)) : events.map(event => ({
-    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label, pending:event.pending, completed:event.completed,
+    eventId:event.eventId, sport:event.sport, eventDate:event.eventDate, label:event.label,scheduleUrgency:event.scheduleUrgency, pending:event.pending, completed:event.completed,producerReviewPending:event.producerReviewPending,
     sourceLeadCount:event.sourceLeads.length, personnelFollowUpState:event.personnelFollowUp?.state || null,
     routes:event.selections.reduce((counts,row) => ({...counts,[row.route]:(counts[row.route] || 0)+1}),{}),
     nextForecastSources:event.forecastSources.map(source => source.sourceId),
     capturedForecastsAwaitingReview:event.forecastReviews.length,sourceReviewPending:event.sourceReviewPending,nextAction:event.nextAction
   }));
-  return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,sports:plan.sports,forecastReviewCounts:plan.forecastReviewCounts,
+  return {schema:1, mode:'RESEARCH_WORK_PLAN', decisionAuthority:false, counts:plan.counts,sports:plan.sports,sundayNfl:plan.sundayNfl,
+    nextEventId:(outputEvents.find(event=>event.pending>0) || outputEvents[0])?.eventId || null,forecastReviewCounts:plan.forecastReviewCounts,
     sourceCoverageReviewCounts:plan.sourceCoverageReviewCounts,
     reviewCompletionState:plan.counts?.pending > 0 ? 'DECISIONS_PENDING' : capturedReviews > 0 ? 'CAPTURED_FORECAST_REVIEW_PENDING' : 'COMPLETE',
     capturedForecastReviewsPending:capturedReviews,
     completionState:plan.counts?.available > 0 && plan.counts?.completed === 0 ? 'NO_COMPLETED_DECISIONS' :
       plan.counts?.pending > 0 ? 'PARTIAL' : 'COMPLETE',
     instructions:[
-      'Scan the full inventory, then complete event reviews incrementally in start-time order; research leads are not completed research.',
+      'Scan the full inventory, then follow nextEventId and scheduleUrgency: complete Sunday early NFL reviews before later games, otherwise use start-time order. Research leads are not completed research.',
       'Missing independent forecasts or calibrated intervals do not block the qualified market LEAN/PASS route.',
       'Review already captured forecast points first, including events with completed market decisions. Append real applicability checks; this queue does not certify eligibility or block publication. A missing BET bound is not a failed retrieval.',
       'Review remaining applicable source routes once per event even with ESPN present. Combine compatible forecasts and contrary evidence at each price; assess possible BETs before LEAN, WAIT or PASS. Access limitations do not veto completed unrelated cards.',

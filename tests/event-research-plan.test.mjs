@@ -171,3 +171,65 @@ assert.equal(buildResearchWorkPlan(plan).reviewCompletionState,'DECISIONS_PENDIN
 const foreign=structuredClone(capturedInput);
 foreign.forecastCoverage.selections.forEach(row=>row.records.forEach(record=>record.reasons.push('EVENT_MISMATCH')));
 assert.equal(buildEventResearchPlan(foreign).forecastReviewCounts.records,0);
+
+// The Sunday producer must reach every early NFL event before later-game
+// research. Time comparisons use Vancouver, even when inputs use UTC or DST.
+const scheduledRow=(sport,eventId,eventDate,state='BLOCKED')=>({...make('home','full_game_moneyline',eventId),
+  selectionId:`${sport}|${eventId}|full_game_moneyline|home`,sport,eventDate,state,
+  status:state==='EVALUATED'?'PASS':null});
+const sundayRows=[
+  scheduledRow('NHL','hockey','2026-10-25T16:00:00Z'),
+  scheduledRow('NFL','early-b','2026-10-25T17:00:00Z'),
+  scheduledRow('NFL','late','2026-10-25T20:05:00Z'),
+  scheduledRow('NFL','early-a','2026-10-25T17:00:00Z'),
+  scheduledRow('NFL','started','2026-10-25T13:30:00Z'),
+  scheduledRow('NFL','tomorrow','2026-10-26T17:00:00Z'),
+  scheduledRow('NFL','already-done','2026-10-25T17:00:00Z','EVALUATED')
+];
+const sundayInput={report:{ts:'2026-10-25T08:00:00-07:00'},candidateAssessment:{selections:sundayRows}};
+const sundayBefore=JSON.stringify(sundayInput),sundayPlan=buildEventResearchPlan(sundayInput),sundayWork=buildResearchWorkPlan(sundayPlan);
+assert.deepEqual(sundayPlan.events.slice(0,2).map(event=>event.eventId),['early-a','early-b']);
+assert.equal(sundayPlan.events.length,sundayRows.length,'priority retains every other event and all market inventory');
+assert.deepEqual(sundayPlan.sundayNfl,{state:'EARLY_KICKOFF_REVIEW_REQUIRED',events:2,pendingSelections:2,nextEventId:'early-a'});
+assert.equal(sundayWork.nextEventId,'early-a');
+assert.deepEqual(sundayWork.events[0].scheduleUrgency,{code:'SUNDAY_EARLY_NFL',deadline:'2026-10-25T17:00:00Z',minutesUntilStart:120});
+assert.equal(buildResearchWorkPlan(sundayPlan,{eventId:'early-b'}).nextEventId,'early-b');
+assert.equal(sundayPlan.events.find(event=>event.eventId==='late').scheduleUrgency.code,'STANDARD_START_TIME');
+assert.equal(sundayPlan.events.find(event=>event.eventId==='started').scheduleUrgency.code,'STANDARD_START_TIME');
+assert.equal(sundayPlan.events.find(event=>event.eventId==='already-done').scheduleUrgency.code,'STANDARD_START_TIME');
+assert.equal(JSON.stringify(sundayInput),sundayBefore,'scheduling never changes grades or receipts');
+assert.equal(sundayPlan.counts.completed,1);
+assert.equal(sundayPlan.decisionAuthority,false);
+for(const ts of ['2026-10-25T10:00:00-07:00','2026-10-25T13:00:00-07:00','2026-10-24T08:00:00-07:00']){
+  const ordinary=buildEventResearchPlan({...sundayInput,report:{ts}});
+  assert.equal(ordinary.sundayNfl.events,0,'past deadline and non-Sunday retain ordinary start-time order');
+  assert.deepEqual(ordinary.events.slice(0,2).map(event=>event.eventId),['started','hockey']);
+}
+const winter=buildEventResearchPlan({report:{ts:'2025-11-09T09:30:00-08:00'},candidateAssessment:{selections:[
+  scheduledRow('NHL','winter-hockey','2025-11-09T17:45:00Z'),scheduledRow('NFL','winter-early','2025-11-09T18:00:00Z')]}});
+assert.equal(buildResearchWorkPlan(winter).nextEventId,'winter-early','DST change keeps the 10:00 Pacific kickoff deadline');
+assert.equal(winter.events[0].scheduleUrgency.minutesUntilStart,30);
+assert.equal(buildResearchWorkPlan({counts:{available:0,pending:0,completed:0},events:[]}).nextEventId,null);
+const sfRows=rows.map((row,index)=>({...scheduledRow('NFL','sf-atl','2026-10-25T17:00:00Z',index<4?'EVALUATED':'BLOCKED'),
+  selectionId:`NFL|sf-atl|${row.marketDetail}|${row.side}`}));
+const untouched=Array.from({length:10},(_,index)=>scheduledRow('NFL',`nfl-${String(index).padStart(2,'0')}`,'2026-10-25T17:00:00Z'));
+const sweepRows=[...sfRows,...untouched];
+const sweepReceipts=sweepRows.map(row=>({selectionId:row.selectionId,state:row.state,
+  ...(row.state==='BLOCKED'?{blocker:{reason:'RESEARCH_INCOMPLETE',missing:row.eventId==='sf-atl'
+    ?'GRAHAM_FAIR_DISPOSITION_REQUIRED, GRAHAM_CURRENT_SOURCE_REVALIDATION_REQUIRED':'CURRENT_CANDIDATE_REVIEW_REQUIRED'}}:{})}));
+const sweep=buildEventResearchPlan({report:sundayInput.report,candidateAssessment:{selections:sweepRows},sidecar:{primaryAnalysis:{receipts:sweepReceipts}}});
+assert.equal(buildResearchWorkPlan(sweep).nextEventId,'nfl-00','advance past the first reviewed event with specific remaining work');
+assert.deepEqual(sweep.events.slice(0,10).map(event=>event.eventId),untouched.map(row=>row.eventId));
+assert.equal(sweep.events.at(-1).eventId,'sf-atl','the two Graham follow-ups remain visible after the unreviewed NFL sweep');
+assert.equal(sweep.events.at(-1).pending,2);
+assert.equal(sweep.counts.completed,4);
+assert.equal(sweep.counts.pending,12);
+assert.equal(sweep.events[0].producerReviewPending,1);
+const ordinarySweep=buildEventResearchPlan({report:{ts:'2026-10-24T08:00:00-07:00'},candidateAssessment:{selections:[
+  {...sfRows.at(-1),eventDate:'2026-10-25T16:00:00Z'},...untouched]},sidecar:{primaryAnalysis:{receipts:sweepReceipts}}});
+assert.equal(ordinarySweep.events[0].eventId,'sf-atl','placeholder priority never moves a later kickoff ahead outside Sunday early priority');
+const staleDiagnostics=structuredClone(sweepRows);
+staleDiagnostics.filter(row=>row.eventId==='sf-atl' && row.state==='BLOCKED').forEach(row=>row.missingResearch=['CURRENT_CANDIDATE_REVIEW_REQUIRED']);
+const preciseBlockerPlan=buildEventResearchPlan({report:sundayInput.report,candidateAssessment:{selections:staleDiagnostics},sidecar:{primaryAnalysis:{receipts:sweepReceipts}}});
+assert.equal(preciseBlockerPlan.events.at(-1).producerReviewPending,0,'the current exact recorded blocker takes precedence over stale candidate diagnostics');
+console.log('Sunday work queue: early NFL priority, stable start-time fallback, Pacific/DST boundary and inventory preservation passed.');
