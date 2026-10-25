@@ -1,0 +1,596 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-25T20:05:00.000Z",
+  "season": 2026,
+  "sourceWeek": 7,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive active-week PIT-NO reconciliation preserving the complete paired candidate inventories and binding the official NFL final gamebook. Complete starter, substitute, did-not-play, inactive, quarterback, specialist and printed in-game injury status inventories are assembled. The pair remains blocked only by explicit immutable-value, replacement-allocation and injury-boundary/method decisions; no missing value is treated as zero and no rating, fair or customer prediction is changed.",
+  "marketViewed": false,
+  "inputCommit": "84598dfba4db8513457dc434c57a3c48150262c9",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "c578c7f63ee823bcdaef151bf36bd231630653b2",
+    "data/walters/nfl/2026/week-07-current-numbers.json": "d736fe960bf7d6158e1ed9c1b67ff4885cb99995",
+    "data/walters/nfl/weekly-readiness.json": "d1501348e3afcb0f65ffdcccc388a17bfeef7dfa",
+    "data/walters/nfl-power-ratings-ledger.json": "56f6a3c8b6955b1c8dba7c58f28ce3ef6f36a0ff",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd"
+  },
+  "sources": [
+    {
+      "id": "saints-pit-no-official-final",
+      "url": "https://www.neworleanssaints.com/game-day/2026/reg-week7/steelers-at-saints/box-score",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The official Saints game center shows Pittsburgh 16, New Orleans 10, FINAL.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "steelers-pit-no-official-inactives",
+      "url": "https://www.steelers.com/news/steelers-inactives-for-week-7-at-saints",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "Complete paired final inactive lists are published. Pittsburgh also confirms DeShon Elliott activated and available, Sebastian Joseph-Day on Reserve/Injured, Kevin Jobity Jr. expected to debut, and Brandon Johnson and Brandon Smith elevated.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "saints-pit-no-official-inactives",
+      "url": "https://www.neworleanssaints.com/news/new-orleans-saints-inactives-pittsburgh-steelers-2026-nfl-week-7-gameday",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "New Orleans' final inactive list confirms Zach Wilson as emergency QB3 and Cesar Ruiz, Nathan Shepherd, John Ridgeway III, Mike Reid and Treyton Welch inactive; the paired Steelers article additionally lists Tyree Wilson.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "saints-pit-no-official-elevations",
+      "url": "https://www.neworleanssaints.com/news/saints-roster-moves-week-7-elevations-steelers-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "Easton Kilty and Cedric Tillman were elevated for the game.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "saints-current-roster",
+      "url": "https://www.neworleanssaints.com/team/rosters",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The current official roster supplies the full New Orleans Reserve/Injured, designated-for-return and Reserve/PUP inventories.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "steelers-current-roster",
+      "url": "https://www.steelers.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The current official roster supplies the full Pittsburgh Reserve/Injured and Reserve/PUP inventories; the same-day inactives report supersedes its stale DeShon Elliott reserve label.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "saints-depth-chart",
+      "url": "https://www.neworleanssaints.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The official depth chart binds Tyler Shough/Spencer Rattler/Zach Wilson and specialists Daniel Carlson, Ryan Wright and Zach Wood, plus current role candidates.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "steelers-depth-chart",
+      "url": "https://www.steelers.com/team/depth-chart/app",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The official depth chart binds Aaron Rodgers/Mason Rudolph/Will Howard/Drew Allar and specialists Chris Boswell, Cameron Johnston and Christian Kuntz.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "saints-gamebook-index",
+      "url": "https://www.neworleanssaints.com/media/gamebooks/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "The Saints gamebook index still ends at Week 6, but this availability observation is superseded by the official NFL Game Center final gamebook bound below.",
+      "checkedAt": "2026-10-25T17:06:23.081Z"
+    },
+    {
+      "id": "saints-pit-no-official-recap-injuries",
+      "url": "https://www.neworleanssaints.com/game-day/2026/reg-week7/steelers-at-saints/recap",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "Official postgame recap states that Saints RB CJ Donaldson left with a shoulder injury in the first half and S Justin Reid was ruled out with a concussion just before halftime. The recap does not provide exact game-clock boundaries or a complete printed injury/return sequence.",
+      "checkedAt": "2026-10-25T18:58:00.000Z"
+    },
+    {
+      "id": "official-nfl-pit-no-final-gamebook",
+      "url": "https://static.www.nfl.com/image/upload/v1792946417/gamecenter/aad58d7d-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-PIT-NO"
+      ],
+      "finding": "Official NFL final gamebook confirms PIT 16-NO 10; lists every starter, substitute, did-not-play and inactive player; records Aaron Rodgers and Tyler Shough as the sole participating quarterbacks; records Chris Boswell/Cameron Johnston/Christian Kuntz and Daniel Carlson/Ryan Wright/Zach Wood as participating specialists; and prints CJ Donaldson Questionable at Q2 15:00, then CJ Donaldson and Justin Reid Out at the Q3 7:32 timeout. The book does not print either player's original injury play or any return, so no earlier exit boundary or return is inferred.",
+      "checkedAt": "2026-10-25T20:05:00.000Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-PIT-NO",
+      "away": "PIT",
+      "home": "NO",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "saints-pit-no-official-final",
+        "steelers-pit-no-official-inactives",
+        "saints-pit-no-official-inactives",
+        "saints-pit-no-official-elevations",
+        "saints-current-roster",
+        "steelers-current-roster",
+        "saints-depth-chart",
+        "steelers-depth-chart",
+        "saints-gamebook-index",
+        "saints-pit-no-official-recap-injuries",
+        "official-nfl-pit-no-final-gamebook"
+      ],
+      "final": {
+        "awayScore": 16,
+        "homeScore": 10,
+        "status": "FINAL_REGULATION",
+        "sourceIds": [
+          "saints-pit-no-official-final"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-25T06:30:00-07:00",
+        "awayRating": 23.671395616,
+        "homeRating": 20.726750612,
+        "homeLocationAdvantagePoints": 0,
+        "venueClass": "INTERNATIONAL_NEUTRAL",
+        "neutralBaseHome": 2.944645004,
+        "currentNumbersBlobSha": "d736fe960bf7d6158e1ed9c1b67ff4885cb99995",
+        "powerLedgerBlobSha": "56f6a3c8b6955b1c8dba7c58f28ce3ef6f36a0ff",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false,
+        "preservedPregameExactFairHome": 2.485,
+        "preservedPregameDisplayedFairHome": 2.5
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS",
+        "pairedParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "quarterbackParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "specialistParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "officialInGameInjuryReporting": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE_BOUNDARIES_STILL_UNRESOLVED"
+      },
+      "pairedTeamInventories": [
+        {
+          "team": "PIT",
+          "side": "AWAY",
+          "finalInactive": [
+            "Ben Skowronek (WR, calf)",
+            "Drew Allar (QB, inactive non-emergency)",
+            "Will Howard (QB, emergency QB3)",
+            "Brandin Echols (CB, hamstring)",
+            "Eli Heidenreich (RB, healthy scratch)",
+            "Terell Smith (CB, healthy scratch)"
+          ],
+          "reserveUnavailable": [
+            "Jack Driscoll (OT, Reserve/Injured)",
+            "Gennings Dunker (G, Reserve/Injured)",
+            "Derrick Harmon (DT, Reserve/Injured)",
+            "Sebastian Joseph-Day (DT, Reserve/Injured)",
+            "Logan Lee (DL, Reserve/Injured)",
+            "Michael Pittman Jr. (WR, Reserve/Injured)",
+            "Roman Wilson (WR, Reserve/Injured)",
+            "Donte Kent (CB, Reserve/PUP)"
+          ],
+          "gameDayElevations": [
+            "Brandon Johnson (WR)",
+            "Brandon Smith (WR)"
+          ],
+          "participationResolvedActive": [
+            "DeShon Elliott (activated from Reserve/Injured and declared available)",
+            "Rico Dowdle (active after questionable designation)"
+          ],
+          "quarterback": {
+            "starter": "Aaron Rodgers",
+            "backup": "Mason Rudolph",
+            "inactiveNonEmergency": "Drew Allar",
+            "emergencyInactive": "Will Howard",
+            "pregameInventoryState": "COMPLETE_SOURCE_BOUND",
+            "finalParticipationState": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "specialists": {
+            "kicker": "Chris Boswell",
+            "punter": "Cameron Johnston",
+            "longSnapper": "Christian Kuntz",
+            "pregameInventoryState": "COMPLETE_NO_SPECIALIST_INACTIVE",
+            "finalParticipationState": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "resolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-PIT-Ben-Skowronek",
+              "unavailableValue": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "rationale": "The frozen healthy value is calibrated zero; this is not a missing value treated as zero."
+            },
+            {
+              "caseKey": "2026-W07-PIT-DeShon-Elliott",
+              "state": "RESOLVED_ACTIVE_SOURCE_BOUND",
+              "rationale": "The official same-day report states Elliott was activated and would play. The stale roster reserve label and earlier personnel-ledger absence must not create a game-day injury loss."
+            }
+          ],
+          "unresolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-PIT-Sebastian-Joseph-Day",
+              "exactMissingFact": "The official gamebook now binds participating interior defenders (starters Cameron Heyward and Keeanu Benton; substitutes Kevin Jobity, Yahya Black and Greg Rubio), but it does not assign disjoint replacement shares for Joseph-Day after Derrick Harmon and Joseph-Day were both unavailable.",
+              "footballImpact": "A second defensive-line absence can change interior rotation and replacement-duty allocation.",
+              "requiredSourceOrMethodDecision": "Apply the existing distinct-cluster replacement method to the immutable values and role shares of the gamebook-bound interior participants without duplicating Harmon's credit."
+            },
+            {
+              "caseKey": "2026-W07-PIT-Brandin-Echols",
+              "exactMissingFact": "The official gamebook confirms Echols inactive and binds the participating defensive backs, but no immutable one-for-one or committee share is assigned to Echols' expected Week 7 role.",
+              "footballImpact": "Cornerback depth and possible defensive-back workload loss.",
+              "requiredSourceOrMethodDecision": "Bind the current immutable values and expected defensive role to the gamebook participants; special-teams-only participation cannot establish a defensive replacement effect."
+            },
+            {
+              "caseKey": "2026-W07-PIT-Eli-Heidenreich",
+              "exactMissingFact": "The official gamebook confirms Heidenreich inactive. A governed expected-baseline-role ruling remains absent.",
+              "footballImpact": "Reserve running-back depth only unless a current expected role is established.",
+              "requiredSourceOrMethodDecision": "Apply an explicit no-baseline-role ruling or a source-supported expected role; do not infer loss from inactive status alone."
+            },
+            {
+              "caseKey": "2026-W07-PIT-Terell-Smith",
+              "exactMissingFact": "The official gamebook confirms Smith inactive. A governed expected defensive-role ruling remains absent.",
+              "footballImpact": "Reserve cornerback depth only unless a current expected role is established.",
+              "requiredSourceOrMethodDecision": "Apply an explicit no-baseline-role ruling or a source-supported expected defensive role."
+            }
+          ],
+          "officialGamebookParticipation": {
+            "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+            "sourceIds": [
+              "official-nfl-pit-no-final-gamebook"
+            ],
+            "starters": {
+              "offense": [
+                "WR 4 D.Metcalf",
+                "LT 76 T.Fautanu",
+                "LG 66 M.McCormick",
+                "C 54 Z.Frazier",
+                "RG 67 B.Hoffman",
+                "RT 71 M.Iheanachor",
+                "TE 88 P.Freiermuth",
+                "WR 17 G.Bernard",
+                "TE 80 D.Washington",
+                "QB 8 A.Rodgers",
+                "RB 30 J.Warren"
+              ],
+              "defense": [
+                "LB 56 A.Highsmith",
+                "DT 97 C.Heyward",
+                "DT 95 K.Benton",
+                "LB 90 T.Watt",
+                "LB 41 P.Wilson",
+                "LB 6 P.Queen",
+                "CB 35 J.Dean",
+                "CB 22 A.Samuel",
+                "CB 5 J.Ramsey",
+                "S 3 J.Brisker",
+                "S 28 R.Spears-Jennings"
+              ]
+            },
+            "substitutions": [
+              "K 9 C.Boswell",
+              "WR 10 K.Wetjen",
+              "RB 13 R.Dowdle",
+              "P 19 C.Johnston",
+              "RB 21 T.Homer",
+              "CB 23 D.Everette",
+              "S 25 D.Elliott",
+              "CB 27 S.Murphy-Bunting",
+              "RB 31 L.Nichols",
+              "LB 33 J.Sawyer",
+              "FB 37 R.Nowakowski",
+              "DB 40 D.Slaughter",
+              "LB 44 C.Bruener",
+              "LS 46 C.Kuntz",
+              "LB 51 N.Herbig",
+              "LB 55 C.Holcomb",
+              "T 60 D.Cook",
+              "C 62 R.McCollum",
+              "OL 74 S.Anderson",
+              "TE 85 R.Tonyan",
+              "WR 87 B.Smith",
+              "WR 89 B.Johnson",
+              "DL 92 K.Jobity",
+              "DL 94 Y.Black",
+              "DE 96 G.Rubio"
+            ],
+            "didNotPlay": [
+              "QB 2 M.Rudolph"
+            ],
+            "notActive": [
+              "WR 15 B.Skowronek",
+              "QB 16 D.Allar",
+              "3QB 18 W.Howard",
+              "CB 26 B.Echols",
+              "RB/WR 29 E.Heidenreich",
+              "CB 39 T.Smith"
+            ]
+          }
+        },
+        {
+          "team": "NO",
+          "side": "HOME",
+          "finalInactive": [
+            "Zach Wilson (QB, emergency QB3)",
+            "Mike Reid (S)",
+            "Cesar Ruiz (G)",
+            "Treyton Welch (TE)",
+            "Nathan Shepherd (DL)",
+            "John Ridgeway III (DL)",
+            "Tyree Wilson (EDGE)"
+          ],
+          "reserveUnavailable": [
+            "Kelvin Banks Jr. (T, Reserve/Injured)",
+            "Bryan Bresee (DL, Reserve/Injured)",
+            "Ty Chandler (RB, Reserve/Injured)",
+            "Travis Etienne Jr. (RB, Reserve/Injured)",
+            "David Long Jr. (CB, Reserve/Injured)",
+            "Moliki Matavao (TE, Reserve/Injured)",
+            "Dillon Radunz (OL, Reserve/Injured)",
+            "Rejzohn Wright (CB, Reserve/Injured)",
+            "Jordyn Tyson (WR, Reserve/Injured; designated for return)",
+            "Nick Saldiveri (OL, Reserve/PUP)",
+            "Mason Tipton (WR, Reserve/PUP)"
+          ],
+          "gameDayElevations": [
+            "Easton Kilty (T)",
+            "Cedric Tillman (WR)"
+          ],
+          "participationResolvedActive": [
+            "Alvin Kamara",
+            "Kaden Elliss",
+            "Anfernee Jennings",
+            "Martin Emerson Jr. (absent from complete final inactive list)",
+            "CJ Donaldson (official gamebook substitute; injured in game)",
+            "Justin Reid (official gamebook starter; injured in game)"
+          ],
+          "quarterback": {
+            "starter": "Tyler Shough",
+            "backup": "Spencer Rattler",
+            "emergencyInactive": "Zach Wilson",
+            "pregameInventoryState": "COMPLETE_SOURCE_BOUND",
+            "finalParticipationState": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "specialists": {
+            "kicker": "Daniel Carlson",
+            "punter": "Ryan Wright",
+            "longSnapper": "Zach Wood",
+            "pregameInventoryState": "COMPLETE_NO_SPECIALIST_INACTIVE",
+            "finalParticipationState": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "resolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-NO-John-Ridgeway-III",
+              "unavailableValue": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "rationale": "The frozen healthy value is calibrated zero; this is not a missing value treated as zero."
+            },
+            {
+              "caseKey": "2026-W07-NO-Martin-Emerson-Jr",
+              "state": "RESOLVED_ACTIVE_SOURCE_BOUND",
+              "rationale": "The complete final inactive list does not include Emerson, resolving pregame availability as active; final participation remains a gamebook gate."
+            }
+          ],
+          "unresolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-NO-Nick-Saldiveri",
+              "exactMissingFact": "Exact locked current-iteration identity/value remains unavailable after Reserve/PUP status was established.",
+              "footballImpact": "Offensive-line reserve/starter-history depth; no numeric game-day effect can be manufactured.",
+              "requiredSourceOrMethodDecision": "Immutable current-iteration identity/value capture or explicit no-baseline-role treatment by the governed value owner."
+            },
+            {
+              "caseKey": "2026-W07-NO-Cesar-Ruiz",
+              "exactMissingFact": "Ruiz is officially inactive and the gamebook binds starter Jackson Wright at RG plus substitute Will Sherman, but the immutable value and disjoint replacement allocation for the actual right-guard duty chain remain unassembled.",
+              "footballImpact": "Starting right-guard loss and offensive-line continuity.",
+              "requiredSourceOrMethodDecision": "Bind current immutable values and apply the existing one-for-one/cluster method to the gamebook-bound RG chain without duplicate credit."
+            },
+            {
+              "caseKey": "2026-W07-NO-Nathan-Shepherd",
+              "exactMissingFact": "Shepherd and listed backup John Ridgeway III are inactive; the gamebook binds the participating interior line (Chris Wooden, Vernon Broughton, C.J. Miller, Davon Godchaux and Kristian Boyd), but it does not assign disjoint replacement shares.",
+              "footballImpact": "Interior defensive-line rotation and run-defense depth.",
+              "requiredSourceOrMethodDecision": "Apply the existing distinct-cluster replacement method to immutable values and gamebook-bound interior roles; Ridgeway's calibrated-zero value does not establish Shepherd's replacement."
+            },
+            {
+              "caseKey": "2026-W07-NO-Tyree-Wilson",
+              "exactMissingFact": "Wilson is officially inactive and the gamebook binds the participating edge group, but no immutable one-for-one or committee share is assigned to Wilson's expected Week 7 role.",
+              "footballImpact": "Edge rotation and pass-rush depth.",
+              "requiredSourceOrMethodDecision": "Bind current immutable values and expected edge role to the gamebook participants; special-teams-only activity cannot establish a defensive replacement effect."
+            },
+            {
+              "caseKey": "2026-W07-NO-Mike-Reid",
+              "exactMissingFact": "The official gamebook confirms Reid inactive. A governed expected safety-role ruling remains absent.",
+              "footballImpact": "Safety depth only unless a current expected defensive role is established.",
+              "requiredSourceOrMethodDecision": "Apply an explicit no-baseline-role ruling or a source-supported expected defensive role."
+            },
+            {
+              "caseKey": "2026-W07-NO-Treyton-Welch",
+              "exactMissingFact": "The official gamebook confirms Welch inactive. A governed expected tight-end-role ruling remains absent.",
+              "footballImpact": "Tight-end depth and possible blocking/receiving allocation.",
+              "requiredSourceOrMethodDecision": "Apply an explicit no-baseline-role ruling or a source-supported expected role."
+            },
+            {
+              "caseKey": "2026-W07-NO-CJ-Donaldson-IN-GAME",
+              "exactMissingFact": "The official gamebook prints Questionable at Q2 15:00 and Out at Q3 7:32, but not the original injury play or any return; the recap only says first-half shoulder injury.",
+              "footballImpact": "Running-back depth and the duration of Donaldson's in-game unavailability affect the partial-game loss and replacement interval.",
+              "requiredSourceOrMethodDecision": "Use an approved governed boundary rule for a missing original injury clock, or obtain a source that identifies the exit play. Do not backfill an exact exit or return from the printed status updates."
+            },
+            {
+              "caseKey": "2026-W07-NO-Justin-Reid-IN-GAME",
+              "exactMissingFact": "The official gamebook prints Out at Q3 7:32; the recap says ruled out with concussion just before halftime, but neither source prints the original injury play or an exact pre-halftime clock.",
+              "footballImpact": "Starting-safety loss and the replacement interval can materially affect the defensive adjustment.",
+              "requiredSourceOrMethodDecision": "Use an approved governed boundary rule for the interval between the last supported participation and the out report, or obtain a source identifying the exit play. Do not invent an exact clock or return."
+            }
+          ],
+          "officialGamebookParticipation": {
+            "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+            "sourceIds": [
+              "official-nfl-pit-no-final-gamebook"
+            ],
+            "starters": {
+              "offense": [
+                "WR 19 B.Brown",
+                "WR 12 C.Olave",
+                "TE 87 N.Fant",
+                "LT 72 A.Richards",
+                "LG 76 D.Edwards",
+                "C 78 E.McCoy",
+                "RG 65 J.Wright",
+                "RT 75 T.Fuaga",
+                "WR 14 D.Vele",
+                "QB 6 T.Shough",
+                "RB 41 A.Kamara"
+              ],
+              "defense": [
+                "DE 99 C.Young",
+                "DL 50 C.Wooden",
+                "DL 91 V.Broughton",
+                "DE 96 C.Granderson",
+                "LB 55 K.Elliss",
+                "LB 20 P.Werner",
+                "CB 22 M.Emerson",
+                "CB 1 K.McKinstry",
+                "S 23 J.Blackmon",
+                "S 21 J.Reid",
+                "S 7 J.Sanker"
+              ]
+            },
+            "substitutions": [
+              "TE 4 O.Delp",
+              "RB 5 K.Miller",
+              "K 10 D.Carlson",
+              "WR 13 C.Tillman",
+              "P 17 R.Wright",
+              "WR 18 B.Lance",
+              "CB 25 D.Richardson",
+              "LB 28 D.Stutsman",
+              "CB 29 Q.Riley",
+              "DB 31 J.Howden",
+              "DE 33 A.Jennings",
+              "DB 36 L.Styles",
+              "RB 43 C.Donaldson",
+              "LB 44 I.Stalbird",
+              "LS 49 Z.Wood",
+              "DL 52 C.Miller",
+              "LB 53 J.Ford",
+              "LB 58 C.Rumph",
+              "G 66 W.Sherman",
+              "T 73 E.Kilty",
+              "T 74 M.Murphy",
+              "TE 83 J.Johnson",
+              "DL 92 D.Godchaux",
+              "DE 94 C.Jordan",
+              "DL 97 K.Boyd"
+            ],
+            "didNotPlay": [
+              "QB 2 S.Rattler"
+            ],
+            "notActive": [
+              "3QB 11 Z.Wilson",
+              "S 42 M.Reid",
+              "G 51 C.Ruiz",
+              "TE 82 T.Welch",
+              "DL 93 N.Shepherd",
+              "DL 95 J.Ridgeway",
+              "DE 98 T.Wilson"
+            ]
+          }
+        }
+      ],
+      "observedInGameInjuries": [
+        {
+          "team": "NO",
+          "player": "CJ Donaldson",
+          "position": "RB",
+          "reportedAt": "Q2 15:00 STATUS_UPDATE",
+          "returnAt": null,
+          "sourceIds": [
+            "saints-pit-no-official-recap-injuries",
+            "official-nfl-pit-no-final-gamebook"
+          ],
+          "statusUpdates": [
+            "Q2 15:00 — return is Questionable",
+            "Q3 7:32 timeout — Out of the game"
+          ],
+          "literalTreatment": "Official gamebook first prints a Questionable return status at Q2 15:00 and later Out at the Q3 7:32 timeout. It does not print the original injury play or a return. The first-half shoulder injury from the official recap is retained; no earlier clock boundary, return, or duration is inferred."
+        },
+        {
+          "team": "NO",
+          "player": "Justin Reid",
+          "position": "S",
+          "reportedAt": "Q3 7:32 OUT STATUS",
+          "returnAt": null,
+          "sourceIds": [
+            "saints-pit-no-official-recap-injuries",
+            "official-nfl-pit-no-final-gamebook"
+          ],
+          "statusUpdates": [
+            "Q3 7:32 timeout — Out of the game"
+          ],
+          "literalTreatment": "Official gamebook prints Out at the Q3 7:32 timeout. The official recap says he was ruled out with a concussion just before halftime, but neither source prints the original injury play or an exact pre-halftime clock. No earlier clock boundary, return, or duration is inferred."
+        }
+      ],
+      "quarterbackReview": {
+        "PIT": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "finding": "Aaron Rodgers was the sole participating Pittsburgh quarterback. Mason Rudolph is listed Did Not Play; Drew Allar and emergency QB3 Will Howard are listed Not Active. No quarterback injury or relief interval is printed."
+        },
+        "NO": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "finding": "Tyler Shough was the sole participating New Orleans quarterback. Spencer Rattler is listed Did Not Play; emergency QB3 Zach Wilson is listed Not Active. No quarterback injury or relief interval is printed."
+        }
+      },
+      "specialistReview": {
+        "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "finding": "The official gamebook lists Pittsburgh K Chris Boswell, P Cameron Johnston and LS Christian Kuntz as substitutes who participated, and New Orleans K Daniel Carlson, P Ryan Wright and LS Zach Wood as substitutes who participated. No specialist injury is printed."
+      },
+      "blockers": [
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "All available official inactive, reserve, elevation, starter, substitute, DNP, quarterback and specialist evidence is assembled. Remaining cases require immutable-value or governed expected-role/replacement allocation decisions: PIT Joseph-Day, Echols, Heidenreich and Terell Smith; NO Saldiveri, Ruiz, Shepherd, Tyree Wilson, Mike Reid and Treyton Welch. Missing values are not zero, and special-teams-only activity does not establish a defensive replacement effect.",
+          "footballImpact": "Open cases span offensive-line continuity, defensive-line/edge rotations and secondary or reserve depth; premature estimates could duplicate duties or fabricate roles.",
+          "nextAction": "Use the existing immutable registry and approved labelled estimates where eligible; apply one-for-one or distinct-cluster safeguards to the official gamebook participants, and route only the residual source/method decisions to the existing owners.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "CJ Donaldson's official sequence is Questionable at Q2 15:00 and Out at Q3 7:32; Justin Reid is printed Out at Q3 7:32. The recap supplies only first-half/before-halftime wording, and neither source prints the original injury play or a return.",
+          "footballImpact": "The duration of the running-back and starting-safety losses controls partial-game arithmetic and replacement intervals.",
+          "nextAction": "Apply an already approved governed boundary method if eligible or obtain a source identifying the exit play. Do not manufacture exact clocks, returns or durations.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ]
+    }
+  ]
+}
