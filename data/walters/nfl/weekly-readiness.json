@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-25T14:07:19.084Z",
+  "generatedAt": "2026-10-25T17:07:19.060Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 14,
@@ -1222,19 +1222,78 @@
       "gameKey": "2026-W07-PIT-NO",
       "away": "PIT",
       "home": "NO",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
+      "state": "RECONCILE",
+      "workClass": "WAITING_SOURCE_OR_METHOD",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json",
+        "blobSha": "6f7937c940f0fc71a3eec1d491299a99d20176bc",
+        "recordedAt": "2026-10-25T17:06:23.081Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE_OFFICIAL",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "finalInactiveReserveAndElevationInventories": {
+          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "pairedParticipation": {
+          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "quarterbackParticipation": {
+          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "specialistParticipation": {
+          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        },
+        "officialInGameInjuryReporting": {
+          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json"
+        }
+      },
+      "blockers": [
+        {
+          "code": "SOURCE_NOT_YET_AVAILABLE",
+          "finding": "The official Week 7 PIT-NO gamebook is not exposed on the Saints gamebook index. Complete starter, substitute and DNP participation; every quarterback and specialist appearance; and all printed injury/return sequences cannot yet be certified.",
+          "footballImpact": "Without exact participation and injury intervals, whole-game and partial-game losses and disjoint replacement duties cannot be computed safely.",
+          "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation and injury timeline without backdating this attempt.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_ASSEMBLED",
+          "finding": "Complete paired final inactive, reserve, elevation, quarterback and specialist candidate sections are now source-bound, but final participation and in-game injury evidence remain unassembled pending the official gamebook. An empty observedInGameInjuries array is not an assertion that no injuries occurred.",
+          "footballImpact": "Historical learning could omit a real injury interval or assign duplicate replacement credit if promoted now.",
+          "nextAction": "Add every official participant, DNP, injury and return sequence from the gamebook, then reconcile the bound candidate sections additively.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "The paired candidate preserves explicit unresolved value or role-chain cases, including PIT's Joseph-Day/Echols and NO's Saldiveri/Ruiz/Shepherd/Tyree Wilson cases. Missing values are not zero, and special-teams-only activity does not establish a defensive replacement effect.",
+          "footballImpact": "The open cases span offensive-line continuity, defensive-line/edge rotations and secondary depth; premature estimates could double-count duties or fabricate roles.",
+          "nextAction": "Use the gamebook for actual participation, reuse approved source-supported estimates where eligible, and route only the remaining immutable-value or governed-method decisions to their existing owners.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ],
       "firstSeenAt": "2026-10-25T14:07:19.084Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-10-25T14:07:19.084Z",
+      "lastEvidenceAt": "2026-10-25T17:06:23.081Z",
+      "unchangedSince": "2026-10-25T17:06:23.081Z",
       "stalled": false,
-      "fingerprint": "3d23090ba44835919ca6d811229694318ad3476cd9c56e3655a91b6b1f3aa183",
+      "fingerprint": "6adc7d876fecd6038d968f1c780b4c9221ed3fbac241f248f34c07185f53d652",
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+      "nextAction": "Retrieve the official final gamebook when exposed; bind its immutable URL and literal participation and injury timeline without backdating this attempt.",
       "escalation": null
     }
   ],
@@ -1296,6 +1355,7 @@
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-gamebook-reconciliation.json": "49f1136da490a3a6ff26ee56c8d5bec8cd27a6fe",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-23-ne-chi-ready-reconciliation.json": "dacf8bc8d2d132c34420267d89bf0f0871fcf6f9",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-24-daily-review-112657.json": "1b5bd3475e0f142f6aa4faa36ac55627b3691820",
-    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-24-delta-1645-164357.json": "820746a674eb9f3e59b09a5db48d3c8832f86753"
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-24-delta-1645-164357.json": "820746a674eb9f3e59b09a5db48d3c8832f86753",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-final-preparation.json": "6f7937c940f0fc71a3eec1d491299a99d20176bc"
   }
 }
