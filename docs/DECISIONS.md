@@ -1,12 +1,12 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-08-25 — Core 1.4 production closeout
+**Last updated:** 2026-10-25 — progress continuity and resumption
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
 ## Current production boundary
 
-Current production authority is **Betting Edge Contract v1.0 OPERATIONAL**, **VigScope Terminal UI v1.5**, **Betting Edge Core v1.4 OPERATIONAL**, and **Research Library v1.8 / R3 live read-only**. Walters is runtime-switchable and currently operates in `BET_AUTHORITY` for eligible NFL spread/moneyline. Earlier decision entries describe the state that existed when those decisions were made; they remain historical evidence but do not override this current boundary or `docs/PROJECT_STATE.md`.
+Current production authority is **Betting Edge Contract v1.0 OPERATIONAL**, **VigScope Terminal UI v1.5**, **Betting Edge Core v1.5 OPERATIONAL** under `core/CORE_V1_5_OPERATING_CONTRACT.md` and `core/core-v1.5-production.json`, and **Research Library v1.8 / R3 live read-only**. Walters is runtime-switchable and currently operates in `BET_AUTHORITY` for eligible NFL spread/moneyline. Earlier decision entries describe the state that existed when those decisions were made; they remain historical evidence but do not override this current boundary or `docs/PROJECT_STATE.md`.
 
 ## D-001 — Git history is the authoritative rollback system
 
@@ -348,6 +348,18 @@ The unused NFL and NBA/NHL seasonal clocks, daily profile state, profile-switch 
 Cloudflare remains the single automatic odds scheduler, the protected odds workflow remains serialized and duplicate-gated, and the five-primary-pull daily cap is unchanged. This decision does not change pricing, odds collection, report analysis, publication, Graham/Walters tasks, Crypto Specials or any canary.
 
 **Reason:** Remove unused choice and resolution layers while preserving the schedule and operational boundaries already in use.
+
+## D-036 — Resume existing progress before replacing a process
+
+**Status:** Active as of 2026-10-25
+
+Use `docs/PROJECT_STATE.md` as the single project progress/resumption index. Detailed Main report checkpoints and Graham's existing weekly-readiness/evidence records remain authoritative for actual completion; the summary does not grant research, numeric or betting authority.
+
+Before maintenance or another procedural change, read the current progress and relevant decision, verify current detailed state, and continue the existing owner's next unresolved step. After a substantive repair or verified milestone, update the same progress entry with status, evidence, owner and concrete next action. Keep implemented/tested/deployed/live-verified states distinct. Successful partial publication does not complete analysis, and an overall Graham BLOCKED status does not reopen completed historical learning, baseline or propagation. Reopen a completed component only for specific contradictory evidence.
+
+Independent Graham research continues through its market-safe preflight, readiness and task authorities; the mixed project summary and market-bearing report checkpoints are not new research inputs. Routine per-event progress remains in existing checkpoints rather than duplicate trackers or recurring tasks.
+
+**Reason:** Preserve completed work and settled choices across chats and runs, while making genuine remaining work explicit. Prevent repairs from being repeatedly redesigned or declared complete on publication evidence alone.
 
 ---
 

@@ -16,13 +16,15 @@ Core v1.4 closeout: [`BETTING_EDGE_CORE_V1_4_CLOSEOUT_2026-08-25.md`](BETTING_ED
 
 ## Project documentation
 
+Start maintenance by reading the current progress section in [PROJECT_STATE.md](docs/PROJECT_STATE.md) and the relevant [decision](docs/DECISIONS.md). Resume the existing checkpoint/readiness queue and owner. After a substantive repair or verified milestone, update that same progress entry with proof and the exact next action; distinguish deployment from live acceptance. Independent Graham research retains its market-safe task-specific entry path.
+
 Current operating references:
 
-- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — practical current production state and open operational items.
+- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current progress, verification evidence, open work, owners and resume instructions.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — report/odds schedule, recovery, Core 1.4 gate order, Result Closure, Crypto Specials and downstream boundaries.
 - [`docs/PUBLIC_LEDGER_OPERATIONS.md`](docs/PUBLIC_LEDGER_OPERATIONS.md) — canonical public-ledger path, privacy boundary, upload/replacement procedure, compatibility sync and recovery.
 - [`BETTING_EDGE_MAIN_SCHEDULE.md`](BETTING_EDGE_MAIN_SCHEDULE.md) — permanent Main Betting Edge timing and scheduler behavior.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — post-Core-1.4 observation and future work.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — current priority pointer and historical roadmap.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — durable historical architectural decisions. Dated entries record the state when they were made; current production authority is the boundary above plus `docs/PROJECT_STATE.md`.
 - [`BETTING_EDGE_CONTRACT.md`](BETTING_EDGE_CONTRACT.md) — authoritative production governance contract.
 

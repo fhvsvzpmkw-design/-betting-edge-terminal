@@ -1,12 +1,51 @@
 # Betting Edge — Project State
 
+**Updated:** 2026-10-25 · America/Vancouver
+
+**Repository:** `fhvsvzpmkw-design/-betting-edge-terminal` · `main`
+
+This is the project progress and resumption index. Read this current section before maintenance or proposing a replacement process. Detailed checkpoints and readiness outputs hold the actual work; this summary links them and records what has been proved. Recheck current main before acting on a dated snapshot.
+
+## Current production and existing processes
+
+- Core **1.5 OPERATIONAL**: [operating contract](../core/CORE_V1_5_OPERATING_CONTRACT.md) and [production manifest](../core/core-v1.5-production.json). Contract v1.0, VigScope UI v1.5 and Research v1.8 retain their existing authority.
+- Main reports use [the shared scheduled authority](../BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md) and [the resumable controller](REPORT_RUN_CONTROLLER.md). The existing five lanes remain in place.
+- Graham uses [weekly production v2](../GRAHAM_WEEKLY_PRODUCTION.md), its existing task-specific writers and [scheduled task authority](../GRAHAM_SCHEDULED_TASK_AUTHORITY.md). Reuse the existing coordinator and readiness queue.
+- [DECISIONS.md](DECISIONS.md) records durable choices. The historical snapshots below describe earlier states; their obsolete Core versions, card targets, scheduler descriptions and priorities do not override current operating authorities.
+
+## Progress and exact next work
+
+| Work | Verified status | Evidence / existing owner | Next action / close condition |
+|---|---|---|---|
+| Sunday report queue and continuation repair | **DEPLOYED; REGRESSION VERIFIED; LIVE ACCEPTANCE OPEN** | [Repair 04cc240](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/commit/04cc2407518e6a9df6262b4ef3d35df859447123); [publication reliability passed](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/40210192548); [producer transfer/recovery passed](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/40210192492). Owner: existing Main report producer. | Verify a fresh live run advances through untouched early NFL games, saves event reviews and continues unfinished producer work. A green publisher alone does not close this item. |
+| October 25 08:00 analytical backlog | **OPEN: 4/138 evaluated; 134 unfinished** in the last verified issuance | [Saved checkpoint](../data/report-production/checkpoints/2026-10-25-main-080522.json), revision 20; [issued report](../data/history/runs/2026-10-25/main-082116.json). Controller replay: `continuationRequired=true`; 62 NFL, 30 NHL, 42 NBA/WNBA unfinished. Owner: Main producer. | Start a current-time continuation for still-relevant events under ordinary freshness/start-time gates. Reuse pinned observations with current applicability checks, inspect `nextEventId` / `scheduleUrgency`, and checkpoint each event. Preserve the issued report. Do not backdate work on started games. |
+| Graham independent preflight repair | **DEPLOYED; AUTHORITY VALIDATION PASSED; LIVE RESEARCH ACCEPTANCE OPEN** | Same repair; [Graham task validation passed](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/40210192557); `tools/graham-independent-preflight.mjs`. Owner: existing independent Graham research tasks. | Verify a subsequent market-isolated personnel sweep reaches a genuine COMPLETED runtime with matching receipt and readback. A verified blocked record proves recording only. |
+| Graham Week 7 historical learning, initial baseline and rating propagation | **COMPLETE in saved readiness snapshot** | [Readiness queue](../data/walters/nfl/weekly-readiness.json), generated October 25 at 07:07 PT: Week 6 learning **14/14**, initial baseline COMPLETE, propagation **14/14**. Existing 90/10, baseline and rating-refresh owners. | Preserve completed work. Recompute readiness against current main; reopen only the specific component for which new contradictory evidence exists. An overall BLOCKED state does not restart all three completed phases. |
+| Graham Week 7 current personnel/numeric inputs | **OPEN** | Same 07:07 PT queue: currentAvailability INCOMPLETE, 14 game entries. [Weekly completion check remains failed](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/40210294524). Owner: CURRENT_WEEK_RESEARCH_AND_PRODUCTION through existing governed writers. | Run current readiness; follow each exact personnel/group dependency using official evidence and permitted source-supported estimates. Publish supported inputs, verify numeric/readback propagation and retain exact unresolved cases. Do not rerun historical 90/10 to fix availability. |
+
+The 08:00 counts and 07:07 Graham snapshot above are dated evidence, not a claim that later work cannot have advanced. Update these rows when a newer verified milestone supersedes them.
+
+## Resume without rebuilding
+
+1. Read current main, this progress section and the relevant durable decision. Identify the existing work item and owner before changing a process.
+2. Inspect its saved detailed state. For a Main report use `node tools/report-run.mjs status --checkpoint <existing-path>` and `next --checkpoint <existing-path>`; follow [controller instructions](REPORT_RUN_CONTROLLER.md). For Graham use `node tools/graham-weekly-readiness.mjs` under [weekly production](../GRAHAM_WEEKLY_PRODUCTION.md).
+3. Continue the next unresolved action. A published partial report requires a current-time continuation; it never authorizes editing issued history. Distinguish unfinished execution, documented source shortages, publication and numerical readiness.
+4. Save detailed work in the existing checkpoint/readiness/evidence paths. After a substantive process repair or verified milestone, update this same progress row with status, proof, existing owner and concrete next action. Amend [DECISIONS.md](DECISIONS.md) when an operating decision changes. Do not add a duplicate tracker or scheduled task.
+5. Mark an item complete only when its stated close condition has evidence. Separate implemented, tests passed, deployed, and live verified. If blocked, preserve the exact missing input and next action instead of restarting completed phases.
+
+Independent Graham football research must follow its market-safe preflight and readiness path. This mixed project summary and market-bearing report checkpoints are maintenance references, not additional research inputs. Do not open them during the isolated research phase or import market data into Graham's numbers.
+
+## Historical snapshots through September 21
+
+The following retained snapshots are historical implementation context. Current operating authorities and the progress section above take precedence.
+
 ## September 21 Core 1.5 release checkpoint
 
 **Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
 
 Progression order: Core 1.5 consolidation and five Main prompts; then verify/close Graham Stage 3 schedule authority; then source-to-card handoff starting with Graham/Walters NFL spreads. A zero-card run proves publication only; populated forward grading acceptance remains pending. Older checkpoints below describe historical states.
 
-**Last updated:** 2026-09-07 — The Private Line artwork integration
+**Historical snapshot updated:** 2026-09-07 — The Private Line artwork integration
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`  
 **Primary branch:** `main`
 
@@ -58,7 +97,7 @@ The 15:15 archived report remains historical evidence under its original timesta
 
 `docs/CORE_MARKET_RECOVERY_2026-09-05.md` records the exact missing/stale-market diagnosis and the bounded supplemental-request correction. `docs/REPORT_EVIDENCE_REQUIREMENTS.md` governs source and numerical fair evidence from 17:00 PT September 5, shared by all five report lanes. Existing histories, Core thresholds, staking and schedules remain unchanged. The next normal feed/report is required to measure live recovery; the 15:15 manual feed did not establish automatic scheduler reliability.
 
-## Current production boundary
+## Historical production boundary
 
 - **Governance:** `BETTING_EDGE_CONTRACT.md` — **v1.0 OPERATIONAL**.
 - **Presentation:** `runner.html` — **VigScope Terminal UI v1.5**.
@@ -245,7 +284,7 @@ Still deferred:
 
 Also unchanged: no paid odds API, no additional execution books, no staking-methodology change and no broad decision-process rewrite.
 
-## Current operating posture
+## Historical operating posture
 
 Core v1.4 is the forward production baseline. Near-term work is **observation and reliability**, not Core v1.5 by default:
 
