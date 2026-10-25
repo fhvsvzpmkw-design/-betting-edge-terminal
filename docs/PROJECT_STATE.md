@@ -25,6 +25,12 @@ This is the project progress and resumption index. Read this current section bef
 
 The 08:00 counts and 07:07 Graham snapshot above are dated evidence, not a claim that later work cannot have advanced. Update these rows when a newer verified milestone supersedes them.
 
+## Deliberate rule changes
+
+Existing rules can be challenged, amended or retired when they obstruct the goal. When a proposed fix requires departing from a rule, identify the exact rule, explain why it is blocking progress, and present a concrete replacement or scoped exception with its consequences and verification. If that departure is not already authorized, ask the user whether to retain, amend, retire or allow an exception to the rule before applying it. Routine implementation fixes within approved rules continue without repeat approval.
+
+Once a revision is authorized, update the active authority and the decision log so the old rule is explicitly superseded; record the scope and expiry or close condition of a temporary exception. Do not silently bypass an active rule, or keep an obsolete rule active merely to preserve prior decisions. Progress tracking supports deliberate changes in direction.
+
 ## Resume without rebuilding
 
 1. Read current main, this progress section and the relevant durable decision. Identify the existing work item and owner before changing a process.
