@@ -1,0 +1,886 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-26T12:19:34.782Z",
+  "season": 2026,
+  "sourceWeek": 7,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive active-week KC-SEA reconciliation after publication of the official final gamebook. The final score, frozen pre-kickoff ratings/H4, complete paired inactive/reserve/elevation inventories, official starters/substitutions/DNP, QB and specialist participation, full snap tables, every printed in-game injury notice, and the three previously unresolved personnel cases are preserved under Week 7. The pair remains BLOCKED only where the gamebook does not print an initial injury boundary or a distinct relief assignment. No learning, rating, fair, customer number or bet is produced.",
+  "marketViewed": false,
+  "inputCommit": "fb7c073236730fdc7743b0d9b0346cb9537ff1bb",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "c578c7f63ee823bcdaef151bf36bd231630653b2",
+    "data/walters/nfl/2026/week-07-current-numbers.json": "d736fe960bf7d6158e1ed9c1b67ff4885cb99995",
+    "data/walters/nfl/weekly-readiness.json": "61d579cf467a42afae80a9146e82c142b5a9b635",
+    "data/walters/nfl-power-ratings-ledger.json": "56f6a3c8b6955b1c8dba7c58f28ce3ef6f36a0ff",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd"
+  },
+  "sources": [
+    {
+      "id": "nfl-kc-sea-official-final",
+      "url": "https://www.nfl.com/games/chiefs-at-seahawks-2026-reg-7",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "NFL Game Center records Kansas City 3, Seattle 20, FINAL and now exposes the official Download Game Book PDF.",
+      "checkedAt": "2026-10-26T12:19:34.782Z"
+    },
+    {
+      "id": "nfl-kc-sea-official-gamebook",
+      "url": "https://static.www.nfl.com/image/upload/v1793014728/gamecenter/aaf7040e-4feb-11f1-abca-2c54536568a9.pdf",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Official final gamebook supplies complete paired starters, substitutions, DNP, inactives, snap participation, QB/specialist duty and the literal printed injury sequence. It prints Shaheed questionable at Q3 12:04, Shaheed and Velus Jones out before Q4 15:00, Charles Cross out after the Q4 3:13 play, and Nick Bolton injured at Q3 11:19 with return at Q3 10:03.",
+      "checkedAt": "2026-10-26T12:19:34.782Z"
+    },
+    {
+      "id": "chiefs-kc-sea-official-inactives",
+      "url": "https://www.chiefs.com/news/week-7-inactive-players-chiefs-vs-seahawks",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Complete paired final inactive lists: KC Rice, Nussmeier (3QB), Canady, VanSumeren, Pyburn and Moore; SEA Lock (3QB), Charbonnet, Thomas, Henry, Surratt, O'Toole and Stephens.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "seahawks-kc-sea-official-inactives",
+      "url": "https://www.seahawks.com/news/seahawks-vs-chiefs-week-7-inactives",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Seattle confirms Emmanwori, Nwosu and Lawrence active; Drake Thomas out with Tyrice Knight expected to start; Jalen Milroe backup QB and Drew Lock emergency QB3.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "chiefs-current-roster",
+      "url": "https://www.chiefs.com/app/teamroster",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Complete current Kansas City active, Reserve/Injured and Reserve/PUP inventories captured after same-day moves.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "seahawks-current-roster",
+      "url": "https://www.seahawks.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Complete current Seattle active and Reserve/Injured inventories captured after Bradford activation.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "chiefs-official-transactions",
+      "url": "https://www.chiefs.com/team/transactions/2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "October 24 moves: Jaydn Ott active, Cooper McDonald activated from IR, Justin Watson elevated, Brashard Smith placed on IR; Josh Simmons placed on IR October 22.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "seahawks-official-roster-moves",
+      "url": "https://www.seahawks.com/news/seahawks-activate-guard-anthony-bradford-off-injured-reserve-elevate-two-from-practice-squad",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Anthony Bradford activated; Jimmy Ciarlo and Trevon Diggs elevated for Week 7.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "chiefs-depth-chart",
+      "url": "https://www.chiefs.com/team/depth-chart",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Official depth chart binds Patrick Mahomes, Justin Fields and Garrett Nussmeier plus Harrison Butker, Matt Araiza and James Winchester.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "seahawks-depth-chart",
+      "url": "https://www.seahawks.com/team/depth-chart/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Official depth chart binds Sam Darnold, Drew Lock and Jalen Milroe plus Jason Myers, Michael Dickson and Chris Stoll.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    },
+    {
+      "id": "seahawks-kc-sea-in-game-injuries",
+      "url": "https://www.seahawks.com/news/2026-week-7-seahawks-vs-chiefs-in-game-injury-updates",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W07-KC-SEA"
+      ],
+      "finding": "Seattle reports Rashid Shaheed out (knee), Velus Jones Jr. out (hamstring) and Charles Cross out (ankle); exact exit and any earlier return boundaries remain for gamebook reconciliation.",
+      "checkedAt": "2026-10-26T04:09:24.166Z"
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-KC-SEA",
+      "away": "KC",
+      "home": "SEA",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "nfl-kc-sea-official-final",
+        "nfl-kc-sea-official-gamebook",
+        "chiefs-kc-sea-official-inactives",
+        "seahawks-kc-sea-official-inactives",
+        "chiefs-current-roster",
+        "seahawks-current-roster",
+        "chiefs-official-transactions",
+        "seahawks-official-roster-moves",
+        "chiefs-depth-chart",
+        "seahawks-depth-chart",
+        "seahawks-kc-sea-in-game-injuries"
+      ],
+      "final": {
+        "awayScore": 3,
+        "homeScore": 20,
+        "status": "FINAL_REGULATION",
+        "sourceIds": [
+          "nfl-kc-sea-official-final"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-25T17:20:00-07:00",
+        "awayRating": 26.996409266,
+        "homeRating": 28.03230106,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": -1.035891794,
+        "currentNumbersBlobSha": "d736fe960bf7d6158e1ed9c1b67ff4885cb99995",
+        "powerLedgerBlobSha": "56f6a3c8b6955b1c8dba7c58f28ce3ef6f36a0ff",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false,
+        "preservedPregameExactFairHome": -2.718,
+        "preservedPregameDisplayedFairHome": -2.5
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "pairedGameDayInjuryLoss": "BLOCKED",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_SOURCE_BOUND",
+        "pairedParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "quarterbackParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "specialistParticipation": "COMPLETE_OFFICIAL_GAMEBOOK",
+        "officialInGameInjuryReporting": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL BOUNDARIES REMAIN EXPLICIT"
+      },
+      "pairedTeamInventories": [
+        {
+          "team": "KC",
+          "side": "AWAY",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_OFFICIAL_GAMEBOOK",
+          "finalInactive": [
+            "Rashee Rice (WR)",
+            "Garrett Nussmeier (QB, emergency 3QB)",
+            "Jadon Canady (DB)",
+            "Ben VanSumeren (FB)",
+            "Jack Pyburn (DE)",
+            "Jaylon Moore (OL)"
+          ],
+          "reserveUnavailable": [
+            "Jeff Caldwell (WR, Reserve/Injured)",
+            "Ethan Downs (LB, Reserve/Injured)",
+            "John Michael Gyllenborg (TE, Reserve/Injured)",
+            "Jimmy Holiday (WR, Reserve/Injured)",
+            "Josh Simmons (T, Reserve/Injured)",
+            "Brashard Smith (RB, Reserve/Injured)",
+            "Tyquan Thornton (WR, Reserve/Injured)",
+            "Omarr Norman-Lott (DT, Reserve/PUP)"
+          ],
+          "gameDayElevations": [
+            "Justin Watson (WR)"
+          ],
+          "officialGamebookStarters": {
+            "offense": [
+              "Travis Kelce (TE)",
+              "Noah Gray (TE)",
+              "Kingsley Benson (LT)",
+              "Kingsley Suamataia (LG)",
+              "Creed Humphrey (C)",
+              "Trey Smith (RG)",
+              "J.Ezeudu (RT, official printed identity)",
+              "Jalen Royals (WR)",
+              "Xavier Worthy (WR)",
+              "Patrick Mahomes (QB)",
+              "Kenneth Walker (RB)"
+            ],
+            "defense": [
+              "George Karlaftis (DE)",
+              "Khyiris Tonga (NT)",
+              "Chris Jones (DT)",
+              "Felix Anudike-Uzomah (DE)",
+              "Jack Cochrane (LB)",
+              "Drue Tranquill (LB)",
+              "Nick Bolton (LB)",
+              "Chamarri Conner (DB)",
+              "Nate Williams (DB)",
+              "Mansoor Delane (CB)",
+              "Alohi Gilman (S)"
+            ]
+          },
+          "officialGamebookSubstitutions": [
+            "Harrison Butker (K)",
+            "Kristian Fulton (CB)",
+            "Elijah Johnson (RB)",
+            "Jared Wiley (TE)",
+            "C.Allen (WR, official printed identity)",
+            "Matt Araiza (P)",
+            "Jaden Hicks (DB)",
+            "Xavier Nwankpa (S)",
+            "Christian Roland-Wallace (CB)",
+            "Jack Bassa (LB)",
+            "Jaydn Ott (RB)",
+            "L'Jarius Sneed (CB)",
+            "James Winchester (LS)",
+            "Cooper McDonald (LB)",
+            "R.Thomas (DE, official printed identity)",
+            "Hunter Nourzad (OL)",
+            "Mike Caliendo (OL)",
+            "Nikko Remigio (WR)",
+            "Justin Watson (WR)",
+            "Andrew Armstrong (WR)",
+            "Jake Briningstool (TE)",
+            "B.Eason (DT, official printed identity)",
+            "Ashton Gillotte (DE)",
+            "P.Woods (DL, official printed identity)"
+          ],
+          "officialGamebookDidNotPlay": [
+            "Justin Fields (QB)",
+            "D.J. Pounds (T)"
+          ],
+          "participationResolvedActiveCandidates": [
+            "Cooper McDonald (substitution; 1 defensive snap and 12 special-teams snaps)",
+            "Jared Wiley (substitution; 1 offensive snap and 7 special-teams snaps)",
+            "L'Jarius Sneed (substitution; 14 defensive snaps)"
+          ],
+          "candidateLimitation": "Official gamebook lineups and snap tables certify actual participation. Printed initials/abbreviations are preserved; no unsupported full-name identity is used for valuation.",
+          "quarterback": {
+            "starterCandidate": "Patrick Mahomes",
+            "backupCandidate": "Justin Fields",
+            "emergencyInactive": "Garrett Nussmeier",
+            "pregameInventoryState": "COMPLETE_SOURCE_BOUND",
+            "finalParticipationState": "COMPLETE_MAHOMES_53_OFFENSIVE_SNAPS; FIELDS_DNP; NUSSMEIER_INACTIVE_3QB"
+          },
+          "specialists": {
+            "kicker": "Harrison Butker",
+            "punterHolder": "Matt Araiza",
+            "longSnapper": "James Winchester",
+            "pregameInventoryState": "COMPLETE_NO_SPECIALIST_INACTIVE",
+            "finalParticipationState": "COMPLETE_BUTKER_5_ST; ARAIZA_6_ST; WINCHESTER_6_ST"
+          },
+          "resolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-KC-Jeff-Caldwell",
+              "player": "Jeff Caldwell",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "WR",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-Ethan-Downs",
+              "player": "Ethan Downs",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "EDGE",
+              "clusterGroup": "DEFENSIVE_LINE",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-John-Michael-Gyllenborg",
+              "player": "John Michael Gyllenborg",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "TE",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-Cooper-McDonald",
+              "player": "Cooper McDonald",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolutionStatus": "RESOLVED_ACTIVE",
+              "registryPosition": "MLB",
+              "clusterGroup": "LINEBACKER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": null,
+              "method": null,
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 2
+            },
+            {
+              "caseKey": "2026-W07-KC-Omarr-Norman-Lott",
+              "player": "Omarr Norman-Lott",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "DT",
+              "clusterGroup": "DEFENSIVE_LINE",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-Tyquan-Thornton",
+              "player": "Tyquan Thornton",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "WR",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0.2,
+              "replacementValue": 0,
+              "injuryLoss": 0.2,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-Josh-Simmons",
+              "player": "Josh Simmons",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
+              "registryPosition": "LT",
+              "clusterGroup": "OFFENSIVE_LINE",
+              "healthyWaltersPoints": 0.9,
+              "replacementValue": null,
+              "injuryLoss": null,
+              "method": null,
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-Jared-Wiley",
+              "player": "Jared Wiley",
+              "availabilityStatus": "UNRESOLVED",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "TE",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-KC-Brashard-Smith",
+              "player": "Brashard Smith",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "RB",
+              "clusterGroup": "RUNNING_BACK",
+              "healthyWaltersPoints": 0.2,
+              "replacementValue": 0,
+              "injuryLoss": 0.2,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 3
+            },
+            {
+              "caseKey": "2026-W07-KC-Jimmy-Holiday",
+              "player": "Jimmy Holiday",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_REUSED_APPROVED_ESTIMATE",
+              "registryPosition": "WR",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0,
+              "replacementPlayer": "Nikko Remigio",
+              "replacementValue": 0,
+              "injuryLoss": 0,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "APPROVED_POSITION_GROUP_MEDIAN_ESTIMATE",
+              "estimateAcknowledged": true,
+              "missingValueWasZero": false,
+              "priorEvidencePath": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-lac-kc-ready-reconciliation.json",
+              "gamebookFinding": "Remigio is an official substitution and records seven special-teams snaps; the reused case remains a prospective reserve-duty estimate and does not claim measured offensive workload.",
+              "failClosedCode": null
+            },
+            {
+              "caseKey": "2026-W07-KC-Rashee-Rice",
+              "player": "Rashee Rice",
+              "availabilityStatus": "OUT",
+              "resolutionStatus": "RESOLVED_REUSED_PRIMARY_REPLACEMENT",
+              "registryPosition": "WR",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 1.2,
+              "replacementPlayer": "Jalen Royals",
+              "replacementValue": 0,
+              "injuryLoss": 1.2,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "priorEvidencePath": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-lac-kc-ready-reconciliation.json",
+              "gamebookFinding": "Royals started at receiver and played 36 of 53 offensive snaps. The distinct prior allocation is reused without duplicating Tyquan Thornton or another receiver case.",
+              "failClosedCode": null
+            }
+          ],
+          "unresolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-KC-Nick-Bolton-IN_GAME",
+              "player": "Nick Bolton",
+              "availabilityStatus": "PARTIAL_GAME",
+              "healthyWaltersPoints": 0.9,
+              "exactKnownBoundary": "Injured on the Q3 11:19 play; returned at Q3 10:03.",
+              "exactMissingFact": "The official gamebook establishes the complete one-play interval but does not identify which linebacker assumed Bolton's vacated defensive duty during that snap.",
+              "footballImpact": "One defensive snap of Kansas City's 0.9-point middle-linebacker value requires exposure weighting against a distinct relief value; guessing the occupant could duplicate Jack Cochrane's existing starting duty.",
+              "requiredSourceOrMethodDecision": "Bind the exact relief defender from source-supported personnel/film evidence or apply an approved capacity/exposure method that preserves all common baseline duties. Special-teams participation alone is insufficient."
+            }
+          ],
+          "currentPersonnelCaseCountReviewed": 14,
+          "allCurrentPersonnelCasesReviewed": true
+        },
+        {
+          "team": "SEA",
+          "side": "HOME",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_OFFICIAL_GAMEBOOK",
+          "finalInactive": [
+            "Drew Lock (QB, emergency 3QB)",
+            "Zach Charbonnet (RB)",
+            "Drake Thomas (LB)",
+            "Robert Henry Jr. (RB)",
+            "Chazz Surratt (LB)",
+            "Connor O'Toole (LB)",
+            "Beau Stephens (G)"
+          ],
+          "reserveUnavailable": [
+            "Elijah Arroyo (TE, Reserve/Injured)",
+            "Jake Bobo (WR, Reserve/Injured)",
+            "Bud Clark (S, Reserve/Injured)",
+            "Julian Neal (CB, Reserve/Injured)",
+            "Robbie Ouzts (FB, Reserve/Injured)",
+            "Jadarian Price (RB, Reserve/Injured)",
+            "Mason Richman (T/G, Reserve/Injured)"
+          ],
+          "gameDayElevations": [
+            "Jimmy Ciarlo (LB)",
+            "Trevon Diggs (DB)"
+          ],
+          "officialGamebookStarters": {
+            "offense": [
+              "AJ Barner (TE)",
+              "Charles Cross (LT)",
+              "Grey Zabel (LG)",
+              "Jalen Sundell (C)",
+              "Anthony Bradford (RG)",
+              "Abraham Lucas (RT)",
+              "Cooper Kupp (WR)",
+              "Jaxon Smith-Njigba (WR)",
+              "Sam Darnold (QB)",
+              "Brady Russell (FB)",
+              "Emanuel Wilson (RB)"
+            ],
+            "defense": [
+              "DeMarcus Lawrence (LB)",
+              "Byron Murphy II (DE)",
+              "Leonard Williams (DT)",
+              "Derick Hall (LB)",
+              "Tyrice Knight (LB)",
+              "Ernest Jones IV (LB)",
+              "Devon Witherspoon (CB)",
+              "Josh Jobe (CB)",
+              "Nick Emmanwori (S)",
+              "Ty Okada (S)",
+              "Julian Love (S)"
+            ]
+          },
+          "officialGamebookSubstitutions": [
+            "Michael Dickson (P)",
+            "Jason Myers (K)",
+            "Uchenna Nwosu (LB)",
+            "Tory Horton (WR)",
+            "Trevon Diggs (CB)",
+            "Rashid Shaheed (WR)",
+            "R.Thomas (S, official printed identity)",
+            "A.Smith (CB, official printed identity)",
+            "Nehemiah Pritchett (CB)",
+            "Velus Jones Jr. (RB)",
+            "George Holani (RB)",
+            "Chris Stoll (LS)",
+            "Jimmy Ciarlo (LB)",
+            "Patrick O'Connell (LB)",
+            "Olu Oluwatimi (C)",
+            "Dante Fowler Jr. (LB)",
+            "Christian Haynes (G)",
+            "Josh Jones (G/T)",
+            "Eric Saubert (TE)",
+            "I.Charles (WR, official printed identity)",
+            "Nick Kallerup (TE)",
+            "Jarran Reed (DE)",
+            "Mike Morris (DE)",
+            "Brandon Pili (NT)",
+            "Rylie Mills (DT)"
+          ],
+          "officialGamebookDidNotPlay": [
+            "Jalen Milroe (QB)"
+          ],
+          "participationResolvedActiveCandidates": [
+            "Nick Emmanwori (starter; 53 defensive snaps)",
+            "Uchenna Nwosu (substitution; 23 defensive snaps)",
+            "DeMarcus Lawrence (starter; 36 defensive snaps)",
+            "Anthony Bradford (starter; 69 offensive snaps)"
+          ],
+          "candidateLimitation": "Official gamebook lineups and snap tables certify actual participation. Printed initials are preserved when an immutable full-name match is not required for the current numerical case.",
+          "quarterback": {
+            "starterCandidate": "Sam Darnold",
+            "backupCandidate": "Jalen Milroe",
+            "emergencyInactive": "Drew Lock",
+            "pregameInventoryState": "COMPLETE_SOURCE_BOUND",
+            "finalParticipationState": "COMPLETE_DARNOLD_69_OFFENSIVE_SNAPS; MILROE_DNP; LOCK_INACTIVE_3QB"
+          },
+          "specialists": {
+            "kicker": "Jason Myers",
+            "punterHolder": "Michael Dickson",
+            "longSnapper": "Chris Stoll",
+            "pregameInventoryState": "COMPLETE_NO_SPECIALIST_INACTIVE",
+            "finalParticipationState": "COMPLETE_MYERS_9_ST; DICKSON_6_ST; STOLL_6_ST"
+          },
+          "resolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-SEA-Jake-Bobo",
+              "player": "Jake Bobo",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "WR",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 7
+            },
+            {
+              "caseKey": "2026-W07-SEA-Julian-Neal",
+              "player": "Julian Neal",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "CB",
+              "clusterGroup": "DEFENSIVE_BACK",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 5
+            },
+            {
+              "caseKey": "2026-W07-SEA-Mason-Richman",
+              "player": "Mason Richman",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "RT",
+              "clusterGroup": "OFFENSIVE_LINE",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 6
+            },
+            {
+              "caseKey": "2026-W07-SEA-Chazz-Surratt",
+              "player": "Chazz Surratt",
+              "availabilityStatus": "UNRESOLVED",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "OLB",
+              "clusterGroup": "LINEBACKER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 5
+            },
+            {
+              "caseKey": "2026-W07-SEA-Zach-Charbonnet",
+              "player": "Zach Charbonnet",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "RB",
+              "clusterGroup": "RUNNING_BACK",
+              "healthyWaltersPoints": 0.9,
+              "replacementValue": 0.2,
+              "injuryLoss": 0.7,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 5
+            },
+            {
+              "caseKey": "2026-W07-SEA-Jadarian-Price",
+              "player": "Jadarian Price",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "RB",
+              "clusterGroup": "RUNNING_BACK",
+              "healthyWaltersPoints": 0.2,
+              "replacementValue": 0,
+              "injuryLoss": 0.2,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 5
+            },
+            {
+              "caseKey": "2026-W07-SEA-Robbie-Ouzts",
+              "player": "Robbie Ouzts",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "FB",
+              "clusterGroup": "RUNNING_BACK",
+              "healthyWaltersPoints": 0.2,
+              "replacementValue": 0,
+              "injuryLoss": 0.2,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 5
+            },
+            {
+              "caseKey": "2026-W07-SEA-Anthony-Bradford",
+              "player": "Anthony Bradford",
+              "availabilityStatus": "ACTIVE_FULL",
+              "resolutionStatus": "RESOLVED_ACTIVE",
+              "registryPosition": "RG",
+              "clusterGroup": "OFFENSIVE_LINE",
+              "healthyWaltersPoints": 0.2,
+              "replacementValue": null,
+              "injuryLoss": null,
+              "method": null,
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 1
+            },
+            {
+              "caseKey": "2026-W07-SEA-Bud-Clark",
+              "player": "Bud Clark",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "FS",
+              "clusterGroup": "DEFENSIVE_BACK",
+              "healthyWaltersPoints": 0.2,
+              "replacementValue": 0,
+              "injuryLoss": 0.2,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 5
+            },
+            {
+              "caseKey": "2026-W07-SEA-Terrion-Arnold",
+              "player": "Terrion Arnold",
+              "availabilityStatus": "COMMISSIONER_EXEMPT",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "CB",
+              "clusterGroup": "DEFENSIVE_BACK",
+              "healthyWaltersPoints": 0.5,
+              "replacementValue": 0.2,
+              "injuryLoss": 0.3,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 6
+            },
+            {
+              "caseKey": "2026-W07-SEA-Elijah-Arroyo",
+              "player": "Elijah Arroyo",
+              "availabilityStatus": "IR",
+              "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+              "registryPosition": "TE",
+              "clusterGroup": "RECEIVER",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "failClosedCode": null,
+              "sourceBindingCount": 4
+            },
+            {
+              "caseKey": "2026-W07-SEA-Drake-Thomas",
+              "player": "Drake Thomas",
+              "availabilityStatus": "OUT",
+              "resolutionStatus": "RESOLVED_REUSED_PRIMARY_REPLACEMENT",
+              "registryPosition": "MLB",
+              "clusterGroup": "LINEBACKER",
+              "healthyWaltersPoints": 0.2,
+              "replacementPlayer": "Tyrice Knight",
+              "replacementValue": 0.2,
+              "injuryLoss": 0,
+              "method": "PRIMARY_REPLACEMENT",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "missingValueWasZero": false,
+              "priorEvidencePath": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-sea-den-ready-reconciliation.json",
+              "gamebookFinding": "Knight started at linebacker and played 37 of 53 defensive snaps; this is defensive participation, not a special-teams-only inference. Equal locked 0.2-point values produce zero loss.",
+              "failClosedCode": null
+            },
+            {
+              "caseKey": "2026-W07-SEA-Velus-Jones-Jr-IN_GAME",
+              "player": "Velus Jones Jr",
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolutionStatus": "RESOLVED_ZERO_CALIBRATED_LOSS",
+              "registryPosition": "RB",
+              "clusterGroup": "RUNNING_BACK",
+              "healthyWaltersPoints": 0,
+              "replacementValue": null,
+              "injuryLoss": 0,
+              "method": "ZERO_CALIBRATED_LOSS",
+              "valueStatus": "NUMERIC_ELIGIBLE",
+              "missingValueWasZero": false,
+              "gamebookFinding": "Jones played nine offensive and nine special-teams snaps and was printed Out before Q4 15:00. The entry play is unprinted, but any unavailable fraction times a calibrated zero healthy value is zero under the nonnegative replacement floor.",
+              "failClosedCode": null
+            }
+          ],
+          "unresolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-SEA-Rashid-Shaheed-IN_GAME",
+              "player": "Rashid Shaheed",
+              "availabilityStatus": "PARTIAL_GAME",
+              "healthyWaltersPoints": 0.5,
+              "exactMissingFact": "The first printed notice is Questionable at Q3 12:04 and the next is Out before Q4 15:00; the gamebook does not print the originating injury play or a return.",
+              "footballImpact": "Shaheed played 22 offensive and three special-teams snaps; his receiver and return duties can create a material partial-game loss, but an arbitrary entry clock would distort exposure.",
+              "requiredSourceOrMethodDecision": "Find an official/independent source identifying the exit play, or apply an approved bounded-entry method and a distinct receiver/return replacement allocation without reusing an already reserved baseline contributor."
+            },
+            {
+              "caseKey": "2026-W07-SEA-Charles-Cross-IN_GAME",
+              "player": "Charles Cross",
+              "availabilityStatus": "PARTIAL_GAME",
+              "healthyWaltersPoints": 0.9,
+              "exactMissingFact": "Cross is first printed Out after Seattle's Q4 3:13 play. The gamebook does not print the originating injury play; Cross records 57 offensive snaps and Josh Jones records 13, but snap totals do not establish the exact exit clock by themselves.",
+              "footballImpact": "Seattle's left-tackle continuity carries a 0.9-point healthy value; unsupported timing could materially overstate or understate the partial-game loss.",
+              "requiredSourceOrMethodDecision": "Use a source-supported exit play or an approved snap-exposure method, then bind Josh Jones only if the distinct left-tackle relief role is confirmed without duplicating his baseline duty."
+            }
+          ],
+          "currentPersonnelCaseCountReviewed": 16,
+          "allCurrentPersonnelCasesReviewed": true
+        }
+      ],
+      "observedInGameInjuries": [
+        {
+          "team": "SEA",
+          "player": "Rashid Shaheed",
+          "status": "OUT",
+          "injury": "knee",
+          "sourceIds": [
+            "seahawks-kc-sea-in-game-injuries",
+            "nfl-kc-sea-official-gamebook"
+          ],
+          "printedSequence": [
+            "Q3 12:04: return is Questionable",
+            "Before Q4 15:00: Out of the game"
+          ],
+          "boundaryState": "UNRESOLVED_INITIAL_INJURY_PLAY_NO_RETURN_PRINTED",
+          "requiredSourceOrMethodDecision": "Locate the originating injury play or use an approved bounded-entry method; do not infer a full-game loss."
+        },
+        {
+          "team": "SEA",
+          "player": "Velus Jones Jr",
+          "status": "OUT",
+          "injury": "hamstring",
+          "sourceIds": [
+            "seahawks-kc-sea-in-game-injuries",
+            "nfl-kc-sea-official-gamebook"
+          ],
+          "printedSequence": [
+            "Before Q4 15:00: Out of the game"
+          ],
+          "boundaryState": "UNRESOLVED_INITIAL_INJURY_PLAY_NO_RETURN_PRINTED_NUMERICALLY_CLOSED_ZERO_CALIBRATED_HEALTHY_VALUE",
+          "requiredSourceOrMethodDecision": "No boundary decision is required for the zero-point Walters result; preserve the unprinted injury-entry fact in the inventory."
+        },
+        {
+          "team": "SEA",
+          "player": "Charles Cross",
+          "status": "OUT",
+          "injury": "ankle",
+          "sourceIds": [
+            "seahawks-kc-sea-in-game-injuries",
+            "nfl-kc-sea-official-gamebook"
+          ],
+          "printedSequence": [
+            "After Q4 3:13 play: Out of the game"
+          ],
+          "boundaryState": "UNRESOLVED_INITIAL_INJURY_PLAY_NO_RETURN_PRINTED",
+          "requiredSourceOrMethodDecision": "Use a source-supported exit play or an approved snap-exposure method; do not manufacture the entry clock from the notice alone."
+        },
+        {
+          "team": "KC",
+          "player": "Nick Bolton",
+          "status": "RETURNED",
+          "injury": "not printed",
+          "sourceIds": [
+            "nfl-kc-sea-official-gamebook"
+          ],
+          "printedSequence": [
+            "Q3 11:19 play: injured during the play",
+            "Q3 10:03: returned to the game"
+          ],
+          "boundaryState": "COMPLETE_EXACT_INTERVAL_REPLACEMENT_DUTY_UNRESOLVED",
+          "requiredSourceOrMethodDecision": "Bind the one-play relief defender or use an approved distinct capacity method without duplicating existing linebacker duty."
+        }
+      ],
+      "blockers": [
+        {
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "The official gamebook is fully assembled. It does not print the originating injury play for Rashid Shaheed or Charles Cross; their first literal notices are Q3 12:04 Questionable and after Q4 3:13 Out, respectively. Velus Jones is numerically closed at a calibrated zero healthy value. Nick Bolton's exact one-play interval is complete.",
+          "footballImpact": "Shaheed's 0.5-point receiver/return role and Cross's 0.9-point left-tackle role require defensible partial-game exposure; arbitrary entry clocks could materially distort Seattle's loss.",
+          "nextAction": "Use a source-supported exit play or an approved bounded/snap-exposure method for Shaheed and Cross. Preserve the unprinted facts rather than inventing a clock.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Jimmy Holiday, Rashee Rice and Drake Thomas are resolved through approved prior cases plus official participation. Remaining role work is limited to Shaheed's distinct receiver/return relief, Cross's distinct left-tackle relief and Bolton's one-play linebacker relief.",
+          "footballImpact": "The replacement values determine the exposure-weighted loss for the three non-zero in-game cases; using a common baseline contributor twice would overstate or understate the pair.",
+          "nextAction": "Bind each relief role from source-supported personnel or film evidence, or apply the existing approved capacity method; special-teams-only participation does not establish a defensive replacement effect.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ],
+      "officialGamebookUrl": "https://static.www.nfl.com/image/upload/v1793014728/gamecenter/aaf7040e-4feb-11f1-abca-2c54536568a9.pdf",
+      "officialSnapTablesReviewed": true
+    }
+  ]
+}

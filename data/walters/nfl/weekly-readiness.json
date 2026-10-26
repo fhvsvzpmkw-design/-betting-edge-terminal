@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-26T09:17:25.037Z",
+  "generatedAt": "2026-10-26T12:42:57.495Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 14,
@@ -2004,77 +2004,70 @@
       "away": "KC",
       "home": "SEA",
       "state": "RECONCILE",
-      "workClass": "WAITING_SOURCE_OR_METHOD",
+      "workClass": "TARGETED_RECONCILIATION",
       "latestEvidence": {
-        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json",
-        "blobSha": "3349e65272e36698b9a4dd6a0f99a127d5e2a073",
-        "recordedAt": "2026-10-26T04:09:24.166Z"
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json",
+        "blobSha": "9caca27867f980bb18a993de21bad6ccf836e3f2",
+        "recordedAt": "2026-10-26T12:19:34.782Z"
       },
       "checklist": {
         "verifiedFinalResult": {
           "state": "COMPLETE_OFFICIAL",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "frozenKickoffRatingsAndH4": {
           "state": "COMPLETE",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "pairedGameDayInjuryLoss": {
           "state": "BLOCKED",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "finalInactiveReserveAndElevationInventories": {
-          "state": "COMPLETE_SOURCE_BOUND_CANDIDATE_SECTIONS",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "state": "COMPLETE_SOURCE_BOUND",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "pairedParticipation": {
-          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "quarterbackParticipation": {
-          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "specialistParticipation": {
-          "state": "PENDING_FINAL_GAMEBOOK_CERTIFICATION",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         },
         "officialInGameInjuryReporting": {
-          "state": "COMPLETE_OFFICIAL_TEAM_NOTICES; EXACT_BOUNDARIES_PENDING_FINAL_GAMEBOOK",
-          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-kc-sea-final-preparation.json"
+          "state": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE; UNPRINTED INITIAL BOUNDARIES REMAIN EXPLICIT",
+          "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json"
         }
       },
       "blockers": [
         {
-          "code": "SOURCE_NOT_YET_AVAILABLE",
-          "finding": "NFL Game Center shows the final but did not expose a Download Game Book link at capture time.",
-          "footballImpact": "Without the official final gamebook, paired starters, substitutions, DNP, actual QB/specialist participation and exact in-game injury boundaries cannot be certified.",
-          "nextAction": "Recheck the official NFL Game Center and team gamebook index; ingest the immutable PDF as soon as published.",
-          "owner": "GRAHAM_WALTERS_90_10"
-        },
-        {
-          "code": "AVAILABLE_EVIDENCE_NOT_ASSEMBLED",
-          "finding": "Official in-game notices identify three Seattle players ruled out, but exact exit-to-return or remaining-play intervals are not fully bound.",
-          "footballImpact": "Turning a status notice into a full-game or arbitrary partial-game loss would overstate or understate Seattle's actual in-game loss.",
-          "nextAction": "Reconcile the official final play sequence and participation when the gamebook is published; preserve unknown boundaries meanwhile.",
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "The official gamebook is fully assembled. It does not print the originating injury play for Rashid Shaheed or Charles Cross; their first literal notices are Q3 12:04 Questionable and after Q4 3:13 Out, respectively. Velus Jones is numerically closed at a calibrated zero healthy value. Nick Bolton's exact one-play interval is complete.",
+          "footballImpact": "Shaheed's 0.5-point receiver/return role and Cross's 0.9-point left-tackle role require defensible partial-game exposure; arbitrary entry clocks could materially distort Seattle's loss.",
+          "nextAction": "Use a source-supported exit play or an approved bounded/snap-exposure method for Shaheed and Cross. Preserve the unprinted facts rather than inventing a clock.",
           "owner": "GRAHAM_WALTERS_90_10"
         },
         {
           "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
-          "finding": "Jimmy Holiday identity/value, Rashee Rice distinct receiver replacement allocation and Drake Thomas defensive replacement duties remain explicit; missing values are not zero.",
-          "footballImpact": "Receiver and linebacker role continuity can change the paired injury interval, while an unbound reserve identity cannot be valued safely.",
-          "nextAction": "Apply the listed source/method decision for each unresolved numerical case after final participation is bound; reuse supported prior cases and approved estimates.",
+          "finding": "Jimmy Holiday, Rashee Rice and Drake Thomas are resolved through approved prior cases plus official participation. Remaining role work is limited to Shaheed's distinct receiver/return relief, Cross's distinct left-tackle relief and Bolton's one-play linebacker relief.",
+          "footballImpact": "The replacement values determine the exposure-weighted loss for the three non-zero in-game cases; using a common baseline contributor twice would overstate or understate the pair.",
+          "nextAction": "Bind each relief role from source-supported personnel or film evidence, or apply the existing approved capacity method; special-teams-only participation does not establish a defensive replacement effect.",
           "owner": "GRAHAM_WALTERS_90_10"
         }
       ],
       "firstSeenAt": "2026-10-26T01:20:52.068Z",
-      "lastEvidenceAt": "2026-10-26T04:09:24.166Z",
-      "unchangedSince": "2026-10-26T04:09:24.166Z",
+      "lastEvidenceAt": "2026-10-26T12:19:34.782Z",
+      "unchangedSince": "2026-10-26T12:19:34.782Z",
       "stalled": false,
-      "fingerprint": "2f8a322073e9ab62e94ea3064509b32257bf1f630b6bfecec27bddd5d56b5beb",
+      "fingerprint": "1805d5abcdd755bd3543a4be5ca734884fae87a345dad47c710ea6484a4974fa",
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Recheck the official NFL Game Center and team gamebook index; ingest the immutable PDF as soon as published.",
+      "nextAction": "Use a source-supported exit play or an approved bounded/snap-exposure method for Shaheed and Cross. Preserve the unprinted facts rather than inventing a clock.",
       "escalation": null
     }
   ],
@@ -2147,6 +2140,7 @@
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-active-participation-and-prior-case-reconciliation.json": "b7cd64cb3cc0487a83f43d1fe374dc5ca4228aaa",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-afternoon-window-active-status-closure.json": "a146eec14cc33d15d3eff153ac10215fc4f09eff",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-cameron-mitchell-prior-estimate-reuse.json": "c9a880a591f39608adfa057679f7865cfbc06376",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-kc-sea-gamebook-reconciliation.json": "9caca27867f980bb18a993de21bad6ccf836e3f2",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-prior-role-and-healthy-dnp-reconciliation.json": "cf995b0e86c1017cec22b11458a85cda52b50260",
     "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-reused-prior-case-resolutions.json": "39092109c6f92e7698ceb715aaf4862430f5c5d0"
   }
