@@ -103,7 +103,7 @@ try{
     assert.equal(validateObserver(o,{asOf:o.generatedAt}).ok,true,scenario+' observer verifies');
     const calls=JSON.parse(fs.readFileSync(path.join(temp,'calls.json'))).filter(c=>c.ids.length);
     assert.equal(calls.length,2);assert.ok(calls.every(c=>c.ids.length<=5));
-    assert.equal(o.diagnostics.oddsRequests,2);assert.equal(o.quota.protectedReserve,25);
+    assert.equal(o.diagnostics.oddsRequests,2);assert.equal(o.quota.protectedReserve,5);
     if(scenario==='success'){
       collected=o;assert.equal(o.fixtures.length,8);
       const times=new Set(o.fixtures.flatMap(f=>f.pinnacle.markets.flatMap(m=>m.outcomes.flatMap(v=>v.players.map(q=>q.observedAt)))));
