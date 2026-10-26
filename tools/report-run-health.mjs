@@ -5,6 +5,19 @@ import {inspectQuarterbackFollowUp} from './quarterback-follow-up.mjs';
 const documentedShortfallReasons=new Set(['SOURCE_UNAVAILABLE','FAIR_MODEL_UNAVAILABLE','PERSONNEL_UNRESOLVED','CALIBRATION_UNAVAILABLE','CONFLICTING_EVIDENCE']);
 const nonEmpty=value=>typeof value==='string'&&value.trim().length>0;
 const eventOf=row=>String(row.quote?.eventId??row.decision?.feed?.eventId??row.selectionId?.split('|')[1]??'');
+function forecastHandoff(state,receipts){
+  const asOf=Date.parse(state.report?.ts),events=new Set((receipts||[]).map(eventOf));
+  const evidence=state.sidecar?.forecastEvidence||{};
+  const records=(evidence.records||[]).filter(row=>events.has(String(row.eventId)));
+  const matches=review=>Number.isFinite(asOf)&&Date.parse(review?.forReportAt)===asOf;
+  // Mirror the existing report-time binding only. A matching binding does not
+  // validate source freshness, personnel, settlement or a betting decision.
+  const pending=records.filter(record=>!(evidence.revalidations||[]).some(review=>review.recordId===record.recordId&&matches(review))&&!matches(record.applicability));
+  return {state:pending.length?'CURRENT_REPORT_REVIEW_REQUIRED':records.length?'BINDINGS_PRESENT':'NO_CAPTURED_FORECASTS',
+    reportAt:state.report?.ts||null,records:records.length,bindingsPresent:records.length-pending.length,pending:pending.length,
+    pendingRecords:pending.map(row=>({recordId:row.recordId||null,eventId:String(row.eventId),sourceId:row.sourceId||null})),
+    limitation:'Binding diagnostics only; source eligibility and every existing analytical/publication gate remain separate.'};
+}
 function blockerWork(row){
   const blocker=row.blocker||{};
   // RESEARCH_INCOMPLETE describes work left to do, even when a source lead is
@@ -39,6 +52,7 @@ export function reportEventFeedback(state,eventId) {
 
 export function reportRunHealth(state={}) {
   const receipts=state.sidecar?.primaryAnalysis?.receipts;
+  const forecastReviewHandoff=forecastHandoff(state,receipts);
   const available=Array.isArray(receipts)?receipts.length:null;
   const evaluated=(receipts||[]).filter(row=>row.state==='EVALUATED').length;
   const blocked=(receipts||[]).filter(row=>row.state==='BLOCKED').length;
@@ -62,11 +76,15 @@ export function reportRunHealth(state={}) {
   const validationState=state.validation?.state==='PASS'&&['FROZEN','STAGED','PUBLISHED'].includes(state.phase)?'PASS':'NOT_VALIDATED';
   const publicationState=state.phase==='PUBLISHED'&&state.publication?'DURABLY_VERIFIED':state.phase==='STAGED'?'PUBLICATION_PENDING':'NOT_ISSUED';
   const continueAction=`Complete current event reviews for ${remainingWork.producerUnfinished} unfinished selections and inspect ${remainingWork.blockerReviewRequired} undocumented blockers across ${remainingWork.events} pending events. Follow nextEventId and scheduleUrgency, inspect next --event-id, reuse pinned observations with current applicability checks, and save each event before preparing again. Do not relabel unfinished work as a source shortfall.`;
-  return {analysisState,validationState,publicationState,sports,continuationRequired,remainingWork,
+  const handoffNotice=forecastReviewHandoff.pending?['FROZEN','STAGED','PUBLISHED'].includes(state.phase)
+    ?` ${forecastReviewHandoff.pending} captured forecasts lack applicability reviews bound to this report time. Disclose that unfinished review; preserve sealed/issued bytes. A documented source shortfall does not certify forecast review completion.`
+    :` ${forecastReviewHandoff.pending} captured forecasts lack applicability reviews bound to this report time. Export the draft, inspect next --event-id, perform the current applicability checks and save the event before preparing. Preserve original observations; do not merely restamp forReportAt or repeatedly retime an unchanged draft.`:'';
+  return {analysisState,validationState,publicationState,sports,continuationRequired,remainingWork,forecastReviewHandoff,
     gaps:[...gaps].sort((a,b)=>b[1]-a[1]).slice(0,8).map(([missing,selections])=>({missing,selections})),
     nextAction:publicationState==='DURABLY_VERIFIED'?(continuationRequired?`Publication is verified; producer work is unfinished. Start a current-time continuation without editing issued History. ${continueAction}`:
       blocked?'Published selections are verified; remaining receipts record source shortfalls. Recheck the named sources when their inputs change.':'Read the verified issued decisions.'):
       state.phase==='FROZEN'||state.phase==='STAGED'?`Preserve and submit the exact sealed candidate; verify publisher and controller readback.${continuationRequired?` Then start a current-time continuation. ${continueAction}`:''}`:
       continuationRequired?continueAction:'Resume the saved event work, inspect exact missingResearch, retime and reconcile eligibility, prepare and inspect deferrals, then freeze/stage and verify publication.',
+    ...(handoffNotice?{forecastReviewNotice:handoffNotice.trim()}:{}),
     limitation:'EVALUATED is a saved producer assessment, not a passed validation or issued report. Saved event reviews and successful publication do not complete unfinished research.'};
 }

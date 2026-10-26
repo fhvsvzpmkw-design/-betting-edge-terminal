@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {reportRunHealth,reportEventFeedback} from '../tools/report-run-health.mjs';
+import {parseReportDocument} from '../tools/report-document-transport.mjs';
 const receipt=(sport,state)=>({selectionId:`${sport}|test|full_game_moneyline|home`,state,
   ...(state==='BLOCKED'?{blocker:{reason:'RESEARCH_INCOMPLETE',missing:'QB_CURRENT_TARGETED_RESEARCH_REQUIRED'}}:{})});
 const state={phase:'DRAFT',sidecar:{primaryAnalysis:{receipts:[receipt('NCAAF','BLOCKED'),receipt('NHL','EVALUATED')]}}};
@@ -66,4 +68,42 @@ const generic=structuredClone(sourceGap);generic.blocker.missing='CURRENT_CANDID
 assert.equal(reportRunHealth({sidecar:{primaryAnalysis:{receipts:[generic]}}}).remainingWork.producerUnfinished,1,'generic current-review work cannot be relabeled SOURCE_UNAVAILABLE');
 assert.equal(reportRunHealth({}).continuationRequired,false);
 assert.equal(reportRunHealth({sidecar:{primaryAnalysis:{receipts:[]}}}).remainingWork.selections,0);
+
+// A real source shortfall cannot hide an independently missing final-time
+// applicability review. Diagnose it without clearing evidence or forcing a
+// repeated collection/continuation against the same unavailable source.
+const retimed={phase:'DRAFT',report:{ts:'2026-10-25T18:28:01-07:00'},sidecar:{primaryAnalysis:{receipts:[sourceGap]},
+  forecastEvidence:{records:[{recordId:'point',eventId:'A',sourceId:'moneypuck',observedAt:'2026-10-25T22:25:11Z'}],
+    revalidations:[{recordId:'point',forReportAt:'2026-10-25T18:26:03-07:00',checkedAt:'2026-10-25T18:26:03-07:00'}]}}};
+const retimedBefore=JSON.stringify(retimed),retimedHealth=reportRunHealth(retimed);
+assert.equal(retimedHealth.forecastReviewHandoff.pending,1);
+assert.equal(retimedHealth.forecastReviewHandoff.state,'CURRENT_REPORT_REVIEW_REQUIRED');
+assert.equal(retimedHealth.remainingWork.documentedShortfalls,1);
+assert.equal(retimedHealth.continuationRequired,false,'binding diagnostics cannot force an unchanged-source retry');
+assert.match(retimedHealth.forecastReviewNotice,/perform the current applicability checks/);
+assert.match(retimedHealth.forecastReviewNotice,/do not merely restamp forReportAt/);
+assert.equal(JSON.stringify(retimed),retimedBefore,'diagnostics never reapprove or retime source evidence');
+const bound=structuredClone(retimed);
+bound.sidecar.forecastEvidence.revalidations.push({recordId:'point',forReportAt:'2026-10-26T01:28:01Z'});
+assert.equal(reportRunHealth(bound).forecastReviewHandoff.pending,0,'equivalent ISO instants bind; this does not certify review contents');
+const inline=structuredClone(retimed);inline.sidecar.forecastEvidence.records[0].applicability={forReportAt:inline.report.ts};
+assert.equal(reportRunHealth(inline).forecastReviewHandoff.pending,0,'legacy inline applicability keeps its existing binding semantics');
+bound.sidecar.forecastEvidence.records.push({recordId:'unretained',eventId:'B'});
+assert.equal(reportRunHealth(bound).forecastReviewHandoff.records,1,'removed events must not manufacture current review work');
+assert.match(reportRunHealth({...retimed,phase:'FROZEN'}).forecastReviewNotice,/preserve sealed\/issued bytes/);
+
+// Replay the issued October 25 failure shapes without changing either saved
+// checkpoint, model observations, receipts, status or validation semantics.
+for(const [file,expected]of [
+  ['data/report-production/checkpoints/2026-10-25-evening-152421.json',23],
+  ['data/report-production/checkpoints/20261025-late-1815-182446.json',2]
+]){
+  const bytes=fs.readFileSync(file),saved=parseReportDocument(bytes,'REPORT_CHECKPOINT');
+  const bundle=parseReportDocument(saved.frozen.serializedBundle,'STAGED_REPORT');
+  const current=reportRunHealth({...saved,report:bundle.report,sidecar:bundle.sidecar});
+  assert.equal(current.forecastReviewHandoff.pending,expected);
+  assert.equal(current.validationState,'PASS','diagnostics add no gate or retroactive validation failure');
+  assert.match(current.forecastReviewNotice,/Disclose that unfinished review/);
+  assert.deepEqual(fs.readFileSync(file),bytes);
+}
 console.log('Run health: final validation, publication, unfinished producer work and documented source shortfalls stay distinct.');
