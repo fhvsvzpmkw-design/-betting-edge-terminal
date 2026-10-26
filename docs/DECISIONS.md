@@ -365,6 +365,17 @@ Independent Graham research continues through its market-safe preflight, readine
 
 **Reason:** Preserve completed work and settled choices across chats and runs, while making genuine remaining work explicit. Prevent repairs from being repeatedly redesigned or declared complete on publication evidence alone.
 
+
+## D-037 — Five-request OddsPapi reserve
+
+**Status:** Active on deployment, user approved October 26, 2026
+
+Pinnacle/OddsPapi collection now protects a five-request reserve, superseding the previous 25-request floor. Keep the existing account preflight and reject a planned odds batch when its projected remaining allowance would fall below five. The provider's actual allowance, tournament batch limits, request pacing, source/settlement qualification, primary-book budgets, report schedules, analytical/publication gates and issued history retain their existing roles. This amendment does not purchase or upgrade a subscription.
+
+The user also approved one controlled Pinnacle-only recovery through the existing recovery workflow. It must preserve the primary odds snapshot, check concurrent feed changes before publication, publish only the exact verified observer and avoid blind collection retries. Verify actual returned coverage and disclose remaining gaps; successful acquisition does not itself complete any betting assessment.
+
+**Reason:** The October 26 Open collector stopped with 224/250 used and 26 requests remaining: two planned calls would leave 24, below the internal 25-request floor. The provider had not exhausted or rejected the allowance. A five-request buffer permits useful collection from the existing quota. Sustainable monthly capacity and live analytical completion remain separate open items. [Implementation and tests: PR #130](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/pull/130).
+
 ---
 
 When a durable architectural or operational choice changes, append or amend the relevant decision here and update `docs/PROJECT_STATE.md` if the active system state also changed.

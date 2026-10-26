@@ -12,7 +12,7 @@ assert(observer.includes("const selected=TOURNAMENTS.filter(t=>ALWAYS_OBSERVE.ha
 assert(observer.includes("const retentionHorizonHours=fixtureHorizonHours(f)"),'fixture-specific retention horizon must be applied after the batched OddsPapi responses');
 assert(observer.includes("retentionHorizonHours,primaryMatch:match,pinnacle"),'each retained fixture must expose its applied horizon for auditability');
 assert(observer.includes("bookmaker:'pinnacle'"),'OddsPapi observer must remain Pinnacle-specific');
-assert(observer.includes('const RESERVE=25;'),'25-request OddsPapi reserve must remain protected');
+assert(observer.includes('const RESERVE=5;'),'5-request OddsPapi reserve must remain protected');
 
 const selected=Array.from({length:6},(_,i)=>({key:`TEST_${i+1}`,id:i+1}));
 const batches=planTournamentBatches(selected);
