@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {AUTHORITY,QUALIFIED,qualifyMarket,annotatePinnacle,validateObserver} from '../tools/pinnacle-sharp-benchmark.mjs';
-import {summarizePinnacle} from '../tools/oddspapi-observer.mjs';
+import {summarizePinnacle,categoryKey} from '../tools/oddspapi-observer.mjs';
 import {exactMarketReference,validateBoundMarketAssessment} from '../tools/market-price-assessment.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -90,7 +90,9 @@ try{
     };
   `);
   const categories=[['NBA',132],['NFL',31],['NFL_PRESEASON',233],['CFL',790],['NCAAF',27653],['BOXING',24327],['MLB',109],['WNBA',486]];
-  const primary={events:categories.map(([key,id])=>({id:String(id),home:'Home '+id,away:'Away '+id,date:'2026-09-08T23:10:00Z',sport:{slug:key==='BOXING'?'boxing':key==='NCAAF'?'american-football':'baseball'},league:{name:key==='NFL_PRESEASON'?'NFL':key}}))};
+  const sports={NBA:'basketball',NFL:'american-football',NFL_PRESEASON:'american-football',CFL:'american-football',NCAAF:'american-football',BOXING:'boxing',MLB:'baseball',WNBA:'basketball'};
+  const primary={events:categories.map(([key,id])=>({id:String(id),home:'Home '+id,away:'Away '+id,date:'2026-09-08T23:10:00Z',sport:{slug:sports[key]},league:{name:key==='NFL_PRESEASON'?'NFL':key}}))};
+  primary.events.forEach((event,i)=>assert.equal(categoryKey(event),categories[i][0]==='NFL_PRESEASON'?'NFL':categories[i][0],'freshness fixtures must use real provider sport/league identities'));
   fs.mkdirSync(path.join(temp,'data'));fs.writeFileSync(path.join(temp,'data/live-odds.json'),JSON.stringify(primary));
   let collected;
   for(const scenario of ['success','failed','malformed','shape','mismatch','missing-side','suspended','empty-book','replacement','empty']){
