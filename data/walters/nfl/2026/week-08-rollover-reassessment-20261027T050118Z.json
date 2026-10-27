@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "season": 2026,
+  "targetWeek": 8,
+  "state": "BLOCKED_FAIL_CLOSED",
+  "recordedAt": "2026-10-27T05:01:18.000Z",
+  "authority": "GRAHAM_WEEK_ROLLOVER",
+  "scope": "Clean additive reassessment of the bound Week 8 rollover preparation. This record does not activate Week 8, construct or publish a Week 8 fair, change a rating, inspect a market price, or issue a bet.",
+  "sourceBindings": {
+    "authoritativeMainCommit": "1a31c0cd4b4b8f820ab2e219e719550a551976b9",
+    "priorPreparationPath": "data/walters/nfl/2026/week-08-rollover-preparation-20261027.json",
+    "priorPreparationBlobSha": "635205fe90c4627522e14abfa2636b47514a5b70",
+    "currentRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
+    "currentRatingLedgerBlobSha": "ffeae0eebc309351273112dba6f5d55453628728"
+  },
+  "gates": {
+    "activeWeek": 7,
+    "activeFinals": "COMPLETE_14_OF_14",
+    "historicalLearning": "COMPLETE_14_OF_14_PUBLICATION_VERIFIED",
+    "strictRolloverHandoff": "COMPLETE",
+    "priorDisplayRefreshRequired": false,
+    "week08ScheduleInventory": "REUSED_BOUND_14_GAMES"
+  },
+  "reassessment": {
+    "availableEvidenceNotAssembled": [],
+    "genuinelyUnavailableEvidence": [],
+    "calculationPublicationFailures": [],
+    "resolvedSincePriorPreparation": [
+      {
+        "code": "MARKET_ISOLATION_CONTAMINATED_RUN",
+        "resolution": "This is a separate clean runtime. No sportsbook, market, odds, observer, or price-bearing terminal content was consulted for independent Week 8 research or arithmetic. Market isolation is available for this run."
+      }
+    ],
+    "remainingBlockers": [
+      {
+        "code": "H4_SHARED_VENUE_METHOD_REQUIRED",
+        "gameKey": "2026-W08-LAC-LAR",
+        "missingFactOrDecision": "The official schedule designates the Rams as home at SoFi Stadium, the same governed stadium used by the Chargers. The operational H4 release publishes 2.082 points for ordinary DOMESTIC_HOME and zero for neutral games, but it publishes no authorized SHARED_VENUE_OR_METRO points-to-home-spread value or production override.",
+        "footballImpact": "The location component of Chargers at Rams remains unknown. Applying either the ordinary 2.082-point home term or zero would manufacture one game's fair and prevent the Week 8 board from being numerically complete.",
+        "requiredSourceOrMethodDecision": "The governed home-field owner must publish a source-bound SHARED_VENUE_OR_METRO classification and authorized points-to-home-spread value or method for 2026-W08-LAC-LAR. After that readback, the mechanical rollover can construct all 14 fairs, activate Week 8 last, run the QB workflow, and start the separate Tuesday baseline recovery phase.",
+        "durableEvidence": [
+          "data/walters/nfl/home-field/h4-current.json",
+          "data/walters/nfl/home-field/home-field-calibration-v1.json",
+          "data/walters/nfl/home-field/h3-shadow-contract-v1.json",
+          "tools/run-walters-home-field-h3.mjs",
+          "data/walters/nfl/s-factors/source/nflverse-schedules-sfactor-snapshot-2026-09-01.csv",
+          "data/walters/nfl/2026/week-08-rollover-preparation-20261027.json"
+        ]
+      }
+    ]
+  },
+  "writesAuthorizedThisRun": {
+    "week08CurrentNumbers": false,
+    "week08ResearchLedger": false,
+    "week08DailyMarketLedger": false,
+    "activeWeekManifest": false,
+    "qbWorkflow": false,
+    "baseline": false
+  },
+  "marketViewed": false,
+  "marketDataUsed": false,
+  "betIssued": false
+}
