@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {deriveGrahamFairDecomposition,synchronizeGrahamFairBoard,roundHalf} from './graham-fair-decomposition.mjs';
 export const CURRENT_RATING_REVIEW='GRAHAM_ONE_TIME_CURRENT_RATING_REVIEW';
+const CURRENT_REVIEW_SOURCES=new Set(['USER_REQUEST_2026_10_22','USER_REQUEST_2026_10_26']);
 const fail=s=>{throw Error('CURRENT_RATING_REVIEW:'+s);};
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const digest=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
@@ -26,7 +27,7 @@ function inventory(power){
 export function verifyCurrentRatingReview(power,review=power.currentRatingReview){
  try{
   const byTeam=inventory(power);
-  if(review?.schema!==1||review.type!==CURRENT_RATING_REVIEW||review.state!=='APPLIED'||!review.auditId||review.marketViewed!==false||review.estimateAcknowledged!==true||review.authorization?.source!=='USER_REQUEST_2026_10_22'||!review.authorization?.text?.trim()||!Number.isFinite(Date.parse(review.effectiveAt))||review.teamFindings?.length!==32||new Set(review.teamFindings.map(t=>t.team)).size!==32||!Array.isArray(review.ratingChanges))return false;
+  if(review?.schema!==1||review.type!==CURRENT_RATING_REVIEW||review.state!=='APPLIED'||!review.auditId||review.marketViewed!==false||review.estimateAcknowledged!==true||!CURRENT_REVIEW_SOURCES.has(review.authorization?.source)||!review.authorization?.text?.trim()||!Number.isFinite(Date.parse(review.effectiveAt))||review.teamFindings?.length!==32||new Set(review.teamFindings.map(t=>t.team)).size!==32||!Array.isArray(review.ratingChanges))return false;
   const {proofSha256,...proof}=review;if(digest(proof)!==proofSha256)return false;
   const changed=review.teamFindings.filter(f=>f.delta!==0);if(changed.length!==review.ratingChanges.length)return false;
   for(const f of review.teamFindings){
@@ -51,7 +52,7 @@ export function applyCurrentRatingReview({plan,power,board,active,policy,effecti
   }
   return{power:structuredClone(power),board:structuredClone(board),plan:structuredClone(plan),ratingChanges:[],games:[],frozenStartedGames:[],changed:false};
  }
- if(plan?.schema!==1||plan.type!==CURRENT_RATING_REVIEW||plan.state!=='READY'||!plan.auditId||plan.marketViewed!==false||plan.estimateAcknowledged!==true||plan.authorization?.source!=='USER_REQUEST_2026_10_22'||!plan.authorization?.text?.trim())fail('AUTHORIZATION_OR_PLAN_IDENTITY');
+ if(plan?.schema!==1||plan.type!==CURRENT_RATING_REVIEW||plan.state!=='READY'||!plan.auditId||plan.marketViewed!==false||plan.estimateAcknowledged!==true||!CURRENT_REVIEW_SOURCES.has(plan.authorization?.source)||!plan.authorization?.text?.trim())fail('AUTHORIZATION_OR_PLAN_IDENTITY');
  if(plan.season!==active.season||plan.week!==active.week||board.season!==active.season||board.week!==active.week||power.season!==active.season)fail('ACTIVE_WEEK_IDENTITY');
  if(!Number.isFinite(Date.parse(effectiveAt))||effectiveAt!==plan.effectiveAt)fail('PUBLICATION_CLOCK');
  for(const at of [power.updatedAt,board.updatedAt])if(at&&(!Number.isFinite(Date.parse(at))||Date.parse(at)>Date.parse(effectiveAt)))fail('PUBLICATION_CLOCK');

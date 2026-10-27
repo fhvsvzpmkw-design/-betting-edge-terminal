@@ -1,3 +1,4 @@
+import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -29,4 +30,29 @@ test('full 32-team review, exact expected ratings and source blobs are required'
 test('authorization, half-point cap and chronological publication are enforced',()=>{for(const mutate of [f=>f.plan.authorization.text='',f=>f.plan.teams[0].delta=-1,f=>f.plan.effectiveAt='2026-08-01T00:00:00Z',f=>f.plan.teams[1].decision='ADJUST']){const f=fixture();mutate(f);assert.throws(()=>applyCurrentRatingReview(f),/AUTHORIZATION|INVALID_REVIEW|PUBLICATION_CLOCK/);}});
 test('same applied plan is idempotent; reusing READY audit or altered history fails',()=>{const f=fixture(),r=applyCurrentRatingReview(f),again=applyCurrentRatingReview({...f,power:r.power,board:r.board,plan:r.plan});assert.equal(again.changed,false);assert.deepEqual(again.power,r.power);const repeated={...f,power:r.power,board:r.board};repeated.plan={...f.plan,expectedPowerBlobSha:blob(r.power),expectedBoardBlobSha:blob(r.board)};assert.throws(()=>applyCurrentRatingReview(repeated),/AUDIT_ALREADY_APPLIED/);r.power.teams[0].history[0].toRating=99;assert.equal(verifyCurrentRatingReview(r.power),false);});
 test('future normal 90/10 starts at corrected current rating, without rewriting review',()=>{const f=fixture(),r=applyCurrentRatingReview(f),t=r.power.teams[0];const c=weeklyCalculation({oldRating:t.currentRating,opponentOldRating:24,scoreMargin:7,teamInjuryLoss:1,opponentInjuryLoss:0,teamLocationAdvantage:0});assert.equal(c.newRating,28.3393315238);const event=structuredClone(t.history.at(-1));t.history.push({type:'WALTERS_WEEKLY_90_10',fromRating:t.currentRating,toRating:c.newRating,effectiveAt:'2026-10-27T20:00:00Z'});t.currentRating=c.newRating;assert.deepEqual(t.history.at(-2),event);assert.equal(verifyCurrentRatingReview(r.power),false);});
-console.log(`CURRENT RATING REVIEW: ${n} PASS`);
+test('new request authorizes the same half-point bounds and preserves every started game',()=>{
+ const f=fixture();f.plan.authorization.source='USER_REQUEST_2026_10_26';
+ for(const g of f.board.games)g.startTimePacific='2026-10-22T19:00:00Z';
+ f.plan.expectedBoardBlobSha=blob(f.board);
+ const r=applyCurrentRatingReview(f);
+ assert.equal(verifyCurrentRatingReview(r.power),true);
+ assert.deepEqual(r.board.games,f.board.games);
+ const denied=fixture();denied.plan.authorization.source='UNRECOGNIZED_REQUEST';
+ assert.throws(()=>applyCurrentRatingReview(denied),/AUTHORIZATION/);
+});
+test('published October26 adjustments replay exactly with native crypto and original Git blobs',()=>{
+ const p='data/walters/nfl/2026/rating-reviews/2026-10-26-small-current-adjustment.json';
+ const applied=JSON.parse(fs.readFileSync(p));
+ const get=sha=>JSON.parse(execFileSync('git',['cat-file','blob',sha],{maxBuffer:16*1024*1024,encoding:'utf8'}));
+ const oldPower=get(applied.expectedPowerBlobSha),oldBoard=get(applied.expectedBoardBlobSha);
+ const expected=get(applied.result.powerBlobSha),plan=structuredClone(applied);
+ plan.state='READY';delete plan.result;delete plan.appliedAt;
+ const result=applyCurrentRatingReview({plan,power:oldPower,board:oldBoard,active:{season:applied.season,week:applied.week},policy,effectiveAt:applied.effectiveAt,powerBlobSha:applied.expectedPowerBlobSha,boardBlobSha:applied.expectedBoardBlobSha});
+ assert.deepEqual(result.power,expected);
+ assert.deepEqual(result.plan.result,applied.result);
+ assert.deepEqual(result.board.games,oldBoard.games);
+ assert.deepEqual(result.power.weekly90_10,oldPower.weekly90_10);
+ assert.deepEqual(result.ratingChanges.map(c=>[c.team,c.delta]),[['PHI',-0.5],['LAC',-0.5]]);
+ assert.equal(verifyCurrentRatingReview(expected),true);
+});
+console.log('CURRENT RATING REVIEW: '+n+' PASS');
