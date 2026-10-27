@@ -293,7 +293,7 @@ function inspectExactPrimary(event, book, spec, feedGeneratedAt) {
   return { ...inspected, selections: states, quotes };
 }
 
-export function derivePrimarySelectionInventory(report, feed, policy) {
+export function derivePrimarySelectionInventory(report, feed, policy, {validateHealth=true} = {}) {
   const bound = deriveBoundCoverage(report, feed, policy); // Retain exact scope/clock checks.
   const merged = mergedFeedEvents(feed), selections = [], limitations = new Map(), sports = {};
   for (const sport of policy.coverageAudit.sportKeys) {
@@ -315,7 +315,7 @@ export function derivePrimarySelectionInventory(report, feed, policy) {
     sports[sport] = { ...expected, primary: { required: expected.primary.required, available, unavailable } };
   }
   selections.sort((a, b) => a.selectionId.localeCompare(b.selectionId));
-  validatePrimaryFeedHealth(report, feed, selections.length);
+  if(validateHealth) validatePrimaryFeedHealth(report, feed, selections.length);
   return { selections, sports, limitations };
 }
 
