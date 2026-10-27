@@ -79,7 +79,7 @@ export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,
   const nextWeekRequired=activeFinals.state==='COMPLETE';
   const rolloverBlockers=nextWeekRequired&&!historicalComplete?['HISTORICAL_LEARNING_INCOMPLETE']:[];
   const problems=[...(cycle?[{code:'BASELINE_PROPAGATION_CYCLE',finding:'A pending initial baseline and unpublished carried bases coexist; mechanical propagation must not wait for research completion.'}]:[]),
-    ...(missedEarlierBatches.length?[{code:'EARLIER_PUBLISHED_BATCHES_NOT_PROPAGATED',games:missedEarlierBatches.map(g=>g.gameKey)}]:[]),
+    ...(!nextWeekRequired&&missedEarlierBatches.length?[{code:'EARLIER_PUBLISHED_BATCHES_NOT_PROPAGATED',games:missedEarlierBatches.map(g=>g.gameKey)}]:[]),
     ...(historical.some(g=>g.stalled)?[{code:'STALLED_HISTORICAL_RECOVERY',games:historical.filter(g=>g.stalled).map(g=>g.gameKey)}]:[]),
     ...(nextWeekRequired?[{code:'NEXT_WEEK_NOT_ACTIVATED',expectedWeek:active.week+1,reason:rolloverBlockers.length?'Historical learning still incomplete.':'Run the mechanical rollover owner now; previous-game display refresh is not a new-week rating input.'}]:[])];
   const counts={historicalApplied:historical.filter(g=>g.state==='APPLIED').length,historicalExpected:historical.length,
