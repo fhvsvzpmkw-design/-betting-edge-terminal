@@ -378,7 +378,10 @@ export function derivePrimaryMarketInstrumentTelemetry({report,feed,policy,feedB
   const snapshots=oddsSnapshots.filter(s=>earlierBaseline(s.feed?.generatedAt,feed.generatedAt))
     .sort((a,b)=>Date.parse(b.feed.generatedAt)-Date.parse(a.feed.generatedAt)||String(a.blobSha).localeCompare(String(b.blobSha)))
     .filter((s,i,all)=>all.findIndex(x=>x.blobSha===s.blobSha)===i).slice(0,12)
-    .map(s=>({...s,selections:new Map(derivePrimarySelectionInventory({...report,feedGeneratedAt:s.feed.generatedAt},s.feed,policy).selections.map(row=>[row.selectionId,row]))}));
+    // Historical meter baselines are comparison-only snapshots. Their lack of
+    // currently eligible quotes makes the meter unmeasured; it must not trip
+    // the current-run primary-feed acquisition blocker.
+    .map(s=>({...s,selections:new Map(derivePrimarySelectionInventory({...report,feedGeneratedAt:s.feed.generatedAt},s.feed,policy,{validateHealth:false}).selections.map(row=>[row.selectionId,row]))}));
   function comparisonFor(selection,{book=null,selectionKey=null}={}){
     for(const snapshot of snapshots){
       const before=snapshot.selections.get(selection.selectionId);
