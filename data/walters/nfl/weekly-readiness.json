@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-27T04:07:58.910Z",
+  "generatedAt": "2026-10-27T04:14:38.728Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 14,
@@ -16,16 +16,17 @@
     "initialBaseline": "COMPLETE"
   },
   "rollover": {
-    "required": false,
-    "nextWeek": null,
+    "required": true,
+    "nextWeek": 8,
     "activeFinals": {
-      "state": "UNVERIFIED",
-      "reason": "FINAL_FACTS_NOT_RECORDED",
-      "gamesVerified": 0,
-      "gamesExpected": 14
+      "state": "COMPLETE",
+      "gamesVerified": 14,
+      "gamesExpected": 14,
+      "verifiedAt": "2026-10-27T04:09:00.000Z",
+      "path": "data/walters/nfl/2026/week-07-final-facts-20261027.json"
     },
     "blockers": [],
-    "nextAction": "PREPARE_EVIDENCE_AS_GAMES_FINISH"
+    "nextAction": "RUN_WEEK_ROLLOVER"
   },
   "completion": {
     "schema": 1,
@@ -39,14 +40,14 @@
         "owner": "TUESDAY_BASELINE"
       },
       "historicalLearning": {
-        "state": "INCOMPLETE",
+        "state": "COMPLETE",
         "owner": "GRAHAM_WALTERS_90_10",
         "sourceWeek": 6,
         "targetWeek": 7,
         "gamesApplied": 14,
         "gamesExpected": 14,
         "blockedGames": [],
-        "publicationVerified": false
+        "publicationVerified": true
       },
       "ratingPropagation": {
         "state": "INCOMPLETE",
@@ -278,9 +279,6 @@
       }
     },
     "problems": [
-      {
-        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
-      },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W07-NE-CHI",
@@ -2155,9 +2153,14 @@
       "games": [
         "2026-W07-DAL-PHI"
       ]
+    },
+    {
+      "code": "NEXT_WEEK_NOT_ACTIVATED",
+      "expectedWeek": 8,
+      "reason": "Run the mechanical rollover owner now; previous-game display refresh is not a new-week rating input."
     }
   ],
-  "customerMessage": "Week 7: historical rating updates 14/14; baseline verified.",
+  "customerMessage": "Week 8 has not been published. Historical rating updates: 14/14; completed Week 7 evidence ready: 1/14.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
