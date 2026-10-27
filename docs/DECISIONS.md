@@ -378,13 +378,13 @@ The user also approved one controlled Pinnacle-only recovery through the existin
 
 ## D-038 — Primary acquisition order and bookmaker access failures
 
-**Status:** October 27 repair tested; deployment and live verification tracked in PROJECT_STATE.md
+**Status:** Deployed October 27; all six relevant CI checks and live source recovery verified; analytical report completion remains open (PROJECT_STATE.md)
 
 Keep Crypto-watch and primary major-sport ordering through actual odds requests; do not sort that acquisition queue back into global start-time order. Permanent HTTP client errors are not retried as network failures. A bookmaker 403 suspends that book for the current pull, including supplemental requests, while the other approved book continues. Probe it again on the next normal pull and retain the provider message; no plan purchase or execution-book substitution is authorized.
 
 From 07:15 PT October 27, the existing inventory/coverage validator rejects a zero-selection candidate when collector diagnostics identify upcoming same-day primary events without eligible prices. This repairs the false empty-slate route; it does not reject a supported partial board, require a pick, rewrite issued History or bypass any analytical gate. Feed completeness must disclose access errors and unattempted primary games. Keep report-owned pulls, actual clocks, budgets/reserve, deduplication, five report lanes, saved research and the staged publisher.
 
-**Reason:** The October 27 06:10:55 PT snapshot spent 51 requests on Bet365's paid-plan denial, priced earlier ancillary fixtures first, left 23 of 24 selected primary events unattempted and was marked complete. The resulting zero-board report passed publication despite a known upcoming slate. Offline tests reproduce and prevent that combination, while preserving healthy-book decisions and real empty slates.
+**Reason:** The October 27 06:10:55 PT snapshot spent 51 requests on Bet365's paid-plan denial, priced earlier ancillary fixtures first, left 23 of 24 selected primary events unattempted and was marked complete. The resulting zero-board report passed publication despite a known upcoming slate. Offline tests reproduce and prevent that combination, while preserving healthy-book decisions and real empty slates. [Repair 4520d0c](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/commit/4520d0cbf7725b4491a02ed37a891c320dc65e04) passed six CI checks. [One live recovery](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/40520143821) restored 108 primary selections across 18 games at 07:21 PT, with 102 qualified exact Pinnacle references, using 45/90 requests and one Bet365 denial attempt. Provider access, remaining exact spread gaps and prospective report analysis remain explicitly separate.
 
 ---
 
