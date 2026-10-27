@@ -1,232 +1,74 @@
 # Betting Edge — Operations
 
-## September 21 Core 1.5 release checkpoint
-
-**Core 1.5 forward release:** For reports at/after `2026-09-21T06:00:00-07:00`, read `core/CORE_V1_5_OPERATING_CONTRACT.md` and resolve `core/core-v1.5-production.json`. This current consolidation supersedes older release labels and conflicting universal fair/support or numeric-card instructions below; the detailed evidence and wagering safeguards remain in force. Contract v1.0 and scheduled authority v1.2 are unchanged. Historical reports retain their original release.
-
-Progression order: Core 1.5 consolidation and five Main prompts; then verify/close Graham Stage 3 schedule authority; then source-to-card handoff starting with Graham/Walters NFL spreads. A zero-card run proves publication only; populated forward grading acceptance remains pending. Older checkpoints below describe historical states.
-
-**Last updated:** 2026-09-06 — quote observation freshness correction and permanent Main schedule
-
-This is the practical operating runbook. The authoritative betting-governance file is `BETTING_EDGE_CONTRACT.md` **v1.0 OPERATIONAL**. Core methodology authority is `core/core-v1.4-production.json` **Core v1.4 OPERATIONAL**.
+Updated October 27, 2026. This runbook follows the current [scheduled authority](../BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md), [Core 1.5 contract](../core/CORE_V1_5_OPERATING_CONTRACT.md), and [project progress](PROJECT_STATE.md). Historical editions remain in Git; their scheduler, card limits and grading quotas do not control current production.
 
 ## Production identities
 
-- **Contract:** v1.0 OPERATIONAL.
-- **Presentation:** VigScope Terminal UI v1.5.
-- **Core:** v1.4 OPERATIONAL.
-- **Research Library:** v1.8 / R3 live read-only.
-- **Walters authority:** runtime-switchable; currently `BET_AUTHORITY` for eligible NFL spread/moneyline.
-- **Report provenance:** schema 3.
-- **Timezone:** `America/Vancouver`.
-- **Books:** Bet365 + DraftKings.
-- **Feed freshness:** 75 minutes from completed snapshot to report.
-- **Executable quote freshness:** 30 minutes from exact market observation to completed snapshot for `quoteObservationVersion: 1`; legacy feeds retain their original clock.
-- **Market retention:** 90 minutes on that same versioned quote clock.
-- **Primary Odds-API pull cap:** five per Vancouver operating day.
+- Contract v1.0, Core **1.5 OPERATIONAL**, VigScope UI v1.5, Research Library v1.8 / R3 read-only.
+- America/Vancouver; the permanent Main schedule is `data/main-schedule.json`.
+- Execution books: Bet365 and DraftKings. Pinnacle is the sharp benchmark, never an execution book or automatic betting instruction. Novig retains its existing comparison role.
+- Primary full-game moneylines, spreads, MLB run lines, NHL puck lines and totals. Player props are paused; college soccer is excluded upstream.
+- Public odds use American format. Structured decimal prices remain unchanged for arithmetic and exact history.
 
-The version tracks are independent. UI, Core, Contract, Research and character/hotline versions do not automatically promote one another.
+## Five Main report lanes and one collection owner
 
-## Exact market observation and price movement
+| Lane | Canonical pulse identity | Report task |
+|---|---|---|
+| open | 05:50 | 06:00 |
+| main | 07:50 | 08:00 |
+| final_morning | 09:20 | 09:30 |
+| evening | 15:05 | 15:15 |
+| late | 18:05 | 18:15 |
 
-New odds snapshots declare `quoteObservationVersion: 1`, record `collectionStartedAt` before fetching and `generatedAt` after collection completes. Each exact successfully returned and identity-checked market receives `observedAt` at response receipt; its provider `updatedAt` is preserved as last-change time. An unchanged price can therefore qualify as current without inventing movement. Missing/suspended prices are not restored from older copies, failed requests do not refresh data, and version-1 markets with missing/invalid/future observations fail closed. The 30/90-minute limits are unchanged; historical snapshots are not backfilled. See Contract section 4.0a and [the field and regression reference](ODDS_OBSERVATION_FRESHNESS.md).
+Each report task owns its normal odds request after lane resolution. The left column of times supplies permanent identity; it is not another running scheduler. Follow [ODDS_RUN_REQUEST.md](ODDS_RUN_REQUEST.md): inspect the current feed, exact-slot request/run and durable receipt, reuse eligible fulfilled-slot or manual inputs, or submit one governed request for an unfulfilled slot. Verify the exact request commit's collection, saved feed and matching receipt before research.
 
-At the next ordinary refresh/report, verify the versioned timestamps, exact-market availability receipt, meter freshness and successful publication. Record the actual number of recovered selections; do not predict a BET or fabricate a replay observation from the September 6 09:30 feed. This check uses the existing run and creates no additional scheduler or API request.
+The existing collector is serialized, suppresses same-slot duplicates and retains the five-primary-slot cap and provider budgets. A queued, skipped, partial or failed pull is not proof of complete collection or permission to submit another. Check errors, concurrency and provider reset before recovery. Intentional manual recovery remains available. Main tasks use the governed scheduled request mode.
 
-## Scheduled report gate order
+Cloudflare odds timers and GitHub odds cron are retired. The Cloudflare Worker continues website hosting/report routing; its delayed scheduled callback performs no network operations. No report task should wait for that timer or a user click.
 
-Every standard report trigger performs these steps in order:
+## Acquisition and source health
 
-1. **Main schedule gate.** Read `BETTING_EDGE_MAIN_SCHEDULE.md` and `data/main-schedule.json`. If the trigger is not one of the five permanent report times, exit before analysis/history.
-2. **Contract/Core preflight.** Require Contract v1.0 OPERATIONAL and `core/core-v1.4-production.json` Core v1.4 OPERATIONAL. Resolve exact current Core framework and provenance identities.
-3. **Research/Walters/personnel authority.** Resolve Research v1.8, `BETTING_EDGE_PERSONNEL_SWEEP.md`, Walters interface and current Walters authority mode.
-4. **Live-feed validation.** Bind the exact `data/live-odds.json` snapshot and enforce feed/quote freshness and exact Bet365/DraftKings identity. Apply the shared scheduled authority's manual-snapshot binding rule: valid same-day manual refreshes may supply a scheduled report, whose lane comes from the task's expected time and Main schedule. Preserve manual feed provenance; automatic snapshots still require matching schedule identity.
-5. **Stage 1 handicap.** Perform broad current-information research and independent matchup/model work before finalizing provisional fair value.
-6. **Stage 2 personnel.** Where materially personnel-sensitive, perform the required deeper source sweep and explicit re-handicap.
-7. **Core 1.4 model-error pass.** Build `coreAssessment`, derive applicable fixed Research graduation IDs and recompute model-error state/eligibility. Market/book disagreement alone is not a WAIT.
-8. **Walters pass.** For eligible NFL spread/moneyline, apply current Walters mode. BET_AUTHORITY may originate an auditable candidate but cannot bypass any Core/execution gate.
-9. **Research Fit.** Use Research v1.8 read-only History Fit after the provisional current handicap. Normal History Fit cannot create BET or move the fair point estimate.
-10. **Payload/provenance validation.** Require exact `rec.feed`, personnel fields, WAIT qualification where applicable, `coreAssessment`, `waltersEvidence`, schema-3 provenance, status/stake/risk consistency and valid serialization.
-11. **Immutable publication.** Publish frozen report + matching sidecar + `run-history.json`, never rewriting prior reports.
-12. **Machine verification and delivery.** Require the Report history publication verification chain to pass before treating storage as fully verified.
+Major-sport acquisition requires both sport and league identity. European soccer leagues containing “CFL” are not Canadian football. Preserve primary priority through actual odds requests, retaining the separately approved exact Crypto watch. Ancillary soccer and tennis use remaining capacity.
 
-Production authority conflict must fail closed with:
+A bookmaker access denial stops that book for the current pull; the other approved book continues. Do not purchase a plan or introduce a new execution book as automatic recovery. Keep successful quotes, original timestamps and explicit book/source failures.
 
-`PREFLIGHT BLOCK — ANALYSIS NOT STARTED`
+Read `report-inputs.mjs` acquisition and exact Pinnacle diagnostics before broad research. A known upcoming primary slate with no eligible prices, or failed primary discovery with no eligible prices, is an acquisition failure. It cannot be delivered as a completed empty/no-value analysis. Usable partial coverage remains eligible for its own research and publication gates; retain named unavailable markets and source gaps.
 
-If storage fails after a valid frozen report exists:
+## Exact snapshot, quotes and event eligibility
 
-`HISTORY SAVE FAILED — REPORT VALID`
+Accept a same-day snapshot no older than 75 minutes at the saved actual run start. The controller pins its exact blob and acceptance time in `oddsSnapshot`; later analysis/publication duration does not expire or refresh that accepted snapshot. Actual issue time remains truthful. A snapshot stale at intake cannot be rescued by backdating or a new timestamp.
 
-If storage succeeds but machine verification fails:
+Version-1 quote freshness uses exact successful `observedAt`: 30-minute executable and 90-minute retention limits relative to the completed snapshot. Provider `updatedAt` remains the original price-change timestamp for movement. Failed requests, suspended prices and missing markets do not refresh or resurrect old quotes. Older records retain their original clock rules.
 
-`HISTORY VERIFY FAILED — REPORT STORED`
+Published cards must concern unstarted events on the same Vancouver operating date at actual issuance. Apply the existing event-eligibility gate again when retiming/freezing. Tomorrow's or already-started games cannot fill a board.
 
-Do not rerun handicapping merely to repair storage/verification.
+## One saved research queue
 
-## Card-volume rule
+Resolve the lane/current Core release and save the complete initial controller checkpoint before broad research. Use `report-run.mjs status`, `next` and `next --event-id`; resume the saved state rather than reconstructing completed work from chat.
 
-Scheduled report lanes target **up to nine meaningful cards**.
+Complete shared current event/personnel facts once, then finish supported exact moneyline, spread/run/puck-line and total assessments. Save each event and advance through the queue. Resolve captured forecast applicability, known-source follow-ups, actual model disagreement and material quarterback/goalie/pitcher dependencies. Preserve original source times and named rechecks. A missing forecast is not a universal veto on the qualified market LEAN/PASS route.
 
-This is not a quota. Do not:
+BET retains every supported-fair, uncertainty, personnel, execution, exposure and staking gate. Qualified LEAN and WAIT remain zero stake, with meaningful source support and concrete conditions. NHL forecast moneyline opinions retain their approved two-source/one-point rule and explicit Pinnacle disagreement review. A reasoned PASS requires completed assessment. Missing work remains RESEARCH_INCOMPLETE; it never becomes a fabricated PASS or WAIT.
 
-- lower BET or WAIT standards;
-- retain weak filler;
-- manufacture candidates;
-- force a Pizza Play.
+Publish every completed validated primary decision, including PASS. There is no card minimum, target or maximum. Keep incomplete selections and source shortfalls explicit, publish unrelated completed decisions and continue eligible unfinished work. Source attempts, saved EVALUATED counts, validation, publication and analytical completion are separate facts.
 
-Fewer than nine cards and zero BETs are normal valid outcomes.
+## One publisher and exact recovery
 
-## Permanent Main Betting Edge times
+The existing controller owns draft/checkpoint, preparation, actual-time retiming, freeze and staging. The existing `report-pipeline.mjs` owns the gate list. Follow [REPORT_RUN_CONTROLLER.md](REPORT_RUN_CONTROLLER.md); do not copy a fixed gate count into task prompts.
 
-Canonical slots remain `open`, `main`, `final_morning`, `evening`, `late`.
+Persist the complete lossless checkpoint and exact sealed candidate. Transfer/storage failures never justify dropping cards, market families, receipts or sources. Retry exact bytes for publication infrastructure recovery. A changed analysis/feed/time requires a new eligible actual-time candidate; frozen and issued records stay immutable.
 
-| Schedule | Vancouver pulse → report pairs |
-|---|---|
-| MAIN BETTING EDGE | 05:50→06:00, 07:50→08:00, 09:20→09:30, 15:05→15:15, 18:05→18:15 |
+Only `.github/workflows/report-history-staged.yml` writes issued report/sidecar History and its index. It resolves the exact triggering candidate. After success, independently fetch authoritative main and run controller readback against the exact checkpoint. Use [REPORT_PUBLICATION_REQUEST.md](REPORT_PUBLICATION_REQUEST.md) for a preserved candidate lacking its publisher trigger. Never directly write History or claim publication from a queued workflow.
 
-There are no seasonal alternatives or queued schedule state. The schedule is repository-controlled and is not a Preferences option.
+Keep all three VigScope meters active through the existing evidence-derived production/fallback logic. Neither a featured schedule label nor a meter value changes a decision or establishes profitability.
 
-## Odds scheduling
+## Existing downstream and separate owners
 
-Primary odds workflow: `.github/workflows/odds-refresh.yml`.
+- [Card Grading](../CARD_GRADING_AUTHORITY.md): native 03:00 Vancouver execution plus the existing 03:30 verification/fallback task; attempt all pending historical events without retired 20/10 quotas. Verify observation/results-index publication and exact remaining backlog. Issued analysis is immutable; hypothetical grades never alter bankroll or betting ledger.
+- Graham: [weekly production](../GRAHAM_WEEKLY_PRODUCTION.md), existing readiness/coordinator and task-specific authorities. Preserve completed learning/propagation and independent market isolation. Main reliability maintenance does not change ratings, the fair-number formula or task schedules. Graham hotline comparisons use the latest validated comparison and locked fair; a market difference cannot move that fair or create BET by itself.
+- Graham ATS: the existing separate historical closeout owner verifies final scores and grades saved pregame selections against their documented posted spread/comparison rules. Do not grade against Graham's predicted margin or mutate old fairs.
+- Crypto Specials retains its independent existing task and editorial outputs. Its own task configuration controls timing. Exact enabled combat watches retain their approved collector scope.
+- Pizza Plays remains downstream and uses eligible VigScope output; no forced filler.
+- F3 and Eddie Numbers use the sanitized public ledger under [PUBLIC_LEDGER_OPERATIONS.md](PUBLIC_LEDGER_OPERATIONS.md), never the raw private ledger as a public runtime source.
 
-### Primary path
-
-Cloudflare Worker Cron is the single automatic clock. It reads the permanent Vancouver schedule and dispatches the existing odds workflow only when a configured pulse is due.
-
-The target workflow retains serialization, fixed-schedule validation, duplicate protection and the five-primary-pull cap. There is no second automatic scheduler.
-
-## Manual odds recovery
-
-Manual odds recovery remains available through `workflow_dispatch`.
-
-Use it only when:
-
-1. the scheduled pulse should have occurred;
-2. there is no usable fresh snapshot for that canonical slot;
-3. no scheduled refresh for that slot is still running;
-4. a fresh pull remains useful before the report.
-
-For the 05:50→06:00 lane, a practical human fallback check is around **05:55**, allowing the primary path time to act first.
-
-Never change Core or Contract merely to recover an odds pulse.
-
-## Manual report-lane recovery
-
-A missed report may be reissued only inside the original canonical lane when the window remains useful.
-
-- preserve the canonical slot;
-- append `— RECOVERY` to the label;
-- use the actual Vancouver issue time;
-- obey the same current Core v1.4 gates;
-- request a fresh odds pull only when necessary;
-- archive as a new immutable issuance;
-- never overwrite an earlier genuine report;
-- zero BETs remains valid.
-
-## Structured identity and repricing
-
-Every new recommendation preserves exact structured `rec.feed` identity. Player props require exact event/player/market/side/line identity.
-
-`UPDATE ODDS / REPRICE NOW` is a client-side comparison overlay only. It cannot mutate the issued report, promote status, set stake, rewrite fair value or become issued history.
-
-Spread repricing must respect home-side raw-hdp semantics and spread lineage. A changed handicap is a different current selection and does not inherit the old recommendation automatically.
-
-`PRICE WATCH` remains informational PASS metadata, not a fifth status.
-
-## Durable report history
-
-Issued payloads:
-
-`data/history/runs/YYYY-MM-DD/<slot>-HHMMSS.json`
-
-Research/Core/Walters provenance sidecars:
-
-`data/history/research-fit/YYYY-MM-DD/<slot>-HHMMSS.json`
-
-Result/price observation sidecars:
-
-`data/history/observations/YYYY-MM-DD/<slot>-HHMMSS.json`
-
-`run-history.json` is navigation/index metadata and cannot override the issued payload.
-
-Historical v0.9 / Core v1.3 / Research v1.7 reports remain valid immutable evidence.
-
-## Result Closure — 05:00
-
-The daily Result Closure task runs at **05:00 America/Vancouver**, before the morning odds sequence.
-
-It is an audit layer and must handle both legacy Core v1.3 and current Core v1.4 issuance without rerunning the handicap.
-
-It may write only matching observation sidecars. It must preserve as immutable:
-
-- issued status/price/fair/playTo/stake;
-- `rec.feed` identity;
-- personnel evidence;
-- Core v1.4 `coreAssessment`;
-- Walters evidence;
-- schema-3 Research/Core/Walters provenance;
-- issued report JSON.
-
-Current verification quotas remain:
-
-- up to 20 unique previous-day events;
-- plus up to 10 older backlog events.
-
-Deduplicate by exact `rec.feed.eventId` so one final result can close repeated cards across several report runs.
-
-BET results are official. LEAN/WAIT/PASS outcomes are hypothetical and never alter the betting ledger/bankroll.
-
-## Crypto Specials — 10:30
-
-Crypto Specials is a separate daily research/editorial pipeline scheduled for **10:30 America/Vancouver**.
-
-It may use market-information concepts such as price, line shopping, implied/no-vig probability, disagreement, movement, maturity and target-price discipline.
-
-It does **not** run:
-
-- Core v1.4 production preflight/model-error gate;
-- Walters authority;
-- VigScope approval;
-- Betting Edge report-history publication;
-- betting-ledger writes.
-
-It writes only `data/crypto-specials.json`. The 10:30 schedule deliberately avoids the NBA/NHL 11:00 report-time collision.
-
-## Pizza Plays
-
-Pizza Plays remains downstream of VigScope. Lou Two-Slice selects a single compelling eligible VigScope play when one exists. An all-PASS/otherwise unqualified board correctly produces no Pizza Play. Do not force a longshot merely to fill the presentation.
-
-## Private ledger / F3 / Eddie Numbers
-
-Current architecture:
-
-**private master ledger → Cloudflare Worker → sanitized `/api/bet-history` projection → F3 Bet History + Eddie Numbers**
-
-The raw private ledger is not a public runtime source. Eddie Numbers must use the public projection.
-
-## Research v1.8 boundary
-
-Research v1.8 is live read-only. Normal History Fit cannot create BET, supply executable price, override identity/freshness, move the fair point estimate or set stake.
-
-Only the fixed Core v1.4 graduated Research allowlist may raise model-error floors according to the operational framework.
-
-## Walters boundary
-
-Current Walters mode is read at runtime from `core/walters-authority-v1.4.json`.
-
-In `BET_AUTHORITY`, an AVAILABLE/current/arithmetic-verified NFL spread/moneyline Walters handicap may originate a candidate or contribute one independent fair input. It remains subordinate to all normal execution and Core model-error gates and cannot set stake directly.
-
-## Deferred work
-
-Do not fold these into ordinary Core v1.4 maintenance:
-
-- Results/CLV feedback learning loop;
-- Shadow History activation;
-- learned player/team associations;
-- personal-ledger calibration;
-- paid odds or extra execution books;
-- staking-methodology changes.
-
-Core v1.4 closeout record: `BETTING_EDGE_CORE_V1_4_CLOSEOUT_2026-08-25.md`.
+Do not enable intentionally disabled tasks or change any recurring time during error cleanup. Record a substantive repair and its exact verification in the existing [progress entry](PROJECT_STATE.md) and [decision log](DECISIONS.md). Keep deployment and live acceptance distinct; preserve the next unresolved action.

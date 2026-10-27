@@ -670,6 +670,7 @@ jobs:
           function eventPriorityScore(event, now) {
             const sport = sportSlug(event);
             const text = leagueText(event);
+            const category = categoryKey(event);
             const hours = eventHoursAway(event, now);
 
             let score = 0;
@@ -682,9 +683,9 @@ jobs:
             else if (hours <= HORIZON_HOURS) score += 20;
 
             // Major leagues / high-value sport families.
-            if (/\bnfl\b|\bncaaf\b|\bncaa football\b/.test(text)) score += 55;
-            if (/\bnhl\b|\bnba\b|\bmlb\b|\bwnba\b/.test(text)) score += 50;
-            if (/\bcfl\b|canadian football/.test(text)) score += 40;
+            if (['NFL', 'NCAAF'].includes(category)) score += 55;
+            if (['NHL', 'NBA', 'MLB', 'WNBA'].includes(category)) score += 50;
+            if (category === 'CFL') score += 40;
             if (sport === 'boxing' || /boxing/.test(sport)) score += 45;
             if (sport === 'mma' || /mma|mixed-martial|ufc/.test(sport)) score += 45;
 
@@ -792,14 +793,16 @@ jobs:
             const sport = sportSlug(event);
             const text = leagueText(event);
 
-            if (/\bmlb\b|major league baseball/.test(text)) return 'MLB';
-            if (/\bnhl\b|national hockey league/.test(text)) return 'NHL';
-            if (/\bnba\b/.test(text)) return 'NBA';
-            if (/\bwnba\b/.test(text)) return 'WNBA';
-            if (/\bnfl\b/.test(text)) return 'NFL';
+            // League abbreviations are meaningful only within their sport.
+            // Montenegro/Czech soccer also has leagues named "CFL".
+            if (sport === 'baseball' && /\bmlb\b|major league baseball/.test(text)) return 'MLB';
+            if (sport === 'ice-hockey' && /\bnhl\b|national hockey league/.test(text)) return 'NHL';
+            if (sport === 'basketball' && /\bnba\b/.test(text)) return 'NBA';
+            if (sport === 'basketball' && /\bwnba\b/.test(text)) return 'WNBA';
+            if (sport === 'american-football' && /\bnfl\b|national football league/.test(text)) return 'NFL';
             if (sport === 'american-football' && /\bncaaf\b|\bncaa\b|college/.test(text)) return 'NCAAF';
             if (/\bncaa\b|college basketball/.test(text) && sport === 'basketball') return 'NCAAB';
-            if (/\bcfl\b|canadian football/.test(text)) return 'CFL';
+            if (sport === 'american-football' && /\bcfl\b|canadian football/.test(text)) return 'CFL';
             if (sport === 'boxing' || /boxing/.test(sport)) return 'BOXING';
             if (sport === 'mma' || /mma|mixed-martial|ufc/.test(sport)) return 'MMA';
             if (sport === 'football') return 'SOCCER';

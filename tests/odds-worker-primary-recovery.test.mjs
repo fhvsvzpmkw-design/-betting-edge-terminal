@@ -323,6 +323,20 @@ for (const url of [...result.calls,...saturday.calls]) {
 }
 assert.equal(result.calls.find(url=>url.pathname.endsWith('/odds') && url.searchParams.get('eventId')==='fight').searchParams.has('markets'), false, 'independently enabled combat watch retains deep market scope');
 
+// League names cannot override the sport, or soccer's CFL receives Canadian
+// football priority in both collection and acquisition-health diagnostics.
+const mislabeledSoccer = ['Montenegro - 1. CFL','Czechia - CFL, Group A','Czechia - CFL, Group B','NBA','NHL','MLB','NFL']
+  .map((name,i)=>event(`soccer-acronym-${i}`,0.1,'football',name));
+const actualMajors = [event('actual-cfl',5,'american-football','Canada CFL'),event('actual-nhl',6,'ice-hockey','NHL')];
+const categoryIsolation = await run({
+  candidates:[...mislabeledSoccer,...actualMajors],
+  main:(e,book)=>({...e,bookmakers:{[book]:completeMarkets()}}),
+  supplemental:()=>{throw Error('Complete markets need no supplemental pull');}
+});
+assert.deepEqual(categoryIsolation.feed.diagnostics.coreSelectedByCategory,{CFL:1,NHL:1,SOCCER:7});
+assert.deepEqual(new Set(categoryIsolation.feed.diagnostics.coreMarketAvailability.map(row=>row.eventId)),new Set(actualMajors.map(row=>row.id)));
+assert.deepEqual(new Set(categoryIsolation.calls.find(url=>url.pathname.endsWith('/odds/multi')).searchParams.get('eventIds').split(',').slice(0,2)),new Set(actualMajors.map(row=>row.id)));
+
 // October 27: imminent ancillary games plus a paid-plan denial must not spend
 // the run on tennis while selected NHL/NBA/MLB games remain unrequested.
 const majors = [

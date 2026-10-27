@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-10-27 — primary odds acquisition recovery
+**Last updated:** 2026-10-27 — production configuration alignment
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -283,13 +283,13 @@ Core v1.4 became operational forward-only at `2026-08-25T17:20:00-07:00`. It pre
 
 Post-cutover reports require structured `coreAssessment` and `waltersEvidence` and are machine-checked by the Core v1.4 publication gate. Historical Core v1.3 reports remain immutable.
 
-Scheduled lanes target up to **nine meaningful cards**. Nine is a review/presentation target, not a BET quota; weaker standards or filler are forbidden merely to reach nine.
+Historical Core 1.4 presentation used up to nine cards. That card target is superseded for current production: Core 1.5 and the shared authority publish every completed primary decision without a numeric minimum, target or maximum. No-filler and betting safeguards remain.
 
 **Reason:** Core v1.4 makes uncertainty and independent-support requirements explicit without loosening the hard execution/risk boundary.
 
 ## D-031 — Cloudflare is primary; GitHub provides a two-minute odds dispatch backstop
 
-**Status:** Active as of 2026-08-25
+**Status:** Superseded for current triggering by the October 18 report-owned request policy; retired timer removal confirmed in D-039. The following is historical architecture.
 
 Cloudflare Worker Cron remains the primary odds scheduler. After the Cloudflare→GitHub handoff missed the 18:05 MLB pulse on 2026-08-25, `.github/workflows/odds-refresh-backstop.yml` was added as a narrow two-minute recovery layer.
 
@@ -315,7 +315,7 @@ Core v1.4 has a fixed graduated Research allowlist that may **raise** the model-
 
 ## D-033 — Result Closure is a separate version-tolerant audit layer
 
-**Status:** Active as of 2026-08-25
+**Status:** Audit/immutability boundary remains active. Timing, event quotas and permitted outputs are superseded by `CARD_GRADING_AUTHORITY.md` v1.1; the following describes the August 25 state.
 
 The daily 05:00 Result Closure task may process both legacy Core v1.3 and current Core v1.4 issued cards. It grades the issued selection under the historical issuance record and writes only observation sidecars.
 
@@ -339,7 +339,7 @@ The 10:30 schedule avoids the NBA/NHL 11:00 seasonal report-time collision.
 
 ## D-035 — One permanent Main Betting Edge schedule replaces seasonal profiles
 
-**Status:** Active as of 2026-09-06
+**Status:** Permanent five report times remain active. The Cloudflare triggering description is superseded by the October 18 report-owned request policy and D-039.
 
 Betting Edge permanently uses the former MLB/Summer clock as its Main schedule: 06:00, 08:00, 09:30, 15:15 and 18:15 report runs in `America/Vancouver`, with their existing ten-minute-prior odds pulses.
 
@@ -389,3 +389,20 @@ From 07:15 PT October 27, the existing inventory/coverage validator rejects a ze
 ---
 
 When a durable architectural or operational choice changes, append or amend the relevant decision here and update `docs/PROJECT_STATE.md` if the active system state also changed.
+
+
+## D-039 — Enforce the existing production configuration across entrypoints
+
+**Status:** Implementation and local configuration/forecast/output regressions verified; deployment and live Worker acceptance require the exact commit's Actions/readback. User authorized configuration alignment October 27, 2026.
+
+Major-sport collection requires both sport and league. The saved October 27 recovery feed exposed six European soccer competitions whose CFL league names had been treated as Canadian football by the collector and Pinnacle observer. Correct the collector's categories and priority bonuses; use the shared sport/league classifier for report coverage, observer scope and feed health. Regression fixtures include the exact Montenegro/Czech CFL league names and real provider sport slugs. Existing market filters, approved books, Crypto watch, request caps and five-request Pinnacle reserve remain.
+
+From October 27 08:00 Vancouver, known unpriced primary events remain visible to feed-health checks when diagnostics are absent. Failed primary discovery with zero eligible prices cannot be called a verified empty slate. Available partial boards remain eligible through selection-specific evidence and publication gates. Historical source bytes and issued decisions remain immutable.
+
+Remove the already-retired Cloudflare odds cron from deployment and make its delayed scheduled callback perform no network operations. Its live health response identifies report-owned collection; hosting, content proxying and report routing retain their existing owner. The current request protocol still serializes and deduplicates the five report-owned slots. This completes the October 18 retirement rather than adding a new scheduler.
+
+Update the existing Game Day regression workflow so changes to the actual odds entry workflow, schedule, sport classifier, health, snapshots and active runbooks trigger the operational checks. Exercise acquisition, quota denial, snapshot intake, source handoff, NHL corroboration, American odds and active meters through existing test suites. Current runbooks have no nine-card cap, universal forecast veto, retired grading quotas or Cloudflare-primary instruction. Historical decisions are explicitly marked as superseded where appropriate.
+
+The five Main task prompts resolve the same current shared authority; remove the Final task's duplicated historical producer/gate instructions while preserving its exact activation and schedule. Preserve all other active and intentionally disabled tasks, all staking rules, independent Graham formula/ratings and the single checkpoint/staged-publisher/readback process. No plan purchase, execution-book expansion, new model, recurring monitor or numerical pick quota is authorized by this repair.
+
+**Reason:** A repair must enforce the user's established behavior in code and actual deployment, and verify cross-component configuration instead of treating a green workflow as proof of analysis or system-wide correctness.

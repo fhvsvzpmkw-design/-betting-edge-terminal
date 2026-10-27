@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 import { loadMainSchedule, resolveWorkflowSchedule, scheduleMetadataForReport, validateMainSchedule } from '../tools/main-schedule.mjs';
 
 const schedule=loadMainSchedule();
@@ -58,9 +59,23 @@ for(const source of [worker,oddsWorkflow]){
   assert(!source.includes('schedule-profiles.json'),'runtime schedulers must not read seasonal profiles');
   assert(!source.includes('schedule-state.json'),'runtime schedulers must not read retired selection state');
 }
-assert(worker.includes('data/main-schedule.json'),'Worker must read the permanent Main schedule');
-assert(worker.includes('const SCHEDULER_CRON = "5,20,50 * * * *";'),'Worker scheduler cadence must remain unchanged');
-assert(wrangler.includes('"crons": ["5,20,50 * * * *"]'),'deployed Worker cron must remain unchanged');
+assert.deepEqual(JSON.parse(wrangler).triggers.crons,[],'retired Cloudflare odds timers must remain disabled');
 assert(oddsWorkflow.includes('node tools/main-schedule.mjs resolve-workflow'),'odds workflow must use the Main schedule resolver');
+
+// Execute the deployed Worker: a late legacy timer cannot issue a request,
+// even when old scheduler credentials remain configured for other routes.
+const calls=[];
+const runtime=vm.createContext({URL,Request,Response,console,fetch:async(url,options)=>{
+  calls.push({url,options});
+  return Response.json({runs:[{ts:'2026-10-27T06:18:42-07:00',slot:'open',id:'synthetic-issued',path:'data/history/runs/2026-10-27/synthetic.json'}]});
+}});
+vm.runInContext(worker.replace('export default {','globalThis.productionWorker = {'),runtime);
+await runtime.productionWorker.scheduled({scheduledTime:Date.parse('2026-10-27T12:50:00Z')},{GITHUB_ACTIONS_TOKEN:'offline-test'});
+assert.equal(calls.length,0,'retired scheduled handler performs no network operations');
+const health=await (await runtime.productionWorker.fetch(new Request('https://vigwirelabs.com/health'),{})).json();
+assert.equal(health.scheduler.mode,'report-owned');
+assert.equal(health.scheduler.scheduledDispatchEnabled,false);
+assert.equal(calls.length,1,'health only reads the issued report index');
+assert.equal(calls[0].options.method,undefined,'health never dispatches a workflow');
 
 console.log('MAIN BETTING EDGE SCHEDULE TESTS PASS');

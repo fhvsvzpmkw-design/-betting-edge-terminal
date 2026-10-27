@@ -34,7 +34,7 @@ For every scheduled Betting Edge report, a recommendation is eligible for the pu
 
 This is an additional hard subset of the normal active horizon. Whenever a scheduled-task prompt says to consider every supported major-sport market inside the normal active horizon, candidate evaluation for the report card is limited to events that also satisfy this same-day rule. Tomorrow's games may remain in `data/live-odds.json` and may remain available for non-publication research, but they are outside today's report-card candidate pool. Games that have already started are also outside the candidate pool.
 
-Apply the rule before deep candidate research/card selection and again immediately before freeze/staging. Do not backfill an undersized board with next-day events. Nine remains a hard maximum and never a quota; a same-day slate may legitimately produce fewer cards or zero cards.
+Apply the rule before deep candidate research/card selection and again immediately before freeze/staging. Do not backfill an undersized board with next-day events. Publish every completed EVALUATED primary decision, including PASS. There is no numeric card minimum, target or maximum; a same-day slate may legitimately produce zero cards after its actual assessments.
 
 The staged publisher independently enforces the same rule and fails closed on `EVENT_ALREADY_STARTED`, `EVENT_OUTSIDE_REPORT_DATE` or invalid timestamp state. Historical issued reports remain immutable evidence and are not retroactively rewritten or invalidated.
 

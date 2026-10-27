@@ -8,6 +8,10 @@ import {buildPinnacleInputCoverage} from '../tools/report-inputs.mjs';
 assert.equal(categoryKey({sport:{slug:'ice-hockey'},league:{slug:'usa-nhl',name:'USA - NHL'}}),'NHL');
 assert.equal(categoryKey({sport:{slug:'ice-hockey'},league:{slug:'canada-whl'}}),null);
 assert.equal(categoryKey({sport:{slug:'basketball'},league:{name:'WNBA',slug:'usa-wnba'}}),'WNBA');
+for(const name of ['Montenegro - 1. CFL','Czechia - CFL, Group A','Czechia - CFL, Group B','NBA','NHL','MLB','NFL'])
+  assert.equal(categoryKey({sport:{slug:'football'},league:{name}}),null,`${name} soccer must not activate a major-sport tournament`);
+for(const [sport,name,wanted] of [['american-football','CFL','CFL'],['american-football','NFL','NFL'],['american-football','NCAA FBS','NCAAF'],['baseball','MLB','MLB'],['basketball','NBA','NBA'],['ice-hockey','NHL','NHL']])
+  assert.equal(categoryKey({sport:{slug:sport},league:{name}}),wanted);
 assert.equal(TOURNAMENTS.find(t=>t.key==='NHL').id,234);
 assert.ok(planTournamentBatches(TOURNAMENTS).flat().some(t=>t.id===234));
 assert.ok(planTournamentBatches(TOURNAMENTS).every(batch=>batch.length<=5));

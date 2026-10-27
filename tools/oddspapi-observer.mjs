@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {annotatePinnacle,AUTHORITY,isFullGameAlternateTotalMarket} from './pinnacle-sharp-benchmark.mjs';
+import {majorSportKey} from './primary-sport-identity.mjs';
 
 const API_BASE='https://api.oddspapi.io/v4';
 const API_KEY=String(process.env.ODDSPAPI_API_KEY||'').trim();
@@ -28,7 +29,14 @@ function norm(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ')}
 function token(v){return norm(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
 function safeError(e){return String(e?.message||e||'Unknown OddsPapi error').replace(API_KEY,'REDACTED').slice(0,700)}
 function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-export function categoryKey(e){const s=norm(e?.sport?.slug||e?.sport?.name),t=norm([e?.league?.name,e?.league?.slug,e?.tournament?.name,e?.sport?.name,e?.sport?.slug].filter(Boolean).join(' '));if(/\bmlb\b|major league baseball/.test(t))return'MLB';if(/\bwnba\b/.test(t))return'WNBA';if(/\bnba\b/.test(t))return'NBA';if(/\bnhl\b|national hockey league/.test(t))return'NHL';if(/\bnfl\b/.test(t))return'NFL';if(s==='american-football'&&/\bncaaf\b|\bncaa\b|college/.test(t))return'NCAAF';if(/\bcfl\b|canadian football/.test(t))return'CFL';if(s==='boxing'||/boxing/.test(s))return'BOXING';return null}
+export function categoryKey(e){
+  const category=majorSportKey(e);
+  if(category==='NBA_WNBA')return /\bwnba\b/i.test([e?.league?.name,e?.league?.slug,e?.identity?.leagueKey].join(' '))?'WNBA':'NBA';
+  if(category)return category;
+  const s=norm(e?.sport?.slug||e?.sport?.name);
+  if(s==='boxing'||/boxing/.test(s))return'BOXING';
+  return null;
+}
 
 // Hockey regulation and overtime markets can share the same handicap and
 // Pinnacle path suffix. Retain provider definitions; never infer the clock.

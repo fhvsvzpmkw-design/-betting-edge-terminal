@@ -4,7 +4,7 @@ Betting Edge uses one permanent schedule in `America/Vancouver`. It has no seaso
 
 `data/main-schedule.json` is the machine-readable authority. The canonical slot names remain unchanged so report generation, publication and History continue to use the established lanes.
 
-All five report producers read `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` from authoritative `main` (authority version 1.2). Its `evidenceRepairVersion: 2026-09-12` applies the same forecast-coverage, blocker-recovery and card-evidence preparation process before each draft is validated and frozen. Source coverage and advisory warnings do not create another whole-report publication gate; the existing qualified market-assessment and partial-publication rules remain in force.
+All five report producers read `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` from authoritative `main` (authority version 1.2). Its current operating revision applies the same forecast-coverage, blocker-recovery and card-evidence preparation process before each draft is validated and frozen. Source coverage and advisory warnings do not create another whole-report publication gate; the existing qualified market-assessment and partial-publication rules remain in force.
 
 | Canonical slot | Odds pulse | Report run | Label | Featured VigScope |
 |---|---:|---:|---|---|
@@ -14,6 +14,6 @@ All five report producers read `BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md` from
 | `evening` | 15:05 | 15:15 | EVENING | Yes |
 | `late` | 18:05 | 18:15 | LATE / WEST COAST | No |
 
-The five-pull daily cap is unchanged. Cloudflare remains the single automatic odds scheduler and dispatches the existing protected `odds-refresh.yml` workflow. Manual workflow dispatch remains the recovery path for a missed scheduled pull.
+The five-primary-slot daily cap is unchanged. Each report task owns its default odds request through `data/odds-run-request.json` and the existing protected `odds-refresh.yml`. Reuse an eligible fulfilled-slot or fresh manual snapshot under the current authority. The retired Cloudflare odds timer is disabled; its delayed handler is a network-free no-op, and GitHub odds cron remains retired. Intentional manual recovery remains available after checking the existing request, concurrency and provider budget.
 
 Historical issued reports are immutable. Existing `mlb` / `MLB / SUMMER` provenance remains valid as historical evidence; new compatibility metadata identifies the schedule as `main` / `MAIN BETTING EDGE`.

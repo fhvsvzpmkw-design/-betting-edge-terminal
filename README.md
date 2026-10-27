@@ -64,31 +64,21 @@ Vancouver pulse → report pairs:
 
 `data/main-schedule.json` is the single schedule authority. The five-primary-pull cap is unchanged.
 
-## Odds scheduler
+## Odds acquisition
 
-Cloudflare Worker Cron is the **single automatic odds scheduler**.
+Each of the five Main report tasks owns its normal request through `data/odds-run-request.json` and the existing protected collector. Reuse eligible fulfilled-slot or fresh manual inputs; verify exact saved bytes, diagnostics and the durable slot receipt before research. Cloudflare odds timers and GitHub odds cron are retired. The deployed Worker retains website hosting and report routing; its old scheduled callback performs no network operations.
 
-The temporary GitHub Actions two-minute scheduler backstop was removed on 2026-08-26. Scheduled odds pulls are now intentionally simple: Cloudflare dispatches the protected `odds-refresh.yml`; if a scheduled dispatch is missed, recovery is manual rather than a second automatic scheduler.
+Primary acquisition requires matching sport and league, and preserves major-sport priority through actual requests. The independently enabled exact Crypto watch keeps its approved scope. Soccer or tennis cannot displace the primary board. A bookmaker access denial stops that book for this pull while the other approved book continues. Primary discovery/pricing failures are acquisition failures, not a completed empty-slate analysis. Partial usable coverage remains eligible for its normal selection-specific evidence gates.
 
-The odds workflow retains Main-schedule validation, serialization, duplicate protection and the five-primary-pull cap. Manual workflow dispatch remains the explicit recovery path.
+The five-primary-slot cap, same-slot deduplication, provider budgets and explicit manual recovery remain. Follow [the shared authority](BETTING_EDGE_SCHEDULED_REPORT_AUTHORITY.md) and [the request protocol](docs/ODDS_RUN_REQUEST.md); no second scheduler or extra price-driven pull is introduced.
 
-The underlying Cloudflare dispatch path should continue to be observed for reliability; that is infrastructure work, not a Core v1.4 methodology change.
+## Card grading
 
-## Result Closure
-
-A separate daily **05:00 America/Vancouver** Result Closure task grades finished issued cards and works through unresolved backlog.
-
-It is an audit layer only. It can process legacy Core v1.3 and current Core v1.4 reports but may write only `data/history/observations/...` sidecars. It must never mutate issued status, price, fair, playTo, stake, `coreAssessment`, Walters evidence, Research/Core/Walters provenance, or the betting ledger for hypothetical LEAN/WAIT/PASS outcomes.
-
-Current event quotas are 20 previous-day unique events plus 10 older backlog unique events.
+[CARD_GRADING_AUTHORITY.md](CARD_GRADING_AUTHORITY.md) governs the existing native 03:00 Vancouver grader and 03:30 verification/fallback task. Grade all pending previous-day and older events without the retired 20/10 quotas. Preserve issued decisions and verify observation/result-index publication and exact remaining cases. Hypothetical LEAN/WAIT/PASS outcomes never change the bankroll or betting ledger.
 
 ## Crypto Specials
 
-Crypto Specials remains independent from Core v1.4 and runs daily at **10:30 America/Vancouver**.
-
-It may use the useful market-information pass—current/best price, line shopping, implied/no-vig probability, disagreement, movement, maturity and target-price discipline—but does not run Core v1.4 model-error, Walters authority, VigScope publication, report history or betting-ledger workflows.
-
-It writes only `data/crypto-specials.json`.
+Crypto Specials uses its existing independent editorial task and output paths. Its current task configuration controls timing; Main report times do not reschedule it. It does not own Core decisions, Main report History, bankrolls or stakes. Exact enabled combat watches retain their approved collector scope.
 
 ## Durable history
 

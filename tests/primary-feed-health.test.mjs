@@ -13,4 +13,12 @@ for(const startTime of ['2026-10-27T12:00:00Z','2026-10-29T00:00:00Z'])
 assert.throws(()=>validatePrimaryFeedHealth(report,{diagnostics:{primaryEventsNotPriced:[{...row,date:row.startTime}]}},0),/ACQUISITION BLOCK/,'capacity omissions cannot disappear from a zero-board report');
 assert.throws(()=>validatePrimaryFeedHealth(report,{diagnostics:{coreMarketAvailability:[{...row,acquisition:{Bet365:'EVENT_NOT_RETURNED',DraftKings:'EVENT_NOT_RETURNED'}}]}},0),/ACQUISITION BLOCK/,'known upcoming games without returned prices are not a no-event slate');
 assert.doesNotThrow(()=>validatePrimaryFeedHealth(report,{diagnostics:{coreMarketAvailability:[{...row,category:'TENNIS'}]}},0));
+const unpriced={id:'unpriced',date:row.startTime,sport:{slug:'ice-hockey'},league:{name:'NHL'},bookmakers:{}};
+assert.throws(()=>validatePrimaryFeedHealth(report,{events:[unpriced]},0),/ACQUISITION BLOCK/,'a known primary event cannot disappear when the diagnostic manifest is absent');
+const soccer={id:row.eventId,date:row.startTime,sport:{slug:'football'},league:{name:'Montenegro - 1. CFL'},bookmakers:{}};
+assert.doesNotThrow(()=>validatePrimaryFeedHealth(report,{events:[soccer],diagnostics:{coreMarketAvailability:[{...row,category:'CFL'}]}},0),'an old misclassified soccer diagnostic cannot create a Canadian-football slate');
+const discoveryFailure={events:[],errors:[{stage:'events',sport:'ice-hockey',message:'503 NHL discovery unavailable'}]};
+assert.equal(inspectPrimaryFeedHealth(report,discoveryFailure,0).state,'PRIMARY_DISCOVERY_FAILED');
+assert.throws(()=>validatePrimaryFeedHealth(report,discoveryFailure,0),/ACQUISITION BLOCK/,'failed primary discovery is not a verified empty slate');
+assert.equal(validatePrimaryFeedHealth(report,discoveryFailure,6).state,'PRICES_AVAILABLE','usable partial coverage remains publishable through its own evidence gates');
 console.log('PRIMARY FEED HEALTH: PASS // failed collection, supported partial board, genuine empty slate, event eligibility and immutable history');

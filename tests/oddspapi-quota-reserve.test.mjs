@@ -13,7 +13,7 @@ try{
   fs.mkdirSync(path.join(temp,'data'));
   // Same seven-tournament/two-request shape as the blocked October 26 Open.
   fs.writeFileSync(path.join(temp,'data/live-odds.json'),JSON.stringify({events:
-    ['NBA','NFL','CFL','MLB','WNBA','NHL'].map((name,i)=>({id:String(i),league:{name},sport:{slug:name.toLowerCase()}}))}));
+    [['NBA','basketball'],['NFL','american-football'],['CFL','american-football'],['MLB','baseball'],['WNBA','basketball'],['NHL','ice-hockey']].map(([name,sport],i)=>({id:String(i),league:{name},sport:{slug:sport}}))}));
   const hook=path.join(temp,'transport.mjs');
   fs.writeFileSync(hook,`
     import fs from 'node:fs';

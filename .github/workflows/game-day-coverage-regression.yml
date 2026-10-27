@@ -5,6 +5,29 @@ on:
     branches: [main]
     paths:
       - 'tools/odds-refresh-worker-source.yml'
+      - '.github/workflows/odds-refresh.yml'
+      - 'data/main-schedule.json'
+      - 'tools/main-schedule.mjs'
+      - 'tools/odds-run-request.mjs'
+      - 'tools/odds-slot-state.mjs'
+      - 'tools/primary-sport-identity.mjs'
+      - 'tools/primary-feed-health.mjs'
+      - 'tools/oddspapi-observer.mjs'
+      - 'tools/major-sport-market-coverage-gate.mjs'
+      - 'tools/report-inputs.mjs'
+      - 'tools/report-snapshot.mjs'
+      - 'core/core-v1.5-production.json'
+      - 'BETTING_EDGE_MAIN_SCHEDULE.md'
+      - 'README.md'
+      - 'docs/OPERATIONS.md'
+      - 'docs/MAIN_SCHEDULE.md'
+      - 'cloudflare-worker/**'
+      - 'tests/main-schedule.test.mjs'
+      - 'tests/odds-primary-entry.test.mjs'
+      - 'tests/odds-run-request.test.mjs'
+      - 'tests/odds-slot-state.test.mjs'
+      - 'tests/primary-feed-health.test.mjs'
+      - 'tests/pinnacle-nhl-coverage.test.mjs'
       - 'tools/apply-crypto-watch-priority.mjs'
       - 'tools/opinion-review.mjs'
       - 'tools/candidate-assessment.mjs'
@@ -29,6 +52,29 @@ on:
   pull_request:
     paths:
       - 'tools/odds-refresh-worker-source.yml'
+      - '.github/workflows/odds-refresh.yml'
+      - 'data/main-schedule.json'
+      - 'tools/main-schedule.mjs'
+      - 'tools/odds-run-request.mjs'
+      - 'tools/odds-slot-state.mjs'
+      - 'tools/primary-sport-identity.mjs'
+      - 'tools/primary-feed-health.mjs'
+      - 'tools/oddspapi-observer.mjs'
+      - 'tools/major-sport-market-coverage-gate.mjs'
+      - 'tools/report-inputs.mjs'
+      - 'tools/report-snapshot.mjs'
+      - 'core/core-v1.5-production.json'
+      - 'BETTING_EDGE_MAIN_SCHEDULE.md'
+      - 'README.md'
+      - 'docs/OPERATIONS.md'
+      - 'docs/MAIN_SCHEDULE.md'
+      - 'cloudflare-worker/**'
+      - 'tests/main-schedule.test.mjs'
+      - 'tests/odds-primary-entry.test.mjs'
+      - 'tests/odds-run-request.test.mjs'
+      - 'tests/odds-slot-state.test.mjs'
+      - 'tests/primary-feed-health.test.mjs'
+      - 'tests/pinnacle-nhl-coverage.test.mjs'
       - 'tools/apply-crypto-watch-priority.mjs'
       - 'tools/opinion-review.mjs'
       - 'tools/candidate-assessment.mjs'
@@ -66,6 +112,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify current configuration and snapshot intake
+        run: |
+          node tests/main-schedule.test.mjs
+          node tests/odds-primary-entry.test.mjs
+          node tests/odds-run-request.test.mjs
+          node tests/odds-slot-state.test.mjs
+          node tests/core15-release.test.mjs
+          node tests/report-inputs.test.mjs
+          node tests/primary-feed-health.test.mjs
+          node tests/pinnacle-nhl-coverage.test.mjs
+          node tests/report-snapshot.test.mjs
       - name: Verify acquisition without live odds requests
         run: |
           node tests/odds-worker-primary-recovery.test.mjs
@@ -77,5 +134,10 @@ jobs:
           node tests/game-day-history-replay.test.mjs
           node tests/event-research-plan.test.mjs
           node tools/selection-continuity.mjs self-test
+      - name: Verify decision routes and customer output
+        run: |
+          node --test tests/forecast-lean-default.test.mjs tests/forecast-wait.test.mjs tests/nhl-forecast-corroboration.test.mjs
+          node tests/american-odds-display.test.mjs
+          node tests/vigscope-meter-production.test.mjs
       - name: Verify known source handoff and corroboration closeout
         run: node --test tests/forecast-follow-ups.test.mjs tests/known-forecast-follow-up-routing.test.mjs tests/forecast-follow-up-pipeline.test.mjs tests/nhl-corroboration-follow-up.test.mjs
