@@ -1,11 +1,22 @@
 import {createHash} from 'node:crypto';
-import {verifyCurrentRatingReview} from './graham-current-rating-review.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import {verifyCurrentRatingReview,verifyAppliedCurrentRatingReviewEvent} from './graham-current-rating-review.mjs';
 export const HISTORICAL_CORRECTION='WALTERS_HISTORICAL_INPUT_CORRECTION';
 export const correctionDigest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const fail=s=>{throw Error('HISTORICAL_INPUT_CORRECTION:'+s);};
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
-export function verifiedCorrectionPublication(power,staging){
+export function loadAppliedCurrentRatingReviewPlans({root=process.cwd(),season}={}){
+ const directory=path.join(root,'data/walters/nfl',String(season),'rating-reviews');
+ if(!fs.existsSync(directory))return [];
+ const plans=[];
+ for(const name of fs.readdirSync(directory).sort())if(name.endsWith('.json')){
+  try{const plan=JSON.parse(fs.readFileSync(path.join(directory,name)));if(plan?.type==='GRAHAM_ONE_TIME_CURRENT_RATING_REVIEW'&&plan.state==='APPLIED')plans.push(plan);}catch{}
+ }
+ return plans;
+}
+export function verifiedCorrectionPublication(power,staging,{reviewPlans}={}){
  if(staging?.state!=='APPLIED'||staging.auditType!==HISTORICAL_CORRECTION||staging.marketViewed!==false||staging.result?.type!==HISTORICAL_CORRECTION||staging.result.state!=='COMPLETE'||!same(staging.result.receipt,power.weekly90_10))return false;
  const entry=power.historicalInputCorrections?.find(c=>c.auditId===staging.auditId);
  if(!entry||entry.proofSha256!==staging.result.proofSha256||!same(entry.ratingChanges,staging.result.ratingChanges))return false;
@@ -16,6 +27,7 @@ export function verifiedCorrectionPublication(power,staging){
  // This receipt certifies the preserved historical correction. A separately
  // verified, forward-only current-rating review may establish a later baseline
  // without invalidating that history or claiming the old correction again.
+ const plans=reviewPlans||loadAppliedCurrentRatingReviewPlans({season:power.season});
  let reviewVerified;
  return ratingChanges.every(c=>{
   const t=power.teams.find(t=>t.abbr===c.team);
@@ -26,9 +38,16 @@ export function verifiedCorrectionPublication(power,staging){
   const suffix=t.history.slice(t.history.indexOf(e)+1);
   if(!suffix.length)return t.currentRating===c.currentRating;
   if(reviewVerified===undefined)reviewVerified=verifyCurrentRatingReview(power,power.currentRatingReview);
-  const later=suffix[0];
-  return reviewVerified===true&&suffix.length===1&&later.type==='GRAHAM_ONE_TIME_CURRENT_RATING_REVIEW'&&
-   later.auditId===power.currentRatingReview.auditId&&later.fromRating===c.currentRating&&later.toRating===t.currentRating;
+  if(reviewVerified!==true)return false;
+  let current=c.currentRating;
+  for(const later of suffix){
+   const plan=plans.find(p=>p.auditId===later.auditId);
+   const latestChange=power.currentRatingReview?.ratingChanges?.find(x=>x.team===c.team);
+   const latest=power.currentRatingReview?.auditId===later.auditId&&latestChange?.eventSha256===correctionDigest(later);
+   if(later.fromRating!==current||(!latest&&(!plan||!verifyAppliedCurrentRatingReviewEvent(plan,later,c.team))))return false;
+   current=later.toRating;
+  }
+  return current===t.currentRating;
  });
 }
 
