@@ -38,8 +38,6 @@ function classifiedTypeSets(policy){
 export function deriveGrahamFairDecomposition(game,policy){
   if(!game?.gameKey)throw new Error('GRAHAM_FAIR_DECOMPOSITION_GAME_KEY_MISSING');
   const neutral=num(game.neutralBaseHome,`${game.gameKey}:neutralBaseHome`);
-  const storedExact=num(game.grahamExactFairHome,`${game.gameKey}:grahamExactFairHome`);
-  const storedDisplay=num(game.grahamFairHome,`${game.gameKey}:grahamFairHome`);
   const adjustments=Array.isArray(game.adjustments)?game.adjustments:[];
   const sets=classifiedTypeSets(policy);
 
@@ -63,6 +61,34 @@ export function deriveGrahamFairDecomposition(game,policy){
     return finite(a?.pointsToHomeSpread)&&!sets.home.has(t)&&!sets.personnel.has(t)&&!sets.matchup.has(t);
   }).reduce((s,a)=>s+Number(a.pointsToHomeSpread),0));
 
+  if(game.numberStatus==='FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED'){
+    const homeRows=adjustments.filter(a=>sets.home.has(String(a?.type||'')));
+    if(game.grahamExactFairHome!==null||game.grahamFairHome!==null||
+      game.venueClass!=='SHARED_VENUE_OR_METRO'||game.homeFieldVenueClass!=='SHARED_VENUE_OR_METRO'||
+      game.homeFieldPointsToHomeSpread!==null||game.homeFieldAdvantagePoints!==null||
+      homeRows.length!==1||homeRows[0].venueClass!=='SHARED_VENUE_OR_METRO'||
+      homeRows[0].pointsToHomeSpread!==null||homeRows[0].homeLocationAdvantagePoints!==null){
+      throw new Error(`GRAHAM_FAIR_SHARED_VENUE_FAIL_CLOSED_INVALID:${game.gameKey}`);
+    }
+    return {
+      schema:1,
+      policyId:POLICY_ID,
+      neutralTeamBaseHome:round(neutral),
+      homeFieldPointsToHomeSpread:null,
+      otherGovernedPointsToHomeSpread:round(other),
+      prePersonnelExactFairHome:null,
+      personnelPointsToHomeSpread:round(personnel),
+      matchupPointsToHomeSpread:round(matchup),
+      exactFairHome:null,
+      displayedFairHome:null,
+      arithmeticVerified:false,
+      failClosedCode:'FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED'
+    };
+  }
+
+  const storedExact=num(game.grahamExactFairHome,`${game.gameKey}:grahamExactFairHome`);
+  const storedDisplay=num(game.grahamFairHome,`${game.gameKey}:grahamFairHome`);
+
   const prePersonnel=round(neutral+homeField+other+matchup,3);
   const computedExact=round(neutral+homeField+personnel+matchup+other,3);
   const computedDisplay=roundHalf(computedExact);
@@ -85,6 +111,7 @@ export function deriveGrahamFairDecomposition(game,policy){
 }
 
 export function formatGrahamFairSummary(d){
+  if(d?.failClosedCode==='FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED')return `Fail closed fair decomposition: neutral/team base ${fmt(d.neutralTeamBaseHome)} retained; home-field location unresolved for SHARED_VENUE_OR_METRO; other governed ${fmt(d.otherGovernedPointsToHomeSpread)} retained; personnel ${fmt(d.personnelPointsToHomeSpread)}; matchup ${fmt(d.matchupPointsToHomeSpread)}; no exact or displayed Graham fair published.`;
   return `Governed fair decomposition: neutral/team base ${fmt(d.neutralTeamBaseHome)}; home field ${fmt(d.homeFieldPointsToHomeSpread)}; other governed ${fmt(d.otherGovernedPointsToHomeSpread)}; pre-personnel exact ${fmt(d.prePersonnelExactFairHome)}; personnel ${fmt(d.personnelPointsToHomeSpread)}; matchup ${fmt(d.matchupPointsToHomeSpread)}; exact Graham home fair ${fmt(d.exactFairHome)}; displayed ${fmtDisplay(d.displayedFairHome)}.`;
 }
 

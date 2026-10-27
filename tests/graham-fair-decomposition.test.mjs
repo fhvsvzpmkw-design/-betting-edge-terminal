@@ -62,4 +62,31 @@ assert.equal(od.displayedFairHome,0.5);
 const tampered={...pacheco,grahamExactFairHome:-6.082};
 assert.throws(()=>deriveGrahamFairDecomposition(tampered,policy),/GRAHAM_FAIR_EXACT_MISMATCH/);
 
-console.log('GRAHAM FAIR DECOMPOSITION REGRESSION: PASS // PACHECO PERSONNEL + OTHER-GOVERNED + MISMATCH FAIL-CLOSED');
+const sharedVenueFailClosed={
+  gameKey:'2026-W08-LAC-LAR',
+  venueClass:'SHARED_VENUE_OR_METRO',
+  homeFieldVenueClass:'SHARED_VENUE_OR_METRO',
+  numberStatus:'FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED',
+  neutralBaseHome:-7.198714828,
+  grahamExactFairHome:null,
+  grahamFairHome:null,
+  homeFieldPointsToHomeSpread:null,
+  homeFieldAdvantagePoints:null,
+  personnelOverlayPointsToHomeSpread:0,
+  matchupOverlayPointsToHomeSpread:0,
+  adjustments:[
+    {type:'HOME_FIELD',venueClass:'SHARED_VENUE_OR_METRO',pointsToHomeSpread:null,homeLocationAdvantagePoints:null},
+    {type:'QB_PERFORMANCE_PRODUCTION',pointsToHomeSpread:-0.59}
+  ]
+};
+const sd=deriveGrahamFairDecomposition(sharedVenueFailClosed,policy);
+assert.equal(sd.neutralTeamBaseHome,-7.199);
+assert.equal(sd.homeFieldPointsToHomeSpread,null);
+assert.equal(sd.otherGovernedPointsToHomeSpread,-0.59);
+assert.equal(sd.exactFairHome,null);
+assert.equal(sd.displayedFairHome,null);
+assert.equal(sd.arithmeticVerified,false);
+assert.match(formatGrahamFairSummary(sd),/no exact or displayed Graham fair published/);
+assert.throws(()=>deriveGrahamFairDecomposition({...sharedVenueFailClosed,homeFieldPointsToHomeSpread:0},policy),/SHARED_VENUE_FAIL_CLOSED_INVALID/);
+
+console.log('GRAHAM FAIR DECOMPOSITION REGRESSION: PASS // PACHECO PERSONNEL + OTHER-GOVERNED + SHARED-VENUE FAIL-CLOSED + MISMATCH FAIL-CLOSED');
