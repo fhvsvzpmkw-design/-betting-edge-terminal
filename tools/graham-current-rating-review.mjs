@@ -41,6 +41,23 @@ export function verifyCurrentRatingReview(power,review=power.currentRatingReview
   return true;
  }catch{return false;}
 }
+export function verifyAppliedCurrentRatingReviewEvent(plan,event,team){
+ try{
+  if(plan?.schema!==1||plan.type!==CURRENT_RATING_REVIEW||plan.state!=='APPLIED'||!plan.auditId||
+    plan.marketViewed!==false||plan.estimateAcknowledged!==true||!CURRENT_REVIEW_SOURCES.has(plan.authorization?.source)||
+    !plan.authorization?.text?.trim()||plan.appliedAt!==plan.effectiveAt||!Number.isFinite(Date.parse(plan.effectiveAt))||
+    plan.teams?.length!==32||new Set(plan.teams.map(t=>t.team)).size!==32||plan.result?.marketViewed!==false||
+    !/^[0-9a-f]{40}$/.test(plan.result?.powerBlobSha||'')||!/^[0-9a-f]{64}$/.test(plan.result?.proofSha256||''))return false;
+  const finding=plan.teams.find(f=>f.team===team),change=plan.result.ratingChanges?.find(c=>c.team===team);
+  if(!finding||finding.decision!=='ADJUST'||![0.5,-0.5].includes(finding.delta)||!finding.rationale?.trim()||
+    !finding.sourceRefs?.length||!change||change.priorRating!==finding.priorRating||change.delta!==finding.delta||
+    change.currentRating!==sum(finding.priorRating,finding.delta))return false;
+  return event?.type===CURRENT_RATING_REVIEW&&event.auditId===plan.auditId&&event.fromRating===change.priorRating&&
+    event.delta===change.delta&&event.toRating===change.currentRating&&event.effectiveAt===plan.effectiveAt&&
+    event.reason===finding.rationale&&same(event.sourceRefs,finding.sourceRefs)&&event.marketViewed===false&&
+    event.estimateAcknowledged===true&&digest(event)===change.eventSha256;
+ }catch{return false;}
+}
 export function applyCurrentRatingReview({plan,power,board,active,policy,effectiveAt=plan?.effectiveAt,powerBlobSha,boardBlobSha}){
  inventory(power);
  if(plan?.state==='APPLIED'){
