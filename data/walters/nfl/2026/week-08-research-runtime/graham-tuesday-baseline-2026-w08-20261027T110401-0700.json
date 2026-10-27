@@ -7,14 +7,84 @@
   "season": 2026,
   "week": 8,
   "ledgerPath": "data/walters/nfl/2026/week-08-research-ledger.json",
-  "state": "RUN_STARTED",
-  "checkpoint": "STARTED",
+  "state": "BLOCKED_WITH_DURABLE_RECORD",
+  "checkpoint": "CONTROLLED_FAILURE",
   "startedAt": "2026-10-27T11:04:01-07:00",
-  "lastCheckpointAt": "2026-10-27T11:04:01-07:00",
+  "lastCheckpointAt": "2026-10-27T18:25:00.000Z",
   "staleAfter": "2026-10-27T12:04:01-07:00",
   "marketViewed": false,
-  "ledgerSweepPresent": false,
-  "completionResult": null,
+  "ledgerSweepPresent": true,
+  "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
   "completionReceipt": null,
-  "failure": null
+  "failure": {
+    "phase": "SOURCE_ISOLATION_POST_CONSTRUCTION_COMPARISON",
+    "code": "MARKET_BEARING_SEARCH_RESULT_EXPOSED_DURING_ESPN_FPI_LOOKUP",
+    "summary": "The required post-construction ESPN FPI lookup returned an adjacent search result containing sportsbook point spreads, moneylines and totals. The exact blocked sweep was durably recorded and its VERIFIED receipt confirms only that record; full Week 8 Tuesday baseline research is not complete and coverage did not advance.",
+    "automatic": false,
+    "failedAction": "Search for ESPN NFL FPI 2026 Week 8 after the clean-source Graham board was constructed.",
+    "impact": "No FPI value was captured or applied after exposure. No full 32-team baseline, baseline recovery, or customer publication certification was completed.",
+    "completionReceiptEvidence": {
+      "path": "data/walters/nfl/research-completion-current.json",
+      "state": "VERIFIED",
+      "policyId": "graham-research-completion-v1",
+      "verifiedAt": "2026-10-27T18:24:55.284Z",
+      "runEventId": "graham-tuesday-baseline-2026-w08-20261027T110401-0700",
+      "taskKey": "TUESDAY_BASELINE",
+      "season": 2026,
+      "week": 8,
+      "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
+      "marketViewed": false,
+      "ledgerBlobSha": "8a32c7cc9b57d6c96ee375d33de58749e922ec85",
+      "receiptBlobSha": "dd26d4a9bd6ae35f71d8ce4cf8c4490b8df168de"
+    },
+    "governedCleanSourceWrites": {
+      "personnel": {
+        "batchId": "graham-tuesday-baseline-2026-w08-20261027T112100-0700-personnel-01",
+        "workflowRunId": 40557899893,
+        "conclusion": "success",
+        "publishedFairChange": {
+          "gameKey": "2026-W08-CAR-GB",
+          "priorFairHome": -5,
+          "currentFairHome": -5.5
+        }
+      },
+      "qb": {
+        "batchId": "graham-tuesday-baseline-2026-w08-20261027T112200-0700-qb-01",
+        "workflowRunId": 40558146224,
+        "conclusion": "success",
+        "team": "BAL",
+        "status": "FAIL_CLOSED_UNRESOLVED_STARTER"
+      }
+    },
+    "workflowHistory": [
+      {
+        "runId": 40557650007,
+        "workflow": "Graham personnel production",
+        "conclusion": "cancelled",
+        "reason": "Pending run displaced in shared concurrency group before job start."
+      },
+      {
+        "runId": 40557687064,
+        "workflow": "Graham QB performance production",
+        "conclusion": "cancelled",
+        "reason": "Pending run displaced in shared concurrency group before job start."
+      },
+      {
+        "runId": 40557899893,
+        "workflow": "Graham personnel production",
+        "conclusion": "success"
+      },
+      {
+        "runId": 40558146224,
+        "workflow": "Graham QB performance production",
+        "conclusion": "success"
+      },
+      {
+        "runId": 40558457810,
+        "workflow": "Graham research completion",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "blockedAt": "2026-10-27T18:25:00.000Z"
 }
