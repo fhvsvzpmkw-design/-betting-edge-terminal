@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 7,
-  "generatedAt": "2026-10-26T23:18:12.914Z",
+  "generatedAt": "2026-10-27T01:37:03.235Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 14,
@@ -11,8 +11,8 @@
     "historicalReadyToValidate": 0,
     "stalledHistoricalGames": 0,
     "activeWeekEvidenceReady": 1,
-    "activeWeekEvidenceExpected": 13,
-    "ratingBasesBehind": 0,
+    "activeWeekEvidenceExpected": 14,
+    "ratingBasesBehind": 1,
     "initialBaseline": "COMPLETE"
   },
   "rollover": {
@@ -39,21 +39,23 @@
         "owner": "TUESDAY_BASELINE"
       },
       "historicalLearning": {
-        "state": "COMPLETE",
+        "state": "INCOMPLETE",
         "owner": "GRAHAM_WALTERS_90_10",
         "sourceWeek": 6,
         "targetWeek": 7,
         "gamesApplied": 14,
         "gamesExpected": 14,
         "blockedGames": [],
-        "publicationVerified": true
+        "publicationVerified": false
       },
       "ratingPropagation": {
-        "state": "COMPLETE",
+        "state": "INCOMPLETE",
         "owner": "GRAHAM_RATING_BASE_REFRESH",
-        "gamesVerified": 14,
+        "gamesVerified": 13,
         "gamesExpected": 14,
-        "unpropagatedGames": []
+        "unpropagatedGames": [
+          "2026-W07-DAL-PHI"
+        ]
       },
       "currentAvailability": {
         "state": "INCOMPLETE",
@@ -277,6 +279,9 @@
     },
     "problems": [
       {
+        "code": "WEEKLY_PUBLICATION_UNVERIFIED"
+      },
+      {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W07-NE-CHI",
         "personnelCases": [
@@ -469,6 +474,10 @@
         ],
         "blockedGroups": [],
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
+      },
+      {
+        "code": "FAIR_RATING_INPUT_STALE",
+        "gameKey": "2026-W07-DAL-PHI"
       },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
@@ -1523,6 +1532,29 @@
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     },
     {
+      "gameKey": "2026-W07-DAL-PHI",
+      "away": "DAL",
+      "home": "PHI",
+      "state": "RECONCILE",
+      "workClass": "AVAILABLE_WORK",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-dal-phi-final-availability-reconciliation.json",
+        "blobSha": "04020ff900c7ac9bcb2bb6ab8ac07927a2c6e43f",
+        "recordedAt": "2026-10-26T23:09:00.000Z"
+      },
+      "checklist": {},
+      "blockers": [],
+      "firstSeenAt": "2026-10-26T23:09:00.000Z",
+      "lastEvidenceAt": "2026-10-26T23:09:00.000Z",
+      "unchangedSince": "2026-10-26T23:09:00.000Z",
+      "stalled": false,
+      "fingerprint": "f981860bde9361eae8df1f9f6f61e2fd358c442f8314b1f3387d8020728df371",
+      "receiptBlockerSuperseded": false,
+      "owner": "GRAHAM_WALTERS_90_10",
+      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+      "escalation": null
+    },
+    {
       "gameKey": "2026-W07-NYG-HOU",
       "away": "NYG",
       "home": "HOU",
@@ -2055,14 +2087,21 @@
       "escalation": "UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient."
     }
   ],
-  "processProblems": [],
+  "processProblems": [
+    {
+      "code": "EARLIER_PUBLISHED_BATCHES_NOT_PROPAGATED",
+      "games": [
+        "2026-W07-DAL-PHI"
+      ]
+    }
+  ],
   "customerMessage": "Week 7: historical rating updates 14/14; baseline verified.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
   "inputBlobs": {
-    "data/walters/nfl/2026/week-07-current-numbers.json": "0549a81457dd4c3d0d3f58a6b150dd9f82adfa9d",
-    "data/walters/nfl-power-ratings-ledger.json": "56f6a3c8b6955b1c8dba7c58f28ce3ef6f36a0ff",
+    "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
+    "data/walters/nfl-power-ratings-ledger.json": "ffeae0eebc309351273112dba6f5d55453628728",
     "data/walters/nfl/carried-rating-audit-staging.json": "f560c50e770a8176e289b2a94e50e15870f018f3",
     "data/walters/nfl/2026/week-06-current-numbers.json": "d37901e3feb1a142f02b6ff2f6087428f0c3f073",
     "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-16-current-ea-missing-identity-kenny-moore.json": "6bdf8f97b499cabc701f0bdc5a07159925bce827",
