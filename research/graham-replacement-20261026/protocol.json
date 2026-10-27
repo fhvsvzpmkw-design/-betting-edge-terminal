@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "state": "FROZEN_BEFORE_CANDIDATE_METRICS",
+  "baseCommit": "842944f85adf3908d3cb2e708dfdd51392e5c3cc",
+  "studyDate": "2026-10-26",
+  "purpose": "Identify a shadow replacement formula; no production rating, publication, schedule or betting authority changes.",
+  "knownBeforeStudy": {
+    "weeks1to5": "43-32-4 historical all-games comparison",
+    "week6": "2-12, including one forced equal-line loss",
+    "week7": "Reported externally; no committed final facts, excluded"
+  },
+  "fit": "Before each test week use only unique completed games in strictly earlier weeks. Train score targets from canonical facts only; market file is joined after predictions.",
+  "candidates": [
+    {
+      "id": "preseason",
+      "kind": "frozen_preseason"
+    },
+    {
+      "id": "ridge_4",
+      "kind": "ridge",
+      "lambda": 4,
+      "role": "primary inherited from October22 diagnostic"
+    },
+    {
+      "id": "ridge_2",
+      "kind": "ridge",
+      "lambda": 2,
+      "role": "sensitivity"
+    },
+    {
+      "id": "ridge_8",
+      "kind": "ridge",
+      "lambda": 8,
+      "role": "sensitivity"
+    },
+    {
+      "id": "huber_4",
+      "kind": "huber",
+      "lambda": 4,
+      "delta": 14,
+      "role": "predeclared robust sensitivity, Huber residual threshold fixed at two touchdowns"
+    }
+  ],
+  "trainingTarget": "homeScore-awayScore-archivedHomeFieldAdvantage",
+  "prediction": "awayRating-homeRating-homeFieldAdvantage; decimal ROUND_HALF_UP at 0.5 for comparison",
+  "prior": "Original VSiN preseason seed, subtract common mean; no October22 manual corrections",
+  "warmupWeeks": [
+    1,
+    2,
+    3
+  ],
+  "developmentWeeks": [
+    4,
+    5,
+    6
+  ],
+  "metrics": {
+    "primary": "displayed-fair MAE",
+    "secondary": [
+      "displayed-fair RMSE",
+      "bias",
+      "weekly MAE",
+      "ATS at same saved market spread, zero-gap NO_EDGE"
+    ],
+    "rawFairMAE": "sensitivity"
+  },
+  "candidateChoice": "Primary ridge4 enters shadow only if aggregate MAE improves versus archived Graham without worse RMSE. Prefer a simpler candidate within0.25 MAE of best. Other parameters remain sensitivity; no ATS optimization.",
+  "injuries": "No absolute personnel or extra QB performance overlays in base challenger. Injury extensions require matched healthy-baseline normalization and before-kickoff provenance; retrospective or missing inputs cannot be presumed zero.",
+  "limitations": [
+    "Retrospective investigation initiated after observing poor Week6; not an untouched holdout.",
+    "No prospective betting-edge claim.",
+    "Week7 excluded pending canonical committed final facts.",
+    "As-played rating is not a healthy-roster rating.",
+    "Saved Pinnacle observations are not actual closes; ATS is diagnostic, not issued bets."
+  ]
+}
