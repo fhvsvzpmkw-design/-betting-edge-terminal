@@ -12,6 +12,7 @@ import {validateBoundForecastLean} from './forecast-evidence.mjs';
 import { validatePersonnelSemantics } from './personnel-semantic-gate.mjs';
 import { evaluate as evaluateCore, loadProductionFramework, matchCondition, validateContext } from './core-handicap-framework.mjs';
 import {localDateKey, evaluatedDecisionLookup} from './coverage-validation-lookups.mjs';
+import {validatePrimaryFeedHealth} from './primary-feed-health.mjs';
 
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
 const FEED_PATH = 'data/live-odds.json';
@@ -327,6 +328,7 @@ export function derivePrimarySelectionInventory(report, feed, policy) {
     sports[sport] = { ...expected, primary: { required: expected.primary.required, available, unavailable } };
   }
   selections.sort((a, b) => a.selectionId.localeCompare(b.selectionId));
+  validatePrimaryFeedHealth(report, feed, selections.length);
   return { selections, sports, limitations };
 }
 

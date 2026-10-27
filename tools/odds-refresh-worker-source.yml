@@ -241,10 +241,14 @@ jobs:
                   throw error;
                 }
 
-                if (response.status < 500) throw error;
+                error.status = response.status;
+                if (response.status >= 400 && response.status < 500 && response.status !== 408) {
+                  error.code = response.status === 403 ? 'BOOK_ACCESS_DENIED' : 'HTTP_CLIENT_ERROR';
+                  throw error;
+                }
                 lastError = error;
               } catch (error) {
-                if (error?.code === 'RATE_LIMIT') throw error;
+                if (['RATE_LIMIT', 'BOOK_ACCESS_DENIED', 'HTTP_CLIENT_ERROR'].includes(error?.code)) throw error;
                 lastError = error;
               }
 
@@ -895,9 +899,9 @@ jobs:
               take(item);
             }
 
-            return selected.sort(
-              (a, b) => String(a.date || '').localeCompare(String(b.date || ''))
-            );
+            // Keep acquisition priority. Sorting this queue by start time lets
+            // imminent ancillary games exhaust quota before the major board.
+            return selected;
           }
 
           async function discoverSport(sport, now, to, diagnostics) {
@@ -1188,6 +1192,9 @@ jobs:
             let coreBatchesUsed = 0;
             let coreStopReason = 'CORE_LIMIT';
             const coreEventMap = new Map();
+            // Access denials are book-scoped and permanent for this pull only.
+            // Probe again on the next normal pull; keep the other book running.
+            const deniedBookmakers = new Map();
             const coreAcquisition = new Map(coreSelected.map(event => [
               String(event.id), Object.fromEntries(BOOKMAKERS.map(book => [book, 'NOT_ATTEMPTED']))
             ]));
@@ -1214,6 +1221,10 @@ jobs:
               );
 
               for (const bookmaker of BOOKMAKERS) {
+                if (deniedBookmakers.has(bookmaker)) {
+                  for (const event of batch) coreAcquisition.get(String(event.id))[bookmaker] = 'ACCESS_DENIED';
+                  continue;
+                }
                 for (const event of batch) coreAcquisition.get(String(event.id))[bookmaker] = 'REQUEST_FAILED';
                 const requestStart = requestsUsed;
                 try {
@@ -1269,6 +1280,10 @@ jobs:
                     snapshot.diagnostics.draftKingsRetries += retries;
                   }
 
+                  if (error?.code === 'BOOK_ACCESS_DENIED') {
+                    deniedBookmakers.set(bookmaker, String(error.message));
+                    for (const event of batch) coreAcquisition.get(String(event.id))[bookmaker] = 'ACCESS_DENIED';
+                  }
                   snapshot.errors.push({
                     stage: `odds-multi:${bookmaker}`,
                     bookmaker,
@@ -1287,6 +1302,9 @@ jobs:
               coreBatchesUsed++;
             }
 
+            snapshot.diagnostics.bookmakerAccess = Object.fromEntries(BOOKMAKERS.map(book => [book,
+              deniedBookmakers.has(book) ? {state:'ACCESS_DENIED',reason:deniedBookmakers.get(book)} : {state:'NOT_DENIED'}
+            ]));
             snapshot.diagnostics.coreRequestsUsed = requestsUsed - coreRequestStart;
             for (const receipt of coreAcquisition.values()) {
               for (const book of BOOKMAKERS) {
@@ -1333,6 +1351,8 @@ jobs:
 
             for (let i = 0; i < deepQueue.length; i++) {
               const { event, score } = deepQueue[i];
+              const availableBooks = BOOKMAKERS.filter(book => !deniedBookmakers.has(book));
+              if (!availableBooks.length) break;
 
               if (
                 requestsUsed >= OPTIONAL_STOP_AT ||
@@ -1359,7 +1379,7 @@ jobs:
                 const { payload: responseEvent, observedAt } = await fetchJson(
                   apiUrl('/odds', {
                     eventId: event.id,
-                    bookmakers: BOOKMAKERS.join(','),
+                    bookmakers: availableBooks.join(','),
                     markets: typeof cryptoWatchMatch === 'function' && cryptoWatchMatch(event) ? undefined : PRIMARY_MARKETS
                   }),
                   {
@@ -1402,7 +1422,7 @@ jobs:
                   );
                 }
                 mergeCoreEvent(coreEventMap, event, primaryOnly, {
-                  replaceBooks: completeOddsResponse(responseEvent) ? BOOKMAKERS : []
+                  replaceBooks: completeOddsResponse(responseEvent) ? availableBooks : []
                 });
                 if (recoverCore) {
                   const after = coreMarketAvailability(coreEventMap.get(String(event.id)), new Date());
@@ -1636,10 +1656,9 @@ jobs:
 
             snapshot.complete =
               snapshot.eventCount > 0 &&
-              !snapshot.errors.some(error =>
-                /RATE_LIMIT|429|identity/i.test(
-                  String(error.message || '')
-                )
+              snapshot.errors.length === 0 &&
+              !snapshot.diagnostics.coreMarketAvailability.some(row =>
+                Object.values(row.acquisition).some(state => state.startsWith('NOT_ATTEMPTED'))
               );
 
             console.log(

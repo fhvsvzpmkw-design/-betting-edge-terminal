@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-10-25 — progress continuity and resumption
+**Last updated:** 2026-10-27 — primary odds acquisition recovery
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -375,6 +375,16 @@ Pinnacle/OddsPapi collection now protects a five-request reserve, superseding th
 The user also approved one controlled Pinnacle-only recovery through the existing recovery workflow. It must preserve the primary odds snapshot, check concurrent feed changes before publication, publish only the exact verified observer and avoid blind collection retries. Verify actual returned coverage and disclose remaining gaps; successful acquisition does not itself complete any betting assessment.
 
 **Reason:** The October 26 Open collector stopped with 224/250 used and 26 requests remaining: two planned calls would leave 24, below the internal 25-request floor. The provider had not exhausted or rejected the allowance. A five-request buffer permits useful collection from the existing quota. Sustainable monthly capacity and live analytical completion remain separate open items. [Implementation and tests: PR #130](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/pull/130).
+
+## D-038 — Primary acquisition order and bookmaker access failures
+
+**Status:** October 27 repair tested; deployment and live verification tracked in PROJECT_STATE.md
+
+Keep Crypto-watch and primary major-sport ordering through actual odds requests; do not sort that acquisition queue back into global start-time order. Permanent HTTP client errors are not retried as network failures. A bookmaker 403 suspends that book for the current pull, including supplemental requests, while the other approved book continues. Probe it again on the next normal pull and retain the provider message; no plan purchase or execution-book substitution is authorized.
+
+From 07:15 PT October 27, the existing inventory/coverage validator rejects a zero-selection candidate when collector diagnostics identify upcoming same-day primary events without eligible prices. This repairs the false empty-slate route; it does not reject a supported partial board, require a pick, rewrite issued History or bypass any analytical gate. Feed completeness must disclose access errors and unattempted primary games. Keep report-owned pulls, actual clocks, budgets/reserve, deduplication, five report lanes, saved research and the staged publisher.
+
+**Reason:** The October 27 06:10:55 PT snapshot spent 51 requests on Bet365's paid-plan denial, priced earlier ancillary fixtures first, left 23 of 24 selected primary events unattempted and was marked complete. The resulting zero-board report passed publication despite a known upcoming slate. Offline tests reproduce and prevent that combination, while preserving healthy-book decisions and real empty slates.
 
 ---
 

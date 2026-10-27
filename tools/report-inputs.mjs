@@ -9,6 +9,7 @@ import {resolveCoreRelease} from './core-release.mjs';
 import {derivePrimarySelectionInventory, mergedFeedEvents} from './major-sport-market-coverage-gate.mjs';
 import {bindIntelligence,buildGameIntelligence,projectGameIntelligence} from './game-intelligence.mjs';
 import {exactMarketReference} from './market-price-assessment.mjs';
+import {inspectPrimaryFeedHealth} from './primary-feed-health.mjs';
 
 // Price acquisition is checked before research, independently of decision gates.
 export function buildPinnacleInputCoverage(report, inventory, observer, {eventId = null} = {}) {
@@ -75,6 +76,7 @@ export function buildReportInputs({root = process.cwd(), at, reportTime, eventId
     bindings: {feed: feed.binding, coverage: policy.binding,
       observer: observer.binding},
     pinnacleCoverage:buildPinnacleInputCoverage(report,inventory,observer.value,{eventId}),
+    acquisition:inspectPrimaryFeedHealth(report,feed.value,inventory.selections.length),
     feed: {generatedAt: feed.value.generatedAt,
       ageMinutesAtReport: (Date.parse(at) - Date.parse(feed.value.generatedAt)) / 60000,
       scheduleMeta: feed.value.scheduleMeta ?? null},

@@ -31,7 +31,7 @@ function market(name, age = 1, extra = {}) {
 }
 function completeMarkets() { return ['ML', 'Spread', 'Totals'].map(name => market(name)); }
 
-async function run({ candidates, main, supplemental, watches = [], multiFailures = 0, requestStepMs = 1000, extraMulti = () => [] }) {
+async function run({ candidates, main, supplemental, watches = [], multiFailures = 0, requestStepMs = 1000, extraMulti = () => [], httpFailure = () => null }) {
   let clock = now;
   class ReceiptDate extends Date {
     constructor(...args) { super(...(args.length ? args : [clock])); }
@@ -56,6 +56,8 @@ async function run({ candidates, main, supplemental, watches = [], multiFailures
       const url = new URL(raw);
       calls.push(url);
       clock += requestStepMs;
+      const status = httpFailure(url);
+      if (status) return {ok:false,status,statusText:'Fixture error',text:async () => status === 403 ? 'Bet365 is only available on our paid plans' : 'offline HTTP failure'};
       let data;
       if (url.pathname.endsWith('/sports')) data = [...new Set(candidates.map(e => e.sport.slug))].map(slug => ({ slug }));
       else if (url.pathname.endsWith('/events')) {
@@ -321,4 +323,44 @@ for (const url of [...result.calls,...saturday.calls]) {
 }
 assert.equal(result.calls.find(url=>url.pathname.endsWith('/odds') && url.searchParams.get('eventId')==='fight').searchParams.has('markets'), false, 'independently enabled combat watch retains deep market scope');
 
-console.log('ODDS WORKER CORE RECOVERY: PASS // production Crypto overlay, local observation timestamps, old unchanged prices, complete/partial/failure receipts, omission/suspension, real retention age, quota ceiling');
+// October 27: imminent ancillary games plus a paid-plan denial must not spend
+// the run on tennis while selected NHL/NBA/MLB games remain unrequested.
+const majors = [
+  ...Array.from({length:11},(_,i)=>event(`nhl-${i}`,10+i/100,'ice-hockey','NHL')),
+  ...Array.from({length:4},(_,i)=>event(`nba-${i}`,11+i/100,'basketball','NBA')),
+  event('mlb-night',11,'baseball','MLB'),
+  ...Array.from({length:2},(_,i)=>event(`ncaaf-${i}`,10+i/100,'american-football','NCAAF'))
+];
+const crowded = await run({
+  candidates:[...Array.from({length:322},(_,i)=>event(`tennis-${i}`,0.1+i/10000,'tennis','ITF')), ...majors],
+  httpFailure:url=>url.searchParams.get('bookmakers') === 'Bet365' ? 403 : null,
+  main:(e,book)=>({...e,bookmakers:{[book]:completeMarkets()}}),
+  supplemental:()=>{throw Error('Complete DraftKings board needs no supplemental call');}
+});
+const multi = crowded.calls.filter(url=>url.pathname.endsWith('/odds/multi'));
+assert.equal(multi.filter(url=>url.searchParams.get('bookmakers')==='Bet365').length,1,'one book denial per pull, with no retry or later batch reprobe');
+const dkIds=multi.filter(url=>url.searchParams.get('bookmakers')==='DraftKings').flatMap(url=>url.searchParams.get('eventIds').split(','));
+assert.ok(dkIds.slice(0,majors.length).every(id=>majors.some(e=>e.id===id)),'preserve major priority through actual request ordering');
+for(const e of majors) assert.ok(crowded.feed.events.some(row=>row.id===e.id&&row.bookmakers.DraftKings?.length===3));
+assert.equal(crowded.feed.diagnostics.bet365CoreRequests,1);
+assert.equal(crowded.feed.diagnostics.bet365Retries,0);
+assert.equal(crowded.feed.diagnostics.bookmakerAccess.Bet365.state,'ACCESS_DENIED');
+assert.equal(crowded.feed.complete,false,'access failure remains visible even when the other book supports decisions');
+assert.ok(crowded.feed.requestsUsed<=90);
+assert.ok(crowded.feed.diagnostics.coreMarketAvailability.every(row=>row.acquisition.DraftKings==='EVENT_RETURNED'));
+
+const deniedDeep=await run({
+  candidates:[event('deep-denied')],
+  httpFailure:url=>url.searchParams.get('bookmakers')==='Bet365'?403:null,
+  main:(e,book)=>({...e,bookmakers:{[book]:[market('ML')]}}),
+  supplemental:e=>({...e,bookmakers:{DraftKings:completeMarkets()}})
+});
+assert.equal(deniedDeep.calls.find(url=>url.pathname.endsWith('/odds')).searchParams.get('bookmakers'),'DraftKings','supplemental request must not include the denied book');
+assert.equal(deniedDeep.feed.events[0].bookmakers.DraftKings.length,3);
+const clientError=await run({
+  candidates:[event('bad-request',20)],
+  httpFailure:url=>url.searchParams.get('bookmakers')==='Bet365'?400:null,
+  main:(e,book)=>({...e,bookmakers:{[book]:completeMarkets()}}),supplemental:()=>null
+});
+assert.equal(clientError.feed.diagnostics.bet365CoreRequests,1,'permanent HTTP client errors must not retry as transient network failures');
+console.log('ODDS WORKER CORE RECOVERY: PASS // primary-first requests, one-shot book denial, healthy-book continuation, supplemental scope, observation identity/retention and quota ceiling');
