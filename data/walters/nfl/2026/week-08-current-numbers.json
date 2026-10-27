@@ -96,7 +96,7 @@
   "week": 8,
   "state": "PROVISIONAL_BASELINE_PENDING",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-27T11:21:00-07:00",
+  "updatedAt": "2026-10-27T11:22:00-07:00",
   "lastResearchAt": "2026-10-27T11:21:00-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-08-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
@@ -185,6 +185,28 @@
           "marketViewed": false
         },
         {
+          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
+          "team": "CAR",
+          "side": "AWAY",
+          "clusterGroup": "OFFENSIVE_LINE",
+          "clusterMultiplier": 1,
+          "caseKeys": [
+            "2026-W08-CAR-Taylor-Moton"
+          ],
+          "rawTeamContributionDelta": -0.7,
+          "finalTeamContributionDelta": -0.7,
+          "pointsToHomeSpread": -0.7,
+          "productionId": "walters-personnel-production-v1",
+          "calibrationId": "walters-nfl-personnel-calibration-v1",
+          "sourceRefs": [
+            "https://www.panthers.com/news/week-8-monday-injury-report-banged-up-in-a-short-week",
+            "https://www.panthers.com/news/panthers-release-depth-chart-ahead-of-week-8-of-the-2026-season-packers",
+            "data/walters/nfl/player-values/by-team-v1/car.json",
+            "data/walters/nfl/player-values/player-values-access-v1.json",
+            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+          ]
+        },
+        {
           "type": "QB_PERFORMANCE_PRODUCTION",
           "productionId": "walters-qb-performance-production-v1",
           "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
@@ -208,30 +230,8 @@
             "core/staging/walters-nfl-seed-dataset-2026.json",
             "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
           ],
-          "effectiveAt": "2026-10-27T04:32:22-07:00",
+          "effectiveAt": "2026-10-27T11:22:00-07:00",
           "marketViewed": false
-        },
-        {
-          "type": "PERSONNEL_CALIBRATED_PRODUCTION",
-          "team": "CAR",
-          "side": "AWAY",
-          "clusterGroup": "OFFENSIVE_LINE",
-          "clusterMultiplier": 1,
-          "caseKeys": [
-            "2026-W08-CAR-Taylor-Moton"
-          ],
-          "rawTeamContributionDelta": -0.7,
-          "finalTeamContributionDelta": -0.7,
-          "pointsToHomeSpread": -0.7,
-          "productionId": "walters-personnel-production-v1",
-          "calibrationId": "walters-nfl-personnel-calibration-v1",
-          "sourceRefs": [
-            "https://www.panthers.com/news/week-8-monday-injury-report-banged-up-in-a-short-week",
-            "https://www.panthers.com/news/panthers-release-depth-chart-ahead-of-week-8-of-the-2026-season-packers",
-            "data/walters/nfl/player-values/by-team-v1/car.json",
-            "data/walters/nfl/player-values/player-values-access-v1.json",
-            "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-          ]
         }
       ],
       "sourceRefs": [
@@ -282,12 +282,12 @@
       "priorGrahamFairHome": -5,
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-      "qbPerformanceBaseExactFairHome": -4.634,
+      "qbPerformanceBaseExactFairHome": -5.334,
       "qbPerformancePointsToHomeSpread": -0.16,
       "qbPerformanceAwayTeamDelta": 0,
       "qbPerformanceHomeTeamDelta": 0.16,
       "qbPerformanceRetiredStarterIdentityOverlayPoints": 0,
-      "qbPerformanceLastAppliedAt": "2026-10-27T04:32:22-07:00",
+      "qbPerformanceLastAppliedAt": "2026-10-27T11:22:00-07:00",
       "qbPriorEstimateTeams": [],
       "qbPriorEstimates": [],
       "personnelProductionId": "walters-personnel-production-v1",
@@ -397,8 +397,10 @@
       "homeFieldAdvantagePoints": 2.082,
       "homeFieldPointsToHomeSpread": -2.082,
       "homeFieldLastAppliedAt": "2026-10-27T04:32:22-07:00",
-      "qbPerformanceStatus": "OPERATIONAL_SCOPED_APPLIED",
-      "qbPerformanceFailClosedTeams": [],
+      "qbPerformanceStatus": "FAIL_CLOSED_GAME_PRESERVED",
+      "qbPerformanceFailClosedTeams": [
+        "BAL"
+      ],
       "fairDecomposition": {
         "schema": 1,
         "policyId": "graham-fair-decomposition-v1",
@@ -2004,11 +2006,13 @@
     "productionAuthority": true,
     "grahamWritesAllowed": true,
     "approvedTeamCount": 32,
-    "currentResolvedTeamCount": 32,
+    "currentResolvedTeamCount": 31,
     "permanentlyExcludedTeams": [],
-    "currentFailClosedTeams": [],
-    "failClosedGameCount": 0,
-    "lastAppliedAt": "2026-10-27T04:32:22-07:00",
+    "currentFailClosedTeams": [
+      "BAL"
+    ],
+    "failClosedGameCount": 1,
+    "lastAppliedAt": "2026-10-27T11:22:00-07:00",
     "marketViewed": false,
     "postActivationCanaryState": "PENDING"
   },
