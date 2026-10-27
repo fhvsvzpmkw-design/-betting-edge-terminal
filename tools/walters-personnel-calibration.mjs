@@ -19,21 +19,25 @@ export function playerValue(cal,{position,maddenOvr}){
   throw Object.assign(new Error(`No governed value curve for position ${p}`),{code:'REVIEW_REQUIRED_SPECIALIST_VALUE'});
 }
 
+function finiteInput(value,code,label){
+  if(!['number','string'].includes(typeof value)||(typeof value==='string'&&!value.trim())||!Number.isFinite(Number(value)))
+    throw Object.assign(new Error(label+' is required and must be numeric'),{code});
+  return Number(value);
+}
+
 function assertPct(v){
-  const n=Number(v);
-  if(!Number.isFinite(n)||n<0||n>1) throw Object.assign(new Error('approvedEffectivenessPct must be 0..1'),{code:'REVIEW_REQUIRED_EFFECTIVENESS'});
+  const n=finiteInput(v,'REVIEW_REQUIRED_EFFECTIVENESS','approvedEffectivenessPct');
+  if(n<0||n>1) throw Object.assign(new Error('approvedEffectivenessPct must be 0..1'),{code:'REVIEW_REQUIRED_EFFECTIVENESS'});
   return n;
 }
 
 export function individualDelta(cal,input){
   const status=String(input.availabilityStatus||'UNKNOWN').toUpperCase();
   const rule=cal.availabilityRules[status]||cal.availabilityRules.UNKNOWN;
-  const healthy=Number(input.healthyValue);
-  if(!Number.isFinite(healthy)) throw Object.assign(new Error('healthyValue is required'),{code:'REVIEW_REQUIRED_PLAYER_VALUE'});
+  const healthy=finiteInput(input.healthyValue,'REVIEW_REQUIRED_PLAYER_VALUE','healthyValue');
   if(status==='ACTIVE_FULL') return {...input,rawTeamContributionDelta:0};
   if(['OUT','IR','SUSPENDED','COMMISSIONER_EXEMPT'].includes(status)){
-    const replacement=Number(input.replacementValue);
-    if(!Number.isFinite(replacement)) throw Object.assign(new Error('replacementValue is required'),{code:'REVIEW_REQUIRED_REPLACEMENT_VALUE'});
+    const replacement=finiteInput(input.replacementValue,'REVIEW_REQUIRED_REPLACEMENT_VALUE','replacementValue');
     return {...input,rawTeamContributionDelta:Number((replacement-healthy).toFixed(3))};
   }
   if(status==='PLAYING_LIMITED'){

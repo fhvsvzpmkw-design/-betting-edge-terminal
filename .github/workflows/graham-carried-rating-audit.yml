@@ -7,6 +7,8 @@ on:
       - data/walters/nfl/carried-rating-audit-staging.json
   pull_request:
     paths:
+      - tools/walters-personnel-calibration.mjs
+      - tests/walters-personnel-numeric-inputs.test.mjs
       - tools/graham-current-rating-review.mjs
       - tools/test-graham-current-rating-review.mjs
       - .github/workflows/graham-carried-rating-audit.yml
@@ -64,6 +66,7 @@ jobs:
           node-version: '22'
       - name: Validate proposed weekly recovery code and evidence
         run: |
+          node --test tests/walters-personnel-numeric-inputs.test.mjs
           node tools/test-graham-current-rating-review.mjs
           node tools/test-graham-historical-input-correction.mjs
           node tools/test-graham-historical-ancillary-duty.mjs
