@@ -58,6 +58,11 @@ const reviewedFixture=()=>{
  x.power=result.power;return x;
 };
 test('verified current baseline review preserves historical completion certification',()=>{const x=reviewedFixture();assert.ok(verifiedCorrectionPublication(x.power,x.input));});
+test('multiple durable disjoint reviews preserve historical completion certification',()=>{
+ const power=JSON.parse(fs.readFileSync('data/walters/nfl-power-ratings-ledger.json'));
+ const staging=JSON.parse(fs.readFileSync('data/walters/nfl/carried-rating-audit-staging.json'));
+ assert.equal(verifiedCorrectionPublication(power,staging),true);
+});
 test('unbound event after current review cannot certify historical publication',()=>{const x=reviewedFixture(),t=x.power.teams.find(t=>t.abbr==='A');t.history.push({...t.history.at(-1),auditId:'unbound-extra',sequence:99,fromRating:t.currentRating,delta:0,toRating:t.currentRating});assert.equal(verifiedCorrectionPublication(x.power,x.input),false);});
 test('current review cannot conceal altered original historical correction',()=>{const x=reviewedFixture(),t=x.power.teams.find(t=>t.abbr==='A');t.history.find(e=>e.type===HISTORICAL_CORRECTION).reason='altered preserved history';assert.equal(verifiedCorrectionPublication(x.power,x.input),false);});
 test('neutral refresh accepts source-week or next-week stored bases and preserves orthogonal layers',()=>{
