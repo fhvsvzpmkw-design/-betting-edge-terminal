@@ -426,9 +426,20 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
     const awayBinding = bindings.get(game.away);
     const homeBinding = bindings.get(game.home);
     if (!awayBinding || !homeBinding) fail(`ACTIVE_BOARD_TEAM_BINDING_MISSING:${game.gameKey}`);
-    const priorExact = Number(game.grahamExactFairHome);
-    const priorDisplayed = Number(game.grahamFairHome);
-    if (!finite(priorExact) || !finite(priorDisplayed)) fail(`ACTIVE_BOARD_FAIR_MISSING:${game.gameKey}`);
+    const sharedVenueFailClosed = game.numberStatus === 'FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED';
+    const priorExact = sharedVenueFailClosed ? null : Number(game.grahamExactFairHome);
+    const priorDisplayed = sharedVenueFailClosed ? null : Number(game.grahamFairHome);
+    if (sharedVenueFailClosed) {
+      if (
+        game.venueClass !== 'SHARED_VENUE_OR_METRO' ||
+        game.homeFieldVenueClass !== 'SHARED_VENUE_OR_METRO' ||
+        game.grahamExactFairHome !== null ||
+        game.grahamFairHome !== null ||
+        game.qbPerformanceBaseExactFairHome !== null
+      ) fail(`ACTIVE_BOARD_SHARED_VENUE_FAIL_CLOSED_INVALID:${game.gameKey}`);
+    } else if (!finite(priorExact) || !finite(priorDisplayed)) {
+      fail(`ACTIVE_BOARD_FAIR_MISSING:${game.gameKey}`);
+    }
 
     if (!bindingResolved(awayBinding) || !bindingResolved(homeBinding)) {
       game.qbPerformanceStatus = 'FAIL_CLOSED_GAME_PRESERVED';
@@ -487,13 +498,15 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
       .filter(item => item.gameKey === game.gameKey)
       .reduce((sum, item) => sum + Number(item.retiredPointsToHomeSpread || 0), 0));
     const pointsToHomeSpread = round(Number(awayBinding.teamQbDelta) - Number(homeBinding.teamQbDelta));
-    const baseExactFairHome = round(priorExact - priorQbPoints - retiredNowPoints);
-    const exactFairHome = round(baseExactFairHome + pointsToHomeSpread);
-    const displayedFairHome = roundHalf(exactFairHome);
+    const baseExactFairHome = sharedVenueFailClosed ? null : round(priorExact - priorQbPoints - retiredNowPoints);
+    const exactFairHome = sharedVenueFailClosed ? null : round(baseExactFairHome + pointsToHomeSpread);
+    const displayedFairHome = sharedVenueFailClosed ? null : roundHalf(exactFairHome);
     // A different team's staging batch must not restamp unchanged game evidence.
     const unchanged = game.qbPerformanceStatus === 'OPERATIONAL_SCOPED_APPLIED' &&
-      priorQbAdjustments.length === 1 && !retiredNow.length && close(priorExact, exactFairHome) &&
-      close(game.qbPerformanceBaseExactFairHome, baseExactFairHome) &&
+      priorQbAdjustments.length === 1 && !retiredNow.length &&
+      (sharedVenueFailClosed
+        ? game.grahamExactFairHome === null && game.grahamFairHome === null && game.qbPerformanceBaseExactFairHome === null
+        : close(priorExact, exactFairHome) && close(game.qbPerformanceBaseExactFairHome, baseExactFairHome)) &&
       priorQbAdjustments[0].awayStarter === awayBinding.currentStarterPlayer.playerName &&
       priorQbAdjustments[0].homeStarter === homeBinding.currentStarterPlayer.playerName &&
       close(priorQbPoints, pointsToHomeSpread);
@@ -533,8 +546,8 @@ function applyProductionToBoard(board, production, contract, effectiveAt) {
       marketViewed: false,
     });
 
-    const numericChanged = !close(priorExact, exactFairHome);
-    const displayedChanged = !close(priorDisplayed, displayedFairHome);
+    const numericChanged = sharedVenueFailClosed ? false : !close(priorExact, exactFairHome);
+    const displayedChanged = sharedVenueFailClosed ? false : !close(priorDisplayed, displayedFairHome);
     if (displayedChanged) game.priorGrahamFairHome = priorDisplayed;
     game.adjustments = adjustments;
     game.grahamExactFairHome = exactFairHome;

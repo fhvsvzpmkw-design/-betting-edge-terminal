@@ -124,6 +124,22 @@ for (const game of board.games || []) {
   if (qbAdjustments.length !== 1) fail(`QB_TERM_COUNT_INVALID:${game.gameKey}:${qbAdjustments.length}`);
   const adjustment = qbAdjustments[0];
   const expectedPoints = Number((Number(away.teamQbDelta) - Number(home.teamQbDelta)).toFixed(3));
+  const sharedVenueFailClosed = game.numberStatus === 'FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED';
+  if (sharedVenueFailClosed) {
+    if (
+      game.venueClass !== 'SHARED_VENUE_OR_METRO' ||
+      game.homeFieldVenueClass !== 'SHARED_VENUE_OR_METRO' ||
+      game.grahamExactFairHome !== null ||
+      game.grahamFairHome !== null ||
+      game.qbPerformanceBaseExactFairHome !== null ||
+      adjustment.authorityToken !== TOKEN ||
+      adjustment.productionId !== production.productionId ||
+      adjustment.marketViewed !== false ||
+      !close(adjustment.pointsToHomeSpread, expectedPoints) ||
+      !close(game.qbPerformancePointsToHomeSpread, expectedPoints)
+    ) fail(`QB_TERM_SHARED_VENUE_FAIL_CLOSED_INVALID:${game.gameKey}`);
+    continue;
+  }
   const expectedExact = Number((Number(game.qbPerformanceBaseExactFairHome) + expectedPoints).toFixed(3));
   if (
     adjustment.authorityToken !== TOKEN ||
