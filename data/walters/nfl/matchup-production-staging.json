@@ -4,15 +4,15 @@
   "season": 2026,
   "week": 8,
   "timezone": "America/Vancouver",
-  "batchId": "graham-daily-review-m4-2026-w08-20261028T114000-0700",
-  "runEventId": "graham-daily-review-2026-w08-20261028T112548-0700",
-  "startedAt": "2026-10-28T11:25:48-07:00",
-  "effectiveAt": "2026-10-28T11:40:00-07:00",
-  "sourceTask": "DAILY_REVIEW",
+  "batchId": "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01",
+  "runEventId": "graham-delta-1645-2026-w08-20261028T164156-0700",
+  "startedAt": "2026-10-28T16:41:56-07:00",
+  "effectiveAt": "2026-10-28T16:50:30-07:00",
+  "sourceTask": "DELTA_1645",
   "marketViewed": false,
   "cases": [
     {
-      "matchupEventId": "2026-W08-WAS-TERRY-MCLAURIN-IR-VIC-20261028",
+      "matchupEventId": "2026-W08-WAS-TERRY-MCLAURIN-IR-VIC-20261028-DELTA-RETRY",
       "caseKey": "2026-W08-WAS-Terry-McLaurin",
       "gameKey": "2026-W08-PHI-WAS",
       "team": "WAS",
@@ -69,5 +69,13 @@
         "data/walters/nfl/player-values/by-team-v1/was.json"
       ]
     }
-  ]
+  ],
+  "retryContext": {
+    "failedWorkflowRunIds": [
+      40747060090
+    ],
+    "failedAction": "Start Graham matchup production workflow",
+    "reason": "Prior DAILY_REVIEW attempt was cancelled before any job started; this isolated DELTA_1645 retry reuses the same source-bound M4 case.",
+    "retryAt": "2026-10-28T16:50:30-07:00"
+  }
 }
