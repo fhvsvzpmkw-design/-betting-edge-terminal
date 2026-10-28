@@ -6,15 +6,48 @@
   "season": 2026,
   "week": 8,
   "ledgerPath": "data/walters/nfl/2026/week-08-research-ledger.json",
-  "state": "RUN_STARTED",
-  "checkpoint": "STARTED",
+  "state": "BLOCKED_WITH_DURABLE_RECORD",
+  "checkpoint": "CONTROLLED_FAILURE",
   "startedAt": "2026-10-28T11:25:48-07:00",
-  "lastCheckpointAt": "2026-10-28T11:25:48-07:00",
+  "lastCheckpointAt": "2026-10-28T11:46:26-07:00",
   "staleAfter": "2026-10-28T12:25:48-07:00",
   "marketViewed": false,
-  "ledgerSweepPresent": false,
-  "completionResult": null,
+  "ledgerSweepPresent": true,
+  "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
   "completionReceipt": null,
-  "failure": null,
-  "taskPromptVersion": "graham-daily-review-v1.0"
+  "failure": {
+    "phase": "GOVERNED_PRODUCTION_PUBLICATION",
+    "code": "PRODUCTION_WORKFLOWS_CANCELLED_BEFORE_JOB_START",
+    "summary": "All current-information research was completed and one Daily Review sweep was durably recorded, but repository-owned personnel and M4 publication workflows were cancelled before any job started. Prior governed fairs remain authoritative and customer publication was not verified.",
+    "automatic": false,
+    "failedAction": "Publish two Indianapolis personnel cases and one Washington value-invariant committee case through the repository-owned production calculators.",
+    "workflowEvidence": {
+      "personnelRunIds": [
+        40745955068,
+        40746289253,
+        40746768512,
+        40747021562
+      ],
+      "matchupRunId": 40747060090,
+      "conclusions": "cancelled",
+      "jobsReadBack": "empty arrays; no job started"
+    },
+    "completionReceiptEvidence": {
+      "state": "VERIFIED",
+      "policyId": "graham-research-completion-v1",
+      "runEventId": "graham-daily-review-2026-w08-20261028T112548-0700",
+      "taskKey": "DAILY_REVIEW",
+      "season": 2026,
+      "week": 8,
+      "ledgerPath": "data/walters/nfl/2026/week-08-research-ledger.json",
+      "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
+      "marketViewed": false,
+      "receiptBlobSha": "ac0bde3661a31af4a766a3218a657dbb9b23c2b7",
+      "ledgerBlobSha": "55b5d3eed2480354be86ae5af7334fbedc112ec2",
+      "sweepSequence": 4,
+      "verifiedAt": "2026-10-28T18:46:10.019Z"
+    }
+  },
+  "taskPromptVersion": "graham-daily-review-v1.0",
+  "blockedAt": "2026-10-28T11:46:26-07:00"
 }
