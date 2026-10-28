@@ -1,18 +1,18 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-daily-review-2026-w08-20261028T112548-0700-personnel-01",
+  "batchId": "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-retry-01",
   "season": 2026,
   "week": 8,
-  "sourceTask": "DAILY_REVIEW",
-  "effectiveAt": "2026-10-28T11:40:00-07:00",
-  "startedAt": "2026-10-28T11:25:48-07:00",
-  "runEventId": "graham-daily-review-2026-w08-20261028T112548-0700",
+  "sourceTask": "DELTA_1645",
+  "effectiveAt": "2026-10-28T16:48:30-07:00",
+  "startedAt": "2026-10-28T16:41:56-07:00",
+  "runEventId": "graham-delta-1645-2026-w08-20261028T164156-0700",
   "marketViewed": false,
   "productionId": "walters-personnel-production-v1",
   "cases": [
     {
-      "personnelEventId": "2026-W08-IND-Quenton-Nelson-daily-20261028T113300-0700",
+      "personnelEventId": "2026-W08-IND-Quenton-Nelson-delta-retry-20261028T164830-0700",
       "caseKey": "2026-W08-IND-Quenton-Nelson",
       "gameKey": "2026-W08-IND-JAX",
       "team": "IND",
@@ -87,7 +87,7 @@
       }
     },
     {
-      "personnelEventId": "2026-W08-IND-DeForest-Buckner-daily-20261028T113300-0700",
+      "personnelEventId": "2026-W08-IND-DeForest-Buckner-delta-retry-20261028T164830-0700",
       "caseKey": "2026-W08-IND-DeForest-Buckner",
       "gameKey": "2026-W08-IND-JAX",
       "team": "IND",
@@ -168,16 +168,12 @@
     "failedWorkflowRunIds": [
       40745955068,
       40746289253,
-      40746768512
+      40746768512,
+      40747021562
     ],
     "failedAction": "Start Graham personnel production workflow",
-    "reason": "All three push-triggered personnel runs were cancelled before any job started; exact remote jobs read-back returned empty arrays. The current batch is now limited to the two Indianapolis one-for-one depth-estimate cases.",
-    "retryAt": "2026-10-28T11:40:00-07:00"
-  },
-  "supersessionContext": {
-    "supersededPendingWorkflowRunId": 40746289253,
-    "reason": "Queued personnel publication had not started. New additive official evidence placed Terry McLaurin on IR and resolved a source-supported committee estimate, so the same unprocessed batch was expanded before execution.",
-    "supersededAt": "2026-10-28T11:39:00-07:00"
+    "reason": "Prior DAILY_REVIEW attempts were cancelled before any job started; this isolated DELTA_1645 retry reuses the same source-bound cases and current active-week binding.",
+    "retryAt": "2026-10-28T16:48:30-07:00"
   },
   "routingCorrection": {
     "caseKey": "2026-W08-WAS-Terry-McLaurin",
