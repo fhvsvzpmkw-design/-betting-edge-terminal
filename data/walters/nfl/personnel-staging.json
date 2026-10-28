@@ -1,66 +1,167 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-tuesday-baseline-2026-w08-20261027T112100-0700-personnel-01",
+  "batchId": "graham-daily-review-2026-w08-20261028T112548-0700-personnel-01",
   "season": 2026,
   "week": 8,
-  "sourceTask": "TUESDAY_BASELINE",
-  "effectiveAt": "2026-10-27T11:21:00-07:00",
-  "startedAt": "2026-10-27T11:04:01-07:00",
-  "runEventId": "graham-tuesday-baseline-2026-w08-20261027T110401-0700",
+  "sourceTask": "DAILY_REVIEW",
+  "effectiveAt": "2026-10-28T11:33:00-07:00",
+  "startedAt": "2026-10-28T11:25:48-07:00",
+  "runEventId": "graham-daily-review-2026-w08-20261028T112548-0700",
   "marketViewed": false,
   "productionId": "walters-personnel-production-v1",
   "cases": [
     {
-      "personnelEventId": "2026-W08-CAR-Taylor-Moton-baseline-20261027T112100-0700",
-      "caseKey": "2026-W08-CAR-Taylor-Moton",
-      "gameKey": "2026-W08-CAR-GB",
-      "team": "CAR",
+      "personnelEventId": "2026-W08-IND-Quenton-Nelson-daily-20261028T113300-0700",
+      "caseKey": "2026-W08-IND-Quenton-Nelson",
+      "gameKey": "2026-W08-IND-JAX",
+      "team": "IND",
       "side": "AWAY",
-      "player": "Taylor Moton",
-      "playerEaId": "12636",
-      "availabilityStatus": "IR",
-      "resolutionStatus": "RESOLVED_ONE_FOR_ONE",
-      "replacementPlayer": "Monroe Freeling",
-      "replacementEaId": "16165",
-      "reason": "Carolina placed Taylor Moton on injured reserve after surgery for a broken fibula, and the club's Week 8 depth chart moves Monroe Freeling into the starting right-tackle role. Apply the one-for-one frozen value differential through the governed personnel writer; no prior-game overlay or market input is used.",
+      "player": "Quenton Nelson",
+      "playerEaId": "13081",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Indianapolis traded Quenton Nelson to Seattle, removing him from the Colts' Week 8 lineup. The official pre-trade Week 8 depth chart listed Dalton Tucker directly behind Nelson at left guard, the current live depth chart keeps Tucker in that reserve slot with the starter slot vacant, and the current roster lists Tucker active. Apply a labelled documented-depth estimate using frozen values; this is not a confirmed starter assignment and does not use market evidence.",
       "sourceRefs": [
-        "https://www.panthers.com/news/week-8-monday-injury-report-banged-up-in-a-short-week",
-        "https://www.panthers.com/news/panthers-release-depth-chart-ahead-of-week-8-of-the-2026-season-packers",
-        "data/walters/nfl/player-values/by-team-v1/car.json",
+        "https://www.colts.com/news/colts-trade-g-quenton-nelson-to-seattle-seahawks-for-2-future-nfl-draft-picks",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+        "https://www.colts.com/team/depth-chart",
+        "https://www.colts.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ind.json",
         "data/walters/nfl/player-values/player-values-access-v1.json",
         "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
       "availabilitySourceRefs": [
-        "https://www.panthers.com/news/week-8-monday-injury-report-banged-up-in-a-short-week"
+        "https://www.colts.com/news/colts-trade-g-quenton-nelson-to-seattle-seahawks-for-2-future-nfl-draft-picks",
+        "https://www.colts.com/team/players-roster/"
       ],
       "roleSourceRefs": [
-        "https://www.panthers.com/news/panthers-release-depth-chart-ahead-of-week-8-of-the-2026-season-packers"
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+        "https://www.colts.com/team/depth-chart",
+        "https://www.colts.com/team/players-roster/"
       ],
-      "reopenOn": "Reopen only if Carolina changes the named Week 8 right-tackle assignment or another offensive-line absence requires whole-group review.",
+      "reopenOn": "Reopen if Indianapolis names a different Week 8 left guard, Dalton Tucker becomes unavailable, or a documented offensive-line role chain displaces another baseline starter.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Tucker is the same-position reserve listed directly behind Nelson before the trade and remains the listed reserve after the starter slot became vacant. Treating him as the primary added-duty estimate is narrower than moving existing right guard Jalen Farmer and avoids inventing a displaced baseline role.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Tucker was listed as Nelson's reserve rather than an existing starter, so the estimate assigns only Nelson's newly vacant left-guard duties and leaves all other baseline offensive-line duties unchanged.",
+        "baselineSourceIds": [
+          "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+          "https://www.colts.com/team/depth-chart"
+        ],
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "replacements": [
+          {
+            "player": "Dalton Tucker",
+            "eaPlayerId": "1338",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current active Colts guard and the listed second left guard immediately before and after Nelson's trade.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+              "https://www.colts.com/team/depth-chart",
+              "https://www.colts.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Monroe Freeling",
-          "Stone Forsythe"
+          "Dalton Tucker",
+          "Jalen Farmer"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
         "replacementClassification": "ONE_FOR_ONE",
-        "conclusion": "RESOLVED_NUMERIC",
-        "finding": "Moton is on injured reserve and the official Week 8 depth chart names Freeling as the starting right tackle, with Forsythe as backup; frozen values are 0.9 and 0.2 Walters points respectively."
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Nelson is no longer on the Colts roster. Tucker is active and is the documented same-position reserve on both the pre-trade Week 8 chart and the current live chart. Farmer was considered but remains tied to the right-guard depth chain, so using him would require displaced-role reconciliation not supported by current evidence."
+      }
+    },
+    {
+      "personnelEventId": "2026-W08-IND-DeForest-Buckner-daily-20261028T113300-0700",
+      "caseKey": "2026-W08-IND-DeForest-Buckner",
+      "gameKey": "2026-W08-IND-JAX",
+      "team": "IND",
+      "side": "AWAY",
+      "player": "DeForest Buckner",
+      "playerEaId": "17542",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Indianapolis traded DeForest Buckner to San Francisco after the prior valid research cutoff, removing him from the Colts' Week 8 lineup. The official pre-trade Week 8 depth chart listed Adetomiwa Adebawore directly behind Buckner at defensive tackle, the current live depth chart keeps Adebawore in that reserve slot with the starter slot vacant, and the current roster lists Adebawore active. Apply a labelled documented-depth estimate using frozen values; this is not a confirmed starter assignment and does not use market evidence.",
+      "sourceRefs": [
+        "https://www.colts.com/news/colts-acquire-2027-fourth-round-pick-in-exchange-for-dt-deforest-buckner-in-trade-with-san-francisco-49ers",
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+        "https://www.colts.com/team/depth-chart",
+        "https://www.colts.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ind.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.colts.com/news/colts-acquire-2027-fourth-round-pick-in-exchange-for-dt-deforest-buckner-in-trade-with-san-francisco-49ers",
+        "https://www.colts.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+        "https://www.colts.com/team/depth-chart",
+        "https://www.colts.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if Indianapolis names a different Week 8 defensive-tackle starter, Adetomiwa Adebawore becomes unavailable, or current reporting establishes a committee allocation.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Adebawore is the same-position reserve listed directly behind Buckner before the trade and remains the listed reserve after the starter slot became vacant. The estimate is explicitly labelled and will be reopened on a different named assignment or committee.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Adebawore was listed as Buckner's reserve rather than an existing starter, so the estimate assigns only Buckner's newly vacant defensive-tackle duties and leaves the nose-tackle and end baseline roles unchanged.",
+        "baselineSourceIds": [
+          "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+          "https://www.colts.com/team/depth-chart"
+        ],
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "replacements": [
+          {
+            "player": "Adetomiwa Adebawore",
+            "eaPlayerId": "22928",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current active Colts defensive tackle and the listed second defensive tackle immediately before and after Buckner's trade.",
+            "sourceRefs": [
+              "https://www.colts.com/news/colts-release-unofficial-depth-chart-for-week-8-at-jacksonville",
+              "https://www.colts.com/team/depth-chart",
+              "https://www.colts.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Adetomiwa Adebawore",
+          "Grover Stewart",
+          "Jerry Tillery",
+          "Tim Smith"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Buckner is no longer on the Colts roster. Adebawore is active and is the documented same-position reserve on both the pre-trade Week 8 chart and the current live chart. Stewart, Tillery and Smith remain in the separate nose-tackle chain, so their baseline duties are not reassigned."
       }
     }
-  ],
-  "retryContext": {
-    "failedWorkflowRunId": 40557650007,
-    "failedAction": "Start Graham personnel production workflow",
-    "reason": "The pending workflow was displaced by a newer run in the shared graham-personnel-production concurrency group before any job started.",
-    "retryAt": "2026-10-27T11:25:00-07:00"
-  }
+  ]
 }
