@@ -5,7 +5,7 @@
   "season": 2026,
   "week": 8,
   "sourceTask": "DAILY_REVIEW",
-  "effectiveAt": "2026-10-28T11:33:00-07:00",
+  "effectiveAt": "2026-10-28T11:39:00-07:00",
   "startedAt": "2026-10-28T11:25:48-07:00",
   "runEventId": "graham-daily-review-2026-w08-20261028T112548-0700",
   "marketViewed": false,
@@ -162,6 +162,100 @@
         "conclusion": "RESOLVED_MODEL_ESTIMATE",
         "finding": "Buckner is no longer on the Colts roster. Adebawore is active and is the documented same-position reserve on both the pre-trade Week 8 chart and the current live chart. Stewart, Tillery and Smith remain in the separate nose-tackle chain, so their baseline duties are not reassigned."
       }
+    },
+    {
+      "personnelEventId": "2026-W08-WAS-Terry-McLaurin-daily-20261028T113900-0700",
+      "caseKey": "2026-W08-WAS-Terry-McLaurin",
+      "gameKey": "2026-W08-PHI-WAS",
+      "team": "WAS",
+      "side": "HOME",
+      "player": "Terry McLaurin",
+      "playerEaId": "20435",
+      "availabilityStatus": "IR",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Washington placed Terry McLaurin on injured reserve with a season-ending patellar-tendon tear. Official team reporting says Stefon Diggs' workload should not increase, Antonio Williams will receive more targets, and Treylon Burks and Dyami Brown are better suited to McLaurin's vacated spot. Apply a labelled equal-share additional-duty estimate across those three active receivers using frozen values; this is not confirmed workload and does not use market evidence.",
+      "sourceRefs": [
+        "https://www.commanders.com/news/commanders-terry-mclaurin-injured-reserve-jer-zhan-newton",
+        "https://www.commanders.com/news/commanders-antonio-williams-bigger-role-terry-mclaurin-injury",
+        "https://www.commanders.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/was.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.commanders.com/news/commanders-terry-mclaurin-injured-reserve-jer-zhan-newton",
+        "https://www.commanders.com/team/players-roster/"
+      ],
+      "roleSourceRefs": [
+        "https://www.commanders.com/news/commanders-antonio-williams-bigger-role-terry-mclaurin-injury",
+        "https://www.commanders.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen when Washington publishes a Week 8 receiver depth chart, names a primary replacement, provides role-share evidence, or any committee member becomes unavailable.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "EQUAL_SHARE_COMMITTEE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Washington explicitly described a distributed response: Williams gains targets while Burks and Brown are better suited to McLaurin's vacated spot, and Diggs is not expected to take more work. With no supported shares, equal additional-duty weights are the narrow governed estimate.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "The three receivers retain their existing roles and absorb only portions of McLaurin's newly vacant role; no existing starter contribution is removed or reassigned.",
+        "baselineSourceIds": [
+          "https://www.commanders.com/news/commanders-antonio-williams-bigger-role-terry-mclaurin-injury",
+          "https://www.commanders.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Treylon Burks",
+            "eaPlayerId": "22069",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official team reporting identifies Burks as better suited to McLaurin's vacated spot.",
+            "sourceRefs": [
+              "https://www.commanders.com/news/commanders-antonio-williams-bigger-role-terry-mclaurin-injury",
+              "https://www.commanders.com/team/players-roster/"
+            ]
+          },
+          {
+            "player": "Dyami Brown",
+            "eaPlayerId": "21585",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official team reporting identifies Brown as better suited to McLaurin's vacated spot.",
+            "sourceRefs": [
+              "https://www.commanders.com/news/commanders-antonio-williams-bigger-role-terry-mclaurin-injury",
+              "https://www.commanders.com/team/players-roster/"
+            ]
+          },
+          {
+            "player": "Antonio Williams",
+            "eaPlayerId": "1885",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Official team reporting says Williams will receive more targets following McLaurin's injury.",
+            "sourceRefs": [
+              "https://www.commanders.com/news/commanders-antonio-williams-bigger-role-terry-mclaurin-injury",
+              "https://www.commanders.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Treylon Burks",
+          "Dyami Brown",
+          "Antonio Williams",
+          "Van Jefferson",
+          "Stefon Diggs"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "replacementClassification": "COMMITTEE",
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "McLaurin is on IR and the club describes a distributed replacement plan. Burks, Brown and Williams are the source-supported additional-duty committee; Diggs is explicitly excluded from increased workload, and newly promoted Van Jefferson remains a reopen trigger rather than receiving an unsupported share."
+      }
     }
   ],
   "retryContext": {
@@ -169,5 +263,10 @@
     "failedAction": "Start Graham personnel production workflow",
     "reason": "The workflow was cancelled before any job started; GitHub returned an empty jobs list and no newer Graham personnel production run was visible.",
     "retryAt": "2026-10-28T11:35:00-07:00"
+  },
+  "supersessionContext": {
+    "supersededPendingWorkflowRunId": 40746289253,
+    "reason": "Queued personnel publication had not started. New additive official evidence placed Terry McLaurin on IR and resolved a source-supported committee estimate, so the same unprocessed batch was expanded before execution.",
+    "supersededAt": "2026-10-28T11:39:00-07:00"
   }
 }
