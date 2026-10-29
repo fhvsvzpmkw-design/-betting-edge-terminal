@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-28T17:00:30-07:00",
+  "updatedAt": "2026-10-29T11:36:00-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -23,7 +23,8 @@
   "processedBatchIds": [
     "graham-tuesday-baseline-2026-w08-20261027T112100-0700-personnel-01",
     "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-retry-02",
-    "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-02"
+    "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-02",
+    "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01"
   ],
   "events": [
     {
@@ -1307,6 +1308,76 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Reopen if Green Bay names a different primary linebacker allocation, Ty'Ron Hopper becomes unavailable, or current reporting establishes a value-changing committee."
       }
+    },
+    {
+      "personnelEventId": "2026-W08-TEN-Jeffery-Simmons-trade-pending-20261029T113600-0700",
+      "caseKey": "2026-W08-TEN-Jeffery-Simmons",
+      "gameKey": "2026-W08-TEN-CIN",
+      "team": "TEN",
+      "side": "AWAY",
+      "player": "Jeffery Simmons",
+      "playerEaId": "20549",
+      "availabilityStatus": "UNRESOLVED",
+      "resolutionStatus": "FAIL_CLOSED",
+      "failClosedCode": "TRADE_PENDING_PHYSICAL_AND_WEEK_8_AVAILABILITY_NOT_OFFICIALLY_FINAL",
+      "reason": "Tennessee announced an agreed trade sending Jeffery Simmons to Chicago, expressly pending a physical. The club transaction pages had not yet posted a completed transaction at the review cutoff. Tennessee's current depth chart lists Solomon Thomas directly behind Simmons, but the acquisition is not final, John Franklin-Myers was a Wednesday non-participant, newly claimed Jonah Laulu is not yet on the current depth chart, and Nazir Stackhouse has no locked identity in the team shard. Record the material development and preserve TEN-CIN fail closed with no numeric move until the transaction and Week 8 role are official.",
+      "sourceRefs": [
+        "https://www.tennesseetitans.com/news/titans-trade-dt-jeffery-simmons-to-the-chicago-bears-in-exchange-for-two-first-round-picks",
+        "https://www.tennesseetitans.com/team/transactions/",
+        "https://www.chicagobears.com/team/transactions/",
+        "https://www.tennesseetitans.com/team/depth-chart",
+        "https://www.tennesseetitans.com/team/players-roster/",
+        "https://www.tennesseetitans.com/team/players-roster/solomon-thomas/",
+        "https://www.tennesseetitans.com/news/week-8-injury-report-titans-at-bengals",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/ten.json",
+        "data/walters/nfl/player-values/by-team-v1/lv.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.tennesseetitans.com/news/titans-trade-dt-jeffery-simmons-to-the-chicago-bears-in-exchange-for-two-first-round-picks",
+        "https://www.tennesseetitans.com/team/transactions/",
+        "https://www.chicagobears.com/team/transactions/"
+      ],
+      "roleSourceRefs": [
+        "https://www.tennesseetitans.com/team/depth-chart",
+        "https://www.tennesseetitans.com/team/players-roster/",
+        "https://www.tennesseetitans.com/team/players-roster/solomon-thomas/",
+        "https://www.tennesseetitans.com/news/week-8-injury-report-titans-at-bengals"
+      ],
+      "reopenOn": "Reopen immediately when both clubs post the completed transaction or the physical fails, then recheck Tennessee's official Week 8 depth/injury role and Chicago's official Week 8 activation before any production move.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Solomon Thomas",
+          "Jackie Marshall",
+          "John Franklin-Myers",
+          "Nazir Stackhouse",
+          "Jonah Laulu"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "The agreed trade is pending a physical and is absent from both official transaction logs at the review cutoff. Simmons is locked at 2.2 points; the direct reserve Thomas is 0.2, Marshall is 0, Franklin-Myers is 0.9 but had a separate starting role and missed Wednesday practice, Laulu is 0 in the frozen LV shard but was only claimed October 28, and Stackhouse has no exact team-shard binding. Do not guess the final availability or post-trade allocation."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
+      "effectiveAt": "2026-10-29T11:36:00-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "DT",
+      "maddenOvr": 95,
+      "healthyWaltersPoints": 2.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
     }
   ],
   "currentCases": {
@@ -2530,10 +2601,80 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Reopen if Green Bay names a different primary linebacker allocation, Ty'Ron Hopper becomes unavailable, or current reporting establishes a value-changing committee."
       }
+    },
+    "2026-W08-TEN-Jeffery-Simmons": {
+      "personnelEventId": "2026-W08-TEN-Jeffery-Simmons-trade-pending-20261029T113600-0700",
+      "caseKey": "2026-W08-TEN-Jeffery-Simmons",
+      "gameKey": "2026-W08-TEN-CIN",
+      "team": "TEN",
+      "side": "AWAY",
+      "player": "Jeffery Simmons",
+      "playerEaId": "20549",
+      "availabilityStatus": "UNRESOLVED",
+      "resolutionStatus": "FAIL_CLOSED",
+      "failClosedCode": "TRADE_PENDING_PHYSICAL_AND_WEEK_8_AVAILABILITY_NOT_OFFICIALLY_FINAL",
+      "reason": "Tennessee announced an agreed trade sending Jeffery Simmons to Chicago, expressly pending a physical. The club transaction pages had not yet posted a completed transaction at the review cutoff. Tennessee's current depth chart lists Solomon Thomas directly behind Simmons, but the acquisition is not final, John Franklin-Myers was a Wednesday non-participant, newly claimed Jonah Laulu is not yet on the current depth chart, and Nazir Stackhouse has no locked identity in the team shard. Record the material development and preserve TEN-CIN fail closed with no numeric move until the transaction and Week 8 role are official.",
+      "sourceRefs": [
+        "https://www.tennesseetitans.com/news/titans-trade-dt-jeffery-simmons-to-the-chicago-bears-in-exchange-for-two-first-round-picks",
+        "https://www.tennesseetitans.com/team/transactions/",
+        "https://www.chicagobears.com/team/transactions/",
+        "https://www.tennesseetitans.com/team/depth-chart",
+        "https://www.tennesseetitans.com/team/players-roster/",
+        "https://www.tennesseetitans.com/team/players-roster/solomon-thomas/",
+        "https://www.tennesseetitans.com/news/week-8-injury-report-titans-at-bengals",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "data/walters/nfl/player-values/by-team-v1/ten.json",
+        "data/walters/nfl/player-values/by-team-v1/lv.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.tennesseetitans.com/news/titans-trade-dt-jeffery-simmons-to-the-chicago-bears-in-exchange-for-two-first-round-picks",
+        "https://www.tennesseetitans.com/team/transactions/",
+        "https://www.chicagobears.com/team/transactions/"
+      ],
+      "roleSourceRefs": [
+        "https://www.tennesseetitans.com/team/depth-chart",
+        "https://www.tennesseetitans.com/team/players-roster/",
+        "https://www.tennesseetitans.com/team/players-roster/solomon-thomas/",
+        "https://www.tennesseetitans.com/news/week-8-injury-report-titans-at-bengals"
+      ],
+      "reopenOn": "Reopen immediately when both clubs post the completed transaction or the physical fails, then recheck Tennessee's official Week 8 depth/injury role and Chicago's official Week 8 activation before any production move.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Solomon Thomas",
+          "Jackie Marshall",
+          "John Franklin-Myers",
+          "Nazir Stackhouse",
+          "Jonah Laulu"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "The agreed trade is pending a physical and is absent from both official transaction logs at the review cutoff. Simmons is locked at 2.2 points; the direct reserve Thomas is 0.2, Marshall is 0, Franklin-Myers is 0.9 but had a separate starting role and missed Wednesday practice, Laulu is 0 in the frozen LV shard but was only claimed October 28, and Stackhouse has no exact team-shard binding. Do not guess the final availability or post-trade allocation."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
+      "effectiveAt": "2026-10-29T11:36:00-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "DT",
+      "maddenOvr": 95,
+      "healthyWaltersPoints": 2.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
     }
   },
-  "lastBatchId": "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-02",
-  "lastBatchSourceTask": "DELTA_1645",
+  "lastBatchId": "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
+  "lastBatchSourceTask": "DAILY_REVIEW",
   "processedMatchupBatchIds": [
     "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01"
   ],
