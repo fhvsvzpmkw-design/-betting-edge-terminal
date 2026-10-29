@@ -72,3 +72,7 @@ Keep all three VigScope meters active through the existing evidence-derived prod
 - F3 and Eddie Numbers use the sanitized public ledger under [PUBLIC_LEDGER_OPERATIONS.md](PUBLIC_LEDGER_OPERATIONS.md), never the raw private ledger as a public runtime source.
 
 Do not enable intentionally disabled tasks or change any recurring time during error cleanup. Record a substantive repair and its exact verification in the existing [progress entry](PROJECT_STATE.md) and [decision log](DECISIONS.md). Keep deployment and live acceptance distinct; preserve the next unresolved action.
+
+## OddsPapi monthly pacing — October 28
+
+The [approved request budget](ODDSPAPI_BUDGET.md) is in the existing collector before November 1. Preserve seven charged attempts per Vancouver day, five monthly reserve calls, full catalogue/error accounting, NHL/NBA first-batch priority, actual-preseason selection, and the separate definitions cache. Monthly allocation follows the provider account; the routine ceiling is 210 for November or 217 for a 31-day month. Read the saved usage line and explicit deferred competitions. Main reports and FanDuel/DraftKings continue at their existing times. Do not retry a budget deferral or reuse stale Pinnacle prices as fresh.

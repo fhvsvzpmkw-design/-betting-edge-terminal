@@ -8,6 +8,14 @@ on:
       - tools/pinnacle-sharp-benchmark.mjs
       - tools/pinnacle-benchmark-publication-gate.mjs
       - tools/oddspapi-observer.mjs
+      - tests/odds-snapshot-publication.test.mjs
+      - tests/oddspapi-usage-summary.test.mjs
+      - tests/oddspapi-streamlining.test.mjs
+      - tests/oddspapi-budget.test.mjs
+      - tools/report-inputs.mjs
+      - tools/publish-odds-snapshot.mjs
+      - tools/oddspapi-usage-summary.mjs
+      - tools/oddspapi-budget.mjs
       - tools/primary-sport-identity.mjs
       - tools/build-graham-current-week.mjs
       - syndicates/generated/graham-mercer/hotline.html
@@ -31,6 +39,14 @@ on:
       - tools/pinnacle-sharp-benchmark.mjs
       - tools/pinnacle-benchmark-publication-gate.mjs
       - tools/oddspapi-observer.mjs
+      - tests/odds-snapshot-publication.test.mjs
+      - tests/oddspapi-usage-summary.test.mjs
+      - tests/oddspapi-streamlining.test.mjs
+      - tests/oddspapi-budget.test.mjs
+      - tools/report-inputs.mjs
+      - tools/publish-odds-snapshot.mjs
+      - tools/oddspapi-usage-summary.mjs
+      - tools/oddspapi-budget.mjs
       - tools/primary-sport-identity.mjs
       - tools/build-graham-current-week.mjs
       - syndicates/generated/graham-mercer/hotline.html
@@ -69,12 +85,19 @@ jobs:
           node --check tools/pinnacle-sharp-benchmark.mjs
           node --check tools/pinnacle-benchmark-publication-gate.mjs
           node --check tools/oddspapi-observer.mjs
+          node --check tools/oddspapi-budget.mjs
+          node --check tools/publish-odds-snapshot.mjs
+          node --check tools/oddspapi-usage-summary.mjs
       - name: Benchmark math and authority tests
         run: |
           node tools/pinnacle-sharp-benchmark.mjs self-test
           node tools/pinnacle-benchmark-publication-gate.mjs self-test
           node tests/oddspapi-retention-horizons.test.mjs
           node tests/oddspapi-quota-reserve.test.mjs
+          node tests/oddspapi-budget.test.mjs
+          node tests/oddspapi-streamlining.test.mjs
+          node tests/oddspapi-usage-summary.test.mjs
+          node tests/odds-snapshot-publication.test.mjs
           node tests/pinnacle-observation-freshness.test.mjs
           node tests/pinnacle-total-retention.test.mjs
           node tests/pinnacle-exact-total-assessment.test.mjs

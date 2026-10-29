@@ -104,6 +104,7 @@ jobs:
           node --check /tmp/betting-edge-odds-worker.js
 
       - name: Pull quota-balanced FanDuel + DraftKings odds
+        id: primary
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
@@ -114,17 +115,21 @@ jobs:
         run: node /tmp/betting-edge-odds-worker.js
 
       - name: Refresh official Pinnacle sharp benchmark
+        id: benchmark
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
           ODDSPAPI_API_KEY: ${{ secrets.ODDSPAPI_API_KEY }}
+          ODDSPAPI_CANONICAL_SLOT: ${{ steps.schedule.outputs.canonical_slot }}
         run: |
           node --check tools/pinnacle-sharp-benchmark.mjs
           node --check tools/oddspapi-observer.mjs
+          node --check tools/oddspapi-budget.mjs
           node tools/pinnacle-sharp-benchmark.mjs self-test
           node tools/oddspapi-observer.mjs
           node tools/pinnacle-sharp-benchmark.mjs validate-observer data/oddspapi-observer.json
 
       - name: Attach schedule provenance
+        id: provenance
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
           OPERATING_DATE: ${{ steps.schedule.outputs.operating_date }}
@@ -164,58 +169,10 @@ jobs:
           NODE
 
       - name: Publish snapshot
-        if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
-        run: |
-          set -euo pipefail
-          git config user.name "betting-edge-bot"
-          git config user.email "actions@users.noreply.github.com"
-
-          # Preserve the exact snapshots that already passed their worker stages.
-          # A push collision must never cause another odds API pull.
-          candidate="$(mktemp)"
-          cp data/live-odds.json "$candidate"
-          candidate_epoch="$(node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); const t=Date.parse(d.generatedAt||""); if(!Number.isFinite(t)) process.exit(2); process.stdout.write(String(t));' "$candidate")"
-
-          observer_candidate="$(mktemp)"
-          have_observer=false
-          if [ -f data/oddspapi-observer.json ]; then
-            cp data/oddspapi-observer.json "$observer_candidate"
-            have_observer=true
-          fi
-
-          for attempt in 1 2 3 4; do
-            git fetch origin main
-            remote_epoch="$(git show origin/main:data/live-odds.json 2>/dev/null | node -e 'let s=""; process.stdin.on("data",d=>s+=d); process.stdin.on("end",()=>{try{const j=JSON.parse(s); const t=Date.parse(j.generatedAt||""); process.stdout.write(Number.isFinite(t)?String(t):"0")}catch{process.stdout.write("0")}})')"
-            if [ "${remote_epoch:-0}" -ge "$candidate_epoch" ]; then
-              echo "Remote live odds are already equal/newer; no publish needed."
-              exit 0
-            fi
-            git reset --hard origin/main
-            cp "$candidate" data/live-odds.json
-            if [ "$have_observer" = true ]; then
-              cp "$observer_candidate" data/oddspapi-observer.json
-            fi
-            node tools/odds-slot-state.mjs record
-            git add -- data/live-odds.json
-            if [ -d data/odds-pull-receipts ]; then
-              git add -- data/odds-pull-receipts
-            fi
-            if [ "$have_observer" = true ]; then
-              git add -- data/oddspapi-observer.json
-            fi
-            if git diff --cached --quiet; then
-              echo "No validated odds changes to publish."
-              exit 0
-            fi
-            git commit -m "Refresh Betting Edge live odds"
-            if git push origin HEAD:main; then
-              echo "Validated Main Betting Edge odds snapshot published on attempt $attempt."
-              exit 0
-            fi
-            echo "Publish collision on attempt $attempt; retrying the same validated snapshots."
-          done
-          echo "Validated odds snapshot could not be published after 4 attempts." >&2
-          exit 1
+        if: always() && steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
+        env:
+          ODDS_SNAPSHOTS_VALIDATED: ${{ steps.primary.outcome == 'success' && steps.benchmark.outcome == 'success' && steps.provenance.outcome == 'success' }}
+        run: node tools/publish-odds-snapshot.mjs
 
       - name: Schedule summary
         if: always()
@@ -244,7 +201,8 @@ jobs:
             echo "- Featured Vig Scope: \`${{ steps.schedule.outputs.featured_vig_scope }}\`"
             echo "- Gate: \`${{ steps.gate.outputs.reason || 'not-due' }}\`"
             echo "- Crypto fight watch: exact-pair priority inside 30 hours"
-            echo "- Pinnacle: official non-executable sharp benchmark via OddsPapi; 5-request reserve protected"
+            echo "- Pinnacle: official non-executable sharp benchmark via OddsPapi; 7 charged requests/day, 5-request monthly reserve"
+            node tools/oddspapi-usage-summary.mjs
             echo "- Five-pull daily cap: unchanged"
             echo "- Automatic entry: scheduled report-task request; legacy scheduler dispatches rejected"
           } >> "$GITHUB_STEP_SUMMARY"

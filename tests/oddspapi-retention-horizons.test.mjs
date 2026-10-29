@@ -1,29 +1,28 @@
 #!/usr/bin/env node
+import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {ODDS_REQUEST_SPACING_MS,planTournamentBatches} from '../tools/oddspapi-observer.mjs';
+import {ODDS_REQUEST_SPACING_MS,planTournamentBatches,selectRelevantTournaments} from '../tools/oddspapi-observer.mjs';
 
-const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 const observer=fs.readFileSync('tools/oddspapi-observer.mjs','utf8');
 const primary=fs.readFileSync('tools/odds-refresh-worker-source.yml','utf8');
-
-assert(observer.includes("RETENTION_HORIZONS_HOURS={default:30,NFL:384,NFL_PRESEASON:192,BOXING:30}"),'OddsPapi retention horizons must keep regular-season NFL at 384h, preseason at 192h, and Boxing/default at 30h');
-assert(observer.includes("ALWAYS_OBSERVE=new Set(['NFL','NFL_PRESEASON'])"),'NFL regular season and preseason must be observed even when outside the primary 30h snapshot');
-assert(observer.includes("const selected=TOURNAMENTS.filter(t=>ALWAYS_OBSERVE.has(t.key)||active.has(t.key)"),'OddsPapi tournament selection must include always-observed NFL categories');
-assert(observer.includes("const retentionHorizonHours=fixtureHorizonHours(f)"),'fixture-specific retention horizon must be applied after the batched OddsPapi responses');
-assert(observer.includes("retentionHorizonHours,primaryMatch:match,pinnacle"),'each retained fixture must expose its applied horizon for auditability');
-assert(observer.includes("bookmaker:'pinnacle'"),'OddsPapi observer must remain Pinnacle-specific');
-assert(observer.includes('const RESERVE=5;'),'5-request OddsPapi reserve must remain protected');
-
+assert.ok(observer.includes('RETENTION_HORIZONS_HOURS={default:30,NFL:384,NFL_PRESEASON:192,BOXING:30}'),'regular-season NFL384h, actual preseason192h and default/boxing30h remain');
+const now=Date.parse('2026-11-01T14:00:00Z');
+const empty=selectRelevantTournaments({events:[]},now);
+assert.deepEqual(empty.selected.map(t=>t.key),['NFL'],'Graham regular-season runway remains, preseason is no longer unconditional');
+const preseason=selectRelevantTournaments({quoteObservationVersion:1,generatedAt:new Date(now).toISOString(),bookmakers:['DraftKings'],events:[{
+  id:'preseason',date:new Date(now+3600000).toISOString(),sport:{slug:'american-football'},league:{name:'NFL Preseason'},bookmakers:{DraftKings:[{name:'ML',observedAt:new Date(now).toISOString(),odds:[{home:2,away:1.9}]}]}
+}]},now);
+assert.ok(preseason.selected.some(t=>t.key==='NFL_PRESEASON'),'real upcoming priced preseason still receives its own tournament');
+assert.ok(observer.includes('retentionHorizonHours=fixtureHorizonHours(f)'),'fixture-specific retention applies after collection');
+assert.ok(observer.includes('retentionHorizonHours,primaryMatch:match,pinnacle'),'retained fixtures expose their actual horizon');
+assert.ok(observer.includes("bookmaker:'pinnacle'"),'observer stays Pinnacle-specific');
+assert.ok(observer.includes('const RESERVE=5;'),'five-request reserve retained');
 const selected=Array.from({length:6},(_,i)=>({key:`TEST_${i+1}`,id:i+1}));
 const batches=planTournamentBatches(selected);
-assert(batches.length===2,'six selected tournaments must be split into two OddsPapi calls');
-assert(batches.every(batch=>batch.length<=5),'OddsPapi requests must never contain more than five tournament IDs');
-assert(batches.flat().map(t=>t.id).join(',')==='1,2,3,4,5,6','tournament batching must preserve all selected IDs and their order');
-assert(ODDS_REQUEST_SPACING_MS>=750,'batched OddsPapi calls must be spaced beyond the observed 524ms endpoint throttle');
-assert(observer.includes('if(index>0)await pause(ODDS_REQUEST_SPACING_MS)'),'the observer must apply governed pacing between tournament batches');
-assert(observer.includes('estimatedRemainingAfter=remaining===null?null:remaining-batches.length'),'quota projection must account for every planned odds request');
-assert(observer.includes('observation.diagnostics.billableRequestsThisRun++'),'observer diagnostics must count every attempted odds request');
-
-assert(primary.includes('const HORIZON_HOURS = 30;'),'primary Betting Edge odds worker must retain its 30-hour event horizon');
-
-console.log('ODDSPAPI RETENTION HORIZONS: PASS // NFL 384h // BOXING 30h // MAX 5 IDS // BATCHES PACED');
+assert.equal(batches.length,2);assert.ok(batches.every(batch=>batch.length<=5));
+assert.deepEqual(batches.flat().map(t=>t.id),[1,2,3,4,5,6],'batching preserves selected order');
+assert.ok(ODDS_REQUEST_SPACING_MS>=750,'spacing remains beyond the observed524ms throttle');
+assert.ok(observer.includes('if(index>0)await pause(ODDS_REQUEST_SPACING_MS)'),'batch pacing retained');
+assert.ok(observer.includes('recordBudgetSpend')&&observer.includes('metadataRequests:'),'shared budget includes both odds and metadata');
+assert.ok(primary.includes('const HORIZON_HOURS = 30;'),'primary worker horizon remains30h');
+console.log('ODDSPAPI RETENTION: NFL384h, actual preseason192h, no automatic preseason, five-ID batches and pacing PASS');

@@ -32,7 +32,10 @@ export function buildPinnacleInputCoverage(report, inventory, observer, {eventId
   return {mode:'ACQUISITION_DIAGNOSTIC',decisionAuthority:false,observerStatus:observer.status || 'UNAVAILABLE',generatedAt:observer.generatedAt || null,
     availableSelections:inventory.selections.length,withExactReference,withoutExactReference:inventory.selections.length-withExactReference,
     sports,activePrimaryCategories:observer.diagnostics?.activePrimaryCategories || [],skippedCategories:observer.diagnostics?.skippedCategories || [],
-    collectionErrors:observer.diagnostics?.errors || [],...(eventId !== null ? {selections} : {}),
+    collectionErrors:observer.diagnostics?.errors || [],
+    acquisitionComplete:observer.acquisitionComplete ?? null,coverageStatus:observer.coverageStatus || null,
+    deferredTournaments:observer.diagnostics?.deferredTournaments || [],budget:observer.budget || null,
+    ...(eventId !== null ? {selections} : {}),
     instruction:'Inspect missing/stale exact references and collection errors before research. Recheck the scheduled snapshot binding; use the existing forecast alternative where needed. This diagnostic creates no PASS, LEAN, BET or publication clearance.'};
 }
 

@@ -7,6 +7,7 @@ import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {AUTHORITY,QUALIFIED,qualifyMarket,annotatePinnacle,validateObserver} from '../tools/pinnacle-sharp-benchmark.mjs';
 import {summarizePinnacle,categoryKey} from '../tools/oddspapi-observer.mjs';
+import {reconcileBudgetState} from '../tools/oddspapi-budget.mjs';
 import {exactMarketReference,validateBoundMarketAssessment} from '../tools/market-price-assessment.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -91,13 +92,16 @@ try{
   `);
   const categories=[['NBA',132],['NFL',31],['NFL_PRESEASON',233],['CFL',790],['NCAAF',27653],['BOXING',24327],['MLB',109],['WNBA',486]];
   const sports={NBA:'basketball',NFL:'american-football',NFL_PRESEASON:'american-football',CFL:'american-football',NCAAF:'american-football',BOXING:'boxing',MLB:'baseball',WNBA:'basketball'};
-  const primary={events:categories.map(([key,id])=>({id:String(id),home:'Home '+id,away:'Away '+id,date:'2026-09-08T23:10:00Z',sport:{slug:sports[key]},league:{name:key==='NFL_PRESEASON'?'NFL':key}}))};
-  primary.events.forEach((event,i)=>assert.equal(categoryKey(event),categories[i][0]==='NFL_PRESEASON'?'NFL':categories[i][0],'freshness fixtures must use real provider sport/league identities'));
+  const primary={quoteObservationVersion:1,generatedAt:generated,bookmakers:['FanDuel','DraftKings'],events:categories.map(([key,id])=>({id:String(id),home:'Home '+id,away:'Away '+id,date:'2026-09-08T23:10:00Z',sport:{slug:sports[key]},league:{name:key==='NFL_PRESEASON'?'NFL Preseason':key},bookmakers:{DraftKings:[{name:'ML',observedAt:generated,odds:[{home:2,away:1.92}]}]}}))};
+  primary.events.forEach((event,i)=>assert.equal(categoryKey(event),categories[i][0],'freshness fixtures must use real provider sport/league identities'));
   fs.mkdirSync(path.join(temp,'data'));fs.writeFileSync(path.join(temp,'data/live-odds.json'),JSON.stringify(primary));
   let collected;
   for(const scenario of ['success','failed','malformed','shape','mismatch','missing-side','suspended','empty-book','replacement','empty']){
     fs.writeFileSync(path.join(temp,'data/oddspapi-observer.json'),JSON.stringify({status:'ok',fixtures:[{fixtureId:'old-cache'}]}));
-    execFileSync(process.execPath,['--import',hook,path.join(root,'tools/oddspapi-observer.mjs')],{cwd:temp,env:{...process.env,ODDSPAPI_API_KEY:'TEST-NOT-A-REAL-KEY',PINNACLE_TEST_SCENARIO:scenario},stdio:'pipe'});
+    const knownBudget=reconcileBudgetState({requestLimit:1000,requestCount:0,now:generated,subscriptionId:'1'});
+    knownBudget.providerObservedCount=10;knownBudget.estimatedRequestCount=10;
+    fs.writeFileSync(path.join(temp,'data/oddspapi-budget-state.json'),JSON.stringify(knownBudget));
+    execFileSync(process.execPath,['--import',hook,path.join(root,'tools/oddspapi-observer.mjs')],{cwd:temp,env:{...process.env,ODDSPAPI_API_KEY:'TEST-NOT-A-REAL-KEY',PINNACLE_TEST_SCENARIO:scenario,ODDSPAPI_CANONICAL_SLOT:'3'},stdio:'pipe'});
     const o=JSON.parse(fs.readFileSync(path.join(temp,'data/oddspapi-observer.json')));
     assert.ok(!o.fixtures.some(f=>f.fixtureId==='old-cache'),'saved snapshots are never relabeled as observed');
     if(['failed','malformed','shape','mismatch'].includes(scenario)){assert.equal(o.status,'odds-error');assert.equal(o.fixtures.length,0);continue;}

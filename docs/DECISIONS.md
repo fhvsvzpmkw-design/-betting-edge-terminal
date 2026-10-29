@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-10-27 — production configuration alignment
+**Last updated:** 2026-10-28 — OddsPapi monthly pacing
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -34,11 +34,11 @@ The odds refresh, runner UI/repricing, research library, history/provenance laye
 
 **Reason:** A failure in one layer should not force changes in unrelated layers. Modularity makes diagnosis and rollback safer.
 
-## D-004 — Bet365 and DraftKings are the primary live pricing books
+## D-004 — FanDuel and DraftKings are the primary live pricing books
 
-**Status:** Active
+**Status:** Active; Bet365 replaced with FanDuel by user approval October 28, 2026.
 
-The odds-refresh workflow currently requests Bet365 and DraftKings.
+The odds-refresh workflow currently requests FanDuel and DraftKings. Historical Bet365 observations retain their identity.
 
 **Reason:** They provide a practical two-book validation/repricing base within the existing no-paid-subscription approach.
 
@@ -406,3 +406,13 @@ Update the existing Game Day regression workflow so changes to the actual odds e
 The five Main task prompts resolve the same current shared authority; remove the Final task's duplicated historical producer/gate instructions while preserving its exact activation and schedule. Preserve all other active and intentionally disabled tasks, all staking rules, independent Graham formula/ratings and the single checkpoint/staged-publisher/readback process. No plan purchase, execution-book expansion, new model, recurring monitor or numerical pick quota is authorized by this repair.
 
 **Reason:** A repair must enforce the user's established behavior in code and actual deployment, and verify cross-component configuration instead of treating a green workflow as proof of analysis or system-wide correctness.
+
+## D-040 — Fit OddsPapi spending to the monthly free allowance
+
+**Status:** Active; approved October 28, 2026 for deployment before November 1.
+
+The original one-call-per-report estimate became two batches and exceeded the sustainable monthly rate. Keep all five Main report times and the existing collector. Apply [ODDSPAPI_BUDGET.md](ODDSPAPI_BUDGET.md): seven total charged routine attempts per Vancouver day, at most two extra tournament batches, provider-confirmed monthly accounting and a five-request reserve. Count errors and catalogue refreshes, preserve definitions separately from live observations, remove unsupported/inactive competition requests and automatic NFL preseason, and put NHL/NBA in the first batch. Preserve regular NFL Graham runway and all exact benchmark gates.
+
+Optional competitions may have fewer fresh Pinnacle observations on busy boards; expose each deferral and exact missing reference. These limits never authorize stale-price reuse or a duplicate pull. Persist accounting after failed validation and publication collisions without repeating API calls. Existing tasks and report times remain unchanged.
+
+**Verification:** pure 31-day/reset tests, real collector fake-transport tests and local Git collision tests. Actual provider reset acceptance belongs to the first normal November pull; it is not claimed from an offline simulation.
