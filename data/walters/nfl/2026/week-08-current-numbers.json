@@ -96,8 +96,8 @@
   "week": 8,
   "state": "PROVISIONAL_BASELINE_PENDING",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-29T11:36:00-07:00",
-  "lastResearchAt": "2026-10-29T11:36:00-07:00",
+  "updatedAt": "2026-10-29T16:53:30-07:00",
+  "lastResearchAt": "2026-10-29T16:53:30-07:00",
   "researchLedgerPath": "data/walters/nfl/2026/week-08-research-ledger.json",
   "powerRatingLedgerPath": "data/walters/nfl-power-ratings-ledger.json",
   "marketComparisonLedgerPath": "data/walters/nfl/2026/week-08-daily-market-ledger.json",
@@ -148,7 +148,7 @@
       "status": "SCHEDULED",
       "grahamFairHome": -7,
       "grahamExactFairHome": -6.894,
-      "grahamAsOf": "2026-10-28T17:00:30-07:00",
+      "grahamAsOf": "2026-10-29T16:53:30-07:00",
       "numberStatus": "PROVISIONAL_BASELINE_PENDING",
       "informationStatus": "PERSONNEL_PRODUCTION_REVIEWED",
       "neutralBaseHome": -2.55180411,
@@ -182,6 +182,33 @@
             "data/walters/nfl/home-field/home-field-production-current.json",
             "data/walters/nfl/home-field/h4-current.json"
           ],
+          "marketViewed": false
+        },
+        {
+          "type": "QB_PERFORMANCE_PRODUCTION",
+          "productionId": "walters-qb-performance-production-v1",
+          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
+          "awayTeam": "CAR",
+          "homeTeam": "GB",
+          "awayStarter": "Bryce Young",
+          "homeStarter": "Jordan Love",
+          "awayTeamQbDelta": 0,
+          "homeTeamQbDelta": 0.16,
+          "pointsToHomeSpread": -0.16,
+          "reason": "Governed Walters QB differential: CAR 0.00 minus GB 0.16 equals -0.16 points to the home-spread coordinate.",
+          "valuationMethods": {
+            "away": "STAGE3_PERFORMANCE_CANDIDATE",
+            "home": "STAGE3_PERFORMANCE_CANDIDATE"
+          },
+          "sourceRefs": [
+            "data/walters/nfl/qb-production/production-contract-v1.json",
+            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
+            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
+            "data/walters/nfl/2026/week-01-research-ledger.json",
+            "core/staging/walters-nfl-seed-dataset-2026.json",
+            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
+          ],
+          "effectiveAt": "2026-10-27T11:22:00-07:00",
           "marketViewed": false
         },
         {
@@ -304,33 +331,6 @@
             "data/walters/nfl/player-values/player-values-access-v1.json",
             "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
           ]
-        },
-        {
-          "type": "QB_PERFORMANCE_PRODUCTION",
-          "productionId": "walters-qb-performance-production-v1",
-          "authorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
-          "awayTeam": "CAR",
-          "homeTeam": "GB",
-          "awayStarter": "Bryce Young",
-          "homeStarter": "Jordan Love",
-          "awayTeamQbDelta": 0,
-          "homeTeamQbDelta": 0.16,
-          "pointsToHomeSpread": -0.16,
-          "reason": "Governed Walters QB differential: CAR 0.00 minus GB 0.16 equals -0.16 points to the home-spread coordinate.",
-          "valuationMethods": {
-            "away": "STAGE3_PERFORMANCE_CANDIDATE",
-            "home": "STAGE3_PERFORMANCE_CANDIDATE"
-          },
-          "sourceRefs": [
-            "data/walters/nfl/qb-production/production-contract-v1.json",
-            "data/walters/nfl/qb-performance/model/stage3c-model-v1.json",
-            "data/walters/nfl/qb-performance/stage4/starter-baseline-bindings-v1.json",
-            "data/walters/nfl/2026/week-01-research-ledger.json",
-            "core/staging/walters-nfl-seed-dataset-2026.json",
-            "research/season-previews/private/2026-vsin-nfl-source2-postpreseason2.json"
-          ],
-          "effectiveAt": "2026-10-27T11:22:00-07:00",
-          "marketViewed": false
         }
       ],
       "sourceRefs": [
@@ -358,11 +358,19 @@
         "https://www.packers.com/news/unexpected-debut-was-meaningful-to-john-williams-oct-28-2026",
         "https://www.packers.com/team/depth-chart",
         "https://www.packers.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/gb.json"
+        "data/walters/nfl/player-values/by-team-v1/gb.json",
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers"
       ],
       "personnelBaselineExactFairHome": -4.794,
       "personnelOverlayPointsToHomeSpread": -2.1,
-      "personnelUnresolvedCases": [],
+      "personnelUnresolvedCases": [
+        {
+          "caseKey": "2026-W08-CAR-Bobby-Brown-III",
+          "player": "Bobby Brown III",
+          "failClosedCode": "REPLACEMENT_VALUE_OR_OFFICIAL_CAPTURE_UNRESOLVED",
+          "resolutionStatus": "FAIL_CLOSED"
+        }
+      ],
       "personnelBlockedGroups": [],
       "matchupOverlayPointsToHomeSpread": 0,
       "homeFieldNonLocationExactFairHome": -2.55180411,
@@ -388,7 +396,7 @@
         "arithmeticVerified": true
       },
       "researchSummary": "Governed fair decomposition: neutral/team base -2.552; home field -2.082; other governed -0.160; pre-personnel exact -4.794; personnel -2.100; matchup +0.000; exact Graham home fair -6.894; displayed -7.0.",
-      "priorGrahamFairHome": -5.5,
+      "priorGrahamFairHome": -7,
       "qbPerformanceProductionId": "walters-qb-performance-production-v1",
       "qbPerformanceAuthorityToken": "APPROVED_WALTERS_QB_PERFORMANCE",
       "qbPerformanceBaseExactFairHome": -6.734,
@@ -400,7 +408,7 @@
       "qbPriorEstimateTeams": [],
       "qbPriorEstimates": [],
       "personnelProductionId": "walters-personnel-production-v1",
-      "personnelLastAppliedAt": "2026-10-28T17:00:30-07:00",
+      "personnelLastAppliedAt": "2026-10-29T16:53:30-07:00",
       "personnelNonmaterialAvailabilityCases": [],
       "personnelEstimateCases": [
         {
@@ -2592,8 +2600,8 @@
     "state": "OPERATIONAL",
     "productionId": "walters-personnel-production-v1",
     "calibrationId": "walters-nfl-personnel-calibration-v1",
-    "lastBatchId": "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
-    "lastAppliedAt": "2026-10-29T11:36:00-07:00",
+    "lastBatchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
+    "lastAppliedAt": "2026-10-29T16:53:30-07:00",
     "marketViewed": false
   },
   "matchupExpansionProduction": {

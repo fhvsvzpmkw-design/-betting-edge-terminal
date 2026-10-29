@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-29T11:36:00-07:00",
+  "updatedAt": "2026-10-29T16:53:30-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -24,7 +24,8 @@
     "graham-tuesday-baseline-2026-w08-20261027T112100-0700-personnel-01",
     "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-retry-02",
     "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-02",
-    "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01"
+    "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
+    "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01"
   ],
   "events": [
     {
@@ -1378,6 +1379,66 @@
       "healthyWaltersPoints": 2.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_LINE"
+    },
+    {
+      "personnelEventId": "2026-W08-CAR-Bobby-Brown-III-inactive-20261029T165330-0700",
+      "caseKey": "2026-W08-CAR-Bobby-Brown-III",
+      "gameKey": "2026-W08-CAR-GB",
+      "team": "CAR",
+      "side": "AWAY",
+      "player": "Bobby Brown III",
+      "playerEaId": "21922",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "FAIL_CLOSED",
+      "failClosedCode": "REPLACEMENT_VALUE_OR_OFFICIAL_CAPTURE_UNRESOLVED",
+      "reason": "Carolina's official inactive list ruled starting DT Bobby Brown III out after he had been questionable. The current official depth chart lists TeRah Edwards directly behind Brown and the active roster confirms Edwards, but Edwards is absent from the locked Carolina player-value shard and no exact governed official EA supplement is bound. Brown's frozen healthy value is 0.2 points. Preserve CAR-GB fail closed with no numeric move rather than assign a missing replacement value to zero; also retain the existing defensive-line cluster guard.",
+      "sourceRefs": [
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers",
+        "https://www.panthers.com/team/depth-chart",
+        "https://www.panthers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/car.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers"
+      ],
+      "roleSourceRefs": [
+        "https://www.panthers.com/team/depth-chart",
+        "https://www.panthers.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen when TeRah Edwards receives an exact immutable governed player-value binding or another current official source establishes a distinct available replacement with a locked value; then re-run the defensive-line cluster and double-count review.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "TeRah Edwards",
+          "Tershawn Wharton",
+          "Lee Hunter",
+          "Aaron Hall"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Brown is officially inactive and locked at 0.2 points. TeRah Edwards is the direct listed reserve and active, but has no locked Carolina-shard value; Wharton and Hunter already occupy a separate baseline DL chain, while Aaron Hall has no exact locked binding. Do not manufacture replacement value, workload or cluster arithmetic."
+      },
+      "batchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
+      "effectiveAt": "2026-10-29T16:53:30-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "DT",
+      "maddenOvr": 74,
+      "healthyWaltersPoints": 0.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
     }
   ],
   "currentCases": {
@@ -2671,10 +2732,70 @@
       "healthyWaltersPoints": 2.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_LINE"
+    },
+    "2026-W08-CAR-Bobby-Brown-III": {
+      "personnelEventId": "2026-W08-CAR-Bobby-Brown-III-inactive-20261029T165330-0700",
+      "caseKey": "2026-W08-CAR-Bobby-Brown-III",
+      "gameKey": "2026-W08-CAR-GB",
+      "team": "CAR",
+      "side": "AWAY",
+      "player": "Bobby Brown III",
+      "playerEaId": "21922",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "FAIL_CLOSED",
+      "failClosedCode": "REPLACEMENT_VALUE_OR_OFFICIAL_CAPTURE_UNRESOLVED",
+      "reason": "Carolina's official inactive list ruled starting DT Bobby Brown III out after he had been questionable. The current official depth chart lists TeRah Edwards directly behind Brown and the active roster confirms Edwards, but Edwards is absent from the locked Carolina player-value shard and no exact governed official EA supplement is bound. Brown's frozen healthy value is 0.2 points. Preserve CAR-GB fail closed with no numeric move rather than assign a missing replacement value to zero; also retain the existing defensive-line cluster guard.",
+      "sourceRefs": [
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers",
+        "https://www.panthers.com/team/depth-chart",
+        "https://www.panthers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/car.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers"
+      ],
+      "roleSourceRefs": [
+        "https://www.panthers.com/team/depth-chart",
+        "https://www.panthers.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen when TeRah Edwards receives an exact immutable governed player-value binding or another current official source establishes a distinct available replacement with a locked value; then re-run the defensive-line cluster and double-count review.",
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "TeRah Edwards",
+          "Tershawn Wharton",
+          "Lee Hunter",
+          "Aaron Hall"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
+        "finding": "Brown is officially inactive and locked at 0.2 points. TeRah Edwards is the direct listed reserve and active, but has no locked Carolina-shard value; Wharton and Hunter already occupy a separate baseline DL chain, while Aaron Hall has no exact locked binding. Do not manufacture replacement value, workload or cluster arithmetic."
+      },
+      "batchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
+      "effectiveAt": "2026-10-29T16:53:30-07:00",
+      "sourceTask": "DELTA_1645",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
+      "registryPosition": "DT",
+      "maddenOvr": 74,
+      "healthyWaltersPoints": 0.2,
+      "rawTeamContributionDelta": null,
+      "clusterGroup": "DEFENSIVE_LINE"
     }
   },
-  "lastBatchId": "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
-  "lastBatchSourceTask": "DAILY_REVIEW",
+  "lastBatchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
+  "lastBatchSourceTask": "DELTA_1645",
   "processedMatchupBatchIds": [
     "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01"
   ],
