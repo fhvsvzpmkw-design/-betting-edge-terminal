@@ -76,7 +76,7 @@ try{
   fs.rmSync(temp,{recursive:true,force:true});
 }
 
-const collector=step('Pull quota-balanced Bet365 + DraftKings odds');
+const collector=step('Pull quota-balanced FanDuel + DraftKings odds');
 assert.match(collector,/if: steps\.schedule\.outputs\.should_run == 'true' && steps\.gate\.outputs\.execute == 'true'/,
   'accepted entries still require schedule and durable duplicate gates before spending quota');
 assert.match(workflow,/group: betting-edge-odds-refresh\n  cancel-in-progress: false/,

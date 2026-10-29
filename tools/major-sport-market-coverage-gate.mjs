@@ -19,7 +19,7 @@ export {majorSportKey} from './primary-sport-identity.mjs';
 const AUTHORITY_PATH = 'data/major-sport-market-coverage-v1.json';
 const FEED_PATH = 'data/live-odds.json';
 const EXPECTED_AUTHORITY_ID = 'major-sport-market-coverage-v1';
-const BOOKS = Object.freeze(['Bet365', 'DraftKings']);
+const BOOKS = Object.freeze(['Bet365', 'DraftKings', 'FanDuel']);
 const QUOTE_MAX_AGE_MINUTES = 30;
 const PRIMARY_SCORE_EPSILON = 1e-8;
 const FEED_MARKET_KEYS = Object.freeze({ moneyline: 'ml', spread: 'spread', total: 'totals' });

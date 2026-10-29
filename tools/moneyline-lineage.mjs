@@ -9,7 +9,7 @@ import { timestampMs, ageMinutes, americanToken, canonicalBook, hasNumber, price
   loadBoundFeed, priorSelections, decisionProblems } from './primary-lineage.mjs';
 
 export const MONEYLINE_MOVEMENT_FROM = '2026-09-05T14:15:00-07:00';
-const BOOKS = ['Bet365', 'DraftKings'];
+const BOOKS = ['Bet365', 'DraftKings', 'FanDuel'];
 const SPORTS = new Set(['MLB', 'NHL', 'NBA', 'WNBA', 'NBA_WNBA', 'NFL', 'NCAAF', 'CFL']);
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const keyOf = value => String(value?.marketKey || value?.identity?.marketKey || value?.market || '').toLowerCase();

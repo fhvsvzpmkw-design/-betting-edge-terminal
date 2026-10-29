@@ -14,7 +14,9 @@ import {
 
 export const VIG_METER_TELEMETRY_SCHEMA=1;
 export const VIG_METER_TELEMETRY_AUTHORITY='PUBLISHER_BOUND_FEED_V1';
-export const EXECUTION_BOOKS=Object.freeze(['Bet365','DraftKings']);
+export const EXECUTION_BOOKS=Object.freeze(['Bet365','DraftKings','FanDuel']);
+function agreementBooks(feed){return feed?.bookmakers?.includes('FanDuel')?['DraftKings','FanDuel']:['Bet365','DraftKings'];}
+function agreementSource(feed,primary=false){return `BOUND_${primary?'PRIMARY_':''}FEED_${agreementBooks(feed)[0]==='DraftKings'?'DRAFTKINGS_FANDUEL':'BET365_DRAFTKINGS'}`;}
 export const QUOTE_MAX_AGE_MINUTES=30;
 export const RESILIENT_METER_CUTOVER='2026-09-05T11:00:00-07:00';
 export const PRIMARY_MARKET_METER_CUTOVER='2026-09-06T00:00:00-07:00';
@@ -132,20 +134,21 @@ export function exactSelectionQuote(feed,book,selectionKey,{requireFresh=true,ma
 }
 function agreementFromFeed(report,feed){
   const recs=Array.isArray(report?.recs)?report.recs:[];
+  const books=agreementBooks(feed),source=agreementSource(feed);
   const diffs=[];
   let identityEligible=0;
   for(const rec of recs){
     const key=rec?.feed?.selectionKey;
     if(!nonEmpty(key)) continue;
     identityEligible++;
-    const bet365=exactSelectionQuote(feed,'Bet365',key);
-    const draftKings=exactSelectionQuote(feed,'DraftKings',key);
-    if(!bet365||!draftKings) continue;
-    diffs.push(Math.abs(bet365.probability-draftKings.probability));
+    const first=exactSelectionQuote(feed,books[0],key);
+    const second=exactSelectionQuote(feed,books[1],key);
+    if(!first||!second) continue;
+    diffs.push(Math.abs(first.probability-second.probability));
   }
   const pairs=diffs.length;
   if(!pairs){
-    return {score:50,rawScore:50,confidence:0,pairs:0,identityEligible,source:'BOUND_FEED_BET365_DRAFTKINGS',state:'UNMEASURED'};
+    return {score:50,rawScore:50,confidence:0,pairs:0,identityEligible,source,state:'UNMEASURED'};
   }
   const avgDiff=diffs.reduce((sum,value)=>sum+value,0)/pairs;
   const rawScore=clamp(100-(avgDiff/0.10)*100);
@@ -158,7 +161,7 @@ function agreementFromFeed(report,feed){
     pairs,
     identityEligible,
     averageImpliedProbabilityGap:round(avgDiff),
-    source:'BOUND_FEED_BET365_DRAFTKINGS',
+    source,
     state:'MEASURED'
   };
 }
@@ -410,18 +413,20 @@ export function derivePrimaryMarketInstrumentTelemetry({report,feed,policy,feedB
     reason:count?null:total?'NO_EXACT_PRIMARY_SAME_BOOK_BASELINE':'NO_VERIFIED_PRIMARY_QUOTES',
     reportComparisons:0,snapshotComparisons:count,comparisons};
   const pairs=[];
+  const [firstBook,secondBook]=agreementBooks(feed);
+  const bookField={Bet365:'bet365',DraftKings:'draftKings',FanDuel:'fanDuel'};
   for(const selection of selections){
-    const first=selection.quotes.find(q=>q.book==='Bet365'),second=selection.quotes.find(q=>q.book==='DraftKings');
+    const first=selection.quotes.find(q=>q.book===firstBook),second=selection.quotes.find(q=>q.book===secondBook);
     if(!first||!second||first.selectionKey!==second.selectionKey)continue;
-    pairs.push({selectionId:selection.selectionId,selectionKey:first.selectionKey,bet365Decimal:first.priceDecimal,draftKingsDecimal:second.priceDecimal,
-      bet365QuoteUpdatedAt:first.quoteUpdatedAt,draftKingsQuoteUpdatedAt:second.quoteUpdatedAt,...(QuoteObservation.requiresObservation(feed)?{bet365QuoteObservedAt:first.quoteObservedAt,draftKingsQuoteObservedAt:second.quoteObservedAt}:{}),gap:Math.abs(1/first.priceDecimal-1/second.priceDecimal)});
+    pairs.push({selectionId:selection.selectionId,selectionKey:first.selectionKey,[`${bookField[firstBook]}Decimal`]:first.priceDecimal,[`${bookField[secondBook]}Decimal`]:second.priceDecimal,
+      [`${bookField[firstBook]}QuoteUpdatedAt`]:first.quoteUpdatedAt,[`${bookField[secondBook]}QuoteUpdatedAt`]:second.quoteUpdatedAt,...(QuoteObservation.requiresObservation(feed)?{[`${bookField[firstBook]}QuoteObservedAt`]:first.quoteObservedAt,[`${bookField[secondBook]}QuoteObservedAt`]:second.quoteObservedAt}:{}),gap:Math.abs(1/first.priceDecimal-1/second.priceDecimal)});
   }
   const avgDiff=pairs.length?pairs.reduce((n,p)=>n+p.gap,0)/pairs.length:0;
   const agreementScore=pairs.length?clamp(100-avgDiff/0.10*100):50;
   const agreementConfidence=total?pairs.length/total*100:0;
   const agreement={score:Math.round(agreementScore),rawScore:round(agreementScore),confidence:Math.round(agreementConfidence),rawConfidence:round(agreementConfidence),
     pairs:pairs.length,identityEligible:total,averageImpliedProbabilityGap:pairs.length?round(avgDiff):null,
-    source:'BOUND_PRIMARY_FEED_BET365_DRAFTKINGS',state:pairs.length?'MEASURED':'UNMEASURED',
+    source:agreementSource(feed,true),state:pairs.length?'MEASURED':'UNMEASURED',
     reason:pairs.length?null:total?'NO_EXACT_CROSS_BOOK_PRIMARY_PAIR':'NO_VERIFIED_PRIMARY_QUOTES',comparisons:pairs};
 
   const referents=new Map();let unverifiedReferences=0;

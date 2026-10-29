@@ -4,7 +4,11 @@ import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
 import {primaryAnalysisRequired, validateCoverageAudit, describeResearchCompletion} from './major-sport-market-coverage-gate.mjs';
 
-const BOOKS = ['Bet365', 'DraftKings'];
+const BOOKS = ['Bet365', 'DraftKings', 'FanDuel'];
+function activeBooks(feed) {
+  const books = [...new Set((feed?.bookmakers || []).filter(book => BOOKS.includes(book)))];
+  return books.length ? books : ['Bet365', 'DraftKings'];
+}
 const SPORTS = new Set(['MLB', 'NHL', 'NBA', 'WNBA', 'NBA_WNBA', 'NFL', 'NCAAF', 'CFL']);
 const keyFor = detail => detail.includes('moneyline') ? 'ml' : detail.includes('total') ? 'totals' : 'spread';
 const localDayFormatter = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Vancouver', year:'numeric', month:'2-digit', day:'2-digit'});
@@ -17,6 +21,7 @@ const eventLabel = (feed, id) => {
 
 // Acquisition diagnostics explain exclusions; they never make a quote executable.
 export function explainUnavailableSelections(report, audit, feed) {
+  const books = activeBooks(feed);
   const diagnostics = new Map((feed.diagnostics?.coreMarketAvailability || []).map(row => [String(row.eventId), row]));
   const reasonCounts = new Map();
   const details = [];
@@ -25,8 +30,8 @@ export function explainUnavailableSelections(report, audit, feed) {
     const market = diagnostic?.markets?.[keyFor(limitation.marketDetail)];
     let reason = limitation.reason;
     if (reason === 'MARKET_NOT_RETURNED' && market && market.available === false) {
-      const states = BOOKS.map(book => market.books?.[book]);
-      const old = BOOKS.filter(book => market.books?.[book] === 'STALE_BEYOND_RETENTION');
+      const states = books.map(book => market.books?.[book]);
+      const old = books.filter(book => market.books?.[book] === 'STALE_BEYOND_RETENTION');
       const staleEvidence = old.length > 0 && old.every(book => {
         const age = (Date.parse(feed.generatedAt) - Date.parse(quoteObservation.requiresObservation(feed) ? market.observedAtByBook?.[book] : market.updatedAtByBook?.[book])) / 60000;
         return Number.isFinite(age) && age > (feed.maxMarketAgeMinutes || 90);
@@ -43,8 +48,8 @@ export function explainUnavailableSelections(report, audit, feed) {
     return SPORTS.has(row.category) && !retained.has(String(row.eventId)) && Number.isFinite(start) &&
       start > Date.parse(report.ts) && localDay(row.startTime) === localDay(report.ts);
   }).map(row => ({eventId:String(row.eventId), sport:row.category,
-    reason:BOOKS.every(book => row.acquisition?.[book] === 'EVENT_NOT_RETURNED') ? 'EVENT_NOT_RETURNED' : 'EVENT_ACQUISITION_INCOMPLETE',
-    acquisition:Object.fromEntries(BOOKS.map(book => [book, row.acquisition?.[book] || 'UNKNOWN']))
+    reason:books.every(book => row.acquisition?.[book] === 'EVENT_NOT_RETURNED') ? 'EVENT_NOT_RETURNED' : 'EVENT_ACQUISITION_INCOMPLETE',
+    acquisition:Object.fromEntries(books.map(book => [book, row.acquisition?.[book] || 'UNKNOWN']))
   })).sort((a,b) => a.eventId.localeCompare(b.eventId));
   return {unavailableReasons:[...reasonCounts].sort(([a],[b]) => a.localeCompare(b)).map(([reason,count]) => ({reason,count})), unavailableDetails:details, discoveryOmissions};
 }

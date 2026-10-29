@@ -10,7 +10,7 @@ import quoteObservation from '../assets/quote-observation.js';
 import { latestMarket } from './major-sport-market-coverage-gate.mjs';
 import { lineageApplies, auditPrimaryLineage } from './primary-lineage.mjs';
 
-const BOOKS = ['Bet365', 'DraftKings'];
+const BOOKS = ['Bet365', 'DraftKings', 'FanDuel'];
 const FEED_MAX_AGE_MINUTES = 75;
 const QUOTE_MAX_AGE_MINUTES = 30;
 const PRIMARY_SCORE_EPSILON = 1e-8;
@@ -324,7 +324,7 @@ function auditLineage({ root, report, sidecar = null, feed = null }) {
       diagnostic.state = 'BOOK_CONFLICT';
       diagnostics.push(diagnostic);
       if (!/(CONFLICTING SIGNALS|PRICE NOT VERIFIED)/.test(text)) {
-        violations.push(`${prior.title}: Bet365/DraftKings primary spreads disagree (${primaries.map((x) => `${x.book} ${lineText(x.displayLine)}`).join(', ')}); draft must preserve the conflict`);
+        violations.push(`${prior.title}: supported-book primary spreads disagree (${primaries.map((x) => `${x.book} ${lineText(x.displayLine)}`).join(', ')}); draft must preserve the conflict`);
       }
       continue;
     }

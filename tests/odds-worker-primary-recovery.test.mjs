@@ -57,7 +57,7 @@ async function run({ candidates, main, supplemental, watches = [], multiFailures
       calls.push(url);
       clock += requestStepMs;
       const status = httpFailure(url);
-      if (status) return {ok:false,status,statusText:'Fixture error',text:async () => status === 403 ? 'Bet365 is only available on our paid plans' : 'offline HTTP failure'};
+      if (status) return {ok:false,status,statusText:'Fixture error',text:async () => status === 403 ? 'FanDuel is only available on our paid plans' : 'offline HTTP failure'};
       let data;
       if (url.pathname.endsWith('/sports')) data = [...new Set(candidates.map(e => e.sport.slug))].map(slug => ({ slug }));
       else if (url.pathname.endsWith('/events')) {
@@ -102,40 +102,43 @@ const result = await run({
   },
   supplemental: e => {
     if (e.id === 'missing') return null;
-    if (e.id === 'stale') return { ...e, home: 'Wrong team', bookmakers: { Bet365: completeMarkets() } };
-    if (e.id === 'recover') return { ...e, bookmakers: { Bet365: [market('ML', 20), market('Spread', 1, { odds: [{ hdp: -4, home: '1.91', away: '1.91' }] }), market('Totals')] } };
-    if (e.id === 'incomplete') return { ...e, bookmakers: Object.fromEntries(['Bet365', 'DraftKings'].map(book => [book, [market('ML', 1, { odds: [{ home: '1.80' }] }), market('Spread', 1, { status: 'suspended' }), market('Totals', 1, { odds: [] })]])) };
-    return { ...e, bookmakers: { Bet365: completeMarkets() } };
+    if (e.id === 'stale') return { ...e, home: 'Wrong team', bookmakers: { FanDuel: completeMarkets() } };
+    if (e.id === 'recover') return { ...e, bookmakers: { FanDuel: [market('ML', 20), market('Spread', 1, { odds: [{ hdp: -4, home: '1.91', away: '1.91' }] }), market('Totals')] } };
+    if (e.id === 'incomplete') return { ...e, bookmakers: Object.fromEntries(['FanDuel', 'DraftKings'].map(book => [book, [market('ML', 1, { odds: [{ home: '1.80' }] }), market('Spread', 1, { status: 'suspended' }), market('Totals', 1, { odds: [] })]])) };
+    return { ...e, bookmakers: { FanDuel: completeMarkets() } };
   }
 });
+assert.deepEqual(result.feed.bookmakers, ['FanDuel', 'DraftKings'], 'the current feed declares the approved replacement pair');
+assert.ok(result.calls.filter(url => /\/odds(?:\/multi)?$/.test(url.pathname)).every(url => url.searchParams.get('bookmakers').split(',').every(book => ['FanDuel', 'DraftKings'].includes(book))), 'primary and supplemental calls only request the approved free books');
+assert.ok(result.feed.events.every(e => !Object.hasOwn(e.bookmakers, 'Bet365')), 'new snapshots cannot carry unrequested Bet365 prices');
 const supplementIds = result.calls.filter(url => url.pathname.endsWith('/odds')).map(url => url.searchParams.get('eventId'));
 assert.equal(supplementIds.length, 5, 'only exact combat watch and four primary gaps need supplemental requests');
 assert.equal(supplementIds[0], 'fight', 'Crypto exact fight watch must retain precedence and 30-hour horizon');
 for (const id of ['recover', 'incomplete', 'stale', 'missing']) assert.ok(supplementIds.includes(id), `gap ${id} must outrank complete urgent events`);
 const repaired = result.feed.events.find(e => e.id === 'recover');
-assert.equal(repaired.bookmakers.Bet365.find(m => m.name === 'ML').updatedAt, stamp(20), 'latest observation wins without rewriting the original provider change timestamp');
-assert.equal(repaired.bookmakers.Bet365.find(m => m.name === 'Spread').odds[0].hdp, -4);
-assert.equal(repaired.bookmakers.Bet365.find(m => m.name === 'Totals').odds.length, 1);
-assert.equal(repaired.bookmakers.Bet365.filter(m => m.name === 'Player Props').length, 0, 'props omitted by a later full response must not survive from earlier core data');
+assert.equal(repaired.bookmakers.FanDuel.find(m => m.name === 'ML').updatedAt, stamp(20), 'latest observation wins without rewriting the original provider change timestamp');
+assert.equal(repaired.bookmakers.FanDuel.find(m => m.name === 'Spread').odds[0].hdp, -4);
+assert.equal(repaired.bookmakers.FanDuel.find(m => m.name === 'Totals').odds.length, 1);
+assert.equal(repaired.bookmakers.FanDuel.filter(m => m.name === 'Player Props').length, 0, 'props omitted by a later full response must not survive from earlier core data');
 assert.equal(repaired.bookmakers.DraftKings, undefined, 'book omitted by later successful full requested-book response must not resurrect');
-assert.equal(repaired.bookmakers.Bet365.find(m => m.name === 'Spread').odds[0].selectionKeys.home, 'recover|spread|home||-4');
+assert.equal(repaired.bookmakers.FanDuel.find(m => m.name === 'Spread').odds[0].selectionKeys.home, 'recover|spread|home||-4');
 const incomplete = result.feed.events.find(e => e.id === 'incomplete');
-assert.equal(incomplete.bookmakers.Bet365.find(m => m.name === 'ML').odds[0].away, undefined, 'newer missing side must not resurrect older executable quote');
+assert.equal(incomplete.bookmakers.FanDuel.find(m => m.name === 'ML').odds[0].away, undefined, 'newer missing side must not resurrect older executable quote');
 const availability = new Map(result.feed.diagnostics.coreMarketAvailability.map(e => [e.eventId, e]));
 assert.equal(availability.get('incomplete').markets.ml.available, false);
-assert.equal(availability.get('incomplete').markets.ml.books.Bet365, 'INCOMPLETE');
-assert.equal(availability.get('incomplete').markets.spread.books.Bet365, 'SUSPENDED');
-assert.equal(incomplete.bookmakers.Bet365.find(m => m.name === 'Spread').odds.length, 0, 'suspended snapshot must not expose previously priced sides');
-assert.equal(incomplete.bookmakers.Bet365.find(m => m.name === 'Totals').odds.length, 0, 'empty incoming snapshot must remain unavailable');
-assert.equal(availability.get('stale').markets.spread.books.Bet365, 'AVAILABLE', 'an unchanged old provider price remains fresh when just returned');
-assert.equal(availability.get('stale').markets.spread.updatedAtByBook.Bet365, stamp(100));
-assert.equal(availability.get('missing').acquisition.Bet365, 'EVENT_NOT_RETURNED');
-assert.equal(availability.get('missing').markets.ml.books.Bet365, 'NOT_RETURNED');
+assert.equal(availability.get('incomplete').markets.ml.books.FanDuel, 'INCOMPLETE');
+assert.equal(availability.get('incomplete').markets.spread.books.FanDuel, 'SUSPENDED');
+assert.equal(incomplete.bookmakers.FanDuel.find(m => m.name === 'Spread').odds.length, 0, 'suspended snapshot must not expose previously priced sides');
+assert.equal(incomplete.bookmakers.FanDuel.find(m => m.name === 'Totals').odds.length, 0, 'empty incoming snapshot must remain unavailable');
+assert.equal(availability.get('stale').markets.spread.books.FanDuel, 'AVAILABLE', 'an unchanged old provider price remains fresh when just returned');
+assert.equal(availability.get('stale').markets.spread.updatedAtByBook.FanDuel, stamp(100));
+assert.equal(availability.get('missing').acquisition.FanDuel, 'EVENT_NOT_RETURNED');
+assert.equal(availability.get('missing').markets.ml.books.FanDuel, 'NOT_RETURNED');
 assert.equal(result.feed.diagnostics.identityRejects, 1);
 assert.equal(result.feed.diagnostics.coreRecovery.results.find(e => e.eventId === 'missing').outcome, 'EVENT_NOT_RETURNED');
 assert.equal(result.feed.diagnostics.coreRecovery.results.find(e => e.eventId === 'stale').outcome, 'IDENTITY_REJECTED');
 assert.equal(result.feed.diagnostics.coreRecovery.results.length, result.feed.diagnostics.coreRecovery.eventsChecked);
-assert.ok(result.feed.events.find(e => e.id === 'stale').bookmakers.Bet365.some(m => m.name === 'Spread'), 'old last-change timestamp no longer discards a fresh observation');
+assert.ok(result.feed.events.find(e => e.id === 'stale').bookmakers.FanDuel.some(m => m.name === 'Spread'), 'old last-change timestamp no longer discards a fresh observation');
 assert.equal(result.feed.diagnostics.coreRecovery.results.find(e => e.eventId === 'recover').recovered.length, 1);
 assert.equal(result.feed.quoteObservationVersion, 1);
 assert.equal(result.feed.collectionStartedAt, new Date(now).toISOString());
@@ -148,7 +151,7 @@ for (const event of [...result.feed.events, ...result.feed.deepMarkets, ...resul
     }
   }
 }
-assert.equal(availability.get('stale').markets.spread.observedAtByBook.Bet365, result.feed.events.find(e => e.id === 'stale').bookmakers.Bet365.find(m => m.name === 'Spread').observedAt);
+assert.equal(availability.get('stale').markets.spread.observedAtByBook.FanDuel, result.feed.events.find(e => e.id === 'stale').bookmakers.FanDuel.find(m => m.name === 'Spread').observedAt);
 assert.ok(result.feed.requestsUsed <= 90);
 assert.equal(result.feed.maxMarketAgeMinutes, 90);
 assert.equal(result.feed.requestPolicy.coreQuoteMaxAgeMinutes, 30);
@@ -156,15 +159,15 @@ assert.equal(result.feed.requestPolicy.coreQuoteMaxAgeMinutes, 30);
 const ambiguous = await run({
   candidates: [event('ambiguous')],
   main: (e, book) => ({ ...e, bookmakers: { [book]: [market('ML'), market('Totals'), market('Spread', 1, { odds: [{ hdp: -2, home: '1.90', away: '1.90' }, { hdp: -3, home: '1.90', away: '1.90' }] })] } }),
-  supplemental: e => ({ ...e, bookmakers: { Bet365: completeMarkets() } })
+  supplemental: e => ({ ...e, bookmakers: { FanDuel: completeMarkets() } })
 });
-assert.equal(ambiguous.feed.diagnostics.coreRecovery.results[0].before.spread.books.Bet365, 'PRIMARY_LINE_UNRESOLVED');
+assert.equal(ambiguous.feed.diagnostics.coreRecovery.results[0].before.spread.books.FanDuel, 'PRIMARY_LINE_UNRESOLVED');
 assert.deepEqual(ambiguous.feed.diagnostics.coreRecovery.results[0].recovered, ['spread']);
 
 const duplicates = await run({
   candidates: [event('duplicate-a'), event('duplicate-b')],
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
-  supplemental: e => ({ ...e, bookmakers: { Bet365: [...completeMarkets(), market('Player Props', 1, { odds: [{ label: 'Identical suspicious player payload', over: '2.00' }] })] } })
+  supplemental: e => ({ ...e, bookmakers: { FanDuel: [...completeMarkets(), market('Player Props', 1, { odds: [{ label: 'Identical suspicious player payload', over: '2.00' }] })] } })
 });
 assert.equal(duplicates.calls.filter(url => url.pathname.endsWith('/odds')).length, 0, 'complete games never trigger player-prop calls');
 assert.equal(duplicates.feed.diagnostics.duplicateDeepRejects, 0);
@@ -177,20 +180,20 @@ const unchanged = await run({
   supplemental: () => { throw Error('Outside supplemental horizon'); }
 });
 assert.equal(unchanged.calls.filter(url => url.pathname.endsWith('/odds')).length, 0);
-assert.equal(unchanged.feed.events[0].bookmakers.Bet365[0].updatedAt, stamp(240));
-assert.equal(unchanged.feed.events[0].bookmakers.Bet365[0].observedAt, new Date(now + 3000).toISOString(), 'only local receipt time is trusted, not provider-supplied observedAt');
-assert.equal(unchanged.feed.events[0].bookmakers.Bet365.filter(m => m.name === 'Player Props').length, 0, 'disabled props are stripped if the provider ignores the request filter');
-assert.equal(unchanged.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.Bet365, 'AVAILABLE');
+assert.equal(unchanged.feed.events[0].bookmakers.FanDuel[0].updatedAt, stamp(240));
+assert.equal(unchanged.feed.events[0].bookmakers.FanDuel[0].observedAt, new Date(now + 3000).toISOString(), 'only local receipt time is trusted, not provider-supplied observedAt');
+assert.equal(unchanged.feed.events[0].bookmakers.FanDuel.filter(m => m.name === 'Player Props').length, 0, 'disabled props are stripped if the provider ignores the request filter');
+assert.equal(unchanged.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.FanDuel, 'AVAILABLE');
 assert.equal(unchanged.feed.diagnostics.staleMarketsRemoved, 0);
 
 const omitted = await run({
   candidates: [event('omitted')],
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
-  supplemental: e => ({ ...e, bookmakers: { Bet365: [market('ML', 240)] } })
+  supplemental: e => ({ ...e, bookmakers: { FanDuel: [market('ML', 240)] } })
 });
-assert.deepEqual(omitted.feed.events[0].bookmakers.Bet365.map(m => m.name), ['ML']);
+assert.deepEqual(omitted.feed.events[0].bookmakers.FanDuel.map(m => m.name), ['ML']);
 assert.equal(omitted.feed.events[0].bookmakers.DraftKings, undefined);
-assert.equal(omitted.feed.diagnostics.coreMarketAvailability[0].markets.spread.books.Bet365, 'NOT_RETURNED', 'omitted latest full-response market is not recovered from earlier priced snapshot');
+assert.equal(omitted.feed.diagnostics.coreMarketAvailability[0].markets.spread.books.FanDuel, 'NOT_RETURNED', 'omitted latest full-response market is not recovered from earlier priced snapshot');
 assert.equal(omitted.feed.events[0].bookmakerObservedAt.DraftKings, new Date(now + 5000).toISOString(), 'absent requested book retains authoritative full-scope receipt');
 
 const withdrawn = await run({
@@ -201,10 +204,10 @@ const withdrawn = await run({
 assert.equal(withdrawn.feed.events.length, 1, 'retain full-response scope tombstones even when no priced markets remain');
 assert.deepEqual(withdrawn.feed.events[0].bookmakers, {});
 assert.deepEqual(withdrawn.feed.events[0].bookmakerObservedAt, {
-  Bet365: new Date(now + 5000).toISOString(), DraftKings: new Date(now + 5000).toISOString()
+  FanDuel: new Date(now + 5000).toISOString(), DraftKings: new Date(now + 5000).toISOString()
 });
 assert.equal(withdrawn.feed.diagnostics.mainOddsEvents, 0);
-assert.equal(withdrawn.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.Bet365, 'NOT_RETURNED');
+assert.equal(withdrawn.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.FanDuel, 'NOT_RETURNED');
 
 await assert.rejects(run({
   candidates: [event('all-failed')], multiFailures: 999,
@@ -215,21 +218,21 @@ await assert.rejects(run({
 const partial = await run({
   candidates: [event('partial')],
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
-  supplemental: e => ({ ...e, partial: true, bookmakers: { Bet365: [market('ML', 240)] } })
+  supplemental: e => ({ ...e, partial: true, bookmakers: { FanDuel: [market('ML', 240)] } })
 });
 const partialEvent = partial.feed.events[0];
-assert.equal(partialEvent.bookmakers.Bet365.find(m => m.name === 'ML').observedAt, new Date(now + 5000).toISOString());
-assert.equal(partialEvent.bookmakers.Bet365.find(m => m.name === 'Spread').observedAt, new Date(now + 3000).toISOString(), 'partial response must not restamp absent spread');
+assert.equal(partialEvent.bookmakers.FanDuel.find(m => m.name === 'ML').observedAt, new Date(now + 5000).toISOString());
+assert.equal(partialEvent.bookmakers.FanDuel.find(m => m.name === 'Spread').observedAt, new Date(now + 3000).toISOString(), 'partial response must not restamp absent spread');
 assert.equal(partialEvent.bookmakers.DraftKings[0].observedAt, new Date(now + 4000).toISOString(), 'partial response must not restamp absent book');
-assert.equal(partialEvent.bookmakerObservedAt.Bet365, new Date(now + 3000).toISOString(), 'partial response cannot claim full-book authority');
+assert.equal(partialEvent.bookmakerObservedAt.FanDuel, new Date(now + 3000).toISOString(), 'partial response cannot claim full-book authority');
 
 const failed = await run({
   candidates: [event('failed')],
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets().filter(m => m.name !== 'Totals') } }),
   supplemental: () => new Error('offline supplemental failure')
 });
-assert.equal(failed.feed.events[0].bookmakers.Bet365[0].observedAt, new Date(now + 3000).toISOString(), 'failed request cannot restamp retained core quotes');
-assert.equal(failed.feed.events[0].bookmakerObservedAt.Bet365, new Date(now + 3000).toISOString());
+assert.equal(failed.feed.events[0].bookmakers.FanDuel[0].observedAt, new Date(now + 3000).toISOString(), 'failed request cannot restamp retained core quotes');
+assert.equal(failed.feed.events[0].bookmakerObservedAt.FanDuel, new Date(now + 3000).toISOString());
 assert.equal(failed.feed.diagnostics.coreRecovery.results[0].outcome, 'REQUEST_FAILED');
 
 const unavailable = await run({
@@ -244,11 +247,11 @@ const unavailable = await run({
 });
 const unavailableRows = new Map(unavailable.feed.diagnostics.coreMarketAvailability.map(row => [row.eventId, row]));
 for (const key of ['ml', 'spread', 'totals']) {
-  assert.equal(unavailableRows.get('inactive-markets').markets[key].books.Bet365, 'SUSPENDED');
-  assert.equal(unavailableRows.get('inactive-event').markets[key].books.Bet365, 'SUSPENDED');
+  assert.equal(unavailableRows.get('inactive-markets').markets[key].books.FanDuel, 'SUSPENDED');
+  assert.equal(unavailableRows.get('inactive-event').markets[key].books.FanDuel, 'SUSPENDED');
 }
-assert.equal(unavailableRows.get('inactive-rows').markets.ml.books.Bet365, 'INCOMPLETE', 'inactive row cannot supply a priced primary side');
-assert.equal(unavailableRows.get('inactive-rows').markets.spread.books.Bet365, 'INCOMPLETE', 'cancelled row cannot supply a priced primary line');
+assert.equal(unavailableRows.get('inactive-rows').markets.ml.books.FanDuel, 'INCOMPLETE', 'inactive row cannot supply a priced primary side');
+assert.equal(unavailableRows.get('inactive-rows').markets.spread.books.FanDuel, 'INCOMPLETE', 'cancelled row cannot supply a priced primary line');
 assert.ok(unavailable.feed.events.filter(e => e.id !== 'inactive-rows').every(e => Object.values(e.bookmakers).every(markets => markets.every(m => m.odds.length === 0))));
 
 // A provider must not turn a selected-but-unrequested event into a fresh quote
@@ -271,8 +274,8 @@ const aging = await run({
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
   supplemental: () => { throw Error('Outside supplemental horizon'); }
 });
-assert.equal(aging.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.Bet365, 'STALE_BEYOND_RETENTION');
-assert.equal(aging.feed.events[0].bookmakers.Bet365, undefined);
+assert.equal(aging.feed.diagnostics.coreMarketAvailability[0].markets.ml.books.FanDuel, 'STALE_BEYOND_RETENTION');
+assert.equal(aging.feed.events[0].bookmakers.FanDuel, undefined);
 assert.equal(aging.feed.events[0].bookmakers.DraftKings[0].updatedAt, stamp(1));
 assert.equal(aging.feed.diagnostics.removedMarkets.length, 3);
 assert.equal(aging.feed.diagnostics.removedMarkets[0].reason, 'STALE_BEYOND_RETENTION');
@@ -285,7 +288,7 @@ const budget = await run({
   candidates: board,
   multiFailures: 16,
   main: (e, book) => ({ ...e, bookmakers: { [book]: completeMarkets() } }),
-  supplemental: e => ({ ...e, bookmakers: { Bet365: completeMarkets() } })
+  supplemental: e => ({ ...e, bookmakers: { FanDuel: completeMarkets() } })
 });
 assert.ok(budget.feed.requestsUsed <= 90);
 assert.ok(budget.calls.filter(url => url.pathname.endsWith('/odds')).length <= 6);
@@ -347,25 +350,25 @@ const majors = [
 ];
 const crowded = await run({
   candidates:[...Array.from({length:322},(_,i)=>event(`tennis-${i}`,0.1+i/10000,'tennis','ITF')), ...majors],
-  httpFailure:url=>url.searchParams.get('bookmakers') === 'Bet365' ? 403 : null,
+  httpFailure:url=>url.searchParams.get('bookmakers') === 'FanDuel' ? 403 : null,
   main:(e,book)=>({...e,bookmakers:{[book]:completeMarkets()}}),
   supplemental:()=>{throw Error('Complete DraftKings board needs no supplemental call');}
 });
 const multi = crowded.calls.filter(url=>url.pathname.endsWith('/odds/multi'));
-assert.equal(multi.filter(url=>url.searchParams.get('bookmakers')==='Bet365').length,1,'one book denial per pull, with no retry or later batch reprobe');
+assert.equal(multi.filter(url=>url.searchParams.get('bookmakers')==='FanDuel').length,1,'one book denial per pull, with no retry or later batch reprobe');
 const dkIds=multi.filter(url=>url.searchParams.get('bookmakers')==='DraftKings').flatMap(url=>url.searchParams.get('eventIds').split(','));
 assert.ok(dkIds.slice(0,majors.length).every(id=>majors.some(e=>e.id===id)),'preserve major priority through actual request ordering');
 for(const e of majors) assert.ok(crowded.feed.events.some(row=>row.id===e.id&&row.bookmakers.DraftKings?.length===3));
-assert.equal(crowded.feed.diagnostics.bet365CoreRequests,1);
-assert.equal(crowded.feed.diagnostics.bet365Retries,0);
-assert.equal(crowded.feed.diagnostics.bookmakerAccess.Bet365.state,'ACCESS_DENIED');
+assert.equal(crowded.feed.diagnostics.fanDuelCoreRequests,1);
+assert.equal(crowded.feed.diagnostics.fanDuelRetries,0);
+assert.equal(crowded.feed.diagnostics.bookmakerAccess.FanDuel.state,'ACCESS_DENIED');
 assert.equal(crowded.feed.complete,false,'access failure remains visible even when the other book supports decisions');
 assert.ok(crowded.feed.requestsUsed<=90);
 assert.ok(crowded.feed.diagnostics.coreMarketAvailability.every(row=>row.acquisition.DraftKings==='EVENT_RETURNED'));
 
 const deniedDeep=await run({
   candidates:[event('deep-denied')],
-  httpFailure:url=>url.searchParams.get('bookmakers')==='Bet365'?403:null,
+  httpFailure:url=>url.searchParams.get('bookmakers')==='FanDuel'?403:null,
   main:(e,book)=>({...e,bookmakers:{[book]:[market('ML')]}}),
   supplemental:e=>({...e,bookmakers:{DraftKings:completeMarkets()}})
 });
@@ -373,8 +376,8 @@ assert.equal(deniedDeep.calls.find(url=>url.pathname.endsWith('/odds')).searchPa
 assert.equal(deniedDeep.feed.events[0].bookmakers.DraftKings.length,3);
 const clientError=await run({
   candidates:[event('bad-request',20)],
-  httpFailure:url=>url.searchParams.get('bookmakers')==='Bet365'?400:null,
+  httpFailure:url=>url.searchParams.get('bookmakers')==='FanDuel'?400:null,
   main:(e,book)=>({...e,bookmakers:{[book]:completeMarkets()}}),supplemental:()=>null
 });
-assert.equal(clientError.feed.diagnostics.bet365CoreRequests,1,'permanent HTTP client errors must not retry as transient network failures');
+assert.equal(clientError.feed.diagnostics.fanDuelCoreRequests,1,'permanent HTTP client errors must not retry as transient network failures');
 console.log('ODDS WORKER CORE RECOVERY: PASS // primary-first requests, one-shot book denial, healthy-book continuation, supplemental scope, observation identity/retention and quota ceiling');

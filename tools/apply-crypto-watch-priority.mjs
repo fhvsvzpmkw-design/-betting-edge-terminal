@@ -89,10 +89,10 @@ replaceRegexOnce(
 );
 
 replaceRegexOnce(
-  /([ \t]*)strategy:\n([ \t]*)'primary major sports before ancillary games; college soccer excluded; sequential Bet365\/DraftKings primary game markets only; disabled player props not requested'/,
+  /([ \t]*)strategy:\n([ \t]*)'primary major sports before ancillary games; college soccer excluded; sequential FanDuel\/DraftKings primary game markets only; disabled player props not requested'/,
   (match, strategyIndent, valueIndent) =>
     `${strategyIndent}strategy:\n` +
-    `${valueIndent}'primary major sports before ancillary games; college soccer excluded; Crypto exact-pair watch priority inside 30 hours; sequential Bet365/DraftKings primary game markets only; disabled player props not requested; watched combat deep markets enabled'`,
+    `${valueIndent}'primary major sports before ancillary games; college soccer excluded; Crypto exact-pair watch priority inside 30 hours; sequential FanDuel/DraftKings primary game markets only; disabled player props not requested; watched combat deep markets enabled'`,
   'request policy description'
 );
 

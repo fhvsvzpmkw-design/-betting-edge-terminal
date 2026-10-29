@@ -6,7 +6,7 @@ Updated October 27, 2026. This runbook follows the current [scheduled authority]
 
 - Contract v1.0, Core **1.5 OPERATIONAL**, VigScope UI v1.5, Research Library v1.8 / R3 read-only.
 - America/Vancouver; the permanent Main schedule is `data/main-schedule.json`.
-- Execution books: Bet365 and DraftKings. Pinnacle is the sharp benchmark, never an execution book or automatic betting instruction. Novig retains its existing comparison role.
+- Execution books: FanDuel and DraftKings for new collections from the October 28, 2026 user-approved replacement; historical Bet365 snapshots remain supported. The bound feed declares its active pair. Pinnacle is the sharp benchmark, never an execution book or automatic betting instruction. Novig retains its existing comparison role.
 - Primary full-game moneylines, spreads, MLB run lines, NHL puck lines and totals. Player props are paused; college soccer is excluded upstream.
 - Public odds use American format. Structured decimal prices remain unchanged for arithmetic and exact history.
 

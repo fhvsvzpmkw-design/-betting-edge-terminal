@@ -103,7 +103,7 @@ jobs:
           node tools/apply-crypto-watch-priority.mjs /tmp/betting-edge-odds-worker.js
           node --check /tmp/betting-edge-odds-worker.js
 
-      - name: Pull quota-balanced Bet365 + DraftKings odds
+      - name: Pull quota-balanced FanDuel + DraftKings odds
         if: steps.schedule.outputs.should_run == 'true' && steps.gate.outputs.execute == 'true'
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}

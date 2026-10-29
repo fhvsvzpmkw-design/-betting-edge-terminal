@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull separate quota-balanced Bet365 + DraftKings odds
+      - name: Pull separate quota-balanced FanDuel + DraftKings odds
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
@@ -41,7 +41,7 @@ jobs:
 
           const API_BASE = 'https://api.odds-api.io/v3';
           const API_KEY = process.env.ODDS_API_KEY;
-          const BOOKMAKERS = ['Bet365', 'DraftKings'];
+          const BOOKMAKERS = ['FanDuel', 'DraftKings'];
           const PRIMARY_MARKETS = 'ML,Spread,Totals';
 
           const TARGET_SPORTS = [
@@ -1096,14 +1096,14 @@ jobs:
                 coreCandidatesSelected: 0,
                 coreSelectedByCategory: {},
                 coreRequestsUsed: 0,
-                bet365CoreRequests: 0,
+                fanDuelCoreRequests: 0,
                 draftKingsCoreRequests: 0,
-                bet365Retries: 0,
+                fanDuelRetries: 0,
                 draftKingsRetries: 0,
                 mainOddsEvents: 0,
                 mainOddsMarkets: 0,
-                bet365Events: 0,
-                bet365Markets: 0,
+                fanDuelEvents: 0,
+                fanDuelMarkets: 0,
                 draftKingsEvents: 0,
                 draftKingsMarkets: 0,
                 twoBookEvents: 0,
@@ -1206,7 +1206,7 @@ jobs:
             for (const batch of chunks(coreSelected, 10)) {
               if (coreBatchesUsed >= CORE_REQUEST_TARGET) break;
 
-              // Deliberately pull Bet365 first, then DraftKings separately.
+              // Deliberately pull FanDuel first, then DraftKings separately.
               // A successful sparse response is accepted; retries are failure-only.
               const remainingForDeep = Math.max(0, DEEP_REQUEST_TARGET);
               if (
@@ -1238,9 +1238,9 @@ jobs:
 
                   const callsUsed = requestsUsed - requestStart;
                   const retries = Math.max(0, callsUsed - 1);
-                  if (bookmaker === 'Bet365') {
-                    snapshot.diagnostics.bet365CoreRequests += callsUsed;
-                    snapshot.diagnostics.bet365Retries += retries;
+                  if (bookmaker === 'FanDuel') {
+                    snapshot.diagnostics.fanDuelCoreRequests += callsUsed;
+                    snapshot.diagnostics.fanDuelRetries += retries;
                   } else {
                     snapshot.diagnostics.draftKingsCoreRequests += callsUsed;
                     snapshot.diagnostics.draftKingsRetries += retries;
@@ -1275,9 +1275,9 @@ jobs:
                 } catch (error) {
                   const callsUsed = requestsUsed - requestStart;
                   const retries = Math.max(0, callsUsed - 1);
-                  if (bookmaker === 'Bet365') {
-                    snapshot.diagnostics.bet365CoreRequests += callsUsed;
-                    snapshot.diagnostics.bet365Retries += retries;
+                  if (bookmaker === 'FanDuel') {
+                    snapshot.diagnostics.fanDuelCoreRequests += callsUsed;
+                    snapshot.diagnostics.fanDuelRetries += retries;
                   } else {
                     snapshot.diagnostics.draftKingsCoreRequests += callsUsed;
                     snapshot.diagnostics.draftKingsRetries += retries;
@@ -1563,19 +1563,19 @@ jobs:
                 0
               );
 
-            snapshot.diagnostics.bet365Events =
+            snapshot.diagnostics.fanDuelEvents =
               snapshot.events.filter(
                 event =>
-                  Array.isArray(event?.bookmakers?.Bet365) &&
-                  event.bookmakers.Bet365.length
+                  Array.isArray(event?.bookmakers?.FanDuel) &&
+                  event.bookmakers.FanDuel.length
               ).length;
 
-            snapshot.diagnostics.bet365Markets =
+            snapshot.diagnostics.fanDuelMarkets =
               snapshot.events.reduce(
                 (total, event) =>
                   total + (
-                    Array.isArray(event?.bookmakers?.Bet365)
-                      ? event.bookmakers.Bet365.length
+                    Array.isArray(event?.bookmakers?.FanDuel)
+                      ? event.bookmakers.FanDuel.length
                       : 0
                   ),
                 0
@@ -1602,17 +1602,17 @@ jobs:
             snapshot.diagnostics.twoBookEvents =
               snapshot.events.filter(
                 event =>
-                  Array.isArray(event?.bookmakers?.Bet365) &&
-                  event.bookmakers.Bet365.length &&
+                  Array.isArray(event?.bookmakers?.FanDuel) &&
+                  event.bookmakers.FanDuel.length &&
                   Array.isArray(event?.bookmakers?.DraftKings) &&
                   event.bookmakers.DraftKings.length
               ).length;
 
             snapshot.diagnostics.twoBookCoveragePct =
-              snapshot.diagnostics.bet365Events > 0
+              snapshot.diagnostics.fanDuelEvents > 0
                 ? Math.round(
                     1000 * snapshot.diagnostics.twoBookEvents /
-                    snapshot.diagnostics.bet365Events
+                    snapshot.diagnostics.fanDuelEvents
                   ) / 10
                 : 0;
 
@@ -1654,7 +1654,7 @@ jobs:
               supplementalPriority: 'Crypto exact fight watch; major-sport missing/stale primary recovery only',
               supplementalPrimarySnapshotsMerged: true,
               strategy:
-                'primary major sports before ancillary games; college soccer excluded; sequential Bet365/DraftKings primary game markets only; disabled player props not requested'
+                'primary major sports before ancillary games; college soccer excluded; sequential FanDuel/DraftKings primary game markets only; disabled player props not requested'
             };
 
             snapshot.complete =
@@ -1680,17 +1680,17 @@ jobs:
             );
 
             console.log(
-              `Book coverage: Bet365 ${snapshot.diagnostics.bet365Events} events / ` +
-              `${snapshot.diagnostics.bet365Markets} markets; DraftKings ` +
+              `Book coverage: FanDuel ${snapshot.diagnostics.fanDuelEvents} events / ` +
+              `${snapshot.diagnostics.fanDuelMarkets} markets; DraftKings ` +
               `${snapshot.diagnostics.draftKingsEvents} events / ` +
               `${snapshot.diagnostics.draftKingsMarkets} markets; both books ` +
               `${snapshot.diagnostics.twoBookEvents} events ` +
-              `(${snapshot.diagnostics.twoBookCoveragePct}% of Bet365 coverage).`
+              `(${snapshot.diagnostics.twoBookCoveragePct}% of FanDuel coverage).`
             );
 
             console.log(
-              `Core requests: Bet365 ${snapshot.diagnostics.bet365CoreRequests} ` +
-              `(retries ${snapshot.diagnostics.bet365Retries}); DraftKings ` +
+              `Core requests: FanDuel ${snapshot.diagnostics.fanDuelCoreRequests} ` +
+              `(retries ${snapshot.diagnostics.fanDuelRetries}); DraftKings ` +
               `${snapshot.diagnostics.draftKingsCoreRequests} ` +
               `(retries ${snapshot.diagnostics.draftKingsRetries}).`
             );
@@ -1730,6 +1730,8 @@ jobs:
               Number(verify.eventCount) <= 0 ||
               !Array.isArray(verify.bookmakers) ||
               !verify.bookmakers.includes('DraftKings') ||
+              !verify.bookmakers.includes('FanDuel') ||
+              typeof verify?.diagnostics?.fanDuelEvents !== 'number' ||
               typeof verify?.diagnostics?.draftKingsEvents !== 'number' ||
               Number(verify.identitySchema) !== 1 ||
               Number(verify.quoteObservationVersion) !== 1 ||

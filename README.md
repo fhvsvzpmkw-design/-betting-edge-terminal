@@ -8,7 +8,7 @@
 - **Research Library:** v1.8 / R3 live read-only
 - **Walters mode:** runtime-switchable, currently `BET_AUTHORITY` for eligible NFL spread/moneyline
 - **Timezone:** `America/Vancouver`
-- **Primary books:** Bet365 + DraftKings
+- **Primary books:** FanDuel + DraftKings
 
 Core v1.4 became the forward production baseline at `2026-08-25T17:20:00-07:00`. Historical Core v1.3 reports remain immutable.
 

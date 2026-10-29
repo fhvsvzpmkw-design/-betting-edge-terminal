@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-27.1
+**Operating revision:** 2026-10-28.1
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -79,7 +79,7 @@ For the bound report, Pinnacle whole-observer freshness is also checked at the s
 
 Inspect initial `pinnacleCoverage` by sport before research, including missing/stale exact matches, skipped categories and collection errors. Event detail exposes the failed quote match. For research closeout, inspect `reviewCompletionState` and `capturedForecastReviewsPending` as well as decision completion. Address card-review `SOURCE_ORIGIN_ATTRIBUTION` findings with the actual originating reporting URL/type. These diagnostics confer no betting or publication authority and require no additional odds pull.
 
-Executable books are Bet365 and DraftKings. One valid supported book can establish availability; it does not establish value. Bind exact event/start time, full-game period, side, line, settlement and selectionKey. Missing/suspended quotes in the newest successful scope cannot be supplied by older copies. Preserve disagreements between books.
+Executable books for new collections are FanDuel and DraftKings, as approved October 28, 2026. Use the exact active `bookmakers` declared by the bound feed; retain historical Bet365 support for older snapshots and issued reports. The forward replacement supersedes earlier execution-pair descriptors in frozen Core/Pinnacle component files without changing their pinned bytes or Pinnacle benchmark authority. One valid supported book can establish availability; it does not establish value. Bind exact event/start time, full-game period, side, line, settlement and selectionKey. Missing/suspended quotes in the newest successful scope cannot be supplied by older copies. Preserve disagreements between books.
 
 A same-operating-date snapshot explicitly marked `scheduleMeta.triggerSource:manual` may serve any Main lane if normal freshness and identity checks pass. Null canonicalSlot/plannedReportTime and MANUAL markers are valid manual provenance. Resolve the lane from the Main schedule without relabeling the feed. An automatic snapshot must match the lane. Unknown provenance, stale/future prices and conflicting automatic identities remain blocked.
 

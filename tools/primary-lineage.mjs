@@ -13,7 +13,7 @@ const SPECS = {
   totals: { sides: ['over', 'under'], details: ['full_game_primary_total', 'full_game_total'], from: TOTAL_LINEAGE_FROM, name: 'total', sideName: 'Over/Under side' },
   spread: { sides: ['home', 'away'], details: ['full_game_primary_spread', 'full_game_spread', 'full_game_primary_run_line', 'full_game_run_line', 'full_game_primary_puck_line', 'full_game_puck_line'], from: SPREAD_MOVEMENT_FROM, name: 'spread', sideName: 'team/side' }
 };
-const BOOKS = ['Bet365', 'DraftKings'];
+const BOOKS = ['Bet365', 'DraftKings', 'FanDuel'];
 const SPORTS = new Set(['MLB', 'NHL', 'NBA', 'WNBA', 'NBA_WNBA', 'NFL', 'NCAAF', 'CFL']);
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const DECISIONS = new Set([...ACTIVE, 'PASS']);
@@ -33,7 +33,7 @@ function americanToken(value) {
   return match && Math.abs(Number(match[1])) >= 100 ? Number(match[1]) : null;
 }
 const priceDecimal = value => { const n = americanToken(value); return n === null ? null : n > 0 ? 1 + n / 100 : 1 + 100 / -n; };
-const canonicalBook = value => { const key = String(value || '').toLowerCase().replace(/[^a-z0-9]/g, ''); return ['bet365', 'b365'].includes(key) ? 'Bet365' : key === 'draftkings' ? 'DraftKings' : null; };
+const canonicalBook = value => { const key = String(value || '').toLowerCase().replace(/[^a-z0-9]/g, ''); return ['bet365', 'b365'].includes(key) ? 'Bet365' : key === 'draftkings' ? 'DraftKings' : ['fanduel', 'fd'].includes(key) ? 'FanDuel' : null; };
 const day = value => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Vancouver', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value));
 function ensure(condition, message) { if (!condition) throw new Error(message); }
 

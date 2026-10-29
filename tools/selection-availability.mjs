@@ -7,7 +7,7 @@ import quoteObservation from '../assets/quote-observation.js';
 import { latestMarket } from './major-sport-market-coverage-gate.mjs';
 import { moneylineApplies } from './moneyline-lineage.mjs';
 
-const BOOKS = ['Bet365', 'DraftKings'];
+const BOOKS = ['Bet365', 'DraftKings', 'FanDuel'];
 const ACTIVE = new Set(['BET', 'LEAN', 'WAIT']);
 const QUOTE_MAX_AGE_MINUTES = 30;
 
@@ -39,9 +39,10 @@ function canonicalBook(value) {
   const source = String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (source === 'BET365' || source === 'B365') return 'Bet365';
   if (source === 'DRAFTKINGS' || source === 'DK') return 'DraftKings';
+  if (source === 'FANDUEL' || source === 'FD') return 'FanDuel';
   return null;
 }
-function bookAliases(book) { return book === 'Bet365' ? ['BET365', 'B365'] : ['DRAFTKINGS', 'DK']; }
+function bookAliases(book) { return book === 'Bet365' ? ['BET365', 'B365'] : book === 'FanDuel' ? ['FANDUEL', 'FAN DUEL', 'FD'] : ['DRAFTKINGS', 'DK']; }
 function escaped(value) { return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 function quotedBookPrice(text, book, american) {
   const source = String(text || '').toUpperCase().replace(/−/g, '-');
