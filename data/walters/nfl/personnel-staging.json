@@ -1,64 +1,54 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
+  "batchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
   "season": 2026,
   "week": 8,
-  "sourceTask": "DAILY_REVIEW",
-  "effectiveAt": "2026-10-29T11:36:00-07:00",
-  "startedAt": "2026-10-29T11:26:01-07:00",
-  "runEventId": "graham-daily-review-2026-w08-20261029T112601-0700",
+  "sourceTask": "DELTA_1645",
+  "effectiveAt": "2026-10-29T16:53:30-07:00",
+  "startedAt": "2026-10-29T16:44:30-07:00",
+  "runEventId": "graham-delta-1645-2026-w08-20261029T164430-0700",
   "marketViewed": false,
   "productionId": "walters-personnel-production-v1",
   "cases": [
     {
-      "personnelEventId": "2026-W08-TEN-Jeffery-Simmons-trade-pending-20261029T113600-0700",
-      "caseKey": "2026-W08-TEN-Jeffery-Simmons",
-      "gameKey": "2026-W08-TEN-CIN",
-      "team": "TEN",
+      "personnelEventId": "2026-W08-CAR-Bobby-Brown-III-inactive-20261029T165330-0700",
+      "caseKey": "2026-W08-CAR-Bobby-Brown-III",
+      "gameKey": "2026-W08-CAR-GB",
+      "team": "CAR",
       "side": "AWAY",
-      "player": "Jeffery Simmons",
-      "playerEaId": "20549",
-      "availabilityStatus": "UNRESOLVED",
+      "player": "Bobby Brown III",
+      "playerEaId": "21922",
+      "availabilityStatus": "OUT",
       "resolutionStatus": "FAIL_CLOSED",
-      "failClosedCode": "TRADE_PENDING_PHYSICAL_AND_WEEK_8_AVAILABILITY_NOT_OFFICIALLY_FINAL",
-      "reason": "Tennessee announced an agreed trade sending Jeffery Simmons to Chicago, expressly pending a physical. The club transaction pages had not yet posted a completed transaction at the review cutoff. Tennessee's current depth chart lists Solomon Thomas directly behind Simmons, but the acquisition is not final, John Franklin-Myers was a Wednesday non-participant, newly claimed Jonah Laulu is not yet on the current depth chart, and Nazir Stackhouse has no locked identity in the team shard. Record the material development and preserve TEN-CIN fail closed with no numeric move until the transaction and Week 8 role are official.",
+      "failClosedCode": "REPLACEMENT_VALUE_OR_OFFICIAL_CAPTURE_UNRESOLVED",
+      "reason": "Carolina's official inactive list ruled starting DT Bobby Brown III out after he had been questionable. The current official depth chart lists TeRah Edwards directly behind Brown and the active roster confirms Edwards, but Edwards is absent from the locked Carolina player-value shard and no exact governed official EA supplement is bound. Brown's frozen healthy value is 0.2 points. Preserve CAR-GB fail closed with no numeric move rather than assign a missing replacement value to zero; also retain the existing defensive-line cluster guard.",
       "sourceRefs": [
-        "https://www.tennesseetitans.com/news/titans-trade-dt-jeffery-simmons-to-the-chicago-bears-in-exchange-for-two-first-round-picks",
-        "https://www.tennesseetitans.com/team/transactions/",
-        "https://www.chicagobears.com/team/transactions/",
-        "https://www.tennesseetitans.com/team/depth-chart",
-        "https://www.tennesseetitans.com/team/players-roster/",
-        "https://www.tennesseetitans.com/team/players-roster/solomon-thomas/",
-        "https://www.tennesseetitans.com/news/week-8-injury-report-titans-at-bengals",
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers",
+        "https://www.panthers.com/team/depth-chart",
+        "https://www.panthers.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/car.json",
         "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/player-values/by-team-v1/ten.json",
-        "data/walters/nfl/player-values/by-team-v1/lv.json",
         "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
       "availabilitySourceRefs": [
-        "https://www.tennesseetitans.com/news/titans-trade-dt-jeffery-simmons-to-the-chicago-bears-in-exchange-for-two-first-round-picks",
-        "https://www.tennesseetitans.com/team/transactions/",
-        "https://www.chicagobears.com/team/transactions/"
+        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers"
       ],
       "roleSourceRefs": [
-        "https://www.tennesseetitans.com/team/depth-chart",
-        "https://www.tennesseetitans.com/team/players-roster/",
-        "https://www.tennesseetitans.com/team/players-roster/solomon-thomas/",
-        "https://www.tennesseetitans.com/news/week-8-injury-report-titans-at-bengals"
+        "https://www.panthers.com/team/depth-chart",
+        "https://www.panthers.com/team/players-roster/"
       ],
-      "reopenOn": "Reopen immediately when both clubs post the completed transaction or the physical fails, then recheck Tennessee's official Week 8 depth/injury role and Chicago's official Week 8 activation before any production move.",
+      "reopenOn": "Reopen when TeRah Edwards receives an exact immutable governed player-value binding or another current official source establishes a distinct available replacement with a locked value; then re-run the defensive-line cluster and double-count review.",
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "Solomon Thomas",
-          "Jackie Marshall",
-          "John Franklin-Myers",
-          "Nazir Stackhouse",
-          "Jonah Laulu"
+          "TeRah Edwards",
+          "Tershawn Wharton",
+          "Lee Hunter",
+          "Aaron Hall"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
@@ -66,13 +56,13 @@
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
         "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
-        "finding": "The agreed trade is pending a physical and is absent from both official transaction logs at the review cutoff. Simmons is locked at 2.2 points; the direct reserve Thomas is 0.2, Marshall is 0, Franklin-Myers is 0.9 but had a separate starting role and missed Wednesday practice, Laulu is 0 in the frozen LV shard but was only claimed October 28, and Stackhouse has no exact team-shard binding. Do not guess the final availability or post-trade allocation."
+        "finding": "Brown is officially inactive and locked at 0.2 points. TeRah Edwards is the direct listed reserve and active, but has no locked Carolina-shard value; Wharton and Hunter already occupy a separate baseline DL chain, while Aaron Hall has no exact locked binding. Do not manufacture replacement value, workload or cluster arithmetic."
       }
     }
   ],
   "priorPublicationContext": {
-    "baselineRunEventId": "graham-delta-1645-2026-w08-20261028T164156-0700",
-    "baselineCoverageEnd": "2026-10-28T17:12:40-07:00",
-    "note": "Preserve all verified Week 8 cases and fairs. This isolated batch records only the new Simmons transaction-pending availability case; it does not replay completed Wednesday production."
+    "baselineRunEventId": "graham-daily-review-2026-w08-20261029T112601-0700",
+    "baselineCoverageEnd": "2026-10-29T11:37:15.479-07:00",
+    "note": "Preserve every verified Week 8 case and fair. This isolated batch records only Bobby Brown III's newly official inactive status and its exact unresolved replacement-value gate; it does not replay completed Thursday production."
   }
 }
