@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-30T11:42:18-07:00",
+  "updatedAt": "2026-10-30T11:46:24-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -27,7 +27,8 @@
     "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
     "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
     "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
-    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02"
+    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02",
+    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-03"
   ],
   "events": [
     {
@@ -1671,6 +1672,80 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Reopen if Tampa Bay changes Egbuka's final availability or names a different primary replacement before kickoff."
       }
+    },
+    {
+      "personnelEventId": "2026-W08-BUF-Tyrell-Shavers-out-20261030T1146240700",
+      "caseKey": "2026-W08-BUF-Tyrell-Shavers",
+      "gameKey": "2026-W08-BAL-BUF",
+      "team": "BUF",
+      "side": "HOME",
+      "player": "Tyrell Shavers",
+      "playerEaId": "10684",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Buffalo's official Friday Week 8 injury report ruled wide receiver Tyrell Shavers out. His frozen calibrated healthy value is exactly 0.0 points; under the governed nonnegative replacement floor, the absence is recorded as a zero-calibrated loss without inventing a replacement value or role allocation.",
+      "sourceRefs": [
+        "https://www.buffalobills.com/team/injury-report/",
+        "data/walters/nfl/player-values/by-team-v1/buf.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buffalobills.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.buffalobills.com/team/injury-report/"
+      ],
+      "reopenOn": "Reopen if Buffalo changes Shavers' official availability before kickoff or the frozen calibrated player value is superseded by governed production.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Shavers' frozen calibrated healthy value is exactly 0.0 points and replacement value is bounded below by zero, so the maximum governed injury loss is exactly 0.0. This records the absence without treating missing replacement evidence as zero."
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Shavers is officially out and frozen at 0.0 points. The zero-calibrated-loss invariant resolves the numeric effect at 0.0 without assigning any unverified reserve a role or value."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-03",
+      "effectiveAt": "2026-10-30T11:46:24-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Shavers' frozen calibrated healthy value is exactly 0.0 points and replacement value is bounded below by zero, so the maximum governed injury loss is exactly 0.0. This records the absence without treating missing replacement evidence as zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Buffalo changes Shavers' official availability before kickoff or the frozen calibrated player value is superseded by governed production.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   ],
   "currentCases": {
@@ -3254,9 +3329,83 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Reopen if Tampa Bay changes Egbuka's final availability or names a different primary replacement before kickoff."
       }
+    },
+    "2026-W08-BUF-Tyrell-Shavers": {
+      "personnelEventId": "2026-W08-BUF-Tyrell-Shavers-out-20261030T1146240700",
+      "caseKey": "2026-W08-BUF-Tyrell-Shavers",
+      "gameKey": "2026-W08-BAL-BUF",
+      "team": "BUF",
+      "side": "HOME",
+      "player": "Tyrell Shavers",
+      "playerEaId": "10684",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Buffalo's official Friday Week 8 injury report ruled wide receiver Tyrell Shavers out. His frozen calibrated healthy value is exactly 0.0 points; under the governed nonnegative replacement floor, the absence is recorded as a zero-calibrated loss without inventing a replacement value or role allocation.",
+      "sourceRefs": [
+        "https://www.buffalobills.com/team/injury-report/",
+        "data/walters/nfl/player-values/by-team-v1/buf.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buffalobills.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.buffalobills.com/team/injury-report/"
+      ],
+      "reopenOn": "Reopen if Buffalo changes Shavers' official availability before kickoff or the frozen calibrated player value is superseded by governed production.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "ZERO_CALIBRATED_LOSS",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Shavers' frozen calibrated healthy value is exactly 0.0 points and replacement value is bounded below by zero, so the maximum governed injury loss is exactly 0.0. This records the absence without treating missing replacement evidence as zero."
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Shavers is officially out and frozen at 0.0 points. The zero-calibrated-loss invariant resolves the numeric effect at 0.0 without assigning any unverified reserve a role or value."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-03",
+      "effectiveAt": "2026-10-30T11:46:24-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 65,
+      "healthyWaltersPoints": 0,
+      "rawTeamContributionDelta": 0,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "ZERO_CALIBRATED_LOSS",
+        "healthyValue": 0,
+        "replacementValue": null,
+        "injuryLoss": 0,
+        "rawTeamContributionDelta": 0,
+        "injuryLossRange": {
+          "min": 0,
+          "max": 0
+        },
+        "assumptionRationale": "Shavers' frozen calibrated healthy value is exactly 0.0 points and replacement value is bounded below by zero, so the maximum governed injury loss is exactly 0.0. This records the absence without treating missing replacement evidence as zero.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "reopenOn": "Reopen if Buffalo changes Shavers' official availability before kickoff or the frozen calibrated player value is superseded by governed production.",
+        "limitation": "Frozen healthy value is calibrated zero and the replacement floor is nonnegative; no missing replacement value is assigned zero."
+      }
     }
   },
-  "lastBatchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02",
+  "lastBatchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-03",
   "lastBatchSourceTask": "DAILY_REVIEW",
   "processedMatchupBatchIds": [
     "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01"
