@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-29T16:53:30-07:00",
+  "updatedAt": "2026-10-30T11:39:27-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -25,7 +25,8 @@
     "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-retry-02",
     "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-02",
     "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
-    "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01"
+    "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
+    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01"
   ],
   "events": [
     {
@@ -1439,6 +1440,121 @@
       "healthyWaltersPoints": 0.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_LINE"
+    },
+    {
+      "personnelEventId": "2026-W08-BAL-Jaylinn-Hawkins-out-20261030T1139270700",
+      "caseKey": "2026-W08-BAL-Jaylinn-Hawkins",
+      "gameKey": "2026-W08-BAL-BUF",
+      "team": "BAL",
+      "side": "AWAY",
+      "player": "Jaylinn Hawkins",
+      "playerEaId": "21272",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Baltimore Head Coach Jesse Minter ruled starting strong safety Jaylinn Hawkins out for Sunday. The current official depth chart lists Keondre Jackson directly behind Hawkins, and both identities have frozen calibrated values. Apply the acknowledged documented-depth primary estimate for Hawkins' additional vacant duties only; do not displace Jackson's baseline duties or infer measured workload.",
+      "sourceRefs": [
+        "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
+        "https://www.baltimoreravens.com/team/injury-report/",
+        "https://www.baltimoreravens.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/bal.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
+        "https://www.baltimoreravens.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.baltimoreravens.com/team/depth-chart"
+      ],
+      "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The official current depth chart places Keondre Jackson immediately behind starting SS Jaylinn Hawkins; use that documented available reserve as the primary additional-duty estimate, not as a confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Keondre Jackson's existing baseline duties remain embedded. Only Hawkins' newly vacant strong-safety duties are allocated once.",
+        "baselineSourceIds": [
+          "https://www.baltimoreravens.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Keondre Jackson",
+            "eaPlayerId": "4675",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Immediate listed reserve behind Jaylinn Hawkins at strong safety on Baltimore's current official depth chart.",
+            "sourceRefs": [
+              "https://www.baltimoreravens.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Keondre Jackson",
+          "K'Von Wallace"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Hawkins is officially out and frozen at 0.5 points. Keondre Jackson is the immediate documented reserve and frozen at 0 points; K'Von Wallace is the next listed reserve. No other Baltimore defensive-back absence is presently final, so the single-vacancy estimate is distinct and cluster-safe."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
+      "effectiveAt": "2026-10-30T11:39:27-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "FS",
+      "maddenOvr": 78,
+      "healthyWaltersPoints": 0.5,
+      "rawTeamContributionDelta": -0.5,
+      "clusterGroup": "DEFENSIVE_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 0.5,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 0.5,
+        "rawTeamContributionDelta": -0.5,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.5,
+          "max": 0.5
+        },
+        "weights": [
+          {
+            "player": "Keondre Jackson",
+            "eaPlayerId": "4675",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "The official current depth chart places Keondre Jackson immediately behind starting SS Jaylinn Hawkins; use that documented available reserve as the primary additional-duty estimate, not as a confirmed workload.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff."
+      }
     }
   ],
   "currentCases": {
@@ -2792,10 +2908,125 @@
       "healthyWaltersPoints": 0.2,
       "rawTeamContributionDelta": null,
       "clusterGroup": "DEFENSIVE_LINE"
+    },
+    "2026-W08-BAL-Jaylinn-Hawkins": {
+      "personnelEventId": "2026-W08-BAL-Jaylinn-Hawkins-out-20261030T1139270700",
+      "caseKey": "2026-W08-BAL-Jaylinn-Hawkins",
+      "gameKey": "2026-W08-BAL-BUF",
+      "team": "BAL",
+      "side": "AWAY",
+      "player": "Jaylinn Hawkins",
+      "playerEaId": "21272",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Baltimore Head Coach Jesse Minter ruled starting strong safety Jaylinn Hawkins out for Sunday. The current official depth chart lists Keondre Jackson directly behind Hawkins, and both identities have frozen calibrated values. Apply the acknowledged documented-depth primary estimate for Hawkins' additional vacant duties only; do not displace Jackson's baseline duties or infer measured workload.",
+      "sourceRefs": [
+        "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
+        "https://www.baltimoreravens.com/team/injury-report/",
+        "https://www.baltimoreravens.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/bal.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
+        "https://www.baltimoreravens.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.baltimoreravens.com/team/depth-chart"
+      ],
+      "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The official current depth chart places Keondre Jackson immediately behind starting SS Jaylinn Hawkins; use that documented available reserve as the primary additional-duty estimate, not as a confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Keondre Jackson's existing baseline duties remain embedded. Only Hawkins' newly vacant strong-safety duties are allocated once.",
+        "baselineSourceIds": [
+          "https://www.baltimoreravens.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Keondre Jackson",
+            "eaPlayerId": "4675",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Immediate listed reserve behind Jaylinn Hawkins at strong safety on Baltimore's current official depth chart.",
+            "sourceRefs": [
+              "https://www.baltimoreravens.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Keondre Jackson",
+          "K'Von Wallace"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Hawkins is officially out and frozen at 0.5 points. Keondre Jackson is the immediate documented reserve and frozen at 0 points; K'Von Wallace is the next listed reserve. No other Baltimore defensive-back absence is presently final, so the single-vacancy estimate is distinct and cluster-safe."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
+      "effectiveAt": "2026-10-30T11:39:27-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "FS",
+      "maddenOvr": 78,
+      "healthyWaltersPoints": 0.5,
+      "rawTeamContributionDelta": -0.5,
+      "clusterGroup": "DEFENSIVE_BACK",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 0.5,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 0.5,
+        "rawTeamContributionDelta": -0.5,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.5,
+          "max": 0.5
+        },
+        "weights": [
+          {
+            "player": "Keondre Jackson",
+            "eaPlayerId": "4675",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "The official current depth chart places Keondre Jackson immediately behind starting SS Jaylinn Hawkins; use that documented available reserve as the primary additional-duty estimate, not as a confirmed workload.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff."
+      }
     }
   },
-  "lastBatchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
-  "lastBatchSourceTask": "DELTA_1645",
+  "lastBatchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
+  "lastBatchSourceTask": "DAILY_REVIEW",
   "processedMatchupBatchIds": [
     "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01"
   ],
