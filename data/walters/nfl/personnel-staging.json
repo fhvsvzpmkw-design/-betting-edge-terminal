@@ -1,68 +1,88 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
+  "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
   "season": 2026,
   "week": 8,
-  "sourceTask": "DELTA_1645",
-  "effectiveAt": "2026-10-29T16:53:30-07:00",
-  "startedAt": "2026-10-29T16:44:30-07:00",
-  "runEventId": "graham-delta-1645-2026-w08-20261029T164430-0700",
+  "sourceTask": "DAILY_REVIEW",
+  "effectiveAt": "2026-10-30T11:39:27-07:00",
+  "startedAt": "2026-10-30T11:31:55-07:00",
+  "runEventId": "graham-daily-review-2026-w08-20261030T113155-0700",
   "marketViewed": false,
   "productionId": "walters-personnel-production-v1",
   "cases": [
     {
-      "personnelEventId": "2026-W08-CAR-Bobby-Brown-III-inactive-20261029T165330-0700",
-      "caseKey": "2026-W08-CAR-Bobby-Brown-III",
-      "gameKey": "2026-W08-CAR-GB",
-      "team": "CAR",
+      "personnelEventId": "2026-W08-BAL-Jaylinn-Hawkins-out-20261030T1139270700",
+      "caseKey": "2026-W08-BAL-Jaylinn-Hawkins",
+      "gameKey": "2026-W08-BAL-BUF",
+      "team": "BAL",
       "side": "AWAY",
-      "player": "Bobby Brown III",
-      "playerEaId": "21922",
+      "player": "Jaylinn Hawkins",
+      "playerEaId": "21272",
       "availabilityStatus": "OUT",
-      "resolutionStatus": "FAIL_CLOSED",
-      "failClosedCode": "REPLACEMENT_VALUE_OR_OFFICIAL_CAPTURE_UNRESOLVED",
-      "reason": "Carolina's official inactive list ruled starting DT Bobby Brown III out after he had been questionable. The current official depth chart lists TeRah Edwards directly behind Brown and the active roster confirms Edwards, but Edwards is absent from the locked Carolina player-value shard and no exact governed official EA supplement is bound. Brown's frozen healthy value is 0.2 points. Preserve CAR-GB fail closed with no numeric move rather than assign a missing replacement value to zero; also retain the existing defensive-line cluster guard.",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Baltimore Head Coach Jesse Minter ruled starting strong safety Jaylinn Hawkins out for Sunday. The current official depth chart lists Keondre Jackson directly behind Hawkins, and both identities have frozen calibrated values. Apply the acknowledged documented-depth primary estimate for Hawkins' additional vacant duties only; do not displace Jackson's baseline duties or infer measured workload.",
       "sourceRefs": [
-        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers",
-        "https://www.panthers.com/team/depth-chart",
-        "https://www.panthers.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/car.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
+        "https://www.baltimoreravens.com/team/injury-report/",
+        "https://www.baltimoreravens.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/bal.json",
         "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
       "availabilitySourceRefs": [
-        "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers"
+        "https://www.baltimoreravens.com/news/lamar-jackson-ravens-bills-set-to-play-2026",
+        "https://www.baltimoreravens.com/team/injury-report/"
       ],
       "roleSourceRefs": [
-        "https://www.panthers.com/team/depth-chart",
-        "https://www.panthers.com/team/players-roster/"
+        "https://www.baltimoreravens.com/team/depth-chart"
       ],
-      "reopenOn": "Reopen when TeRah Edwards receives an exact immutable governed player-value binding or another current official source establishes a distinct available replacement with a locked value; then re-run the defensive-line cluster and double-count review.",
+      "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The official current depth chart places Keondre Jackson immediately behind starting SS Jaylinn Hawkins; use that documented available reserve as the primary additional-duty estimate, not as a confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Keondre Jackson's existing baseline duties remain embedded. Only Hawkins' newly vacant strong-safety duties are allocated once.",
+        "baselineSourceIds": [
+          "https://www.baltimoreravens.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Keondre Jackson",
+            "eaPlayerId": "4675",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Immediate listed reserve behind Jaylinn Hawkins at strong safety on Baltimore's current official depth chart.",
+            "sourceRefs": [
+              "https://www.baltimoreravens.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
         "replacementCandidatesConsidered": [
-          "TeRah Edwards",
-          "Tershawn Wharton",
-          "Lee Hunter",
-          "Aaron Hall"
+          "Keondre Jackson",
+          "K'Von Wallace"
         ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
-        "replacementClassification": "UNRESOLVED_AFTER_COMPLETE_SEARCH",
+        "replacementClassification": "ONE_FOR_ONE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
-        "finding": "Brown is officially inactive and locked at 0.2 points. TeRah Edwards is the direct listed reserve and active, but has no locked Carolina-shard value; Wharton and Hunter already occupy a separate baseline DL chain, while Aaron Hall has no exact locked binding. Do not manufacture replacement value, workload or cluster arithmetic."
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Hawkins is officially out and frozen at 0.5 points. Keondre Jackson is the immediate documented reserve and frozen at 0 points; K'Von Wallace is the next listed reserve. No other Baltimore defensive-back absence is presently final, so the single-vacancy estimate is distinct and cluster-safe."
       }
     }
   ],
   "priorPublicationContext": {
-    "baselineRunEventId": "graham-daily-review-2026-w08-20261029T112601-0700",
-    "baselineCoverageEnd": "2026-10-29T11:37:15.479-07:00",
-    "note": "Preserve every verified Week 8 case and fair. This isolated batch records only Bobby Brown III's newly official inactive status and its exact unresolved replacement-value gate; it does not replay completed Thursday production."
+    "baselineRunEventId": "graham-delta-1645-2026-w08-20261029T164430-0700",
+    "baselineCoverageEnd": "2026-10-29T16:53:37.173-07:00",
+    "note": "Preserve all verified Week 8 cases and the new governed Lamar Jackson QB reconciliation. This isolated batch applies only the newly official Jaylinn Hawkins absence through the labelled current-personnel estimate."
   }
 }
