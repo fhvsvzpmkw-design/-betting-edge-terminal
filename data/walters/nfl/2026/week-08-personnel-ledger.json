@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-30T11:39:27-07:00",
+  "updatedAt": "2026-10-30T11:42:18-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -26,7 +26,8 @@
     "graham-delta-1645-2026-w08-20261028T164156-0700-personnel-02",
     "graham-daily-review-2026-w08-20261029T112601-0700-personnel-01",
     "graham-delta-1645-2026-w08-20261029T164430-0700-personnel-01",
-    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01"
+    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
+    "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02"
   ],
   "events": [
     {
@@ -1555,6 +1556,121 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff."
       }
+    },
+    {
+      "personnelEventId": "2026-W08-TB-Emeka-Egbuka-out-20261030T1142180700",
+      "caseKey": "2026-W08-TB-Emeka-Egbuka",
+      "gameKey": "2026-W08-ATL-TB",
+      "team": "TB",
+      "side": "HOME",
+      "player": "Emeka Egbuka",
+      "playerEaId": "15054",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Tampa Bay's Friday final injury report ruled starting wide receiver Emeka Egbuka out. The current official depth chart lists Tez Johnson directly behind Egbuka, and both identities have frozen calibrated values. Apply the acknowledged documented-depth primary estimate for Egbuka's additional vacant duties only; no measured workload or receiver multiplier is inferred.",
+      "sourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/",
+        "https://www.buccaneers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.buccaneers.com/team/depth-chart"
+      ],
+      "reopenOn": "Reopen if Tampa Bay changes Egbuka's final availability or names a different primary replacement before kickoff.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The official current depth chart places Tez Johnson immediately behind starting WR Emeka Egbuka; use that documented available reserve as the primary additional-duty estimate, not as confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Tez Johnson's existing baseline duties remain embedded. Only Egbuka's newly vacant receiver duties are allocated once.",
+        "baselineSourceIds": [
+          "https://www.buccaneers.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Tez Johnson",
+            "eaPlayerId": "15072",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Immediate listed reserve behind Emeka Egbuka on Tampa Bay's current official depth chart.",
+            "sourceRefs": [
+              "https://www.buccaneers.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tez Johnson",
+          "Kameron Johnson",
+          "Ted Hurst III",
+          "David Sills V"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Egbuka is officially out and frozen at 0.9 points. Tez Johnson is the direct listed reserve and frozen at 0.2 points. Chris Godwin returned to full practice and is not a simultaneous final absence; a single-vacancy estimate applies without a receiver-cluster multiplier."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02",
+      "effectiveAt": "2026-10-30T11:42:18-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 81,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.7,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0.2,
+        "replacementValueRatio": {
+          "numerator": 0.2,
+          "denominator": 1
+        },
+        "injuryLoss": 0.7,
+        "rawTeamContributionDelta": -0.7,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.7,
+          "max": 0.7
+        },
+        "weights": [
+          {
+            "player": "Tez Johnson",
+            "eaPlayerId": "15072",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "The official current depth chart places Tez Johnson immediately behind starting WR Emeka Egbuka; use that documented available reserve as the primary additional-duty estimate, not as confirmed workload.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Tampa Bay changes Egbuka's final availability or names a different primary replacement before kickoff."
+      }
     }
   ],
   "currentCases": {
@@ -3023,9 +3139,124 @@
         "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
         "reopenOn": "Reopen if Baltimore changes Hawkins' official availability or names a different primary strong-safety replacement before kickoff."
       }
+    },
+    "2026-W08-TB-Emeka-Egbuka": {
+      "personnelEventId": "2026-W08-TB-Emeka-Egbuka-out-20261030T1142180700",
+      "caseKey": "2026-W08-TB-Emeka-Egbuka",
+      "gameKey": "2026-W08-ATL-TB",
+      "team": "TB",
+      "side": "HOME",
+      "player": "Emeka Egbuka",
+      "playerEaId": "15054",
+      "availabilityStatus": "OUT",
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "Tampa Bay's Friday final injury report ruled starting wide receiver Emeka Egbuka out. The current official depth chart lists Tez Johnson directly behind Egbuka, and both identities have frozen calibrated values. Apply the acknowledged documented-depth primary estimate for Egbuka's additional vacant duties only; no measured workload or receiver multiplier is inferred.",
+      "sourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/",
+        "https://www.buccaneers.com/team/depth-chart",
+        "data/walters/nfl/player-values/by-team-v1/tb.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "availabilitySourceRefs": [
+        "https://www.buccaneers.com/team/injury-report/"
+      ],
+      "roleSourceRefs": [
+        "https://www.buccaneers.com/team/depth-chart"
+      ],
+      "reopenOn": "Reopen if Tampa Bay changes Egbuka's final availability or names a different primary replacement before kickoff.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "The official current depth chart places Tez Johnson immediately behind starting WR Emeka Egbuka; use that documented available reserve as the primary additional-duty estimate, not as confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Tez Johnson's existing baseline duties remain embedded. Only Egbuka's newly vacant receiver duties are allocated once.",
+        "baselineSourceIds": [
+          "https://www.buccaneers.com/team/depth-chart"
+        ],
+        "replacements": [
+          {
+            "player": "Tez Johnson",
+            "eaPlayerId": "15072",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Immediate listed reserve behind Emeka Egbuka on Tampa Bay's current official depth chart.",
+            "sourceRefs": [
+              "https://www.buccaneers.com/team/depth-chart"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Tez Johnson",
+          "Kameron Johnson",
+          "Ted Hurst III",
+          "David Sills V"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "Egbuka is officially out and frozen at 0.9 points. Tez Johnson is the direct listed reserve and frozen at 0.2 points. Chris Godwin returned to full practice and is not a simultaneous final absence; a single-vacancy estimate applies without a receiver-cluster multiplier."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02",
+      "effectiveAt": "2026-10-30T11:42:18-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 81,
+      "healthyWaltersPoints": 0.9,
+      "rawTeamContributionDelta": -0.7,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 0.9,
+        "replacementValue": 0.2,
+        "replacementValueRatio": {
+          "numerator": 0.2,
+          "denominator": 1
+        },
+        "injuryLoss": 0.7,
+        "rawTeamContributionDelta": -0.7,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 0.7,
+          "max": 0.7
+        },
+        "weights": [
+          {
+            "player": "Tez Johnson",
+            "eaPlayerId": "15072",
+            "lockedValue": 0.2,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "The official current depth chart places Tez Johnson immediately behind starting WR Emeka Egbuka; use that documented available reserve as the primary additional-duty estimate, not as confirmed workload.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if Tampa Bay changes Egbuka's final availability or names a different primary replacement before kickoff."
+      }
     }
   },
-  "lastBatchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-01",
+  "lastBatchId": "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02",
   "lastBatchSourceTask": "DAILY_REVIEW",
   "processedMatchupBatchIds": [
     "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01"
