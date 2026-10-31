@@ -130,7 +130,7 @@
   "state": "ACTIVE",
   "baselineStatus": "PENDING_TUESDAY_GRAHAM_BASELINE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-30T16:58:56-07:00",
+  "updatedAt": "2026-10-30T17:05:43.674-07:00",
   "purpose": "Preserve Week8 current-information research and independently constructed Graham fairs after completed Week7 and verified Week6 learning.",
   "researchEventsDir": "data/walters/nfl/2026/week-08-research-events",
   "rolloverProvenance": {
@@ -7072,6 +7072,462 @@
         "carriedRatingMoves": 0,
         "marketViewed": false,
         "productionId": "walters-personnel-production-v1"
+      }
+    },
+    {
+      "sequence": 18,
+      "type": "DELTA_1645_SCHEDULED_SWEEP",
+      "runEventId": "graham-delta-1645-2026-w08-20261030T165005-0700",
+      "sourceTaskKey": "DELTA_1645",
+      "completionResult": "BLOCKED_WITH_DURABLE_RECORD",
+      "startedAt": "2026-10-30T16:50:05-07:00",
+      "completedAt": "2026-10-30T17:05:43.674-07:00",
+      "scope": "Market-isolated Week 8 late-day information delta from the verified 2026-10-30 11:49:03.657 Pacific Daily Review cutoff through Friday final reports. Reused resolved evidence, prioritized exact unfinished current inputs, published all safe supported non-LAC personnel cases together, and preserved the LAC-LAR null H4 fair.",
+      "sourcesChecked": [
+        {
+          "source": "NFL Week 8 official injury report",
+          "url": "https://www.nfl.com/injuries/league/2026/REG8",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Friday final game statuses across the active Sunday slate; no market-bearing fields consulted."
+        },
+        {
+          "source": "Titans official transactions",
+          "url": "https://www.tennesseetitans.com/team/transactions/",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Confirmed Jeffery Simmons' October 29 trade was completed and removed him from Tennessee's Week 8 roster."
+        },
+        {
+          "source": "Official team depth charts",
+          "url": "https://www.nfl.com/teams/",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Current replacement-role chains for the 17 implicated teams; every numeric case was separately bound in the personnel production batch."
+        },
+        {
+          "source": "Read-optimized frozen player values",
+          "url": "data/walters/nfl/player-values/player-values-access-v1.json",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Verified active market-isolated shard bindings and exact fallback blob before value use."
+        },
+        {
+          "source": "Governed personnel production readback",
+          "url": "data/walters/nfl/2026/week-08-personnel-ledger.json",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Verified 34 durable events in the exact batch: 22 numeric-eligible and 12 fail-closed."
+        },
+        {
+          "source": "Governed Week 8 current-number readback",
+          "url": "data/walters/nfl/2026/week-08-current-numbers.json",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Verified calculator-owned exact and published fair changes while preserving null H4 and carried ratings."
+        },
+        {
+          "source": "Current weekly readiness queue",
+          "url": "data/walters/nfl/weekly-readiness.json",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Applied the October 20 replacement process and separated historical learning, rating propagation and current availability."
+        },
+        {
+          "source": "Walters canonical methodology",
+          "url": "/Betting Edge/walters-full-analysis-v1.0.md",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Applied replacement-aware injury loss, fail-closed missing-input discipline and independent fair construction."
+        },
+        {
+          "source": "Walters calibration plan",
+          "url": "/Betting Edge/walters-current-calibration-plan-v1.0.md",
+          "checkedAt": "2026-10-30T17:05:43.674-07:00",
+          "purpose": "Preserved labelled current estimates, immutable source bindings and market isolation."
+        }
+      ],
+      "teamFindings": [
+        {
+          "team": "PIT",
+          "gameKey": "2026-W08-CLE-PIT",
+          "finding": "Brandin Echols and Doneiko Slaughter are officially out. Echols remains blocked by the simultaneous defensive-back inventory; Slaughter has no exact frozen identity/value after shard and registry fallback searches.",
+          "availabilityStatus": "TWO_DEFENSIVE_BACKS_OUT",
+          "resolutionStatus": "FAIL_CLOSED_DURABLY_RECORDED",
+          "numericAction": "NONE",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "BAL",
+          "gameKey": "2026-W08-BAL-BUF",
+          "finding": "Olaivavega Ioane is officially out. The governed documented-depth estimate assigned the additional right-guard duties to Emery Jones Jr and applied a 0.5-point team loss.",
+          "availabilityStatus": "IOANE_OUT",
+          "resolutionStatus": "GOVERNED_PERSONNEL_ESTIMATE_APPLIED",
+          "numericAction": "BAL-BUF_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8",
+            "https://www.baltimoreravens.com/team/depth-chart"
+          ]
+        },
+        {
+          "team": "TEN",
+          "gameKey": "2026-W08-TEN-CIN",
+          "finding": "Tyjae Spears, Carnell Tate and Tommy Townsend are out; Jeffery Simmons' trade is complete. Spears-to-Singleton applied 0.5, Tate-to-Ayomanor applied zero, Simmons-to-Solomon Thomas applied 2.0, and Townsend remains specialist-review blocked.",
+          "availabilityStatus": "FOUR_ABSENCES_CONFIRMED",
+          "resolutionStatus": "THREE_GOVERNED_ESTIMATES_ONE_FAIL_CLOSED",
+          "numericAction": "TEN-CIN_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8",
+            "https://www.tennesseetitans.com/team/transactions/",
+            "https://www.tennesseetitans.com/team/depth-chart"
+          ]
+        },
+        {
+          "team": "CIN",
+          "gameKey": "2026-W08-TEN-CIN",
+          "finding": "Kyle Dugger is officially out. Russ Yeast is the documented next reserve and the governed estimate applied a 0.5-point Cincinnati loss.",
+          "availabilityStatus": "DUGGER_OUT",
+          "resolutionStatus": "GOVERNED_PERSONNEL_ESTIMATE_APPLIED",
+          "numericAction": "TEN-CIN_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "ARI",
+          "gameKey": "2026-W08-ARI-DAL",
+          "finding": "Jon Gaines II and Walter Nolen III are out. Gaines' frozen healthy value proves zero loss; Nolen-to-L.J. Collier applied a 0.5-point Arizona loss.",
+          "availabilityStatus": "TWO_ABSENCES_CONFIRMED",
+          "resolutionStatus": "GOVERNED_ZERO_AND_PRIMARY_ESTIMATES_APPLIED",
+          "numericAction": "ARI-DAL_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "DAL",
+          "gameKey": "2026-W08-ARI-DAL",
+          "finding": "KaVontae Turpin and Dee Winters are out. Current receiver/return and linebacker evidence does not establish distinct additional-duty replacements without displaced or duplicated baseline roles.",
+          "availabilityStatus": "TWO_ABSENCES_CONFIRMED",
+          "resolutionStatus": "FAIL_CLOSED_DURABLY_RECORDED",
+          "numericAction": "NONE",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "LV",
+          "gameKey": "2026-W08-LV-NYJ",
+          "finding": "Patrick Johnson is out and frozen at zero loss. Carter Runyon is out but remains absent from the exact shard and frozen-registry fallback.",
+          "availabilityStatus": "TWO_ABSENCES_CONFIRMED",
+          "resolutionStatus": "ZERO_LOSS_APPLIED_AND_IDENTITY_FAIL_CLOSED",
+          "numericAction": "LV-NYJ_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "NYJ",
+          "gameKey": "2026-W08-LV-NYJ",
+          "finding": "T'Vondre Sweat and Max Mitchell are out; Joseph Ossai is out and David Bailey doubtful. Sweat-to-Jack Heflin applied 0.5, Mitchell is zero loss, and the edge chain remains fail closed because Bailey is unresolved and Nate Lynn lacks a governed identity.",
+          "availabilityStatus": "THREE_OUT_ONE_DOUBTFUL",
+          "resolutionStatus": "TWO_GOVERNED_RESULTS_EDGE_CHAIN_FAIL_CLOSED",
+          "numericAction": "LV-NYJ_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "ATL",
+          "gameKey": "2026-W08-ATL-TB",
+          "finding": "Brian Robinson Jr is out. The current depth chart does not identify a distinct next reserve for his own additional duties after preserving Bijan Robinson's baseline role.",
+          "availabilityStatus": "ROBINSON_OUT",
+          "resolutionStatus": "FAIL_CLOSED_DURABLY_RECORDED",
+          "numericAction": "NONE",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "DET",
+          "gameKey": "2026-W08-MIN-DET",
+          "finding": "Kerby Joseph is out. The current safety configuration is multi-role and the candidate frozen identity/value inventory is incomplete.",
+          "availabilityStatus": "JOSEPH_OUT",
+          "resolutionStatus": "FAIL_CLOSED_DURABLY_RECORDED",
+          "numericAction": "NONE",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "IND",
+          "gameKey": "2026-W08-IND-JAX",
+          "finding": "Anthony Gould and Justin Walley are out; both have frozen calibrated healthy values of zero, so the governed zero-loss invariant recorded them without fabricated replacements.",
+          "availabilityStatus": "TWO_ABSENCES_CONFIRMED",
+          "resolutionStatus": "TWO_ZERO_CALIBRATED_LOSSES_APPLIED",
+          "numericAction": "IND-JAX_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "JAX",
+          "gameKey": "2026-W08-IND-JAX",
+          "finding": "Antonio Johnson is out. Jalen Huskey is the documented available safety reserve and the governed estimate applied a 0.9-point Jacksonville loss.",
+          "availabilityStatus": "JOHNSON_OUT",
+          "resolutionStatus": "GOVERNED_PERSONNEL_ESTIMATE_APPLIED",
+          "numericAction": "IND-JAX_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "MIA",
+          "gameKey": "2026-W08-NE-MIA",
+          "finding": "Kadyn Proctor is out. The current depth chart and exact frozen-registry fallback bind Jarrett Kingston as the reserve; the governed estimate applied a 0.5-point Miami loss.",
+          "availabilityStatus": "PROCTOR_OUT",
+          "resolutionStatus": "GOVERNED_PERSONNEL_ESTIMATE_APPLIED",
+          "numericAction": "NE-MIA_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "KC",
+          "gameKey": "2026-W08-KC-DEN",
+          "finding": "Omarr Norman-Lott is out and has a frozen calibrated healthy value of zero; the governed zero-loss invariant was recorded.",
+          "availabilityStatus": "NORMAN_LOTT_OUT",
+          "resolutionStatus": "ZERO_CALIBRATED_LOSS_APPLIED",
+          "numericAction": "KC-DEN_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "DEN",
+          "gameKey": "2026-W08-KC-DEN",
+          "finding": "RJ Harvey and Talanoa Hufanga are out. Harvey-to-Jonah Coleman applied 0.7 and Hufanga-to-JL Skinner applied 1.2 through distinct governed estimates.",
+          "availabilityStatus": "TWO_ABSENCES_CONFIRMED",
+          "resolutionStatus": "TWO_GOVERNED_PERSONNEL_ESTIMATES_APPLIED",
+          "numericAction": "KC-DEN_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "PHI",
+          "gameKey": "2026-W08-PHI-WAS",
+          "finding": "Jihaad Campbell, Britain Covey, Jonathan Jones, DeVonta Smith and Dontayvion Wicks are out. Campbell, Smith and Wicks received distinct documented-depth estimates; Covey is zero loss; Jones remains role-blocked. Complete tied-value receiver inventory prevented the automatic receiver multiplier.",
+          "availabilityStatus": "FIVE_ABSENCES_CONFIRMED",
+          "resolutionStatus": "FOUR_GOVERNED_RESULTS_ONE_FAIL_CLOSED",
+          "numericAction": "PHI-WAS_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "WAS",
+          "gameKey": "2026-W08-PHI-WAS",
+          "finding": "Javon Kinlaw and Daron Payne are out. Kinlaw-to-Charles Omenihu is a governed excluded upgrade with zero loss; Payne remains fail closed because the simultaneous defensive-line inventory cannot bind a distinct complete replacement.",
+          "availabilityStatus": "TWO_ABSENCES_CONFIRMED",
+          "resolutionStatus": "ZERO_LOSS_APPLIED_AND_CLUSTER_FAIL_CLOSED",
+          "numericAction": "PHI-WAS_RECOMPUTED",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        },
+        {
+          "team": "LAC",
+          "gameKey": "2026-W08-LAC-LAR",
+          "finding": "Kayode Awosika, Derwin James Jr, Deane Leonard and Brenen Thompson are out. Research resolved Awosika and Leonard at zero and Derwin-to-Tony Jefferson at 0.8, while Thompson's role remains unresolved. Publication was intentionally withheld because the active H4 fair is null and the current personnel writer would coerce that null baseline to zero, manufacturing a forbidden fair.",
+          "availabilityStatus": "FOUR_ABSENCES_CONFIRMED_H4_NULL",
+          "resolutionStatus": "SUPPORTED_CASES_BLOCKED_BY_NULL_FAIR_WRITER_PATH",
+          "numericAction": "NONE",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8",
+            "https://www.chargers.com/team/depth-chart"
+          ]
+        },
+        {
+          "team": "LAR",
+          "gameKey": "2026-W08-LAC-LAR",
+          "finding": "Joe Cardona is doubtful and the specialist registry is ineligible for numeric use. No effectiveness percentage was inferred; the shared-venue H4 fair remains null.",
+          "availabilityStatus": "CARDONA_DOUBTFUL_H4_UNRESOLVED",
+          "resolutionStatus": "FAIL_CLOSED",
+          "numericAction": "NONE",
+          "sourceRefs": [
+            "https://www.nfl.com/injuries/league/2026/REG8"
+          ]
+        }
+      ],
+      "ratingChanges": [],
+      "matchupChanges": [
+        {
+          "gameKey": "2026-W08-BAL-BUF",
+          "priorPublishedFairHome": -3,
+          "priorExactFairHome": -2.853,
+          "newPublishedFairHome": -3.5,
+          "newExactFairHome": -3.353,
+          "reason": "Ioane's governed 0.5-point loss moved Baltimore's side through the personnel owner.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-TEN-CIN",
+          "priorPublishedFairHome": -9.5,
+          "priorExactFairHome": -9.452,
+          "newPublishedFairHome": -11.5,
+          "newExactFairHome": -11.452,
+          "reason": "Spears and completed Simmons-departure estimates produced a net 2.0-point calculator move; Tate was value-invariant and Townsend stayed blocked.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-ARI-DAL",
+          "priorPublishedFairHome": -9,
+          "priorExactFairHome": -8.923,
+          "newPublishedFairHome": -9.5,
+          "newExactFairHome": -9.423,
+          "reason": "Walter Nolen III's governed 0.5-point loss moved Arizona's side; Jon Gaines II was zero loss.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-IND-JAX",
+          "priorPublishedFairHome": -12.5,
+          "priorExactFairHome": -12.422,
+          "newPublishedFairHome": -11.5,
+          "newExactFairHome": -11.522,
+          "reason": "Antonio Johnson's 0.9-point Jacksonville loss moved the home-spread coordinate; the two Indianapolis absences were zero loss.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-LV-NYJ",
+          "priorPublishedFairHome": -2,
+          "priorExactFairHome": -2.213,
+          "newPublishedFairHome": -1.5,
+          "newExactFairHome": -1.713,
+          "reason": "T'Vondre Sweat's 0.5-point Jets loss moved the home-spread coordinate; zero and blocked cases were preserved separately.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-KC-DEN",
+          "priorPublishedFairHome": -3,
+          "priorExactFairHome": -2.928,
+          "newPublishedFairHome": -1,
+          "newExactFairHome": -1.028,
+          "reason": "Distinct Denver Harvey and Hufanga estimates produced a 1.9-point calculator move; Norman-Lott was zero loss.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-NE-MIA",
+          "priorPublishedFairHome": 11,
+          "priorExactFairHome": 10.861,
+          "newPublishedFairHome": 11.5,
+          "newExactFairHome": 11.361,
+          "reason": "Kadyn Proctor's governed 0.5-point Miami loss moved the home-spread coordinate.",
+          "productionReadback": "VERIFIED"
+        },
+        {
+          "gameKey": "2026-W08-PHI-WAS",
+          "priorPublishedFairHome": 0,
+          "priorExactFairHome": 0.159,
+          "newPublishedFairHome": -2,
+          "newExactFairHome": -2.041,
+          "reason": "Philadelphia's linear receiver and linebacker estimates plus Washington's excluded Kinlaw upgrade produced a net -2.2-point calculator move; Jones and Payne remain blocked.",
+          "productionReadback": "VERIFIED"
+        }
+      ],
+      "espnFpiCapture": {
+        "status": "NOT_REFRESHED_CURRENT_INFORMATION_PRIORITY",
+        "role": "INDEPENDENT_COMPARISON_ONLY",
+        "reason": "Newest official final availability and exact unfinished role/value inputs were prioritized. No market-bearing comparison source was opened."
+      },
+      "summary": {
+        "teamsReviewed": 19,
+        "allTeamsReviewed": false,
+        "gamesReviewed": 12,
+        "marketViewed": false,
+        "marketBearingFieldExposureObserved": false,
+        "marketDataUsed": false,
+        "coverageStart": "2026-10-30T11:49:03.657-07:00",
+        "coverageEnd": "2026-10-30T17:05:43.674-07:00",
+        "priorVerifiedRunEventId": "graham-daily-review-2026-w08-20261030T113155-0700",
+        "priorCoverageBaselineState": "VERIFIED_COMPLETED_ACTIVE_WEEK_DAILY_REVIEW",
+        "coverageAdvanced": false,
+        "missedDayCatchUpRequired": false,
+        "missedDayCatchUpCompletedForScope": true,
+        "unresolvedCoverageGaps": [],
+        "materialInformationRecorded": true,
+        "governedFairChanges": 8,
+        "productionBatchesSubmitted": 1,
+        "productionPublication": {
+          "personnelBatchId": "graham-delta-1645-2026-w08-20261030T165005-0700-personnel-friday-final-01",
+          "personnelWorkflowRunId": 41147600359,
+          "qbReconciliationWorkflowRunId": 41147753406,
+          "terminalRefreshWorkflowRunId": 41147916000,
+          "repositoryBoardReadback": "VERIFIED",
+          "boardBlobSha": "3ca68231535c9257593ca4684b520f05824d535f",
+          "personnelLedgerBlobSha": "1a7ff517469e9deb2a53b666baf2b1be9f3cc165",
+          "terminalBlobSha": "89ddea57b0391db6ec99cd0ac63cddde4a7c6992",
+          "customerTerminalReadback": "PENDING_SCHEDULED_SWEEP_RECEIPT_AND_FINAL_DEPLOYED_READBACK"
+        },
+        "researchRecordingState": "BLOCKED_WITH_DURABLE_RECORD_PENDING_SWEEP_COMMIT",
+        "customerPublicationState": "GOVERNED_NON_LAC_NUMBERS_PUBLISHED_REPOSITORY_TERMINAL; DEPLOYED_READBACK_PENDING; LAC_SUPPORTED_PERSONNEL_WITHHELD_TO_PRESERVE_NULL_H4",
+        "historicalLearning": {
+          "state": "INCOMPLETE",
+          "gamesApplied": 1,
+          "gamesExpected": 14,
+          "stalledGames": 13,
+          "sourceWeek": 7,
+          "targetWeek": 8,
+          "owner": "GRAHAM_WALTERS_90_10",
+          "nextAction": "Close the 13 exact stalled Week 7 game-bound injury-boundary, source and replacement/value decisions; do not replay current-week work."
+        },
+        "ratingPropagation": {
+          "state": "INCOMPLETE",
+          "gamesVerified": 2,
+          "gamesExpected": 14,
+          "unpropagatedGames": 12,
+          "ratingBasesBehindCurrentBoard": 0,
+          "owner": "GRAHAM_RATING_BASE_REFRESH",
+          "nextAction": "Retain the 12 pending propagation checks. The current board already consumes the verified rating ledger; do not hindsight-edit old published fairs."
+        },
+        "currentAvailability": {
+          "state": "INCOMPLETE_WITH_EXPLICIT_BLOCKERS",
+          "resolvedThisRun": [
+            "22 numeric-eligible personnel events across 34 submitted cases",
+            "8 governed fair changes",
+            "completed Jeffery Simmons transaction",
+            "Friday final designations"
+          ],
+          "existingExplicitBlockers": [
+            "CAR Bobby Brown III missing replacement value/official capture",
+            "TEN Tommy Townsend specialist valuation",
+            "DAL KaVontae Turpin multi-role replacement",
+            "DAL Dee Winters linebacker replacement",
+            "DET Kerby Joseph safety allocation",
+            "LV Carter Runyon missing identity/value",
+            "NYJ Joseph Ossai plus doubtful David Bailey edge allocation",
+            "PIT Brandin Echols/Doneiko Slaughter DB cluster and Slaughter missing identity/value",
+            "ATL Brian Robinson Jr next-duty assignment",
+            "PHI Jonathan Jones next reserve",
+            "WAS Daron Payne defensive-line cluster",
+            "LAC-LAR shared-venue H4 plus null-fair-safe personnel publication path"
+          ],
+          "nextAction": "Resolve each named identity/role through the existing owner. H4 or a null-fair-safe record-only personnel path must exist before publishing LAC cases."
+        },
+        "rolloverHandoffGate": {
+          "required": true,
+          "reason": "Week 7-to-8 historical learning remains incomplete for 13 of 14 games. Current availability work does not replace unfinished earlier learning."
+        },
+        "readinessQueue": {
+          "state": "BLOCKED",
+          "initialBaseline": "INCOMPLETE",
+          "historicalApplied": 1,
+          "historicalExpected": 14,
+          "stalledHistoricalGames": 13,
+          "ratingPropagationVerified": 2,
+          "ratingPropagationExpected": 14,
+          "ratingBasesBehindCurrentBoard": 0,
+          "activeWeekPreparationStalled": [
+            "2026-W08-CAR-GB"
+          ],
+          "explicitEscalation": "GRAHAM_WALTERS_90_10 must close 13 stalled Week 7 games and the exact CAR-GB final-game inventory; current personnel owners retain the named live blockers."
+        },
+        "result": "BLOCKED_WITH_DURABLE_RECORD",
+        "note": "Research coverage completed for the change-only Delta scope and the safe governed changes were published. The run remains controlled-failure blocked because publishing the supported LAC personnel cases through the current writer would manufacture a fair from the intentionally null H4 baseline. A blocked receipt proves recording, not completed production or customer publication."
       }
     }
   ]
