@@ -1,0 +1,993 @@
+{
+  "schema": 1,
+  "evidenceId": "graham-2026-w07-dal-phi-reused-role-reconciliation-20261031T230529Z",
+  "recordedAt": "2026-10-31T23:05:29.000Z",
+  "season": 2026,
+  "sourceWeek": 7,
+  "scope": "Additive DAL-PHI reconciliation reusing source-bound, previously approved role estimates only where the official Week 7 gamebook confirms the same active replacement identity. One pregame personnel case and four in-game exposure boundaries remain explicit.",
+  "marketViewed": false,
+  "inputCommit": "d7c790934ddde1aee74433b9e3285a7e6ef5eab6",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-07-personnel-ledger.json": "488c3c54ddf09b6531437a1fc9855c1c93065358",
+    "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
+    "data/walters/nfl/weekly-readiness.json": "d573b144a896200c1bac3fc363303494169563d0",
+    "data/walters/nfl-power-ratings-ledger.json": "08d7317ccc18c975d15bfc221398afad9085d95f",
+    "data/walters/nfl/home-field/h4-current.json": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "e733347372f2b40e7a5bb57145d9c2d612d0c041",
+    "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-26-dal-phi-final-preparation.json": "071a1eb17d8fc0d7160b661b8a05156c9ed86d5c",
+    "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json": "c1c314aa8443c5282c1f6d12027be30fb754c432",
+    "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-tb-dal-full-reserve-correction.json": "d3448f44f370fcef7ccdb6099eca447fa367fac1",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-dal-gb-ready-reconciliation.json": "714140fb6ea787b0f94dd767f3dbdd47ca8f585b",
+    "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-car-phi-ready-reconciliation.json": "4692a45b6c99a8fd226af7376d79f1f9022f6246"
+  },
+  "sources": [
+    {
+      "id": "nfl-dal-phi-week7-official-gamebook",
+      "kind": "OFFICIAL",
+      "url": "https://static.www.nfl.com/image/upload/v1793101127/gamecenter/aaf70733-4feb-11f1-abca-2c54536568a9.pdf",
+      "checkedAt": "2026-10-31T21:09:55.000Z",
+      "gameKeys": [
+        "2026-W07-DAL-PHI"
+      ],
+      "finding": "NFL Game Center exposes the official final DAL-PHI Week 7 gamebook with paired lineups, substitutions, DNPs, inactives, quarterback/specialist participation and printed injury updates.",
+      "sha256": "d4a4e263753566e381c033936b1d67d24c4e7a7c02ca52a35d83b92e2a42f319",
+      "bytes": 335665,
+      "pages": 20
+    },
+    {
+      "id": "ea-kenny-moore-week7",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/kenny-moore-ii/12965",
+      "finding": "Official Madden NFL 27 binds Kenny Moore II at CB 80; reused under the unchanged frozen historical conversion without altering the registry.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:04:42.000Z",
+      "gameKeys": [
+        "2026-W07-DAL-PHI"
+      ]
+    },
+    {
+      "id": "ea-johnny-wilson-week7",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/positions-ratings/wide-receiver/WR?page=3&pageType=positions-ratings",
+      "finding": "Official Madden NFL 27 receiver index binds the exact Philadelphia Johnny Wilson identity at WR 68; reused under the unchanged frozen historical conversion without altering the registry.",
+      "kind": "OFFICIAL",
+      "checkedAt": "2026-10-20T21:04:42.000Z",
+      "gameKeys": [
+        "2026-W07-DAL-PHI"
+      ]
+    }
+  ],
+  "games": [
+    {
+      "gameKey": "2026-W07-DAL-PHI",
+      "away": "DAL",
+      "home": "PHI",
+      "state": "BLOCKED",
+      "sourceIds": [
+        "nfl-dal-phi-week7-official-gamebook"
+      ],
+      "sourceAvailabilityChange": {
+        "previous": "SOURCE_NOT_YET_AVAILABLE",
+        "current": "OFFICIAL_GAMEBOOK_CAPTURED_AND_ASSEMBLED",
+        "finding": "NFL Game Center now exposes the official 20-page DAL-PHI Week 7 gamebook. The prior source-availability blocker is cleared.",
+        "footballImpact": "Paired starters, substitutes, DNPs, inactives, quarterbacks, specialists and the complete printed injury-update sequence are now source-bound. Remaining blockers are numerical role/value or bounded-exposure decisions, not missing participation evidence."
+      },
+      "final": {
+        "awayScore": 38,
+        "homeScore": 21,
+        "status": "FINAL_REGULATION",
+        "sourceId": "nfl-dal-phi-week7-official-gamebook"
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-26T17:15:00-07:00",
+        "awayRating": 23.171534758,
+        "homeRating": 25.004974248,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": -1.83343949,
+        "currentNumbersBlobSha": "0547aab9cf16001cae7d99d6c831944640065403",
+        "powerLedgerBlobSha": "56f6a3c8b6955b1c8dba7c58f28ce3ef6f36a0ff",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "marketViewed": false,
+        "preservedH4": true,
+        "preservedPregameExactFairHome": -1.275,
+        "preservedPregameDisplayedFairHome": -1.5
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_SOURCE_BOUND_PAIRED",
+        "pairedParticipation": "COMPLETE_OFFICIAL_STARTERS_SUBSTITUTES_DNP",
+        "quarterbackParticipation": "COMPLETE_OFFICIAL",
+        "specialistParticipation": "COMPLETE_OFFICIAL",
+        "officialInGameInjuryReporting": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE_WITH_EXPLICIT_BOUNDARY_GAPS",
+        "pairedGameDayInjuryLoss": "BLOCKED_NUMERICAL_ASSEMBLY"
+      },
+      "pairedTeamInventories": [
+        {
+          "team": "DAL",
+          "side": "AWAY",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_WITH_EXPLICIT_UNRESOLVED_CASES",
+          "offensiveStarters": [
+            "88 C.Lamb (WR)",
+            "89 B.Spann-Ford (TE)",
+            "60 T.Guyton (LT)",
+            "73 T.Smith (LG)",
+            "56 C.Beebe (C)",
+            "52 T.Booker (RG)",
+            "78 T.Steele (RT)",
+            "87 J.Ferguson (TE)",
+            "3 G.Pickens (WR)",
+            "4 D.Prescott (QB)",
+            "33 J.Williams (RB)"
+          ],
+          "defensiveStarters": [
+            "57 M.Lawrence (OLB)",
+            "92 Q.Williams (DT)",
+            "97 K.Clark (DT)",
+            "91 O.Ogbonnia (DT)",
+            "7 R.Gary (OLB)",
+            "50 S.James (LB)",
+            "55 J.Barham (LB)",
+            "13 C.Downs (DB)",
+            "25 J.Porter (CB)",
+            "26 D.Bland (CB)",
+            "24 M.Hooker (S)"
+          ],
+          "substitutes": [
+            "0 D.Overshown (LB)",
+            "2 C.Durant (CB)",
+            "5 B.Anger (P)",
+            "6 D.Ezeiruaku (OLB)",
+            "11 A.Clark (S)",
+            "14 M.Bell (S)",
+            "17 B.Aubrey (K)",
+            "18 J.Mingo (WR)",
+            "19 R.Flournoy (WR)",
+            "23 A.Speed (CB)",
+            "28 S.Revel (CB)",
+            "30 H.Luepke (FB)",
+            "32 T.Goodson (RB)",
+            "40 V.Miller (OLB)",
+            "41 J.Houston (OLB)",
+            "43 J.Thomas (S)",
+            "44 T.Sieg (LS)",
+            "45 J.Barron (LB)",
+            "65 A.Cornelius (T)",
+            "66 T.Bass (G)",
+            "77 B.Jones (T)",
+            "80 C.Brown (WR)",
+            "86 L.Schoonmaker (TE)",
+            "93 E.Garcia (DT)",
+            "99 L.Overton (DT)"
+          ],
+          "didNotPlay": [
+            "16 S.Howell (QB)"
+          ],
+          "finalInactive": [
+            "KaVontae Turpin (WR/returner)",
+            "Emari Demercado (RB)",
+            "Dee Winters (LB)",
+            "Tyrus Wheat (OLB)",
+            "Drew Shelton (T)"
+          ],
+          "reserveUnavailable": [
+            "Jonathan Bullard (DT, Reserve/Designated to Return)",
+            "Marist Liufau (OLB, Reserve/Designated to Return)",
+            "P.J. Locke (S, Reserve/Designated to Return)",
+            "Devin Moore (CB, Reserve/Designated to Return)",
+            "Jalen Thompson (S, Reserve/Designated to Return)",
+            "Malik Davis (RB, Reserve/Injured)",
+            "Princeton Fant (TE, Reserve/Injured)",
+            "Kelvin Gilliam (DT, Reserve/Injured)",
+            "Matt Hennessy (OL, Reserve/Injured)",
+            "DJ Rogers (TE, Reserve/Injured)"
+          ],
+          "gameDayElevations": [],
+          "quarterback": {
+            "starter": "Dak Prescott",
+            "didNotPlay": "Sam Howell",
+            "injuryDutyLoss": "NONE_REPORTED",
+            "state": "COMPLETE_OFFICIAL"
+          },
+          "specialists": {
+            "kicker": "Brandon Aubrey",
+            "punterHolder": "Bryan Anger",
+            "longSnapper": "Trent Sieg",
+            "puntReturner": "Jonathan Mingo",
+            "kickReturners": [
+              "Jonathan Mingo",
+              "Tyler Goodson"
+            ],
+            "state": "COMPLETE_OFFICIAL"
+          },
+          "resolvedNumericalCases": [
+            "2026-W07-DAL-Dee-Winters",
+            "2026-W07-DAL-Drew-Shelton",
+            "2026-W07-DAL-Marist-Liufau",
+            "2026-W07-DAL-Princeton-Fant",
+            "2026-W07-DAL-Matt-Hennessy",
+            "2026-W07-DAL-Malik-Davis",
+            "2026-W07-DAL-Emari-Demercado",
+            "2026-W07-DAL-Tyrus-Wheat",
+            "2026-W07-DAL-Kelvin-Gilliam",
+            "2026-W07-DAL-DJ-Rogers",
+            "2026-W07-DAL-Jonathan-Bullard",
+            "2026-W07-DAL-Jalen-Thompson",
+            "2026-W07-DAL-P-J-Locke",
+            "2026-W07-DAL-KaVontae-Turpin"
+          ],
+          "unresolvedNumericalCases": [],
+          "allCurrentPersonnelCasesReviewed": true,
+          "numericInventoryComplete": false,
+          "coverageExclusions": [
+            {
+              "player": "Kelvin Gilliam",
+              "category": "CAMP_ROSTER_ONLY",
+              "establishedRegularSeasonRole": false,
+              "estimateAcknowledged": true,
+              "rationale": "Previously approved no-established-regular-season-role finding reused; Week 7 official inventory confirms Reserve/Injured with no contradictory duty.",
+              "evidence": [
+                "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+                "nfl-dal-phi-week7-official-gamebook"
+              ]
+            },
+            {
+              "player": "DJ Rogers",
+              "category": "CAMP_ROSTER_ONLY",
+              "establishedRegularSeasonRole": false,
+              "estimateAcknowledged": true,
+              "rationale": "Previously approved no-established-regular-season-role finding reused; Week 7 official inventory confirms Reserve/Injured with no contradictory duty.",
+              "evidence": [
+                "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+                "nfl-dal-phi-week7-official-gamebook"
+              ]
+            }
+          ]
+        },
+        {
+          "team": "PHI",
+          "side": "HOME",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_WITH_EXPLICIT_UNRESOLVED_CASES",
+          "offensiveStarters": [
+            "83 J.Mundt (TE)",
+            "81 G.Calcaterra (TE)",
+            "68 J.Mailata (LT)",
+            "69 L.Dickerson (LG)",
+            "66 D.Kendall (C)",
+            "56 T.Steen (RG)",
+            "72 M.Bell (RT)",
+            "88 D.Goedert (TE)",
+            "19 E.Moore (WR)",
+            "16 T.McKee (QB)",
+            "26 S.Barkley (RB)"
+          ],
+          "defensiveStarters": [
+            "52 J.Greenard (OLB)",
+            "97 M.Ojomo (DT)",
+            "90 J.Davis (DT)",
+            "98 J.Carter (DT)",
+            "58 J.Hunt (OLB)",
+            "53 Z.Baun (LB)",
+            "11 J.Campbell (LB)",
+            "33 C.DeJean (DB)",
+            "2 T.Woolen (CB)",
+            "27 Q.Mitchell (CB)",
+            "24 A.Mukuba (S)"
+          ],
+          "substitutes": [
+            "0 M.Brown (WR)",
+            "4 J.Elliott (K)",
+            "7 K.Ringo (CB)",
+            "9 M.Lemon (WR)",
+            "10 B.Mann (P)",
+            "17 A.Ebiketie (OLB)",
+            "23 K.Moore (DB)",
+            "29 M.Epps (S)",
+            "31 J.Jones (CB)",
+            "39 D.Pierce (RB)",
+            "41 R.Underwood (LS)",
+            "42 S.Mondon (LB)",
+            "49 E.Mitchell (RB)",
+            "50 K.James-Newby (OLB)",
+            "54 J.Trotter (LB)",
+            "57 A.Epenesa (OLB)",
+            "61 W.Lampkin (C/G)",
+            "74 F.Johnson (T)",
+            "76 M.Morris (G)",
+            "80 D.Cooper (WR)",
+            "85 B.Covey (WR)",
+            "87 E.Stowers (TE)",
+            "94 B.Young (DT)",
+            "95 T.Robinson (DT)"
+          ],
+          "didNotPlay": [
+            "14 J.Milton (QB)",
+            "22 M.McWilliams (CB)"
+          ],
+          "finalInactive": [
+            "Nolan Smith Jr. (OLB)",
+            "DeVonta Smith (WR)",
+            "Dontayvion Wicks (WR)",
+            "Cole Payton (emergency third QB)",
+            "Michael Carter II (DB)",
+            "Lane Johnson (T; roster-exit exclusion, not a fresh injury charge)",
+            "Jake Majors (C/G)"
+          ],
+          "reserveUnavailable": [
+            "Jakorian Bennett (CB, Reserve/Injured)",
+            "Tank Bigsby (RB, Reserve/Injured)",
+            "Jalen Hurts (QB, Reserve/Injured)",
+            "Andre Sam (S, Reserve/Injured)",
+            "Will Shipley (RB, Reserve/Injured)",
+            "Johnny Wilson (WR, Reserve/Injured)",
+            "Tucker Large (S, Reserve/Non-Football Injury)"
+          ],
+          "activated": [
+            "Grant Calcaterra",
+            "Landon Dickerson",
+            "Eli Stowers"
+          ],
+          "gameDayElevations": [
+            "Keyshawn James-Newby",
+            "Elijah Mitchell"
+          ],
+          "coverageExclusions": [
+            {
+              "player": "Lane Johnson",
+              "classification": "ROSTER_EXIT_NOT_FRESH_INJURY_CHARGE",
+              "basis": "The prior bound Week 7 review records Johnson's retirement as a roster exit. The gamebook inactive row does not reopen him as a current injury case."
+            },
+            {
+              "player": "Andre Sam",
+              "category": "CAMP_ROSTER_ONLY",
+              "establishedRegularSeasonRole": false,
+              "estimateAcknowledged": true,
+              "rationale": "Previously approved no-established-regular-season-role finding reused; Week 7 official inventory confirms Reserve/Injured with no contradictory defensive role.",
+              "evidence": [
+                "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+                "nfl-dal-phi-week7-official-gamebook"
+              ]
+            },
+            {
+              "player": "Tucker Large",
+              "category": "CAMP_ROSTER_ONLY",
+              "establishedRegularSeasonRole": false,
+              "estimateAcknowledged": true,
+              "rationale": "Previously approved no-established-regular-season-role finding reused; Week 7 official inventory confirms Reserve/NFI with no contradictory regular-season role.",
+              "evidence": [
+                "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+                "nfl-dal-phi-week7-official-gamebook"
+              ]
+            }
+          ],
+          "quarterback": {
+            "starter": "Tanner McKee",
+            "didNotPlay": "Joe Milton III",
+            "emergencyInactive": "Cole Payton",
+            "injuryDutyLoss": "NONE_REPORTED",
+            "state": "COMPLETE_OFFICIAL"
+          },
+          "specialists": {
+            "kicker": "Jake Elliott",
+            "punterHolder": "Braden Mann",
+            "longSnapper": "Rocco Underwood",
+            "puntReturnState": "NO_PLAYER_RETURN_RECORDED; ONE_DOWNED_AND_ONE_OUT_OF_BOUNDS",
+            "kickReturners": [
+              "Elijah Mitchell",
+              "Dameon Pierce",
+              "Britain Covey"
+            ],
+            "state": "COMPLETE_OFFICIAL"
+          },
+          "resolvedNumericalCases": [
+            "2026-W07-PHI-Jakorian-Bennett",
+            "2026-W07-PHI-Tank-Bigsby",
+            "2026-W07-PHI-Jalen-Hurts",
+            "2026-W07-PHI-Nolan-Smith-Jr",
+            "2026-W07-PHI-Lane-Johnson-roster-exit-exclusion",
+            "2026-W07-PHI-Andre-Sam",
+            "2026-W07-PHI-Jake-Majors",
+            "2026-W07-PHI-Tucker-Large",
+            "2026-W07-PHI-DeVonta-Smith",
+            "2026-W07-PHI-Dontayvion-Wicks",
+            "2026-W07-PHI-Michael-Carter-II",
+            "2026-W07-PHI-Johnny-Wilson"
+          ],
+          "unresolvedNumericalCases": [
+            {
+              "caseKey": "2026-W07-PHI-Will-Shipley",
+              "exactMissingFact": "The gamebook binds Mitchell, Pierce and Covey as kick returners but not Shipley's distinct offensive duty or nonduplicated return allocation.",
+              "footballImpact": "Return-game and running-back depth loss.",
+              "requiredSourceOrMethodDecision": "Separate return units from offensive duties and apply an approved disjoint primary/committee estimate."
+            }
+          ],
+          "allCurrentPersonnelCasesReviewed": true,
+          "numericInventoryComplete": false
+        }
+      ],
+      "observedInGameInjuries": [
+        {
+          "team": "PHI",
+          "player": "Britain Covey",
+          "statusSequence": [
+            "Q1 06:18 remaining: return Questionable",
+            "start of Q2: Out"
+          ],
+          "boundaryState": "INITIAL_INJURY_PLAY_UNPRINTED; OUT_NOTICE_COMPLETE",
+          "footballImpact": "Return duty was lost for the remainder, but the exact initial injury exposure is not printed.",
+          "requiredSourceOrMethodDecision": "Use a source-supported exit play or approved bounded method; do not invent a clock."
+        },
+        {
+          "team": "PHI",
+          "player": "Quinyon Mitchell",
+          "statusSequence": [
+            "Q2 01:14 remaining: injured during 13-yard completion",
+            "Q2 00:12 remaining: returned"
+          ],
+          "boundaryState": "COMPLETE_PRINTED_INTERVAL",
+          "footballImpact": "A 62-second game-clock interval is source-bound and eligible for the existing partial-game exposure method."
+        },
+        {
+          "team": "PHI",
+          "player": "Saquon Barkley",
+          "statusSequence": [
+            "Q4 14:27 remaining: return Questionable"
+          ],
+          "boundaryState": "INITIAL_INJURY_PLAY_UNPRINTED; RETURN_STATUS_UNRESOLVED",
+          "footballImpact": "A positive healthy value makes arbitrary exposure material.",
+          "requiredSourceOrMethodDecision": "Use a source-supported departure play/participation bound or retain unknown exposure."
+        },
+        {
+          "team": "PHI",
+          "player": "Dameon Pierce",
+          "statusSequence": [
+            "Q4 08:38 remaining: injured during 1-yard reception"
+          ],
+          "boundaryState": "EXIT_PLAY_COMPLETE; NO_PRINTED_RETURN",
+          "footballImpact": "Late running-back and kick-return duty may have been lost.",
+          "requiredSourceOrMethodDecision": "Use the printed exit with no return only through the approved exposure convention; do not infer impairment while active."
+        },
+        {
+          "team": "PHI",
+          "player": "Moro Ojomo",
+          "statusSequence": [
+            "Q4 07:04 remaining: injured during 5-yard run"
+          ],
+          "boundaryState": "EXIT_PLAY_COMPLETE; NO_PRINTED_RETURN",
+          "footballImpact": "Late defensive-line duty may have been lost.",
+          "requiredSourceOrMethodDecision": "Use the printed exit with no return only through the approved exposure convention and preserve baseline rotation assumptions."
+        }
+      ],
+      "caseReviews": [
+        {
+          "team": "PHI",
+          "player": "Nolan Smith Jr",
+          "eaPlayerId": "22700",
+          "caseKey": "2026-W07-PHI-Nolan-Smith-Jr",
+          "availabilityStatus": "OUT",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official gamebook confirms Smith inactive and lists Arnold Ebiketie, A.J. Epenesa and elevated Keyshawn James-Newby as active edge substitutes behind the Greenard/Hunt starting edge pair.",
+          "resolution": "EQUAL_SHARE_COMMITTEE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "The final gamebook establishes the complete three-player active substitute edge candidate set, but it does not print their exact added-duty allocation.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Use the approved equal-share committee only for Smith's additional vacant edge duty; this is a labelled allocation assumption, not observed snap weights.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Greenard and Hunt remain common starters. Ebiketie, Epenesa and James-Newby retain their existing baseline duties and receive only equal shares of Smith's additional vacancy; no candidate is reused by another resolved case in this bundle.",
+          "replacements": [
+            {
+              "player": "Arnold Ebiketie",
+              "eaPlayerId": "22147"
+            },
+            {
+              "player": "A.J. Epenesa",
+              "eaPlayerId": "20984"
+            },
+            {
+              "player": "Keyshawn James-Newby",
+              "eaPlayerId": "10185"
+            }
+          ]
+        },
+        {
+          "team": "DAL",
+          "player": "Jonathan Bullard",
+          "eaPlayerId": "17656",
+          "caseKey": "2026-W07-DAL-Jonathan-Bullard",
+          "availabilityStatus": "IR",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Bullard on reserve/DTR and L.T. Overton active as a substitute defensive tackle.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Reuse the approved recurring documented-depth assignment only for Bullard's additional vacant interior-line duty; common starters retain baseline duties.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Source-bound recurring primary assignment, not measured snaps.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Overton is credited once; Clark, Williams and Ogbonnia remain common baseline contributors.",
+          "replacements": [
+            {
+              "player": "LT Overton",
+              "eaPlayerId": "16420"
+            }
+          ]
+        },
+        {
+          "team": "DAL",
+          "player": "Jalen Thompson",
+          "eaPlayerId": "20813",
+          "caseKey": "2026-W07-DAL-Jalen-Thompson",
+          "availabilityStatus": "IR",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Thompson on reserve/DTR and Markquese Bell active as a substitute safety.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Reuse the approved recurring primary safety assignment only for Thompson's additional vacancy.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Source-bound recurring primary assignment, not measured snaps.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Bell is reserved to Thompson; Hooker and Downs retain their common baseline duties.",
+          "replacements": [
+            {
+              "player": "Markquese Bell",
+              "eaPlayerId": "22229"
+            }
+          ]
+        },
+        {
+          "team": "DAL",
+          "player": "P.J. Locke",
+          "eaPlayerId": "21414",
+          "caseKey": "2026-W07-DAL-P-J-Locke",
+          "availabilityStatus": "IR",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Locke on reserve/DTR and Juanyeh Thomas active as a substitute safety.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Reuse the approved recurring documented-depth assignment only for Locke's additional safety depth duty.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Source-bound recurring primary assignment, not measured snaps.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Thomas is credited once; Bell remains reserved to Thompson.",
+          "replacements": [
+            {
+              "player": "Juanyeh Thomas",
+              "eaPlayerId": "22400"
+            }
+          ]
+        },
+        {
+          "team": "DAL",
+          "player": "KaVontae Turpin",
+          "eaPlayerId": "22599",
+          "caseKey": "2026-W07-DAL-KaVontae-Turpin",
+          "availabilityStatus": "OUT",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Turpin inactive and Jonathan Mingo active at receiver/return depth.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Reuse the approved Mingo primary only for Turpin's additional receiver/return vacancy; no return multiplier is added.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Source-bound recurring primary assignment, not measured receiver or return share.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Mingo is credited once. Goodson retains his common return/RB baseline and existing Malik Davis relief.",
+          "replacements": [
+            {
+              "player": "Jonathan Mingo",
+              "eaPlayerId": "22770"
+            }
+          ]
+        },
+        {
+          "team": "PHI",
+          "player": "DeVonta Smith",
+          "eaPlayerId": "21761",
+          "caseKey": "2026-W07-PHI-DeVonta-Smith",
+          "availabilityStatus": "OUT",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Smith inactive and Elijah Moore listed as the starting receiver.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Reuse the approved Moore primary for Smith's additional receiver vacancy only.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Source-bound recurring primary assignment, not measured targets.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Moore is credited once to Smith; Cooper is reserved to Wicks and Covey to his own in-game case.",
+          "replacements": [
+            {
+              "player": "Elijah Moore",
+              "eaPlayerId": "21599"
+            }
+          ]
+        },
+        {
+          "team": "PHI",
+          "player": "Dontayvion Wicks",
+          "eaPlayerId": "22772",
+          "caseKey": "2026-W07-PHI-Dontayvion-Wicks",
+          "availabilityStatus": "OUT",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Wicks inactive and Darius Cooper active as a substitute receiver.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Assign Cooper only to Wicks's additional receiver vacancy, preserving Smith/Moore and Covey's in-game case as distinct.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Documented-depth primary assignment, not measured targets.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Cooper is credited once; no Covey relief credit is used.",
+          "replacements": [
+            {
+              "player": "Darius Cooper",
+              "eaPlayerId": "4727"
+            }
+          ]
+        },
+        {
+          "team": "PHI",
+          "player": "Michael Carter II",
+          "eaPlayerId": "21697",
+          "caseKey": "2026-W07-PHI-Michael-Carter-II",
+          "availabilityStatus": "OUT",
+          "sourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The official Week 7 gamebook confirms Carter inactive and Kenny Moore II active as a substitute defensive back.",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+          "modelId": "graham-replacement-role-estimate-v1",
+          "roleSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "roleRationale": "Reuse the approved direct defensive-back depth assignment only for Carter's nickel vacancy.",
+          "estimateAcknowledged": true,
+          "assumptionRationale": "Source-bound recurring primary assignment, not measured snaps.",
+          "baselineDoubleCountReviewed": true,
+          "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+          "baselineDutiesDisplaced": false,
+          "baselineSourceIds": [
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "baselineRationale": "Moore is credited once; Mukuba and other active defensive backs retain their common baseline duties.",
+          "replacements": [
+            {
+              "player": "Kenny Moore II",
+              "eaPlayerId": "estimate:kenny-moore-ii"
+            }
+          ]
+        }
+      ],
+      "blockers": [
+        {
+          "code": "AVAILABLE_EVIDENCE_NOT_RECONCILED",
+          "finding": "The complete paired official inventory remains source-bound. Fifteen of the original sixteen pregame personnel cases are now closed: seven through calibrated-zero/no-established-role rulings and eight through recurring source-bound roles whose exact replacements are confirmed active in the Week 7 gamebook. Will Shipley remains the sole unresolved pregame personnel case; Nolan Smith Jr. remains a validated labelled estimate.",
+          "footballImpact": "Shipley's distinct running-back/return allocation and four incomplete in-game exposure boundaries can still change Philadelphia's loss.",
+          "nextAction": "Resolve Shipley's distinct RB/return duties without reusing Pierce's later in-game vacancy or another common baseline, then apply only source-supported or eligible approved exposure methods for Covey, Barkley, Pierce and Ojomo.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "Quinyon Mitchell has a complete printed injury-to-return interval. Covey and Barkley lack printed initial exit plays; Pierce and Ojomo have printed exits but no return notices.",
+          "footballImpact": "Arbitrary exposure can materially distort Philadelphia return, secondary, running-back and defensive-line loss.",
+          "nextAction": "Apply the complete Mitchell interval; use only an eligible approved bounded method or source-supported departure/return evidence for the other four cases, otherwise retain unknown exposure.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Fifteen of sixteen pregame personnel cases are closed without double counting. The remaining pregame case is Will Shipley: the gamebook confirms active backs/returners but does not bind a distinct, nonduplicated healthy-duty replacement after preserving their common baseline and later in-game injuries.",
+          "footballImpact": "Shipley's frozen 0.2 value cannot enter the paired subtotal until his distinct RB/return relief is assigned without consuming the same player twice.",
+          "nextAction": "Use a source-supported distinct primary/committee assignment for Shipley's additional duties, or an eligible approved capacity method. Do not infer an offensive role from special teams alone.",
+          "owner": "GRAHAM_WALTERS_90_10"
+        }
+      ],
+      "resolvedCaseAdditions": [
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-Emari-Demercado",
+          "player": "Emari Demercado",
+          "resolution": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "eaPlayerId": "23339",
+          "footballImpact": "No positive point loss is possible under the frozen nonnegative calibration.",
+          "evidence": [
+            "data/walters/nfl/player-values/player-values-2026-v1.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The frozen registry value is exactly zero. This closes the point effect without inventing a replacement or treating a missing value as zero."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-Tyrus-Wheat",
+          "player": "Tyrus Wheat",
+          "resolution": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "eaPlayerId": "23151",
+          "footballImpact": "No positive point loss is possible under the frozen nonnegative calibration.",
+          "evidence": [
+            "data/walters/nfl/player-values/player-values-2026-v1.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The frozen registry value is exactly zero. Special-teams activity is not used to infer a defensive replacement effect."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-Kelvin-Gilliam",
+          "player": "Kelvin Gilliam",
+          "resolution": "NO_ESTABLISHED_REGULAR_SEASON_ROLE",
+          "footballImpact": "No established healthy baseline duty is charged.",
+          "evidence": [
+            "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "Reuse the approved CAMP_ROSTER_ONLY/no-established-regular-season-role finding; the Week 7 official inventory confirms Reserve/Injured and supplies no contradictory regular-season duty."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-DJ-Rogers",
+          "player": "DJ Rogers",
+          "resolution": "NO_ESTABLISHED_REGULAR_SEASON_ROLE",
+          "footballImpact": "No established healthy baseline duty is charged.",
+          "evidence": [
+            "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "Reuse the approved CAMP_ROSTER_ONLY/no-established-regular-season-role finding; the Week 7 official inventory confirms Reserve/Injured and supplies no contradictory regular-season duty."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-Andre-Sam",
+          "player": "Andre Sam",
+          "resolution": "NO_ESTABLISHED_REGULAR_SEASON_ROLE",
+          "footballImpact": "No defensive loss is inferred from reserve or special-teams status.",
+          "evidence": [
+            "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "Reuse the approved CAMP_ROSTER_ONLY/no-established-regular-season-role finding; the Week 7 official inventory confirms Reserve/Injured and supplies no contradictory defensive role."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-Jake-Majors",
+          "player": "Jake Majors",
+          "resolution": "ZERO_CALIBRATED_LOSS",
+          "healthyValue": 0,
+          "eaPlayerId": "15137",
+          "footballImpact": "No positive point loss is possible under the frozen nonnegative calibration.",
+          "evidence": [
+            "data/walters/nfl/player-values/player-values-2026-v1.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "The frozen registry value is exactly zero. This closes the point effect without inventing a replacement or treating a missing value as zero."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-Tucker-Large",
+          "player": "Tucker Large",
+          "resolution": "NO_ESTABLISHED_REGULAR_SEASON_ROLE",
+          "footballImpact": "No defensive loss is inferred from reserve or special-teams status.",
+          "evidence": [
+            "data/walters/nfl/2026/week-02-weekly-evidence/2026-09-22-full-slate-approved-estimates.json",
+            "nfl-dal-phi-week7-official-gamebook"
+          ],
+          "rationale": "Reuse the approved CAMP_ROSTER_ONLY/no-established-regular-season-role finding; the Week 7 official inventory confirms Reserve/NFI and supplies no contradictory regular-season duty."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-Jonathan-Bullard",
+          "player": "Jonathan Bullard",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "LT Overton",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Frozen 0.2 minus Overton 0.0 yields a 0.2 candidate loss before team cluster assembly."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-Jalen-Thompson",
+          "player": "Jalen Thompson",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "Markquese Bell",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Frozen 1.2 minus Bell 0.2 yields a 1.0 candidate loss before team cluster assembly."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-P-J-Locke",
+          "player": "P.J. Locke",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "Juanyeh Thomas",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Frozen 0.2 minus Thomas 0.0 yields a 0.2 candidate loss before team cluster assembly."
+        },
+        {
+          "team": "DAL",
+          "caseKey": "2026-W07-DAL-KaVontae-Turpin",
+          "player": "KaVontae Turpin",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "Jonathan Mingo",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Frozen 0.5 minus Mingo 0.0 yields a 0.5 candidate loss; no separate return multiplier."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-DeVonta-Smith",
+          "player": "DeVonta Smith",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "Elijah Moore",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Frozen 1.7 minus Moore 0.2 yields a 1.5 candidate loss before receiver-cluster review."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-Dontayvion-Wicks",
+          "player": "Dontayvion Wicks",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "Darius Cooper",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Frozen 0.5 minus Cooper 0.0 yields a 0.5 candidate loss before receiver-cluster review."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-Michael-Carter-II",
+          "player": "Michael Carter II",
+          "resolution": "PRIMARY_REPLACEMENT",
+          "replacement": "Kenny Moore II",
+          "validatedCaseEstimate": true,
+          "footballImpact": "The source-bound 80 OVR replacement exceeds Carter's frozen 0.2 value; the nonnegative loss floor yields zero, not a fabricated zero value."
+        },
+        {
+          "team": "PHI",
+          "caseKey": "2026-W07-PHI-Johnny-Wilson",
+          "player": "Johnny Wilson",
+          "resolution": "ZERO_IMPUTED_BASELINE_ESTIMATE",
+          "validatedCaseEstimate": true,
+          "footballImpact": "Official 68 OVR maps to a zero healthy point baseline under the frozen curve; nonnegative replacements make the point loss zero while preserving estimate provenance."
+        }
+      ],
+      "receiverClusterSafeguard": {
+        "state": "REVIEW_REQUIRED_BEFORE_READY",
+        "finding": "DeVonta Smith uses Elijah Moore and Dontayvion Wicks uses Darius Cooper as distinct primaries. Britain Covey is reserved for his own in-game case and receives no Wicks relief credit. Any top-receiver cluster multiplier remains separately gated."
+      }
+    }
+  ],
+  "predecessorEvidence": {
+    "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-31-dal-phi-value-and-role-reconciliation.json",
+    "commit": "422a4e8ae701ae1282861d57f10c5dc36530677c",
+    "blobSha": "58bea8faa2e7d1fd016778a159f21a0d1eea222d"
+  },
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "governedPriorBindings": [
+    {
+      "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-tb-dal-full-reserve-correction.json",
+      "blobSha": "d3448f44f370fcef7ccdb6099eca447fa367fac1",
+      "use": "Dallas distinct replacement chain"
+    },
+    {
+      "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-dal-gb-ready-reconciliation.json",
+      "blobSha": "714140fb6ea787b0f94dd767f3dbdd47ca8f585b",
+      "use": "Dallas recurring distinct replacements"
+    },
+    {
+      "path": "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-car-phi-ready-reconciliation.json",
+      "blobSha": "4692a45b6c99a8fd226af7376d79f1f9022f6246",
+      "use": "Philadelphia recurring roles and official Madden estimates"
+    }
+  ],
+  "valueEstimates": [
+    {
+      "player": "Kenny Moore II",
+      "identity": "estimate:kenny-moore-ii",
+      "position": "CB",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 80,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL 27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity is absent from the frozen registry; reuse the source-bound official rating through the unchanged curve without overwriting the registry.",
+      "sourceIds": [
+        "ea-kenny-moore-week7"
+      ],
+      "roleSourceIds": [
+        "nfl-dal-phi-week7-official-gamebook"
+      ],
+      "gameKeys": [
+        "2026-W07-DAL-PHI"
+      ]
+    },
+    {
+      "player": "Johnny Wilson",
+      "identity": "estimate:johnny-wilson",
+      "position": "WR",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 68,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Madden NFL 27",
+      "estimateAcknowledged": true,
+      "rationale": "Exact identity is absent from the frozen registry; reuse the source-bound official rating through the unchanged curve without overwriting the registry.",
+      "sourceIds": [
+        "ea-johnny-wilson-week7"
+      ],
+      "roleSourceIds": [
+        "nfl-dal-phi-week7-official-gamebook"
+      ],
+      "gameKeys": [
+        "2026-W07-DAL-PHI"
+      ]
+    }
+  ]
+}
