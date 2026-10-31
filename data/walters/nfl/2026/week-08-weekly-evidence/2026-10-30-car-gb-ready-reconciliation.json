@@ -1,0 +1,995 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-31T01:03:29.258Z",
+  "season": 2026,
+  "sourceWeek": 8,
+  "estimationPolicy": "graham-historical-value-estimates-v1",
+  "scope": "Additive CAR-GB READY reconciliation. It retains the complete paired inventory and prior governed cases, adds source-supported Melton/Sturdivant outside-receiver rotation evidence for Watson's exact interval, binds Sturdivant's official EA Madden NFL 27 value, and computes only a labelled historical partial-duty estimate. The started-game publication remains immutable; no active fair, carried rating or bet is changed.",
+  "marketViewed": false,
+  "inputCommit": "055824dfe099ede94f547172419a4b5a74ff1ead",
+  "inputBlobs": {
+    "data/walters/nfl/2026/week-08-personnel-ledger.json": "1a7ff517469e9deb2a53b666baf2b1be9f3cc165",
+    "data/walters/nfl/2026/week-08-current-numbers.json": "3ca68231535c9257593ca4684b520f05824d535f",
+    "data/walters/nfl/player-values/player-values-2026-v1.json": "dbba71f6830daff5e07b622597681b8abdc9f011",
+    "data/walters/nfl/personnel-calibration-v1.json": "68a94d6e1de3a40f4b0ba4ed3417e84c4c25a364",
+    "data/walters/nfl/personnel-production-current.json": "9742cdf1ec46832d829e5791011fe232ba5b0efd",
+    "data/walters/nfl/matchup-production-current.json": "e733347372f2b40e7a5bb57145d9c2d612d0c041"
+  },
+  "sources": [
+    {
+      "id": "car-gb-official-gamebook-final",
+      "url": "https://static.clubs.nfl.com/image/upload/packers/ia7jnbokrjesqdfxqreh",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official final gamebook supplies the 27-19 final, complete starters, substitutions, DNP and inactive inventories, quarterback and specialist participation, and printed injury/update sequences for Will Lee III, Christian Watson, Josh Whyle and Corey Bullock.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "car-official-final-roster",
+      "url": "https://www.panthers.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official roster supplies Carolina's complete current Reserve/Injured and Reserve/PUP inventories, including the October 29 Akayleb Evans placement.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "car-official-final-transactions",
+      "url": "https://www.panthers.com/team/transactions/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "October 29 transactions placed Akayleb Evans on injured reserve, signed Malcolm DeWalt IV, and elevated Marco Wilson and Jake Curhan for Week 8.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "car-official-final-inactives",
+      "url": "https://www.panthers.com/news/week-8-inactives-at-green-bay-panthers-down-three-starters-for-packers",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official Carolina final inactives and Bobby Brown III's late inactive designation are reconciled to the gamebook.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "car-official-depth",
+      "url": "https://www.panthers.com/news/panthers-release-depth-chart-ahead-of-week-8-of-the-2026-season-packers",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official Week 8 depth chart identifies TeRah Edwards in the defensive-tackle reserve chain; the gamebook independently confirms Edwards was active and participated on defense.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "gb-official-final-roster",
+      "url": "https://www.packers.com/team/players-roster/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official roster supplies Green Bay's complete current Reserve/Injured, Reserve/Injured-Designated for Return and Reserve/PUP inventories.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "gb-official-final-transactions",
+      "url": "https://www.packers.com/team/transactions/",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "October 26-29 transactions placed Jacob Monk on injured reserve, signed Mekhi Becton Sr. and elevated Arron Mosby for Week 8.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "gb-official-final-inactives",
+      "url": "https://www.packers.com/news/packers-panthers-week-8-inactives-oct-29-2026",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official Green Bay inactive list and active questionable players are reconciled to the gamebook.",
+      "checkedAt": "2026-10-31T00:15:02.712Z"
+    },
+    {
+      "id": "watson-receiver-role-report",
+      "url": "https://www.cheeseheadtv.com/blog/packers-snap-counts-vs-carolina-week-8-407",
+      "kind": "REPORTING",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Postgame personnel and snap review explicitly reports that J. Michael Sturdivant and Bo Melton rotated at the outside receiver positions while Christian Watson was away for medical evaluation; its snap table also records both as offensive participants.",
+      "checkedAt": "2026-10-31T01:03:29.258Z"
+    },
+    {
+      "id": "ea-sturdivant-week6",
+      "url": "https://www.ea.com/games/madden-nfl/ratings/player-ratings/j-michael-sturdivant/1816",
+      "kind": "OFFICIAL",
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ],
+      "finding": "Official EA SPORTS Madden NFL 27 Week 6 page identifies J. Michael Sturdivant as a Green Bay wide receiver with 68 OVR.",
+      "checkedAt": "2026-10-31T01:03:29.258Z"
+    }
+  ],
+  "valueEstimates": [
+    {
+      "player": "J. Michael Sturdivant",
+      "identity": "estimate:j-michael-sturdivant",
+      "position": "WR",
+      "method": "INDEPENDENT_MADDEN_27",
+      "maddenOvr": 68,
+      "ratingVersion": "MADDEN_NFL_27",
+      "provider": "EA SPORTS official Week 6 ratings",
+      "estimateAcknowledged": true,
+      "rationale": "Official EA identity and OVR are retained only for the source-bound CAR-GB historical temporary-duty case; the frozen registry is not changed.",
+      "sourceIds": [
+        "ea-sturdivant-week6"
+      ],
+      "roleSourceIds": [
+        "watson-receiver-role-report",
+        "car-gb-official-gamebook-final"
+      ],
+      "gameKeys": [
+        "2026-W08-CAR-GB"
+      ]
+    }
+  ],
+  "playerAliases": [],
+  "valueSupplements": [],
+  "games": [
+    {
+      "gameKey": "2026-W08-CAR-GB",
+      "away": "CAR",
+      "home": "GB",
+      "state": "READY",
+      "sourceIds": [
+        "car-gb-official-gamebook-final",
+        "car-official-final-roster",
+        "car-official-final-transactions",
+        "car-official-final-inactives",
+        "car-official-depth",
+        "gb-official-final-roster",
+        "gb-official-final-transactions",
+        "gb-official-final-inactives",
+        "watson-receiver-role-report",
+        "ea-sturdivant-week6"
+      ],
+      "final": {
+        "awayScore": 19,
+        "homeScore": 27,
+        "status": "FINAL_REGULATION",
+        "sourceIds": [
+          "car-gb-official-gamebook-final"
+        ]
+      },
+      "frozenKickoff": {
+        "startTimePacific": "2026-10-29T17:15:00-07:00",
+        "awayRating": 25.380786472,
+        "homeRating": 27.932590582,
+        "homeLocationAdvantagePoints": 2.082,
+        "venueClass": "DOMESTIC_HOME",
+        "neutralBaseHome": -2.55180411,
+        "currentNumbersBlobSha": "3ca68231535c9257593ca4684b520f05824d535f",
+        "powerLedgerBlobSha": "08d7317ccc18c975d15bfc221398afad9085d95f",
+        "h4BlobSha": "15c734e711d8fd531ec3703a23966c5a0aca8bfd",
+        "preservedH4": true,
+        "marketViewed": false,
+        "preservedPregameExactFairHome": -6.894,
+        "preservedPregameDisplayedFairHome": -7,
+        "ratingReviewNote": "The started game remains bound to its published kickoff ratings and prediction. This evidence prepares Week 8 learning only."
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_OFFICIAL_PAIRED",
+        "pairedParticipation": "COMPLETE_OFFICIAL_STARTERS_SUBSTITUTES_DNP",
+        "quarterbackParticipation": "COMPLETE_OFFICIAL",
+        "specialistParticipation": "COMPLETE_OFFICIAL",
+        "officialInGameInjuryReporting": "COMPLETE_PRINTED_GAMEBOOK_SEQUENCE",
+        "pairedGameDayInjuryLoss": "READY_SOURCE_BOUND_LABELLED_ESTIMATE"
+      },
+      "pairedTeamInventories": [
+        {
+          "team": "CAR",
+          "side": "AWAY",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_CANDIDATE_ONE_METHOD_DECISION_REMAINS",
+          "finalInactive": [
+            "Ja'Tavion Sanders (TE)",
+            "Jaelan Phillips (OLB)",
+            "Haynes King (QB, emergency third quarterback)",
+            "AJ Dillon (RB)",
+            "Akayleb Evans (CB, placed on Reserve/Injured before kickoff)",
+            "Torricelli Simpkins III (G)",
+            "Damien Lewis (G)",
+            "Bobby Brown III (DT)"
+          ],
+          "reserveUnavailable": [
+            "Chris Brazzell II (WR, Reserve/Injured)",
+            "Jonathon Brooks (RB, Reserve/Injured)",
+            "Brady Christensen (OL, Reserve/Injured)",
+            "Akayleb Evans (CB, Reserve/Injured)",
+            "Jaycee Horn (CB, Reserve/Injured)",
+            "Thomas Incoom (OLB, Reserve/Injured)",
+            "Cam Jackson (DT, Reserve/Injured)",
+            "Mike Jackson (CB, Reserve/Injured)",
+            "Xavier Legette (WR, Reserve/Injured)",
+            "Taylor Moton (T, Reserve/Injured)",
+            "Nic Scourton (OLB, Reserve/Injured)",
+            "Ikem Ekwonu (T, Reserve/PUP)"
+          ],
+          "gameDayElevations": [
+            "Marco Wilson (CB)",
+            "Jake Curhan (OL)"
+          ],
+          "starters": [
+            "John Metchie III",
+            "Jalen Coker",
+            "Tommy Tremble",
+            "Rasheed Walker",
+            "Corey Bullock",
+            "Luke Fortner",
+            "Robert Hunt",
+            "Monroe Freeling",
+            "Tetairoa McMillan",
+            "Bryce Young",
+            "Chuba Hubbard",
+            "Patrick Jones II",
+            "Tershawn Wharton",
+            "Derrick Brown",
+            "Princely Umanmielen",
+            "Devin Lloyd",
+            "Bobby Okereke",
+            "Marco Wilson",
+            "Will Lee III",
+            "Zyon Wheatley",
+            "Trevon Moehrig",
+            "Nick Scott"
+          ],
+          "substitutes": [
+            "Sam Martin",
+            "Ryan Fitzgerald",
+            "Lathan Ransom",
+            "Trevor Etienne",
+            "Chau Smith-Wade",
+            "Isaiah Simmons",
+            "Tyrel Dodson",
+            "Anthony Tyus III",
+            "Malcolm DeWalt IV",
+            "Nick Hampton",
+            "JJ Jansen",
+            "Jack Kiser",
+            "Trevis Gipson",
+            "Bam Martin-Scott",
+            "Stone Forsythe",
+            "Jake Curhan",
+            "Seth Hecht",
+            "Feleipe Franks",
+            "David Moore",
+            "Mitchell Evans",
+            "Brycen Tremayne",
+            "Darren Waller",
+            "L.J. Hunter",
+            "TeRah Edwards",
+            "Aaron Hall"
+          ],
+          "didNotPlay": [
+            "Kenny Pickett (QB)"
+          ],
+          "quarterback": {
+            "starter": "Bryce Young",
+            "backupDnp": "Kenny Pickett",
+            "emergencyInactive": "Haynes King",
+            "state": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "specialists": {
+            "kicker": "Ryan Fitzgerald",
+            "punterHolder": "Sam Martin",
+            "longSnapper": "JJ Jansen",
+            "puntReturners": [
+              "Trevor Etienne",
+              "David Moore"
+            ],
+            "kickReturner": "Anthony Tyus III",
+            "state": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "resolvedNumericalCases": [
+            {
+              "caseKey": "2026-W08-CAR-Taylor-Moton",
+              "resolutionStatus": "RETAINED_GOVERNED_PRIMARY_REPLACEMENT",
+              "replacement": "Monroe Freeling",
+              "injuryLoss": 0.7
+            },
+            {
+              "caseKey": "2026-W08-CAR-Damien-Lewis",
+              "resolutionStatus": "RETAINED_GOVERNED_PRIMARY_REPLACEMENT",
+              "replacement": "Corey Bullock",
+              "injuryLoss": 1.2
+            },
+            {
+              "caseKey": "2026-W08-CAR-Torricelli-Simpkins-III",
+              "resolutionStatus": "RETAINED_ZERO_CALIBRATED_LOSS",
+              "injuryLoss": 0
+            },
+            {
+              "caseKey": "2026-W08-CAR-Jaelan-Phillips",
+              "resolutionStatus": "RETAINED_GOVERNED_PRIMARY_REPLACEMENT",
+              "replacement": "Princely Umanmielen",
+              "injuryLoss": 0.7
+            },
+            {
+              "caseKey": "2026-W08-CAR-Akayleb-Evans",
+              "resolutionStatus": "RETAINED_ZERO_CALIBRATED_LOSS",
+              "injuryLoss": 0
+            },
+            {
+              "caseKey": "2026-W08-CAR-Bobby-Brown-III",
+              "resolutionStatus": "SUPPORTED_PRIMARY_REPLACEMENT_CANDIDATE",
+              "replacement": "TeRah Edwards",
+              "healthyValue": 0.2,
+              "replacementValue": 0,
+              "candidateInjuryLoss": 0.2
+            },
+            {
+              "caseKey": "2026-W08-CAR-Will-Lee-III-InGame",
+              "resolutionStatus": "ZERO_CALIBRATED_VALUE_INVARIANT",
+              "healthyValue": 0,
+              "injuryLoss": 0
+            },
+            {
+              "caseKey": "2026-W08-CAR-Corey-Bullock-InGame",
+              "resolutionStatus": "ZERO_CALIBRATED_VALUE_INVARIANT",
+              "healthyValue": 0,
+              "injuryLoss": 0
+            }
+          ],
+          "unresolvedNumericalCases": [],
+          "allCurrentPersonnelCasesReviewed": true,
+          "reviewLimitation": "Complete candidate inventory is assembled. Long-term reserve names are retained for rating-baseline review and are not assigned a new Week 8 duty without evidence."
+        },
+        {
+          "team": "GB",
+          "side": "HOME",
+          "inventoryState": "COMPLETE_SOURCE_BOUND_CANDIDATE_ONE_METHOD_DECISION_REMAINS",
+          "finalInactive": [
+            "Jonnu Smith (TE)",
+            "Kaleb Johnson (RB)",
+            "Zaire Franklin (LB)",
+            "Donovan Jennings (G/T)",
+            "Sean Rhyan (C/G)",
+            "Travis Glover (G/T)"
+          ],
+          "reserveUnavailable": [
+            "Zach Bako-Bewele (OL, Reserve/Injured)",
+            "Warren Brinson (DT, Reserve/Injured)",
+            "Chris Brooks (RB, Reserve/Injured)",
+            "Edgerrin Cooper (LB, Reserve/Injured)",
+            "Jonathan Ford (DT, Reserve/Injured)",
+            "Javon Hargrave (DT, Reserve/Injured)",
+            "Jacob Monk (C/G, Reserve/Injured)",
+            "Skyy Moore (WR, Reserve/Injured)",
+            "Jayden Reed (WR, Reserve/Injured)",
+            "Collin Oliver (EDGE, Reserve/Injured-Designated for Return)",
+            "Luke Musgrave (TE, Reserve/PUP)",
+            "Micah Parsons (EDGE, Reserve/PUP)"
+          ],
+          "gameDayElevations": [
+            "Arron Mosby (EDGE)"
+          ],
+          "starters": [
+            "Christian Watson",
+            "Savion Williams",
+            "Jordan Morgan",
+            "Aaron Banks",
+            "John Williams",
+            "Laken Tomlinson",
+            "Anthony Belton",
+            "Tucker Kraft",
+            "Matthew Golden",
+            "Jordan Love",
+            "Josh Jacobs",
+            "Lukas Van Ness",
+            "Kenny Brooks",
+            "Devonte Wyatt",
+            "Barryn Sorrell",
+            "Isaiah McDuffie",
+            "Ty'Ron Hopper",
+            "Brandon Cisse",
+            "Keisean Nixon",
+            "Xavier McKinney",
+            "Evan Williams",
+            "Javon Bullard"
+          ],
+          "substitutes": [
+            "Coleman Owen",
+            "Bo Melton",
+            "Daniel Whelan",
+            "Benjamin St-Juste",
+            "Pierre Strong Jr.",
+            "Carrington Valentine",
+            "Kitan Oladapo",
+            "Trey Smack",
+            "Nick Niemann",
+            "MarShawn Lloyd",
+            "Kamari Hadden",
+            "Matt Orzech",
+            "Dani Dennis-Sutton",
+            "Arron Mosby",
+            "Kristian Welch",
+            "Cam McClellan",
+            "Brenton Cox Jr.",
+            "Kevin Zeitler",
+            "Josh Whyle",
+            "Mark Redman",
+            "J. Michael Sturdivant",
+            "Anthony Campbell",
+            "Jordon Riley"
+          ],
+          "didNotPlay": [
+            "Tyrod Taylor (QB)",
+            "Jager Burton (C/G)",
+            "Mekhi Becton Sr. (G)"
+          ],
+          "quarterback": {
+            "starter": "Jordan Love",
+            "backupDnp": "Tyrod Taylor",
+            "state": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "specialists": {
+            "kicker": "Trey Smack",
+            "punterHolder": "Daniel Whelan",
+            "longSnapper": "Matt Orzech",
+            "puntReturner": "Coleman Owen",
+            "kickReturners": [
+              "Coleman Owen",
+              "Bo Melton"
+            ],
+            "state": "COMPLETE_OFFICIAL_GAMEBOOK"
+          },
+          "resolvedNumericalCases": [
+            {
+              "caseKey": "2026-W08-GB-Sean-Rhyan",
+              "resolutionStatus": "RETAINED_ZERO_CALIBRATED_LOSS",
+              "injuryLoss": 0
+            },
+            {
+              "caseKey": "2026-W08-GB-Travis-Glover",
+              "resolutionStatus": "RETAINED_ZERO_CALIBRATED_LOSS",
+              "injuryLoss": 0
+            },
+            {
+              "caseKey": "2026-W08-GB-Zaire-Franklin",
+              "resolutionStatus": "RETAINED_GOVERNED_PRIMARY_REPLACEMENT",
+              "replacement": "Ty'Ron Hopper",
+              "injuryLoss": 0.5
+            },
+            {
+              "caseKey": "2026-W08-GB-Josh-Whyle-InGame",
+              "resolutionStatus": "ZERO_CALIBRATED_VALUE_INVARIANT",
+              "healthyValue": 0,
+              "injuryLoss": 0
+            }
+          ],
+          "unresolvedNumericalCases": [
+            {
+              "caseKey": "2026-W08-GB-Christian-Watson-InGame",
+              "exactMissingFact": "The official gamebook supplies Watson's exact Q2 9:19 injury and Q3 4:01 return, but it does not identify which available receiver absorbed his distinct route/receiver duties during that interval.",
+              "footballImpact": "Watson has a frozen 0.5 healthy value; assigning an arbitrary replacement or treating missing role evidence as zero could distort Green Bay's paired historical injury loss.",
+              "requiredSourceOrMethodDecision": "Use a source-supported personnel/snap or film allocation for the exact interval, or apply an already approved bounded capacity/role method to the complete available receiver inventory. Do not infer workload from return duty or box-score production alone."
+            }
+          ],
+          "allCurrentPersonnelCasesReviewed": false,
+          "reviewLimitation": "All inactive, reserve, participation, quarterback, specialist and printed injury evidence is assembled. Only Watson's distinct temporary receiver-duty allocation remains unresolved."
+        }
+      ],
+      "observedInGameInjuries": [
+        {
+          "team": "CAR",
+          "player": "Will Lee III",
+          "status": "OUT",
+          "knownBoundary": "Injured on the Q2 9:19 53-yard Christian Watson reception; ruled doubtful in Q2 and out at Q3 14:54.",
+          "numericState": "ZERO_CALIBRATED_VALUE_INVARIANT",
+          "footballImpact": "Secondary continuity changed, but Lee's frozen healthy value is exactly zero and no defensive replacement value is manufactured."
+        },
+        {
+          "team": "CAR",
+          "player": "Corey Bullock",
+          "status": "QUESTIONABLE_NO_PRINTED_RETURN",
+          "knownBoundary": "Injured on the Q3 7:24 Carolina rush; listed questionable at Q4 14:28 with no printed return notice.",
+          "numericState": "ZERO_CALIBRATED_VALUE_INVARIANT",
+          "footballImpact": "Line continuity changed, but Bullock's frozen healthy value is exactly zero; the missing return fact is not converted into a fabricated loss."
+        },
+        {
+          "team": "GB",
+          "player": "Christian Watson",
+          "status": "RETURNED",
+          "knownBoundary": "Injured on the Q2 9:19 reception and returned on the Q3 4:01 snap.",
+          "numericState": "ROLE_ALLOCATION_UNRESOLVED",
+          "footballImpact": "Temporary receiver loss is exposure-bounded but requires a distinct replacement-duty method for Watson's frozen 0.5 value."
+        },
+        {
+          "team": "GB",
+          "player": "Josh Whyle",
+          "status": "OUT",
+          "knownBoundary": "First printed questionable update at Q2 15:00; ruled out at Q3 13:44; initial injury play is not printed.",
+          "numericState": "ZERO_CALIBRATED_VALUE_INVARIANT",
+          "footballImpact": "Tight-end depth changed, but Whyle's frozen healthy value is exactly zero and the unprinted entry boundary cannot create a nonzero loss."
+        }
+      ],
+      "teams": [
+        {
+          "team": "CAR",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Complete official final inactive, reserve, elevation, starter, substitute, DNP, quarterback, specialist and printed injury inventory is bound. Every archived current case and new in-game injury is retained.",
+          "sourceIds": [
+            "car-gb-official-gamebook-final",
+            "car-official-final-roster",
+            "car-official-final-transactions",
+            "car-official-final-inactives",
+            "car-official-depth"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Bryce Young played every Carolina offensive snap; backups recorded no lost quarterback duty.",
+            "sourceIds": [
+              "car-gb-official-gamebook-final"
+            ]
+          },
+          "cases": [
+            {
+              "caseKey": "2026-W08-CAR-Taylor-Moton",
+              "player": "Taylor Moton",
+              "eaPlayerId": "12636",
+              "availabilityStatus": "IR",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-final-inactives",
+                "car-official-depth",
+                "car-official-final-roster"
+              ],
+              "rationale": "Retain the governed documented-depth primary replacement after final game-day participation confirmation.",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Final gamebook participation preserves the previously source-bound distinct reserve assignment.",
+              "roleSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Monroe Freeling is the current source-bound same-family reserve for Taylor Moton; this is a labelled allocation estimate, not a confirmed workload.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Assign only Taylor Moton's newly vacant duties to Monroe Freeling; preserve all existing baseline roles.",
+              "baselineSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Monroe Freeling",
+                  "eaPlayerId": "16165"
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W08-CAR-Damien-Lewis",
+              "player": "Damien Lewis",
+              "eaPlayerId": "21101",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-final-inactives",
+                "car-official-depth",
+                "car-official-final-roster"
+              ],
+              "rationale": "Retain the governed documented-depth primary replacement after final game-day participation confirmation.",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Final gamebook participation preserves the previously source-bound distinct reserve assignment.",
+              "roleSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Corey Bullock is the current source-bound same-family reserve for Damien Lewis; this is a labelled allocation estimate, not a confirmed workload.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Assign only Damien Lewis's newly vacant duties to Corey Bullock; preserve all existing baseline roles.",
+              "baselineSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Corey Bullock",
+                  "eaPlayerId": "4708"
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W08-CAR-Torricelli-Simpkins-III",
+              "player": "Torricelli Simpkins III",
+              "eaPlayerId": "15151",
+              "availabilityStatus": "OUT",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-final-inactives",
+                "car-official-depth",
+                "car-official-final-roster"
+              ],
+              "rationale": "Retain the governed current-week frozen-zero case in the complete final game-day inventory.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Torricelli Simpkins III has a frozen calibrated healthy value of exactly zero; the nonnegative floor makes the point loss zero without assigning a missing replacement value.",
+              "replacements": []
+            },
+            {
+              "caseKey": "2026-W08-CAR-Jaelan-Phillips",
+              "player": "Jaelan Phillips",
+              "eaPlayerId": "21512",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-final-inactives",
+                "car-official-depth",
+                "car-official-final-roster"
+              ],
+              "rationale": "Retain the governed documented-depth primary replacement after final game-day participation confirmation.",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Final gamebook participation preserves the previously source-bound distinct reserve assignment.",
+              "roleSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Princely Umanmielen is the current source-bound same-family reserve for Jaelan Phillips; this is a labelled allocation estimate, not a confirmed workload.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Assign only Jaelan Phillips's newly vacant duties to Princely Umanmielen; preserve all existing baseline roles.",
+              "baselineSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Princely Umanmielen",
+                  "eaPlayerId": "15177"
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W08-CAR-Akayleb-Evans",
+              "player": "Akayleb Evans",
+              "eaPlayerId": "22208",
+              "availabilityStatus": "OUT",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-final-inactives",
+                "car-official-depth",
+                "car-official-final-roster"
+              ],
+              "rationale": "Retain the governed current-week frozen-zero case in the complete final game-day inventory.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Akayleb Evans has a frozen calibrated healthy value of exactly zero; the nonnegative floor makes the point loss zero without assigning a missing replacement value.",
+              "replacements": []
+            },
+            {
+              "caseKey": "2026-W08-CAR-Bobby-Brown-III",
+              "player": "Bobby Brown III",
+              "eaPlayerId": "21922",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-final-inactives",
+                "car-official-depth"
+              ],
+              "rationale": "Brown was officially inactive; the final gamebook confirms TeRah Edwards active on defense in the direct source-bound reserve chain.",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Assign only Brown's additional vacant defensive-tackle duties to Edwards while retaining Wharton and L.J. Hunter baseline roles.",
+              "roleSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Compare Brown's frozen 0.2 value with Edwards' immutable frozen 0.0 value only for Brown's additional vacant duties.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Wharton and L.J. Hunter remain baseline contributors; Edwards receives only Brown's additional duty.",
+              "baselineSourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "TeRah Edwards",
+                  "eaPlayerId": "4670"
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W08-CAR-Will-Lee-III-InGame",
+              "player": "Will Lee III",
+          "eaPlayerId": "16315",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final"
+              ],
+              "rationale": "Official gamebook binds the injury and out sequence; Lee's frozen healthy value is exactly zero.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Frozen calibrated healthy value is zero, so the nonnegative replacement floor yields zero without fabricating a replacement.",
+              "replacements": []
+            },
+            {
+              "caseKey": "2026-W08-CAR-Corey-Bullock-InGame",
+              "player": "Corey Bullock",
+              "eaPlayerId": "4708",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final"
+              ],
+              "rationale": "Official gamebook binds Bullock's injury and questionable sequence; his frozen healthy value is exactly zero.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Frozen calibrated healthy value is zero, so the nonnegative replacement floor yields zero without fabricating a replacement.",
+              "replacements": []
+            }
+          ],
+          "coverageExclusions": [],
+          "participationReviews": [],
+          "clusterReviews": [
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Moton, Lewis and Simpkins occupy distinct reviewed line vacancies; Freeling and Bullock are assigned once, and no nonlinear penalty is added.",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "car-official-depth"
+              ]
+            },
+            {
+              "group": "DEFENSIVE_BACK",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Evans and Lee are retained as distinct zero-valued cases; no missing replacement value or cluster penalty is manufactured.",
+              "sourceIds": [
+                "car-gb-official-gamebook-final"
+              ]
+            }
+          ],
+          "specialistCases": []
+        },
+        {
+          "team": "GB",
+          "coverage": "FINAL_GAME_DAY",
+          "allAbsencesReviewed": true,
+          "coverageRationale": "Complete official final inactive, reserve, elevation, starter, substitute, DNP, quarterback, specialist and printed injury inventory is bound. Every archived current case and new in-game injury is retained.",
+          "sourceIds": [
+            "car-gb-official-gamebook-final",
+            "gb-official-final-roster",
+            "gb-official-final-transactions",
+            "gb-official-final-inactives",
+            "watson-receiver-role-report",
+            "ea-sturdivant-week6"
+          ],
+          "qbAvailability": {
+            "state": "NO_GAME_DAY_LOSS",
+            "rationale": "Jordan Love played the Green Bay quarterback duty; Tyrod Taylor did not play and no injury-driven quarterback loss occurred.",
+            "sourceIds": [
+              "car-gb-official-gamebook-final"
+            ]
+          },
+          "cases": [
+            {
+              "caseKey": "2026-W08-GB-Sean-Rhyan",
+              "player": "Sean Rhyan",
+              "eaPlayerId": "22443",
+              "availabilityStatus": "OUT",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "gb-official-final-inactives",
+                "gb-official-final-roster"
+              ],
+              "rationale": "Retain the governed current-week frozen-zero case in the complete final game-day inventory.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Sean Rhyan has a frozen calibrated healthy value of exactly zero; the nonnegative floor makes the point loss zero without assigning a missing replacement value.",
+              "replacements": []
+            },
+            {
+              "caseKey": "2026-W08-GB-Travis-Glover",
+              "player": "Travis Glover",
+              "eaPlayerId": "1118",
+              "availabilityStatus": "OUT",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "gb-official-final-inactives",
+                "gb-official-final-roster"
+              ],
+              "rationale": "Retain the governed current-week frozen-zero case in the complete final game-day inventory.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Travis Glover has a frozen calibrated healthy value of exactly zero; the nonnegative floor makes the point loss zero without assigning a missing replacement value.",
+              "replacements": []
+            },
+            {
+              "caseKey": "2026-W08-GB-Zaire-Franklin",
+              "player": "Zaire Franklin",
+              "eaPlayerId": "13480",
+              "availabilityStatus": "OUT",
+              "resolution": "PRIMARY_REPLACEMENT",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "gb-official-final-inactives",
+                "gb-official-final-roster"
+              ],
+              "rationale": "Retain the governed documented-depth primary replacement after final game-day participation confirmation.",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Final gamebook participation preserves the previously source-bound distinct reserve assignment.",
+              "roleSourceIds": [
+                "car-gb-official-gamebook-final",
+                "gb-official-final-roster"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Ty'Ron Hopper is the current source-bound same-family reserve for Zaire Franklin; this is a labelled allocation estimate, not a confirmed workload.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Assign only Zaire Franklin's newly vacant duties to Ty'Ron Hopper; preserve all existing baseline roles.",
+              "baselineSourceIds": [
+                "car-gb-official-gamebook-final",
+                "gb-official-final-roster"
+              ],
+              "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+              "replacements": [
+                {
+                  "player": "Ty'Ron Hopper",
+                  "eaPlayerId": "14910"
+                }
+              ]
+            },
+            {
+              "caseKey": "2026-W08-GB-Christian-Watson-InGame",
+              "player": "Christian Watson",
+              "eaPlayerId": "22373",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "PARTIAL_TIME_EXPOSURE",
+              "replacementResolution": "EQUAL_SHARE_COMMITTEE",
+              "modelId": "graham-replacement-role-estimate-v1",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "watson-receiver-role-report",
+                "ea-sturdivant-week6"
+              ],
+              "rationale": "Watson's exact exit-to-return interval is source-bound; postgame role reporting identifies Melton and Sturdivant as the outside-receiver rotation during his absence.",
+              "baselineDoubleCountReviewed": true,
+              "roleRationale": "Allocate only Watson's temporary outside-receiver duties equally to the two explicitly reported rotating outside receivers; their other baseline duties remain preserved.",
+              "roleSourceIds": [
+                "car-gb-official-gamebook-final",
+                "watson-receiver-role-report"
+              ],
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use an equal-share additional-duty committee because the source identifies both rotating outside during the exact interval but does not claim a precise split.",
+              "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+              "baselineDutiesDisplaced": false,
+              "baselineRationale": "Golden and Savion Williams retain their baseline roles; only Melton and Sturdivant receive Watson's additional temporary outside duties.",
+              "baselineSourceIds": [
+                "car-gb-official-gamebook-final",
+                "watson-receiver-role-report"
+              ],
+              "replacements": [
+                {
+                  "player": "Bo Melton",
+                  "eaPlayerId": "22084"
+                },
+                {
+                  "player": "J. Michael Sturdivant",
+                  "eaPlayerId": "estimate:j-michael-sturdivant"
+                }
+              ],
+              "exposure": {
+                "modelId": "graham-historical-time-exposure-v1",
+                "estimateAcknowledged": true,
+                "gameDurationSeconds": 3600,
+                "durationSourceIds": [
+                  "car-gb-official-gamebook-final"
+                ],
+                "unavailableIntervals": [
+                  {
+                    "startEarliest": 1241,
+                    "startLatest": 1241,
+                    "endEarliest": 2459,
+                    "endLatest": 2459,
+                    "sourceIds": [
+                      "car-gb-official-gamebook-final"
+                    ],
+                    "rationale": "Exact regulation elapsed-time conversion from the official Q2 9:19 injury play through the official Q3 4:01 return snap."
+                  }
+                ],
+                "assumptionRationale": "Regulation elapsed time is used only to scale the temporary replacement-value difference over the source-bound absence interval.",
+                "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE"
+              }
+            },
+            {
+              "caseKey": "2026-W08-GB-Josh-Whyle-InGame",
+              "player": "Josh Whyle",
+              "eaPlayerId": "22835",
+              "newlyIdentified": true,
+              "availabilityStatus": "PARTIAL_GAME",
+              "resolution": "ZERO_CALIBRATED_LOSS",
+              "sourceIds": [
+                "car-gb-official-gamebook-final"
+              ],
+              "rationale": "Official gamebook binds Whyle's game-day injury status; his frozen healthy value is exactly zero.",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Frozen calibrated healthy value is zero, so the nonnegative replacement floor yields zero without fabricating an entry clock or replacement.",
+              "replacements": []
+            }
+          ],
+          "coverageExclusions": [],
+          "participationReviews": [],
+          "clusterReviews": [
+            {
+              "group": "OFFENSIVE_LINE",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Rhyan and Glover are distinct calibrated-zero cases; no replacement value or nonlinear line penalty is manufactured.",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "gb-official-final-inactives"
+              ]
+            },
+            {
+              "group": "RECEIVER",
+              "method": "ADDITIVE_NO_EXTRA_MULTIPLIER_ESTIMATE",
+              "estimateAcknowledged": true,
+              "disjointRolesReviewed": true,
+              "rationale": "Watson's temporary outside-receiver committee is disjoint from Whyle's calibrated-zero tight-end case; no nonlinear receiver penalty is added.",
+              "sourceIds": [
+                "car-gb-official-gamebook-final",
+                "watson-receiver-role-report"
+              ]
+            }
+          ],
+          "receiverClusterReview": {
+            "eligible": false,
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "car-gb-official-gamebook-final",
+              "watson-receiver-role-report"
+            ],
+            "rationale": "The final inventory does not establish simultaneous loss of Green Bay's two highest-valued expected receiving options; Watson is the only positive-valued receiver loss in this pair."
+          },
+          "topReceiverClusterReviewed": true,
+          "specialistCases": []
+        }
+      ],
+      "blockers": [],
+      "officialGamebookUrl": "https://static.clubs.nfl.com/image/upload/packers/ia7jnbokrjesqdfxqreh"
+    }
+  ]
+}
