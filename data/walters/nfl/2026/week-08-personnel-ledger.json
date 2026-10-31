@@ -6,7 +6,7 @@
   "timezone": "America/Vancouver",
   "state": "ACTIVE",
   "createdAt": "2026-10-27T04:32:22-07:00",
-  "updatedAt": "2026-10-31T11:44:00-07:00",
+  "updatedAt": "2026-10-31T11:49:00-07:00",
   "baselineStatus": "PENDING_FIRST_GOVERNED_PERSONNEL_BATCH",
   "productionId": "walters-personnel-production-v1",
   "calibrationId": "walters-nfl-personnel-calibration-v1",
@@ -30,7 +30,8 @@
     "graham-daily-review-2026-w08-20261030T113155-0700-personnel-02",
     "graham-daily-review-2026-w08-20261030T113155-0700-personnel-03",
     "graham-delta-1645-2026-w08-20261030T165005-0700-personnel-friday-final-01",
-    "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-01"
+    "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-01",
+    "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-02"
   ],
   "events": [
     {
@@ -5074,6 +5075,127 @@
       "healthyWaltersPoints": 0.9,
       "rawTeamContributionDelta": null,
       "clusterGroup": "RUNNING_BACK"
+    },
+    {
+      "personnelEventId": "2026-W08-NE-AJ-Brown-20261031T1149000700",
+      "caseKey": "2026-W08-NE-A.J.-Brown",
+      "gameKey": "2026-W08-NE-MIA",
+      "team": "NE",
+      "side": "AWAY",
+      "player": "A.J. Brown",
+      "playerEaId": "20495",
+      "availabilityStatus": "OUT",
+      "sourceRefs": [
+        "https://www.nfl.com/injuries/league/2026/REG8",
+        "https://www.patriots.com/news/week-8-injury-report-dolphins-at-patriots",
+        "https://www.patriots.com/team/depth-chart",
+        "https://www.patriots.com/team/players-roster/",
+        "data/walters/nfl/player-values/by-team-v1/ne.json",
+        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
+      ],
+      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
+      "reason": "New England downgraded starting wide receiver A.J. Brown to out on Saturday. The current official depth chart lists Efton Chism III directly behind Brown and both identities have frozen calibrated values.",
+      "availabilitySourceRefs": [
+        "https://www.nfl.com/injuries/league/2026/REG8",
+        "https://www.patriots.com/news/week-8-injury-report-dolphins-at-patriots"
+      ],
+      "roleSourceRefs": [
+        "https://www.patriots.com/team/depth-chart",
+        "https://www.patriots.com/team/players-roster/"
+      ],
+      "reopenOn": "Reopen if New England changes A.J. Brown's availability, names a different primary replacement, or Efton Chism III becomes unavailable.",
+      "replacementModel": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "resolution": "PRIMARY_REPLACEMENT",
+        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+        "estimateAcknowledged": true,
+        "assumptionRationale": "Efton Chism III is the current source-bound reserve directly behind A.J. Brown; this is an acknowledged additional-duty allocation estimate, not confirmed workload.",
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "baselineDutiesDisplaced": false,
+        "baselineRationale": "Assign only A.J. Brown's newly vacant duties to Efton Chism III; preserve all existing baseline duties.",
+        "baselineSourceIds": [
+          "https://www.patriots.com/team/depth-chart",
+          "https://www.patriots.com/team/players-roster/"
+        ],
+        "replacements": [
+          {
+            "player": "Efton Chism III",
+            "eaPlayerId": "4663",
+            "availabilityStatus": "ACTIVE",
+            "roleRationale": "Current available direct reserve in the official A.J. Brown depth chain.",
+            "sourceRefs": [
+              "https://www.patriots.com/team/depth-chart",
+              "https://www.patriots.com/team/players-roster/"
+            ]
+          }
+        ]
+      },
+      "closureReview": {
+        "availabilityVerified": true,
+        "rosterChecked": true,
+        "roleEvidenceChecked": true,
+        "replacementSearchCompleted": true,
+        "replacementCandidatesConsidered": [
+          "Efton Chism III",
+          "DeMario Douglas",
+          "Kyle Williams"
+        ],
+        "unavailablePlayerValueChecked": true,
+        "candidateValuesChecked": true,
+        "replacementClassification": "ONE_FOR_ONE",
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "conclusion": "RESOLVED_MODEL_ESTIMATE",
+        "finding": "A.J. Brown is officially out; Efton Chism III is the documented direct available reserve and receives only the additional vacant duties."
+      },
+      "batchId": "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-02",
+      "effectiveAt": "2026-10-31T11:49:00-07:00",
+      "sourceTask": "DAILY_REVIEW",
+      "marketViewed": false,
+      "productionId": "walters-personnel-production-v1",
+      "calibrationId": "walters-nfl-personnel-calibration-v1",
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 89,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": -1.2,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 1.2,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 1.2,
+        "rawTeamContributionDelta": -1.2,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1.2,
+          "max": 1.2
+        },
+        "weights": [
+          {
+            "player": "Efton Chism III",
+            "eaPlayerId": "4663",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Efton Chism III is the current source-bound reserve directly behind A.J. Brown; this is an acknowledged additional-duty allocation estimate, not confirmed workload.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if New England changes A.J. Brown's availability, names a different primary replacement, or Efton Chism III becomes unavailable."
+      }
     }
   ],
   "currentCases": {
@@ -9847,7 +9969,7 @@
       "clusterGroup": "DEFENSIVE_LINE"
     },
     "2026-W08-NE-A.J.-Brown": {
-      "personnelEventId": "2026-W08-NE-AJ-Brown-20261031T1144000700",
+      "personnelEventId": "2026-W08-NE-AJ-Brown-20261031T1149000700",
       "caseKey": "2026-W08-NE-A.J.-Brown",
       "gameKey": "2026-W08-NE-MIA",
       "team": "NE",
@@ -9857,6 +9979,7 @@
       "availabilityStatus": "OUT",
       "sourceRefs": [
         "https://www.nfl.com/injuries/league/2026/REG8",
+        "https://www.patriots.com/news/week-8-injury-report-dolphins-at-patriots",
         "https://www.patriots.com/team/depth-chart",
         "https://www.patriots.com/team/players-roster/",
         "data/walters/nfl/player-values/by-team-v1/ne.json",
@@ -9918,15 +10041,53 @@
         "conclusion": "RESOLVED_MODEL_ESTIMATE",
         "finding": "A.J. Brown is officially out; Efton Chism III is the documented direct available reserve and receives only the additional vacant duties."
       },
-      "batchId": "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-01",
-      "effectiveAt": "2026-10-31T11:44:00-07:00",
+      "batchId": "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-02",
+      "effectiveAt": "2026-10-31T11:49:00-07:00",
       "sourceTask": "DAILY_REVIEW",
       "marketViewed": false,
       "productionId": "walters-personnel-production-v1",
       "calibrationId": "walters-nfl-personnel-calibration-v1",
-      "valueStatus": "FAIL_CLOSED_NO_NUMERIC_MOVE",
-      "failClosedCode": "CURRENT_ESTIMATE_SOURCE_NOT_BOUND",
-      "rawTeamContributionDelta": null
+      "valueStatus": "NUMERIC_ELIGIBLE",
+      "registryPosition": "WR",
+      "maddenOvr": 89,
+      "healthyWaltersPoints": 1.2,
+      "rawTeamContributionDelta": -1.2,
+      "clusterGroup": "RECEIVER",
+      "failClosedCode": null,
+      "replacementEstimate": {
+        "modelId": "graham-replacement-role-estimate-v1",
+        "classification": "GRAHAM_MODEL_ESTIMATE",
+        "method": "PRIMARY_REPLACEMENT",
+        "weightBasis": "DOCUMENTED_AVAILABLE_DEPTH_ROLE_ASSUMPTION",
+        "healthyValue": 1.2,
+        "replacementValue": 0,
+        "replacementValueRatio": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "injuryLoss": 1.2,
+        "rawTeamContributionDelta": -1.2,
+        "upgradeExcluded": false,
+        "injuryLossRange": {
+          "min": 1.2,
+          "max": 1.2
+        },
+        "weights": [
+          {
+            "player": "Efton Chism III",
+            "eaPlayerId": "4663",
+            "lockedValue": 0,
+            "additionalRoleUnits": 1,
+            "weight": 1
+          }
+        ],
+        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+        "assumptionRationale": "Efton Chism III is the current source-bound reserve directly behind A.J. Brown; this is an acknowledged additional-duty allocation estimate, not confirmed workload.",
+        "precision": "Estimated injury loss rounded once to 0.001; subsequent weekly arithmetic is exact.",
+        "scope": "CURRENT_WEEK_TEMPORARY_PERSONNEL",
+        "limitation": "Replacement allocation is a labelled Graham estimate using frozen values or explicitly source-bound supplements. It is not confirmed workload or an empirical confidence interval. QB, playing impairment and unreviewed clusters remain separate.",
+        "reopenOn": "Reopen if New England changes A.J. Brown's availability, names a different primary replacement, or Efton Chism III becomes unavailable."
+      }
     },
     "2026-W08-NE-TreVeyon-Henderson": {
       "personnelEventId": "2026-W08-NE-TreVeyon-Henderson-20261031T1144000700",
@@ -9989,7 +10150,7 @@
       "clusterGroup": "RUNNING_BACK"
     }
   },
-  "lastBatchId": "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-01",
+  "lastBatchId": "graham-daily-review-2026-w08-20261031T113544-0700-personnel-saturday-02",
   "lastBatchSourceTask": "DAILY_REVIEW",
   "processedMatchupBatchIds": [
     "graham-delta-1645-m4-2026-w08-20261028T164156-0700-retry-01"
