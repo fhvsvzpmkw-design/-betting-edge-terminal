@@ -469,3 +469,11 @@ Menu order and art stay attached to the public names: Crypto Specials / F6 / loc
 **Verification:** Existing menu-style, legacy CSS cascade, specialty-return and preferences suites pass; JavaScript syntax, JSON structure and Python compilation pass. Source data and all analytical findings remain attached to the same workflows; only desk metadata, presentation and task naming change.
 
 **Reason:** Apply the user's requested product roles consistently without introducing a second task, extra odds collection, historical rewrites or a data migration.
+
+## D-045 — Verify actual Main runtime delegation before agent activation
+
+**Date:** 2026-11-01. **Status:** APPROVED DESIGN; PREPARED / NOT DEPLOYED.
+
+The user approved four complete-event researchers, two critical reviewers and one coordinator after the genuine November 1 evening report and producer finish. That prerequisite is verified in the [prepared integration/baseline](reviews/2026-11-01-agent-research-rollout.md). The actual hosted Main runtime's working delegation and six-worker concurrency remain unverified; task prompt/status access and another Work runtime's delegation tools do not establish them. Available task controls cannot inspect or separately probe that runtime. This blocks activation in the current session, without asserting platform-wide impossibility.
+
+Preserve existing production until actual Main-runtime capacity evidence exists. The prepared bounded change reuses existing work planning, serial expected-revision event saves, Guy's early handoff and the single staged publisher; workers have no shared mutation authority, and market-exposed findings cannot enter Graham's independent research. Keep all schedules, budgets, snapshots, clocks, decision/stake rules, History and continuations. No reduced team, extra pull, new recurring task or shadow model. Record deployed versus live acceptance separately, compare operational measures against the exact published baseline, and mark unavailable account usage unknown. Pause only the temporary rollout follow-up after reporting the capability-verification blocker.
