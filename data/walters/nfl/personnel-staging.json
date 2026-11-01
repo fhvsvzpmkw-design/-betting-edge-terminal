@@ -1,168 +1,86 @@
 {
   "schema": 1,
   "state": "READY",
-  "batchId": "graham-delta-1645-2026-w08-20261031T164202-0700-personnel-saturday-late-01",
+  "batchId": "graham-w08-current-value-source-recovery-20261101T023751Z",
+  "effectiveAt": "2026-11-01T02:37:51.679139Z",
+  "sourceTask": "MANUAL_CURRENT_PERSONNEL_RECOVERY",
   "season": 2026,
   "week": 8,
-  "sourceTask": "DELTA_1645",
-  "effectiveAt": "2026-10-31T16:49:00-07:00",
-  "startedAt": "2026-10-31T16:42:02-07:00",
-  "runEventId": "graham-delta-1645-2026-w08-20261031T164202-0700",
   "marketViewed": false,
-  "productionId": "walters-personnel-production-v1",
+  "valueSupplements": [
+    {
+      "path": "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+      "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+      "eaPlayerIds": [
+        "15039"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Reuse previously committed official EA Week1 capture for Corey Kiner, missing from lockedregistry. Apply frozen personnel curve and retain CURRENT_EA_SUPPLEMENT provenance without rewriting frozenregistry."
+    },
+    {
+      "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json",
+      "blobSha": "82d2a67a14f58ea21b9174f8d9622ac78e9d7a9d",
+      "eaPlayerIds": [
+        "4832"
+      ],
+      "estimateAcknowledged": true,
+      "rationale": "Reuse committed official EA Week5 capture for exact Doneiko Slaughter identity. Frozen curve converts CB64 to calibrated zero; no missing value is assumed zero and frozenregistry is unchanged."
+    }
+  ],
   "cases": [
     {
-      "personnelEventId": "2026-W08-ATL-Brian-Robinson-Jr-20261031T1649000700",
-      "caseKey": "2026-W08-ATL-Brian-Robinson-Jr",
-      "gameKey": "2026-W08-ATL-TB",
-      "team": "ATL",
+      "personnelEventId": "2026-W08-NE-TreVeyon-Henderson-value-source-recovery-20261101T023751Z",
+      "caseKey": "2026-W08-NE-TreVeyon-Henderson",
+      "gameKey": "2026-W08-NE-MIA",
+      "team": "NE",
       "side": "AWAY",
-      "player": "Brian Robinson Jr",
-      "playerEaId": "22055",
+      "player": "TreVeyon Henderson",
+      "playerEaId": "14810",
       "availabilityStatus": "OUT",
-      "sourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "https://www.atlantafalcons.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/atl.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/player-values/player-values-2026-v1.json#git-blob-dbba71f6830daff5e07b622597681b8abdc9f011",
-        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-      ],
-      "resolutionStatus": "FAIL_CLOSED",
-      "failClosedCode": "REPLACEMENT_LOCKED_VALUE_UNAVAILABLE",
-      "reason": "Atlanta again ruled Brian Robinson Jr out and officially elevated Khalil Herbert as the Week 8 backup. Herbert is absent from the manifest-authorized Atlanta shard and exact frozen registry blob, and no source-bound current EA supplement is present, so the governed replacement arithmetic remains fail closed.",
-      "availabilitySourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs"
-      ],
-      "roleSourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "https://www.atlantafalcons.com/team/players-roster/"
-      ],
-      "reopenOn": "Reopen when Khalil Herbert receives a source-bound locked value or Atlanta publishes a different distinct current replacement with a valid locked value.",
-      "closureReview": {
-        "availabilityVerified": true,
-        "rosterChecked": true,
-        "roleEvidenceChecked": true,
-        "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Khalil Herbert",
-          "Bijan Robinson"
-        ],
-        "unavailablePlayerValueChecked": true,
-        "candidateValuesChecked": true,
-        "replacementClassification": "ONE_FOR_ONE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
-        "finding": "Robinson is out and Herbert is the official current backup elevation, but Herbert is absent from both authorized locked-value routes."
-      }
-    },
-    {
-      "personnelEventId": "2026-W08-ATL-Divine-Deablo-20261031T1649000700",
-      "caseKey": "2026-W08-ATL-Divine-Deablo",
-      "gameKey": "2026-W08-ATL-TB",
-      "team": "ATL",
-      "side": "AWAY",
-      "player": "Divine Deablo",
-      "playerEaId": "21667",
-      "availabilityStatus": "OUT",
-      "sourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "https://www.atlantafalcons.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/atl.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/player-values/player-values-2026-v1.json#git-blob-dbba71f6830daff5e07b622597681b8abdc9f011",
-        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-      ],
-      "resolutionStatus": "FAIL_CLOSED",
-      "failClosedCode": "REVIEW_REQUIRED_LINEBACKER_ROLE_CHAIN",
-      "reason": "Atlanta downgraded Divine Deablo to out. The official depth chart lists Christian Harris behind Deablo, while the club's late update describes Kendal Daniels retaining the green dot, Harold Perkins Jr starting, and Josh Woods/Brian Asamoah as depth; that overlapping allocation is not a distinct one-for-one vacancy.",
-      "availabilitySourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs"
-      ],
-      "roleSourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "https://www.atlantafalcons.com/team/players-roster/"
-      ],
-      "reopenOn": "Reopen when Atlanta source-binds one distinct Deablo replacement or the governed committee method can allocate the overlapping linebacker duties without baseline double count.",
-      "closureReview": {
-        "availabilityVerified": true,
-        "rosterChecked": true,
-        "roleEvidenceChecked": true,
-        "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Christian Harris",
-          "Kendal Daniels",
-          "Harold Perkins Jr.",
-          "Josh Woods",
-          "Brian Asamoah II"
-        ],
-        "unavailablePlayerValueChecked": true,
-        "candidateValuesChecked": true,
-        "replacementClassification": "COMMITTEE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
-        "finding": "Deablo is out, but current official sources describe overlapping starter, signal-caller and depth duties rather than one distinct additional-duty allocation."
-      }
-    },
-    {
-      "personnelEventId": "2026-W08-ATL-Billy-Bowman-Jr-20261031T1649000700",
-      "caseKey": "2026-W08-ATL-Billy-Bowman-Jr",
-      "gameKey": "2026-W08-ATL-TB",
-      "team": "ATL",
-      "side": "AWAY",
-      "player": "Billy Bowman Jr",
-      "playerEaId": "15332",
-      "availabilityStatus": "OUT",
-      "sourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "https://www.atlantafalcons.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/atl.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "data/walters/nfl/player-values/player-values-2026-v1.json#git-blob-dbba71f6830daff5e07b622597681b8abdc9f011",
-        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-      ],
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "Atlanta downgraded Billy Bowman Jr to out and reported that Sydney Brown primarily handled the nickel spot in the comparable prior absence. Bowman and Brown both have source-bound frozen values.",
+      "reason": "Current official club reporting rules Henderson out. Reuse immutable approved Corey Kiner EA capture rather than repeat obsolete missing-value block. Assign additional absent-role duties to next-depth RB Kiner as an acknowledged primary-depth estimate; retain the newly signed Lan Larison as a live alternative, not a verified zero share. Kiner existing return baseline is preserved; no actual return-role displacement is asserted.",
+      "sourceRefs": [
+        "https://www.patriots.com/news/roster-analysis-patriots-downgrade-wr-a-j-brown-rb-treveyon-henderson-to-out-for-week-8-vs-dolphins",
+        "https://www.patriots.com/team/depth-chart",
+        "https://www.patriots.com/team/players-roster/",
+        "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md",
+        "data/walters/nfl/player-values/player-values-access-v1.json"
+      ],
       "availabilitySourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs"
+        "https://www.patriots.com/news/roster-analysis-patriots-downgrade-wr-a-j-brown-rb-treveyon-henderson-to-out-for-week-8-vs-dolphins"
       ],
       "roleSourceRefs": [
-        "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-        "https://www.atlantafalcons.com/team/depth-chart",
-        "https://www.atlantafalcons.com/team/players-roster/"
+        "https://www.patriots.com/team/depth-chart",
+        "https://www.patriots.com/team/players-roster/",
+        "https://www.patriots.com/news/roster-analysis-patriots-downgrade-wr-a-j-brown-rb-treveyon-henderson-to-out-for-week-8-vs-dolphins"
       ],
-      "reopenOn": "Reopen if Atlanta assigns the nickel vacancy to a different player, Sydney Brown becomes unavailable, or Avieon Terrell's active role changes the documented additional-duty chain.",
+      "reopenOn": "Reopen if final inactives remove Kiner, a newer official role report names Larison as primary replacement or confirms a different committee, or documented return-duty displacement requires reconciliation.",
       "replacementModel": {
         "modelId": "graham-replacement-role-estimate-v1",
         "resolution": "PRIMARY_REPLACEMENT",
         "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
         "estimateAcknowledged": true,
-        "assumptionRationale": "Sydney Brown is the club-reported prior nickel replacement for Bowman's absence; this is an acknowledged additional-duty estimate, not confirmed Week 8 workload.",
+        "assumptionRationale": "Kiner is next in current club depth chain and official club analysis expects increased offensive duties. This is an acknowledged primary-depth allocation, not confirmed workload. Newly signed Lan Larison may also play; no measured share or zero Larison share is claimed.",
         "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
         "baselineDutiesDisplaced": false,
-        "baselineRationale": "Assign only the newly vacant duties to Sydney Brown; preserve all existing baseline duties.",
+        "baselineRationale": "Assign only additional vacant Henderson RB duties; preserve Kiner existing reserve offensive and return baseline. The club article raises removing Kiner from returns as a possibility but does not report actual displacement; reopen on a documented changed duty.",
         "baselineSourceIds": [
-          "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-          "https://www.atlantafalcons.com/team/depth-chart",
-          "https://www.atlantafalcons.com/team/players-roster/"
+          "https://www.patriots.com/team/depth-chart",
+          "https://www.patriots.com/team/players-roster/",
+          "https://www.patriots.com/news/roster-analysis-patriots-downgrade-wr-a-j-brown-rb-treveyon-henderson-to-out-for-week-8-vs-dolphins"
         ],
         "replacements": [
           {
-            "player": "Sydney Brown",
-            "eaPlayerId": "23081",
+            "player": "Corey Kiner",
+            "eaPlayerId": "15039",
             "availabilityStatus": "ACTIVE",
-            "roleRationale": "Sydney Brown is the club-reported prior nickel replacement for Bowman's absence; this is an acknowledged additional-duty estimate, not confirmed Week 8 workload.",
+            "roleRationale": "Active next-depth reserve RB with club analysis expecting additional offensive duties; acknowledged primary-depth allocation only.",
             "sourceRefs": [
-              "https://www.atlantafalcons.com/news/downgrade-divine-deablo-billy-bowman-out-vs-bucs",
-              "https://www.atlantafalcons.com/team/depth-chart",
-              "https://www.atlantafalcons.com/team/players-roster/"
+              "https://www.patriots.com/team/depth-chart",
+              "https://www.patriots.com/team/players-roster/",
+              "https://www.patriots.com/news/roster-analysis-patriots-downgrade-wr-a-j-brown-rb-treveyon-henderson-to-out-for-week-8-vs-dolphins",
+              "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json"
             ]
           }
         ]
@@ -172,266 +90,66 @@
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Sydney Brown",
-          "Avieon Terrell"
-        ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
+        "baselineDoubleCountReviewed": true,
+        "m4CommitteeEligibilityReviewed": true,
+        "replacementCandidatesConsidered": [
+          "Corey Kiner",
+          "Lan Larison",
+          "Rhamondre Stevenson"
+        ],
         "replacementClassification": "ONE_FOR_ONE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
         "conclusion": "RESOLVED_MODEL_ESTIMATE",
-        "finding": "Bowman is out; Sydney Brown is the source-bound prior nickel replacement and both identities have equal frozen values."
+        "finding": "Current official club sources confirm Henderson OUT and source-supported next-depth Kiner. Existing primary-depth estimate uses only additional RB duties; Larison is an explicit alternate, Stevenson baseline is preserved, no measured split or changed return role is asserted. Exact Kiner EA supplement supplies existing frozen-curve value."
       }
     },
     {
-      "personnelEventId": "2026-W08-SEA-Charles-Cross-20261031T1649000700",
-      "caseKey": "2026-W08-SEA-Charles-Cross",
-      "gameKey": "2026-W08-CHI-SEA",
-      "team": "SEA",
+      "personnelEventId": "2026-W08-PIT-Doneiko-Slaughter-value-source-recovery-20261101T023751Z",
+      "caseKey": "2026-W08-PIT-Doneiko-Slaughter",
+      "gameKey": "2026-W08-CLE-PIT",
+      "team": "PIT",
       "side": "HOME",
-      "player": "Charles Cross",
-      "playerEaId": "22437",
+      "player": "Doneiko Slaughter",
+      "playerEaId": "4832",
       "availabilityStatus": "OUT",
-      "sourceRefs": [
-        "https://www.seahawks.com/news/week-8-injury-report-bears-at-seahawks",
-        "https://www.seahawks.com/team/depth-chart/",
-        "https://www.seahawks.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/sea.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-      ],
       "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "Seattle ruled starting left tackle Charles Cross out. The current official depth chart lists Josh Jones directly behind Cross and both identities have frozen calibrated values.",
-      "availabilitySourceRefs": [
-        "https://www.seahawks.com/news/week-8-injury-report-bears-at-seahawks"
-      ],
-      "roleSourceRefs": [
-        "https://www.seahawks.com/team/depth-chart/",
-        "https://www.seahawks.com/team/players-roster/"
-      ],
-      "reopenOn": "Reopen if Seattle names a different left tackle, Josh Jones becomes unavailable, or the offensive-line assignment displaces another baseline starter.",
-      "replacementModel": {
-        "modelId": "graham-replacement-role-estimate-v1",
-        "resolution": "PRIMARY_REPLACEMENT",
-        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
-        "estimateAcknowledged": true,
-        "assumptionRationale": "Josh Jones is the current official direct reserve behind Charles Cross; this is an acknowledged additional-duty allocation estimate, not confirmed snap share.",
-        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
-        "baselineDutiesDisplaced": false,
-        "baselineRationale": "Assign only the newly vacant duties to Josh Jones; preserve all existing baseline duties.",
-        "baselineSourceIds": [
-          "https://www.seahawks.com/team/depth-chart/",
-          "https://www.seahawks.com/team/players-roster/"
-        ],
-        "replacements": [
-          {
-            "player": "Josh Jones",
-            "eaPlayerId": "21114",
-            "availabilityStatus": "ACTIVE",
-            "roleRationale": "Josh Jones is the current official direct reserve behind Charles Cross; this is an acknowledged additional-duty allocation estimate, not confirmed snap share.",
-            "sourceRefs": [
-              "https://www.seahawks.com/team/depth-chart/",
-              "https://www.seahawks.com/team/players-roster/"
-            ]
-          }
-        ]
-      },
-      "closureReview": {
-        "availabilityVerified": true,
-        "rosterChecked": true,
-        "roleEvidenceChecked": true,
-        "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Josh Jones"
-        ],
-        "unavailablePlayerValueChecked": true,
-        "candidateValuesChecked": true,
-        "replacementClassification": "ONE_FOR_ONE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "RESOLVED_MODEL_ESTIMATE",
-        "finding": "Cross is out; Josh Jones is the documented direct available reserve and receives only the additional vacant duties."
-      }
-    },
-    {
-      "personnelEventId": "2026-W08-SEA-Rashid-Shaheed-20261031T1649000700",
-      "caseKey": "2026-W08-SEA-Rashid-Shaheed",
-      "gameKey": "2026-W08-CHI-SEA",
-      "team": "SEA",
-      "side": "HOME",
-      "player": "Rashid Shaheed",
-      "playerEaId": "22666",
-      "availabilityStatus": "OUT",
+      "reason": "Official current Steelers injury report confirms SlaughterOUT. Previously committed official EA capture supplies exact missing identity; existing frozen curve gives CB64 zero. Apply existing ZERO_CALIBRATED_LOSS invariant: no replacement identity, role allocation or value is fabricated. Echols separate replacement block remains unresolved.",
       "sourceRefs": [
-        "https://www.seahawks.com/news/week-8-injury-report-bears-at-seahawks",
-        "https://www.seahawks.com/team/depth-chart/",
-        "https://www.seahawks.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/sea.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
+        "https://www.steelers.com/team/injury-report/",
+        "https://www.steelers.com/team/depth-chart/",
+        "https://www.steelers.com/team/players-roster/",
+        "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-20-ea-current-missing-identity-capture.json",
         "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
       ],
-      "resolutionStatus": "FAIL_CLOSED",
-      "failClosedCode": "REVIEW_REQUIRED_MULTIROLE_REPLACEMENT",
-      "reason": "Seattle ruled Rashid Shaheed out. The official depth chart assigns him receiver, punt-return and kick-return roles; the receiver reserve lacks a locked value, the return duties split across other players, and Velus Jones Jr is also out.",
       "availabilitySourceRefs": [
-        "https://www.seahawks.com/news/week-8-injury-report-bears-at-seahawks"
+        "https://www.steelers.com/team/injury-report/"
       ],
       "roleSourceRefs": [
-        "https://www.seahawks.com/team/depth-chart/",
-        "https://www.seahawks.com/team/players-roster/"
+        "https://www.steelers.com/team/depth-chart/",
+        "https://www.steelers.com/team/players-roster/"
       ],
-      "reopenOn": "Reopen when Seattle source-binds the full receiving and return allocation to distinct available players with locked values.",
-      "closureReview": {
-        "availabilityVerified": true,
-        "rosterChecked": true,
-        "roleEvidenceChecked": true,
-        "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Irvin Charles",
-          "Tory Horton",
-          "Velus Jones Jr",
-          "Avery Smith"
-        ],
-        "unavailablePlayerValueChecked": true,
-        "candidateValuesChecked": true,
-        "replacementClassification": "MULTIROLE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "FAIL_CLOSED_AFTER_FULL_REVIEW",
-        "finding": "Shaheed is out; his receiver and two return roles do not resolve to one distinct, fully valued replacement chain, and one listed return reserve is also out."
-      }
-    },
-    {
-      "personnelEventId": "2026-W08-SEA-Velus-Jones-Jr-20261031T1649000700",
-      "caseKey": "2026-W08-SEA-Velus-Jones-Jr",
-      "gameKey": "2026-W08-CHI-SEA",
-      "team": "SEA",
-      "side": "HOME",
-      "player": "Velus Jones Jr",
-      "playerEaId": "22089",
-      "availabilityStatus": "OUT",
-      "sourceRefs": [
-        "https://www.seahawks.com/news/week-8-injury-report-bears-at-seahawks",
-        "https://www.seahawks.com/team/depth-chart/",
-        "https://www.seahawks.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/sea.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-      ],
-      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "Seattle ruled Velus Jones Jr out. His frozen healthy player value is calibrated zero, so the governed nonnegative replacement floor proves zero personnel point loss without fabricating a replacement value.",
-      "availabilitySourceRefs": [
-        "https://www.seahawks.com/news/week-8-injury-report-bears-at-seahawks"
-      ],
-      "roleSourceRefs": [
-        "https://www.seahawks.com/team/depth-chart/",
-        "https://www.seahawks.com/team/players-roster/"
-      ],
-      "reopenOn": "Reopen only if the frozen player identity/value is corrected or a separately governed return-role interaction method becomes operational.",
+      "reopenOn": "Reopen on corrected official identity/value binding or a governed recalibration; source-confirmed absence remains OUT and other DB cases remain independent.",
       "replacementModel": {
         "modelId": "graham-replacement-role-estimate-v1",
         "resolution": "ZERO_CALIBRATED_LOSS",
         "estimateAcknowledged": true,
-        "assumptionRationale": "Velus Jones Jr has a frozen calibrated healthy value of zero; the nonnegative replacement floor makes the current absence point-invariant.",
-        "replacements": []
+        "assumptionRationale": "The source-bound supplemental CB64 value is zero under the existing frozen curve. The nonnegative replacement-aware loss floor yields zero regardless of unresolved replacement value; this does not claim no football impact and does not close Echols."
       },
       "closureReview": {
         "availabilityVerified": true,
         "rosterChecked": true,
         "roleEvidenceChecked": true,
         "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Emanuel Wilson",
-          "George Holani",
-          "Tory Horton",
-          "Avery Smith"
-        ],
         "unavailablePlayerValueChecked": true,
         "candidateValuesChecked": true,
-        "replacementClassification": "MULTIROLE",
         "baselineDoubleCountReviewed": true,
         "m4CommitteeEligibilityReviewed": true,
-        "conclusion": "RESOLVED_MODEL_ESTIMATE",
-        "finding": "Jones is out; the frozen healthy value is zero, so no fabricated replacement value is required for a zero point-loss proof."
-      }
-    },
-    {
-      "personnelEventId": "2026-W08-CHI-Kyle-Monangai-20261031T1649000700",
-      "caseKey": "2026-W08-CHI-Kyle-Monangai",
-      "gameKey": "2026-W08-CHI-SEA",
-      "team": "CHI",
-      "side": "AWAY",
-      "player": "Kyle Monangai",
-      "playerEaId": "15035",
-      "availabilityStatus": "OUT",
-      "sourceRefs": [
-        "https://www.chicagobears.com/team/injury-report/",
-        "https://www.chicagobears.com/team/depth-chart",
-        "https://www.chicagobears.com/team/players-roster/",
-        "data/walters/nfl/player-values/by-team-v1/chi.json",
-        "data/walters/nfl/player-values/player-values-access-v1.json",
-        "GRAHAM_CURRENT_PERSONNEL_ESTIMATES.md"
-      ],
-      "resolutionStatus": "RESOLVED_MODEL_ESTIMATE",
-      "reason": "Chicago ruled reserve running back Kyle Monangai out. The current official depth chart places Roschon Johnson directly behind Monangai and both identities have frozen calibrated values.",
-      "availabilitySourceRefs": [
-        "https://www.chicagobears.com/team/injury-report/"
-      ],
-      "roleSourceRefs": [
-        "https://www.chicagobears.com/team/depth-chart",
-        "https://www.chicagobears.com/team/players-roster/"
-      ],
-      "reopenOn": "Reopen if Chicago changes Monangai's availability, names a different reserve-chain replacement, or Roschon Johnson becomes unavailable.",
-      "replacementModel": {
-        "modelId": "graham-replacement-role-estimate-v1",
-        "resolution": "PRIMARY_REPLACEMENT",
-        "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
-        "estimateAcknowledged": true,
-        "assumptionRationale": "Roschon Johnson is the current official direct reserve behind Kyle Monangai; assign only Monangai's newly vacant reserve duties.",
-        "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
-        "baselineDutiesDisplaced": false,
-        "baselineRationale": "Assign only the newly vacant duties to Roschon Johnson; preserve all existing baseline duties.",
-        "baselineSourceIds": [
-          "https://www.chicagobears.com/team/depth-chart",
-          "https://www.chicagobears.com/team/players-roster/"
-        ],
-        "replacements": [
-          {
-            "player": "Roschon Johnson",
-            "eaPlayerId": "22747",
-            "availabilityStatus": "ACTIVE",
-            "roleRationale": "Roschon Johnson is the current official direct reserve behind Kyle Monangai; assign only Monangai's newly vacant reserve duties.",
-            "sourceRefs": [
-              "https://www.chicagobears.com/team/depth-chart",
-              "https://www.chicagobears.com/team/players-roster/"
-            ]
-          }
-        ]
-      },
-      "closureReview": {
-        "availabilityVerified": true,
-        "rosterChecked": true,
-        "roleEvidenceChecked": true,
-        "replacementSearchCompleted": true,
-        "replacementCandidatesConsidered": [
-          "Roschon Johnson",
-          "D'Andre Swift"
-        ],
-        "unavailablePlayerValueChecked": true,
-        "candidateValuesChecked": true,
+        "replacementCandidatesConsidered": [],
         "replacementClassification": "ONE_FOR_ONE",
-        "baselineDoubleCountReviewed": true,
-        "m4CommitteeEligibilityReviewed": true,
         "conclusion": "RESOLVED_MODEL_ESTIMATE",
-        "finding": "Monangai is out; Roschon Johnson is the distinct documented next reserve and receives only the additional vacant duties."
+        "finding": "Current official report confirms SlaughterOUT. Exact existing official EA capture and frozen curve establish zerohealthyvalue; existing zero-loss floor applies without replacement identity or role inference. Echols remains unresolved."
       }
     }
-  ],
-  "priorPublicationContext": {
-    "baselineRunEventId": "graham-daily-review-2026-w08-20261031T113544-0700",
-    "additiveEvidenceRunEventId": "graham-daily-review-2026-w08-20261031T120747-0700",
-    "note": "Apply only newly source-bound late-Saturday availability through the governed personnel writer. Preserve historical learning separately, retain all existing fail-closed cases, and do not infer Jeffery Simmons workload or specialist value."
-  }
+  ]
 }
