@@ -1,7 +1,11 @@
-# Approved Main research rollout — prepared, activation blocked
+# Approved Main research rollout — baseline and deployment record
 
 Date: November 1, 2026, America/Vancouver.
-Status: PREPARED / NOT DEPLOYED / MAIN RUNTIME CAPACITY UNVERIFIED.
+Status: CONFIGURATION DEPLOYED / MAIN LIVE ACCEPTANCE PENDING.
+
+## Subsequent user instruction and deployment
+
+After this initial blocked review, the user identified the circular dependency and explicitly instructed agent setup. D-046 supersedes the activation hold below: the shared authority, task template and all five existing Main prompts now request the approved team with a 60-second in-run acknowledgment test and coordinator fallback. See [the execution guide](../REPORT_RESEARCH_AGENTS.md). Advance capability inspection is no longer a deployment prerequisite. Each Main task must still provide actual launch/returned-work evidence before live agent use is claimed. The remaining sections preserve the original review and exact published baseline; their earlier hold/disposition is historical and is not a current instruction.
 This is a review record, not a new operating authority, tracker, model or production task.
 
 ## Prerequisite verified

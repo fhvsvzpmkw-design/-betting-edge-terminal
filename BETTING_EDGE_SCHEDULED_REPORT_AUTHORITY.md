@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-11-01.GuyHandoff
+**Operating revision:** 2026-11-01.ResearchAgents
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -13,6 +13,12 @@ For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer
 **NHL forecast corroboration — current from `2026-10-15T12:11:48-07:00`:** For NHL full-game moneyline forecast opinions, apply the October 15 section of `docs/FORECAST_DIRECTIONAL_LEANS.md` instead of the older single-point default below. LEAN requires two of MoneyPuck, DRatings and Dimers supporting the exact price, with an approved anchor at least 1.00 probability point above break-even. PuckCast remains research/comparison only. Use original provider records and retain contrary forecasts; two sources do not establish statistical independence. Supply `judgment.pinnacleReview` with an actual disagreement rationale and decision impact for an unfavorable signed Pinnacle gap. The existing builders bind and display both forecast points and this review; the publisher independently replays the original records and applicability. WAIT requires an actual concrete condition: the price-WAIT helper now computes a two-source/one-point reassessment price from two applicable approved forecasts, including when the lone positive anchor already clears one point. No second applicable approved point or defensible condition means a reviewed PASS or genuine research gap, not a manufactured WAIT. Use source-bound `INSUFFICIENT_CORROBORATION` where appropriate, and explain an earlier LEAN downgrade with its exact previous decision and the actual policy/source finding. Preserve $0/NO BET, independent-fair/BET requirements, other sport/market routes and historical bytes. This selectivity rule is not validated profitability or a numeric pick target. All five Main report tasks inherit it from authoritative main.
 
 ## Operating precedence
+
+### Research agents — November 1 deployment
+
+Use [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) inside every existing Main run: four complete-event researchers, two critical reviewers and this producer as the single coordinator. This is an explicit delegation instruction. After normal lane/odds intake and the saved initial checkpoint, perform the bounded six-worker acknowledgment test in the actual executing runtime. If all six respond, use those same workers for disjoint game research and targeted reviews. If tools/capacity are absent or the 60-second startup test fails, record the exact reason and immediately continue the existing coordinator event loop. Deployment does not wait for an advance runtime inspection; actual launch and returned-work evidence are recorded per run. D-045's earlier activation hold is superseded by the user's later setup instruction.
+
+Only the coordinator merges event evidence through current expected-revision checkpoints and stages the candidate; the existing publisher retains History ownership. Worker failure or unfinished review is not a new report-wide veto. Preserve current analytical gates, price/source clocks, Guy's early handoff, market isolation of independent Graham numbers, schedules, odds budgets and partial-publication/continuation behavior. The optional compact agent receipt described in the guide is execution metadata, never numerical clearance or a publication gate.
 
 **November 1 clock repair:** B.C. remains on UTC-7 year-round after March 2026. Preserve America/Vancouver and all five report times. Follow `docs/ODDS_RUN_REQUEST.md` and generate a scheduled request with `node tools/odds-run-request.mjs create --report-time <EXPECTED_REPORT_TIME>` from the actual clock; do not hand-build a winter offset. The shared schedule loader rejects obsolete timezone data, and the odds workflow installs current Node 24 before resolving the request. Preserve actual request/issue timestamps, the existing 10-minute request window, 75-minute pulse/input windows, slot receipts and no-duplicate-spend controls. Never retry the unchanged expired request to correct a timezone mismatch. A failed prior lane is not a current pregame report; resume eligible work in the current normal lane and preserve the exact prior failure.
 

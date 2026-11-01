@@ -24,6 +24,12 @@ The `completion` object in every controller response separates analysis, final v
 
 `next` also exposes captured forecasts awaiting actual applicability review on events with completed market cards. `next --event-id` includes the latest immutable record IDs, probabilities, native units, original observation times and exact selection questions. Review the actual exported capture and append genuine revalidations or explicit shortfalls; the queue never creates eligibility. Decision completion and outstanding forecast review counts remain separate, and completed qualified cards may still publish.
 
+## Parallel research within the existing producer
+
+Follow [REPORT_RESEARCH_AGENTS.md](REPORT_RESEARCH_AGENTS.md) after normal intake and the initial remotely verified checkpoint. The hosted producer launches four researchers and two reviewers through its actual delegation tools; these Node commands do not launch models. First perform the bounded six-thread startup test. Missing delegation or a failed acknowledgment test selects the existing coordinator loop, without blocking publication.
+
+Use `next` to partition the pending games and `next --event-id` for exact assignment detail. Workers have disjoint complete-event queues and read-only inputs. Only the coordinator exports/reconciles the latest draft and saves each event with the current expected revision. Do not merge a stale worker draft wholesale. Use the same prepare/freeze/stage/readback commands below. A compact optional execution receipt under `data/report-production/agent-receipts/` does not change checkpoint schemas, published sidecars or any publisher gate.
+
 ## Work one event and save
 
 `completion.continuationRequired` distinguishes unfinished producer reviews and undocumented blockers from recorded source shortfalls. Publication does not clear it. Read `remainingWork` by sport and the exact next event plan before stopping. `prepare` returns `preparation.workPlan`, including the next event, so fixing the first event's schema does not hide the unreviewed slate. These are diagnostics and routing instructions; all existing evidence and publication gates still apply.
