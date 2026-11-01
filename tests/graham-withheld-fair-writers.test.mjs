@@ -123,6 +123,39 @@ test('M4 keeps ordinary committee arithmetic while rejecting unreviewed zero, wr
     const f=matchupFixture();try{const original=fs.readFileSync(f.boardPath);mutate(f);f.write('matchup-production-staging.json',f.input);assert.throws(f.run,expected);assert.deepEqual(fs.readFileSync(f.boardPath),original);assert.deepEqual(read(path.join(f.root,'data/walters/nfl/2026/week-08-personnel-ledger.json')).events,[]);}finally{fs.rmSync(f.root,{recursive:true,force:true});}
   }
 });
+test('both current writers reject older or conflicting equal-clock replacements before changing durable records',()=>{
+ for(const [make,stage] of [[fixture,'personnel-staging.json'],[matchupFixture,'matchup-production-staging.json']]){
+  const f=make();try{
+   f.run();const paths=[f.boardPath,path.join(f.root,'data/walters/nfl/2026/week-08-personnel-ledger.json'),path.join(f.root,'data/walters/nfl/2026/week-08-research-ledger.json')],before=paths.map(p=>fs.readFileSync(p,'utf8'));
+   // The unchanged already-processed payload stays idempotent.
+   f.run();assert.deepEqual(paths.map(p=>fs.readFileSync(p,'utf8')),before);
+   f.input.batchId+='-new';f.input.cases[0].personnelEventId+='-new';if(f.input.cases[0].matchupEventId)f.input.cases[0].matchupEventId+='-new';
+   f.input.effectiveAt='2026-10-31T22:59:00Z';f.write(stage,f.input);assert.throws(f.run,/PERSONNEL_CASE_STALE/);assert.deepEqual(paths.map(p=>fs.readFileSync(p,'utf8')),before);
+   f.input.effectiveAt='2026-10-31T23:00:00Z';f.input.cases[0].reason='Conflicting facts at the old observation clock';f.write(stage,f.input);assert.throws(f.run,/PERSONNEL_CASE_SAME_TIME_CONFLICT/);assert.deepEqual(paths.map(p=>fs.readFileSync(p,'utf8')),before);
+  }finally{fs.rmSync(f.root,{recursive:true,force:true});}
+ }
+});
+test('an older independent case retains its source clock without moving newer board and research clocks backward',()=>{
+ for(const [make,stage] of [[fixture,'personnel-staging.json'],[matchupFixture,'matchup-production-staging.json']]){
+  const f=make();try{
+   f.run();const later='2026-10-31T23:10:00Z',b=read(f.boardPath),ledgerPath=path.join(f.root,'data/walters/nfl/2026/week-08-personnel-ledger.json'),researchPath=path.join(f.root,'data/walters/nfl/2026/week-08-research-ledger.json');
+   b.updatedAt=b.lastResearchAt=later;f.write('2026/week-08-current-numbers.json',b);
+   const ledger=read(ledgerPath);ledger.updatedAt=later;f.write('2026/week-08-personnel-ledger.json',ledger);
+   const research=read(researchPath);research.updatedAt=later;f.write('2026/week-08-research-ledger.json',research);
+   const c=f.input.cases[0],excluded=new Set((c.committeeCandidates||[]).map(p=>p.eaPlayerId));
+   const p=read('data/walters/nfl/player-values/player-values-2026-v1.json').players.find(p=>p.valueStatus==='CALIBRATED'&&p.position==='DT'&&p.waltersPoints===0&&!excluded.has(p.eaPlayerId));
+   f.input.batchId+='-independent';f.input.effectiveAt='2026-10-31T22:59:00Z';Object.assign(c,{caseKey:'independent',personnelEventId:'independent',player:p.player,playerEaId:p.eaPlayerId});
+   if(c.matchupEventId)c.matchupEventId='independent';else Object.assign(c,{availabilityStatus:'ACTIVE_FULL',resolutionStatus:'RESOLVED_ACTIVE'});
+   f.write(stage,f.input);f.run();const result=read(f.boardPath);assert.equal(result.updatedAt,later);assert.equal(result.lastResearchAt,later);assert.equal(read(researchPath).updatedAt,later);assert.equal(read(ledgerPath).updatedAt,later);assert.equal(read(ledgerPath).currentCases.independent.effectiveAt,f.input.effectiveAt);
+  }finally{fs.rmSync(f.root,{recursive:true,force:true});}
+ }
+});
+test('missing QB terms fail before either writer changes an operational QB cache',()=>{
+ for(const make of [fixture,matchupFixture]){
+  const g={...withheldGame(),numberStatus:'READY',grahamExactFairHome:0,grahamFairHome:0,qbPerformanceStatus:'OPERATIONAL_SCOPED_APPLIED',qbPerformancePointsToHomeSpread:null};
+  const f=make(g);try{const before=fs.readFileSync(f.boardPath);assert.throws(f.run,/QB_TERM_MISSING/);assert.deepEqual(fs.readFileSync(f.boardPath),before);}finally{fs.rmSync(f.root,{recursive:true,force:true});}
+ }
+});
 test('verified rating propagation updates the retained team base without inventing shared-venue HFA',()=>{
   const f=ratingFixture(),r=refreshRatingBases(f),g=r.board.games[0];
   assert.equal(g.neutralBaseHome,2);assert.equal(g.ratingCarryForward.awayRating,3);

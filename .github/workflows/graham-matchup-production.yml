@@ -6,6 +6,10 @@ on:
     paths:
       - .github/workflows/graham-matchup-production.yml
       - data/walters/nfl/matchup-production-staging.json
+      - tools/apply-graham-matchup-production.mjs
+      - tools/graham-personnel-input-order.mjs
+      - tools/graham-fair-decomposition.mjs
+      - tests/graham-withheld-fair-writers.test.mjs
   workflow_dispatch:
 
 concurrency:
@@ -53,6 +57,9 @@ jobs:
           if(Number(staging.season)!==Number(active.season)||Number(staging.week)!==Number(active.week))throw new Error('M4 staging cross-week mismatch');
           console.log(`GRAHAM MATCHUP PRODUCTION PREFLIGHT: PASS // ACTIVE ${active.season} W${String(active.week).padStart(2,'0')}`);
           NODE
+
+      - name: Verify missing-value and frozen-game writer regressions
+        run: node --test tests/graham-withheld-fair-writers.test.mjs
 
       - name: Apply scoped M4 staging batch
         run: node tools/apply-graham-matchup-production.mjs data/walters/nfl/matchup-production-staging.json

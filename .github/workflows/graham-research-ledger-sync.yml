@@ -2,9 +2,13 @@ name: Graham research ledger sync
 
 on:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/graham-research-ledger-sync.yml'
+      - 'tools/graham-research-ledger-sync.py'
+      - 'tests/graham-research-ledger-sync.test.py'
       - 'data/walters/nfl/20*/week-*-research-events/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,117 +21,31 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
-
-      - name: Sync research events to weekly ledgers and current boards
+      - name: Verify append-only transport
+        run: python tests/graham-research-ledger-sync.test.py
+      - name: Append research sweeps without changing boards
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          changed = []
-          for events_dir in sorted(Path('data/walters/nfl').glob('20*/week-*-research-events')):
-              event_paths = sorted(events_dir.glob('*.json'))
-              if not event_paths:
-                  continue
-              events = [json.loads(p.read_text()) for p in event_paths]
-
-              ledger_path = events_dir.parent / (events_dir.name.replace('-research-events', '-research-ledger.json'))
-              if ledger_path.exists():
-                  ledger = json.loads(ledger_path.read_text())
-                  sweeps = ledger.setdefault('sweeps', [])
-                  existing_run_ids = {s.get('runEventId') for s in sweeps if s.get('runEventId')}
-                  existing_legacy = {
-                      (s.get('sequence'), s.get('type'), s.get('startedAt'))
-                      for s in sweeps
-                  }
-                  appended = 0
-                  for event in events:
-                      run_id = event.get('runEventId')
-                      legacy_key = (event.get('sequence'), event.get('type'), event.get('startedAt'))
-                      if (run_id and run_id in existing_run_ids) or (not run_id and legacy_key in existing_legacy):
-                          continue
-                      sweep = {
-                          k: event[k]
-                          for k in (
-                              'sequence','type','runEventId','sourceTaskKey','completionResult',
-                              'startedAt','completedAt','scope','sourcesChecked','teamFindings',
-                              'ratingChanges','matchupChanges','espnFpiCapture','summary'
-                          )
-                          if k in event
-                      }
-                      for optional_key in (
-                          'methodologySource','activeWeekAuthority','h4Guard','vsin2Source',
-                          'personnelProduction','matchupProduction'
-                      ):
-                          if optional_key in event:
-                              sweep[optional_key] = event[optional_key]
-                      sweeps.append(sweep)
-                      if run_id:
-                          existing_run_ids.add(run_id)
-                      existing_legacy.add(legacy_key)
-                      appended += 1
-                  if appended:
-                      sweeps.sort(key=lambda x: (x.get('startedAt') or '', x.get('sequence') or -1))
-                      completed = [s.get('completedAt') for s in sweeps if s.get('completedAt')]
-                      if completed:
-                          ledger['updatedAt'] = max(completed)
-                      ledger_path.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + '\n')
-                      changed.append(str(ledger_path))
-
-              current_path = events_dir.parent / (events_dir.name.replace('-research-events', '-current-numbers.json'))
-              if current_path.exists():
-                  board = json.loads(current_path.read_text())
-                  latest = max(events, key=lambda e: e.get('completedAt') or e.get('startedAt') or '')
-                  latest_at = latest.get('completedAt') or latest.get('startedAt')
-                  board_changed = False
-                  if latest_at and board.get('lastResearchAt') != latest_at:
-                      board['lastResearchAt'] = latest_at
-                      board['updatedAt'] = latest_at
-                      board['lastInformationReviewAt'] = latest_at
-                      board_changed = True
-                  matchup_by_key = {
-                      m.get('gameKey'): m for m in (latest.get('matchupChanges') or []) if m.get('gameKey')
-                  }
-                  for game in board.get('games') or []:
-                      review = matchup_by_key.get(game.get('gameKey'))
-                      if not review:
-                          continue
-                      action = review.get('action') or ''
-                      status = game.get('informationStatus')
-                      if action == 'PRESERVE_PRIOR_PROVISIONAL_NUMBER':
-                          status = 'REVIEWED_NO_MATERIAL_CHANGE_SOURCE_LOCKED'
-                      elif action.startswith('PRESERVE_CURRENT_GOVERNED_FAIR'):
-                          status = 'REVIEWED_GOVERNED_FAIR_PRESERVED'
-                      if status and game.get('informationStatus') != status:
-                          game['informationStatus'] = status
-                          board_changed = True
-                      if latest_at and game.get('lastInformationReviewAt') != latest_at:
-                          game['lastInformationReviewAt'] = latest_at
-                          board_changed = True
-                  if latest.get('methodologySource'):
-                      method_status = latest['methodologySource'].get('status')
-                      if method_status and board.get('methodologySourceStatus') != method_status:
-                          board['methodologySourceStatus'] = method_status
-                          board_changed = True
-                  if board_changed:
-                      current_path.write_text(json.dumps(board, indent=2, ensure_ascii=False) + '\n')
-                      changed.append(str(current_path))
-
-          print('changed=' + ','.join(changed))
-          PY
-
-      - name: Commit synchronized research state
-        run: |
-          if git diff --quiet -- data/walters/nfl; then
-            echo 'No research-state updates required.'
-            exit 0
-          fi
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/walters/nfl/*/week-*-research-ledger.json data/walters/nfl/*/week-*-current-numbers.json
-          git commit -m 'Sync Graham research event to weekly state'
-          git push
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            python tools/graham-research-ledger-sync.py --write > /tmp/graham-research-ledger-sync.json
+            cat /tmp/graham-research-ledger-sync.json
+            git add -- 'data/walters/nfl/20*/week-*-research-ledger.json'
+            if git diff --cached --quiet; then
+              echo 'No research-ledger additions required.'
+              exit 0
+            fi
+            git commit -m 'Append Graham research events to weekly ledgers'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo 'Concurrent writes prevented research-ledger publication; retry recomputed against latest main.' >&2
+          exit 1

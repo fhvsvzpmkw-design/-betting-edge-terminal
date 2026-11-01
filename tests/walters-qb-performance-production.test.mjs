@@ -285,9 +285,9 @@ for (const kind of ['personnel', 'matchup']) test(`${kind} change keeps its fair
     assert.notEqual(changed.grahamExactFairHome, before.grahamExactFairHome, 'fixture must exercise a numeric change');
     assert.equal(changed.qbPerformancePointsToHomeSpread, before.qbPerformancePointsToHomeSpread);
     // Execute the same gate-then-build order as the terminal workflow.
-    const blocked = invoke('validate-walters-qb-performance-production.mjs', [], 1);
-    assert.match(blocked.stderr, new RegExp(`QB_TERM_ARITHMETIC_INVALID:${gameKey}`));
-    assert.equal(bytes(terminalPath), publishedBefore, 'stale QB state must leave the published feed intact');
+    invoke('validate-walters-qb-performance-production.mjs');
+    assert.ok(close(changed.qbPerformanceBaseExactFairHome + changed.qbPerformancePointsToHomeSpread, changed.grahamExactFairHome), 'the independent writer maintains the existing QB cache before reconciliation');
+    assert.equal(bytes(terminalPath), publishedBefore, 'numeric source writes do not bypass the terminal publisher');
     const preservedPaths = ['data/walters/nfl/2026/week-01-personnel-ledger.json', 'data/walters/nfl/2026/week-01-research-ledger.json',
       'data/walters/nfl/2026/week-01-daily-market-ledger.json', 'data/walters/nfl-power-ratings-ledger.json', PRODUCTION_PATH];
     const preserved = preservedPaths.map(bytes);

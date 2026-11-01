@@ -8,6 +8,9 @@ on:
       - data/walters/nfl/personnel-staging.json
       - data/walters/nfl/personnel-production-current.json
       - tools/apply-graham-personnel-staging.mjs
+      - tools/graham-personnel-input-order.mjs
+      - tools/graham-fair-decomposition.mjs
+      - tests/graham-withheld-fair-writers.test.mjs
       - tools/graham-current-personnel-estimates.mjs
       - tools/graham-current-value-estimates.mjs
       - tests/graham-current-value-estimates.test.mjs
@@ -66,6 +69,9 @@ jobs:
 
       - name: Verify replacement estimate safeguards
         run: node --test tests/graham-current-personnel-estimates.test.mjs tests/graham-current-value-estimates.test.mjs tests/graham-current-receiver-cluster.test.mjs tests/graham-personnel-failure-isolation.test.mjs
+
+      - name: Verify missing-value and frozen-game writer regressions
+        run: node --test tests/graham-withheld-fair-writers.test.mjs
 
       - name: Apply governed personnel staging batch
         run: node tools/apply-graham-personnel-staging.mjs data/walters/nfl/personnel-staging.json

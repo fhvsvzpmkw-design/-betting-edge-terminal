@@ -4,8 +4,10 @@ on:
     branches: [main]
     paths:
       - tools/graham-baseline-recovery.mjs
+      - tools/graham-baseline-production-chain.mjs
       - tools/graham-research-review.mjs
       - tests/graham-baseline-recovery.test.mjs
+      - tests/graham-baseline-production-chain.test.mjs
       - .github/workflows/graham-baseline-recovery.yml
       - data/walters/nfl/20*/week-*-research-runtime/*.json
   workflow_run:
@@ -35,6 +37,7 @@ jobs:
       - name: Verify recovery regressions
         run: |
           node tests/graham-baseline-recovery.test.mjs
+          node tests/graham-baseline-production-chain.test.mjs
           node tests/graham-production-queue.test.mjs
       - name: Reconcile pending baseline against exact verified review
         run: |

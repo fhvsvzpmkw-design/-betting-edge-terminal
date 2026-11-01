@@ -70,7 +70,7 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
 
 export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,activeEvidence=[],activeFinals,effectiveAt,previous=null}){
   if(board.season!==active.season||board.week!==active.week||!Number.isFinite(Date.parse(effectiveAt)))throw Error('READINESS_ACTIVE_IDENTITY_OR_TIME');
-  const completion=weeklyCompletion({active,board,power,staging});
+  const completion=weeklyCompletion({active,board,power,staging,effectiveAt});
   const historical=active.week===1?[]:recoveryQueue({season:active.season,sourceWeek:active.week-1,schedule:prior.games,power,evidence,effectiveAt,previous:previous?.historicalGames});
   const preparation=recoveryQueue({season:active.season,sourceWeek:active.week,schedule:board.games.filter(g=>Date.parse(g.startTimePacific)<Date.parse(effectiveAt)),power,evidence:activeEvidence,effectiveAt,previous:previous?.activeWeekPreparation});
   const historicalComplete=completion.components.historicalLearning.state==='COMPLETE';

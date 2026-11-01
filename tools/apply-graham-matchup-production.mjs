@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {currentReceiverClusterMultiplier} from './graham-current-personnel-estimates.mjs';
 import {sharedVenueFairWithheld} from './graham-fair-decomposition.mjs';
+import {assertPersonnelCaseOrder,latestRecordTime} from './graham-personnel-input-order.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/matchup-production-staging.json');
@@ -93,6 +94,7 @@ for(const c of input.cases){
     if(['caseKey','gameKey','team','side','player'].some(key=>priorEvent[key]!==c[key])||(priorEvent.playerEaId!=null&&priorEvent.playerEaId!==c.playerEaId))fail(`EVENT_ID_REUSED:${c.matchupEventId}`);
     continue;
   }
+  const inputCaseSha256=assertPersonnelCaseOrder(ledger.currentCases?.[c.caseKey],c,input.effectiveAt);
   if(c.productionClass!=='VALUE_INVARIANT_COMMITTEE')fail(`CLASS_NOT_ACCEPTED:${c.productionClass}`);
   if(c.resolutionStatus!=='RESOLVED_VALUE_INVARIANT_COMMITTEE')fail(`RESOLUTION_NOT_ACCEPTED:${c.caseKey}`);
   const availability=String(c.availabilityStatus||'').toUpperCase();
@@ -129,7 +131,7 @@ for(const c of input.cases){
   }
   const rawDelta=round(replacementValue-healthy,3);
   const event={
-    personnelEventId:c.matchupEventId,matchupEventId:c.matchupEventId,caseKey:c.caseKey,gameKey:c.gameKey,team:c.team,side:String(c.side).toUpperCase(),player:player.player,playerEaId:player.eaPlayerId,currentRole:c.currentRole||player.position,
+    personnelEventId:c.matchupEventId,matchupEventId:c.matchupEventId,inputCaseSha256,caseKey:c.caseKey,gameKey:c.gameKey,team:c.team,side:String(c.side).toUpperCase(),player:player.player,playerEaId:player.eaPlayerId,currentRole:c.currentRole||player.position,
     availabilityStatus:availability,resolutionStatus:'RESOLVED_VALUE_INVARIANT_COMMITTEE',replacementCandidates:committee.map(p=>p.player),committee,excludedBaselineContributors:excluded,
     baselineDoubleCountReviewed:true,clusterGuardStatus:'PASS',matchupReview:{...mr,increment:0},reason:c.reason,sourceRefs:unique([...(c.sourceRefs||[]),...(mr.sourceRefs||[]),...excluded.flatMap(e=>e.sourceRefs||[])]),
     batchId:input.batchId,effectiveAt:input.effectiveAt,sourceTask:input.sourceTask||'UNKNOWN',marketViewed:false,productionId:baseProd.productionId,matchupProductionId:prod.productionId,calibrationId:cal.calibrationId,
@@ -179,13 +181,17 @@ for(const gameKey of affectedGames){
   game.priorGrahamFairHome=priorPublished;
   game.grahamExactFairHome=exact;
   game.grahamFairHome=published;
-  if(!withheld)game.grahamAsOf=input.effectiveAt;
+  if(!withheld&&game.qbPerformanceStatus==='OPERATIONAL_SCOPED_APPLIED'){
+    if(!finite(game.qbPerformancePointsToHomeSpread))fail(`QB_TERM_MISSING:${gameKey}`);
+    game.qbPerformanceBaseExactFairHome=round(exact-Number(game.qbPerformancePointsToHomeSpread),3);
+  }
+  if(!withheld)game.grahamAsOf=latestRecordTime(game.grahamAsOf,input.effectiveAt);
   game.personnelBaselineExactFairHome=baseline;
   game.personnelOverlayPointsToHomeSpread=overlay;
   game.personnelProductionId=baseProd.productionId;
-  game.personnelLastAppliedAt=input.effectiveAt;
+  game.personnelLastAppliedAt=latestRecordTime(game.personnelLastAppliedAt,input.effectiveAt);
   game.matchupExpansionProductionId=prod.productionId;
-  game.matchupExpansionLastAppliedAt=input.effectiveAt;
+  game.matchupExpansionLastAppliedAt=latestRecordTime(game.matchupExpansionLastAppliedAt,input.effectiveAt);
   game.personnelUnresolvedCases=cases.filter(c=>c.valueStatus!=='NUMERIC_ELIGIBLE').map(c=>({caseKey:c.caseKey,player:c.player,failClosedCode:c.failClosedCode||null,resolutionStatus:c.resolutionStatus}));
   game.personnelBlockedGroups=blockedGroups;
   const priorAdjustments=(game.adjustments||[]).filter(a=>a.type!=='PERSONNEL_CALIBRATED_PRODUCTION');
@@ -196,7 +202,7 @@ for(const gameKey of affectedGames){
 }
 
 ledger.processedMatchupBatchIds=[...ledger.processedMatchupBatchIds,input.batchId];
-ledger.updatedAt=input.effectiveAt;ledger.lastMatchupBatchId=input.batchId;ledger.lastMatchupBatchSourceTask=input.sourceTask||'UNKNOWN';ledger.matchupProductionId=prod.productionId;ledger.marketViewed=false;
+ledger.updatedAt=latestRecordTime(ledger.updatedAt,input.effectiveAt);ledger.lastMatchupBatchId=input.batchId;ledger.lastMatchupBatchSourceTask=input.sourceTask||'UNKNOWN';ledger.matchupProductionId=prod.productionId;ledger.marketViewed=false;
 const sweep={
   sequence:(research.sweeps||[]).length?Math.max(...research.sweeps.map(s=>Number(s.sequence)||0))+1:0,
   type:'MATCHUP_EXPANSION_PRODUCTION_BATCH',startedAt:input.startedAt||input.effectiveAt,completedAt:input.effectiveAt,
@@ -206,9 +212,9 @@ const sweep={
   ratingChanges:[],matchupChanges,
   summary:{casesSubmitted:input.cases.length,newEventsRecorded:batchEvents.length,numericEligible:batchEvents.length,gamesRecomputed:matchupChanges.length,carriedRatingMoves:0,nonzeroOpponentMatchupIncrements:0,marketViewed:false,productionId:prod.productionId}
 };
-research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=input.effectiveAt;
-numbers.updatedAt=input.effectiveAt;numbers.lastResearchAt=input.effectiveAt;
-numbers.matchupExpansionProduction={state:'OPERATIONAL_SCOPED',productionId:prod.productionId,lastBatchId:input.batchId,lastAppliedAt:input.effectiveAt,marketViewed:false,nonzeroOpponentMatchupAuthority:false};
+research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=latestRecordTime(research.updatedAt,input.effectiveAt);
+numbers.updatedAt=latestRecordTime(numbers.updatedAt,input.effectiveAt);numbers.lastResearchAt=latestRecordTime(numbers.lastResearchAt,input.effectiveAt);
+numbers.matchupExpansionProduction={state:'OPERATIONAL_SCOPED',productionId:prod.productionId,lastBatchId:input.batchId,lastAppliedAt:latestRecordTime(numbers.matchupExpansionProduction?.lastAppliedAt,input.effectiveAt),marketViewed:false,nonzeroOpponentMatchupAuthority:false};
 
 const validateFairs=board=>{for(const game of board.games)if(!sharedVenueFairWithheld(game)&&(!finite(game.grahamExactFairHome)||!finite(game.grahamFairHome)))fail(`INVALID_GRAHAM_FAIR:${game.gameKey}`);};
 validateFairs(numbers);

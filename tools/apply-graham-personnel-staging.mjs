@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus, synchronizePersonnelBoardStatus, currentReceiverClusterMultiplier} from './graham-current-personnel-estimates.mjs';
 import {loadCurrentValueEstimates} from './graham-current-value-estimates.mjs';
 import {sharedVenueFairWithheld} from './graham-fair-decomposition.mjs';
+import {assertPersonnelCaseOrder,latestRecordTime} from './graham-personnel-input-order.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/personnel-staging.json');
@@ -108,7 +109,8 @@ for(const c of input.cases){
     if(['caseKey','gameKey','team','side','player','playerEaId'].some(key=>priorEvent[key]!==c[key]))throw new Error(`PERSONNEL_EVENT_ID_REUSED:${c.personnelEventId}`);
     continue;
   }
-  const event={...c,batchId:input.batchId,effectiveAt:input.effectiveAt,sourceTask:input.sourceTask||'UNKNOWN',marketViewed:false,productionId:prod.productionId,calibrationId:cal.calibrationId};
+  const inputCaseSha256=assertPersonnelCaseOrder(ledger.currentCases?.[c.caseKey],c,input.effectiveAt);
+  const event={...c,inputCaseSha256,batchId:input.batchId,effectiveAt:input.effectiveAt,sourceTask:input.sourceTask||'UNKNOWN',marketViewed:false,productionId:prod.productionId,calibrationId:cal.calibrationId};
   if(c.resolutionStatus==='RESOLVED_MODEL_ESTIMATE'){
     try {
       const p=playerLookup(c.player,c.playerEaId);
@@ -172,11 +174,15 @@ for(const gameKey of affectedGames){
   game.priorGrahamFairHome=priorPublished;
   game.grahamExactFairHome=exact;
   game.grahamFairHome=published;
-  if(!withheld)game.grahamAsOf=input.effectiveAt;
+  if(!withheld&&game.qbPerformanceStatus==='OPERATIONAL_SCOPED_APPLIED'){
+    if(!finite(game.qbPerformancePointsToHomeSpread))throw Error(`PERSONNEL_QB_TERM_MISSING:${gameKey}`);
+    game.qbPerformanceBaseExactFairHome=round(exact-Number(game.qbPerformancePointsToHomeSpread),3);
+  }
+  if(!withheld)game.grahamAsOf=latestRecordTime(game.grahamAsOf,input.effectiveAt);
   game.personnelBaselineExactFairHome=baseline;
   game.personnelOverlayPointsToHomeSpread=overlay;
   game.personnelProductionId=prod.productionId;
-  game.personnelLastAppliedAt=input.effectiveAt;
+  game.personnelLastAppliedAt=latestRecordTime(game.personnelLastAppliedAt,input.effectiveAt);
   game.personnelUnresolvedCases=cases.filter(c=>c.valueStatus!=='NUMERIC_ELIGIBLE').map(c=>({caseKey:c.caseKey,player:c.player,failClosedCode:c.failClosedCode,resolutionStatus:c.resolutionStatus}));
   game.personnelNonmaterialAvailabilityCases=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&c.availabilityStatus==='UNRESOLVED'&&c.healthyWaltersPoints===0).map(c=>({caseKey:c.caseKey,player:c.player,availabilityStatus:'UNRESOLVED',pointLoss:0,limitation:'Availability remains unconfirmed; the approved calibrated-zero model has zero point loss for every availability outcome.'}));
   game.personnelBlockedGroups=blockedGroups;
@@ -189,7 +195,7 @@ for(const gameKey of affectedGames){
   matchupChanges.push({gameKey,priorPublishedFairHome:priorPublished,baselineExactFairHome:baseline,priorPersonnelOverlay:priorOverlay,newPersonnelOverlay:overlay,newExactFairHome:exact,newPublishedFairHome:published,applied,blockedGroups,unresolvedCases:game.personnelUnresolvedCases});
 }
 
-ledger.processedBatchIds=[...(ledger.processedBatchIds||[]),input.batchId];ledger.updatedAt=input.effectiveAt;ledger.lastBatchId=input.batchId;ledger.lastBatchSourceTask=input.sourceTask||'UNKNOWN';ledger.marketViewed=false;
+ledger.processedBatchIds=[...(ledger.processedBatchIds||[]),input.batchId];ledger.updatedAt=latestRecordTime(ledger.updatedAt,input.effectiveAt);ledger.lastBatchId=input.batchId;ledger.lastBatchSourceTask=input.sourceTask||'UNKNOWN';ledger.marketViewed=false;
 const sweep={
   sequence:(research.sweeps||[]).length?Math.max(...research.sweeps.map(s=>Number(s.sequence)||0))+1:0,
   type:'PERSONNEL_PRODUCTION_BATCH',startedAt:input.startedAt||input.effectiveAt,completedAt:input.effectiveAt,
@@ -200,8 +206,8 @@ const sweep={
   espnFpiCapture:{status:'NOT_REFRESHED_PERSONNEL_ONLY',role:'INDEPENDENT_COMPARISON_ONLY'},
   summary:{casesSubmitted:input.cases.length,newEventsRecorded:batchEvents.length,numericEligible:batchEvents.filter(e=>e.valueStatus==='NUMERIC_ELIGIBLE').length,failedClosed:batchEvents.filter(e=>e.valueStatus!=='NUMERIC_ELIGIBLE').length,gamesRecomputed:matchupChanges.length,carriedRatingMoves:0,marketViewed:false,productionId:prod.productionId}
 };
-research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=input.effectiveAt;
-numbers.updatedAt=input.effectiveAt;numbers.lastResearchAt=input.effectiveAt;numbers.personnelProduction={state:'OPERATIONAL',productionId:prod.productionId,calibrationId:cal.calibrationId,lastBatchId:input.batchId,lastAppliedAt:input.effectiveAt,marketViewed:false};
+research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=latestRecordTime(research.updatedAt,input.effectiveAt);
+numbers.updatedAt=latestRecordTime(numbers.updatedAt,input.effectiveAt);numbers.lastResearchAt=latestRecordTime(numbers.lastResearchAt,input.effectiveAt);numbers.personnelProduction={state:'OPERATIONAL',productionId:prod.productionId,calibrationId:cal.calibrationId,lastBatchId:input.batchId,lastAppliedAt:latestRecordTime(numbers.personnelProduction?.lastAppliedAt,input.effectiveAt),marketViewed:false};
 
 synchronizePersonnelBoardStatus(numbers);
 const validateFairs=board=>{for(const game of board.games)if(!sharedVenueFairWithheld(game)&&(!finite(game.grahamExactFairHome)||!finite(game.grahamFairHome)))throw new Error(`INVALID_GRAHAM_FAIR_AFTER_PERSONNEL:${game.gameKey}`);};
