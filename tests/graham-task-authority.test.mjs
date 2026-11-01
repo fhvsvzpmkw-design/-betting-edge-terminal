@@ -7,7 +7,12 @@ const before=JSON.parse(fs.readFileSync('docs/releases/graham-stage3-tasks-befor
 assert.throws(()=>validateLiveGrahamTasks(before,authority),/prompt drift/,'the real pre-build snapshot reproduces the instruction mismatch');
 for(const task of before.filter(t=>t.title!=='Graham 16:45 Delta')) {
   const binding=authority.registry.tasks.find(t=>t.automationId===task.id);
-  assert.ok(fs.readFileSync(binding.authorityPath,'utf8').includes(task.prompt),'preserve all prior task-specific instructions during migration');
+  const current=fs.readFileSync(binding.authorityPath,'utf8');
+  // Authorized amendments can be inserted between preserved instructions.
+  // Retain every original paragraph without requiring the old whole prompt
+  // to remain one uninterrupted block forever.
+  for(const paragraph of task.prompt.split(/\n\s*\n/).filter(p=>p.trim()))
+    assert.ok(current.includes(paragraph),'preserve every prior task-specific instruction during migration: '+binding.taskKey);
 }
 const aligned=before.map(t=>({...t,prompt:buildGrahamTaskPrompt(authority.registry.tasks.find(x=>x.automationId===t.id),authority.registry)}));
 assert.equal(validateLiveGrahamTasks(aligned,authority).length,5);
