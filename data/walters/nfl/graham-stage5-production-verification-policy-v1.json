@@ -2,26 +2,26 @@
   "schema": 1,
   "policyId": "graham-stage5-production-verification-v1",
   "state": "ACTIVE_VERIFICATION",
-  "purpose": "Final production verification after Stage 4: read back the complete active Week 1 Graham board, verify the four live research tasks against repository authority, and dry-run a future-week rollover without advancing the live active week.",
+  "purpose": "Verify production integrity against the manifest-resolved current Graham week: exact verified slate, valid numeric or explicitly withheld fairs, recorded task attestation and a temporary next-week rollover dry-run. This does not certify completed football research, weekly learning or game readiness.",
   "prerequisites": {
     "stage4Receipt": "data/walters/nfl/graham-stage4-regression-current.json",
     "requiredStage4State": "PASS"
   },
   "checks": [
     {
-      "checkKey": "WEEK1_PRODUCTION_READBACK",
-      "requirement": "Active 2026 Week 1 must contain 16 unique games; all exact/displayed fairs, generated decompositions, written summaries, home-field terms, personnel/matchup overlays, schedule metadata and market-isolation fields must validate from durable repository state."
+      "checkKey": "ACTIVE_WEEK_PRODUCTION_READBACK",
+      "requirement": "Resolve the actual active season/week and bind its complete unique slate to verified schedule facts. Validate every numeric fair, generated explanation, home-field term, personnel/matchup overlay, frozen pre-kickoff prediction and schedule metadata. Shared-venue fairs may remain explicitly null only under the existing H4 fail-closed shape. Never coerce null into a numeric fair."
     },
     {
       "checkKey": "FOUR_RESEARCH_TASKS",
-      "requirement": "TUESDAY_BASELINE, DAILY_REVIEW, DELTA_1645 and SUNDAY_PREGAME must be enabled exact-schedule ChatGPT tasks whose RRULEs match graham-schedule-metadata-v1 and whose prompts retain the active-week, Walters source, H4, personnel, M4, market-isolation and completion/read-back gates."
+      "requirement": "Validate the four recorded research-task attestation entries against repository schedule and completion authority, retaining their capture time and limitation: stored attestation is not current scheduler state or proof of completed football coverage."
     },
     {
       "checkKey": "FUTURE_WEEK_ROLLOVER_DRY_RUN",
       "requirement": "Create and resolve the next Graham week only inside a temporary sandbox, carry forward all 32 current team ratings, inherit repository schedule metadata into the simulated next-week board/research ledger, verify required file paths before simulated activation, and prove the live active-week manifest is unchanged afterward."
     }
   ],
-  "passRule": "All three production-verification checks must pass against the same repository revision; the live active week must remain unchanged throughout.",
+  "passRule": "All three production-integrity checks must pass against the same repository revision; all protected live inputs remain byte-for-byte unchanged. Include baseline, historical-learning, propagation and current-availability limitations separately. PASS never overrides incomplete football readiness.",
   "liveMutationAllowed": false,
   "allowedDurableWrite": "data/walters/nfl/graham-stage5-production-verification-current.json",
   "marketViewed": false

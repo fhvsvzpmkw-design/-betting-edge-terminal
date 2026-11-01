@@ -14,6 +14,7 @@ on:
 concurrency:
   group: graham-stage5-production-verification
   cancel-in-progress: false
+  queue: max
 
 permissions:
   contents: write
@@ -79,14 +80,22 @@ jobs:
 
       - name: Summary
         if: always()
+        env:
+          STAGE5_JOB_STATUS: ${{ job.status }}
         run: |
-          {
-            echo "## Graham Stage 5 production verification"
-            echo
-            echo "- Prerequisite: Stage 4 six-case regression PASS"
-            echo "- Week 1 production read-back: 16 games, generated explanations and governed arithmetic"
-            echo "- Live Graham research tasks: 4 exact-schedule tasks checked against repository authority"
-            echo "- Future-week rollover: temporary dry-run only"
-            echo "- Live active-week mutation allowed: no"
-            echo "- Durable write allowed: Stage 5 receipt only"
-          } >> "$GITHUB_STEP_SUMMARY"
+          node --input-type=module - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          import fs from 'node:fs';
+          console.log('## Graham Stage 5 production integrity');
+          if(process.env.STAGE5_JOB_STATUS!=='success'){
+            console.log('- Verification/publication failed; a previous receipt is not evidence for this attempt.');
+          }else{
+            const receipt=JSON.parse(fs.readFileSync('data/walters/nfl/graham-stage5-production-verification-current.json'));
+            const board=receipt.checks.find(c=>c.checkKey==='ACTIVE_WEEK_PRODUCTION_READBACK');
+            const tasks=receipt.checks.find(c=>c.checkKey==='FOUR_RESEARCH_TASKS');
+            console.log(`- Production integrity: ${receipt.state}; Week ${board.week}, ${board.gamesVerified} games verified, ${board.withheldFairGames} fair(s) explicitly withheld.`);
+            console.log(`- Football inputs: ${receipt.footballReadiness.state}; baseline ${receipt.footballReadiness.baselineStatus}.`);
+            console.log(`- Recorded four-task attestation captured ${tasks.attestationCapturedAt}; current scheduler state and research completion are separate.`);
+            console.log('- Future-week rollover: temporary dry-run only; protected live inputs unchanged.');
+            console.log('- Durable write allowed: Stage 5 receipt only.');
+          }
+          NODE

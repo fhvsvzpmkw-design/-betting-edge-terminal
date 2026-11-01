@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import {sharedVenueFairWithheld} from '../tools/graham-fair-decomposition.mjs';
+import {weeklyCompletion} from '../tools/graham-weekly-completion.mjs';
 import {
   grahamWeekPaths,
   resolveGrahamActiveWeek
@@ -51,15 +53,38 @@ assert.equal(stage4.cases.every(c => c.result === 'PASS'), true, 'Every Stage 4 
 const activeBeforeRaw = fs.readFileSync(path.join(ROOT, 'data/walters/nfl/active-week.json'), 'utf8');
 const active = resolveGrahamActiveWeek();
 assert.equal(active.season, 2026, 'Stage 5 production verification is scoped to 2026');
-assert.equal(active.week, 1, 'Week 1 must remain active during Stage 5');
 
-// 1) Complete Week 1 durable production read-back.
+// 1) Verify production integrity for the manifest's actual active slate.
 const numbers = readJson(active.paths.currentNumbers);
 const research = readJson(active.paths.researchLedger);
 const market = readJson(active.paths.dailyMarketLedger);
 const h4 = readJson('data/walters/nfl/home-field/home-field-production-current.json');
 const ratings = readJson('data/walters/nfl-power-ratings-ledger.json');
 const scheduleAuthority = loadGrahamScheduleAuthority();
+assert.ok(numbers.scheduleSource?.factsPath, 'Active board must bind its verified schedule facts');
+const scheduleFacts = readJson(numbers.scheduleSource.factsPath);
+const protectedPaths=['data/walters/nfl/active-week.json',active.paths.currentNumbers,active.paths.researchLedger,active.paths.dailyMarketLedger,'data/walters/nfl-power-ratings-ledger.json'];
+const protectedBytes=new Map(protectedPaths.map(p=>[p,fs.readFileSync(path.join(ROOT,p),'utf8')]));
+
+function verifySlateIdentity(board,facts){
+  assert.equal(facts.schema,1);assert.equal(facts.season,active.season);assert.equal(facts.week,active.week);
+  assert.equal(facts.marketViewed,false);assert.ok(Number.isFinite(Date.parse(facts.verifiedAt)));
+  assert.ok(Array.isArray(facts.games)&&facts.games.length>0,'Verified schedule must contain the actual slate');
+  assert.equal(board.games.length,facts.games.length,'Active board must contain the complete verified slate');
+  assert.equal(new Set(board.games.map(g=>g.gameKey)).size,board.games.length,'Active game identities must be unique');
+  assert.equal(new Set(facts.games.map(g=>g.gameKey)).size,facts.games.length,'Schedule game identities must be unique');
+  const teams=new Set();
+  for(const game of board.games){
+    const scheduled=facts.games.find(g=>g.gameKey===game.gameKey);
+    assert.ok(scheduled,`${game.gameKey} is absent from verified schedule`);
+    assert.equal(game.gameKey,`${active.season}-W${String(active.week).padStart(2,'0')}-${game.away}-${game.home}`);
+    assert.equal(game.away,scheduled.away);assert.equal(game.home,scheduled.home);
+    assert.notEqual(game.away,game.home);
+    assert.ok(Number.isFinite(Date.parse(game.startTimePacific)),`${game.gameKey} kickoff missing`);
+    assert.equal(Date.parse(game.startTimePacific),Date.parse(scheduled.startTimePacific),`${game.gameKey} kickoff differs from verified schedule`);
+    for(const team of [game.away,game.home]){assert.ok(ratings.teams.some(t=>t.abbr===team),`Unknown active team ${team}`);assert.equal(teams.has(team),false,`Repeated active team ${team}`);teams.add(team);}
+  }
+}
 
 assert.equal(numbers.season, active.season);
 assert.equal(numbers.week, active.week);
@@ -67,14 +92,19 @@ assert.equal(research.season, active.season);
 assert.equal(research.week, active.week);
 assert.equal(market.season, active.season);
 assert.equal(market.week, active.week);
-assert.equal(numbers.games.length, 16, 'Week 1 board must contain all 16 games');
-assert.equal(new Set(numbers.games.map(g => g.gameKey)).size, 16, 'Week 1 game keys must be unique');
+verifySlateIdentity(numbers,scheduleFacts);
+for(const mutate of [
+  b=>b.games.pop(),
+  b=>{b.games[0].away='UNKNOWN';},
+  b=>{b.games[0].startTimePacific='2000-01-01T00:00:00Z';},
+  b=>{b.games[1].gameKey=b.games[0].gameKey;},
+]){const invalid=structuredClone(numbers);mutate(invalid);assert.throws(()=>verifySlateIdentity(invalid,scheduleFacts),'Corrupt active slate must fail production verification');}
 assert.equal(h4.state, 'OPERATIONAL_SCOPED');
 assert.equal(h4.productionAuthority, true);
 assert.equal(h4.marketViewed, false);
 assert.equal(ratings.teams.length, 32, 'Graham power-rating ledger must carry all 32 teams');
 assert.equal(new Set(ratings.teams.map(t => t.abbr)).size, 32, 'Power-rating team identities must be unique');
-assert.equal(ratings.teams.every(t => Number.isFinite(Number(t.currentRating))), true, 'All current team ratings must be numeric');
+assert.equal(ratings.teams.every(t => Number.isFinite(t.currentRating)), true, 'All current team ratings must be numeric');
 
 const fairReadback = run('tools/graham-fair-decomposition.mjs', ['--path', active.paths.currentNumbers]);
 assert.match(fairReadback, /READBACK VERIFIED/);
@@ -89,19 +119,42 @@ let domesticGames = 0;
 let neutralGames = 0;
 let personnelOverlayGames = 0;
 let matchupOverlayGames = 0;
+let withheldGames = 0;
+const frozenStartedGames = [];
+const verificationTime = Date.now();
 for (const game of numbers.games) {
   assert.ok(game.gameKey);
-  assert.equal(Number.isFinite(Number(game.grahamExactFairHome)), true, `${game.gameKey} exact fair missing`);
-  assert.equal(Number.isFinite(Number(game.grahamFairHome)), true, `${game.gameKey} display fair missing`);
-  assert.equal(game.fairDecomposition?.arithmeticVerified, true, `${game.gameKey} arithmetic not verified`);
+  const withheld=sharedVenueFairWithheld(game);
+  if(withheld){
+    withheldGames+=1;
+    assert.equal(game.fairDecomposition?.arithmeticVerified,false);
+    assert.equal(game.fairDecomposition?.failClosedCode,'FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED');
+    assert.match(game.researchSummary||'',/^Fail closed fair decomposition:/);
+  }else{
+    assert.equal(Number.isFinite(game.grahamExactFairHome), true, `${game.gameKey} exact fair missing`);
+    assert.equal(Number.isFinite(game.grahamFairHome), true, `${game.gameKey} display fair missing`);
+    assert.equal(game.fairDecomposition?.arithmeticVerified, true, `${game.gameKey} arithmetic not verified`);
+    assert.match(game.researchSummary || '', /^Governed fair decomposition:/, `${game.gameKey} generated explanation missing`);
+  }
   assert.equal(game.fairDecomposition?.exactFairHome, game.grahamExactFairHome, `${game.gameKey} exact decomposition drift`);
   assert.equal(game.fairDecomposition?.displayedFairHome, game.grahamFairHome, `${game.gameKey} display decomposition drift`);
-  assert.match(game.researchSummary || '', /^Governed fair decomposition:/, `${game.gameKey} generated explanation missing`);
+
+  assert.ok(Number.isFinite(game.ratingCarryForward?.awayRating)&&Number.isFinite(game.ratingCarryForward?.homeRating),`${game.gameKey} carried ratings missing`);
+  assert.equal(close(game.neutralBaseHome,game.ratingCarryForward.awayRating-game.ratingCarryForward.homeRating,1e-8),true,`${game.gameKey} frozen neutral base drift`);
+  if(Date.parse(game.startTimePacific)<=verificationTime){
+    frozenStartedGames.push(game.gameKey);
+    assert.ok(Number.isFinite(Date.parse(game.grahamAsOf))&&Date.parse(game.grahamAsOf)<=Date.parse(game.startTimePacific),`${game.gameKey} issued prediction timestamp is after kickoff`);
+  }else{
+    assert.equal(game.ratingCarryForward.awayRating,ratings.teams.find(t=>t.abbr===game.away).currentRating,`${game.gameKey} away current base stale`);
+    assert.equal(game.ratingCarryForward.homeRating,ratings.teams.find(t=>t.abbr===game.home).currentRating,`${game.gameKey} home current base stale`);
+  }
 
   const venueAdjustment = (game.adjustments || []).find(a => ['HOME_FIELD', 'VENUE'].includes(a.type));
   const venueClass = game.homeFieldVenueClass || venueAdjustment?.venueClass;
   assert.ok(venueClass, `${game.gameKey} venue class missing`);
-  if (venueClass === 'DOMESTIC_HOME') {
+  if(withheld){
+    assert.equal(venueClass,'SHARED_VENUE_OR_METRO');
+  }else if (venueClass === 'DOMESTIC_HOME') {
     domesticGames += 1;
     assert.equal(close(game.homeFieldPointsToHomeSpread, domesticHfa), true, `${game.gameKey} domestic HFA mismatch`);
   } else if (neutralClasses.has(venueClass)) {
@@ -125,8 +178,8 @@ for (const game of numbers.games) {
   assert.equal(close(matchupSum, storedMatchup), true, `${game.gameKey} matchup overlay mismatch`);
   if (Math.abs(storedMatchup) > 0.0005) matchupOverlayGames += 1;
 }
-assert.equal(domesticGames + neutralGames, 16, 'All Week 1 venues must resolve to production H4 scope');
-assert.equal(numbers.rules?.marketIsolation?.includes('before viewing'), true, 'Week 1 board market-isolation rule missing');
+assert.equal(domesticGames + neutralGames + withheldGames, numbers.games.length, 'Every active venue must resolve or remain explicitly withheld');
+assert.equal(numbers.rules?.marketIsolation?.includes('before viewing'), true, 'Active board market-isolation rule missing');
 assert.equal(research.policy?.marketIsolation?.includes('before contemporaneous Pinnacle comparison'), true, 'Research ledger market-isolation rule missing');
 
 // 2) Verify the four actual live research tasks against repository schedule/completion authority.
@@ -254,22 +307,33 @@ assert.equal(activeAfterRaw, activeBeforeRaw, 'Stage 5 rollover dry-run mutated 
 const activeAfter = resolveGrahamActiveWeek();
 assert.equal(activeAfter.season, active.season);
 assert.equal(activeAfter.week, active.week);
+for(const [relative,bytes]of protectedBytes)assert.equal(fs.readFileSync(path.join(ROOT,relative),'utf8'),bytes,`Verification mutated protected input ${relative}`);
+
+// A valid calculator/deployment chain can faithfully preserve a provisional
+// board. Report its football limitations rather than converting PASS into a
+// claim that the weekly baseline, learning and availability are complete.
+const completion=weeklyCompletion({active,board:numbers,power:ratings,staging:readJson('data/walters/nfl/carried-rating-audit-staging.json')});
 
 const receipt = {
   schema: 1,
   policyId: policy.policyId,
   state: 'PASS',
+  verificationScope: 'PRODUCTION_INTEGRITY_NOT_FOOTBALL_READINESS',
   testedCommit: process.env.GITHUB_SHA || null,
   testedAt: new Date().toISOString(),
   marketViewed: false,
   activeWeekPreserved: { season: active.season, week: active.week },
   checks: [
     {
-      checkKey: 'WEEK1_PRODUCTION_READBACK',
+      checkKey: 'ACTIVE_WEEK_PRODUCTION_READBACK',
       result: 'PASS',
-      gamesVerified: 16,
-      exactAndDisplayedFairsVerified: 16,
-      explanationsVerified: 16,
+      season:active.season,
+      week:active.week,
+      gamesVerified: numbers.games.length,
+      exactAndDisplayedFairsVerified: numbers.games.length-withheldGames,
+      withheldFairGames:withheldGames,
+      explanationsVerified: numbers.games.length,
+      frozenStartedGamesVerified:frozenStartedGames,
       domesticHomeGames: domesticGames,
       neutralGames,
       personnelOverlayGames,
@@ -279,7 +343,9 @@ const receipt = {
     {
       checkKey: 'FOUR_RESEARCH_TASKS',
       result: 'PASS',
-      tasksVerified: requiredTaskKeys
+      tasksVerified: requiredTaskKeys,
+      attestationCapturedAt:taskAttestation.capturedAt,
+      evidenceScope:'RECORDED_ATTESTATION_NOT_CURRENT_SCHEDULER_OR_RESEARCH_COMPLETION'
     },
     {
       checkKey: 'FUTURE_WEEK_ROLLOVER_DRY_RUN',
@@ -290,8 +356,10 @@ const receipt = {
       liveActiveWeekUnchanged: true
     }
   ],
-  fiveStagePlan: 'COMPLETE',
-  nextGate: 'NONE_PRODUCTION_VERIFIED'
+  footballReadiness:{state:completion.state,baselineStatus:numbers.baselineStatus,
+    components:completion.components,problems:completion.problems},
+  fiveStagePlan: 'PRODUCTION_INTEGRITY_VERIFIED',
+  nextGate: completion.state==='COMPLETE'?'NONE_PRODUCTION_INTEGRITY_VERIFIED':'COMPLETE_ACTIVE_WEEK_FOOTBALL_INPUTS'
 };
 
 const receiptIndex = process.argv.indexOf('--receipt-out');
@@ -301,4 +369,4 @@ if (receiptIndex >= 0) {
   fs.writeFileSync(path.resolve(ROOT, out), `${JSON.stringify(receipt, null, 2)}\n`);
 }
 
-console.log(`GRAHAM STAGE 5 PRODUCTION VERIFICATION: PASS // WEEK 1 16/16 // TASKS 4/4 // ROLLOVER DRY-RUN W${String(active.week).padStart(2, '0')}->W${String(nextWeek).padStart(2, '0')} // LIVE WEEK PRESERVED`);
+console.log(`GRAHAM STAGE 5 PRODUCTION VERIFICATION: PASS // WEEK ${active.week} ${numbers.games.length} GAMES (${withheldGames} FAIR WITHHELD) // TASK ATTESTATION 4/4 // FOOTBALL INPUTS ${completion.state} // ROLLOVER DRY-RUN W${String(active.week).padStart(2, '0')}->W${String(nextWeek).padStart(2, '0')} // LIVE WEEK PRESERVED`);
