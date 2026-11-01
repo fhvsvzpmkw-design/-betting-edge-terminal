@@ -59,3 +59,12 @@ For the first supported normal agent run compare the same measures using actual 
 ## Disposition
 
 No operational authority, checkpoint, staging, History, Main task prompt, activation, timing or odds budget was changed. Prepared documentation is saved on main. Pause only the temporary rollout follow-up after reporting this capability-verification blocker. Resume scoped implementation when actual Main-runtime evidence resolves the gate.
+
+
+## Hosted scheduled capability test — passed
+
+The existing temporary rollout task `6ae7c1f19d408191acd8b1490aa23073` completed the user-authorized read-only probe in execution `b0c28aca-6198-8330-a078-c99cd99bbde8`. Its task result reports AGENTS_READY: six distinct launches and six role/nonce-matching returns within 31 seconds, using actual `collaboration.spawn_agent`, `collaboration.list_agents` and `collaboration.wait_agent` tools. Returned canonical identifiers were `/root/researcher_1`, `/root/researcher_2`, `/root/researcher_3`, `/root/researcher_4`, `/root/reviewer_1` and `/root/reviewer_2`. Launches were observed at 23:20:48–23:21:08 UTC November 1; all six responses were observed by 23:21:19 UTC. Individual child timestamps, separate UUIDs and simultaneous-compute telemetry were not captured. The execution ID here comes from the task-manager readback, not from a guessed worker identity.
+
+The matching completed result was created at 23:21:26.334102Z, within execution start 23:20:37.438482Z and completion 23:21:26.655390Z. [Test conversation](https://chatgpt.com/c/6ae7a0a4-5d94-83e8-8e76-1cdcc4934bb8). The temporary task is read back paused; its saved schedule was preserved. No odds, research or publication ran in the probe.
+
+Configuration commit [bd724737](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/commit/bd72473732422e98261dd7c67d13a83032e3e42b) is exactly read back for all seven files. All five enabled Main task prompts are independently read back with the agent instruction and their original schedules/timezones intact. The existing shared-authority test and an outside-amendment content comparison pass. Producer/publication regressions were triggered by this commit; their results are separate from the capacity test. This proves six-worker support in the tested hosted task and deployed configuration in all five Main tasks. Per-Main startup launches, real returned research/reviews and durable publication remain the first normal-run acceptance criteria; do not rerun the baseline or pull odds for acceptance.
