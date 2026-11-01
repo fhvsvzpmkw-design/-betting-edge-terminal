@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 8,
-  "generatedAt": "2026-11-01T02:48:49.050Z",
+  "generatedAt": "2026-11-01T02:50:23.692Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 1,
@@ -13,7 +13,7 @@
     "activeWeekEvidenceReady": 1,
     "activeWeekEvidenceExpected": 1,
     "ratingBasesBehind": 0,
-    "initialBaseline": "INCOMPLETE"
+    "initialBaseline": "COMPLETE"
   },
   "rollover": {
     "required": false,
@@ -35,7 +35,7 @@
     "games": 14,
     "components": {
       "initialBaseline": {
-        "state": "INCOMPLETE",
+        "state": "COMPLETE",
         "owner": "TUESDAY_BASELINE"
       },
       "historicalLearning": {
@@ -249,21 +249,10 @@
       "ratingPropagation": {
         "state": "INCOMPLETE",
         "owner": "GRAHAM_RATING_BASE_REFRESH",
-        "gamesVerified": 2,
+        "gamesVerified": 13,
         "gamesExpected": 14,
         "unpropagatedGames": [
-          "2026-W08-CAR-GB",
-          "2026-W08-BAL-BUF",
-          "2026-W08-TEN-CIN",
-          "2026-W08-ARI-DAL",
-          "2026-W08-MIN-DET",
-          "2026-W08-IND-JAX",
-          "2026-W08-LV-NYJ",
-          "2026-W08-CLE-PIT",
-          "2026-W08-ATL-TB",
-          "2026-W08-LAC-LAR",
-          "2026-W08-KC-DEN",
-          "2026-W08-PHI-WAS"
+          "2026-W08-CAR-GB"
         ]
       },
       "currentAvailability": {
@@ -368,9 +357,6 @@
     },
     "problems": [
       {
-        "code": "INITIAL_BASELINE_INCOMPLETE"
-      },
-      {
         "code": "WEEKLY_RATINGS_INCOMPLETE",
         "gamesUpdated": 1,
         "gamesExpected": 14
@@ -389,14 +375,6 @@
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
       },
       {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-BAL-BUF"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-TEN-CIN"
-      },
-      {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W08-TEN-CIN",
         "personnelCases": [
@@ -404,10 +382,6 @@
         ],
         "blockedGroups": [],
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-ARI-DAL"
       },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
@@ -420,10 +394,6 @@
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
       },
       {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-MIN-DET"
-      },
-      {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W08-MIN-DET",
         "personnelCases": [
@@ -431,14 +401,6 @@
         ],
         "blockedGroups": [],
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-IND-JAX"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-LV-NYJ"
       },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
@@ -452,10 +414,6 @@
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
       },
       {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-CLE-PIT"
-      },
-      {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W08-CLE-PIT",
         "personnelCases": [
@@ -463,10 +421,6 @@
         ],
         "blockedGroups": [],
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-ATL-TB"
       },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
@@ -479,23 +433,11 @@
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
       },
       {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-LAC-LAR"
-      },
-      {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
         "gameKey": "2026-W08-LAC-LAR",
         "personnelCases": [],
         "blockedGroups": [],
         "qbStatus": "OPERATIONAL_SCOPED_APPLIED"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-KC-DEN"
-      },
-      {
-        "code": "FAIR_RATING_INPUT_STALE",
-        "gameKey": "2026-W08-PHI-WAS"
       },
       {
         "code": "CURRENT_NUMERIC_INPUTS_UNRESOLVED",
@@ -520,13 +462,13 @@
     "marketViewed": false
   },
   "currentBaseline": {
-    "state": "INCOMPLETE",
+    "state": "COMPLETE",
     "owner": "TUESDAY_BASELINE",
-    "required": true,
-    "nextAction": "RUN_ACTIVE_BASELINE_RECOVERY",
+    "required": false,
+    "nextAction": "PRESERVE_VERIFIED_CURRENT_BASELINE",
     "historicalLearningBlocksReview": false,
     "requiresSeparateResearchRuntime": true,
-    "instruction": "Check for a live competing baseline runtime, then execute the full current-information baseline under the existing partial-weekly-input policy. Do not wait for historical learning or next-week rollover; preserve unresolved weekly and numerical inputs."
+    "instruction": "Retain the verified baseline and its original limitations."
   },
   "historicalGames": [
     {
@@ -1596,19 +1538,14 @@
         "2026-W07-IND-MIN",
         "2026-W07-GB-DET"
       ]
-    },
-    {
-      "code": "INITIAL_BASELINE_RECOVERY_REQUIRED",
-      "owner": "TUESDAY_BASELINE",
-      "nextAction": "RUN_ACTIVE_BASELINE_RECOVERY"
     }
   ],
-  "customerMessage": "Week 8: historical rating updates 1/14; baseline incomplete.",
+  "customerMessage": "Week 8: historical rating updates 1/14; baseline verified.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
   "inputBlobs": {
-    "data/walters/nfl/2026/week-08-current-numbers.json": "5872616bdf3a92ed22210cdd81fc47ebbd34bc07",
+    "data/walters/nfl/2026/week-08-current-numbers.json": "87126aac53d690806d5ca58747b56a22098f0cac",
     "data/walters/nfl-power-ratings-ledger.json": "08d7317ccc18c975d15bfc221398afad9085d95f",
     "data/walters/nfl/carried-rating-audit-staging.json": "0fbae85382860a841916ec8f7eaa92437a9835be",
     "data/walters/nfl/2026/week-07-current-numbers.json": "0547aab9cf16001cae7d99d6c831944640065403",
