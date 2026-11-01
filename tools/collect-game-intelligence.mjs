@@ -11,6 +11,7 @@ import {teamAbbr} from './graham-market-utils.mjs';
 import {list,number,digest,readOptional,eventIdentity,sameEvent,recordId,validateCapture} from './game-intelligence.mjs';
 import {loadForecastSourceRegistry} from './forecast-evidence.mjs';
 import {mlbScheduleUrl,parseOfficialMlb} from './official-personnel.mjs';
+import {parseEspnGoalieContext,replaceEspnGoalieFacts} from './guy-goalie-context.mjs';
 
 export const ROUTES={NFL:'football/nfl',NCAAF:'football/college-football',CFL:'football/cfl',MLB:'baseball/mlb',NBA:'basketball/nba',WNBA:'basketball/wnba',NHL:'hockey/nhl'};
 export const NFELO_URL='https://raw.githubusercontent.com/greerreNFL/nfelo/main/output_data/nfelo_games.csv';
@@ -261,11 +262,11 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
     if(bytes.length>8*1024*1024)throw Error('Source response exceeds 8 MiB');
     return format==='json'?JSON.parse(bytes):bytes;
   }
-  const boards=new Map(),matches=new Map();
+  const boards=new Map(),boardObservedAt=new Map(),matches=new Map();
   const boardKeys=[...new Set(events.map(e=>`${e.sport}|${date(e.startTime)}`))];
   await pool(boardKeys,async key=>{
     const [sport,day]=key.split('|'),url=`https://site.api.espn.com/apis/site/v2/sports/${ROUTES[sport]}/scoreboard?dates=${day.replaceAll('-','')}&limit=300`;
-    try{boards.set(key,await get(url));}catch(error){sources.push({sourceId:'espn',scope:key,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
+    try{boards.set(key,await get(url));boardObservedAt.set(key,clock());}catch(error){sources.push({sourceId:'espn',scope:key,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message,url});}
   });
   for(const event of events){const match=matchEspnEvent(event,boards.get(`${event.sport}|${date(event.startTime)}`)?.events);if(match)matches.set(event.eventId,match);}
   await pool(events,async event=>{
@@ -273,6 +274,17 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
     if(!match){sources.push({sourceId:'espn',eventId:event.eventId,state:'NO_EXACT_EVENT',checkedAt:clock()});return;}
     const competition=match.competitions?.[0];
     if(competition?.status?.type?.state!=='pre'){sources.push({sourceId:'espn',eventId:event.eventId,state:'EVENT_STARTED',checkedAt:clock()});return;}
+    // The scoreboard has structured goalie status that the summary omits.
+    // It is already fetched once per sport/date, including summary-cache hits.
+    const day=date(event.startTime),boardKey=`${event.sport}|${day}`;
+    const goalieFacts=parseEspnGoalieContext({competition,event,observedAt:boardObservedAt.get(boardKey),
+      url:`https://site.api.espn.com/apis/site/v2/sports/${ROUTES[event.sport]}/scoreboard?dates=${day.replaceAll('-','')}&limit=300`,
+      sourceField:`events[${list(boards.get(boardKey)?.events).indexOf(match)}].competitions[0]`});
+    const refreshGoalies=()=>{
+      if(!goalieFacts.length)return;
+      const updated=replaceEspnGoalieFacts(facts,event,goalieFacts);facts.splice(0,facts.length,...updated);
+    };
+    refreshGoalies();
     const ttl=time(event.startTime)-time(at)<2*3600000?15*60000:60*60000;
     if(!force&&cache[key]&&time(at)-time(cache[key])<ttl){sources.push({sourceId:'espn',eventId:event.eventId,state:'CACHED',checkedAt:cache[key]});return;}
     try {
@@ -280,8 +292,8 @@ export async function collect({root=process.cwd(),at=new Date().toISOString(),fe
       const parsed=parseEspn(summary,event,observedAt,registry);
       for(let i=records.length-1;i>=0;i--)if(records[i].sourceId==='espn'&&sameEvent(records[i],event))records.splice(i,1);
       for(let i=facts.length-1;i>=0;i--)if(facts[i].sourceId==='espn'&&sameEvent(facts[i],event))facts.splice(i,1);
-      records.push(...parsed.records);facts.push(...parsed.facts);cache[key]=observedAt;
-      sources.push({sourceId:'espn',eventId:event.eventId,state:parsed.records.length?'COLLECTED':'CONTEXT_ONLY',records:parsed.records.length,facts:parsed.facts.length,checkedAt:observedAt});
+      records.push(...parsed.records);facts.push(...parsed.facts,...goalieFacts);cache[key]=observedAt;
+      sources.push({sourceId:'espn',eventId:event.eventId,state:parsed.records.length?'COLLECTED':'CONTEXT_ONLY',records:parsed.records.length,facts:parsed.facts.length+goalieFacts.length,checkedAt:observedAt});
     }catch(error){sources.push({sourceId:'espn',eventId:event.eventId,state:'UNAVAILABLE',checkedAt:clock(),reason:error.message});}
   });
   // Verified public daily previews identify the exact native game CSV. The

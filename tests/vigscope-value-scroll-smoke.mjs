@@ -28,11 +28,17 @@ try{
  assert.equal(await page.$eval('#resultsCardLog [data-scope].active',e=>e.dataset.scope),'cards','every issued card remains selectable');
  await page.select('#valueStatus','ALL');
  assert.equal(await page.$eval('#valueStatus',e=>e.value),'ALL','all decisions remain selectable');
+ assert.match(await page.$eval('#resultsGuyCall',e=>e.innerText),/GUY’S PLAY/);
+ assert.equal(await page.$eval('#guyMoneyPuckBenchmark',e=>e.open),false,'historical MoneyPuck benchmark starts collapsed');
+ await page.click('#guyMoneyPuckBenchmark > summary');
+ assert.equal(await page.$eval('#guyMoneyPuckBenchmark',e=>e.open),true,'benchmark remains accessible separately from the actual daily call');
  assert.match(await page.$eval('#resultsGuyValue',e=>e.innerText),/GUY’S BLUE LINE/);
  assert.match(await page.$eval('#resultsGuyValue',e=>e.innerText),/Flat 1u risk/);
  await page.click('#resultsGuyValue > details:last-of-type > summary');
  assert.match(await page.$eval('#resultsGuyValue',e=>e.innerText),/The daily leader freezes one minute before its own game starts/);
  await page.click('#resultsGuyValue > details:last-of-type > summary');
+ await page.click('#guyMoneyPuckBenchmark > summary');
+ assert.equal(await page.$eval('#guyMoneyPuckBenchmark',e=>e.open),false,'benchmark remains collapsible after checking the original method');
  const completedWeek=Math.max(...comparison.rows.filter(r=>comparison.rows.filter(g=>g.week===r.week).every(g=>g.resultState==='FINAL')).map(r=>r.week));
  assert.equal(await page.$eval('#grahamGameLog',e=>e.open),false,'ledger is collapsed on arrival');
  await page.click('#grahamGameLog > summary');

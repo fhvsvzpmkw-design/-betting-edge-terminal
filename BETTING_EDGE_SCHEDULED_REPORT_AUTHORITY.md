@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-28.2
+**Operating revision:** 2026-10-31.Guy
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -243,6 +243,10 @@ Audit moneyline, spread and total lineage using their tools and exact bound feed
 Freeze only after checks pass. All finished decisions publish; incomplete selections remain separate. Never repair a frozen candidate's analytical content in place.
 
 ## 9. Publisher ownership and truthful delivery
+
+### Guy's November 1 researched daily play
+
+From November 1 Vancouver, apply `GUY_DAILY_SELECTION_AUTHORITY.md` within these existing five tasks. After normal source intake, obtain the saved-board top-three NHL shortlist with `node tools/guy-daily-selection.mjs --shortlist`. Reuse current hockey research to review named goalies, lineup changes, rest/travel and five-on-five play for those games, then stage one independently reasoned Guy moneyline choice, current-price limit and explicit Pinnacle assessment through `data/characters/guy-laflame/call-staging.json`. Complete a new source-bound revision when a material goalie/model change invalidates the published call's assumptions. Preserve the one-minute-before-selected-game lock and existing MoneyPuck benchmark. The new Guy publisher owns its actual-call ledger and generated page; it cannot alter VigScope grades or issued History. Do not request extra odds pulls, create a recurring task, copy a VigScope grade as Guy's judgment, fabricate a daily call, or let a Guy-specific shortfall block completed Main decisions. Verify the matching researched call after its publisher; record any precise unfinished follow-up. Earlier instructions saying Guy's MoneyPuck choice remains unchanged continue to preserve that benchmark; they do not suppress this separately authorized researched call.
 
 The task produces candidates only. Never directly create/update/delete/index `data/history/runs/**`, `data/history/research-fit/**`, or `run-history.json`.
 

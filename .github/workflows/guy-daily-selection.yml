@@ -1,0 +1,145 @@
+name: Guy daily researched selection
+on:
+  workflow_dispatch:
+    inputs:
+      staging_commit:
+        description: 'Optional exact main commit SHA to retry a researched submission; blank refreshes saved status only.'
+        required: false
+        type: string
+  workflow_run:
+    workflows: [Game intelligence aggregation]
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - data/characters/guy-laflame/call-staging.json
+      - data/characters/guy-laflame/selection-policy.json
+      - tools/guy-daily-selection.mjs
+      - tools/build-guy-hotline.mjs
+      - assets/guy-daily-call.js
+      - assets/guy-daily-call.css
+      - assets/guy-blue-line.js
+      - syndicates/generated/guy-laflame/shell.html
+      - tests/guy-daily-selection.test.mjs
+      - tests/guy-daily-call.test.mjs
+      - tests/guy-daily-publication.test.mjs
+      - GUY_DAILY_SELECTION_AUTHORITY.md
+      - .github/workflows/guy-daily-selection.yml
+permissions:
+  contents: write
+concurrency:
+  group: guy-daily-selection
+  cancel-in-progress: false
+  queue: max
+jobs:
+  publish:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify researched selection and preserved benchmark
+        run: node --test tests/guy-daily-selection.test.mjs tests/guy-daily-call.test.mjs tests/guy-daily-publication.test.mjs tests/guy-goalie-context.test.mjs tests/guy-blue-line.test.mjs tests/guy-value.test.mjs
+      - name: Pin this submission
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          STAGING_COMMIT: ${{ inputs.staging_commit }}
+        run: |
+          set -euo pipefail
+          # A queued run must consume its own submission, not newer staging.
+          if [ "$EVENT_NAME" = push ]; then
+            STAGING_COMMIT="$GITHUB_SHA"
+          fi
+          if [ -n "$STAGING_COMMIT" ]; then
+            [[ "$STAGING_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+            git merge-base --is-ancestor "$STAGING_COMMIT" HEAD
+            git show "$STAGING_COMMIT:data/characters/guy-laflame/call-staging.json" > /tmp/guy-staging-candidate.json
+          fi
+      - name: Publish Guy call and immutable hotline edition
+        run: |
+          set -euo pipefail
+          git config user.name betting-edge-bot
+          git config user.email actions@users.noreply.github.com
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            # Discard only this ephemeral worker's uncommitted generated
+            # editions from a rejected/colliding attempt. Issued files are tracked.
+            git clean -fd -- data/characters/guy-laflame/editions syndicates/generated/guy-laflame/archive
+            # Always preserve prior-call alerts, locking and settlement even if
+            # this candidate fails validation. No external requests are made.
+            node tools/guy-daily-selection.mjs --refresh-only
+            candidate_status=0
+            if [ -f /tmp/guy-staging-candidate.json ]; then
+              node tools/guy-daily-selection.mjs --staging /tmp/guy-staging-candidate.json || candidate_status=$?
+              if [ "$candidate_status" = 0 ]; then
+                node --input-type=module - <<'NODE' || candidate_status=$?
+          import fs from 'node:fs';
+          const candidate=JSON.parse(fs.readFileSync('/tmp/guy-staging-candidate.json'));
+          const ledger=JSON.parse(fs.readFileSync('data/characters/guy-laflame/calls-ledger.json'));
+          if(candidate.state==='READY'){
+            const receipt=ledger.processedResearchIds.find(r=>r.researchId===candidate.researchId);
+            if(!receipt)throw Error('STAGING_NOT_PUBLISHED: check activation, local date and selected-game lock.');
+            console.log(JSON.stringify({researchId:receipt.researchId,publicationId:receipt.publicationId,recordedAt:receipt.recordedAt}));
+          }
+          NODE
+              fi
+            fi
+            node tools/build-guy-hotline.mjs
+            git show origin/main:data/characters/guy-laflame/calls-ledger.json > /tmp/guy-previous-calls.json
+            # A slow build must not first publish or revise a call past cutoff.
+            if ! node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {assertPublicationWindow} from './tools/guy-daily-selection.mjs';
+          assertPublicationWindow(JSON.parse(fs.readFileSync('/tmp/guy-previous-calls.json')),JSON.parse(fs.readFileSync('data/characters/guy-laflame/calls-ledger.json')));
+          NODE
+            then
+              echo '::warning::Call reached its cutoff during rendering; rebuilding saved status without the late submission.'
+              continue
+            fi
+            git add -- data/characters/guy-laflame/calls-ledger.json data/characters/guy-laflame.json data/characters/guy-laflame/current-edition.json data/characters/guy-laflame/editions syndicates/generated/guy-laflame/hotline.html syndicates/generated/guy-laflame/archive
+            if git diff --cached --quiet; then exit "$candidate_status"; fi
+            git commit -m 'Publish Guy researched call and saved-data status'
+            if ! node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {assertPublicationWindow} from './tools/guy-daily-selection.mjs';
+          assertPublicationWindow(JSON.parse(fs.readFileSync('/tmp/guy-previous-calls.json')),JSON.parse(fs.readFileSync('data/characters/guy-laflame/calls-ledger.json')));
+          NODE
+            then
+              echo '::warning::Call reached its cutoff before publication; rebuilding from current main.'
+              continue
+            fi
+            if git push origin HEAD:main; then
+              git fetch origin main
+              git show origin/main:data/characters/guy-laflame/calls-ledger.json > /tmp/guy-published-calls.json
+              git show origin/main:data/characters/guy-laflame/current-edition.json > /tmp/guy-published-edition.json
+              node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const ledger=JSON.parse(fs.readFileSync('/tmp/guy-published-calls.json'));
+          const pointer=JSON.parse(fs.readFileSync('/tmp/guy-published-edition.json'));
+          const edition=JSON.parse(execFileSync('git',['show','origin/main:'+pointer.path]));
+          const archive=execFileSync('git',['show','origin/main:'+pointer.archivePath],{maxBuffer:16*1024*1024}).toString();
+          if(edition.id!==pointer.id||!archive.includes('GUY’S PLAY'))throw Error('HOTLINE_READBACK_FAILED');
+          if(fs.existsSync('/tmp/guy-staging-candidate.json')){
+            const candidate=JSON.parse(fs.readFileSync('/tmp/guy-staging-candidate.json'));
+            if(candidate.state==='READY'){
+              const receipt=ledger.processedResearchIds.find(r=>r.researchId===candidate.researchId);
+              if(!receipt||!ledger.entries.some(e=>e.publications.some(p=>p.publicationId===receipt.publicationId)))throw Error('PUBLICATION_READBACK_FAILED');
+              console.log(JSON.stringify({verifiedResearchId:receipt.researchId,verifiedPublicationId:receipt.publicationId}));
+            }
+          }
+          console.log('Verified remote Guy ledger, hotline edition and archive: '+pointer.id);
+          NODE
+              exit "$candidate_status"
+            fi
+          done
+          echo 'Concurrent writes prevented Guy publication; submission remains staged.' >&2
+          exit 1

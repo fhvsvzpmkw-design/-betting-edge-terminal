@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-10-28 — OddsPapi monthly pacing
+**Last updated:** 2026-10-31 — Guy's November 1 researched daily selection
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -416,3 +416,19 @@ The original one-call-per-report estimate became two batches and exceeded the su
 Optional competitions may have fewer fresh Pinnacle observations on busy boards; expose each deferral and exact missing reference. These limits never authorize stale-price reuse or a duplicate pull. Persist accounting after failed validation and publication collisions without repeating API calls. Existing tasks and report times remain unchanged.
 
 **Verification:** pure 31-day/reset tests, real collector fake-transport tests and local Git collision tests. Actual provider reset acceptance belongs to the first normal November pull; it is not claimed from an offline simulation.
+
+## D-041 — Guy makes a researched daily choice; the MoneyPuck peak remains a separate benchmark
+
+**Status:** APPROVED / IMPLEMENTED / TARGETED TESTS PASSED / DEPLOYMENT PENDING / FIRST LIVE RESEARCH ACCEPTANCE OPEN. Effective November 1, 2026, 00:00 America/Vancouver; prospective only, with no backfilled calls or results.
+
+Follow the canonical [Guy daily selection authority](../GUY_DAILY_SELECTION_AUTHORITY.md), policy `guy-researched-daily-call-v1`. Within the existing five Main report producers, review the saved-board top three eligible NHL moneyline games, or all eligible games when fewer than three are available. Reuse current report research to assess named goalies and confirmed/projected status, material lineup changes, rest/travel and five-on-five play. Each reviewed game needs source-backed support and contrary findings before Guy chooses one independent daily play.
+
+Guy may choose either side and need not choose the largest MoneyPuck gap or copy a VigScope grade. An opposing model side or negative gap requires a specific independent hockey rationale. Publish the current executable book/price, a worst acceptable price and an explicit Pinnacle assessment (`AGREES`, `DISAGREES` or `UNAVAILABLE`) with reasons. An unfavorable or missing benchmark stays visible; it does not automatically select or veto Guy's choice. Prices and limits display in American odds. Do not invent a Guy win probability or treat a market-blended forecast as independent market confirmation.
+
+Stage genuine research through `data/characters/guy-laflame/call-staging.json`; the existing Guy publisher owns the prospective actual-call record in `calls-ledger.json`, the generated hotline and archives. Track the locked published call at flat 1u risk using exact-event verified finals including overtime/shootouts. The daily call locks one minute before its selected game's own start; pre-lock revisions retain their original research/publication identities and history. After lock, preserve team, book and published price, while displaying fresh-price expiry and decision-sensitive goalie/model recheck notices separately. An expired price or later concern cannot erase an issued call or avoid a loss.
+
+Preserve `value-ledger.json` and its intentional highest-captured-MoneyPuck-edge history as the separate hypothetical benchmark. Do not rename that benchmark's results as Guy's independent record, rewrite either history or manufacture a closing line. This amendment adds no odds pulls, scheduled tasks, Core authority, model weights, bankroll changes or customer wagers. A Guy-specific shortfall must not block independently completed Main decisions.
+
+**Verification and close condition:** targeted selector, source/goalie-context, price-limit, lock/revision, prospective grading and hotline/F8 tests establish implementation only. After deployment, the next eligible existing Main producer must submit actual November 1 research, inspect the exact **Guy daily researched selection** workflow and read back the matching research/publication ID in the actual-call ledger and rendered hotline/F8. An empty seed ledger or successful build does not establish the first live selection.
+
+**Reason:** Guy's independent hockey judgment and usable current price need their own auditable call. The intentional peak-edge comparison answers a different question and remains intact without becoming the daily selection process.

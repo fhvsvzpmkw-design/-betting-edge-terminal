@@ -97,9 +97,18 @@
   guyValue.async=false;
   document.head.appendChild(guyValue);
 
+  const guyDailyCall=document.createElement('script');
+  const guyDailyCallStyle=document.createElement('link');
+  guyDailyCallStyle.rel='stylesheet';guyDailyCallStyle.href=`./assets/guy-daily-call.css?v=1&b=${UI_CACHE_BUST}`;
+  document.head.appendChild(guyDailyCallStyle);
+  guyDailyCall.id='guyDailyCallLoader';
+  guyDailyCall.src=`./assets/guy-daily-call.js?v=1&b=${UI_CACHE_BUST}`;
+  guyDailyCall.async=false;
+  document.head.appendChild(guyDailyCall);
+
   const resultsDesk=document.createElement('script');
   resultsDesk.id='resultsDeskUiLoader';
-  resultsDesk.src=`./assets/results-value-desk-v2.js?v=2&b=${UI_CACHE_BUST}`;
+  resultsDesk.src=`./assets/results-value-desk-v2.js?v=3&b=${UI_CACHE_BUST}`;
   resultsDesk.async=false;
   document.head.appendChild(resultsDesk);
 

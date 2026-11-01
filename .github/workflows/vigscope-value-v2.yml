@@ -5,6 +5,12 @@ on:
     branches: [main]
     paths:
       - 'assets/results-value-desk-v2.js'
+      - 'assets/guy-daily-call.*'
+      - 'assets/guy-value.*'
+      - 'assets/guy-blue-line.css'
+      - 'tools/build-guy-hotline.mjs'
+      - 'syndicates/generated/guy-laflame/shell.html'
+      - 'tests/guy-daily-call*'
       - 'tests/vigscope-value*'
       - '.github/workflows/vigscope-value-v2.yml'
   pull_request:
@@ -13,6 +19,11 @@ on:
       - 'assets/value-analytics.js'
       - 'assets/guy-value.js'
       - 'assets/guy-value.css'
+      - 'assets/guy-daily-call.*'
+      - 'assets/guy-blue-line.css'
+      - 'tools/build-guy-hotline.mjs'
+      - 'syndicates/generated/guy-laflame/shell.html'
+      - 'tests/guy-daily-call*'
       - 'tools/track-guy-value.mjs'
       - 'tests/guy-value.test.mjs'
       - 'assets/report-dashboard-vigscope.js'
@@ -33,6 +44,8 @@ jobs:
           node-version: 22
       - run: |
           node --test tests/guy-value.test.mjs
+          node --test tests/guy-daily-call.test.mjs
+          node tests/guy-daily-call-browser-smoke.mjs --self-check
           node tests/vigscope-value-v2.test.mjs
           node tests/results-performance-populations.test.mjs
           node tools/build-results-index.mjs
@@ -47,9 +60,12 @@ jobs:
           SERVER_PID=$!
           trap 'kill "$SERVER_PID"' EXIT
           node tests/vigscope-value-scroll-smoke.mjs
+          node tests/guy-daily-call-browser-smoke.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: vigscope-value-screenshots
-          path: .qa/value-*.png
+          path: |
+            .qa/value-*.png
+            .qa/guy-*.png
           include-hidden-files: true

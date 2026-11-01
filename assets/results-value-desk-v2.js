@@ -1,8 +1,8 @@
 (()=>{
   'use strict';
   const A=globalThis.VigScopeValueAnalytics,O=globalThis.VigScopeOddsFormat;
-  const INDEX_URL='./data/history/results-index.json',GRAHAM_URL='./data/history/graham-pinnacle-value.json',GUY_URL='./data/characters/guy-laflame/value-ledger.json';
-  let cached=null,graham=null,guy=null,loading=false;
+  const INDEX_URL='./data/history/results-index.json',GRAHAM_URL='./data/history/graham-pinnacle-value.json',GUY_URL='./data/characters/guy-laflame/value-ledger.json',GUY_CALLS_URL='./data/characters/guy-laflame/calls-ledger.json';
+  let cached=null,graham=null,guy=null,guyCalls=null,loading=false;
   const state={start:'',end:'',sport:'ALL',status:'LEAN',lane:'ALL',scope:'unique',grade:'ALL',page:0,size:10,gWeek:'ALL',gLogWeek:'LATEST',gSide:'ALL',gGap:'ALL',strategy:'graham'};
   const PIN_KEY='vigscope.value.followed.v1',pins=new Set(),reportCache=new Map();
   try{for(const key of JSON.parse(localStorage.getItem(PIN_KEY)||'[]'))if(typeof key==='string')pins.add(key);}catch{}
@@ -105,8 +105,11 @@
   }
   function render(d,index){
     cached=index;const engine=d.getElementById('engine');if(!engine)return;ensureStyle(d);const open=new Set([...engine.querySelectorAll('details[id]')].filter(x=>x.open).map(x=>x.id)),had=engine.dataset.valueRendered==='1',runs=latestRuns(index);
-    engine.classList.add('resultsDesk');engine.innerHTML=hero(index,runs)+pizza(index)+grahamSection()+(globalThis.GuyValue?.render(guy,{hotlineHref:'syndicates/generated/guy-laflame/hotline.html'})||'')+proof(index)+watchlist(runs)+shadowDetails(index)+audit(index)+historicalControls(index)+performance(index)+cardLog(index)+`<p class="resultsFoot">INDEX UPDATED ${clock(index.generatedAt)} • All historical records remain saved. Performance is rebuilt from immutable issued reports and verified observations.</p>`;
+    const guyCall=globalThis.GuyDailyCall?.render(guyCalls,{id:'resultsGuyCall',history:true})||'<section class="resultsBox"><h2 class="resultsSection">GUY’S PUBLISHED PICKS</h2><p class="resultsNote">The daily call record could not be loaded. Refresh to check Guy’s saved selections.</p></section>';
+    const guyBenchmark=globalThis.GuyValue?.render(guy,{hotlineHref:'syndicates/generated/guy-laflame/hotline.html'})||'';
+    engine.classList.add('resultsDesk');engine.innerHTML=hero(index,runs)+pizza(index)+grahamSection()+guyCall+(guyBenchmark?`<details class="methodDetails guy-benchmark-record" id="guyMoneyPuckBenchmark"><summary>MONEYPUCK BENCHMARK // HISTORICAL TOP-EDGE TRACKING</summary>${guyBenchmark}</details>`:'')+proof(index)+watchlist(runs)+shadowDetails(index)+audit(index)+historicalControls(index)+performance(index)+cardLog(index)+`<p class="resultsFoot">INDEX UPDATED ${clock(index.generatedAt)} • All historical records remain saved. Performance is rebuilt from immutable issued reports and verified observations.</p>`;
     engine.dataset.valueRendered='1';if(had)for(const detail of engine.querySelectorAll('details[id]'))detail.open=open.has(detail.id);
+    globalThis.GuyDailyCall?.watch?.({ledger:guyCalls,id:'resultsGuyCall',history:true,document:d});
     const redraw=()=>render(d,cached);
     for(const [id,key]of [['valueStart','start'],['valueEnd','end'],['valueSport','sport'],['valueStatus','status'],['valueLane','lane'],['valueGrade','grade'],['valueSize','size'],['gWeek','gWeek'],['gLogWeek','gLogWeek'],['gSide','gSide'],['gGap','gGap']])engine.querySelector('#'+id)?.addEventListener('change',e=>{state[key]=key==='size'&&e.target.value!=='ALL'?Number(e.target.value):e.target.value;state.page=0;redraw();d.getElementById(id)?.focus({preventScroll:true});});
     engine.querySelectorAll('[data-period]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.period,end=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());state.end=p==='ALL'?'':end;state.start=p==='ALL'?'':p==='TODAY'?end:new Date(Date.parse(end+'T12:00:00Z')-(Number(p)-1)*86400000).toISOString().slice(0,10);state.page=0;redraw();}));
@@ -117,11 +120,11 @@
     engine.querySelectorAll('[data-archive-card]').forEach(details=>details.addEventListener('toggle',()=>openAnalysis(details,index)));
   }
   async function load(d){if(loading)return;loading=true;const engine=d.getElementById('engine');if(!cached)engine.innerHTML='<p class="resultsNote">Loading the saved Value history…</p>';try{
-    const [index,comparison,record]=await Promise.all([fetch(`${INDEX_URL}?v=${Date.now()}`,{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Results history unavailable');return r.json();}),fetch(`${GRAHAM_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),fetch(`${GUY_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
-    graham=comparison?.schema===1?comparison:null;guy=record?.schema===1&&record?.characterId==='guy-laflame'?record:null;render(d,index);
+    const [index,comparison,record,callRecord]=await Promise.all([fetch(`${INDEX_URL}?v=${Date.now()}`,{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Results history unavailable');return r.json();}),fetch(`${GRAHAM_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),fetch(`${GUY_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),fetch(`${GUY_CALLS_URL}?v=${Date.now()}`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
+    graham=comparison?.schema===1?comparison:null;guy=record?.schema===1&&record?.characterId==='guy-laflame'?record:null;guyCalls=callRecord?.schema===1&&callRecord?.characterId==='guy-laflame'?callRecord:null;render(d,index);
   }catch(e){if(!cached)engine.innerHTML=`<p class="resultsNote">${esc(e.message)}. Reload to try again.</p>`;}finally{loading=false;}}
   function install(d){if(!d?.getElementById('engine'))return false;ensureStyle(d);const engine=d.getElementById('engine');if(engine.dataset.resultsDeskInstalled!=='1'){engine.dataset.resultsDeskInstalled='1';load(d);}return true;}
   let tries=0;const timer=setInterval(()=>{tries++;const d=appDoc();if(d&&install(d)||tries>250)clearInterval(timer);},40);
   window.addEventListener('pageshow',()=>{const d=appDoc();if(d&&cached)load(d);});
-  globalThis.VigScopeValueDesk=Object.freeze({render,cardLogRows,reportChanges,latestRuns,grahamLedgerWeek,historyWeeks,state,setComparison:value=>{graham=value;},setGuyRecord:value=>{guy=value;}});
+  globalThis.VigScopeValueDesk=Object.freeze({render,cardLogRows,reportChanges,latestRuns,grahamLedgerWeek,historyWeeks,state,setComparison:value=>{graham=value;},setGuyRecord:value=>{guy=value;},setGuyCalls:value=>{guyCalls=value;}});
 })();

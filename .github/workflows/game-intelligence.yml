@@ -10,6 +10,8 @@ on:
     paths:
       - tools/game-intelligence.mjs
       - tools/collect-game-intelligence.mjs
+      - tools/guy-goalie-context.mjs
+      - tests/guy-goalie-context.test.mjs
       - tools/forecast-aggregation.mjs
       - tools/event-research-plan.mjs
       - tests/forecast-source-expansion.test.mjs
@@ -34,6 +36,7 @@ permissions:
 concurrency:
   group: game-intelligence
   cancel-in-progress: false
+  queue: max
 jobs:
   aggregate:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
@@ -63,6 +66,7 @@ jobs:
           node tests/official-personnel.test.mjs
           node --test tests/game-intelligence.test.mjs tests/forecast-source-expansion.test.mjs tests/moneypuck-collection.test.mjs tests/candidate-assessment.test.mjs tests/event-research-plan.test.mjs
           node --test tests/guy-value.test.mjs
+          node --test tests/guy-goalie-context.test.mjs
           node tools/collect-game-intelligence.mjs
           cp data/game-intelligence/current.json /tmp/game-intelligence-candidate.json
       - name: Collect optional Novig NHL moneyline observations
@@ -98,6 +102,13 @@ jobs:
             node tools/grade-game-intelligence.mjs
             node tools/build-game-board.mjs
             node tools/track-guy-value.mjs
+            # Saved data only: a Guy status/settlement issue must not prevent
+            # the shared board or preserved MoneyPuck benchmark publication.
+            if node tools/guy-daily-selection.mjs --refresh-only; then
+              git add -- data/characters/guy-laflame/calls-ledger.json
+            else
+              echo '::warning::Guy call refresh needs review; shared intelligence publication continues.'
+            fi
             git add -- data/game-intelligence data/characters/guy-laflame/value-ledger.json
             if [ -d data/novig ]; then git add -- data/novig; fi
             if git diff --cached --quiet; then exit 0; fi
