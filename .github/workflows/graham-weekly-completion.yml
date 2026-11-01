@@ -27,6 +27,7 @@ permissions:
 concurrency:
   group: graham-weekly-completion
   cancel-in-progress: false
+  queue: max
 jobs:
   verify:
     if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)

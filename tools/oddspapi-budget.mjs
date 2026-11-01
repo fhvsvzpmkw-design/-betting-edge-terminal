@@ -65,8 +65,12 @@ export function reconcileBudgetState({state = null, requestLimit, requestCount, 
   const subscriptionChanged = subscription !== null && state.subscriptionId !== null && subscription !== state.subscriptionId;
   const reset = requestCount < state.providerObservedCount || subscriptionChanged;
   const unseen = reset ? requestCount : Math.max(0, requestCount - state.estimatedRequestCount);
+  // Account counters can lag our charged attempts. Only an observed provider
+  // reset may clear pending charges; a later counter confirms them as it catches
+  // up rather than granting the same monthly credits again.
+  const estimatedRequestCount = reset ? requestCount : Math.max(state.estimatedRequestCount, requestCount);
   return {...next, subscriptionId: subscription ?? state.subscriptionId, requestLimit,
-    providerObservedCount: requestCount, estimatedRequestCount: requestCount,
+    providerObservedCount: requestCount, estimatedRequestCount,
     // The provider's monthly reset can occur before local midnight. Preserve
     // the same Vancouver day's spending so it cannot grant a second daily cap.
     todayUsed: next.todayUsed + unseen,

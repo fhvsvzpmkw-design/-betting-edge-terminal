@@ -77,6 +77,24 @@ try{
   assert.equal(output.effective_event_name,'schedule');
   assert.equal(output.request_scheduled_at,pulse);
 
+  for(const [canonicalSlot,pulseTime] of [[1,'05:50'],[2,'07:50'],[3,'09:20'],[4,'15:05'],[5,'18:05']]){
+    const scheduledAt=`2026-11-01T${pulseTime}:00-07:00`;
+    const reportAt=new Date(Date.parse(scheduledAt)+10*60000);
+    const november=resolveOddsRunRequest({schema:1,mode:'scheduled_recovery',requestId:`november-slot-${canonicalSlot}`,
+      requestedAt:reportAt.toISOString(),scheduledAt,operatingDate:'2026-11-01',canonicalSlot},{now:reportAt,root});
+    assert.equal(november.slot.canonicalSlot,canonicalSlot,'Nov. 1 report request resolves its actual Vancouver pulse');
+    const novemberFeed={generatedAt:new Date(reportAt.getTime()+90000).toISOString(),scheduleMeta:{
+      triggerSource:november.requestTriggerSource,triggerScheduledAt:november.requestScheduledAt,
+      operatingDate:'2026-11-01',canonicalSlot,slot:november.slot.slotName,
+      plannedPulseTime:november.slot.plannedPulseTime,plannedReportTime:november.slot.plannedReportTime}};
+    assert.equal(slotForFeed(novemberFeed,root)?.canonicalSlot,canonicalSlot,'Nov. 1 collected feed retains its slot');
+    fs.writeFileSync(path.join(root,'data/live-odds.json'),JSON.stringify(novemberFeed));
+    assert.equal(recordOddsSlot({root}).recorded,true);
+    assert.equal(shouldCollect({root,slot:november.slot}).execute,false,'Nov. 1 duplicate pull remains suppressed');
+  }
+  const novemberReceipt=JSON.parse(fs.readFileSync(path.join(root,'data/odds-pull-receipts/2026-11-01.json')));
+  assert.equal(Object.keys(novemberReceipt.slots).length,5,'all five pulls share the Vancouver operating date');
+
   // Request payload comes from the triggering commit, even if main has advanced.
   const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
   git('init');git('config','user.name','odds-request-test');git('config','user.email','test@example.invalid');

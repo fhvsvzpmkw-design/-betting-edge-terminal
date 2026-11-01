@@ -8,7 +8,7 @@ export const POLICY_PATH='data/walters/nfl/graham-fair-decomposition-policy-v1.j
 const TOL=0.0005;
 const round=(n,d=3)=>Number(Number(n).toFixed(d));
 export const roundHalf=n=>Math.round((Number(n)+Number.EPSILON)*2)/2;
-const finite=v=>Number.isFinite(Number(v));
+const finite=v=>(typeof v==='number'||typeof v==='string'&&v.trim()!=='')&&Number.isFinite(Number(v));
 const num=(v,label)=>{if(!finite(v))throw new Error(`GRAHAM_FAIR_DECOMPOSITION_MISSING:${label}`);return Number(v);};
 const close=(a,b)=>Math.abs(Number(a)-Number(b))<=TOL;
 const fmt=(n,d=3)=>`${Number(n)>=0?'+':''}${Number(n).toFixed(d)}`;
@@ -35,11 +35,36 @@ function classifiedTypeSets(policy){
   };
 }
 
+// Withholding a location-dependent fair must survive every independent writer.
+// In particular, null is not a zero-point home-field assumption.
+export function sharedVenueFairWithheld(game,homeFieldTypes=['HOME_FIELD','VENUE']){
+  if(game?.numberStatus!=='FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED')return false;
+  const types=new Set(homeFieldTypes);
+  const homeRows=(game.adjustments||[]).filter(a=>types.has(String(a?.type||'')));
+  if(game.grahamExactFairHome!==null||game.grahamFairHome!==null||
+    game.venueClass!=='SHARED_VENUE_OR_METRO'||game.homeFieldVenueClass!=='SHARED_VENUE_OR_METRO'||
+    game.homeFieldPointsToHomeSpread!==null||game.homeFieldAdvantagePoints!==null||
+    homeRows.length!==1||homeRows[0].venueClass!=='SHARED_VENUE_OR_METRO'||
+    homeRows[0].pointsToHomeSpread!==null||homeRows[0].homeLocationAdvantagePoints!==null){
+    throw new Error(`GRAHAM_FAIR_SHARED_VENUE_FAIL_CLOSED_INVALID:${game.gameKey}`);
+  }
+  return true;
+}
+
 export function deriveGrahamFairDecomposition(game,policy){
   if(!game?.gameKey)throw new Error('GRAHAM_FAIR_DECOMPOSITION_GAME_KEY_MISSING');
   const neutral=num(game.neutralBaseHome,`${game.gameKey}:neutralBaseHome`);
   const adjustments=Array.isArray(game.adjustments)?game.adjustments:[];
   const sets=classifiedTypeSets(policy);
+  const withheld=sharedVenueFairWithheld(game,[...sets.home]);
+  for(const field of ['homeFieldPointsToHomeSpread','personnelOverlayPointsToHomeSpread','matchupOverlayPointsToHomeSpread']){
+    if(Object.hasOwn(game,field)&&!finite(game[field])&&!(withheld&&field==='homeFieldPointsToHomeSpread'))throw new Error(`GRAHAM_FAIR_DECOMPOSITION_MISSING:${game.gameKey}:${field}`);
+  }
+  for(const adjustment of adjustments){
+    const type=String(adjustment?.type||'');
+    if((sets.home.has(type)||sets.personnel.has(type)||sets.matchup.has(type)||Object.hasOwn(adjustment||{},'pointsToHomeSpread'))&&
+      !finite(adjustment?.pointsToHomeSpread)&&!(withheld&&sets.home.has(type)))throw new Error(`GRAHAM_FAIR_DECOMPOSITION_MISSING:${game.gameKey}:adjustment:${type}`);
+  }
 
   const locationAdjustments=adjustments.filter(a=>sets.home.has(String(a?.type||''))&&finite(a?.pointsToHomeSpread));
   const locationSum=round(locationAdjustments.reduce((s,a)=>s+Number(a.pointsToHomeSpread),0));
@@ -61,15 +86,7 @@ export function deriveGrahamFairDecomposition(game,policy){
     return finite(a?.pointsToHomeSpread)&&!sets.home.has(t)&&!sets.personnel.has(t)&&!sets.matchup.has(t);
   }).reduce((s,a)=>s+Number(a.pointsToHomeSpread),0));
 
-  if(game.numberStatus==='FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED'){
-    const homeRows=adjustments.filter(a=>sets.home.has(String(a?.type||'')));
-    if(game.grahamExactFairHome!==null||game.grahamFairHome!==null||
-      game.venueClass!=='SHARED_VENUE_OR_METRO'||game.homeFieldVenueClass!=='SHARED_VENUE_OR_METRO'||
-      game.homeFieldPointsToHomeSpread!==null||game.homeFieldAdvantagePoints!==null||
-      homeRows.length!==1||homeRows[0].venueClass!=='SHARED_VENUE_OR_METRO'||
-      homeRows[0].pointsToHomeSpread!==null||homeRows[0].homeLocationAdvantagePoints!==null){
-      throw new Error(`GRAHAM_FAIR_SHARED_VENUE_FAIL_CLOSED_INVALID:${game.gameKey}`);
-    }
+  if(withheld){
     return {
       schema:1,
       policyId:POLICY_ID,

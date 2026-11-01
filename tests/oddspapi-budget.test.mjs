@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {reconcileBudgetState, planOddsPapiBudget, recordBudgetSpend, budgetSummary} from '../tools/oddspapi-budget.mjs';
 
-const at = (day, hour = 6, month = 11) => new Date(Date.UTC(2026, month - 1, day, hour + 8));
+// Vancouver remains UTC-7 after March 2026; these are exact local test hours.
+const at = (day, hour = 6, month = 11) => new Date(Date.UTC(2026, month - 1, day, hour + 7));
 let s = reconcileBudgetState({requestLimit: 250, requestCount: 0, now: at(1)});
 assert.equal(planOddsPapiBudget({state:s, now:at(1), canonicalSlot:1, desiredOddsRequests:2}).allowedOddsRequests,2);
 assert.equal(planOddsPapiBudget({state:s, now:at(1), canonicalSlot:1, desiredOddsRequests:2, metadataRequests:1}).allowedTotalRequests,3);
@@ -35,6 +36,31 @@ assert.equal(external.estimatedRequestCount,11);
 const unchanged = reconcileBudgetState({state:external,requestLimit:250,requestCount:11,now:at(3)});
 assert.equal(unchanged.todayUsed,0);
 assert.equal(unchanged.estimatedRequestCount,11,'new date cannot grant monthly credits');
+
+let delayed = reconcileBudgetState({requestLimit:250,requestCount:0,now:at(1)});
+delayed = recordBudgetSpend(delayed,{requests:2,oddsRequests:2,extraBatches:1,now:at(1)});
+delayed = reconcileBudgetState({state:delayed,requestLimit:250,requestCount:0,now:at(1,8)});
+assert.equal(delayed.estimatedRequestCount,2,'an unchanged provider counter cannot erase pending charged attempts');
+assert.equal(delayed.todayUsed,2);
+assert.equal(budgetSummary(delayed,{now:at(1,8)}).pendingRequests,2);
+delayed = reconcileBudgetState({state:delayed,requestLimit:250,requestCount:1,now:at(2)});
+assert.equal(delayed.estimatedRequestCount,2,'pending monthly charges survive a Vancouver day boundary');
+assert.equal(delayed.todayUsed,0,'late confirmation of prior-day charges is not charged again today');
+assert.equal(budgetSummary(delayed,{now:at(2)}).pendingRequests,1);
+delayed = reconcileBudgetState({state:delayed,requestLimit:250,requestCount:2,now:at(2,8)});
+assert.equal(delayed.estimatedRequestCount,2);
+assert.equal(delayed.todayUsed,0);
+assert.equal(budgetSummary(delayed,{now:at(2,8)}).pendingRequests,0);
+delayed = recordBudgetSpend(delayed,{requests:1,oddsRequests:1,now:at(2,9)});
+delayed = reconcileBudgetState({state:delayed,requestLimit:250,requestCount:0,now:at(2,10)});
+assert.equal(delayed.providerCounterReset,true);
+assert.equal(delayed.estimatedRequestCount,0,'a verified provider counter decrease clears charges from the old quota period');
+assert.equal(delayed.todayUsed,1,'a provider reset still preserves the local daily spending limit');
+
+const reservePending = {...unchanged,providerObservedCount:243,estimatedRequestCount:245};
+const laggingReserve = reconcileBudgetState({state:reservePending,requestLimit:250,requestCount:243,now:at(3,8)});
+assert.equal(planOddsPapiBudget({state:laggingReserve,now:at(3,8),canonicalSlot:2}).reason,'MONTHLY_RESERVE',
+  'pending charged attempts protect the actual five-request reserve while the provider counter lags');
 
 const cold = reconcileBudgetState({requestLimit:250,requestCount:244,now:at(28,18,10)});
 assert.equal(cold.todayUsed,7);

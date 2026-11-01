@@ -73,6 +73,7 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     if(!changed.has(g.away)&&!changed.has(g.home)&&currentAway&&currentHome&&
        g.ratingCarryForward?.awayRating===currentAway.currentRating&&g.ratingCarryForward?.homeRating===currentHome.currentRating)continue;
     const d=deriveGrahamFairDecomposition(g,policy),away=byTeam.get(g.away),home=byTeam.get(g.home);
+    const withheld=d.failClosedCode==='FAIL_CLOSED_H4_SHARED_VENUE_METHOD_REQUIRED';
     if(!away||!home||![away.currentRating,home.currentRating,g.neutralBaseHome,g.ratingCarryForward?.awayRating,g.ratingCarryForward?.homeRating].every(Number.isFinite))fail('RATING_INPUT_MISSING');
     const neutral=decimalSum(away.currentRating,-home.currentRating);
     if(g.ratingCarryForward.awayRating===away.currentRating&&g.ratingCarryForward.homeRating===home.currentRating&&Math.abs(g.neutralBaseHome-neutral)<1e-9)continue;
@@ -88,16 +89,18 @@ export function refreshRatingBases({board,power,staging,active,policy,effectiveA
     const delta=decimalSum(neutral,-g.neutralBaseHome),before={neutralBaseHome:g.neutralBaseHome,exactFairHome:g.grahamExactFairHome,displayedFairHome:g.grahamFairHome};
     g.neutralBaseHome=neutral;
     for(const field of ['personnelBaselineExactFairHome','homeFieldNonLocationExactFairHome']){
+      if(withheld&&g[field]===null)continue;
       if(!Number.isFinite(g[field]))fail('CACHED_BASE_MISSING:'+field);
       g[field]=decimalSum(g[field],delta);
     }
-    g.grahamExactFairHome=round(neutral+d.homeFieldPointsToHomeSpread+d.otherGovernedPointsToHomeSpread+d.personnelPointsToHomeSpread+d.matchupPointsToHomeSpread);
-    g.priorGrahamFairHome=g.grahamFairHome;g.grahamFairHome=roundHalf(g.grahamExactFairHome)||0;g.grahamAsOf=effectiveAt;
-    if(g.qbPerformanceStatus==='OPERATIONAL_SCOPED_APPLIED')g.qbPerformanceBaseExactFairHome=round(g.grahamExactFairHome-g.qbPerformancePointsToHomeSpread);
+    g.grahamExactFairHome=withheld?null:round(neutral+d.homeFieldPointsToHomeSpread+d.otherGovernedPointsToHomeSpread+d.personnelPointsToHomeSpread+d.matchupPointsToHomeSpread);
+    g.priorGrahamFairHome=g.grahamFairHome;g.grahamFairHome=withheld?null:roundHalf(g.grahamExactFairHome)||0;
+    if(!withheld)g.grahamAsOf=effectiveAt;
+    if(!withheld&&g.qbPerformanceStatus==='OPERATIONAL_SCOPED_APPLIED')g.qbPerformanceBaseExactFairHome=round(g.grahamExactFairHome-g.qbPerformancePointsToHomeSpread);
     g.ratingCarryForward={...g.ratingCarryForward,awayRating:away.currentRating,homeRating:home.currentRating,sourceBlobSha:powerBlobSha,sourceUpdatedAt:power.updatedAt,marketViewed:false};
     const blocked=new Set(receipt.blockedGames.flatMap(x=>[x.away,x.home]));
     g.weeklyRatingInput={...g.weeklyRatingInput,state:receipt.state,sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,awayCurrentRating:away.currentRating,homeCurrentRating:home.currentRating,awayUpdateState:blocked.has(g.away)?'PRESERVED_BLOCKED':'UPDATED',homeUpdateState:blocked.has(g.home)?'PRESERVED_BLOCKED':'UPDATED',blockedTeams:[g.away,g.home].filter(t=>blocked.has(t)),sourceBlobSha:powerBlobSha,appliedToFair:true,applicationStatus:'APPLIED',marketViewed:false};
-    g.informationStatus=baselinePending?'PUBLISHED_RATING_BASE_SYNCED_BASELINE_PENDING':'WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE';
+    if(!withheld)g.informationStatus=baselinePending?'PUBLISHED_RATING_BASE_SYNCED_BASELINE_PENDING':'WEEKLY_RATING_BASE_REFRESHED_AFTER_TUESDAY_BASELINE';
     g.sourceRefs=[...new Set([...g.sourceRefs,'data/walters/nfl/carried-rating-audit-staging.json'])];
     games.push({gameKey:g.gameKey,neutralDelta:delta,before,after:{neutralBaseHome:neutral,exactFairHome:g.grahamExactFairHome,displayedFairHome:g.grahamFairHome}});
   }

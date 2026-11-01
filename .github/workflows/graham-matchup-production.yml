@@ -11,6 +11,7 @@ on:
 concurrency:
   group: graham-personnel-production
   cancel-in-progress: false
+  queue: max
 
 permissions:
   contents: write
@@ -65,8 +66,9 @@ jobs:
 
       - name: Verify durable outputs and market isolation
         run: |
-          node - <<'NODE'
-          const fs=require('node:fs');
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {synchronizeGrahamFairBoard} from './tools/graham-fair-decomposition.mjs';
           const s=JSON.parse(fs.readFileSync('data/walters/nfl/matchup-production-staging.json','utf8'));
           const active=JSON.parse(fs.readFileSync('data/walters/nfl/active-week.json','utf8'));
           const week=String(Number(active.week)).padStart(2,'0');
@@ -78,7 +80,7 @@ jobs:
           if(!(ledger.processedMatchupBatchIds||[]).includes(s.batchId))throw new Error('M4 batch not durable');
           if(numbers.matchupExpansionProduction?.lastBatchId!==s.batchId)throw new Error('M4 numbers batch mismatch');
           if(research.sweeps.at(-1)?.summary?.marketViewed!==false)throw new Error('research market isolation failed');
-          if(numbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))throw new Error('invalid Graham fair');
+          synchronizeGrahamFairBoard(numbers,{write:false});
           if(numbers.fairDecompositionPolicyId!=='graham-fair-decomposition-v1'||numbers.fairExplanationState!=='SYNCHRONIZED')throw new Error('fair explanation synchronization missing');
           console.log(`GRAHAM MATCHUP PRODUCTION VERIFY: PASS // ${s.batchId}`);
           NODE

@@ -4,6 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {resolveGrahamActiveWeek} from './graham-active-week.mjs';
 import {currentReceiverClusterMultiplier} from './graham-current-personnel-estimates.mjs';
+import {sharedVenueFairWithheld} from './graham-fair-decomposition.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/matchup-production-staging.json');
@@ -22,6 +23,7 @@ const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const fileHash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const unique=arr=>[...new Set(arr)];
 const fail=msg=>{throw new Error(`M4_MATCHUP_PRODUCTION:${msg}`);};
+const finite=v=>(typeof v==='number'||typeof v==='string'&&v.trim()!=='')&&Number.isFinite(Number(v));
 
 const ACTIVE=resolveGrahamActiveWeek({root:ROOT,requireFiles:true});
 for(const p of [STAGING,PROD,M3,BASE_PROD,REGISTRY,CAL,POWER])if(!fs.existsSync(p))fail(`MISSING:${path.relative(ROOT,p)}`);
@@ -75,9 +77,22 @@ function clusterGroup(pos){
 }
 
 const batchEvents=[];
+const boardGames=new Map((numbers.games||[]).map(g=>[g.gameKey,g]));
+const incomingEventIds=new Set();
 for(const c of input.cases){
   if(!c.matchupEventId||!c.caseKey||!c.gameKey||!c.team||!c.side||!c.player||!c.reason||!Array.isArray(c.sourceRefs)||!c.sourceRefs.length)fail(`INVALID_CASE:${c.matchupEventId||'unknown'}`);
-  if((ledger.events||[]).some(e=>e.personnelEventId===c.matchupEventId||e.matchupEventId===c.matchupEventId))continue;
+  if(incomingEventIds.has(c.matchupEventId))fail(`DUPLICATE_EVENT_ID:${c.matchupEventId}`);
+  incomingEventIds.add(c.matchupEventId);
+  const game=boardGames.get(c.gameKey);
+  if(!game)fail(`GAME_NOT_FOUND:${c.gameKey}`);
+  if(!['HOME','AWAY'].includes(c.side)||game[c.side==='HOME'?'home':'away']!==c.team)fail(`TEAM_SIDE_MISMATCH:${c.matchupEventId}`);
+  if(!Number.isFinite(Date.parse(game.startTimePacific)))fail(`GAME_KICKOFF_REQUIRED:${c.gameKey}`);
+  if(Date.parse(game.startTimePacific)<=Date.parse(input.effectiveAt))fail(`STARTED_GAME_FROZEN:${c.gameKey}`);
+  const priorEvent=(ledger.events||[]).find(e=>e.personnelEventId===c.matchupEventId||e.matchupEventId===c.matchupEventId);
+  if(priorEvent){
+    if(['caseKey','gameKey','team','side','player'].some(key=>priorEvent[key]!==c[key])||(priorEvent.playerEaId!=null&&priorEvent.playerEaId!==c.playerEaId))fail(`EVENT_ID_REUSED:${c.matchupEventId}`);
+    continue;
+  }
   if(c.productionClass!=='VALUE_INVARIANT_COMMITTEE')fail(`CLASS_NOT_ACCEPTED:${c.productionClass}`);
   if(c.resolutionStatus!=='RESOLVED_VALUE_INVARIANT_COMMITTEE')fail(`RESOLUTION_NOT_ACCEPTED:${c.caseKey}`);
   const availability=String(c.availabilityStatus||'').toUpperCase();
@@ -85,9 +100,9 @@ for(const c of input.cases){
   if(c.baselineDoubleCountReviewed!==true)fail(`BASELINE_DOUBLE_COUNT_REVIEW_REQUIRED:${c.caseKey}`);
   if(c.clusterGuardStatus!=='PASS')fail(`CLUSTER_GUARD_REQUIRED:${c.caseKey}`);
   const mr=c.matchupReview||{};
-  if(mr.status!=='REVIEWED_ZERO'||Number(mr.increment)!==0||!String(mr.reason||'').trim()||!Array.isArray(mr.sourceRefs)||!mr.sourceRefs.length)fail(`ZERO_MATCHUP_REVIEW_REQUIRED:${c.caseKey}`);
+  if(mr.status!=='REVIEWED_ZERO'||!finite(mr.increment)||Number(mr.increment)!==0||!String(mr.reason||'').trim()||!Array.isArray(mr.sourceRefs)||!mr.sourceRefs.length)fail(`ZERO_MATCHUP_REVIEW_REQUIRED:${c.caseKey}`);
   const player=lookup(c.player,c.playerEaId);
-  if(player.valueStatus!=='CALIBRATED'||player.waltersPoints==null)fail(`PLAYER_VALUE_UNAVAILABLE:${c.player}`);
+  if(player.valueStatus!=='CALIBRATED'||!finite(player.waltersPoints))fail(`PLAYER_VALUE_UNAVAILABLE:${c.player}`);
   if(player.position==='QB')fail(`QB_COMMITTEE_NOT_ACCEPTED:${c.player}`);
   const healthy=Number(player.waltersPoints);
   const candidates=Array.isArray(c.committeeCandidates)?c.committeeCandidates:[];
@@ -99,7 +114,7 @@ for(const c of input.cases){
     if(!name)fail(`COMMITTEE_NAME_MISSING:${c.caseKey}`);
     if(seen.has(norm(name)))fail(`COMMITTEE_DUPLICATE:${name}`);seen.add(norm(name));
     const p=lookup(name,id);
-    if(p.valueStatus!=='CALIBRATED'||p.waltersPoints==null)fail(`COMMITTEE_VALUE_UNAVAILABLE:${name}`);
+    if(p.valueStatus!=='CALIBRATED'||!finite(p.waltersPoints))fail(`COMMITTEE_VALUE_UNAVAILABLE:${name}`);
     if(p.position==='QB')fail(`COMMITTEE_QB_NOT_ACCEPTED:${name}`);
     return {player:p.player,eaPlayerId:p.eaPlayerId,position:p.position,frozenTeamAbbr:p.teamAbbr,maddenOvr:p.maddenOvr,waltersPoints:Number(p.waltersPoints),rankingCapturedAt:p.rankingCapturedAt};
   });
@@ -114,7 +129,7 @@ for(const c of input.cases){
   }
   const rawDelta=round(replacementValue-healthy,3);
   const event={
-    personnelEventId:c.matchupEventId,matchupEventId:c.matchupEventId,caseKey:c.caseKey,gameKey:c.gameKey,team:c.team,side:String(c.side).toUpperCase(),player:player.player,currentRole:c.currentRole||player.position,
+    personnelEventId:c.matchupEventId,matchupEventId:c.matchupEventId,caseKey:c.caseKey,gameKey:c.gameKey,team:c.team,side:String(c.side).toUpperCase(),player:player.player,playerEaId:player.eaPlayerId,currentRole:c.currentRole||player.position,
     availabilityStatus:availability,resolutionStatus:'RESOLVED_VALUE_INVARIANT_COMMITTEE',replacementCandidates:committee.map(p=>p.player),committee,excludedBaselineContributors:excluded,
     baselineDoubleCountReviewed:true,clusterGuardStatus:'PASS',matchupReview:{...mr,increment:0},reason:c.reason,sourceRefs:unique([...(c.sourceRefs||[]),...(mr.sourceRefs||[]),...excluded.flatMap(e=>e.sourceRefs||[])]),
     batchId:input.batchId,effectiveAt:input.effectiveAt,sourceTask:input.sourceTask||'UNKNOWN',marketViewed:false,productionId:baseProd.productionId,matchupProductionId:prod.productionId,calibrationId:cal.calibrationId,
@@ -126,18 +141,18 @@ for(const c of input.cases){
   batchEvents.push(event);
 }
 
-const boardGames=new Map((numbers.games||[]).map(g=>[g.gameKey,g]));
 const currentCases=Object.values(ledger.currentCases||{});
 const affectedGames=new Set(input.cases.map(c=>c.gameKey));
 const matchupChanges=[];
 for(const gameKey of affectedGames){
   const game=boardGames.get(gameKey);if(!game)fail(`GAME_NOT_FOUND:${gameKey}`);
+  const withheld=sharedVenueFairWithheld(game);
   const priorOverlay=Number(game.personnelOverlayPointsToHomeSpread||0);
-  const currentExact=Number.isFinite(Number(game.grahamExactFairHome))?Number(game.grahamExactFairHome):Number(game.grahamFairHome);
-  if(!Number.isFinite(currentExact))fail(`FAIR_MISSING:${gameKey}`);
-  const baseline=round(currentExact-priorOverlay,3);
+  if(!withheld&&(!finite(game.grahamExactFairHome)||!finite(game.grahamFairHome)))fail(`FAIR_MISSING:${gameKey}`);
+  const currentExact=withheld?null:Number(game.grahamExactFairHome);
+  const baseline=withheld?null:round(currentExact-priorOverlay,3);
   const cases=currentCases.filter(c=>c.gameKey===gameKey);
-  const numeric=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&Number.isFinite(Number(c.rawTeamContributionDelta))&&String(c.availabilityStatus).toUpperCase()!=='ACTIVE_FULL');
+  const numeric=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&finite(c.rawTeamContributionDelta)&&String(c.availabilityStatus).toUpperCase()!=='ACTIVE_FULL');
   const byTeamGroup=new Map();
   for(const c of numeric){const key=`${c.team}|${c.clusterGroup}`;const arr=byTeamGroup.get(key)||[];arr.push(c);byTeamGroup.set(key,arr);}
   let overlay=0;const applied=[],blockedGroups=[];
@@ -160,11 +175,11 @@ for(const gameKey of affectedGames){
     applied.push({team,side:sides[0],clusterGroup:group,clusterMultiplier:multiplier,caseKeys:arr.map(c=>c.caseKey),rawTeamContributionDelta:round(raw),finalTeamContributionDelta:final,pointsToHomeSpread:pointsToHome});
   }
   overlay=round(overlay,3);
-  const exact=round(baseline+overlay,3),published=roundHalf(exact),priorPublished=Number(game.grahamFairHome);
+  const exact=withheld?null:round(baseline+overlay,3),published=withheld?null:roundHalf(exact),priorPublished=withheld?null:Number(game.grahamFairHome);
   game.priorGrahamFairHome=priorPublished;
   game.grahamExactFairHome=exact;
   game.grahamFairHome=published;
-  game.grahamAsOf=input.effectiveAt;
+  if(!withheld)game.grahamAsOf=input.effectiveAt;
   game.personnelBaselineExactFairHome=baseline;
   game.personnelOverlayPointsToHomeSpread=overlay;
   game.personnelProductionId=baseProd.productionId;
@@ -176,7 +191,7 @@ for(const gameKey of affectedGames){
   const priorAdjustments=(game.adjustments||[]).filter(a=>a.type!=='PERSONNEL_CALIBRATED_PRODUCTION');
   game.adjustments=[...priorAdjustments,...applied.map(a=>({type:'PERSONNEL_CALIBRATED_PRODUCTION',...a,productionId:baseProd.productionId,matchupProductionId:prod.productionId,calibrationId:cal.calibrationId,sourceRefs:unique(cases.filter(c=>a.caseKeys.includes(c.caseKey)).flatMap(c=>c.sourceRefs||[]))}))];
   game.sourceRefs=unique([...(game.sourceRefs||[]),...cases.flatMap(c=>c.sourceRefs||[])]);
-  game.informationStatus=overlay!==priorOverlay||game.personnelUnresolvedCases.length?'PERSONNEL_PRODUCTION_REVIEWED':'PERSONNEL_PRODUCTION_NO_CHANGE';
+  if(!withheld)game.informationStatus=overlay!==priorOverlay||game.personnelUnresolvedCases.length?'PERSONNEL_PRODUCTION_REVIEWED':'PERSONNEL_PRODUCTION_NO_CHANGE';
   matchupChanges.push({gameKey,priorPublishedFairHome:priorPublished,baselineExactFairHome:baseline,priorPersonnelOverlay:priorOverlay,newPersonnelOverlay:overlay,newExactFairHome:exact,newPublishedFairHome:published,applied,blockedGroups,unresolvedCases:game.personnelUnresolvedCases});
 }
 
@@ -195,12 +210,14 @@ research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=input.effect
 numbers.updatedAt=input.effectiveAt;numbers.lastResearchAt=input.effectiveAt;
 numbers.matchupExpansionProduction={state:'OPERATIONAL_SCOPED',productionId:prod.productionId,lastBatchId:input.batchId,lastAppliedAt:input.effectiveAt,marketViewed:false,nonzeroOpponentMatchupAuthority:false};
 
+const validateFairs=board=>{for(const game of board.games)if(!sharedVenueFairWithheld(game)&&(!finite(game.grahamExactFairHome)||!finite(game.grahamFairHome)))fail(`INVALID_GRAHAM_FAIR:${game.gameKey}`);};
+validateFairs(numbers);
 write(ledgerPath,ledger);write(researchPath,research);write(numbersPath,numbers);
 const vLedger=read(ledgerPath),vResearch=read(researchPath),vNumbers=read(numbersPath);
 if(!vLedger.processedMatchupBatchIds.includes(input.batchId))fail('LEDGER_READBACK_FAILED');
 if(vResearch.sweeps.at(-1)?.type!=='MATCHUP_EXPANSION_PRODUCTION_BATCH')fail('RESEARCH_READBACK_FAILED');
 if(vNumbers.matchupExpansionProduction?.lastBatchId!==input.batchId)fail('NUMBERS_READBACK_FAILED');
-if(vNumbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))fail('INVALID_GRAHAM_FAIR');
+validateFairs(vNumbers);
 const protectedAfter={powerRatings:fileHash(POWER),playerValueRegistry:fileHash(REGISTRY)};
 if(JSON.stringify(protectedBefore)!==JSON.stringify(protectedAfter))fail('PROTECTED_RATING_OR_REGISTRY_CHANGED');
 console.log(`GRAHAM MATCHUP PRODUCTION APPLIED // BATCH ${input.batchId} // ${batchEvents.length} EXACT VALUE-INVARIANT COMMITTEE EVENTS // ${matchupChanges.length} GAMES // NONZERO MATCHUP AUTHORITY OFF`);

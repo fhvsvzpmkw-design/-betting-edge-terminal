@@ -13,6 +13,8 @@ const list=x=>Array.isArray(x)?x:[];
 const blob=bytes=>createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex');
 const done=value=>/^(COMPLETE|RECONCILED|VERIFIED|READY)(?:_|$)/.test(String(value));
 const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const targetedCodes=new Set(['REPLACEMENT_OR_VALUE_UNRESOLVED','IDENTITY_CONFLICT','PAIRED_HISTORY_CONFLICT']);
+const methodCodes=new Set(['SOURCE_NOT_YET_AVAILABLE','METHOD_DECISION_REQUIRED','IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED']);
 
 // Read-only projection. It cannot approve an estimate, set a rating or activate a week.
 export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effectiveAt,previous=[]}){
@@ -33,14 +35,19 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
       events[0].effectiveAt===events[1].effectiveAt&&events.every(e=>e.marketViewed===false&&e.gameDayEvidenceBinding);
     const receiptBlocked=matches?list(receipt.blockedGames).find(g=>g.gameKey===game.gameKey):null;
     const applied=matches&&paired&&!receiptBlocked;
+    if(applied&&checklist.pairedGameDayInjuryLoss&&!done(checklist.pairedGameDayInjuryLoss.state)){
+      checklist.pairedGameDayInjuryLoss={state:'COMPLETE_APPLIED_PAIRED_HISTORY',path:events[0].gameDayEvidenceBinding.path,
+        blobSha:events[0].gameDayEvidenceBinding.blobSha,supersededEvidence:checklist.pairedGameDayInjuryLoss};
+    }
     const conflict=pair.some(p=>p.length)&&!paired;
     const oldReasons=list(receiptBlocked?.reasons);
     const blockers=applied?[]:conflict?[{code:'PAIRED_HISTORY_CONFLICT',finding:'Missing, duplicate or mismatched paired weekly history.',nextAction:'Reconcile the original paired transaction; do not replay either side.',owner:'GRAHAM_WALTERS_90_10'}]:
       latest?.game.state==='READY'?[]:latest?list(latest.game.blockers):oldReasons.map(finding=>({code:'RECEIPT_ONLY_BLOCKER',finding,nextAction:'Bind the current missing input in a source-week evidence bundle.',owner:'GRAHAM_WALTERS_90_10'}));
     const state=applied?'APPLIED':conflict?'BLOCKED_HISTORY':latest?.game.state==='READY'?'VALIDATE_AND_PUBLISH':latest?'RECONCILE':'PREPARE';
+    const targetedBlocker=blockers.find(b=>targetedCodes.has(b.code));
+    const methodBlocker=blockers.find(b=>methodCodes.has(b.code));
     const workClass=state==='APPLIED'?'DONE':state==='VALIDATE_AND_PUBLISH'?'READY_FOR_VALIDATION':
-      blockers.some(b=>['SOURCE_NOT_YET_AVAILABLE','METHOD_DECISION_REQUIRED'].includes(b.code))?'WAITING_SOURCE_OR_METHOD':
-      blockers.some(b=>['REPLACEMENT_OR_VALUE_UNRESOLVED','IDENTITY_CONFLICT','PAIRED_HISTORY_CONFLICT'].includes(b.code))?'TARGETED_RECONCILIATION':'AVAILABLE_WORK';
+      targetedBlocker?'TARGETED_RECONCILIATION':methodBlocker?'WAITING_SOURCE_OR_METHOD':'AVAILABLE_WORK';
     const fingerprint=digest({state,checklist,blockers});
     const old=previous.find(p=>p.gameKey===game.gameKey);
     const firstSeenAt=old?.firstSeenAt||records.at(-1)?.bundle.recordedAt||effectiveAt;
@@ -52,7 +59,7 @@ export function recoveryQueue({season,sourceWeek,schedule,power,evidence,effecti
       checklist,blockers,firstSeenAt,lastEvidenceAt,unchangedSince,stalled,fingerprint,
       receiptBlockerSuperseded:!applied&&!!receiptBlocked&&!!latest&&Date.parse(lastEvidenceAt)>Date.parse(receipt.appliedAt),
       owner:'GRAHAM_WALTERS_90_10',nextAction:state==='APPLIED'?'PRESERVE_PAIRED_HISTORY':state==='VALIDATE_AND_PUBLISH'?'RUN_BOUND_EVALUATOR_THEN_STAGE_WITH_EXISTING_UPDATER':
-        blockers[0]?.nextAction||'Complete the paired final-game inventory from the official gamebook, then validate supported estimates.',
+        (targetedBlocker||methodBlocker||blockers[0])?.nextAction||'Complete the paired final-game inventory from the official gamebook, then validate supported estimates.',
       escalation:stalled?'UNRESOLVED_ACROSS_RUNS: report the exact missing fact or method decision; another generic pending note is insufficient.':null});
   }
   // Work that can actually close a pair comes before a repeatedly unavailable
@@ -78,9 +85,15 @@ export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,
   const cycle=completion.components.initialBaseline.state!=='COMPLETE'&&pendingRatings.length>0;
   const nextWeekRequired=activeFinals.state==='COMPLETE';
   const rolloverBlockers=nextWeekRequired&&!historicalComplete?['HISTORICAL_LEARNING_INCOMPLETE']:[];
+  const baselineRequired=completion.components.initialBaseline.state!=='COMPLETE';
+  const currentBaseline={state:completion.components.initialBaseline.state,owner:'TUESDAY_BASELINE',required:baselineRequired,
+    nextAction:baselineRequired?'RUN_ACTIVE_BASELINE_RECOVERY':'PRESERVE_VERIFIED_CURRENT_BASELINE',
+    historicalLearningBlocksReview:false,requiresSeparateResearchRuntime:true,
+    instruction:baselineRequired?'Check for a live competing baseline runtime, then execute the full current-information baseline under the existing partial-weekly-input policy. Do not wait for historical learning or next-week rollover; preserve unresolved weekly and numerical inputs.':'Retain the verified baseline and its original limitations.'};
   const problems=[...(cycle?[{code:'BASELINE_PROPAGATION_CYCLE',finding:'A pending initial baseline and unpublished carried bases coexist; mechanical propagation must not wait for research completion.'}]:[]),
     ...(!nextWeekRequired&&missedEarlierBatches.length?[{code:'EARLIER_PUBLISHED_BATCHES_NOT_PROPAGATED',games:missedEarlierBatches.map(g=>g.gameKey)}]:[]),
     ...(historical.some(g=>g.stalled)?[{code:'STALLED_HISTORICAL_RECOVERY',games:historical.filter(g=>g.stalled).map(g=>g.gameKey)}]:[]),
+    ...(baselineRequired?[{code:'INITIAL_BASELINE_RECOVERY_REQUIRED',owner:'TUESDAY_BASELINE',nextAction:currentBaseline.nextAction}]:[]),
     ...(nextWeekRequired?[{code:'NEXT_WEEK_NOT_ACTIVATED',expectedWeek:active.week+1,reason:rolloverBlockers.length?'Historical learning still incomplete.':'Run the mechanical rollover owner now; previous-game display refresh is not a new-week rating input.'}]:[])];
   const counts={historicalApplied:historical.filter(g=>g.state==='APPLIED').length,historicalExpected:historical.length,
     historicalReadyToValidate:historical.filter(g=>g.state==='VALIDATE_AND_PUBLISH').length,stalledHistoricalGames:historical.filter(g=>g.stalled).length,
@@ -90,7 +103,7 @@ export function buildWeeklyReadiness({active,board,power,staging,prior,evidence,
     state:nextWeekRequired||completion.state!=='COMPLETE'?'BLOCKED':'VERIFIED_CURRENT',counts,
     rollover:{required:nextWeekRequired,nextWeek:nextWeekRequired?active.week+1:null,activeFinals,blockers:rolloverBlockers,
       nextAction:!nextWeekRequired?'PREPARE_EVIDENCE_AS_GAMES_FINISH':historicalComplete?'RUN_WEEK_ROLLOVER':'FINISH_OLDEST_HISTORICAL_INPUTS'},
-    completion,historicalGames:historical,activeWeekPreparation:preparation,processProblems:problems,
+    completion,currentBaseline,historicalGames:historical,activeWeekPreparation:preparation,processProblems:problems,
     customerMessage:nextWeekRequired?`Week ${active.week+1} has not been published. Historical rating updates: ${counts.historicalApplied}/${counts.historicalExpected}; completed Week ${active.week} evidence ready: ${counts.activeWeekEvidenceReady}/${counts.activeWeekEvidenceExpected}.`:
       `Week ${active.week}: historical rating updates ${counts.historicalApplied}/${counts.historicalExpected}; ${counts.initialBaseline==='COMPLETE'?'baseline verified':'baseline incomplete'}.`,
     marketViewed:false,numericAuthority:false,completionRule:'A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.'};

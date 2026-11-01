@@ -33,6 +33,22 @@ for(const [iso,slot,reportTime] of [
 const winter=resolveWorkflowSchedule({now:new Date('2025-12-06T13:50:00Z'),eventName:'schedule'});
 assert.equal(winter.slotName,'open','Vancouver-local 05:50 must survive the historical PST offset');
 assert.equal(winter.plannedReportTime,'06:00');
+// B.C. ended seasonal clock changes in March 2026. Exercise the runtime's
+// timezone data at all five actual Nov. 1 pulses, including the UTC date rollover.
+for(const [iso,canonicalSlot] of [
+  ['2026-11-01T12:50:00Z',1],['2026-11-01T14:50:00Z',2],
+  ['2026-11-01T16:20:00Z',3],['2026-11-01T22:05:00Z',4],
+  ['2026-11-02T01:05:00Z',5]
+]){
+  const result=resolveWorkflowSchedule({now:new Date(iso),eventName:'schedule'});
+  assert.equal(result.shouldRun,true,`Nov. 1 slot ${canonicalSlot} must use Vancouver UTC-7`);
+  assert.equal(result.canonicalSlot,canonicalSlot);
+  assert.equal(result.operatingDate,'2026-11-01');
+}
+assert.equal(resolveWorkflowSchedule({now:new Date('2026-12-06T12:50:00Z'),eventName:'schedule'}).slotName,'open',
+  'Vancouver remains UTC-7 through winter 2026');
+assert.equal(resolveWorkflowSchedule({now:new Date('2026-11-01T13:50:00Z'),eventName:'schedule'}).shouldRun,false,
+  'the retired UTC-8 fallback must not shift the opening pulse by one hour');
 assert.equal(resolveWorkflowSchedule({now:new Date('2026-09-06T18:00:00Z'),eventName:'schedule'}).shouldRun,false);
 
 const manual=resolveWorkflowSchedule({now:new Date('2026-09-06T18:00:00Z'),eventName:'workflow_dispatch'});

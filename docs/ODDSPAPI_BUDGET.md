@@ -20,6 +20,8 @@ Pack at most five competition IDs per request. NHL and NBA are first in the main
 
 `data/oddspapi-budget-state.json` saves confirmed provider usage, estimated pending charged attempts, daily spending and extra batches. Each billed attempt is recorded before transport, so timeouts and HTTP errors cannot create an automatic free retry. On first deployment with existing provider usage, an unknown current-day total is conservatively reserved and labelled estimated. The next normal day can open its daily allocation without clearing monthly usage.
 
+An unchanged or lagging account counter retains pending local charges, including across a Vancouver day boundary. As the provider counter catches up, those charges become confirmed without being counted twice. Only an observed counter decrease or subscription change clears the previous quota period's estimates; the same local day's spending remains enforced.
+
 `data/oddspapi-market-cache.json` saves validated NHL overtime market definitions and their original observation time for up to 30 days. It contains definitions, never reusable live odds. Blocked/error observers do not discard this cache. A required refresh is included in the planned and recorded charged request total.
 
 The existing odds publication step preserves these state files even when a newer primary snapshot wins a publication collision or an earlier validation stage fails. Publication retries use saved bytes and never repeat collection. The existing shared odds-workflow concurrency remains the single-writer boundary.

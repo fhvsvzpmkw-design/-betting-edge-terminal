@@ -4,6 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {currentPersonnelEstimate, assertDistinctPersonnelReplacements, synchronizePersonnelInputStatus, synchronizePersonnelBoardStatus, currentReceiverClusterMultiplier} from './graham-current-personnel-estimates.mjs';
 import {loadCurrentValueEstimates} from './graham-current-value-estimates.mjs';
+import {sharedVenueFairWithheld} from './graham-fair-decomposition.mjs';
 
 const ROOT=process.cwd();
 const STAGING=path.join(ROOT,process.argv[2]||'data/walters/nfl/personnel-staging.json');
@@ -18,6 +19,7 @@ const round=(n,d=3)=>Number(Number(n).toFixed(d));
 const roundHalf=n=>Math.round((Number(n)+Number.EPSILON)*2)/2;
 const normalizeName=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const sha=j=>crypto.createHash('sha256').update(JSON.stringify(j,Object.keys(j).sort())).digest('hex');
+const finite=v=>(typeof v==='number'||typeof v==='string'&&v.trim()!=='')&&Number.isFinite(Number(v));
 
 const prod=read(PROD),s2=read(STAGE2),s3=read(STAGE3),registry=read(REGISTRY),cal=read(CAL),input=read(STAGING);
 if(prod?.state!=='OPERATIONAL'||prod?.productionAuthority!==true)throw new Error('PERSONNEL_PRODUCTION_NOT_OPERATIONAL');
@@ -36,6 +38,18 @@ const researchPath=path.join(base,`week-${week}-research-ledger.json`);
 const ledgerPath=path.join(base,`week-${week}-personnel-ledger.json`);
 const numbers=read(numbersPath),research=read(researchPath);
 if(Number(numbers.season)!==Number(input.season)||Number(numbers.week)!==Number(input.week))throw new Error('ACTIVE_BOARD_WEEK_MISMATCH');
+const boardGames=new Map((numbers.games||[]).map(g=>[g.gameKey,g]));
+const incomingEventIds=new Set();
+for(const c of input.cases){
+  if(!c?.personnelEventId||!c?.caseKey||!c?.gameKey||!c?.team||!c?.side||!c?.player||!Array.isArray(c.sourceRefs)||!c.sourceRefs.length||!c.reason)throw new Error(`INVALID_CASE:${c?.personnelEventId||'unknown'}`);
+  if(incomingEventIds.has(c.personnelEventId))throw new Error(`DUPLICATE_PERSONNEL_EVENT_ID:${c.personnelEventId}`);
+  incomingEventIds.add(c.personnelEventId);
+  const game=boardGames.get(c.gameKey);
+  if(!game)throw new Error(`GAME_NOT_FOUND:${c.gameKey}`);
+  if(!['HOME','AWAY'].includes(c.side)||game[c.side==='HOME'?'home':'away']!==c.team)throw new Error(`PERSONNEL_TEAM_SIDE_MISMATCH:${c.personnelEventId}`);
+  if(!Number.isFinite(Date.parse(game.startTimePacific)))throw new Error(`PERSONNEL_GAME_KICKOFF_REQUIRED:${c.gameKey}`);
+  if(Date.parse(game.startTimePacific)<=Date.parse(input.effectiveAt))throw new Error(`PERSONNEL_STARTED_GAME_FROZEN:${c.gameKey}`);
+}
 
 let ledger;
 if(fs.existsSync(ledgerPath)) ledger=read(ledgerPath);
@@ -68,11 +82,12 @@ function clusterGroup(pos){
 }
 function resolvedContribution(c){
   const player=playerLookup(c.player,c.playerEaId);
-  if(player.valueStatus!=='CALIBRATED'||player.waltersPoints==null)throw new Error(`PLAYER_VALUE_UNAVAILABLE:${c.player}`);
+  if(player.valueStatus!=='CALIBRATED'||!finite(player.waltersPoints))throw new Error(`PLAYER_VALUE_UNAVAILABLE:${c.player}`);
   const healthy=Number(player.waltersPoints);
   const status=String(c.availabilityStatus||'').toUpperCase();
   if(status==='ACTIVE_FULL')return {player,healthy,replacement:null,replacementValue:null,rawDelta:0,status:'RESOLVED_ACTIVE'};
   if(status==='PLAYING_LIMITED'){
+    if(!finite(c.approvedEffectivenessPct))throw new Error(`REVIEW_REQUIRED_EFFECTIVENESS:${c.player}`);
     const pct=Number(c.approvedEffectivenessPct);
     if(!Number.isFinite(pct)||pct<0||pct>1)throw new Error(`REVIEW_REQUIRED_EFFECTIVENESS:${c.player}`);
     return {player,healthy,replacement:null,replacementValue:null,rawDelta:round(healthy*pct-healthy),status:'RESOLVED_LIMITED'};
@@ -80,7 +95,7 @@ function resolvedContribution(c){
   if(!prod.productionRules.resolvedStatuses.includes(status))throw new Error(`UNSUPPORTED_RESOLVED_STATUS:${status}`);
   if(c.resolutionStatus!=='RESOLVED_ONE_FOR_ONE')throw new Error(`REPLACEMENT_NOT_RESOLVED:${c.personnelEventId}`);
   const replacement=playerLookup(c.replacementPlayer,c.replacementEaId);
-  if(replacement.valueStatus!=='CALIBRATED'||replacement.waltersPoints==null)throw new Error(`REPLACEMENT_VALUE_UNAVAILABLE:${c.replacementPlayer}`);
+  if(replacement.valueStatus!=='CALIBRATED'||!finite(replacement.waltersPoints))throw new Error(`REPLACEMENT_VALUE_UNAVAILABLE:${c.replacementPlayer}`);
   if((player.position==='QB'||replacement.position==='QB')&&c.qbValidation?.status!=='APPROVED_WALTERS_QB_PERFORMANCE')throw new Error(`QB_PERFORMANCE_VALIDATION_REQUIRED:${c.player}`);
   const replacementValue=Number(replacement.waltersPoints);
   return {player,healthy,replacement,replacementValue,rawDelta:round(replacementValue-healthy),status:'RESOLVED_ONE_FOR_ONE'};
@@ -88,8 +103,11 @@ function resolvedContribution(c){
 
 const batchEvents=[];
 for(const c of input.cases){
-  if(!c?.personnelEventId||!c?.caseKey||!c?.gameKey||!c?.team||!c?.side||!c?.player||!Array.isArray(c.sourceRefs)||!c.sourceRefs.length||!c.reason)throw new Error(`INVALID_CASE:${c?.personnelEventId||'unknown'}`);
-  if((ledger.events||[]).some(e=>e.personnelEventId===c.personnelEventId))continue;
+  const priorEvent=(ledger.events||[]).find(e=>e.personnelEventId===c.personnelEventId);
+  if(priorEvent){
+    if(['caseKey','gameKey','team','side','player','playerEaId'].some(key=>priorEvent[key]!==c[key]))throw new Error(`PERSONNEL_EVENT_ID_REUSED:${c.personnelEventId}`);
+    continue;
+  }
   const event={...c,batchId:input.batchId,effectiveAt:input.effectiveAt,sourceTask:input.sourceTask||'UNKNOWN',marketViewed:false,productionId:prod.productionId,calibrationId:cal.calibrationId};
   if(c.resolutionStatus==='RESOLVED_MODEL_ESTIMATE'){
     try {
@@ -112,18 +130,19 @@ for(const c of input.cases){
   ledger.events=[...(ledger.events||[]),event];batchEvents.push(event);
 }
 
-const boardGames=new Map((numbers.games||[]).map(g=>[g.gameKey,g]));
 const currentCases=Object.values(ledger.currentCases||{});
 assertDistinctPersonnelReplacements(currentCases);
 const affectedGames=new Set(input.cases.map(c=>c.gameKey));
 const matchupChanges=[];
 for(const gameKey of affectedGames){
   const game=boardGames.get(gameKey);if(!game)throw new Error(`GAME_NOT_FOUND:${gameKey}`);
+  const withheld=sharedVenueFairWithheld(game);
   const priorOverlay=Number(game.personnelOverlayPointsToHomeSpread||0);
-  const currentExact=Number.isFinite(Number(game.grahamExactFairHome))?Number(game.grahamExactFairHome):Number(game.grahamFairHome);
-  const baseline=round(currentExact-priorOverlay,3);
+  if(!withheld&&(!finite(game.grahamExactFairHome)||!finite(game.grahamFairHome)))throw new Error(`INVALID_GRAHAM_FAIR_BEFORE_PERSONNEL:${gameKey}`);
+  const currentExact=withheld?null:Number(game.grahamExactFairHome);
+  const baseline=withheld?null:round(currentExact-priorOverlay,3);
   const cases=currentCases.filter(c=>c.gameKey===gameKey);
-  const numeric=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&Number.isFinite(Number(c.rawTeamContributionDelta))&&String(c.availabilityStatus).toUpperCase()!=='ACTIVE_FULL');
+  const numeric=cases.filter(c=>c.valueStatus==='NUMERIC_ELIGIBLE'&&finite(c.rawTeamContributionDelta)&&String(c.availabilityStatus).toUpperCase()!=='ACTIVE_FULL');
   const byTeamGroup=new Map();
   for(const c of numeric){const key=`${c.team}|${c.clusterGroup}`;const arr=byTeamGroup.get(key)||[];arr.push(c);byTeamGroup.set(key,arr);}
   let overlay=0;const applied=[];const blockedGroups=[];
@@ -148,12 +167,12 @@ for(const gameKey of affectedGames){
     overlay+=pointsToHome;applied.push({team,side,clusterGroup:group,clusterMultiplier:multiplier,caseKeys:arr.map(c=>c.caseKey),rawTeamContributionDelta:round(raw),finalTeamContributionDelta:final,pointsToHomeSpread:pointsToHome});for(const c of arr)handled.add(c.caseKey);
   }
   overlay=round(overlay,3);
-  const exact=round(baseline+overlay,3),published=roundHalf(exact);
-  const priorPublished=Number(game.grahamFairHome);
+  const exact=withheld?null:round(baseline+overlay,3),published=withheld?null:roundHalf(exact);
+  const priorPublished=withheld?null:Number(game.grahamFairHome);
   game.priorGrahamFairHome=priorPublished;
   game.grahamExactFairHome=exact;
   game.grahamFairHome=published;
-  game.grahamAsOf=input.effectiveAt;
+  if(!withheld)game.grahamAsOf=input.effectiveAt;
   game.personnelBaselineExactFairHome=baseline;
   game.personnelOverlayPointsToHomeSpread=overlay;
   game.personnelProductionId=prod.productionId;
@@ -166,7 +185,7 @@ for(const gameKey of affectedGames){
   const priorAdjustments=(game.adjustments||[]).filter(a=>a.type!=='PERSONNEL_CALIBRATED_PRODUCTION');
   game.adjustments=[...priorAdjustments,...applied.map(a=>({type:'PERSONNEL_CALIBRATED_PRODUCTION',...a,productionId:prod.productionId,calibrationId:cal.calibrationId,sourceRefs:[...new Set(cases.filter(c=>a.caseKeys.includes(c.caseKey)).flatMap(c=>c.sourceRefs||[]))]}))];
   game.sourceRefs=[...new Set([...(game.sourceRefs||[]),...cases.flatMap(c=>c.sourceRefs||[])])];
-  game.informationStatus=overlay!==priorOverlay||game.personnelUnresolvedCases.length?'PERSONNEL_PRODUCTION_REVIEWED':'PERSONNEL_PRODUCTION_NO_CHANGE';
+  if(!withheld)game.informationStatus=overlay!==priorOverlay||game.personnelUnresolvedCases.length?'PERSONNEL_PRODUCTION_REVIEWED':'PERSONNEL_PRODUCTION_NO_CHANGE';
   matchupChanges.push({gameKey,priorPublishedFairHome:priorPublished,baselineExactFairHome:baseline,priorPersonnelOverlay:priorOverlay,newPersonnelOverlay:overlay,newExactFairHome:exact,newPublishedFairHome:published,applied,blockedGroups,unresolvedCases:game.personnelUnresolvedCases});
 }
 
@@ -185,10 +204,12 @@ research.sweeps=[...(research.sweeps||[]),sweep];research.updatedAt=input.effect
 numbers.updatedAt=input.effectiveAt;numbers.lastResearchAt=input.effectiveAt;numbers.personnelProduction={state:'OPERATIONAL',productionId:prod.productionId,calibrationId:cal.calibrationId,lastBatchId:input.batchId,lastAppliedAt:input.effectiveAt,marketViewed:false};
 
 synchronizePersonnelBoardStatus(numbers);
+const validateFairs=board=>{for(const game of board.games)if(!sharedVenueFairWithheld(game)&&(!finite(game.grahamExactFairHome)||!finite(game.grahamFairHome)))throw new Error(`INVALID_GRAHAM_FAIR_AFTER_PERSONNEL:${game.gameKey}`);};
+validateFairs(numbers);
 write(ledgerPath,ledger);write(researchPath,research);write(numbersPath,numbers);
 const vLedger=read(ledgerPath),vResearch=read(researchPath),vNumbers=read(numbersPath);
 if(!vLedger.processedBatchIds.includes(input.batchId))throw new Error('PERSONNEL_LEDGER_READBACK_FAILED');
 if(vResearch.sweeps.at(-1)?.type!=='PERSONNEL_PRODUCTION_BATCH')throw new Error('RESEARCH_LEDGER_READBACK_FAILED');
 if(vNumbers.personnelProduction?.lastBatchId!==input.batchId)throw new Error('NUMBERS_READBACK_FAILED');
-if(vNumbers.games.some(g=>!Number.isFinite(Number(g.grahamFairHome))))throw new Error('INVALID_GRAHAM_FAIR_AFTER_PERSONNEL');
+validateFairs(vNumbers);
 console.log(`GRAHAM PERSONNEL PRODUCTION APPLIED // BATCH ${input.batchId} // ${batchEvents.filter(e=>e.valueStatus==='NUMERIC_ELIGIBLE').length} NUMERIC-ELIGIBLE EVENTS // ${batchEvents.filter(e=>e.valueStatus!=='NUMERIC_ELIGIBLE').length} FAIL-CLOSED EVENTS // ${matchupChanges.length} GAMES RECOMPUTED // MARKET VIEWED FALSE`);

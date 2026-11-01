@@ -16,8 +16,9 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: graham-baseline-recovery
+  group: graham-personnel-production
   cancel-in-progress: false
+  queue: max
 jobs:
   recover:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
@@ -44,11 +45,15 @@ jobs:
             ACTIVE_NUMBERS="$(node tools/graham-active-week.mjs --path currentNumbers)"
             BASELINE="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).baselineStatus" "$ACTIVE_NUMBERS")"
             if [ "$BASELINE" = "PENDING_TUESDAY_GRAHAM_BASELINE" ]; then
-              # Incomplete or unverified research stays pending without a fabricated sweep.
-              if ! node tools/graham-baseline-recovery.mjs --write; then
-                echo "Baseline remains pending; verified full catch-up is not yet available."
-                exit 0
+              # Retain the pending board, but surface the exact failed gate.
+              if ! node tools/graham-baseline-recovery.mjs --write > /tmp/graham-baseline-recovery.json 2> /tmp/graham-baseline-recovery-error.txt; then
+                cat /tmp/graham-baseline-recovery.json
+                cat /tmp/graham-baseline-recovery-error.txt >&2
+                echo '### Graham baseline recovery blocked' >> "$GITHUB_STEP_SUMMARY"
+                cat /tmp/graham-baseline-recovery-error.txt >> "$GITHUB_STEP_SUMMARY"
+                exit 1
               fi
+              cat /tmp/graham-baseline-recovery.json
             else
               exit 0
             fi

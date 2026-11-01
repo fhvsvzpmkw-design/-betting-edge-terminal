@@ -5,7 +5,14 @@ const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const args={facts:read('data/walters/nfl/2026/weeks-01-03-final-facts-20260930.json'),boards:[1,2,3].map(w=>read(`data/walters/nfl/2026/week-0${w}-current-numbers.json`)),power:read('data/walters/nfl-power-ratings-ledger.json')};
 const before=JSON.stringify(args),result=auditCloseout(args);
 assert.equal(JSON.stringify(args),before);
-assert.equal(result.summary.finalsVerified,48);assert.equal(result.summary.governedGameUpdatesAudited,22);assert.equal(result.summary.missingPairedInputs,26);assert.equal(result.summary.legacyBindingGameUpdates,6);assert.equal(result.summary.auditErrors,0);
+assert.equal(result.summary.finalsVerified,48);
+// The dated final facts stay fixed while append-only recovery legitimately
+// completes additional games. Retain the original verified floor and require
+// complete accounting rather than freezing the live ledger at 22 updates.
+assert.ok(result.summary.governedGameUpdatesAudited>=22);
+assert.ok(result.summary.missingPairedInputs<=26);
+assert.equal(result.summary.governedGameUpdatesAudited+result.summary.missingPairedInputs,48);
+assert.equal(result.summary.legacyBindingGameUpdates,6);assert.equal(result.summary.auditErrors,0);
 const bad=structuredClone(args);bad.facts.weeks[1].games[0].awayScore+=1;
 assert.ok(auditCloseout(bad).summary.auditErrors>0,'score disagreements invalidate historical arithmetic');
 bad.facts.weeks[1].games[0].startTimePacific='2026-09-01T00:00:00Z';assert.throws(()=>auditCloseout(bad),/FINAL_IDENTITY/);

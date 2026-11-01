@@ -25,10 +25,17 @@ export function recoverBaseline({active, board, ledger, events, power, policy, e
   const summary = sweep.summary;
   const gameKeys = list(board.games).map(game => game.gameKey);
   const teamKeys = list(board.games).flatMap(game => [game.away,game.home]);
+  const findingKeys = list(sweep.teamFindings).map(team => team.team);
+  const leagueTeamKeys = list(power.teams).map(team => team.abbr);
   const sameSet = (left,right) => left.length === right.length && new Set(left).size === left.length && left.every(key => right.includes(key));
+  // Tuesday's mandate includes bye teams. Exact active-team coverage remains
+  // the requirement for other full catch-ups; extra/unknown findings cannot
+  // substitute for a missing active team in either form of review.
+  const teamCoverage = review.taskKey === 'TUESDAY_BASELINE'
+    ? leagueTeamKeys.length === 32 && sameSet(findingKeys,leagueTeamKeys) && teamKeys.every(team => findingKeys.includes(team))
+    : sameSet(findingKeys,teamKeys);
   if (!gameKeys.length || !sameSet(list(sweep.matchupChanges).map(game => game.gameKey),gameKeys)
-    || !sameSet(list(sweep.teamFindings).map(team => team.team),teamKeys)
-    || summary.teamsReviewed !== teamKeys.length || summary.gamesReviewed !== gameKeys.length
+    || !teamCoverage || summary.teamsReviewed !== findingKeys.length || summary.gamesReviewed !== gameKeys.length
     || summary.marketViewed !== false || !Array.isArray(summary.unresolvedCoverageGaps) || summary.unresolvedCoverageGaps.length
     || list(sweep.teamFindings).some(team => team.marketViewed !== false || !list(team.sourceRefs).length)
     || list(sweep.matchupChanges).some(game => game.marketViewed !== false)) fail('FULL_EXACT_REVIEW_COVERAGE_REQUIRED');
@@ -42,16 +49,28 @@ export function recoverBaseline({active, board, ledger, events, power, policy, e
   const ratings = new Map(power.teams.map(team => [team.abbr,team.currentRating]));
   const blocked = new Set(list(receipt.blockedGames).flatMap(game => [game.away,game.home]));
   const result = structuredClone(board);
+  const frozenStartedGames = [];
   for (const game of result.games) {
+    const change = sweep.matchupChanges.find(item => item.gameKey === game.gameKey);
+    if (change.currentExactFairHome !== game.grahamExactFairHome || change.currentDisplayedFairHome !== game.grahamFairHome) fail('REVIEWED_FAIR_CHANGED:' + game.gameKey);
+    const kickoff = Date.parse(game.startTimePacific);
+    if (!Number.isFinite(kickoff)) fail('KICKOFF_TIME_REQUIRED:' + game.gameKey);
+    // Recovery describes the current research baseline. It cannot retrospectively
+    // certify a started game's inputs or move its original publication clock.
+    if (kickoff <= Date.parse(effectiveAt)) {
+      frozenStartedGames.push(game.gameKey);
+      continue;
+    }
     const away = ratings.get(game.away), home = ratings.get(game.home);
     if (![away,home].every(Number.isFinite) || game.ratingCarryForward?.awayRating !== away
       || game.ratingCarryForward?.homeRating !== home || Math.abs(Number(Number(game.neutralBaseHome).toFixed(3)) - Number((away-home).toFixed(3))) > 1e-9) fail('CURRENT_CARRIED_RATING_MISMATCH:' + game.gameKey);
-    const change = sweep.matchupChanges.find(item => item.gameKey === game.gameKey);
-    if (change.currentExactFairHome !== game.grahamExactFairHome || change.currentDisplayedFairHome !== game.grahamFairHome) fail('REVIEWED_FAIR_CHANGED:' + game.gameKey);
     game.weeklyRatingInput = {state:receipt.state,sourceWeek:receipt.sourceWeek,targetWeek:receipt.targetWeek,
       awayCurrentRating:away,homeCurrentRating:home,awayUpdateState:blocked.has(game.away)?'PRESERVED_BLOCKED':'UPDATED',
       homeUpdateState:blocked.has(game.home)?'PRESERVED_BLOCKED':'UPDATED',blockedTeams:[game.away,game.home].filter(team=>blocked.has(team)),
       sourceBlobSha:powerBlobSha,appliedToFair:true,applicationStatus:'CARRIED_BASE_VERIFIED',marketViewed:false};
+    // A reviewed but unresolved venue/QB gate remains an unresolved numerical
+    // input. In particular, H4's explicit null fair must retain its guard.
+    if (String(game.numberStatus).startsWith('FAIL_CLOSED')) continue;
     const unresolved = list(game.personnelUnresolvedCases).length || list(game.personnelBlockedGroups).length || String(game.qbPerformanceStatus).startsWith('FAIL_CLOSED');
     game.numberStatus = receipt.state === 'PARTIAL_BLOCKED' ? 'READY_PARTIAL_BLOCKED_WEEKLY_RATING_INPUT'
       : unresolved ? 'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS' : list(game.personnelEstimateCases).length ? 'READY_WITH_PERSONNEL_MODEL_ESTIMATES' : 'READY';
@@ -63,12 +82,12 @@ export function recoverBaseline({active, board, ledger, events, power, policy, e
   synchronizeGrahamFairBoard(result,{write:false,policy});
   result.baselineStatus = 'CURRENT_BASELINE_COMPLETE' + (receipt.state === 'PARTIAL_BLOCKED' ? '_WITH_PARTIAL_BLOCKED_WEEKLY_90_10' : '');
   result.state = receipt.state === 'PARTIAL_BLOCKED' ? 'INFORMATION_REVIEW_CURRENT_FAIR_PARTIAL_BLOCKED'
-    : result.games.some(game => game.numberStatus === 'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS') ? 'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS' : 'INFORMATION_REVIEW_CURRENT_FAIR';
+    : result.games.some(game => String(game.numberStatus).startsWith('FAIL_CLOSED') || game.numberStatus === 'READY_WITH_UNRESOLVED_PERSONNEL_OR_QB_INPUTS') ? 'INFORMATION_REVIEW_CURRENT_FAIR_WITH_UNRESOLVED_OVERLAYS' : 'INFORMATION_REVIEW_CURRENT_FAIR';
   result.updatedAt = effectiveAt;
   result.lastResearchAt = review.completedAt;
   result.baselineRecovery = {schema:1,state:'APPLIED',effectiveAt,runEventId:review.runEventId,sourceTaskKey:review.taskKey,
-    researchCompletedAt:review.completedAt,ledgerBlobSha,powerBlobSha,teamsReviewed:teamKeys.length,gamesReviewed:gameKeys.length,
-    originalBaselineStatus:board.baselineStatus,originalTuesdayRunPreserved:true,numericMoves:0,marketViewed:false,
+    researchCompletedAt:review.completedAt,ledgerBlobSha,powerBlobSha,teamsReviewed:findingKeys.length,activeTeamsReviewed:teamKeys.length,gamesReviewed:gameKeys.length,
+    originalBaselineStatus:board.baselineStatus,originalTuesdayRunPreserved:true,numericMoves:0,frozenStartedGames,marketViewed:false,
     limitation:'Current baseline recovered from a verified full review. Missing historical weekly inputs and unresolved overlays retain their separate limitations.'};
   return {board:result,changed:true};
 }

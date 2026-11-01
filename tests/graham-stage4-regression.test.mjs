@@ -82,6 +82,7 @@ function makePersonnelSandbox() {
       gameKey,
       away: 'OPP',
       home: 'ST4',
+      startTimePacific: '2026-09-06T10:00:00-07:00',
       neutralBaseHome: 0,
       grahamExactFairHome: baseExact,
       grahamFairHome: roundHalf(baseExact),
