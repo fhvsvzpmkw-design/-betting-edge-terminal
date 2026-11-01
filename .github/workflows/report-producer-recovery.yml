@@ -13,6 +13,7 @@ on:
       - tools/report-evidence-repair.mjs
       - tools/extract-staged-report.mjs
       - tests/report-document-transport.test.mjs
+      - tests/report-run-mutex.test.mjs
       - tests/report-producer-progress.test.mjs
       - tests/report-run-health.test.mjs
       - tests/checkpoint-research-leads.test.mjs
@@ -38,6 +39,7 @@ jobs:
         run: node tests/report-document-transport.test.mjs
       - name: Controller and shared authority regressions
         run: |
+          node tests/report-run-mutex.test.mjs
           node tests/report-producer-progress.test.mjs
           node tests/report-run-health.test.mjs
           node tests/checkpoint-research-leads.test.mjs

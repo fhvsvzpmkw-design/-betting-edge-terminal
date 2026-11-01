@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
 import {prepareEvidenceDraft,buildEvidenceAudit,captureForecastEvidenceDraft} from './report-evidence-repair.mjs';
 import {buildResearchWorkPlan} from './event-research-plan.mjs';
 import {scheduleMetadataForReport} from './main-schedule.mjs';
@@ -25,6 +26,12 @@ function atomic(file,bytes){
   const temporary=`${file}.tmp-${process.pid}`;
   try{fs.writeFileSync(temporary,bytes,{flag:'wx'});fs.renameSync(temporary,file);}
   finally{if(fs.existsSync(temporary))fs.unlinkSync(temporary);}
+}
+// Process mutexes are ephemeral and must not be synchronized with repository files.
+// runCommand has already canonicalized root and resolved/validated checkpoint.
+export function checkpointLockPath(file){
+  const key=createHash('sha256').update(path.resolve(file)).digest('hex');
+  return path.join(os.tmpdir(),'betting-edge-report-locks',`${key}.lock`);
 }
 function within(root,file){return path.relative(root,file).split(path.sep).join('/');}
 function safeCheckpoint(root,file){
@@ -99,9 +106,14 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
   const mutating=['start','checkpoint','retime','prepare','freeze','stage','readback'].includes(command);
   if(!readonly&&!mutating)throw new Error('Unknown run command');
   fs.mkdirSync(path.dirname(file),{recursive:true});
+  const lockFile=checkpointLockPath(file);
   let lock;
-  if(mutating)lock=fs.openSync(`${file}.lock`,'wx');
+  if(mutating){
+    fs.mkdirSync(path.dirname(lockFile),{recursive:true,mode:0o700});
+    lock=fs.openSync(lockFile,'wx',0o600);
+  }
   try{
+    if(lock!==undefined)fs.writeFileSync(lock,json({pid:process.pid,startedAt:new Date(commandStarted).toISOString(),checkpoint:file}));
     let state=fs.existsSync(file)?parseReportDocument(fs.readFileSync(file),'REPORT_CHECKPOINT'):null;
     if(command==='start'){
       if(state)throw new Error('Run already exists; resume it with status/next');
@@ -220,7 +232,7 @@ export function runCommand({command,root=process.cwd(),checkpoint,report,sidecar
     return {...summary(state),checkpoint:within(root,file),
       ...(command==='checkpoint'&&eventId?{eventAssessment:reportEventFeedback(state,eventId)}:{}),
       ...(command==='stage'?{stagingPath:'data/history/staging/report-bundle.json',requiresRemoteCommitAndWorkflowSuccess:true}:{})};
-  }finally{if(lock!==undefined){fs.closeSync(lock);fs.unlinkSync(`${file}.lock`);}}
+  }finally{if(lock!==undefined){fs.closeSync(lock);fs.unlinkSync(lockFile);}}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
   try{

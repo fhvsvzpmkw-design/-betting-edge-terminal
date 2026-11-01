@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {gzipSync,gunzipSync} from 'node:zlib';
 import {serializeReportDocument,parseReportDocument,TRANSPORT_FORMAT,MAX_DOCUMENT_BYTES} from '../tools/report-document-transport.mjs';
 import {runCommand} from '../tools/report-run.mjs';
 import {extractStagedReport,blobSha} from '../tools/extract-staged-report.mjs';
@@ -19,6 +21,23 @@ assert.ok(Buffer.byteLength(packed)<1024*1024,'the actual full checkpoint must f
 assert.deepEqual(parseReportDocument(packed,'REPORT_CHECKPOINT'),original);
 assert.equal(JSON.stringify(original),before,'packing cannot change analytical content');
 const envelope=JSON.parse(packed);
+// Recreate the previous pretty-JSON transport from the same wire object.
+// This proves compact encoding preserves the schema and historical readability,
+// instead of attributing the saving to omitted report/source/evidence fields.
+const wireBytes=gunzipSync(Buffer.from(envelope.data,'base64'));
+assert.equal(wireBytes.length,envelope.decodedBytes);
+assert.equal(createHash('sha256').update(wireBytes).digest('hex'),envelope.sha256);
+const legacyBytes=Buffer.from(JSON.stringify(JSON.parse(wireBytes),null,2)+'\n');
+const legacyPacked=JSON.stringify({...envelope,decodedBytes:legacyBytes.length,
+  sha256:createHash('sha256').update(legacyBytes).digest('hex'),
+  data:gzipSync(legacyBytes,{level:9}).toString('base64')},null,2)+'\n';
+assert.deepEqual(parseReportDocument(legacyPacked,'REPORT_CHECKPOINT'),original,
+  'legacy pretty-gzip checkpoints preserve every analytical field');
+assert.ok(Buffer.byteLength(packed)<Buffer.byteLength(legacyPacked),
+  'compact encoding reduces the full real fixture without dropping fields');
+assert.deepEqual(parseReportDocument(packed,'REPORT_CHECKPOINT').frozen,original.frozen,
+  'pre-existing frozen seals remain byte-for-byte unchanged');
+
 for(const change of [
   {sha256:'0'.repeat(64)}, {decodedBytes:envelope.decodedBytes+1},
   {decodedBytes:MAX_DOCUMENT_BYTES+1}, {data:envelope.data.slice(0,-8)},
