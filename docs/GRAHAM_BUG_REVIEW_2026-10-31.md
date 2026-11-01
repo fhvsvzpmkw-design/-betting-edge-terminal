@@ -36,6 +36,10 @@ Chargers–Rams still requires an explicit shared-stadium H4 method. This review
 
 Completion-receipt binding remains strict. The adapter verifies the original Git blob and unchanged research prefix before accepting an intervening governed personnel/M4 publication. Unknown sweeps, manual fair drift, changed prefixes, unrecorded batches or mismatched staging remain rejected. This is a proof of already-published work, not a new football calculation or permission to relabel a partial review complete.
 
+The first recovery attempt reshaped a completed review to fit the later personnel publication. The restorative source audit preserves that altered record and its differences, restores the original completed sweep/runtime/receipt, and regenerates only baseline metadata through the verified production-follow-up proof. All fair numbers and started-game records stay unchanged. Future runs explicitly reuse the original source instead of rewriting completed research.
+
+The targeted official EA recheck is `data/walters/nfl/2026/week-08-weekly-evidence/2026-10-31-current-missing-values-official-ea-recheck.json`: all 20 current pages contained 1,946 unique players; exact Herbert/Runyon searches across eight advertised iterations returned no eligible rows. This is a genuine source gap, not a zero value. The record retains URLs, response excerpts and hashes.
+
 ## Validation and execution evidence
 
 - November 1 tests exercise all five report/pull slots, request/feed/receipt identity, duplicate suppression, UTC-date crossover and Vancouver's winter UTC−7 behavior.
@@ -46,5 +50,7 @@ Completion-receipt binding remains strict. The adapter verifies the original Git
 - The immediate full Tuesday baseline review completed and its receipt/runtime were verified under `graham-tuesday-baseline-2026-w08-20261031T193536-0700`. Its 28 active-team findings and four explicit bye-team findings cover all 32 teams and 14 matchups. Customer baseline metadata/publication has its separate adapter and readback boundary.
 
 All five Betting Edge schedules and the Sunday 07:00 Vancouver pregame task remain enabled. Read the current receipts and readiness queue for final status; this review does not declare incomplete football inputs ready.
+
+The five live Graham task identities, exact canonical prompts, schedules and activation flags were independently validated against current connected-task state at 02:57:39 UTC November 1 (19:57:39 Vancouver October 31).
 
 GitHub queue semantics: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
