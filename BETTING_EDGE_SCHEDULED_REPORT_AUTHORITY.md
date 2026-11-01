@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-11-01.Timezone
+**Operating revision:** 2026-11-01.GuyHandoff
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -17,6 +17,15 @@ For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer
 **November 1 clock repair:** B.C. remains on UTC-7 year-round after March 2026. Preserve America/Vancouver and all five report times. Follow `docs/ODDS_RUN_REQUEST.md` and generate a scheduled request with `node tools/odds-run-request.mjs create --report-time <EXPECTED_REPORT_TIME>` from the actual clock; do not hand-build a winter offset. The shared schedule loader rejects obsolete timezone data, and the odds workflow installs current Node 24 before resolving the request. Preserve actual request/issue timestamps, the existing 10-minute request window, 75-minute pulse/input windows, slot receipts and no-duplicate-spend controls. Never retry the unchanged expired request to correct a timezone mismatch. A failed prior lane is not a current pregame report; resume eligible work in the current normal lane and preserve the exact prior failure.
 
 **Progress continuity — October 25:** Read the current progress section of `docs/PROJECT_STATE.md` before diagnosing or replacing this process. Verify current report checkpoint `status` / `next` and resume the existing queue; a dated project summary never overrides newer runtime evidence. After a substantive process repair or verified milestone, update that same progress entry with proof, existing owner and next action, and record changed operating decisions in `docs/DECISIONS.md`. Routine event work stays in the existing checkpoints. Keep tests, deployment, live acceptance and analytical completion distinct; do not add a second tracker or task.
+
+### Guy's November 1 researched daily play
+
+From November 1 Vancouver, apply `GUY_DAILY_SELECTION_AUTHORITY.md` within these existing five tasks. After normal source intake, obtain the saved-board top-three NHL shortlist with `node tools/guy-daily-selection.mjs --shortlist`. Reuse current hockey research to review named goalies, lineup changes, rest/travel and five-on-five play for those games, then stage one independently reasoned Guy moneyline choice, current-price limit and explicit Pinnacle assessment through `data/characters/guy-laflame/call-staging.json`. Complete a new source-bound revision when a material goalie/model change invalidates the published call's assumptions. Preserve the one-minute-before-selected-game lock and existing MoneyPuck benchmark. The new Guy publisher owns its actual-call ledger and generated page; it cannot alter VigScope grades or issued History. Do not request extra odds pulls, create a recurring task, copy a VigScope grade as Guy's judgment, fabricate a daily call, or let a Guy-specific shortfall block completed Main decisions. Verify the matching researched call after its publisher; record any precise unfinished follow-up. Earlier instructions saying Guy's MoneyPuck choice remains unchanged continue to preserve that benchmark; they do not suppress this separately authorized researched call.
+
+
+**Fresh-intake handoff — November 1 recovery correction:** Immediately after normal source intake, inspect today's Guy call and run the saved-board shortlist before broad Main report research. When eligible NHL games exist and no call is published, complete the shortlist review in parallel with or alongside the report's hockey research, then commit Guy's submission and verify its publisher as soon as that research is complete. Do not defer this handoff until Main preparation, freeze, History publication or the report recovery's end. A Main report's accepted input snapshot does not extend Guy's separate 75-minute quote/forecast eligibility. If his inputs have expired, preserve their clocks and resume at the next normally supplied eligible board; no extra Guy odds request or retrospective call.
+
+The producer's final delivery must separately state either Guy's verified research/publication IDs or the exact unfinished Guy work, actual source/price shortfall and next existing review opportunity. An empty ledger, `IDLE` staging, a green refresh-only workflow or a “looking” placeholder is not a completed selection or proof that research is running. This handoff does not block independently completed Main cards or permit invented research, forced picks, relaxed freshness or changes to published records.
 
 **October 25 Sunday execution repair:** The 08:00 run assessed only four of 138 selections, with 124 exact market references available, and never advanced beyond its first event. `CURRENT_CANDIDATE_REVIEW_REQUIRED` is unfinished producer work, not evidence that a source or benchmark is missing. The controller now reports `continuationRequired` and `remainingWork` separately from validation/publication, and preparation returns the remaining work plan. A green publisher or a repaired first event is not the end of this task while those current reviews remain.
 
@@ -246,9 +255,6 @@ Freeze only after checks pass. All finished decisions publish; incomplete select
 
 ## 9. Publisher ownership and truthful delivery
 
-### Guy's November 1 researched daily play
-
-From November 1 Vancouver, apply `GUY_DAILY_SELECTION_AUTHORITY.md` within these existing five tasks. After normal source intake, obtain the saved-board top-three NHL shortlist with `node tools/guy-daily-selection.mjs --shortlist`. Reuse current hockey research to review named goalies, lineup changes, rest/travel and five-on-five play for those games, then stage one independently reasoned Guy moneyline choice, current-price limit and explicit Pinnacle assessment through `data/characters/guy-laflame/call-staging.json`. Complete a new source-bound revision when a material goalie/model change invalidates the published call's assumptions. Preserve the one-minute-before-selected-game lock and existing MoneyPuck benchmark. The new Guy publisher owns its actual-call ledger and generated page; it cannot alter VigScope grades or issued History. Do not request extra odds pulls, create a recurring task, copy a VigScope grade as Guy's judgment, fabricate a daily call, or let a Guy-specific shortfall block completed Main decisions. Verify the matching researched call after its publisher; record any precise unfinished follow-up. Earlier instructions saying Guy's MoneyPuck choice remains unchanged continue to preserve that benchmark; they do not suppress this separately authorized researched call.
 
 The task produces candidates only. Never directly create/update/delete/index `data/history/runs/**`, `data/history/research-fit/**`, or `run-history.json`.
 

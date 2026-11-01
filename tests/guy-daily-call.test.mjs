@@ -106,7 +106,9 @@ test('actual published-pick results count settled calls only and never borrow Mo
 
 test('pending and prelaunch records never manufacture a daily choice or reset a missing record to zero',()=>{
   const ledger=fixture();ledger.entries=[];
-  assert.match(ui.render(ledger,{now}),/Guy is checking today’s shortlist/);
+  const pending=ui.render(ledger,{now});
+  assert.match(pending,/No researched pick has been published today/);
+  assert.doesNotMatch(pending,/Guy is checking today’s shortlist/);
   assert.match(ui.render(ledger,{now:'2026-11-01T06:59:00Z'}),/DAILY CALL STARTS NOVEMBER 1/);
   const html=ui.render(null,{now});assert.match(html,/latest call could not be loaded|published-pick record is unavailable/);assert.doesNotMatch(html,/0–0/);
 });

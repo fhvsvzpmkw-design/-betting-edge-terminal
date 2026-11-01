@@ -64,7 +64,7 @@
     const record=usable?`<p class="guy-call-record"><b>GUY’S PUBLISHED PICKS:</b> ${s.wins}–${s.losses} · ${signed(s.netUnits,'u')} · ROI ${signed(s.roiPct,'%')} <span>(${s.settled} settled · flat 1u risk)</span></p>`:'<p class="guy-call-record">Guy’s published-pick record is unavailable.</p>';
     let body;
     if(!call||beforeLaunch){
-      body=`<div class="guy-call-waiting"><h3>${state==='NOT_STARTED'?'A new daily call from November 1.':state==='UNAVAILABLE'?'Guy’s latest call could not be loaded.':'Guy is checking today’s shortlist.'}</h3><p>${state==='UNAVAILABLE'?'Refresh to check the saved selection.':state==='NOT_STARTED'?'One researched NHL moneyline, its recorded price and Guy’s limit.':'His daily play appears here after the hockey and price review.'}</p></div>`;
+      body=`<div class="guy-call-waiting"><h3>${state==='NOT_STARTED'?'A new daily call from November 1.':state==='UNAVAILABLE'?'Guy’s latest call could not be loaded.':'No researched pick has been published today.'}</h3><p>${state==='UNAVAILABLE'?'Refresh to check the saved selection.':state==='NOT_STARTED'?'One researched NHL moneyline, its recorded price and Guy’s limit.':'His daily play appears here after the hockey and price review.'}</p></div>`;
     }else{
       const checked=review(entry,now);
       const message=state==='LOCKED'?'This is the frozen published selection. Its recorded odds are used for results.':state==='CURRENT'?'Latest captured quote passes Guy’s limit. Check the sportsbook price before acting.':checked.reason||'The published selection is retained. A fresh price or hockey check is needed before acting.';

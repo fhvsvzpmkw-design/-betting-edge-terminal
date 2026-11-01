@@ -433,6 +433,8 @@ Preserve `value-ledger.json` and its intentional highest-captured-MoneyPuck-edge
 
 **Reason:** Guy's independent hockey judgment and usable current price need their own auditable call. The intentional peak-edge comparison answers a different question and remains intact without becoming the daily selection process.
 
+**November 1 execution correction:** The morning producers and manual report recovery did not submit Guy research; a successful saved-status refresh and the empty “looking” message concealed that missing handoff. His independent 75-minute price/model bounds then expired. Move the existing Guy handoff to fresh-source intake before broad Main work, require a separate truthful Guy outcome in producer delivery, and use factual no-pick empty-state wording. Keep existing tasks, one-unit editorial record, own-game cutoff, research requirements, price/forecast bounds, no-extra-pull rule and prospective-only publication unchanged. The next normally fresh eligible board must still produce and verify a genuine call before first-live acceptance closes.
+
 ## D-042 — Use the same current Vancouver clock for report-owned odds
 
 **Status:** DEPLOYED; six local suites and all eight relevant GitHub checks passed; November 1 live acquisition verified; delayed Final Morning recovery publication/readback verified in PROJECT_STATE.md; failed Open remains unissued.
