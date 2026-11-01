@@ -128,11 +128,20 @@ jobs:
           const edition=JSON.parse(execFileSync('git',['show','origin/main:'+pointer.path]));
           const archive=execFileSync('git',['show','origin/main:'+pointer.archivePath],{maxBuffer:16*1024*1024}).toString();
           if(edition.id!==pointer.id||!archive.includes('GUY’S PLAY'))throw Error('HOTLINE_READBACK_FAILED');
+          const embedded=archive.match(/<script type="application\/json" data-guy-call-snapshot>([\s\S]*?)<\/script>/);
+          if(!embedded)throw Error('HOTLINE_SNAPSHOT_MISSING');
+          const rendered=JSON.parse(embedded[1]);
+          for(const entry of ledger.entries){
+            const saved=edition.callsLedger?.entries.find(e=>e.date===entry.date);
+            const shown=rendered?.entries.find(e=>e.date===entry.date);
+            if(saved?.call.publicationId!==entry.call.publicationId||shown?.call.publicationId!==entry.call.publicationId||shown?.call.researchId!==entry.call.researchId)throw Error('HOTLINE_CALL_ID_MISMATCH');
+          }
           if(fs.existsSync('/tmp/guy-staging-candidate.json')){
             const candidate=JSON.parse(fs.readFileSync('/tmp/guy-staging-candidate.json'));
             if(candidate.state==='READY'){
               const receipt=ledger.processedResearchIds.find(r=>r.researchId===candidate.researchId);
               if(!receipt||!ledger.entries.some(e=>e.publications.some(p=>p.publicationId===receipt.publicationId)))throw Error('PUBLICATION_READBACK_FAILED');
+              if(!edition.callsLedger?.entries.some(e=>e.publications.some(p=>p.publicationId===receipt.publicationId&&p.researchId===receipt.researchId)))throw Error('EDITION_PUBLICATION_READBACK_FAILED');
               console.log(JSON.stringify({verifiedResearchId:receipt.researchId,verifiedPublicationId:receipt.publicationId}));
             }
           }

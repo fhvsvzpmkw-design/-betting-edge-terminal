@@ -71,7 +71,7 @@ const server=http.createServer((request,response)=>{
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const origin=`http://127.0.0.1:${server.address().port}`;
-let browser;
+let browser,page;
 try{
   // This mode validates fixture isolation in environments without Chrome.
   for(const route of ['hotline','value'])for(const name of scenarios){const response=await fetch(`${origin}/${route}/${name}`);assert.equal(response.status,200);assert.match(await response.text(),/GUY’S PLAY \/\/ DAILY NHL MONEYLINE/);}
@@ -83,7 +83,7 @@ try{
     assert.ok(process.env.CHROME,'CHROME is required (use --self-check for fixture-only validation)');
     const {default:puppeteer}=await import('puppeteer-core');
     browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME,args:['--no-sandbox','--disable-dev-shm-usage']});
-    const page=await browser.newPage(),errors=[],external=[],dataRequests=[];
+    page=await browser.newPage();const errors=[],external=[],dataRequests=[];
     page.on('pageerror',error=>errors.push(String(error)));
     await page.setRequestInterception(true);
     page.on('request',request=>{const url=new URL(request.url());if(url.origin!==origin){external.push(request.url());void request.abort();}else{if(url.pathname.includes('/calls-ledger.json'))dataRequests.push(url.pathname);void request.continue();}});
@@ -129,4 +129,7 @@ try{
     console.log('GUY DAILY CALL BROWSER: PASS // mobile/tablet/desktop, Hotline + Value, independent choice, limit, separate benchmark, quote/model/research expiry, projected goalie, frozen audit, offline fallback');
   }
   for(const [name,f]of fixtures)assert.equal(json(f),originals.get(name),'fixtures stay immutable');
+}catch(error){
+  if(page){fs.mkdirSync('.qa',{recursive:true});await page.screenshot({path:'.qa/guy-call-failure.png',fullPage:true});console.error(await page.evaluate(()=>({url:location.href,ready:window.fixtureReady,state:document.querySelector('[data-guy-call-state]')?.dataset.guyCallState,text:document.querySelector('[data-guy-call-state]')?.innerText})));}
+  throw error;
 }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}

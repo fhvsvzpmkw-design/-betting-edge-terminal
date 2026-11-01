@@ -7,16 +7,17 @@ const expectedGraham=A.summary(A.strategyRows(comparison.rows,'graham')).grades;
 const executablePath=process.env.CHROME;
 if(!executablePath)throw new Error('CHROME is required');
 const browser=await puppeteer.launch({headless:true,executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});
+let page;
 try{
- const page=await browser.newPage(),errors=[],requests=[];
+ page=await browser.newPage();const errors=[],requests=[];
  page.on('pageerror',e=>errors.push(String(e)));
  page.on('request',r=>{if(r.url().includes('/data/history/results-index.json'))requests.push(r.url());});
  await page.setViewport({width:390,height:844,deviceScaleFactor:1,isMobile:false,hasTouch:false});
  await page.goto('http://127.0.0.1:8765/runner.html',{waitUntil:'domcontentloaded',timeout:60000});
- await page.waitForSelector('.tabs>.btn[data-view="engine"]',{timeout:60000});
  await page.waitForSelector('#resultsGrahamValue .comparisonTable',{timeout:60000,visible:false});
- await page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).display==='none'||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
- await page.click('.tabs>.btn[data-view="engine"]');
+ await page.waitForFunction(()=>document.documentElement.dataset.primaryNavShellBound==='5'&&window.VigScopeMenuHome?.ready&&document.body.classList.contains('vigMenuStyled')&&(!document.getElementById('splash2')||getComputedStyle(document.getElementById('splash2')).display==='none'||getComputedStyle(document.getElementById('splash2')).visibility==='hidden'),{timeout:60000});
+ await page.waitForSelector('#vigMainMenu>[data-vig-menu-id="engine"]',{visible:true,timeout:60000});
+ await page.click('#vigMainMenu>[data-vig-menu-id="engine"]');
  await page.waitForFunction(()=>document.body.dataset.primaryView==='engine',{timeout:10000});
  const initial=await page.evaluate(()=>({view:document.body.dataset.primaryView,title:document.querySelector('#engine .resultsTitle')?.textContent,proof:document.querySelectorAll('.whyProofCard').length,pizza:!!document.querySelector('#resultsPizzaValueBox'),shadow:!!document.querySelector('#resultsDecisionValueBox'),archive:!!document.querySelector('#resultsCardLog'),filters:!!document.querySelector('#valueHistoryFilters'),graham:document.querySelector('.comparisonTable').innerText,iframe:document.querySelectorAll('iframe').length}));
  assert.equal(initial.view,'engine');assert.equal(initial.title,undefined);assert.equal(initial.proof,6);assert.ok(initial.pizza&&initial.shadow&&initial.archive&&initial.filters);assert.equal(initial.iframe,0);assert.ok(initial.graham.includes(`${expectedGraham.WIN}–${expectedGraham.LOSS}–${expectedGraham.PUSH}`),'display reflects the current saved ATS population');assert.equal(requests.length,1,'one shared history request');
@@ -78,4 +79,7 @@ try{
   await page.evaluate(()=>window.scrollTo(0,document.scrollingElement.scrollHeight*.6));assert.ok(await page.evaluate(()=>scrollY)>100);
  }
  assert.deepEqual(errors,[]);console.log('VIGSCOPE VALUE BROWSER: PASS // mobile/tablet/desktop, archive, filters, strategies, source analysis, scrolling, one history request');
+}catch(error){
+ if(page){fs.mkdirSync('.qa',{recursive:true});await page.screenshot({path:'.qa/value-failure.png',fullPage:true});console.error(await page.evaluate(()=>({view:document.body.dataset.primaryView,classes:document.body.className,menuReady:window.VigScopeMenuHome?.ready,benchmark:document.getElementById('guyMoneyPuckBenchmark')?.open})));}
+ throw error;
 }finally{await browser.close();}
