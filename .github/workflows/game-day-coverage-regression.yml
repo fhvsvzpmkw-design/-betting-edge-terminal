@@ -23,6 +23,7 @@ on:
       - 'docs/MAIN_SCHEDULE.md'
       - 'cloudflare-worker/**'
       - 'tests/main-schedule.test.mjs'
+      - 'tests/vancouver-runtime.test.mjs'
       - 'tests/odds-primary-entry.test.mjs'
       - 'tests/odds-run-request.test.mjs'
       - 'tests/odds-slot-state.test.mjs'
@@ -72,6 +73,7 @@ on:
       - 'docs/MAIN_SCHEDULE.md'
       - 'cloudflare-worker/**'
       - 'tests/main-schedule.test.mjs'
+      - 'tests/vancouver-runtime.test.mjs'
       - 'tests/odds-primary-entry.test.mjs'
       - 'tests/odds-run-request.test.mjs'
       - 'tests/odds-slot-state.test.mjs'
@@ -115,10 +117,12 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
+          check-latest: true
       - name: Verify current configuration and snapshot intake
         run: |
           node tests/main-schedule.test.mjs
+          node tests/vancouver-runtime.test.mjs
           node tests/odds-primary-entry.test.mjs
           node tests/odds-run-request.test.mjs
           node tests/odds-slot-state.test.mjs

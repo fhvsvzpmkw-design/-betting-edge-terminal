@@ -35,7 +35,43 @@ function vancouverParts(date=new Date()){
   };
 }
 
+// Fail before collection if a host still applies B.C.'s retired winter fallback.
+// Keep historical winter time intact; B.C. adopted permanent UTC-7 in March 2026.
+export function validateVancouverRuntime(DateTimeFormat=Intl.DateTimeFormat){
+  const formatter=new DateTimeFormat('en-CA',{
+    timeZone:'America/Vancouver',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'
+  });
+  for(const [instant,expected] of [
+    ['2025-12-06T13:00:00Z','2025-12-06 05:00'],
+    ['2026-11-01T13:00:00Z','2026-11-01 06:00'],
+    ['2026-12-06T13:00:00Z','2026-12-06 06:00']
+  ]){
+    const p=Object.fromEntries(formatter.formatToParts(new Date(instant)).map(part=>[part.type,part.value]));
+    const actual=`${p.year}-${p.month}-${p.day} ${p.hour==='24'?'00':p.hour}:${p.minute}`;
+    assert(actual===expected,`VANCOUVER_TIMEZONE_DATA_OUTDATED: ${instant} resolved to ${actual}, expected ${expected}. Use the configured Node runtime with current IANA data before requesting odds.`);
+  }
+  return true;
+}
+
+export function plannedMainPulse({now=new Date(),reportTime},root=DEFAULT_ROOT){
+  const schedule=loadMainSchedule(root),clock=vancouverParts(now);
+  const lane=schedule.slots.find(slot=>slot.reportTime===reportTime);
+  assert(lane,'reportTime must identify a current Main report lane');
+  const target=Date.parse(`${clock.date}T${lane.pulseTime}:00Z`);
+  let instant=target;
+  for(let i=0;i<3;i++){
+    const local=vancouverParts(new Date(instant));
+    const correction=target-Date.parse(`${local.date}T${local.time}:00Z`);
+    if(correction===0)break;
+    instant+=correction;
+  }
+  const local=vancouverParts(new Date(instant));
+  assert(local.date===clock.date&&local.time===lane.pulseTime,'Main pulse could not be resolved in America/Vancouver');
+  return {operatingDate:clock.date,canonicalSlot:lane.canonicalSlot,slot:lane.slot,scheduledAt:new Date(instant).toISOString()};
+}
+
 export function loadMainSchedule(root=DEFAULT_ROOT){
+  validateVancouverRuntime();
   const schedule=readJson(path.join(root,SCHEDULE_PATH));
   validateMainSchedule(schedule);
   return schedule;

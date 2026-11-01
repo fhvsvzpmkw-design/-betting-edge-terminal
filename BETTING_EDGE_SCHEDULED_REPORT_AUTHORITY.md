@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-10-31.Guy
+**Operating revision:** 2026-11-01.Timezone
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -13,6 +13,8 @@ For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer
 **NHL forecast corroboration — current from `2026-10-15T12:11:48-07:00`:** For NHL full-game moneyline forecast opinions, apply the October 15 section of `docs/FORECAST_DIRECTIONAL_LEANS.md` instead of the older single-point default below. LEAN requires two of MoneyPuck, DRatings and Dimers supporting the exact price, with an approved anchor at least 1.00 probability point above break-even. PuckCast remains research/comparison only. Use original provider records and retain contrary forecasts; two sources do not establish statistical independence. Supply `judgment.pinnacleReview` with an actual disagreement rationale and decision impact for an unfavorable signed Pinnacle gap. The existing builders bind and display both forecast points and this review; the publisher independently replays the original records and applicability. WAIT requires an actual concrete condition: the price-WAIT helper now computes a two-source/one-point reassessment price from two applicable approved forecasts, including when the lone positive anchor already clears one point. No second applicable approved point or defensible condition means a reviewed PASS or genuine research gap, not a manufactured WAIT. Use source-bound `INSUFFICIENT_CORROBORATION` where appropriate, and explain an earlier LEAN downgrade with its exact previous decision and the actual policy/source finding. Preserve $0/NO BET, independent-fair/BET requirements, other sport/market routes and historical bytes. This selectivity rule is not validated profitability or a numeric pick target. All five Main report tasks inherit it from authoritative main.
 
 ## Operating precedence
+
+**November 1 clock repair:** B.C. remains on UTC-7 year-round after March 2026. Preserve America/Vancouver and all five report times. Follow `docs/ODDS_RUN_REQUEST.md` and generate a scheduled request with `node tools/odds-run-request.mjs create --report-time <EXPECTED_REPORT_TIME>` from the actual clock; do not hand-build a winter offset. The shared schedule loader rejects obsolete timezone data, and the odds workflow installs current Node 24 before resolving the request. Preserve actual request/issue timestamps, the existing 10-minute request window, 75-minute pulse/input windows, slot receipts and no-duplicate-spend controls. Never retry the unchanged expired request to correct a timezone mismatch. A failed prior lane is not a current pregame report; resume eligible work in the current normal lane and preserve the exact prior failure.
 
 **Progress continuity — October 25:** Read the current progress section of `docs/PROJECT_STATE.md` before diagnosing or replacing this process. Verify current report checkpoint `status` / `next` and resume the existing queue; a dated project summary never overrides newer runtime evidence. After a substantive process repair or verified milestone, update that same progress entry with proof, existing owner and next action, and record changed operating decisions in `docs/DECISIONS.md`. Routine event work stays in the existing checkpoints. Keep tests, deployment, live acceptance and analytical completion distinct; do not add a second tracker or task.
 

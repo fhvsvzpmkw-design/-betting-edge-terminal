@@ -60,6 +60,15 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Set up the current timezone-aware Node runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          check-latest: true
+
+      - name: Verify Vancouver permanent Pacific time before provider access
+        run: node tools/main-schedule.mjs validate
+
       - name: Resolve permanent Main Betting Edge schedule
         id: schedule
         env:

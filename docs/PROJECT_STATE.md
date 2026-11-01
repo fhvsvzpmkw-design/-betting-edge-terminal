@@ -1,6 +1,6 @@
 # Betting Edge — Project State
 
-**Updated:** 2026-10-31 · America/Vancouver
+**Updated:** 2026-11-01 · America/Vancouver
 
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal` · `main`
 
@@ -15,6 +15,8 @@ This is the project progress and resumption index. Read this current section bef
 - [DECISIONS.md](DECISIONS.md) records durable choices. The historical snapshots below describe earlier states; their obsolete Core versions, card targets, scheduler descriptions and priorities do not override current operating authorities.
 
 ## Progress and exact next work
+
+**November 1 odds acquisition recovery (existing Main producer/collector):** The Open request at [688e6420](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/commit/688e6420a891eb78141c53759af41ccadfa48c57) used the retired winter offset. [Workflow 41309420836](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41309420836) rejected attempt 1 before the provider steps, then attempt 2 rejected its expired request. No provider calls or Nov. 1 receipt were produced. B.C.'s actual clock remains UTC-7; the scheduler's 13:00Z Open and 15:00Z Main times are correct. The bounded [D-042](DECISIONS.md#d-042--use-the-same-current-vancouver-clock-for-report-owned-odds) repair installs current Node 24 in the collector, checks the runtime's November/winter and historical clocks, and constructs canonical requests from the actual clock. Six local schedule/request/slot/entry/authority regression suites passed. Deployment and a current-lane collection/receipt are the next acceptance checks; report publication and analytical completion still require their existing producer/publisher/readback evidence. Preserve the failed Open lane; do not backdate it or consume a future slot.
 
 | Work | Verified status | Evidence / existing owner | Next action / close condition |
 |---|---|---|---|

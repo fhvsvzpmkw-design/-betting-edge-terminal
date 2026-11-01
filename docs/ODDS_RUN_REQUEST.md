@@ -10,6 +10,8 @@ After resolving the Main lane and before binding inputs or broad research, inspe
 
 Use a fresh `requestedAt` and a unique `requestId`. Resolve `scheduledAt` as that date's exact canonical pulse with the actual America/Vancouver UTC offset. The existing `scheduled_recovery` enum and `report-task-recovery` provenance remain compatibility names for this default method. Replace every example value with the actual lane/date/clock:
 
+**November 1 timezone repair:** B.C. remains on UTC-7 after March 2026. The odds workflow now installs current Node 24 rather than relying on Ubuntu's preinstalled Node/timezone data, and the shared schedule loader verifies both the new winter clock and historical PST before provider access. Generate the exact request with `node tools/odds-run-request.mjs create --report-time <HH:MM>` using the expected Main report time, then commit its complete JSON bytes. The command uses the actual current clock and canonical pulse, validates the unchanged 10-minute/75-minute windows, and avoids manually guessing `-07:00` or `-08:00`. A stale host fails with `VANCOUVER_TIMEZONE_DATA_OUTDATED`; use the configured runtime before constructing or resolving the request. Task schedules, provider budgets, deduplication and report freshness remain unchanged.
+
 ```json
 {
   "schema": 1,

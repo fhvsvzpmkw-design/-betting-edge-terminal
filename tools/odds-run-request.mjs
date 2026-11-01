@@ -2,9 +2,19 @@
 import {execFileSync} from 'node:child_process';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {resolveWorkflowSchedule} from './main-schedule.mjs';
+import {randomUUID} from 'node:crypto';
+import {plannedMainPulse,resolveWorkflowSchedule} from './main-schedule.mjs';
 
 const REQUEST_PATH = 'data/odds-run-request.json';
+
+export function buildScheduledOddsRunRequest({reportTime,now=new Date(),requestId,root=process.cwd()}) {
+  const pulse=plannedMainPulse({now,reportTime},root);
+  const request={schema:1,requestId:requestId||`${pulse.operatingDate}-${pulse.slot}-primary-${randomUUID()}`,
+    mode:'scheduled_recovery',requestedAt:now.toISOString(),scheduledAt:pulse.scheduledAt,
+    operatingDate:pulse.operatingDate,canonicalSlot:pulse.canonicalSlot};
+  resolveOddsRunRequest(request,{now,root});
+  return request;
+}
 
 export function resolveRecoverySlot({scheduledAt,operatingDate,canonicalSlot,now=new Date(),root=process.cwd()}) {
   const scheduled = new Date(typeof scheduledAt === 'string' ? scheduledAt : NaN);
@@ -80,8 +90,12 @@ export function requestOutputLines(result) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    if (process.argv[2] !== 'resolve') throw new Error('Use odds-run-request.mjs resolve');
-    console.log(requestOutputLines(resolveOddsRunRequest(readFrozenOddsRunRequest())));
+    if (process.argv[2] === 'create' && process.argv[3] === '--report-time' && process.argv.length === 5) {
+      console.log(JSON.stringify(buildScheduledOddsRunRequest({reportTime:process.argv[4]}),null,2));
+    } else {
+      if (process.argv[2] !== 'resolve' || process.argv.length !== 3) throw new Error('Use odds-run-request.mjs resolve | create --report-time <HH:MM>');
+      console.log(requestOutputLines(resolveOddsRunRequest(readFrozenOddsRunRequest())));
+    }
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;
