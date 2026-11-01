@@ -12,18 +12,20 @@ const state=api.selectBoard(board,{report});
 const shell=fs.readFileSync('syndicates/generated/guy-laflame/shell.html','utf8');
 const ledgerPath='data/characters/guy-laflame/value-ledger.json',ledger=fs.existsSync(ledgerPath)?json(ledgerPath):null;
 const callsPath='data/characters/guy-laflame/calls-ledger.json',calls=fs.existsSync(callsPath)?json(callsPath):null;
-const renderAt=calls?.updatedAt||ledger?.updatedAt||board.asOf;
+// Status uses the newest preserved input clock, not an old empty-ledger seed.
+const statusTimes=[calls?.updatedAt,ledger?.updatedAt,board.asOf,report?.ts].filter(value=>typeof value==='string'&&Number.isFinite(Date.parse(value)));
+const renderAt=statusTimes.sort((a,b)=>Date.parse(b)-Date.parse(a))[0]||board.asOf;
 const live='syndicates/generated/guy-laflame/hotline.html';
 const html=shell.replaceAll('{{PAGE_PATH}}',live).replace('{{DAILY_CALL}}',dailyCall.render(calls,{now:renderAt,id:'guyActualCall'})).replace('{{DAILY_PICK_RECORD}}',value.render(ledger,{now:ledger?.updatedAt||board.asOf,id:'guyDailyPick',history:false,valueHref:'runner.html'})).replace('{{DAILY_RUNDOWN}}',api.render(state,{now:report?.ts||board.asOf}));
 fs.writeFileSync(live,html);
 if(!process.argv.includes('--preview')){
   const shellSha256=crypto.createHash('sha256').update(shell).digest('hex');
   const rendererSha256=Object.fromEntries(['guy-blue-line','guy-value','guy-daily-call'].map(name=>[name,crypto.createHash('sha256').update(fs.readFileSync(new URL(`../assets/${name}.js`,import.meta.url))).digest('hex')]));
-  const digest=crypto.createHash('sha256').update(JSON.stringify({shellSha256,rendererSha256,data:{state,valueLedger:ledger,callsLedger:calls}})).digest('hex');
+  const digest=crypto.createHash('sha256').update(JSON.stringify({shellSha256,rendererSha256,statusAsOf:renderAt,data:{state,valueLedger:ledger,callsLedger:calls}})).digest('hex');
   const id=`${state.date}-blue-line-${digest.slice(0,12)}`;
   const editionPath=`data/characters/guy-laflame/editions/${id}.json`;
   const archivePath=`syndicates/generated/guy-laflame/archive/${state.date}/${id}.html`;
-  const edition={schema:1,id,characterId:'guy-laflame',shellId:'guy-blue-line',shellVersion:1,shellSha256,rendererSha256,source:'data/game-intelligence/board.json',sourceReport:latest?.path??null,state,...(ledger?{valueLedger:ledger}:{}),...(calls?{callsLedger:calls}:{})};
+  const edition={schema:1,id,characterId:'guy-laflame',shellId:'guy-blue-line',shellVersion:1,shellSha256,rendererSha256,statusAsOf:renderAt,source:'data/game-intelligence/board.json',sourceReport:latest?.path??null,state,...(ledger?{valueLedger:ledger}:{}),...(calls?{callsLedger:calls}:{})};
   const archive=html.replace('<base href="../../../">','<base href="../../../../../">').replaceAll(`href="${live}#`,`href="${archivePath}#`).replace(/<script data-blue-line-live>[\s\S]*?<\/script>/,'');
   for(const [file,text] of [[editionPath,JSON.stringify(edition,null,2)+'\n'],[archivePath,archive]]){
     if(fs.existsSync(file)&&fs.readFileSync(file,'utf8')!==text)throw Error(`Published Guy edition is immutable: ${file}`);

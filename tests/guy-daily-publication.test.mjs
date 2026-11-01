@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {DEFAULT_POLICY,buildShortlist,gitBlobSha,newCallsLedger,assertPublicationWindow} from '../tools/guy-daily-selection.mjs';
 
@@ -158,4 +159,35 @@ test('queued publications consume their own committed research and Git board sna
   const settledBytes=s.bytes(ledgerPath);s.publish('2026-11-02T03:05:00Z',['--refresh-only']);assert.deepEqual(s.bytes(ledgerPath),settledBytes);
   s.build();const finalSnapshot=s.snapshot();s.build();assert.deepEqual(s.snapshot(),finalSnapshot);
   assert.deepEqual(s.bytes('data/characters/guy-laflame/value-ledger.json'),benchmark,'actual-pick publication, expiry, lock and loss never mutate the historical MoneyPuck benchmark');
+});
+
+
+test('static call status uses preserved source clocks and keeps editions stable and immutable',t=>{
+  const s=sandbox(t),f=researchFixture(),seed='2026-10-31T04:00:00Z';
+  const calls=newCallsLedger(seed),benchmark=s.read('data/characters/guy-laflame/value-ledger.json');
+  benchmark.updatedAt=seed;s.write(ledgerPath,calls);s.write('data/characters/guy-laflame/value-ledger.json',benchmark);s.write(boardPath,f.bytes);
+  const inputPaths=[ledgerPath,'data/characters/guy-laflame/value-ledger.json',boardPath,'run-history.json'];
+  const inputs=inputPaths.map(file=>s.bytes(file));
+  s.build();const pointer=s.read('data/characters/guy-laflame/current-edition.json'),edition=s.read(pointer.path);
+  const html=s.bytes('syndicates/generated/guy-laflame/hotline.html').toString();
+  assert.match(html,/data-guy-call-state="WAITING"/);assert.match(html,/No researched pick has been published today/);
+  assert.equal(edition.statusAsOf,observed,'a current board must supersede the empty ledger’s prelaunch seed');
+  assert.doesNotMatch(html,/A new daily call from November 1|Guy is checking today’s shortlist/);
+  inputPaths.forEach((file,i)=>assert.deepEqual(s.bytes(file),inputs[i],'building must preserve source clocks and observations: '+file));
+  const legacyDigest=createHash('sha256').update(JSON.stringify({shellSha256:edition.shellSha256,rendererSha256:edition.rendererSha256,data:{state:edition.state,valueLedger:edition.valueLedger,callsLedger:edition.callsLedger}})).digest('hex');
+  assert.notEqual(pointer.id,`${edition.state.date}-blue-line-${legacyDigest.slice(0,12)}`,'the new status clock must not reuse the legacy edition identity');
+  const firstEdition=s.bytes(pointer.path),firstArchive=s.bytes(pointer.archivePath),built=s.snapshot();
+  s.build();assert.deepEqual(s.snapshot(),built,'unchanged inputs preserve the edition id and every output byte');
+
+  const reportAt='2026-11-01T15:40:00Z',reportPath='data/history/runs/2026-11-01/main-154000.json';
+  s.write(reportPath,{ts:reportAt,slot:'main',label:'Current report',recs:[]});s.write('run-history.json',{runs:[{ts:reportAt,path:reportPath}]});
+  const clocks=[['report',reportAt],['benchmark','2026-11-01T15:50:00Z'],['calls','2026-11-01T16:00:00Z'],['invalid-call','2026-11-01T15:50:00Z']];
+  for(const [source,expected] of clocks){
+    if(source==='benchmark'){benchmark.updatedAt=expected;s.write('data/characters/guy-laflame/value-ledger.json',benchmark);}
+    if(source==='calls'||source==='invalid-call'){calls.updatedAt=source==='calls'?expected:'invalid-clock';s.write(ledgerPath,calls);}
+    const preserved=inputPaths.map(file=>s.bytes(file));s.build();const current=s.read('data/characters/guy-laflame/current-edition.json');
+    assert.equal(s.read(current.path).statusAsOf,expected,source+' must select the latest valid preserved clock');
+    inputPaths.forEach((file,i)=>assert.deepEqual(s.bytes(file),preserved[i]));
+    assert.notEqual(current.id,pointer.id);assert.deepEqual(s.bytes(pointer.path),firstEdition);assert.deepEqual(s.bytes(pointer.archivePath),firstArchive);
+  }
 });
