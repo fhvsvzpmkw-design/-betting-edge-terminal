@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep the Meat Desk manifest synchronized with source-pdfs/*.pdf.
+"""Keep the Crypto Specials manifest synchronized with source-pdfs/*.pdf.
 
 The PDF folder is the active-library source of truth. Existing manifest metadata is
 preserved for files that remain present. Newly added PDFs are registered as
@@ -88,7 +88,7 @@ def infer_metadata(filename: str) -> dict:
         tags = ["RACING", year]
     else:
         desk = "GENERAL"
-        kind = "MEAT DESK SOURCE"
+        kind = "CRYPTO SPECIALS SOURCE"
         season = year
         tags = [year] if year != "CURRENT" else []
 
@@ -117,7 +117,7 @@ def new_entry(pdf: Path) -> dict:
         "publicationStatus": "PRIVATE // NOT PUBLISHED",
         "reviewedAt": None,
         "publishedAt": None,
-        "use": "Private Meat Desk reference source. Existing Betting Edge engine remains the betting-decision layer.",
+        "use": "Private Crypto Specials reference source. Existing Betting Edge engine remains the betting-decision layer.",
         "notes": "Registered from source-pdfs. No automatic analysis. Full-source review is triggered only after the source is manually uploaded to ChatGPT and approved for analysis.",
     }
 
@@ -139,7 +139,7 @@ def load_review_patches() -> list[dict]:
             with path.open("r", encoding="utf-8") as handle:
                 payload = json.load(handle)
         except (OSError, json.JSONDecodeError) as exc:
-            raise RuntimeError(f"Invalid Meat Desk review metadata: {path}: {exc}") from exc
+            raise RuntimeError(f"Invalid Crypto Specials review metadata: {path}: {exc}") from exc
         patch = payload.get("manifestPatch")
         if not isinstance(patch, dict):
             continue
@@ -174,7 +174,7 @@ def apply_review_patches(sources: list[dict], patches: list[dict]) -> list[dict]
             continue
         if len(matches) > 1:
             raise RuntimeError(
-                f"Review metadata matched multiple Meat Desk sources: {review['path']}"
+                f"Review metadata matched multiple Crypto Specials sources: {review['path']}"
             )
         target = matches[0]
         target.update(review["patch"])
@@ -227,7 +227,7 @@ def main() -> None:
     sources = apply_review_patches(sources, load_review_patches())
 
     manifest["schema"] = max(int(manifest.get("schema", 0) or 0), 3)
-    manifest["title"] = manifest.get("title") or "Meat Desk Source Library"
+    manifest["title"] = manifest.get("title") or "Crypto Specials Source Library"
     manifest["updatedAt"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     manifest["sourceFolder"] = "research/season-previews/source-pdfs/"
     policy = dict(DEFAULT_POLICY)
@@ -241,7 +241,7 @@ def main() -> None:
 
     removed = [source.get("file") for source in existing_sources if isinstance(source, dict) and source.get("file") not in present_names]
     added = [pdf.name for pdf in pdfs if pdf.name not in existing_by_file]
-    print(f"Meat Desk sync complete: {len(sources)} active source(s)")
+    print(f"Crypto Specials sync complete: {len(sources)} active source(s)")
     if added:
         print("Added: " + ", ".join(added))
     if removed:
@@ -252,3 +252,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

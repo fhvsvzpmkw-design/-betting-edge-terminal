@@ -130,7 +130,9 @@ function moduleControl(module){
   return '';
 }
 function effectLabel(id){
-  return ({meter_presentation:'Applies now.',card_view:'Applies now.',startup_screen:'Applies next time you open VigScope.',history_landing:'Applies next time you open Bet History.',recommendation_detail:'Applies now.',syndicate_load:'Used on your next Syndicate visit.',meat_desk_analysis:'Used for your next manual Meat Desk review.',crypto_specials_analysis:'Used for your next manual Crypto Specials review.'})[id]||'';
+  // Module IDs retain their desk names; data/preferences.json keeps the legacy
+  // storage keys with each workflow to preserve saved manual review depths.
+  return ({meter_presentation:'Applies now.',card_view:'Applies now.',startup_screen:'Applies next time you open VigScope.',history_landing:'Applies next time you open Bet History.',recommendation_detail:'Applies now.',syndicate_load:'Used on your next Syndicate visit.',meat_desk_analysis:'Used for your next manual Meat Desk web-source review. The daily scrape uses GOD MODE.',crypto_specials_analysis:'Used for your next manual Crypto Specials source review.'})[id]||'';
 }
 function feedbackHtml(id){
   const state=feedback.get(id);
@@ -482,4 +484,5 @@ Promise.all([
   window.addEventListener('pageshow',()=>{const d=appDoc();if(d){render(d);applyDetailDefaults(d)}});
 }).catch(e=>console.warn('Preferences framework unavailable',e));
 })();
+
 

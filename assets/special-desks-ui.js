@@ -10,6 +10,8 @@ const PREF_ID='runnerPreferencesF6';
 const PIZZA_PANEL='runnerPizzaWorkspace';
 const CRYPTO_PANEL='runnerCryptoWorkspace';
 const STYLE_ID='runnerSpecialDesksStyle';
+// Compatibility paths, IDs and saved review depth follow the daily web workflow.
+// Its public destination is Meat Desk; Crypto Specials now opens the PDF library.
 const CRYPTO_ANALYSIS_MODE_KEY='bettingEdge.preferences.cryptoSpecialsAnalysisMode';
 let pizza=null,crypto=null,lastDoc=null,observer=null;
 
@@ -37,7 +39,7 @@ function cryptoButtonMessage(){
   const sourceCount=crypto?.source?.url?1:(Array.isArray(crypto?.items)?crypto.items.length:0);
   const cardCount=Array.isArray(crypto?.board?.cards)?crypto.board.cards.filter(x=>String(x?.status||'').toUpperCase()!=='PASS').length:0;
   const cardText=cardCount?` // ${cardCount} LIVE CARD${cardCount===1?'':'S'}`:'';
-  return `${sourceCount} WEB SOURCE${sourceCount===1?'':'S'} // ${publishedModeLabel()}${cardText}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN`;
+  return `${sourceCount} WEB SOURCE${sourceCount===1?'':'S'} // ${publishedModeLabel()}${cardText}&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN`;
 }
 function pizzaButtonMessage(){
   if(String(pizza?.status||'').toUpperCase()==='PLAY'&&pizza?.play)return `LOU TWO SLICE // 1 COMPELLED VIGSCOPE CARD&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN`;
@@ -62,12 +64,12 @@ function ensureStyle(d){
     #runnerSyndicateF5:hover,#runnerSyndicateF5.loaded{box-shadow:inset 0 0 0 1px rgba(255,240,170,.16),0 0 16px rgba(255,210,80,.26),0 0 30px rgba(255,210,80,.12)!important;text-shadow:0 0 8px rgba(255,225,125,.42),0 0 16px rgba(255,216,106,.18)!important}
     #${PIZZA_ID}{border-color:#c97035!important;color:#ffd7a3!important;background:#100704!important;box-shadow:inset 0 0 0 1px rgba(255,166,80,.05),0 0 10px rgba(220,105,35,.08)!important}
     #${PIZZA_ID}:hover,#${PIZZA_ID}.active{border-color:#ff9a49!important;color:#fff0c9!important;background:#1a0a04!important}
-    #${CRYPTO_ID}{border-color:#6552a8!important;color:#cfc4ff!important;background:#070611!important;box-shadow:inset 0 0 0 1px rgba(156,130,255,.05),0 0 10px rgba(93,70,180,.08)!important}
-    #${CRYPTO_ID}:hover,#${CRYPTO_ID}.active{border-color:#9c87ff!important;color:#eee9ff!important;background:#0d0a1c!important;box-shadow:inset 0 0 0 1px rgba(185,165,255,.08),0 0 15px rgba(130,94,255,.16)!important}
-    .specialMain{display:block;font-size:inherit}.specialMessage{display:block;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}.pizzaMessage{color:#c98a59}.cryptoMessage{color:#9e91dc}
+    #${CRYPTO_ID}{border-color:#9b5b50!important;color:#ffd0bb!important;background:#0a0505!important;box-shadow:inset 0 0 0 1px rgba(156,130,255,.05),0 0 10px rgba(93,70,180,.08)!important}
+    #${CRYPTO_ID}:hover,#${CRYPTO_ID}.active{border-color:#ed9179!important;color:#ffe2d8!important;background:#140706!important;box-shadow:inset 0 0 0 1px rgba(185,165,255,.08),0 0 15px rgba(130,94,255,.16)!important}
+    .specialMain{display:block;font-size:inherit}.specialMessage{display:block;font-size:8px;font-weight:900;letter-spacing:.11em;line-height:1.35}.pizzaMessage{color:#c98a59}.cryptoMessage{color:#c88f80}
     #${PIZZA_PANEL},#${CRYPTO_PANEL}{display:none;margin:0 10px 16px;padding:14px;min-height:65vh;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
     #${PIZZA_PANEL}{--deskAccent:#ff9a49;--deskAccentSoft:#c98a59;--deskLine:#75421f;border:1px solid #75421f;background:radial-gradient(circle at 50% -18%,rgba(183,76,24,.22),transparent 46%),linear-gradient(180deg,#100703,#030303);color:#ecd8c4;box-shadow:inset 0 0 30px rgba(255,137,55,.025),0 0 18px rgba(172,73,24,.08)}
-    #${CRYPTO_PANEL}{--deskAccent:#9c87ff;--deskAccentSoft:#9e91dc;--deskLine:#514379;border:1px solid #514379;background:radial-gradient(circle at 50% -18%,rgba(92,63,184,.16),transparent 44%),linear-gradient(180deg,#06050d,#020306 58%,#010204);color:#ddd8f6;box-shadow:inset 0 0 30px rgba(124,91,222,.03),0 0 18px rgba(82,58,164,.08);font-size:18px}
+    #${CRYPTO_PANEL}{--deskAccent:#ed9179;--deskAccentSoft:#c88f80;--deskLine:#70473c;border:1px solid #70473c;background:radial-gradient(circle at 50% -18%,rgba(92,63,184,.16),transparent 44%),linear-gradient(180deg,#06050d,#020306 58%,#010204);color:#ddd8f6;box-shadow:inset 0 0 30px rgba(124,91,222,.03),0 0 18px rgba(82,58,164,.08);font-size:18px}
     body.runnerPizzaLoaded .top,body.runnerCryptoLoaded .top{display:none!important}
     body.runnerPizzaLoaded .runnerNavPad,body.runnerCryptoLoaded .runnerNavPad{padding-top:8px!important;padding-bottom:0!important;margin-top:0!important}
     body.runnerPizzaLoaded .runnerNavPad .tabs>.btn:not(#${PIZZA_ID}){display:none!important}
@@ -80,13 +82,13 @@ function ensureStyle(d){
     .cryptoSourceBar{display:grid;grid-template-columns:minmax(0,1.35fr) repeat(3,minmax(110px,.65fr));gap:0;margin-top:11px;border:1px solid #3d315d;background:linear-gradient(180deg,#090814,#05050b)}.cryptoSourceCell{border:0;border-left:1px solid #302744;background:transparent;padding:8px 10px;min-width:0}.cryptoSourceCell:first-child{border-left:0}.cryptoSourceCell small{display:block;color:#746b91;font-size:8px;font-weight:950;letter-spacing:.12em;margin-bottom:3px}.cryptoSourceCell strong,.cryptoSourceCell a{display:block;color:#c8c0e5;font-size:11px;font-weight:950;line-height:1.3;letter-spacing:.04em;text-decoration:none;overflow-wrap:anywhere}.cryptoSourceCell a:hover{color:#fff}.cryptoSourceCell.cryptoNoVig strong{color:#8f86ab}
     .cryptoSummary{margin-top:9px;border-left:3px solid #785dbd;background:#080710;padding:9px 11px;color:#9f97b7;font-size:11px;line-height:1.5;letter-spacing:.02em}.cryptoSummary b{color:#d6d0e8;letter-spacing:.08em}
     .cryptoBoard{display:grid;grid-template-columns:1fr;gap:11px;margin-top:12px}
-    .cryptoPick{--status:#9c87ff;position:relative;width:100%;border:1px solid #4b4163;border-left:4px solid var(--status);background:linear-gradient(180deg,#070914,#04060c);padding:13px 14px;box-shadow:inset 0 0 0 1px rgba(191,176,255,.018),0 0 10px rgba(0,0,0,.22);font-size:16px}
+    .cryptoPick{--status:#ed9179;position:relative;width:100%;border:1px solid #4b4163;border-left:4px solid var(--status);background:linear-gradient(180deg,#070914,#04060c);padding:13px 14px;box-shadow:inset 0 0 0 1px rgba(191,176,255,.018),0 0 10px rgba(0,0,0,.22);font-size:16px}
     .cryptoPick[data-status="PLAY"]{--status:#58ff88}.cryptoPick[data-status="WAIT"]{--status:#5edcff}.cryptoPick[data-status="WATCH"]{--status:#ffd36b}.cryptoPick[data-status="PASS"]{--status:#ff738a}
     .cryptoTopLine{display:flex;justify-content:space-between;align-items:center;gap:12px}.cryptoStatusTag{display:inline-block;border:1px solid var(--status);color:var(--status);background:color-mix(in srgb,var(--status) 6%,#03060b);padding:5px 10px;font-size:14px;font-weight:950;letter-spacing:.11em;box-shadow:0 0 9px color-mix(in srgb,var(--status) 14%,transparent)}.cryptoGrade{color:#9e96b3;font-size:10px;font-weight:950;letter-spacing:.12em;white-space:nowrap}.cryptoGrade b{color:#d8d1e9;font-size:13px;margin-left:4px}.cryptoPick h3{margin:9px 0 0;color:#f2eff8;font-size:22px;line-height:1.18;letter-spacing:.045em;text-transform:uppercase}.cryptoMarket{margin-top:5px;color:#8d85a4;font-size:12px;font-weight:900;letter-spacing:.075em}
     .cryptoValueStrip{margin-top:12px;background:#040710;border:1px solid #514172;padding:10px 11px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cryptoValueCell{min-width:0}.cryptoValueCell small{display:block;color:#776e8b;font-size:9px;font-weight:950;letter-spacing:.11em;margin-bottom:5px}.cryptoValueCell strong{display:block;color:#ebe7f5;font-size:21px;font-weight:950;line-height:1.2;overflow-wrap:anywhere}.cryptoValueCell.fair strong{color:#c9c1df}.cryptoValueCell.target strong{color:var(--status)}
     .cryptoActionLine{margin-top:8px;display:flex;align-items:center;gap:9px;border-left:3px solid var(--status);background:color-mix(in srgb,var(--status) 4%,#070811);padding:8px 10px;color:#c5bed5;font-size:12px;font-weight:900;letter-spacing:.055em}.cryptoActionLine b{color:var(--status);font-size:13px;letter-spacing:.08em}.cryptoActionLine span{color:#938aa7}
     .cryptoEventMeta{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:8px;padding:7px 1px 0;border:0;border-top:1px solid #272237;background:transparent;color:#91899f;font-size:11px;font-weight:800;line-height:1.4;letter-spacing:.025em}.cryptoEventMeta span{white-space:normal}.cryptoEventMeta b{color:#aaa1bf;font-size:9px;letter-spacing:.08em}.cryptoEventMeta .eventStart{color:#c7c0d5}.cryptoEventMeta .eventStart b{color:var(--status)}
-    .cryptoWhy{margin-top:9px;padding:0 1px;color:#b6afc2;font-size:14px;line-height:1.5}.cryptoWhy b{display:block;margin-bottom:3px;color:var(--status);font-size:10px;letter-spacing:.10em}.cryptoSourceNote{margin-top:8px;color:#716a7d;font-size:10px;line-height:1.4;letter-spacing:.025em}.cryptoSourceNote b{color:#938b9f}.cryptoAnalysisBtn{width:100%;margin-top:9px;font:inherit;font-size:11px;font-weight:950;padding:8px 10px;background:#0b0814;color:#b9ace6;border:1px solid #574586;cursor:pointer;letter-spacing:.075em}.cryptoAnalysisBtn:hover{border-color:#8d75d5;color:#eee9ff}
+    .cryptoWhy{margin-top:9px;padding:0 1px;color:#b6afc2;font-size:14px;line-height:1.5}.cryptoWhy b{display:block;margin-bottom:3px;color:var(--status);font-size:10px;letter-spacing:.10em}.cryptoSourceNote{margin-top:8px;color:#716a7d;font-size:10px;line-height:1.4;letter-spacing:.025em}.cryptoSourceNote b{color:#938b9f}.cryptoAnalysisBtn{width:100%;margin-top:9px;font:inherit;font-size:11px;font-weight:950;padding:8px 10px;background:#0b0814;color:#b9ace6;border:1px solid #574586;cursor:pointer;letter-spacing:.075em}.cryptoAnalysisBtn:hover{border-color:#8d75d5;color:#ffe2d8}
     .cryptoDetail{margin-top:8px;border:1px dotted #4b3e64;background:#03050a;padding:10px;display:none;color:#9d95ad;font-size:13px;line-height:1.5}.cryptoDetail.open{display:block}.cryptoDetailFull{padding:1px 2px 10px;border-bottom:1px solid #292237;margin-bottom:9px}.cryptoDetailFull small{display:block;color:#827993;font-size:9px;font-weight:950;letter-spacing:.11em;margin-bottom:5px}.cryptoDetailFull p{margin:0;color:#b8b0c4;font-size:13px;line-height:1.55}.cryptoDetailGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.cryptoDetailCell{border:1px solid #292337;background:#060710;padding:8px}.cryptoDetailCell small{display:block;color:#71697f;font-size:9px;font-weight:950;letter-spacing:.10em;margin-bottom:4px}.cryptoDetailCell strong{display:block;color:#c3bbd2;font-size:12px;line-height:1.4}
     .cryptoPasses{margin-top:12px;border:1px solid rgba(94,76,143,.30);background:rgba(8,6,18,.60)}.cryptoPasses summary{cursor:pointer;list-style:none;padding:9px 11px;color:#9a90b3;font-size:11px;font-weight:950;letter-spacing:.11em}.cryptoPasses summary::-webkit-details-marker{display:none}.cryptoPasses[open] summary{border-bottom:1px solid rgba(94,76,143,.24)}.cryptoPassList{display:grid;gap:7px;padding:9px}.cryptoPass{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;border-left:3px solid #ff738a;background:#07070d;padding:9px}.cryptoPass strong{color:#bbb4c7;font-size:13px;letter-spacing:.05em}.cryptoPass span{display:block;margin-top:3px;color:#817a8d;font-size:11px;line-height:1.4}.cryptoPass b{color:#ff8295;font-size:11px;letter-spacing:.08em}.cryptoTimestamp{margin-top:10px;text-align:right;color:#6e667e;font-size:10px;font-weight:900;letter-spacing:.08em}
     @media(max-width:900px){.pizzaMarketStrip{grid-template-columns:repeat(2,minmax(0,1fr))}.pizzaExplainGrid{grid-template-columns:1fr}.cryptoDetailGrid{grid-template-columns:1fr}}
@@ -319,10 +321,10 @@ function panelHtml(kind,data){
   if(kind==='pizza')return pizzaPanelHtml(data||{});
   if(kind==='crypto'&&data?.board)return cryptoPanelHtml(data);
   const items=Array.isArray(data?.items)?data.items:[];
-  const title='CRYPTO SPECIALS';
-  const desc='PREMIUM WEB LINKS // CRYPTO ANALYSIS // SPECIAL COLLECTION';
+  const title='MEAT DESK';
+  const desc='DAILY WEB INTELLIGENCE // SOURCE + MARKET ANALYSIS';
   const badge=`${items.length} WEB SOURCE${items.length===1?'':'S'} // ${cryptoAnalysisModeLabel()}`;
-  const emptyTitle='THE VAULT IS EMPTY';
+  const emptyTitle='NO WEB ANALYSIS PUBLISHED';
   const emptyText='Add one curated web-page URL here. New sources remain pending until an analysis is published.';
   return `<div class="specialHead deskStatusRail cryptoHead"><div class="specialBadge cryptoBadge">${badge}</div></div><div class="deskSectionBar"><b>SOURCE COLLECTION</b><span>CURATED WEB INTELLIGENCE</span></div>${items.length?`<div class="specialShelf">${items.map(x=>itemCard(x,kind)).join('')}</div>`:`<div class="specialEmpty"><strong>${emptyTitle}</strong><span>${emptyText}</span></div>`}`;
 }
@@ -332,7 +334,7 @@ function bindCryptoDetails(d){
 }
 function ensurePanel(d,id,kind,data){
   const tabs=d.querySelector('.runnerNavPad .tabs')||d.querySelector('.tabs');const nav=tabs?.parentElement;if(!nav)return null;
-  let p=d.getElementById(id);if(!p){p=d.createElement('section');p.id=id;p.setAttribute('aria-label',kind==='pizza'?'Pizza Plays':'Crypto Specials');nav.insertAdjacentElement('afterend',p)}
+  let p=d.getElementById(id);if(!p){p=d.createElement('section');p.id=id;p.setAttribute('aria-label',kind==='pizza'?'Pizza Plays':'Meat Desk');nav.insertAdjacentElement('afterend',p)}
   const key=JSON.stringify([data||{},kind==='crypto'?cryptoAnalysisModeLabel():'']);if(p.dataset.key!==key){p.dataset.key=key;p.innerHTML=panelHtml(kind,data);if(kind==='crypto')p.dataset.detailBound=''}if(kind==='crypto')bindCryptoDetails(d);return p;
 }
 function buttonHtml(key,title,msg,kind){return `<span class="specialMain"><b>[${key}]</b>&nbsp; ${title}</span><span class="specialMessage ${kind}Message">${msg}</span>`}
@@ -346,9 +348,10 @@ function ensureButtons(d){
   const pizzaHtml=buttonHtml('F5','🍕 PIZZA PLAYS 🍕',pizzaButtonMessage(),'pizza');if(p.innerHTML!==pizzaHtml)p.innerHTML=pizzaHtml;
   let c=d.getElementById(CRYPTO_ID);if(!c){c=d.createElement('button');c.type='button';c.id=CRYPTO_ID;c.className='btn'}
   if(c.dataset.specialDeskOpenBound!=='1'){c.dataset.specialDeskOpenBound='1';c.addEventListener('click',()=>{const open=!d.body.classList.contains('runnerCryptoLoaded');closeAllDesks(d);if(open){d.body.classList.add('runnerCryptoLoaded');c.classList.add('active');ensurePanel(d,CRYPTO_PANEL,'crypto',crypto)}})}
-  const cryptoHtml=buttonHtml('F6','🔒 CRYPTO SPECIALS 🔒',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
-  meat.setAttribute('aria-label','Meat Desk');
-  const ordered=[board,market,history,f5,p,c,meat,engine,pref].filter(Boolean),current=[...tabs.children].filter(node=>ordered.includes(node));
+  const cryptoHtml=buttonHtml('F7','🥩 MEAT DESK 🥩',cryptoButtonMessage(),'crypto');if(c.innerHTML!==cryptoHtml)c.innerHTML=cryptoHtml;
+  c.setAttribute('aria-label','Meat Desk');
+  meat.setAttribute('aria-label','Crypto Specials');
+  const ordered=[board,market,history,f5,p,meat,c,engine,pref].filter(Boolean),current=[...tabs.children].filter(node=>ordered.includes(node));
   if(current.length!==ordered.length||ordered.some((node,index)=>current[index]!==node))ordered.forEach(node=>tabs.appendChild(node));
   if(meat.dataset.specialDeskBound!=='1'){meat.dataset.specialDeskBound='1';meat.addEventListener('click',()=>closeSpecial(d))}
   if(pref.dataset.specialDeskBound!=='1'){pref.dataset.specialDeskBound='1';pref.addEventListener('click',()=>closeSpecial(d))}
@@ -359,11 +362,11 @@ function ensureButtons(d){
 function bindKeys(d){
   const w=d.defaultView;if(!w||w.__specialDeskKeysBound)return;w.__specialDeskKeysBound=true;
   w.addEventListener('keydown',e=>{
-    if(!['F5','F6'].includes(e.key))return;
+    if(!['F5','F7'].includes(e.key))return;
     const target=e.target;if(target?.closest?.('input,select,textarea,[contenteditable="true"]'))return;
     e.preventDefault();e.stopImmediatePropagation();
     if(e.key==='F5')d.getElementById(PIZZA_ID)?.click();
-    if(e.key==='F6')d.getElementById(CRYPTO_ID)?.click();
+    if(e.key==='F7')d.getElementById(CRYPTO_ID)?.click();
   },true);
 }
 function attach(){
@@ -379,3 +382,4 @@ Promise.all([
 let tries=0;const timer=setInterval(()=>{tries++;if(attach()||tries>250)clearInterval(timer)},40);
 window.addEventListener('pageshow',()=>{const d=appDoc();if(d){bindKeys(d);ensureButtons(d)}});
 })();
+

@@ -76,9 +76,11 @@ The five-primary-slot cap, same-slot deduplication, provider budgets and explici
 
 [CARD_GRADING_AUTHORITY.md](CARD_GRADING_AUTHORITY.md) governs the existing native 03:00 Vancouver grader and 03:30 verification/fallback task. Grade all pending previous-day and older events without the retired 20/10 quotas. Preserve issued decisions and verify observation/result-index publication and exact remaining cases. Hypothetical LEAN/WAIT/PASS outcomes never change the bankroll or betting ledger.
 
-## Crypto Specials
+## Meat Desk and Crypto Specials
 
-Crypto Specials uses its existing independent editorial task and output paths. Its current task configuration controls timing; Main report times do not reschedule it. It does not own Core decisions, Main report History, bankrolls or stakes. Exact enabled combat watches retain their approved collector scope.
+Meat Desk runs the existing independent daily Bad Left Hook editorial task. It retains `data/crypto-specials.json` and `data/crypto-fight-watch.json` as compatibility paths. Crypto Specials now opens the manual source bookshelf at `research/season-previews/manifest.json`, with approved findings and private source PDFs. Opening the bookshelf does not trigger analysis.
+
+The daily Meat Desk task uses its existing output paths. Its current task configuration controls timing; Main report times do not reschedule it. It does not own Core decisions, Main report History, bankrolls or stakes. Exact enabled combat watches retain their approved collector scope.
 
 ## Durable history
 
@@ -136,3 +138,4 @@ For direct edits:
 8. restore the exact prior Git version on regression rather than reconstructing by hand.
 
 Higher-risk files—runner, odds workflows, scheduler logic, production Core/Contract integration, Research governance and ledger boundaries—require stricter before/after validation.
+

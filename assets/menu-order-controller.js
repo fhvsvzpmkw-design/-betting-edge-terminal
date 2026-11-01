@@ -17,8 +17,8 @@ const DEFINITIONS={
   history:{selector:'.btn[data-view="history"]',key:'F3',html:'<span class="primaryMenuMain"><b>[F3]</b>&nbsp; 🎟️ BET HISTORY 🎟️</span><span class="primaryMenuMessage">BET HISTORY&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F3] TO OPEN</span>'},
   syndicate:{selector:'#runnerSyndicateF5',id:'runnerSyndicateF5',key:'F4',html:'<span class="canonicalMenuMain"><b>[F4]</b>&nbsp; 💵 SYNDICATE 💵</span><span class="canonicalMenuMessage">DISCONNECTED&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F4] TO LOAD SYNDICATE</span>'},
   pizza:{selector:'#runnerPizzaF6',id:'runnerPizzaF6',key:'F5',html:'<span class="canonicalMenuMain"><b>[F5]</b>&nbsp; 🍕 PIZZA PLAYS 🍕</span><span class="canonicalMenuMessage">LOU TWO SLICE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F5] TO OPEN</span>'},
-  crypto:{selector:'#runnerCryptoF7',id:'runnerCryptoF7',key:'F6',html:'<span class="canonicalMenuMain"><b>[F6]</b>&nbsp; 🔒 CRYPTO SPECIALS 🔒</span><span class="canonicalMenuMessage">DAILY WEB INTELLIGENCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN</span>'},
-  meat:{selector:'#runnerSeasonPreviewF6',id:'runnerSeasonPreviewF6',key:'F7',html:'<span class="canonicalMenuMain"><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="canonicalMenuMessage">PRIVATE RESEARCH DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN</span>'},
+  crypto:{selector:'#runnerSeasonPreviewF6',id:'runnerSeasonPreviewF6',key:'F6',html:'<span class="canonicalMenuMain"><b>[F6]</b>&nbsp; 🔒 CRYPTO SPECIALS 🔒</span><span class="canonicalMenuMessage">PRIVATE RESEARCH DESK&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F6] TO OPEN</span>'},
+  meat:{selector:'#runnerCryptoF7',id:'runnerCryptoF7',key:'F7',html:'<span class="canonicalMenuMain"><b>[F7]</b>&nbsp; 🥩 MEAT DESK 🥩</span><span class="canonicalMenuMessage">DAILY WEB INTELLIGENCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F7] TO OPEN</span>'},
   engine:{selector:'.btn[data-view="engine"]',key:'F8',html:'<span class="primaryMenuMain"><b>[F8]</b>&nbsp; 🧠 VIGSCOPE VALUE 🧠</span><span class="primaryMenuMessage">VALUE + PERFORMANCE&nbsp;&nbsp; // &nbsp;&nbsp;PRESS [F8] TO OPEN</span>'},
   preferences:{selector:'#runnerPreferencesF6',id:'runnerPreferencesF6',key:'TAB',html:'<span class="canonicalMenuMain"><b>[TAB]</b>&nbsp; ⚙ PREFERENCES</span><span class="canonicalMenuMessage">OPERATIONS + DISPLAY&nbsp;&nbsp; // &nbsp;&nbsp;PRESS TO OPEN</span>'}
 };
@@ -144,3 +144,4 @@ const timer=setInterval(()=>{
   if((d&&reconcile(d))||tries>=150)clearInterval(timer);
 },40);
 })();
+

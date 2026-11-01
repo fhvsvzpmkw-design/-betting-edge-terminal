@@ -456,3 +456,16 @@ Place ephemeral producer mutexes under `os.tmpdir()/betting-edge-report-locks`, 
 **Verification:** On the captured complete revision 26 document, compact encoding reduced transfer from 3,475,945 to 2,377,384 bytes (31.60%) while all 126 receipts, 112 candidate cards and full evidence round-tripped through both original and current readers. Decoded length/SHA and corruption rejection passed; the existing frozen bundle string, length and Git SHA remained exact. The mutex regression held a real producer child open: another producer on the same checkpoint failed with `EEXIST` without removing its lock, other roots/checkpoints proceeded independently, successful retime/reacquire roundtrips passed, and a thrown action released its lock. Pre-existing adjacent artifacts were ignored without deletion. Existing transfer retry/exact-trigger extraction tests remain required.
 
 **Reason:** Resume valid work reliably without changing analytical eligibility, quote clocks, schedules, odds budgets, the single staged publisher or historical records.
+
+
+## D-044 — Swap Meat Desk and Crypto Specials workflows
+
+**Status:** IMPLEMENTED; local menu, return-path, cascade and preferences regression suites passed. Production commit/readback and live acceptance are recorded in PROJECT_STATE.md.
+
+Meat Desk is the daily Bad Left Hook website discovery, Level 3 / God Mode analysis, market pass and current-day board. Rename the existing daily automation to Meat Desk Daily while retaining its configured source, schedule, watchlist, permitted writes and pricing boundaries. Crypto Specials is the former Meat Desk manual source library with up to four bookshelf slots, private PDFs and approved published findings. Opening it never triggers analysis. This user-directed swap supersedes D-034's public desk name; the editorial independence and all existing analysis boundaries remain.
+
+Menu order and art stay attached to the public names: Crypto Specials / F6 / lock opens the library; Meat Desk / F7 / meat opens daily web intelligence. Preserve legacy element IDs, body classes and file paths to avoid breaking existing readers, writers and combat-watch priority: `data/crypto-specials.json` and `data/crypto-fight-watch.json` still serve the daily web workflow; `research/season-previews/manifest.json` serves the library. The source sync workflow/script paths remain compatible while their public labels say Crypto Specials. Stored review depths also follow the original workflows: the library retains `meatDeskAnalysisMode`, the web workflow retains `cryptoSpecialsAnalysisMode`. Preferences show their new public names; the daily scheduled task still uses God Mode independently of manual-review settings.
+
+**Verification:** Existing menu-style, legacy CSS cascade, specialty-return and preferences suites pass; JavaScript syntax, JSON structure and Python compilation pass. Source data and all analytical findings remain attached to the same workflows; only desk metadata, presentation and task naming change.
+
+**Reason:** Apply the user's requested product roles consistently without introducing a second task, extra odds collection, historical rewrites or a data migration.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply approved small publicFindings overrides after the normal Meat Desk source sync.
+"""Apply approved small publicFindings overrides after the normal Crypto Specials source sync.
 
 Review sidecars may optionally include a top-level publicFindingsPatch object. This
 allows a source's presentation metadata to change without duplicating or replacing
@@ -21,7 +21,7 @@ def main() -> None:
 
     sources = manifest.get("sources")
     if not isinstance(sources, list):
-        raise RuntimeError("Meat Desk manifest sources must be a list")
+        raise RuntimeError("Crypto Specials manifest sources must be a list")
 
     changed = False
     for path in sorted(PRIVATE_DIR.glob("*-manifest.json")):
@@ -44,7 +44,7 @@ def main() -> None:
         ]
         if len(matches) != 1:
             raise RuntimeError(
-                f"publicFindingsPatch must match exactly one Meat Desk source: {path}"
+                f"publicFindingsPatch must match exactly one Crypto Specials source: {path}"
             )
 
         target = matches[0]
@@ -64,3 +64,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

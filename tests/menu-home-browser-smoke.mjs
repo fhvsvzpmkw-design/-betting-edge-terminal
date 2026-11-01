@@ -90,7 +90,7 @@ try{
     };
     requestAnimationFrame(inspect);
   });
-  const sections={board:'runnerPrimaryViewLoaded',market:'runnerPrimaryViewLoaded',history:'runnerPrimaryViewLoaded',syndicate:'runnerSyndicateLoaded',pizza:'runnerPizzaLoaded',crypto:'runnerCryptoLoaded',meat:'runnerSeasonPreviewsLoaded',engine:'runnerPrimaryViewLoaded',preferences:'runnerPreferencesLoaded'};
+  const sections={board:'runnerPrimaryViewLoaded',market:'runnerPrimaryViewLoaded',history:'runnerPrimaryViewLoaded',syndicate:'runnerSyndicateLoaded',pizza:'runnerPizzaLoaded',crypto:'runnerSeasonPreviewsLoaded',meat:'runnerCryptoLoaded',engine:'runnerPrimaryViewLoaded',preferences:'runnerPreferencesLoaded'};
   for(const [width,height] of [[390,650],[834,1000],[1194,650]]){
     await page.setViewport({width,height,deviceScaleFactor:1});
     for(const [id,section] of Object.entries(sections)){
@@ -169,3 +169,4 @@ try{
   }));}
   throw error;
 }finally{await browser.close();}
+

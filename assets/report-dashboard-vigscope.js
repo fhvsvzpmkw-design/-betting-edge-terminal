@@ -120,7 +120,7 @@
     document.head.appendChild(script);
   }
 
-  // Install Pizza and Crypto navigation before Meat Desk binds F7. The final
+  // Install Pizza and the Meat Desk daily web board before Crypto binds F6. The final
   // menu order is F4 Syndicate, F5 Pizza, F6 Crypto, F7 Meat, F8 Results.
   const specialDesks=document.createElement('script');
   specialDesks.id='specialDesksUiLoader';
@@ -128,7 +128,7 @@
   specialDesks.async=false;
   document.head.appendChild(specialDesks);
 
-  // Meat Desk source library. Preferences remains re-keyed to TAB and stays
+  // Crypto Specials source library. Preferences remains re-keyed to TAB and stays
   // the permanent lowest navigation selection.
   const seasonPreviews=document.createElement('script');
   seasonPreviews.id='seasonPreviewsUiLoader';
@@ -341,4 +341,5 @@
     setTimeout(()=>{applyFix();injectGameWindowIntelligence()},350)
   });
 })();
+
 

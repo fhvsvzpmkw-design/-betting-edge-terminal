@@ -6,7 +6,7 @@ import fs from 'node:fs';
 // it is not a replacement for browser rendering.
 const menu=fs.readFileSync('assets/menu-home-style.css','utf8');
 const originals=['runner.html','assets/menu-order-controller.js','assets/primary-nav-shell.js','assets/special-desks-ui.js','assets/preferences-framework.js','assets/report-dashboard-vigscope.js'].map(path=>fs.readFileSync(path,'utf8'));
-const ids={board:'',market:'',history:'',syndicate:'runnerSyndicateF5',pizza:'runnerPizzaF6',crypto:'runnerCryptoF7',meat:'runnerSeasonPreviewF6',engine:'',preferences:'runnerPreferencesF6'};
+const ids={board:'',market:'',history:'',syndicate:'runnerSyndicateF5',pizza:'runnerPizzaF6',crypto:'runnerSeasonPreviewF6',meat:'runnerCryptoF7',engine:'',preferences:'runnerPreferencesF6'};
 
 function split(value,separator=','){
   const out=[];let start=0,depth=0,quote='';
@@ -134,3 +134,4 @@ for(const all of [[...rules(menu),...legacy],[...legacy,...rules(menu)]]){
   body.classes=new Set(['vigMenuStyled','runnerMenuHome']);
 }
 console.log(`Standalone menu CSS: PASS // ${checks} button/load-order/state combinations isolated from the existing section styles`);
+

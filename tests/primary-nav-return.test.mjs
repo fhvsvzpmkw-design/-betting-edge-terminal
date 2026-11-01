@@ -4,7 +4,7 @@ import vm from 'node:vm';
 
 const source=fs.readFileSync('assets/primary-nav-shell.js','utf8');
 const bindSource=source.slice(0,source.indexOf('\nfunction attach(){'))+'globalThis.bindForTest=bind;})();';
-const sections={syndicate:'runnerSyndicateLoaded',pizza:'runnerPizzaLoaded',crypto:'runnerCryptoLoaded',meat:'runnerSeasonPreviewsLoaded',preferences:'runnerPreferencesLoaded'};
+const sections={syndicate:'runnerSyndicateLoaded',pizza:'runnerPizzaLoaded',crypto:'runnerSeasonPreviewsLoaded',meat:'runnerCryptoLoaded',preferences:'runnerPreferencesLoaded'};
 
 // Trusted browser events may drain microtasks between capture and target
 // listeners. A return queued in capture therefore runs before the desk closes.
@@ -40,3 +40,4 @@ for(const [id,section] of Object.entries(sections)){
   }
 }
 console.log('Specialty menu returns: PASS // all five trusted-event paths finish on the prepared menu without timers; opening preserves each secondary screen');
+

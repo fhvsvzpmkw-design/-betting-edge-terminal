@@ -1,4 +1,4 @@
-name: Sync Meat Desk sources
+name: Sync Crypto Specials sources
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Rebuild active Meat Desk manifest
+      - name: Rebuild active Crypto Specials manifest
         run: |
           python3 scripts/sync_meat_desk_sources.py
           python3 scripts/patch_meat_desk_public_findings.py
@@ -33,12 +33,13 @@ jobs:
         shell: bash
         run: |
           if git diff --quiet -- research/season-previews/manifest.json; then
-            echo 'Meat Desk manifest already matches the PDF folder and approved review metadata.'
+            echo 'Crypto Specials manifest already matches the PDF folder and approved review metadata.'
             exit 0
           fi
 
           git config user.name 'github-actions[bot]'
           git config user.email '418982+github-actions[bot]@users.noreply.github.com'
           git add -- research/season-previews/manifest.json
-          git commit -m 'Auto-sync Meat Desk source manifest'
+          git commit -m 'Auto-sync Crypto Specials source manifest'
           git push origin HEAD:main
+
