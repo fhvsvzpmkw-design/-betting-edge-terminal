@@ -64,6 +64,8 @@
     const read=async p=>{const u=new URL(p,locationBase);u.searchParams.set('v',String(Date.now()));const response=await fetch(u,{cache:'no-store'});if(!response.ok)throw Error('Saved feed unavailable');return response.json();};
     const button=document.getElementById('refreshRundown');
     if(button)button.disabled=true;
+    // Validate the embedded call and start its clock before shared feeds load.
+    if(root.GuyDailyCall)void root.GuyDailyCall.boot({base:locationBase,read}).catch(()=>{});
     try{
       const board=await read('data/game-intelligence/board.json');
       if(!Array.isArray(board.games)||!day(board.asOf))throw Error('Invalid saved board');
@@ -77,10 +79,6 @@
       notice.textContent=state.date!==today?`Saved ${state.date} rundown. Today’s NHL board has not arrived yet.`:'Recorded pregame prices and captured forecasts. Refresh loads the latest saved rundown.';
     }catch{notice.textContent='The refreshed feed is unavailable. The dated saved rundown below remains on the sheet.';}
     finally{
-      // The actual daily call has its own saved decision record. Refresh it
-      // even when the broader rundown cannot be loaded; dated fallback data
-      // is rechecked against the browser clock before displaying a price.
-      if(root.GuyDailyCall)await root.GuyDailyCall.boot({base:locationBase,read});
       if(button)button.disabled=false;
     }
     if(button&&!button.dataset.bound){button.dataset.bound='1';button.addEventListener('click',()=>boot({base:locationBase,container,notice}));}

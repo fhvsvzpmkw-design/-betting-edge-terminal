@@ -88,7 +88,7 @@ try{
     await page.setRequestInterception(true);
     page.on('request',request=>{const url=new URL(request.url());if(url.origin!==origin){external.push(request.url());void request.abort();}else{if(url.pathname.includes('/calls-ledger.json'))dataRequests.push(url.pathname);void request.continue();}});
     fs.mkdirSync('.qa',{recursive:true});
-    const open=async(route,name)=>{await page.goto(`${origin}/${route}/${name}`,{waitUntil:'networkidle0'});await page.waitForFunction(()=>window.fixtureReady===true);return route==='value'?'#resultsGuyCall':'#guyActualCall';};
+    const open=async(route,name)=>{await page.goto(`${origin}/${route}/${name}`,{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.fixtureReady===true);return route==='value'?'#resultsGuyCall':'#guyActualCall';};
     const state=selector=>page.$eval(selector,node=>node.dataset.guyCallState);
     const text=selector=>page.$eval(selector,node=>node.innerText);
     const unchanged=async()=>{

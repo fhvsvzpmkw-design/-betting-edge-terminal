@@ -103,15 +103,20 @@
   async function boot({base,read,id='guyActualCall'}={}){
     const node=root.document?.getElementById(id);if(!node)return;
     let ledger=null;
+    try{ledger=JSON.parse(node.querySelector('[data-guy-call-snapshot]')?.textContent||'null');}catch{}
+    node.outerHTML=render(ledger,{now:new Date().toISOString(),id});
+    watch({ledger,id});
     try{
       if(read)ledger=await read('data/characters/guy-laflame/calls-ledger.json');
       else{
         const u=new URL('data/characters/guy-laflame/calls-ledger.json',base||new URL('../../../',root.location.href));u.searchParams.set('v',String(Date.now()));
         const response=await fetch(u,{cache:'no-store'});if(!response.ok)throw Error('Call unavailable');ledger=await response.json();
       }
-    }catch{try{ledger=JSON.parse(node.querySelector('[data-guy-call-snapshot]')?.textContent||'null');}catch{}}
-    node.outerHTML=render(ledger,{now:new Date().toISOString(),id});
-    watch({ledger,id});
+      if(!valid(ledger))throw Error('Invalid saved call');
+      const current=root.document?.getElementById(id);if(!current)return;
+      current.outerHTML=render(ledger,{now:new Date().toISOString(),id});
+      watch({ledger,id});
+    }catch{}
   }
   const api={day,clock,american,status,summary,render,watch,boot};root.GuyDailyCall=api;
   if(typeof module==='object'&&module.exports)module.exports=api;

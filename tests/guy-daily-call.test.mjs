@@ -132,6 +132,33 @@ test('failed live refresh rechecks the saved fallback against the browser clock'
   assert.match(ui.render({...old,entries:[null]},{now}),/published-pick record is unavailable/);
 });
 
+test('a pending refresh immediately clock-checks the embedded call and keeps its timer running before the network completes',async()=>{
+  let at='2026-11-01T17:16:00Z',painted='',callback,release,reads=0,clears=0;const ledger=fixture(),entry=ledger.entries[0];
+  entry.call.modelObservedAt=entry.liveStatus.currentQuote.modelObservedAt='2026-11-01T16:00:00Z';
+  entry.call.research.goalies[1].recheckAt='2026-11-01T17:17:00Z';const before=JSON.stringify(ledger);
+  const saved=ui.render(ledger,{now}).match(/data-guy-call-snapshot>([\s\S]*?)<\/script>/)[1];
+  const node={querySelector:()=>({textContent:saved}),querySelectorAll:()=>[],set outerHTML(html){painted=html;}};
+  class BrowserDate extends Date{constructor(value){super(value??at);}static now(){return Date.parse(at);}}
+  const context={Date:BrowserDate,Intl,URL,document:{getElementById:()=>node},setTimeout(fn){callback=fn;return 1;},clearTimeout(){clears++;},console};
+  vm.createContext(context);vm.runInContext(fs.readFileSync('assets/guy-daily-call.js','utf8'),context);
+  const pending=context.GuyDailyCall.boot({read:()=>{reads++;return new Promise(resolve=>{release=resolve;});}});
+  assert.match(painted,/fresh MoneyPuck forecast/);assert.doesNotMatch(visible(painted),/PRICE CHECK PASSED/);
+  assert.equal(typeof callback,'function','the local watcher starts before the saved feed resolves');
+  at='2026-11-01T17:17:00Z';callback();assert.match(painted,/GOALIE RECHECK NEEDED/);assert.equal(reads,1);assert.equal(JSON.stringify(ledger),before);
+  const refreshed=fixture();refreshed.entries[0].liveStatus.currentQuote.observedAt=refreshed.entries[0].liveStatus.currentQuote.modelObservedAt=at;
+  refreshed.entries[0].call.research.goalies.forEach(goalie=>{goalie.status='CONFIRMED';});
+  release(refreshed);await pending;assert.match(painted,/PRICE CHECK PASSED/);assert.ok(clears>0,'successful refresh replaces the fallback watcher');
+  at='2026-11-01T18:33:00Z';callback();assert.match(painted,/PRICE REFRESH NEEDED/);assert.equal(reads,1,'later local expiry consumes no extra source requests');
+});
+
+test('Blue Line starts the actual-call refresh before a pending shared board request',()=>{
+  const events=[],never=new Promise(()=>{}),doc={getElementById:()=>null};
+  const context={document:doc,URL,Date,Intl,console,location:{href:'https://fixture.local/syndicates/generated/guy-laflame/'},GuyDailyCall:{boot({read}){events.push('actual-call');return read('data/characters/guy-laflame/calls-ledger.json');}},fetch(url){events.push(new URL(url).pathname);return never;}};
+  vm.createContext(context);vm.runInContext(fs.readFileSync('assets/guy-blue-line.js','utf8'),context);
+  void context.GuyBlueLine.boot({base:'https://fixture.local/',container:{innerHTML:''},notice:{textContent:''}});
+  assert.deepEqual(events,['actual-call','/data/characters/guy-laflame/calls-ledger.json','/data/game-intelligence/board.json']);
+});
+
 test('an open page changes its status locally when a goalie check becomes due, without fetching or rewriting research',()=>{
   let at=now,painted='',callback,networkCalls=0;const ledger=fixture();ledger.entries[0].call.research.goalies[1].recheckAt='2026-11-01T17:01:00Z';const before=JSON.stringify(ledger);
   const node={querySelectorAll:()=>[],set outerHTML(html){painted=html;}};

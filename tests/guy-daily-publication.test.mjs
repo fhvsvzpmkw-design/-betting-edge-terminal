@@ -113,6 +113,8 @@ test('queued publications consume their own committed research and Git board sna
   assert.equal(edition.callsLedger.entries[0].call.researchId,'trigger-a');assert.deepEqual(edition.valueLedger,JSON.parse(benchmark));
   const html=s.bytes('syndicates/generated/guy-laflame/hotline.html').toString();
   assert.match(html,/GUY’S PLAY \/\/ DAILY NHL MONEYLINE/);assert.ok(html.includes(firstCall.reason));assert.match(html,/Home 1 <strong>\+110<\/strong>/);
+  assert.ok(html.includes('href="syndicates/generated/guy-laflame/hotline.html#guyActualCall"'),'section navigation stays on the live hotline despite its asset base URL');
+  assert.ok(s.bytes(pointer.archivePath).toString().includes(`href="${pointer.archivePath}#guyActualCall"`),'archived section navigation stays on its own immutable issue');
   assert.ok(html.indexOf('id="guyActualCall"')<html.indexOf('MONEYPUCK BENCHMARK // HISTORICAL TOP-EDGE TRACKING'));
   const built=s.snapshot();s.build();assert.deepEqual(s.snapshot(),built,'same saved inputs must not create a new edition or change any bytes');
   assert.deepEqual(s.bytes('data/characters/guy-laflame/value-ledger.json'),benchmark);
