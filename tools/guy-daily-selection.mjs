@@ -238,6 +238,9 @@ export function assertPublicationWindow(previousLedger,nextLedger,{at=new Date()
   if(!finite(time(at)))fail('CLOCK_INVALID');
   const known=new Set(list(previousLedger?.entries).flatMap(e=>[e.call,...list(e.publications)]).filter(Boolean).map(c=>c.publicationId));
   for(const entry of list(nextLedger?.entries)){
+    const previous=list(previousLedger?.entries).find(e=>e.date===entry.date);
+    if(previous?.call?.publicationId&&entry.call?.publicationId!==previous.call.publicationId
+      &&time(at)>=time(previous.lockAt||cutoff(previous.call.startTime,DEFAULT_POLICY)))fail('PUBLICATION_WINDOW_CLOSED:'+entry.call?.publicationId);
     const added=[entry.call,...list(entry.publications)].filter(c=>c?.publicationId&&!known.has(c.publicationId));
     for(const publication of added){
       const lockAt=cutoff(publication.startTime,DEFAULT_POLICY);

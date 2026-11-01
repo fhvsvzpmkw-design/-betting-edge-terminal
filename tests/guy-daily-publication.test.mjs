@@ -65,6 +65,17 @@ function sandbox(t){
   return {root,write,read,bytes,git,commit,run,publish,build,snapshot};
 }
 
+test('a delayed revision to a later game cannot cross the previously published game’s cutoff',()=>{
+  const original={publicationId:'original-game-a',startTime:'2026-11-01T22:00:00Z'};
+  const replacement={publicationId:'replacement-game-b',startTime:'2026-11-01T23:00:00Z'};
+  const previous={entries:[{date:'2026-11-01',lockAt:'2026-11-01T21:59:00Z',call:original,publications:[original]}]};
+  const next={entries:[{date:'2026-11-01',lockAt:'2026-11-01T22:59:00Z',call:replacement,publications:[original,replacement]}]};
+  assert.equal(assertPublicationWindow(previous,next,{at:'2026-11-01T21:58:59Z'}),true);
+  for(const at of ['2026-11-01T21:59:00Z','2026-11-01T22:00:00Z'])assert.throws(()=>assertPublicationWindow(previous,next,{at}),/PUBLICATION_WINDOW_CLOSED/);
+  assert.equal(assertPublicationWindow(previous,previous,{at:'2026-11-01T22:00:00Z'}),true);
+  assert.equal(assertPublicationWindow(next,next,{at:'2026-11-02T03:00:00Z'}),true);
+});
+
 test('queued publications consume their own committed research and Git board snapshot; pages and benchmark remain stable',t=>{
   const s=sandbox(t),f=researchFixture(),benchmark=s.bytes('data/characters/guy-laflame/value-ledger.json');
   s.write(boardPath,f.bytes);s.write(stagingPath,f.staging);const commitA=s.commit();
