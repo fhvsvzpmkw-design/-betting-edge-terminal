@@ -16,7 +16,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: graham-personnel-production
+  group: graham-baseline-recovery
   cancel-in-progress: false
   queue: max
 jobs:
@@ -33,7 +33,9 @@ jobs:
         with:
           node-version: '22'
       - name: Verify recovery regressions
-        run: node tests/graham-baseline-recovery.test.mjs
+        run: |
+          node tests/graham-baseline-recovery.test.mjs
+          node tests/graham-production-queue.test.mjs
       - name: Reconcile pending baseline against exact verified review
         run: |
           set -euo pipefail
