@@ -58,6 +58,8 @@ Before the Sunday review and at the end of each active-week review, run `node to
 
 ## Faster weekly handling — October 7
 
+October 31 recovery correction: a pending active baseline is an independent work item for the existing weekly coordinator. Execute a separate full `TUESDAY_BASELINE` recovery as soon as no live baseline runtime owns it, including while the active slate is open and prior-week learning remains partial. Follow the explicit partial-input policy and durable lifecycle; neither unfinished 90/10 learning nor ineligible next rollover may suppress this research. Ordinary Daily/Delta scope remains unchanged. Full numeric readiness still requires the separate historical and current-input checks.
+
 Keep the existing owners and durable lifecycle. At the start of each review, inspect the completion checkpoint's separate historical-learning, rating-propagation and current-availability components. A shared INCOMPLETE label is not evidence that every component needs rebuilding. Reuse the latest verified baseline, bound historical evidence and previously resolved cases. Prioritize precise unresolved numeric inputs within this task's own scope, then complete its required coverage; targeted follow-up does not substitute for a required broad review.
 
 - TUESDAY_BASELINE: build the initial baseline using the latest published carried ratings under the existing partial-input policy. Report applied/expected prior-slate games separately from current personnel/QB gaps. Preserve this baseline for the automatic rating-base refresh; do not repeatedly reconstruct it when historical learning advances.
