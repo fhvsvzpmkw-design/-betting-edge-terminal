@@ -1,6 +1,6 @@
 # Betting Edge — Decision Log
 
-**Last updated:** 2026-10-31 — Guy's November 1 researched daily selection
+**Last updated:** 2026-11-01 — game-day report recovery reliability
 
 This file records durable project decisions and the reasoning behind them. It exists so future changes do not accidentally undo choices that were already made intentionally.
 
@@ -435,7 +435,7 @@ Preserve `value-ledger.json` and its intentional highest-captured-MoneyPuck-edge
 
 ## D-042 — Use the same current Vancouver clock for report-owned odds
 
-**Status:** DEPLOYED; six local suites and all eight relevant GitHub checks passed; November 1 live acquisition verified; report recovery pending.
+**Status:** DEPLOYED; six local suites and all eight relevant GitHub checks passed; November 1 live acquisition verified; delayed Final Morning recovery publication/readback verified in PROJECT_STATE.md; failed Open remains unissued.
 
 B.C. remains on UTC-7 after March 2026 ([provincial guidance](https://www2.gov.bc.ca/gov/content/governments/celebrating-british-columbia/daylight-saving-time), [IANA 2026b release](https://www.iana.org/time-zones/releases)). The November 1 Open request used an obsolete winter offset, while the correctly timed scheduler continued at 06:00 Vancouver. Both attempts of workflow 41309420836 stopped at schedule resolution before provider access; the later attempt also exceeded the existing request expiry.
 
@@ -445,7 +445,7 @@ Preserve America/Vancouver, every task's activation and five report times, the 1
 
 ## D-043 — Preserve complete producer bytes and keep process locks outside synchronized workspaces
 
-**Status:** Active on deployment; implementation authorized during November 1 game-day recovery. Production publication/readback evidence belongs to the existing Main producer.
+**Status:** DEPLOYED in `f33387ed`; producer-recovery and publication-reliability CI passed. November 1 delayed Final Morning publisher `41336458907` and independent controller readback revision 48 passed; exact evidence is recorded in PROJECT_STATE.md. On-time future-run acceptance remains open.
 
 Checkpoint and staging documents retain `BETTING_EDGE_GZIP_JSON_V1`, every analytical field and the existing integrity checks. Serialize compact JSON before gzip to remove formatting whitespace. Existing plain/pretty-gzip documents remain readable. Preserve an already frozen candidate's original serialized bytes, byte length and Git blob seal across retries; compact formatting does not authorize resealing an old frozen candidate, dropping cards, deduplicating sources, changing research or altering issued History.
 
