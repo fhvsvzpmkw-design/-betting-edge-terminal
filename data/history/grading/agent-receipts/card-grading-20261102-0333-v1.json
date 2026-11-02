@@ -116,8 +116,48 @@
     "findingsRejected": 0
   },
   "remainingWork": [
-    "Deterministic grading workflow must complete and independently publish/read back its own supported results.",
-    "Event 70898886 remains unresolved unless a separately authorized repair or supported grader identity-precedence change is implemented; agent findings are not settlement input."
+    "No deterministic grading outputs for 2026-11-01 were persisted; the missing receipt and four missing observation files confirm calculated results are unsaved.",
+    "Resolve the results-index publication size limit through an authorized repository-supported path, then run a new unique grading request; do not bypass the denial.",
+    "Event 70898886 remains a separate documented repair exception: immutable snapshot identity is supportable, but the routine grader does not override malformed presentation labels."
   ],
-  "recordedAt": "2026-11-02T10:38:39.105Z"
+  "recordedAt": "2026-11-02T10:47:47.538Z",
+  "gradingOutcome": {
+    "workflowRunId": "41429946934",
+    "requestCommit": "fc079ed71bd8ccddf85e11ec1504e69131337f46",
+    "state": "GRADING_WRITE_BLOCKED",
+    "calculatedButUnsaved": true,
+    "failedStage": "Commit only verified historical outputs",
+    "error": "GitHub remote rejected data/history/results-index.json at 101.39 MB because it exceeds the 100.00 MB file size limit (GH001); three bounded push attempts failed.",
+    "durableGradingReceipt": null,
+    "durableTargetObservationFiles": 0,
+    "durableIndexBlobSha": "7b1239a6752971765d7ca1782aeea157910cf9b8",
+    "calculatedTarget": {
+      "issued": 200,
+      "complete": 200,
+      "unresolved": 0,
+      "grades": {
+        "WIN": 102,
+        "LOSS": 98,
+        "PUSH": 0,
+        "VOID": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0
+      }
+    },
+    "calculatedHistoricalCoverage": {
+      "throughDate": "2026-11-01",
+      "cards": 11809,
+      "completeCards": 11795,
+      "unresolvedCards": 14,
+      "unresolvedSelections": 6,
+      "unresolvedEvents": 1
+    },
+    "calculatedBacklogHealth": {
+      "state": "REVIEW_REQUIRED",
+      "quotaDeferredEvents": 0,
+      "allPendingEventsAttempted": 22,
+      "remainingEventId": "70898886",
+      "reason": "identity_conflict"
+    }
+  }
 }
