@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_90_10",
+  "executionRunId": null,
+  "workBinding": {
+    "mainCommit": "b5aefc0083e856ba53f885e8c3a870c77ef6f0d4",
+    "activeManifestBlobSha": "a976ce31d988e0197b2940da57b4e8edd5451808",
+    "season": 2026,
+    "week": 8,
+    "gameKeys": ["2026-W08-KC-DEN", "2026-W08-LAC-LAR", "2026-W08-NE-MIA"],
+    "evidenceBlobs": ["ce6001250da20bc2642d8a14fa0df80a0743537b", "e7483aa3f81bfc901cc86497c32a1ee72dece1bb"]
+  },
+  "mode": "AGENTS_PARTIAL",
+  "reason": "KC-DEN official gamebook research and independent review completed; the LAC-LAR/NE-MIA lane stopped immediately after an unrelated search result exposed a market-bearing line and is quarantined.",
+  "workers": [
+    {
+      "role": "source researcher",
+      "id": "/root/kc_den_fresh",
+      "freshContext": true,
+      "readOnly": true,
+      "assignment": "KC-DEN official final gamebook inventory",
+      "launchObservedAt": "2026-11-02T07:04:34Z",
+      "acknowledgmentState": "ACKNOWLEDGED",
+      "returnState": "RETURNED_CLEAN_SOURCE_ONLY",
+      "result": "Official 17-page NFL gamebook recovered; complete starters, substitutes, DNP, QB, specialist and literal injury-annotation inventories returned."
+    },
+    {
+      "role": "source researcher",
+      "id": "/root/la_ne_fresh",
+      "freshContext": true,
+      "readOnly": true,
+      "assignment": "LAC-LAR and NE-MIA official final gamebook inventories",
+      "launchObservedAt": "2026-11-02T07:04:34Z",
+      "acknowledgmentState": "ACKNOWLEDGED",
+      "returnState": "CONTROLLED_ABORT_MARKET_ISOLATION",
+      "error": "An unrelated web-search result exposed a market-bearing line while locating the LAC-LAR gamebook. No market value was returned to the coordinator; retrieval stopped and the lane's substantive output was quarantined."
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/late_pairs_review",
+      "freshContext": true,
+      "readOnly": true,
+      "assignment": "KC-DEN inventory/method review and late-pair controlled-failure review",
+      "launchObservedAt": "2026-11-02T07:04:34Z",
+      "acknowledgmentState": "ACKNOWLEDGED",
+      "returnState": "RETURNED",
+      "result": "KC-DEN not READY; approved checklist advances, literal boundary corrections and disjoint-replacement safeguards. LAC-LAR/NE-MIA lane quarantined."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "Use two source researchers and one reviewer",
+      "namedQuestion": "Can the newly exposed official gamebooks complete paired final inventories without reopening resolved evidence?",
+      "expectedQualityBenefit": "Independent source recovery plus double-count and boundary review.",
+      "releaseCondition": "Return complete official inventories or stop on source exhaustion/market-isolation failure."
+    }
+  ],
+  "qualityFindings": [
+    "The KC-DEN gamebook closes participation, DNP, QB and specialist identity inventories but contains no snap-count table; audit completeness is not exposure completeness.",
+    "Brandon Jones' printed Out update occurs after Q3 11:12, not at halftime, and cannot be treated as a departure; JL Skinner and Jonah Coleman are already reserved by retained cases."
+  ],
+  "completedWork": [
+    "KC-DEN official gamebook PDF recovered and source-bound with exact SHA-256.",
+    "KC-DEN complete paired starter/substitute/DNP/QB/specialist inventories assembled.",
+    "KC-DEN complete literal injury-annotation audit reviewed.",
+    "Additive correction prepared without numerical authority or market use."
+  ],
+  "remainingWork": [
+    "KC-DEN values, disjoint replacement roles and eligible exposure decisions for Woods, Sutton, Abrams-Draine and Brandon Jones plus retained unresolved inactive/reserve cases.",
+    "Clean fresh-context official-only revalidation of LAC-LAR and NE-MIA gamebooks; existing evidence remains unchanged.",
+    "LAC-LAR retains official participation/injury audit and shared-venue/H4 method gap.",
+    "NE-MIA retains official participation certification plus Malik Herring departure and Jones/Washington exposure decisions."
+  ],
+  "marketViewed": false,
+  "numericAuthority": false,
+  "recordedAt": "2026-11-02T07:13:53Z"
+}
