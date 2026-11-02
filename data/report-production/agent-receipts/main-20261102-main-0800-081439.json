@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-08:00",
+  "executionRunId": "20261102-main-0800-081439",
+  "workBinding": {
+    "candidateId": "2026-11-02T08:14:39.419-07:00|2",
+    "checkpointPath": "data/report-production/checkpoints/20261102-main-0800-081439.json",
+    "checkpointRevisionAtLaunch": 2,
+    "feedBlobSha": "0214b5357b9b53527fdc2c48891c45e95a7c3427",
+    "operatingDate": "2026-11-02",
+    "canonicalSlot": 2,
+    "expectedReportTime": "08:00"
+  },
+  "mode": "ADAPTIVE_FULL_POOL",
+  "reason": "The bound queue contains 20 events, 120 available selections and 79 captured forecasts; four disjoint complete-event researchers and two independent critical reviewers all have useful work.",
+  "workers": [
+    {"role":"complete-event researcher","id":"/root/researcher_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909306","72909308","72909310","72909312"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-02T15:17:30Z","returnedAt":null,"state":"RESEARCHING","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["73719484","73719486","73719488","73719490"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-02T15:17:30Z","returnedAt":null,"state":"RESEARCHING","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_3","boundary":"READ_ONLY_NO_DELEGATION","assignments":["73719492","73719494","73719496","73719498","73719500"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-02T15:17:30Z","returnedAt":null,"state":"RESEARCHING","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_4","boundary":"READ_ONLY_NO_DELEGATION","assignments":["71515978","73719502","73719506","73719508","73719510","73719512","73719514"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-02T15:17:30Z","returnedAt":null,"state":"RESEARCHING","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["NHL_GUY_SHORTLIST","72909306","72909308","72909310","72909312"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-02T15:17:30Z","returnedAt":null,"state":"REVIEWING","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["71515978_QB_FOLLOW_UP","LATE_NBA_CONTRARY_REVIEW"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-02T15:17:30Z","returnedAt":null,"state":"REVIEWING","error":null}
+  ],
+  "scalingDecisions": [{
+    "decision": "USE_SIX_WORKERS",
+    "reason": "Twenty complete events divide into four disjoint event queues while the two reviewers can test the highest-risk NHL/Guy and NFL/late-NBA evidence independently.",
+    "expectedQualityBenefit": "Complete market-family coverage, current personnel review and independent contrary-case checks before coordinator merge.",
+    "releaseCondition": "Each worker returns its bound result or an exact failure; individual failure does not veto publication."
+  }],
+  "qualityFindings": [],
+  "reasoningCorrections": [],
+  "completedWork": {
+    "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
+    "ackClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments within the single bounded window ending at ackWindowCompletedAt.",
+    "eventResearchReturned": 0,
+    "criticalReviewsReturned": 0
+  },
+  "remainingWork": {
+    "eventResearch": 20,
+    "criticalReviews": 2,
+    "coordinatorMerge": true,
+    "controllerEventSaves": 20,
+    "prepareFreezeStageReadback": "PENDING"
+  },
+  "recordedAt": "2026-11-02T15:17:30Z"
+}
