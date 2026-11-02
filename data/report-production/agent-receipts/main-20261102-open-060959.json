@@ -23,8 +23,8 @@
       "assignments": ["72909306", "72909308", "72909310", "72909312", "71515978"],
       "launchedAt": "2026-11-02T13:11:00Z",
       "acknowledgedAt": "2026-11-02T13:11:00Z",
-      "returnedAt": null,
-      "state": "RESEARCHING",
+      "returnedAt": "2026-11-02T13:22:30Z",
+      "state": "RETURNED",
       "error": null
     },
     {
@@ -34,8 +34,8 @@
       "assignments": ["73719484", "73719486", "73719488", "73719490", "73719492"],
       "launchedAt": "2026-11-02T13:11:00Z",
       "acknowledgedAt": "2026-11-02T13:11:00Z",
-      "returnedAt": null,
-      "state": "RESEARCHING",
+      "returnedAt": "2026-11-02T13:22:30Z",
+      "state": "RETURNED",
       "error": null
     },
     {
@@ -45,8 +45,8 @@
       "assignments": ["73719494", "73719496", "73719498", "73719500", "73719502"],
       "launchedAt": "2026-11-02T13:11:00Z",
       "acknowledgedAt": "2026-11-02T13:11:00Z",
-      "returnedAt": null,
-      "state": "RESEARCHING",
+      "returnedAt": "2026-11-02T13:22:30Z",
+      "state": "RETURNED",
       "error": null
     },
     {
@@ -56,8 +56,8 @@
       "assignments": ["73719506", "73719508", "73719510", "73719512", "73719514"],
       "launchedAt": "2026-11-02T13:11:00Z",
       "acknowledgedAt": "2026-11-02T13:11:00Z",
-      "returnedAt": null,
-      "state": "RESEARCHING",
+      "returnedAt": "2026-11-02T13:22:30Z",
+      "state": "RETURNED",
       "error": null
     },
     {
@@ -67,8 +67,8 @@
       "assignments": ["FULL_QUEUE_OPPOSING_CASE", "GUY_EARLY_SHORTLIST"],
       "launchedAt": "2026-11-02T13:11:00Z",
       "acknowledgedAt": "2026-11-02T13:11:00Z",
-      "returnedAt": null,
-      "state": "REVIEWING",
+      "returnedAt": "2026-11-02T13:22:30Z",
+      "state": "RETURNED",
       "error": null
     },
     {
@@ -78,8 +78,8 @@
       "assignments": ["CAPTURED_FORECAST_AUDIT", "71515978_QB_FOLLOW_UP", "PINNACLE_GAPS"],
       "launchedAt": "2026-11-02T13:11:00Z",
       "acknowledgedAt": "2026-11-02T13:11:00Z",
-      "returnedAt": null,
-      "state": "REVIEWING",
+      "returnedAt": "2026-11-02T13:22:30Z",
+      "state": "RETURNED",
       "error": null
     }
   ],
@@ -91,18 +91,37 @@
       "releaseCondition": "Each worker returns its bound result or reports an exact failure; no individual failure creates a report-wide veto."
     }
   ],
-  "qualityFindings": [],
+  "qualityFindings": [
+    {
+      "finding": "All 43 captured forecasts were roughly twelve hours old and lacked publisher calculation times; none was adopted as a current fair. The NBA captures were moneyline-only, MoneyPuck remained goalie-sensitive, and the NFL nfelo records explicitly carried a 10.95% push at three.",
+      "effect": "Every forecast was reviewed and bound as stale context, preventing old model points from becoming synthetic spread, total or moneyline edges."
+    },
+    {
+      "finding": "Official personnel follow-up left six NBA events without a complete submitted report or a named decision-sensitive resolution, and all four NHL goalie pairs remained projected rather than confirmed. NFL starter identities were resolved as Caleb Williams and Sam Darnold, but the independent models still opposed one another.",
+      "effect": "No BET or LEAN survived; 120 exact selections were retained as documented personnel, calibration or conflicting-evidence shortfalls."
+    }
+  ],
+  "reasoningCorrections": [
+    {
+      "correction": "The feed's spread line is home-oriented for both sides; an away raw line of -4.5 displays as away +4.5. The apparent sign mismatch raised by one worker was not an identity defect.",
+      "coordinatorAction": "Preserved the exact quote identity and rejected the proposed feed-conflict interpretation."
+    },
+    {
+      "correction": "Apparent ESPN NBA moneyline edges could not be treated as current because the model clocks were absent and the captured points preceded the official injury report by roughly twelve hours.",
+      "coordinatorAction": "Downgraded all apparent edges to documented shortfalls pending current personnel/model incorporation."
+    }
+  ],
   "completedWork": {
     "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
-    "eventResearchReturned": 0,
-    "criticalReviewsReturned": 0
+    "eventResearchReturned": 20,
+    "criticalReviewsReturned": 2
   },
   "remainingWork": {
-    "eventResearch": 20,
-    "criticalReviews": 2,
-    "coordinatorMerge": true,
-    "controllerEventSaves": 20,
+    "eventResearch": 0,
+    "criticalReviews": 0,
+    "coordinatorMerge": false,
+    "controllerEventSaves": 0,
     "prepareFreezeStageReadback": true
   },
-  "recordedAt": "2026-11-02T13:13:20.787Z"
+  "recordedAt": "2026-11-02T13:28:00.000Z"
 }
