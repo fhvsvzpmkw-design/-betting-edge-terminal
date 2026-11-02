@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_COORDINATOR",
+  "executionRunId": null,
+  "mode": "TARGETED_FOLLOWUP_RETURNED_PAIR_BLOCKED",
+  "workBinding": {
+    "phase": "ACTIVE_WEEK_FINAL_EVIDENCE_RECONCILIATION",
+    "authoritativeMainHeadAtLaunch": "19007c18546869a789b2eccd7483bf53773ed006",
+    "season": 2026,
+    "week": 8,
+    "gameKey": "2026-W08-PHI-WAS",
+    "candidateEvidencePath": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-phi-was-final-gamebook-reconciliation.json",
+    "candidateEvidenceBlobSha": "ce57adcf787f4301ce006c5808559b540d20e7d1",
+    "priorAgentReceiptPath": "data/walters/nfl/research-agent-receipts/2026-11-02-graham-weekly-phi-was-2026-w08-0500z.json",
+    "priorAgentReceiptBlobSha": "248db5e72902906528e490237076952530c47765",
+    "officialGamebook": "https://static.www.nfl.com/image/upload/v1793593826/gamecenter/ab167386-4feb-11f1-abca-2c54536568a9.pdf"
+  },
+  "reason": "The clean coordinator consumed the prior isolated source packets and published complete paired candidate inventories. Targeted market-free follow-up checked existing roster-exit, healthy-scratch, depth/value and injury-boundary evidence before retaining the residual numerical blocks.",
+  "workers": [
+    {
+      "workerId": "/root/phi_sources",
+      "role": "SOURCE_ONLY_RESEARCHER_FOLLOWUP",
+      "assignment": "Lane Johnson roster-exit eligibility and PHI defensive-back role/boundary reconciliation",
+      "freshOriginalContext": true,
+      "readOnly": true,
+      "delegationAllowed": false,
+      "marketDataAllowed": false,
+      "state": "RETURNED",
+      "returnedWork": [
+        "Bound the official October 6 Lane Johnson retirement and Week 7 roster-exit precedent.",
+        "Recovered current PHI depth pairs and complete Week 8 defensive-back participation.",
+        "Reduced Mukuba's printed sequence to one valid Washington offensive snap between injury and return.",
+        "Preserved Jonathan Jones and Michael Carter II as unresolved."
+      ]
+    },
+    {
+      "workerId": "/root/was_sources",
+      "role": "SOURCE_ONLY_RESEARCHER_FOLLOWUP",
+      "assignment": "Togiai/Yiadom exclusions, Payne/Kinlaw disjoint DL inventory and McNichols boundary reconciliation",
+      "freshOriginalContext": true,
+      "readOnly": true,
+      "delegationAllowed": false,
+      "marketDataAllowed": false,
+      "state": "RETURNED",
+      "returnedWork": [
+        "Recovered Tanoa Togiai official EA Week 1 capture: EA ID 4819, LG, OVR 63.",
+        "Recovered Week 5/6 Togiai and Week 6 Yiadom HEALTHY_SCRATCH precedents.",
+        "Corrected the Payne candidate inventory to include Deatrich Wise Jr. along with Settle, Tuttle and Cowart while reserving Omenihu to Kinlaw.",
+        "Confirmed McNichols Q3 3:40 is only a Questionable status-placement clock, not a departure or return."
+      ]
+    },
+    {
+      "workerId": "/root/phi_was_reviewer",
+      "role": "INDEPENDENT_CRITICAL_REVIEWER_FOLLOWUP",
+      "assignment": "Check source/method eligibility, value scoping, exposure and double counting for the targeted returns",
+      "freshOriginalContext": true,
+      "readOnly": true,
+      "delegationAllowed": false,
+      "marketDataAllowed": false,
+      "state": "RETURNED",
+      "returnedWork": [
+        "Separated source availability from evaluator/schema eligibility.",
+        "Rejected automatic reuse of prior-week role/value bindings without current-game scope.",
+        "Confirmed PHI DB and WAS DL no-double-count requirements.",
+        "Determined the pair remains not READY."
+      ]
+    }
+  ],
+  "qualityCorrections": [
+    {
+      "finding": "The gamebook's Lane Johnson Not Active row conflicts with the official six-player inactive article, but an official October 6 retirement and Week 7 roster-exit precedent exist.",
+      "correction": "Do not create a second Johnson-to-Bell injury charge. SOURCE_CONFIRMED_ROSTER_EXIT is eligible only if the Week 8 bundle carries an archived Lane case and exact official pre-kickoff retirement fields required by the evaluator; otherwise retain a schema/method block."
+    },
+    {
+      "finding": "Mukuba was absent for one valid Washington offensive snap and Kenny Moore II is the current depth-chart reserve behind Mukuba.",
+      "correction": "One valid snap is not automatically eligible snap exposure. Require current-game Moore role evidence, a Week 8-scoped value binding, valid clock/snap exposure declaration and proof Moore is not reused for Jones, Carter or baseline duties."
+    },
+    {
+      "finding": "Togiai and Yiadom are Week 8 Not Active and absent from the final injury report; earlier weeks classified them HEALTHY_SCRATCH.",
+      "correction": "Prior exclusions may support but do not self-reuse. Bind current game-specific official inactive/health evidence and an explicit no-established-regular-season-duty assessment. Togiai's EA capture closes identity availability but does not promote a production-registry value."
+    },
+    {
+      "finding": "Payne's active candidate inventory includes Deatrich Wise Jr.; Omenihu is already reserved for Kinlaw and Cowart lacks a governed value.",
+      "correction": "Any Payne committee must include the full Settle/Tuttle/Cowart/Wise inventory with disjoint duties and eligible values. Do not reuse Omenihu or average Cowart as zero."
+    },
+    {
+      "finding": "McNichols has a printed Q3 3:40 Questionable notice but no originating play, actual return, Out notice or terminal status.",
+      "correction": "Role precedent may be preserved narratively, but a PARTIAL_GAME case remains blocked. The brief-return prior and rotational snap-bound method are ineligible on current evidence."
+    }
+  ],
+  "resolvedOrNarrowedEvidence": [
+    {
+      "case": "Lane Johnson",
+      "state": "SOURCE_AVAILABLE_CONDITIONAL_METHOD_ELIGIBILITY",
+      "durableEvidence": [
+        "https://www.philadelphiaeagles.com/news/lane-johnson-announces-his-retirement",
+        "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-31-dal-phi-reused-role-reconciliation.json",
+        "tools/graham-weekly-evidence.mjs"
+      ]
+    },
+    {
+      "case": "Tanoa Togiai",
+      "state": "IDENTITY_CAPTURE_FOUND_CURRENT_EXCLUSION_REVIEW_REQUIRED",
+      "durableEvidence": [
+        "data/walters/nfl/2026/week-01-weekly-evidence/2026-09-21-ea-week1-missing-player-capture.json",
+        "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-20-nyg-was-ready-reconciliation.json",
+        "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-ready-reconciliation.json"
+      ]
+    },
+    {
+      "case": "Isaac Yiadom",
+      "state": "CURRENT_EXCLUSION_REVIEW_REQUIRED",
+      "durableEvidence": [
+        "data/walters/nfl/2026/week-06-weekly-evidence/2026-10-20-was-sf-ready-reconciliation.json",
+        "https://www.commanders.com/news/inactives-commanders-vs-eagles-week-8-2026"
+      ]
+    }
+  ],
+  "remainingGaps": [
+    {
+      "case": "Lane Johnson",
+      "exactMissingFact": "Week 8 evaluator-form archived-case eligibility and exact roster-exit fields reconciling the contradictory gamebook listing.",
+      "footballImpact": "A mistaken new charge would double count a right-tackle transition already completed after retirement.",
+      "requiredDecision": "Bind the official pre-kickoff retirement as SOURCE_CONFIRMED_ROSTER_EXIT with no replacement and normalDutyEnded, or retain the schema block."
+    },
+    {
+      "case": "Andrew Mukuba",
+      "exactMissingFact": "Current-game Moore role/value binding, eligible exposure declaration and proof of no Jones/Carter/baseline reuse.",
+      "footballImpact": "The temporary safety loss cannot be valued without a disjoint relief baseline and approved exposure.",
+      "requiredDecision": "Use the existing documented-depth and clock/snap adapters only after every current-game binding passes."
+    },
+    {
+      "case": "Jonathan Jones",
+      "exactMissingFact": "A distinct source-bound full-game replacement after preserving baseline DB duties.",
+      "footballImpact": "Cornerback depth/coverage loss remains unknown and can overlap the Mukuba/Carter cluster.",
+      "requiredDecision": "Bind a disjoint role through the existing adapter or retain fail-closed."
+    },
+    {
+      "case": "Michael Carter II",
+      "exactMissingFact": "Injury onset, actual return/terminal status, exposure and a relief identity distinct from Moore if Moore is reserved to Mukuba.",
+      "footballImpact": "Unknown DB exposure prevents paired injury arithmetic and cluster review.",
+      "requiredDecision": "Obtain official source boundaries/relief or use an eligible existing bounded method only when its literal conditions hold."
+    },
+    {
+      "case": "Daron Payne",
+      "exactMissingFact": "Complete disjoint allocation among Settle, Tuttle, Cowart and Wise, with Cowart value provenance and no Omenihu reuse.",
+      "footballImpact": "Starting defensive-tackle loss changes interior run/pass strength and cluster continuity.",
+      "requiredDecision": "Bind a governed primary/committee/capacity method with the complete inventory; never average a missing value as zero."
+    },
+    {
+      "case": "Jeremy McNichols",
+      "exactMissingFact": "Source-bound departure plus actual return or terminal status.",
+      "footballImpact": "Rotational running-back exposure cannot be inferred from the Questionable notice.",
+      "requiredDecision": "Obtain an official boundary or keep the PARTIAL_GAME case blocked; no current approved prior applies."
+    },
+    {
+      "case": "PHI_DB_AND_WAS_DL_CLUSTERS",
+      "exactMissingFact": "Final disjoint cluster reviews after the named cases resolve.",
+      "footballImpact": "Duplicate replacement credit would overstate or understate the paired injury losses.",
+      "requiredDecision": "Run the existing evaluator only after all component role/value/exposure gates pass."
+    }
+  ],
+  "ready": false,
+  "numericAuthority": false,
+  "marketViewed": false,
+  "recordedAt": "2026-11-02T06:19:24Z"
+}
