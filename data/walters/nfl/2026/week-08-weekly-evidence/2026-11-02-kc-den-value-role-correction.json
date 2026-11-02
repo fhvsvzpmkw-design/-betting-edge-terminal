@@ -1,0 +1,1243 @@
+{
+  "schema": 1,
+  "scope": "WEEK8_KC_DEN_VALUE_ROLE_CORRECTION",
+  "season": 2026,
+  "sourceWeek": 8,
+  "recordedAt": "2026-11-02T09:56:31Z",
+  "marketViewed": false,
+  "numericAuthority": false,
+  "inputCommit": "367f6136af8504b9dcdb32e0ee1d1368d375f26b",
+  "baseEvidence": {
+    "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-01-kc-den-final-preparation.json",
+    "blobSha": "ce6001250da20bc2642d8a14fa0df80a0743537b",
+    "reuse": [
+      "final score",
+      "frozen kickoff ratings and H4",
+      "complete paired final inactive inventories",
+      "complete paired reserve inventories",
+      "complete paired elevation and promotion inventories",
+      "all resolved numerical cases",
+      "all unresolved numerical cases",
+      "cluster safeguards"
+    ]
+  },
+  "sources": [
+    {
+      "sourceId": "kc-den-official-final-gamebook",
+      "provider": "NFL",
+      "url": "https://static.www.nfl.com/image/upload/v1793580202/gamecenter/ab166dc7-4feb-11f1-abca-2c54536568a9.pdf",
+      "pages": 17,
+      "sha256": "6e3b0fb1ff6cd73827e5fbdeb29f483ce3969deb4364b9f3215dcf1bd1a2fee7",
+      "observedAt": "2026-11-02T07:08:35Z",
+      "sourceType": "ORIGINAL_OFFICIAL_GAMEBOOK_PDF"
+    },
+    {
+      "sourceId": "kc-den-official-game-center",
+      "provider": "NFL",
+      "url": "https://www.nfl.com/games/chiefs-at-broncos-2026-reg-8?tab=recap",
+      "observedAt": "2026-11-02T07:08:35Z",
+      "sourceType": "OFFICIAL_GAME_CENTER"
+    },
+    {
+      "sourceId": "kc-den-official-final-gamebook",
+      "kind": "OFFICIAL",
+      "provider": "NFL",
+      "url": "https://static.www.nfl.com/image/upload/v1793580202/gamecenter/ab166dc7-4feb-11f1-abca-2c54536568a9.pdf",
+      "binding": "LATEST_EVIDENCE_BLOB_4d636653b7e3eb43e7ef61585d71fb4aa184f955",
+      "sha256": "6e3b0fb1ff6cd73827e5fbdeb29f483ce3969deb4364b9f3215dcf1bd1a2fee7",
+      "observedAt": "2026-11-02T07:08:35Z",
+      "gameKeys": [
+        "2026-W08-KC-DEN"
+      ]
+    },
+    {
+      "sourceId": "den-official-depth-current",
+      "kind": "OFFICIAL",
+      "provider": "Denver Broncos",
+      "url": "https://www.denverbroncos.com/team/depth-chart/",
+      "observedAt": "2026-11-02T09:36:01Z",
+      "factsUsed": [
+        "Courtland Sutton is listed at WR on a solo depth row.",
+        "Marvin Mims Jr/Troy Franklin and Jaylen Waddle/Lil'Jordan Humphrey are the other two WR depth chains.",
+        "Kris Abrams-Draine is the reserve behind RCB Riley Moss.",
+        "Jahdae Barron is an available CB reserve at LCB and NCB.",
+        "Brandon Jones is the first safety and Devon Key is directly behind him.",
+        "JL Skinner is directly behind Talanoa Hufanga."
+      ],
+      "gameKeys": [
+        "2026-W08-KC-DEN"
+      ]
+    },
+    {
+      "sourceId": "den-official-roster-current",
+      "kind": "OFFICIAL",
+      "provider": "Denver Broncos",
+      "url": "https://www.denverbroncos.com/team/rosters",
+      "observedAt": "2026-11-02T09:36:01Z",
+      "factsUsed": [
+        "Lil'Jordan Humphrey, Jahdae Barron and Devon Key are on the active roster.",
+        "Pat Bryant is on Reserve/Injured and is not an available Sutton relief candidate."
+      ],
+      "gameKeys": [
+        "2026-W08-KC-DEN"
+      ]
+    },
+    {
+      "sourceId": "kc-official-depth-current",
+      "kind": "OFFICIAL",
+      "provider": "Kansas City Chiefs",
+      "url": "https://www.chiefs.com/app/depth-chart",
+      "observedAt": "2026-11-02T09:36:01Z",
+      "factsUsed": [
+        "Peter Woods is the second DT behind Chris Jones.",
+        "Bryson Eason is the other listed DT reserve, behind Khyiris Tonga."
+      ],
+      "gameKeys": [
+        "2026-W08-KC-DEN"
+      ]
+    }
+  ],
+  "methodReview": {
+    "workBinding": {
+      "mainHead": "367f6136af8504b9dcdb32e0ee1d1368d375f26b",
+      "manifestBlob": "a976ce31d988e0197b2940da57b4e8edd5451808",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-kc-den-final-gamebook-correction.json",
+        "blobSha": "4d636653b7e3eb43e7ef61585d71fb4aa184f955"
+      },
+      "baseEvidence": {
+        "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-01-kc-den-final-preparation.json",
+        "blobSha": "ce6001250da20bc2642d8a14fa0df80a0743537b"
+      }
+    },
+    "governingMethod": {
+      "replacementModelId": "graham-replacement-role-estimate-v1",
+      "exposureModelId": "graham-historical-time-exposure-v1",
+      "capacityModelId": "graham-capacity-limited-loss-v1",
+      "rulesApplied": [
+        "Missing values are never zero.",
+        "DOCUMENTED_DEPTH_ESTIMATE may assign an available depth-chart reserve to additional vacant duties when actual substitution is unavailable.",
+        "Baseline duties remain present; only additional duties may receive relief credit.",
+        "The same player may not relieve two simultaneous vacancies.",
+        "PARTIAL_VALUE_INVARIANT closes at zero only when every documented relief candidate used by the case equals the healthy value.",
+        "Literal interval exposure requires a documented departure and return boundary.",
+        "The 0-5 minute brief-return prior requires an explicitly reported injury absence and return with no recoverable clock.",
+        "The every-snap snap-bound route requires a normally every-snap role, independent injury reporting, and verified played/team snaps; rotational players are ineligible.",
+        "CAPACITY_LIMITED_LOSS_ESTIMATE is unavailable while an unused healthy source-bound candidate remains.",
+        "Special-teams participation does not establish defensive missing duty or defensive relief."
+      ]
+    },
+    "priorCaseReuseReview": {
+      "reusedMethodShapes": [
+        {
+          "priorCase": "2026-W02-PIT-Jaquan-Brisker",
+          "reusedOnly": "Exact literal interval plus DOCUMENTED_DEPTH_ESTIMATE/PRIMARY_REPLACEMENT shape",
+          "oldSnapshotRebound": false
+        },
+        {
+          "priorCases": [
+            "2026-W02-ARI-Mack-Wilson-Sr",
+            "2026-W02-DAL-Jaishawn-Barham"
+          ],
+          "reusedOnly": "0-5 minute brief-return eligibility conditions",
+          "oldSnapshotRebound": false
+        },
+        {
+          "priorCases": [
+            "2026-W02-DET-Avonte-Maddox",
+            "2026-W02-PIT-Rico-Dowdle",
+            "2026-W02-NE-Dre-Mont-Jones"
+          ],
+          "reusedOnly": "PARTIAL_VALUE_INVARIANT exact equal-value proof",
+          "oldSnapshotRebound": false
+        }
+      ],
+      "currentBindingsOnly": "All Week 8 identities, availability, roles and candidate allocations use the bound KC-DEN evidence plus direct current official club depth/roster sources; no Week 2 source snapshot is rebound to Week 8."
+    },
+    "clusterAndDoubleCountReview": {
+      "DEN_RECEIVER": {
+        "proposedAllocation": "Courtland Sutton -> Lil'Jordan Humphrey",
+        "retainedCommonDuties": [
+          "Marvin Mims Jr",
+          "Troy Franklin",
+          "Jaylen Waddle"
+        ],
+        "otherUnavailableNotUsed": [
+          "Pat Bryant"
+        ],
+        "caseLevelResult": "PASS_DISJOINT",
+        "gameLevelLimitation": "Other retained unresolved receiver inventory still must be closed before paired READY."
+      },
+      "DEN_DEFENSIVE_BACK": {
+        "reservedOrProposedAllocations": [
+          "Talanoa Hufanga -> JL Skinner (already retained)",
+          "Kris Abrams-Draine -> Jahdae Barron (proposed)",
+          "Brandon Jones -> Devon Key (role draft only)"
+        ],
+        "retainedCommonDuties": [
+          "Patrick Surtain II",
+          "Riley Moss",
+          "Ja'Quan McMillian",
+          "Taylor Rapp"
+        ],
+        "caseLevelResult": "PASS_DISJOINT_IDENTITIES",
+        "gameLevelLimitation": "Brandon Jones remains nonnumeric because exposure is unsupported; DEN defensive-back cluster cannot be certified complete until that boundary is resolved."
+      },
+      "KC_DEFENSIVE_LINE": {
+        "proposedAllocation": "Peter Woods -> Bryson Eason (role draft only)",
+        "retainedCommonDuties": [
+          "Chris Jones",
+          "Khyiris Tonga",
+          "Felix Anudike-Uzomah",
+          "George Karlaftis"
+        ],
+        "otherCases": [
+          "Omarr Norman-Lott zero-calibrated",
+          "Jack Pyburn inactive",
+          "Tyreke Smith inactive"
+        ],
+        "caseLevelResult": "PASS_DISJOINT_IDENTITY",
+        "gameLevelLimitation": "Peter Woods remains nonnumeric because exposure is unsupported; other retained unresolved defensive-line inventory still requires final treatment."
+      }
+    },
+    "releaseSummary": {
+      "supportedClosures": [
+        {
+          "player": "Courtland Sutton",
+          "injuryLoss": 0.071,
+          "method": "PARTIAL_TIME_EXPOSURE"
+        },
+        {
+          "player": "Kris Abrams-Draine",
+          "injuryLoss": 0,
+          "method": "PARTIAL_VALUE_INVARIANT"
+        }
+      ],
+      "exactGaps": [
+        {
+          "player": "Brandon Jones",
+          "supportedHealthyValue": 0.9,
+          "supportedRelief": "Devon Key (0.0)",
+          "blocker": "No eligible official exposure boundary or snap bound"
+        },
+        {
+          "player": "Peter Woods",
+          "supportedHealthyValue": 0.5,
+          "supportedRelief": "Bryson Eason (0.0 official EA supplement)",
+          "blocker": "No eligible official exposure boundary; rotational role cannot use every-snap bound"
+        }
+      ],
+      "capacityLimitedClosures": 0,
+      "pairedGameReady": false,
+      "pairedGameReadyReason": "These four cases do not close the retained complete paired inventory; Jones, Woods and other base-evidence cases remain unresolved."
+    }
+  },
+  "games": [
+    {
+      "gameKey": "2026-W08-KC-DEN",
+      "away": "KC",
+      "home": "DEN",
+      "state": "BLOCKED",
+      "final": {
+        "awayScore": 24,
+        "homeScore": 28,
+        "status": "FINAL_REGULATION",
+        "sourceId": "kc-den-official-final-gamebook",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      "checklist": {
+        "verifiedFinalResult": "COMPLETE_OFFICIAL",
+        "frozenKickoffRatingsAndH4": "COMPLETE_REUSED_IMMUTABLE",
+        "finalInactiveReserveAndElevationInventories": "COMPLETE_PAIRED_SOURCE_BOUND_REUSED",
+        "pairedParticipation": "COMPLETE_OFFICIAL_STARTERS_SUBSTITUTIONS_DNP_NO_SNAP_COUNTS",
+        "quarterbackParticipation": "COMPLETE_STARTERS_DNP_BACKUPS_AND_EMERGENCY_INACTIVES",
+        "specialistParticipation": "COMPLETE_IDENTITIES_AND_USAGE",
+        "officialInGameInjuryReporting": "COMPLETE_LITERAL_GAMEBOOK_ANNOTATION_AUDIT_BOUNDARIES_UNRESOLVED",
+        "pairedGameDayInjuryLoss": "BLOCKED_TWO_SUPPORTED_CASE_CLOSURES_TWO_EXPOSURE_BOUNDARIES_UNRESOLVED"
+      },
+      "candidateTeamSections": [
+        {
+          "team": "KC",
+          "side": "AWAY",
+          "completeCandidateSection": true,
+          "baseInventoryReuse": {
+            "sourceBlobSha": "ce6001250da20bc2642d8a14fa0df80a0743537b",
+            "fields": [
+              "finalInactive",
+              "reserveUnavailable",
+              "gameDayElevations",
+              "resolvedNumericalCases",
+              "unresolvedNumericalCases"
+            ],
+            "treatment": "RETAIN_ALL_WITHOUT_REBINDING_OR_REWRITING"
+          },
+          "starters": {
+            "offense": [
+              "X.Worthy",
+              "R.Rice",
+              "K.Benson",
+              "M.Caliendo",
+              "C.Humphrey",
+              "Tr.Smith",
+              "J.Moore",
+              "N.Gray",
+              "T.Kelce",
+              "P.Mahomes",
+              "K.Walker"
+            ],
+            "defense": [
+              "G.Karlaftis",
+              "K.Tonga",
+              "C.Jones",
+              "F.Anudike-Uzomah",
+              "J.Cochrane",
+              "D.Tranquill",
+              "N.Bolton",
+              "C.Conner",
+              "N.Williams",
+              "K.Fulton",
+              "A.Gilman"
+            ]
+          },
+          "substitutes": [
+            "H.Butker",
+            "E.Johnson",
+            "J.Royals",
+            "J.Wiley",
+            "C.Allen",
+            "M.Araiza",
+            "J.Hicks",
+            "J.Canady",
+            "X.Nwankpa",
+            "C.Roland-Wallace",
+            "J.Bassa",
+            "J.Ott",
+            "M.Smith",
+            "J.Winchester",
+            "C.McDonald",
+            "R.Thomas",
+            "H.Nourzad",
+            "K.Suamataia",
+            "N.Remigio",
+            "A.Armstrong",
+            "J.Briningstool",
+            "B.Eason",
+            "A.Gillotte",
+            "P.Woods"
+          ],
+          "didNotPlay": [
+            "J.Fields",
+            "J.Ezeudu"
+          ],
+          "quarterbackInventory": {
+            "starterAndSoleStatisticalQuarterback": "Patrick Mahomes",
+            "activeDidNotPlay": "Justin Fields",
+            "inactiveEmergencyThirdQuarterback": "Garrett Nussmeier",
+            "state": "COMPLETE_OFFICIAL"
+          },
+          "specialistInventory": {
+            "kicker": "Harrison Butker",
+            "punter": "Matt Araiza",
+            "longSnapper": "James Winchester",
+            "state": "COMPLETE_OFFICIAL_IDENTITIES_AND_USAGE"
+          },
+          "inGameInjuryInventory": [
+            {
+              "player": "Peter Woods",
+              "state": "UNRESOLVED_EXPOSURE_NOT_ZERO",
+              "literalGamebookFacts": [
+                "Questionable update printed on page 9 immediately after the Q1 4:29 timeout",
+                "Out update printed on page 14 immediately after the Q3 1:06 timeout"
+              ],
+              "missingFacts": [
+                "departure play or clock",
+                "return",
+                "gamebook injury type",
+                "snap counts"
+              ],
+              "footballImpact": "KC defensive-line exposure and distinct relief allocation cannot be scaled without a departure boundary or eligible exposure method.",
+              "requiredDecision": "Bind immutable healthy value and current source-supported KC defensive-line relief while preserving common starter duties; no interval, brief-return or snap-bound method is currently eligible.",
+              "sourceId": "kc-den-official-final-gamebook",
+              "pages": [
+                9,
+                14
+              ]
+            }
+          ],
+          "resolvedCasesRetained": [
+            "2026-W08-KC-Omarr-Norman-Lott"
+          ],
+          "unresolvedCasesRetained": "ALL_CASES_FROM_BASE_EVIDENCE_BLOB_ce6001250da20bc2642d8a14fa0df80a0743537b",
+          "coverageNote": "The gamebook contains participation categories but no snap-count table. DNP status is not converted into injury loss.",
+          "caseCorrections": [
+            {
+              "caseKey": "2026-W08-KC-FINAL-DT-Peter-Woods-in-game-neck-injury",
+              "team": "KC",
+              "player": "Peter Woods",
+              "state": "EXACT_METHOD_GAP",
+              "healthyValueBinding": {
+                "eaPlayerId": "16269",
+                "waltersPoints": 0.5,
+                "provenance": "kcShard"
+              },
+              "supportedRoleDraft": {
+                "replacementResolution": "PRIMARY_REPLACEMENT",
+                "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+                "replacement": {
+                  "player": "Bryson Eason",
+                  "eaPlayerId": "16415",
+                  "waltersPoints": 0,
+                  "valueProvenance": "officialEaSupplement"
+                },
+                "unscaledReplacementDifference": 0.5,
+                "roleRationale": "The official depth chart identifies Eason as the other DT reserve and the official gamebook lists Eason as a substitute. His value comes from the committed official EA supplement through the unchanged curve.",
+                "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                "baselineDutiesDisplaced": false
+              },
+              "baselineAndCapacityReview": {
+                "commonBaseline": [
+                  {
+                    "player": "Chris Jones",
+                    "status": "GAMEBOOK_STARTER",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "Khyiris Tonga",
+                    "status": "GAMEBOOK_STARTER",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "Felix Anudike-Uzomah",
+                    "status": "GAMEBOOK_STARTER",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "George Karlaftis",
+                    "status": "GAMEBOOK_STARTER",
+                    "additionalReliefCredit": 0
+                  }
+                ],
+                "otherUnavailableOrResolved": [
+                  "Omarr Norman-Lott: retained zero-calibrated case; no replacement reserved",
+                  "Jack Pyburn: final inactive and cannot relieve Woods",
+                  "Tyreke Smith: final inactive and cannot relieve Woods"
+                ],
+                "availableUnreservedCandidate": "Bryson Eason",
+                "capacityLimitedEligible": false,
+                "capacityLimitedReason": "Bryson Eason is an unused source-bound active DT reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+              },
+              "adapterTests": {
+                "literalInterval": "INELIGIBLE_NO_DOCUMENTED_DEPARTURE_OR_RETURN",
+                "briefReturnPrior": "INELIGIBLE_NO_RETURN",
+                "everySnapBound": "INELIGIBLE_ROTATIONAL_ROLE_AND_NO_VERIFIED_SNAP_COUNTS",
+                "capacityLimited": "INELIGIBLE_UNUSED_HEALTHY_CANDIDATE_BRYSON_EASON"
+              },
+              "exactBlocker": {
+                "code": "EXPOSURE_BOUNDARY_UNSUPPORTED",
+                "missingFact": "The official gamebook prints a questionable update after the Q1 4:29 timeout and an out update after the Q3 1:06 timeout, but no departure play/clock, return, injury type, or snap counts.",
+                "unknownBoundaryTreatment": "No status-update placement is treated as a departure, and no full-game or broad midpoint exposure is proposed. Woods is rotational, so the every-snap missing-share adapter is unavailable even if only a generic participation row exists.",
+                "requiredSourceOrDecision": "An official game-specific departure/return boundary is required for the existing interval adapter. Absent that fact, the source-supported value and Eason relief draft remain nonnumeric."
+              }
+            }
+          ],
+          "methodAndValueBinding": {
+            "sourcePhase": "WEEK8_KC_DEN_VALUE_ROLE_RECONCILIATION",
+            "registry": {
+              "path": "data/walters/nfl/player-values/player-values-2026-v1.json",
+              "blobSha": "dbba71f6830daff5e07b622597681b8abdc9f011",
+              "state": "IMMUTABLE_FROZEN_REGISTRY"
+            },
+            "teamShard": {
+              "path": "data/walters/nfl/player-values/by-team-v1/kc.json",
+              "blobSha": "3c56a61671547aa569d145d31162a013b9da88ed"
+            },
+            "officialEaSupplement": {
+              "path": "data/walters/nfl/2026/week-05-weekly-evidence/2026-10-08-thursday-ea-supplement-binding.json",
+              "commit": "342f080d3fb39451abd5e859f978e4933d39aaae",
+              "blobSha": "7bd98ecfd85aee88630be9f1204cc0b09379d494",
+              "sourceAuthority": "EA_OFFICIAL_MADDEN_NFL_27",
+              "lockedRegistryBlob": "dbba71f6830daff5e07b622597681b8abdc9f011",
+              "estimateAcknowledged": true,
+              "rationale": "Retrospective committed official EA Week 1 capture supplies Bryson Eason, who is absent from the frozen registry; it does not overwrite a frozen identity."
+            }
+          }
+        },
+        {
+          "team": "DEN",
+          "side": "HOME",
+          "completeCandidateSection": true,
+          "baseInventoryReuse": {
+            "sourceBlobSha": "ce6001250da20bc2642d8a14fa0df80a0743537b",
+            "fields": [
+              "finalInactive",
+              "reserveUnavailable",
+              "gameDayElevations",
+              "activeRosterPromotions",
+              "resolvedNumericalCases",
+              "unresolvedNumericalCases"
+            ],
+            "treatment": "RETAIN_ALL_WITHOUT_REBINDING_OR_REWRITING"
+          },
+          "starters": {
+            "offense": [
+              "T.Franklin",
+              "M.Mims",
+              "A.Trautman",
+              "G.Bolles",
+              "B.Powers",
+              "L.Wattenberg",
+              "Q.Meinerz",
+              "M.McGlinchey",
+              "N.Adkins",
+              "B.Nix",
+              "J.Dobbins"
+            ],
+            "defense": [
+              "N.Bonitto",
+              "Z.Allen",
+              "D.Jones",
+              "E.Uwazurike",
+              "J.Cooper",
+              "A.Singleton",
+              "J.McMillian",
+              "P.Surtain",
+              "R.Moss",
+              "B.Jones",
+              "T.Rapp"
+            ]
+          },
+          "substitutes": [
+            "E.Engram",
+            "W.Lutz",
+            "L.Humphrey",
+            "C.Sutton",
+            "J.Crawshaw",
+            "J.Waddle",
+            "J.Coleman",
+            "J.Barron",
+            "C.Schrader",
+            "D.Key",
+            "K.Abrams-Draine",
+            "J.Skinner",
+            "J.Strnad",
+            "A.Prentice",
+            "K.Reid",
+            "M.Fraboni",
+            "Q.Robinson",
+            "A.Forsyth",
+            "J.Turner",
+            "A.Palczewski",
+            "M.Peart",
+            "D.Tillman",
+            "S.Jones",
+            "M.Roach"
+          ],
+          "didNotPlay": [
+            "J.Stidham"
+          ],
+          "quarterbackInventory": {
+            "starterAndSoleStatisticalQuarterback": "Bo Nix",
+            "activeDidNotPlay": "Jarrett Stidham",
+            "inactiveEmergencyThirdQuarterback": "Sam Ehlinger",
+            "state": "COMPLETE_OFFICIAL"
+          },
+          "specialistInventory": {
+            "kicker": "Wil Lutz",
+            "punterAndHolder": "Jeremy Crawshaw",
+            "longSnapper": "Mitchell Fraboni",
+            "state": "COMPLETE_OFFICIAL_IDENTITIES_AND_USAGE"
+          },
+          "inGameInjuryInventory": [
+            {
+              "player": "Courtland Sutton",
+              "state": "UNRESOLVED_VALUE_AND_RELIEF_NOT_ZERO",
+              "literalGamebookFacts": [
+                "Injured on the Q2 4:59 play on page 11",
+                "Returned on the Q2 1:25 play on page 12"
+              ],
+              "missingFacts": [
+                "game-scoped value binding",
+                "source-supported relief identity or committee",
+                "formal eligible exposure declaration"
+              ],
+              "footballImpact": "The complete interval can scale receiver loss only after disjoint replacement duties are bound.",
+              "requiredDecision": "Use the existing interval-exposure adapter only after value, relief and baseline-preservation requirements are satisfied.",
+              "sourceId": "kc-den-official-final-gamebook",
+              "pages": [
+                11,
+                12
+              ]
+            },
+            {
+              "player": "Kris Abrams-Draine",
+              "state": "UNRESOLVED_EXPOSURE_NOT_ZERO",
+              "literalGamebookFacts": [
+                "Questionable update printed after Q2 2:21 and before Q2 2:14 on page 12",
+                "Return printed at the Q2 1:15 possession boundary on page 12"
+              ],
+              "missingFacts": [
+                "departure play or clock",
+                "gamebook injury type",
+                "snap counts",
+                "distinct defensive replacement"
+              ],
+              "footballImpact": "The missing departure prevents literal interval arithmetic and his special-teams participation does not establish defensive relief.",
+              "requiredDecision": "Use the approved brief-return prior only if its explicit conditions, game-scoped value, actual role and distinct replacement are all satisfied; otherwise retain unknown exposure.",
+              "sourceId": "kc-den-official-final-gamebook",
+              "pages": [
+                12
+              ]
+            },
+            {
+              "player": "Brandon Jones",
+              "state": "UNRESOLVED_EXPOSURE_AND_CLUSTER_NOT_ZERO",
+              "literalGamebookFacts": [
+                "Out update printed after Q3 11:12 and before Q3 10:33 on page 13"
+              ],
+              "missingFacts": [
+                "departure play or clock",
+                "return",
+                "gamebook injury type",
+                "snap counts",
+                "disjoint defensive-back replacement"
+              ],
+              "footballImpact": "Safety exposure and Denver's defensive-back cluster cannot be valued without an eligible boundary and nonduplicated relief.",
+              "requiredDecision": "Bind value and current role/capacity evidence. JL Skinner is reserved to Hufanga, Taylor Rapp is a common baseline starter, and Abrams-Draine is a separate injury case; none may be reused without an authorized capacity treatment.",
+              "sourceId": "kc-den-official-final-gamebook",
+              "pages": [
+                13
+              ]
+            }
+          ],
+          "resolvedCasesRetained": [
+            "2026-W08-DEN-RJ-Harvey",
+            "2026-W08-DEN-Talanoa-Hufanga"
+          ],
+          "unresolvedCasesRetained": "ALL_CASES_FROM_BASE_EVIDENCE_BLOB_ce6001250da20bc2642d8a14fa0df80a0743537b",
+          "coverageNote": "The gamebook contains participation categories but no snap-count table. Stidham DNP and emergency-third-quarterback inactivity do not create injury loss.",
+          "caseCorrections": [
+            {
+              "caseKey": "2026-W08-DEN-FINAL-WR-Courtland-Sutton-in-game-injury-interval",
+              "team": "DEN",
+              "player": "Courtland Sutton",
+              "state": "SUPPORTED_PROPOSED_CLOSURE",
+              "healthyValueBinding": {
+                "eaPlayerId": "13087",
+                "waltersPoints": 1.2,
+                "provenance": "denShard"
+              },
+              "baselineAndCapacityReview": {
+                "commonOrAlreadyOccupied": [
+                  {
+                    "player": "Marvin Mims Jr",
+                    "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "Troy Franklin",
+                    "status": "GAMEBOOK_STARTER",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "Jaylen Waddle",
+                    "status": "HEALTHY_DEPTH_FIRST_BASELINE_CONTRIBUTOR",
+                    "additionalReliefCredit": 0
+                  }
+                ],
+                "unavailable": [
+                  "Courtland Sutton during the literal interval",
+                  "Pat Bryant (Reserve/Injured)"
+                ],
+                "availableUnreservedCandidate": "Lil'Jordan Humphrey",
+                "capacityLimitedEligible": false,
+                "capacityLimitedReason": "Lil'Jordan Humphrey is an unused game-active WR reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+              },
+              "proposedEvaluatorCase": {
+                "caseKey": "2026-W08-DEN-FINAL-WR-Courtland-Sutton-in-game-injury-interval",
+                "newlyIdentified": true,
+                "player": "Courtland Sutton",
+                "eaPlayerId": "13087",
+                "resolution": "PARTIAL_TIME_EXPOSURE",
+                "availabilityStatus": "PARTIAL_GAME",
+                "modelId": "graham-replacement-role-estimate-v1",
+                "replacementResolution": "PRIMARY_REPLACEMENT",
+                "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+                "estimateAcknowledged": true,
+                "sourceIds": [
+                  "kc-den-official-final-gamebook",
+                  "den-official-depth-current",
+                  "den-official-roster-current"
+                ],
+                "rationale": "The official gamebook prints the injury at Q2 4:59 and return at Q2 1:25; the official depth/roster plus gamebook participation leave Humphrey as the only unused active WR reserve after common duties are preserved.",
+                "assumptionRationale": "Assign only Sutton's added vacant WR duty to game-active reserve Lil'Jordan Humphrey; this is a documented-depth allocation estimate, not observed snap share.",
+                "baselineDoubleCountReviewed": true,
+                "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                "baselineDutiesDisplaced": false,
+                "baselineRationale": "Mims, Franklin and Waddle retain their common healthy/game baseline duties; Humphrey retains any baseline duty and receives only Sutton's additional vacant duty.",
+                "baselineSourceIds": [
+                  "kc-den-official-final-gamebook",
+                  "den-official-depth-current",
+                  "den-official-roster-current"
+                ],
+                "roleRationale": "Humphrey is a named active WR reserve on the official depth chart and appears in the official gamebook substitute inventory. No actual workload is claimed.",
+                "roleSourceIds": [
+                  "kc-den-official-final-gamebook",
+                  "den-official-depth-current",
+                  "den-official-roster-current"
+                ],
+                "replacements": [
+                  {
+                    "player": "Lil'Jordan Humphrey",
+                    "eaPlayerId": "20501"
+                  }
+                ],
+                "exposure": {
+                  "modelId": "graham-historical-time-exposure-v1",
+                  "estimateAcknowledged": true,
+                  "assumptionRationale": "Use the exact printed regulation elapsed-time interval; elapsed time approximates lost role exposure and does not measure impairment.",
+                  "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+                  "gameDurationSeconds": 3600,
+                  "durationSourceIds": [
+                    "kc-den-official-final-gamebook"
+                  ],
+                  "unavailableIntervals": [
+                    {
+                      "startEarliest": 1501,
+                      "startLatest": 1501,
+                      "endEarliest": 1715,
+                      "endLatest": 1715,
+                      "rationale": "Q2 4:59 injury to Q2 1:25 return is a literal 214-second interval.",
+                      "sourceIds": [
+                        "kc-den-official-final-gamebook"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "expectedEvaluatorResult": {
+                "healthyValue": 1.2,
+                "replacementValue": 0,
+                "fullGameLoss": 1.2,
+                "exposureFraction": 0.059444444444444446,
+                "exposureFractionRange": {
+                  "min": 0.059444444444444446,
+                  "max": 0.059444444444444446
+                },
+                "injuryLoss": 0.071,
+                "injuryLossRange": {
+                  "min": 0.071,
+                  "max": 0.071
+                },
+                "rawTeamContributionDelta": -0.071
+              }
+            },
+            {
+              "caseKey": "2026-W08-DEN-FINAL-CB-Kris-Abrams-Draine-in-game-ankle-interval",
+              "team": "DEN",
+              "player": "Kris Abrams-Draine",
+              "state": "SUPPORTED_PROPOSED_CLOSURE",
+              "healthyValueBinding": {
+                "eaPlayerId": "14954",
+                "waltersPoints": 0.2,
+                "provenance": "denShard"
+              },
+              "baselineAndCapacityReview": {
+                "commonOrAlreadyOccupied": [
+                  {
+                    "player": "Patrick Surtain II",
+                    "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "Riley Moss",
+                    "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                    "additionalReliefCredit": 0
+                  },
+                  {
+                    "player": "Ja'Quan McMillian",
+                    "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                    "additionalReliefCredit": 0
+                  }
+                ],
+                "availableUnreservedCandidate": "Jahdae Barron",
+                "capacityLimitedEligible": false,
+                "capacityLimitedReason": "Jahdae Barron is an unused game-active CB reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+              },
+              "adapterTests": {
+                "literalInterval": "INELIGIBLE_NO_DEPARTURE_BOUNDARY",
+                "briefReturnPrior": "FACTUALLY_AVAILABLE_IF_NEEDED_FROM_OFFICIAL_RETURN_WORDING_BUT_NUMERICALLY_UNNECESSARY",
+                "partialValueInvariant": "ELIGIBLE_AND_PREFERRED_BECAUSE_HEALTHY_AND_RELIEF_VALUES_ARE_BOTH_0.2",
+                "specialTeamsInference": "NOT_USED"
+              },
+              "proposedEvaluatorCase": {
+                "caseKey": "2026-W08-DEN-FINAL-CB-Kris-Abrams-Draine-in-game-ankle-interval",
+                "newlyIdentified": true,
+                "player": "Kris Abrams-Draine",
+                "eaPlayerId": "14954",
+                "resolution": "PARTIAL_VALUE_INVARIANT",
+                "availabilityStatus": "PARTIAL_GAME",
+                "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+                "estimateAcknowledged": true,
+                "sourceIds": [
+                  "kc-den-official-final-gamebook",
+                  "den-official-depth-current",
+                  "den-official-roster-current"
+                ],
+                "rationale": "The official gamebook prints a questionable update followed by a return. The official depth chart establishes Abrams-Draine's defensive reserve role and Barron as the remaining active CB reserve; defensive relief is not inferred from special teams.",
+                "assumptionRationale": "Barron supplies only the additional temporarily vacant CB reserve duty. Because both frozen values are 0.2, any unavailable fraction yields zero replacement-aware loss.",
+                "activeEffectivenessConvention": "NO_UNREPORTED_IMPAIRMENT",
+                "baselineDoubleCountReviewed": true,
+                "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                "baselineDutiesDisplaced": false,
+                "baselineRationale": "Surtain, Moss and McMillian retain common starter duties; Barron retains any baseline reserve duty and receives only the added Abrams-Draine duty.",
+                "baselineSourceIds": [
+                  "kc-den-official-final-gamebook",
+                  "den-official-depth-current",
+                  "den-official-roster-current"
+                ],
+                "roleRationale": "The official defensive depth chart lists Abrams-Draine at RCB and Barron as a CB reserve; the gamebook lists both as participants. This is a documented-depth assumption, not observed defensive snap allocation.",
+                "roleSourceIds": [
+                  "kc-den-official-final-gamebook",
+                  "den-official-depth-current",
+                  "den-official-roster-current"
+                ],
+                "replacements": [
+                  {
+                    "player": "Jahdae Barron",
+                    "eaPlayerId": "15277"
+                  }
+                ]
+              },
+              "expectedEvaluatorResult": {
+                "healthyValue": 0.2,
+                "replacementValue": 0.2,
+                "injuryLoss": 0,
+                "rawTeamContributionDelta": 0,
+                "exposureRange": [
+                  0,
+                  1
+                ],
+                "proof": "Any unavailable fraction times max(0, 0.2 - 0.2) equals zero."
+              }
+            },
+            {
+              "caseKey": "2026-W08-DEN-FINAL-S-Brandon-Jones-in-game-hamstring-injury",
+              "team": "DEN",
+              "player": "Brandon Jones",
+              "state": "EXACT_METHOD_GAP",
+              "healthyValueBinding": {
+                "eaPlayerId": "21267",
+                "waltersPoints": 0.9,
+                "provenance": "denShard"
+              },
+              "supportedRoleDraft": {
+                "replacementResolution": "PRIMARY_REPLACEMENT",
+                "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+                "replacement": {
+                  "player": "Devon Key",
+                  "eaPlayerId": "22623",
+                  "waltersPoints": 0
+                },
+                "unscaledReplacementDifference": 0.9,
+                "roleRationale": "The official depth chart places Devon Key directly behind Brandon Jones and the official gamebook lists Key as a substitute.",
+                "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+                "baselineDutiesDisplaced": false
+              },
+              "baselineAndCapacityReview": {
+                "reserved": [
+                  {
+                    "player": "JL Skinner",
+                    "reservedFor": "2026-W08-DEN-Talanoa-Hufanga"
+                  }
+                ],
+                "commonBaseline": [
+                  {
+                    "player": "Taylor Rapp",
+                    "status": "GAMEBOOK_STARTER",
+                    "additionalReliefCredit": 0
+                  }
+                ],
+                "separateInjuryCase": "Kris Abrams-Draine",
+                "availableUnreservedCandidate": "Devon Key",
+                "capacityLimitedEligible": false,
+                "capacityLimitedReason": "Devon Key is an unused source-bound safety reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+              },
+              "adapterTests": {
+                "literalInterval": "INELIGIBLE_NO_DOCUMENTED_DEPARTURE_OR_RETURN",
+                "briefReturnPrior": "INELIGIBLE_NO_RETURN",
+                "everySnapBound": "INELIGIBLE_NO_VERIFIED_PLAYED_OR_TEAM_SNAP_COUNTS",
+                "capacityLimited": "INELIGIBLE_UNUSED_HEALTHY_CANDIDATE_DEVON_KEY"
+              },
+              "exactBlocker": {
+                "code": "EXPOSURE_BOUNDARY_UNSUPPORTED",
+                "missingFact": "The official gamebook prints only an out update after Q3 11:12 and before Q3 10:33. It does not document the departure play/clock, a return, or snap counts.",
+                "unknownBoundaryTreatment": "No departure time, exposure fraction, midpoint, or injuryLoss is proposed. The update-placement clock is not converted into a departure boundary.",
+                "requiredSourceOrDecision": "An official game-specific departure/return boundary or verified eligible every-snap played/team snap counts is required. Without one, keep the role/value draft but leave the case unresolved."
+              }
+            }
+          ],
+          "methodAndValueBinding": {
+            "sourcePhase": "WEEK8_KC_DEN_VALUE_ROLE_RECONCILIATION",
+            "registry": {
+              "path": "data/walters/nfl/player-values/player-values-2026-v1.json",
+              "blobSha": "dbba71f6830daff5e07b622597681b8abdc9f011",
+              "state": "IMMUTABLE_FROZEN_REGISTRY"
+            },
+            "teamShard": {
+              "path": "data/walters/nfl/player-values/by-team-v1/den.json",
+              "blobSha": "eb964a116d2c7ada24e314f05211ee811c41826d"
+            },
+            "officialEaSupplement": null
+          }
+        }
+      ],
+      "clusterSafeguards": [
+        "Preserve every common KC defensive-line starter's normal duty; substitution-list presence does not assign Woods relief.",
+        "Do not reuse JL Skinner after the retained Hufanga estimate.",
+        "Do not reuse Jonah Coleman after the retained RJ Harvey estimate without an authorized capacity treatment.",
+        "Do not infer defensive replacement duty from special-teams-only participation."
+      ],
+      "blockingReasons": [
+        "Peter Woods has a supported 0.5 value and Bryson Eason 0.0 relief, but no official departure/return boundary; his rotational role cannot use the every-snap adapter.",
+        "Brandon Jones has a supported 0.9 value and Devon Key 0.0 relief, but no official departure/return boundary or eligible snap bound.",
+        "Courtland Sutton is supported at 0.071 over the exact 214-second interval with Lil Jordan Humphrey documented-depth relief.",
+        "Kris Abrams-Draine is supported at zero through PARTIAL_VALUE_INVARIANT with Jahdae Barron; no exposure precision is manufactured.",
+        "All other retained base cases remain explicit and the pair is not READY."
+      ],
+      "nextAction": "Retain the two supported proposed closures, resolve Woods and Brandon Jones only with an eligible official boundary/method, reconcile every other base case, and validate both teams together.",
+      "supportedCaseReviews": [
+        {
+          "caseKey": "2026-W08-DEN-FINAL-WR-Courtland-Sutton-in-game-injury-interval",
+          "team": "DEN",
+          "player": "Courtland Sutton",
+          "state": "SUPPORTED_PROPOSED_CLOSURE",
+          "healthyValueBinding": {
+            "eaPlayerId": "13087",
+            "waltersPoints": 1.2,
+            "provenance": "denShard"
+          },
+          "baselineAndCapacityReview": {
+            "commonOrAlreadyOccupied": [
+              {
+                "player": "Marvin Mims Jr",
+                "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "Troy Franklin",
+                "status": "GAMEBOOK_STARTER",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "Jaylen Waddle",
+                "status": "HEALTHY_DEPTH_FIRST_BASELINE_CONTRIBUTOR",
+                "additionalReliefCredit": 0
+              }
+            ],
+            "unavailable": [
+              "Courtland Sutton during the literal interval",
+              "Pat Bryant (Reserve/Injured)"
+            ],
+            "availableUnreservedCandidate": "Lil'Jordan Humphrey",
+            "capacityLimitedEligible": false,
+            "capacityLimitedReason": "Lil'Jordan Humphrey is an unused game-active WR reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+          },
+          "proposedEvaluatorCase": {
+            "caseKey": "2026-W08-DEN-FINAL-WR-Courtland-Sutton-in-game-injury-interval",
+            "newlyIdentified": true,
+            "player": "Courtland Sutton",
+            "eaPlayerId": "13087",
+            "resolution": "PARTIAL_TIME_EXPOSURE",
+            "availabilityStatus": "PARTIAL_GAME",
+            "modelId": "graham-replacement-role-estimate-v1",
+            "replacementResolution": "PRIMARY_REPLACEMENT",
+            "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "kc-den-official-final-gamebook",
+              "den-official-depth-current",
+              "den-official-roster-current"
+            ],
+            "rationale": "The official gamebook prints the injury at Q2 4:59 and return at Q2 1:25; the official depth/roster plus gamebook participation leave Humphrey as the only unused active WR reserve after common duties are preserved.",
+            "assumptionRationale": "Assign only Sutton's added vacant WR duty to game-active reserve Lil'Jordan Humphrey; this is a documented-depth allocation estimate, not observed snap share.",
+            "baselineDoubleCountReviewed": true,
+            "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+            "baselineDutiesDisplaced": false,
+            "baselineRationale": "Mims, Franklin and Waddle retain their common healthy/game baseline duties; Humphrey retains any baseline duty and receives only Sutton's additional vacant duty.",
+            "baselineSourceIds": [
+              "kc-den-official-final-gamebook",
+              "den-official-depth-current",
+              "den-official-roster-current"
+            ],
+            "roleRationale": "Humphrey is a named active WR reserve on the official depth chart and appears in the official gamebook substitute inventory. No actual workload is claimed.",
+            "roleSourceIds": [
+              "kc-den-official-final-gamebook",
+              "den-official-depth-current",
+              "den-official-roster-current"
+            ],
+            "replacements": [
+              {
+                "player": "Lil'Jordan Humphrey",
+                "eaPlayerId": "20501"
+              }
+            ],
+            "exposure": {
+              "modelId": "graham-historical-time-exposure-v1",
+              "estimateAcknowledged": true,
+              "assumptionRationale": "Use the exact printed regulation elapsed-time interval; elapsed time approximates lost role exposure and does not measure impairment.",
+              "activeEffectivenessConvention": "NORMAL_WHILE_ACTIVE_ESTIMATE",
+              "gameDurationSeconds": 3600,
+              "durationSourceIds": [
+                "kc-den-official-final-gamebook"
+              ],
+              "unavailableIntervals": [
+                {
+                  "startEarliest": 1501,
+                  "startLatest": 1501,
+                  "endEarliest": 1715,
+                  "endLatest": 1715,
+                  "rationale": "Q2 4:59 injury to Q2 1:25 return is a literal 214-second interval.",
+                  "sourceIds": [
+                    "kc-den-official-final-gamebook"
+                  ]
+                }
+              ]
+            }
+          },
+          "expectedEvaluatorResult": {
+            "healthyValue": 1.2,
+            "replacementValue": 0,
+            "fullGameLoss": 1.2,
+            "exposureFraction": 0.059444444444444446,
+            "exposureFractionRange": {
+              "min": 0.059444444444444446,
+              "max": 0.059444444444444446
+            },
+            "injuryLoss": 0.071,
+            "injuryLossRange": {
+              "min": 0.071,
+              "max": 0.071
+            },
+            "rawTeamContributionDelta": -0.071
+          }
+        },
+        {
+          "caseKey": "2026-W08-DEN-FINAL-CB-Kris-Abrams-Draine-in-game-ankle-interval",
+          "team": "DEN",
+          "player": "Kris Abrams-Draine",
+          "state": "SUPPORTED_PROPOSED_CLOSURE",
+          "healthyValueBinding": {
+            "eaPlayerId": "14954",
+            "waltersPoints": 0.2,
+            "provenance": "denShard"
+          },
+          "baselineAndCapacityReview": {
+            "commonOrAlreadyOccupied": [
+              {
+                "player": "Patrick Surtain II",
+                "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "Riley Moss",
+                "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "Ja'Quan McMillian",
+                "status": "GAMEBOOK_STARTER_AND_DEPTH_FIRST",
+                "additionalReliefCredit": 0
+              }
+            ],
+            "availableUnreservedCandidate": "Jahdae Barron",
+            "capacityLimitedEligible": false,
+            "capacityLimitedReason": "Jahdae Barron is an unused game-active CB reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+          },
+          "adapterTests": {
+            "literalInterval": "INELIGIBLE_NO_DEPARTURE_BOUNDARY",
+            "briefReturnPrior": "FACTUALLY_AVAILABLE_IF_NEEDED_FROM_OFFICIAL_RETURN_WORDING_BUT_NUMERICALLY_UNNECESSARY",
+            "partialValueInvariant": "ELIGIBLE_AND_PREFERRED_BECAUSE_HEALTHY_AND_RELIEF_VALUES_ARE_BOTH_0.2",
+            "specialTeamsInference": "NOT_USED"
+          },
+          "proposedEvaluatorCase": {
+            "caseKey": "2026-W08-DEN-FINAL-CB-Kris-Abrams-Draine-in-game-ankle-interval",
+            "newlyIdentified": true,
+            "player": "Kris Abrams-Draine",
+            "eaPlayerId": "14954",
+            "resolution": "PARTIAL_VALUE_INVARIANT",
+            "availabilityStatus": "PARTIAL_GAME",
+            "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+            "estimateAcknowledged": true,
+            "sourceIds": [
+              "kc-den-official-final-gamebook",
+              "den-official-depth-current",
+              "den-official-roster-current"
+            ],
+            "rationale": "The official gamebook prints a questionable update followed by a return. The official depth chart establishes Abrams-Draine's defensive reserve role and Barron as the remaining active CB reserve; defensive relief is not inferred from special teams.",
+            "assumptionRationale": "Barron supplies only the additional temporarily vacant CB reserve duty. Because both frozen values are 0.2, any unavailable fraction yields zero replacement-aware loss.",
+            "activeEffectivenessConvention": "NO_UNREPORTED_IMPAIRMENT",
+            "baselineDoubleCountReviewed": true,
+            "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+            "baselineDutiesDisplaced": false,
+            "baselineRationale": "Surtain, Moss and McMillian retain common starter duties; Barron retains any baseline reserve duty and receives only the added Abrams-Draine duty.",
+            "baselineSourceIds": [
+              "kc-den-official-final-gamebook",
+              "den-official-depth-current",
+              "den-official-roster-current"
+            ],
+            "roleRationale": "The official defensive depth chart lists Abrams-Draine at RCB and Barron as a CB reserve; the gamebook lists both as participants. This is a documented-depth assumption, not observed defensive snap allocation.",
+            "roleSourceIds": [
+              "kc-den-official-final-gamebook",
+              "den-official-depth-current",
+              "den-official-roster-current"
+            ],
+            "replacements": [
+              {
+                "player": "Jahdae Barron",
+                "eaPlayerId": "15277"
+              }
+            ]
+          },
+          "expectedEvaluatorResult": {
+            "healthyValue": 0.2,
+            "replacementValue": 0.2,
+            "injuryLoss": 0,
+            "rawTeamContributionDelta": 0,
+            "exposureRange": [
+              0,
+              1
+            ],
+            "proof": "Any unavailable fraction times max(0, 0.2 - 0.2) equals zero."
+          }
+        },
+        {
+          "caseKey": "2026-W08-DEN-FINAL-S-Brandon-Jones-in-game-hamstring-injury",
+          "team": "DEN",
+          "player": "Brandon Jones",
+          "state": "EXACT_METHOD_GAP",
+          "healthyValueBinding": {
+            "eaPlayerId": "21267",
+            "waltersPoints": 0.9,
+            "provenance": "denShard"
+          },
+          "supportedRoleDraft": {
+            "replacementResolution": "PRIMARY_REPLACEMENT",
+            "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+            "replacement": {
+              "player": "Devon Key",
+              "eaPlayerId": "22623",
+              "waltersPoints": 0
+            },
+            "unscaledReplacementDifference": 0.9,
+            "roleRationale": "The official depth chart places Devon Key directly behind Brandon Jones and the official gamebook lists Key as a substitute.",
+            "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+            "baselineDutiesDisplaced": false
+          },
+          "baselineAndCapacityReview": {
+            "reserved": [
+              {
+                "player": "JL Skinner",
+                "reservedFor": "2026-W08-DEN-Talanoa-Hufanga"
+              }
+            ],
+            "commonBaseline": [
+              {
+                "player": "Taylor Rapp",
+                "status": "GAMEBOOK_STARTER",
+                "additionalReliefCredit": 0
+              }
+            ],
+            "separateInjuryCase": "Kris Abrams-Draine",
+            "availableUnreservedCandidate": "Devon Key",
+            "capacityLimitedEligible": false,
+            "capacityLimitedReason": "Devon Key is an unused source-bound safety reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+          },
+          "adapterTests": {
+            "literalInterval": "INELIGIBLE_NO_DOCUMENTED_DEPARTURE_OR_RETURN",
+            "briefReturnPrior": "INELIGIBLE_NO_RETURN",
+            "everySnapBound": "INELIGIBLE_NO_VERIFIED_PLAYED_OR_TEAM_SNAP_COUNTS",
+            "capacityLimited": "INELIGIBLE_UNUSED_HEALTHY_CANDIDATE_DEVON_KEY"
+          },
+          "exactBlocker": {
+            "code": "EXPOSURE_BOUNDARY_UNSUPPORTED",
+            "missingFact": "The official gamebook prints only an out update after Q3 11:12 and before Q3 10:33. It does not document the departure play/clock, a return, or snap counts.",
+            "unknownBoundaryTreatment": "No departure time, exposure fraction, midpoint, or injuryLoss is proposed. The update-placement clock is not converted into a departure boundary.",
+            "requiredSourceOrDecision": "An official game-specific departure/return boundary or verified eligible every-snap played/team snap counts is required. Without one, keep the role/value draft but leave the case unresolved."
+          }
+        },
+        {
+          "caseKey": "2026-W08-KC-FINAL-DT-Peter-Woods-in-game-neck-injury",
+          "team": "KC",
+          "player": "Peter Woods",
+          "state": "EXACT_METHOD_GAP",
+          "healthyValueBinding": {
+            "eaPlayerId": "16269",
+            "waltersPoints": 0.5,
+            "provenance": "kcShard"
+          },
+          "supportedRoleDraft": {
+            "replacementResolution": "PRIMARY_REPLACEMENT",
+            "primaryEvidence": "DOCUMENTED_DEPTH_ESTIMATE",
+            "replacement": {
+              "player": "Bryson Eason",
+              "eaPlayerId": "16415",
+              "waltersPoints": 0,
+              "valueProvenance": "officialEaSupplement"
+            },
+            "unscaledReplacementDifference": 0.5,
+            "roleRationale": "The official depth chart identifies Eason as the other DT reserve and the official gamebook lists Eason as a substitute. His value comes from the committed official EA supplement through the unchanged curve.",
+            "baselineTreatment": "ADDITIONAL_DUTIES_ONLY",
+            "baselineDutiesDisplaced": false
+          },
+          "baselineAndCapacityReview": {
+            "commonBaseline": [
+              {
+                "player": "Chris Jones",
+                "status": "GAMEBOOK_STARTER",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "Khyiris Tonga",
+                "status": "GAMEBOOK_STARTER",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "Felix Anudike-Uzomah",
+                "status": "GAMEBOOK_STARTER",
+                "additionalReliefCredit": 0
+              },
+              {
+                "player": "George Karlaftis",
+                "status": "GAMEBOOK_STARTER",
+                "additionalReliefCredit": 0
+              }
+            ],
+            "otherUnavailableOrResolved": [
+              "Omarr Norman-Lott: retained zero-calibrated case; no replacement reserved",
+              "Jack Pyburn: final inactive and cannot relieve Woods",
+              "Tyreke Smith: final inactive and cannot relieve Woods"
+            ],
+            "availableUnreservedCandidate": "Bryson Eason",
+            "capacityLimitedEligible": false,
+            "capacityLimitedReason": "Bryson Eason is an unused source-bound active DT reserve; UNALLOCATED_AVAILABLE_CAPACITY would reject capacity-limited treatment."
+          },
+          "adapterTests": {
+            "literalInterval": "INELIGIBLE_NO_DOCUMENTED_DEPARTURE_OR_RETURN",
+            "briefReturnPrior": "INELIGIBLE_NO_RETURN",
+            "everySnapBound": "INELIGIBLE_ROTATIONAL_ROLE_AND_NO_VERIFIED_SNAP_COUNTS",
+            "capacityLimited": "INELIGIBLE_UNUSED_HEALTHY_CANDIDATE_BRYSON_EASON"
+          },
+          "exactBlocker": {
+            "code": "EXPOSURE_BOUNDARY_UNSUPPORTED",
+            "missingFact": "The official gamebook prints a questionable update after the Q1 4:29 timeout and an out update after the Q3 1:06 timeout, but no departure play/clock, return, injury type, or snap counts.",
+            "unknownBoundaryTreatment": "No status-update placement is treated as a departure, and no full-game or broad midpoint exposure is proposed. Woods is rotational, so the every-snap missing-share adapter is unavailable even if only a generic participation row exists.",
+            "requiredSourceOrDecision": "An official game-specific departure/return boundary is required for the existing interval adapter. Absent that fact, the source-supported value and Eason relief draft remain nonnumeric."
+          }
+        }
+      ]
+    }
+  ]
+}
