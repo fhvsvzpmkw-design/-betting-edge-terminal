@@ -84,3 +84,41 @@ Local shared-report authority regression, Graham task/schedule/prompt regression
 Two fresh-context read-only implementation reviewers examined the quality/ownership contracts. Their material findings were corrected before deployment: grading findings are explicit exception diagnoses unless independently verified through supported deterministic paths; unchanged no-delegation checks create no timestamp-only activity receipt; baseline ownership uses one conditional expected-head RUN_STARTED claim covering all nonterminal checkpoints and requires durable watchdog/control termination before replacement. A terminated owner must stop its workers and cannot revive/merge/stage. No production source retrieval, odds collection or numerical changes occurred in this QA.
 
 The implementation updates only operating instructions, the group policy, the existing Graham prompt builder, task template and documentation. Exact repository readback, twelve task prompt readbacks, unchanged schedules/activation and relevant CI results are recorded in the deployment follow-up.
+
+### Deployed configuration and exact task readback
+
+Configuration commit [99e675f0](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/commit/99e675f0052265247b525990e2063b0774eed4dd) was accepted on authoritative main with an expected-head ref update. All fourteen modified/new files were fetched at that immutable commit and compared with the complete intended UTF-8 content; all matched. Policy blob: f9b96a84cf336113a12a23de3dbe9b15c649f08f.
+
+After the twelve prompt-only updates, a fresh task lookup verified all twenty-five known task IDs: twelve prompts matched the intended group instructions, thirteen other prompts matched their originals, and every title, schedule, activation, timezone and timing mode remained unchanged. The real five-task Graham snapshot also passed tools/graham-task-authority.mjs --snapshot against the updated builder and authoritative schedule, including unchanged mechanical rollover.
+
+| Existing task | Automation ID | Group | Schedule / activation |
+|---|---|---|---|
+| Morning Betting Edge — Main | 6a7b3e283f088191af11ffd569fe7f32 | main | unchanged |
+| Betting Edge — Evening | 6a7b3f1426288191a2c7361eab3f63ff | main | unchanged |
+| Betting Edge — Late | 6a7b3f251b248191b1ae5ae92ece6ea4 | main | unchanged |
+| Morning Betting Edge — Open | 6a7b332b41208191afbf9b4583ddefee | main | unchanged |
+| Morning Betting Edge — Final | 6a7b3e34848c81919349d8944e3512e4 | main | unchanged |
+| Meat Desk Daily | 6a8bc631a66881919e2f81b6bfdbcc4f | meat-desk | unchanged |
+| Graham Walters 90/10 | 6aa07e219f608191bf225f56ddf5bb20 | graham | unchanged |
+| Card Grading | 6a903fccabf08191b60c8dd7d04e798a | grading | unchanged |
+| Graham 16:45 Delta | 6a94a085e124819197674a10e963ddc4 | graham | unchanged |
+| Graham Daily Review | 6a94a072cb4481918fbdf96bb03cfcfd | graham | unchanged |
+| Graham Tuesday Baseline | 6a94a06c26c08191b2f8caf0b2ac139d | graham | unchanged |
+| Graham Sunday Pregame | 6a94a07fab248191aaad210a4ce0ad4c | graham | unchanged |
+
+Crypto source review is manual-only policy, not another scheduled task. The temporary capability-test task stays paused. Neither ATS closeout nor mechanical rollover received a research team. No production odds/research/report/grading run was manually requested for verification.
+
+Live acceptance remains per ordinary execution: actual tool availability, clean context where required, worker IDs/returned findings and their quality impact must appear in its execution output and informational receipt. The earlier startup probe and these configuration tests cannot establish real scheduled research or improved betting results.
+
+### Relevant GitHub checks — all passed
+
+- [Graham task authority validation](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896941) — success.
+- [Major sport market coverage](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896938) — success.
+- [Game Day coverage regression](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896943) — success.
+- [Guy daily researched selection](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896982) — success.
+- [Card evidence application review](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896908) — success.
+- [Report publication reliability](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896937) — success.
+- [Core 1.4 production validation](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896952) — success.
+- [Report producer transfer and recovery](https://github.com/fhvsvzpmkw-design/-betting-edge-terminal/actions/runs/41379896963) — success.
+
+These checks validate the configuration's existing operational boundaries and regressions; they do not establish substantive scheduled agent research. The next ordinary task must provide its actual worker/quality evidence. No additional recurring monitor was created.
