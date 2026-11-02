@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-06:00",
+  "executionRunId": "20261102-open-0600-060959",
+  "workBinding": {
+    "candidateId": "2026-11-02T06:09:59-07:00|1",
+    "checkpointPath": "data/report-production/checkpoints/20261102-open-0600-060959.json",
+    "checkpointRevisionAtLaunch": 1,
+    "feedBlobSha": "5c4b9df6dd555a18eb20e6d76fc0b676a1c5ee1e",
+    "operatingDate": "2026-11-02",
+    "canonicalSlot": 1,
+    "expectedReportTime": "06:00"
+  },
+  "mode": "ADAPTIVE_FULL_POOL",
+  "reason": "The bound queue contains 20 events, 120 available primary selections across NBA, NHL and NFL, plus 43 captured forecasts awaiting applicability review; all four researchers and both reviewers have disjoint useful work.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["72909306", "72909308", "72909310", "72909312", "71515978"],
+      "launchedAt": "2026-11-02T13:11:00Z",
+      "acknowledgedAt": "2026-11-02T13:11:00Z",
+      "returnedAt": null,
+      "state": "RESEARCHING",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719484", "73719486", "73719488", "73719490", "73719492"],
+      "launchedAt": "2026-11-02T13:11:00Z",
+      "acknowledgedAt": "2026-11-02T13:11:00Z",
+      "returnedAt": null,
+      "state": "RESEARCHING",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_3",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719494", "73719496", "73719498", "73719500", "73719502"],
+      "launchedAt": "2026-11-02T13:11:00Z",
+      "acknowledgedAt": "2026-11-02T13:11:00Z",
+      "returnedAt": null,
+      "state": "RESEARCHING",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_4",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719506", "73719508", "73719510", "73719512", "73719514"],
+      "launchedAt": "2026-11-02T13:11:00Z",
+      "acknowledgedAt": "2026-11-02T13:11:00Z",
+      "returnedAt": null,
+      "state": "RESEARCHING",
+      "error": null
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["FULL_QUEUE_OPPOSING_CASE", "GUY_EARLY_SHORTLIST"],
+      "launchedAt": "2026-11-02T13:11:00Z",
+      "acknowledgedAt": "2026-11-02T13:11:00Z",
+      "returnedAt": null,
+      "state": "REVIEWING",
+      "error": null
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["CAPTURED_FORECAST_AUDIT", "71515978_QB_FOLLOW_UP", "PINNACLE_GAPS"],
+      "launchedAt": "2026-11-02T13:11:00Z",
+      "acknowledgedAt": "2026-11-02T13:11:00Z",
+      "returnedAt": null,
+      "state": "REVIEWING",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_SIX_WORKERS",
+      "reason": "Twenty complete events divide evenly across four researchers while two independent reviewers can cover opposing cases, Guy, forecasts, personnel and exact references.",
+      "expectedQualityBenefit": "Complete market-family coverage with independent error detection before coordinator merge.",
+      "releaseCondition": "Each worker returns its bound result or reports an exact failure; no individual failure creates a report-wide veto."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
+    "eventResearchReturned": 0,
+    "criticalReviewsReturned": 0
+  },
+  "remainingWork": {
+    "eventResearch": 20,
+    "criticalReviews": 2,
+    "coordinatorMerge": true,
+    "controllerEventSaves": 20,
+    "prepareFreezeStageReadback": true
+  },
+  "recordedAt": "2026-11-02T13:13:20.787Z"
+}
