@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "status": "OPERATIONAL_CONFIGURATION",
+  "effectiveDate": "2026-11-01",
+  "timezone": "America/Vancouver",
+  "objective": "Improve source-backed research depth, opposing-case review and decision quality.",
+  "coordinatorOnlySpawning": true,
+  "recursiveDelegation": false,
+  "maxOpenWorkersPerCoordinator": 6,
+  "startupAcknowledgmentBoundSeconds": 60,
+  "expansionRequires": [
+    "namedQuestion",
+    "expectedQualityBenefit",
+    "readOnlyAssignment",
+    "completionOrReleaseCondition"
+  ],
+  "expansionStopsAfterCapacityError": true,
+  "inheritTaskModelAndEffort": true,
+  "groups": {
+    "main": {
+      "normalResearchers": 4,
+      "normalReviewers": 2,
+      "maxOpenWorkers": 6,
+      "adaptive": true,
+      "receiptDirectory": "data/report-production/agent-receipts",
+      "scope": "Existing five Main report tasks and Guy handoff"
+    },
+    "graham": {
+      "normalResearchers": 2,
+      "normalReviewers": 1,
+      "maxOpenWorkers": 6,
+      "adaptive": true,
+      "requireFreshMarketFreeContext": true,
+      "receiptDirectory": "data/walters/nfl/research-agent-receipts",
+      "scope": "Existing four research tasks and substantive hourly learning/baseline phases; no mechanical rollover or ATS closeout delegation",
+      "baselineOwnerClaim": "Existing RUN_STARTED event committed with expected main head; losing entrant observes owner"
+    },
+    "meat-desk": {
+      "normalResearchers": 1,
+      "normalReviewers": 1,
+      "maxOpenWorkers": 6,
+      "adaptive": true,
+      "receiptDirectory": "data/research-agents/receipts/meat-desk",
+      "scope": "Existing Meat Desk Daily discovery and thesis review"
+    },
+    "grading": {
+      "normalResearchers": 1,
+      "normalReviewers": 0,
+      "maxOpenWorkers": 6,
+      "adaptive": true,
+      "exceptionsOnly": true,
+      "receiptDirectory": "data/history/grading/agent-receipts",
+      "scope": "Existing 03:30 verification/fallback task, only genuinely unresolved historical cases"
+    },
+    "crypto-sources": {
+      "normalResearchers": 1,
+      "normalReviewers": 1,
+      "maxOpenWorkers": 6,
+      "adaptive": true,
+      "explicitManualReviewOnly": true,
+      "receiptDirectory": "data/research-agents/receipts/crypto-sources",
+      "scope": "Explicitly requested source/PDF analysis; opening the shelf or uploading a file does not start analysis"
+    }
+  },
+  "receipt": {
+    "schema": 1,
+    "informationalOnly": true,
+    "saveAttemptRequired": true,
+    "publicationGate": false,
+    "fields": [
+      "policyId",
+      "group",
+      "taskId",
+      "executionRunId",
+      "workBinding",
+      "mode",
+      "reason",
+      "workers",
+      "scalingDecisions",
+      "qualityFindings",
+      "completedWork",
+      "remainingWork",
+      "recordedAt"
+    ],
+    "saveAttemptRequiredFor": "Substantive delegated phases and actual startup failures",
+    "skipVerifiedUnchangedChecksWithoutDelegation": true
+  },
+  "unchanged": [
+    "task activation and schedules",
+    "odds budgets and normal pulls",
+    "numerical writers and existing validators",
+    "decision thresholds and stakes",
+    "immutable issued History",
+    "single publisher per product"
+  ]
+}

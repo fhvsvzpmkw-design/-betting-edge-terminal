@@ -20,6 +20,8 @@ Start maintenance by reading the current progress section in [PROJECT_STATE.md](
 
 Current operating references:
 
+- [`docs/REPORT_RESEARCH_AGENTS.md`](docs/REPORT_RESEARCH_AGENTS.md) and [`data/research-agents/policy.json`](data/research-agents/policy.json) — adaptive Main/Guy, independent Graham, Meat Desk and grading research groups; explicitly requested manual Crypto source review; actual quality/worker evidence and coordinator limits.
+
 - [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — current progress, verification evidence, open work, owners and resume instructions.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — report/odds schedule, recovery, Core 1.4 gate order, Result Closure, Crypto Specials and downstream boundaries.
 - [`docs/PUBLIC_LEDGER_OPERATIONS.md`](docs/PUBLIC_LEDGER_OPERATIONS.md) — canonical public-ledger path, privacy boundary, upload/replacement procedure, compatibility sync and recovery.

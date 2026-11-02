@@ -5,6 +5,10 @@ Effective November 1, 2026, 00:00 America/Vancouver.
 
 The existing five Main report tasks own Guy's researched daily NHL moneyline choice. This is Guy's independent editorial play, with a prospective flat-one-unit record. It does not change VigScope grades, Core betting authority, bankroll or a customer wager. There is no new scheduled task, prediction-weight formula or odds pull. The current report queue and its publication remain separate; a Guy-specific shortfall must not block independently completed VigScope cards.
 
+## Main-team depth and critical review — November 1
+
+Use the Main group in [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) and [data/research-agents/policy.json](data/research-agents/policy.json); there is no separate Guy task or extra team/pull. Keep one complete-event owner per shortlisted game and use an available critical reviewer for the strongest opposing hockey case, goalie/model applicability and the choice among the actual candidates. The Main coordinator may allocate a bounded specialist question within its six-worker limit. Preserve the early fresh-intake handoff, original clocks and selected-game cutoff. Review findings inform Guy's independent reasoning; agent agreement is not a win probability or permission to change VigScope grades. Record the actual Guy research/review contribution in the Main informational activity receipt while preserving the existing call-staging and publisher ownership.
+
 ## Research and choice
 
 After normal feed/source intake, run `node tools/guy-daily-selection.mjs --shortlist`. It returns the top three eligible MoneyPuck-ranked games, or fewer when fewer have matching fresh forecasts and executable prices. Preserve its source-board blob SHA/as-of and exact event, teams, start and model IDs. Use the saved source board; do not obtain another odds snapshot for Guy. Reuse current NHL research already performed for the report.

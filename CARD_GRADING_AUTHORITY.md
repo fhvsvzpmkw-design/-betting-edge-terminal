@@ -10,6 +10,14 @@ Verification and fallback owner: existing ChatGPT daily task at 03:30 America/Va
 
 Grade the previous Vancouver calendar day's immutable issued Betting Edge cards and older unresolved cards, including older issued cards with missing observation/completion records. This is retrospective settlement, not handicapping or bet execution. The settlement, historical-price, immutable-issuance and retry rules in `data/history/observations/README.md` remain in force. The former 05:00 closure is superseded; the continuing verification task retains its 03:30 schedule.
 
+## Exception research agents — November 1 quality deployment
+
+The existing 03:30 verification/fallback coordinator follows [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) and [data/research-agents/policy.json](data/research-agents/policy.json), group grading. Check the native receipt and in-progress request first. A verified clear historical backlog is a no-op with zero workers. Otherwise use one read-only exception researcher, adding narrowly assigned researchers/reviewers without another permission request for disjoint unresolved historical events or a consequential identity/settlement question, up to six open workers. Workers never spawn agents.
+
+Bind each assignment to the immutable issued report/card, exact event/start/teams, book/market/selection and unresolved reason. Workers return official result/rule evidence and concrete identity conflicts as exception diagnoses with exact issued bindings and source URLs/times. The current READY request has no agent-evidence input: a new workflow pass does not automatically consume those findings. The existing deterministic grader must independently verify through a supported source/identity path; unsupported source/rule/matching findings remain named exceptions for a separately supported repair, never agent-authored observation grades. No live odds, re-handicapping, alternative grades, changed issued cards or betting-ledger writes. Preserve request concurrency and all settlement/immutable-history rules.
+
+The verification coordinator may additionally write compact informational activity receipts only at data/history/grading/agent-receipts/<unique-execution-id>.json; this does not expand the native grader's output allowance. Attempt startup/return/final records and state actual workers, facts/corrections and remaining exceptions. Worker/receipt-save failure never manufactures a settlement or changes scheduling, and metadata is not a successful grading receipt.
+
 ## Reusable execution path
 
 Use authoritative branch `main` in `fhvsvzpmkw-design/-betting-edge-terminal`.

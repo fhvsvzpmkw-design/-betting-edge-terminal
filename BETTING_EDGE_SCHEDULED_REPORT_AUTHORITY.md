@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL
 **Authority version:** 1.2
-**Operating revision:** 2026-11-01.ResearchAgents
+**Operating revision:** 2026-11-01.AdaptiveResearchAgents
 **Repository:** `fhvsvzpmkw-design/-betting-edge-terminal`
 **Branch:** `main`
 
@@ -14,11 +14,13 @@ For reports at/after `2026-09-27T12:00:00-07:00`, this edition controls producer
 
 ## Operating precedence
 
-### Research agents — November 1 deployment
+### Research agent groups — November 1 quality and adaptive deployment
 
-Use [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) inside every existing Main run: four complete-event researchers, two critical reviewers and this producer as the single coordinator. This is an explicit delegation instruction. After normal lane/odds intake and the saved initial checkpoint, perform the bounded six-worker acknowledgment test in the actual executing runtime. If all six respond, use those same workers for disjoint game research and targeted reviews. If tools/capacity are absent or the 60-second startup test fails, record the exact reason and immediately continue the existing coordinator event loop. Deployment does not wait for an advance runtime inspection; actual launch and returned-work evidence are recorded per run. D-045's earlier activation hold is superseded by the user's later setup instruction.
+Use [docs/REPORT_RESEARCH_AGENTS.md](docs/REPORT_RESEARCH_AGENTS.md) and [the group policy](data/research-agents/policy.json) inside every existing Main run. This is explicit delegation and bounded coordinator expansion authority: normally four complete-event researchers, two critical reviewers and this producer as coordinator, with the useful pool sized to the actual queue. After normal intake and the remotely verified initial checkpoint, obtain the selected pool's exact-bound read-only acknowledgments within 60 seconds. Reuse those workers for real research. Only the coordinator may add/reassign help for a named research gap, conflict or opposing case, without another permission request, up to six open workers in the actual runtime. Workers never spawn agents.
 
-Only the coordinator merges event evidence through current expected-revision checkpoints and stages the candidate; the existing publisher retains History ownership. Worker failure or unfinished review is not a new report-wide veto. Preserve current analytical gates, price/source clocks, Guy's early handoff, market isolation of independent Graham numbers, schedules, odds budgets and partial-publication/continuation behavior. The optional compact agent receipt described in the guide is execution metadata, never numerical clearance or a publication gate.
+Prioritize deeper verified findings, Support/Contrary, applicable History Fit, consequential PASS/WAIT reasoning and Guy's early shortlist review. A smaller useful pool or partial startup must be recorded honestly; missing tools, capacity or individual workers select the guide's partial/fallback coordinator loop. This supersedes D-046's all-six-or-fallback startup requirement and optional-only activity recording. Attempt a durable informational activity receipt at startup, meaningful returns and final delivery, including actual IDs, scaling reasons and adopted/rejected findings. A duplicate/already-published retry reads the matching original receipt; absent evidence means UNVERIFIED agent use. Configuration, startup, returned work, corrected decisions and durable publication remain separate facts.
+
+Only the coordinator merges evidence through current expected-revision checkpoints and stages; the existing publisher retains History ownership. Worker failure, reviewer delay or receipt-save failure is not a new report-wide veto. Keep existing analytical gates, price/source clocks, current Guy handoff, independent Graham context, schedules, odds budgets and partial-publication/continuation behavior. The receipt remains metadata in the existing agent-receipts area, never numerical clearance, a new queue or a publication gate.
 
 **November 1 clock repair:** B.C. remains on UTC-7 year-round after March 2026. Preserve America/Vancouver and all five report times. Follow `docs/ODDS_RUN_REQUEST.md` and generate a scheduled request with `node tools/odds-run-request.mjs create --report-time <EXPECTED_REPORT_TIME>` from the actual clock; do not hand-build a winter offset. The shared schedule loader rejects obsolete timezone data, and the odds workflow installs current Node 24 before resolving the request. Preserve actual request/issue timestamps, the existing 10-minute request window, 75-minute pulse/input windows, slot receipts and no-duplicate-spend controls. Never retry the unchanged expired request to correct a timezone mismatch. A failed prior lane is not a current pregame report; resume eligible work in the current normal lane and preserve the exact prior failure.
 
