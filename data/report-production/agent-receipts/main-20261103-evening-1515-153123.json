@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-15:15",
+  "executionRunId": "20261103-evening-1515-153123",
+  "workBinding": {
+    "candidateId": "2026-11-03T15:31:23.000-07:00|4",
+    "checkpointPath": "data/report-production/checkpoints/20261103-evening-1515-153123.json",
+    "checkpointRevisionAtLaunch": 1,
+    "feedBlobSha": "6256aa8b9e5051d58435436c8b6faea15c14aa73",
+    "operatingDate": "2026-11-03",
+    "canonicalSlot": 4,
+    "expectedReportTime": "15:15"
+  },
+  "mode": "ADAPTIVE_FULL_POOL",
+  "reason": "The bound queue contains 13 complete events and 78 available selections. Four disjoint complete-event researchers and two critical reviewers have useful work; Guy's fresh shortlist is empty and requires an explicit source-board review rather than candidate research.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["70898986", "70918976"],
+      "state": "ACKNOWLEDGED",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["72909314", "72909316", "72909318"],
+      "state": "ACKNOWLEDGED",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_3",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["72909322", "72909324", "72909326"],
+      "state": "ACKNOWLEDGED",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_4",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["72909328", "72909330", "72909320", "72909332", "72909334"],
+      "state": "ACKNOWLEDGED",
+      "error": null
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["GUY_EMPTY_SHORTLIST_SOURCE_REVIEW", "NHL_STRONGEST_OPPOSING_CASE"],
+      "state": "ACKNOWLEDGED",
+      "error": null
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["NCAAF_CONTRARY_REVIEW", "PINNACLE_REFERENCE_GAPS", "EXACT_IDENTITY_REVIEW"],
+      "state": "ACKNOWLEDGED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_SIX_WORKERS",
+      "reason": "Thirteen complete events divide into four non-overlapping queues; two reviewers can independently test the empty Guy board, the strongest opposing hockey case, NCAAF uncertainty and exact-reference gaps.",
+      "expectedQualityBenefit": "Complete market-family coverage plus explicit Support/Contrary, current applicability, History Fit and independent critical review.",
+      "releaseCondition": "Each worker returns its bound result or an exact failure; individual failure does not veto independently completed publication."
+    }
+  ],
+  "completedWork": {
+    "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
+    "acknowledgmentClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments inside one bounded window.",
+    "eventResearchReturned": 0,
+    "eventResearchCompleted": 0,
+    "criticalReviewsReturned": 0,
+    "availableSelections": 78,
+    "controllerEventSaves": 0,
+    "publisherState": "NOT_STARTED",
+    "durableControllerReadback": false
+  },
+  "remainingWork": {
+    "eventResearch": 13,
+    "criticalReviews": 2,
+    "coordinatorMerge": true,
+    "controllerEventSaves": 13,
+    "prepareFreezeStageReadback": "PENDING",
+    "guyFollowUp": "Fresh shortlist returned zero eligible rows; reviewer will verify the board/source limitation."
+  },
+  "recordedAt": "2026-11-03T22:33:00.000Z",
+  "state": "STARTUP_SAVED"
+}
