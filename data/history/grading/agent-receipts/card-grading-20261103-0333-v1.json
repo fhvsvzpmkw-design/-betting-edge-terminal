@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "grading",
+  "taskId": "Card Grading",
+  "executionRunId": "41620354432",
+  "workBinding": {
+    "targetDate": "2026-11-02",
+    "priorAgentReceipt": "data/history/grading/agent-receipts/card-grading-20261102-0333-v1.json",
+    "unresolvedEventId": "70898886",
+    "unresolvedReason": "identity_conflict",
+    "eventStart": "2026-10-28T00:00:00Z",
+    "issuedReports": [
+      {
+        "path": "data/history/runs/2026-10-27/evening-154315.json",
+        "blobSha": "6a419053833e5b3e83e22642bb1965ebf0f6d367",
+        "rows": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ]
+      },
+      {
+        "path": "data/history/runs/2026-10-27/final_morning-094833.json",
+        "blobSha": "e069796eeab0b1121828a1e8bbf1c29c65b2c756",
+        "rows": [
+          26,
+          27,
+          28,
+          29
+        ]
+      },
+      {
+        "path": "data/history/runs/2026-10-27/main-083240.json",
+        "blobSha": "3e0c0573298e97d988edceb112222231c95cab2d",
+        "rows": [
+          28,
+          29,
+          30,
+          31
+        ]
+      }
+    ],
+    "exactQuestion": "Did current main gain a repository-supported identity precedence, correction authorization, or repair artifact for event 70898886?"
+  },
+  "mode": "AGENTS_READY",
+  "reason": "The historical backlog was not clear; the existing read-only exception researcher was reused for a bounded current-main support-path check.",
+  "workers": [
+    {
+      "role": "exception researcher",
+      "actualId": "/root/grading_exception_70898886",
+      "readOnly": true,
+      "freshContext": false,
+      "reusedAcknowledgedWorker": true,
+      "assignmentId": "event-70898886-supported-path-recheck",
+      "binding": "Exact immutable issued rows and event 70898886 at 2026-10-28T00:00:00Z",
+      "launchObservedAt": "2026-11-03T10:33Z",
+      "acknowledgmentObservedAt": "2026-11-03T10:33Z",
+      "returnObservedAt": "2026-11-03T10:34:17Z",
+      "state": "RETURNED",
+      "error": null
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "selectedWorkers": 1,
+      "namedQuestion": "Has any supported deterministic repair path appeared for event 70898886?",
+      "expectedQualityBenefit": "Avoid repeating an obsolete exception diagnosis or overlooking newly authorized repair evidence.",
+      "readOnlyAssignment": true,
+      "completionOrReleaseCondition": "Return a changed supported path or confirm the exception remains with current repository evidence.",
+      "expansionDecision": "No expansion: one event, no new conflicting question, and the reused researcher returned a conclusive unchanged diagnosis."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "finding": "No new identity-precedence rule, correction authorization, or repair artifact covers event 70898886; the authority and grader remain unchanged.",
+      "evidence": [
+        "CARD_GRADING_AUTHORITY.md@7cc9c48b74e264ac20302ae0cb3f3c603033c126",
+        "tools/grade-issued-card-history.mjs@57bdd323a6d44f5263935d0654b3c8e71fb23bbc",
+        "data/history/grading/agent-receipts/card-grading-20261102-0333-v1.json@1daf76ee6bd533ba3c4f21d68e262dc3b7895a53"
+      ],
+      "impact": "The prior factual identity diagnosis remains valid, but routine grading must retain identity_conflict and cannot consume agent findings."
+    }
+  ],
+  "completedWork": {
+    "researchersLaunched": 1,
+    "researchersReturned": 1,
+    "reviewsCompleted": 0,
+    "eventsInvestigated": 1,
+    "supportPathChecksCompleted": 1,
+    "newOfficialSourceRetrievals": 0,
+    "findingsAdopted": 1,
+    "findingsRejected": 0
+  },
+  "remainingWork": [
+    "Deterministic grading workflow must independently grade and durably publish November 1 recovery plus November 2 target outputs.",
+    "Event 70898886 remains a separate repair exception unless separately authorized repository support is added."
+  ],
+  "recordedAt": "2026-11-03T10:35:42.009Z"
+}
