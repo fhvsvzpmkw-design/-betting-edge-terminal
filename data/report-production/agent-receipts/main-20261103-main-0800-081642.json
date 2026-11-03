@@ -16,12 +16,96 @@
   "mode": "ADAPTIVE_FULL_POOL",
   "reason": "The bound queue contains 13 complete events, 78 available selections and 46 captured forecasts. Four disjoint complete-event researchers and two critical reviewers have useful work, including the three-game Guy shortlist.",
   "workers": [
-    {"role":"complete-event researcher","id":"/root/researcher_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["70898986","70918976"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"complete-event researcher","id":"/root/researcher_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909314","72909316","72909318"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"complete-event researcher","id":"/root/researcher_3","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909322","72909324","72909326"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"complete-event researcher","id":"/root/researcher_4","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909328","72909330","72909320","72909332","72909334"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"critical reviewer","id":"/root/reviewer_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["GUY_SHORTLIST:72909316","GUY_SHORTLIST:72909324","GUY_SHORTLIST:72909314"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"critical reviewer","id":"/root/reviewer_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["NCAAF_CONTRARY_REVIEW","NHL_EXACT_IDENTITY_AND_BLOCKER_REVIEW"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null}
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": [
+        "70898986",
+        "70918976"
+      ],
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "ackWindowCompletedAt": "2026-11-03T15:18:31Z",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": [
+        "72909314",
+        "72909316",
+        "72909318"
+      ],
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "ackWindowCompletedAt": "2026-11-03T15:18:31Z",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_3",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": [
+        "72909322",
+        "72909324",
+        "72909326"
+      ],
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "ackWindowCompletedAt": "2026-11-03T15:18:31Z",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_4",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": [
+        "72909328",
+        "72909330",
+        "72909320",
+        "72909332",
+        "72909334"
+      ],
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "ackWindowCompletedAt": "2026-11-03T15:18:31Z",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": [
+        "GUY_SHORTLIST:72909316",
+        "GUY_SHORTLIST:72909324",
+        "GUY_SHORTLIST:72909314"
+      ],
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "ackWindowCompletedAt": "2026-11-03T15:18:31Z",
+      "state": "RETURNED",
+      "error": null
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": [
+        "NCAAF_CONTRARY_REVIEW",
+        "NHL_EXACT_IDENTITY_AND_BLOCKER_REVIEW"
+      ],
+      "launchedAt": null,
+      "acknowledgedAt": null,
+      "ackWindowCompletedAt": "2026-11-03T15:18:31Z",
+      "state": "RETURNED",
+      "error": null
+    }
   ],
   "scalingDecisions": [
     {
@@ -31,27 +115,53 @@
       "releaseCondition": "Each worker returns its bound result or an exact failure; individual failure does not veto independently completed publication."
     }
   ],
-  "qualityFindings": [],
+  "qualityFindings": [
+    {
+      "finding": "Guy shortlist rejected for this pulse",
+      "impact": "Montreal, Minnesota and Toronto each had material Pinnacle disagreement and unresolved goalie/personnel dependencies; no dedicated call was staged."
+    },
+    {
+      "finding": "Legacy blockers were separated from current exact identity",
+      "impact": "Buffalo-Miami and Dallas-Washington had qualifying exact DraftKings contracts; the only selection-level exact-reference gap is the Vegas-Pittsburgh puck-line pair."
+    },
+    {
+      "finding": "No actionable model agreement survived review",
+      "impact": "All qualified selections remained zero-stake PASS; provisional single-source or market-blended edges were not promoted."
+    }
+  ],
   "completedWork": {
     "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
     "acknowledgmentClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments inside one bounded window.",
-    "eventResearchReturned": 0,
-    "eventResearchCompleted": 0,
-    "criticalReviewsReturned": 0,
+    "eventResearchReturned": 4,
+    "eventResearchCompleted": 13,
+    "criticalReviewsReturned": 2,
     "availableSelections": 78,
-    "controllerEventSaves": 0,
-    "publisherState": "NOT_STARTED",
-    "durableControllerReadback": false,
+    "controllerEventSaves": 13,
+    "publisherState": "SUCCESS",
+    "durableControllerReadback": true,
     "modelTokenCreditUsage": "UNKNOWN",
-    "overlapTelemetry": "UNKNOWN"
+    "overlapTelemetry": "UNKNOWN",
+    "publicationWorkflowRun": 41665632027,
+    "publicationCommit": "e590722e36f0d90d6eaa2d3c4a93d26c23989055",
+    "controllerRevision": 40
   },
   "remainingWork": {
-    "eventResearch": 13,
-    "criticalReviews": 2,
-    "coordinatorMerge": true,
-    "controllerEventSaves": 13,
-    "prepareFreezeStageReadback": "PENDING",
-    "guyFollowUp": "Review all three source-bound shortlist games, select only if the complete staging contract is supported, then verify the dedicated publisher."
+    "eventResearch": 0,
+    "criticalReviews": 0,
+    "coordinatorMerge": false,
+    "controllerEventSaves": 0,
+    "prepareFreezeStageReadback": "COMPLETE",
+    "guyFollowUp": "No 08:00 call staged; re-evaluate named goalie/personnel dependencies only on the next normal Main intake with a fresh governed board."
   },
-  "recordedAt": "2026-11-03T15:18:31Z"
+  "recordedAt": "2026-11-03T15:55:49.659Z",
+  "finalization": {
+    "candidateId": "2026-11-03T08:34:56-07:00|2",
+    "reportPath": "data/history/runs/2026-11-03/main-083456.json",
+    "sidecarPath": "data/history/research-fit/2026-11-03/main-083456.json",
+    "reportBlobSha": "9618982f7384ad386f70a5c98c5c92a64124e7ef",
+    "sidecarBlobSha": "6b665a43943dc89bf60502aa34e67c3dab54e9ef",
+    "publisherWorkflowRun": 41665632027,
+    "publicationCommit": "e590722e36f0d90d6eaa2d3c4a93d26c23989055",
+    "durableReadbackAt": "2026-11-03T15:55:49.659Z"
+  }
 }
