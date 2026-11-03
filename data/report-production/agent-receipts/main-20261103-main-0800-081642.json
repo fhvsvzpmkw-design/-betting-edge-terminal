@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-08:00",
+  "executionRunId": "20261103-main-0800-081642",
+  "workBinding": {
+    "candidateId": "2026-11-03T08:16:42.877-07:00|2",
+    "checkpointPath": "data/report-production/checkpoints/20261103-main-0800-081642.json",
+    "checkpointRevisionAtLaunch": 1,
+    "feedBlobSha": "cdd89b9d6b3b69692abb13b2fc4b07811f52e63a",
+    "operatingDate": "2026-11-03",
+    "canonicalSlot": 2,
+    "expectedReportTime": "08:00"
+  },
+  "mode": "ADAPTIVE_FULL_POOL",
+  "reason": "The bound queue contains 13 complete events, 78 available selections and 46 captured forecasts. Four disjoint complete-event researchers and two critical reviewers have useful work, including the three-game Guy shortlist.",
+  "workers": [
+    {"role":"complete-event researcher","id":"/root/researcher_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["70898986","70918976"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909314","72909316","72909318"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_3","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909322","72909324","72909326"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_4","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909328","72909330","72909320","72909332","72909334"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["GUY_SHORTLIST:72909316","GUY_SHORTLIST:72909324","GUY_SHORTLIST:72909314"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["NCAAF_CONTRARY_REVIEW","NHL_EXACT_IDENTITY_AND_BLOCKER_REVIEW"],"launchedAt":null,"acknowledgedAt":null,"ackWindowCompletedAt":"2026-11-03T15:18:31Z","state":"ACKNOWLEDGED","error":null}
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_SIX_WORKERS",
+      "reason": "Thirteen complete events divide into four non-overlapping queues; the two reviewers can independently test Guy's three candidates and the highest-risk exact-identity/blocked cases.",
+      "expectedQualityBenefit": "Complete market-family coverage plus explicit Support/Contrary, current applicability, History Fit and independent shortlist review.",
+      "releaseCondition": "Each worker returns its bound result or an exact failure; individual failure does not veto independently completed publication."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
+    "acknowledgmentClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments inside one bounded window.",
+    "eventResearchReturned": 0,
+    "eventResearchCompleted": 0,
+    "criticalReviewsReturned": 0,
+    "availableSelections": 78,
+    "controllerEventSaves": 0,
+    "publisherState": "NOT_STARTED",
+    "durableControllerReadback": false,
+    "modelTokenCreditUsage": "UNKNOWN",
+    "overlapTelemetry": "UNKNOWN"
+  },
+  "remainingWork": {
+    "eventResearch": 13,
+    "criticalReviews": 2,
+    "coordinatorMerge": true,
+    "controllerEventSaves": 13,
+    "prepareFreezeStageReadback": "PENDING",
+    "guyFollowUp": "Review all three source-bound shortlist games, select only if the complete staging contract is supported, then verify the dedicated publisher."
+  },
+  "recordedAt": "2026-11-03T15:18:31Z"
+}
