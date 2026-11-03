@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-18:15",
+  "executionRunId": "20261102-late-1815-182141",
+  "workBinding": {
+    "candidateIdAtLaunch": "2026-11-02T18:21:41-07:00|5",
+    "checkpointPath": "data/report-production/checkpoints/20261102-late-1815-182300.json",
+    "checkpointRevisionAtLaunch": 1,
+    "feedBlobSha": "94f8b3d6731daeba1692d0fe647e3e63fd3a217e",
+    "operatingDate": "2026-11-02",
+    "canonicalSlot": 5,
+    "expectedReportTime": "18:15"
+  },
+  "mode": "ADAPTIVE_FULL_POOL",
+  "reason": "The bound queue contains seven complete events, 42 available primary selections across NBA and NHL, and 26 captured forecasts awaiting applicability review; all four researchers and both critical reviewers have disjoint useful work.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719502", "73719506"],
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719508", "72909312"],
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_3",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719510", "73719512"],
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_4",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["73719514"],
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_1",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["FIRST_HALF_ACTIONABLE_OPPOSING_CASE", "72909312_NHL_GUY", "SUPPORT_CONTRARY_HISTORY_FIT"],
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_2",
+      "boundary": "READ_ONLY_NO_DELEGATION",
+      "assignments": ["SECOND_HALF_EXACT_QUOTE_FAIR", "CALIBRATION_PERSONNEL", "CAPTURED_FORECAST_AUDIT"],
+      "state": "ACKNOWLEDGED"
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "USE_SIX_WORKERS",
+      "reason": "Seven complete events divide into four disjoint event queues while two independent reviewers can challenge actionable cases and audit quote, forecast, personnel and calibration evidence.",
+      "expectedQualityBenefit": "Complete market-family coverage plus independent opposing-case and evidence-identity checks before coordinator merge.",
+      "releaseCondition": "Each worker returns its bound result or reports an exact failure; no individual failure creates a report-wide veto."
+    }
+  ],
+  "qualityFindings": [],
+  "reasoningCorrections": [],
+  "completedWork": {
+    "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
+    "eventResearchReturned": 0,
+    "criticalReviewsReturned": 0
+  },
+  "remainingWork": {
+    "eventResearch": 7,
+    "criticalReviews": 2,
+    "coordinatorMerge": true,
+    "controllerEventSaves": 7,
+    "prepareFreezeStageReadback": "PENDING"
+  },
+  "recordedAt": "2026-11-03T01:24:00.000Z"
+}
