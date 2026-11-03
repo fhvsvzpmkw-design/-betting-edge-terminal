@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-09:30",
+  "executionRunId": "20261103-final-morning-0930-095225",
+  "workBinding": {
+    "candidateId": "2026-11-03T09:52:25.807-07:00|3",
+    "checkpointPath": "data/report-production/checkpoints/20261103-final-morning-0930-095225.json",
+    "checkpointRevisionAtLaunch": 1,
+    "feedBlobSha": "2de16eabb0591e484242a1b27777fa3ac02ee81f",
+    "operatingDate": "2026-11-03",
+    "canonicalSlot": 3,
+    "expectedReportTime": "09:30"
+  },
+  "mode": "ADAPTIVE_FULL_POOL",
+  "reason": "The bound queue contains 13 complete events and 78 available selections. Four disjoint complete-event researchers and two critical reviewers all have useful work, including the three-event Guy shortlist.",
+  "workers": [
+    {"role":"complete-event researcher","id":"/root/researcher_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909316","70898986","72909322"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909314","70918976","72909324"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_3","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909318","72909326","72909328"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_4","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909330","72909320","72909332","72909334"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["GUY_SHORTLIST","NCAAF_AND_CONSEQUENTIAL_PROPOSALS"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["OPPOSING_CASES","FORECAST_CONFLICTS","CONSEQUENTIAL_PASS_OR_BLOCKER_PROPOSALS"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null}
+  ],
+  "scalingDecisions": [
+    {"decision":"USE_SIX_WORKERS","reason":"Thirteen complete events divide into four non-overlapping queues; two reviewers can independently challenge Guy's shortlist and the most consequential proposals.","expectedQualityBenefit":"Complete market-family coverage plus current personnel, Support/Contrary, History Fit and independent review.","releaseCondition":"Each worker returns its bound result or exact failure; individual failure does not veto independently completed publication."}
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
+    "acknowledgmentClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments inside the bound window.",
+    "eventResearchReturned": 0,
+    "criticalReviewsReturned": 0,
+    "availableSelections": 78,
+    "controllerEventSaves": 0,
+    "publisherState": "NOT_STARTED",
+    "durableControllerReadback": false
+  },
+  "remainingWork": {
+    "eventResearch": 13,
+    "criticalReviews": 2,
+    "coordinatorMerge": true,
+    "controllerEventSaves": 13,
+    "prepareFreezeStageReadback": "PENDING",
+    "guyFollowUp": "PENDING"
+  },
+  "recordedAt": "2026-11-03T16:54:56Z"
+}
