@@ -16,34 +16,39 @@
   "mode": "ADAPTIVE_FULL_POOL",
   "reason": "The bound queue contains 13 complete events and 78 available selections. Four disjoint complete-event researchers and two critical reviewers all have useful work, including the three-event Guy shortlist.",
   "workers": [
-    {"role":"complete-event researcher","id":"/root/researcher_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909316","70898986","72909322"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"complete-event researcher","id":"/root/researcher_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909314","70918976","72909324"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"complete-event researcher","id":"/root/researcher_3","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909318","72909326","72909328"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"complete-event researcher","id":"/root/researcher_4","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909330","72909320","72909332","72909334"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"critical reviewer","id":"/root/reviewer_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["GUY_SHORTLIST","NCAAF_AND_CONSEQUENTIAL_PROPOSALS"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null},
-    {"role":"critical reviewer","id":"/root/reviewer_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["OPPOSING_CASES","FORECAST_CONFLICTS","CONSEQUENTIAL_PASS_OR_BLOCKER_PROPOSALS"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"ACKNOWLEDGED","error":null}
+    {"role":"complete-event researcher","id":"/root/researcher_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909316","70898986","72909322"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"RETURNED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909314","70918976","72909324"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"RETURNED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_3","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909318","72909326","72909328"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"RETURNED","error":null},
+    {"role":"complete-event researcher","id":"/root/researcher_4","boundary":"READ_ONLY_NO_DELEGATION","assignments":["72909330","72909320","72909332","72909334"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"RETURNED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_1","boundary":"READ_ONLY_NO_DELEGATION","assignments":["GUY_SHORTLIST","NCAAF_AND_CONSEQUENTIAL_PROPOSALS"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"RETURNED","error":null},
+    {"role":"critical reviewer","id":"/root/reviewer_2","boundary":"READ_ONLY_NO_DELEGATION","assignments":["OPPOSING_CASES","FORECAST_CONFLICTS","CONSEQUENTIAL_PASS_OR_BLOCKER_PROPOSALS"],"launchedAt":"2026-11-03T16:53:00Z","acknowledgedAt":"2026-11-03T16:54:00Z","state":"RETURNED","error":null}
   ],
   "scalingDecisions": [
     {"decision":"USE_SIX_WORKERS","reason":"Thirteen complete events divide into four non-overlapping queues; two reviewers can independently challenge Guy's shortlist and the most consequential proposals.","expectedQualityBenefit":"Complete market-family coverage plus current personnel, Support/Contrary, History Fit and independent review.","releaseCondition":"Each worker returns its bound result or exact failure; individual failure does not veto independently completed publication."}
   ],
-  "qualityFindings": [],
+  "qualityFindings": [
+    {"finding":"All 78 available selections across 13 events were completed as zero-stake PASS decisions after moneyline, spread or puck-line, and total review.","impact":"No market family or event was dropped; all exact Pinnacle references were preserved."},
+    {"finding":"Five NHL moneyline prices had positive single-source forecast points at the executable quote.","impact":"Toronto, Montreal, Detroit, NY Rangers and Minnesota were retained as PASS after explicit directional review because exact Pinnacle opposed the price and no independent calibrated bound or required corroboration existed."},
+    {"finding":"The Washington-Dallas puck-line pair and every other current selection had an exact qualified reference; an apparent missing-reference result came from an unpopulated draft view.","impact":"The coordinator rejected the false blocker and completed the exact retained route."},
+    {"finding":"Guy shortlist review considered Montreal, Toronto and Detroit.","impact":"No Guy call was cleared: Montreal's only positive high point was market-blended, while exact Pinnacle and the independent Dimers point opposed and final Winnipeg goalie/key Montreal availability remained unresolved."}
+  ],
   "completedWork": {
     "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
     "acknowledgmentClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments inside the bound window.",
-    "eventResearchReturned": 0,
-    "criticalReviewsReturned": 0,
+    "eventResearchReturned": 4,
+    "criticalReviewsReturned": 2,
     "availableSelections": 78,
-    "controllerEventSaves": 0,
-    "publisherState": "NOT_STARTED",
+    "controllerEventSaves": 13,
+    "publisherState": "PREPARED",
     "durableControllerReadback": false
   },
   "remainingWork": {
-    "eventResearch": 13,
-    "criticalReviews": 2,
-    "coordinatorMerge": true,
-    "controllerEventSaves": 13,
-    "prepareFreezeStageReadback": "PENDING",
-    "guyFollowUp": "PENDING"
+    "eventResearch": 0,
+    "criticalReviews": 0,
+    "coordinatorMerge": false,
+    "controllerEventSaves": 0,
+    "prepareFreezeStageReadback": "FREEZE_STAGE_READBACK_PENDING",
+    "guyFollowUp": "NO_CALL_EXACT_EVIDENCE_SHORTFALL_RECORDED"
   },
-  "recordedAt": "2026-11-03T16:54:56Z"
+  "recordedAt": "2026-11-03T17:12:00Z"
 }
