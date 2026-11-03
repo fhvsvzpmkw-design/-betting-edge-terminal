@@ -96,8 +96,61 @@
     "findingsRejected": 0
   },
   "remainingWork": [
-    "Deterministic grading workflow must independently grade and durably publish November 1 recovery plus November 2 target outputs.",
-    "Event 70898886 remains a separate repair exception unless separately authorized repository support is added."
+    "No deterministic November 1 recovery or November 2 target grading outputs were persisted; the missing receipt and six missing observation files confirm calculated results are unsaved.",
+    "Resolve the results-index publication size limit through an authorized repository-supported path, then run a new unique grading request; do not bypass the GitHub rejection.",
+    "Event 70898886 remains a separate documented repair exception; no current identity-precedence rule or correction authorization covers it."
   ],
-  "recordedAt": "2026-11-03T10:35:42.009Z"
+  "recordedAt": "2026-11-03T10:48:27.942Z",
+  "gradingOutcome": {
+    "workflowRunId": "41620354432",
+    "requestCommit": "2a04769b72423a0d714a1c4d1ff0e76c070608b4",
+    "state": "GRADING_WRITE_BLOCKED",
+    "calculatedButUnsaved": true,
+    "failedStage": "Commit only verified historical outputs",
+    "error": "GitHub remote rejected data/history/results-index.json at 102.97 MB because it exceeds the 100.00 MB file size limit (GH001); three bounded push attempts failed.",
+    "durableGradingReceipt": null,
+    "durableNovember1ObservationFiles": 0,
+    "durableNovember2ObservationFiles": 0,
+    "durableIndexBlobSha": "7b1239a6752971765d7ca1782aeea157910cf9b8",
+    "calculatedTarget": {
+      "date": "2026-11-02",
+      "issued": 111,
+      "statusCounts": {
+        "PASS": 111
+      },
+      "complete": 111,
+      "unresolved": 0,
+      "grades": {
+        "WIN": 56,
+        "LOSS": 55,
+        "PUSH": 0,
+        "VOID": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0
+      },
+      "priced": 58,
+      "netUnits": 4.25,
+      "roiPct": 7.33
+    },
+    "calculatedRecovery": {
+      "olderEnteringCards": 214,
+      "backlogEventsAttempted": 22,
+      "backlogEventsVerifiedFinal": 21
+    },
+    "calculatedHistoricalCoverage": {
+      "throughDate": "2026-11-02",
+      "cards": 11920,
+      "completeCards": 11906,
+      "unresolvedCards": 14,
+      "unresolvedSelections": 6,
+      "unresolvedEvents": 1
+    },
+    "calculatedBacklogHealth": {
+      "state": "REVIEW_REQUIRED",
+      "quotaDeferredEvents": 0,
+      "allPendingEventsAttempted": 41,
+      "remainingEventId": "70898886",
+      "reason": "identity_conflict"
+    }
+  }
 }
