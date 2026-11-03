@@ -5,7 +5,7 @@
   "taskId": "main-15:15",
   "executionRunId": "20261103-evening-1515-153123",
   "workBinding": {
-    "candidateId": "2026-11-03T15:31:23.000-07:00|4",
+    "candidateId": "2026-11-03T16:04:10.000-07:00|4",
     "checkpointPath": "data/report-production/checkpoints/20261103-evening-1515-153123.json",
     "checkpointRevisionAtLaunch": 1,
     "feedBlobSha": "6256aa8b9e5051d58435436c8b6faea15c14aa73",
@@ -21,48 +21,54 @@
       "id": "/root/researcher_1",
       "boundary": "READ_ONLY_NO_DELEGATION",
       "assignments": ["70898986", "70918976"],
-      "state": "ACKNOWLEDGED",
-      "error": null
+      "state": "RETURNED",
+      "error": null,
+      "returnedWork": "Completed both NCAAF events (12 selections), including QB/personnel, Support/Contrary, History Fit and exact-reference review."
     },
     {
       "role": "complete-event researcher",
       "id": "/root/researcher_2",
       "boundary": "READ_ONLY_NO_DELEGATION",
       "assignments": ["72909314", "72909316", "72909318"],
-      "state": "ACKNOWLEDGED",
-      "error": null
+      "state": "RETURNED",
+      "error": null,
+      "returnedWork": "Completed three NHL events (18 selections), including goalie/applicability and all moneyline, puck-line and total markets."
     },
     {
       "role": "complete-event researcher",
       "id": "/root/researcher_3",
       "boundary": "READ_ONLY_NO_DELEGATION",
       "assignments": ["72909322", "72909324", "72909326"],
-      "state": "ACKNOWLEDGED",
-      "error": null
+      "state": "RETURNED",
+      "error": null,
+      "returnedWork": "Completed three NHL events (18 selections), including personnel, contrary cases and exact contract checks."
     },
     {
       "role": "complete-event researcher",
       "id": "/root/researcher_4",
       "boundary": "READ_ONLY_NO_DELEGATION",
       "assignments": ["72909328", "72909330", "72909320", "72909332", "72909334"],
-      "state": "ACKNOWLEDGED",
-      "error": null
+      "state": "RETURNED",
+      "error": null,
+      "returnedWork": "Completed five NHL events (30 selections), including full market-family review and current personnel applicability."
     },
     {
       "role": "critical reviewer",
       "id": "/root/reviewer_1",
       "boundary": "READ_ONLY_NO_DELEGATION",
       "assignments": ["GUY_EMPTY_SHORTLIST_SOURCE_REVIEW", "NHL_STRONGEST_OPPOSING_CASE"],
-      "state": "ACKNOWLEDGED",
-      "error": null
+      "state": "RETURNED",
+      "error": null,
+      "returnedWork": "Verified the expired Guy board supplied no current call and challenged the strongest hockey opinions and opposing cases."
     },
     {
       "role": "critical reviewer",
       "id": "/root/reviewer_2",
       "boundary": "READ_ONLY_NO_DELEGATION",
       "assignments": ["NCAAF_CONTRARY_REVIEW", "PINNACLE_REFERENCE_GAPS", "EXACT_IDENTITY_REVIEW"],
-      "state": "ACKNOWLEDGED",
-      "error": null
+      "state": "RETURNED",
+      "error": null,
+      "returnedWork": "Reviewed NCAAF contrary evidence and exact Pinnacle identity; identified Buffalo–Miami ±6.5 versus ±7.0 as a non-transposable contract gap."
     }
   ],
   "scalingDecisions": [
@@ -76,22 +82,30 @@
   "completedWork": {
     "acknowledgmentTest": "6_OF_6_BOUND_ACKNOWLEDGMENTS_WITHIN_60_SECONDS",
     "acknowledgmentClockLimitation": "The delegation API exposed no per-message clock; the coordinator observed all six acknowledgments inside one bounded window.",
-    "eventResearchReturned": 0,
-    "eventResearchCompleted": 0,
-    "criticalReviewsReturned": 0,
+    "eventResearchReturned": 4,
+    "eventResearchCompleted": 13,
+    "criticalReviewsReturned": 2,
     "availableSelections": 78,
-    "controllerEventSaves": 0,
-    "publisherState": "NOT_STARTED",
+    "controllerEventSaves": 13,
+    "publisherState": "STAGED",
     "durableControllerReadback": false
   },
   "remainingWork": {
-    "eventResearch": 13,
-    "criticalReviews": 2,
-    "coordinatorMerge": true,
-    "controllerEventSaves": 13,
-    "prepareFreezeStageReadback": "PENDING",
-    "guyFollowUp": "Fresh shortlist returned zero eligible rows; reviewer will verify the board/source limitation."
+    "eventResearch": 0,
+    "criticalReviews": 0,
+    "coordinatorMerge": false,
+    "controllerEventSaves": 0,
+    "prepareFreezeStageReadback": "PUBLICATION_AND_READBACK_PENDING",
+    "guyFollowUp": "The Guy board had expired before the bound lane and supplied no current call; no stale shortlist was adopted."
   },
-  "recordedAt": "2026-11-03T22:33:00.000Z",
-  "state": "STARTUP_SAVED"
+  "qualityFindings": [
+    "Exact-contract review prevented the Buffalo–Miami ±6.5 executable spread from being compared with a different ±7.0 Pinnacle contract.",
+    "Second-source NHL follow-up converted the initial all-PASS draft into five governed LEAN and three WAIT opinions while preserving opposing-side coherence and zero stake."
+  ],
+  "decisionCorrections": [
+    "Restored current DRatings and Dimers comparisons for eight NHL moneylines and retained every conflicting probability instead of averaging them away.",
+    "Selected one directional opinion per paired moneyline contract; the opposing Rangers and Minnesota sides remained PASS."
+  ],
+  "recordedAt": "2026-11-03T23:17:09.566Z",
+  "state": "RETURNS_SAVED"
 }
