@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-open-0600",
+  "executionRunId": "20261103-open-0600-061523",
+  "workBinding": {
+    "candidateId": "2026-11-03T06:15:23.566-07:00|1",
+    "feedBlobSha": "8a8044048caee96242fe137c46b8cb2837fb29fc",
+    "checkpointPath": "data/report-production/checkpoints/20261103-open-0600-061523.json",
+    "checkpointRevision": 1,
+    "checkpointBlobSha": "3b20f79006911cd9d0b8c5650bd9f1b94e90518e",
+    "events": 13,
+    "selections": 78
+  },
+  "mode": "AGENTS_READY",
+  "reason": "The actual queue has 13 complete events and 78 exact selections; four disjoint event queues plus two critical-review queues are useful under the normal Main group.",
+  "workers": [
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_1",
+      "readOnlyBoundary": "No shared writes, odds collection, or delegation.",
+      "assignmentIds": [
+        "70898986",
+        "72909314",
+        "72909316"
+      ],
+      "coordinatorObservedLaunchAt": "2026-11-03T13:16:20.000Z",
+      "coordinatorObservedAcknowledgmentAt": "2026-11-03T13:16:52.264Z",
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_2",
+      "readOnlyBoundary": "No shared writes, odds collection, or delegation.",
+      "assignmentIds": [
+        "72909318",
+        "72909322",
+        "72909324"
+      ],
+      "coordinatorObservedLaunchAt": "2026-11-03T13:16:20.000Z",
+      "coordinatorObservedAcknowledgmentAt": "2026-11-03T13:16:52.264Z",
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_3",
+      "readOnlyBoundary": "No shared writes, odds collection, or delegation.",
+      "assignmentIds": [
+        "72909326",
+        "72909328",
+        "72909330"
+      ],
+      "coordinatorObservedLaunchAt": "2026-11-03T13:16:20.000Z",
+      "coordinatorObservedAcknowledgmentAt": "2026-11-03T13:16:52.264Z",
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "complete-event researcher",
+      "id": "/root/researcher_4",
+      "readOnlyBoundary": "No shared writes, odds collection, or delegation.",
+      "assignmentIds": [
+        "72909320",
+        "70918976",
+        "72909332",
+        "72909334"
+      ],
+      "coordinatorObservedLaunchAt": "2026-11-03T13:16:20.000Z",
+      "coordinatorObservedAcknowledgmentAt": "2026-11-03T13:16:52.264Z",
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_1",
+      "readOnlyBoundary": "No shared writes, odds collection, independent handicapping, or delegation.",
+      "assignmentIds": [
+        "review-queue-a"
+      ],
+      "coordinatorObservedLaunchAt": "2026-11-03T13:16:20.000Z",
+      "coordinatorObservedAcknowledgmentAt": "2026-11-03T13:16:52.264Z",
+      "state": "ACKNOWLEDGED"
+    },
+    {
+      "role": "critical reviewer",
+      "id": "/root/reviewer_2",
+      "readOnlyBoundary": "No shared writes, odds collection, independent handicapping, or delegation.",
+      "assignmentIds": [
+        "review-queue-b"
+      ],
+      "coordinatorObservedLaunchAt": "2026-11-03T13:16:20.000Z",
+      "coordinatorObservedAcknowledgmentAt": "2026-11-03T13:16:52.264Z",
+      "state": "ACKNOWLEDGED"
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "FULL_NORMAL_TEAM",
+      "reason": "Thirteen events support four disjoint complete-event queues; two reviewers will receive disjoint consequential result queues.",
+      "expectedQualityBenefit": "Parallel current personnel/forecast/contrary-case coverage plus independent identity and opposing-case checks.",
+      "releaseCondition": "Each researcher returns its bound events; reviewers return consequential corrections or explicitly report no review question."
+    }
+  ],
+  "qualityFindings": [],
+  "completedWork": {
+    "researchEvents": 0,
+    "researchSelections": 0,
+    "reviews": 0,
+    "returnedWorkers": 0
+  },
+  "remainingWork": {
+    "researchEvents": 13,
+    "researchSelections": 78,
+    "reviews": "Pending returned proposals and consequential PASS/WAIT/source-unavailability claims."
+  },
+  "recordedAt": "2026-11-03T13:16:52.264Z"
+}
