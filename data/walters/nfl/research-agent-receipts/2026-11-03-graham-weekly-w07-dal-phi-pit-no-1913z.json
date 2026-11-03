@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "graham",
+  "taskId": "GRAHAM_WEEKLY_PRODUCTION_HISTORICAL_RECONCILIATION",
+  "executionRunId": null,
+  "workBinding": {
+    "phase": "HISTORICAL_LEARNING",
+    "activeManifest": {
+      "season": 2026,
+      "week": 8,
+      "mainHead": "c3a3e47717f9957e57dcc65d354200c76ae51e0b"
+    },
+    "gameKeys": [
+      "2026-W07-DAL-PHI",
+      "2026-W07-PIT-NO"
+    ],
+    "evidence": [
+      {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-31-dal-phi-reused-role-reconciliation.json",
+        "blobSha": "6624c8d3eb4d6ca2237a27450def3d3452b829c7"
+      },
+      {
+        "path": "data/walters/nfl/2026/week-07-weekly-evidence/2026-10-25-pit-no-gamebook-reconciliation.json",
+        "blobSha": "87fbc284b6e2997be6ed4abed22600250c7214d4"
+      }
+    ],
+    "marketViewed": false
+  },
+  "mode": "AGENTS_READY_WITH_CLEAN_REVIEWER_REPLACEMENT",
+  "reason": "Two targeted source-only researchers returned. The initial reviewer stopped on an unrelated market-bearing record and was excluded; a fresh exact-blob reviewer completed the clean review.",
+  "workers": [
+    {
+      "role": "CASE_RESEARCHER",
+      "workerId": "/root/graham_dal_phi_researcher",
+      "assignmentId": "GRAHAM-20261103-DAL-PHI-R1",
+      "binding": "2026-W07-DAL-PHI",
+      "freshContext": true,
+      "readOnly": true,
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": "2026-11-03T19:09:34Z",
+      "state": "RETURNED",
+      "error": null,
+      "clockNote": "Launch and acknowledgment timestamps were not exposed by the collaboration API; they occurred before the returned source-observation timestamp."
+    },
+    {
+      "role": "CASE_RESEARCHER",
+      "workerId": "/root/graham_pit_no_researcher",
+      "assignmentId": "GRAHAM-20261103-PIT-NO-R2",
+      "binding": "2026-W07-PIT-NO",
+      "freshContext": true,
+      "readOnly": true,
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": "2026-11-03T19:08:26Z",
+      "state": "RETURNED",
+      "error": null,
+      "clockNote": "Launch and acknowledgment timestamps were not exposed by the collaboration API; they occurred before the returned source-observation timestamp."
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/graham_historical_reviewer",
+      "assignmentId": "GRAHAM-20261103-HIST-REV",
+      "binding": "DAL-PHI and PIT-NO returned findings",
+      "freshContext": true,
+      "readOnly": true,
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": null,
+      "state": "STOPPED_CONTAMINATION",
+      "error": "Stopped after repository search surfaced market-bearing content in an unrelated Week Seven preparation record; no review conclusion was accepted.",
+      "clockNote": "Exact collaboration timestamps were not exposed by the API."
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/graham_historical_reviewer2",
+      "assignmentId": "GRAHAM-20261103-HIST-REV2",
+      "binding": "Exact blobs 6624c8d3eb4d6ca2237a27450def3d3452b829c7 and 87fbc284b6e2997be6ed4abed22600250c7214d4 plus coordinator-supplied findings",
+      "freshContext": true,
+      "readOnly": true,
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": "2026-11-03T19:12:57Z",
+      "state": "RETURNED_CLEAN",
+      "error": null,
+      "clockNote": "Exact launch and acknowledgment timestamps were not exposed by the collaboration API."
+    }
+  ],
+  "scalingDecisions": [
+    {
+      "decision": "LAUNCH_NORMAL_GRAHAM_POOL",
+      "namedQuestion": "Can original official play-level injury evidence and existing approved value/method adapters close DAL-PHI or PIT-NO without inventing boundaries, values or replacement roles?",
+      "expectedQualityBenefit": "Resolve source-correctable cases while independently checking exposure, identity, allocation and double counting.",
+      "readOnlyAssignment": true,
+      "completionOrReleaseCondition": "Return exact adopted facts and remaining gaps, then release."
+    },
+    {
+      "decision": "REPLACE_STOPPED_REVIEWER",
+      "namedQuestion": "Can the two returned findings be reviewed in a clean exact-blob context after the first reviewer stopped on unrelated market-bearing content?",
+      "expectedQualityBenefit": "Preserve Graham market isolation and prevent unsupported READY promotion.",
+      "readOnlyAssignment": true,
+      "completionOrReleaseCondition": "Review only the two exact blobs and supplied facts, or stop on contamination."
+    }
+  ],
+  "qualityFindings": [
+    {
+      "gameKey": "2026-W07-PIT-NO",
+      "finding": "Existing-method structures are plausible for Donaldson, Joseph-Day, Echols, Ruiz and Shepherd, but the clean reviewer rejected READY status until Reid, Saldiveri, healthy-scratch exclusions, immutable values, identity aliases and disjoint allocations are explicitly bound.",
+      "impact": "Prevents a source-research return from being mistaken for complete paired numerical evidence."
+    },
+    {
+      "gameKey": "2026-W07-DAL-PHI",
+      "finding": "Quinyon Mitchell has a complete printed interval and Shipley's additional-duty allocation is conditionally supportable, but Shipley's value and Covey, Barkley, Pierce, Ojomo and Quinyon relief remain unresolved.",
+      "impact": "Preserves supported facts without manufacturing endpoints or duplicate replacement credit."
+    }
+  ],
+  "completedWork": {
+    "researchersReturned": 2,
+    "cleanReviewsReturned": 1,
+    "stoppedReviews": 1,
+    "gamePairsResearched": 2,
+    "gamePairsReviewed": 2,
+    "gamePairsReady": 0,
+    "sharedFilesWrittenByWorkers": 0,
+    "marketViewed": false
+  },
+  "remainingWork": [
+    {
+      "gameKey": "2026-W07-PIT-NO",
+      "state": "BLOCKED",
+      "gaps": [
+        "Bind Justin Reid every-snap/nonplayed-snap exposure, Jordan Howden relief identity/value and disjoint additional duties.",
+        "Bind the exact Saldiveri prior estimate and Week 7 no-contradiction role treatment.",
+        "Provide source-bound no-established-role findings for Heidenreich, Terell Smith, Tyree Wilson, Mike Reid and Treyton Welch.",
+        "Bind exact values, legal-name alias and nonduplicated allocations for Joseph-Day, Echols, Ruiz and Shepherd."
+      ]
+    },
+    {
+      "gameKey": "2026-W07-DAL-PHI",
+      "state": "BLOCKED",
+      "gaps": [
+        "Bind Week 7 Elijah Mitchell value provenance and Shipley's distinct additional duties.",
+        "Bind Quinyon Mitchell relief identity/value.",
+        "Resolve Covey return-duty replacement and exposure bound.",
+        "Obtain an eligible existing exposure method or source-supported endpoints for Barkley, Pierce and Ojomo."
+      ]
+    }
+  ],
+  "recordedAt": "2026-11-03T19:12:57Z"
+}
