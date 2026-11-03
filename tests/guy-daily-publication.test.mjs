@@ -10,6 +10,7 @@ import {DEFAULT_POLICY,buildShortlist,gitBlobSha,newCallsLedger,assertPublicatio
 
 const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const ledgerPath='data/characters/guy-laflame/calls-ledger.json';
+const benchmarkPath='data/characters/guy-laflame/value-ledger.json';
 const stagingPath='data/characters/guy-laflame/call-staging.json';
 const boardPath='data/game-intelligence/board.json';
 const observed='2026-11-01T15:20:00Z';
@@ -62,7 +63,12 @@ function sandbox(t){
   git('init','-q');
   write('run-history.json',{runs:[]});write('data/characters/guy-laflame.json',{id:'guy-laflame',continuity:{}});
   write('data/characters/guy-laflame/selection-policy.json',DEFAULT_POLICY);write(ledgerPath,newCallsLedger(initialAt));
-  for(const file of ['data/characters/guy-laflame/value-ledger.json','syndicates/generated/guy-laflame/shell.html'])write(file,fs.readFileSync(path.join(repo,file)));
+  // Keep the saved benchmark clock on the same fixture day as the board and call.
+  const benchmark=JSON.parse(fs.readFileSync(path.join(repo,benchmarkPath),'utf8'));
+  benchmark.updatedAt=observed;
+  write(benchmarkPath,benchmark);
+  const shell='syndicates/generated/guy-laflame/shell.html';
+  write(shell,fs.readFileSync(path.join(repo,shell)));
   return {root,write,read,bytes,git,commit,run,publish,build,snapshot};
 }
 

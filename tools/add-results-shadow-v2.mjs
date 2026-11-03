@@ -240,5 +240,6 @@ index.decisionValueShadowV2={
   ]
 };
 
-fs.writeFileSync(INDEX_PATH,`${JSON.stringify(index,null,2)}\n`,'utf8');
+// This is the final shared results artifact. Keep its full data compact enough to publish.
+fs.writeFileSync(INDEX_PATH,`${JSON.stringify(index)}\n`,'utf8');
 console.log(`${path.relative(ROOT,INDEX_PATH)}: Filter Calibration Shadow Review (${overall.priced}/${finalDecisions.length} valid priced; ${round(overall.shadowNetUnits,2)}u if played; ${round(overall.shadowRoiPct,2)}% shadow ROI)`);

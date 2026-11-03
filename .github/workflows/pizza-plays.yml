@@ -10,6 +10,7 @@ on:
       - run-history.json
       - data/history/runs/**
       - tools/build-pizza-plays.mjs
+      - tools/add-results-shadow-v2.mjs
       - tests/pizza-publication.test.mjs
       - .github/workflows/pizza-plays.yml
   workflow_dispatch:
@@ -69,6 +70,14 @@ jobs:
             fi
             report_label=$(node -e "const p=require('./data/pizza-plays.json'); process.stdout.write(String(p.source?.reportLabel||p.source?.slot||'latest report'))")
             git commit -m "Publish Pizza Plays from ${report_label}"
+            # Concurrent changes outside these inputs and outputs can carry
+            # the finished rebuild forward without repeating the analytics.
+            git fetch origin main
+            if ! git diff --quiet HEAD^ origin/main -- run-history.json data/history data/pizza-plays.json tools assets research .github/workflows/pizza-plays.yml; then
+              echo "Pizza or results inputs changed during the build; rebuilding from current main."
+              continue
+            fi
+            git rebase origin/main
             if git push origin HEAD:main; then
               published=1
               break
