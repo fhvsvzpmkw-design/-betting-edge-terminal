@@ -3,7 +3,7 @@
   "policyId": "graham-weekly-production-v2",
   "season": 2026,
   "activeWeek": 8,
-  "generatedAt": "2026-11-03T01:33:11.093Z",
+  "generatedAt": "2026-11-03T05:23:04.532Z",
   "state": "BLOCKED",
   "counts": {
     "historicalApplied": 1,
@@ -16,16 +16,19 @@
     "initialBaseline": "COMPLETE"
   },
   "rollover": {
-    "required": false,
-    "nextWeek": null,
+    "required": true,
+    "nextWeek": 9,
     "activeFinals": {
-      "state": "UNVERIFIED",
-      "reason": "FINAL_FACTS_NOT_RECORDED",
-      "gamesVerified": 0,
-      "gamesExpected": 14
+      "state": "COMPLETE",
+      "gamesVerified": 14,
+      "gamesExpected": 14,
+      "verifiedAt": "2026-11-03T05:21:14Z",
+      "path": "data/walters/nfl/2026/week-08-final-facts-20261103.json"
     },
-    "blockers": [],
-    "nextAction": "PREPARE_EVIDENCE_AS_GAMES_FINISH"
+    "blockers": [
+      "HISTORICAL_LEARNING_INCOMPLETE"
+    ],
+    "nextAction": "FINISH_OLDEST_HISTORICAL_INPUTS"
   },
   "completion": {
     "schema": 1,
@@ -2136,19 +2139,75 @@
       "gameKey": "2026-W08-CHI-SEA",
       "away": "CHI",
       "home": "SEA",
-      "state": "PREPARE",
-      "workClass": "AVAILABLE_WORK",
-      "latestEvidence": null,
-      "checklist": {},
-      "blockers": [],
+      "state": "RECONCILE",
+      "workClass": "TARGETED_RECONCILIATION",
+      "latestEvidence": {
+        "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json",
+        "blobSha": "314d53e2dce9767f80bfb960825e78b0fb3199d9",
+        "recordedAt": "2026-11-03T05:21:14Z"
+      },
+      "checklist": {
+        "verifiedFinalResult": {
+          "state": "COMPLETE_OFFICIAL",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "frozenKickoffRatingsAndH4": {
+          "state": "COMPLETE_REUSED_IMMUTABLE",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "finalInactiveReserveAndElevationInventories": {
+          "state": "BLOCKED_CHI_OFFICIAL_IR_PLACEMENT_ROSTER_CONFLICT",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "pairedParticipation": {
+          "state": "COMPLETE_OFFICIAL_GAMEBOOK_STARTERS_SUBSTITUTES_DNP_NO_SNAP_TABLE",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "quarterbackParticipation": {
+          "state": "COMPLETE_OFFICIAL_STARTERS_ACTIVE_DNP_AND_EMERGENCY_INACTIVES",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "specialistParticipation": {
+          "state": "COMPLETE_OFFICIAL_IDENTITIES_AND_USAGE",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "officialInGameInjuryReporting": {
+          "state": "COMPLETE_LITERAL_GAMEBOOK_AUDIT_WITH_EXPLICIT_BOUNDARY_EXCEPTIONS",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        },
+        "pairedGameDayInjuryLoss": {
+          "state": "BLOCKED",
+          "path": "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json"
+        }
+      },
+      "blockers": [
+        {
+          "code": "OFFICIAL_SOURCE_CONFLICT_REQUIRES_RECONCILIATION",
+          "finding": "Chicago's transaction chronology places Dallis Flowers, Jonathan Garvin, Jaylon Jones and Ray-Ray McCloud III on IR before kickoff with no later named disposition, while the current roster IR section omits all four.",
+          "footballImpact": "The complete full-game unavailable baseline cannot be certified; McCloud has a positive frozen value and cannot be treated as zero or silently omitted.",
+          "nextAction": "Obtain official dispositions or record supported CAMP_ROSTER_ONLY/no-established-regular-season-role exclusions identity by identity."
+        },
+        {
+          "code": "REPLACEMENT_OR_VALUE_UNRESOLVED",
+          "finding": "Shaheed's receiving/return duties, Nwosu's additional duties, Jaylon Johnson's brief DB relief, Leonard Williams's relief and remaining archived reserve identities are not yet fully disjoint and evaluator-bound.",
+          "footballImpact": "Duplicated baseline duties or omitted positive-value absences can overstate or understate the paired game-day losses.",
+          "nextAction": "Use immutable values, existing labelled estimates and cluster safeguards; promote only source-supported disjoint roles and keep residual cases blocked."
+        },
+        {
+          "code": "IN_GAME_INJURY_BOUNDARY_OR_METHOD_UNRESOLVED",
+          "finding": "Leonard Williams has a printed injury and an unclocked Questionable-return notice but no actual return or terminal disposition.",
+          "footballImpact": "Unknown exposure prevents defensible partial-game arithmetic and interacts with the Seattle defensive-front cluster.",
+          "nextAction": "Use an eligible existing bounded/snap-exposure method only if its literal conditions hold; otherwise preserve the endpoint as unknown."
+        }
+      ],
       "firstSeenAt": "2026-11-03T01:33:11.093Z",
-      "lastEvidenceAt": null,
-      "unchangedSince": "2026-11-03T01:33:11.093Z",
+      "lastEvidenceAt": "2026-11-03T05:21:14Z",
+      "unchangedSince": "2026-11-03T05:21:14Z",
       "stalled": false,
-      "fingerprint": "3d23090ba44835919ca6d811229694318ad3476cd9c56e3655a91b6b1f3aa183",
+      "fingerprint": "b59e271beabf8db88e132310ba116d5020518effc7197aca034b8f7e25815f51",
       "receiptBlockerSuperseded": false,
       "owner": "GRAHAM_WALTERS_90_10",
-      "nextAction": "Complete the paired final-game inventory from the official gamebook, then validate supported estimates.",
+      "nextAction": "Use immutable values, existing labelled estimates and cluster safeguards; promote only source-supported disjoint roles and keep residual cases blocked.",
       "escalation": null
     }
   ],
@@ -2170,9 +2229,14 @@
         "2026-W07-IND-MIN",
         "2026-W07-GB-DET"
       ]
+    },
+    {
+      "code": "NEXT_WEEK_NOT_ACTIVATED",
+      "expectedWeek": 9,
+      "reason": "Historical learning still incomplete."
     }
   ],
-  "customerMessage": "Week 8: historical rating updates 1/14; baseline verified.",
+  "customerMessage": "Week 9 has not been published. Historical rating updates: 1/14; completed Week 8 evidence ready: 1/14.",
   "marketViewed": false,
   "numericAuthority": false,
   "completionRule": "A finished worker is not published completion. Publication requires the correct week, supported ratings and baseline, production readback and deployed-feed verification.",
@@ -2236,6 +2300,7 @@
     "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-kc-den-final-gamebook-correction.json": "4d636653b7e3eb43e7ef61585d71fb4aa184f955",
     "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-kc-den-value-role-correction.json": "afa10fcd3e0e7b37ffde014d5f2e7e07b5c38d92",
     "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-late-window-final-gamebook-correction.json": "0b9b598f3c7af41c5b3c5d699f19a52be86f10dc",
-    "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-phi-was-final-gamebook-reconciliation.json": "ce57adcf787f4301ce006c5808559b540d20e7d1"
+    "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-02-phi-was-final-gamebook-reconciliation.json": "ce57adcf787f4301ce006c5808559b540d20e7d1",
+    "data/walters/nfl/2026/week-08-weekly-evidence/2026-11-03-chi-sea-final-gamebook-preparation.json": "314d53e2dce9767f80bfb960825e78b0fb3199d9"
   }
 }
