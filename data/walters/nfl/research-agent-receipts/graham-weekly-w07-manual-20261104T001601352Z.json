@@ -41,8 +41,8 @@
     "marketViewed": false,
     "scope": "Independent player, role and injury judgment was assigned to fresh-context researchers. Coordinator preflight used exact historical inputs and verified ledger metadata."
   },
-  "mode": "AGENTS_READY",
-  "reason": "Immediate historical recovery under the existing weekly coordinator with disjoint game assignments.",
+  "mode": "AGENTS_READY_WITH_CLEAN_REVIEWER_REPLACEMENT",
+  "reason": "Six workers launched, five completed clean source assignments, one stopped. An independent replacement rechecked the accepted source facts and rejected unsupported assignments.",
   "workers": [
     {
       "role": "CASE_RESEARCHER",
@@ -59,9 +59,12 @@
       "acknowledgmentObservedAt": null,
       "acknowledgmentVerifiedBy": "2026-11-04T00:16:01.352Z",
       "returnedAt": null,
-      "state": "ACKNOWLEDGED",
+      "state": "RETURNED",
       "error": null,
-      "clockNote": "Exact launch and acknowledgment times were not retained. All five bindings were acknowledged by the recorded checkpoint."
+      "clockNote": "Individual launch/return clocks were not retained. This is the coordinator's verified receipt timestamp.",
+      "acceptedCaseOnly": 37,
+      "scope": "NYG–HOU, MIA–NYJ, SF–ATL paired inventories and individual cases",
+      "completionObservedBy": "2026-11-04T00:46:06.416Z"
     },
     {
       "role": "CASE_RESEARCHER",
@@ -78,9 +81,12 @@
       "acknowledgmentObservedAt": null,
       "acknowledgmentVerifiedBy": "2026-11-04T00:16:01.352Z",
       "returnedAt": null,
-      "state": "ACKNOWLEDGED",
+      "state": "RETURNED",
       "error": null,
-      "clockNote": "Exact launch and acknowledgment times were not retained. All five bindings were acknowledged by the recorded checkpoint."
+      "clockNote": "Individual launch/return clocks were not retained. This is the coordinator's verified receipt timestamp.",
+      "acceptedCaseOnly": 22,
+      "scope": "LAR–LV ready; DEN–ARI and DAL–PHI paired partial evidence",
+      "completionObservedBy": "2026-11-04T00:46:06.416Z"
     },
     {
       "role": "CRITICAL_REVIEWER",
@@ -97,9 +103,11 @@
       "acknowledgmentObservedAt": null,
       "acknowledgmentVerifiedBy": "2026-11-04T00:16:01.352Z",
       "returnedAt": null,
-      "state": "ACKNOWLEDGED",
+      "state": "RETURNED",
       "error": null,
-      "clockNote": "Exact launch and acknowledgment times were not retained. All five bindings were acknowledged by the recorded checkpoint."
+      "clockNote": "Individual launch/return clocks were not retained. This is the coordinator's verified receipt timestamp.",
+      "scope": "CLE–TEN, IND–MIN and GB–DET pair proposals, plus independent LAR and CIN review",
+      "completionObservedBy": "2026-11-04T00:46:06.416Z"
     },
     {
       "role": "CASE_SPECIALIST",
@@ -115,9 +123,11 @@
       "acknowledgmentObservedAt": null,
       "acknowledgmentVerifiedBy": "2026-11-04T00:16:01.352Z",
       "returnedAt": null,
-      "state": "ACKNOWLEDGED",
-      "error": null,
-      "clockNote": "Exact launch and acknowledgment times were not retained. All five bindings were acknowledged by the recorded checkpoint."
+      "state": "STOPPED_CONTAMINATION",
+      "error": "An unrelated market quote surfaced in a result snippet after the initial source-only handoffs. Subsequent worker judgment was excluded.",
+      "clockNote": "Individual launch/return clocks were not retained. This is the coordinator's verified receipt timestamp.",
+      "scope": "Exact pre-exposure leads only; independent replacement reverified the facts",
+      "completionObservedBy": "2026-11-04T00:46:06.416Z"
     },
     {
       "role": "CASE_SPECIALIST",
@@ -133,9 +143,32 @@
       "acknowledgmentObservedAt": null,
       "acknowledgmentVerifiedBy": "2026-11-04T00:16:01.352Z",
       "returnedAt": null,
-      "state": "ACKNOWLEDGED",
+      "state": "RETURNED",
       "error": null,
-      "clockNote": "Exact launch and acknowledgment times were not retained. All five bindings were acknowledged by the recorded checkpoint."
+      "clockNote": "Individual launch/return clocks were not retained. This is the coordinator's verified receipt timestamp.",
+      "acceptedCaseOnly": 4,
+      "scope": "CIN–BAL ready and TB–CAR paired partial evidence",
+      "completionObservedBy": "2026-11-04T00:46:06.416Z"
+    },
+    {
+      "role": "CRITICAL_REVIEWER",
+      "workerId": "/root/week7_clean_review",
+      "assignmentId": "manual-W07-clean-review",
+      "binding": [
+        "2026-W07-PIT-NO",
+        "2026-W07-KC-SEA",
+        "2026-W07-DEN-ARI",
+        "2026-W07-GB-DET"
+      ],
+      "freshContext": true,
+      "readOnly": true,
+      "launchObservedAt": null,
+      "acknowledgmentObservedAt": null,
+      "returnedAt": null,
+      "state": "RETURNED_CLEAN",
+      "scope": "Independent PIT–NO/KC–SEA evidence replacement, KC final inactive follow-up, DEN–ARI and GB–DET critical review",
+      "completionObservedBy": "2026-11-04T00:46:06.416Z",
+      "clockNote": "Individual launch/return clocks were not retained. This is the coordinator's verified receipt timestamp."
     }
   ],
   "scalingDecisions": [
@@ -146,6 +179,10 @@
     {
       "decision": "ADD_SOURCE_SPECIALISTS",
       "namedQuestion": "Work the unassigned PIT–NO and KC–SEA exposure/role gaps and distribute injury-boundary checks for CIN–BAL and TB–CAR without overlapping ownership."
+    },
+    {
+      "decision": "REPLACE_STOPPED_SOURCE_REVIEWER",
+      "namedQuestion": "Independently verify the PIT–NO and KC–SEA source facts, then challenge the high-impact DEN–ARI and GB–DET role allocations."
     }
   ],
   "qualityFindings": [
@@ -156,16 +193,67 @@
         "data/walters/nfl-power-ratings-ledger.json",
         "data/walters/nfl/2026/rating-reviews/2026-10-26-small-current-adjustment.json"
       ]
+    },
+    {
+      "finding": "Held Denver–Arizona after the official gamebook showed the proposed Allen relief was already a co-starter. The replacement assignment needs additional evidence before a numerical pair can clear."
+    },
+    {
+      "finding": "Changed return notices without direct participation into conservative latest confirmation bounds. Green Bay and Detroit also retain explicitly modelled depth assignments and separate role credits."
+    },
+    {
+      "finding": "Pinned the historical-correction regression test to the original correction snapshot. The first publisher validation had read the live weekly staging file, which made the historical fixture assertion fail."
     }
   ],
   "completedWork": {
-    "preflight": "VERIFIED",
-    "historicalPairsAppliedAtStart": 1,
-    "newPairsApplied": 0
+    "fiveNewPairsApplied": [
+      "LAR-LV",
+      "CIN-BAL",
+      "CLE-TEN",
+      "IND-MIN",
+      "GB-DET"
+    ],
+    "teamsNewlyUpdated": 10,
+    "historicalApplied": 6,
+    "historicalExpected": 14,
+    "partialIndividualEstimatesValidated": 63,
+    "activeWeek": 8,
+    "expectedWeek": 9,
+    "ratingWorkflows": [
+      41747819293,
+      41748412326
+    ],
+    "unappliedFirstAttemptWorkflow": 41747229106,
+    "ratingPublicationCommit": "0a29586140bc131800eb76039f028cbbfba030cb",
+    "powerLedgerBlob": "f1be521ec4760752732b2da121d3c3594f89dcc1",
+    "appliedStagingBlob": "ba8fa76b59f2840c7f13b107bd7ffa9c9f56cad8",
+    "repositoryReadback": "VERIFIED",
+    "evidencePaths": [
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-lar-lv-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-cin-bal-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-cle-ten-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-ind-min-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-gb-det-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-early-window-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-tb-car-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-den-ari-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-dal-phi-targeted-reconciliation.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-pit-no-kc-sea-case-followup.json",
+      "data/walters/nfl/2026/week-07-weekly-evidence/2026-11-03-kc-sea-inactive-and-bolton-followup.json"
+    ]
   },
   "remainingWork": {
-    "historicalPairs": 13,
-    "next": "Validate the returned game-day evidence and persist supported inputs through the existing writer."
+    "historicalPairs": 8,
+    "gameKeys": [
+      "2026-W07-PIT-NO",
+      "2026-W07-SF-ATL",
+      "2026-W07-TB-CAR",
+      "2026-W07-NYG-HOU",
+      "2026-W07-MIA-NYJ",
+      "2026-W07-DEN-ARI",
+      "2026-W07-KC-SEA",
+      "2026-W07-DAL-PHI"
+    ],
+    "next": "Use the latest saved evidence to close remaining role, source and exposure decisions. Dallas–Philadelphia also requires separately governed forward reconciliation of the intervening rating review. Week 9 rollover remains blocked until the earlier learning is complete."
   },
-  "recordedAt": "2026-11-04T00:16:01.352Z"
+  "recordedAt": "2026-11-04T00:46:06.416Z"
 }
