@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "policyId": "research-agent-groups-v2",
+  "group": "main",
+  "taskId": "main-09:30",
+  "executionRunId": null,
+  "workBinding": {
+    "candidateId": "2026-11-04T09:44:42.000-07:00|3",
+    "feedBlobSha": "6580fbf01ae7ca5f043ecc812fddbdb6ee723b62",
+    "checkpoint": "data/report-production/checkpoints/2026-11-04-main-094442.json",
+    "checkpointRevision": 1,
+    "operatingRevision": "2026-11-01.AdaptiveResearchAgents"
+  },
+  "mode": "AGENTS_READY",
+  "reason": "Twenty-one events and 126 available selections support the normal four complete-event researchers and two critical reviewers. All six existing threads acknowledged the immutable binding within the 60-second total startup bound.",
+  "workers": [
+    {"role":"complete-event researcher","actualId":"/root/researcher_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["70898988","70918978","70894866","72909336","72909338"],"acknowledgment":"BOUND","state":"WORKING","scalingNote":"The initial handoff accidentally overlapped two NBA events; those were stopped before merge and replaced by the two otherwise-unassigned NHL events."},
+    {"role":"complete-event researcher","actualId":"/root/researcher_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719516","73719518","73719520","73719522","73719524"],"acknowledgment":"BOUND","state":"WORKING"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_3","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719526","73719528","73719530","73719532","73719534"],"acknowledgment":"BOUND","state":"WORKING"},
+    {"role":"complete-event researcher","actualId":"/root/researcher_4","boundary":"read-only; no subagents; no shared writes","assignmentIds":["73719536","73719538","73719540","73719542","72909340","72909342"],"acknowledgment":"BOUND","state":"WORKING"},
+    {"role":"critical reviewer","actualId":"/root/reviewer_1","boundary":"read-only; no subagents; no shared writes","assignmentIds":["exact-reference-gap-audit","market-family-and-identity-audit"],"acknowledgment":"BOUND","state":"WORKING"},
+    {"role":"critical reviewer","actualId":"/root/reviewer_2","boundary":"read-only; no subagents; no shared writes","assignmentIds":["forecast-route-audit","Guy-shortlist-and-risk-audit"],"acknowledgment":"BOUND","state":"WORKING"}
+  ],
+  "scalingDecisions": [
+    {"decision":"NORMAL_POOL","workers":6,"reason":"Twenty-one disjoint complete games plus two material cross-slate review questions justify the configured pool.","expectedQualityBenefit":"Current source-backed event depth, opposing-case review and exact evidence-identity checks.","releaseCondition":"Assigned events and review questions returned or source routes exhausted."}
+  ],
+  "qualityFindings": [],
+  "completedWork": {"acknowledgments":6,"eventResearch":0,"reviews":0},
+  "remainingWork": {"events":21,"reviews":2,"merge":"coordinator only","publication":"not started"},
+  "recordedAt": "2026-11-04T16:45:30.000Z"
+}
